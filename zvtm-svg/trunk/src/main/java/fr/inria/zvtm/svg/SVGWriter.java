@@ -48,7 +48,6 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.Translucent;
 import fr.inria.zvtm.glyphs.VCircle;
-import fr.inria.zvtm.glyphs.VDiamond;
 import fr.inria.zvtm.glyphs.VEllipse;
 import fr.inria.zvtm.glyphs.VImage;
 import fr.inria.zvtm.glyphs.VPoint;
@@ -57,7 +56,6 @@ import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VSegment;
 import fr.inria.zvtm.glyphs.VShape;
 import fr.inria.zvtm.glyphs.VText;
-import fr.inria.zvtm.glyphs.VTriangle;
 import fr.inria.zvtm.glyphs.DPath;
 
     /** A class to export the content of a virtual space as an SVG document. Support for all glyph classes defined in package fr.inria.zvtm.glyphs, including transparency.
@@ -216,10 +214,8 @@ public class SVGWriter {
 	    else if (o instanceof VRectangle){return createRect((VRectangle)o);}
 	    else if (o instanceof DPath){return createPath((DPath)o);}
 	    else if (o instanceof VText){return createText((VText)o);}
-	    else if (o instanceof VTriangle){return createPolygon((VTriangle)o);}
 	    else if (o instanceof VCircle){return createCircle((VCircle)o);}
 	    else if (o instanceof VPolygon){return createPolygon((VPolygon)o);}
-	    else if (o instanceof VDiamond){return createPolygon((VDiamond)o);}
 	    else if (o instanceof VPoint){return createPoint((VPoint)o);}
 	    else if (o instanceof VSegment){return createLine((VSegment)o);}
 	    else if (o instanceof VShape){return createPolygon((VShape)o);}
@@ -298,17 +294,6 @@ public class SVGWriter {
 		}
 	}
 
-//     private Element shapeText(Glyph g){
-// 	Element text=svgDoc.createElementNS(svgURI,SVGReader._text);
-// 	text.setAttribute(SVGReader._x,String.valueOf(g.vx+farWest));
-// 	text.setAttribute(SVGReader._y,String.valueOf(-g.vy+farNorth));
-// 	text.appendChild(svgDoc.createTextNode(g.getText()));
-// 	Color c=g.getColorb();
-// 	String color="stroke:rgb("+c.getRed()+","+c.getGreen()+","+c.getBlue()+");fill:rgb("+c.getRed()+","+c.getGreen()+","+c.getBlue()+")";
-// 	text.setAttribute("style","font-family:"+g.getFont().getFamily()+","+getGenericFontFamily(g.getFont())+";font-size:"+g.getFont().getSize()+";"+color);
-// 	return text;
-//     }
-
     private Element createGroup(){
 	Element res=svgDoc.createElementNS(svgURI,SVGReader._g);
 	return res;
@@ -318,8 +303,8 @@ public class SVGWriter {
 		Element shape=svgDoc.createElementNS(svgURI,SVGReader._ellipse);
 		shape.setAttribute(SVGReader._cx,String.valueOf(e.vx+farWest));
 		shape.setAttribute(SVGReader._cy,String.valueOf(-e.vy+farNorth));
-		shape.setAttribute(SVGReader._rx,String.valueOf(e.getWidth()));
-		shape.setAttribute(SVGReader._ry,String.valueOf(e.getHeight()));
+		shape.setAttribute(SVGReader._rx,String.valueOf(e.getWidth()/2d));
+		shape.setAttribute(SVGReader._ry,String.valueOf(e.getHeight()/2d));
 		shape.setAttribute(SVGReader._style,shapeColors(e));
 		if (e.getStroke()!=null){
 			createStrokeInformation(e,shape);
@@ -332,7 +317,7 @@ public class SVGWriter {
 		Element shape=svgDoc.createElementNS(svgURI,SVGReader._circle);
 		shape.setAttribute(SVGReader._cx,String.valueOf(c.vx+farWest));
 		shape.setAttribute(SVGReader._cy,String.valueOf(-c.vy+farNorth));
-		shape.setAttribute(SVGReader._r,String.valueOf(Math.round(c.getSize())));
+		shape.setAttribute(SVGReader._r,String.valueOf(Math.round(c.getSize()/2d)));
 		shape.setAttribute(SVGReader._style,shapeColors(c));
 		if (c.getStroke()!=null){
 			createStrokeInformation(c,shape);
@@ -345,18 +330,18 @@ public class SVGWriter {
 		Element shape;
 		if (r.getOrient()==0){
 			shape = svgDoc.createElementNS(svgURI,SVGReader._rect);
-			shape.setAttribute(SVGReader._x,String.valueOf(r.vx-r.getWidth()+farWest));
-			shape.setAttribute(SVGReader._y,String.valueOf(-r.vy-r.getHeight()+farNorth));
-			shape.setAttribute(SVGReader._width,String.valueOf(2*r.getWidth()));
-			shape.setAttribute(SVGReader._height,String.valueOf(2*r.getHeight()));
+			shape.setAttribute(SVGReader._x,String.valueOf(r.vx-r.getWidth()/2d+farWest));
+			shape.setAttribute(SVGReader._y,String.valueOf(-r.vy-r.getHeight()/2d+farNorth));
+			shape.setAttribute(SVGReader._width,String.valueOf(r.getWidth()));
+			shape.setAttribute(SVGReader._height,String.valueOf(r.getHeight()));
 			shape.setAttribute(SVGReader._style,shapeColors(r));
 		}
 		else {
 			shape = svgDoc.createElementNS(svgURI,SVGReader._polygon);
-			double x1=-r.getWidth();
-			double y1=-r.getHeight();
-			double x2=r.getWidth();
-			double y2=r.getHeight();
+			double x1=-r.getWidth()/2d;
+			double y1=-r.getHeight()/2d;
+			double x2=r.getWidth()/2d;
+			double y2=r.getHeight()/2d;
 			double[] xcoords=new double[4];
 			double[] ycoords=new double[4];
 			xcoords[0]=(x2*Math.cos(Math.PI-r.getOrient())+y1*Math.sin(Math.PI-r.getOrient()))+r.vx+farWest;
@@ -445,52 +430,10 @@ public class SVGWriter {
 		Color c=t.getColor();
 		//only fill, do not add stroke:rgb("+c.getRed()+","+c.getGreen()+","+c.getBlue()+") as it creates a wide stroke
 		String style="fill:rgb("+c.getRed()+","+c.getGreen()+","+c.getBlue()+")";
-		if (t.usesSpecialFont()){style=createFontInformation(t.getFont())+";"+style;}
+		if (t.usesSpecificFont()){style=createFontInformation(t.getFont())+";"+style;}
 		text.setAttribute(SVGReader._style,style);
 		createClassInforation(t, text);
 		return text;
-	}
-
-	private Element createPolygon(VTriangle t){
-		Element shape=svgDoc.createElementNS(svgURI,SVGReader._polygon);
-		double[] xcoords=new double[3];
-		double[] ycoords=new double[3];
-		double halfEdge=0.866f*t.getSize();
-		double thirdHeight=0.5f*t.getSize();
-		xcoords[0]=t.vx-t.getSize()*Math.sin(Math.PI-t.getOrient())+farWest;
-		xcoords[1]=t.vx-halfEdge*Math.cos(Math.PI-t.getOrient())+thirdHeight*Math.sin(Math.PI-t.getOrient())+farWest;
-		xcoords[2]=t.vx+halfEdge*Math.cos(Math.PI-t.getOrient())+thirdHeight*Math.sin(Math.PI-t.getOrient())+farWest;
-		ycoords[0]=-t.vy-t.getSize()*Math.cos(Math.PI-t.getOrient())+farNorth;
-		ycoords[1]=-t.vy+thirdHeight*Math.cos(Math.PI-t.getOrient())+halfEdge*Math.sin(Math.PI-t.getOrient())+farNorth;
-		ycoords[2]=-t.vy+thirdHeight*Math.cos(Math.PI-t.getOrient())-halfEdge*Math.sin(Math.PI-t.getOrient())+farNorth;
-		shape.setAttribute(SVGReader._points,String.valueOf(xcoords[0])+","+String.valueOf(ycoords[0])+" "+String.valueOf(xcoords[1])+","+String.valueOf(ycoords[1])+" "+String.valueOf(xcoords[2])+","+String.valueOf(ycoords[2]));
-		shape.setAttribute(SVGReader._style,shapeColors(t));
-		if (t.getStroke()!=null){
-			createStrokeInformation(t,shape);
-		}
-		createClassInforation(t, shape);
-		return shape;
-	}
-
-	private Element createPolygon(VDiamond d){
-		Element shape=svgDoc.createElementNS(svgURI,SVGReader._polygon);
-		double[] xcoords=new double[4];
-		double[] ycoords=new double[4];
-		xcoords[0]=d.vx+d.getSize()*Math.cos(Math.PI-d.getOrient())+farWest;
-		xcoords[1]=d.vx-d.getSize()*Math.sin(Math.PI-d.getOrient())+farWest;
-		xcoords[2]=d.vx-d.getSize()*Math.cos(Math.PI-d.getOrient())+farWest;
-		xcoords[3]=d.vx+d.getSize()*Math.sin(Math.PI-d.getOrient())+farWest;
-		ycoords[0]=-d.vy-d.getSize()*Math.sin(Math.PI-d.getOrient())+farNorth;
-		ycoords[1]=-d.vy-d.getSize()*Math.cos(Math.PI-d.getOrient())+farNorth;
-		ycoords[2]=-d.vy+d.getSize()*Math.sin(Math.PI-d.getOrient())+farNorth;
-		ycoords[3]=-d.vy+d.getSize()*Math.cos(Math.PI-d.getOrient())+farNorth;
-		shape.setAttribute(SVGReader._points,String.valueOf(xcoords[0])+","+String.valueOf(ycoords[0])+" "+String.valueOf(xcoords[1])+","+String.valueOf(ycoords[1])+" "+String.valueOf(xcoords[2])+","+String.valueOf(ycoords[2])+" "+String.valueOf(xcoords[3])+","+String.valueOf(ycoords[3]));
-		shape.setAttribute(SVGReader._style,shapeColors(d));
-		if (d.getStroke()!=null){
-			createStrokeInformation(d,shape);
-		}
-		createClassInforation(d, shape);
-		return shape;
 	}
 
 	private Element createPoint(VPoint p){
@@ -528,8 +471,8 @@ public class SVGWriter {
 		double[] xcoords=new double[vertices.length];
 		double[] ycoords=new double[vertices.length];
 		for (int j=0;j<vertices.length;j++){
-			xcoords[j]=s.vx+s.getSize()*Math.cos(vertexAngle)*vertices[j]+farWest;
-			ycoords[j]=-s.vy-s.getSize()*Math.sin(vertexAngle)*vertices[j]+farNorth;
+			xcoords[j]=s.vx+s.getSize()/2d*Math.cos(vertexAngle)*vertices[j]+farWest;
+			ycoords[j]=-s.vy-s.getSize()/2d*Math.sin(vertexAngle)*vertices[j]+farNorth;
 			vertexAngle-=2*Math.PI/vertices.length;
 		}
 		String coords="";
@@ -577,10 +520,10 @@ public class SVGWriter {
 		Element shape;
 		try {
 			shape=svgDoc.createElementNS(svgURI,SVGReader._image);
-			shape.setAttribute(SVGReader._x,String.valueOf(i.vx-i.getWidth()+farWest));
-			shape.setAttribute(SVGReader._y,String.valueOf(-i.vy-i.getHeight()+farNorth));
-			shape.setAttribute(SVGReader._width,String.valueOf(2*i.getWidth()));
-			shape.setAttribute(SVGReader._height,String.valueOf(2*i.getHeight()));
+			shape.setAttribute(SVGReader._x,String.valueOf(i.vx-i.getWidth()/2d+farWest));
+			shape.setAttribute(SVGReader._y,String.valueOf(-i.vy-i.getHeight()/2d+farNorth));
+			shape.setAttribute(SVGReader._width,String.valueOf(i.getWidth()));
+			shape.setAttribute(SVGReader._height,String.valueOf(i.getHeight()));
 			Image im=i.getImage();
 			ImageWriter writer=(ImageWriter)ImageIO.getImageWritersByFormatName("png").next();
 			File f=null;
@@ -609,10 +552,10 @@ public class SVGWriter {
 		}
 		catch (Exception ex){
 			shape=svgDoc.createElementNS(svgURI,SVGReader._rect);
-			shape.setAttribute(SVGReader._x,String.valueOf(i.vx-i.getWidth()+farWest));
-			shape.setAttribute(SVGReader._y,String.valueOf(-i.vy-i.getHeight()+farNorth));
-			shape.setAttribute(SVGReader._width,String.valueOf(2*i.getWidth()));
-			shape.setAttribute(SVGReader._height,String.valueOf(2*i.getHeight()));
+			shape.setAttribute(SVGReader._x,String.valueOf(i.vx-i.getWidth()/2d+farWest));
+			shape.setAttribute(SVGReader._y,String.valueOf(-i.vy-i.getHeight()/2d+farNorth));
+			shape.setAttribute(SVGReader._width,String.valueOf(i.getWidth()));
+			shape.setAttribute(SVGReader._height,String.valueOf(i.getHeight()));
 			System.err.println("SVGWriter:An error occured while exporting "+i.toString()+" to PNG.\n"+ex);
 			if (!Utilities.javaVersionIs140OrLater()){
 				System.err.println("ZVTM/SVGWriter:Error: the Java Virtual Machine in use seems to be older than version 1.4.0 ; package javax.imageio is probably missing, which prevents generating bitmap files for representing VImage objects. Install a JVM version 1.4.0 or later if you want to use this functionality.");

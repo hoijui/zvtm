@@ -738,13 +738,13 @@ public class SVGReader {
     public static VEllipse createEllipse(Element e,Context ctx,boolean meta){
         double x = Double.parseDouble(e.getAttribute(_cx));
         double y = Double.parseDouble(e.getAttribute(_cy));
-        double w = Double.parseDouble(e.getAttribute(_rx));
-        double h = Double.parseDouble(e.getAttribute(_ry));
+        double w = 2 * Double.parseDouble(e.getAttribute(_rx));
+        double h = 2 * Double.parseDouble(e.getAttribute(_ry));
         if (scale != 1.0) {
-            x = (long)(Math.floor((double)x * scale));
-            y = (long)(Math.floor((double)y * scale));
-            w = (long)(Math.floor((double)w * scale));
-            h = (long)(Math.floor((double)h * scale));
+            x *= scale;
+            y *= scale;
+            w *= scale;
+            h *= scale;
         }
         x += xoffset;
         y += yoffset;
@@ -817,11 +817,11 @@ public class SVGReader {
     public static VCircle createCircle(Element e,Context ctx,boolean meta){
         double x = Double.parseDouble(e.getAttribute(_cx));
         double y = Double.parseDouble(e.getAttribute(_cy));
-        double r = Double.parseDouble(e.getAttribute(_r));
+        double d = 2 * Double.parseDouble(e.getAttribute(_r));
         if (scale != 1.0) {
-            x = (long)(Math.floor((double)x * scale));
-            y = (long)(Math.floor((double)y * scale));
-            r = (long)(Math.floor((double)r * scale));
+            x *= scale;
+            y *= scale;
+            d *= scale;
         }
         x += xoffset;
         y += yoffset;
@@ -829,12 +829,12 @@ public class SVGReader {
         SVGStyle ss=getStyle(e.getAttribute(_style), e);
         if (ss != null){
             if (ss.hasTransparencyInformation()){
-                if (ss.getFillColor()==null){res=new VCircle(x,-y,0,r,Color.WHITE, Color.BLACK, 1.0f);res.setFilled(false);}
-                else {res=new VCircle(x,-y,0,r,ss.getFillColor(), Color.BLACK, ss.getAlphaTransparencyValue());}
+                if (ss.getFillColor()==null){res=new VCircle(x,-y,0,d,Color.WHITE, Color.BLACK, 1.0f);res.setFilled(false);}
+                else {res=new VCircle(x,-y,0,d,ss.getFillColor(), Color.BLACK, ss.getAlphaTransparencyValue());}
             }
             else {
-                if (ss.getFillColor()==null){res=new VCircle(x,-y,0,r,Color.WHITE, Color.BLACK, 1.0f);res.setFilled(false);}
-                else {res=new VCircle(x,-y,0,r,ss.getFillColor(), Color.BLACK, 1.0f);}
+                if (ss.getFillColor()==null){res=new VCircle(x,-y,0,d,Color.WHITE, Color.BLACK, 1.0f);res.setFilled(false);}
+                else {res=new VCircle(x,-y,0,d,ss.getFillColor(), Color.BLACK, 1.0f);}
             }
             Color border=ss.getStrokeColor();
             if (border != null){
@@ -847,13 +847,14 @@ public class SVGReader {
             if (ss.requiresSpecialStroke()){
                 assignStroke(res, ss);
             }
-            } else {res=new VCircle(x,-y,0,r,Color.WHITE, Color.BLACK, 1.0f);}
-            if (meta){setMetadata(res,ctx);}
-            if (e.hasAttribute(_class)){
-                res.setType(e.getAttribute(_class));
-            }
-            return res;
         }
+        else {res=new VCircle(x,-y,0,d,Color.WHITE, Color.BLACK, 1.0f);}
+        if (meta){setMetadata(res,ctx);}
+        if (e.hasAttribute(_class)){
+            res.setType(e.getAttribute(_class));
+        }
+        return res;
+    }
 
     /** Create a VText from an SVG text element.
      * Warning if text uses attribute text-anchor and has a value different from start, it will not be taken into account (it is up to you to place the text correctly, as it requires information about the View's graphicscontext to compute the string's width/height).
@@ -882,14 +883,12 @@ public class SVGReader {
         String tx=(e.getFirstChild()==null) ? "" : e.getFirstChild().getNodeValue();
         double x = Double.parseDouble(e.getAttribute(_x));
         double y = Double.parseDouble(e.getAttribute(_y));
-
         if (scale != 1.0) {
-            x = (long)(Math.floor((double)x * scale));
-            y = (long)(Math.floor((double)y * scale));
+            x *= scale;
+            y *= scale;
         }
         x += xoffset;
         y += yoffset;
-
         VText res;
         short ta = VText.TEXT_ANCHOR_START;
         if (e.hasAttribute(_textanchor)){
@@ -917,7 +916,7 @@ public class SVGReader {
             }
             Font f;
             if (specialFont(f=ss.getDefinedFont(ctx), VText.getMainFont())){
-                res.setSpecialFont(f);
+                res.setFont(f);
             }
         }
         else if (ctx != null){
@@ -929,7 +928,7 @@ public class SVGReader {
             }
             Font f;
             if (specialFont(f=ctx.getDefinedFont(), VText.getMainFont())){
-                res.setSpecialFont(f);
+                res.setFont(f);
             }
         }
         else {
@@ -994,12 +993,12 @@ public class SVGReader {
             SVGStyle ss = ss = getStyle(e.getAttribute(_style), e);
             if (ss != null){
                 if (ss.hasTransparencyInformation()){
-                    if (ss.getFillColor()==null){res=new VRectangleOr(x,-y,0,w/2d,h/2d,Color.WHITE, Color.BLACK, 0, ss.getAlphaTransparencyValue());res.setFilled(false);}
-                    else {res=new VRectangleOr(x,-y,0,w/2d,h/2d,ss.getFillColor(), Color.BLACK, 0, ss.getAlphaTransparencyValue());}
+                    if (ss.getFillColor()==null){res=new VRectangleOr(x,-y,0,w,h,Color.WHITE, Color.BLACK, 0, ss.getAlphaTransparencyValue());res.setFilled(false);}
+                    else {res=new VRectangleOr(x,-y,0,w,h,ss.getFillColor(), Color.BLACK, 0, ss.getAlphaTransparencyValue());}
                 }
                 else {
-                    if (ss.getFillColor()==null){res=new VRectangleOr(x,-y,0,w/2d,h/2d,Color.WHITE, Color.BLACK, 0, 1.0f);res.setFilled(false);}
-                    else {res=new VRectangleOr(x,-y,0,w/2d,h/2d,ss.getFillColor(), Color.BLACK, 0, 1.0f);}
+                    if (ss.getFillColor()==null){res=new VRectangleOr(x,-y,0,w,h,Color.WHITE, Color.BLACK, 0, 1.0f);res.setFilled(false);}
+                    else {res=new VRectangleOr(x,-y,0,w,h,ss.getFillColor(), Color.BLACK, 0, 1.0f);}
                 }
                 Color border=ss.getStrokeColor();
                 if (border != null){
@@ -1015,12 +1014,12 @@ public class SVGReader {
             }
             else if (ctx!=null){
                 if (ctx.hasTransparencyInformation()){
-                    if (ctx.getFillColor()==null){res=new VRectangleOr(x,-y,0,w/2d,h/2d,Color.WHITE, Color.BLACK, 0, ctx.getAlphaTransparencyValue());res.setFilled(false);}
-                    else {res=new VRectangleOr(x,-y,0,w/2d,h/2d,ctx.getFillColor(), Color.BLACK, 0, ctx.getAlphaTransparencyValue());}
+                    if (ctx.getFillColor()==null){res=new VRectangleOr(x,-y,0,w,h,Color.WHITE, Color.BLACK, 0, ctx.getAlphaTransparencyValue());res.setFilled(false);}
+                    else {res=new VRectangleOr(x,-y,0,w,h,ctx.getFillColor(), Color.BLACK, 0, ctx.getAlphaTransparencyValue());}
                 }
                 else {
-                    if (ctx.getFillColor()==null){res=new VRectangleOr(x,-y,0,w/2d,h/2d,Color.WHITE, Color.BLACK, 0, 1.0f);res.setFilled(false);}
-                    else {res=new VRectangleOr(x,-y,0,w/2d,h/2d,ctx.getFillColor(), Color.BLACK, 0, 1.0f);}
+                    if (ctx.getFillColor()==null){res=new VRectangleOr(x,-y,0,w,h,Color.WHITE, Color.BLACK, 0, 1.0f);res.setFilled(false);}
+                    else {res=new VRectangleOr(x,-y,0,w,h,ctx.getFillColor(), Color.BLACK, 0, 1.0f);}
                 }
                 Color border=ctx.getStrokeColor();
                 if (border != null){
@@ -1031,7 +1030,7 @@ public class SVGReader {
                     res.setDrawBorder(false);
                 }
             }
-            else {res=new VRectangleOr(x,-y,0,w/2d,h/2d,Color.WHITE, Color.BLACK, 0, 1.0f);}
+            else {res=new VRectangleOr(x,-y,0,w,h,Color.WHITE, Color.BLACK, 0, 1.0f);}
             if (meta){setMetadata(res,ctx);}
             if (e.hasAttribute(_class)){
                 res.setType(e.getAttribute(_class));
@@ -1091,20 +1090,20 @@ public class SVGReader {
             if (ss != null){
                 if (ss.hasTransparencyInformation()){
                     if (ss.getFillColor()==null){
-                        res = new VRoundRect(x,-y,0,w/2d,h/2d,Color.WHITE, Color.BLACK, ss.getAlphaTransparencyValue(), Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));
+                        res = new VRoundRect(x,-y,0,w,h,Color.WHITE, Color.BLACK, ss.getAlphaTransparencyValue(), Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));
                         res.setFilled(false);
                     }
                     else {
-                        res = new VRoundRect(x,-y,0,w/2d,h/2d,ss.getFillColor(), Color.BLACK, ss.getAlphaTransparencyValue(),Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));
+                        res = new VRoundRect(x,-y,0,w,h,ss.getFillColor(), Color.BLACK, ss.getAlphaTransparencyValue(),Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));
                     }
                 }
                 else {
                     if (ss.getFillColor()==null){
-                        res = new VRoundRect(x,-y,0,w/2d,h/2d,Color.WHITE, Color.BLACK, 1.0f, Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));
+                        res = new VRoundRect(x,-y,0,w,h,Color.WHITE, Color.BLACK, 1.0f, Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));
                         res.setFilled(false);
                     }
                     else {
-                        res = new VRoundRect(x,-y,0,w/2d,h/2d,ss.getFillColor(), Color.BLACK, 1.0f, Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));
+                        res = new VRoundRect(x,-y,0,w,h,ss.getFillColor(), Color.BLACK, 1.0f, Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));
                     }
                 }
                 Color border=ss.getStrokeColor();
@@ -1122,20 +1121,20 @@ public class SVGReader {
             else if (ctx!=null){
                 if (ctx.hasTransparencyInformation()){
                     if (ctx.getFillColor()==null){
-                        res = new VRoundRect(x,-y,0,w/2d,h/2d,Color.WHITE, Color.BLACK, ctx.getAlphaTransparencyValue(), Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));
+                        res = new VRoundRect(x,-y,0,w,h,Color.WHITE, Color.BLACK, ctx.getAlphaTransparencyValue(), Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));
                         res.setFilled(false);
                     }
                     else {
-                        res = new VRoundRect(x,-y,0,w/2d,h/2d,ctx.getFillColor(), Color.BLACK, ctx.getAlphaTransparencyValue(), Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));
+                        res = new VRoundRect(x,-y,0,w,h,ctx.getFillColor(), Color.BLACK, ctx.getAlphaTransparencyValue(), Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));
                     }
                 }
                 else {
                     if (ctx.getFillColor()==null){
-                        res = new VRoundRect(x,-y,0,w/2d,h/2d,Color.WHITE, Color.BLACK, 1.0f, Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));
+                        res = new VRoundRect(x,-y,0,w,h,Color.WHITE, Color.BLACK, 1.0f, Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));
                         res.setFilled(false);
                     }
                     else {
-                        res = new VRoundRect(x,-y,0,w/2d,h/2d,ctx.getFillColor(), Color.BLACK, 1.0f, Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));
+                        res = new VRoundRect(x,-y,0,w,h,ctx.getFillColor(), Color.BLACK, 1.0f, Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));
                     }
                 }
                 Color border=ctx.getStrokeColor();
@@ -1148,7 +1147,7 @@ public class SVGReader {
                 }
             }
             else {
-                res = new VRoundRect(x,-y,0,w/2d,h/2d,Color.WHITE, Color.BLACK, 1.0f, Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));
+                res = new VRoundRect(x,-y,0,w,h,Color.WHITE, Color.BLACK, 1.0f, Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));
             }
             if (meta){setMetadata(res,ctx);}
             if (e.hasAttribute(_class)){
@@ -1182,13 +1181,13 @@ public class SVGReader {
     public static VRectangleOr createRectangle(Element e,Context ctx,boolean meta){
         double x = Double.parseDouble(e.getAttribute(_x));
         double y = Double.parseDouble(e.getAttribute(_y));
-        double w = Double.parseDouble(e.getAttribute(_width))/2d;
-        double h = Double.parseDouble(e.getAttribute(_height))/2d;
+        double w = Double.parseDouble(e.getAttribute(_width));
+        double h = Double.parseDouble(e.getAttribute(_height));
         if (scale != 1.0) {
-            x = x * scale;
-            y = y * scale;
-            w = w * scale;
-            h = h * scale;
+            x *= scale;
+            y *= scale;
+            w *= scale;
+            h *= scale;
         }
         x += xoffset;
         y += yoffset;
@@ -1473,10 +1472,10 @@ public class SVGReader {
 		double x2 = Double.parseDouble(e.getAttribute(_x2));
 		double y2 = Double.parseDouble(e.getAttribute(_y2));
 		if (scale != 1.0) {
-			x1 = x1 * scale;
-			y1 = y1 * scale;
-			x2 = x2 * scale;
-			y2 = y2 * scale;
+			x1 *= scale;
+			y1 *= scale;
+			x2 *= scale;
+			y2 *= scale;
 		}
 		x1 += xoffset;
 		y1 += yoffset;
