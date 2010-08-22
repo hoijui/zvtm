@@ -85,8 +85,8 @@ public class IcePDFPageImg extends ZPDFPage {
 		synchronized(pdfDoc){
             this.pageImage = (BufferedImage)pdfDoc.getPageImage(pageNumber, GraphicsRenderingHints.SCREEN, Page.BOUNDARY_CROPBOX, 0f, detailFactor);		    
 		}
-		this.vw = pageImage.getWidth()*scaleFactor/2d;
-		this.vh = pageImage.getHeight()*scaleFactor/2d;
+		this.vw = pageImage.getWidth()*scaleFactor;
+		this.vh = pageImage.getHeight()*scaleFactor;
 		if (vw==0 && vh==0){this.ar = 1.0f;}
 		else {this.ar = vw / vh;}
 		computeSize();

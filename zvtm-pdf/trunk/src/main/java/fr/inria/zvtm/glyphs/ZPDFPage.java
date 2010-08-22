@@ -96,7 +96,7 @@ public abstract class ZPDFPage extends ClosedShape implements RectangularShape {
     /** Set glyph's size by setting its bounding circle's radius.
      *@see #reSize(double factor)
      */
-    public void sizeTo(double radius){/*XXX:TBW*/}
+    public void sizeTo(double s){/*XXX:TBW*/}
 
     /** Set glyph's size by multiplying its bounding circle radius by a factor. 
      *@see #sizeTo(double radius)
@@ -113,9 +113,9 @@ public abstract class ZPDFPage extends ClosedShape implements RectangularShape {
 
 	public void highlight(boolean b, Color selectedColor){}
 
-	public void setWidth(double w){}
+	public void setWidth(double w){/*XXX:TBW*/}
 
-	public void setHeight(double h){}
+	public void setHeight(double h){/*XXX:TBW*/}
 
 	public double getWidth(){return vw;}
 
@@ -164,7 +164,7 @@ public abstract class ZPDFPage extends ClosedShape implements RectangularShape {
             /* Glyph hotspot is in the region. The glyph is obviously visible */
             return true;
         }
-        else if (((vx-vw)<=eb) && ((vx+vw)>=wb) && ((vy-vh)<=nb) && ((vy+vh)>=sb)){
+        else if (((vx-vw/2d)<=eb) && ((vx+vw/2d)>=wb) && ((vy-vh/2d)<=nb) && ((vy+vh/2d)>=sb)){
             /* Glyph is at least partially in region.
             We approximate using the glyph bounding box, meaning that some glyphs not
             actually visible can be projected and drawn (but they won't be displayed)) */
@@ -174,7 +174,7 @@ public abstract class ZPDFPage extends ClosedShape implements RectangularShape {
     }
     
 	public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
-		return dvs.intersects(vx-vw, vy-vh, 2*vw, 2*vh);
+		return dvs.intersects(vx-vw/2d, vy-vh/2d, vw, vh);
 	}
 
 	public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
@@ -224,12 +224,12 @@ public abstract class ZPDFPage extends ClosedShape implements RectangularShape {
 		pc[i].cy = (int)Math.round((d.height/2)-(vy-c.posy)*coef);
 		//project width and height
 		if (zoomSensitive){
-			pc[i].cw = (int)Math.round(vw*coef);
-			pc[i].ch = (int)Math.round(vh*coef);
+			pc[i].cw = (int)Math.round(vw/2d*coef);
+			pc[i].ch = (int)Math.round(vh/2d*coef);
 		}
 		else{
-			pc[i].cw = (int)vw;
-			pc[i].ch = (int)vh;
+			pc[i].cw = (int)Math.round(vw/2d);
+			pc[i].ch = (int)Math.round(vh/2d);
 		}
 	}
 
@@ -242,12 +242,12 @@ public abstract class ZPDFPage extends ClosedShape implements RectangularShape {
 		pc[i].lcy = (int)Math.round(lensHeight/2 - (vy-lensy)*coef);
 		//project width and height
 		if (zoomSensitive){
-			pc[i].lcw = (int)Math.round(vw*coef);
-			pc[i].lch = (int)Math.round(vh*coef);
+			pc[i].lcw = (int)Math.round(vw/2d*coef);
+			pc[i].lch = (int)Math.round(vh/2d*coef);
 		}
 		else {
-			pc[i].lcw = (int)vw;
-			pc[i].lch = (int)vh;
+			pc[i].lcw = (int)Math.round(vw/2d);
+			pc[i].lch = (int)Math.round(vh/2d);
 		}
 	}
 	
