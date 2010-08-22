@@ -45,8 +45,10 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 
 public class VSegment extends Glyph implements RectangularShape {
 
-    /*half width and height in virtual space*/
-    double vw,vh;
+    /** Width in virtual space. For internal use. Made public for easier outside package subclassing. */
+    public double vw;
+    /** Height in virtual space. For internal use. Made public for easier outside package subclassing. */
+    public double vh;
 
     RProjectedCoords[] pc;
 
@@ -77,19 +79,19 @@ public class VSegment extends Glyph implements RectangularShape {
         vx = (x1 + x2) / 2;
         vy = (y1 + y2) / 2;
         vz = z;
-        vw = (x2 - x1) / 2;
-        vh = (y2 - y1) / 2;
+        vw = (x2 - x1);
+        vh = (y2 - y1);
         computeSize();
         setColor(c);
         setTranslucencyValue(alpha);
     }
 
     /**
-     *give the centre of segment and half its length & orient
+     *give the centre of segment and half its length and orient
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
      *@param z z-index (pass 0 if you do not use z-ordering)
-     *@param lgth half length in virtual space
+     *@param lgth length in virtual space
      *@param angle orientation
      *@param c fill color
      */
@@ -98,11 +100,11 @@ public class VSegment extends Glyph implements RectangularShape {
     }
     
     /**
-     *give the centre of segment and half its length & orient
+     *give the centre of segment and half its length and orient
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
      *@param z z-index (pass 0 if you do not use z-ordering)
-     *@param lgth half length in virtual space
+     *@param lgth length in virtual space
      *@param angle orientation
      *@param c fill color
       *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
@@ -174,7 +176,7 @@ public class VSegment extends Glyph implements RectangularShape {
 	 *@return west, north, east and south bounds in virtual space.
 	 */
 	public double[] getBounds(){
-		double[] res = {vx-vw,vy+vh,vx+vw,vy-vh};
+		double[] res = {vx-vw/2d,vy+vh/2d,vx+vw/2d,vy-vh/2d};
 		return res;
 	}
 
@@ -182,8 +184,8 @@ public class VSegment extends Glyph implements RectangularShape {
     public void setEndPoints(double x1, double y1, double x2, double y2){
         vx = (x1 + x2) / 2;
         vy = (y1 + y2) / 2;
-        vw = (x2 - x1) / 2;
-        vh = (y2 - y1) / 2;
+        vw = (x2 - x1);
+        vh = (y2 - y1);
         computeSize();
         VirtualSpaceManager.INSTANCE.repaintNow();
     }
@@ -193,14 +195,14 @@ public class VSegment extends Glyph implements RectangularShape {
      */
     public Point2D.Double[] getEndPoints(){
         Point2D.Double[] res = new Point2D.Double[2];
-        res[0] = new Point2D.Double(vx+vw, vy+vh);
-        res[1] = new Point2D.Double(vx-vw, vy-vh);
+        res[0] = new Point2D.Double(vx+vw/2d, vy+vh/2d);
+        res[1] = new Point2D.Double(vx-vw/2d, vy-vh/2d);
         return res;
     }
     
     void computeSize(){
         size = Math.sqrt(Math.pow(vw,2)+Math.pow(vh,2));
-        if (vw!=0){orient=Math.atan((vh/(double)vw));}
+        if (vw!=0){orient=Math.atan((vh/vw));}
         else {
             orient=(vh>0) ? Math.PI/2.0f : -Math.PI/2.0f ;
         }
@@ -219,33 +221,33 @@ public class VSegment extends Glyph implements RectangularShape {
 
     public double getHeight(){return vh;}
 
-    public void sizeTo(double radius){
-        size=radius;
+    public void sizeTo(double s){
+        size = s;
         computeEdges();
         VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public void reSize(double factor){
-        size*=factor;
+        size *= factor;
         computeEdges();
         VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public void setWidth(double w){
-        vw=w;
+        vw = w;
         computeSize();
         VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public void setHeight(double h){
-        vh=h;
+        vh = h;
         computeSize();
         VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
     public void setWidthHeight(double w,double h){
-        this.vw=w;
-        this.vh=h;
+        vw = w;
+        vh = h;
         computeSize();
         VirtualSpaceManager.INSTANCE.repaintNow();
     }
@@ -255,8 +257,8 @@ public class VSegment extends Glyph implements RectangularShape {
     }
 
     void computeEdges(){
-        vw=(double)Math.round(size*Math.cos(orient));
-        vh=(double)Math.round(size*Math.sin(orient));
+        vw = size * Math.cos(orient);
+        vh = size * Math.sin(orient);
     }
 
     public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
@@ -285,7 +287,7 @@ public class VSegment extends Glyph implements RectangularShape {
     }
     
     public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
-		return Line2D.ptSegDist(vx-vw, vy-vh, vx+vw, vy+vh, dvx, dvy) <= dvr;
+		return Line2D.ptSegDist(vx-vw/2d, vy-vh/2d, vx+vw/2d, vy+vh/2d, dvx, dvy) <= dvr;
 	}
 
     public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
@@ -300,8 +302,8 @@ public class VSegment extends Glyph implements RectangularShape {
         pc[i].cx = (int)Math.round((d.width/2)+(vx-c.posx)*coef);
         pc[i].cy = (int)Math.round((d.height/2)-(vy-c.posy)*coef);
         //project width and height
-        pc[i].cw = (int)Math.round(vw*coef);
-        pc[i].ch = (int)Math.round(vh*coef);
+        pc[i].cw = (int)Math.round(vw/2d*coef);
+        pc[i].ch = (int)Math.round(vh/2d*coef);
     }
 
     public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, double lensx, double lensy){
@@ -312,8 +314,8 @@ public class VSegment extends Glyph implements RectangularShape {
         pc[i].lcx = (int)Math.round((lensWidth/2) + (vx-(lensx))*coef);
         pc[i].lcy = (int)Math.round((lensHeight/2) - (vy-(lensy))*coef);
         //project width and height
-        pc[i].lcw = (int)Math.round(vw*coef);
-        pc[i].lch = (int)Math.round(vh*coef);
+        pc[i].lcw = (int)Math.round(vw/2d*coef);
+        pc[i].lch = (int)Math.round(vh/2d*coef);
     }
 
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){

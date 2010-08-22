@@ -194,9 +194,9 @@ public class AllGlyphsTest {
         sg = new VSegment(-20, 420, 20, 460, 0, Color.RED);
         sg.moveTo(40, 440);
         vs.addGlyph(sg);
-        sg = new VSegment(80, 440, 0, Color.BLUE, (float)Math.sqrt(Math.pow(20,2)+Math.pow(20,2)), (float)Math.PI/4f);
+        sg = new VSegment(80, 440, 0, Color.BLUE, (float)Math.sqrt(Math.pow(40,2)+Math.pow(40,2)), (float)Math.PI/4f);
         vs.addGlyph(sg);
-        sg = new VSegment(0, 0, 0, Color.GREEN, (float)Math.sqrt(Math.pow(20,2)+Math.pow(20,2)), (float)Math.PI/4f);
+        sg = new VSegment(0, 0, 0, Color.GREEN, (float)Math.sqrt(Math.pow(40,2)+Math.pow(40,2)), (float)Math.PI/4f);
         sg.moveTo(120, 440);
         vs.addGlyph(sg);
         // slices and rings
