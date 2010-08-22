@@ -40,7 +40,10 @@ import javax.swing.KeyStroke;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.FileOutputStream;
 import java.net.MalformedURLException;
+
 import java.util.Vector;
 import java.util.Scanner;
 
@@ -50,6 +53,11 @@ import javax.xml.parsers.FactoryConfigurationError;
 import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
+import org.apache.xerces.dom.DOMImplementationImpl;
+import org.apache.xml.serialize.LineSeparator;
+import org.apache.xml.serialize.OutputFormat;
+import org.apache.xml.serialize.XMLSerializer;
+import org.apache.xml.serialize.DOMSerializer;
 
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.VirtualSpace;
@@ -246,6 +254,40 @@ public class Viewer {
         gp.setVisible(false);
     }
     
+    /* --------------- SVG exporting ------------------*/
+    
+    static final String SVG_OUTPUT_ENCODING = "UTF-8";
+    
+    void export(){
+        final JFileChooser fc = new JFileChooser(SCENE_FILE_DIR);
+        fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        fc.setDialogTitle("Export SVG File");
+        int returnVal= fc.showSaveDialog(mView.getFrame());
+        if (returnVal == JFileChooser.APPROVE_OPTION){
+            final SwingWorker worker = new SwingWorker(){
+                public Object construct(){
+                    exportSVG(fc.getSelectedFile());
+                    return null; 
+                }
+            };
+            worker.start();
+        }
+    }
+    
+    void exportSVG(File f){
+        SVGWriter sw = new SVGWriter();
+	    if (f.exists()){f.delete();}
+	    Document d = sw.exportVirtualSpace(svgSpace, new DOMImplementationImpl(), f);
+        OutputFormat format = new OutputFormat(d, SVG_OUTPUT_ENCODING, true);
+        format.setLineSeparator(LineSeparator.Web);
+        try {
+            OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(f), SVG_OUTPUT_ENCODING);
+            DOMSerializer serializer = (new XMLSerializer(osw, format)).asDOMSerializer();
+            serializer.serialize(d);
+        }
+        catch (IOException e){e.printStackTrace();}
+    }
+
     /* --------------- Main/exit ------------------*/
     
     void exit(){
@@ -879,12 +921,15 @@ class Config {
 		openMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		final JMenuItem reloadMI = new JMenuItem("Reload");
 		reloadMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		final JMenuItem exportMI = new JMenuItem("Export...");
+		exportMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		final JMenuItem aboutMI = new JMenuItem("About...");
 		ActionListener a0 = new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				if (e.getSource()==exitMI){app.exit();}
 				else if (e.getSource()==openMI){app.openFile();}
 				else if (e.getSource()==reloadMI){app.reload();}
+				else if (e.getSource()==exportMI){app.export();}
 				else if (e.getSource()==aboutMI){app.ovm.showAbout();}
 			}
 		};
@@ -894,12 +939,15 @@ class Config {
 		fileM.add(openMI);
 		fileM.add(reloadMI);
 		fileM.addSeparator();
+		fileM.add(exportMI);
+		fileM.addSeparator();
 		fileM.add(exitMI);
 		helpM.add(aboutMI);
 		jmb.add(fileM);
 		jmb.add(helpM);
 		openMI.addActionListener(a0);
 		reloadMI.addActionListener(a0);
+		exportMI.addActionListener(a0);
 		exitMI.addActionListener(a0);
 		aboutMI.addActionListener(a0);
 		return jmb;
