@@ -33,6 +33,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
+import java.awt.geom.Point2D;
 
 import java.util.Vector;
 
@@ -41,11 +42,8 @@ import fr.inria.zvtm.animation.interpolation.ConstantAccInterpolator;
 import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
 import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 import fr.inria.zvtm.engine.TransitionManager;
-import fr.inria.zvtm.glyphs.CGlyph;
-import fr.inria.zvtm.glyphs.SGlyph;
 
 import fr.inria.zvtm.engine.Camera;
-import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.ViewEventHandler;
@@ -60,7 +58,6 @@ import fr.inria.zvtm.glyphs.VShape;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.glyphs.VTextOr;
 import fr.inria.zvtm.glyphs.VImageOr;
-import fr.inria.zvtm.glyphs.VTriangleOr;
 
 public class AnimationDemo extends JApplet implements MouseListener, KeyListener {
 
@@ -158,86 +155,85 @@ public class AnimationDemo extends JApplet implements MouseListener, KeyListener
     VShape irregularShape, star;
     VTextOr text;
     VImageOr image;
-    CGlyph composite1, composite2;
     VSegment segment;
-    VTriangleOr triangle;
+    VShape triangle;
 
-    static final long COL1_X = -500;
-    static final long COL2_X = 0;
-    static final long COL3_X = 500;
-    static final long ROW1_Y = 400;
-    static final long ROW2_Y = 0;
-    static final long ROW3_Y = -400;
+    static final double COL1_X = -500;
+    static final double COL2_X = 0;
+    static final double COL3_X = 500;
+    static final double ROW1_Y = 400;
+    static final double ROW2_Y = 0;
+    static final double ROW3_Y = -400;
     static final Color GLYPH_BORDER_COLOR = Color.BLACK;
     static final Color ROW1_COLOR = new Color(110, 253, 55);
     static final Color ROW2_COLOR = new Color(82, 190, 40);
     static final Color ROW3_COLOR = new Color(54, 126, 26);
-    static final float SIZE = 80;
-    static float COMPOSITE_SIZE = 0;
-    static float RECTANGLE_SIZE = 0;
-    static float IMAGE_SIZE = 0;
+    static final double SIZE = 80;
+    static double COMPOSITE_SIZE = 0;
+    static double RECTANGLE_SIZE = 0;
+    static double IMAGE_SIZE = 0;
     
     void initGlyphs(){
 	// 1st row
 	rectangle = new VRectangleOr(COL1_X, ROW1_Y, 0, 100, 50, ROW1_COLOR, GLYPH_BORDER_COLOR, 0, 1.0f);
 	float[] starVertices = {1.0f, 0.5f, 1.0f, 0.5f, 1.0f, 0.5f, 1.0f, 0.5f};
-	star = new VShape(COL2_X, ROW1_Y, 0, (long)SIZE, starVertices, ROW1_COLOR, GLYPH_BORDER_COLOR, 0, 1.0f);
-	triangle = new VTriangleOr(COL3_X, ROW1_Y, 0, (long)SIZE, ROW1_COLOR, GLYPH_BORDER_COLOR, 0, 1.0f);
+	star = new VShape(COL2_X, ROW1_Y, 0, SIZE, starVertices, ROW1_COLOR, GLYPH_BORDER_COLOR, 0, 1.0f);
+	float[] triangleEdges = {1f, 1f, 1f};
+	triangle = new VShape(COL3_X, ROW1_Y, 0, SIZE, triangleEdges, ROW1_COLOR, GLYPH_BORDER_COLOR, 1.0f);
 	// 2nd row
 	text = new VTextOr(COL1_X, ROW2_Y, 0, ROW2_COLOR, "Text", 0.0f, VText.TEXT_ANCHOR_MIDDLE, 1.0f);
-	text.setSpecialFont(new Font("Arial", Font.PLAIN, 48));
+	text.setFont(new Font("Arial", Font.PLAIN, 48));
 	image = new VImageOr(COL2_X, ROW2_Y, 0, (new ImageIcon(this.getClass().getResource("/images/logo-futurs-small.png"))).getImage(), 0, 1.0f);
 	image.setBorderColor(GLYPH_BORDER_COLOR);
 	image.setDrawBorderPolicy(VImageOr.DRAW_BORDER_MOUSE_INSIDE);
 	float[] irregVertices = {1.0f, 0.2f, 0.7f, 0.3f, 0.5f, 0.1f, 0.8f, 1.0f, 0.4f, 0.4f, 0.3f, 0.6f};
 	irregularShape = new VShape(COL3_X, ROW2_Y, 0, (long)SIZE, irregVertices, ROW2_COLOR, GLYPH_BORDER_COLOR, 0, 1.0f);
 	// 3rd row
-	VRectangleOr c1m = new VRectangleOr(COL1_X, ROW3_Y, 0, 80, 30, ROW3_COLOR, GLYPH_BORDER_COLOR, 0, 1.0f);
-	SGlyph[] sgs1 = {
-	    new SGlyph(new VRectangleOr(0, 0, 0, 10, 10, ROW2_COLOR, GLYPH_BORDER_COLOR, 0, 0.8f), 80, 30, SGlyph.FULL_ROTATION,SGlyph.RESIZE),
-	    new SGlyph(new VRectangleOr(0, 0, 0, 10, 10, ROW2_COLOR, GLYPH_BORDER_COLOR, 0, 0.8f), 80, -30, SGlyph.FULL_ROTATION,SGlyph.RESIZE),
-	    new SGlyph(new VRectangleOr(0, 0, 0, 10, 10, ROW2_COLOR, GLYPH_BORDER_COLOR, 0, 0.8f), -80, 30, SGlyph.FULL_ROTATION,SGlyph.RESIZE),
-	    new SGlyph(new VRectangleOr(0, 0, 0, 10, 10, ROW2_COLOR, GLYPH_BORDER_COLOR, 0, 0.8f), -80, -30, SGlyph.FULL_ROTATION,SGlyph.RESIZE)
-	};
-	composite1 = new CGlyph(c1m, sgs1);
-	VRectangleOr c2m = new VRectangleOr(COL2_X, ROW3_Y, 0, 80, 30, ROW3_COLOR, GLYPH_BORDER_COLOR, 0, 1.0f);
-	SGlyph[] sgs2 = {
-	    new SGlyph(new VRectangleOr(0, 0, 0, 10, 10, ROW2_COLOR, GLYPH_BORDER_COLOR, 0, 0.8f), 80, 30, SGlyph.ROTATION_POSITION_ONLY,SGlyph.RESIZE),
-	    new SGlyph(new VRectangleOr(0, 0, 0, 10, 10, ROW2_COLOR, GLYPH_BORDER_COLOR, 0, 0.8f), 80, -30, SGlyph.ROTATION_POSITION_ONLY,SGlyph.RESIZE),
-	    new SGlyph(new VRectangleOr(0, 0, 0, 10, 10, ROW2_COLOR, GLYPH_BORDER_COLOR, 0, 0.8f), -80, 30, SGlyph.ROTATION_POSITION_ONLY,SGlyph.RESIZE),
-	    new SGlyph(new VRectangleOr(0, 0, 0, 10, 10, ROW2_COLOR, GLYPH_BORDER_COLOR, 0, 0.8f), -80, -30, SGlyph.ROTATION_POSITION_ONLY,SGlyph.RESIZE)
-	};
-	composite2 = new CGlyph(c2m, sgs2);
-	segment = new VSegment(COL3_X, ROW3_Y, 0, SIZE, 0.707f, ROW3_COLOR, 1.0f);
+	//VRectangleOr c1m = new VRectangleOr(COL1_X, ROW3_Y, 0, 80, 30, ROW3_COLOR, GLYPH_BORDER_COLOR, 0, 1.0f);
+	//SGlyph[] sgs1 = {
+	//    new SGlyph(new VRectangleOr(0, 0, 0, 10, 10, ROW2_COLOR, GLYPH_BORDER_COLOR, 0, 0.8f), 80, 30, SGlyph.FULL_ROTATION,SGlyph.RESIZE),
+	//    new SGlyph(new VRectangleOr(0, 0, 0, 10, 10, ROW2_COLOR, GLYPH_BORDER_COLOR, 0, 0.8f), 80, -30, SGlyph.FULL_ROTATION,SGlyph.RESIZE),
+	//    new SGlyph(new VRectangleOr(0, 0, 0, 10, 10, ROW2_COLOR, GLYPH_BORDER_COLOR, 0, 0.8f), -80, 30, SGlyph.FULL_ROTATION,SGlyph.RESIZE),
+	//    new SGlyph(new VRectangleOr(0, 0, 0, 10, 10, ROW2_COLOR, GLYPH_BORDER_COLOR, 0, 0.8f), -80, -30, SGlyph.FULL_ROTATION,SGlyph.RESIZE)
+	//};
+	//composite1 = new CGlyph(c1m, sgs1);
+	//VRectangleOr c2m = new VRectangleOr(COL2_X, ROW3_Y, 0, 80, 30, ROW3_COLOR, GLYPH_BORDER_COLOR, 0, 1.0f);
+	//SGlyph[] sgs2 = {
+	//    new SGlyph(new VRectangleOr(0, 0, 0, 10, 10, ROW2_COLOR, GLYPH_BORDER_COLOR, 0, 0.8f), 80, 30, SGlyph.ROTATION_POSITION_ONLY,SGlyph.RESIZE),
+	//    new SGlyph(new VRectangleOr(0, 0, 0, 10, 10, ROW2_COLOR, GLYPH_BORDER_COLOR, 0, 0.8f), 80, -30, SGlyph.ROTATION_POSITION_ONLY,SGlyph.RESIZE),
+	//    new SGlyph(new VRectangleOr(0, 0, 0, 10, 10, ROW2_COLOR, GLYPH_BORDER_COLOR, 0, 0.8f), -80, 30, SGlyph.ROTATION_POSITION_ONLY,SGlyph.RESIZE),
+	//    new SGlyph(new VRectangleOr(0, 0, 0, 10, 10, ROW2_COLOR, GLYPH_BORDER_COLOR, 0, 0.8f), -80, -30, SGlyph.ROTATION_POSITION_ONLY,SGlyph.RESIZE)
+	//};
+	//composite2 = new CGlyph(c2m, sgs2);
+	segment = new VSegment(COL3_X, ROW3_Y, 0, ROW3_COLOR, 1.0f, SIZE, 0.707f);
 	mSpace.addGlyph(rectangle);
 	mSpace.addGlyph(star);
 	mSpace.addGlyph(triangle);
 	mSpace.addGlyph(text);
 	mSpace.addGlyph(image);
 	mSpace.addGlyph(irregularShape);
-	mSpace.addGlyph(c1m);
 	mSpace.addGlyph(new VText(COL1_X, ROW3_Y-100, 0, Color.BLACK, "Composite: full rotation", VText.TEXT_ANCHOR_MIDDLE));
-	for (int i=0;i<sgs1.length;i++){
-	    mSpace.addGlyph(sgs1[i].getGlyph());
-	}
-	mSpace.addGlyph(composite1);
-	mSpace.addGlyph(c2m);
-	for (int i=0;i<sgs2.length;i++){
-	    mSpace.addGlyph(sgs2[i].getGlyph());
-	}
-	mSpace.addGlyph(composite2);
+	//for (int i=0;i<sgs1.length;i++){
+	//    mSpace.addGlyph(sgs1[i].getGlyph());
+	//}
+	//mSpace.addGlyph(composite1);
+	//mSpace.addGlyph(c2m);
+	//for (int i=0;i<sgs2.length;i++){
+	//    mSpace.addGlyph(sgs2[i].getGlyph());
+	//}
+	//mSpace.addGlyph(composite2);
 	mSpace.addGlyph(new VText(COL2_X, ROW3_Y-100, 0, Color.BLACK, "Composite: position rotation", VText.TEXT_ANCHOR_MIDDLE));
 	mSpace.addGlyph(segment);
 	RECTANGLE_SIZE = rectangle.getSize();
 	IMAGE_SIZE = image.getSize();
-	COMPOSITE_SIZE = composite1.getSize();
+	//COMPOSITE_SIZE = composite1.getSize();
     }
 
     void reset(){
 	// rectangle
 	if (rectangle.vx != COL1_X || rectangle.vy != ROW1_Y){
 	    Animation anim = vsm.getAnimationManager().getAnimationFactory()
-		.createGlyphTranslation(500, rectangle, new LongPoint(COL1_X, ROW1_Y-rectangle.vy), false,
+		.createGlyphTranslation(500, rectangle, new Point2D.Double(COL1_X, ROW1_Y-rectangle.vy), false,
 					IdentityInterpolator.getInstance(), null);
 	    vsm.getAnimationManager().startAnimation(anim, false);
 	}
@@ -250,7 +246,7 @@ public class AnimationDemo extends JApplet implements MouseListener, KeyListener
 	// star
 	if (star.vx != COL2_X || star.vy != ROW1_Y){
 	    Animation anim = vsm.getAnimationManager().getAnimationFactory()
-		.createGlyphTranslation(500, star, new LongPoint(COL2_X, ROW1_Y), false,
+		.createGlyphTranslation(500, star, new Point2D.Double(COL2_X, ROW1_Y), false,
 					IdentityInterpolator.getInstance(), null);
 	    vsm.getAnimationManager().startAnimation(anim, false);
 	}
@@ -263,7 +259,7 @@ public class AnimationDemo extends JApplet implements MouseListener, KeyListener
 	// triangle
 	if (triangle.vx != COL3_X || triangle.vy != ROW1_Y){
 	    Animation anim = vsm.getAnimationManager().getAnimationFactory()
-		.createGlyphTranslation(500, triangle, new LongPoint(COL3_X, ROW1_Y), false,
+		.createGlyphTranslation(500, triangle, new Point2D.Double(COL3_X, ROW1_Y), false,
 					IdentityInterpolator.getInstance(), null);
 	    vsm.getAnimationManager().startAnimation(anim, false);
 	}
@@ -276,14 +272,14 @@ public class AnimationDemo extends JApplet implements MouseListener, KeyListener
 	// text
 	if (text.vx != COL1_X || text.vy != ROW2_Y){
 	    Animation anim = vsm.getAnimationManager().getAnimationFactory()
-		.createGlyphTranslation(500, text, new LongPoint(COL1_X, ROW2_Y), false,
+		.createGlyphTranslation(500, text, new Point2D.Double(COL1_X, ROW2_Y), false,
 					IdentityInterpolator.getInstance(), null);
 	    vsm.getAnimationManager().startAnimation(anim, false);
 	}
 	// image
 	if (image.vx != COL2_X || image.vy != ROW2_Y){
 	    Animation anim = vsm.getAnimationManager().getAnimationFactory()
-		.createGlyphTranslation(500, image, new LongPoint(COL2_X, ROW2_Y), false,
+		.createGlyphTranslation(500, image, new Point2D.Double(COL2_X, ROW2_Y), false,
 					IdentityInterpolator.getInstance(), null);
 	    vsm.getAnimationManager().startAnimation(anim, false);
 	}
@@ -296,7 +292,7 @@ public class AnimationDemo extends JApplet implements MouseListener, KeyListener
 	// shape
 	if (irregularShape.vx != COL3_X || irregularShape.vy != ROW2_Y){
 	    Animation anim = vsm.getAnimationManager().getAnimationFactory()
-		.createGlyphTranslation(500, irregularShape, new LongPoint(COL3_X, ROW2_Y), false,
+		.createGlyphTranslation(500, irregularShape, new Point2D.Double(COL3_X, ROW2_Y), false,
 					IdentityInterpolator.getInstance(), null);
 	    vsm.getAnimationManager().startAnimation(anim, false);
 	}
@@ -309,7 +305,7 @@ public class AnimationDemo extends JApplet implements MouseListener, KeyListener
 	// segment
 	if (segment.vx != COL3_X || segment.vy != ROW3_Y){
 	    Animation anim = vsm.getAnimationManager().getAnimationFactory()
-		.createGlyphTranslation(500, segment, new LongPoint(COL3_X, ROW3_Y), false,
+		.createGlyphTranslation(500, segment, new Point2D.Double(COL3_X, ROW3_Y), false,
 					IdentityInterpolator.getInstance(), null);
 	    vsm.getAnimationManager().startAnimation(anim, false);
 	}
@@ -393,7 +389,7 @@ public class AnimationDemo extends JApplet implements MouseListener, KeyListener
 
     /* ------------------   POSITION   ------------------------ */
 
-    static final LongPoint TRANSLATE_DATA = new LongPoint(100, 50);
+    static final Point2D.Double TRANSLATE_DATA = new Point2D.Double(100, 50);
 
     void translate(Glyph g, int d){
 	switch(cmdPanel.getPacingFunction()){
@@ -619,7 +615,7 @@ class AnimationDemoEventHandler implements ViewEventHandler {
     }
 
 	public void press1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){
-		underCursor = getGlyph(v.getMouse());
+		underCursor = getGlyph(v.getVCursor());
 		if (underCursor != null){
 			application.mSpace.onTop(underCursor);
 			v.getVCursor().stickGlyph(underCursor);
@@ -665,15 +661,15 @@ class AnimationDemoEventHandler implements ViewEventHandler {
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
 	if (buttonNumber == 3 || ((mod == META_MOD || mod == META_SHIFT_MOD) && buttonNumber == 1)){
 	    Camera c = application.vsm.getActiveCamera();
-	    float a = (c.focal+Math.abs(c.altitude))/c.focal;
+	    double a = (c.focal+Math.abs(c.altitude))/c.focal;
 	    if (mod == META_SHIFT_MOD) {
 		application.vsm.getAnimationManager().setXspeed(0);
 		application.vsm.getAnimationManager().setYspeed(0);
-		application.vsm.getAnimationManager().setZspeed((c.altitude>0) ? (long)((lastJPY-jpy) * (a/SPEED_FACTOR)) : (long)((lastJPY-jpy) / (a*SPEED_FACTOR)));
+		application.vsm.getAnimationManager().setZspeed((c.altitude>0) ? (lastJPY-jpy) * (a/SPEED_FACTOR) : (lastJPY-jpy) / (a*SPEED_FACTOR));
 	    }
 	    else {
-		application.vsm.getAnimationManager().setXspeed((c.altitude>0) ? (long)((jpx-lastJPX) * (a/SPEED_FACTOR)) : (long)((jpx-lastJPX) / (a*SPEED_FACTOR)));
-		application.vsm.getAnimationManager().setYspeed((c.altitude>0) ? (long)((lastJPY-jpy) * (a/SPEED_FACTOR)) : (long)((lastJPY-jpy) / (a*SPEED_FACTOR)));
+		application.vsm.getAnimationManager().setXspeed((c.altitude>0) ? (jpx-lastJPX) * (a/SPEED_FACTOR) : (jpx-lastJPX) / (a*SPEED_FACTOR));
+		application.vsm.getAnimationManager().setYspeed((c.altitude>0) ? (lastJPY-jpy) * (a/SPEED_FACTOR) : (lastJPY-jpy) / (a*SPEED_FACTOR));
 		application.vsm.getAnimationManager().setZspeed(0);
 	    }
 	}
@@ -681,7 +677,7 @@ class AnimationDemoEventHandler implements ViewEventHandler {
 
     public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
 	Camera c = application.vsm.getActiveCamera();
-	float a = (c.focal+Math.abs(c.altitude))/c.focal;
+	double a = (c.focal+Math.abs(c.altitude))/c.focal;
 	if (wheelDirection == WHEEL_UP){
 	    c.altitudeOffset(-a*5);
 	    application.vsm.repaintNow();
@@ -713,21 +709,21 @@ class AnimationDemoEventHandler implements ViewEventHandler {
     public void viewClosing(View v){}
 
     Glyph getGlyph(VCursor c){
-	Glyph res = c.lastGlyphEntered;
-	if (res != null){return res;}
-	else {
-	    Vector v = c.getIntersectingTexts(application.mCam);
-	    if (v != null){
-		res = (Glyph)v.firstElement();
-	    }
-	    else {
-		v = c.getIntersectingSegments(application.mCam, 4);
-		if (v != null){
-		    res = (Glyph)v.firstElement();
-		}
-	    }
-	}
-	return res;
+        Glyph res = c.lastGlyphEntered;
+        if (res != null){return res;}
+        else {
+            Vector<VText> v = c.getIntersectingTexts(application.mCam);
+            if (v != null){
+                res = v.firstElement();
+            }
+            else {
+                Vector<VSegment> v2 = c.getIntersectingSegments(application.mCam, 4);
+                if (v2 != null){
+                    res = v2.firstElement();
+                }
+            }
+        }
+        return res;
     }
     
 }

@@ -10,8 +10,12 @@
 
 package fr.inria.zvtm.demo;
 
+import java.awt.geom.Point2D;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
+
 import fr.inria.zvtm.engine.Camera;
-import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.glyphs.VSegment;
@@ -21,10 +25,6 @@ import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 import fr.inria.zvtm.engine.ViewEventHandler;
 
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
-
 public class FractalEventHandler implements ViewEventHandler {
 
     FractalDemo application;
@@ -33,11 +33,12 @@ public class FractalEventHandler implements ViewEventHandler {
     boolean manualRightButtonMove=false;
     boolean zoomingInRegion=false;
 
-    long lastX,lastY,lastJPX,lastJPY;    //remember last mouse coords to compute translation  (dragging)
+    double lastX,lastY;
+    int lastJPX,lastJPY;    //remember last mouse coords to compute translation  (dragging)
     long jpxD, jpyD;
-    float tfactor;
+    double tfactor;
     float cfactor=50.0f;
-    long x1,y1,x2,y2;                    //remember last mouse coords to display selection rectangle (dragging)
+    double x1,y1,x2,y2;                    //remember last mouse coords to display selection rectangle (dragging)
 
     VSegment navSeg;
 
@@ -58,8 +59,8 @@ public class FractalEventHandler implements ViewEventHandler {
 	}
 	else if (mod == ALT_MOD){
 	    zoomingInRegion=true;
-	    x1=v.getMouse().vx;
-	    y1=v.getMouse().vy;
+	    x1=v.getVCursor().vx;
+	    y1=v.getVCursor().vy;
 	    v.setDrawRect(true);
 	}
     }
@@ -67,8 +68,8 @@ public class FractalEventHandler implements ViewEventHandler {
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
 	if (zoomingInRegion){
 	    v.setDrawRect(false);
-	    x2=v.getMouse().vx;
-	    y2=v.getMouse().vy;
+	    x2=v.getVCursor().vx;
+	    y2=v.getVCursor().vy;
 	    if ((Math.abs(x2-x1)>=4) && (Math.abs(y2-y1)>=4)){
 		v.parent.centerOnRegion(application.vsm.getActiveCamera(),FractalDemo.ANIM_MOVE_LENGTH,x1,y1,x2,y2);
 	    }
@@ -85,7 +86,7 @@ public class FractalEventHandler implements ViewEventHandler {
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy, int clickNumber, MouseEvent e){
-	LongPoint lp = new LongPoint(v.getMouse().vx - v.cams[0].posx, v.getMouse().vy - v.cams[0].posy);
+	Point2D.Double lp = new Point2D.Double(v.getVCursor().vx - v.cams[0].posx, v.getVCursor().vy - v.cams[0].posy);
 
 	Animation transAnim = application.vsm.getAnimationManager().getAnimationFactory()
 	    .createCameraTranslation(FractalDemo.ANIM_MOVE_LENGTH, v.cams[0], 
@@ -114,7 +115,7 @@ public class FractalEventHandler implements ViewEventHandler {
     }
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy, int clickNumber, MouseEvent e){
-	LongPoint lp = new LongPoint(v.getMouse().vx - v.cams[0].posx, v.getMouse().vy - v.cams[0].posy);
+	Point2D.Double lp = new Point2D.Double(v.getVCursor().vx - v.cams[0].posx, v.getVCursor().vy - v.cams[0].posy);
 
 	Animation transAnim = application.vsm.getAnimationManager().getAnimationFactory()
 	    .createCameraTranslation(FractalDemo.ANIM_MOVE_LENGTH, v.cams[0], 
@@ -130,14 +131,14 @@ public class FractalEventHandler implements ViewEventHandler {
 	    if (mod == SHIFT_MOD || mod == META_SHIFT_MOD){
 		application.vsm.getAnimationManager().setXspeed(0);
 		application.vsm.getAnimationManager().setYspeed(0);
-		application.vsm.getAnimationManager().setZspeed((activeCam.altitude>0) ? (long)((lastJPY-jpy)*(tfactor/cfactor)) : (long)((lastJPY-jpy)/(tfactor*cfactor)));
+		application.vsm.getAnimationManager().setZspeed((activeCam.altitude>0) ? (lastJPY-jpy)*(tfactor/cfactor) : (lastJPY-jpy)/(tfactor*cfactor));
 		//50 is just a speed factor (too fast otherwise)
 	    }
 	    else {
 		jpxD = jpx-lastJPX;
 		jpyD = lastJPY-jpy;
-		application.vsm.getAnimationManager().setXspeed((activeCam.altitude>0) ? (long)(jpxD*(tfactor/cfactor)) : (long)(jpxD/(tfactor*cfactor)));
-		application.vsm.getAnimationManager().setYspeed((activeCam.altitude>0) ? (long)(jpyD*(tfactor/cfactor)) : (long)(jpyD/(tfactor*cfactor)));
+		application.vsm.getAnimationManager().setXspeed((activeCam.altitude>0) ? jpxD*(tfactor/cfactor) : jpxD/(tfactor*cfactor));
+		application.vsm.getAnimationManager().setYspeed((activeCam.altitude>0) ? jpyD*(tfactor/cfactor) : jpyD/(tfactor*cfactor));
 		application.vsm.getAnimationManager().setZspeed(0);
 	    }
 	}
@@ -145,7 +146,7 @@ public class FractalEventHandler implements ViewEventHandler {
 
     public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
 	Camera c=application.vsm.getActiveCamera();
-	float a=(c.focal+Math.abs(c.altitude))/c.focal;
+	double a=(c.focal+Math.abs(c.altitude))/c.focal;
 	if (wheelDirection == WHEEL_UP){
 	    c.altitudeOffset(a*10);
 	}

@@ -203,15 +203,15 @@ class LensAppletEvtHdlr implements ViewEventHandler {
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
 	if (buttonNumber==1 || buttonNumber==3){
 	    Camera c=application.vsm.getActiveCamera();
-	    float a=(c.focal+Math.abs(c.altitude))/c.focal;
+	    double a=(c.focal+Math.abs(c.altitude))/c.focal;
 	    if (mod == SHIFT_MOD || mod == META_SHIFT_MOD) {
 		application.vsm.getAnimationManager().setXspeed(0);
 		application.vsm.getAnimationManager().setYspeed(0);
- 		application.vsm.getAnimationManager().setZspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));  //50 is just a speed factor (too fast otherwise)
+ 		application.vsm.getAnimationManager().setZspeed((c.altitude>0) ? (lastJPY-jpy)*(a/50.0f) : (lastJPY-jpy)/(a*50));  //50 is just a speed factor (too fast otherwise)
 	    }
 	    else {
-		application.vsm.getAnimationManager().setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/50.0f)) : (long)((jpx-lastJPX)/(a*50)));
-		application.vsm.getAnimationManager().setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
+		application.vsm.getAnimationManager().setXspeed((c.altitude>0) ? (jpx-lastJPX)*(a/50.0f) : (jpx-lastJPX)/(a*50));
+		application.vsm.getAnimationManager().setYspeed((c.altitude>0) ? (lastJPY-jpy)*(a/50.0f) : (lastJPY-jpy)/(a*50));
 		application.vsm.getAnimationManager().setZspeed(0);
 	    }
 	}
@@ -219,7 +219,7 @@ class LensAppletEvtHdlr implements ViewEventHandler {
 
     public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
 	Camera c=application.vsm.getActiveCamera();
-	float a=(c.focal+Math.abs(c.altitude))/c.focal;
+	double a=(c.focal+Math.abs(c.altitude))/c.focal;
 	if (wheelDirection == WHEEL_UP){
 	    c.altitudeOffset(-a*5);
 	    application.vsm.repaintNow();

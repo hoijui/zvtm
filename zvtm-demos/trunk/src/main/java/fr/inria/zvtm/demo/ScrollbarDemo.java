@@ -11,12 +11,12 @@ import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+import java.awt.geom.Point2D;
 
 import java.util.Vector;
 
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.CameraListener;
-import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
@@ -87,10 +87,10 @@ public class ScrollbarDemo implements CameraListener {
     
     void buildGlyphs(){
 	VRectangle r;
-	long cw = 45;
-	long ch = 45;
-	long tw = 40;
-	long th = 40;
+	double cw = 45;
+	double ch = 45;
+	double tw = 90;
+	double th = 90;
 	for (int i=0;i<30;i++){
 	    for (int j=0;j<30;j++){
 		r = new VRectangle(2*i*cw, 2*j*ch, 0, tw, th, Color.getHSBColor((float)((i*j)/900.0), 1.0f,1.0f));
@@ -105,23 +105,23 @@ public class ScrollbarDemo implements CameraListener {
 
     void translateView(short direction){
 	Camera c = demoView.getCameraNumber(0);
-	LongPoint trans;
-	long[] rb = demoView.getVisibleRegion(c);
+	Point2D.Double trans;
+	double[] rb = demoView.getVisibleRegion(c);
 	if (direction==MOVE_UP){
-	    long qt=Math.round((rb[1]-rb[3])/2.4);
-	    trans=new LongPoint(0,qt);
+	    double qt=(rb[1]-rb[3])/2.4;
+	    trans=new Point2D.Double(0,qt);
 	}
 	else if (direction==MOVE_DOWN){
-	    long qt=Math.round((rb[3]-rb[1])/2.4);
-	    trans=new LongPoint(0,qt);
+	    double qt=(rb[3]-rb[1])/2.4;
+	    trans=new Point2D.Double(0,qt);
 	}
 	else if (direction==MOVE_RIGHT){
-	    long qt=Math.round((rb[2]-rb[0])/2.4);
-	    trans=new LongPoint(qt,0);
+	    double qt=(rb[2]-rb[0])/2.4;
+	    trans=new Point2D.Double(qt,0);
 	}
 	else {//MOVE_LEFT
-	    long qt=Math.round((rb[0]-rb[2])/2.4);
-	    trans=new LongPoint(qt,0);
+	    double qt=(rb[0]-rb[2])/2.4;
+	    trans=new Point2D.Double(qt,0);
 	}
 
 	Animation anim = vsm.getAnimationManager().getAnimationFactory()
@@ -136,7 +136,7 @@ public class ScrollbarDemo implements CameraListener {
 
     void getHigherView(){
 	Camera c = demoView.getCameraNumber(0);
-	float alt = c.getAltitude()+c.getFocal();
+	double alt = c.getAltitude()+c.getFocal();
 	
 	Animation anim = vsm.getAnimationManager().getAnimationFactory()
 	    .createCameraAltAnim(ScrollbarDemo.ANIM_MOVE_LENGTH, c, alt, true,
@@ -146,7 +146,7 @@ public class ScrollbarDemo implements CameraListener {
     
     void getLowerView(){
 	Camera c = demoView.getCameraNumber(0);
-	float alt = -(c.getAltitude()+c.getFocal())/2.0f;
+	double alt = -(c.getAltitude()+c.getFocal())/2.0f;
 	
 	Animation anim = vsm.getAnimationManager().getAnimationFactory()
 	    .createCameraAltAnim(ScrollbarDemo.ANIM_MOVE_LENGTH, c, alt, true,
@@ -154,7 +154,7 @@ public class ScrollbarDemo implements CameraListener {
 	vsm.getAnimationManager().startAnimation(anim, true);
     }
 
-    public void cameraMoved(Camera cam, LongPoint coord, float alt){
+    public void cameraMoved(Camera cam, Point2D.Double coord, double alt){
 	sl.cameraUpdated();
     }
 
@@ -176,7 +176,8 @@ class ScrollbarDemoEventHandler implements ViewEventHandler {
     int mli;
     int sli;
 
-    long lastX,lastY,lastJPX,lastJPY;    //remember last mouse coords to compute translation  (dragging)
+    double lastX,lastY;
+    int lastJPX,lastJPY;    //remember last mouse coords to compute translation  (dragging)
 
     ScrollbarDemoEventHandler(ScrollbarDemo appli, int mainLayerIndex, int scrollLayerIndex){
 	application = appli;
@@ -227,15 +228,15 @@ class ScrollbarDemoEventHandler implements ViewEventHandler {
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
 	if (buttonNumber == 1){
 	    Camera c = application.demoView.getCameraNumber(0);
-	    float a = (c.focal+Math.abs(c.altitude))/c.focal;
+	    double a = (c.focal+Math.abs(c.altitude))/c.focal;
 	    if (mod == SHIFT_MOD) {
 		application.vsm.getAnimationManager().setXspeed(0);
 		application.vsm.getAnimationManager().setYspeed(0);
-		application.vsm.getAnimationManager().setZspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));  //50 is just a speed factor (too fast otherwise)
+		application.vsm.getAnimationManager().setZspeed((c.altitude>0) ? (lastJPY-jpy)*(a/50.0f) : (lastJPY-jpy)/(a*50));  //50 is just a speed factor (too fast otherwise)
 	    }
 	    else {
-		application.vsm.getAnimationManager().setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/50.0f)) : (long)((jpx-lastJPX)/(a*50)));
-		application.vsm.getAnimationManager().setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
+		application.vsm.getAnimationManager().setXspeed((c.altitude>0) ? (jpx-lastJPX)*(a/50.0f) : (jpx-lastJPX)/(a*50));
+		application.vsm.getAnimationManager().setYspeed((c.altitude>0) ? (lastJPY-jpy)*(a/50.0f) : (lastJPY-jpy)/(a*50));
 		application.vsm.getAnimationManager().setZspeed(0);
 	    }
 	}
@@ -243,7 +244,7 @@ class ScrollbarDemoEventHandler implements ViewEventHandler {
 
     public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
 	Camera c = application.demoView.getCameraNumber(0);
-	float a = (c.focal+Math.abs(c.altitude))/c.focal;
+	double a = (c.focal+Math.abs(c.altitude))/c.focal;
 	if (wheelDirection == WHEEL_UP){
 	    c.altitudeOffset(-a*5);
 	    application.vsm.repaintNow();

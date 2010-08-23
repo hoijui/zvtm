@@ -62,8 +62,8 @@ public class DynaSpotDemo {
         demoView.setEventHandler(eh);
         demoView.setNotifyMouseMoved(true);
         vsm.getVirtualSpace("src").getCamera(0).setAltitude(50);
-		vs.addGlyph(new VCircle(-300,0,0,4,Color.BLACK));
-		vs.addGlyph(new VCircle(300,0,0,4,Color.BLACK));
+		vs.addGlyph(new VCircle(-300,0,0,8,Color.BLACK));
+		vs.addGlyph(new VCircle(300,0,0,8,Color.BLACK));
         vsm.repaintNow();
 		demoView.getCursor().activateDynaSpot(true);
     }
@@ -87,13 +87,14 @@ class DynaSpotDemoEvtHdlr implements ViewEventHandler {
 
     DynaSpotDemo application;
 
-    long lastX,lastY,lastJPX,lastJPY;    //remember last mouse coords to compute translation  (dragging)
+    double lastX,lastY;
+    int lastJPX,lastJPY;    //remember last mouse coords to compute translation  (dragging)
 
     DynaSpotDemoEvtHdlr(DynaSpotDemo appli){
         application = appli;
     }
 
-    long x1,x2,y1,y2;
+    double x1,x2,y1,y2;
 
     public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
         
@@ -146,16 +147,16 @@ class DynaSpotDemoEvtHdlr implements ViewEventHandler {
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
         if (buttonNumber == 3 || ((mod == META_MOD || mod == META_SHIFT_MOD) && buttonNumber == 1)){
             Camera c=application.vsm.getActiveCamera();
-            float a=(c.focal+Math.abs(c.altitude))/c.focal;
+            double a=(c.focal+Math.abs(c.altitude))/c.focal;
             if (mod == META_SHIFT_MOD) {
                 application.vsm.getAnimationManager().setXspeed(0);
                 application.vsm.getAnimationManager().setYspeed(0);
-                application.vsm.getAnimationManager().setZspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
+                application.vsm.getAnimationManager().setZspeed((c.altitude>0) ? (lastJPY-jpy)*(a/50.0f) : (lastJPY-jpy)/(a*50));
                 //50 is just a speed factor (too fast otherwise)
             }
             else {
-                application.vsm.getAnimationManager().setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/50.0f)) : (long)((jpx-lastJPX)/(a*50)));
-                application.vsm.getAnimationManager().setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
+                application.vsm.getAnimationManager().setXspeed((c.altitude>0) ? (jpx-lastJPX)*(a/50.0f) : (jpx-lastJPX)/(a*50));
+                application.vsm.getAnimationManager().setYspeed((c.altitude>0) ? (lastJPY-jpy)*(a/50.0f) : (lastJPY-jpy)/(a*50));
                 application.vsm.getAnimationManager().setZspeed(0);
             }
         }
@@ -163,7 +164,7 @@ class DynaSpotDemoEvtHdlr implements ViewEventHandler {
 
     public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
         Camera c=application.vsm.getActiveCamera();
-        float a=(c.focal+Math.abs(c.altitude))/c.focal;
+        double a=(c.focal+Math.abs(c.altitude))/c.focal;
         if (wheelDirection == WHEEL_UP){
             c.altitudeOffset(-a*5);
             application.vsm.repaintNow();

@@ -10,6 +10,7 @@
 
 package fr.inria.zvtm.demo;
 
+import java.awt.geom.Point2D;
 import java.awt.Color;
 import java.util.Vector;
 import javax.swing.SwingUtilities;
@@ -23,7 +24,6 @@ import fr.inria.zvtm.engine.Java2DPainter;
 import fr.inria.zvtm.engine.ViewEventHandler;
 
 import fr.inria.zvtm.engine.Camera;
-import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.SwingWorker;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewPanel;
@@ -102,8 +102,8 @@ public class ViewDemo {
 	VRectangle r;
 	long cw = 50;
 	long ch = 50;
-	long tw = 60;
-	long th = 60;
+	long tw = 120;
+	long th = 120;
 	for (int i=0;i<100;i++){
 	    for (int j=0;j<100;j++){
 		if (translucentMode == 1){
@@ -123,30 +123,30 @@ public class ViewDemo {
     }
 
     void translateView(short direction){
-	Camera c = vsm.getView(mainViewName).getCameraNumber(0);
-	LongPoint trans;
-	long[] rb = vsm.getView(mainViewName).getVisibleRegion(c);
+	Camera c = demoView.getCameraNumber(0);
+	Point2D.Double trans;
+	double[] rb = demoView.getVisibleRegion(c);
 	if (direction==MOVE_UP){
-	    long qt=Math.round((rb[1]-rb[3])/2.4);
-	    trans=new LongPoint(0,qt);
+	    double qt=(rb[1]-rb[3])/2.4;
+	    trans=new Point2D.Double(0,qt);
 	}
 	else if (direction==MOVE_DOWN){
-	    long qt=Math.round((rb[3]-rb[1])/2.4);
-	    trans=new LongPoint(0,qt);
+	    double qt=(rb[3]-rb[1])/2.4;
+	    trans=new Point2D.Double(0,qt);
 	}
 	else if (direction==MOVE_RIGHT){
-	    long qt=Math.round((rb[2]-rb[0])/2.4);
-	    trans=new LongPoint(qt,0);
+	    double qt=(rb[2]-rb[0])/2.4;
+	    trans=new Point2D.Double(qt,0);
 	}
 	else {//MOVE_LEFT
-	    long qt=Math.round((rb[0]-rb[2])/2.4);
-	    trans=new LongPoint(qt,0);
+	    double qt=(rb[0]-rb[2])/2.4;
+	    trans=new Point2D.Double(qt,0);
 	}
-	Animation transAnim = vsm.getAnimationManager().getAnimationFactory()
-	    .createCameraTranslation(ViewDemo.ANIM_MOVE_LENGTH, c, trans, 
-				     true, SlowInSlowOutInterpolator.getInstance(), null);
 
-	vsm.getAnimationManager().startAnimation(transAnim, true);	
+	Animation anim = vsm.getAnimationManager().getAnimationFactory()
+	    .createCameraTranslation(ScrollbarDemo.ANIM_MOVE_LENGTH, c, trans, true,
+				     SlowInSlowOutInterpolator.getInstance(), null);
+	vsm.getAnimationManager().startAnimation(anim, true);
     }
 
     void getGlobalView(){
@@ -155,7 +155,7 @@ public class ViewDemo {
 
     void getHigherView(){
 	Camera c = vsm.getView(mainViewName).getCameraNumber(0);
-	float alt = c.getAltitude()+c.getFocal();
+	double alt = c.getAltitude()+c.getFocal();
 
 	Animation altAnim = vsm.getAnimationManager().getAnimationFactory()
 	    .createCameraAltAnim(ViewDemo.ANIM_MOVE_LENGTH, c, alt, true, 
@@ -165,7 +165,7 @@ public class ViewDemo {
     
     void getLowerView(){
 	Camera c = vsm.getView(mainViewName).getCameraNumber(0);
-	float alt = -(c.getAltitude()+c.getFocal())/2.0f;
+	double alt = -(c.getAltitude()+c.getFocal())/2.0;
 
 	Animation altAnim = vsm.getAnimationManager().getAnimationFactory()
 	    .createCameraAltAnim(ViewDemo.ANIM_MOVE_LENGTH, c, alt, true, 
@@ -200,11 +200,12 @@ class ViewDemoEventHandler implements ViewEventHandler {
     boolean manualRightButtonMove=false;
     boolean zoomingInRegion=false;
 
-    long lastX,lastY,lastJPX,lastJPY;    //remember last mouse coords to compute translation  (dragging)
-    long jpxD, jpyD;
-    float tfactor;
+    double lastX,lastY;
+    int lastJPX,lastJPY;    //remember last mouse coords to compute translation  (dragging)
+    double jpxD, jpyD;
+    double tfactor;
     float cfactor=50.0f;
-    long x1,y1,x2,y2;                    //remember last mouse coords to display selection rectangle (dragging)
+    double x1,y1,x2,y2;                    //remember last mouse coords to display selection rectangle (dragging)
 
     VSegment navSeg;
 
@@ -225,8 +226,8 @@ class ViewDemoEventHandler implements ViewEventHandler {
 	}
 	else if (mod == ALT_MOD){
 	    zoomingInRegion=true;
-	    x1=v.getMouse().vx;
-	    y1=v.getMouse().vy;
+	    x1=v.getVCursor().vx;
+	    y1=v.getVCursor().vy;
 	    v.setDrawRect(true);
 	}
     }
@@ -234,8 +235,8 @@ class ViewDemoEventHandler implements ViewEventHandler {
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
 	if (zoomingInRegion){
 	    v.setDrawRect(false);
-	    x2=v.getMouse().vx;
-	    y2=v.getMouse().vy;
+	    x2=v.getVCursor().vx;
+	    y2=v.getVCursor().vy;
 	    if ((Math.abs(x2-x1)>=4) && (Math.abs(y2-y1)>=4)){
 		application.demoView.centerOnRegion(application.vsm.getActiveCamera(),ViewDemo.ANIM_MOVE_LENGTH,x1,y1,x2,y2);
 	    }
@@ -252,7 +253,7 @@ class ViewDemoEventHandler implements ViewEventHandler {
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy, int clickNumber, MouseEvent e){
-	LongPoint lp = new LongPoint(v.getMouse().vx - v.cams[0].posx, v.getMouse().vy - v.cams[0].posy);
+	Point2D.Double  lp = new Point2D.Double(v.getVCursor().vx - v.cams[0].posx, v.getVCursor().vy - v.cams[0].posy);
 
 	Animation transAnim = application.vsm.getAnimationManager().getAnimationFactory()
 	    .createCameraTranslation(ViewDemo.ANIM_MOVE_LENGTH, v.cams[0], lp, true, 
@@ -281,7 +282,7 @@ class ViewDemoEventHandler implements ViewEventHandler {
     }
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy, int clickNumber, MouseEvent e){
-	LongPoint lp = new LongPoint(v.getMouse().vx - v.cams[0].posx, v.getMouse().vy - v.cams[0].posy);
+	Point2D.Double  lp = new Point2D.Double(v.getVCursor().vx - v.cams[0].posx, v.getVCursor().vy - v.cams[0].posy);
 
 	Animation transAnim = application.vsm.getAnimationManager().getAnimationFactory()
 	    .createCameraTranslation(ViewDemo.ANIM_MOVE_LENGTH, v.cams[0], lp, true, 
@@ -297,14 +298,14 @@ class ViewDemoEventHandler implements ViewEventHandler {
 	    if (mod == SHIFT_MOD || mod == META_SHIFT_MOD){
 		application.vsm.getAnimationManager().setXspeed(0);
 		application.vsm.getAnimationManager().setYspeed(0);
-		application.vsm.getAnimationManager().setZspeed((activeCam.altitude>0) ? (long)((lastJPY-jpy)*(tfactor/cfactor)) : (long)((lastJPY-jpy)/(tfactor*cfactor)));
+		application.vsm.getAnimationManager().setZspeed((activeCam.altitude>0) ? (lastJPY-jpy)*(tfactor/cfactor) : (lastJPY-jpy)/(tfactor*cfactor));
 		//50 is just a speed factor (too fast otherwise)
 	    }
 	    else {
 		jpxD = jpx-lastJPX;
 		jpyD = lastJPY-jpy;
-		application.vsm.getAnimationManager().setXspeed((activeCam.altitude>0) ? (long)(jpxD*(tfactor/cfactor)) : (long)(jpxD/(tfactor*cfactor)));
-		application.vsm.getAnimationManager().setYspeed((activeCam.altitude>0) ? (long)(jpyD*(tfactor/cfactor)) : (long)(jpyD/(tfactor*cfactor)));
+		application.vsm.getAnimationManager().setXspeed((activeCam.altitude>0) ? jpxD*(tfactor/cfactor) : jpxD/(tfactor*cfactor));
+		application.vsm.getAnimationManager().setYspeed((activeCam.altitude>0) ? jpyD*(tfactor/cfactor) : jpyD/(tfactor*cfactor));
 		application.vsm.getAnimationManager().setZspeed(0);
 	    }
 	}
@@ -312,7 +313,7 @@ class ViewDemoEventHandler implements ViewEventHandler {
 
     public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
 	Camera c=application.vsm.getActiveCamera();
-	float a=(c.focal+Math.abs(c.altitude))/c.focal;
+	double a=(c.focal+Math.abs(c.altitude))/c.focal;
 	if (wheelDirection == WHEEL_UP){
 	    c.altitudeOffset(a*10);
 	}
