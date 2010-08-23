@@ -201,11 +201,19 @@ public class AllGlyphsTest {
         vs.addGlyph(sg);
         // slices and rings
         //XXX: this one is actually buggy (bad rendering)
-        VSlice sl = new VSlice(-20, 380, 0, 40, Math.PI/2d, Math.PI/4d, Color.WHITE, Color.BLACK);
+        //VSlice sl = new VSlice(-20, 380, 0, 40, Math.PI/2d, Math.PI/4d, Color.WHITE, Color.BLACK);
+        //vs.addGlyph(sl);
+        //sl = new VSlice(20, 380, 0, 40, Math.PI/2d, Math.PI/4d, Color.RED, Color.BLACK);
+        //sl.moveTo(20, 380);
+        //vs.addGlyph(sl);
+        
+        VRing sl = new VRing(-20, 380, 0, 40, Math.PI/2d, 0, Math.PI/4d, Color.WHITE, Color.BLACK);
         vs.addGlyph(sl);
-        sl = new VSlice(20, 380, 0, 40, Math.PI/2d, Math.PI/4d, Color.RED, Color.BLACK);
+        sl = new VRing(20, 380, 0, 40, Math.PI/2d, 0, Math.PI/4d, Color.RED, Color.BLACK);
         sl.moveTo(20, 380);
         vs.addGlyph(sl);
+        
+        
         VRing rg = new VRing(60, 380, 0, 40, Math.PI/2d, .2f, Math.PI/4d, Color.BLUE, Color.BLACK);
         vs.addGlyph(rg);
         rg = new VRing(60, 380, 0, 40, Math.PI/2d, .2f, Math.PI/4d, Color.GREEN, Color.BLACK);
