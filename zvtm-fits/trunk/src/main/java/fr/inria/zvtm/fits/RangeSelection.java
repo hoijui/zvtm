@@ -8,8 +8,8 @@ import java.awt.Color;
 import java.awt.geom.Point2D;
 
 public class RangeSelection extends Composite {
-    private static final double BAR_HEIGHT = 10;
-    private static final double BAR_WIDTH = 200;
+    private static final double BAR_HEIGHT = 20;
+    private static final double BAR_WIDTH = 400;
 
     VRectangle bar;
     VPolygon leftTick;
@@ -18,9 +18,9 @@ public class RangeSelection extends Composite {
     public RangeSelection(){
         bar = new VRectangle(0,0,0,BAR_WIDTH,BAR_HEIGHT,new Color(0,200,0,180));
         leftTick = makeTick();
-        leftTick.move(-BAR_WIDTH + 20, BAR_HEIGHT);
+        leftTick.move(-BAR_WIDTH/2 + 20, BAR_HEIGHT/2);
         rightTick = makeTick();
-        rightTick.move(BAR_WIDTH - 20, BAR_HEIGHT);
+        rightTick.move(BAR_WIDTH/2 - 20, BAR_HEIGHT/2);
         addChild(bar);
         addChild(leftTick);
         addChild(rightTick);
@@ -28,12 +28,12 @@ public class RangeSelection extends Composite {
 
     //left value, in [0,1]
     public double getLeftValue(){
-        return (leftTick.vx - (this.vx - bar.getWidth()))/(2 * bar.getWidth());
+        return (leftTick.vx - (this.vx - bar.getWidth()/2)) / bar.getWidth();
     }
 
     //right value, in [0,1]
     public double getRightValue(){
-        return (rightTick.vx - (this.vx - bar.getWidth()))/(2 * bar.getWidth());
+        return (rightTick.vx - (this.vx - bar.getWidth()/2)) / bar.getWidth();
     }
 
     //left value, in [0,1]
@@ -47,14 +47,14 @@ public class RangeSelection extends Composite {
         double finalRight = Math.max(0, right);
         finalRight = Math.min(finalRight, 1);
 
-        leftTick.moveTo(this.vx - bar.getWidth() + 2*finalLeft*bar.getWidth(), leftTick.vy);
-        rightTick.moveTo(this.vx - bar.getWidth() + 2*finalRight*bar.getWidth(), rightTick.vy);
+        leftTick.moveTo(this.vx + (finalLeft-0.5)*bar.getWidth(), leftTick.vy);
+        rightTick.moveTo(this.vx + (finalRight-0.5)*bar.getWidth(), rightTick.vy);
     }
 
     //should be an internal method that reacts to mouse events
     public void setLeftTickPos(double xPos){
         //constrained by left end and right tick 
-        double finalPos = Math.max(xPos, vx-bar.getWidth());
+        double finalPos = Math.max(xPos, vx-(bar.getWidth()/2));
         finalPos = Math.min(finalPos, rightTick.vx);
         leftTick.moveTo(finalPos, leftTick.vy);
     }
@@ -62,7 +62,7 @@ public class RangeSelection extends Composite {
     //should be an internal method that reacts to mouse events
     public void setRightTickPos(double xPos){
         //constrained by right end and left tick
-        double finalPos = Math.min(xPos, vx+bar.getWidth());
+        double finalPos = Math.min(xPos, vx+(bar.getWidth()/2));
         finalPos = Math.max(finalPos, leftTick.vx);
         rightTick.moveTo(finalPos, rightTick.vy);
     }

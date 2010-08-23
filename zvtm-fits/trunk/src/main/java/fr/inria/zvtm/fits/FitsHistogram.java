@@ -20,7 +20,7 @@ public class FitsHistogram extends Composite {
         double height = 100;
         for(int val: data){
             double h = (Math.sqrt(val) * height) / Math.sqrt(max - min); 
-            VRectangle bar = new VRectangle(i, h, 0, DEFAULT_BIN_WIDTH/2, h, 
+            VRectangle bar = new VRectangle(i, h/2, 0, DEFAULT_BIN_WIDTH, h, 
                     new Color(0,0,255,127));
             bar.setBorderColor(new Color(0,0,255,180));
             addChild(bar);
