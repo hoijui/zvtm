@@ -8,14 +8,14 @@
  */
 package fr.inria.zvtm.layout.tree;
 
+import java.awt.geom.Point2D;
+
 import fr.inria.zvtm.engine.VirtualSpaceManager;
-import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.animation.EndAction;
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 import fr.inria.zvtm.glyphs.DPath;
-import fr.inria.zvtm.glyphs.VBText;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -130,7 +130,7 @@ public class LNode {
 	 */
 	public void setBackgroundColor(Color backgroundColor) {
 		if (drawBorder && isExpanded()){
-			((VBText)vText).setBackgroundFillColor(backgroundColor);
+			//XXX:((VBText)vText).setBackgroundFillColor(backgroundColor);
 			this.backgroundColor = backgroundColor;
 		}
 	}
@@ -159,7 +159,7 @@ public class LNode {
 
 	public void setSelectedBackgroundColor(Color selectedBackgroundColor) {
 		if (drawBorder && !isExpanded()){
-			((VBText)vText).setBackgroundFillColor(selectedBackgroundColor);
+			//XXX:((VBText)vText).setBackgroundFillColor(selectedBackgroundColor);
 		}
 		this.selectedBackgroundColor = selectedBackgroundColor;
 	}
@@ -195,11 +195,11 @@ public class LNode {
 	}
 
 	/**
-	 * Get bounds of the node. As far as we use VText or VBText for drawing nodes, we should provide camera index.
+	 * Get bounds of the node. As far as we use VText for drawing nodes, we should provide camera index.
 	 * @param camIndex Index of active camera.
-	 * @return LongPoint that represent bounds of the node.
+	 * @return Point2D.Double that represent bounds of the node.
 	 */
-	public LongPoint getBounds(int camIndex) {
+	public Point2D.Double getBounds(int camIndex) {
 		return vText.getBounds(camIndex);
 	}
 
@@ -317,8 +317,8 @@ public class LNode {
 
 	public void removeChild(LNode child, boolean deleteSubTree){
 		if (children.contains(child)){
-			tree.vs.destroyGlyph(child.inEdge);
-			tree.vs.destroyGlyph(child.vText);
+			tree.vs.removeGlyph(child.inEdge);
+			tree.vs.removeGlyph(child.vText);
 			if (!deleteSubTree){ // set my parents as parents of my children.
 				for (LNode node : child.children){
 					if (!children.contains(node)){
@@ -348,16 +348,17 @@ public class LNode {
 
 	void initLNode() {
 		if (drawBorder)
-			vText = new VBText(0, 0, 0, Color.blue, text);
+			vText = new VText(0, 0, 0, Color.blue, text);
+		    //XXX:vText = new VBText(0, 0, 0, Color.blue, text);
 		else
 			vText = new VText(0, 0, 0, Color.blue, text);
 		vText.setOwner(this);
 		inEdge = new DPath();
 		inEdge.addCbCurve(0, 0, 0, 0, 0, 0, false);
 		if (parent != null) {
-			LongPoint[] cp = new LongPoint[2];
-			cp[0] = new LongPoint(parent.vText.vx, parent.vText.vy);
-			cp[1] = new LongPoint(parent.vText.vx, parent.vText.vy);
+			Point2D.Double[] cp = new Point2D.Double[2];
+			cp[0] = new Point2D.Double(parent.vText.vx, parent.vText.vy);
+			cp[1] = new Point2D.Double(parent.vText.vx, parent.vText.vy);
 			inEdge.editElement(0, parent.vText.vx, parent.vText.vy, parent.vText.vx, parent.vText.vy, cp, true);
 			vText.vx = parent.vText.vx;
 			vText.vy = parent.vText.vy;
@@ -368,14 +369,14 @@ public class LNode {
 		tree.vs.atBottom(vText);
 		if (isExpanded()){
 			if (drawBorder){
-				((VBText)vText).setBackgroundFillColor(backgroundColor);
+				//XXX:((VBText)vText).setBackgroundFillColor(backgroundColor);
 				vText.setBorderColor(borderColor);
 			}
 			vText.setColor(textColor);
 		}
 		else{
 			if (drawBorder) {
-				((VBText) vText).setBackgroundFillColor(selectedBackgroundColor);
+				//XXX:((VBText) vText).setBackgroundFillColor(selectedBackgroundColor);
 				vText.setBorderColor(selectedBorderColor);
 			}
 			vText.setColor(selectedTextColor);
@@ -389,13 +390,13 @@ public class LNode {
 	 * @param camIndex Index of active camera.
 	 */
 	public void updateNode(int treeOrientation, int camIndex) {
-		long textX = 0;
-		long textY = 0;
-		LongPoint[] dpath = new LongPoint[4];
-		dpath[0] = new LongPoint(); // start point
-		dpath[1] = new LongPoint();
-		dpath[2] = new LongPoint();
-		dpath[3] = new LongPoint(); // end point (to the child)
+		double textX = 0;
+		double textY = 0;
+		Point2D.Double[] dpath = new Point2D.Double[4];
+		dpath[0] = new Point2D.Double(); // start point
+		dpath[1] = new Point2D.Double();
+		dpath[2] = new Point2D.Double();
+		dpath[3] = new Point2D.Double(); // end point (to the child)
 		EndAction ea = null;
 
 		if (collapseTo != null) {
@@ -483,7 +484,7 @@ public class LNode {
 				break;
 			}
 			
-			LongPoint[] cp = new LongPoint[]{dpath[0], dpath[3]};
+			Point2D.Double[] cp = new Point2D.Double[]{dpath[0], dpath[3]};
 			inEdge.editElement(0, dpath[0].x, dpath[0].y, dpath[3].x, dpath[3].y, cp, true);
 			vText.vx = textX;
 			vText.vy = textY;
@@ -577,7 +578,7 @@ public class LNode {
 				}				
 			}
 		}
-		LongPoint data = new LongPoint(textX - vText.vx, textY - vText.vy);
+		Point2D.Double data = new Point2D.Double(textX - vText.vx, textY - vText.vy);
 		Animation an = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createGlyphTranslation(500, vText, data, true, SlowInSlowOutInterpolator.getInstance(), null);
 		VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(an, false);
 		if (parent != null){
@@ -589,17 +590,17 @@ public class LNode {
 		}
 	}
 
-	private void updateControlPoints(LongPoint[] cp) {
-		long sx = cp[0].x;
-		long sy = cp[0].y;
-		long ex = cp[3].x;
-		long ey = cp[3].y;
+	private void updateControlPoints(Point2D.Double[] cp) {
+		double sx = cp[0].x;
+		double sy = cp[0].y;
+		double ex = cp[3].x;
+		double ey = cp[3].y;
 
 		double dx = ex - sx;
 		double dy = ey - sy;
 
-		cp[1] = new LongPoint(sx + 2 * dx / 3, sy);
-		cp[2] = new LongPoint(ex - dx / 8, ey - dy / 8);
+		cp[1] = new Point2D.Double(sx + 2 * dx / 3, sy);
+		cp[2] = new Point2D.Double(ex - dx / 8, ey - dy / 8);
 	}
 
 	private void setCollapseToRecursively(LNode colTo) {
@@ -665,7 +666,7 @@ public class LNode {
 	private void switchToExpandedView() {
 		if (drawBorder){
 			vText.setBorderColor(borderColor);
-			((VBText) vText).setBackgroundFillColor(backgroundColor);
+			//XXX:((VBText) vText).setBackgroundFillColor(backgroundColor);
 		}
 		vText.setColor(textColor);
 	}
@@ -674,7 +675,7 @@ public class LNode {
 		if (hasChildren()){
 			if (drawBorder){
 				vText.setBorderColor(selectedBorderColor);
-				((VBText) vText).setBackgroundFillColor(selectedBackgroundColor);
+				//XXX:((VBText) vText).setBackgroundFillColor(selectedBackgroundColor);
 			}
 			vText.setColor(selectedTextColor);
 		}

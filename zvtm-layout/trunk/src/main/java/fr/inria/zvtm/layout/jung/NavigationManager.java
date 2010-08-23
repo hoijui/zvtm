@@ -8,11 +8,11 @@
 package fr.inria.zvtm.layout.jung;
 
 import java.awt.Color;
+import java.awt.geom.Point2D;
 
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.Camera;
-import fr.inria.zvtm.engine.OverviewPortal;
-import fr.inria.zvtm.engine.LongPoint;
+import fr.inria.zvtm.engine.portals.OverviewPortal;
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
@@ -66,24 +66,24 @@ class NavigationManager {
 
     /* Direction should be one of Viewer.MOVE_* */
     void translateView(short direction){
-        LongPoint trans;
-        long[] rb = application.mView.getVisibleRegion(mCamera);
+        Point2D.Double trans;
+        double[] rb = application.mView.getVisibleRegion(mCamera);
         if (direction==MOVE_UP){
-            long qt = Math.round((rb[1]-rb[3])/4.0);
-            trans = new LongPoint(0,qt);
+            double qt = (rb[1]-rb[3])/4.0;
+            trans = new Point2D.Double(0,qt);
         }
         else if (direction==MOVE_DOWN){
-            long qt = Math.round((rb[3]-rb[1])/4.0);
-            trans = new LongPoint(0,qt);
+            double qt = (rb[3]-rb[1])/4.0;
+            trans = new Point2D.Double(0,qt);
         }
         else if (direction==MOVE_RIGHT){
-            long qt = Math.round((rb[2]-rb[0])/4.0);
-            trans = new LongPoint(qt,0);
+            double qt = (rb[2]-rb[0])/4.0;
+            trans = new Point2D.Double(qt,0);
         }
         else {
             // direction==MOVE_LEFT
-            long qt = Math.round((rb[0]-rb[2])/4.0);
-            trans = new LongPoint(qt,0);
+            double qt = (rb[0]-rb[2])/4.0;
+            trans = new Point2D.Double(qt,0);
         }
         Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(ConfigManager.ANIM_MOVE_LENGTH, mCamera,
             trans, true, SlowInSlowOutInterpolator.getInstance(), null);

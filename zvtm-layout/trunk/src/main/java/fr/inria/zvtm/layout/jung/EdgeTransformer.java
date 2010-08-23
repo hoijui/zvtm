@@ -17,7 +17,6 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.PathIterator;
 
-import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.glyphs.VSegment;
 import fr.inria.zvtm.glyphs.DPath;
 import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;

@@ -8,6 +8,7 @@
 package fr.inria.zvtm.layout.jung;
 
 import java.awt.Dimension;
+import java.awt.geom.Point2D;
 
 import java.io.File;
 import java.io.FileReader;
@@ -18,7 +19,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import fr.inria.zvtm.engine.VirtualSpaceManager;
-import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.DPath;
 import fr.inria.zvtm.glyphs.VCircle;
@@ -121,13 +121,13 @@ class GraphManager {
 		layout.initialize();
 		for (Glyph g:graph.getVertices()){
 		    Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createGlyphTranslation(ConfigManager.ANIM_MOVE_LENGTH,
-		        g, new LongPoint(layout.getX(g), layout.getY(g)), false, SlowInSlowOutInterpolator.getInstance(), null);
+		        g, new Point2D.Double(layout.getX(g), layout.getY(g)), false, SlowInSlowOutInterpolator.getInstance(), null);
 		    VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, true);
 		}
         for (DPath d:graph.getEdges()){
             Pair p = graph.getEndpoints(d);
-            LongPoint[] points = {new LongPoint(Math.round(layout.getX((Glyph)p.getFirst())), Math.round(layout.getY((Glyph)p.getFirst()))),
-                                  new LongPoint(Math.round(layout.getX((Glyph)p.getSecond())), Math.round(layout.getY((Glyph)p.getSecond())))};
+            Point2D.Double[] points = {new Point2D.Double(layout.getX((Glyph)p.getFirst()), layout.getY((Glyph)p.getFirst())),
+                                  new Point2D.Double(layout.getX((Glyph)p.getSecond()), layout.getY((Glyph)p.getSecond()))};
             Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createPathAnim(ConfigManager.ANIM_MOVE_LENGTH,
                 d, points, false, SlowInSlowOutInterpolator.getInstance(), null);
             VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, true);
@@ -165,11 +165,11 @@ class GraphManager {
             for (Glyph g:graph.getVertices()){
                 g.moveTo(Math.round(layout.getX(g)), Math.round(layout.getY(g)));
             }
-            LongPoint[] points = new LongPoint[2];
+            Point2D.Double[] points = new Point2D.Double[2];
             for (DPath d:graph.getEdges()){
                 Pair p = graph.getEndpoints(d);
-                points[0] = new LongPoint(Math.round(layout.getX((Glyph)p.getFirst())), Math.round(layout.getY((Glyph)p.getFirst())));
-                points[1] = new LongPoint(Math.round(layout.getX((Glyph)p.getSecond())), Math.round(layout.getY((Glyph)p.getSecond())));
+                points[0] = new Point2D.Double(layout.getX((Glyph)p.getFirst()), layout.getY((Glyph)p.getFirst()));
+                points[1] = new Point2D.Double(layout.getX((Glyph)p.getSecond()), layout.getY((Glyph)p.getSecond()));
                 d.edit(points, true);
             }
         }

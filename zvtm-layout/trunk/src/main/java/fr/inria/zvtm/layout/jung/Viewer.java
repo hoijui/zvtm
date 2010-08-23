@@ -47,9 +47,8 @@ import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.engine.ViewEventHandler;
 import fr.inria.zvtm.engine.Java2DPainter;
 import fr.inria.zvtm.glyphs.RImage;
-
-import fr.inria.zvtm.glyphs.PieMenu;
-import fr.inria.zvtm.glyphs.PieMenuFactory;
+import fr.inria.zvtm.widgets.PieMenu;
+import fr.inria.zvtm.widgets.PieMenuFactory;
 
 import edu.uci.ics.jung.io.GraphMLReader;
 
@@ -418,14 +417,14 @@ class Overlay implements ViewEventHandler {
         application.aboutSpace.addGlyph(fadedRegion);
         fadedRegion.setVisible(false);
         sayGlyph = new VText(0, -10, 0, ConfigManager.SAY_MSG_COLOR, Messages.EMPTY_STRING, VText.TEXT_ANCHOR_MIDDLE);
-        sayGlyph.setSpecialFont(ConfigManager.SAY_MSG_FONT);
+        sayGlyph.setFont(ConfigManager.SAY_MSG_FONT);
         application.aboutSpace.addGlyph(sayGlyph);
         sayGlyph.setVisible(false);
     }
     
     void showAbout(){
         if (!showingAbout){
-            fadeAbout = new VRectangle(0, 0, 0, Math.round(application.panelWidth/2.1), Math.round(application.panelHeight/3),
+            fadeAbout = new VRectangle(0, 0, 0, Math.round(application.panelWidth/1.05), Math.round(application.panelHeight/1.5),
                 ConfigManager.FADE_REGION_FILL, ConfigManager.FADE_REGION_STROKE, 0.85f);
             aboutLines = new VText[4];
 			aboutLines[0] = new VText(0, 150, 0, Color.WHITE, Messages.APP_NAME, VText.TEXT_ANCHOR_MIDDLE, 4.0f);
@@ -435,7 +434,7 @@ class Overlay implements ViewEventHandler {
             inriaLogo = new RImage(-150, -40, 0, (new ImageIcon(this.getClass().getResource(ConfigManager.INRIA_LOGO_PATH))).getImage(), 1.0f);
             insituLogo = new RImage(200, -40, 0, (new ImageIcon(this.getClass().getResource(ConfigManager.INSITU_LOGO_PATH))).getImage(), 1.0f);
             aboutLines[3] = new VText(0, -200, 0, Color.WHITE, Messages.ABOUT_DEPENDENCIES, VText.TEXT_ANCHOR_MIDDLE, 2.0f);
-            aboutLines[3].setSpecialFont(ConfigManager.MONOSPACE_ABOUT_FONT);
+            aboutLines[3].setFont(ConfigManager.MONOSPACE_ABOUT_FONT);
             application.aboutSpace.addGlyph(fadeAbout);
             application.aboutSpace.addGlyph(inriaLogo);
             application.aboutSpace.addGlyph(insituLogo);
@@ -578,7 +577,7 @@ class PieMenuEventHandler implements ViewEventHandler {
     public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
 	public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-		Glyph g = v.getMouse().lastGlyphEntered;
+		Glyph g = v.getVCursor().lastGlyphEntered;
 		if (g != null && g.getType() == Messages.PM_ENTRY){
 			application.pieMenuEvent(g);
 		}

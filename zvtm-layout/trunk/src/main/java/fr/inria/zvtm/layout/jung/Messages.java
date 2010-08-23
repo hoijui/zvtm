@@ -7,7 +7,7 @@
 
 package fr.inria.zvtm.layout.jung;
 
-import fr.inria.zvtm.engine.LongPoint;
+import java.awt.geom.Point2D;
 
 public class Messages {
 
@@ -41,8 +41,8 @@ public class Messages {
     static final String PM_GLOBALVIEW = "Global View";
 
     static final String[] MAIN_MENU_LABELS = {PM_GLOBALVIEW, PM_LAYOUT, PM_BACK, PM_OPEN};
-    static final LongPoint[] MAIN_MENU_LABEL_OFFSETS = {new LongPoint(5, -3), new LongPoint(0, 0),
-						                                new LongPoint(-10, -3), new LongPoint(0, -10)};
+    static final Point2D.Double[] MAIN_MENU_LABEL_OFFSETS = {new Point2D.Double(5, -3), new Point2D.Double(0, 0),
+						                                new Point2D.Double(-10, -3), new Point2D.Double(0, -10)};
 
     static final String PM_LAYOUT_SPRING = "Spring";
     static final String PM_LAYOUT_CIRCLE = "Circle";
@@ -52,9 +52,9 @@ public class Messages {
     static final String PM_LAYOUT_FR = "Fruch.-Reing.";
 
     static final String[] LAYOUT_MENU_LABELS = {PM_LAYOUT_CIRCLE, PM_LAYOUT_FR, PM_LAYOUT_SPRING, PM_LAYOUT_KK, PM_LAYOUT_ISOM, PM_LAYOUT_UPDATE};
-    static final LongPoint[] LAYOUT_MENU_LABEL_OFFSETS = {new LongPoint(-8, 3), new LongPoint(-8, 2),
-						                                  new LongPoint(0, -10), new LongPoint(9, 2),
-						                                  new LongPoint(8, 3), new LongPoint(0, 5)};
+    static final Point2D.Double[] LAYOUT_MENU_LABEL_OFFSETS = {new Point2D.Double(-8, 3), new Point2D.Double(-8, 2),
+						                                  new Point2D.Double(0, -10), new Point2D.Double(9, 2),
+						                                  new Point2D.Double(8, 3), new Point2D.Double(0, 5)};
     /* cmd line help */
     protected static void printCmdLineHelp(){
 		System.out.println("Usage:\n\tjava -jar target/zvtm-layout-"+VERSION+".jar <path_to_file> [options]");
