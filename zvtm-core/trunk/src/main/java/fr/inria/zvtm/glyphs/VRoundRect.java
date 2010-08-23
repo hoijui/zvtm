@@ -422,7 +422,7 @@ public class VRoundRect extends ClosedShape implements RectangularShape  {
     }
 
     public Object clone(){
-        VRoundRect res = new VRoundRect(vx, vy, 0, vw, vh, color, borderColor, (alphaC != null) ? alphaC.getAlpha() : 1.0f, arcWidth, arcHeight);
+        VRoundRect res = new VRoundRect(vx, vy, vz, vw, vh, color, borderColor, (alphaC != null) ? alphaC.getAlpha() : 1.0f, arcWidth, arcHeight);
         res.cursorInsideColor=this.cursorInsideColor;
         return res;
     }

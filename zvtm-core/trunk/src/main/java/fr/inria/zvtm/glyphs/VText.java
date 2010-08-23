@@ -564,7 +564,7 @@ public class VText extends Glyph {
     }
 
     public Object clone(){
-	VText res=new VText(vx,vy,0,color,(new StringBuffer(text)).toString(),text_anchor, getScale(), (alphaC != null) ? alphaC.getAlpha() : 1.0f);
+	VText res=new VText(vx,vy,vz,color,(new StringBuffer(text)).toString(),text_anchor, getScale(), (alphaC != null) ? alphaC.getAlpha() : 1.0f);
 	res.cursorInsideColor=this.cursorInsideColor;
 	return res;
     }

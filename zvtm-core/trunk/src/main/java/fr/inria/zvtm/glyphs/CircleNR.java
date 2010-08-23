@@ -94,7 +94,7 @@ public class CircleNR extends VCircle {
 	}
 
 	public Object clone(){
-		CircleNR res=new CircleNR(vx, vy, 0, size, color);
+		CircleNR res=new CircleNR(vx, vy, vz, size, color);
 		res.borderColor=this.borderColor;
 		res.cursorInsideColor=this.cursorInsideColor;
 		res.bColor=this.bColor;

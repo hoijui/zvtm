@@ -170,7 +170,7 @@ public class FRectangle extends VRectangle {
 	}
 
 	public Object clone(){
-		FRectangle res = new FRectangle(vx, vy, 0, vw, vh, color, borderColor, MASK_ALPHA_TOP, MASK_ALPHA_BOTTOM);
+		FRectangle res = new FRectangle(vx, vy, vz, vw, vh, color, borderColor, MASK_ALPHA_TOP, MASK_ALPHA_BOTTOM);
 		res.cursorInsideColor = this.cursorInsideColor;
 		return res;
 	}

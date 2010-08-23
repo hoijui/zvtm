@@ -211,7 +211,7 @@ public class VTextOr extends VText {
 
 
     public Object clone(){
-        VTextOr res=new VTextOr(vx,vy,0,color,(new StringBuffer(text)).toString(),orient, text_anchor);
+        VTextOr res=new VTextOr(vx,vy,vz,color,(new StringBuffer(text)).toString(),orient, text_anchor);
         res.cursorInsideColor=this.cursorInsideColor;
         return res;
     }

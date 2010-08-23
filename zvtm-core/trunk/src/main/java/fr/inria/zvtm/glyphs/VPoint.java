@@ -231,7 +231,7 @@ public class VPoint extends Glyph {
     }
 
     public Object clone(){
-        VPoint res = new VPoint(vx, vy, 0, color, (alphaC != null) ? alphaC.getAlpha(): 1.0f);
+        VPoint res = new VPoint(vx, vy, vz, color, (alphaC != null) ? alphaC.getAlpha(): 1.0f);
         res.cursorInsideColor = this.cursorInsideColor;
         return res;
     }

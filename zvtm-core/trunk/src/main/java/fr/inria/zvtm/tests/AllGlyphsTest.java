@@ -104,10 +104,10 @@ public class AllGlyphsTest {
         vs.addGlyph(d);
         // polygons
         Point2D.Double[] vertices = {new Point2D.Double(-20,120), new Point2D.Double(0,140), new Point2D.Double(20,120), new Point2D.Double(0,100)};
-        FPolygon fp = new FPolygon(vertices, Color.WHITE);
+        FPolygon fp = new FPolygon(vertices, 0, Color.WHITE);
         vs.addGlyph(fp);
         Point2D.Double[] vertices2 = {new Point2D.Double(0,0), new Point2D.Double(20,20), new Point2D.Double(40,0), new Point2D.Double(20,-20)};
-        fp = new FPolygon(vertices2, Color.RED);
+        fp = new FPolygon(vertices2, 0, Color.RED);
         fp.moveTo(40, 120);
         vs.addGlyph(fp);
         Point2D.Double[] vertices3 = {new Point2D.Double(60,120), new Point2D.Double(80,140), new Point2D.Double(100,120), new Point2D.Double(80,100)};
@@ -200,21 +200,12 @@ public class AllGlyphsTest {
         sg.moveTo(120, 440);
         vs.addGlyph(sg);
         // slices and rings
-        //XXX: this one is actually buggy (bad rendering)
-        //VSlice sl = new VSlice(-20, 380, 0, 40, Math.PI/2d, Math.PI/4d, Color.WHITE, Color.BLACK);
-        //vs.addGlyph(sl);
-        //sl = new VSlice(20, 380, 0, 40, Math.PI/2d, Math.PI/4d, Color.RED, Color.BLACK);
-        //sl.moveTo(20, 380);
-        //vs.addGlyph(sl);
-        
-        VRing sl = new VRing(-20, 380, 0, 40, Math.PI/2d, 0, Math.PI/4d, Color.WHITE, Color.BLACK);
-        vs.addGlyph(sl);
-        sl = new VRing(20, 380, 0, 40, Math.PI/2d, 0, Math.PI/4d, Color.RED, Color.BLACK);
-        sl.moveTo(20, 380);
-        vs.addGlyph(sl);
-        
-        
-        VRing rg = new VRing(60, 380, 0, 40, Math.PI/2d, .2f, Math.PI/4d, Color.BLUE, Color.BLACK);
+        VRing rg = new VRing(-20, 380, 0, 40, Math.PI/2d, 0, Math.PI/4d, Color.WHITE, Color.BLACK);
+        vs.addGlyph(rg);
+        rg = new VRing(20, 380, 0, 40, Math.PI/2d, 0, Math.PI/4d, Color.RED, Color.BLACK);
+        rg.moveTo(20, 380);
+        vs.addGlyph(rg);
+        rg = new VRing(60, 380, 0, 40, Math.PI/2d, .2f, Math.PI/4d, Color.BLUE, Color.BLACK);
         vs.addGlyph(rg);
         rg = new VRing(60, 380, 0, 40, Math.PI/2d, .2f, Math.PI/4d, Color.GREEN, Color.BLACK);
         rg.moveTo(100, 380);

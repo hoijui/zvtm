@@ -46,12 +46,12 @@ public class FPolygon extends ClosedShape {
      *@param v list of x,y vertices ABSOLUTE coordinates
      *@param c fill color
      */
-    public FPolygon(Point2D.Double[] v,Color c){
-	    this(v, c, Color.BLACK, 1.0f);
+    public FPolygon(Point2D.Double[] v, int z, Color c){
+	    this(v, z, c, Color.BLACK, 1.0f);
     }
 
-    public FPolygon(Point2D.Double[] v, Color c, Color bc){
-	    this(v, c, Color.BLACK, 1.0f);
+    public FPolygon(Point2D.Double[] v, int z, Color c, Color bc){
+	    this(v, z, c, Color.BLACK, 1.0f);
     }
 
     /**
@@ -60,7 +60,7 @@ public class FPolygon extends ClosedShape {
      *@param bc border color
      *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
      */
-    public FPolygon(Point2D.Double[] v, Color c, Color bc, float alpha){
+    public FPolygon(Point2D.Double[] v, int z, Color c, Color bc, float alpha){
         //should be zero here first as this is assumed when calling getCentroid later to compute the centroid's coordinates
         //several lines belowvx=0;
         vy=0;
@@ -472,7 +472,7 @@ public class FPolygon extends ClosedShape {
         for (int i=0;i<lps.length;i++){
             lps[i]=new Point2D.Double(xcoords[i]+vx,ycoords[i]+vy);
         }
-        FPolygon res=new FPolygon(lps,color);
+        FPolygon res=new FPolygon(lps, vz, color);
         res.borderColor=this.borderColor;
         res.cursorInsideColor=this.cursorInsideColor;
         res.bColor=this.bColor;

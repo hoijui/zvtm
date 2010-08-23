@@ -403,7 +403,7 @@ public class RectangleNR extends ClosedShape implements RectangularShape {
     }
 
     public Object clone(){
-        RectangleNR res = new RectangleNR(vx,vy,0,vw,vh,color);
+        RectangleNR res = new RectangleNR(vx,vy,vz,vw,vh,color);
         res.borderColor = this.borderColor;
         res.cursorInsideColor = this.cursorInsideColor;
         res.bColor = this.bColor;

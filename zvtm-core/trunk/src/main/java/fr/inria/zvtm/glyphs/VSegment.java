@@ -374,7 +374,7 @@ public class VSegment extends Glyph implements RectangularShape {
 
     public Object clone(){
         Point2D.Double[] ep = getEndPoints();
-        VSegment res = new VSegment(ep[0].x, ep[0].y, ep[1].x, ep[1].y, 0, color, (alphaC != null) ? alphaC.getAlpha() : 1f);
+        VSegment res = new VSegment(ep[0].x, ep[0].y, ep[1].x, ep[1].y, vz, color, (alphaC != null) ? alphaC.getAlpha() : 1f);
         res.cursorInsideColor = this.cursorInsideColor;
         return res;
     }

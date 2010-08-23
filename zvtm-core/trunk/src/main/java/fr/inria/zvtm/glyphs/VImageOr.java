@@ -404,7 +404,7 @@ public class VImageOr extends VImage {
     }
 
     public Object clone(){
-        VImageOr res = new VImageOr(vx,vy,0,image,orient, (alphaC != null) ? alphaC.getAlpha(): 1.0f);
+        VImageOr res = new VImageOr(vx,vy,vz,image,orient, (alphaC != null) ? alphaC.getAlpha(): 1.0f);
         res.setWidth(vw);
         res.setHeight(vh);
         res.borderColor=this.borderColor;

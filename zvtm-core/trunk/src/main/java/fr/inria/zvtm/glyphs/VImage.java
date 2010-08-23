@@ -525,7 +525,7 @@ public class VImage extends ClosedShape implements RectangularShape {
     }
 
     public Object clone(){
-        VImage res=new VImage(vx,vy,0,image);
+        VImage res=new VImage(vx,vy,vz,image);
         res.setWidth(vw);
         res.setHeight(vh);
         res.borderColor=this.borderColor;

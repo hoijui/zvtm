@@ -432,7 +432,7 @@ public class VRectangleOr extends VRectangle {
     }
 
     public Object clone(){
-        VRectangleOr res=new VRectangleOr(vx, vy, 0, vw, vh, color, borderColor, orient);
+        VRectangleOr res=new VRectangleOr(vx, vy, vz, vw, vh, color, borderColor, orient);
         res.cursorInsideColor=this.cursorInsideColor;
         return res;
     }

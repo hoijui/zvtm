@@ -124,7 +124,7 @@ public class RImage extends VImage {
     }
     
     public Object clone(){
-    	RImage res = new RImage(vx, vy, 0, image, (alphaC != null) ? alphaC.getAlpha() : 1.0f);
+    	RImage res = new RImage(vx, vy, vz, image, (alphaC != null) ? alphaC.getAlpha() : 1.0f);
     	res.setWidth(vw);
     	res.setHeight(vh);
     	res.borderColor = this.borderColor;

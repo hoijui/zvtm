@@ -402,7 +402,7 @@ public class VEllipse extends ClosedShape implements RectangularShape {
     }
 
     public Object clone(){
-        VEllipse res=new VEllipse(vx,vy,0,vw,vh,color, this.borderColor, (alphaC != null) ? alphaC.getAlpha() : 1.0f);
+        VEllipse res=new VEllipse(vx,vy,vz,vw,vh,color, this.borderColor, (alphaC != null) ? alphaC.getAlpha() : 1.0f);
         res.cursorInsideColor=this.cursorInsideColor;
         res.bColor=this.bColor;
         return res;
