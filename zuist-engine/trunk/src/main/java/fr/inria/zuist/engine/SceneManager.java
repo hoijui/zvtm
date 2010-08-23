@@ -591,7 +591,7 @@ public class SceneManager implements CameraListener {
         if (title != null && title.length() > 0){
             region.setTitle(title);
         }
-        VRectangle r = new VRectangle(x+origin.x, y+origin.y, 0, w/2, h/2, Color.WHITE, Color.BLACK);
+        VRectangle r = new VRectangle(x+origin.x, y+origin.y, 0, w, h, Color.WHITE, Color.BLACK);
         if (fill != null){
             r.setColor(fill);
         }
@@ -835,7 +835,7 @@ public class SceneManager implements CameraListener {
         Color stroke = SVGReader.getColor(rectEL.getAttribute(_stroke));
         Color fill = SVGReader.getColor(rectEL.getAttribute(_fill));
         boolean sensitivity = (rectEL.hasAttribute(_sensitive)) ? Boolean.parseBoolean(rectEL.getAttribute(_sensitive)) : true;
-        ClosedShape g = new VRectangle(x+origin.x, y+origin.y, zindex, w/2, h/2, (fill!=null) ? fill : Color.BLACK, (stroke!=null) ? stroke : Color.WHITE, 1.0f);
+        ClosedShape g = new VRectangle(x+origin.x, y+origin.y, zindex, w, h, (fill!=null) ? fill : Color.BLACK, (stroke!=null) ? stroke : Color.WHITE, 1.0f);
         if (fill == null){g.setFilled(false);}
         if (stroke == null){g.setDrawBorder(false);}
         return createClosedShapeDescription(g, id, zindex, region, sensitivity);

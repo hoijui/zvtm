@@ -80,7 +80,7 @@ public class ImageDescription extends ResourceDescription {
             if (glyph == null){
                 // open connection to data
                 if (showFeedbackWhenFetching){
-                    final VRectProgress vrp = new VRectProgress(vx, vy, zindex, vw / 2 , vh / 80);
+                    final VRectProgress vrp = new VRectProgress(vx, vy, zindex, vw, vh / 40);
                     vs.addGlyph(vrp);
                     try {
                         URLConnection uc = src.openConnection();

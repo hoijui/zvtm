@@ -37,11 +37,7 @@ public class SceneFragmentDescription extends ResourceDescription {
     *@param id ID of object in scene
     *@param x x-coordinate in scene
     *@param y y-coordinate in scene
-    *@param z z-index (layer). Feed 0 if you don't know.
-    *@param w width in scene
-    *@param h height in scene
     *@param p path to bitmap resource (any valid absolute URL)
-    *@param sc border color
     *@param pr parent Region in scene
     */
     SceneFragmentDescription(String id, double x, double y, URL p, Region pr, SceneManager sm){
