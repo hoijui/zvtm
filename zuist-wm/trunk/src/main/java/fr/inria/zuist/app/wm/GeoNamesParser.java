@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2009. All Rights Reserved
+ *   Copyright (c) INRIA, 2009-2010. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -89,7 +89,7 @@ public class GeoNamesParser {
             application.console.setText("Loaded "+searchResult.getTotalResultsCount()+" entities");
             for (Toponym toponym : searchResult.getToponyms()){
                 ClosedShape g = new RectangleNR(Math.round(GeoToolsManager.CC*toponym.getLongitude()), Math.round(GeoToolsManager.CC*toponym.getLatitude()),
-                                                1, 3, 3, FEATURE_COLOR);
+                                                1, 6, 6, FEATURE_COLOR);
                 application.bSpace.addGlyph(g);
                 g.setCursorInsideFillColor(Color.RED);
                 g.setOwner(toponym);

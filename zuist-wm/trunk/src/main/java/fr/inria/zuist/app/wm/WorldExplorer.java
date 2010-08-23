@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2007-2009. All Rights Reserved
+ *   Copyright (c) INRIA, 2007-2010. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -29,6 +29,7 @@ import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLayeredPane;
 import javax.swing.ImageIcon;
+import java.awt.geom.Point2D;
 
 import java.util.Vector;
 
@@ -38,7 +39,6 @@ import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.View;
-import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.Utilities;
 import fr.inria.zvtm.glyphs.VSegment;
 import fr.inria.zvtm.glyphs.Glyph;
@@ -116,9 +116,9 @@ public class WorldExplorer implements Java2DPainter {
     
     TranslucentTextArea console;
 
-    public WorldExplorer(boolean queryGN, boolean fullscreen, boolean grid, boolean opengl, File xmlSceneFile){
+    public WorldExplorer(boolean queryGN, boolean fullscreen, boolean grid, boolean opengl, boolean aa, File xmlSceneFile){
         nm = new NavigationManager(this);
-        initGUI(fullscreen, opengl);
+        initGUI(fullscreen, opengl, aa);
         gp = new WEGlassPane(this);
         ((JFrame)mView.getFrame()).setGlassPane(gp);
         gp.setValue(0);
@@ -147,7 +147,7 @@ public class WorldExplorer implements Java2DPainter {
         mCamera.addListener(eh);
     }
 
-    void initGUI(boolean fullscreen, boolean opengl){
+    void initGUI(boolean fullscreen, boolean opengl, boolean aa){
         windowLayout();
         vsm = VirtualSpaceManager.INSTANCE;
         mSpace = vsm.addVirtualSpace(mSpaceName);
@@ -159,13 +159,14 @@ public class WorldExplorer implements Java2DPainter {
         cameras.add(mCamera);
         cameras.add(bCamera);
         mCamera.stick(bCamera, true);
-        mView = vsm.addFrameView(cameras, mViewName, (opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, false, null);
+        mView = vsm.addFrameView(cameras, mViewName, (opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, !fullscreen, null);
         if (fullscreen && GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().isFullScreenSupported()){
             GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow((JFrame)mView.getFrame());
         }
         else {
             mView.setVisible(true);
         }
+		mView.setAntialiasing(aa);
         eh = new ExplorerEventHandler(this);
         mView.setEventHandler(eh, 0);
         mView.setEventHandler(eh, 1);
@@ -206,13 +207,13 @@ public class WorldExplorer implements Java2DPainter {
     
     void buildGrid(){
         for (int i=-43200;i<=43200;){
-            VSegment s = new VSegment(i, 0, 0, 0, 21600, Color.RED);
+            VSegment s = new VSegment(i, 0, 0, 21600, 0, Color.RED);
             s.setSensitivity(false);
             bSpace.addGlyph(s);
             i += GRID_STEP;
         }
         for (int i=-21600;i<=21600;){
-            VSegment s = new VSegment(0, i, 0, 43200, 0, Color.RED);
+            VSegment s = new VSegment(0, i, 43200, 0, 0, Color.RED);
             s.setSensitivity(false);
             bSpace.addGlyph(s);
             i += GRID_STEP;
@@ -276,24 +277,24 @@ public class WorldExplorer implements Java2DPainter {
 
     /* Direction should be one of WorldExplorer.MOVE_* */
     void translateView(short direction){
-        LongPoint trans;
-        long[] rb = mView.getVisibleRegion(mCamera);
+        Point2D.Double trans;
+        double[] rb = mView.getVisibleRegion(mCamera);
         if (direction==MOVE_UP){
-            long qt = Math.round((rb[1]-rb[3])/4.0);
-            trans = new LongPoint(0,qt);
+            double qt = (rb[1]-rb[3])/4.0;
+            trans = new Point2D.Double(0,qt);
         }
         else if (direction==MOVE_DOWN){
-            long qt = Math.round((rb[3]-rb[1])/4.0);
-            trans = new LongPoint(0,qt);
+            double qt = (rb[3]-rb[1])/4.0;
+            trans = new Point2D.Double(0,qt);
         }
         else if (direction==MOVE_RIGHT){
-            long qt = Math.round((rb[2]-rb[0])/4.0);
-            trans = new LongPoint(qt,0);
+            double qt = (rb[2]-rb[0])/4.0;
+            trans = new Point2D.Double(qt,0);
         }
         else {
             // direction==MOVE_LEFT
-            long qt = Math.round((rb[0]-rb[2])/4.0);
-            trans = new LongPoint(qt,0);
+            double qt = (rb[0]-rb[2])/4.0;
+            trans = new Point2D.Double(qt,0);
         }
         //vsm.animator.createCameraAnimation(WorldExplorer.ANIM_MOVE_DURATION, AnimManager.CA_TRANS_SIG, trans, mCamera.getID());
         Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(WorldExplorer.ANIM_MOVE_DURATION, mCamera,
@@ -384,41 +385,56 @@ public class WorldExplorer implements Java2DPainter {
     }
 
     static void printCmdLineHelp(){
-        System.out.println("Usage:\n\tjava -Xmx1024M -Xms512M -jar target/zuist-wm-X.X.X.jar <path_to_scene_dir> [queryGN] [fs] [grid] [opengl]");
+        System.out.println("Usage:\n\tjava -Xmx1024M -Xms512M -jar target/zuist-wm-X.X.X.jar <path_to_scene_dir> [options]");
 		System.out.println("\n\tqgn: query geonames.org Web service: true or false");
 		System.out.println("\tfs: fullscreen: true or false");
 		System.out.println("\tgrid: draw a grid on top of the map: true or false");
 		System.out.println("\topengl: use OpenGL: true or false");
+        System.out.println("\t-aa: antialiasing");
 		System.exit(0);
     }
 
     public static void main(String[] args){
         File xmlSceneFile = null;
-        File f = new File(args[0]);
-        if (f.exists()){
-            if (f.isDirectory()){
-                // if arg is a directory, take first xml file we find in that directory
-                String[] xmlFiles = f.list(new FilenameFilter(){
-                                        public boolean accept(File dir, String name){return name.endsWith(".xml");}
-                                    });
-                if (xmlFiles.length > 0){
-                    xmlSceneFile = new File(f, xmlFiles[0]);
+		boolean fs = false;
+		boolean ogl = false;
+		boolean aa = false;
+		boolean grid = false;
+		boolean queryGN = false;
+		for (int i=0;i<args.length;i++){
+			if (args[i].startsWith("-")){
+				if (args[i].substring(1).equals("fs")){fs = true;}
+				else if (args[i].substring(1).equals("opengl")){ogl = true;}
+				else if (args[i].substring(1).equals("aa")){aa = true;}
+				else if (args[i].substring(1).equals("grid")){grid = true;}
+				else if (args[i].substring(1).equals("qgn")){queryGN = true;}
+				else if (args[i].substring(1).equals("h") || args[i].substring(1).equals("--help")){WorldExplorer.printCmdLineHelp();System.exit(0);}
+			}
+            else {
+                // the only other thing allowed as a cmd line param is a scene file
+                File f = new File(args[i]);
+                if (f.exists()){
+                    if (f.isDirectory()){
+                        // if arg is a directory, take first xml file we find in that directory
+                        String[] xmlFiles = f.list(new FilenameFilter(){
+                                                public boolean accept(File dir, String name){return name.endsWith(".xml");}
+                                            });
+                        if (xmlFiles.length > 0){
+                            xmlSceneFile = new File(f, xmlFiles[0]);
+                        }
+                    }
+                    else {
+                        xmlSceneFile = f;                        
+                    }
                 }
             }
-            else {
-                xmlSceneFile = f;                        
-            }
+		}
+        if (!fs && Utilities.osIsMacOS()){
+            System.setProperty("apple.laf.useScreenMenuBar", "true");
         }
-        if (xmlSceneFile == null){
-            printCmdLineHelp();
-            return;
-        }
-        boolean queryGN = (args.length > 1) ? Boolean.parseBoolean(args[1]) : false;
-        boolean fs = (args.length > 2) ? Boolean.parseBoolean(args[2]) : false;
-        boolean grid = (args.length > 3) ? Boolean.parseBoolean(args[3]) : false;
-        boolean ogl = (args.length > 4) ? Boolean.parseBoolean(args[3]) : false;
-        System.out.println("Using GeoTools v" + GeoTools.getVersion() );
-        new WorldExplorer(queryGN, fs, grid, ogl, xmlSceneFile);
+        System.out.println("--help for command line options");
+        System.out.println("Using GeoTools v" + GeoTools.getVersion());
+        new WorldExplorer(queryGN, fs, grid, ogl, aa, xmlSceneFile);
     }
 
 }

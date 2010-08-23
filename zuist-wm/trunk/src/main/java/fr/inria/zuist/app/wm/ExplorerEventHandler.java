@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2007-2009. All Rights Reserved
+ *   Copyright (c) INRIA, 2007-2010. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -13,6 +13,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.ComponentEvent;
+import java.awt.geom.Point2D;
 
 import java.util.Vector;
 import java.util.Timer;
@@ -20,16 +21,15 @@ import java.util.TimerTask;
 
 import fr.inria.zvtm.engine.VCursor;
 import fr.inria.zvtm.engine.Camera;
-import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.engine.ViewEventHandler;
 import fr.inria.zvtm.engine.CameraListener;
-import fr.inria.zvtm.engine.Portal;
-import fr.inria.zvtm.engine.OverviewPortal;
-import fr.inria.zvtm.engine.PortalEventHandler;
+import fr.inria.zvtm.engine.portals.Portal;
+import fr.inria.zvtm.engine.portals.OverviewPortal;
+import fr.inria.zvtm.engine.portals.PortalEventHandler;
 
 import fr.inria.zuist.engine.Region;
 import fr.inria.zuist.engine.ObjectDescription;
@@ -49,13 +49,15 @@ class ExplorerEventHandler implements ViewEventHandler, CameraListener, Componen
 	// update scene when panned from overview every 0.5s
 	static final int DELAYED_UPDATE_FREQUENCY = 500;
 
-    int lastJPX,lastJPY;    //remember last mouse coords to compute translation  (dragging)
-    long lastVX, lastVY;
+    //remember last mouse coords to compute translation  (dragging)
+    int lastJPX,lastJPY;
+    double lastVX, lastVY;
+    
     int currentJPX, currentJPY;
 
     /* bounds of region in virtual space currently observed through mCamera */
-    long[] wnes = new long[4];
-    float oldCameraAltitude;
+    double[] wnes = new double[4];
+    double oldCameraAltitude;
 
     boolean mCamStickedToMouse = false;
     boolean regionStickedToMouse = false;
@@ -73,7 +75,7 @@ class ExplorerEventHandler implements ViewEventHandler, CameraListener, Componen
 	
 	// region selection
 	boolean selectingRegion = false;
-	long x1, y1, x2, y2;
+	double x1, y1, x2, y2;
 
     ExplorerEventHandler(WorldExplorer app){
         this.application = app;
@@ -97,8 +99,8 @@ class ExplorerEventHandler implements ViewEventHandler, CameraListener, Componen
 		    }
 			else {
 				double a = (application.ovCamera.focal+Math.abs(application.ovCamera.altitude)) / application.ovCamera.focal;
-				application.mCamera.moveTo(Math.round(a*(jpx-application.nm.ovPortal.x-application.nm.ovPortal.w/2)),
-				                           Math.round(-a*(jpy-application.nm.ovPortal.y-application.nm.ovPortal.h/2)));
+				application.mCamera.moveTo(a*(jpx-application.nm.ovPortal.x-application.nm.ovPortal.w/2),
+				                           -a*(jpy-application.nm.ovPortal.y-application.nm.ovPortal.h/2));
 				cameraMoved(null, null, 0);
 				// position camera where user has pressed, and then allow seamless dragging
 				regionStickedToMouse = true;
@@ -218,9 +220,9 @@ class ExplorerEventHandler implements ViewEventHandler, CameraListener, Componen
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
         if (panning){
             if (v.getVCursor().isDynaSpotActivated()){v.getVCursor().activateDynaSpot(false);}
-            float a = (application.mCamera.focal+Math.abs(application.mCamera.altitude)) / application.mCamera.focal;
+            double a = (application.mCamera.focal+Math.abs(application.mCamera.altitude)) / application.mCamera.focal;
             synchronized(application.mCamera){
-                application.mCamera.move(Math.round(a*(lastJPX-jpx)), Math.round(a*(jpy-lastJPY)));
+                application.mCamera.move(a*(lastJPX-jpx), a*(jpy-lastJPY));
                 lastJPX = jpx;
                 lastJPY = jpy;
                 cameraMoved(null, null, 0);
@@ -230,8 +232,8 @@ class ExplorerEventHandler implements ViewEventHandler, CameraListener, Componen
         	}
         }
 		else if (regionStickedToMouse){
-			float a = (application.ovCamera.focal+Math.abs(application.ovCamera.altitude)) / application.ovCamera.focal;
-			application.mCamera.move(Math.round(a*(jpx-lastJPX)), Math.round(a*(lastJPY-jpy)));
+			double a = (application.ovCamera.focal+Math.abs(application.ovCamera.altitude)) / application.ovCamera.focal;
+			application.mCamera.move(a*(jpx-lastJPX), a*(lastJPY-jpy));
 			dut.requestUpdate();
 			lastJPX = jpx;
 			lastJPY = jpy;
@@ -251,7 +253,7 @@ class ExplorerEventHandler implements ViewEventHandler, CameraListener, Componen
             }
         }
         else {
-            float a = (application.mCamera.focal+Math.abs(application.mCamera.altitude)) / application.mCamera.focal;
+            double a = (application.mCamera.focal+Math.abs(application.mCamera.altitude)) / application.mCamera.focal;
             if (wheelDirection  == WHEEL_UP){
                 // zooming in
                 application.mCamera.altitudeOffset(a*WHEEL_ZOOMOUT_FACTOR);
@@ -316,14 +318,14 @@ class ExplorerEventHandler implements ViewEventHandler, CameraListener, Componen
     }
     public void componentShown(ComponentEvent e){}
 
-    public void cameraMoved(Camera cam, LongPoint coord, float a){
+    public void cameraMoved(Camera cam, Point2D.Double coord, double a){
         dut.requestUpdate();
     }
     
     void cameraMoved(){
         // region seen through camera
         application.mView.getVisibleRegion(application.mCamera, wnes);
-        float alt = application.mCamera.getAltitude();
+        double alt = application.mCamera.getAltitude();
         if (alt != oldCameraAltitude){
             oldCameraAltitude = alt;
         }

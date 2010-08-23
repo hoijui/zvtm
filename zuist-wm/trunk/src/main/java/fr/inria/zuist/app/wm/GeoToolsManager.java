@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2007-2009. All Rights Reserved
+ *   Copyright (c) INRIA, 2007-2010. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -9,6 +9,8 @@ package fr.inria.zuist.app.wm;
 
 import java.awt.Color;
 import java.awt.geom.PathIterator;
+import java.awt.geom.Point2D;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
@@ -32,8 +34,6 @@ import com.vividsolutions.jts.simplify.DouglasPeuckerSimplifier;
 import com.vividsolutions.jts.geom.util.PolygonExtracter;
 
 import fr.inria.zvtm.glyphs.VPolygon;
-import fr.inria.zvtm.glyphs.RectangleNR;
-import fr.inria.zvtm.engine.LongPoint;
 
 import fr.inria.zuist.engine.Region;
 
@@ -62,7 +62,7 @@ class GeoToolsManager {
                                                     1, transitions, Region.ORDERING_DISTANCE,
                                                     false, null, null);
 
-        loadShapes(new File("data/shapefiles/misc/countries.shp"), "Loading countries...", region, COUNTRY_COLOR);
+        loadShapes(new File("data/TM_WORLD_BORDERS-0.3.shp"), "Loading countries...", region, COUNTRY_COLOR);
 //        loadShapes(new File("data/shapefiles/ca_provinces/province.shp"), "Loading Canadian provinces...", region, ADMIN_DIV_1_COLOR);
 //        loadShapes(new File("data/shapefiles/us_states/statesp020.shp"), "Loading US states...", region, ADMIN_DIV_1_COLOR);
 //        loadShapes(new File("data/shapefiles/mx_states/mx_state.shp"), "Loading Mexican states...", region, ADMIN_DIV_1_COLOR);
@@ -88,7 +88,7 @@ class GeoToolsManager {
                 String typeName = typeNames[0];
                 FeatureCollection collection = dataStore.getFeatureSource(typeName).getFeatures();
                 Feature[] features = (Feature[])collection.toArray();
-                LongPoint[] zvtmCoords;
+                Point2D.Double[] zvtmCoords;
                 Vector points = new Vector();
                 for (int i=0;i<features.length;i++){
                     Feature feature = features[i];
@@ -104,15 +104,15 @@ class GeoToolsManager {
                         while (!pi.isDone()){
                             type = pi.currentSegment(coords);
                             if (type == PathIterator.SEG_LINETO){
-                                points.add(new LongPoint(Math.round(coords[0]*CC), Math.round(coords[1]*CC)));
+                                points.add(new Point2D.Double(coords[0]*CC, coords[1]*CC));
                             }
                             else if (type == PathIterator.SEG_MOVETO){
                                 points.clear();
                             }
                             else if (type == PathIterator.SEG_CLOSE){
-                                zvtmCoords = new LongPoint[points.size()];
+                                zvtmCoords = new Point2D.Double[points.size()];
                                 for (int j=0;j<zvtmCoords.length;j++){
-                                    zvtmCoords[j] = (LongPoint)points.elementAt(j);
+                                    zvtmCoords[j] = (Point2D.Double)points.elementAt(j);
                                 }
                                 VPolygon polygon = new VPolygon(zvtmCoords, 0, Color.BLACK, shapeColor, 1.0f);
                                 polygon.setFilled(false);
