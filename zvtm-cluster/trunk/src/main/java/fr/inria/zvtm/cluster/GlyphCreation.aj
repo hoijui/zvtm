@@ -24,7 +24,6 @@ import fr.inria.zvtm.glyphs.Composite;
 import fr.inria.zvtm.glyphs.DPath;
 import fr.inria.zvtm.glyphs.RectangleNR;
 import fr.inria.zvtm.glyphs.VCircle;
-import fr.inria.zvtm.glyphs.VDiamond;
 import fr.inria.zvtm.glyphs.VEllipse;
 import fr.inria.zvtm.glyphs.VImage;
 import fr.inria.zvtm.glyphs.VPoint;
@@ -153,10 +152,6 @@ public aspect GlyphCreation {
 
     @Override GlyphReplicator VPolygon.getReplicator(){
         return new VPolygonReplicator(this);
-    }
-
-    @Override GlyphReplicator VDiamond.getReplicator(){
-        return new VDiamondReplicator(this);
     }
 
     @Override GlyphReplicator Composite.getReplicator(){
@@ -446,39 +441,39 @@ public aspect GlyphCreation {
     }
 
     private static class VRingReplicator extends ClosedShapeReplicator {
-        private final double arcRadius;
+        private final double arcDiameter;
         private final double arcAngle;
         private final float irRad; //inner ring radius (%outer ring radius)
         private final double sliceOrient;
 
         VRingReplicator(VRing source){
             super(source);
-            this.arcRadius = source.vr;
+            this.arcDiameter = source.getSize();
             this.arcAngle = source.angle;
             this.irRad = source.getInnerRatio();
             this.sliceOrient = source.orient;
         }
 
         public Glyph doCreateGlyph(){
-            return new VRing(0d,0d,0,arcRadius,arcAngle,irRad,sliceOrient,
+            return new VRing(0d,0d,0,arcDiameter,arcAngle,irRad,sliceOrient,
                     Color.BLACK, Color.BLACK);
         }
     }
 
     private static class VSliceReplicator extends ClosedShapeReplicator {
-        private final double arcRadius;
+        private final double arcDiameter;
         private final double arcAngle;
         private final double sliceOrient; 
 
         VSliceReplicator(VSlice source){
             super(source);
-            this.arcRadius = source.vr;
+            this.arcDiameter = source.getSize();
             this.arcAngle = source.angle;
             this.sliceOrient = source.orient;
         }
 
         public Glyph doCreateGlyph(){
-            return new VSlice(0d,0d,0,arcRadius,arcAngle,sliceOrient,
+            return new VSlice(0d,0d,0,arcDiameter,arcAngle,sliceOrient,
                     Color.BLACK,Color.BLACK);
         }
     }
@@ -493,19 +488,6 @@ public aspect GlyphCreation {
 
         public Glyph doCreateGlyph(){
             return new VPolygon(coords, 0, Color.BLACK);
-        }
-    }
-
-    private static class VDiamondReplicator extends ClosedShapeReplicator {
-        private final double size; //width = height
-
-        VDiamondReplicator(VDiamond source){
-            super(source);
-            this.size = source.getSize();
-        }
-
-        public Glyph doCreateGlyph(){
-            return new VDiamond(0d,0d,0,size,Color.BLACK);
         }
     }
 

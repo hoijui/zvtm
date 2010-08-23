@@ -55,7 +55,7 @@
 		</dependency>
 		<dependency>
 			<groupId>fr.inria.zvtm</groupId>
-			<artifactId>zvtm</artifactId>
+			<artifactId>zvtm-core</artifactId>
 			<version>0.11.0-SNAPSHOT</version>
             <scope>provided</scope>
 		</dependency>
@@ -120,7 +120,7 @@
 					<weaveDependencies>
 						<weaveDependency>
 							<groupId>fr.inria.zvtm</groupId>
-							<artifactId>zvtm</artifactId>
+							<artifactId>zvtm-core</artifactId>
 						</weaveDependency>
 					</weaveDependencies>	
 					<source>1.5</source>

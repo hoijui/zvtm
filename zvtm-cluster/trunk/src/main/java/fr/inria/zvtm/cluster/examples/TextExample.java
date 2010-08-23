@@ -71,7 +71,7 @@ public class TextExample {
         VTextOr hi = new VTextOr(0,0,0,Color.GREEN,"Hello Clustered ZVTM", 0f);
         hi.orientTo((float)Math.PI / 4f);
         vs.addGlyph(hi, false);	
-        hi.setSpecialFont(new Font("Serif", Font.PLAIN, 20));
+        hi.setFont(new Font("Serif", Font.PLAIN, 20));
     }
 
 	public static void main(String[] args){

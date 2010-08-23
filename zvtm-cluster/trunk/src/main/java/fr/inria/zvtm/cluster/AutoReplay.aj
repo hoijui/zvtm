@@ -51,7 +51,7 @@ public aspect AutoReplay extends AbstractAutoReplay {
          execution(public void Glyph.orientTo(float)) ||
          execution(public void Glyph.setSensitivity(boolean)) ||
          execution(public void VSlice.setAngle(double)) || 
-         execution(public void VText.setSpecialFont(Font)) || 
+         execution(public void VText.setFont(Font)) || 
          execution(public void VText.setText(String)) || 
          execution(public void VText.setScale(float)) || 
          execution(public void ClosedShape.setDrawBorder(boolean)) || 
