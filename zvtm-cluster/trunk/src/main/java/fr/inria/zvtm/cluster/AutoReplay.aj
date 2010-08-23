@@ -18,7 +18,7 @@ import fr.inria.zvtm.glyphs.VText;
 
 import java.awt.Color;
 import java.awt.Font;
-import java.awt.geom.Point2D.Double;
+import java.awt.geom.Point2D;
 
 /**
  * Define methods that will be replayed automatically
