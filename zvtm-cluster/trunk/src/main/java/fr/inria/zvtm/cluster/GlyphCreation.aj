@@ -31,7 +31,6 @@ import fr.inria.zvtm.glyphs.VPolygon;
 import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VRing;
 import fr.inria.zvtm.glyphs.VSegment;
-import fr.inria.zvtm.glyphs.VSlice;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.glyphs.VTextOr;
 
@@ -144,10 +143,6 @@ public aspect GlyphCreation {
 
     @Override GlyphReplicator VRing.getReplicator(){
         return new VRingReplicator(this);
-    }
-
-    @Override GlyphReplicator VSlice.getReplicator(){
-        return new VSliceReplicator(this);
     }
 
     @Override GlyphReplicator VPolygon.getReplicator(){
@@ -457,24 +452,6 @@ public aspect GlyphCreation {
         public Glyph doCreateGlyph(){
             return new VRing(0d,0d,0,arcDiameter,arcAngle,irRad,sliceOrient,
                     Color.BLACK, Color.BLACK);
-        }
-    }
-
-    private static class VSliceReplicator extends ClosedShapeReplicator {
-        private final double arcDiameter;
-        private final double arcAngle;
-        private final double sliceOrient; 
-
-        VSliceReplicator(VSlice source){
-            super(source);
-            this.arcDiameter = source.getSize();
-            this.arcAngle = source.angle;
-            this.sliceOrient = source.orient;
-        }
-
-        public Glyph doCreateGlyph(){
-            return new VSlice(0d,0d,0,arcDiameter,arcAngle,sliceOrient,
-                    Color.BLACK,Color.BLACK);
         }
     }
 
