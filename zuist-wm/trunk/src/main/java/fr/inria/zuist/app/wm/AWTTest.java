@@ -14,13 +14,16 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.Vector;
+import java.util.Iterator;
 import java.net.MalformedURLException;
 
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+
 import org.geotools.factory.GeoTools;
 import org.geotools.data.shapefile.shp.JTSUtilities;
 
@@ -28,6 +31,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.simplify.DouglasPeuckerSimplifier;
 import com.vividsolutions.jts.geom.util.PolygonExtracter;
+
 
 public class AWTTest extends JFrame {
     
@@ -63,32 +67,36 @@ public class AWTTest extends JFrame {
                 DataStore dataStore = DataStoreFinder.getDataStore(connect);
                 String[] typeNames = dataStore.getTypeNames();
                 String typeName = typeNames[0];
-                FeatureCollection collection = dataStore.getFeatureSource(typeName).getFeatures();
-                Feature[] features = (Feature[])collection.toArray();
 
-                Vector awtPolygons = new Vector();
-                // for each feature
-                for (int i=0;i<features.length;i++){
-                    Feature feature = features[i];
-                    Geometry geometry = feature.getDefaultGeometry();
-                    Object[] polygons = PolygonExtracter.getPolygons(geometry).toArray();
-                    // for each polygon in the MultiPolygon
-                    for (int j=0;j<polygons.length;j++){
-                        Geometry simplifiedPolygon = (Geometry)polygons[j];
-                        Coordinate[] coords = simplifiedPolygon.getCoordinates();
-                        Vector points = new Vector();
-                        // add each x,y coord pair to a list of pairs that will be used to create an AWT polygon
-                        for (int k=0;k<coords.length;k+=1){
-                            points.add(new Point((int)Math.round(coords[k].x*CC), (int)Math.round(coords[k].y*CC)));
+                FeatureCollection<SimpleFeatureType, SimpleFeature> featureCollection = dataStore.getFeatureSource(typeName).getFeatures();
+                FeatureIterator<SimpleFeature> fi = featureCollection.features();
+                Vector<Polygon> awtPolygons = new Vector<Polygon>();
+                try {
+                    while(fi.hasNext()){
+                        SimpleFeature f = fi.next();
+                        Geometry geometry = (Geometry)f.getDefaultGeometry();
+                        Object[] polygons = PolygonExtracter.getPolygons(geometry).toArray();
+                        // for each polygon in the MultiPolygon
+                        for (int j=0;j<polygons.length;j++){
+                            Geometry simplifiedPolygon = (Geometry)polygons[j];
+                            Coordinate[] coords = simplifiedPolygon.getCoordinates();
+                            Vector points = new Vector();
+                            // add each x,y coord pair to a list of pairs that will be used to create an AWT polygon
+                            for (int k=0;k<coords.length;k+=1){
+                                points.add(new Point((int)Math.round(coords[k].x*CC), (int)Math.round(coords[k].y*CC)));
+                            }
+                            int[] x = new int[points.size()];
+                            int[] y = new int[points.size()];
+                            for (int k=0;k<points.size();k++){
+                                x[k] = 640+((Point)points.elementAt(k)).x;
+                                y[k] = 300-((Point)points.elementAt(k)).y;
+                            }
+                            awtPolygons.add(new Polygon(x, y, points.size()));
                         }
-                        int[] x = new int[points.size()];
-                        int[] y = new int[points.size()];
-                        for (int k=0;k<points.size();k++){
-                            x[k] = 640+((Point)points.elementAt(k)).x;
-                            y[k] = 300-((Point)points.elementAt(k)).y;
-                        }
-                        awtPolygons.add(new Polygon(x, y, points.size()));
                     }
+                }
+                finally {
+                    featureCollection.close(fi);
                 }
                 countryBoundaries = new Polygon[awtPolygons.size()];
                 for (int h=0;h<awtPolygons.size();h++){

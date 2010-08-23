@@ -18,15 +18,16 @@ import java.util.HashMap;
 import java.util.Vector;
 import java.net.MalformedURLException;
 
+// GeoTools
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFinder;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.geotools.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.geotools.factory.GeoTools;
 import org.geotools.data.shapefile.shp.JTSUtilities;
 import org.geotools.geometry.jts.LiteShape;
-
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Polygon;
@@ -34,13 +35,7 @@ import com.vividsolutions.jts.simplify.DouglasPeuckerSimplifier;
 import com.vividsolutions.jts.geom.util.PolygonExtracter;
 
 import fr.inria.zvtm.glyphs.VPolygon;
-
 import fr.inria.zuist.engine.Region;
-
-import org.geonames.ToponymSearchCriteria;
-import org.geonames.ToponymSearchResult;
-import org.geonames.Toponym;
-import org.geonames.WebService;
 
 class GeoToolsManager {
     
@@ -86,17 +81,18 @@ class GeoToolsManager {
                 DataStore dataStore = DataStoreFinder.getDataStore(connect);
                 String[] typeNames = dataStore.getTypeNames();
                 String typeName = typeNames[0];
-                FeatureCollection collection = dataStore.getFeatureSource(typeName).getFeatures();
-                Feature[] features = (Feature[])collection.toArray();
-                Point2D.Double[] zvtmCoords;
+                FeatureCollection<SimpleFeatureType, SimpleFeature> featureCollection = dataStore.getFeatureSource(typeName).getFeatures();
+                FeatureIterator<SimpleFeature> fi = featureCollection.features();
+                Vector<Polygon> awtPolygons = new Vector<Polygon>();
                 Vector points = new Vector();
-                for (int i=0;i<features.length;i++){
-                    Feature feature = features[i];
-                    Geometry geometry = feature.getDefaultGeometry();                    
+                Point2D.Double[] zvtmCoords;
+                int i = 0;
+                while(fi.hasNext()){
+                    SimpleFeature f = fi.next();
+                    Geometry geometry = (Geometry)f.getDefaultGeometry();                    
                     Object[] polygons = PolygonExtracter.getPolygons(geometry).toArray();
                     for (int k=0;k<polygons.length;k++){
                         Geometry simplifiedPolygon = DouglasPeuckerSimplifier.simplify((Geometry)polygons[k], 0.01);
-                        //Geometry simplifiedPolygon = (Geometry)polygons[k];
                         PathIterator pi = (new LiteShape(simplifiedPolygon, null, false)).getPathIterator(null);
                         double[] coords = new double[6];
                         int type;
@@ -117,40 +113,29 @@ class GeoToolsManager {
                                 VPolygon polygon = new VPolygon(zvtmCoords, 0, Color.BLACK, shapeColor, 1.0f);
                                 polygon.setFilled(false);
                                 application.sm.createClosedShapeDescription(polygon, "B"+Integer.toString(polygonID++),
-																			polygon.getZindex(),
-                                                                            region, false);
+                                    polygon.getZindex(),
+                                    region, false);
                             }
                             else {
-                                System.err.println("Error");
+                                System.err.println("Error: GeoToolsManager.loadShape: Unsupported path iterator element type:" + type);
                             }
                             pi.next();
                         }
-
-//                        Coordinate[] coords = simplifiedPolygon.getCoordinates();
-//                        points.clear();
-//                        for (int j=0;j<coords.length;j+=1){
-//                            points.add(new LongPoint(Math.round(coords[j].x*CC), Math.round(coords[j].y*CC)));
-//                        }
-//                        zvtmCoords = new LongPoint[points.size()];
-//                        for (int j=0;j<zvtmCoords.length;j++){
-//                            zvtmCoords[j] = (LongPoint)points.elementAt(j);
-//                        }
-//                        application.sm.createPolygon(zvtmCoords, "B"+Integer.toString(polygonID++), region,
-//                            false, null, Color.YELLOW);
                     }
-                    newProgress = i *100 / features.length;
+                    newProgress = (i++) * 100 / featureCollection.size();
                     if (newProgress > progress){
                         progress = newProgress;
                         application.gp.setValue(progress);
                     }
                 }
+                fi.close();
             }
-            catch (IOException ioex){
-                ioex.printStackTrace();
+            catch(MalformedURLException uex){
+                uex.printStackTrace();
             }
         }
-        catch(MalformedURLException uex){
-            uex.printStackTrace();
+        catch (IOException ioex){
+            ioex.printStackTrace();
         }
     }
     
