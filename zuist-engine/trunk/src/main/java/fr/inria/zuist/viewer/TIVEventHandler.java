@@ -85,8 +85,8 @@ class TIVExplorerEventHandler implements ViewEventHandler, ComponentListener, Po
 			else {
 				double rw = (jpx-application.nm.ovPortal.x) / (double)application.nm.ovPortal.w;
 				double rh = (jpy-application.nm.ovPortal.y) / (double)application.nm.ovPortal.h;
-                application.mCamera.moveTo(Math.round(rw*(application.nm.scene_bounds[2]-application.nm.scene_bounds[0]) + application.nm.scene_bounds[0]),
-                                           Math.round(rh*(application.nm.scene_bounds[3]-application.nm.scene_bounds[1]) + application.nm.scene_bounds[1]));
+                application.mCamera.moveTo(rw*(application.nm.scene_bounds[2]-application.nm.scene_bounds[0]) + application.nm.scene_bounds[0],
+                                           rh*(application.nm.scene_bounds[3]-application.nm.scene_bounds[1]) + application.nm.scene_bounds[1]);
 				// position camera where user has pressed, and then allow seamless dragging
 				regionStickedToMouse = true;
 			}
@@ -208,7 +208,7 @@ class TIVExplorerEventHandler implements ViewEventHandler, ComponentListener, Po
 	    Camera c = application.mCamera;
         if (zero_order_dragging){
             double a = (c.focal+Math.abs(c.altitude)) / c.focal;
-            c.move(Math.round(a*(lastJPX-jpx)), Math.round(a*(jpy-lastJPY)));
+            c.move(a*(lastJPX-jpx), a*(jpy-lastJPY));
             lastJPX = jpx;
             lastJPY = jpy;
 		    if (nm.lensType != 0 && nm.lens != null){
@@ -223,8 +223,8 @@ class TIVExplorerEventHandler implements ViewEventHandler, ComponentListener, Po
             }
             else {
                 double a = (c.focal+Math.abs(c.altitude)) / c.focal;
-                VirtualSpaceManager.INSTANCE.getAnimationManager().setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/PAN_SPEED_COEF)) : (long)((jpx-lastJPX)/(a*PAN_SPEED_COEF)));
-                VirtualSpaceManager.INSTANCE.getAnimationManager().setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/PAN_SPEED_COEF)) : (long)((lastJPY-jpy)/(a*PAN_SPEED_COEF)));
+                VirtualSpaceManager.INSTANCE.getAnimationManager().setXspeed((c.altitude>0) ? (jpx-lastJPX)*(a/PAN_SPEED_COEF) : (jpx-lastJPX)/(a*PAN_SPEED_COEF));
+                VirtualSpaceManager.INSTANCE.getAnimationManager().setYspeed((c.altitude>0) ? (lastJPY-jpy)*(a/PAN_SPEED_COEF) : (lastJPY-jpy)/(a*PAN_SPEED_COEF));
                 VirtualSpaceManager.INSTANCE.getAnimationManager().setZspeed(0);
             }
 		    if (nm.lensType != 0 && nm.lens != null){
@@ -233,7 +233,7 @@ class TIVExplorerEventHandler implements ViewEventHandler, ComponentListener, Po
         }
 	    else if (regionStickedToMouse){
 	        double a = (application.ovCamera.focal+Math.abs(application.ovCamera.altitude)) / application.ovCamera.focal;
-			c.move(Math.round(a*(jpx-lastJPX)), Math.round(a*(lastJPY-jpy)));
+			c.move(a*(jpx-lastJPX), a*(lastJPY-jpy));
 			lastJPX = jpx;
             lastJPY = jpy;
 		}

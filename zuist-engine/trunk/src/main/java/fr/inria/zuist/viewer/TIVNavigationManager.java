@@ -106,20 +106,20 @@ class TIVNavigationManager {
         Point2D.Double trans;
         double[] rb = application.mView.getVisibleRegion(mCamera);
         if (direction==MOVE_UP){
-            double qt = Math.round((rb[1]-rb[3])/4.0);
+            double qt = (rb[1]-rb[3])/4.0;
             trans = new Point2D.Double(0,qt);
         }
         else if (direction==MOVE_DOWN){
-            double qt = Math.round((rb[3]-rb[1])/4.0);
+            double qt = (rb[3]-rb[1])/4.0;
             trans = new Point2D.Double(0,qt);
         }
         else if (direction==MOVE_RIGHT){
-            double qt = Math.round((rb[2]-rb[0])/4.0);
+            double qt = (rb[2]-rb[0])/4.0;
             trans = new Point2D.Double(qt,0);
         }
         else {
             // direction==MOVE_LEFT
-            double qt = Math.round((rb[0]-rb[2])/4.0);
+            double qt = (rb[0]-rb[2])/4.0;
             trans = new Point2D.Double(qt,0);
         }
         //vsm.animator.createCameraAnimation(TIVNavigationManager.ANIM_MOVE_DURATION, AnimManager.CA_TRANS_SIG, trans, mCamera.getID());

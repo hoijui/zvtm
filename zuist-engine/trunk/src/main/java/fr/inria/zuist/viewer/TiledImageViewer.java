@@ -456,14 +456,14 @@ class Overlay implements ViewEventHandler {
         application.aboutSpace.addGlyph(fadedRegion);
         fadedRegion.setVisible(false);
         sayGlyph = new VText(0, -10, 0, SAY_MSG_COLOR, " ", VText.TEXT_ANCHOR_MIDDLE);
-        sayGlyph.setSpecialFont(SAY_MSG_FONT);
+        sayGlyph.setFont(SAY_MSG_FONT);
         application.aboutSpace.addGlyph(sayGlyph);
         sayGlyph.setVisible(false);
     }
     
     void showAbout(){
         if (!showingAbout){
-            fadeAbout = new VRectangle(0, 0, 0, Math.round(application.panelWidth/2.1), Math.round(application.panelHeight/3),
+            fadeAbout = new VRectangle(0, 0, 0, Math.round(application.panelWidth/1.05), Math.round(application.panelHeight/1.5),
                 FADE_REGION_FILL, FADE_REGION_STROKE, 0.85f);
             aboutLines = new VText[5];
 			aboutLines[0] = new VText(0, 150, 0, Color.WHITE, "ZUIST Tiled Image Viewer", VText.TEXT_ANCHOR_MIDDLE, 4.0f);
@@ -523,8 +523,8 @@ class Overlay implements ViewEventHandler {
     }
 
     void showMessage(String msg){
-	    fadedRegion.setWidth(application.panelWidth/2-1);
-	    fadedRegion.setHeight(50);
+	    fadedRegion.setWidth(application.panelWidth-2);
+	    fadedRegion.setHeight(100);
 	    sayGlyph.setText(msg);
 	    fadedRegion.setVisible(true);
 	    sayGlyph.setVisible(true);

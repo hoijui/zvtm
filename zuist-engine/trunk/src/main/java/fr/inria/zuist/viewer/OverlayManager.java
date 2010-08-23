@@ -97,7 +97,7 @@ class OverlayManager implements ViewEventHandler {
     
     void showAbout(){
         if (!showingAbout){
-            fadeAbout = new VRectangle(0, 0, 0, Math.round(application.panelWidth/2.1), Math.round(application.panelHeight/3),
+            fadeAbout = new VRectangle(0, 0, 0, Math.round(application.panelWidth/1.05), Math.round(application.panelHeight/1.5),
                 FADE_REGION_FILL, FADE_REGION_STROKE, 0.85f);
             aboutLines = new VText[5];
 			aboutLines[0] = new VText(0, 150, 0, Color.WHITE, "ZUIST Viewer", VText.TEXT_ANCHOR_MIDDLE, 4.0f);

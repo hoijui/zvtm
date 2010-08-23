@@ -84,7 +84,7 @@ public class TextDescription extends ObjectDescription {
         if (glyph == null){
             if (fadeIn){
                 glyph = new VText(vx, vy, zindex, fillColor, text, anchor, scale, 0.0f);
-                if (font != null){((VText)glyph).setSpecialFont(font);}
+                if (font != null){((VText)glyph).setFont(font);}
                 if (!sensitive){glyph.setSensitivity(false);}
 //                VirtualSpaceManager.INSTANCE.animator.createGlyphAnimation(GlyphLoader.FADE_IN_DURATION, AnimManager.GL_COLOR_LIN,
 //                    GlyphLoader.FADE_IN_ANIM_DATA, glyph.getID());
@@ -94,7 +94,7 @@ public class TextDescription extends ObjectDescription {
             }
             else {
                 glyph = new VText(vx, vy, zindex, fillColor, text, anchor, scale, 1.0f);
-                if (font != null){((VText)glyph).setSpecialFont(font);}
+                if (font != null){((VText)glyph).setFont(font);}
                 if (!sensitive){glyph.setSensitivity(false);}
             }
             try {

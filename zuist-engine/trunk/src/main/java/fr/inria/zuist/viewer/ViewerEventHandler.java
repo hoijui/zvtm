@@ -149,7 +149,7 @@ class ViewerEventHandler implements ViewEventHandler, ComponentListener, CameraL
         Camera c = application.mCamera;
         double a = (c.focal+Math.abs(c.altitude)) / c.focal;
         if (zero_order_dragging){
-            c.move(Math.round(a*(lastJPX-jpx)), Math.round(a*(jpy-lastJPY)));
+            c.move(a*(lastJPX-jpx), a*(jpy-lastJPY));
             lastJPX = jpx;
             lastJPY = jpy;
         }
@@ -160,8 +160,8 @@ class ViewerEventHandler implements ViewEventHandler, ComponentListener, CameraL
                 VirtualSpaceManager.INSTANCE.getAnimationManager().setZspeed(((lastJPY-jpy)*(ZOOM_SPEED_COEF)));
             }
             else {
-                VirtualSpaceManager.INSTANCE.getAnimationManager().setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/PAN_SPEED_COEF)) : (long)((jpx-lastJPX)/(a*PAN_SPEED_COEF)));
-                VirtualSpaceManager.INSTANCE.getAnimationManager().setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/PAN_SPEED_COEF)) : (long)((lastJPY-jpy)/(a*PAN_SPEED_COEF)));
+                VirtualSpaceManager.INSTANCE.getAnimationManager().setXspeed((c.altitude>0) ? (jpx-lastJPX)*(a/PAN_SPEED_COEF) : (jpx-lastJPX)/(a*PAN_SPEED_COEF));
+                VirtualSpaceManager.INSTANCE.getAnimationManager().setYspeed((c.altitude>0) ? (lastJPY-jpy)*(a/PAN_SPEED_COEF) : (lastJPY-jpy)/(a*PAN_SPEED_COEF));
                 VirtualSpaceManager.INSTANCE.getAnimationManager().setZspeed(0);
             }
         }
