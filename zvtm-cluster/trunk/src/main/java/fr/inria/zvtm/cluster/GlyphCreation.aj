@@ -35,7 +35,6 @@ import fr.inria.zvtm.glyphs.VSegment;
 import fr.inria.zvtm.glyphs.VSlice;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.glyphs.VTextOr;
-import fr.inria.zvtm.glyphs.VTriangleOr;
 
 interface GlyphReplicator extends Serializable {
    public Glyph createGlyph();
@@ -102,10 +101,6 @@ public aspect GlyphCreation {
 
 	@Override GlyphReplicator VCircle.getReplicator(){
 		return new VCircleReplicator(this);
-	}
-
-	@Override GlyphReplicator VTriangleOr.getReplicator(){
-		return new VTriangleOrReplicator(this);
 	}
 
 	@Override GlyphReplicator VSegment.getReplicator(){
@@ -302,20 +297,6 @@ public aspect GlyphCreation {
 		}
 	}
 	
-	private static class VTriangleOrReplicator extends ClosedShapeReplicator {
-		private final double height;
-
-		VTriangleOrReplicator(VTriangleOr source){
-			super(source);
-			this.height = source.getSize();
-		}
-
-		public Glyph doCreateGlyph(){
-			//beware of z-index
-			return new VTriangleOr(0d,0d,0,height,Color.BLACK, 0);
-		}
-	}
-
 	private static class VSegmentReplicator extends AbstractGlyphReplicator {
 		private final double halfWidth;
 		private final double halfHeight;
