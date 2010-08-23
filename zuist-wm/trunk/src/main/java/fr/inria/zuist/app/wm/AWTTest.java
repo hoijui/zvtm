@@ -1,7 +1,13 @@
 package fr.inria.zuist.app.wm;
 
-import java.awt.*;
-import javax.swing.*;
+import java.awt.Color;
+import java.awt.Polygon;
+import java.awt.Point;
+import java.awt.Graphics;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 import java.io.File;
 import java.io.IOException;
@@ -38,7 +44,14 @@ public class AWTTest extends JFrame {
         p = new GeoPanel(this);
         this.add(p);
         this.setSize(1280,1280/2);
-        this.setVisible(true);        
+        this.setVisible(true);
+        this.addWindowListener(
+            new WindowAdapter(){
+                public void windowClosing(WindowEvent e){
+                    System.exit(0);
+                }
+            }
+        );
         load(new File(shapeFilePath));
     }
 
