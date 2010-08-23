@@ -65,8 +65,8 @@ public class Composite extends Glyph {
     }
 
     //mainly for debug purposes
-    public long[] getBoundingBox(){
-        long[] retval = new long[bbox.length];
+    public double[] getBoundingBox(){
+        double[] retval = new double[bbox.length];
         System.arraycopy(bbox, 0, retval, 0, bbox.length);
         return retval;
     }
@@ -221,20 +221,20 @@ public class Composite extends Glyph {
         for(Glyph child: children){
             child.reSize(factor);
 
-            child.move((long)((vx - child.vx) * (1. - factor)), 
-                    (long)((vy - child.vy) * (1. - factor)));
+            child.move((vx - child.vx) * (1. - factor), 
+                    (vy - child.vy) * (1. - factor));
         }
         computeBoundingBox();
     }
 
     @Override
-    public void sizeTo(double newRadius){
-        reSize(newRadius/radius()); 
+    public void sizeTo(double newDiameter){
+        reSize(newDiameter/diameter()); 
     }
 
     @Override
     public double getSize(){
-        return radius();
+        return diameter();
     }
 
     @Override 
@@ -270,10 +270,10 @@ public class Composite extends Glyph {
     }
 
     private void computeBoundingBox(){
-        bbox[0] = Long.MAX_VALUE;
-        bbox[1] = Long.MIN_VALUE;
-        bbox[2] = Long.MIN_VALUE;
-        bbox[3] = Long.MAX_VALUE;
+        bbox[0] = Double.MAX_VALUE;
+        bbox[1] = Double.MIN_VALUE;
+        bbox[2] = Double.MIN_VALUE;
+        bbox[3] = Double.MAX_VALUE;
 
         for(Glyph child: children){
             double[] glBounds = child.getBounds();
@@ -296,8 +296,8 @@ public class Composite extends Glyph {
         }
     }
 
-    private double radius(){
-        return (float)(0.5*Math.sqrt((bbox[1] - bbox[3])*(bbox[1] - bbox[3]) + 
+    private double diameter(){
+        return (Math.sqrt((bbox[1] - bbox[3])*(bbox[1] - bbox[3]) + 
                 (bbox[2] - bbox[0])*(bbox[2] - bbox[0])));
     }
 }
