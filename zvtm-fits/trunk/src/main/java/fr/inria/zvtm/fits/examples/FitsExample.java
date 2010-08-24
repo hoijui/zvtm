@@ -90,13 +90,13 @@ public class FitsExample {
         Point2D end = new Point2D.Float(200,0);
 
         MultipleGradientPaint nopGrad = Utils.makeGradient(new NopFilter());
-        vs.addGlyph(new PRectangle(0, -200, 0, 100, 10, nopGrad, Color.BLACK));
+        vs.addGlyph(new PRectangle(0, -200, 0, 200, 20, nopGrad, Color.BLACK));
 
         MultipleGradientPaint heatGrad = Utils.makeGradient(new HeatFilter());
-        vs.addGlyph(new PRectangle(0, -250, 0, 100, 10, heatGrad, Color.BLACK));
+        vs.addGlyph(new PRectangle(0, -250, 0, 200, 20, heatGrad, Color.BLACK));
 
         MultipleGradientPaint rainbowGrad = Utils.makeGradient(new RainbowFilter());
-        vs.addGlyph(new PRectangle(0, -300, 0, 100, 10, rainbowGrad, Color.BLACK));
+        vs.addGlyph(new PRectangle(0, -300, 0, 200, 20, rainbowGrad, Color.BLACK));
     }
 
     private Point2D.Double viewToSpace(Camera cam, int jpx, int jpy){

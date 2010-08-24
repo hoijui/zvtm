@@ -10,13 +10,13 @@ import java.awt.image.RGBImageFilter;
  * Miscellaneous utility functions
  */
 public class Utils {
-    private static final int NB_POINTS = 10;
+    private static final int NB_POINTS = 20;
 
     private Utils(){}
 
     public static MultipleGradientPaint makeGradient(RGBImageFilter filter){
          Point2D start = new Point2D.Float(0, 0);
-         Point2D end = new Point2D.Float(200, 0);
+         Point2D end = new Point2D.Float(250, 0);
          float fractions[] = new float[NB_POINTS];
          Color colors[] = new java.awt.Color[NB_POINTS];
 
