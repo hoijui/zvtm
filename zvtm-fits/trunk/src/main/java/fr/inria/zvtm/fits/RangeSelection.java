@@ -17,9 +17,9 @@ public class RangeSelection extends Composite {
 
     public RangeSelection(){
         bar = new VRectangle(0,0,0,BAR_WIDTH,BAR_HEIGHT,new Color(0,200,0,180));
-        leftTick = makeTick();
+        leftTick = makeLeftTick();
         leftTick.move(-BAR_WIDTH/2 + 20, BAR_HEIGHT/2);
-        rightTick = makeTick();
+        rightTick = makeRightTick();
         rightTick.move(BAR_WIDTH/2 - 20, BAR_HEIGHT/2);
         addChild(bar);
         addChild(leftTick);
@@ -86,20 +86,29 @@ public class RangeSelection extends Composite {
     }
 
     private static final double[] tickCoordsX = {0, 0, -5, -5, 5, 5, 0};
-    private static final double[] tickCoordsY = {0, -BAR_HEIGHT, -BAR_HEIGHT-5, 
+    private static final double[] tickCoordsLY = {0, -BAR_HEIGHT, -BAR_HEIGHT-5, 
         -BAR_HEIGHT-5-22, -BAR_HEIGHT-5-22, -BAR_HEIGHT-5, -BAR_HEIGHT};
+    private static final double[] tickCoordsRY = {0, -BAR_HEIGHT, -BAR_HEIGHT-5, 
+        -BAR_HEIGHT-5-32, -BAR_HEIGHT-5-32, -BAR_HEIGHT-5, -BAR_HEIGHT};
 
-    private static final Point2D.Double[] getTickCoords(){
+    private static final Point2D.Double[] getTickCoords(double[] yCoords){
         Point2D.Double retval[] = new Point2D.Double[7];
         for(int i=0; i<retval.length; ++i){
-            retval[i] = new Point2D.Double(tickCoordsX[i], tickCoordsY[i]);
+            retval[i] = new Point2D.Double(tickCoordsX[i], yCoords[i]);
         }
         return retval;
     }
 
-    private static final VPolygon makeTick(){
-        return new VPolygon(getTickCoords(), 0, new Color(200, 0, 0, 120),
+    private static final VPolygon makeLeftTick(){
+        return new VPolygon(getTickCoords(tickCoordsLY), 0, 
+                new Color(200, 0, 0, 120),
                 Color.RED);
+    }
+
+    private static final VPolygon makeRightTick(){
+        return new VPolygon(getTickCoords(tickCoordsRY), 0, 
+                new Color(200, 200, 0, 120),
+                Color.YELLOW);
     }
 }
 
