@@ -71,16 +71,18 @@ public class RangeSelection extends Composite {
     //interactivity to RangeSelection. We need a better event system
     //but right now I just need to get started.
     public boolean overLeftTick(double xPos, double yPos){
-        double[] ltBounds = leftTick.getBounds(); //wnes
-        return (xPos >= ltBounds[0]) && (xPos <= ltBounds[2]) &&
-            (yPos <= ltBounds[1]) && (yPos >= ltBounds[3]);
+        //approximate tick by the lower, rectangular part
+        Point2D.Double[] tickCoords = leftTick.getAbsoluteVertices();
+        return (xPos >= tickCoords[2].x) && (xPos <= tickCoords[4].x) &&
+            (yPos <= tickCoords[2].y) && (yPos >= tickCoords[4].y); 
     }
 
     //See above method
     public boolean overRightTick(double xPos, double yPos){
-    double[] rtBounds = rightTick.getBounds(); //wnes
-        return (xPos >= rtBounds[0]) && (xPos <= rtBounds[2]) &&
-            (yPos <= rtBounds[1]) && (yPos >= rtBounds[3]);
+        //approximate tick by the lower, rectangular part
+        Point2D.Double[] tickCoords = rightTick.getAbsoluteVertices();
+        return (xPos >= tickCoords[2].x) && (xPos <= tickCoords[4].x) &&
+            (yPos <= tickCoords[2].y) && (yPos >= tickCoords[4].y); 
     }
 
     private static final double[] tickCoordsX = {0, 0, -5, -5, 5, 5, 0};
