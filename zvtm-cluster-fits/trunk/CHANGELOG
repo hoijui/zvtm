@@ -1,3 +1,5 @@
+Changed zvtm to zvtm-core in POM
+
 0.1.0
 -----
 Updated to use the new zvtm coordinate system (starting with zvtm 0.11.0)
