@@ -51,18 +51,20 @@ class GeoToolsManager {
 
     int polygonID = 0;
     
-    GeoToolsManager(WorldExplorer app, boolean queryGN){
+    GeoToolsManager(WorldExplorer app, boolean queryGN, boolean loadAdminDiv1){
         this.application = app;
         Region region = application.sm.createRegion(0, 0, 84600, 43200, 0, 4, "BR0", "Boundaries",
                                                     1, transitions, Region.ORDERING_DISTANCE,
                                                     false, null, null);
 
         loadShapes(new File("data/TM_WORLD_BORDERS-0.3.shp"), "Loading countries...", region, COUNTRY_COLOR);
-//        loadShapes(new File("data/shapefiles/ca_provinces/province.shp"), "Loading Canadian provinces...", region, ADMIN_DIV_1_COLOR);
-//        loadShapes(new File("data/shapefiles/us_states/statesp020.shp"), "Loading US states...", region, ADMIN_DIV_1_COLOR);
-//        loadShapes(new File("data/shapefiles/mx_states/mx_state.shp"), "Loading Mexican states...", region, ADMIN_DIV_1_COLOR);
-//        loadShapes(new File("data/shapefiles/russia/RUS1.shp"), "Loading Russian administrative divisions...", region, ADMIN_DIV_1_COLOR);
-//        loadShapes(new File("data/shapefiles/china/CHN1.shp"), "Loading Chinese administrative divisions...", region, ADMIN_DIV_1_COLOR);
+        if (loadAdminDiv1){
+            loadShapes(new File("data/shapefiles/ca_provinces/province.shp"), "Loading Canadian provinces...", region, ADMIN_DIV_1_COLOR);
+            loadShapes(new File("data/shapefiles/us_states/statesp020.shp"), "Loading US states...", region, ADMIN_DIV_1_COLOR);
+            loadShapes(new File("data/shapefiles/mx_states/mx_state.shp"), "Loading Mexican states...", region, ADMIN_DIV_1_COLOR);
+            loadShapes(new File("data/shapefiles/russia/RUS1.shp"), "Loading Russian administrative divisions...", region, ADMIN_DIV_1_COLOR);
+            loadShapes(new File("data/shapefiles/china/CHN1.shp"), "Loading Chinese administrative divisions...", region, ADMIN_DIV_1_COLOR);            
+        }
         gnp = new GeoNamesParser(application);
         if (queryGN){
             loadEntities();            
