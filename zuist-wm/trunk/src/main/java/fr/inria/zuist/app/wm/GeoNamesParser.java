@@ -35,14 +35,18 @@ public class GeoNamesParser {
     static final String OUTPUT_CSV_SEP = "\t";
     static final String OUTPUT_FILE_ENCODING = "UTF-8";
 
-    static ToponymSearchResult getEntitiesFromWebService(String featureCode, int maxRows){
+    static void getEntitiesFromWebService(String featureCode, int maxRows){
         try {
             ToponymSearchCriteria searchCriteria = new ToponymSearchCriteria();
             searchCriteria.setFeatureCode(featureCode);
             searchCriteria.setMaxRows(maxRows);
-            return WebService.search(searchCriteria);            
+            ToponymSearchResult searchResults = WebService.search(searchCriteria);
+            for (Toponym toponym : searchResults.getToponyms()) {
+                System.out.println(toponym.getName()+OUTPUT_CSV_SEP+toponym.getLatitude()+OUTPUT_CSV_SEP+toponym.getLongitude());
+            }
+            System.out.println("\n-------------------- Returned a total of " + searchResults.getTotalResultsCount()  + "results");
         }
-        catch (Exception e){e.printStackTrace();return null;} 
+        catch (Exception e){e.printStackTrace();} 
     }
 
     static void getEntitiesFromWebService(String fileName){
@@ -69,7 +73,7 @@ public class GeoNamesParser {
     }
 
     public static void main (String[] args){
-        getEntitiesFromWebService(args[0]);
+        getEntitiesFromWebService(args[0], Integer.parseInt(args[1]));
         System.exit(0);
     }
     
