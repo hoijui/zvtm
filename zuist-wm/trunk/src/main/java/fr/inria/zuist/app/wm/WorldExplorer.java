@@ -189,6 +189,7 @@ public class WorldExplorer implements Java2DPainter {
         console.setMargin(new java.awt.Insets(5,5,5,5));
         console.setVisible(false);
         mView.setActiveLayer(1);
+        mView.getPanel().addComponentListener(eh);
     }
 
     void windowLayout(){
@@ -302,13 +303,18 @@ public class WorldExplorer implements Java2DPainter {
         vsm.getAnimationManager().startAnimation(a, false);
     }
     
-    void altitudeChanged(){
-    }
+    void altitudeChanged(){}
     
     void updatePanelSize(){
         Dimension d = mView.getPanel().getSize();
         panelWidth = d.width;
         panelHeight = d.height;
+        if (nm != null && nm.ovPortal != null){
+            nm.ovPortal.moveTo(panelWidth-nm.ovPortal.getDimensions().width-1, panelHeight-nm.ovPortal.getDimensions().height-1);            
+        }
+        if (console != null){
+            console.setBounds(20, panelHeight-100, panelWidth-250, 96);
+        }
     }
     
     void toggleMemoryUsageDisplay(){
