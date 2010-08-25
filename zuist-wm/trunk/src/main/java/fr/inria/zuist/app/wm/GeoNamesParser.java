@@ -27,7 +27,7 @@ import org.geonames.WebService;
 import org.geonames.Style;
 
 import fr.inria.zvtm.glyphs.ClosedShape;
-import fr.inria.zvtm.glyphs.RectangleNR;
+import fr.inria.zvtm.glyphs.SIRectangle;
 import fr.inria.zvtm.glyphs.VText;
 
 import au.com.bytecode.opencsv.CSVReader;
@@ -128,7 +128,7 @@ public class GeoNamesParser {
             ToponymSearchResult searchResult = WebService.search(searchCriteria);
             application.console.setText("Loaded "+searchResult.getTotalResultsCount()+" entities");
             for (Toponym toponym : searchResult.getToponyms()){
-                ClosedShape g = new RectangleNR(GeoToolsManager.CC*toponym.getLongitude(), GeoToolsManager.CC*toponym.getLatitude(),
+                ClosedShape g = new SIRectangle(GeoToolsManager.CC*toponym.getLongitude(), GeoToolsManager.CC*toponym.getLatitude(),
                                                 2, 6, 6, FEATURE_COLOR);
                 application.bSpace.addGlyph(g);
                 g.setCursorInsideFillColor(Color.RED);

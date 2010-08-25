@@ -315,10 +315,6 @@ class NavigationManager {
         return res;
     }
     
-    void showLensChooser(){
-        new LensChooser(this);
-    }
-
 }
 
 class ZP2LensAction implements EndAction {
