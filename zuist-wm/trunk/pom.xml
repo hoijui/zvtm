@@ -90,10 +90,17 @@ $Id$
 	  <artifactId>gt-epsg-hsql</artifactId>
 	   <version>${geotools.version}</version>
 	</dependency>
+	<!-- http://geonames.org -->
 	<dependency>
 		<groupId>org.geonames</groupId>
 		<artifactId>geonames</artifactId>
 		<version>1.0</version>
+	</dependency>
+	<!-- http://opencsv.sourceforge.net/ -->
+	<dependency>
+	  <groupId>net.sf.opencsv</groupId>
+	  <artifactId>opencsv</artifactId>
+	  <version>2.1</version>
 	</dependency>
   </dependencies>
   

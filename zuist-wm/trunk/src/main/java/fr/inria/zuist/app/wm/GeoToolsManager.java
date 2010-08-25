@@ -148,7 +148,7 @@ class GeoToolsManager {
     void loadEntities(){
         application.gp.setValue(10);
         application.gp.setLabel("Loading GeoNames features");
-        gnp.loadFeatures();
+        gnp.loadCities();
         application.gp.setValue(100);
     }
 
