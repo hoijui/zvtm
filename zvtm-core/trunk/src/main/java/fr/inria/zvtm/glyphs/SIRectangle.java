@@ -1,4 +1,4 @@
-/*   FILE: RectangleNR.java
+/*   FILE: SIRectangle.java
  *   DATE OF CREATION:   Thu Dec 05 13:53:36 2002
  *   AUTHOR :            Emmanuel Pietriga (emmanuel@w3.org)
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
@@ -29,14 +29,14 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
  * @author Emmanuel Pietriga
  **/
 
-public class RectangleNR extends ClosedShape implements RectangularShape {
+public class SIRectangle extends ClosedShape implements RectangularShape {
 
     double vw,vh;
     double ar;
 
     RProjectedCoords[] pc;
 
-    public RectangleNR(){
+    public SIRectangle(){
 	    this(0, 0, 0, 5, 5, Color.WHITE, Color.BLACK);
     }
 
@@ -48,7 +48,7 @@ public class RectangleNR extends ClosedShape implements RectangularShape {
      *@param h height in virtual space
      *@param c fill color
      */
-    public RectangleNR(double x,double y, int z,double w,double h,Color c){
+    public SIRectangle(double x,double y, int z,double w,double h,Color c){
 	    this(x, y, z, w, h, c, Color.BLACK);
     }
 
@@ -61,7 +61,7 @@ public class RectangleNR extends ClosedShape implements RectangularShape {
      *@param c fill color
      *@param bc border color
      */
-    public RectangleNR(double x, double y, int z, double w, double h, Color c, Color bc){
+    public SIRectangle(double x, double y, int z, double w, double h, Color c, Color bc){
         vx=x;
         vy=y;
         vz=z;
@@ -96,7 +96,7 @@ public class RectangleNR extends ClosedShape implements RectangularShape {
                 pc[pc.length-1].cw = (int)(vw / 2d);
                 pc[pc.length-1].ch = (int)(vh / 2d);
             }
-            else {System.err.println("RectangleNR:Error while adding camera "+verifIndex);}
+            else {System.err.println("SIRectangle:Error while adding camera "+verifIndex);}
         }
         else {
             if (verifIndex==0){
@@ -105,7 +105,7 @@ public class RectangleNR extends ClosedShape implements RectangularShape {
                 pc[0].cw = (int)(vw / 2d);
                 pc[0].ch = (int)(vh / 2d);
             }
-            else {System.err.println("RectangleNR:Error while adding camera "+verifIndex);}
+            else {System.err.println("SIRectangle:Error while adding camera "+verifIndex);}
         }
     }
 
@@ -403,7 +403,7 @@ public class RectangleNR extends ClosedShape implements RectangularShape {
     }
 
     public Object clone(){
-        RectangleNR res = new RectangleNR(vx,vy,vz,vw,vh,color);
+        SIRectangle res = new SIRectangle(vx,vy,vz,vw,vh,color);
         res.borderColor = this.borderColor;
         res.cursorInsideColor = this.cursorInsideColor;
         res.bColor = this.bColor;

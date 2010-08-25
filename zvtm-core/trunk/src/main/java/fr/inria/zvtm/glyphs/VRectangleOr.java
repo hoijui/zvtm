@@ -35,6 +35,9 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
  * Rectangle. This version is less efficient than VRectangle, but it can be reoriented.
  * @author Emmanuel Pietriga
  *@see fr.inria.zvtm.glyphs.VRectangle
+ *@see fr.inria.zvtm.glyphs.PRectangle
+ *@see fr.inria.zvtm.glyphs.FRectangle
+ *@see fr.inria.zvtm.glyphs.SIRectangle
  */
 
 public class VRectangleOr extends VRectangle {

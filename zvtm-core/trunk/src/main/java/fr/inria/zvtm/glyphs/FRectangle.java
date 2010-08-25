@@ -22,6 +22,8 @@ import fr.inria.zvtm.glyphs.VRectangle;
  *@author Emmanuel Pietriga
  *@see fr.inria.zvtm.glyphs.VRectangle
  *@see fr.inria.zvtm.glyphs.VRectangleOr
+ *@see fr.inria.zvtm.glyphs.PRectangle
+ *@see fr.inria.zvtm.glyphs.SIRectangle
  */
 
 public class FRectangle extends VRectangle {

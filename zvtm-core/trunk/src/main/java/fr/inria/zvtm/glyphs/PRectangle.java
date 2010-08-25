@@ -18,10 +18,13 @@ import java.awt.Paint;
 import fr.inria.zvtm.glyphs.VRectangle;
 
 /**
- * Rectangle filled a customizable gradient paint.
+ * Rectangle filled a customizable gradient paint. Cannot be reoriented.
  *@author Emmanuel Pietriga
  *@see fr.inria.zvtm.glyphs.VRectangle
  *@see fr.inria.zvtm.glyphs.VRectangleOr
+ *@see fr.inria.zvtm.glyphs.VRectangle
+ *@see fr.inria.zvtm.glyphs.FRectangle
+ *@see fr.inria.zvtm.glyphs.SIRectangle
  */
 
 public class PRectangle extends VRectangle {

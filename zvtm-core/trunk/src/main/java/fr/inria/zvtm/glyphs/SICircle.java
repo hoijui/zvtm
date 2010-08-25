@@ -16,9 +16,9 @@ import java.awt.geom.AffineTransform;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.glyphs.VCircle;
 
-public class CircleNR extends VCircle {
+public class SICircle extends VCircle {
 
-	public CircleNR(){
+	public SICircle(){
 		super();
 	}
 
@@ -29,7 +29,7 @@ public class CircleNR extends VCircle {
 		*@param d diameter in virtual space
 		*@param c fill color
 		*/
-	public CircleNR(double x, double y, int z, double d, Color c){
+	public SICircle(double x, double y, int z, double d, Color c){
 		super(x, y, z, d, c);
 	}
 
@@ -41,7 +41,7 @@ public class CircleNR extends VCircle {
 		*@param c fill color
 		*@param bc border color
 		*/
-	public CircleNR(double x, double y, int z, double d, Color c, Color bc){
+	public SICircle(double x, double y, int z, double d, Color c, Color bc){
 		super(x, y, z, d, c, bc);
 	}
 
@@ -54,7 +54,7 @@ public class CircleNR extends VCircle {
 		*@param bc border color
 		*@param alpha alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
 		*/
-	public CircleNR(double x, double y, int z, double d, Color c, Color bc, float alpha){
+	public SICircle(double x, double y, int z, double d, Color c, Color bc, float alpha){
 		super(x, y, z, d, c, bc, alpha);
 	}
 	
@@ -94,7 +94,7 @@ public class CircleNR extends VCircle {
 	}
 
 	public Object clone(){
-		CircleNR res=new CircleNR(vx, vy, vz, size, color);
+		SICircle res=new SICircle(vx, vy, vz, size, color);
 		res.borderColor=this.borderColor;
 		res.cursorInsideColor=this.cursorInsideColor;
 		res.bColor=this.bColor;

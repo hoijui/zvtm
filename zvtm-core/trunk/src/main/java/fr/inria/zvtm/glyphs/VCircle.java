@@ -39,6 +39,7 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
  * Circle. 
  * @author Emmanuel Pietriga
  *@see fr.inria.zvtm.glyphs.VEllipse
+ *@see fr.inria.zvtm.glyphs.SICircle
  */
 
 public class VCircle extends ClosedShape {
