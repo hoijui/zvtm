@@ -48,32 +48,9 @@ class NavigationManager {
     int lensType = NO_LENS;
     
     /* lens distance and drop-off functions */
-    static final short L1_Linear = 0;
-    static final short L1_InverseCosine = 1;
-    static final short L1_Manhattan = 2;
-    static final short L2_Gaussian = 3;
-    static final short L2_Linear = 4;
-    static final short L2_InverseCosine = 5;
-    static final short L2_Manhattan = 6;
-    static final short L2_TLinear = 7;
-    static final short L2_Fading = 8;
-    static final short L2_DLinear = 9;
-    static final short L3_Gaussian = 10;
-    static final short L3_Linear = 11;
-    static final short L3_InverseCosine = 12;
-    static final short L3_Manhattan = 13;
-    static final short L3_TLinear = 14;
-    static final short LInf_Gaussian = 15;
-    static final short LInf_Linear = 16;
-    static final short LInf_InverseCosine = 17;
-    static final short LInf_Manhattan = 18;
-    static final short LInf_TLinear = 19;
-    static final short LInf_Fading = 20;
-    static final short L2_Wave = 21;
-    static final short LInf_Step = 22;
-    static final short L2_XGaussian = 23;
-    static final short L2_HLinear = 24;
-    short lensFamily = L2_Gaussian;
+    static final short L2_Gaussian = 0;
+    static final short L2_SCB = 1;
+    short lensFamily = L2_SCB;
     
     static final float FLOOR_ALTITUDE = 100.0f;
 
@@ -137,6 +114,17 @@ class NavigationManager {
 	}
 	
 	/* -------------- Sigma Lenses ------------------- */
+
+    void toggleLensType(){
+	    if (lensFamily == L2_Gaussian){
+	        lensFamily = L2_SCB;
+	        //application.ovm.say(Messages.SCB);
+	    }
+	    else {
+	        lensFamily = L2_Gaussian;
+	        //application.ovm.say(Messages.FISHEYE);
+	    }
+	}
 
     void setLens(int t){
         lensType = t;
@@ -311,135 +299,16 @@ class NavigationManager {
     Lens getLensDefinition(int x, int y){
         Lens res = null;
         switch (lensFamily){
-            case L1_Linear:{
-                res = new L1FSLinearLens(1.0f, LENS_R1, LENS_R2, x - application.panelWidth/2, y - application.panelHeight/2);
-                tLens = null;
-                break;
-            }
-            case L1_InverseCosine:{
-                res = new L1FSInverseCosineLens(1.0f, LENS_R1, LENS_R2, x - application.panelWidth/2, y - application.panelHeight/2);
-                tLens = null;
-                break;
-            }
-            case L1_Manhattan:{
-                res = new L1FSManhattanLens(1.0f, LENS_R1, x - application.panelWidth/2, y - application.panelHeight/2);
-                tLens = null;
-                break;
-            }
             case L2_Gaussian:{
                 res = new FSGaussianLens(1.0f, LENS_R1, LENS_R2, x - application.panelWidth/2, y - application.panelHeight/2);
                 tLens = null;
                 break;
             }
-            case L2_Linear:{
-                res = new FSLinearLens(1.0f, LENS_R1, LENS_R2, x - application.panelWidth/2, y - application.panelHeight/2);
-                tLens = null;
-                break;
-            }
-            case L2_InverseCosine:{
-                res = new FSInverseCosineLens(1.0f, LENS_R1, LENS_R2, x - application.panelWidth/2, y - application.panelHeight/2);
-                tLens = null;
-                break;
-            }
-            case L2_Manhattan:{
-                res = new FSManhattanLens(1.0f, LENS_R1, x - application.panelWidth/2, y - application.panelHeight/2);
-                tLens = null;
-                break;
-            }
-            case LInf_Linear:{
-                res = new LInfFSLinearLens(1.0f, LENS_R1, LENS_R2, x - application.panelWidth/2, y - application.panelHeight/2);
-                tLens = null;
-                break;
-            }
-            case LInf_InverseCosine:{
-                res = new LInfFSInverseCosineLens(1.0f, LENS_R1, LENS_R2, x - application.panelWidth/2, y - application.panelHeight/2);
-                tLens = null;
-                break;
-            }
-            case LInf_Manhattan:{
-                res = new LInfFSManhattanLens(1.0f, LENS_R1, x - application.panelWidth/2, y - application.panelHeight/2);
-                tLens = null;
-                break;
-            }
-            case LInf_Gaussian:{
-                res = new LInfFSGaussianLens(1.0f, LENS_R1, LENS_R2, x - application.panelWidth/2, y - application.panelHeight/2);
-                tLens = null;
-                break;
-            }
-            case L2_TLinear:{
-                res = new BLinearLens(1.0f, 0.0f, 0.95f, LENS_R1, 50, x - application.panelWidth/2, y - application.panelHeight/2);
-                tLens = null;
-                break;
-            }
-            case LInf_TLinear:{
-                res = new LInfBLinearLens(1.0f, 0.0f, 0.95f, LENS_R1, 100, x - application.panelWidth/2, y - application.panelHeight/2);
-                tLens = null;
-                break;
-            }
-            case L3_TLinear:{
-                res = new L3BLinearLens(1.0f, 0.0f, 0.95f, LENS_R1, 100, x - application.panelWidth/2, y - application.panelHeight/2);
-                tLens = null;
-                break;
-            }
-            case L2_Fading:{
+            case L2_SCB:{
                 tLens = new SCBLens(1.0f, 0.0f, 1.0f, LENS_R1, x - application.panelWidth/2, y - application.panelHeight/2);
                 ((SCBLens)tLens).setBoundaryColor(Color.RED);
                 ((SCBLens)tLens).setObservedRegionColor(Color.RED);
                 res = (Lens)tLens;
-                break;
-            }
-            case L2_DLinear:{
-                tLens = new SCFLinearLens(1.0f, LENS_R1, LENS_R2, x - application.panelWidth/2, y - application.panelHeight/2);
-                res = (Lens)tLens;
-                ((FixedSizeLens)res).setInnerRadiusColor(Color.RED);
-                ((FixedSizeLens)res).setOuterRadiusColor(Color.RED);
-				break;
-            }
-            case LInf_Fading:{
-                tLens = new LInfSCBLens(1.0f, 0.0f, 0.98f, LENS_R1, x - application.panelWidth/2, y - application.panelHeight/2);
-                ((SCBLens)tLens).setBoundaryColor(Color.RED);
-                ((SCBLens)tLens).setObservedRegionColor(Color.RED);
-                res = (Lens)tLens;
-                break;
-            }
-            case L3_Linear:{
-                res = new L3FSLinearLens(1.0f, LENS_R1, LENS_R2, x - application.panelWidth/2, y - application.panelHeight/2);
-                tLens = null;
-                break;
-            }
-            case L3_InverseCosine:{
-                res = new L3FSInverseCosineLens(1.0f, LENS_R1, LENS_R2, x - application.panelWidth/2, y - application.panelHeight/2);
-                tLens = null;
-                break;
-            }
-            case L3_Manhattan:{
-                res = new L3FSManhattanLens(1.0f, LENS_R1, x - application.panelWidth/2, y - application.panelHeight/2);
-                tLens = null;
-                break;
-            }
-            case L3_Gaussian:{
-                res = new L3FSGaussianLens(1.0f, LENS_R1, LENS_R2, x - application.panelWidth/2, y - application.panelHeight/2);
-                tLens = null;
-                break;
-            }
-            case L2_Wave:{
-                res = new FSWaveLens(1.0f, LENS_R1, LENS_R2/2, 8, x - application.panelWidth/2, y - application.panelHeight/2);
-                tLens = null;
-                break;
-            }
-            case LInf_Step:{
-                res = new LInfFSStepLens(1.0f, LENS_R1, LENS_R2, 1, x - application.panelWidth/2, y - application.panelHeight/2);
-                tLens = null;
-                break;
-            }
-        	case L2_XGaussian:{
-        	    res = new XGaussianLens(1.0f, 0.2f, 1.0f, LENS_R1, LENS_R2, x - application.panelWidth/2, y - application.panelHeight/2);
-        	    tLens = null;
-        	    break;
-        	}
-            case L2_HLinear:{
-                res = new HLinearLens(1.0f, 0.0f, 0.95f, LENS_R1, LENS_R2, x - application.panelWidth/2, y - application.panelHeight/2);
-                tLens = null;
                 break;
             }
         }
@@ -467,49 +336,6 @@ class ZP2LensAction implements EndAction {
         nm.lens = null;
         nm.setLens(NavigationManager.NO_LENS);
         nm.application.sm.setUpdateLevel(true);
-    }
-    
-}
-
-class LensChooser extends JFrame implements ItemListener {
-
-    // index of lenses should correspond to short value of associated lens type in NavigationManager
-    static final String[] LENS_NAMES = {"L1 / Linear", "L1 / Inverse Cosine", "L1 / Manhattan",
-        "L2 / Gaussian", "L2 / Linear", "L2 / Inverse Cosine", "L2 / Manhattan", "L2 / Translucence Linear", "L2 / Fading", "L2 / Dynamic Linear",
-        "L3 / Gaussian", "L3 / Linear", "L3 / Inverse Cosine", "L3 / Manhattan", "L3 / Translucence Linear",
-        "LInf / Gaussian", "LInf / Linear", "LInf / Inverse Cosine", "LInf / Manhattan", "LInf / Translucence Linear", "LInf / Fading",
-        "L2 / Wave", "LInf / Step", "L2 / XGaussian", "L2 / HLinear"};
-
-    NavigationManager nm;
-
-    JComboBox lensList;
-
-    LensChooser(NavigationManager nm){
-        super();
-        this.nm = nm;
-        initGUI();
-        this.pack();
-        this.setVisible(true);
-    }
-    
-    void initGUI(){
-        Container cp = getContentPane();
-        lensList = new JComboBox(LENS_NAMES);
-        lensList.setSelectedIndex(nm.lensFamily);
-        lensList.addItemListener(this);
-        cp.add(lensList);
-    }
-    
-    public void itemStateChanged(ItemEvent e){
-        if (e.getStateChange() == ItemEvent.SELECTED){
-            Object src = e.getItem();
-            for (int i=0;i<LENS_NAMES.length;i++){
-                if (src == LENS_NAMES[i]){
-                    nm.lensFamily = (short)i;
-                    return;
-                }
-            }
-        }
     }
     
 }

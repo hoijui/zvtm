@@ -106,6 +106,20 @@ class ExplorerEventHandler implements ViewEventHandler, CameraListener, Componen
 				regionStickedToMouse = true;
 			}
 		}
+        else if (mod == SHIFT_MOD){
+            lastVX = v.getVCursor().vx;
+            lastVY = v.getVCursor().vy;
+            if (nm.lensType != NavigationManager.NO_LENS){
+                nm.zoomInPhase2(lastVX, lastVY);
+            }
+            else {
+                if (cursorNearBorder){
+                    // do not activate the lens when cursor is near the border
+                    return;
+                }
+                nm.zoomInPhase1(jpx, jpy);
+            }
+		}
 		else {
 		    if (v.getVCursor().getDynaSpotRadius() > 0){return;}
 		    selectingRegion = true;
@@ -136,29 +150,11 @@ class ExplorerEventHandler implements ViewEventHandler, CameraListener, Componen
     	application.displayFeatureInfo((g != null) ? (Toponym)g.getOwner() : null, g);
     }
 
-    public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-        lastJPX = jpx;
-        lastJPY = jpy;
-    }
+    public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
-    public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-        if (!v.getVCursor().isDynaSpotActivated()){v.getVCursor().activateDynaSpot(true);}
-    }
+    public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
-    public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-        lastVX = v.getVCursor().vx;
-    	lastVY = v.getVCursor().vy;
-        if (nm.lensType != NavigationManager.NO_LENS){
-            nm.zoomInPhase2(lastVX, lastVY);
-        }
-        else {
-            if (cursorNearBorder){
-                // do not activate the lens when cursor is near the border
-                return;
-            }
-            nm.zoomInPhase1(jpx, jpy);
-        }
-    }
+    public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
     public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
         lastJPX = jpx;
@@ -178,15 +174,17 @@ class ExplorerEventHandler implements ViewEventHandler, CameraListener, Componen
         lastJPY = jpy;
         lastVX = v.getVCursor().vx;
         lastVY = v.getVCursor().vy;
-        if (nm.lensType != NavigationManager.NO_LENS){
-            nm.zoomOutPhase2();
-        }
-        else {
-            if (cursorNearBorder){
-                // do not activate the lens when cursor is near the border
-                return;
+        if (mod == META_SHIFT_MOD){
+            if (nm.lensType != NavigationManager.NO_LENS){
+                nm.zoomOutPhase2();
             }
-            nm.zoomOutPhase1(jpx, jpy, lastVX, lastVY);
+            else {
+                if (cursorNearBorder){
+                    // do not activate the lens when cursor is near the border
+                    return;
+                }
+                nm.zoomOutPhase1(jpx, jpy, lastVX, lastVY);
+            }            
         }
     }
         
@@ -245,7 +243,7 @@ class ExplorerEventHandler implements ViewEventHandler, CameraListener, Componen
 
     public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
         if (nm.lensType != 0 && nm.lens != null){
-            if (wheelDirection  == ViewEventHandler.WHEEL_UP){
+            if (wheelDirection  == ViewEventHandler.WHEEL_DOWN){
                 nm.magnifyFocus(NavigationManager.WHEEL_MM_STEP, nm.lensType, application.mCamera);
             }
             else {
@@ -290,7 +288,7 @@ class ExplorerEventHandler implements ViewEventHandler, CameraListener, Componen
         else if (code == KeyEvent.VK_F1){application.toggleMemoryUsageDisplay();}
         else if (code == KeyEvent.VK_F2){application.gc();}
         else if (code == KeyEvent.VK_B){application.gm.toggleBoundaryDisplay();}
-        else if (code == KeyEvent.VK_L){application.nm.showLensChooser();}
+        else if (code == KeyEvent.VK_L){application.nm.toggleLensType();}
         else if (code == KeyEvent.VK_U){application.toggleUpdateMaps();}
     }
 
