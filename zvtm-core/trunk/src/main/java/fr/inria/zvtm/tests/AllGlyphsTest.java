@@ -166,6 +166,12 @@ public class AllGlyphsTest {
         tx = new VTextOr(0, 320, 0, Color.BLUE, txt, (float)Math.PI/2f, VText.TEXT_ANCHOR_END);
         tx.moveTo(93, 328);
         vs.addGlyph(tx);
+        tx = new VText(120, 302, 0, Color.WHITE, Color.BLACK, txt, VText.TEXT_ANCHOR_START, 1f, 1f);
+        vs.addGlyph(tx);
+        tx = new VText(120, 315, 0, Color.WHITE, Color.BLACK, txt, VText.TEXT_ANCHOR_MIDDLE, 1f, 1f);
+        vs.addGlyph(tx);
+        tx = new VText(120, 328, 0, Color.WHITE, Color.BLACK, txt, VText.TEXT_ANCHOR_END, 1f, 1f);
+        vs.addGlyph(tx);
         // shapes
         float[] vertices6 = {1f, .5f, 1f, .5f, 1f, .5f, 1f, .5f};
         VShape s = new VShape(0, 240, 0, 40, vertices6, Color.WHITE, 0);

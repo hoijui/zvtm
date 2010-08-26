@@ -46,7 +46,7 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
  *@see fr.inria.zvtm.glyphs.VTextOr
  */
 
-public class VText extends Glyph {
+public class VText extends ClosedShape {
 
     /** Text alignment (for text anchor) used to align a VText (vx,vy coordinates coincides with start of String). */
     public static final short TEXT_ANCHOR_START=0;
@@ -79,9 +79,19 @@ public class VText extends Glyph {
 	protected String text;
 
 	protected float scaleFactor = 1.0f;
+	
+	/**
+	 * Offset between text and vertical borders
+	 */
+	public int paddingX = 1;
+
+	/**
+	 * Offset betwenn text and horizontal borders
+	 */
+	public int paddingY = 1;
     
     public VText(String t){
-		this(0, 0, 0, Color.BLACK, t, TEXT_ANCHOR_START, 1f, 1f);
+		this(0, 0, 0, Color.BLACK, null, t, TEXT_ANCHOR_START, 1f, 1f);
     }
 
     /**
@@ -92,7 +102,7 @@ public class VText extends Glyph {
      *@param t text string
      */
     public VText(double x, double y, int z, Color c, String t){
-		this(x, y, z, c, t, TEXT_ANCHOR_START, 1f, 1f);
+		this(x, y, z, c, null, t, TEXT_ANCHOR_START, 1f, 1f);
     }
 
     /**
@@ -104,7 +114,7 @@ public class VText extends Glyph {
      *@param ta text-anchor (for alignment: one of TEXT_ANCHOR_*)
      */
     public VText(double x,double y, int z,Color c,String t,short ta){
-		this(x, y, z, c, t, ta, 1f, 1f);
+		this(x, y, z, c, null, t, ta, 1f, 1f);
     }
 
     /**
@@ -117,9 +127,10 @@ public class VText extends Glyph {
      *@param scale scaleFactor w.r.t original image size
      */
     public VText(double x, double y, int z, Color c, String t, short ta, float scale){
-        this(x, y, z, c, t, ta, scale, 1.0f);
+        this(x, y, z, c, null, t, ta, scale, 1.0f);
     }
 
+    
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
@@ -131,14 +142,37 @@ public class VText extends Glyph {
       *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
      */
     public VText(double x, double y, int z, Color c, String t, short ta, float scale, float alpha){
+        this(x, y, z, c, null, t, ta, scale, alpha);
+    }
+    
+    /**
+     *@param x coordinate in virtual space
+     *@param y coordinate in virtual space
+     *@param z z-index (pass 0 if you do not use z-ordering)
+     *@param c fill color
+     *@param bkg background color (null if not painted)
+     *@param t text string
+     *@param ta text-anchor (for alignment: one of TEXT_ANCHOR_*)
+     *@param scale scaleFactor w.r.t original image size
+      *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
+     */
+    public VText(double x, double y, int z, Color c, Color bkg, String t, short ta, float scale, float alpha){
         vx = x;
         vy = y;
         vz = z;
         text = t;
         setColor(c);
+        // store background color in borderColor attribute
+        if (bkg != null){
+            setDrawBorder(true);
+            setBorderColor(bkg);            
+        }
+        else {
+            setDrawBorder(false);
+        }
         text_anchor = ta;
         scaleFactor = scale;
-        setTranslucencyValue(alpha);
+        setTranslucencyValue(alpha);        
     }
 
     public void initCams(int nbCam){
@@ -377,22 +411,33 @@ public class VText extends Glyph {
 			g.setFont((font!=null) ? font : getMainFont());
 			Rectangle2D bounds = g.getFontMetrics().getStringBounds(text,g);
 			// cw and ch actually hold width and height of text *in virtual space*
-			pc[i].cw = (int)Math.round(bounds.getWidth() * scaleFactor);
-			pc[i].ch = (int)Math.round(bounds.getHeight() * scaleFactor);
+			pc[i].cw = (int)Math.round((bounds.getWidth() + 2*paddingX) * scaleFactor);
+			pc[i].ch = (int)Math.round((bounds.getHeight() + 2*paddingY)* scaleFactor);
 			pc[i].valid=true;
 		}
         if (alphaC != null && alphaC.getAlpha()==0){return;}
 		double trueCoef = scaleFactor * coef;
-		g.setColor(this.color);
 		if (trueCoef*fontSize > VirtualSpaceManager.INSTANCE.getTextDisplayedAsSegCoef() || !zoomSensitive){
 			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
-			g.setFont((font!=null) ? font : getMainFont());			
+			g.setFont((font!=null) ? font : getMainFont());	
 			AffineTransform at;
-			if (text_anchor==TEXT_ANCHOR_START){at=AffineTransform.getTranslateInstance(dx+pc[i].cx,dy+pc[i].cy);}
-			else if (text_anchor==TEXT_ANCHOR_MIDDLE){at=AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw*coef/2.0f,dy+pc[i].cy);}
-			else {at=AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw*coef,dy+pc[i].cy);}
+			if (text_anchor==TEXT_ANCHOR_START){
+			    at = AffineTransform.getTranslateInstance(dx+pc[i].cx,dy+pc[i].cy);
+			}
+			else if (text_anchor==TEXT_ANCHOR_MIDDLE){
+			    at = AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw*coef/2.0f,dy+pc[i].cy);
+			    }
+			else {
+			    at = AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw*coef,dy+pc[i].cy);
+			}
 			if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(trueCoef, trueCoef));}
 			g.setTransform(at);
+			int rectH = Math.round(pc[i].ch / scaleFactor);
+			if (isBorderDrawn()){
+			    g.setColor(borderColor);
+                g.fillRect(dx-paddingX, dy-rectH+1+2*paddingY, Math.round(pc[i].cw / scaleFactor), rectH-1);
+			}
+    		g.setColor(this.color);
 			if (alphaC != null){
 				g.setComposite(alphaC);
 				g.drawString(text, 0.0f, 0.0f);
@@ -404,6 +449,7 @@ public class VText extends Glyph {
 			g.setTransform(stdT);
 		}
 		else {
+    		g.setColor(this.color);
 			if (alphaC != null){
 				g.setComposite(alphaC);
 				g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
@@ -564,28 +610,31 @@ public class VText extends Glyph {
     }
 
     public Object clone(){
-	VText res=new VText(vx,vy,vz,color,(new StringBuffer(text)).toString(),text_anchor, getScale(), (alphaC != null) ? alphaC.getAlpha() : 1.0f);
-	res.cursorInsideColor=this.cursorInsideColor;
-	return res;
+        VText res = new VText(vx, vy, vz, color, borderColor, (new StringBuffer(text)).toString(),
+            text_anchor, getScale(), (alphaC != null) ? alphaC.getAlpha() : 1.0f);
+        res.cursorInsideColor = this.cursorInsideColor;
+        return res;
     }
 
     /** Highlight this glyph to give visual feedback when the cursor is inside it. */
     public void highlight(boolean b, Color selectedColor){
         boolean update = false;
         if (b){
-            if (cursorInsideColor != null){color = cursorInsideColor;update = true;}
+            if (cursorInsideFColor != null){color = cursorInsideFColor;update = true;}
+            if (cursorInsideColor != null){borderColor = cursorInsideColor;update = true;}
         }
         else {
             if (isSelected() && selectedColor != null){
-                color = selectedColor;
+                borderColor = selectedColor;
                 update = true;
             }
             else {
-                if (cursorInsideColor != null){color = fColor;update = true;}
+                if (cursorInsideFColor != null){color = fColor;update = true;}
+                if (cursorInsideColor != null){borderColor = bColor;update = true;}
             }
         }
         if (update){
-		VirtualSpaceManager.INSTANCE.repaintNow();
+            VirtualSpaceManager.INSTANCE.repaintNow();
         }
     }
 
