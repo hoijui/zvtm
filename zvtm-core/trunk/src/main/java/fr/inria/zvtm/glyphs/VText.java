@@ -175,6 +175,7 @@ public class VText extends ClosedShape {
         setTranslucencyValue(alpha);        
     }
 
+    @Override
     public void initCams(int nbCam){
 	pc=new ProjText[nbCam];
 	for (int i=0;i<nbCam;i++){
@@ -182,6 +183,7 @@ public class VText extends ClosedShape {
 	}
     }
 
+    @Override
     public void addCamera(int verifIndex){
 	if (pc!=null){
 	    if (verifIndex==pc.length){
@@ -203,16 +205,19 @@ public class VText extends ClosedShape {
 	}
     }
 
+    @Override
     public void removeCamera(int index){
 	pc[index]=null;
     }
 
+    @Override
     public void resetMouseIn(){
 	for (int i=0;i<pc.length;i++){
 	    resetMouseIn(i);
 	}
     }
 
+    @Override
     public void resetMouseIn(int i){
 	if (pc[i]!=null){pc[i].prevMouseIn=false;}
     }
@@ -220,14 +225,17 @@ public class VText extends ClosedShape {
     /** No effect. Use the glyph's scale factor.
      *@see #setScale(float s)
      */
+     @Override
     public void sizeTo(double factor){}
 
     /** No effect. Use the glyph's scale factor.
      *@see #setScale(float s)
      */
+     @Override
     public void reSize(double factor){}
 
     /** Cannot be reoriented. */
+    @Override
     public void orientTo(double angle){}
 
     /** Get glyph's size (size of bounding circle).
@@ -236,6 +244,7 @@ public class VText extends ClosedShape {
      *@see #validBounds(int i)
      *@see #invalidate()
      */
+     @Override
     public double getSize(){
         for (int i=0;i<pc.length;i++){
             if (pc[i] != null & pc[i].valid){
@@ -246,6 +255,7 @@ public class VText extends ClosedShape {
         return 0;
     }
 
+    @Override
     public double getOrient(){return orient;}
 
     /** Set to false if the text should not be scaled according to camera's altitude. Its apparent size will always be the same, no matter the camera's altitude.
@@ -265,6 +275,24 @@ public class VText extends ClosedShape {
 	return zoomSensitive;
     }
 
+    /** Set the text's background color.
+     *@param c background fill color. null if background should not be painted.
+     *@see #setColor(Color c)
+     */
+     @Override
+    public void setBorderColor(Color c){
+        super.setBorderColor(c);
+    }
+    
+    /** Get the text's background color.
+     *@return background fill color. null if background is not painted.
+     */
+     @Override
+    public Color getBorderColor(){
+        return super.getBorderColor();
+    }
+
+    @Override
     public boolean visibleInRegion(double wb, double nb, double eb, double sb, int i){
         if (!validBounds(i)){return true;}
         if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
@@ -304,6 +332,7 @@ public class VText extends ClosedShape {
         }
     }
 
+    @Override
     public boolean containedInRegion(double wb, double nb, double eb, double sb, int i){
 	if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
 	    /* Glyph hotspot is in the region.
@@ -331,10 +360,12 @@ public class VText extends ClosedShape {
 	return false;
     }
 
+    @Override
     public boolean fillsView(double w,double h,int camIndex){
 	return false;
     }
 
+    @Override
     public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
         boolean res=false;
         switch (text_anchor){
@@ -353,6 +384,7 @@ public class VText extends ClosedShape {
         return res;
     }
 
+    @Override
 	public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
 	    if (text_anchor==TEXT_ANCHOR_START){
     		return dvs.intersects(vx, vy, pc[camIndex].cw, pc[camIndex].ch);
@@ -366,6 +398,7 @@ public class VText extends ClosedShape {
         }	    
 	}
 
+    @Override
     public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
 	    if (coordInside(jpx, jpy, camIndex, cvx, cvy)){
              //if the mouse is inside the glyph
@@ -388,6 +421,7 @@ public class VText extends ClosedShape {
          }
     }
 
+    @Override
     public void project(Camera c, Dimension d){
         int i=c.getIndex();
         coef = c.focal/(c.focal+c.altitude);
@@ -397,6 +431,7 @@ public class VText extends ClosedShape {
         pc[i].cy=(d.height/2)-(int)Math.round((vy-c.posy)*coef);
     }
 
+    @Override
     public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, double lensx, double lensy){
         int i=c.getIndex();
         coef = c.focal/(c.focal+c.altitude) * lensMag;
@@ -406,6 +441,7 @@ public class VText extends ClosedShape {
         pc[i].lcy = lensHeight/2 - (int)Math.round((vy-lensy)*coef);
     }
 
+    @Override
 	public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 		if (!pc[i].valid){
 			g.setFont((font!=null) ? font : getMainFont());
@@ -461,6 +497,7 @@ public class VText extends ClosedShape {
 		}
 	}
 
+    @Override
 	public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 		if (!pc[i].lvalid){
 			g.setFont((font!=null) ? font : getMainFont());
@@ -617,6 +654,7 @@ public class VText extends ClosedShape {
     }
 
     /** Highlight this glyph to give visual feedback when the cursor is inside it. */
+    @Override
     public void highlight(boolean b, Color selectedColor){
         boolean update = false;
         if (b){
