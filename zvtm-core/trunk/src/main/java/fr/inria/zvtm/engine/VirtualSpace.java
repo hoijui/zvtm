@@ -448,13 +448,13 @@ public class VirtualSpace {
 			//init result with first glyph found
 			if (gl[0] instanceof RectangularShape){
 				rs = (RectangularShape)gl[0];
-				res[0] = gl[0].vx - rs.getWidth();
-				res[1] = gl[0].vy + rs.getHeight();
-				res[2] = gl[0].vx + rs.getWidth();
-				res[3] = gl[0].vy - rs.getHeight();				
+				res[0] = gl[0].vx - rs.getWidth()/2d;
+				res[1] = gl[0].vy + rs.getHeight()/2d;
+				res[2] = gl[0].vx + rs.getWidth()/2d;
+				res[3] = gl[0].vy - rs.getHeight()/2d;				
 			}
 			else {
-				size = (long)gl[0].getSize();
+				size = gl[0].getSize() / 2d;
 				res[0] = gl[0].vx - size;
 				res[1] = gl[0].vy + size;
 				res[2] = gl[0].vx + size;
@@ -464,13 +464,13 @@ public class VirtualSpace {
 			for (int i=1;i<gl.length;i++){
 				if (gl[i] instanceof RectangularShape){
 					rs = (RectangularShape)gl[i];
-					tmp = gl[i].vx - rs.getWidth();if (tmp<res[0]){res[0] = tmp;}
-					tmp = gl[i].vy + rs.getHeight();if (tmp>res[1]){res[1] = tmp;}
-					tmp = gl[i].vx + rs.getWidth();if (tmp>res[2]){res[2] = tmp;}
-					tmp = gl[i].vy - rs.getHeight();if (tmp<res[3]){res[3] = tmp;}
+					tmp = gl[i].vx - rs.getWidth()/2d;if (tmp<res[0]){res[0] = tmp;}
+					tmp = gl[i].vy + rs.getHeight()/2d;if (tmp>res[1]){res[1] = tmp;}
+					tmp = gl[i].vx + rs.getWidth()/2d;if (tmp>res[2]){res[2] = tmp;}
+					tmp = gl[i].vy - rs.getHeight()/2d;if (tmp<res[3]){res[3] = tmp;}
 				}
 				else {
-					size = (long)gl[i].getSize();
+					size = gl[i].getSize() / 2d;
 					tmp = gl[i].vx - size;if (tmp<res[0]){res[0] = tmp;}
 					tmp = gl[i].vy + size;if (tmp>res[1]){res[1] = tmp;}
 					tmp = gl[i].vx + size;if (tmp>res[2]){res[2] = tmp;}

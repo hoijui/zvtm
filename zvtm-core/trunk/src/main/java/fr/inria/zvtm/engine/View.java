@@ -776,10 +776,10 @@ public abstract class View {
                     ratio = (((VText)g).getBounds(c.getIndex()).x) / (g.vx-trRegBounds[0]);
                 }
                 else if (g instanceof RectangularShape){
-                    ratio = (((RectangularShape)g).getWidth()) / (g.vx-trRegBounds[0]);
+                    ratio = (((RectangularShape)g).getWidth()/2d) / (g.vx-trRegBounds[0]);
                 }
                 else {
-                    ratio = g.getSize() / (g.vx-trRegBounds[0]);
+                    ratio = g.getSize() / 2d / (g.vx-trRegBounds[0]);
                 }
             }
             //same for Y ; take the max of both
@@ -789,10 +789,10 @@ public abstract class View {
                     tmpRatio = (((VText)g).getBounds(c.getIndex()).y) / (g.vy-trRegBounds[1]);
                 }
                 else if (g instanceof RectangularShape){
-                    tmpRatio = (((RectangularShape)g).getHeight()) / (g.vy-trRegBounds[1]);
+                    tmpRatio = (((RectangularShape)g).getHeight()/2d) / (g.vy-trRegBounds[1]);
                 }
                 else {
-                    tmpRatio = g.getSize() / (g.vy-trRegBounds[1]);
+                    tmpRatio = g.getSize() / 2d / (g.vy-trRegBounds[1]);
                 }
                 if (tmpRatio>ratio){ratio=tmpRatio;}
             }
