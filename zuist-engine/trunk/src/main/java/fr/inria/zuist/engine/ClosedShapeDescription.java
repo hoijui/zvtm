@@ -44,17 +44,14 @@ public class ClosedShapeDescription extends ObjectDescription {
         this.sensitive = sensitive;
     }
 
-    /** Called automatically by scene manager, but can be called by client application to force loading of objects not actually visible. */
     @Override
     public void createObject(final SceneManager sm, final VirtualSpace vs, boolean fadeIn){
         if (!inSpace){
             if (fadeIn){
                 glyph.setTranslucencyValue(0.0f);
                 if (!sensitive){glyph.setSensitivity(false);}
-                //XXX:TBW FADE_ANIM_DATA should actually have a translucency value that equals the glyph's original value,
-                //        not necessarily 1.0f
-//                VirtualSpaceManager.INSTANCE.animator.createGlyphAnimation(GlyphLoader.FADE_IN_DURATION, AnimManager.GL_COLOR_LIN,
-//                    GlyphLoader.FADE_IN_ANIM_DATA, glyph.getID());
+                //XXX:FIXME FADE_ANIM_DATA should actually have a translucency value that equals the glyph's original value,
+                //          not necessarily 1.0f
                 Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_IN_DURATION, glyph,
                     1.0f, false, IdentityInterpolator.getInstance(), null);
                 VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
@@ -79,14 +76,10 @@ public class ClosedShapeDescription extends ObjectDescription {
         }
     }
 
-    /** Called automatically by scene manager, but can be called by client application to force unloading of objects still visible. */
     @Override
     public void destroyObject(final SceneManager sm, final VirtualSpace vs, boolean fadeOut){
         if (inSpace){
             if (fadeOut){
-//                VirtualSpaceManager.INSTANCE.animator.createGlyphAnimation(GlyphLoader.FADE_OUT_DURATION, AnimManager.GL_COLOR_LIN,
-//                    GlyphLoader.FADE_OUT_ANIM_DATA, glyph.getID(),
-//                    new ClosedShapeHideAction(vs));
                 Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, glyph,
                     0.0f, false, IdentityInterpolator.getInstance(), new ClosedShapeHideAction(sm, vs));
                 VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
@@ -110,16 +103,17 @@ public class ClosedShapeDescription extends ObjectDescription {
     }
 
     /** Get actual ClosedShape instance wrapped in this ZUIST object description. */
+    @Override
     public Glyph getGlyph(){
 	    return glyph;
     }
     
-    /** Get x-coordinate of object in virtual space. */
+    @Override
     public double getX(){
         return glyph.vx;
     }
     
-    /** Get y-coordinate of object in virtual space. */
+    @Override
     public double getY(){
         return glyph.vy;
     }

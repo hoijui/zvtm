@@ -28,18 +28,18 @@ public abstract class ObjectDescription {
     String takesTo;
     short takesToType;
     
-    /** Called automatically by scene manager. But cam ne called by client application to force loading of objects not actually visible. */
+    /** Called automatically by scene manager. But can be called by client application to force loading of objects not actually visible. */
     public abstract void createObject(SceneManager sm, final VirtualSpace vs, boolean fadeIn);
 
-    /** Called automatically by scene manager. But cam ne called by client application to force unloading of objects still visible. */
+    /** Called automatically by scene manager. But can be called by client application to force unloading of objects still visible. */
     public abstract void destroyObject(SceneManager sm, final VirtualSpace vs, boolean fadeOut);
 
     public void setSensitive(boolean b){
-	sensitive = b;
+	    sensitive = b;
     }
 
     public boolean isSensitive(){
-	return sensitive;
+	    return sensitive;
     }
 
     public abstract Glyph getGlyph();
@@ -49,37 +49,40 @@ public abstract class ObjectDescription {
 	}
 
     public Region getParentRegion(){
-	return parentRegion;
+	    return parentRegion;
     }
 
     /** Should take/"transport" to object/region whose ID is id
      *@param id set to null if should not take anywhere 
      */
     public void setTakesTo(String id, short t){
-	takesTo = id;
-	takesToType = t;
+	    takesTo = id;
+	    takesToType = t;
     }
 
     /** Get the ID of object where this one takes/"transports" to.
      *@return null if none
      */
     public String takesTo(){
-	return takesTo;
+	    return takesTo;
     }
 
     /**
      *@return one of SceneManager.{TAKES_TO_OBJECT, TAKES_TO_REGION}
      */
     public short takesToType(){
-	return takesToType;
+	    return takesToType;
     }
 
+    /** Get this object description's ID. */
     public String getID(){
-	return id;
+	    return id;
     }
     
+    /** Get X-coordinate of object in virtual space. */
     public abstract double getX();
     
+    /** Get Y-coordinate of object in virtual space. */
     public abstract double getY();
 
 }

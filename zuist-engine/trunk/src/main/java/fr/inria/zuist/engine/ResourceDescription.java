@@ -38,10 +38,12 @@ public abstract class ResourceDescription extends ObjectDescription {
     /* necessary info about a resource for instantiation */
     double vx, vy;
 
+    @Override
     public double getX(){
         return vx;
     }
     
+    @Override
     public double getY(){
         return vy;
     }
@@ -56,28 +58,7 @@ public abstract class ResourceDescription extends ObjectDescription {
 		this.src = url;
 	}
 	
-	///** Set URL of this resource. */
-	//public void setURL(String path){
-	//	if (path.indexOf(URL_PROTOCOL_SEQ) != -1){
-	//		//patch fixed
-	//		//XXX:make sure we support file:/, http:/, https:/, ftp:/
-	//		path = "http"+path.substring(path.indexOf(URL_PROTOCOL_SEQ));
-	//		try {
-	//			this.src  = new URL(path);
-	//		}
-	//		catch(MalformedURLException ex){System.err.println("Error: malformed resource URL: "+path);}
-	//	}
-	//	else {
-	//		// probably a relative file URL
-	//		try {
-	//			this.src  = (new File(path)).toURI().toURL();	
-	//		}
-	//		catch(MalformedURLException ex){System.err.println("Error: malformed resource URL: "+path);}			
-	//	}
-	//	
-	//}
-
-	/** Get the URI of this resource. */
+	/** Get the URL of this resource. */
 	public URL getURL(){
 		return src;
 	}
@@ -118,7 +99,7 @@ public abstract class ResourceDescription extends ObjectDescription {
         return showFeedbackWhenFetching;
     }
 	
-	/*------------------------- VrectProgress Colors parameters ----------------------- */
+	/*------------------------- VRectProgress Colors parameters ----------------------- */
 	
 	static Color DEFAULT_BAR_BKG_COLOR = Color.WHITE;
 	static Color DEFAULT_BAR_COLOR = Color.BLACK;

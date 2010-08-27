@@ -17,7 +17,7 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.VRectangle;
 
 /**
- * VRectProgress - A progress bar based on VRectangle
+ * VRectProgress - A progress bar based on VRectangle.
  * 
  * @author Julien Husson
  * @see fr.inria.zvtm.glyphs.VRectangle

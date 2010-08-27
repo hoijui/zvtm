@@ -49,14 +49,12 @@ public class SceneFragmentDescription extends ResourceDescription {
         this.sm = sm;
     }
 
-    /** Type of resource.
-    *@return type of resource.
-    */
+    @Override
     public String getType(){
         return RESOURCE_TYPE_SCENE;
     }
 
-    /** Called automatically by scene manager. But cam ne called by client application to force loading of objects not actually visible. */
+    @Override
     public void createObject(SceneManager sm, final VirtualSpace vs, final boolean fadeIn){
         //System.out.println("Loading fragment: "+src);
         if (regions == null){
@@ -85,7 +83,7 @@ public class SceneFragmentDescription extends ResourceDescription {
         }
     }
 
-    /** Called automatically by scene manager. But cam ne called by client application to force unloading of objects still visible. */
+    @Override
     public void destroyObject(SceneManager sm, VirtualSpace vs, boolean fadeOut){
         //System.out.println("Unloading fragment "+src);
         if (regions != null){
@@ -97,6 +95,8 @@ public class SceneFragmentDescription extends ResourceDescription {
         sm.destroySceneFragment(this);
     }
     
+    /** Does not return anything since this is a scene fragment. */
+    @Override
     public Glyph getGlyph(){
         return null;
     }

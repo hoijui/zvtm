@@ -78,7 +78,6 @@ public class TextDescription extends ObjectDescription {
         this.anchor = ta;
     }
 
-    /** Called automatically by scene manager. But cam ne called by client application to force loading of objects not actually visible. */
     @Override
     public void createObject(final SceneManager sm, final VirtualSpace vs, boolean fadeIn){
         if (glyph == null){
@@ -86,8 +85,6 @@ public class TextDescription extends ObjectDescription {
                 glyph = new VText(vx, vy, zindex, fillColor, text, anchor, scale, 0.0f);
                 if (font != null){((VText)glyph).setFont(font);}
                 if (!sensitive){glyph.setSensitivity(false);}
-//                VirtualSpaceManager.INSTANCE.animator.createGlyphAnimation(GlyphLoader.FADE_IN_DURATION, AnimManager.GL_COLOR_LIN,
-//                    GlyphLoader.FADE_IN_ANIM_DATA, glyph.getID());
                 Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_IN_DURATION, glyph,
                     1.0f, false, IdentityInterpolator.getInstance(), null);
                 VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
@@ -114,14 +111,10 @@ public class TextDescription extends ObjectDescription {
         }
     }
 
-    /** Called automatically by scene manager. But cam ne called by client application to force unloading of objects still visible. */
     @Override
     public void destroyObject(final SceneManager sm, final VirtualSpace vs, boolean fadeOut){
         if (glyph != null){
             if (fadeOut){
-//                VirtualSpaceManager.INSTANCE.animator.createGlyphAnimation(GlyphLoader.FADE_OUT_DURATION, AnimManager.GL_COLOR_LIN,
-//                    GlyphLoader.FADE_OUT_ANIM_DATA, glyph.getID(),
-//                    new TextHideAction(vs));
                 Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, glyph,
                     0.0f, false, IdentityInterpolator.getInstance(), new TextHideAction(sm, vs));
                 VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
@@ -147,15 +140,16 @@ public class TextDescription extends ObjectDescription {
     }
 
     public void setFont(Font f){
-	this.font = f;
+	    this.font = f;
     }
 
     public Font getFont(){
-	return font;
+	    return font;
     }
 
+    @Override
     public Glyph getGlyph(){
-	return glyph;
+	    return glyph;
     }
     
     public String getText(){
@@ -172,10 +166,12 @@ public class TextDescription extends ObjectDescription {
         else {return VText.TEXT_ANCHOR_MIDDLE;}
     }
     
+    @Override
     public double getX(){
         return vx;
     }
     
+    @Override
     public double getY(){
         return vy;
     }

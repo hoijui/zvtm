@@ -195,14 +195,13 @@ public class ImageDescription extends ResourceDescription {
         this.parentRegion = pr;
     }
     
-    /** Type of resource.
-	 *@return type of resource.
-	 */
+    @Override
 	public String getType(){
 	    return RESOURCE_TYPE_IMG;
 	}
 
     /** Called automatically by scene manager. But cam ne called by client application to force loading of objects not actually visible. */
+    @Override
     public void createObject(final SceneManager sm, final VirtualSpace vs, final boolean fadeIn){
         display = true;
         loadTask = imageLoader.submit(new ImageLoadTask(sm, vs, fadeIn));
@@ -261,11 +260,12 @@ public class ImageDescription extends ResourceDescription {
         catch(InvocationTargetException ite){ /*ite.printStackTrace();*/}
     }
 
-    /** Called automatically by scene manager. But cam ne called by client application to force unloading of objects still visible. */
+    @Override
     public void destroyObject(final SceneManager sm, final VirtualSpace vs, boolean fadeOut){
         imageUnloader.submit(new ImageUnloadTask(sm, vs, fadeOut));        
     }
     
+    @Override
     public Glyph getGlyph(){
 	    return glyph;
     }
