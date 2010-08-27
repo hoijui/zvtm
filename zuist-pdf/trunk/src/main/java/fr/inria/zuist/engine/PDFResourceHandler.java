@@ -55,7 +55,8 @@ public class PDFResourceHandler implements ResourceHandler {
     /* PDF Resource Handler */
 
     public PDFResourceHandler(){}
-        
+    
+    @Override
     public PDFPageDescription createResourceDescription(double x, double y, String id, int zindex, Region region, 
                                                         URL resourceURL, boolean sensitivity, Color stroke, String params){
         Object im = RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
