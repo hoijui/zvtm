@@ -97,13 +97,16 @@ public class FRectangle extends VRectangle {
 		g2.dispose();
 	}
 
-	public boolean fillsView(double w,double h,int camIndex){
+	@Override
+	/** Never fills view, as we can see through it. */
+    public boolean fillsView(double w,double h,int camIndex){
 		return false;
 	}
 	
 	AffineTransform at;
 	
-	public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
+	@Override
+    public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 		if ((pc[i].cw>1) && (pc[i].ch>1)){
 			//repaint only if object is visible
 			if (isFilled()){
@@ -137,7 +140,8 @@ public class FRectangle extends VRectangle {
 		}
 	}
 
-	public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
+	@Override
+    public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 		if ((pc[i].lcw>1) && (pc[i].lch>1)){
 			//repaint only if object is visible
 			if (isFilled()){
@@ -171,7 +175,8 @@ public class FRectangle extends VRectangle {
 		}
 	}
 
-	public Object clone(){
+	@Override
+    public Object clone(){
 		FRectangle res = new FRectangle(vx, vy, vz, vw, vh, color, borderColor, MASK_ALPHA_TOP, MASK_ALPHA_BOTTOM);
 		res.cursorInsideColor = this.cursorInsideColor;
 		return res;

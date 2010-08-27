@@ -105,17 +105,20 @@ public class VTextOr extends VText {
     /** Set the glyph's absolute orientation.
      *@param angle in [0:2Pi[ 
      */
+     @Override
     public void orientTo(double angle){
 	orient = angle;
 	invalidate();
 	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
+    @Override
     public boolean fillsView(double w,double h,int camIndex){
 	return false;
     }
 
-	public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
+	@Override
+    public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 		if (!pc[i].valid){
 			g.setFont((font!=null) ? font : getMainFont());
 			Rectangle2D bounds = g.getFontMetrics().getStringBounds(text, g);
@@ -162,7 +165,8 @@ public class VTextOr extends VText {
 		else {g.fillRect(dx+pc[i].cx,pc[i].cy,1,1);}
 	}
 
-	public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
+	@Override
+    public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 		if (!pc[i].lvalid){
 			g.setFont((font!=null) ? font : getMainFont());
 			Rectangle2D bounds = g.getFontMetrics().getStringBounds(text, g);
@@ -210,6 +214,7 @@ public class VTextOr extends VText {
 	}
 
 
+    @Override
     public Object clone(){
         VTextOr res=new VTextOr(vx,vy,vz,color,(new StringBuffer(text)).toString(),orient, text_anchor);
         res.cursorInsideColor=this.cursorInsideColor;

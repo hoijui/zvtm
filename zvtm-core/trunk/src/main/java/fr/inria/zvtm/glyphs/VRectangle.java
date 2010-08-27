@@ -109,6 +109,7 @@ public class VRectangle extends ClosedShape implements RectangularShape {
         setTranslucencyValue(alpha);
     }
 
+    @Override
     public void initCams(int nbCam){
 	pc=new RProjectedCoordsP[nbCam];
 	for (int i=0;i<nbCam;i++){
@@ -116,6 +117,7 @@ public class VRectangle extends ClosedShape implements RectangularShape {
 	}
     }
 
+    @Override
     public void addCamera(int verifIndex){
 	if (pc!=null){
 	    if (verifIndex==pc.length){
@@ -137,36 +139,45 @@ public class VRectangle extends ClosedShape implements RectangularShape {
 	}
     }
 
+    @Override
     public void removeCamera(int index){
 	pc[index]=null;
     }
 
+    @Override
     public void resetMouseIn(){
 	for (int i=0;i<pc.length;i++){
 	    resetMouseIn(i);
 	}
     }
 
+    @Override
     public void resetMouseIn(int i){
 	if (pc[i]!=null){pc[i].prevMouseIn=false;}
 	borderColor = bColor;
     }
 
+    @Override
     public double getOrient(){return orient;}
 
     /** Cannot be reoriented. */
+    @Override
     public void orientTo(double angle){}
 
+    @Override
     public double getSize(){return size;}
 
+    @Override
     public double getWidth(){return vw;}
 
+    @Override
     public double getHeight(){return vh;}
 
     void computeSize(){
 	    size = Math.sqrt(Math.pow(vw,2)+Math.pow(vh,2));
     }
 
+    @Override
     public void sizeTo(double s){
         // return diameter of bounding circle
         size = s;
@@ -175,6 +186,7 @@ public class VRectangle extends ClosedShape implements RectangularShape {
         VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
+    @Override
     public void setWidth(double w){ 
         vw = w;
         ar = vw / vh;
@@ -182,6 +194,7 @@ public class VRectangle extends ClosedShape implements RectangularShape {
         VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
+    @Override
     public void setHeight(double h){
         vh = h;
         ar = vw / vh;
@@ -189,6 +202,7 @@ public class VRectangle extends ClosedShape implements RectangularShape {
         VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
+    @Override
     public void reSize(double factor){ //resizing factor
         size *= factor;
         vw = (size*ar) / Math.sqrt(Math.pow(ar,2)+1);
@@ -196,17 +210,20 @@ public class VRectangle extends ClosedShape implements RectangularShape {
         VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
+    @Override
     public boolean fillsView(double w,double h,int camIndex){
         return ((alphaC == null) &&
             (w<=pc[camIndex].cx+pc[camIndex].cw) && (0>=pc[camIndex].cx-pc[camIndex].cw) &&
             (h<=pc[camIndex].cy+pc[camIndex].ch) && (0>=pc[camIndex].cy-pc[camIndex].ch));
     }
 
+    @Override
     public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
         return ((jpx>=(pc[camIndex].cx-pc[camIndex].cw)) && (jpx<=(pc[camIndex].cx+pc[camIndex].cw)) &&
             (jpy>=(pc[camIndex].cy-pc[camIndex].ch)) && (jpy<=(pc[camIndex].cy+pc[camIndex].ch)));
     }
 
+    @Override
     public boolean visibleInRegion(double wb, double nb, double eb, double sb, int i){
         if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
             /* Glyph hotspot is in the region. The glyph is obviously visible */
@@ -221,18 +238,21 @@ public class VRectangle extends ClosedShape implements RectangularShape {
         return false;
     }
 
-	public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
+	@Override
+    public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
 		return dvs.intersects(vx-vw/2d, vy-vh/2d, vw, vh);
 	}
 
 	/** Get the bounding box of this Glyph in virtual space coordinates.
 	 *@return west, north, east and south bounds in virtual space.
 	 */
-	public double[] getBounds(){
+	@Override
+    public double[] getBounds(){
 		double[] res = {vx-vw/2d,vy+vh/2d,vx+vw/2d,vy-vh/2d};
 		return res;
     }
 
+    @Override
     public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
         if (coordInside(jpx, jpy, camIndex, cvx, cvy)){
             //if the mouse is inside the glyph
@@ -255,6 +275,7 @@ public class VRectangle extends ClosedShape implements RectangularShape {
         }
     }
 
+    @Override
     public void project(Camera c, Dimension d){
         int i=c.getIndex();
         coef = c.focal/(c.focal+c.altitude);
@@ -267,6 +288,7 @@ public class VRectangle extends ClosedShape implements RectangularShape {
         pc[i].ch = (int)Math.round(Math.ceil(vh/2d*coef));
     }
 
+    @Override
     public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, double lensx, double lensy){
         int i = c.getIndex();
         coef = c.focal/(c.focal+c.altitude) * lensMag;
@@ -279,6 +301,7 @@ public class VRectangle extends ClosedShape implements RectangularShape {
         pc[i].lch = (int)Math.round(Math.ceil(vh/2d*coef));
     }
 
+    @Override
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
         if (alphaC != null && alphaC.getAlpha()==0){return;}
         if ((pc[i].cw == 1) && (pc[i].ch==1)){
@@ -347,6 +370,7 @@ public class VRectangle extends ClosedShape implements RectangularShape {
         }
     }
 
+    @Override
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
         if (alphaC != null && alphaC.getAlpha()==0){return;}
         if ((pc[i].lcw==1) && (pc[i].lch==1)){
@@ -409,6 +433,7 @@ public class VRectangle extends ClosedShape implements RectangularShape {
         }
     }
 
+    @Override
     public Object clone(){
         VRectangle res=new VRectangle(vx, vy, vz, vw, vh, color, borderColor);
         res.cursorInsideColor=this.cursorInsideColor;

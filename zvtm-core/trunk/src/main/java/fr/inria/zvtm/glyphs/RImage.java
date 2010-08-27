@@ -110,6 +110,7 @@ public class RImage extends VImage {
     }
     
     /** Set bitmap image to be displayed. */
+    @Override
     public void setImage(Image i){
         image = createReflection(i);
         vw = Math.round(image.getWidth(null));
@@ -119,10 +120,12 @@ public class RImage extends VImage {
 	VirtualSpaceManager.INSTANCE.repaintNow();
     }
     
+    @Override
     public double getHeight(){
         return (irihc) ? vh : vh/2;
     }
     
+    @Override
     public Object clone(){
     	RImage res = new RImage(vx, vy, vz, image, (alphaC != null) ? alphaC.getAlpha() : 1.0f);
     	res.setWidth(vw);

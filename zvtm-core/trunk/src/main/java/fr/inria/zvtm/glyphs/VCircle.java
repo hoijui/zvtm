@@ -94,6 +94,7 @@ public class VCircle extends ClosedShape {
         setTranslucencyValue(alpha);
     }
 
+    @Override
     public void initCams(int nbCam){
 	pc = new BProjectedCoords[nbCam];
 	for (int i=0;i<nbCam;i++){
@@ -101,6 +102,7 @@ public class VCircle extends ClosedShape {
 	}
     }
 
+    @Override
     public void addCamera(int verifIndex){
 	if (pc!=null){
 	    if (verifIndex==pc.length){
@@ -122,38 +124,47 @@ public class VCircle extends ClosedShape {
 	}
     }
 
+    @Override
     public void removeCamera(int index){
 	pc[index]=null;
     }
 
+    @Override
     public void resetMouseIn(){
 	for (int i=0;i<pc.length;i++){
 	    resetMouseIn(i);
 	}
     }
 
+    @Override
     public void resetMouseIn(int i){
 	if (pc[i]!=null){pc[i].prevMouseIn=false;}
 	borderColor = bColor;
     }
 
+    @Override
     public double getOrient(){return orient;}
 
     /** Cannot be reoriented (it makes no sense). */
+    @Override
     public void orientTo(double angle){}
 
+    @Override
     public double getSize(){return size;}
 
+    @Override
     public void sizeTo(double s){
         size = s;
         VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
+    @Override
     public void reSize(double factor){
         size *= factor;
         VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
+    @Override
     public boolean fillsView(double w,double h,int camIndex){
         if ((alphaC == null) && (Math.sqrt(Math.pow(w-pc[camIndex].cx,2)+Math.pow(h-pc[camIndex].cy,2))<=pc[camIndex].cr/2d) 
             && (Math.sqrt(Math.pow(pc[camIndex].cx,2)+Math.pow(h-pc[camIndex].cy,2))<=pc[camIndex].cr/2d) 
@@ -162,11 +173,13 @@ public class VCircle extends ClosedShape {
         else {return false;}
     }
     
+    @Override
     public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
         if (Math.sqrt(Math.pow(jpx-pc[camIndex].cx,2)+Math.pow(jpy-pc[camIndex].cy,2))<=pc[camIndex].cr/2d){return true;}
         else {return false;}
     }
 
+    @Override
     public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
         if (coordInside(jpx, jpy, camIndex, cvx, cvy)){
             //if the mouse is inside the glyph
@@ -189,10 +202,12 @@ public class VCircle extends ClosedShape {
         }
     }
 
-	public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
+	@Override
+    public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
 		return Math.sqrt(Math.pow(vx-dvx, 2)+Math.pow(vy-dvy, 2)) <= (dvr + size/2d);
 	}
 
+    @Override
     public void project(Camera c, Dimension d){
         int i=c.getIndex();
         coef = c.focal / (c.focal+c.altitude);
@@ -204,6 +219,7 @@ public class VCircle extends ClosedShape {
         pc[i].cr = (int)Math.round(size*coef);
     }
 
+    @Override
     public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, double lensx, double lensy){
         int i = c.getIndex();
         coef = c.focal/(c.focal+c.altitude) * lensMag;
@@ -215,6 +231,7 @@ public class VCircle extends ClosedShape {
         pc[i].lcr = (int)Math.round(size*coef);
     }
 
+    @Override
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
         if (alphaC != null){
             // glyph is not opaque
@@ -275,6 +292,7 @@ public class VCircle extends ClosedShape {
         }
     }
 
+    @Override
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
         if (alphaC != null){
             // glyph is not opaque
@@ -335,6 +353,7 @@ public class VCircle extends ClosedShape {
         }
     }
 
+    @Override
     public Object clone(){
         VCircle res=new VCircle(vx,vy,vz,size,color, borderColor, (alphaC != null) ? alphaC.getAlpha() : 1);
         res.cursorInsideColor=this.cursorInsideColor;

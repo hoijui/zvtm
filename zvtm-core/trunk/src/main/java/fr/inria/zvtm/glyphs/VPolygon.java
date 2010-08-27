@@ -97,6 +97,7 @@ public class VPolygon extends ClosedShape {
         setTranslucencyValue(alpha);
     }
 
+    @Override
     public void initCams(int nbCam){
 	pc=new ProjPolygon[nbCam];
 	for (int i=0;i<nbCam;i++){
@@ -104,6 +105,7 @@ public class VPolygon extends ClosedShape {
 	}
     }
 
+    @Override
     public void addCamera(int verifIndex){
 	if (pc!=null){
 	    if (verifIndex==pc.length){
@@ -125,29 +127,35 @@ public class VPolygon extends ClosedShape {
 	}
     }
 
+    @Override
     public void removeCamera(int index){
 	pc[index]=null;
     }
 
+    @Override
     public void resetMouseIn(){
 	for (int i=0;i<pc.length;i++){
 	    resetMouseIn(i);
 	}
     }
 
+    @Override
     public void resetMouseIn(int i){
 	if (pc[i]!=null){pc[i].prevMouseIn=false;}
 	borderColor = bColor;
     }
 
+    @Override
     public double getOrient(){return orient;}
 
     /** Cannot be reoriented. */
+    @Override
     public void orientTo(double angle){}
 
+    @Override
     public double getSize(){return size;}
 
-    synchronized void computeSize(){
+    void computeSize(){
         size = 0;
         double f;
         for (int i=0;i<xcoords.length;i++){
@@ -158,6 +166,7 @@ public class VPolygon extends ClosedShape {
         size *= 2;
     }
 
+    @Override
     public synchronized void sizeTo(double s){
         double ratio = s / size;
         size = 0;
@@ -172,6 +181,7 @@ public class VPolygon extends ClosedShape {
         VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
+    @Override
     public synchronized void reSize(double factor){
         size = 0;
         double f;
@@ -185,22 +195,26 @@ public class VPolygon extends ClosedShape {
         VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
+    @Override
     public boolean fillsView(double w,double h,int camIndex){
         return ((alphaC == null) &&
             (pc[camIndex].p.contains(0,0)) && (pc[camIndex].p.contains(w,0)) &&
             (pc[camIndex].p.contains(0,h)) && (pc[camIndex].p.contains(w,h)));
     }
 
+    @Override
     public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
         if (pc[camIndex].p.contains(jpx, jpy)){return true;}
         else {return false;}
     }
 
     /** The disc is actually approximated to its bounding box here. Precise intersection computation would be too costly. */
-	public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
+	@Override
+    public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
 		return pc[camIndex].p.intersects(jpx-dpr, jpy-dpr, 2*dpr, 2*dpr);
 	}
 
+    @Override
     public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
         if (coordInside(jpx, jpy, camIndex, cvx, cvy)){
             //if the mouse is inside the glyph
@@ -257,6 +271,7 @@ public class VPolygon extends ClosedShape {
         return res.toString();
     }
 
+    @Override
     public void project(Camera c, Dimension d){
         int i=c.getIndex();
         coef = c.focal / (c.focal+c.altitude);
@@ -283,6 +298,7 @@ public class VPolygon extends ClosedShape {
         }
     }
 
+    @Override
     public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, double lensx, double lensy){
         int i=c.getIndex();
         coef = c.focal/(c.focal+c.altitude) * lensMag;
@@ -309,6 +325,7 @@ public class VPolygon extends ClosedShape {
         }
     }
 
+    @Override
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
         if (alphaC != null && alphaC.getAlpha()==0){return;}
         if (pc[i].cr>1){
@@ -375,6 +392,7 @@ public class VPolygon extends ClosedShape {
         }
     }
 
+    @Override
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
         if (alphaC != null && alphaC.getAlpha()==0){return;}
         if (pc[i].lcr>1){
@@ -498,6 +516,7 @@ public class VPolygon extends ClosedShape {
         return new Point2D.Double(cx,cy);
     }
 
+    @Override
     public Object clone(){
         Point2D.Double[] lps=new Point2D.Double[xcoords.length];
         for (int i=0;i<lps.length;i++){

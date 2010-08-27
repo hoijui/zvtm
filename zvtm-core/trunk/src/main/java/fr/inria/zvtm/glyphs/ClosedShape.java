@@ -157,6 +157,7 @@ public abstract class ClosedShape extends Glyph {
     }
 
     /** Highlight this glyph to give visual feedback when the cursor is inside it. */
+    @Override
     public void highlight(boolean b, Color selectedColor){
 	boolean update = false;
 	if (b){

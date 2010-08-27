@@ -88,16 +88,19 @@ public class VImageOr extends VImage {
     /** Set the glyph's absolute orientation.
      *@param angle in [0:2Pi[ 
      */
+     @Override
     public void orientTo(double angle){
 	orient=angle;
 	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
+    @Override
     public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
         if (pc[camIndex].p.contains(jpx, jpy)){return true;}
         else {return false;}
     }
     
+    @Override
     public boolean visibleInRegion(double wb, double nb, double eb, double sb, int i){
         if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
             /* Glyph hotspot is in the region. The glyph is obviously visible */
@@ -113,10 +116,12 @@ public class VImageOr extends VImage {
     }
     
     /** The disc is actually approximated to its bounding box here. Precise intersection computation would be too costly. */
-	public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
+	@Override
+    public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
 		return pc[camIndex].p.intersects(jpx-dpr, jpy-dpr, 2*dpr, 2*dpr);
 	}
 
+    @Override
     public void project(Camera c, Dimension d){
         int i=c.getIndex();
         coef = c.focal/(c.focal+c.altitude);
@@ -157,6 +162,7 @@ public class VImageOr extends VImage {
         }
     }
 
+    @Override
     public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, double lensx, double lensy){
         int i=c.getIndex();
         coef = c.focal/(c.focal+c.altitude) * lensMag;
@@ -197,6 +203,7 @@ public class VImageOr extends VImage {
         }
     }
 
+    @Override
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
         if (alphaC != null && alphaC.getAlpha()==0){return;}
         if ((pc[i].cw>=1) || (pc[i].ch>=1)){
@@ -300,6 +307,7 @@ public class VImageOr extends VImage {
         }
     }
 
+    @Override
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
         if (alphaC != null && alphaC.getAlpha()==0){return;}
         if ((pc[i].lcw>=1) || (pc[i].lch>=1)){
@@ -403,6 +411,7 @@ public class VImageOr extends VImage {
         }
     }
 
+    @Override
     public Object clone(){
         VImageOr res = new VImageOr(vx,vy,vz,image,orient, (alphaC != null) ? alphaC.getAlpha(): 1.0f);
         res.setWidth(vw);

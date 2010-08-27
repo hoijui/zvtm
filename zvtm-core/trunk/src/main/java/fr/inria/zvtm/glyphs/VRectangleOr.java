@@ -95,16 +95,19 @@ public class VRectangleOr extends VRectangle {
         setTranslucencyValue(alpha);
     }
 
+    @Override
     public double getOrient(){return orient;}
 
     /** Set the glyph's absolute orientation.
      *@param angle in [0:2Pi[ 
      */
+     @Override
     public void orientTo(double angle){
 	orient=angle;
 	VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
+    @Override
     public boolean fillsView(double w,double h,int camIndex){
 	if (orient==0){
 	    if ((w<=pc[camIndex].cx+pc[camIndex].cw) && (0>=pc[camIndex].cx-pc[camIndex].cw) && (h<=pc[camIndex].cy+pc[camIndex].ch) && (0>=pc[camIndex].cy-pc[camIndex].ch)){return true;}
@@ -117,7 +120,8 @@ public class VRectangleOr extends VRectangle {
     }
 
     /** The disc is actually approximated to its bounding box here. Precise intersection computation would be too costly. */
-	public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
+	@Override
+    public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
 		if (orient == 0){
     		return dvs.intersects(vx-vw/2d, vy-vh/2d, vw, vh);
 		}
@@ -126,6 +130,7 @@ public class VRectangleOr extends VRectangle {
 		}
 	}
 	
+    @Override
     public boolean visibleInRegion(double wb, double nb, double eb, double sb, int i){
         if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
             /* Glyph hotspot is in the region. The glyph is obviously visible */
@@ -140,6 +145,7 @@ public class VRectangleOr extends VRectangle {
         return false;
     }
 
+    @Override
     public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
         if (orient==0){
             if ((jpx>=(pc[camIndex].cx-pc[camIndex].cw)) && (jpx<=(pc[camIndex].cx+pc[camIndex].cw)) &&
@@ -152,6 +158,7 @@ public class VRectangleOr extends VRectangle {
         }
     }
 
+    @Override
     public void project(Camera c, Dimension d){
         int i=c.getIndex();
         coef = c.focal/(c.focal+c.altitude);
@@ -188,6 +195,7 @@ public class VRectangleOr extends VRectangle {
         }
     }
 
+    @Override
     public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, double lensx, double lensy){
         int i=c.getIndex();
         coef = c.focal/(c.focal+c.altitude) * lensMag;
@@ -224,6 +232,7 @@ public class VRectangleOr extends VRectangle {
         }
     }
 
+    @Override
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
         if (alphaC != null && alphaC.getAlpha()==0){return;}
         if ((pc[i].cw==1) && (pc[i].ch==1)){
@@ -332,6 +341,7 @@ public class VRectangleOr extends VRectangle {
         }
     }
 
+    @Override
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
         if (alphaC != null && alphaC.getAlpha()==0){return;}
         if ((pc[i].lcw==1) || (pc[i].lch==1)){
@@ -434,6 +444,7 @@ public class VRectangleOr extends VRectangle {
         }
     }
 
+    @Override
     public Object clone(){
         VRectangleOr res=new VRectangleOr(vx, vy, vz, vw, vh, color, borderColor, orient);
         res.cursorInsideColor=this.cursorInsideColor;

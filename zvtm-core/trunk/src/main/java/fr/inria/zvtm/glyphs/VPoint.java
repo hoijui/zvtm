@@ -82,6 +82,7 @@ public class VPoint extends Glyph {
         setTranslucencyValue(alpha);
     }
 
+    @Override
     public void initCams(int nbCam){
 	pc=new ProjectedCoords[nbCam];
 	for (int i=0;i<nbCam;i++){
@@ -89,6 +90,7 @@ public class VPoint extends Glyph {
 	}
     }
 
+    @Override
     public void addCamera(int verifIndex){
 	if (pc!=null){
 	    if (verifIndex==pc.length){
@@ -110,46 +112,58 @@ public class VPoint extends Glyph {
 	}
     }
 
+    @Override
     public void removeCamera(int index){
 	pc[index]=null;
     }
 
+    @Override
     public void resetMouseIn(){
 	for (int i=0;i<pc.length;i++){
 	    resetMouseIn(i);
 	}
     }
 
+    @Override
     public void resetMouseIn(int i){
 	if (pc[i]!=null){pc[i].prevMouseIn=false;}
     }
 
     /** Cannot be resized (it makes on sense). */
+    @Override
     public void sizeTo(double s){}
 
     /** Cannot be resized (it makes on sense). */
+    @Override
     public void reSize(double factor){}
 
     /** Cannot be reoriented (it makes on sense). */
+    @Override
     public void orientTo(double angle){}
 
+    @Override
     public double getSize(){return 1.0f;}
 
+    @Override
     public double getOrient(){return 0;}
 
+    @Override
     public boolean fillsView(double w,double h,int camIndex){
 	    return false;
     }
 
+    @Override
     public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
         if (jpx==pc[camIndex].cx && jpy==pc[camIndex].cy){return true;}
         else {return false;}
     }
 
-	public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
+	@Override
+    public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
 		return Math.sqrt(Math.pow(vx-dvx, 2)+Math.pow(vy-dvy, 2)) <= dvr;
 	}
 	
+    @Override
     public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
         if (coordInside(jpx, jpy, camIndex, cvx, cvy)){
             //if the mouse is inside the glyph
@@ -172,6 +186,7 @@ public class VPoint extends Glyph {
         }
     }
 
+    @Override
     public void project(Camera c, Dimension d){
         int i=c.getIndex();
         coef = c.focal / (c.focal+c.altitude);
@@ -181,6 +196,7 @@ public class VPoint extends Glyph {
         pc[i].cy = (int)Math.round((d.height/2)-(vy-c.posy)*coef);
     }
 
+    @Override
     public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, double lensx, double lensy){
         int i=c.getIndex();
         coef = c.focal/(c.focal+c.altitude) * lensMag;
@@ -190,6 +206,7 @@ public class VPoint extends Glyph {
         pc[i].lcy = (int)Math.round((lensHeight/2) - (vy-(lensy))*coef);
     }
 
+    @Override
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
         if (alphaC != null){
             // glyph is not opaque
@@ -210,6 +227,7 @@ public class VPoint extends Glyph {
         }
     }
 
+    @Override
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
         if (alphaC != null){
             // glyph is not opaque
@@ -230,6 +248,7 @@ public class VPoint extends Glyph {
         }
     }
 
+    @Override
     public Object clone(){
         VPoint res = new VPoint(vx, vy, vz, color, (alphaC != null) ? alphaC.getAlpha(): 1.0f);
         res.cursorInsideColor = this.cursorInsideColor;
@@ -237,6 +256,7 @@ public class VPoint extends Glyph {
     }
 
     /** Highlight this glyph to give visual feedback when the cursor is inside it. */
+    @Override
     public void highlight(boolean b, Color selectedColor){
         boolean update = false;
         if (b){

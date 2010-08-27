@@ -58,7 +58,8 @@ public class SICircle extends VCircle {
 		super(x, y, z, d, c, bc, alpha);
 	}
 	
-	public boolean visibleInViewport(double wb, double nb, double eb, double sb, Camera c){
+	@Override
+    public boolean visibleInViewport(double wb, double nb, double eb, double sb, Camera c){
         if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
             return true;
         }
@@ -71,7 +72,8 @@ public class SICircle extends VCircle {
         return false;
     }
     
-	public void project(Camera c, Dimension d){
+	@Override
+    public void project(Camera c, Dimension d){
 		int i=c.getIndex();
 		coef = c.focal / (c.focal+c.altitude);
 		//find coordinates of object's geom center wrt to camera center and project
@@ -82,7 +84,8 @@ public class SICircle extends VCircle {
 		pc[i].cr = (int)Math.round(size);
 	}
 
-	public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, double lensx, double lensy){
+	@Override
+    public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, double lensx, double lensy){
 		int i = c.getIndex();
 		coef = c.focal/(c.focal+c.altitude) * lensMag;
 		//find coordinates of object's geom center wrt to camera center and project
@@ -93,7 +96,8 @@ public class SICircle extends VCircle {
 		pc[i].lcr = (int)Math.round(size);
 	}
 
-	public Object clone(){
+	@Override
+    public Object clone(){
 		SICircle res=new SICircle(vx, vy, vz, size, color);
 		res.borderColor=this.borderColor;
 		res.cursorInsideColor=this.cursorInsideColor;

@@ -270,15 +270,19 @@ public class DPath extends Glyph implements RectangularShape {
 	/* ------------- implementation of RectangularShape --------------- */
 
 	/** Get the horizontal distance from western-most point to the eastern-most one. */
+    @Override
     public double getWidth(){return vw;}
 
 	/** Get the vertical distance from northern-most point to the southern-most one. */
+    @Override
     public double getHeight(){return vh;}
 
 	/** Not implemented yet. */
+    @Override
     public void setWidth(double w){}
 
 	/** Not implemented yet. */
+    @Override
     public void setHeight(double h){}
 
 	public Point2D.Double getStartPoint(){
@@ -289,6 +293,7 @@ public class DPath extends Glyph implements RectangularShape {
 		return new Point2D.Double(endPoint.x, endPoint.y);
 	}
 
+    @Override
     public void initCams(int nbCam){
 	pc = new ProjectedCoords[nbCam];
 	for (int i=0;i<nbCam;i++){
@@ -299,6 +304,7 @@ public class DPath extends Glyph implements RectangularShape {
 	}
     }
 
+    @Override
     public void addCamera(int verifIndex){
 	if (pc != null){
 	    if (verifIndex == pc.length){
@@ -321,6 +327,7 @@ public class DPath extends Glyph implements RectangularShape {
 	}
     }
 
+    @Override
     public void removeCamera(int index){
  	pc[index] = null;
 	for (int i=0;i<elements.length;i++){
@@ -328,20 +335,25 @@ public class DPath extends Glyph implements RectangularShape {
 	}
     }
 
+    @Override
     public void resetMouseIn(){}
 
+    @Override
     public void resetMouseIn(int i){}
     
 	/** No effect. */
+    @Override
     public void sizeTo(double s){}
 
 	/** No effect. */
+    @Override
     public void reSize(double factor){}
 
 	/** Translate the glyph by (x,y) - relative translation.
 		*@see #moveTo(double x, double y)
 		*/
-	public void move(double x, double y){
+	@Override
+    public void move(double x, double y){
 		Point2D.Double[] t = new Point2D.Double[getNumberOfPoints()];
 		Arrays.fill(t, new Point2D.Double(x, y));
 		this.edit(t, false);
@@ -352,7 +364,8 @@ public class DPath extends Glyph implements RectangularShape {
 	/** Translate the glyph to (x,y) - absolute translation.
 		*@see #move(double x, double y)
 		*/
-	public void moveTo(double x, double y){
+	@Override
+    public void moveTo(double x, double y){
 		propagateMove(x-vx, y-vy);  //take care of sticked glyphs
 		Point2D.Double[] t = new Point2D.Double[getNumberOfPoints()];
 		Arrays.fill(t, new Point2D.Double(x-vx, y-vy));
@@ -361,8 +374,10 @@ public class DPath extends Glyph implements RectangularShape {
 	}
 
 	/** No effect. */
+    @Override
     public void orientTo(double angle){}
 
+    @Override
     public double getSize(){
 	    return size;
     }
@@ -400,7 +415,8 @@ public class DPath extends Glyph implements RectangularShape {
 	/** Get the bounding box of this Glyph in virtual space coordinates.
 	 *@return west, north, east and south bounds in virtual space.
 	 */
-	public double[] getBounds(){
+	 @Override
+    public double[] getBounds(){
 		double[] res = {vx-vw/2d,vy+vh/2d,vx+vw/2d,vy-vh/2d};
 		return res;
 	}
@@ -410,22 +426,27 @@ public class DPath extends Glyph implements RectangularShape {
 		       (y >= vy-vh/2d) && (y <= vy+vh/2d);
 	}
 
+    @Override
     public double getOrient(){return orient;}
 
+    @Override
     public boolean fillsView(double w,double h,int camIndex){
 	return false;
     }
 
+    @Override
     public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
 	    return false;
     }
 
+    @Override
     public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
 	    return Glyph.NO_CURSOR_EVENT;
     }
 
     int hw, hh, lhw, lhh;
 
+    @Override
     public void project(Camera c, Dimension d){
 	int i = c.getIndex();
 	coef = c.focal / (c.focal+c.altitude);
@@ -440,6 +461,7 @@ public class DPath extends Glyph implements RectangularShape {
 	}
     }
 
+    @Override
     public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, double lensx, double lensy){
 	int i = c.getIndex();
 	coef = c.focal / (c.focal+c.altitude) * lensMag;
@@ -455,6 +477,7 @@ public class DPath extends Glyph implements RectangularShape {
     }
 
 
+    @Override
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
         if (alphaC != null && alphaC.getAlpha() == 0){return;}
         g.setColor(this.color);
@@ -502,6 +525,7 @@ public class DPath extends Glyph implements RectangularShape {
         }
     }
 
+    @Override
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
         if (alphaC != null && alphaC.getAlpha() == 0){return;}
         g.setColor(this.color);
@@ -549,6 +573,7 @@ public class DPath extends Glyph implements RectangularShape {
         }
     }
 
+    @Override
     public boolean visibleInRegion(double wb, double nb, double eb, double sb, int i){
 	    if ((vx >= wb) && (vx <= eb) && (vy >= sb) && (vy <= nb)){
 			// if glyph hotspot is in the region, we consider it is visible
@@ -563,6 +588,7 @@ public class DPath extends Glyph implements RectangularShape {
 		return false;
     }
 
+    @Override
     public boolean containedInRegion(double wb, double nb, double eb, double sb, int i){
 	    if ((vx >= wb) && (vx <= eb) && (vy >= sb) && (vy <= nb)){
 			// if glyph hotspot is in the region, we consider it is visible
@@ -578,16 +604,19 @@ public class DPath extends Glyph implements RectangularShape {
     }
 
     /** The disc is actually approximated to its bounding box here. Precise intersection computation would be too costly. */
-	public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
+	@Override
+    public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
 		return gp.intersects(dvx-dvr, dvy-dvr, 2*dvr, 2*dvr) && !gp.contains(dvx-dvr, dvy-dvr, 2*dvr, 2*dvr);
 	}
 	
     /** Not implemented yet. */
+    @Override
     public Object clone(){
 		return null;
     }
 
     /** Highlight this glyph to give visual feedback when the cursor is inside it. */
+    @Override
     public void highlight(boolean b, Color selectedColor){
         boolean update = false;
         if (b){
@@ -1142,6 +1171,7 @@ class MOVElement extends PathElement {
         }
     }
     
+    @Override
     void initCams(int nbCam){
 	pc = new Point2D[nbCam];
 	lpc = new Point2D[nbCam];
@@ -1151,6 +1181,7 @@ class MOVElement extends PathElement {
 	}
     }
 
+    @Override
     void addCamera(int verifIndex){
 	if (pc != null){
 	    if (verifIndex == pc.length){
@@ -1176,39 +1207,48 @@ class MOVElement extends PathElement {
 	}
     }
 
+    @Override
     void removeCamera(int index){
  	pc[index] = null;
  	lpc[index] = null;
     }
 
+    @Override
     void project(int i, int hw, int hh, Camera c, double coef, double px, double py){
 	pc[i].setLocation(hw+(x-c.posx)*coef, hh-(y-c.posy)*coef);
     }
 
+    @Override
     void projectForLens(int i, int hw, int hh, double lx, double ly, double coef, double px, double py){
 	lpc[i].setLocation(hw+(x-lx)*coef, hh-(y-ly)*coef);
     }
 
+    @Override
     double getX(int i){
 	return pc[i].getX();
     }
 
+    @Override
     double getY(int i){
 	return pc[i].getY();
     }
 
+    @Override
     double getlX(int i){
 	return lpc[i].getX();
     }
 
+    @Override
     double getlY(int i){
 	return lpc[i].getY();
     }
 
+    @Override
     Shape getShape(int i){
 	return null;
     }
 
+    @Override
     Shape getlShape(int i){
 	return null;
     }
@@ -1231,6 +1271,7 @@ class SEGElement extends PathElement {
         }
     }
 
+    @Override
     void initCams(int nbCam){
 	pc = new Line2D[nbCam];
 	lpc = new Line2D[nbCam];
@@ -1240,6 +1281,7 @@ class SEGElement extends PathElement {
 	}
     }
 
+    @Override
     void addCamera(int verifIndex){
 	if (pc != null){
 	    if (verifIndex == pc.length){
@@ -1265,39 +1307,48 @@ class SEGElement extends PathElement {
 	}
     }
 
+    @Override
     void removeCamera(int index){
  	pc[index] = null;
  	lpc[index] = null;
     }
 
+    @Override
     void project(int i, int hw, int hh, Camera c, double coef, double px, double py){
 	pc[i].setLine(px, py, hw+(x-c.posx)*coef, hh-(y-c.posy)*coef);
     }
 
+    @Override
     void projectForLens(int i, int hw, int hh, double lx, double ly, double coef, double px, double py){
 	lpc[i].setLine(px, py, hw+(x-lx)*coef, hh-(y-ly)*coef);
     }
 
+    @Override
     double getX(int i){
 	return pc[i].getX2();
     }
 
+    @Override
     double getY(int i){
 	return pc[i].getY2();
     }
 
+    @Override
     double getlX(int i){
 	return lpc[i].getX2();
     }
 
+    @Override
     double getlY(int i){
 	return lpc[i].getY2();
     }
 
+    @Override
     Shape getShape(int i){
 	return pc[i];
     }
 
+    @Override
     Shape getlShape(int i){
 	return lpc[i];
     }
@@ -1326,6 +1377,7 @@ class QDCElement extends PathElement {
         }
     }
 
+    @Override
     void initCams(int nbCam){
 	pc = new QuadCurve2D[nbCam];
 	lpc = new QuadCurve2D[nbCam];
@@ -1335,6 +1387,7 @@ class QDCElement extends PathElement {
 	}
     }
 
+    @Override
     void addCamera(int verifIndex){
 	if (pc != null){
 	    if (verifIndex == pc.length){
@@ -1360,39 +1413,48 @@ class QDCElement extends PathElement {
 	}
     }
 
+    @Override
     void removeCamera(int index){
  	pc[index] = null;
  	lpc[index] = null;
     }
     
+    @Override
     void project(int i, int hw, int hh, Camera c, double coef, double px, double py){
 	pc[i].setCurve(px, py, hw+(ctrlx-c.posx)*coef, hh-(ctrly-c.posy)*coef, hw+(x-c.posx)*coef, hh-(y-c.posy)*coef);
     }
 
+    @Override
     void projectForLens(int i, int hw, int hh, double lx, double ly, double coef, double px, double py){
 	lpc[i].setCurve(px, py, hw+(ctrlx-lx)*coef, hh-(ctrly-ly)*coef, hw+(x-lx)*coef, hh-(y-ly)*coef);
     }
 
+    @Override
     double getX(int i){
 	return pc[i].getX2();
     }
 
+    @Override
     double getY(int i){
 	return pc[i].getY2();
     }
 
+    @Override
     double getlX(int i){
 	return lpc[i].getX2();
     }
 
+    @Override
     double getlY(int i){
 	return lpc[i].getY2();
     }
 
+    @Override
     Shape getShape(int i){
 	return pc[i];
     }
 
+    @Override
     Shape getlShape(int i){
 	return lpc[i];
     }
@@ -1425,6 +1487,7 @@ class CBCElement extends PathElement {
         }
     }
 
+    @Override
     void initCams(int nbCam){
 	pc = new CubicCurve2D[nbCam];
 	lpc = new CubicCurve2D[nbCam];
@@ -1434,6 +1497,7 @@ class CBCElement extends PathElement {
 	}
     }
 
+    @Override
     void addCamera(int verifIndex){
 	if (pc != null){
 	    if (verifIndex == pc.length){
@@ -1459,11 +1523,13 @@ class CBCElement extends PathElement {
 	}
     }
 
+    @Override
     void removeCamera(int index){
  	pc[index] = null;
  	lpc[index] = null;
     }
 
+    @Override
     void project(int i, int hw, int hh, Camera c, double coef, double px, double py){
 	pc[i].setCurve(px, py,
 		       hw+(ctrlx1-c.posx)*coef, hh-(ctrly1-c.posy)*coef,
@@ -1471,6 +1537,7 @@ class CBCElement extends PathElement {
 		       hw+(x-c.posx)*coef, hh-(y-c.posy)*coef);
     }
 
+    @Override
     void projectForLens(int i, int hw, int hh, double lx, double ly, double coef, double px, double py){
 	lpc[i].setCurve(px, py,
 		       hw+(ctrlx1-lx)*coef, hh-(ctrly1-ly)*coef,
@@ -1478,26 +1545,32 @@ class CBCElement extends PathElement {
 		       hw+(x-lx)*coef, hh-(y-ly)*coef);
     }
 
+    @Override
     double getX(int i){
 	return pc[i].getX2();
     }
 
+    @Override
     double getY(int i){
 	return pc[i].getY2();
     }
 
+    @Override
     double getlX(int i){
 	return lpc[i].getX2();
     }
 
+    @Override
     double getlY(int i){
 	return lpc[i].getY2();
     }
 
+    @Override
     Shape getShape(int i){
 	return pc[i];
     }
 
+    @Override
     Shape getlShape(int i){
 	return lpc[i];
     }

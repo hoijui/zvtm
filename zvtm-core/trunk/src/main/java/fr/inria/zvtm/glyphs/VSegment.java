@@ -120,6 +120,7 @@ public class VSegment extends Glyph implements RectangularShape {
         setTranslucencyValue(alpha);
     }
 
+    @Override
     public void initCams(int nbCam){
 	pc=new RProjectedCoords[nbCam];
 	for (int i=0;i<nbCam;i++){
@@ -127,6 +128,7 @@ public class VSegment extends Glyph implements RectangularShape {
 	}
     }
 
+    @Override
     public void addCamera(int verifIndex){
 	if (pc!=null){
 	    if (verifIndex==pc.length){
@@ -148,34 +150,41 @@ public class VSegment extends Glyph implements RectangularShape {
 	}
     }
 
+    @Override
     public void removeCamera(int index){
 	pc[index]=null;
     }
 
+    @Override
     public void resetMouseIn(){
 	for (int i=0;i<pc.length;i++){
 	    resetMouseIn(i);
 	}
     }
 
+    @Override
     public void resetMouseIn(int i){
 	if (pc[i]!=null){pc[i].prevMouseIn=false;}
     }
 
+    @Override
     public double getOrient(){return orient;}
 
+    @Override
     public void orientTo(double angle){
         orient = angle;
         computeEdges();
         VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
+    @Override
     public double getSize(){return size;}
 
 	/** Get the bounding box of this Glyph in virtual space coordinates.
 	 *@return west, north, east and south bounds in virtual space.
 	 */
-	public double[] getBounds(){
+	@Override
+    public double[] getBounds(){
 		double[] res = {vx-vw/2d,vy+vh/2d,vx+vw/2d,vy-vh/2d};
 		return res;
 	}
@@ -217,28 +226,34 @@ public class VSegment extends Glyph implements RectangularShape {
         else if(orient==0 && vw<0){orient=Math.PI;}	    
     }
 
+    @Override
     public double getWidth(){return vw;}
 
+    @Override
     public double getHeight(){return vh;}
 
+    @Override
     public void sizeTo(double s){
         size = s;
         computeEdges();
         VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
+    @Override
     public void reSize(double factor){
         size *= factor;
         computeEdges();
         VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
+    @Override
     public void setWidth(double w){
         vw = w;
         computeSize();
         VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
+    @Override
     public void setHeight(double h){
         vh = h;
         computeSize();
@@ -252,6 +267,7 @@ public class VSegment extends Glyph implements RectangularShape {
         VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
+    @Override
     public boolean fillsView(double w,double h,int camIndex){
         return false;
     }
@@ -261,6 +277,7 @@ public class VSegment extends Glyph implements RectangularShape {
         vh = size * Math.sin(orient);
     }
 
+    @Override
     public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
 	    return false;
     }
@@ -286,14 +303,17 @@ public class VSegment extends Glyph implements RectangularShape {
 	                            x, y) <= tolerance;
     }
     
+    @Override
     public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
 		return Line2D.ptSegDist(vx-vw/2d, vy-vh/2d, vx+vw/2d, vy+vh/2d, dvx, dvy) <= dvr;
 	}
 
+    @Override
     public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
 	    return Glyph.NO_CURSOR_EVENT;
     }
 
+    @Override
     public void project(Camera c, Dimension d){
         int i=c.getIndex();
         coef = c.focal / (c.focal+c.altitude);
@@ -306,6 +326,7 @@ public class VSegment extends Glyph implements RectangularShape {
         pc[i].ch = (int)Math.round(vh/2d*coef);
     }
 
+    @Override
     public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, double lensx, double lensy){
         int i = c.getIndex();
         coef = c.focal/(c.focal+c.altitude) * lensMag;
@@ -318,6 +339,7 @@ public class VSegment extends Glyph implements RectangularShape {
         pc[i].lch = (int)Math.round(vh/2d*coef);
     }
 
+    @Override
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
         if (alphaC != null && alphaC.getAlpha()==0){return;}
         g.setColor(this.color);
@@ -345,6 +367,7 @@ public class VSegment extends Glyph implements RectangularShape {
         }
     }
 
+    @Override
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
         if (alphaC != null && alphaC.getAlpha()==0){return;}
         g.setColor(this.color);
@@ -372,6 +395,7 @@ public class VSegment extends Glyph implements RectangularShape {
         }
     }
 
+    @Override
     public Object clone(){
         Point2D.Double[] ep = getEndPoints();
         VSegment res = new VSegment(ep[0].x, ep[0].y, ep[1].x, ep[1].y, vz, color, (alphaC != null) ? alphaC.getAlpha() : 1f);
@@ -380,6 +404,7 @@ public class VSegment extends Glyph implements RectangularShape {
     }
 
     /** Highlight this glyph to give visual feedback when the cursor is inside it. */
+    @Override
     public void highlight(boolean b, Color selectedColor){
         boolean update = false;
         if (b){

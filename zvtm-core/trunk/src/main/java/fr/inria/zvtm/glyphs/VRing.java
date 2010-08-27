@@ -149,22 +149,9 @@ public class VRing extends ClosedShape {
 		xpcoords = new int[n];
 	    ypcoords = new int[n];
 	}
-	
-    public void move(double x, double y){
-        vx += x;
-        vy += y;
-        propagateMove(x, y);
-        VirtualSpaceManager.INSTANCE.repaintNow();
-    }
 
-    public void moveTo(double x, double y){
-        propagateMove(x-vx, y-vy);
-        vx = x;
-        vy = y;
-        VirtualSpaceManager.INSTANCE.repaintNow();
-    }
-
-	public void initCams(int nbCam){
+	@Override
+    public void initCams(int nbCam){
 		pr = new ProjRing[nbCam];
 		for (int i=0;i<nbCam;i++){
 			pr[i] = new ProjRing();
@@ -235,14 +222,17 @@ public class VRing extends ClosedShape {
     /** Get the slice's orientation.
      *@return slice's orientation in virtual space, interpreted as the orientation of the segment linking the vertex that is not an arc endpoint to the middle of the arc (bisector of the main angle). In [0:2Pi[
      */
+     @Override
     public double getOrient(){return orient;}
 
+    @Override
     public boolean fillsView(double w,double h,int camIndex){
 	    //XXX: TBW (call coordInside() for the four view corners)
 	    return false;
     }    
 
-	public void addCamera(int verifIndex){
+	@Override
+    public void addCamera(int verifIndex){
 		if (pr != null){
 			if (verifIndex == pr.length){
 				ProjRing[] ta = (ProjRing[])pr;
@@ -263,21 +253,25 @@ public class VRing extends ClosedShape {
 		}
 	}
 
+    @Override
     public void removeCamera(int index){
 	pr[index] = null;
     }
 
+    @Override
     public void resetMouseIn(){
 	for (int i=0;i<pr.length;i++){
 	    resetMouseIn(i);
 	}
     }
 
+    @Override
     public void resetMouseIn(int i){
 	if (pr[i] != null){pr[i].prevMouseIn = false;}
 	borderColor = bColor;
     }
 
+    @Override
     public void sizeTo(double s){
         size = s;
         computeSliceEdges();
@@ -285,6 +279,7 @@ public class VRing extends ClosedShape {
         VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
+    @Override
     public void reSize(double factor){
         size *= factor;
         computeSliceEdges();
@@ -295,6 +290,7 @@ public class VRing extends ClosedShape {
     /** Set the slice's orientation.
      *@param ag slice orientation in virtual space, interpreted as the orientation of the segment linking the vertex that is not an arc endpoint to the middle of the arc (bisector of the main angle). In [0:2Pi[
      */
+     @Override
     public void orientTo(double ag){
         orient = (ag > Utilities.TWO_PI) ? (ag % Utilities.TWO_PI) : ag;
         orientDeg = (int)Math.round(orient * RAD2DEG_FACTOR);
@@ -321,6 +317,7 @@ public class VRing extends ClosedShape {
 	return angle;
     }
 
+    @Override
     public double getSize(){
 	return size;
     }
@@ -345,7 +342,8 @@ public class VRing extends ClosedShape {
 	}
     }
 
-	public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
+	@Override
+    public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
 		if (Math.sqrt(Math.pow(jpx-pr[camIndex].cx, 2)+Math.pow(jpy-pr[camIndex].cy, 2)) <= pr[camIndex].outerCircleRadius){
 			if (pr[camIndex].ring.contains(jpx, jpy)){
 				return true;
@@ -355,14 +353,16 @@ public class VRing extends ClosedShape {
 	}
     
     /** The disc is actually approximated to its bounding box here. Precise intersection computation would be too costly. */
-	public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
+	@Override
+    public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
 		if (Math.sqrt(Math.pow(vx-dvx, 2)+Math.pow(vy-dvy, 2)) < (dvr + size)){
 		    return pr[camIndex].ring.intersects(jpx-dpr, jpy-dpr, 2*dpr, 2*dpr);
 		}
 	    return false;
 	}
 	
-	public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
+	@Override
+    public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
             if (coordInside(jpx, jpy, camIndex, cvx, cvy)){
                 //if the mouse is inside the glyph
                 if (!pr[camIndex].prevMouseIn){
@@ -384,7 +384,8 @@ public class VRing extends ClosedShape {
             }
     }
     
-	public void project(Camera c, Dimension d){
+	@Override
+    public void project(Camera c, Dimension d){
 		int i = c.getIndex();
 		coef = c.focal / (c.focal+c.altitude);
 		//find coordinates of object's geom center wrt to camera center and project
@@ -397,7 +398,8 @@ public class VRing extends ClosedShape {
 		pr[i].innerRingRadius = (int)Math.round(size * irr_p * coef);
 	}
 
-	public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, double lensx, double lensy){
+	@Override
+    public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, double lensx, double lensy){
 		int i = c.getIndex();
 		coef = c.focal/(c.focal+c.altitude) * lensMag;
 		//find coordinates of object's geom center wrt to camera center and project
@@ -414,7 +416,8 @@ public class VRing extends ClosedShape {
 	Ellipse2D innerSlice = new Ellipse2D.Double();
 	Area subring;
 	
-	public void draw(Graphics2D g, int vW, int vH, int i, Stroke stdS, AffineTransform stdT, int dx, int dy){
+	@Override
+    public void draw(Graphics2D g, int vW, int vH, int i, Stroke stdS, AffineTransform stdT, int dx, int dy){
 	    if (alphaC != null && alphaC.getAlpha() == 0){return;}
 		if (pr[i].outerCircleRadius > 2){
 			if (isFilled()){
@@ -489,6 +492,7 @@ public class VRing extends ClosedShape {
 		}
 	}
 
+    @Override
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
         if (alphaC != null && alphaC.getAlpha() == 0){return;}
         if (pr[i].louterCircleRadius > 2){
@@ -564,6 +568,7 @@ public class VRing extends ClosedShape {
         }
     }
 
+    @Override
     public Object clone(){
 	    VRing res = new VRing(vx, vy, vz, size, angle, irr_p, orient, color, borderColor, (alphaC != null) ? alphaC.getAlpha() : 1);
         res.cursorInsideColor = this.cursorInsideColor;

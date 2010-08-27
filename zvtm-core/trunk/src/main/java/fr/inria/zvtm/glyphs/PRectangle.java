@@ -80,7 +80,8 @@ public class PRectangle extends VRectangle {
 	    return gp;
 	}
 
-	public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
+	@Override
+    public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 		if ((pc[i].cw>1) && (pc[i].ch>1)){
 			at = AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch);
             at.concatenate(AffineTransform.getScaleInstance(coef, coef));
@@ -116,7 +117,8 @@ public class PRectangle extends VRectangle {
 		}
 	}
 
-	public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
+	@Override
+    public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 		if ((pc[i].lcw>1) && (pc[i].lch>1)){
 			at = AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch);
             at.concatenate(AffineTransform.getScaleInstance(coef, coef));
@@ -152,7 +154,8 @@ public class PRectangle extends VRectangle {
 		}
 	}
 
-	public Object clone(){
+	@Override
+    public Object clone(){
 		PRectangle res = new PRectangle(vx, vy, 0, vw, vh, gp, getBorderColor());
 		res.cursorInsideColor = this.cursorInsideColor;
 		return res;

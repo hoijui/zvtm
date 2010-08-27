@@ -106,6 +106,7 @@ public class VEllipse extends ClosedShape implements RectangularShape {
         setTranslucencyValue(alpha);
     }
 
+    @Override
     public void initCams(int nbCam){
 	pc=new ProjEllipse[nbCam];
 	for (int i=0;i<nbCam;i++){
@@ -113,6 +114,7 @@ public class VEllipse extends ClosedShape implements RectangularShape {
 	}
     }
 
+    @Override
     public void addCamera(int verifIndex){
 	if (pc!=null){
 	    if (verifIndex==pc.length){
@@ -134,24 +136,29 @@ public class VEllipse extends ClosedShape implements RectangularShape {
 	}
     }
 
+    @Override
     public void removeCamera(int index){
 	pc[index]=null;
     }
 
+    @Override
     public void resetMouseIn(){
 	for (int i=0;i<pc.length;i++){
 	    resetMouseIn(i);
 	}
     }
 
+    @Override
     public void resetMouseIn(int i){
 	if (pc[i]!=null){pc[i].prevMouseIn=false;}
 	borderColor = bColor;
     }
 
     /** Cannot be reoriented. */
+    @Override
     public double getOrient(){return 0;}
 
+    @Override
     public void orientTo(double angle){}
 
     void computeSize(){
@@ -159,8 +166,10 @@ public class VEllipse extends ClosedShape implements RectangularShape {
         ar = vw / vh;
     }
 
+    @Override
     public double getSize(){return size;}
 
+    @Override
     public void sizeTo(double s){
         size = s;
         if (vw >= vh){
@@ -174,22 +183,27 @@ public class VEllipse extends ClosedShape implements RectangularShape {
         VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
+    @Override
     public void setWidth(double w){ 
         vw = w;
         computeSize();
         VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
+    @Override
     public void setHeight(double h){
         vh = h;
         computeSize();
         VirtualSpaceManager.INSTANCE.repaintNow();
     }
 
+    @Override
     public double getWidth(){return vw;}
 
+    @Override
     public double getHeight(){return vh;}
 
+    @Override
     public void reSize(double factor){
         size *= factor;
         if (vw >= vh){
@@ -206,25 +220,30 @@ public class VEllipse extends ClosedShape implements RectangularShape {
 	/** Get the bounding box of this Glyph in virtual space coordinates.
 	 *@return west, north, east and south bounds in virtual space.
 	 */
-	public double[] getBounds(){
+	 @Override
+    public double[] getBounds(){
 		double[] res = {vx-vw/2d,vy+vh/2d,vx+vw/2d,vy-vh/2d};
 		return res;
 	}
 
+    @Override
     public boolean fillsView(double w,double h,int camIndex){//would be too complex: just say no
 	return false;
     }
 
+    @Override
     public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
         if (pc[camIndex].ellipse.contains(jpx, jpy)){return true;}
         else {return false;}
     }
 
     /** The disc is actually approximated to its bounding box here. Precise intersection computation would be too costly. */
-	public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
+	@Override
+    public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
 		return pc[camIndex].ellipse.intersects(jpx-dpr, jpy-dpr, 2*dpr, 2*dpr);
 	}
 
+    @Override
     public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
         if (coordInside(jpx, jpy, camIndex, cvx, cvy)){
             //if the mouse is inside the glyph
@@ -247,6 +266,7 @@ public class VEllipse extends ClosedShape implements RectangularShape {
         }
     }
 
+    @Override
     public void project(Camera c, Dimension d){
         int i=c.getIndex();
         coef = c.focal / (c.focal+c.altitude);
@@ -259,6 +279,7 @@ public class VEllipse extends ClosedShape implements RectangularShape {
         pc[i].ellipse.setFrame(pc[i].cx-vw/2d*coef,pc[i].cy-vh/2d*coef,2*pc[i].cvw,2*pc[i].cvh);
     }
 
+    @Override
     public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, double lensx, double lensy){
         int i=c.getIndex();
         coef = c.focal/(c.focal+c.altitude) * lensMag;
@@ -271,6 +292,7 @@ public class VEllipse extends ClosedShape implements RectangularShape {
         pc[i].lellipse.setFrame(pc[i].lcx-vw/2d*coef,pc[i].lcy-vh/2d*coef,2*pc[i].lcvw,2*pc[i].lcvh);
     }
 
+    @Override
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
         if (alphaC != null && alphaC.getAlpha()==0){return;}
         if ((pc[i].ellipse.getBounds().width>2) || (pc[i].ellipse.getBounds().height>2)){
@@ -336,6 +358,7 @@ public class VEllipse extends ClosedShape implements RectangularShape {
         }
     }
 
+    @Override
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
         if (alphaC != null && alphaC.getAlpha()==0){return;}
         if ((pc[i].lellipse.getBounds().width>2) || (pc[i].lellipse.getBounds().height>2)){
@@ -401,6 +424,7 @@ public class VEllipse extends ClosedShape implements RectangularShape {
         }
     }
 
+    @Override
     public Object clone(){
         VEllipse res=new VEllipse(vx,vy,vz,vw,vh,color, this.borderColor, (alphaC != null) ? alphaC.getAlpha() : 1.0f);
         res.cursorInsideColor=this.cursorInsideColor;
