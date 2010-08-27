@@ -178,14 +178,12 @@ public class PDFPageDescription extends ResourceDescription {
         this.parentRegion = pr;
     }
     
-    /** Type of resource.
-	 *@return type of resource.
-	 */
+    @Override
 	public String getType(){
 	    return PDFResourceHandler.RESOURCE_TYPE_PDF;
 	}
 
-    /** Called automatically by scene manager. But cam ne called by client application to force loading of objects not actually visible. */
+    @Override
     public void createObject(final SceneManager sm, final VirtualSpace vs, final boolean fadeIn){
         display = true;
         loadTask = pageLoader.submit(new PageLoadTask(sm, vs, fadeIn));
@@ -247,10 +245,12 @@ public class PDFPageDescription extends ResourceDescription {
         glyph.setOwner(this);
     }
     
+    @Override
     public void destroyObject(final SceneManager sm, final VirtualSpace vs, boolean fadeOut){
         pageUnloader.submit(new PageUnloadTask(sm, vs, fadeOut));
     }
 
+    @Override
     public Glyph getGlyph(){
 	    return glyph;
     }
