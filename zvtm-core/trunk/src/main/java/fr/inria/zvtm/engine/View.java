@@ -261,7 +261,6 @@ public abstract class View {
 
     /** Get height of rectangular region of the VirtualSpace seen through a camera.
      *@param c camera
-     *@param res array which will contain the result
      *@return width in VirtualSpace coordinates (from north to south boundaries)
      */
     public double getVisibleRegionHeight(Camera c){
@@ -393,7 +392,7 @@ public abstract class View {
     /** Sets whether this View is resizable by the user.
      *@param resizable - true if this frame is resizable; false otherwise.
      */
-    public abstract void setResizable(boolean b);
+    public abstract void setResizable(boolean resizable);
 
     /** Shows or hides this View depending on the value of parameter b. */
     public abstract void setVisible(boolean b);
@@ -493,166 +492,162 @@ public abstract class View {
         repaint();
     }
 
-    /**Remove the repaint listener associated with this view.
-     *@see #repaintNow(RepaintListener rl)
+    /** Remove the repaint listener associated with this view.
+     *@see #repaint(RepaintListener rl)
      */
     public void removeRepaintListener(){
-	panel.repaintListener = null;
+	    panel.repaintListener = null;
     }
 
-    /**gives access to the panel's Graphics object - can be useful in some cases, for instance to compute the bounds of a text string that has not yet been added to any virtual space. SHOULD NOT BE TAMPERED WITH. USE AT YOUR OWN RISKS!*/
+    /** Get access to the panel's AWT Graphics object.
+     * This can be useful in some cases, for instance to compute the bounds of a text string
+       that has not yet been added to any virtual space.
+       This instance of Graphics should not be tampered with (this will be at your own risks).
+     */
     public Graphics getGraphicsContext(){
-	return panel.stableRefToBackBufferGraphics;
+	    return panel.stableRefToBackBufferGraphics;
     }
 
-    /**ask for a bitmap rendering of this view and encode it in a PNG file
+    /** Ask for a bitmap rendering of this view and encode it in a PNG file.
      *@param w width of rendered image
      *@param h height of rendered image
-     *@param vsm the current VirtualSpaceManager
      *@param f the location of the resulting PNG file
-     *@see #rasterize(int w, int h, VirtualSpaceManager vsm, java.io.File f, Vector layers)
-     *@see #rasterize(int w, int h, VirtualSpaceManager vsm)
-     *@see #rasterize(int w, int h, VirtualSpaceManager vsm, Vector layers)
+     *@see #rasterize(int w, int h, java.io.File f, Vector layers)
+     *@see #rasterize(int w, int h)
+     *@see #rasterize(int w, int h, Vector layers)
      */
-    public void rasterize(int w, int h, VirtualSpaceManager vsm, java.io.File f){
-	rasterize(w, h, vsm, f, null);
+    public void rasterize(int w, int h, java.io.File f){
+	    rasterize(w, h, f, null);
     }
 
-    /**ask for a bitmap rendering of this view and encode it in a PNG file
+    /** Ask for a bitmap rendering of this view and encode it in a PNG file.
      *@param w width of rendered image
      *@param h height of rendered image
-     *@param vsm the current VirtualSpaceManager
      *@param f the location of the resulting PNG file
      *@param layers Vector of cameras : what layers (represented by cameras) of this view should be rendered (you can pass null for all layers)
-     *@see #rasterize(int w, int h, VirtualSpaceManager vsm, java.io.File f)
-     *@see #rasterize(int w, int h, VirtualSpaceManager vsm)
-     *@see #rasterize(int w, int h, VirtualSpaceManager vsm, Vector layers)
+     *@see #rasterize(int w, int h, java.io.File f)
+     *@see #rasterize(int w, int h)
+     *@see #rasterize(int w, int h, Vector layers)
      */
-    public void rasterize(int w, int h, VirtualSpaceManager vsm, java.io.File f, Vector layers){
-	javax.imageio.ImageWriter writer = (javax.imageio.ImageWriter)javax.imageio.ImageIO.getImageWritersByFormatName("png").next();
-	try {
-	    writer.setOutput(javax.imageio.ImageIO.createImageOutputStream(f));
-	    BufferedImage bi = this.rasterize(w, h, vsm, layers);
-	    if (bi != null){
-		writer.write(bi);
-		writer.dispose();
-	    }
-	}
-	catch (java.io.IOException ex){ex.printStackTrace();}
+    public void rasterize(int w, int h, java.io.File f, Vector<Camera> layers){
+        javax.imageio.ImageWriter writer = (javax.imageio.ImageWriter)javax.imageio.ImageIO.getImageWritersByFormatName("png").next();
+        try {
+            writer.setOutput(javax.imageio.ImageIO.createImageOutputStream(f));
+            BufferedImage bi = this.rasterize(w, h, layers);
+            if (bi != null){
+                writer.write(bi);
+                writer.dispose();
+            }
+        }
+        catch (java.io.IOException ex){ex.printStackTrace();}
     }
 
-    /**ask for a bitmap rendering of this view and return the resulting BufferedImage
+    /** Ask for a bitmap rendering of this view and return the resulting BufferedImage.
      *@param w width of rendered image
      *@param h height of rendered image
-     *@param vsm the current VirtualSpaceManager
      *@return the resulting buffered image which can then be manipulated and serialized
-     *@see #rasterize(int w, int h, VirtualSpaceManager vsm, java.io.File f)
-     *@see #rasterize(int w, int h, VirtualSpaceManager vsm, java.io.File f, Vector layers)
-     *@see #rasterize(int w, int h, VirtualSpaceManager vsm, Vector layers)
+     *@see #rasterize(int w, int h, java.io.File f)
+     *@see #rasterize(int w, int h, java.io.File f, Vector layers)
+     *@see #rasterize(int w, int h, Vector layers)
      */
-    public BufferedImage rasterize(int w, int h, VirtualSpaceManager vsm){
-	return rasterize(w, h, vsm, (Vector)null);
+    public BufferedImage rasterize(int w, int h){
+	    return rasterize(w, h, (Vector)null);
     }
 
-    /**ask for a bitmap rendering of this view and return the resulting BufferedImage
+    /** Ask for a bitmap rendering of this view and return the resulting BufferedImage.
      *@param w width of rendered image
      *@param h height of rendered image
-     *@param vsm the current VirtualSpaceManager
      *@param layers Vector of cameras : what layers (represented by cameras) of this view should be rendered (you can pass null for all layers)
      *@return the resulting buffered image which can then be manipulated and serialized
-     *@see #rasterize(int w, int h, VirtualSpaceManager vsm, java.io.File f)
-     *@see #rasterize(int w, int h, VirtualSpaceManager vsm, java.io.File f, Vector layers)
-     *@see #rasterize(int w, int h, VirtualSpaceManager vsm)
+     *@see #rasterize(int w, int h, java.io.File f)
+     *@see #rasterize(int w, int h, java.io.File f, Vector layers)
+     *@see #rasterize(int w, int h)
      */
-    public BufferedImage rasterize(int w, int h, VirtualSpaceManager vsm, Vector layers){
-	Dimension panelSize = panel.getSize();
-	float mFactor = 1/Math.min(w / ((float)panelSize.getWidth()),
-				   h / ((float)panelSize.getHeight()));
-	Camera c, nc;
-	Vector clones= new Vector();
-	Vector cams = (layers != null) ? layers : cameras;
-	for (int i=0;i<cams.size();i++){
-	    c = (Camera)cams.elementAt(i);
-	    nc = c.parentSpace.addCamera();
-	    nc.posx = c.posx;
-	    nc.posy = c.posy;
-	    /*change this altitude to compensate for the w/h change what we
-	      want is to get the same view at a higher (or lower) resolution*/
-	    nc.focal = c.focal;
-	    nc.altitude = (c.altitude + c.focal) * mFactor - c.focal;
-	    clones.add(nc);
-	}
-	BufferedImage img = (new OffscreenViewPanel(clones)).rasterize(w, h, panel.backColor);
-	for (int i=0;i<clones.size();i++){
-	    nc = (Camera)clones.elementAt(i);
-	    vsm.getVirtualSpace(nc.parentSpace.spaceName).removeCamera(nc.index);
-	}
-	return img;
+    public BufferedImage rasterize(int w, int h, Vector<Camera> layers){
+        Dimension panelSize = panel.getSize();
+        float mFactor = 1/Math.min(w / ((float)panelSize.getWidth()),
+            h / ((float)panelSize.getHeight()));
+        Camera c, nc;
+        Vector<Camera> clones= new Vector<Camera>();
+        Vector<Camera> cams = (layers != null) ? layers : cameras;
+        for (int i=0;i<cams.size();i++){
+            c = cams.elementAt(i);
+            nc = c.parentSpace.addCamera();
+            nc.posx = c.posx;
+            nc.posy = c.posy;
+            /*change this altitude to compensate for the w/h change what we
+            want is to get the same view at a higher (or lower) resolution*/
+            nc.focal = c.focal;
+            nc.altitude = (c.altitude + c.focal) * mFactor - c.focal;
+            clones.add(nc);
+        }
+        BufferedImage img = (new OffscreenViewPanel(clones)).rasterize(w, h, panel.backColor);
+        for (int i=0;i<clones.size();i++){
+            nc = clones.elementAt(i);
+            VirtualSpaceManager.INSTANCE.getVirtualSpace(nc.parentSpace.spaceName).removeCamera(nc.index);
+        }
+        return img;
     }
 
-    //we have to specify the layer too (I think)     write this later
-//     /**show/hide in this view the region seen through a camera (as a rectangle)
-//      *@param c the camera to be displayed (should not be one of the cameras composing this view)
-//      */
-//     public void showCamera(Camera c,boolean b,Color col){
-    
-//     }
-
-    /** set a paint method (containing Java2D paint instructions) that will be called each time the view is repainted
+    /** Set a paint method (containing Java2D paint instructions) that will be called each time the view is repainted.
      *@param p the paint method encapsulated in an object implementing the Java2DPainter interface (pass null to unset an existing one)
      *@param g one of Java2DPainter.BACKGROUND, Java2DPainter.FOREGROUND, Java2DPainter.AFTER_DISTORTION, Java2DPainter.AFTER_PORTALS depending on whether the method should be called before or after ZVTM glyphs have been painted, after distortion by a lens (FOREGROUND and AFTER_DISTORTION are equivalent in the absence of lens), or after portals have been painted
      */
     public void setJava2DPainter(Java2DPainter p, short g){
-	painters[g] = p;
-	repaint();
+        painters[g] = p;
+        repaint();
     }
 
-    /** get the paint method (containing Java2D paint instructions) that will be called each time the view is repainted
+    /** Get the implementation of the paint method (containing Java2D paint instructions) that will be called each time the view is repainted.
      *@param g one of Java2DPainter.BACKGROUND, Java2DPainter.FOREGROUND, Java2DPainter.AFTER_DISTORTION, Java2DPainter.AFTER_PORTALS depending on whether the method should be called before or after ZVTM glyphs have been painted, after distortion by a lens (FOREGROUND and AFTER_DISTORTION are equivalent in the absence of lens), or after portals have been painted
      *@return p the paint method encapsulated in an object implementing the Java2DPainter interface (null if not set)
      */
     public Java2DPainter getJava2DPainter(short g){
-	return painters[g];
+	    return painters[g];
     }
     
-    /**get the name of this view*/
+    /** Get the View's name. */
     public String getName(){
-	return name;
+	    return name;
     }
 
-    /** set a padding for customizing the region inside the view for which objects are actually visibles
+    /** Set a padding for customizing the region inside the view for which objects are actually visible.
      *@param wnesPadding padding values in pixels for the west, north, east and south borders
-    */
+     */
     public void setVisibilityPadding(int[] wnesPadding){
-	panel.setVisibilityPadding(wnesPadding);
+	    panel.setVisibilityPadding(wnesPadding);
     }
 
-    /** get the padding values customizing the region inside the view for which objects are actually visibles
+    /** Get the padding values customizing the region inside the view for which objects are actually visible.
      *@return padding values in pixels for the west, north, east and south borders
-    */
+     */
     public int[] getVisibilityPadding(){
-	return panel.getVisibilityPadding();
+	    return panel.getVisibilityPadding();
     }
-    
-    void buildConstraints(GridBagConstraints gbc, int gx,int gy,int gw,int gh,int wx,int wy){
-	gbc.gridx=gx;
-	gbc.gridy=gy;
-	gbc.gridwidth=gw;
-	gbc.gridheight=gh;
-	gbc.weightx=wx;
-	gbc.weighty=wy;
+
+    /* for gridbagconstraint layout */
+    static void buildConstraints(GridBagConstraints gbc, int gx,int gy,int gw,int gh,int wx,int wy){
+        gbc.gridx=gx;
+        gbc.gridy=gy;
+        gbc.gridwidth=gw;
+        gbc.gridheight=gh;
+        gbc.weightx=wx;
+        gbc.weighty=wy;
     }
     
     /* --------------------- LENSES -------------------------- */
 
-    /**set a lens for this view ; set to null to remove an existing lens<br/>Only works with standard view (has no effect when set on accelereated views)<br>
-        * Important: Distortion lenses cannot be associated with VolatileImage-based or OpenGL-based views*/
+    /** Activate a lens in this view. This only works with regular views (not OpengGL views - GLEView).
+     *@param l the lens instance. Pass null to remove an existing lens.
+     */
     public Lens setLens(Lens l){
         Lens res = panel.setLens(l);
         return res;
     }
 
-    /**return Lens currently used by this view (null if none)*/
+    /** Get Lens currently active in this view
+     *@return null if none
+     */
     public Lens getLens(){
         return panel.getLens();
     }
@@ -854,7 +849,7 @@ public abstract class View {
      *@return the final camera location, null if the camera is not associated with this view.
      */
     public Location centerOnGlyph(Glyph g,Camera c,int d){
-	return this.centerOnGlyph(g,c,d,true);
+	    return this.centerOnGlyph(g,c,d,true);
     }
 
     /** Translates and (un)zooms a camera in order to focus on glyph g
@@ -866,7 +861,7 @@ public abstract class View {
      *@return the final camera location, null if the camera is not associated with this view.
      */
     public Location centerOnGlyph(Glyph g, Camera c, int d, boolean z){
-	return this.centerOnGlyph(g, c, d, z, 1.0f);
+	    return this.centerOnGlyph(g, c, d, z, 1.0f);
     }
 
     /** Translates and (un)zooms a camera in order to focus on glyph g
@@ -879,7 +874,7 @@ public abstract class View {
      *@return the final camera location, null if the camera is not associated with this view.
      */
     public Location centerOnGlyph(Glyph g, Camera c, int d, boolean z, float mFactor){
-	return this.centerOnGlyph(g, c, d, z, mFactor, null);
+	    return this.centerOnGlyph(g, c, d, z, mFactor, null);
     }
     
     
@@ -948,7 +943,10 @@ public abstract class View {
         return new Location(dx, dy, na);
     }
 
-    /** returns a vector of glyphs whose hotspot is in region delimited by rectangle (x1,y1,x2,y2) in virtual space vs (returns null if empty). Coordinates of the mouse cursor in virtual space are available in instance variables vx and vy of class VCursor. The selection rectangle can be drawn on screen by using ViewPanel.setDrawRect(true) (e.g. call when mouse button is pressed)/ViewPanel.setDrawRect(false) (e.g. call when mouse button is released)
+    /** Get glyphs whose hotspot is in region delimited by rectangle (x1,y1,x2,y2) in VirtualSpace vs.
+     * Coordinates of the mouse cursor in virtual space are available in instance variables vx and vy of class VCursor.
+     * The selection rectangle can be drawn on screen by using ViewPanel.setDrawRect(true) (e.g. call when mouse button is pressed)/ViewPanel.setDrawRect(false) (e.g. call when mouse button is released).
+     *@return null if empty. 
      *@param x1 x coord of first point
      *@param y1 y coord of first point
      *@param x2 x coord of opposite point
@@ -957,14 +955,14 @@ public abstract class View {
      *@param wg which glyphs in the region should be returned (among VIS_AND_SENS_GLYPHS (default), VISIBLE_GLYPHS, SENSIBLE_GLYPHS, ALL_GLYPHS)
      */
     public Vector<Glyph> getGlyphsInRegion(double x1,double y1,double x2,double y2,String vsn,int wg){
-        Vector res = new Vector();
+        Vector<Glyph> res = new Vector<Glyph>();
         VirtualSpace vs = VirtualSpaceManager.INSTANCE.getVirtualSpace(vsn);
         double minX = Math.min(x1,x2);
         double minY = Math.min(y1,y2);
         double maxX = Math.max(x1,x2);
         double maxY = Math.max(y1,y2);
         if (vs!=null){
-            Vector allG=vs.getAllGlyphs();
+            Vector<Glyph> allG = vs.getAllGlyphs();
             Glyph g;
             for (int i=0;i<allG.size();i++){
                 g=(Glyph)allG.elementAt(i);

@@ -131,7 +131,7 @@ public class GLEView extends View implements KeyListener{
     public void setSize(int width, int height){frame.setSize(width, height);}
 
     @Override
-    public void setResizable(boolean b){frame.setResizable(b);}
+    public void setResizable(boolean resizable){frame.setResizable(resizable);}
 
     @Override
     public void setVisible(boolean b){

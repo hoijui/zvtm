@@ -362,8 +362,8 @@ public class VirtualSpaceManager implements AWTEventListener {
      * In some cases it is not possible to detect graphical changes so repaint
      * calls have to be issued manually (unless you are willing to wait for
      * another event to trigger repaint).
-     *@see #repaintNow(View v)
-     *@see #repaintNow(View v, RepaintListener rl)
+     *@see #repaint(View v)
+     *@see #repaint(View v, RepaintListener rl)
      */
     public void repaint(){
         for (int i=0;i<allViews.length;i++){
@@ -376,7 +376,7 @@ public class VirtualSpaceManager implements AWTEventListener {
      * calls have to be issued manually (unless you are willing to wait for
      * another event to trigger repaint).
      *@see #repaint()
-     *@see #repaintNow(View v, RepaintListener rl)
+     *@see #repaint(View v, RepaintListener rl)
      */
     public void repaint(View v){
 	    v.repaint();
@@ -388,7 +388,7 @@ public class VirtualSpaceManager implements AWTEventListener {
      * another event to trigger repaint).
      *@param v the view to repaint
      *@param rl a repaint listener to be notified when this repaint cycle is completed (it must be removed manually if you are not interested in being notified about following repaint cycles)
-     *@see #repaintNow(View v)
+     *@see #repaint(View v)
      *@see View#removeRepaintListener()
      */
     public void repaint(View v, RepaintListener rl){

@@ -78,7 +78,7 @@ public class PView extends View implements KeyListener {
 
     /** No effect. */
     @Override
-    public void setResizable(boolean b){}
+    public void setResizable(boolean resizable){}
 
     /** No effect. */
     @Override
