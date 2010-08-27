@@ -41,25 +41,34 @@ public class Camera {
 
     public static final float DEFAULT_FOCAL = 100;
 
-    /** camera index (wrt the owning virtual space)*/
+    /** Camera index (wrt the owning virtual space)*/
     int index; 
+
     /** Coordinates in virtual space.*/
-	public double posx,posy;
-    /** altitude of observation*/
+	public double vx,vy;
+
+    /** Altitude of observation (controls zoom factor).*/
     public double altitude;
-    /** focal distance*/
+
+    /** Focal distance. */
     public double focal;
-    /**camera is enabled or not (disabling does not destroy)*/
+
+    /** Camera is enabled or not (disabling does not destroy). */
     boolean enabled;
-    /** virtual space to which this camera belongs to*/
+
+    /** VirtualSpace to which this camera belongs to. */
     VirtualSpace parentSpace;
+
     /**View using this camera as one of its layer(s)*/
     View view;
-    /**glyphs sticked to this one*/
+
+    /** Glyphs sticked to this camera. */
     Glyph[] stickedGlyphs;
-    /**glyphs sticked to this one*/
+
+    /** Other cameras sticked to this camera*/
     Camera[] stickedCameras;
-    /**tells whether camera altitude changes should be propagated to sticked cameras or not (in addition to x,y changes)*/
+
+    /** Records whether camera altitude changes should be propagated to sticked cameras or not (in addition to x,y changes). */
     boolean[] stickAltitude;
 
     /**Lazy camera, true if the camera only repaints when explicitely asked*/
@@ -68,8 +77,8 @@ public class Camera {
     /**when in lazy mode, tells the camera to repaint next time the owning view goes through its paint loop*/
     boolean shouldRepaint=false;
 
-    /**allow negative camera altitudes (zoom beyond the standard size=magnification) ; this is actually a hack to decrease focal value automatically when the altitude is 0*/
-    private double zoomFloor=0;
+    /**allow negative camera altitudes (this will zoom beyond the nominal scale).*/
+    private double zoomFloor = 0;
 
     //"listeners" is traversed a lot more often than it is mutated.
     private final List<CameraListener> listeners = new CopyOnWriteArrayList<CameraListener>();
@@ -94,8 +103,8 @@ public class Camera {
      * @param l lazy camera, will only repaint when explicitely told to do so (default is false) 
      */
     Camera(double x, double y, double alt, double f, int i, boolean l){
-	    posx=x;
-	    posy=y;
+	    vx=x;
+	    vy=y;
 	    altitude=alt;
 	    focal=f;
 	    index=i;
@@ -124,22 +133,22 @@ public class Camera {
 	return zoomFloor;
     }
 
-    /**relative translation (offset) - will trigger a repaint, whereas directly assigning values to posx, posy will not*/
+    /**relative translation (offset) - will trigger a repaint, whereas directly assigning values to vx, vy will not*/
     public void move(double x, double y){
-        posx += x;
-        posy += y;
-        propagateMove(posx, posy);  //take care of sticked glyphs
+        vx += x;
+        vy += y;
+        propagateMove(vx, vy);  //take care of sticked glyphs
         if (view != null){
             VirtualSpaceManager.INSTANCE.repaint(view);
         }
         notifyMoved();
     }
     
-    /**absolute translation - will trigger a repaint, whereas directly assigning values to posx, posy will not*/
+    /**absolute translation - will trigger a repaint, whereas directly assigning values to vx, vy will not*/
     public void moveTo(double x, double y){
-        posx = x;
-        posy = y;
-        propagateMove(x-posx, y-posy);  //take care of sticked glyphs
+        vx = x;
+        vy = y;
+        propagateMove(x-vx, y-vy);  //take care of sticked glyphs
         if (view != null){
             VirtualSpaceManager.INSTANCE.repaint(view);
         }
@@ -202,10 +211,10 @@ public class Camera {
      * Set camera location
      */
     public void setLocation(Location l){
-        propagateMove(l.vx-posx, l.vy-posy);
+        propagateMove(l.vx-vx, l.vy-vy);
         propagateAltitudeChange(l.alt - altitude);
-        posx = l.vx;
-        posy = l.vy;
+        vx = l.vx;
+        vy = l.vy;
         altitude = l.alt;
         if (view != null){
             VirtualSpaceManager.INSTANCE.repaint(view);
@@ -217,7 +226,7 @@ public class Camera {
      * get camera location
      */
     public Location getLocation(){
-	return new Location(posx,posy,altitude);
+	return new Location(vx,vy,altitude);
     }
     
     /**
@@ -240,7 +249,7 @@ public class Camera {
      */
     protected void notifyMoved(){
 	for(CameraListener listener: listeners){
-	    listener.cameraMoved(this, new Point2D.Double(posx, posy), altitude);
+	    listener.cameraMoved(this, new Point2D.Double(vx, vy), altitude);
 	}
     }
 
@@ -270,7 +279,7 @@ public class Camera {
         }
         if (stickedCameras != null){
             for (int i=0;i<stickedCameras.length;i++){
-                stickedCameras[i].moveTo(posx, posy);
+                stickedCameras[i].moveTo(vx, vy);
             }
         }
     }
@@ -544,7 +553,7 @@ public class Camera {
      * returns a String with ID, position, altitude and focal distance
      */
     public String toString() {
-	return new String("Camera: index"+index+" position ("+posx+","+posy+") alt "+altitude+" focal "+focal);
+	return new String("Camera: index"+index+" position ("+vx+","+vy+") alt "+altitude+" focal "+focal);
     }
 
 	/*--------------------Sticking--------------------*/

@@ -319,8 +319,8 @@ public class VSegment extends Glyph implements RectangularShape {
         coef = c.focal / (c.focal+c.altitude);
         //find coordinates of object's geom center wrt to camera center and project
         //translate in JPanel coords
-        pc[i].cx = (int)Math.round((d.width/2)+(vx-c.posx)*coef);
-        pc[i].cy = (int)Math.round((d.height/2)-(vy-c.posy)*coef);
+        pc[i].cx = (int)Math.round((d.width/2)+(vx-c.vx)*coef);
+        pc[i].cy = (int)Math.round((d.height/2)-(vy-c.vy)*coef);
         //project width and height
         pc[i].cw = (int)Math.round(vw/2d*coef);
         pc[i].ch = (int)Math.round(vh/2d*coef);

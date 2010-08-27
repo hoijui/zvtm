@@ -398,8 +398,8 @@ public class AnimationManager {
 
         if(dz != 0){
             if (zile){
-                cam.setLocation(new Location(cam.posx+Math.round((cam.posx-zilX)*dz/(cam.getAltitude()+cam.focal)),
-                    cam.posy+Math.round((cam.posy-zilY)*dz/(cam.getAltitude()+cam.focal)),
+                cam.setLocation(new Location(cam.vx+Math.round((cam.vx-zilX)*dz/(cam.getAltitude()+cam.focal)),
+                    cam.vy+Math.round((cam.vy-zilY)*dz/(cam.getAltitude()+cam.focal)),
                     cam.getAltitude()+dz));
             }
 	    else

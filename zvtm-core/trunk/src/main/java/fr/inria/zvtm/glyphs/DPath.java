@@ -452,8 +452,8 @@ public class DPath extends Glyph implements RectangularShape {
 	coef = c.focal / (c.focal+c.altitude);
 	hw = d.width/2;
 	hh = d.height/2;
-	pc[i].cx = hw + (int)Math.round((spx-c.posx)*coef);
-	pc[i].cy = hh - (int)Math.round((spy-c.posy)*coef);
+	pc[i].cx = hw + (int)Math.round((spx-c.vx)*coef);
+	pc[i].cy = hh - (int)Math.round((spy-c.vy)*coef);
 	if (elements.length == 0){return;}
 	elements[0].project(i, hw, hh, c, coef, pc[i].cx, pc[i].cy);
 	for (int j=1;j<elements.length;j++){
@@ -1215,7 +1215,7 @@ class MOVElement extends PathElement {
 
     @Override
     void project(int i, int hw, int hh, Camera c, double coef, double px, double py){
-	pc[i].setLocation(hw+(x-c.posx)*coef, hh-(y-c.posy)*coef);
+	pc[i].setLocation(hw+(x-c.vx)*coef, hh-(y-c.vy)*coef);
     }
 
     @Override
@@ -1315,7 +1315,7 @@ class SEGElement extends PathElement {
 
     @Override
     void project(int i, int hw, int hh, Camera c, double coef, double px, double py){
-	pc[i].setLine(px, py, hw+(x-c.posx)*coef, hh-(y-c.posy)*coef);
+	pc[i].setLine(px, py, hw+(x-c.vx)*coef, hh-(y-c.vy)*coef);
     }
 
     @Override
@@ -1421,7 +1421,7 @@ class QDCElement extends PathElement {
     
     @Override
     void project(int i, int hw, int hh, Camera c, double coef, double px, double py){
-	pc[i].setCurve(px, py, hw+(ctrlx-c.posx)*coef, hh-(ctrly-c.posy)*coef, hw+(x-c.posx)*coef, hh-(y-c.posy)*coef);
+	pc[i].setCurve(px, py, hw+(ctrlx-c.vx)*coef, hh-(ctrly-c.vy)*coef, hw+(x-c.vx)*coef, hh-(y-c.vy)*coef);
     }
 
     @Override
@@ -1532,9 +1532,9 @@ class CBCElement extends PathElement {
     @Override
     void project(int i, int hw, int hh, Camera c, double coef, double px, double py){
 	pc[i].setCurve(px, py,
-		       hw+(ctrlx1-c.posx)*coef, hh-(ctrly1-c.posy)*coef,
-		       hw+(ctrlx2-c.posx)*coef, hh-(ctrly2-c.posy)*coef,
-		       hw+(x-c.posx)*coef, hh-(y-c.posy)*coef);
+		       hw+(ctrlx1-c.vx)*coef, hh-(ctrly1-c.vy)*coef,
+		       hw+(ctrlx2-c.vx)*coef, hh-(ctrly2-c.vy)*coef,
+		       hw+(x-c.vx)*coef, hh-(y-c.vy)*coef);
     }
 
     @Override

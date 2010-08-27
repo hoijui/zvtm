@@ -84,10 +84,10 @@ public class OverviewPortal extends CameraPortal {
      *@param cy vertical cursor coordinate (JPanel)
      */
     public boolean coordInsideObservedRegion(int cx, int cy){
-	return (cx >= x+w/2 + Math.round((observedRegion[0]-camera.posx)*orcoef) &&
-		cy >= y+h/2 + Math.round((camera.posy-observedRegion[1])*orcoef) &&
-		cx <= x+w/2 + Math.round((observedRegion[2]-camera.posx)*orcoef) &&
-		cy <= y+h/2 + Math.round((camera.posy-observedRegion[3])*orcoef));
+	return (cx >= x+w/2 + Math.round((observedRegion[0]-camera.vx)*orcoef) &&
+		cy >= y+h/2 + Math.round((camera.vy-observedRegion[1])*orcoef) &&
+		cx <= x+w/2 + Math.round((observedRegion[2]-camera.vx)*orcoef) &&
+		cy <= y+h/2 + Math.round((camera.vy-observedRegion[3])*orcoef));
     }
     
     public void setObservedRegionColor(Color c){
@@ -109,11 +109,11 @@ public class OverviewPortal extends CameraPortal {
 
     public double getObservedRegionX() {
 	orcoef = camera.focal/(camera.focal+camera.altitude);
-	return x+ (double)w/2.0 + (observedRegion[0]-camera.posx)*orcoef;
+	return x+ (double)w/2.0 + (observedRegion[0]-camera.vx)*orcoef;
     }
     public double getObservedRegionY() {
 	orcoef = camera.focal/(camera.focal+camera.altitude);
-	return y+ h/2.0 - (observedRegion[1]-camera.posy)*orcoef;
+	return y+ h/2.0 - (observedRegion[1]-camera.vy)*orcoef;
     }
     public double getObservedRegionW() {
 	orcoef = camera.focal/(camera.focal+camera.altitude);
@@ -152,10 +152,10 @@ public class OverviewPortal extends CameraPortal {
             drawnGlyphs.removeAllElements();
             uncoef = (camera.focal+camera.altitude) / camera.focal;
             //compute region seen from this view through camera
-            viewWC = camera.posx - (w/2)*uncoef;
-            viewNC = camera.posy + (h/2)*uncoef;
-            viewEC = camera.posx + (w/2)*uncoef;
-            viewSC = camera.posy - (h/2)*uncoef;
+            viewWC = camera.vx - (w/2)*uncoef;
+            viewNC = camera.vy + (h/2)*uncoef;
+            viewEC = camera.vx + (w/2)*uncoef;
+            viewSC = camera.vy - (h/2)*uncoef;
             gll = cameraSpace.getDrawingList();
             for (int i=0;i<gll.length;i++){
                 if (gll[i] != null){
@@ -177,14 +177,14 @@ public class OverviewPortal extends CameraPortal {
         orcoef = (float)(camera.focal/(camera.focal+camera.altitude));
         if (acST != null){
             g2d.setComposite(acST);
-            g2d.fillRect((int)(x+w/2 + Math.round((observedRegion[0]-camera.posx)*orcoef)),
-                (int)(y+h/2 - Math.round((observedRegion[1]-camera.posy)*orcoef)),
+            g2d.fillRect((int)(x+w/2 + Math.round((observedRegion[0]-camera.vx)*orcoef)),
+                (int)(y+h/2 - Math.round((observedRegion[1]-camera.vy)*orcoef)),
                 (int)Math.round((observedRegion[2]-observedRegion[0])*orcoef),
                 (int)Math.round((observedRegion[1]-observedRegion[3])*orcoef));
             g2d.setComposite(Translucent.acO);
         }
-        g2d.drawRect((int)(x+w/2 + Math.round((observedRegion[0]-camera.posx)*orcoef)),
-            (int)(y+h/2 - Math.round((observedRegion[1]-camera.posy)*orcoef)),
+        g2d.drawRect((int)(x+w/2 + Math.round((observedRegion[0]-camera.vx)*orcoef)),
+            (int)(y+h/2 - Math.round((observedRegion[1]-camera.vy)*orcoef)),
             (int)Math.round((observedRegion[2]-observedRegion[0])*orcoef),
             (int)Math.round((observedRegion[1]-observedRegion[3])*orcoef));
         // reset Graphics2D

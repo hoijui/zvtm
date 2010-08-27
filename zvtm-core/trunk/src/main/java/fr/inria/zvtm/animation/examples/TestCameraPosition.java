@@ -146,8 +146,8 @@ public class TestCameraPosition {
 	public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
 	    //Animate from the current position to the target position 
 	    //over the course of a second
-	    final double sx = vsm.getVirtualSpace("src").getCamera(0).posx;
-	    final double sy = vsm.getVirtualSpace("src").getCamera(0).posy;
+	    final double sx = vsm.getVirtualSpace("src").getCamera(0).vx;
+	    final double sy = vsm.getVirtualSpace("src").getCamera(0).vy;
 	    final double ex = v.getVCursor().vx;
 	    final double ey = v.getVCursor().vy;
 

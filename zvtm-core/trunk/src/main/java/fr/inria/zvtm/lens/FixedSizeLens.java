@@ -512,10 +512,10 @@ public abstract class FixedSizeLens extends Lens {
      *@param res array which will contain the result */
     public long[] getVisibleRegionInFocus(Camera c, long[] res){
 	float uncoef = (float)((c.focal+c.altitude)/c.focal);
-	res[0] = (long)(c.posx + (lx-LR2/MM)*uncoef);
-	res[1] = (long)(c.posy + (-ly+LR2/MM)*uncoef);
-	res[2] = (long)(c.posx + (lx+LR2/MM)*uncoef);
-	res[3] = (long)(c.posy + (-ly-LR2/MM)*uncoef);
+	res[0] = (long)(c.vx + (lx-LR2/MM)*uncoef);
+	res[1] = (long)(c.vy + (-ly+LR2/MM)*uncoef);
+	res[2] = (long)(c.vx + (lx+LR2/MM)*uncoef);
+	res[3] = (long)(c.vy + (-ly-LR2/MM)*uncoef);
 	return res;
     }
 

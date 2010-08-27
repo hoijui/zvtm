@@ -19,10 +19,13 @@ import java.awt.Graphics2D;
 
 public interface Java2DPainter {
 
+    /** Before any glyph gets painted. */
     public static final short BACKGROUND = 0;
+    /** After all glyphs have been painted (for all layers). */
     public static final short FOREGROUND = 1;
+    /** After all glyphs have been painted, and after lens rendering ahve been applied. */
     public static final short AFTER_LENSES = 2;
-    /** Also painted when view is in blank mode. */
+    /** After glyphs, lenses and portals have been painted. Also painted when view is in blank mode. */
     public static final short AFTER_PORTALS = 3;
     
     /**Painting instructions, called by the associated view at each repaint.

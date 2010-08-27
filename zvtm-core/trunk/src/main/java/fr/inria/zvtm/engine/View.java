@@ -242,10 +242,10 @@ public abstract class View {
             //compute region seen from this view through camera
             double uncoef = (c.focal+c.altitude) / c.focal;
             Dimension panelSize = panel.getSize();
-            res[0] = c.posx-(panelSize.width/2-panel.visibilityPadding[0])*uncoef;
-            res[1] = c.posy+(panelSize.height/2-panel.visibilityPadding[1])*uncoef;
-            res[2] = c.posx+(panelSize.width/2-panel.visibilityPadding[2])*uncoef;
-            res[3] = c.posy-(panelSize.height/2-panel.visibilityPadding[3])*uncoef;
+            res[0] = c.vx-(panelSize.width/2-panel.visibilityPadding[0])*uncoef;
+            res[1] = c.vy+(panelSize.height/2-panel.visibilityPadding[1])*uncoef;
+            res[2] = c.vx+(panelSize.width/2-panel.visibilityPadding[2])*uncoef;
+            res[3] = c.vy-(panelSize.height/2-panel.visibilityPadding[3])*uncoef;
             return res;
         }
         return null;
@@ -573,8 +573,8 @@ public abstract class View {
         for (int i=0;i<cams.size();i++){
             c = cams.elementAt(i);
             nc = c.parentSpace.addCamera();
-            nc.posx = c.posx;
-            nc.posy = c.posy;
+            nc.vx = c.vx;
+            nc.vy = c.vy;
             /*change this altitude to compensate for the w/h change what we
             want is to get the same view at a higher (or lower) resolution*/
             nc.focal = c.focal;
@@ -674,7 +674,7 @@ public abstract class View {
         /*region that will be visible after translation, but before zoom/unzoom (need to
         compute zoom) ; we only take left and down because we only need horizontal and
         vertical ratios, which are equals for left and right, up and down*/
-        double[] trRegBounds = {regBounds[0]+dx-c.posx, regBounds[3]+dy-c.posy};
+        double[] trRegBounds = {regBounds[0]+dx-c.vx, regBounds[3]+dy-c.vy};
         double currentAlt = c.getAltitude()+c.getFocal();
         double ratio = 0;
         //compute the mult factor for altitude to see all stuff on X
@@ -764,21 +764,21 @@ public abstract class View {
             VText t=(VText)g;
             Point2D.Double p = t.getBounds(c.getIndex());
             if (t.getTextAnchor()==VText.TEXT_ANCHOR_START){
-                dx=g.vx+p.x/2-c.posx;
-                dy=g.vy+p.y/2-c.posy;
+                dx=g.vx+p.x/2-c.vx;
+                dy=g.vy+p.y/2-c.vy;
             }
             else if (t.getTextAnchor()==VText.TEXT_ANCHOR_MIDDLE){
-                dx=g.vx-c.posx;
-                dy=g.vy-c.posy;
+                dx=g.vx-c.vx;
+                dy=g.vy-c.vy;
             }
             else {
-                dx=g.vx-p.x/2-c.posx;
-                dy=g.vy-p.y/2-c.posy;
+                dx=g.vx-p.x/2-c.vx;
+                dy=g.vy-p.y/2-c.vy;
             }
         }
         else {
-            dx=g.vx-c.posx;
-            dy=g.vy-c.posy;
+            dx=g.vx-c.vx;
+            dy=g.vy-c.vy;
         }
         //relative translation
         Animation trans = 

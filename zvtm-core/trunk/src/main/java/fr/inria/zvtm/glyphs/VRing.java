@@ -392,8 +392,8 @@ public class VRing extends ClosedShape {
 		//translate in JPanel coords
 		int hw = d.width/2;
 		int hh = d.height/2;
-		pr[i].cx = hw + (int)Math.round((vx-c.posx) * coef);
-		pr[i].cy = hh - (int)Math.round((vy-c.posy) * coef);
+		pr[i].cx = hw + (int)Math.round((vx-c.vx) * coef);
+		pr[i].cy = hh - (int)Math.round((vy-c.vy) * coef);
 		pr[i].outerCircleRadius = (int)Math.round(size * coef);
 		pr[i].innerRingRadius = (int)Math.round(size * irr_p * coef);
 	}

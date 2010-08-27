@@ -104,10 +104,10 @@ public class RoundCameraPortal extends CameraPortal {
             drawnGlyphs.removeAllElements();
             uncoef = (camera.focal+camera.altitude) / camera.focal;
             //compute region seen from this view through camera
-            viewWC = camera.posx - (w/2)*uncoef;
-            viewNC = camera.posy + (h/2)*uncoef;
-            viewEC = camera.posx + (w/2)*uncoef;
-            viewSC = camera.posy - (h/2)*uncoef;
+            viewWC = camera.vx - (w/2)*uncoef;
+            viewNC = camera.vy + (h/2)*uncoef;
+            viewEC = camera.vx + (w/2)*uncoef;
+            viewSC = camera.vy - (h/2)*uncoef;
             gll = cameraSpace.getDrawingList();
             for (int i=0;i<gll.length;i++){
                 if (gll[i] != null){

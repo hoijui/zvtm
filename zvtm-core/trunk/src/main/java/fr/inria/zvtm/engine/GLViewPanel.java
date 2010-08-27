@@ -121,10 +121,10 @@ public class GLViewPanel extends ViewPanel {
 			    //compute region seen from this view through camera
 				double viewW = size.width;
 				double viewH = size.height;
-			    double viewWC = cams[nbcam].posx - (viewW/2-visibilityPadding[0]) * uncoef;
-			    double viewNC = cams[nbcam].posy + (viewH/2-visibilityPadding[1]) * uncoef;
-			    double viewEC = cams[nbcam].posx + (viewW/2-visibilityPadding[2]) * uncoef;
-			    double viewSC = cams[nbcam].posy - (viewH/2-visibilityPadding[3]) * uncoef;
+			    double viewWC = cams[nbcam].vx - (viewW/2-visibilityPadding[0]) * uncoef;
+			    double viewNC = cams[nbcam].vy + (viewH/2-visibilityPadding[1]) * uncoef;
+			    double viewEC = cams[nbcam].vx + (viewW/2-visibilityPadding[2]) * uncoef;
+			    double viewSC = cams[nbcam].vy - (viewH/2-visibilityPadding[3]) * uncoef;
 			    gll = cams[nbcam].parentSpace.getDrawingList();
 			    for (int i=0;i<gll.length;i++){
 				if (gll[i].visibleInViewport(viewWC, viewNC, viewEC, viewSC, cams[nbcam])){

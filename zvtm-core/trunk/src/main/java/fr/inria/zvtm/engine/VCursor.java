@@ -648,8 +648,8 @@ public class VCursor {
             //find coordinates of object's geom center wrt to camera center and project IN VIRTUAL SPACE
             pvx = vx;
             pvy = vy;
-            vx = (cx*ucoef) + c.posx;
-            vy = (cy*ucoef) + c.posy;
+            vx = (cx*ucoef) + c.vx;
+            vy = (cy*ucoef) + c.vy;
         }
     }
 
@@ -671,7 +671,7 @@ public class VCursor {
         }
         double ucoef = (c.focal+c.altitude) / c.focal;
         // find coordinates of object's geom center wrt to camera center and project IN VIRTUAL SPACE
-        return new Point2D.Double((tcx*ucoef) + c.posx, (tcy*ucoef) + c.posy);
+        return new Point2D.Double((tcx*ucoef) + c.vx, (tcy*ucoef) + c.vy);
     }
 
     /**returns the cursor's X JPanel coordinate*/

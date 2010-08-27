@@ -356,10 +356,10 @@ public abstract class Lens {
      *@param res array which will contain the result */
     public long[] getVisibleRegion(Camera c, long[] res){
 	float uncoef = (float)((c.focal+c.altitude)/c.focal);
-	res[0] = (long)(c.posx + (lx-lensWidth/2)*uncoef);
-	res[1] = (long)(c.posy + (-ly+lensHeight/2)*uncoef);
-	res[2] = (long)(c.posx + (lx+lensWidth/2)*uncoef);
-	res[3] = (long)(c.posy + (-ly-lensHeight/2)*uncoef);
+	res[0] = (long)(c.vx + (lx-lensWidth/2)*uncoef);
+	res[1] = (long)(c.vy + (-ly+lensHeight/2)*uncoef);
+	res[2] = (long)(c.vx + (lx+lensWidth/2)*uncoef);
+	res[3] = (long)(c.vy + (-ly-lensHeight/2)*uncoef);
 	return res;
     }
 

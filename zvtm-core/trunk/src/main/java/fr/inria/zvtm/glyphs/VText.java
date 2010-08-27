@@ -427,8 +427,8 @@ public class VText extends ClosedShape {
         coef = c.focal/(c.focal+c.altitude);
         //find coordinates of object's geom center wrt to camera center and project
         //translate in JPanel coords
-        pc[i].cx=(d.width/2)+(int)Math.round((vx-c.posx)*coef);
-        pc[i].cy=(d.height/2)-(int)Math.round((vy-c.posy)*coef);
+        pc[i].cx=(d.width/2)+(int)Math.round((vx-c.vx)*coef);
+        pc[i].cy=(d.height/2)-(int)Math.round((vy-c.vy)*coef);
     }
 
     @Override

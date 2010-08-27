@@ -215,7 +215,7 @@ public class ScrollLayer implements ComponentListener {
 	    sliderSize = MIN_SLIDER_SIZE;
 	}
 	vsliderRS.setHeight(sliderSize);
-	double y = Math.round(2*(controlledCamera.posy-(populatedRegionBounds[1]+populatedRegionBounds[3])/2.0)/(populatedRegionBounds[1] - populatedRegionBounds[3]) * vgutterRS.getHeight());
+	double y = Math.round(2*(controlledCamera.vy-(populatedRegionBounds[1]+populatedRegionBounds[3])/2.0)/(populatedRegionBounds[1] - populatedRegionBounds[3]) * vgutterRS.getHeight());
 	if (y > upBt.vy-upBtRS.getHeight()-sliderSize){
 	    y = upBt.vy-upBtRS.getHeight()-sliderSize;
 	}
@@ -241,7 +241,7 @@ public class ScrollLayer implements ComponentListener {
 	    sliderSize = MIN_SLIDER_SIZE;
 	}
 	hsliderRS.setWidth(sliderSize);
-	double x = Math.round(2*(controlledCamera.posx-(populatedRegionBounds[2]+populatedRegionBounds[0])/2.0)/(populatedRegionBounds[2] - populatedRegionBounds[0]) * hgutterRS.getWidth());
+	double x = Math.round(2*(controlledCamera.vx-(populatedRegionBounds[2]+populatedRegionBounds[0])/2.0)/(populatedRegionBounds[2] - populatedRegionBounds[0]) * hgutterRS.getWidth());
 	if (x > rightBt.vx-rightBtRS.getWidth()-sliderSize){
 	    x = rightBt.vx-rightBtRS.getWidth()-sliderSize;
 	}
@@ -252,11 +252,11 @@ public class ScrollLayer implements ComponentListener {
     }
 
     void updateCameraVerticalPosition(){
-	controlledCamera.moveTo(controlledCamera.posx, Math.round(vslider.vy * (populatedRegionBounds[1]-populatedRegionBounds[3]) / (2.0*vgutterRS.getHeight()) + (populatedRegionBounds[1] + populatedRegionBounds[3])/2.0));
+	controlledCamera.moveTo(controlledCamera.vx, Math.round(vslider.vy * (populatedRegionBounds[1]-populatedRegionBounds[3]) / (2.0*vgutterRS.getHeight()) + (populatedRegionBounds[1] + populatedRegionBounds[3])/2.0));
     }
     
     void updateCameraHorizontalPosition(){
-	controlledCamera.moveTo(Math.round(hslider.vx * (populatedRegionBounds[2]-populatedRegionBounds[0]) / (2.0*hgutterRS.getWidth()) + (populatedRegionBounds[2] + populatedRegionBounds[0])/2.0), controlledCamera.posy);
+	controlledCamera.moveTo(Math.round(hslider.vx * (populatedRegionBounds[2]-populatedRegionBounds[0]) / (2.0*hgutterRS.getWidth()) + (populatedRegionBounds[2] + populatedRegionBounds[0])/2.0), controlledCamera.vy);
     }
 
     /** Tells whether the given point is inside the area containing the scroll bars or not. 
@@ -265,8 +265,8 @@ public class ScrollLayer implements ComponentListener {
      */
     public boolean cursorInside(int cx, int cy){
 	double coef = (((double)slC.focal+(double)slC.altitude) / (double)slC.focal);
-	double vx = Math.round(((cx - (panelWidth/2)) * coef) + slC.posx);
-	double vy = Math.round((((panelHeight/2) - cy) * coef) + slC.posy);
+	double vx = Math.round(((cx - (panelWidth/2)) * coef) + slC.vx);
+	double vy = Math.round((((panelHeight/2) - cy) * coef) + slC.vy);
 	return (vx > vgutter.vx-vgutterRS.getWidth()) || (vy < hgutter.vy+hgutterRS.getHeight());
     }
 

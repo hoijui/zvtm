@@ -154,16 +154,16 @@ public class CameraPortal extends Portal {
      */
     public Point2D.Double getVSCoordinates(int cx, int cy){
         double uncoef = (camera.focal+camera.altitude) / camera.focal;
-        return new Point2D.Double((camera.posx + (cx-x-w/2)*uncoef), (camera.posy - (cy-y-h/2)*uncoef));
+        return new Point2D.Double((camera.vx + (cx-x-w/2)*uncoef), (camera.vy - (cy-y-h/2)*uncoef));
     }
     
     /**returns bounds of rectangle representing virtual space's region seen through camera c [west,north,east,south]*/
     public double[] getVisibleRegion(double[] res){
         double uncoef = (camera.focal+camera.altitude) / camera.focal;
-        res[0] = camera.posx - (w/2d)*uncoef;
-        res[1] = camera.posy + (h/2d)*uncoef;
-        res[2] = camera.posx + (w/2d)*uncoef;
-        res[3] = camera.posy - (h/2d)*uncoef;
+        res[0] = camera.vx - (w/2d)*uncoef;
+        res[1] = camera.vy + (h/2d)*uncoef;
+        res[2] = camera.vx + (w/2d)*uncoef;
+        res[3] = camera.vy - (h/2d)*uncoef;
         return res;
     }
 
@@ -183,7 +183,7 @@ public class CameraPortal extends Portal {
         /*region that will be visible after translation, but before zoom/unzoom (need to
         compute zoom) ; we only take left and down because we only need horizontal and
         vertical ratios, which are equals for left and right, up and down*/
-        double[] trRegBounds = {regBounds[0]+dx-camera.posx, regBounds[3]+dy-camera.posy};
+        double[] trRegBounds = {regBounds[0]+dx-camera.vx, regBounds[3]+dy-camera.vy};
         double currentAlt = camera.getAltitude()+camera.getFocal();
         double ratio = 0;
         //compute the mult factor for altitude to see all stuff on X
@@ -246,7 +246,7 @@ public class CameraPortal extends Portal {
 		double[] regBounds = getVisibleRegion();
 		// region that will be visible after translation, but before zoom/unzoom  (need to compute zoom) ;
 		// we only take left and down because we only need horizontal and vertical ratios, which are equals for left and right, up and down
-		double[] trRegBounds = {regBounds[0]+dx-camera.posx, regBounds[3]+dy-camera.posy};
+		double[] trRegBounds = {regBounds[0]+dx-camera.vx, regBounds[3]+dy-camera.vy};
 		double currentAlt = camera.getAltitude() + camera.getFocal();
 		double ratio = 0;
 		//compute the mult factor for altitude to see all stuff on X
@@ -311,10 +311,10 @@ public class CameraPortal extends Portal {
             drawnGlyphs.removeAllElements();
             uncoef = (camera.focal+camera.altitude) / camera.focal;
             //compute region seen from this view through camera
-            viewWC = camera.posx - (w/2) * uncoef;
-            viewNC = camera.posy + (h/2) * uncoef;
-            viewEC = camera.posx + (w/2) * uncoef;
-            viewSC = camera.posy - (h/2) * uncoef;
+            viewWC = camera.vx - (w/2) * uncoef;
+            viewNC = camera.vy + (h/2) * uncoef;
+            viewEC = camera.vx + (w/2) * uncoef;
+            viewSC = camera.vy - (h/2) * uncoef;
             gll = cameraSpace.getDrawingList();
             for (int i=0;i<gll.length;i++){
                 if (gll[i] != null){
