@@ -121,7 +121,7 @@ public abstract class Lens {
 	if (forceRaster){
 	    setMagRasterDimensions(mbw, mbh);
 	}
-	owningView.parent.repaintNow();
+	owningView.parent.repaint();
     }
 
     /**
@@ -139,7 +139,7 @@ public abstract class Lens {
      */
     public void setBufferThreshold(float t){
 	this.mSwitchThreshold = t;
-	owningView.parent.repaintNow();
+	owningView.parent.repaint();
     }
 
     /**

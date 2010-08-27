@@ -72,7 +72,6 @@ public class TestCameraAnim {
         testView = vsm.addFrameView(cameras, "Test", vt, 800, 600, false, true);
         testView.setBackgroundColor(Color.LIGHT_GRAY);
         testView.setEventHandler(eh);
-        testView.setNotifyMouseMoved(true);
         vsm.getVirtualSpace("src").getCamera(0).setAltitude(50);
 
 	am = vsm.getAnimationManager();
@@ -272,11 +271,11 @@ public class TestCameraAnim {
 	    double a=(c.focal+Math.abs(c.altitude))/c.focal;
 	    if (wheelDirection == WHEEL_UP){
 		c.altitudeOffset(-a*5);
-		application.vsm.repaintNow();
+		application.vsm.repaint();
 	    }
 	    else {
 		c.altitudeOffset(a*5);
-		application.vsm.repaintNow();
+		application.vsm.repaint();
 	    }
 	}
 

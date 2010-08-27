@@ -130,7 +130,7 @@ public class Camera {
         posy += y;
         propagateMove(posx, posy);  //take care of sticked glyphs
         if (view != null){
-            VirtualSpaceManager.INSTANCE.repaintNow(view);
+            VirtualSpaceManager.INSTANCE.repaint(view);
         }
         notifyMoved();
     }
@@ -141,7 +141,7 @@ public class Camera {
         posy = y;
         propagateMove(x-posx, y-posy);  //take care of sticked glyphs
         if (view != null){
-            VirtualSpaceManager.INSTANCE.repaintNow(view);
+            VirtualSpaceManager.INSTANCE.repaint(view);
         }
         notifyMoved();
     }
@@ -176,7 +176,7 @@ public class Camera {
         else {altitude=zoomFloor;}
         propagateAltitudeChange(altitude - oldAlt);
         if (repaint && view != null){
-            VirtualSpaceManager.INSTANCE.repaintNow(view);
+            VirtualSpaceManager.INSTANCE.repaint(view);
         }
         notifyMoved();
     }
@@ -208,7 +208,7 @@ public class Camera {
         posy = l.vy;
         altitude = l.alt;
         if (view != null){
-            VirtualSpaceManager.INSTANCE.repaintNow(view);
+            VirtualSpaceManager.INSTANCE.repaint(view);
         }
         notifyMoved();
     }
@@ -501,7 +501,7 @@ public class Camera {
     public void setEnabled(boolean b){
         if (b != enabled){
             enabled = b;
-	    VirtualSpaceManager.INSTANCE.repaintNow(view);
+	    VirtualSpaceManager.INSTANCE.repaint(view);
         }
     }
 
@@ -528,7 +528,7 @@ public class Camera {
     /**
      * the content seen through this camera will be repainted in the next owning view's paint loop
      */
-    public void repaintNow(){
+    public void repaint(){
 	shouldRepaint=true;
     }
 

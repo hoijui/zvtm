@@ -104,7 +104,7 @@ public class VRectangleOr extends VRectangle {
      @Override
     public void orientTo(double angle){
 	orient=angle;
-	VirtualSpaceManager.INSTANCE.repaintNow();
+	VirtualSpaceManager.INSTANCE.repaint();
     }
 
     @Override

@@ -115,7 +115,7 @@ public class TransitionManager {
 	fadeRect.setDrawBorder(false);
 	c.getOwningSpace().addGlyph(fadeRect);
 	v.setBlank(null);
-	vsm.repaintNow();
+	vsm.repaint();
 
 	Animation trans = vsm.getAnimationManager().getAnimationFactory()
 	    .createTranslucencyAnim(duration, fadeRect,

@@ -54,77 +54,75 @@ public class PView extends View implements KeyListener {
 		panel.addKeyListener(this);
 	}
 
-    /**get the java.awt.Container for this view*/
+    /** Get the java.awt.Container for this view*/
+    @Override
     public Container getFrame(){return panel;}
 
-    /**tells whether this frame is selected or not - not used*/
+    /** Always returns false as this is not a window. */
+    @Override
     public boolean isSelected(){
-	return false;
+	    return false;
     } 
 
-    /**set the window location*/
+    /** No effect. */
+    @Override
     public void setLocation(int x,int y){}
 
-    /**set the window title*/
+    /** No effect. */
+    @Override
     public void setTitle(String t){}
 
-    /**set the window size*/
-    public void setSize(int x,int y){}
+    /** No effect. */
+    @Override
+    public void setSize(int width, int height){}
 
-    /**can the window be resized or not (no effect)*/
+    /** No effect. */
+    @Override
     public void setResizable(boolean b){}
 
-    /**Shows or hides this view*/
-    public void setVisible(boolean b){
-    }
+    /** No effect. */
+    @Override
+    public void setVisible(boolean b){}
 
-    /**Brings this window to the front. Places this window at the top of the stacking order and shows it in front of any other windows*/
-    public void toFront(){}
-
-    /**Sends this window to the back. Places this window at the bottom of the stacking order and makes the corresponding adjustment to other visible windows*/
-    public void toBack(){}
-
-    /**destroy this view*/
+    @Override
     public void destroyView(){
-	panel.stop();
-	//parent.destroyView(this.name);
-	//frame.dispose();
+        panel.stop();
+        VirtualSpaceManager.INSTANCE.destroyView(this.name);
     }
 
-    /**detect key typed and send to application event handler*/
+    @Override
     public void keyTyped(KeyEvent e){
-	if (e.isShiftDown()) {
-	    if (e.isControlDown()) {panel.evHs[panel.activeLayer].Ktype(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.CTRL_SHIFT_MOD, e);}
-	    else {panel.evHs[panel.activeLayer].Ktype(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.SHIFT_MOD, e);}
-	}
-	else {
-	    if (e.isControlDown()) {panel.evHs[panel.activeLayer].Ktype(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.CTRL_MOD, e);}
-	    else {panel.evHs[panel.activeLayer].Ktype(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.NO_MODIFIER, e);}
-	}
+        if (e.isShiftDown()) {
+            if (e.isControlDown()) {panel.evHs[panel.activeLayer].Ktype(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.CTRL_SHIFT_MOD, e);}
+            else {panel.evHs[panel.activeLayer].Ktype(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.SHIFT_MOD, e);}
+        }
+        else {
+            if (e.isControlDown()) {panel.evHs[panel.activeLayer].Ktype(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.CTRL_MOD, e);}
+            else {panel.evHs[panel.activeLayer].Ktype(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.NO_MODIFIER, e);}
+        }
     }
 
-    /**detect key pressed and send to application event handler*/
+    @Override
     public void keyPressed(KeyEvent e){
-	if (e.isShiftDown()) {
-	    if (e.isControlDown()) {panel.evHs[panel.activeLayer].Kpress(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.CTRL_SHIFT_MOD, e);}
-	    else {panel.evHs[panel.activeLayer].Kpress(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.SHIFT_MOD, e);}
-	}
-	else {
-	    if (e.isControlDown()) {panel.evHs[panel.activeLayer].Kpress(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.CTRL_MOD, e);}
-	    else {panel.evHs[panel.activeLayer].Kpress(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.NO_MODIFIER, e);}
-	}
+        if (e.isShiftDown()) {
+            if (e.isControlDown()) {panel.evHs[panel.activeLayer].Kpress(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.CTRL_SHIFT_MOD, e);}
+            else {panel.evHs[panel.activeLayer].Kpress(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.SHIFT_MOD, e);}
+        }
+        else {
+            if (e.isControlDown()) {panel.evHs[panel.activeLayer].Kpress(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.CTRL_MOD, e);}
+            else {panel.evHs[panel.activeLayer].Kpress(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.NO_MODIFIER, e);}
+        }
     }
 
-    /**detect key released and send to application event handler*/
     public void keyReleased(KeyEvent e) {
-	if (e.isShiftDown()) {
-	    if (e.isControlDown()) {panel.evHs[panel.activeLayer].Krelease(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.CTRL_SHIFT_MOD, e);}
-	    else {panel.evHs[panel.activeLayer].Krelease(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.SHIFT_MOD, e);}
-	}
-	else {
-	    if (e.isControlDown()) {panel.evHs[panel.activeLayer].Krelease(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.CTRL_MOD, e);}
-	    else {panel.evHs[panel.activeLayer].Krelease(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.NO_MODIFIER, e);}
-	}
+        if (e.isShiftDown()) {
+            if (e.isControlDown()) {panel.evHs[panel.activeLayer].Krelease(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.CTRL_SHIFT_MOD, e);}
+            else {panel.evHs[panel.activeLayer].Krelease(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.SHIFT_MOD, e);}
+        }
+        else {
+            if (e.isControlDown()) {panel.evHs[panel.activeLayer].Krelease(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.CTRL_MOD, e);}
+            else {panel.evHs[panel.activeLayer].Krelease(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.NO_MODIFIER, e);}
+        }
     }
 
 }

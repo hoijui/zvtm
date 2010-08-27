@@ -155,7 +155,7 @@ public class SIRectangle extends ClosedShape implements RectangularShape {
         vw = (size*ar) / Math.sqrt(Math.pow(ar,2)+1);
         vh = size / Math.sqrt(Math.pow(ar,2)+1);
         updateProjectedWH();
-        VirtualSpaceManager.INSTANCE.repaintNow();
+        VirtualSpaceManager.INSTANCE.repaint();
     }
 
     @Override
@@ -163,7 +163,7 @@ public class SIRectangle extends ClosedShape implements RectangularShape {
         vw=w;
         computeSize();
         updateProjectedWH();
-        VirtualSpaceManager.INSTANCE.repaintNow();
+        VirtualSpaceManager.INSTANCE.repaint();
     }
 
     @Override
@@ -171,7 +171,7 @@ public class SIRectangle extends ClosedShape implements RectangularShape {
         vh=h;
         computeSize();
         updateProjectedWH();
-        VirtualSpaceManager.INSTANCE.repaintNow();
+        VirtualSpaceManager.INSTANCE.repaint();
     }
 
     @Override
@@ -180,7 +180,7 @@ public class SIRectangle extends ClosedShape implements RectangularShape {
         vw = (size*ar) / Math.sqrt(Math.pow(ar,2)+1);
         vh = size / Math.sqrt(Math.pow(ar,2)+1);
         updateProjectedWH();
-        VirtualSpaceManager.INSTANCE.repaintNow();
+        VirtualSpaceManager.INSTANCE.repaint();
     }
 
 	/** Get the bounding box of this Glyph in virtual space coordinates.

@@ -183,7 +183,7 @@ public class VRectangle extends ClosedShape implements RectangularShape {
         size = s;
         vw = (size*ar) / Math.sqrt(Math.pow(ar,2)+1);
         vh = size / Math.sqrt(Math.pow(ar,2)+1);
-        VirtualSpaceManager.INSTANCE.repaintNow();
+        VirtualSpaceManager.INSTANCE.repaint();
     }
 
     @Override
@@ -191,7 +191,7 @@ public class VRectangle extends ClosedShape implements RectangularShape {
         vw = w;
         ar = vw / vh;
         computeSize();
-        VirtualSpaceManager.INSTANCE.repaintNow();
+        VirtualSpaceManager.INSTANCE.repaint();
     }
 
     @Override
@@ -199,7 +199,7 @@ public class VRectangle extends ClosedShape implements RectangularShape {
         vh = h;
         ar = vw / vh;
         computeSize();
-        VirtualSpaceManager.INSTANCE.repaintNow();
+        VirtualSpaceManager.INSTANCE.repaint();
     }
 
     @Override
@@ -207,7 +207,7 @@ public class VRectangle extends ClosedShape implements RectangularShape {
         size *= factor;
         vw = (size*ar) / Math.sqrt(Math.pow(ar,2)+1);
         vh = size / Math.sqrt(Math.pow(ar,2)+1);
-        VirtualSpaceManager.INSTANCE.repaintNow();
+        VirtualSpaceManager.INSTANCE.repaint();
     }
 
     @Override

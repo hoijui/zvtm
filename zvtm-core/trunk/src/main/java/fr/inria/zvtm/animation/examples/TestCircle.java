@@ -68,11 +68,10 @@ public class TestCircle {
         testView = vsm.addFrameView(cameras, "Test", vt, 800, 600, false, true);
         testView.setBackgroundColor(Color.LIGHT_GRAY);
         testView.setEventHandler(eh);
-        testView.setNotifyMouseMoved(true);
 	final Glyph circle = new VCircle(100,0,0,40,Color.WHITE);
         vsm.getVirtualSpace("src").getCamera(0).setAltitude(50);
 	vs.addGlyph(circle);
-        vsm.repaintNow();
+        vsm.repaint();
 
 	AnimationManager am = vsm.getAnimationManager();
 
@@ -236,12 +235,12 @@ public class TestCircle {
 	    double a = (c.focal+Math.abs(c.altitude)) / c.focal;
 	    if (wheelDirection == WHEEL_UP){
 		c.altitudeOffset(-a*5);
-		application.vsm.repaintNow();
+		application.vsm.repaint();
 	    }
 	    else {
 		//wheelDirection == WHEEL_DOWN
 		c.altitudeOffset(a*5);
-		application.vsm.repaintNow();
+		application.vsm.repaint();
 	    }
 	}
 

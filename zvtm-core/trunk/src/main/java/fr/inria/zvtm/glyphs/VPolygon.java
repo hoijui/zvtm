@@ -178,7 +178,7 @@ public class VPolygon extends ClosedShape {
             if (f > size){size = f;}
         }
         size *= 2;
-        VirtualSpaceManager.INSTANCE.repaintNow();
+        VirtualSpaceManager.INSTANCE.repaint();
     }
 
     @Override
@@ -192,7 +192,7 @@ public class VPolygon extends ClosedShape {
             if (f > size){size = f;}
         }
         size *= 2;
-        VirtualSpaceManager.INSTANCE.repaintNow();
+        VirtualSpaceManager.INSTANCE.repaint();
     }
 
     @Override

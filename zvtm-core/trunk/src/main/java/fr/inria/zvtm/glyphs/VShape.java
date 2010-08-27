@@ -168,7 +168,7 @@ public class VShape extends ClosedShape {
     @Override
     public void orientTo(double angle){
         orient=angle;
-        VirtualSpaceManager.INSTANCE.repaintNow();
+        VirtualSpaceManager.INSTANCE.repaint();
     }
 
     @Override
@@ -177,13 +177,13 @@ public class VShape extends ClosedShape {
     @Override
     public void sizeTo(double s){
         size = s;
-        VirtualSpaceManager.INSTANCE.repaintNow();
+        VirtualSpaceManager.INSTANCE.repaint();
     }
 
     @Override
     public void reSize(double factor){
         size *= factor;
-        VirtualSpaceManager.INSTANCE.repaintNow();
+        VirtualSpaceManager.INSTANCE.repaint();
     }
 
     @Override

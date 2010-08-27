@@ -901,7 +901,7 @@ public class VCursor {
 				}
 			}
 		}
-		owningView.repaintNow();
+		owningView.repaint();
     }
     
 	void updateDynaSpotArea(int r){

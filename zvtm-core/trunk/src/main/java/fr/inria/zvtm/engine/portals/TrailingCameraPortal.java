@@ -115,7 +115,7 @@ public class TrailingCameraPortal extends CameraPortal {
 	    if (alpha < 0){alpha = 0;}
 	    else if (alpha > 1){alpha = 1.0f;}
 	    setTranslucencyValue(alpha);
-	    owningView.repaintNow();
+	    owningView.repaint();
 	}
     }
 

@@ -174,7 +174,7 @@ public class VSegment extends Glyph implements RectangularShape {
     public void orientTo(double angle){
         orient = angle;
         computeEdges();
-        VirtualSpaceManager.INSTANCE.repaintNow();
+        VirtualSpaceManager.INSTANCE.repaint();
     }
 
     @Override
@@ -196,7 +196,7 @@ public class VSegment extends Glyph implements RectangularShape {
         vw = (x2 - x1);
         vh = (y2 - y1);
         computeSize();
-        VirtualSpaceManager.INSTANCE.repaintNow();
+        VirtualSpaceManager.INSTANCE.repaint();
     }
 
     /** Get the segment's two endpoints
@@ -236,35 +236,35 @@ public class VSegment extends Glyph implements RectangularShape {
     public void sizeTo(double s){
         size = s;
         computeEdges();
-        VirtualSpaceManager.INSTANCE.repaintNow();
+        VirtualSpaceManager.INSTANCE.repaint();
     }
 
     @Override
     public void reSize(double factor){
         size *= factor;
         computeEdges();
-        VirtualSpaceManager.INSTANCE.repaintNow();
+        VirtualSpaceManager.INSTANCE.repaint();
     }
 
     @Override
     public void setWidth(double w){
         vw = w;
         computeSize();
-        VirtualSpaceManager.INSTANCE.repaintNow();
+        VirtualSpaceManager.INSTANCE.repaint();
     }
 
     @Override
     public void setHeight(double h){
         vh = h;
         computeSize();
-        VirtualSpaceManager.INSTANCE.repaintNow();
+        VirtualSpaceManager.INSTANCE.repaint();
     }
 
     public void setWidthHeight(double w,double h){
         vw = w;
         vh = h;
         computeSize();
-        VirtualSpaceManager.INSTANCE.repaintNow();
+        VirtualSpaceManager.INSTANCE.repaint();
     }
 
     @Override
@@ -420,7 +420,7 @@ public class VSegment extends Glyph implements RectangularShape {
             }
         }
         if (update){
-		VirtualSpaceManager.INSTANCE.repaintNow();
+		VirtualSpaceManager.INSTANCE.repaint();
         }
     }
 

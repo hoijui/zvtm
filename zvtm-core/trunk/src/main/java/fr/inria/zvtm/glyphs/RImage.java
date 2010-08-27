@@ -117,7 +117,7 @@ public class RImage extends VImage {
         vh = Math.round(image.getHeight(null)/2.0);
         ar = vw / vh;
         computeSize();
-	VirtualSpaceManager.INSTANCE.repaintNow();
+	VirtualSpaceManager.INSTANCE.repaint();
     }
     
     @Override

@@ -276,7 +276,7 @@ public class VRing extends ClosedShape {
         size = s;
         computeSliceEdges();
         computePolygonEdges();
-        VirtualSpaceManager.INSTANCE.repaintNow();
+        VirtualSpaceManager.INSTANCE.repaint();
     }
 
     @Override
@@ -284,7 +284,7 @@ public class VRing extends ClosedShape {
         size *= factor;
         computeSliceEdges();
         computePolygonEdges();
-        VirtualSpaceManager.INSTANCE.repaintNow();
+        VirtualSpaceManager.INSTANCE.repaint();
     }
 
     /** Set the slice's orientation.
@@ -296,7 +296,7 @@ public class VRing extends ClosedShape {
         orientDeg = (int)Math.round(orient * RAD2DEG_FACTOR);
         computeSliceEdges();
         computePolygonEdges();
-        VirtualSpaceManager.INSTANCE.repaintNow();
+        VirtualSpaceManager.INSTANCE.repaint();
     }
 
     /** Set the arc angle.
@@ -307,7 +307,7 @@ public class VRing extends ClosedShape {
         angleDeg = (int)Math.round(angle * RAD2DEG_FACTOR);
         computeSliceEdges();
         computePolygonEdges();
-        VirtualSpaceManager.INSTANCE.repaintNow();
+        VirtualSpaceManager.INSTANCE.repaint();
     }
 
     /** Get the arc angle.

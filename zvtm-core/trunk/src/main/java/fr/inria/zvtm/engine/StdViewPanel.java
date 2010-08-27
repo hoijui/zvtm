@@ -303,7 +303,7 @@ public class StdViewPanel extends ViewPanel {
 	private void doCursorPicking(){
 		try {                  // branch and we want to catch new requests for repaint
 			parent.mouse.unProject(cams[activeLayer],this); //we project the mouse cursor wrt the appropriate coord sys
-			if (computeListAtEachRepaint && parent.mouse.isSensitive()){parent.mouse.computeCursorOverList(evHs[activeLayer],cams[activeLayer], this);}
+			if (parent.mouse.isSensitive()){parent.mouse.computeCursorOverList(evHs[activeLayer],cams[activeLayer], this);}
 		}
 		catch (NullPointerException ex) {if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.drawdrag "+ex);}}
 	}
@@ -314,9 +314,9 @@ public class StdViewPanel extends ViewPanel {
 		oldSize=getSize();
 		if (notBlank){
 			if (active){
-				if (repaintNow){
+				if (repaintASAP){
 					try {
-						repaintNow=false; //do this first as the thread can be interrupted inside
+						repaintASAP=false; //do this first as the thread can be interrupted inside
 						//this branch and we want to catch new requests for repaint
 						updateMouseOnly=false;
 						updateOffscreenBuffer();

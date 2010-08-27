@@ -147,7 +147,7 @@ public class GLViewPanel extends ViewPanel {
 		if (inside){//deal with mouse glyph only if mouse cursor is inside this window
 			try {
 			parent.mouse.unProject(cams[activeLayer],this); //we project the mouse cursor wrt the appropriate coord sys
-			if (computeListAtEachRepaint && parent.mouse.isSensitive()){
+			if (parent.mouse.isSensitive()){
 			    parent.mouse.computeCursorOverList(evHs[activeLayer],cams[activeLayer]);
 			}
 		    }

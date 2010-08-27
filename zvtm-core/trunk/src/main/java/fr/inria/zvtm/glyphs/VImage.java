@@ -199,7 +199,7 @@ public class VImage extends ClosedShape implements RectangularShape {
         vh = vw / ar;
         computeSize();
         scaleFactor = size / Math.sqrt(Math.pow(image.getWidth(null),2)+Math.pow(image.getHeight(null),2));
-        VirtualSpaceManager.INSTANCE.repaintNow();
+        VirtualSpaceManager.INSTANCE.repaint();
     }
 
     @Override
@@ -208,7 +208,7 @@ public class VImage extends ClosedShape implements RectangularShape {
         vw = vh * ar;
         computeSize();
         scaleFactor = size / Math.sqrt(Math.pow(image.getWidth(null),2)+Math.pow(image.getHeight(null),2));
-        VirtualSpaceManager.INSTANCE.repaintNow();
+        VirtualSpaceManager.INSTANCE.repaint();
     }
 
     @Override
@@ -223,7 +223,7 @@ public class VImage extends ClosedShape implements RectangularShape {
         vw = (size*ar) / (Math.sqrt(Math.pow(ar,2)+1));
         vh = size / (Math.sqrt(Math.pow(ar,2)+1));
         scaleFactor = size / Math.sqrt(Math.pow(image.getWidth(null),2)+Math.pow(image.getHeight(null),2));
-        VirtualSpaceManager.INSTANCE.repaintNow();
+        VirtualSpaceManager.INSTANCE.repaint();
     }
 
     @Override
@@ -232,7 +232,7 @@ public class VImage extends ClosedShape implements RectangularShape {
         vw = (size*ar) / (Math.sqrt(Math.pow(ar,2)+1));
         vh = size / (Math.sqrt(Math.pow(ar,2)+1));
         scaleFactor = size / Math.sqrt(Math.pow(image.getWidth(null),2)+Math.pow(image.getHeight(null),2));
-        VirtualSpaceManager.INSTANCE.repaintNow();
+        VirtualSpaceManager.INSTANCE.repaint();
     }
 
 	/** Get the bounding box of this Glyph in virtual space coordinates.
@@ -251,7 +251,7 @@ public class VImage extends ClosedShape implements RectangularShape {
         vh = image.getHeight(null) * scaleFactor;
         ar = vw / vh;
         computeSize();
-        VirtualSpaceManager.INSTANCE.repaintNow();
+        VirtualSpaceManager.INSTANCE.repaint();
     }
 
     /** Get the bitmap image displayed. */
@@ -265,7 +265,7 @@ public class VImage extends ClosedShape implements RectangularShape {
     public void setZoomSensitive(boolean b){
 	if (zoomSensitive!=b){
 	    zoomSensitive=b;
-	    VirtualSpaceManager.INSTANCE.repaintNow();
+	    VirtualSpaceManager.INSTANCE.repaint();
 	}
     }
 
@@ -282,7 +282,7 @@ public class VImage extends ClosedShape implements RectangularShape {
     public void setDrawBorderPolicy(short p){
         if (drawBorder!=p){
             drawBorder=p;
-            VirtualSpaceManager.INSTANCE.repaintNow();
+            VirtualSpaceManager.INSTANCE.repaint();
         }
     }
 

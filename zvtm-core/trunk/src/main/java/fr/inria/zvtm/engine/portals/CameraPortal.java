@@ -108,7 +108,7 @@ public class CameraPortal extends Portal {
         else {
             alphaC = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);            
         }
-        VirtualSpaceManager.INSTANCE.repaintNow();
+        VirtualSpaceManager.INSTANCE.repaint();
     }
 
     /** Get alpha channel value (translucency).

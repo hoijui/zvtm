@@ -65,13 +65,13 @@ public abstract class View {
     public static final short OPENGL_VIEW = 1;
 
     /**list of Camera objects used in this view*/
-    Vector cameras;
+    Vector<Camera> cameras;
 
-    void initCameras(Vector c){
-	cameras=c;
-	for (int i=0;i<cameras.size();i++){
-	    ((Camera)c.elementAt(i)).setOwningView(this);
-	}
+    void initCameras(Vector<Camera> c){
+        cameras = c;
+        for (int i=0;i<cameras.size();i++){
+            c.elementAt(i).setOwningView(this);
+        }
     }
 
     /**portals embedded in this view*/
@@ -79,37 +79,37 @@ public abstract class View {
     
     /**add a portal to this view*/
     Portal addPortal(Portal p){
-	Portal[] tmpP = new Portal[portals.length+1];
-	System.arraycopy(portals, 0, tmpP, 0, portals.length);
-	tmpP[portals.length] = p;
-	portals = tmpP;
-	p.setOwningView(this);
-	return p;
+        Portal[] tmpP = new Portal[portals.length+1];
+        System.arraycopy(portals, 0, tmpP, 0, portals.length);
+        tmpP[portals.length] = p;
+        portals = tmpP;
+        p.setOwningView(this);
+        return p;
     }
 
     /**remove a portal from this view*/
     void removePortal(Portal p){
-	for (int i=0;i<portals.length;i++){
-	    if (portals[i] == p){
-		removePortalAtIndex(i);
-		break;
-	    }
-	}
+        for (int i=0;i<portals.length;i++){
+            if (portals[i] == p){
+                removePortalAtIndex(i);
+                break;
+            }
+        }
     }
 
     /**remove portal at index portalIndex in the list of portals*/
     void removePortalAtIndex(int portalIndex){
-	Portal[] tmpP = new Portal[portals.length-1];
-	System.arraycopy(portals, 0, tmpP, 0, portalIndex);
-	System.arraycopy(portals, portalIndex+1, tmpP, portalIndex, portals.length-portalIndex-1);
-	portals = tmpP;
-	panel.resetCursorInsidePortals();
+        Portal[] tmpP = new Portal[portals.length-1];
+        System.arraycopy(portals, 0, tmpP, 0, portalIndex);
+        System.arraycopy(portals, portalIndex+1, tmpP, portalIndex, portals.length-portalIndex-1);
+        portals = tmpP;
+        panel.resetCursorInsidePortals();
     }
 
     /**mouse glyph*/
     public VCursor mouse;
 
-	/** Returns this view's cursor object. */
+	/** Get this View's cursor object. */
 	public VCursor getCursor(){
 		return mouse;
 	}
@@ -126,31 +126,31 @@ public abstract class View {
     protected String name;
 
     /**triggers the mouseMoved method in ViewEventHandler when the mouse is moved - set to false by default because few applications will need this; it is therefore not necessary to overload other applications with these events*/
-    boolean notifyMouseMoved = true;
+    boolean notifyCursorMoved = true;
 
     /**hooks for Java2D painting in ZVTM views (BACKGROUND, FOREGROUND, AFTER_DISTORTION, AFTER_PORTALS)*/
     Java2DPainter[] painters = new Java2DPainter[4];
 
     /**
-     * get the ViewPanel associated with this view
+     * Get the ViewPanel associated with this View.
      */
     public ViewPanel getPanel(){
-	return panel;
+	    return panel;
     }
 
-    /**destroy this view*/
+    /** Destroy this view. */
     public abstract void destroyView();
 
-    /**get the java.awt.Container for this view*/
+    /** Get the java.awt.Container for this View. */
     public abstract Container getFrame();
 
-    /**Set the cursor for this view.
+    /**Set the cursor for this View.
      * Either the ZVTM cursor or one of the default AWT cursors.
      *@param cursorType any of the cursor type values declared in java.awt.Cursor, such as DEFAULT_CURSOR, CROSSHAIR_CURSOR HAND_CURSOR, etc. To get the ZVTM cursor, use Cursor.CUSTOM_CURSOR.
      *@see #setCursorIcon(Cursor c)
      */
     public void setCursorIcon(int cursorType){
-	panel.setAWTCursor(cursorType);
+	    panel.setAWTCursor(cursorType);
     }
 
     /**Set the cursor for this view.
@@ -159,306 +159,338 @@ public abstract class View {
      *@see #setCursorIcon(int cursorType)
      */
     public void setCursorIcon(Cursor c){
-	panel.setAWTCursor(c);
+	    panel.setAWTCursor(c);
     }
    
-    /** Set application class to which events are sent.
-     * Assumes layer 0 (deepest) is active.
+    /** Set application class instance to which events are sent for all layers in this view.
+     *@param eh client application implementation of ViewEventHandler
      */
     public void setEventHandler(ViewEventHandler eh){
-	setEventHandler(eh, 0);
+	    for (int i=0;i<cameras.size();i++){
+    	    setEventHandler(eh, i);	        
+	    }
     }
 
-    /** Set application class to which events are sent.
+    /** Set application class instance to which events are sent for a given layer.
+    *@param eh client application implementation of ViewEventHandler
      *@param layer depth of layer to which the event handler should be associated.
      */
     public void setEventHandler(ViewEventHandler eh, int layer){
-	panel.setEventHandler(eh, layer);
+	    panel.setEventHandler(eh, layer);
     }
 
-    /** Sets whether the mouseMoved callback in ViewEventHandler is triggered when the mouse is moved.
+    /** Sets whether the mouseMoved callback in ViewEventHandler is triggered when the cursor moves.
      * Set to true by default. Applications that do not care about this callback can disable notification
      * about these events to avoid unnecessary callbacks (an event each sent each time the cursor moves).
      */
-    public void setNotifyMouseMoved(boolean b){
-	    notifyMouseMoved=b;
+    public void setNotifyCursorMoved(boolean b){
+	    notifyCursorMoved=b;
     }
 
     /** Tells whether the mouseMoved callback in ViewEventHandler is triggered when the mouse is moved.
      * Set to true by default.*/
-    public boolean getNotifyMouseMoved(){return notifyMouseMoved;}
+    public boolean getNotifyCursorMoved(){return notifyCursorMoved;}
 
-    /**set status bar text*/
+    /** Set status bar text. */
     public void setStatusBarText(String s){
-	if (statusBar!=null){if (s.equals("")){statusBar.setText(" ");}else{{statusBar.setText(s);}}}
+	    if (statusBar!=null){if (s.equals("")){statusBar.setText(" ");}else{{statusBar.setText(s);}}}
     }
 
-    /**set font used in status bar text*/
+    /** Set font used in status bar text. */
     public void setStatusBarFont(Font f){
-	if (statusBar!=null){statusBar.setFont(f);}
+	    if (statusBar!=null){statusBar.setFont(f);}
     }
 
-    /**set color used for status bar text*/
+    /** Set color used for status bar text. */
     public void setStatusBarForeground(Color c){
-	if (statusBar!=null){statusBar.setForeground(c);}
+	    if (statusBar!=null){statusBar.setForeground(c);}
     }
 
-    /**enable/disable detection of multiple full fills in one view repaint - for this specific view */
+    /** Enable/disable detection of multiple full fills in one view repaint for this View.
+     * Off by default.
+     * If enabled, all glyphs below the higest glyph in the drawing stack that fills the viewport will not be painted, as they will be invisible anyway.
+     * This computation has a cost. Assess its usefulness and evaluate performance (there is tradeoff).
+     *@see #getDetectMultiFills()
+     */
     public void setDetectMultiFills(boolean b){
-	detectMultipleFullFills=b;
+	    detectMultipleFullFills=b;
     }
 
-    /**get state of detection of multiple full fills in one view repaint - for this specific view*/
+    /** Tells whether detection of multiple full fills in one view repaint is enabled or not for this View.
+     * Off by default.
+     *@see #setDetectMultiFills(boolean b)
+     */
     public boolean getDetectMultiFills(){
-	return detectMultipleFullFills;
+	    return detectMultipleFullFills;
     }
 
-    /**returns bounds of rectangle representing virtual space's region seen through camera c [west,north,east,south]*/
-    public double[] getVisibleRegion(Camera c){
-	return getVisibleRegion(c, new double[4]);
-    }
-
-    /**returns bounds of rectangle representing virtual space's region seen through camera c [west,north,east,south]
+    /** Get bounds of rectangular region of the VirtualSpace seen through a camera.
      *@param c camera
-     *@param res array which will contain the result */
+     *@return boundaries in VirtualSpace coordinates {west,north,east,south}
+     */
+    public double[] getVisibleRegion(Camera c){
+	    return getVisibleRegion(c, new double[4]);
+    }
+
+    /** Get bounds of rectangular region of the VirtualSpace seen through a camera.
+     *@param c camera
+     *@param res array which will contain the result
+     *@return boundaries in VirtualSpace coordinates {west,north,east,south}
+     */
     public double[] getVisibleRegion(Camera c, double[] res){
-	if (cameras.contains(c)){
-	    double uncoef = (c.focal+c.altitude)/c.focal;  //compute region seen from this view through camera
-		Dimension panelSize = panel.getSize();
-	    res[0] = c.posx-(panelSize.width/2-panel.visibilityPadding[0])*uncoef;
-	    res[1] = c.posy+(panelSize.height/2-panel.visibilityPadding[1])*uncoef;
-	    res[2] = c.posx+(panelSize.width/2-panel.visibilityPadding[2])*uncoef;
-	    res[3] = c.posy-(panelSize.height/2-panel.visibilityPadding[3])*uncoef;
-	    return res;
-	}
-	return null;
+        if (cameras.contains(c)){
+            //compute region seen from this view through camera
+            double uncoef = (c.focal+c.altitude) / c.focal;
+            Dimension panelSize = panel.getSize();
+            res[0] = c.posx-(panelSize.width/2-panel.visibilityPadding[0])*uncoef;
+            res[1] = c.posy+(panelSize.height/2-panel.visibilityPadding[1])*uncoef;
+            res[2] = c.posx+(panelSize.width/2-panel.visibilityPadding[2])*uncoef;
+            res[3] = c.posy-(panelSize.height/2-panel.visibilityPadding[3])*uncoef;
+            return res;
+        }
+        return null;
     }
 
+    /** Get width of rectangular region of the VirtualSpace seen through a camera.
+     *@param c camera
+     *@return width in VirtualSpace coordinates (from west to east boundaries)
+     */
     public double getVisibleRegionWidth(Camera c){
-	return panel.getSize().width * ((c.focal+c.altitude) / c.focal);
+	    return panel.getSize().width * ((c.focal+c.altitude) / c.focal);
     }
 
+    /** Get height of rectangular region of the VirtualSpace seen through a camera.
+     *@param c camera
+     *@param res array which will contain the result
+     *@return width in VirtualSpace coordinates (from north to south boundaries)
+     */
     public double getVisibleRegionHeight(Camera c){
-	return panel.getSize().height * ((c.focal+c.altitude) / c.focal);
+	    return panel.getSize().height * ((c.focal+c.altitude) / c.focal);
     }
 
-    /**returns a BufferedImage representation of this view (this is actually a COPY of the original) that can be used for instance with ImageIO.ImageWriter*/
+    /** Get an image of what is visible in this view.
+     *@return a copy of the original offscreen buffer.
+     */
     public BufferedImage getImage(){
-	BufferedImage res=null;
-	    BufferedImage i=panel.getImage();
-	    if (i!=null){
-		//this is the old method for doing this, which eventually stopped working on POSIX systems  (hangs at i.copyData())
-// 		java.awt.image.WritableRaster wr=Raster.createWritableRaster(i.getSampleModel(),new java.awt.Point(0,0));
-// 		res=new BufferedImage(i.getColorModel(),i.copyData(wr),false,null);
-		//new way of doing things
-		res=new BufferedImage(i.getWidth(),i.getHeight(),i.getType());
-		Graphics2D resg2d=res.createGraphics();
-		resg2d.drawImage(i,null,0,0);
-	    }
-	return res;
+        BufferedImage res=null;
+        BufferedImage i=panel.getImage();
+        if (i!=null){
+            res = new BufferedImage(i.getWidth(),i.getHeight(),i.getType());
+            Graphics2D resg2d = res.createGraphics();
+            resg2d.drawImage(i,null,0,0);
+        }
+        return res;
     }
 
-    /**set the layer (camera) active in this view
-     * @param i i-th layer 0 is the deepest layer
+    /** Set which layer (camera) is currently active (getting events).
+     * @param i layer index. 0 is the deepest layer (first camera given in the Vector at construction time).
      */
     public void setActiveLayer(int i){
-	Camera c = (Camera)cameras.elementAt(i);
-	mouse.unProject(c, panel);
-	mouse.resetGlyphsUnderMouseList(c.parentSpace,
-					c.getIndex());
-	panel.activeLayer=i;
+        Camera c = (Camera)cameras.elementAt(i);
+        mouse.unProject(c, panel);
+        mouse.resetGlyphsUnderMouseList(c.parentSpace,
+            c.getIndex());
+        panel.activeLayer=i;
     }
 
-    /**get the active layer in this view (0 is deepest)*/
+    /** Get index of layer (camera) currently active (getting events).
+     *@return layer index. 0 is the deepest layer (first camera given in the Vector at construction time).
+     */
     public int getActiveLayer(){
-	return panel.activeLayer;
+	    return panel.activeLayer;
     }
     
-    /**Get the number of layers in this view.*/
+    /** Get the number of layers (cameras) in this View. */
     public int getLayerCount(){
-	return cameras.size();
+	    return cameras.size();
     }
     
-    /**update font used in this view (for all cameras) (should be automatically called when changing the VSM's main font)*/
+    /** Update default font used in this View. */
     public void updateFont(){panel.updateFont=true;}
 
-    /**set antialias rendering hint for this view*/
+    /** Set antialias rendering hint for this View. */
     public void setAntialiasing(boolean b){
-	if (b!=panel.antialias){
-	    panel.antialias=b;
-	    panel.updateAntialias=true;
-	    repaintNow();
-	}
+        if (b!=panel.antialias){
+            panel.antialias=b;
+            panel.updateAntialias=true;
+            repaint();
+        }
     }
 
-    /**get the value of the antialias rendering hint for this view*/
+    /** Get the value of the antialias rendering hint for this View. */
     public boolean getAntialiasing(){
-	return panel.antialias;
+	    return panel.antialias;
     }
 
-    /**get camera number i (corresponds to layer)*/
+    /** Get camera for layer i.
+     *@param i layer index. 0 is the deepest layer (first camera given in the Vector at construction time).
+     */
     public Camera getCameraNumber(int i){
-	if (cameras.size()>i){return (Camera)cameras.elementAt(i);}
-	else return null;
+        if (cameras.size()>i){return (Camera)cameras.elementAt(i);}
+        else return null;
     }
 
-    /**get active camera (associated with active layer)*/
+    /** Get camera corresponding to layer currently active (getting events).
+     */
     public Camera getActiveCamera(){
 	return panel.cams[panel.activeLayer];
     }
 
     void destroyCamera(Camera c){
-	for (int i=0;i<panel.cams.length;i++){
-	    if (panel.cams[i]==c){
-		panel.cams[i]=null;
-		if (i==panel.activeLayer){//if the camera we remove was associated to the active layer, make active another non-null layer
-		    for (int j=0;j<panel.cams.length;j++){
-			if (panel.cams[j]!=null){
-			    panel.activeLayer=j;
-			    break;
-			}
-		    }
-		}
-		break;
-	    }
-	}
-	cameras.remove(c);
+        for (int i=0;i<panel.cams.length;i++){
+            if (panel.cams[i]==c){
+                panel.cams[i]=null;
+                if (i==panel.activeLayer){
+                    //if the camera we remove was associated to the active layer, make active another non-null layer
+                    for (int j=0;j<panel.cams.length;j++){
+                        if (panel.cams[j]!=null){
+                            panel.activeLayer=j;
+                            break;
+                        }
+                    }
+                }
+                break;
+            }
+        }
+        cameras.remove(c);
     }
 
-    /**set background color for this view*/
+    /** Set background color for this View. */
     public void setBackgroundColor(Color c){
-	panel.backColor=c;
+	    panel.backColor = c;
     }
 
-    /**get background color of this view*/
+    /** Get background color of this view. */
     public Color getBackgroundColor(){
-	return panel.backColor;
+	    return panel.backColor;
     }
 
-    /**tells whether this frame is selected or not*/
     public abstract boolean isSelected();
 
-    /**set the window title*/
+    /** Sets the title for this frame to the specified string.
+     *@param t - the title to be displayed in the frame's border. A null value is treated as an empty string, "".
+     */
     public abstract void setTitle(String t);
 
-    /**set the window location*/
+    /** Moves this component to a new location.
+     * The top-left corner of the new location is specified by the x and y parameters in the coordinate space of this component's parent.
+     *@param x the x-coordinate of the new location's top-left corner in the parent's coordinate space
+     *@param y the y-coordinate of the new location's top-left corner in the parent's coordinate space
+     */
     public abstract void setLocation(int x,int y);
 
-    /**set the window size*/
-    public abstract void setSize(int x,int y);
+    /** Resizes this component so that it has width width and height height. 
+     *@param width - the new width of this component in pixels
+     *@param height - the new height of this component in pixels
+     */
+    public abstract void setSize(int width, int height);
 
-    /**get the dimensions of the ZVTM panel embedded in this view*/
+    /** Get the dimensions of the ZVTM panel embedded in this View. */
     public Dimension getPanelSize(){
-	return panel.size;
+	    return panel.size;
     }
 
-    /**can the window be resized or not*/
+    /** Sets whether this View is resizable by the user.
+     *@param resizable - true if this frame is resizable; false otherwise.
+     */
     public abstract void setResizable(boolean b);
 
-    /**Shows or hides this view*/
+    /** Shows or hides this View depending on the value of parameter b. */
     public abstract void setVisible(boolean b);
 
-    /**Brings this window to the front. Places this window at the top of the stacking order and shows it in front of any other windows*/
-    public abstract void toFront();
-
-    /**Sends this window to the back. Places this window at the bottom of the stacking order and makes the corresponding adjustment to other visible windows*/
-    public abstract void toBack();
-
-    /**Set this view's refresh rate - default is 20
-     *@param r positive integer (refresh rate in milliseconds)
+    /** Set this View's refresh rate - default is 20.
+     *@param rr positive integer (refresh rate in milliseconds)
      */
-    public void setRefreshRate(int r){
-	panel.setRefreshRate(r);
+    public void setRefreshRate(int rr){
+	    panel.setRefreshRate(rr);
     }
 
-    /**Set this view's refresh rate - default is 20*/
+    /** Get this View's refresh rate - default is 20.*/
     public int getRefreshRate(){
-	return panel.getRefreshRate();
+	    return panel.getRefreshRate();
     }
 
-    /**should repaint this view on a regular basis or not (even if not activated, but does not apply to iconified views)*/
+    /*XXX:should repaint this view on a regular basis or not (even if not activated, but does not apply to iconified views)*/
     public void setRepaintPolicy(boolean b){
-	panel.alwaysRepaintMe=b;
-	if (b){panel.active=true;}
-	else {if ((!isSelected()) && (!panel.inside)){panel.active=false;}}
+        panel.alwaysRepaintMe=b;
+        if (b){panel.active=true;}
+        else {if ((!isSelected()) && (!panel.inside)){panel.active=false;}}
     }
 
     /**
-     * make a view blank (the view is erased and filled with a uniform color)
-     *@param c blank color (will fill the entire view) - put null to exit blank mode
+     * Make a view blank. The view is erased and filled with a uniform color.
+     *@param c blank color (will fill the entire view) - pass null to exit blank mode.
      */
     public void setBlank(Color c){
-	if (c==null){
-	    panel.blankColor=null;
-	    panel.notBlank=true;
-	    repaintNow();
-	}
-	else {
-	    panel.blankColor=c;
-	    panel.notBlank=false;
-	    repaintNow();
-	}
+        if (c==null){
+            panel.blankColor=null;
+            panel.notBlank=true;
+            repaint();
+        }
+        else {
+            panel.blankColor=c;
+            panel.notBlank=false;
+            repaint();
+        }
     }
 
     /**
-     *tells if a view is in blank mode (returns the fill color) or not (returns null)
+     * Says whether a view is in blank mode or not.
+     *@return the fill color if in blank mode, null if not in blank mode.
      */
     public Color isBlank(){
-	if (!panel.notBlank){
-	    return panel.blankColor;
-	}
-	else return null;
+        if (!panel.notBlank){
+            return panel.blankColor;
+        }
+        else return null;
     }
 
-    /**if true, compute the list of glyphs under mouse each time the view is repainted (default is false) - note that this list is computed each time the mouse is moved inside the view, no matter the policy*/
-    public void setComputeMouseOverListPolicy(boolean b){
-	panel.computeListAtEachRepaint=b;
-    }
-
-    /**activate the view means that it will be repainted*/
+    /** Activating the view means that it will be repainted. */
     public void activate(){
-	VirtualSpaceManager.INSTANCE.setActiveView(this);
-	panel.active=true;
-	if (panel.evHs[panel.activeLayer]!=null){panel.evHs[panel.activeLayer].viewActivated(this);}
+        VirtualSpaceManager.INSTANCE.setActiveView(this);
+        panel.active=true;
+        if (panel.evHs[panel.activeLayer]!=null){panel.evHs[panel.activeLayer].viewActivated(this);}
     }
     
-    /**deactivate the view (will not be repainted unless setRepaintPolicy(true) or mouse inside the view)*/
+    /** Deactivating the view (will not be repainted unless setRepaintPolicy(true) or mouse inside the view)*/
     public void deactivate(){
-	if ((!panel.alwaysRepaintMe) && (!panel.inside)){panel.active=false;}
-	if (panel.evHs[panel.activeLayer]!=null){panel.evHs[panel.activeLayer].viewDeactivated(this);}
+        if ((!panel.alwaysRepaintMe) && (!panel.inside)){panel.active=false;}
+        if (panel.evHs[panel.activeLayer]!=null){panel.evHs[panel.activeLayer].viewDeactivated(this);}
     }
 
-    /**called from the window listener when the window is iconified - repaint is automatically disabled*/
+    /** Called from the window listener when the window is iconified - repaint is automatically disabled. */
     void iconify(){
-	panel.active=false;
-	if (panel.evHs[panel.activeLayer]!=null){panel.evHs[panel.activeLayer].viewIconified(this);}
+        panel.active=false;
+        if (panel.evHs[panel.activeLayer]!=null){panel.evHs[panel.activeLayer].viewIconified(this);}
     }
 
-    /**called from the window listener when the window is deiconified - repaint is automatically re-enabled*/
+    /** Called from the window listener when the window is deiconified - repaint is automatically re-enabled. */
     void deiconify(){
-	panel.active=true;
-	if (panel.evHs[panel.activeLayer]!=null){panel.evHs[panel.activeLayer].viewDeiconified(this);}
+        panel.active=true;
+        if (panel.evHs[panel.activeLayer]!=null){panel.evHs[panel.activeLayer].viewDeiconified(this);}
     }
 
-    /**called from the window listener when the window is closed*/
+    /** Called from the window listener when the window is closed. */
     protected void close(){
-	if (panel.evHs[panel.activeLayer]!=null){panel.evHs[panel.activeLayer].viewClosing(this);}
+	    if (panel.evHs[panel.activeLayer]!=null){panel.evHs[panel.activeLayer].viewClosing(this);}
     }
 
-    /**Call this if you want to repaint this view at once.
-        *@see #repaintNow(RepaintListener rl)
+    /** Ask for the view to be repainted. This is an asynchronous call.
+        *@see #repaint(RepaintListener rl)
         */
-    public void repaintNow(){
-        panel.repaintNow = true;
+    public void repaint(){
+        panel.repaintASAP = true;
     }
 
-    /**Call this if you want to repaint this view at once.
-        *@param rl a repaint listener to be notified when this repaint cycle is completed (it must be removed manually if you are not interested in being notified about following repaint cycles)
-        *@see #repaintNow()
-        *@see #removeRepaintListener()     */
-    public void repaintNow(RepaintListener rl){
+    /** Ask for the view to be repainted. This is an asynchronous call.
+     *@param rl a repaint listener, to get notified when this repaint cycle is completed. The listener must be removed manually
+     * if you are not interested in being notified about following repaint cycles.
+     *@see #repaint()
+     *@see #removeRepaintListener()
+     */
+    public void repaint(RepaintListener rl){
         panel.repaintListener = rl;
-        repaintNow();
+        repaint();
     }
 
     /**Remove the repaint listener associated with this view.
@@ -572,7 +604,7 @@ public abstract class View {
      */
     public void setJava2DPainter(Java2DPainter p, short g){
 	painters[g] = p;
-	repaintNow();
+	repaint();
     }
 
     /** get the paint method (containing Java2D paint instructions) that will be called each time the view is repainted

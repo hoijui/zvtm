@@ -154,7 +154,7 @@ public class VirtualSpace {
         g.initCams(cm.cameraList.length);
         visualEnts.add(g);
         addGlyphToDrawingList(g);
-        if (repaint){VirtualSpaceManager.INSTANCE.repaintNow();}
+        if (repaint){VirtualSpaceManager.INSTANCE.repaint();}
     }
 
     /**add glyph g to this space*/
@@ -173,7 +173,7 @@ public class VirtualSpace {
 			visualEnts.add(glyph);
 		}
 		addGlyphsToDrawingList(glyphs);
-		if (repaint){VirtualSpaceManager.INSTANCE.repaintNow();}
+		if (repaint){VirtualSpaceManager.INSTANCE.repaint();}
 	}
 
 	public void addGlyphs(Glyph[] glyphs){
@@ -278,7 +278,7 @@ public class VirtualSpace {
         for (int i=0;i<entClone.size();i++){
             removeGlyph((Glyph)entClone.elementAt(i), false);
         }
-        VirtualSpaceManager.INSTANCE.repaintNow();        
+        VirtualSpaceManager.INSTANCE.repaint();        
     }
 
     /** Remove this glyph from this virtual space. ZVTM no longer holds a reference to it. View will be updated. */
@@ -311,7 +311,7 @@ public class VirtualSpace {
             visualEnts.remove(g);
             removeGlyphFromDrawingList(g);
             if (repaint){
-                VirtualSpaceManager.INSTANCE.repaintNow();
+                VirtualSpaceManager.INSTANCE.repaint();
             }
         }
         catch (NullPointerException ex){
@@ -326,7 +326,7 @@ public class VirtualSpace {
      *@see #hide(Glyph g)*/
     public void show(Glyph g){
 	if (visualEnts.contains(g) && glyphIndexInDrawingList(g) == -1){addGlyphToDrawingList(g);}
-	VirtualSpaceManager.INSTANCE.repaintNow();
+	VirtualSpaceManager.INSTANCE.repaint();
     }
 
     /**hide Glyph g
@@ -342,7 +342,7 @@ public class VirtualSpace {
 		cm.cameraList[i].view.mouse.removeGlyphFromList(g);
 	    }
 	}
-	VirtualSpaceManager.INSTANCE.repaintNow();
+	VirtualSpaceManager.INSTANCE.repaint();
     }
 
     /** Put this glyph on top of the drawing list (will be drawn last).

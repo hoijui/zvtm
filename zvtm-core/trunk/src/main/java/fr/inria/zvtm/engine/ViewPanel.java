@@ -88,7 +88,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
     ViewEventHandler[] evHs;
 
     /**repaint only if necessary (when there are animations, when the mouse moves...)*/
-    volatile boolean repaintNow=true;
+    volatile boolean repaintASAP=true;
     RepaintListener repaintListener;
 
     /**only repaint mouse cursor (using XOR mode)*/
@@ -100,11 +100,6 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
     /**for blank mode (methods to enter/exit blank mode are in View)*/
     boolean notBlank=true;
     Color blankColor=null;
-
-    /**should compute the list of glyphs under mouse each time the view is repainted (default is false)
-     * <br>this list is anyway computed each time the mouse is moved
-     */
-    boolean computeListAtEachRepaint=false;
 
     /**minimum time in ms between two consecutive repaints (refresh rate)*/
     int frameTime = 25;
@@ -265,7 +260,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 	curDragx=origDragx;
 	curDragy=origDragy;
 	drawDrag=b;
-	parent.repaintNow();
+	parent.repaint();
     }
 
     /**true will draw a segment between origin of drag and current cursor pos until drag is finished*/
@@ -273,7 +268,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 	curDragx=origDragx;
 	curDragy=origDragy;
 	drawDrag=b;
-	parent.repaintNow();
+	parent.repaint();
     }
 
     /**true will draw a rectangle between origin of drag and current cursor pos until drag is finished*/
@@ -281,7 +276,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 	curDragx=origDragx;
 	curDragy=origDragy;
 	drawRect=b;
-	parent.repaintNow();
+	parent.repaint();
     }
 
     /**draw a circle between origin of drag and current cursor pos until drag is finished (drag segment represents the radius of the circle, not its diameter) - use OVAL for any oval, CIRCLE for circle, NONE to stop drawing it*/
@@ -291,7 +286,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 	if (s==OVAL){drawOval=true;circleOnly=false;}
 	else if (s==CIRCLE){drawOval=true;circleOnly=true;}
 	else if (s==NONE){drawOval=false;}
-	parent.repaintNow();
+	parent.repaint();
     }
 
     /**send event to application event handler*/
@@ -473,7 +468,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
     public void mouseEntered(MouseEvent e){
         //make the view active any time the mouse enters it
         active = true;
-        repaintNow = true;
+        repaintASAP = true;
         inside = true;
         VirtualSpaceManager.INSTANCE.setActiveView(this.parent);
         if (autoRequestFocusOnMouseEnter){
@@ -539,12 +534,12 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
                 updateCursorInsidePortals(e.getX(), e.getY());
                 // forward mouseMoved event to View event handler
                 if (evHs[activeLayer] != null){
-                    if (parent.notifyMouseMoved){
+                    if (parent.notifyCursorMoved){
                         evHs[activeLayer].mouseMoved(this, e.getX(), e.getY(), e);
                     }
                     if (parent.mouse.isSensitive()){
                         if (parent.mouse.computeCursorOverList(evHs[activeLayer], cams[activeLayer], this)){
-                            parent.repaintNow();
+                            parent.repaint();
                         }
                     }
                 }
@@ -592,7 +587,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
                 }
                 //assign anyway, even if the current drag command does not want to display a segment
                 curDragx=e.getX();curDragy=e.getY();  
-                parent.repaintNow();
+                parent.repaint();
                 if (parent.mouse.isSensitive()){parent.mouse.computeCursorOverList(evHs[activeLayer],cams[activeLayer],this);}
             }
         }	
@@ -654,14 +649,14 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 		if (l != null){
 			this.lens = l;
 			this.lens.setLensBuffer(this);	    
-			parent.repaintNow();
+			parent.repaint();
 			return this.lens;
 		}
 		else {
 			//removing the lens set for this view
 			if (this.lens != null){
 				this.lens = null;
-				parent.repaintNow();
+				parent.repaint();
 			}
 			return null;
 		}
@@ -699,7 +694,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 	}	
 	public void run() {
 	    if (id == currentTaskID){ //if this is the last task that was scheduled
-		parent.repaintNow();
+		parent.repaint();
 		currentTaskID = 0;
 	    } // if it is not the last task, then we don't want to repaint view. That would be done by the last task only.
 	}	

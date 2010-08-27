@@ -109,7 +109,7 @@ public class VTextOr extends VText {
     public void orientTo(double angle){
 	orient = angle;
 	invalidate();
-	VirtualSpaceManager.INSTANCE.repaintNow();
+	VirtualSpaceManager.INSTANCE.repaint();
     }
 
     @Override

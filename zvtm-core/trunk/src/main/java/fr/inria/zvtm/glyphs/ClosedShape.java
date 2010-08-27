@@ -54,7 +54,7 @@ public abstract class ClosedShape extends Glyph {
     public void setFilled(boolean b){
 	if (b!=filled){
 	    filled=b;
-	    VirtualSpaceManager.INSTANCE.repaintNow();
+	    VirtualSpaceManager.INSTANCE.repaint();
 	}
     }
 
@@ -69,7 +69,7 @@ public abstract class ClosedShape extends Glyph {
     public void setDrawBorder(boolean b){
 	if (b!=paintBorder){
 	    paintBorder=b;
-	    VirtualSpaceManager.INSTANCE.repaintNow();
+	    VirtualSpaceManager.INSTANCE.repaint();
 	}
     }
 
@@ -94,7 +94,7 @@ public abstract class ClosedShape extends Glyph {
 	borderColor = c;
 	bColor = borderColor;
 	HSVb = Color.RGBtoHSB(borderColor.getRed(), borderColor.getGreen(), borderColor.getBlue(), (new float[3]));
-	VirtualSpaceManager.INSTANCE.repaintNow();
+	VirtualSpaceManager.INSTANCE.repaint();
     }
 
     /** Set the glyph's border color (absolute value, HSV color space).
@@ -113,7 +113,7 @@ public abstract class ClosedShape extends Glyph {
 	if (HSVb[2]>1) {HSVb[2] = 1.0f;} else {if (HSVb[2]<0) {HSVb[2] = 0;}}
 	borderColor = Color.getHSBColor(HSVb[0],HSVb[1],HSVb[2]);
 	bColor = borderColor;
-	VirtualSpaceManager.INSTANCE.repaintNow();
+	VirtualSpaceManager.INSTANCE.repaint();
     }
     
     /** Set the glyph's border color (absolute value, HSV color space).
@@ -132,7 +132,7 @@ public abstract class ClosedShape extends Glyph {
 	if (HSVb[2]>1) {HSVb[2] = 1.0f;} else {if (HSVb[2]<0) {HSVb[2] = 0;}}
 	this.borderColor = Color.getHSBColor(HSVb[0], HSVb[1], HSVb[2]);
 	bColor = borderColor;
-	VirtualSpaceManager.INSTANCE.repaintNow();
+	VirtualSpaceManager.INSTANCE.repaint();
     }
 
     /** Get border color's HSV components. */
@@ -175,7 +175,7 @@ public abstract class ClosedShape extends Glyph {
 	    }
 	}
 	if (update){
-		VirtualSpaceManager.INSTANCE.repaintNow();
+		VirtualSpaceManager.INSTANCE.repaint();
 	}
     }
 

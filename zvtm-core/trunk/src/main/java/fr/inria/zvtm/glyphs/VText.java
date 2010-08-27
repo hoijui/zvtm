@@ -264,7 +264,7 @@ public class VText extends ClosedShape {
     public void setZoomSensitive(boolean b){
 	if (zoomSensitive!=b){
 	    zoomSensitive=b;
-	    VirtualSpaceManager.INSTANCE.repaintNow();
+	    VirtualSpaceManager.INSTANCE.repaint();
 	}
     }
 
@@ -544,7 +544,7 @@ public class VText extends ClosedShape {
     /** Set text that should be painted. */
     public void setText(String t){
 	text=t;
-	VirtualSpaceManager.INSTANCE.repaintNow();
+	VirtualSpaceManager.INSTANCE.repaint();
 	invalidate();
     }
 
@@ -605,7 +605,7 @@ public class VText extends ClosedShape {
      */
     public void setFont(Font f){
 	if (f!=null){font=f;fontSize=font.getSize2D();}else{font=null;fontSize=getMainFont().getSize2D();}
-	VirtualSpaceManager.INSTANCE.repaintNow();
+	VirtualSpaceManager.INSTANCE.repaint();
 	invalidate();
     }
 
@@ -672,7 +672,7 @@ public class VText extends ClosedShape {
             }
         }
         if (update){
-            VirtualSpaceManager.INSTANCE.repaintNow();
+            VirtualSpaceManager.INSTANCE.repaint();
         }
     }
 

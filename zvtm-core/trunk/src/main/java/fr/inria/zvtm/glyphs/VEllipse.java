@@ -180,21 +180,21 @@ public class VEllipse extends ClosedShape implements RectangularShape {
             vh = size;
             vw = vh * ar;
         }
-        VirtualSpaceManager.INSTANCE.repaintNow();
+        VirtualSpaceManager.INSTANCE.repaint();
     }
 
     @Override
     public void setWidth(double w){ 
         vw = w;
         computeSize();
-        VirtualSpaceManager.INSTANCE.repaintNow();
+        VirtualSpaceManager.INSTANCE.repaint();
     }
 
     @Override
     public void setHeight(double h){
         vh = h;
         computeSize();
-        VirtualSpaceManager.INSTANCE.repaintNow();
+        VirtualSpaceManager.INSTANCE.repaint();
     }
 
     @Override
@@ -214,7 +214,7 @@ public class VEllipse extends ClosedShape implements RectangularShape {
             vh = size;
             vw = vh*ar;
         }
-        VirtualSpaceManager.INSTANCE.repaintNow();
+        VirtualSpaceManager.INSTANCE.repaint();
     }
 
 	/** Get the bounding box of this Glyph in virtual space coordinates.

@@ -71,7 +71,6 @@ public class TestCameraPosition {
         testView = vsm.addFrameView(cameras, "Test", vt, 800, 600, false, true);
         testView.setBackgroundColor(Color.LIGHT_GRAY);
         testView.setEventHandler(eh);
-        testView.setNotifyMouseMoved(true);
 
 	final int NB_GLYPHS = 100;
 	java.util.List<Glyph> circles = new java.util.ArrayList<Glyph>();
@@ -235,11 +234,11 @@ public class TestCameraPosition {
 	    double a=(c.focal+Math.abs(c.altitude))/c.focal;
 	    if (wheelDirection == WHEEL_UP){
 		c.altitudeOffset(-a*5);
-		application.vsm.repaintNow();
+		application.vsm.repaint();
 	    }
 	    else {
 		c.altitudeOffset(a*5);
-		application.vsm.repaintNow();
+		application.vsm.repaint();
 	    }
 	}
 

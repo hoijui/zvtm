@@ -68,7 +68,7 @@ public class VirtualSpaceManager implements AWTEventListener {
     			if (g instanceof VText){((VText)g).invalidate();}
     		}		    
 		}
-		repaintNow();
+		repaint();
 	}
 
 	/**select only mouse sensitive and visible glyphs*/
@@ -355,7 +355,7 @@ public class VirtualSpaceManager implements AWTEventListener {
     /**Destroy a view. 
      * Used internally - not available outside from package, you should call the method directly on the view itself*/
     protected void destroyView(String viewName){
-	destroyView(getView(viewName));
+	    destroyView(getView(viewName));
     }
 
     /**Call this if you want to repaint all views at once.
@@ -365,21 +365,21 @@ public class VirtualSpaceManager implements AWTEventListener {
      *@see #repaintNow(View v)
      *@see #repaintNow(View v, RepaintListener rl)
      */
-    public void repaintNow(){
-	for (int i=0;i<allViews.length;i++){
-	    allViews[i].repaintNow();
-	}
+    public void repaint(){
+        for (int i=0;i<allViews.length;i++){
+            allViews[i].repaint();
+        }
     }
 
     /**Call this if you want to repaint a given view at once.
      * In some cases it is not possible to detect graphical changes so repaint
      * calls have to be issued manually (unless you are willing to wait for
      * another event to trigger repaint).
-     *@see #repaintNow()
+     *@see #repaint()
      *@see #repaintNow(View v, RepaintListener rl)
      */
-    public void repaintNow(View v){
-	v.repaintNow();
+    public void repaint(View v){
+	    v.repaint();
     }
 
     /**Call this if you want to repaint a given view at once.
@@ -391,8 +391,8 @@ public class VirtualSpaceManager implements AWTEventListener {
      *@see #repaintNow(View v)
      *@see View#removeRepaintListener()
      */
-    public void repaintNow(View v, RepaintListener rl){
-	v.repaintNow(rl);
+    public void repaint(View v, RepaintListener rl){
+	    v.repaint(rl);
     }
 
     /**Call this if you want to repaint a given view at once. Internal use.
@@ -401,8 +401,8 @@ public class VirtualSpaceManager implements AWTEventListener {
      * another event to trigger repaint).
      *@param i view index in list of views
      */
-    protected void repaintNow(int i){
-	repaintNow(allViews[i]);
+    protected void repaint(int i){
+	    repaint(allViews[i]);
     }
     
     /**manually set active view*/

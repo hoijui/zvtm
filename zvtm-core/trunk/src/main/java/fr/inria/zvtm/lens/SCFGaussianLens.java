@@ -168,7 +168,7 @@ public class SCFGaussianLens extends FSGaussianLens implements TemporalLens {
 		// make the lens almost flat when making big moves
 		dMM = nMM;
 		this.setDynamicMagnification();
-		owningView.parent.repaintNow();
+		owningView.parent.repaint();
 	    if (tpl != null){tpl.parameterUpdated();}
 	    }
 	    if (doRing)
@@ -176,7 +176,7 @@ public class SCFGaussianLens extends FSGaussianLens implements TemporalLens {
 		float bR = Math.min(LR2, ((float)opacity) * (LR2) + 1.0f);
 		if (Math.abs(bR - scRingRadius) > 1.0f){
 		    scRingRadius = bR;
-		    owningView.parent.repaintNow();
+		    owningView.parent.repaint();
 		}
 	    }
 	}
@@ -185,7 +185,7 @@ public class SCFGaussianLens extends FSGaussianLens implements TemporalLens {
     void setDynamicMagnification(){
 	c = (dMM-1)/2;
 	e = (1+dMM)/2;
-	owningView.parent.repaintNow();
+	owningView.parent.repaint();
     }
 
     public void setCutoffFrequencyParameters(double a, double b){

@@ -346,7 +346,7 @@ public abstract class FixedSizeLens extends Lens {
 		owningView.setDrawCursor(!isFocusControlled);
 		lensX = lx + (int)owningView.getSize().getWidth() / 2;
 		lensY = ly + (int)owningView.getSize().getHeight() / 2;
-		owningView.parent.repaintNow();
+		owningView.parent.repaint();
 	}
 
 	int lastX = Integer.MAX_VALUE;
@@ -372,7 +372,7 @@ public abstract class FixedSizeLens extends Lens {
 	else
 	    setAbsolutePosition(lensX, lensY);
 
-	owningView.parent.repaintNow();
+	owningView.parent.repaint();
     }
 
     // FIXME: synchronized !
@@ -409,7 +409,7 @@ public abstract class FixedSizeLens extends Lens {
 			    ((TemporalLens)this).setAbsolutePosition(lensX, lensY, currentTime);
 			else
 			    setAbsolutePosition(lensX, lensY);
-			owningView.parent.repaintNow();
+			owningView.parent.repaint();
 		}
 	}
 

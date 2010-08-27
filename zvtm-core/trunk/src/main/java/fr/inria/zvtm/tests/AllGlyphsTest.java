@@ -52,7 +52,6 @@ public class AllGlyphsTest {
         testView = vsm.addFrameView(cameras, "All Glyphs Test", vt, 1024, 768, false, true, true, null);
         testView.setBackgroundColor(Color.LIGHT_GRAY);
         testView.setEventHandler(eh);
-        testView.setNotifyMouseMoved(true);
         vs.getCamera(0).setAltitude(0);
         populate();
         testView.getGlobalView(mCam, 500, 1.5f);
@@ -317,12 +316,12 @@ class TestEventHandler extends DefaultEventHandler {
         double a = (c.focal+Math.abs(c.altitude)) / c.focal;
         if (wheelDirection == WHEEL_DOWN){
             c.altitudeOffset(-a*5);
-            VirtualSpaceManager.INSTANCE.repaintNow();
+            VirtualSpaceManager.INSTANCE.repaint();
         }
         else {
             //wheelDirection == WHEEL_UP
             c.altitudeOffset(a*5);
-            VirtualSpaceManager.INSTANCE.repaintNow();
+            VirtualSpaceManager.INSTANCE.repaint();
         }
     }
     
