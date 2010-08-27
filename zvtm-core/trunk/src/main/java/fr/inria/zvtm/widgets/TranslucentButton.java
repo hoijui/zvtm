@@ -134,6 +134,7 @@ public class TranslucentButton extends JButton implements TranslucentWidget {
 		this.bgAC = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
 	}
 	
+	@Override
 	public void paint(Graphics g){
 		Graphics2D g2d = (Graphics2D)g;
 		if (cursorInside){

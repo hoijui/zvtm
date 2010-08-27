@@ -148,6 +148,7 @@ public class TranslucentRadioButton extends JRadioButton implements TranslucentW
 		this.bgAC = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
 	}
 	
+	@Override
 	public void paint(Graphics g){
 		Graphics2D g2d = (Graphics2D)g;
 		if (cursorInside){

@@ -85,6 +85,7 @@ public class TranslucentTextField extends JTextField implements TranslucentWidge
 		this.fgAC = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
 	}
 	
+	@Override
 	public void paint(Graphics g){
 		Graphics2D g2d = (Graphics2D)g;
 		g2d.setComposite(bgAC);
