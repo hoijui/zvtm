@@ -83,14 +83,15 @@ public class IcePDFPageImg extends ZPDFPage {
 		this.vy = y;
 		this.vz = z;
 		synchronized(pdfDoc){
-            this.pageImage = (BufferedImage)pdfDoc.getPageImage(pageNumber, GraphicsRenderingHints.SCREEN, Page.BOUNDARY_CROPBOX, 0f, detailFactor);		    
+            setPageImage((BufferedImage)pdfDoc.getPageImage(pageNumber, GraphicsRenderingHints.SCREEN, Page.BOUNDARY_CROPBOX, 0f, detailFactor));
 		}
-		this.vw = pageImage.getWidth()*scaleFactor;
-		this.vh = pageImage.getHeight()*scaleFactor;
-		if (vw==0 && vh==0){this.ar = 1.0f;}
-		else {this.ar = vw / vh;}
-		computeSize();
-		this.orient = 0;
+		this.scaleFactor = scaleFactor;
+	}
+	
+	IcePDFPageImg(double x, double y, int z, double scaleFactor){
+	    this.vx = x;
+		this.vy = y;
+		this.vz = z;
 		this.scaleFactor = scaleFactor;
 	}
 	
@@ -110,7 +111,16 @@ public class IcePDFPageImg extends ZPDFPage {
     public Object getInterpolationMethod(){
         return interpolationMethod;
     }
+    
+    void setPageImage(BufferedImage img){
+        this.vw = this.pageImage.getWidth() * scaleFactor;
+		this.vh = this.pageImage.getHeight() * scaleFactor;
+		if (this.vw==0 && this.vh==0){this.ar = 1.0f;}
+		else {this.ar = this.vw / this.vh;}
+		computeSize();
+    }
 
+	@Override
 	public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 	    if (alphaC != null && alphaC.getAlpha()==0){return;}
 		if ((pc[i].cw>1) && (pc[i].ch>1)){
@@ -204,6 +214,7 @@ public class IcePDFPageImg extends ZPDFPage {
 		}
 	}
 
+	@Override
 	public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 		if ((pc[i].lcw > 1) && (pc[i].lch > 1)){
 			if (zoomSensitive){trueCoef=scaleFactor*coef;}
@@ -289,8 +300,14 @@ public class IcePDFPageImg extends ZPDFPage {
 		}
 	}
 
+    /** Cloning this PDF page glyph. Uses the same bitmap resource as the original.
+     *
+     */
+	@Override
 	public Object clone(){
-		return null;
+	    IcePDFPageImg res = new IcePDFPageImg(vx, vy, vz, scaleFactor);
+	    res.setPageImage(pageImage);
+		return res;
 	}
 
     /** Flush image resource. */

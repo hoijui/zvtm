@@ -53,6 +53,7 @@ public abstract class ZPDFPage extends ClosedShape implements RectangularShape {
      */
     public short drawBorder = VImage.DRAW_BORDER_ALWAYS;
     
+	@Override
 	public void initCams(int nbCam){
 		pc=new RProjectedCoordsP[nbCam];
 		for (int i=0;i<nbCam;i++){
@@ -60,6 +61,7 @@ public abstract class ZPDFPage extends ClosedShape implements RectangularShape {
 		}
 	}
 
+	@Override
 	public void addCamera(int verifIndex){
 		if (pc!=null){
 			if (verifIndex==pc.length){
@@ -81,44 +83,54 @@ public abstract class ZPDFPage extends ClosedShape implements RectangularShape {
 		}
 	}
 
+	@Override
 	public void removeCamera(int index){
 		pc[index]=null;
 	}
 
-    /** For internal use. */
-    public void computeSize(){
+    void computeSize(){
         size = Math.sqrt(Math.pow(vw,2)+Math.pow(vh,2));
     }
 
     /** Get glyph's size (radius of bounding circle). */
-    public double getSize(){return size;}
+    @Override
+	public double getSize(){return size;}
 
     /** Set glyph's size by setting its bounding circle's radius.
      *@see #reSize(double factor)
      */
-    public void sizeTo(double s){/*XXX:TBW*/}
+    @Override
+ 	public void sizeTo(double s){/*XXX:TBW*/}
 
     /** Set glyph's size by multiplying its bounding circle radius by a factor. 
      *@see #sizeTo(double radius)
      */
-    public void reSize(double factor){/*XXX:TBW*/}
+    @Override
+ 	public void reSize(double factor){/*XXX:TBW*/}
 
     /** Get the glyph's orientation. */
-    public double getOrient(){/*XXX:TBW*/return 0;}
+    @Override
+	public double getOrient(){/*XXX:TBW*/return 0;}
 
     /** Set the glyph's absolute orientation.
      *@param angle in [0:2Pi[ 
      */
-    public void orientTo(double angle){/*XXX:TBW*/}
+    @Override
+ 	public void orientTo(double angle){/*XXX:TBW*/}
 
+	@Override
 	public void highlight(boolean b, Color selectedColor){}
 
+	@Override
 	public void setWidth(double w){/*XXX:TBW*/}
 
+	@Override
 	public void setHeight(double h){/*XXX:TBW*/}
 
+	@Override
 	public double getWidth(){return vw;}
 
+	@Override
 	public double getHeight(){return vh;}
 
 	/** Set to false if the image should not be scaled according to camera's altitude. Its size can still be changed, but its apparent size will always be the same, no matter the camera's altitude.
@@ -138,9 +150,9 @@ public abstract class ZPDFPage extends ClosedShape implements RectangularShape {
 		return zoomSensitive;
 	}
 
-	/** Should a border be drawn around the bitmap image.
-		*@param p one of DRAW_BORDER_*
-		*/
+	/** Should a border be drawn around the page.
+	 *@param p one of VImage.DRAW_BORDER_*
+	 */
 	public void setDrawBorderPolicy(short p){
 		if (drawBorder!=p){
 			drawBorder=p;
@@ -148,17 +160,20 @@ public abstract class ZPDFPage extends ClosedShape implements RectangularShape {
 		}
 	}
 	
+	@Override
 	public boolean fillsView(double w,double h,int camIndex){
 		//can contain transparent pixel (we have no way of knowing without analysing the image data -could be done when constructing the object or setting the image)
 		return false; 
 	}
 
+	@Override
 	public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
 		if ((jpx>=(pc[camIndex].cx-pc[camIndex].cw)) && (jpx<=(pc[camIndex].cx+pc[camIndex].cw)) &&
 		    (jpy>=(pc[camIndex].cy-pc[camIndex].ch)) && (jpy<=(pc[camIndex].cy+pc[camIndex].ch))){return true;}
 		else {return false;}
 	}
 	
+	@Override
 	public boolean visibleInRegion(double wb, double nb, double eb, double sb, int i){
         if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
             /* Glyph hotspot is in the region. The glyph is obviously visible */
@@ -173,10 +188,12 @@ public abstract class ZPDFPage extends ClosedShape implements RectangularShape {
         return false;
     }
     
+	@Override
 	public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
 		return dvs.intersects(vx-vw/2d, vy-vh/2d, vw, vh);
 	}
 
+	@Override
 	public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
 		if (coordInside(jpx, jpy, camIndex, cvx, cvy)){
 			//if the mouse is inside the glyph
@@ -204,17 +221,20 @@ public abstract class ZPDFPage extends ClosedShape implements RectangularShape {
 		}
 	}
 
+	@Override
 	public void resetMouseIn(){
 		for (int i=0;i<pc.length;i++){
 			resetMouseIn(i);
 		}
 	}
 
+	@Override
 	public void resetMouseIn(int i){
 		if (pc[i]!=null){pc[i].prevMouseIn=false;}
 		borderColor = bColor;
 	}
 	
+	@Override
 	public void project(Camera c, Dimension d){
 		int i = c.getIndex();
 		coef = c.focal/(c.focal+c.altitude);
@@ -233,6 +253,7 @@ public abstract class ZPDFPage extends ClosedShape implements RectangularShape {
 		}
 	}
 
+	@Override
 	public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, double lensx, double lensy){
 		int i = c.getIndex();
 		coef = c.focal/(c.focal+c.altitude) * lensMag;
