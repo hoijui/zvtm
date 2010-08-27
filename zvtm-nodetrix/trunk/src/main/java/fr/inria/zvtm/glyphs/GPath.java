@@ -19,9 +19,10 @@ import java.awt.MultipleGradientPaint.CycleMethod;
 
 import fr.inria.zvtm.nodetrix.ProjectColors;
 
+/** A path whose smoothly color changes from one color to another one. Approximated using a radial gradient paint. */
+
 public class GPath extends DPath {
     
-//    Color[] gradientColors = {new Color(118,98,252), Color.WHITE};
     private Color[] gradientColors = new Color[2];
     float[] gradientDist = {0.2f, 0.8f};
     Point2D gradientCenter = new Point2D.Float();
@@ -81,6 +82,7 @@ public class GPath extends DPath {
     public void setGradientColors(Color[] gc){
         this.gradientColors = gc;        
     }
+    
     @Override
     /** Is just a <i>delegate</i> for <code>setGradientColors</code>. The one color passed
      * to this method is the second gradient value, whether the first one is a darker 
@@ -90,10 +92,6 @@ public class GPath extends DPath {
      */
     public void setColor(Color c){
     	this.gradientColors = new Color[2];
-//    	if(ProjectColors.COLOR_SCHEME == ProjectColors.CS_PRINT)
-//    		this.gradientColors[0] = c.brighter();
-//    	else
-//    		this.gradientColors[0] = c.darker();
     	this.gradientColors[0] = ProjectColors.EXTRA_COLOR_GRADIENT_START[ProjectColors.COLOR_SCHEME];
         this.gradientColors[1] = c;        
     }
@@ -118,6 +116,7 @@ public class GPath extends DPath {
         this.gradientDist = gd;
     }
     
+    @Override
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
         if (alphaC != null && alphaC.getAlpha() == 0){return;}
         gradientCenter.setLocation(pc[i].cx, pc[i].cy);
@@ -125,7 +124,6 @@ public class GPath extends DPath {
                                     (float)Math.sqrt(Math.pow(elements[elements.length-1].getX(i)-pc[i].cx,2) + Math.pow(elements[elements.length-1].getY(i)-pc[i].cy,2)),
                                     gradientDist, gradientColors, CycleMethod.NO_CYCLE);
         g.setPaint(p);
-        //g.setColor(this.color);
         if (stroke!=null) {
             g.setStroke(stroke);
             g.translate(dx,dy);
@@ -170,6 +168,7 @@ public class GPath extends DPath {
         }
     }
     
+    @Override
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
         if (alphaC != null && alphaC.getAlpha() == 0){return;}
         gradientCenter.setLocation(pc[i].lcx, pc[i].lcy);
@@ -177,7 +176,6 @@ public class GPath extends DPath {
                                     (float)Math.sqrt(Math.pow(elements[elements.length-1].getlX(i)-pc[i].lcx,2) + Math.pow(elements[elements.length-1].getlY(i)-pc[i].lcy,2)),
                                     gradientDist, gradientColors, CycleMethod.NO_CYCLE);
         g.setPaint(p);
-        //g.setColor(this.color);
         if (stroke!=null) {
             g.setStroke(stroke);
             g.translate(dx,dy);
