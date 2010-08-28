@@ -512,8 +512,6 @@ public abstract class View {
      *@param w width of rendered image
      *@param h height of rendered image
      *@return the resulting buffered image which can then be manipulated and serialized
-     *@see #rasterize(int w, int h, java.io.File f)
-     *@see #rasterize(int w, int h, java.io.File f, Vector layers)
      *@see #rasterize(int w, int h, Vector layers)
      */
     public BufferedImage rasterize(int w, int h){
@@ -525,8 +523,6 @@ public abstract class View {
      *@param h height of rendered image
      *@param layers Vector of cameras : what layers (represented by cameras) of this view should be rendered (you can pass null for all layers)
      *@return the resulting buffered image which can then be manipulated and serialized
-     *@see #rasterize(int w, int h, java.io.File f)
-     *@see #rasterize(int w, int h, java.io.File f, Vector layers)
      *@see #rasterize(int w, int h)
      */
     public BufferedImage rasterize(int w, int h, Vector<Camera> layers){
