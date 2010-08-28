@@ -267,20 +267,6 @@ public abstract class View {
 	    return panel.getSize().height * ((c.focal+c.altitude) / c.focal);
     }
 
-    /** Get an image of what is visible in this view.
-     *@return a copy of the original offscreen buffer.
-     */
-    public BufferedImage getImage(){
-        BufferedImage res=null;
-        BufferedImage i=panel.getImage();
-        if (i!=null){
-            res = new BufferedImage(i.getWidth(),i.getHeight(),i.getType());
-            Graphics2D resg2d = res.createGraphics();
-            resg2d.drawImage(i,null,0,0);
-        }
-        return res;
-    }
-
     /** Set which layer (camera) is currently active (getting events).
      * @param i layer index. 0 is the deepest layer (first camera given in the Vector at construction time).
      */
@@ -508,11 +494,28 @@ public abstract class View {
 	    return panel.stableRefToBackBufferGraphics;
     }
 
+    /** Get an image of what is visible in this view, by calling getImage on the JComponent.
+     *@return a copy of the original offscreen buffer.
+     *@see #rasterize(int w, int h)
+     *@see #rasterize(int w, int h, Vector layers)
+     */
+    public BufferedImage getImage(){
+        BufferedImage res=null;
+        BufferedImage i=panel.getImage();
+        if (i!=null){
+            res = new BufferedImage(i.getWidth(),i.getHeight(),i.getType());
+            Graphics2D resg2d = res.createGraphics();
+            resg2d.drawImage(i,null,0,0);
+        }
+        return res;
+    }
+
     /** Ask for a bitmap rendering of this view and return the resulting BufferedImage.
      *@param w width of rendered image
      *@param h height of rendered image
      *@return the resulting buffered image which can then be manipulated and serialized
      *@see #rasterize(int w, int h, Vector layers)
+     *@see #getImage()
      */
     public BufferedImage rasterize(int w, int h){
 	    return rasterize(w, h, (Vector)null);
@@ -524,6 +527,7 @@ public abstract class View {
      *@param layers Vector of cameras : what layers (represented by cameras) of this view should be rendered (you can pass null for all layers)
      *@return the resulting buffered image which can then be manipulated and serialized
      *@see #rasterize(int w, int h)
+     *@see #getImage()
      */
     public BufferedImage rasterize(int w, int h, Vector<Camera> layers){
         Dimension panelSize = panel.getSize();
