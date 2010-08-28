@@ -53,7 +53,7 @@ import java.util.TimerTask;
 import java.util.Vector;
 
 /**
- * Each view runs in its own thread - uses double buffering
+ * JPanel used to paint the content of a view (all camera layers).
  * @author Emmanuel Pietriga
  **/
 public abstract class ViewPanel extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener, ComponentListener {
@@ -163,7 +163,8 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
     /**Lens (fisheye, etc.)*/
     protected Lens lens;
 
-    public abstract void stop();
+    /** Stop this view. */
+    abstract void stop();
     
     /** Set application class to which events are sent.
      *@param layer depth of layer to which the event handler should be associated.

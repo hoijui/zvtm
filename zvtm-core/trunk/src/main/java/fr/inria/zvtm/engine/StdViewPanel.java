@@ -44,8 +44,11 @@ import fr.inria.zvtm.engine.ViewEventHandler;
 
 
 /**
+ * JPanel used to paint the content of a view (all camera layers).
+ * Manual double buffering, to allow modifications to the rendering before it gets painted on screen (e.g., applying magnification lenses).
  * @author Emmanuel Pietriga
  */
+
 public class StdViewPanel extends ViewPanel {
 
 	/** Double Buffering uses a BufferedImage as the back buffer. */
@@ -103,7 +106,7 @@ public class StdViewPanel extends ViewPanel {
 		edtTimer.start();
 	}
 
-	public void stop(){
+	void stop(){
 		edtTimer.stop();
 		if (stableRefToBackBufferGraphics != null) {
 			stableRefToBackBufferGraphics.dispose();
@@ -386,6 +389,7 @@ public class StdViewPanel extends ViewPanel {
 		}
 	}
 
+    @Override
 	public void paint(Graphics g) {
 		if (backBuffer != null){
 			g.drawImage(backBuffer, 0, 0, this);
@@ -393,7 +397,7 @@ public class StdViewPanel extends ViewPanel {
 		}
 	}
 
-	/** Get a snapshot of this view.*/
+    @Override
 	public BufferedImage getImage(){
 		return this.backBuffer;
 	}

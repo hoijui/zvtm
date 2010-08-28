@@ -28,7 +28,8 @@ import fr.inria.zvtm.engine.Java2DPainter;
 import fr.inria.zvtm.engine.ViewEventHandler;
 
 /**
- * Each view runs in its own thread - uses OpenGL acceletation provided by J2SE 5.0<br>
+ * JPanel used to paint the content of a view (all camera layers).
+ * Uses OpenGL acceletation provided by the Java2D OpenGL rendering pipeline available since J2SE 5.0 (Linux and Windows, not Mac OS X).
  * The use of GLViewPanel requires the following Java property: -Dsun.java2d.opengl=true
  * @author Emmanuel Pietriga
  */
@@ -76,17 +77,17 @@ public class GLViewPanel extends ViewPanel {
         start();
     }
 
-    public void start(){
+    private void start(){
         size = getSize();
         oldSize = size;
         edtTimer.start();
     }
 
-    public synchronized void stop() {
-        notify();
+    void stop(){
         edtTimer.stop();
     }
 
+    @Override
     public void paint(Graphics g) {
         super.paint(g);
         // stableRefToBackBufferGraphics is used here not as a Graphics from a back buffer image, but directly as the OpenGL graphics context
@@ -184,6 +185,7 @@ public class GLViewPanel extends ViewPanel {
     }
 
     /** Not implemented yet. */
+    @Override
     public BufferedImage getImage(){
 	    return null;
     }
