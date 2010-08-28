@@ -1,4 +1,4 @@
-/*   FILE: ViewEventHandler.java
+/*   FILE: ViewListener.java
  *   DATE OF CREATION:  Fri May 26 15:01:11 2006
  *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
@@ -8,7 +8,7 @@
  * $Id$
  */ 
 
-package fr.inria.zvtm.engine;
+package fr.inria.zvtm.event;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -22,7 +22,7 @@ import fr.inria.zvtm.glyphs.Glyph;
  * @author Emmanuel Pietriga
  */
 
-public interface ViewEventHandler {
+public interface ViewListener {
 
     /** No key modifier depressed. */
     public static int NO_MODIFIER = 0;

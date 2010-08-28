@@ -19,6 +19,7 @@ import java.awt.geom.Point2D;
 import java.util.Vector;
 
 import fr.inria.zvtm.engine.*;
+import fr.inria.zvtm.event.*;
 import fr.inria.zvtm.animation.*;
 import fr.inria.zvtm.animation.interpolation.*;
 import fr.inria.zvtm.glyphs.*;
@@ -27,7 +28,7 @@ public class AllGlyphsTest {
 
     VirtualSpaceManager vsm;
     VirtualSpace vs;
-    ViewEventHandler eh;
+    ViewListener eh;
     Camera mCam;
 
     View testView;
@@ -277,7 +278,7 @@ public class AllGlyphsTest {
     
 }
 
-class TestEventHandler extends DefaultEventHandler {
+class TestEventHandler extends ViewAdapter {
     
     static float ZOOM_SPEED_COEF = 1.0f/50.0f;
     static double PAN_SPEED_COEF = 50.0;

@@ -32,8 +32,7 @@ import java.awt.event.MouseWheelEvent;
 
 import fr.inria.zvtm.engine.*;
 import fr.inria.zvtm.glyphs.*;
-import fr.inria.zvtm.engine.*;
-import fr.inria.zvtm.glyphs.*;
+import fr.inria.zvtm.event.*;
 import fr.inria.zvtm.widgets.*;
 
 import fr.inria.zvtm.animation.*;
@@ -44,7 +43,7 @@ public class TestCircle {
 
     VirtualSpaceManager vsm;
     VirtualSpace vs;
-    ViewEventHandler eh;   //class that receives the events sent from views (include mouse click, entering object,...)
+    ViewListener eh;   //class that receives the events sent from views (include mouse click, entering object,...)
 
     View testView;
 
@@ -154,7 +153,7 @@ public class TestCircle {
         new TestCircle((args.length > 0) ? Short.parseShort(args[0]) : 0);
     }
     
-    class EventHandlerTest implements ViewEventHandler{
+    class EventHandlerTest implements ViewListener{
 
 	TestCircle application;
 

@@ -32,8 +32,7 @@ import java.awt.event.MouseWheelEvent;
 
 import fr.inria.zvtm.engine.*;
 import fr.inria.zvtm.glyphs.*;
-import fr.inria.zvtm.engine.*;
-import fr.inria.zvtm.glyphs.*;
+import fr.inria.zvtm.event.*;
 import fr.inria.zvtm.widgets.*;
 
 import fr.inria.zvtm.animation.*;
@@ -43,7 +42,7 @@ public class TestDefaultHandler {
 
     VirtualSpaceManager vsm;
     VirtualSpace vs;
-    ViewEventHandler eh;   //class that receives the events sent from views (include mouse click, entering object,...)
+    ViewListener eh;   //class that receives the events sent from views (include mouse click, entering object,...)
 
     View testView;
 
@@ -141,7 +140,7 @@ public class TestDefaultHandler {
         new TestDefaultHandler((args.length > 0) ? Short.parseShort(args[0]) : 0);
     }
     
-    class EventHandlerTestDTH implements ViewEventHandler{
+    class EventHandlerTestDTH implements ViewListener{
 
 	TestDefaultHandler application;
 

@@ -32,8 +32,7 @@ import java.awt.event.MouseWheelEvent;
 
 import fr.inria.zvtm.engine.*;
 import fr.inria.zvtm.glyphs.*;
-import fr.inria.zvtm.engine.*;
-import fr.inria.zvtm.glyphs.*;
+import fr.inria.zvtm.event.*;
 import fr.inria.zvtm.widgets.*;
 
 import fr.inria.zvtm.animation.*;
@@ -47,7 +46,7 @@ public class TestStopCancel {
 
     VirtualSpaceManager vsm;
     VirtualSpace vs;
-    ViewEventHandler eh;   //class that receives the events sent from views (include mouse click, entering object,...)
+    ViewListener eh;   //class that receives the events sent from views (include mouse click, entering object,...)
 
     View testView;
 
@@ -184,7 +183,7 @@ public class TestStopCancel {
         new TestStopCancel().startAnim((args.length > 0) ? Short.parseShort(args[0]) : 0);
     }
 
-    class MyEventHandler implements ViewEventHandler{
+    class MyEventHandler implements ViewListener{
 	TestStopCancel application;
 
 	int lastJPX,lastJPY;    //remember last mouse coords to compute translation  (dragging)

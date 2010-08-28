@@ -32,8 +32,7 @@ import java.awt.event.MouseWheelEvent;
 
 import fr.inria.zvtm.engine.*;
 import fr.inria.zvtm.glyphs.*;
-import fr.inria.zvtm.engine.*;
-import fr.inria.zvtm.glyphs.*;
+import fr.inria.zvtm.event.*;
 import fr.inria.zvtm.widgets.*;
 
 import fr.inria.zvtm.animation.*;
@@ -46,7 +45,7 @@ public class TestCameraPosition {
 
     VirtualSpaceManager vsm;
     VirtualSpace vs;
-    ViewEventHandler eh;   //class that receives the events sent from views (include mouse click, entering object,...)
+    ViewListener eh;   //class that receives the events sent from views (include mouse click, entering object,...)
     AnimationManager am;
 
     View testView;
@@ -128,7 +127,7 @@ public class TestCameraPosition {
         new TestCameraPosition().startAnim((args.length > 0) ? Short.parseShort(args[0]) : 0);
     }
 
-    class MyEventHandler implements ViewEventHandler{
+    class MyEventHandler implements ViewListener{
 	TestCameraPosition application;
 
 	MyEventHandler(TestCameraPosition appli){

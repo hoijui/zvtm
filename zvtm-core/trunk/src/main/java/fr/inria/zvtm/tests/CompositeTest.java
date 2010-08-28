@@ -7,7 +7,7 @@
 package fr.inria.zvtm.tests;
 
 import fr.inria.zvtm.engine.Camera;
-import fr.inria.zvtm.engine.DefaultEventHandler;
+import fr.inria.zvtm.event.ViewAdapter;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.VirtualSpace;
@@ -35,7 +35,7 @@ public class CompositeTest {
 
         View view = vsm.addFrameView(cameras, "Composite test",
                 View.STD_VIEW, 800, 600, false, true, true, null);	
-        view.setEventHandler(new DefaultEventHandler());
+        view.setEventHandler(new ViewAdapter());
 
         //create overlapping circles
         Glyph redC  = new VCircle(0, 0, 0, 30, Color.RED);

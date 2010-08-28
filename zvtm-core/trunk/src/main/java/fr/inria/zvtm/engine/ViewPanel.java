@@ -25,8 +25,8 @@ package fr.inria.zvtm.engine;
 
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.engine.Java2DPainter;
-import fr.inria.zvtm.engine.RepaintListener;
-import fr.inria.zvtm.engine.ViewEventHandler;
+import fr.inria.zvtm.event.RepaintListener;
+import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.lens.Lens;
 
 import javax.swing.JPanel;
@@ -85,7 +85,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
     boolean active=true;
 
     /**send events to this class (application side)*/
-    ViewEventHandler[] evHs;
+    ViewListener[] evHs;
 
     /**repaint only if necessary (when there are animations, when the mouse moves...)*/
     volatile boolean repaintASAP=true;
@@ -169,11 +169,11 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
     /** Set application class to which events are sent.
      *@param layer depth of layer to which the event handler should be associated.
      */
-    void setEventHandler(ViewEventHandler eh, int layer){
+    void setEventHandler(ViewListener eh, int layer){
 	evHs[layer] = eh;
     }
 
-	public ViewEventHandler[] getEventHandlers(){
+	public ViewListener[] getEventHandlers(){
 		return evHs;
 	}
 
@@ -297,52 +297,52 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 	origDragx=e.getX();origDragy=e.getY();  //store these anyway, since we have no way to know which button (if any) sets drawDrag mode
 	if ((whichButton & InputEvent.BUTTON1_MASK)==InputEvent.BUTTON1_MASK){
 	    if (e.isShiftDown()) {
-		if (e.isControlDown()) {evHs[activeLayer].press1(this,ViewEventHandler.CTRL_SHIFT_MOD,e.getX(),e.getY(), e);}
-		else if (e.isMetaDown()) {evHs[activeLayer].press1(this,ViewEventHandler.META_SHIFT_MOD,e.getX(),e.getY(), e);}
-		else if (e.isAltDown()) {evHs[activeLayer].press1(this,ViewEventHandler.ALT_SHIFT_MOD,e.getX(),e.getY(), e);}
-		else {evHs[activeLayer].press1(this,ViewEventHandler.SHIFT_MOD,e.getX(),e.getY(), e);}
+		if (e.isControlDown()) {evHs[activeLayer].press1(this,ViewListener.CTRL_SHIFT_MOD,e.getX(),e.getY(), e);}
+		else if (e.isMetaDown()) {evHs[activeLayer].press1(this,ViewListener.META_SHIFT_MOD,e.getX(),e.getY(), e);}
+		else if (e.isAltDown()) {evHs[activeLayer].press1(this,ViewListener.ALT_SHIFT_MOD,e.getX(),e.getY(), e);}
+		else {evHs[activeLayer].press1(this,ViewListener.SHIFT_MOD,e.getX(),e.getY(), e);}
 	    }
 	    else if (e.isControlDown()){
-		evHs[activeLayer].press1(this,ViewEventHandler.CTRL_MOD,e.getX(),e.getY(), e);
+		evHs[activeLayer].press1(this,ViewListener.CTRL_MOD,e.getX(),e.getY(), e);
 	    }
 	    else {
-		if (e.isMetaDown()) {evHs[activeLayer].press1(this,ViewEventHandler.META_MOD,e.getX(),e.getY(), e);}
-		else if (e.isAltDown()) {evHs[activeLayer].press1(this,ViewEventHandler.ALT_MOD,e.getX(),e.getY(), e);}
-		else {evHs[activeLayer].press1(this,ViewEventHandler.NO_MODIFIER,e.getX(),e.getY(), e);}
+		if (e.isMetaDown()) {evHs[activeLayer].press1(this,ViewListener.META_MOD,e.getX(),e.getY(), e);}
+		else if (e.isAltDown()) {evHs[activeLayer].press1(this,ViewListener.ALT_MOD,e.getX(),e.getY(), e);}
+		else {evHs[activeLayer].press1(this,ViewListener.NO_MODIFIER,e.getX(),e.getY(), e);}
 	    }
 	}
 	else {
 	    if ((whichButton & InputEvent.BUTTON2_MASK)==InputEvent.BUTTON2_MASK){
 		if (e.isShiftDown()) {
-		    if (e.isControlDown()) {evHs[activeLayer].press2(this,ViewEventHandler.CTRL_SHIFT_MOD,e.getX(),e.getY(), e);}
-		    else if (e.isMetaDown()) {evHs[activeLayer].press2(this,ViewEventHandler.META_SHIFT_MOD,e.getX(),e.getY(), e);}
-		    else if (e.isAltDown()) {evHs[activeLayer].press2(this,ViewEventHandler.ALT_SHIFT_MOD,e.getX(),e.getY(), e);}
-		    else {evHs[activeLayer].press2(this,ViewEventHandler.SHIFT_MOD,e.getX(),e.getY(), e);}
+		    if (e.isControlDown()) {evHs[activeLayer].press2(this,ViewListener.CTRL_SHIFT_MOD,e.getX(),e.getY(), e);}
+		    else if (e.isMetaDown()) {evHs[activeLayer].press2(this,ViewListener.META_SHIFT_MOD,e.getX(),e.getY(), e);}
+		    else if (e.isAltDown()) {evHs[activeLayer].press2(this,ViewListener.ALT_SHIFT_MOD,e.getX(),e.getY(), e);}
+		    else {evHs[activeLayer].press2(this,ViewListener.SHIFT_MOD,e.getX(),e.getY(), e);}
 		}
 		else if (e.isControlDown()){
-		    evHs[activeLayer].press2(this,ViewEventHandler.CTRL_MOD,e.getX(),e.getY(), e);
+		    evHs[activeLayer].press2(this,ViewListener.CTRL_MOD,e.getX(),e.getY(), e);
 		}
 		else {
-		    if (e.isMetaDown()) {evHs[activeLayer].press2(this,ViewEventHandler.META_MOD,e.getX(),e.getY(), e);}
-		    else if (e.isAltDown()) {evHs[activeLayer].press2(this,ViewEventHandler.ALT_MOD,e.getX(),e.getY(), e);}
-		    else {evHs[activeLayer].press2(this,ViewEventHandler.NO_MODIFIER,e.getX(),e.getY(), e);}
+		    if (e.isMetaDown()) {evHs[activeLayer].press2(this,ViewListener.META_MOD,e.getX(),e.getY(), e);}
+		    else if (e.isAltDown()) {evHs[activeLayer].press2(this,ViewListener.ALT_MOD,e.getX(),e.getY(), e);}
+		    else {evHs[activeLayer].press2(this,ViewListener.NO_MODIFIER,e.getX(),e.getY(), e);}
 		}
 	    }
 	    else {
 		if ((whichButton & InputEvent.BUTTON3_MASK)==InputEvent.BUTTON3_MASK){
 		    if (e.isShiftDown()) {
-			if (e.isControlDown()) {evHs[activeLayer].press3(this,ViewEventHandler.CTRL_SHIFT_MOD,e.getX(),e.getY(), e);}
-			else if (e.isMetaDown()) {evHs[activeLayer].press3(this,ViewEventHandler.META_SHIFT_MOD,e.getX(),e.getY(), e);}
-			else if (e.isAltDown()) {evHs[activeLayer].press3(this,ViewEventHandler.ALT_SHIFT_MOD,e.getX(),e.getY(), e);}
-			else {evHs[activeLayer].press3(this,ViewEventHandler.SHIFT_MOD,e.getX(),e.getY(), e);}
+			if (e.isControlDown()) {evHs[activeLayer].press3(this,ViewListener.CTRL_SHIFT_MOD,e.getX(),e.getY(), e);}
+			else if (e.isMetaDown()) {evHs[activeLayer].press3(this,ViewListener.META_SHIFT_MOD,e.getX(),e.getY(), e);}
+			else if (e.isAltDown()) {evHs[activeLayer].press3(this,ViewListener.ALT_SHIFT_MOD,e.getX(),e.getY(), e);}
+			else {evHs[activeLayer].press3(this,ViewListener.SHIFT_MOD,e.getX(),e.getY(), e);}
 		    }
 		    else if (e.isControlDown()){
-			evHs[activeLayer].press3(this,ViewEventHandler.CTRL_MOD,e.getX(),e.getY(), e);
+			evHs[activeLayer].press3(this,ViewListener.CTRL_MOD,e.getX(),e.getY(), e);
 		    }
 		    else {
-			if (e.isMetaDown()) {evHs[activeLayer].press3(this,ViewEventHandler.META_MOD,e.getX(),e.getY(), e);}
-			else if (e.isAltDown()) {evHs[activeLayer].press3(this,ViewEventHandler.ALT_MOD,e.getX(),e.getY(), e);}
-			else {evHs[activeLayer].press3(this,ViewEventHandler.NO_MODIFIER,e.getX(),e.getY(), e);}
+			if (e.isMetaDown()) {evHs[activeLayer].press3(this,ViewListener.META_MOD,e.getX(),e.getY(), e);}
+			else if (e.isAltDown()) {evHs[activeLayer].press3(this,ViewListener.ALT_MOD,e.getX(),e.getY(), e);}
+			else {evHs[activeLayer].press3(this,ViewListener.NO_MODIFIER,e.getX(),e.getY(), e);}
 		    }
 		}
 	    }
@@ -355,52 +355,52 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 	int whichButton=e.getModifiers();
 	if ((whichButton & InputEvent.BUTTON1_MASK)==InputEvent.BUTTON1_MASK){
 	    if (e.isShiftDown()) {
-		if (e.isControlDown()) {evHs[activeLayer].click1(this,ViewEventHandler.CTRL_SHIFT_MOD,e.getX(),e.getY(),e.getClickCount(), e);}
-		else if (e.isMetaDown()) {evHs[activeLayer].click1(this,ViewEventHandler.META_SHIFT_MOD,e.getX(),e.getY(),e.getClickCount(), e);}
-		else if (e.isAltDown()) {evHs[activeLayer].click1(this,ViewEventHandler.ALT_SHIFT_MOD,e.getX(),e.getY(),e.getClickCount(), e);}
-		else {evHs[activeLayer].click1(this,ViewEventHandler.SHIFT_MOD,e.getX(),e.getY(),e.getClickCount(), e);}
+		if (e.isControlDown()) {evHs[activeLayer].click1(this,ViewListener.CTRL_SHIFT_MOD,e.getX(),e.getY(),e.getClickCount(), e);}
+		else if (e.isMetaDown()) {evHs[activeLayer].click1(this,ViewListener.META_SHIFT_MOD,e.getX(),e.getY(),e.getClickCount(), e);}
+		else if (e.isAltDown()) {evHs[activeLayer].click1(this,ViewListener.ALT_SHIFT_MOD,e.getX(),e.getY(),e.getClickCount(), e);}
+		else {evHs[activeLayer].click1(this,ViewListener.SHIFT_MOD,e.getX(),e.getY(),e.getClickCount(), e);}
 	    }
 	    else if (e.isControlDown()) {
-		evHs[activeLayer].click1(this,ViewEventHandler.CTRL_MOD,e.getX(),e.getY(),e.getClickCount(), e);
+		evHs[activeLayer].click1(this,ViewListener.CTRL_MOD,e.getX(),e.getY(),e.getClickCount(), e);
 	    }
 	    else {
-		if (e.isMetaDown()) {evHs[activeLayer].click1(this,ViewEventHandler.META_MOD,e.getX(),e.getY(),e.getClickCount(), e);}
-		else if (e.isAltDown()) {evHs[activeLayer].click1(this,ViewEventHandler.ALT_MOD,e.getX(),e.getY(),e.getClickCount(), e);}
-		else {evHs[activeLayer].click1(this,ViewEventHandler.NO_MODIFIER,e.getX(),e.getY(),e.getClickCount(), e);}
+		if (e.isMetaDown()) {evHs[activeLayer].click1(this,ViewListener.META_MOD,e.getX(),e.getY(),e.getClickCount(), e);}
+		else if (e.isAltDown()) {evHs[activeLayer].click1(this,ViewListener.ALT_MOD,e.getX(),e.getY(),e.getClickCount(), e);}
+		else {evHs[activeLayer].click1(this,ViewListener.NO_MODIFIER,e.getX(),e.getY(),e.getClickCount(), e);}
 	    }
 	}
 	else {
 	    if ((whichButton & InputEvent.BUTTON2_MASK)==InputEvent.BUTTON2_MASK){
 		if (e.isShiftDown()) {
-		    if (e.isControlDown()) {evHs[activeLayer].click2(this,ViewEventHandler.CTRL_SHIFT_MOD,e.getX(),e.getY(),e.getClickCount(), e);}
-		    else if (e.isMetaDown()) {evHs[activeLayer].click2(this,ViewEventHandler.META_SHIFT_MOD,e.getX(),e.getY(),e.getClickCount(), e);}
-		    else if (e.isAltDown()) {evHs[activeLayer].click2(this,ViewEventHandler.ALT_SHIFT_MOD,e.getX(),e.getY(),e.getClickCount(), e);}
-		    else {evHs[activeLayer].click2(this,ViewEventHandler.SHIFT_MOD,e.getX(),e.getY(),e.getClickCount(), e);}
+		    if (e.isControlDown()) {evHs[activeLayer].click2(this,ViewListener.CTRL_SHIFT_MOD,e.getX(),e.getY(),e.getClickCount(), e);}
+		    else if (e.isMetaDown()) {evHs[activeLayer].click2(this,ViewListener.META_SHIFT_MOD,e.getX(),e.getY(),e.getClickCount(), e);}
+		    else if (e.isAltDown()) {evHs[activeLayer].click2(this,ViewListener.ALT_SHIFT_MOD,e.getX(),e.getY(),e.getClickCount(), e);}
+		    else {evHs[activeLayer].click2(this,ViewListener.SHIFT_MOD,e.getX(),e.getY(),e.getClickCount(), e);}
 		}
 		else if (e.isControlDown()) {
-		    evHs[activeLayer].click2(this,ViewEventHandler.CTRL_MOD,e.getX(),e.getY(),e.getClickCount(), e);
+		    evHs[activeLayer].click2(this,ViewListener.CTRL_MOD,e.getX(),e.getY(),e.getClickCount(), e);
 		}
 		else {
-		    if (e.isMetaDown()) {evHs[activeLayer].click2(this,ViewEventHandler.META_MOD,e.getX(),e.getY(),e.getClickCount(), e);}
-		    else if (e.isAltDown()) {evHs[activeLayer].click2(this,ViewEventHandler.ALT_MOD,e.getX(),e.getY(),e.getClickCount(), e);}
-		    else {evHs[activeLayer].click2(this,ViewEventHandler.NO_MODIFIER,e.getX(),e.getY(),e.getClickCount(), e);}
+		    if (e.isMetaDown()) {evHs[activeLayer].click2(this,ViewListener.META_MOD,e.getX(),e.getY(),e.getClickCount(), e);}
+		    else if (e.isAltDown()) {evHs[activeLayer].click2(this,ViewListener.ALT_MOD,e.getX(),e.getY(),e.getClickCount(), e);}
+		    else {evHs[activeLayer].click2(this,ViewListener.NO_MODIFIER,e.getX(),e.getY(),e.getClickCount(), e);}
 		}
 	    }
 	    else {
 		if ((whichButton & InputEvent.BUTTON3_MASK)==InputEvent.BUTTON3_MASK){
 		    if (e.isShiftDown()) {
-			if (e.isControlDown()) {evHs[activeLayer].click3(this,ViewEventHandler.CTRL_SHIFT_MOD,e.getX(),e.getY(),e.getClickCount(), e);}
-			else if (e.isMetaDown()) {evHs[activeLayer].click3(this,ViewEventHandler.META_SHIFT_MOD,e.getX(),e.getY(),e.getClickCount(), e);}
-			else if (e.isAltDown()) {evHs[activeLayer].click3(this,ViewEventHandler.ALT_SHIFT_MOD,e.getX(),e.getY(),e.getClickCount(), e);}
-			else {evHs[activeLayer].click3(this,ViewEventHandler.SHIFT_MOD,e.getX(),e.getY(),e.getClickCount(), e);}
+			if (e.isControlDown()) {evHs[activeLayer].click3(this,ViewListener.CTRL_SHIFT_MOD,e.getX(),e.getY(),e.getClickCount(), e);}
+			else if (e.isMetaDown()) {evHs[activeLayer].click3(this,ViewListener.META_SHIFT_MOD,e.getX(),e.getY(),e.getClickCount(), e);}
+			else if (e.isAltDown()) {evHs[activeLayer].click3(this,ViewListener.ALT_SHIFT_MOD,e.getX(),e.getY(),e.getClickCount(), e);}
+			else {evHs[activeLayer].click3(this,ViewListener.SHIFT_MOD,e.getX(),e.getY(),e.getClickCount(), e);}
 		    }
 		    else if (e.isControlDown()) {
-			evHs[activeLayer].click3(this,ViewEventHandler.CTRL_MOD,e.getX(),e.getY(),e.getClickCount(), e);
+			evHs[activeLayer].click3(this,ViewListener.CTRL_MOD,e.getX(),e.getY(),e.getClickCount(), e);
 		    }
 		    else {
-			if (e.isMetaDown()) {evHs[activeLayer].click3(this,ViewEventHandler.META_MOD,e.getX(),e.getY(),e.getClickCount(), e);}
-			else if (e.isAltDown()) {evHs[activeLayer].click3(this,ViewEventHandler.ALT_MOD,e.getX(),e.getY(),e.getClickCount(), e);}
-			else {evHs[activeLayer].click3(this,ViewEventHandler.NO_MODIFIER,e.getX(),e.getY(),e.getClickCount(), e);}
+			if (e.isMetaDown()) {evHs[activeLayer].click3(this,ViewListener.META_MOD,e.getX(),e.getY(),e.getClickCount(), e);}
+			else if (e.isAltDown()) {evHs[activeLayer].click3(this,ViewListener.ALT_MOD,e.getX(),e.getY(),e.getClickCount(), e);}
+			else {evHs[activeLayer].click3(this,ViewListener.NO_MODIFIER,e.getX(),e.getY(),e.getClickCount(), e);}
 		    }
 		}
 	    }
@@ -413,52 +413,52 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 	int whichButton=e.getModifiers();
 	if ((whichButton & InputEvent.BUTTON1_MASK)==InputEvent.BUTTON1_MASK){
 	    if (e.isShiftDown()) {
-		if (e.isControlDown()) {evHs[activeLayer].release1(this,ViewEventHandler.CTRL_SHIFT_MOD,e.getX(),e.getY(), e);}
-		else if (e.isMetaDown()) {evHs[activeLayer].release1(this,ViewEventHandler.META_SHIFT_MOD,e.getX(),e.getY(), e);}
-		else if (e.isAltDown()) {evHs[activeLayer].release1(this,ViewEventHandler.ALT_SHIFT_MOD,e.getX(),e.getY(), e);}
-		else {evHs[activeLayer].release1(this,ViewEventHandler.SHIFT_MOD,e.getX(),e.getY(), e);}
+		if (e.isControlDown()) {evHs[activeLayer].release1(this,ViewListener.CTRL_SHIFT_MOD,e.getX(),e.getY(), e);}
+		else if (e.isMetaDown()) {evHs[activeLayer].release1(this,ViewListener.META_SHIFT_MOD,e.getX(),e.getY(), e);}
+		else if (e.isAltDown()) {evHs[activeLayer].release1(this,ViewListener.ALT_SHIFT_MOD,e.getX(),e.getY(), e);}
+		else {evHs[activeLayer].release1(this,ViewListener.SHIFT_MOD,e.getX(),e.getY(), e);}
 	    }
 	    else if (e.isControlDown()) {
-		evHs[activeLayer].release1(this,ViewEventHandler.CTRL_MOD,e.getX(),e.getY(), e);
+		evHs[activeLayer].release1(this,ViewListener.CTRL_MOD,e.getX(),e.getY(), e);
 	    }
 	    else {
-		if (e.isMetaDown()) {evHs[activeLayer].release1(this,ViewEventHandler.META_MOD,e.getX(),e.getY(), e);}
-		else if (e.isAltDown()) {evHs[activeLayer].release1(this,ViewEventHandler.ALT_MOD,e.getX(),e.getY(), e);}
-		else {evHs[activeLayer].release1(this,ViewEventHandler.NO_MODIFIER,e.getX(),e.getY(), e);}
+		if (e.isMetaDown()) {evHs[activeLayer].release1(this,ViewListener.META_MOD,e.getX(),e.getY(), e);}
+		else if (e.isAltDown()) {evHs[activeLayer].release1(this,ViewListener.ALT_MOD,e.getX(),e.getY(), e);}
+		else {evHs[activeLayer].release1(this,ViewListener.NO_MODIFIER,e.getX(),e.getY(), e);}
 	    }
 	}
 	else {
 	    if ((whichButton & InputEvent.BUTTON2_MASK)==InputEvent.BUTTON2_MASK){
 		if (e.isShiftDown()) {
-		    if (e.isControlDown()) {evHs[activeLayer].release2(this,ViewEventHandler.CTRL_SHIFT_MOD,e.getX(),e.getY(), e);}
-		    else if (e.isMetaDown()) {evHs[activeLayer].release2(this,ViewEventHandler.META_SHIFT_MOD,e.getX(),e.getY(), e);}
-		    else if (e.isAltDown()) {evHs[activeLayer].release2(this,ViewEventHandler.ALT_SHIFT_MOD,e.getX(),e.getY(), e);}
-		    else {evHs[activeLayer].release2(this,ViewEventHandler.SHIFT_MOD,e.getX(),e.getY(), e);}
+		    if (e.isControlDown()) {evHs[activeLayer].release2(this,ViewListener.CTRL_SHIFT_MOD,e.getX(),e.getY(), e);}
+		    else if (e.isMetaDown()) {evHs[activeLayer].release2(this,ViewListener.META_SHIFT_MOD,e.getX(),e.getY(), e);}
+		    else if (e.isAltDown()) {evHs[activeLayer].release2(this,ViewListener.ALT_SHIFT_MOD,e.getX(),e.getY(), e);}
+		    else {evHs[activeLayer].release2(this,ViewListener.SHIFT_MOD,e.getX(),e.getY(), e);}
 		}
 		else if (e.isControlDown()) {
-		    evHs[activeLayer].release2(this,ViewEventHandler.CTRL_MOD,e.getX(),e.getY(), e);
+		    evHs[activeLayer].release2(this,ViewListener.CTRL_MOD,e.getX(),e.getY(), e);
 		}
 		else {
-		    if (e.isMetaDown()) {evHs[activeLayer].release2(this,ViewEventHandler.META_MOD,e.getX(),e.getY(), e);}
-		    else if (e.isAltDown()) {evHs[activeLayer].release2(this,ViewEventHandler.ALT_MOD,e.getX(),e.getY(), e);}
-		    else {evHs[activeLayer].release2(this,ViewEventHandler.NO_MODIFIER,e.getX(),e.getY(), e);}
+		    if (e.isMetaDown()) {evHs[activeLayer].release2(this,ViewListener.META_MOD,e.getX(),e.getY(), e);}
+		    else if (e.isAltDown()) {evHs[activeLayer].release2(this,ViewListener.ALT_MOD,e.getX(),e.getY(), e);}
+		    else {evHs[activeLayer].release2(this,ViewListener.NO_MODIFIER,e.getX(),e.getY(), e);}
 		}
 	    }
 	    else {
 		if ((whichButton & InputEvent.BUTTON3_MASK)==InputEvent.BUTTON3_MASK){
 		    if (e.isShiftDown()) {
-			if (e.isControlDown()) {evHs[activeLayer].release3(this,ViewEventHandler.CTRL_SHIFT_MOD,e.getX(),e.getY(), e);}
-			else if (e.isMetaDown()) {evHs[activeLayer].release3(this,ViewEventHandler.META_SHIFT_MOD,e.getX(),e.getY(), e);}
-			else if (e.isAltDown()) {evHs[activeLayer].release3(this,ViewEventHandler.ALT_SHIFT_MOD,e.getX(),e.getY(), e);}
-			else {evHs[activeLayer].release3(this,ViewEventHandler.SHIFT_MOD,e.getX(),e.getY(), e);}
+			if (e.isControlDown()) {evHs[activeLayer].release3(this,ViewListener.CTRL_SHIFT_MOD,e.getX(),e.getY(), e);}
+			else if (e.isMetaDown()) {evHs[activeLayer].release3(this,ViewListener.META_SHIFT_MOD,e.getX(),e.getY(), e);}
+			else if (e.isAltDown()) {evHs[activeLayer].release3(this,ViewListener.ALT_SHIFT_MOD,e.getX(),e.getY(), e);}
+			else {evHs[activeLayer].release3(this,ViewListener.SHIFT_MOD,e.getX(),e.getY(), e);}
 		    }
 		    else if (e.isControlDown()) {
-			evHs[activeLayer].release3(this,ViewEventHandler.CTRL_MOD,e.getX(),e.getY(), e);
+			evHs[activeLayer].release3(this,ViewListener.CTRL_MOD,e.getX(),e.getY(), e);
 		    }
 		    else {
-			if (e.isMetaDown()) {evHs[activeLayer].release3(this,ViewEventHandler.META_MOD,e.getX(),e.getY(), e);}
-			else if (e.isMetaDown()) {evHs[activeLayer].release3(this,ViewEventHandler.ALT_MOD,e.getX(),e.getY(), e);}
-			else {evHs[activeLayer].release3(this,ViewEventHandler.NO_MODIFIER,e.getX(),e.getY(), e);}
+			if (e.isMetaDown()) {evHs[activeLayer].release3(this,ViewListener.META_MOD,e.getX(),e.getY(), e);}
+			else if (e.isMetaDown()) {evHs[activeLayer].release3(this,ViewListener.ALT_MOD,e.getX(),e.getY(), e);}
+			else {evHs[activeLayer].release3(this,ViewListener.NO_MODIFIER,e.getX(),e.getY(), e);}
 		    }
 		}
 	    }
@@ -572,18 +572,18 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
                     }
                     if (e.isShiftDown()) {
                         //event sent after unproject because we need to compute coord in virtual space
-                        if (e.isControlDown()) {evHs[activeLayer].mouseDragged(this,ViewEventHandler.CTRL_SHIFT_MOD,buttonNumber,e.getX(),e.getY(), e);}
-                        else if (e.isMetaDown()){evHs[activeLayer].mouseDragged(this,ViewEventHandler.META_SHIFT_MOD,buttonNumber,e.getX(),e.getY(), e);}
-                        else if (e.isAltDown()){evHs[activeLayer].mouseDragged(this,ViewEventHandler.ALT_SHIFT_MOD,buttonNumber,e.getX(),e.getY(), e);}
-                        else {evHs[activeLayer].mouseDragged(this,ViewEventHandler.SHIFT_MOD,buttonNumber,e.getX(),e.getY(), e);}
+                        if (e.isControlDown()) {evHs[activeLayer].mouseDragged(this,ViewListener.CTRL_SHIFT_MOD,buttonNumber,e.getX(),e.getY(), e);}
+                        else if (e.isMetaDown()){evHs[activeLayer].mouseDragged(this,ViewListener.META_SHIFT_MOD,buttonNumber,e.getX(),e.getY(), e);}
+                        else if (e.isAltDown()){evHs[activeLayer].mouseDragged(this,ViewListener.ALT_SHIFT_MOD,buttonNumber,e.getX(),e.getY(), e);}
+                        else {evHs[activeLayer].mouseDragged(this,ViewListener.SHIFT_MOD,buttonNumber,e.getX(),e.getY(), e);}
                     }
                     else if (e.isControlDown()){
-                        evHs[activeLayer].mouseDragged(this,ViewEventHandler.CTRL_MOD,buttonNumber,e.getX(),e.getY(), e);
+                        evHs[activeLayer].mouseDragged(this,ViewListener.CTRL_MOD,buttonNumber,e.getX(),e.getY(), e);
                     }
                     else {
-                        if (e.isMetaDown()) {evHs[activeLayer].mouseDragged(this,ViewEventHandler.META_MOD,buttonNumber,e.getX(),e.getY(), e);}
-                        else if (e.isAltDown()) {evHs[activeLayer].mouseDragged(this,ViewEventHandler.ALT_MOD,buttonNumber,e.getX(),e.getY(), e);}
-                        else {evHs[activeLayer].mouseDragged(this,ViewEventHandler.NO_MODIFIER,buttonNumber,e.getX(),e.getY(), e);}
+                        if (e.isMetaDown()) {evHs[activeLayer].mouseDragged(this,ViewListener.META_MOD,buttonNumber,e.getX(),e.getY(), e);}
+                        else if (e.isAltDown()) {evHs[activeLayer].mouseDragged(this,ViewListener.ALT_MOD,buttonNumber,e.getX(),e.getY(), e);}
+                        else {evHs[activeLayer].mouseDragged(this,ViewListener.NO_MODIFIER,buttonNumber,e.getX(),e.getY(), e);}
                     }
                 }
                 //assign anyway, even if the current drag command does not want to display a segment
@@ -599,7 +599,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
     public void mouseWheelMoved(MouseWheelEvent e){
 	if (evHs[activeLayer] != null){
 	    try {
-		evHs[activeLayer].mouseWheelMoved(this, (e.getWheelRotation() < 0) ? ViewEventHandler.WHEEL_DOWN : ViewEventHandler.WHEEL_UP, e.getX(), e.getY(), e);
+		evHs[activeLayer].mouseWheelMoved(this, (e.getWheelRotation() < 0) ? ViewListener.WHEEL_DOWN : ViewListener.WHEEL_UP, e.getX(), e.getY(), e);
 	    }
 	    catch (NullPointerException ex) {if (VirtualSpaceManager.INSTANCE.debugModeON()){System.err.println("viewpanel.mousewheelmoved "+ex);}}
 	}

@@ -5,7 +5,7 @@
  * $Id$
  */
  
-package fr.inria.zvtm.engine;
+package fr.inria.zvtm.event;
 
 import fr.inria.zvtm.engine.VCursor;
 

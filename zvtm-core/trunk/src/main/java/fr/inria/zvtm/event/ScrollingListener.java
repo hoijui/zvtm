@@ -5,7 +5,7 @@
  * $Id$
  */
 
-package fr.inria.zvtm.engine;
+package fr.inria.zvtm.event;
 
 import java.awt.event.MouseEvent;
 
@@ -13,7 +13,7 @@ import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.engine.ScrollLayer;
 
-public class DefaultScrollEventHandler extends DefaultEventHandler {
+public class ScrollingListener extends ViewAdapter {
 
     static final short NOT_DRAGGING_ANY_SLIDER = 0;
     static final short DRAGGING_HSLIDER = 1;
@@ -31,7 +31,7 @@ public class DefaultScrollEventHandler extends DefaultEventHandler {
      *@param scrollLayerIndex index of scroll layer in the view
      *@param controlledLayerIndex index of of controlled layer in the view (layer containing camera controlled by the scroll bars)
      */
-    public DefaultScrollEventHandler(ScrollLayer sl, int scrollLayerIndex, int controlledLayerIndex){
+    public ScrollingListener(ScrollLayer sl, int scrollLayerIndex, int controlledLayerIndex){
         this.sl = sl;
         sli = scrollLayerIndex;
         cli = controlledLayerIndex;

@@ -283,8 +283,8 @@ public class VSegment extends Glyph implements RectangularShape {
     }
 
     /** Detects whether the point (x,y) lies on the segment or not. Default tolerance of 2 pixels.
-     *@param x EXPECTS PROJECTED JPanel COORDINATE (obtained e.g. in ViewEventHandler's mouse methods as jpx)
-     *@param y EXPECTS PROJECTED JPanel COORDINATE (obtained e.g. in ViewEventHandler's mouse methods as jpy)
+     *@param x EXPECTS PROJECTED JPanel COORDINATE (obtained e.g. in ViewListener's mouse methods as jpx)
+     *@param y EXPECTS PROJECTED JPanel COORDINATE (obtained e.g. in ViewListener's mouse methods as jpy)
      *@param camIndex camera index (obtained through Camera.getIndex())
      */
     public boolean intersects(int x, int y, int camIndex){
@@ -292,8 +292,8 @@ public class VSegment extends Glyph implements RectangularShape {
     }
 
     /** Detects whether the point (x,y) lies on the segment or not.
-     *@param x EXPECTS PROJECTED JPanel COORDINATE (obtained e.g. in ViewEventHandler's mouse methods as jpx)
-     *@param y EXPECTS PROJECTED JPanel COORDINATE (obtained e.g. in ViewEventHandler's mouse methods as jpy)
+     *@param x EXPECTS PROJECTED JPanel COORDINATE (obtained e.g. in ViewListener's mouse methods as jpx)
+     *@param y EXPECTS PROJECTED JPanel COORDINATE (obtained e.g. in ViewListener's mouse methods as jpy)
      *@param tolerance the segment's clickable thickness in pixels, not virtual space units
      *@param camIndex camera index (obtained through Camera.getIndex())
      */

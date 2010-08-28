@@ -8,7 +8,7 @@
  * $Id$
  */ 
 
-package fr.inria.zvtm.engine;
+package fr.inria.zvtm.event;
 
 /** Interface to handle events related to areas representing the region observed through a camera
  * @author Emmanuel Pietriga

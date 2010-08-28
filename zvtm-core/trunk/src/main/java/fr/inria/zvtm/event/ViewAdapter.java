@@ -8,7 +8,7 @@
  * $Id$
  */ 
 
-package fr.inria.zvtm.engine;
+package fr.inria.zvtm.event;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -19,11 +19,11 @@ import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.glyphs.Glyph;
 
 /** 
- * Default, empty concrete implementation of ViewEventHandler.
+ * Default, empty concrete implementation of ViewListener.
  * @author Emmanuel Pietriga
  */
 
-public class DefaultEventHandler implements ViewEventHandler {
+public class ViewAdapter implements ViewListener {
     
     @Override
     public void press1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){}

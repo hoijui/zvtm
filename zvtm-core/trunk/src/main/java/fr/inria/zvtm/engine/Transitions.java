@@ -1,4 +1,4 @@
-/*   FILE: TransitionManager.java
+/*   FILE: Transitions.java
  *   DATE OF CREATION:  Sun Mar 04 10:59:11 2007
  *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
@@ -25,7 +25,7 @@ import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
  * @author Emmanuel Pietriga
  */
 
-public class TransitionManager {
+public class Transitions {
 
     /** Makes a view fade out, and eventually be painted blank.
      * The view must not be blank for the fade out to work.
@@ -36,7 +36,7 @@ public class TransitionManager {
      *@see #fadeOut(View v, int duration, Color fadeColor, VirtualSpaceManager vsm, EndAction action)
      */
     public static void fadeOut(View v, int duration, Color fadeColor, VirtualSpaceManager vsm){
-	TransitionManager.fadeOut(v, duration, fadeColor, vsm, null);
+	Transitions.fadeOut(v, duration, fadeColor, vsm, null);
     }
 
     /** Makes a view fade out, and eventually be painted blank.
@@ -88,7 +88,7 @@ public class TransitionManager {
      *@see #fadeIn(View v, int duration, VirtualSpaceManager vsm, EndAction action)
      */
     public static void fadeIn(View v, int duration, VirtualSpaceManager vsm){
-	TransitionManager.fadeIn(v, duration, vsm, null);
+	Transitions.fadeIn(v, duration, vsm, null);
     }    
 
     /** Makes a view (originally blank) fade in.

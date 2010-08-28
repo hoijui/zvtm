@@ -43,8 +43,8 @@ import fr.inria.zvtm.animation.AnimationManager;
 import fr.inria.zvtm.animation.EndAction;
 import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 import fr.inria.zvtm.engine.Java2DPainter;
-import fr.inria.zvtm.engine.RepaintListener;
-import fr.inria.zvtm.engine.ViewEventHandler;
+import fr.inria.zvtm.event.RepaintListener;
+import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.lens.Lens;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VText;
@@ -125,7 +125,7 @@ public abstract class View {
     /**View name*/
     protected String name;
 
-    /**triggers the mouseMoved method in ViewEventHandler when the mouse is moved - set to false by default because few applications will need this; it is therefore not necessary to overload other applications with these events*/
+    /**triggers the mouseMoved method in ViewListener when the mouse is moved - set to false by default because few applications will need this; it is therefore not necessary to overload other applications with these events*/
     boolean notifyCursorMoved = true;
 
     /**hooks for Java2D painting in ZVTM views (BACKGROUND, FOREGROUND, AFTER_DISTORTION, AFTER_PORTALS)*/
@@ -163,23 +163,23 @@ public abstract class View {
     }
    
     /** Set application class instance to which events are sent for all layers in this view.
-     *@param eh client application implementation of ViewEventHandler
+     *@param eh client application implementation of ViewListener
      */
-    public void setEventHandler(ViewEventHandler eh){
+    public void setEventHandler(ViewListener eh){
 	    for (int i=0;i<cameras.size();i++){
     	    setEventHandler(eh, i);	        
 	    }
     }
 
     /** Set application class instance to which events are sent for a given layer.
-    *@param eh client application implementation of ViewEventHandler
+    *@param eh client application implementation of ViewListener
      *@param layer depth of layer to which the event handler should be associated.
      */
-    public void setEventHandler(ViewEventHandler eh, int layer){
+    public void setEventHandler(ViewListener eh, int layer){
 	    panel.setEventHandler(eh, layer);
     }
 
-    /** Sets whether the mouseMoved callback in ViewEventHandler is triggered when the cursor moves.
+    /** Sets whether the mouseMoved callback in ViewListener is triggered when the cursor moves.
      * Set to true by default. Applications that do not care about this callback can disable notification
      * about these events to avoid unnecessary callbacks (an event each sent each time the cursor moves).
      */
@@ -187,7 +187,7 @@ public abstract class View {
 	    notifyCursorMoved=b;
     }
 
-    /** Tells whether the mouseMoved callback in ViewEventHandler is triggered when the mouse is moved.
+    /** Tells whether the mouseMoved callback in ViewListener is triggered when the mouse is moved.
      * Set to true by default.*/
     public boolean getNotifyCursorMoved(){return notifyCursorMoved;}
 

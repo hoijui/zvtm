@@ -25,7 +25,7 @@ import java.util.Vector;
 
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.engine.Java2DPainter;
-import fr.inria.zvtm.engine.ViewEventHandler;
+import fr.inria.zvtm.event.ViewListener;
 
 /**
  * JPanel used to paint the content of a view (all camera layers).
@@ -60,7 +60,7 @@ public class GLViewPanel extends ViewPanel {
         parent=v;
         //init of camera array
         cams=new Camera[cameras.size()];  //array of Camera
-        evHs = new ViewEventHandler[cams.length];
+        evHs = new ViewListener[cams.length];
         for (int nbcam=0;nbcam<cameras.size();nbcam++){
             cams[nbcam]=(Camera)(cameras.get(nbcam));
         }

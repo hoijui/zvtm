@@ -27,7 +27,7 @@ import java.awt.geom.Point2D;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import fr.inria.zvtm.engine.CameraListener;
+import fr.inria.zvtm.event.CameraListener;
 import fr.inria.zvtm.engine.Location;
 
 import fr.inria.zvtm.glyphs.Glyph;

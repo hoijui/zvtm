@@ -20,7 +20,7 @@ import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Translucent;
-import fr.inria.zvtm.engine.ObservedRegionListener;
+import fr.inria.zvtm.event.ObservedRegionListener;
 
 /**A portal behaving as a trailing widget and showing what is seen through a camera that serves as an overview. Shape: rectangular.
    The Camera should not be used in any other View or Portal.*/

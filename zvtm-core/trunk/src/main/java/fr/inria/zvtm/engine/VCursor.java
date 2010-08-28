@@ -34,7 +34,7 @@ import java.util.HashMap;
 import java.util.Arrays;
 import java.util.Set;
 
-import fr.inria.zvtm.engine.ViewEventHandler;
+import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.lens.Lens;
 
 import fr.inria.zvtm.glyphs.Glyph;
@@ -51,8 +51,8 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Area;
 import java.awt.Point;
 
-import fr.inria.zvtm.engine.DynaSpotListener;
-import fr.inria.zvtm.engine.SelectionListener;
+import fr.inria.zvtm.event.DynaSpotListener;
+import fr.inria.zvtm.event.SelectionListener;
 import fr.inria.zvtm.glyphs.Translucency;
 
 /**
@@ -63,7 +63,7 @@ import fr.inria.zvtm.glyphs.Translucency;
  * <p>The DynaSpot behavior must be activated in VCursor, calling</p>
  * <ul><li>VCursor.activateDynaSpot(boolean b)</li></ul>
  * 
- * <p>In your ViewEventHandler, simply call VCursor.dynaPick(Camera c) wherever this makes sense. Usually this will be mouseMoved(...):</p>
+ * <p>In your ViewListener, simply call VCursor.dynaPick(Camera c) wherever this makes sense. Usually this will be mouseMoved(...):</p>
  * <ul>
  *  <li>v.getMouse().dynaPick(c); // where c is the active camera</li>
  * </ul>
@@ -543,12 +543,12 @@ public class VCursor {
     }
 
     /**compute list of glyphs currently overlapped by the mouse*/
-    public boolean computeCursorOverList(ViewEventHandler eh,Camera c){
+    public boolean computeCursorOverList(ViewListener eh,Camera c){
 	return this.computeCursorOverList(eh, c, mx, my);
     }
 
     /**compute list of glyphs currently overlapped by the mouse (take into account lens l when unprojecting)*/
-    boolean computeCursorOverList(ViewEventHandler eh,Camera c, ViewPanel v){
+    boolean computeCursorOverList(ViewListener eh,Camera c, ViewPanel v){
         if (v.lens != null){
             // following use of cx,cy implies that VCursor.unProject() has been called before this method
             return this.computeCursorOverList(eh, c, Math.round(cx + v.size.width/2), Math.round(v.size.height/2 - cy));
@@ -559,7 +559,7 @@ public class VCursor {
     }
     
     /** Compute list of glyphs currently overlapped by the mouse. */
-    boolean computeCursorOverList(ViewEventHandler eh,Camera c, int x, int y){
+    boolean computeCursorOverList(ViewListener eh,Camera c, int x, int y){
         boolean res=false;
         Vector drawnGlyphs = c.getOwningSpace().getDrawnGlyphs(c.getIndex());
                 try {
@@ -586,7 +586,7 @@ public class VCursor {
         return res;
     }
 
-    boolean checkGlyph(ViewEventHandler eh,Camera c, int jpx, int jpy){
+    boolean checkGlyph(ViewListener eh,Camera c, int jpx, int jpy){
         tmpRes = tmpGlyph.mouseInOut(jpx, jpy, c.getIndex(), vx, vy);
         if (tmpRes == Glyph.ENTERED_GLYPH){
             //we've entered this glyph
