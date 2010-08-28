@@ -508,40 +508,6 @@ public abstract class View {
 	    return panel.stableRefToBackBufferGraphics;
     }
 
-    /** Ask for a bitmap rendering of this view and encode it in a PNG file.
-     *@param w width of rendered image
-     *@param h height of rendered image
-     *@param f the location of the resulting PNG file
-     *@see #rasterize(int w, int h, java.io.File f, Vector layers)
-     *@see #rasterize(int w, int h)
-     *@see #rasterize(int w, int h, Vector layers)
-     */
-    public void rasterize(int w, int h, java.io.File f){
-	    rasterize(w, h, f, null);
-    }
-
-    /** Ask for a bitmap rendering of this view and encode it in a PNG file.
-     *@param w width of rendered image
-     *@param h height of rendered image
-     *@param f the location of the resulting PNG file
-     *@param layers Vector of cameras : what layers (represented by cameras) of this view should be rendered (you can pass null for all layers)
-     *@see #rasterize(int w, int h, java.io.File f)
-     *@see #rasterize(int w, int h)
-     *@see #rasterize(int w, int h, Vector layers)
-     */
-    public void rasterize(int w, int h, java.io.File f, Vector<Camera> layers){
-        javax.imageio.ImageWriter writer = (javax.imageio.ImageWriter)javax.imageio.ImageIO.getImageWritersByFormatName("png").next();
-        try {
-            writer.setOutput(javax.imageio.ImageIO.createImageOutputStream(f));
-            BufferedImage bi = this.rasterize(w, h, layers);
-            if (bi != null){
-                writer.write(bi);
-                writer.dispose();
-            }
-        }
-        catch (java.io.IOException ex){ex.printStackTrace();}
-    }
-
     /** Ask for a bitmap rendering of this view and return the resulting BufferedImage.
      *@param w width of rendered image
      *@param h height of rendered image
