@@ -13,7 +13,7 @@ import java.awt.geom.Point2D;
 
 import java.util.Vector;
 
-/**Mean to store a camera location - provides 2 double fields for X,Y and a double field for altitude*/
+/** Store a camera location - provides 2 double fields for X,Y and a double field for altitude. */
 
 public class Location {
 
@@ -55,10 +55,12 @@ public class Location {
         vy=p.y;
     }
 
+    /** Set x-coordinate only. */
     public void setPositionX(double x){
         vx=x;
     }
 
+    /** Set y-coordinate only. */
     public void setPositionY(double y){
         vy=y;
     }

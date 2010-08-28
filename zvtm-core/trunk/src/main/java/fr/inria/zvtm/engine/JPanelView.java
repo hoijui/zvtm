@@ -27,7 +27,7 @@ import fr.inria.zvtm.engine.ViewEventHandler;
  * A ZVTM view implemented as a JPanel rather than as a JFrame. This view supports standard and OpenGL rendering.
  */
 
-public class JPanelView extends View  implements KeyListener {
+public class JPanelView extends View implements KeyListener {
 
     /**
      * The JFrame in which this view exists.
@@ -66,122 +66,108 @@ public class JPanelView extends View  implements KeyListener {
 		      short viewType, JPanel parentPanel,
 		      JFrame frame) {
 
-	checkArgs(cameraList, name, viewType, parentPanel, frame);
-		
-	this.frame = frame;
-	this.parentPanel = parentPanel;
-	if (parentPanel == null) {
-	    parentPanel = (JPanel) frame.getContentPane();
-	}
+        checkArgs(cameraList, name, viewType, parentPanel, frame);
 
-	this.mouse = new VCursor(this);
-	this.name = name;
-	this.detectMultipleFullFills = VirtualSpaceManager.INSTANCE.defaultMultiFill;
+        this.frame = frame;
+        this.parentPanel = parentPanel;
+        if (parentPanel == null) {
+            parentPanel = (JPanel) frame.getContentPane();
+        }
 
-	initCameras(cameraList);
+        this.mouse = new VCursor(this);
+        this.name = name;
+        this.detectMultipleFullFills = VirtualSpaceManager.INSTANCE.defaultMultiFill;
 
-	this.viewContainerPanel = new JPanel();
-	viewContainerPanel.setLayout(new BoxLayout(viewContainerPanel, BoxLayout.Y_AXIS));
-	viewContainerPanel.setAlignmentY(Component.TOP_ALIGNMENT);
-	viewContainerPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        initCameras(cameraList);
 
-	panel = makePanel(viewType, cameraList);
-	panel.setSize(panelWidth, panelHeight);
+        this.viewContainerPanel = new JPanel();
+        viewContainerPanel.setLayout(new BoxLayout(viewContainerPanel, BoxLayout.Y_AXIS));
+        viewContainerPanel.setAlignmentY(Component.TOP_ALIGNMENT);
+        viewContainerPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-	viewContainerPanel.add(panel);
-	parentPanel.add(viewContainerPanel);
+        panel = makePanel(viewType, cameraList);
+        panel.setSize(panelWidth, panelHeight);
 
-	viewContainerPanel.addKeyListener(this);
-	viewContainerPanel.setVisible(visible);
-	viewContainerPanel.setFocusable(true);
+        viewContainerPanel.add(panel);
+        parentPanel.add(viewContainerPanel);
+
+        viewContainerPanel.addKeyListener(this);
+        viewContainerPanel.setVisible(visible);
+        viewContainerPanel.setFocusable(true);
     }
 
     private ViewPanel makePanel(short viewType, Vector cameraList) {
-	switch (viewType) {
-	case View.STD_VIEW: return new StdViewPanel(cameras, this, true);
-	case View.OPENGL_VIEW: return new GLViewPanel(cameras, this, true);
-	default: throw new IllegalArgumentException("Invalid view type");
-	}
+        switch (viewType) {
+            case View.STD_VIEW: return new StdViewPanel(cameras, this, true);
+            case View.OPENGL_VIEW: return new GLViewPanel(cameras, this, true);
+            default: throw new IllegalArgumentException("Invalid view type");
+        }
     }
 
     private void checkArgs(Vector cameraList, String name, short viewType, JPanel parentPanel, JFrame frame) {
-	if ((frame == null) && (parentPanel == null)) {
-	    throw new IllegalArgumentException("Failed to provide parentPanel");
-	}
-	if ((viewType < View.STD_VIEW) || (viewType > View.OPENGL_VIEW)) {
-	    throw new IllegalArgumentException("Invalid viewType");
-	}
-	if ((name == null) || (name.length() == 0)) {
-	    throw new IllegalArgumentException("Failed to provide name");
-	}
-	if ((cameraList == null) || (cameraList.size() == 0)) {
-	    throw new IllegalArgumentException("Failed to provide at least one camera in list");
-	}
+        if ((frame == null) && (parentPanel == null)) {
+            throw new IllegalArgumentException("Failed to provide parentPanel");
+        }
+        if ((viewType < View.STD_VIEW) || (viewType > View.OPENGL_VIEW)) {
+            throw new IllegalArgumentException("Invalid viewType");
+        }
+        if ((name == null) || (name.length() == 0)) {
+            throw new IllegalArgumentException("Failed to provide name");
+        }
+        if ((cameraList == null) || (cameraList.size() == 0)) {
+            throw new IllegalArgumentException("Failed to provide at least one camera in list");
+        }
     }
 
-    //    @Override
+    @Override
     public void destroyView() {
-	panel.stop();
-	VirtualSpaceManager.INSTANCE.destroyView(this.name);
-	parentPanel.remove(viewContainerPanel);
+        panel.stop();
+        VirtualSpaceManager.INSTANCE.destroyView(this.name);
+        parentPanel.remove(viewContainerPanel);
     }
 
-    //    @Override
+    @Override
     public Container getFrame() {
-	return frame;
+	    return frame;
     }
 
-    //    @Override
     /**
      * Requests the this view receive the focus.
      * Focus is granted if the view's window
      * is active.
      */
     public void requestFocus() {
-	if (this.frame.isActive()) {
-	    this.viewContainerPanel.requestFocusInWindow();
-	}
+        if (this.frame.isActive()) {
+            this.viewContainerPanel.requestFocusInWindow();
+        }
     }
 
-    //    @Override
+    @Override
     public boolean isSelected() {
-	return (this.frame == VirtualSpaceManager.INSTANCE.activeJFrame);
+	    return (this.frame == VirtualSpaceManager.INSTANCE.activeJFrame);
     }
 
-    //    @Override
-    /**
-     * Sets the title of this view's window.
-     */
+    @Override
     public void setTitle(String title) {
-	frame.setTitle(title);
+	    frame.setTitle(title);
     }
 
-    //    @Override
-    /**
-     * Sets the location of this view's panel.
-     */
+    @Override
     public void setLocation(int x, int y) {
-	this.viewContainerPanel.setLocation(x, y);
+	    this.viewContainerPanel.setLocation(x, y);
     }
 
-    //    @Override
-    /**
-     * Sets the size of this view's panel.
-     */
+    @Override
     public void setSize(int x,int y) {
-	this.viewContainerPanel.setSize(x,y);
+	    this.viewContainerPanel.setSize(x,y);
     }
 
-    //    @Override
-    /**
-     * Determines whether this view's window may be
-     * resized or not.
-     */
+    @Override
     public void setResizable(boolean b) {
-	frame.setResizable(b);
+	    frame.setResizable(b);
     }
 
-//     @Override
+    @Override
     /**
      * This will make the view's presentation panel
      * invisible--not the window in which the
@@ -191,64 +177,49 @@ public class JPanelView extends View  implements KeyListener {
      * the view is deactivated.
      */
     public void setVisible(boolean visible) {
-	viewContainerPanel.setVisible(visible);
-	if (visible) {
-	    this.activate();
-	} else {
-	    this.deactivate();
-	}
+        viewContainerPanel.setVisible(visible);
+        if (visible) {
+            this.activate();
+        } else {
+            this.deactivate();
+        }
     }
 
-//     @Override
-    /**
-     * Brings this view's window to the front.
-     */
-    public void toFront() {
-	frame.toFront();
-    }
 
-//     @Override
-    /**
-     * Sends this view's window to the back.
-     */
-    public void toBack() {
-	frame.toBack();
-    }
-
-    /**detect key typed and send to application event handler*/
+    @Override
     public void keyTyped(KeyEvent e){
-	if (e.isShiftDown()) {
-	    if (e.isControlDown()) {panel.evHs[panel.activeLayer].Ktype(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.CTRL_SHIFT_MOD, e);}
-	    else {panel.evHs[panel.activeLayer].Ktype(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.SHIFT_MOD, e);}
-	}
-	else {
-	    if (e.isControlDown()) {panel.evHs[panel.activeLayer].Ktype(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.CTRL_MOD, e);}
-	    else {panel.evHs[panel.activeLayer].Ktype(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.NO_MODIFIER, e);}
-	}
+        if (e.isShiftDown()) {
+            if (e.isControlDown()) {panel.evHs[panel.activeLayer].Ktype(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.CTRL_SHIFT_MOD, e);}
+            else {panel.evHs[panel.activeLayer].Ktype(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.SHIFT_MOD, e);}
+        }
+        else {
+            if (e.isControlDown()) {panel.evHs[panel.activeLayer].Ktype(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.CTRL_MOD, e);}
+            else {panel.evHs[panel.activeLayer].Ktype(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.NO_MODIFIER, e);}
+        }
     }
 
-    /**detect key pressed and send to application event handler*/
+    @Override
     public void keyPressed(KeyEvent e){
-	if (e.isShiftDown()) {
-	    if (e.isControlDown()) {panel.evHs[panel.activeLayer].Kpress(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.CTRL_SHIFT_MOD, e);}
-	    else {panel.evHs[panel.activeLayer].Kpress(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.SHIFT_MOD, e);}
-	}
-	else {
-	    if (e.isControlDown()) {panel.evHs[panel.activeLayer].Kpress(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.CTRL_MOD, e);}
-	    else {panel.evHs[panel.activeLayer].Kpress(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.NO_MODIFIER, e);}
-	}
+        if (e.isShiftDown()) {
+            if (e.isControlDown()) {panel.evHs[panel.activeLayer].Kpress(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.CTRL_SHIFT_MOD, e);}
+            else {panel.evHs[panel.activeLayer].Kpress(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.SHIFT_MOD, e);}
+        }
+        else {
+            if (e.isControlDown()) {panel.evHs[panel.activeLayer].Kpress(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.CTRL_MOD, e);}
+            else {panel.evHs[panel.activeLayer].Kpress(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.NO_MODIFIER, e);}
+        }
     }
 
-    /**detect key released and send to application event handler*/
+    @Override
     public void keyReleased(KeyEvent e) {
-	if (e.isShiftDown()) {
-	    if (e.isControlDown()) {panel.evHs[panel.activeLayer].Krelease(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.CTRL_SHIFT_MOD, e);}
-	    else {panel.evHs[panel.activeLayer].Krelease(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.SHIFT_MOD, e);}
-	}
-	else {
-	    if (e.isControlDown()) {panel.evHs[panel.activeLayer].Krelease(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.CTRL_MOD, e);}
-	    else {panel.evHs[panel.activeLayer].Krelease(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.NO_MODIFIER, e);}
-	}
+        if (e.isShiftDown()) {
+            if (e.isControlDown()) {panel.evHs[panel.activeLayer].Krelease(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.CTRL_SHIFT_MOD, e);}
+            else {panel.evHs[panel.activeLayer].Krelease(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.SHIFT_MOD, e);}
+        }
+        else {
+            if (e.isControlDown()) {panel.evHs[panel.activeLayer].Krelease(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.CTRL_MOD, e);}
+            else {panel.evHs[panel.activeLayer].Krelease(panel,e.getKeyChar(),e.getKeyCode(),ViewEventHandler.NO_MODIFIER, e);}
+        }
     }
 
 }

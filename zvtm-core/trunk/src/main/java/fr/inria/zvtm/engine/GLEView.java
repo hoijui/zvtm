@@ -2,7 +2,7 @@
  *   DATE OF CREATION:   Tue Oct 12 09:10:24 2004
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2004-2006. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2010. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -27,12 +27,14 @@ import javax.swing.WindowConstants;
 
 import fr.inria.zvtm.engine.ViewEventHandler;
 
-  /**
-   * An external view is a window and can be composed of one or several cameras superimposed (uses a standard JFrame)<br>
-   * Uses OpenGL acceletation provided by J2SE 5.0<br>
-   * The use of GLEView requires the following Java property: -Dsun.java2d.opengl=true
-   * @author Emmanuel Pietriga
-   **/
+
+/**
+ * An external view (EView) is wrapped in a JFrame window and can be composed of one or several cameras superimposed.
+ * Uses the Java2D OpenGL rendering pipeline available since J2SE 5.0 (Windows and Linux, not Mac OS X).<br>
+ * The use of GLEView requires the following Java property: -Dsun.java2d.opengl=true
+ * GLEview is not compatible with Lenses.
+ * @author Emmanuel Pietriga
+ */
 
 public class GLEView extends View implements KeyListener{
 
@@ -42,27 +44,27 @@ public class GLEView extends View implements KeyListener{
     /**
      *@param v list of cameras
      *@param t view name
-     *@param panelWidth width of window in pixels
-     *@param panelHeight height of window in pixels
+     *@param w width of window in pixels
+     *@param h height of window in pixels
      *@param bar true -&gt; add a status bar to this view (below main panel)
      *@param visible should the view be made visible automatically or not
      *@param decorated should the view be decorated with the underlying window manager's window frame or not
      */
-    protected GLEView(Vector<Camera> v,String t,int panelWidth,int panelHeight,boolean bar,boolean visible, boolean decorated){
-	    this(v, t, panelWidth, panelHeight, bar, visible, decorated, null);
+    protected GLEView(Vector<Camera> v, String t, int w, int h, boolean bar, boolean visible, boolean decorated){
+	    this(v, t, w, h, bar, visible, decorated, null);
     }
 
     /**
      *@param v list of cameras
      *@param t view name
-     *@param panelWidth width of window in pixels
-     *@param panelHeight height of window in pixels
+     *@param w width of window in pixels
+     *@param h height of window in pixels
      *@param bar true -&gt; add a status bar to this view (below main panel)
      *@param visible should the view be made visible automatically or not
      *@param mnb a menu bar, already configured with actionListeners already attached to items (it is just added to the view)
      *@param decorated should the view be decorated with the underlying window manager's window frame or not
      */
-    protected GLEView(Vector<Camera> v,String t,int panelWidth,int panelHeight,boolean bar,boolean visible, boolean decorated, JMenuBar mnb){
+    protected GLEView(Vector<Camera> v, String t, int w, int h, boolean bar, boolean visible, boolean decorated, JMenuBar mnb){
 	    frame=new JFrame();
         if (!decorated){frame.setUndecorated(true);}
         frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
@@ -80,7 +82,7 @@ public class GLEView extends View implements KeyListener{
             constraints.fill=GridBagConstraints.BOTH;
             constraints.anchor=GridBagConstraints.CENTER;
             panel=new GLViewPanel(v,this, false);
-            panel.setSize(panelWidth,panelHeight);
+            panel.setSize(w, h);
             gridBag.setConstraints(panel,constraints);
             cpane.add(panel);
             buildConstraints(constraints,0,1,1,1,0,0);
@@ -94,7 +96,7 @@ public class GLEView extends View implements KeyListener{
             constraints.fill=GridBagConstraints.BOTH;
             constraints.anchor=GridBagConstraints.CENTER;
             panel=new GLViewPanel(v,this, false);
-            panel.setSize(panelWidth,panelHeight);
+            panel.setSize(w, h);
             gridBag.setConstraints(panel,constraints);
             cpane.add(panel);
         }
@@ -109,7 +111,7 @@ public class GLEView extends View implements KeyListener{
         frame.addWindowListener(l);
         frame.addKeyListener(this);
         frame.pack();
-        frame.setSize(panelWidth,panelHeight);
+        frame.setSize(w, h);
         if (visible){frame.setVisible(true);}
     }
 

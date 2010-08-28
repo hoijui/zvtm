@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2007. All Rights Reserved
+ *   Copyright (c) INRIA, 2007-2010. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -9,12 +9,9 @@ package fr.inria.zvtm.engine;
 
 import java.awt.event.MouseEvent;
 
-// import fr.inria.zvtm.engine.Camera;
-// import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.engine.ScrollLayer;
-// import fr.inria.zvtm.engine.ViewEventHandler;
 
 public class DefaultScrollEventHandler extends DefaultEventHandler {
 

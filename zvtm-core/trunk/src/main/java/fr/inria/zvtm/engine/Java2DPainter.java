@@ -13,7 +13,7 @@ package fr.inria.zvtm.engine;
 import java.awt.Graphics2D;
 
 /**
- * Java2D painting operations interface (hook for direct Java2D painting in ZVTM views)
+ * Java2D painting operations interface (hook for direct Java2D painting instructions in Views).
  * @author Emmanuel Pietriga
  **/
 

@@ -4,7 +4,7 @@
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2000-2002. All Rights Reserved
  *   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2006. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2010. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -39,9 +39,11 @@ import javax.swing.WindowConstants;
 import fr.inria.zvtm.engine.ViewEventHandler;
 
 /**
- * An external view is a window and can be composed of one or several cameras superimposed (uses a standard JFrame)
+ * An external view (EView) is wrapped in a JFrame window and can be composed of one or several cameras superimposed.
+ * Double buffering is implemented manually, so as to enable offscreen buffer modifications
+ * after rendering but before painting on screen, such as when magnifying a region with a Lens.
  * @author Emmanuel Pietriga
- **/
+ */
 
 public class EView extends View implements KeyListener{
 
@@ -49,30 +51,30 @@ public class EView extends View implements KeyListener{
     JMenuBar jmb;
 
     /**
-     *@param v list of cameras
-     *@param t view name
-     *@param panelWidth width of window in pixels
-     *@param panelHeight height of window in pixels
+     *@param v list of cameras that will constitue the layers of this View.
+     *@param t view name/title.
+     *@param w width of window in pixels
+     *@param h height of window in pixels
      *@param bar true -&gt; add a status bar to this view (below main panel)
      *@param visible should the view be made visible automatically or not
      *@param decorated should the view be decorated with the underlying window manager's window frame or not
      */
-    protected EView(Vector<Camera> v, String t, int panelWidth, int panelHeight,
+    protected EView(Vector<Camera> v, String t, int w, int h,
 		    boolean bar, boolean visible, boolean decorated){
-		this(v, t, panelWidth, panelHeight, bar, visible, decorated, null);
+		this(v, t, w, h, bar, visible, decorated, null);
 	}
 
     /**
      *@param v list of cameras
      *@param t view name
-     *@param panelWidth width of window in pixels
-     *@param panelHeight height of window in pixels
+     *@param w width of window in pixels
+     *@param h height of window in pixels
      *@param bar true -&gt; add a status bar to this view (below main panel)
      *@param visible should the view be made visible automatically or not
      *@param decorated should the view be decorated with the underlying window manager's window frame or not
      *@param mnb a menu bar, already configured with actionListeners already attached to items (it is just added to the view). No effect if null.
      */
-    protected EView(Vector<Camera> v,String t,int panelWidth,int panelHeight,
+    protected EView(Vector<Camera> v,String t,int w, int h,
 		    boolean bar,boolean visible, boolean decorated,
 		    JMenuBar mnb){
         frame=new JFrame();
@@ -95,7 +97,7 @@ public class EView extends View implements KeyListener{
             constraints.fill=GridBagConstraints.BOTH;
             constraints.anchor=GridBagConstraints.CENTER;
             panel=new StdViewPanel(v,this, false);
-            panel.setSize(panelWidth,panelHeight);
+            panel.setSize(w, h);
             gridBag.setConstraints(panel,constraints);
             cpane.add(panel);
             buildConstraints(constraints,0,1,1,1,0,0);
@@ -109,7 +111,7 @@ public class EView extends View implements KeyListener{
             constraints.fill=GridBagConstraints.BOTH;
             constraints.anchor=GridBagConstraints.CENTER;
             panel=new StdViewPanel(v,this, false);
-            panel.setSize(panelWidth,panelHeight);
+            panel.setSize(w, h);
             gridBag.setConstraints(panel,constraints);
             cpane.add(panel);
         }
@@ -124,7 +126,7 @@ public class EView extends View implements KeyListener{
         frame.addWindowListener(l);
         frame.addKeyListener(this);
         frame.pack();
-        frame.setSize(panelWidth,panelHeight);
+        frame.setSize(w, h);
         if (visible){frame.setVisible(true);}
     }
 
