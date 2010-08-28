@@ -11,6 +11,8 @@ package fr.inria.zvtm.event;
 
 import fr.inria.zvtm.engine.View;
 
+/** Listen to view repainting events. */
+
 public interface RepaintListener {
     
     public void viewRepainted(View v);

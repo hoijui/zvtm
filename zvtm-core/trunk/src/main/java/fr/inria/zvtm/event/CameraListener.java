@@ -11,6 +11,8 @@ import java.awt.geom.Point2D;
 
 import fr.inria.zvtm.engine.Camera;
 
+/** Listen to camera events. */
+
 public interface CameraListener {
 
     /**
