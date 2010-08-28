@@ -165,9 +165,9 @@ public abstract class View {
     /** Set application class instance to which events are sent for all layers in this view.
      *@param eh client application implementation of ViewListener
      */
-    public void setEventHandler(ViewListener eh){
+    public void setListener(ViewListener eh){
 	    for (int i=0;i<cameras.size();i++){
-    	    setEventHandler(eh, i);	        
+    	    setListener(eh, i);	        
 	    }
     }
 
@@ -175,8 +175,8 @@ public abstract class View {
     *@param eh client application implementation of ViewListener
      *@param layer depth of layer to which the event handler should be associated.
      */
-    public void setEventHandler(ViewListener eh, int layer){
-	    panel.setEventHandler(eh, layer);
+    public void setListener(ViewListener eh, int layer){
+	    panel.setListener(eh, layer);
     }
 
     /** Sets whether the mouseMoved callback in ViewListener is triggered when the cursor moves.

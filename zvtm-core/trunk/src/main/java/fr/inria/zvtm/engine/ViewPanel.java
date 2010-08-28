@@ -169,7 +169,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
     /** Set application class to which events are sent.
      *@param layer depth of layer to which the event handler should be associated.
      */
-    void setEventHandler(ViewListener eh, int layer){
+    void setListener(ViewListener eh, int layer){
 	evHs[layer] = eh;
     }
 

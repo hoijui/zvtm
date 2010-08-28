@@ -52,7 +52,7 @@ public class AllGlyphsTest {
         }
         testView = vsm.addFrameView(cameras, "All Glyphs Test", vt, 1024, 768, false, true, true, null);
         testView.setBackgroundColor(Color.LIGHT_GRAY);
-        testView.setEventHandler(eh);
+        testView.setListener(eh);
         vs.getCamera(0).setAltitude(0);
         populate();
         testView.getGlobalView(mCam, 500, 1.5f);

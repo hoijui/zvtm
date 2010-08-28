@@ -69,7 +69,7 @@ public class TestCameraPosition {
         }
         testView = vsm.addFrameView(cameras, "Test", vt, 800, 600, false, true);
         testView.setBackgroundColor(Color.LIGHT_GRAY);
-        testView.setEventHandler(eh);
+        testView.setListener(eh);
 
 	final int NB_GLYPHS = 100;
 	java.util.List<Glyph> circles = new java.util.ArrayList<Glyph>();

@@ -35,7 +35,7 @@ public class CompositeTest {
 
         View view = vsm.addFrameView(cameras, "Composite test",
                 View.STD_VIEW, 800, 600, false, true, true, null);	
-        view.setEventHandler(new ViewAdapter());
+        view.setListener(new ViewAdapter());
 
         //create overlapping circles
         Glyph redC  = new VCircle(0, 0, 0, 30, Color.RED);

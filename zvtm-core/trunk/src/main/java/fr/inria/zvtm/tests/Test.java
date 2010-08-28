@@ -63,7 +63,7 @@ public class Test {
         }
         testView = vsm.addFrameView(cameras, "Test", vt, 800, 600, false, true, false, null);
         testView.setBackgroundColor(Color.LIGHT_GRAY);
-        testView.setEventHandler(eh);
+        testView.setListener(eh);
         vsm.repaint();
     }
 
