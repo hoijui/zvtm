@@ -11,7 +11,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.geom.Point2D;
 
-import fr.inria.zvtm.engine.Utilities;
+import fr.inria.zvtm.engine.Utils;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.VCircle;
 import fr.inria.zvtm.glyphs.VRing;
@@ -65,9 +65,9 @@ public class PieMenuR extends PieMenu {
             if (stringLabels[i] != null && stringLabels[i].length() > 0){
                 if (orientText){
                     textAngle = angle ;
-                    if (angle > Utilities.HALF_PI){
+                    if (angle > Utils.HALF_PI){
                         if (angle >= Math.PI){
-                            if (angle < Utilities.THREE_HALF_PI){textAngle -= Math.PI;}
+                            if (angle < Utils.THREE_HALF_PI){textAngle -= Math.PI;}
                             //else {textAngle +=Math.PI;}
                         }
                         else {textAngle +=Math.PI;}
@@ -143,9 +143,9 @@ public class PieMenuR extends PieMenu {
             if (stringLabels[i] != null && stringLabels[i].length() > 0){
                 if (orientText){
                     textAngle = angle ;
-                    if (angle > Utilities.HALF_PI){
+                    if (angle > Utils.HALF_PI){
                         if (angle > Math.PI){
-                            if (angle < Utilities.THREE_HALF_PI){textAngle -= Math.PI;}
+                            if (angle < Utils.THREE_HALF_PI){textAngle -= Math.PI;}
                         }
                         else {textAngle +=Math.PI;}
                     }
@@ -222,9 +222,9 @@ public class PieMenuR extends PieMenu {
             if (stringLabels[i] != null && stringLabels[i].length() > 0){
                 if (orientText){
                     textAngle = angle ;
-                    if (angle > Utilities.HALF_PI){
+                    if (angle > Utils.HALF_PI){
                         if (angle >= Math.PI){
-                            if (angle < Utilities.THREE_HALF_PI){textAngle -= Math.PI;}
+                            if (angle < Utils.THREE_HALF_PI){textAngle -= Math.PI;}
                             //else {textAngle +=Math.PI;}
                         }
                         else {textAngle +=Math.PI;}
@@ -301,9 +301,9 @@ public class PieMenuR extends PieMenu {
             if (stringLabels[i] != null && stringLabels[i].length() > 0){
                 if (orientText){
                     textAngle = angle ;
-                    if (angle > Utilities.HALF_PI){
+                    if (angle > Utils.HALF_PI){
                         if (angle > Math.PI){
-                            if (angle < Utilities.THREE_HALF_PI){textAngle -= Math.PI;}
+                            if (angle < Utils.THREE_HALF_PI){textAngle -= Math.PI;}
                         }
                         else {textAngle +=Math.PI;}
                     }

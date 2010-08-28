@@ -1021,7 +1021,7 @@ public class VCursor {
     			}
     			// check if cursor hotspot is inside glyph
     			// if hotspot in several glyphs, selected glyph will be the last glyph entered (according to glyphsUnderMouse)
-    			cgumIndex = Utilities.indexOfGlyph(glyphsUnderMouse, g, maxIndex+1);
+    			cgumIndex = Utils.indexOfGlyph(glyphsUnderMouse, g, maxIndex+1);
     			if (cgumIndex > -1){
     				if (cgumIndex > gumIndex){
     					gumIndex = cgumIndex;

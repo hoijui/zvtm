@@ -14,7 +14,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.geom.Point2D;
 
-import fr.inria.zvtm.engine.Utilities;
+import fr.inria.zvtm.engine.Utils;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.VCircle;
 import fr.inria.zvtm.glyphs.VPolygon;
@@ -67,9 +67,9 @@ public class PieMenuP extends PieMenu {
             if (stringLabels[i] != null && stringLabels[i].length() > 0){
                 if (orientText){
                     textAngle = angle - angleDelta / ((float)2);
-                    if (angle > Utilities.HALF_PI){
+                    if (angle > Utils.HALF_PI){
                         if (angle > Math.PI){
-                            if (angle < Utilities.THREE_HALF_PI){textAngle -= Math.PI;}
+                            if (angle < Utils.THREE_HALF_PI){textAngle -= Math.PI;}
                         }
                         else {textAngle +=Math.PI;}
                     }
@@ -79,9 +79,9 @@ public class PieMenuP extends PieMenu {
                 }
                 else {
                     textAngle = angle - angleDelta / ((float)2);
-                    if (angle > Utilities.HALF_PI){
+                    if (angle > Utils.HALF_PI){
                         if (angle > Math.PI){
-                            if (angle < Utilities.THREE_HALF_PI){textAngle -= Math.PI;}
+                            if (angle < Utils.THREE_HALF_PI){textAngle -= Math.PI;}
                         }
                         else {textAngle +=Math.PI;}
                     }
@@ -145,9 +145,9 @@ public class PieMenuP extends PieMenu {
             if (stringLabels[i] != null && stringLabels[i].length() > 0){
                 if (orientText){
                     textAngle = angle - angleDelta / ((float)2);
-                    if (angle > Utilities.HALF_PI){
+                    if (angle > Utils.HALF_PI){
                         if (angle > Math.PI){
-                            if (angle < Utilities.THREE_HALF_PI){textAngle -= Math.PI;}
+                            if (angle < Utils.THREE_HALF_PI){textAngle -= Math.PI;}
                         }
                         else {textAngle +=Math.PI;}
                     }
@@ -217,9 +217,9 @@ public class PieMenuP extends PieMenu {
             if (stringLabels[i] != null && stringLabels[i].length() > 0){
                 if (orientText){
                     textAngle = angle - angleDelta / ((float)2);
-                    if (angle > Utilities.HALF_PI){
+                    if (angle > Utils.HALF_PI){
                         if (angle > Math.PI){
-                            if (angle < Utilities.THREE_HALF_PI){textAngle -= Math.PI;}
+                            if (angle < Utils.THREE_HALF_PI){textAngle -= Math.PI;}
                         }
                         else {textAngle +=Math.PI;}
                     }
@@ -229,9 +229,9 @@ public class PieMenuP extends PieMenu {
                 }
                 else {
                     textAngle = angle - angleDelta / ((float)2);
-                    if (angle > Utilities.HALF_PI){
+                    if (angle > Utils.HALF_PI){
                         if (angle > Math.PI){
-                            if (angle < Utilities.THREE_HALF_PI){textAngle -= Math.PI;}
+                            if (angle < Utils.THREE_HALF_PI){textAngle -= Math.PI;}
                         }
                         else {textAngle +=Math.PI;}
                     }
@@ -296,9 +296,9 @@ public class PieMenuP extends PieMenu {
             if (stringLabels[i] != null && stringLabels[i].length() > 0){
                 if (orientText){
                     textAngle = angle - angleDelta / ((float)2);
-                    if (angle > Utilities.HALF_PI){
+                    if (angle > Utils.HALF_PI){
                         if (angle > Math.PI){
-                            if (angle < Utilities.THREE_HALF_PI){textAngle -= Math.PI;}
+                            if (angle < Utils.THREE_HALF_PI){textAngle -= Math.PI;}
                         }
                         else {textAngle +=Math.PI;}
                     }

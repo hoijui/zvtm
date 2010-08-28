@@ -22,7 +22,7 @@ import java.awt.Polygon;
 
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.Camera;
-import fr.inria.zvtm.engine.Utilities;
+import fr.inria.zvtm.engine.Utils;
 import fr.inria.zvtm.glyphs.projection.ProjRing;
 
 /**
@@ -37,8 +37,8 @@ public class VRing extends ClosedShape {
     /*vertex y coords*/
     public int[] ypcoords;
 
-    public static final double RAD2DEG_FACTOR = 360 / Utilities.TWO_PI;
-    public static final double DEG2RAD_FACTOR = Utilities.TWO_PI / 360.0;
+    public static final double RAD2DEG_FACTOR = 360 / Utils.TWO_PI;
+    public static final double DEG2RAD_FACTOR = Utils.TWO_PI / 360.0;
 
     /*2nd point (arc end point)*/
     public Point2D.Double p1 = new Point2D.Double(0,0);
@@ -174,8 +174,8 @@ public class VRing extends ClosedShape {
     
     void computeOrient(){
         double c = Math.sqrt(Math.pow(p1.x-vx, 2) + Math.pow(p1.y-vy, 2));
-        double a1 = (p1.y-vy >= 0) ? Math.acos((p1.x-vx)/c) : Utilities.TWO_PI - Math.acos((p1.x-vx)/c);
-        double a2 = (p2.y-vy >= 0) ? Math.acos((p2.x-vx)/c) : Utilities.TWO_PI - Math.acos((p2.x-vx)/c);
+        double a1 = (p1.y-vy >= 0) ? Math.acos((p1.x-vx)/c) : Utils.TWO_PI - Math.acos((p1.x-vx)/c);
+        double a2 = (p2.y-vy >= 0) ? Math.acos((p2.x-vx)/c) : Utils.TWO_PI - Math.acos((p2.x-vx)/c);
         // was initially (360/(4*Math.PI)) * (a1 + a2) / 2.0
         orient = (a1 + a2) / 2.0;
         orientDeg = (int)Math.round(orient * RAD2DEG_FACTOR);
@@ -183,8 +183,8 @@ public class VRing extends ClosedShape {
     
     void computeAngle(){
         double c = Math.sqrt(Math.pow(p1.x-vx, 2) + Math.pow(p1.y-vy, 2));
-        double a1 = (p1.y-vy >= 0) ? Math.acos((p1.x-vx)/c) : Utilities.TWO_PI - Math.acos((p1.x-vx)/c);
-        double a2 = (p2.y-vy >= 0) ? Math.acos((p2.x-vx)/c) : Utilities.TWO_PI - Math.acos((p2.x-vx)/c);
+        double a1 = (p1.y-vy >= 0) ? Math.acos((p1.x-vx)/c) : Utils.TWO_PI - Math.acos((p1.x-vx)/c);
+        double a2 = (p2.y-vy >= 0) ? Math.acos((p2.x-vx)/c) : Utils.TWO_PI - Math.acos((p2.x-vx)/c);
         angle = a2 - a1;
         angleDeg = (int)Math.round(angle * RAD2DEG_FACTOR);
     }
@@ -292,7 +292,7 @@ public class VRing extends ClosedShape {
      */
      @Override
     public void orientTo(double ag){
-        orient = (ag > Utilities.TWO_PI) ? (ag % Utilities.TWO_PI) : ag;
+        orient = (ag > Utils.TWO_PI) ? (ag % Utils.TWO_PI) : ag;
         orientDeg = (int)Math.round(orient * RAD2DEG_FACTOR);
         computeSliceEdges();
         computePolygonEdges();
@@ -303,7 +303,7 @@ public class VRing extends ClosedShape {
      *@param ag in [0:2Pi[
      */
     public void setAngle(double ag){
-        angle = (ag > Utilities.TWO_PI) ? (ag % Utilities.TWO_PI) : ag;
+        angle = (ag > Utils.TWO_PI) ? (ag % Utils.TWO_PI) : ag;
         angleDeg = (int)Math.round(angle * RAD2DEG_FACTOR);
         computeSliceEdges();
         computePolygonEdges();
