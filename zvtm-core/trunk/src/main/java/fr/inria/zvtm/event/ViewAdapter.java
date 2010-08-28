@@ -19,7 +19,7 @@ import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.glyphs.Glyph;
 
 /** 
- * Default, empty concrete implementation of ViewListener.
+ * An abstract adapter class for receiving view events. The methods in this class are empty. This class exists as convenience for creating listener objects.
  * @author Emmanuel Pietriga
  */
 
