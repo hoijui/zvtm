@@ -56,7 +56,7 @@ import fr.inria.zvtm.event.SelectionListener;
 import fr.inria.zvtm.glyphs.Translucency;
 
 /**
- * Glyph representing mouse cursor
+ * Glyph representing pointing device cursor. One instance per view.
  * @author Emmanuel Pietriga
  *
  * <h4>Using DynaSpot</h4>
@@ -138,20 +138,20 @@ public class VCursor {
         setSelectionListener(new DefaultSelectionAction());
     }
 
-    /**Set size of cursor (crosshair length).*/
+    /** Set cursor size (crosshair length). */
     public void setSize(int s){
-	this.size = s;
+	    this.size = s;
     }
 
-    /**Get size of cursor (crosshair length).*/
+    /** Get cursor size (crosshair length).*/
     public int getSize(){
-	return size;
+	    return size;
     }
 
-    /**get the mouse location in virtual space (active layer)*/
+    /** Get the cursor's location in virtual space (for active layer/camera). */
     public Point2D.Double getLocation(){return new Point2D.Double(vx,vy);}
 
-    /**get the view to which this cursor belongs*/
+    /** Get view to which this cursor belongs. */
     public View getOwningView(){return owningView;}
 
     /** Set whether this ZVTM cursor is synchronized with the system cursor or not. */
@@ -164,35 +164,35 @@ public class VCursor {
         return sync;
     }
 
-    /**set the mouse cursor color*/
+    /** Set cursor color. */
     public void setColor(Color c){
-	this.color=c;
+	    this.color = c;
     }
 
-    /**set the color of elements associated with cursor (drag segment, selection rectangle, etc.)*/
+    /** Set color of elements associated with cursor (drag segment, selection rectangle, etc.). */
     public void setHintColor(Color c){
-	this.hcolor = c;
+	    this.hcolor = c;
     }
     
-    /**move mouse cursor
-     *@param x EXPECTS JPanel coord
-     *@param y EXPECTS JPanel coord
+    /** Move mouse cursor.
+     *@param x x-coordinate, in JPanel coordinates system
+     *@param y y-coordinate, in JPanel coordinates system
      */
     public void moveTo(int x,int y){
-	if (sync){
-	    mx=x;
-	    my=y;
-	}
+        if (sync){
+            mx = x;
+            my = y;
+        }
     }
 
-    /**propagate mouse cursor movement to sticked glyphs*/
+    /** Propagate cursor movements to sticked glyphs. */
     public void propagateMove(){
-	for (int i=0;i<stickedGlyphs.length;i++){
-	    stickedGlyphs[i].move(vx-pvx, vy-pvy);
-	}
+        for (int i=0;i<stickedGlyphs.length;i++){
+            stickedGlyphs[i].move(vx-pvx, vy-pvy);
+        }
     }
 
-    /** Attach glyph g to mouse cursor. */
+    /** Attach glyph g to cursor. */
 	public void stickGlyph(Glyph g){
 		if (g==null){return;}
 		//make it unsensitive (was automatically disabled when glyph was sticked to mouse)
@@ -223,81 +223,86 @@ public class VCursor {
 		return null;
 	}
 
-    /**get the number of glyphs sticked to the mouse*/
+    /** Get the number of glyphs sticked to the cursor. */
     public int getStickedGlyphsNumber(){return stickedGlyphs.length;}
 
-    /**detach specific glyph from mouse*/
+    /** Detach glyph from cursor. */
     void unstickSpecificGlyph(Glyph g){
-	for (int i=0;i<stickedGlyphs.length;i++){
-	    if (stickedGlyphs[i] == g){
-		g.stickedTo = null;
-		Glyph[] newStickList = new Glyph[stickedGlyphs.length - 1];
-		System.arraycopy(stickedGlyphs, 0, newStickList, 0, i);
-		System.arraycopy(stickedGlyphs, i+1, newStickList, i, stickedGlyphs.length-i-1);
-		stickedGlyphs = newStickList;
-		break;
-	    }
-	}
+        for (int i=0;i<stickedGlyphs.length;i++){
+            if (stickedGlyphs[i] == g){
+                g.stickedTo = null;
+                Glyph[] newStickList = new Glyph[stickedGlyphs.length - 1];
+                System.arraycopy(stickedGlyphs, 0, newStickList, 0, i);
+                System.arraycopy(stickedGlyphs, i+1, newStickList, i, stickedGlyphs.length-i-1);
+                stickedGlyphs = newStickList;
+                break;
+            }
+        }
     }
 
-    /**get glyphs sticked to mouse*/
+    /** Get list of glyphs sticked to cursor.
+     *@return the actual list, not a copy.
+     */
     public Glyph[] getStickedGlyphArray(){
-	return stickedGlyphs;
+	    return stickedGlyphs;
     }
 
-    /**tells whether a cross should be drawn at cursor pos or not*/
+    /** Should the cursor glyph be drawn or not. */
     public void setVisibility(boolean b){
-	isVisible=b;
+	    isVisible = b;
     }
 
-    /**tells whether we should detect entry/exit in glyphs*/
+    /** Enable/disable entry/exit of cursor into/from glyphs. */
     public void setSensitivity(boolean b){
-	sensit=b;
+	    sensit = b;
     }
 
-    /**tells whether mouse sends events related to entry/exit in glyphs or not*/
+    /** Tells whether entry/exit of cursor into/from glyphs is enabled or disabled. */
     public boolean isSensitive(){return sensit;}
 
-	/**returns a list of all DPaths under the mouse cursor - returns null if none
-		*@param c should be the active camera (can be obtained by VirtualSpaceManager.getActiveCamera())
-		*@param tolerance the rectangular area's half width/height considered as the cursor intersecting region, in virtual space units (default tolerance is 5)
-		*@param cursorX cursor X coordinate in associated virtual space (if camera is not the active one)
-		*@param cursorY cursor Y coordinate in associated virtual space (if camera is not the active one)
-		*@see #getIntersectingPaths(Camera c)
-		*/
-	public Vector<DPath> getIntersectingPaths(Camera c, int tolerance, double cursorX, double cursorY){
-			Vector res=new Vector();
-			Vector glyphs = c.getOwningSpace().getDrawnGlyphs(c.getIndex());
-			Object glyph;
-			for (int i=0;i<glyphs.size();i++){
-				glyph = glyphs.elementAt(i);
-				if ((glyph instanceof DPath) && intersectsPath((DPath)glyph, tolerance, cursorX, cursorY)){res.add(glyph);}
-			}
-			return res;
-	}
-    
-    /**returns a list of all DPaths under the mouse cursor (default tolerance, 5) - returns null if none
+	/** Get a list of all DPaths under the cursor.
      *@param c should be the active camera (can be obtained by VirtualSpaceManager.getActiveCamera())
+     *@param tolerance the rectangular area's half width/height considered as the cursor intersecting region, in virtual space units (default tolerance is 5)
+     *@param cursorX cursor x-coordinate in associated virtual space
+     *@param cursorY cursor y-coordinate in associated virtual space
+  	 *@return an empty vector if none
+     *@see #getIntersectingPaths(Camera c)
+	 */
+	public Vector<DPath> getIntersectingPaths(Camera c, int tolerance, double cursorX, double cursorY){
+        Vector res=new Vector();
+        Vector glyphs = c.getOwningSpace().getDrawnGlyphs(c.getIndex());
+        Object glyph;
+        for (int i=0;i<glyphs.size();i++){
+            glyph = glyphs.elementAt(i);
+            if ((glyph instanceof DPath) && intersectsPath((DPath)glyph, tolerance, cursorX, cursorY)){res.add(glyph);}
+        }
+        return res;
+    }
+    
+    /** Get a list of all DPaths under the cursor.
+     *@param c should be the active camera (can be obtained by VirtualSpaceManager.getActiveCamera())
+  	 *@return an empty vector if none
      *@see #getIntersectingPaths(Camera c, int tolerance, double cursorX, double cursorY)
      */
     public Vector<DPath> getIntersectingPaths(Camera c){
-	return getIntersectingPaths(c, 5, vx, vy);
+	    return getIntersectingPaths(c, 5, vx, vy);
     }
 
-    /**returns a list of all DPaths under the mouse cursor (default tolerance, 5) - returns null if none
+    /** Get a list of all DPaths under the cursor.
      *@param c should be the active camera (can be obtained by VirtualSpaceManager.getActiveCamera())
      *@param tolerance the rectangular area's half width/height considered as the cursor intersecting region, in virtual space units (default tolerance is 5)
+  	 *@return an empty vector if none
      *@see #getIntersectingPaths(Camera c, int tolerance, double cursorX, double cursorY)
      */
     public Vector<DPath> getIntersectingPaths(Camera c, int tolerance){
 		return getIntersectingPaths(c, tolerance, vx, vy);
     }
 
-    /**tells if the mouse is above DPath p
+    /** Tells whether the cursor is hovering a particular DPath or not.
      *@param p DPath instance to be tested
      *@param tolerance the rectangular area's half width/height considered as the cursor intersecting region, in virtual space units (default tolerance is 5)
-     *@param cursorX cursor X coordinate in associated virtual space (if camera is not the active one)
-     *@param cursorY cursor Y coordinate in associated virtual space (if camera is not the active one)
+     *@param cursorX cursor x-coordinate in associated virtual space
+     *@param cursorY cursor y-coordinate in associated virtual space
      *@see #intersectsPath(DPath p)
      */
 	public boolean intersectsPath(DPath p, int tolerance, double cursorX, double cursorY){
@@ -307,7 +312,7 @@ public class VCursor {
 		return gp.intersects(cursorX-dtol, cursorY-dtol, dtol, dtol) && !p.getJava2DGeneralPath().contains(cursorX-tolerance, cursorY-tolerance, dtol, dtol);
 	}
 
-    /**tells if the mouse is above DPath p (default tolerance, 5)
+    /** Tells whether the cursor is hovering a particular DPath or not.
      *@param p DPath instance to be tested
      *@param tolerance the rectangular area's half width/height considered as the cursor intersecting region, in virtual space units (default tolerance is 5)
      *@see #intersectsPath(DPath p, int tolerance, double cursorX, double cursorY)
@@ -316,7 +321,7 @@ public class VCursor {
 		return intersectsPath(p, tolerance, vx, vy);
     }
 
-    /**tells if the mouse is above DPath p (default tolerance, 5)
+    /** Tells whether the cursor is hovering a particular DPath or not.
      *@param p DPath instance to be tested
      *@see #intersectsPath(DPath p, int tolerance, double cursorX, double cursorY)
      */
@@ -324,73 +329,11 @@ public class VCursor {
 		return intersectsPath(p, 5, vx, vy);
     }
 
-    /**returns a list of all VTexts under the mouse cursor - returns null if none<br>
-     * (mouse cursor coordinates are taken from the active layer's camera space)
-     *@param c should be the active camera (can be obtained by VirtualSpaceManager.getActiveCamera())
-     *@see #getIntersectingTexts(Camera c, double cursorX, double cursorY)
-     */
-    public Vector<VText> getIntersectingTexts(Camera c){
-	return getIntersectingTexts(c, vx, vy);
-    }
-
-    /**returns a list of all VTexts under the mouse cursor - returns null if none
-     *@param c camera
-     *@param cursorX cursor X coordinate in associated virtual space (if camera is not the active one)
-     *@param cursorY cursor Y coordinate in associated virtual space (if camera is not the active one)
-     *@see #getIntersectingTexts(Camera c)
-     */
-    public Vector<VText> getIntersectingTexts(Camera c, double cursorX, double cursorY){
-	    Vector res=new Vector();
-	    int index=c.getIndex();
-	    Vector glyphs = c.getOwningSpace().getDrawnGlyphs(c.getIndex());
-	    Object glyph;
-	    for (int i=0;i<glyphs.size();i++){
-		glyph = glyphs.elementAt(i);
-		if ((glyph instanceof VText) && (intersectsVText((VText)glyph, index, cursorX, cursorY))){res.add(glyph);}
-	    }
-	    if (res.isEmpty()){res=null;}
-	    return res;
-    }
-
-    /**tells if the mouse is above VText t<br>
-     * camera is supposed to be the active one (mouse cursor coordinates are taken from the active layer's camera space)
-     *@param camIndex should be the active camera's index (active camera can be obtained by VirtualSpaceManager.getActiveCamera(), available through Camera.getIndex())
-     *@see #intersectsVText(VText t,int camIndex, double cursorX, double cursorY)
-     */
-    public boolean intersectsVText(VText t,int camIndex){
-	return intersectsVText(t, camIndex, vx, vy);
-    }
-
-    /**tells if the mouse is above VText t.
-     *@param camIndex the camera's index (available through Camera.getIndex())
-     *@param cursorX cursor X coordinate in associated virtual space (if camera is not the active one)
-     *@param cursorY cursor Y coordinate in associated virtual space (if camera is not the active one)
-     *@see #intersectsVText(VText t,int camIndex)
-     */
-    public boolean intersectsVText(VText t,int camIndex, double cursorX, double cursorY){
-        boolean res=false;
-        Point2D.Double p = t.getBounds(camIndex);
-        switch (t.getTextAnchor()){
-            case VText.TEXT_ANCHOR_START:{
-                if ((cursorX>=t.vx) && (cursorY>=t.vy) && (cursorX<=(t.vx+p.x)) && (cursorY<=(t.vy+p.y))){res=true;}
-                break;
-            }
-            case VText.TEXT_ANCHOR_MIDDLE:{
-                if ((cursorX>=t.vx-p.x/2) && (cursorY>=t.vy) && (cursorX<=(t.vx+p.x/2)) && (cursorY<=(t.vy+p.y))){res=true;}
-                break;
-            }
-            default:{
-                if ((cursorX<=t.vx) && (cursorY>=t.vy) && (cursorX>=(t.vx-p.x)) && (cursorY<=(t.vy+p.y))){res=true;}
-            }
-        }
-        return res;
-    }
-
-    /** Returns a list of all VSegment instances under the mouse cursor.
-     * Mouse cursor coordinates are taken from the active layer's camera space.
+    /** Get a list of all VSegment instances under the cursor.
+     * Cursor coordinates are taken from the active layer's camera space.
      *@param c camera observing the segments of interest
      *@param tolerance the segment's abstract thickness (w.r.t picking) in pixels, not virtual space units (we consider a narrow rectangular region, not an actual segment)
-     *@return null if none
+  	 *@return an empty vector if none
      *@see #getIntersectingSegments(Camera c, int jpx, int jpy, int tolerance)
      *@see #intersectsSegment(VSegment s, int tolerance, int camIndex)
      *@see #intersectsSegment(VSegment s, int jpx, int jpy, int tolerance, int camIndex)
@@ -399,106 +342,107 @@ public class VCursor {
 	return getIntersectingSegments(c, mx, my, tolerance);
     }
 
-    /** Returns a list of all VSegment instances under the mouse cursor.
+    /** Get a list of all VSegment instances under the cursor.
      *@param c camera observing the segments of interest
      *@param tolerance the segment's abstract thickness (w.r.t picking) in pixels, not virtual space units (we consider a narrow rectangular region, not an actual segment)
-     *@return null if none
+     *@param jpx cursor x-coordinate in JPanel coordinates system
+     *@param jpy cursor y-coordinate in JPanel coordinates system
+  	 *@return an empty vector if none
      *@see #getIntersectingSegments(Camera c, int tolerance)
      *@see #intersectsSegment(VSegment s, int tolerance, int camIndex)
      *@see #intersectsSegment(VSegment s, int jpx, int jpy, int tolerance, int camIndex)
      */
     public Vector<VSegment> getIntersectingSegments(Camera c, int jpx, int jpy, int tolerance){
-	    Vector res = new Vector();
-	    int index = c.getIndex();
-	    Vector glyphs = c.getOwningSpace().getDrawnGlyphs(c.getIndex());
-	    Object glyph;
-	    for (int i=0;i<glyphs.size();i++){
-		glyph = glyphs.elementAt(i);
-		if ((glyph instanceof VSegment) && (intersectsSegment((VSegment)glyph, jpx, jpy, tolerance, index))){res.add(glyph);}
-	    }
-	    if (res.isEmpty()){res = null;}
-	    return res;
+        Vector res = new Vector();
+        int index = c.getIndex();
+        Vector glyphs = c.getOwningSpace().getDrawnGlyphs(c.getIndex());
+        Object glyph;
+        for (int i=0;i<glyphs.size();i++){
+            glyph = glyphs.elementAt(i);
+            if ((glyph instanceof VSegment) && (intersectsSegment((VSegment)glyph, jpx, jpy, tolerance, index))){res.add(glyph);}
+        }
+        return res;
     }
 
-    /** Indicates if the mouse cursor is above VSegment s.
+    /** Tells whether the cursor is above VSegment s or not.
      *@param camIndex indes of camera observing the segments of interest (available through Camera.getIndex())
      *@param tolerance the segment's abstract thickness (w.r.t picking) in pixels, not virtual space units (we consider a narrow rectangular region, not an actual segment)
      *@see fr.inria.zvtm.engine.Camera#getIndex()
      *@see #intersectsSegment(VSegment s, int jpx, int jpy, int tolerance, int camIndex)
      *@see #getIntersectingSegments(Camera c, int jpx, int jpy, int tolerance)
      *@see #getIntersectingSegments(Camera c, int tolerance)
+  	 *@return an empty vector if none
      */
     public boolean intersectsSegment(VSegment s, int tolerance, int camIndex){
-	return intersectsSegment(s, mx, my, camIndex, tolerance);
+	    return intersectsSegment(s, mx, my, camIndex, tolerance);
     }
 
     /** Indicates if the mouse cursor is above VSegment s.
+     *@param camIndex indes of camera observing the segments of interest (available through Camera.getIndex())
      *@param tolerance the segment's abstract thickness (w.r.t picking) in pixels, not virtual space units (we consider a narrow rectangular region, not an actual segment)
      *@see #intersectsSegment(VSegment s, int tolerance, int camIndex)
      *@see #getIntersectingSegments(Camera c, int jpx, int jpy, int tolerance)
      *@see #getIntersectingSegments(Camera c, int tolerance)
+  	 *@return an empty vector if none
      */
     public boolean intersectsSegment(VSegment s, int jpx, int jpy, int tolerance, int camIndex){
-	return s.intersects(jpx, jpy, tolerance, camIndex);
+	    return s.intersects(jpx, jpy, tolerance, camIndex);
     }
 
-	/** Get a list of all Glyphs (including texts and paths) under the mouse cursor.
-		* This method is especially useful when the camera of interest is not the active camera for the associated view (i.e. another layer is active).
-		* Beware of the fact that this method returns glyphs of any kind, not just ClosedShape instances.
-		* It can thus be much more computationaly expensive than getGlyphsUnderMouseList()
-		*@param c a camera (the active camera can be obtained by VirtualSpaceManager.getActiveCamera())
-		*@return a list of glyphs under the mouse cursor, sorted by drawing order; null if no object under the cursor.
-		*@see #getGlyphsUnderMouseList()
-		*/
+	/** Get a list of all Glyphs (including segments and paths) under the cursor.
+	 * This method is especially useful when the camera of interest is not the active camera for the associated view (i.e. another layer is active).
+	 * Beware of the fact that this method returns glyphs of any kind, not just ClosedShape instances.
+	 * It can thus be much more computationaly expensive than getGlyphsUnderMouseList()
+	 *@param c a camera (the active camera can be obtained by VirtualSpaceManager.getActiveCamera())
+	 *@return a list of glyphs under the mouse cursor, sorted by drawing order; null if no object under the cursor.
+	 *@see #getGlyphsUnderMouseList()
+	 */
 	public Vector<Glyph> getIntersectingGlyphs(Camera c){
-			Vector res=new Vector();
-			Vector glyphs = c.getOwningSpace().getDrawnGlyphs(c.getIndex());
-			Glyph glyph;
-			for (int i=0;i<glyphs.size();i++){
-				glyph = (Glyph)glyphs.elementAt(i);
-				if (glyph.coordInside(mx, my, c.getIndex(), vx, vy)){
-					res.add(glyph);
-				}
-				else if (glyph instanceof VSegment && intersectsSegment((VSegment)glyph, 2, c.getIndex())){
-					res.add(glyph);
-				}
-				else if (glyph instanceof VText && intersectsVText((VText)glyph, c.getIndex())){
-					res.add(glyph);
-				}
-				else if (glyph instanceof DPath && intersectsPath((DPath)glyph)){
-					res.add(glyph);
-				}
-			}
-			if (res.isEmpty()){res = null;}
-			return res;
-	}
-
-    /**double capacity of array containing glyphs under mouse*/
-    void doubleCapacity(){
-	Glyph[] tmpArray=new Glyph[glyphsUnderMouse.length*2];
-	System.arraycopy(glyphsUnderMouse,0,tmpArray,0,glyphsUnderMouse.length);
-	glyphsUnderMouse=tmpArray;
+        Vector res=new Vector();
+        Vector glyphs = c.getOwningSpace().getDrawnGlyphs(c.getIndex());
+        Glyph glyph;
+        for (int i=0;i<glyphs.size();i++){
+            glyph = (Glyph)glyphs.elementAt(i);
+            if (glyph.coordInside(mx, my, c.getIndex(), vx, vy)){
+                res.add(glyph);
+            }
+            else if (glyph instanceof VSegment && intersectsSegment((VSegment)glyph, 2, c.getIndex())){
+                res.add(glyph);
+            }
+            else if (glyph instanceof DPath && intersectsPath((DPath)glyph)){
+                res.add(glyph);
+            }
+        }
+        if (res.isEmpty()){res = null;}
+        return res;
     }
 
-    /**empty the list of glyphs under mouse*/
+    /** Double capacity of array containing glyphs under the cursor. Mechanism similar to what Vectors do, bu we want to avoid casting. */
+    void doubleCapacity(){
+        Glyph[] tmpArray = new Glyph[glyphsUnderMouse.length*2];
+        System.arraycopy(glyphsUnderMouse,0,tmpArray,0,glyphsUnderMouse.length);
+        glyphsUnderMouse = tmpArray;
+    }
+
+    /** Reset the list of glyphs under the cursor. */
     void resetGlyphsUnderMouseList(VirtualSpace vs,int camIndex){
-            for (int i=0;i<glyphsUnderMouse.length;i++){
-                glyphsUnderMouse[i] = null;
-                maxIndex =- 1;
+        for (int i=0;i<glyphsUnderMouse.length;i++){
+            glyphsUnderMouse[i] = null;
+            maxIndex =- 1;
+        }
+        lastGlyphEntered = null;
+        Glyph[] gl = vs.getDrawingList();
+        for (int i=0;i<gl.length;i++){
+            try {
+                gl[i].resetMouseIn(camIndex);
             }
-            lastGlyphEntered = null;
-            Glyph[] gl = vs.getDrawingList();
-                for (int i=0;i<gl.length;i++){
-                    try {
-                        gl[i].resetMouseIn(camIndex);
-                    }
-                    catch (NullPointerException ex){
-                        if (VirtualSpaceManager.debugModeON()){
-                            System.err.println("Recovered from error when resetting list of glyphs under mouse");
-                            ex.printStackTrace();
-                        }
-                    }
+            catch (NullPointerException ex){
+                if (VirtualSpaceManager.debugModeON()){
+                    System.err.println("Recovered from error when resetting list of glyphs under mouse");
+                    ex.printStackTrace();
                 }
+            }
+        }
     }
 
     /** Get the list of glyphs currently under the cursor. Last entry is last glyph entered.
@@ -508,15 +452,15 @@ public class VCursor {
 	 *@see #getIntersectingGlyphs(Camera c)
      */
     public Glyph[] getGlyphsUnderMouseList(){
-	if (maxIndex >= 0){
-	    Glyph[] res = new Glyph[maxIndex+1];
-	    System.arraycopy(glyphsUnderMouse, 0, res, 0, maxIndex+1);
-	    return res;
-	}
-	else return new Glyph[0];
+        if (maxIndex >= 0){
+            Glyph[] res = new Glyph[maxIndex+1];
+            System.arraycopy(glyphsUnderMouse, 0, res, 0, maxIndex+1);
+            return res;
+        }
+        else return new Glyph[0];
     }
     
-    /** Tells whether a given glyph is under this cursor. */
+    /** Tells whether a given glyph is under this cursor or not. */
     public boolean isUnderCursor(Glyph g){
         for (int i=0;i<=maxIndex;i++){
             if (glyphsUnderMouse[i] == g){return true;}
@@ -524,7 +468,7 @@ public class VCursor {
         return false;
     }
 
-    /**remove glyph g in list of glyphs under mouse if it is present (called when destroying a glyph)*/
+    /** Remove glyph g in list of glyphs under mouse if it is present. Called when destroying a glyph. */
     void removeGlyphFromList(Glyph g){
 	    int i=0;
 	    boolean present=false;
@@ -542,13 +486,16 @@ public class VCursor {
 	    }
     }
 
-    /**compute list of glyphs currently overlapped by the mouse*/
-    public boolean computeCursorOverList(ViewListener eh,Camera c){
-	return this.computeCursorOverList(eh, c, mx, my);
+    /** Compute the list of glyphs currently under the cursor. 
+     *@param eh ViewListener associated with the cursor's owning View.
+     *@param c camera observing the glyphs of potential interest in the View.
+     */
+    public boolean computeCursorOverList(ViewListener eh, Camera c){
+        return this.computeCursorOverList(eh, c, mx, my);
     }
 
-    /**compute list of glyphs currently overlapped by the mouse (take into account lens l when unprojecting)*/
-    boolean computeCursorOverList(ViewListener eh,Camera c, ViewPanel v){
+    /** Compute the list of glyphs currently under the cursor. */
+    boolean computeCursorOverList(ViewListener eh, Camera c, ViewPanel v){
         if (v.lens != null){
             // following use of cx,cy implies that VCursor.unProject() has been called before this method
             return this.computeCursorOverList(eh, c, Math.round(cx + v.size.width/2), Math.round(v.size.height/2 - cy));
@@ -558,31 +505,31 @@ public class VCursor {
         }
     }
     
-    /** Compute list of glyphs currently overlapped by the mouse. */
-    boolean computeCursorOverList(ViewListener eh,Camera c, int x, int y){
+    /** Compute the list of glyphs currently under the cursor. */
+    boolean computeCursorOverList(ViewListener eh, Camera c, int x, int y){
         boolean res=false;
-        Vector drawnGlyphs = c.getOwningSpace().getDrawnGlyphs(c.getIndex());
-                try {
-                    for (int i=0;i<drawnGlyphs.size();i++){
-                        tmpGlyph = (Glyph)drawnGlyphs.elementAt(i);
-                        if (tmpGlyph.isSensitive() && checkGlyph(eh, c, x, y)){
-                            res = true;
-                        }
-                    }
+        Vector<Glyph> drawnGlyphs = c.getOwningSpace().getDrawnGlyphs(c.getIndex());
+        try {
+            for (int i=0;i<drawnGlyphs.size();i++){
+                tmpGlyph = drawnGlyphs.elementAt(i);
+                if (tmpGlyph.isSensitive() && checkGlyph(eh, c, x, y)){
+                    res = true;
                 }
-                catch (java.util.NoSuchElementException e){
-                    if (VirtualSpaceManager.debugModeON()){
-                        System.err.println("vcursor.computeCursorOverList "+e);
-                        e.printStackTrace();
-                    }
-                }
-                catch (NullPointerException e2){
-                    if (VirtualSpaceManager.debugModeON()){
-                        System.err.println("vcursor.computeCursorOverList null "+e2+
-                            " (This might be caused by an error in enterGlyph/exitGlyph in your event handler)");
-                        e2.printStackTrace();
-                    }
-                }
+            }
+        }
+        catch (java.util.NoSuchElementException e){
+            if (VirtualSpaceManager.debugModeON()){
+                System.err.println("vcursor.computeCursorOverList "+e);
+                e.printStackTrace();
+            }
+        }
+        catch (NullPointerException e2){
+            if (VirtualSpaceManager.debugModeON()){
+                System.err.println("vcursor.computeCursorOverList null "+e2+
+                    " (This might be caused by an error in enterGlyph/exitGlyph in your event handler)");
+                e2.printStackTrace();
+            }
+        }
         return res;
     }
 
@@ -617,17 +564,16 @@ public class VCursor {
         return false;
     }
 
-
-    //for debug purpose
+    /** Print list of glyphs under cursor on System.err for debugging. */
     public void printList(){
-	System.err.print("[");
-	for (int i=0;i<=maxIndex;i++){
-	    System.err.print(glyphsUnderMouse[i].hashCode()+",");
-	}
-	System.err.println("]");
+        System.err.print("[");
+        for (int i=0;i<=maxIndex;i++){
+            System.err.print(glyphsUnderMouse[i].hashCode()+",");
+        }
+        System.err.println("]");
     }
 
-    /**project mouse cursor IN VIRTUAL SPACE wrt camera info and change origin -> JPanel coords*/
+    /** Unproject the cursor from JPanel coordinates to VirtualSpace coordinates. */
     public void unProject(Camera c, ViewPanel v){
         if (sync && v.size != null){
             //translate from JPanel coords
@@ -653,6 +599,7 @@ public class VCursor {
         }
     }
 
+    /** Get the virtual space coordinates of the cursor. Unprojected w.r.t Camera c. */
     public Point2D.Double getVSCoordinates(Camera c, ViewPanel v){
         //translate from JPanel coords
         double tcx,tcy;
@@ -674,17 +621,17 @@ public class VCursor {
         return new Point2D.Double((tcx*ucoef) + c.vx, (tcy*ucoef) + c.vy);
     }
 
-    /**returns the cursor's X JPanel coordinate*/
+    /** Get the cursor's x-coordinate in JPanel coordinates system. */
     public int getPanelXCoordinate(){
-	return mx;
+	    return mx;
     }
 
-    /**returns the cursor's Y JPanel coordinate*/
+    /** Get the cursor's y-coordinate in JPanel coordinates system. */
     public int getPanelYCoordinate(){
-	return my;
+	    return my;
     }
 
-    /**draw mouse cursor*/
+    /** Draw cursor crosshair. */
     public void draw(Graphics2D g){
         if (isVisible){
             g.setColor(this.color);
@@ -764,19 +711,23 @@ public class VCursor {
 	int LAG_TIME = 120;
 	int REDUC_TIME = 180;
 	
+	/** Set DynaSpot lag parameter. See <a href="http://zvtm.sourceforge.net/doc/dynaspot.html">http://zvtm.sourceforge.net/doc/dynaspot.html</a> for more detail. */
 	public void setDynaSpotLagTime(int t){
 	    LAG_TIME = t;
 	}
 
+	/** Get DynaSpot lag parameter. See <a href="http://zvtm.sourceforge.net/doc/dynaspot.html">http://zvtm.sourceforge.net/doc/dynaspot.html</a> for more detail. */
 	public int getDynaSpotLagTime(){
 	    return LAG_TIME;
 	}
 
+	/** Set DynaSpot reduction time parameter. See <a href="http://zvtm.sourceforge.net/doc/dynaspot.html">http://zvtm.sourceforge.net/doc/dynaspot.html</a> for more detail. */
 	public void setDynaSpotReducTime(int t){
 	    REDUC_TIME = t;
 	    computeDynaSpotParams();
 	}
 
+	/** Get DynaSpot reduction time parameter. See <a href="http://zvtm.sourceforge.net/doc/dynaspot.html">http://zvtm.sourceforge.net/doc/dynaspot.html</a> for more detail. */
 	public int getDynaSpotReducTime(){
 	    return REDUC_TIME;
 	}
@@ -838,6 +789,10 @@ public class VCursor {
 	boolean reducing = false;
 	long reducStartTime = 0;
 
+    /**
+     * Update DynaSpot's parameters.
+     *@param currentTime current absolute time, obtained from System.currentTimeMillis()
+     */
 	public void updateDynaSpot(long currentTime){
 		// compute mean speed over last 3 points
 		for (int i=1;i<NB_SPEED_POINTS;i++){
@@ -912,21 +867,24 @@ public class VCursor {
 		}
 	}
 	
+	/** Get DynaSpot's current radius. See <a href="http://zvtm.sourceforge.net/doc/dynaspot.html">http://zvtm.sourceforge.net/doc/dynaspot.html</a> for more detail. */
 	public int getDynaSpotRadius(){
 	    return dynaSpotRadius;
 	}
 	
 	DynaSpotListener dsl;
 
+	/** Listen for DynaSpot events. */
 	public void setDynaSpotListener(DynaSpotListener dsl){
 		this.dsl = dsl;
 	}
-	
+
+	/** Find out who is listening for DynaSpot events. */	
 	public DynaSpotListener getDynaSpotListener(){
 		return dsl;
 	}
 	
-	/** Activate or deactivate DynaSpot behavior. */
+	/** Enable/disable DynaSpot cursor behavior. */
 	public void activateDynaSpot(boolean b){
 		dynaSpotActivated = b;
 		if (dynaSpotActivated){
@@ -944,17 +902,18 @@ public class VCursor {
 		}
 	}
 	
+	/** Tells whether DynaSpot cursor behavior is enabled or not. */
 	public boolean isDynaSpotActivated(){
 	    return dynaSpotActivated;
 	}
 
-	/** Set maximum size of DynaSpot selection region. */
+	/** Set maximum size of DynaSpot selection region. See <a href="http://zvtm.sourceforge.net/doc/dynaspot.html">http://zvtm.sourceforge.net/doc/dynaspot.html</a> for more detail. */
 	public void setDynaSpotMaxRadius(int r){
 		DYNASPOT_MAX_RADIUS = (r < 0) ? 0 : r;
 		computeDynaSpotParams();
 	}
 
-	/** Get maximum size of DynaSpot selection region. */
+	/** Get maximum size of DynaSpot selection region. See <a href="http://zvtm.sourceforge.net/doc/dynaspot.html">http://zvtm.sourceforge.net/doc/dynaspot.html</a> for more detail. */
 	public int getDynaSpotMaxRadius(){
 		return DYNASPOT_MAX_RADIUS;
 	}
@@ -987,8 +946,9 @@ public class VCursor {
         return this.sl;
     }
     
-	/** Compute the list of glyphs picked by the dynaspot cursor.
+	/** Compute the list of glyphs picked by the DynaSpot cursor.
 	 * The best picked glyph is returned.
+	 * See <a href="http://zvtm.sourceforge.net/doc/dynaspot.html">http://zvtm.sourceforge.net/doc/dynaspot.html</a> for more detail. 
 	 *@return null if the dynaspot cursor does not pick anything.
      *@see #dynaPick()
 	 */
@@ -1064,6 +1024,7 @@ public class VCursor {
 	}
 
 	/** Get the set of glyphs intersected by the cursor's dynaspot region.
+	 * See <a href="http://zvtm.sourceforge.net/doc/dynaspot.html">http://zvtm.sourceforge.net/doc/dynaspot.html</a> for more detail. 
 	 *@return a set of Glyph IDs
 	 *@see #dynaPick(Camera c)
 	 */

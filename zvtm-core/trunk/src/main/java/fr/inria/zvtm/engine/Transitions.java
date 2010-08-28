@@ -32,11 +32,10 @@ public class Transitions {
      *@param v the view whose content will fade out
      *@param duration duration of the fade out transition in milliseconds
      *@param fadeColor target color for the fade out
-     *@param vsm hook to virtual space manager
-     *@see #fadeOut(View v, int duration, Color fadeColor, VirtualSpaceManager vsm, EndAction action)
+     *@see #fadeOut(View v, int duration, Color fadeColor, EndAction action)
      */
-    public static void fadeOut(View v, int duration, Color fadeColor, VirtualSpaceManager vsm){
-	Transitions.fadeOut(v, duration, fadeColor, vsm, null);
+    public static void fadeOut(View v, int duration, Color fadeColor){
+	    Transitions.fadeOut(v, duration, fadeColor, null);
     }
 
     /** Makes a view fade out, and eventually be painted blank.
@@ -44,93 +43,86 @@ public class Transitions {
      *@param v the view whose content will fade out
      *@param duration duration of the fade out transition in milliseconds
      *@param fadeColor target color for the fade out
-     *@param vsm hook to virtual space manager
      *@param action fade out action. 
-     *@see #fadeOut(View v, int duration, Color fadeColor, VirtualSpaceManager vsm)
+     *@see #fadeOut(View v, int duration, Color fadeColor)
      */
-    public static void fadeOut(final View v, int duration, final Color fadeColor, 
-			       final VirtualSpaceManager vsm, final EndAction action){
-	// do not fade out is view is already blank
-	if (v.isBlank() != null){return;}
-	// get the region of virtual space seen through the
-	// camera belonging to the top layer in this view
-	final Camera c = v.getCameraNumber(v.getLayerCount() - 1);
-	double[] wnes = v.getVisibleRegion(c);
-	// position the fade rectangle so that it covers this region
-	final VRectangle fadeRect = new VRectangle((wnes[0]+wnes[2])/2, (wnes[1]+wnes[3])/2, 0,
-						       (wnes[2]-wnes[0]), (wnes[1]-wnes[3]),
-						       fadeColor, fadeColor, 0.0f);
-	fadeRect.setDrawBorder(false);
-	c.getOwningSpace().addGlyph(fadeRect);
+    public static void fadeOut(final View v, int duration, final Color fadeColor, final EndAction action){
+	    // do not fade out is view is already blank
+        if (v.isBlank() != null){return;}
+        // get the region of virtual space seen through the
+        // camera belonging to the top layer in this view
+        final Camera c = v.getCameraNumber(v.getLayerCount() - 1);
+        double[] wnes = v.getVisibleRegion(c);
+        // position the fade rectangle so that it covers this region
+        final VRectangle fadeRect = new VRectangle((wnes[0]+wnes[2])/2, (wnes[1]+wnes[3])/2, 0,
+            (wnes[2]-wnes[0]), (wnes[1]-wnes[3]),
+            fadeColor, fadeColor, 0.0f);
+        fadeRect.setDrawBorder(false);
+        c.getOwningSpace().addGlyph(fadeRect);
 
-	Animation trans = vsm.getAnimationManager().getAnimationFactory()
-	    .createTranslucencyAnim(duration, fadeRect,
-				    1f, false, IdentityInterpolator.getInstance(),
-				    new EndAction(){
-					public void execute(Object subject, Animation.Dimension dimension){
-					    v.setBlank(fadeColor);
-					    c.getOwningSpace().removeGlyph(fadeRect);
-
-					    if(null != action){
-						action.execute(subject, dimension);
-					    }
-					}
-				    });
-
-	vsm.getAnimationManager().startAnimation(trans, false);
+        Animation trans = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory()
+            .createTranslucencyAnim(duration, fadeRect,
+            1f, false, IdentityInterpolator.getInstance(),
+            new EndAction(){
+                public void execute(Object subject, Animation.Dimension dimension){
+                    v.setBlank(fadeColor);
+                    c.getOwningSpace().removeGlyph(fadeRect);
+            
+                    if(null != action){
+                        action.execute(subject, dimension);
+                    }
+                }
+        });
+        VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(trans, false);
     }
 
     /** Makes a view (originally blank) fade in.
      * The view must be blank for the fade in to work.
      *@param v the view whose content will fade in
      *@param duration duration of the fade in transition in milliseconds
-     *@param vsm hook to virtual space manager
-     *@see #fadeIn(View v, int duration, VirtualSpaceManager vsm, EndAction action)
+     *@see #fadeIn(View v, int duration, EndAction action)
      */
-    public static void fadeIn(View v, int duration, VirtualSpaceManager vsm){
-	Transitions.fadeIn(v, duration, vsm, null);
+    public static void fadeIn(View v, int duration){
+	    Transitions.fadeIn(v, duration, null);
     }    
 
     /** Makes a view (originally blank) fade in.
      * The view must be blank for the fade in to work.
      *@param v the view whose content will fade in
      *@param duration duration of the fade in transition in milliseconds
-     *@param vsm hook to virtual space manager
      *@param action fade-in action. Executed after the view fade-in.
-     *@see #fadeIn(View v, int duration, VirtualSpaceManager vsm)
+     *@see #fadeIn(View v, int duration)
      */
-    public static void fadeIn(final View v, int duration, final VirtualSpaceManager vsm, 
-			      final EndAction action){
-	// do not fade in if view is not blank
-	Color fadeColor = v.isBlank();
-	if (fadeColor == null){return;}
-	// get the region of virtual space seen through the
-	// camera belonging to the top layer in this view
-	final Camera c = v.getCameraNumber(v.getLayerCount() - 1);
-	double[] wnes = v.getVisibleRegion(c);
-	// position the fade rectangle so that it covers this region
-	final VRectangle fadeRect = new VRectangle((wnes[0]+wnes[2])/2, (wnes[1]+wnes[3])/2, 0,
-						       (wnes[2]-wnes[0]), (wnes[1]-wnes[3]),
-						       fadeColor, fadeColor, 1.0f);
-	fadeRect.setDrawBorder(false);
-	c.getOwningSpace().addGlyph(fadeRect);
-	v.setBlank(null);
-	vsm.repaint();
+    public static void fadeIn(final View v, int duration, final EndAction action){
+	    // do not fade in if view is not blank
+        Color fadeColor = v.isBlank();
+        if (fadeColor == null){return;}
+        // get the region of virtual space seen through the
+        // camera belonging to the top layer in this view
+        final Camera c = v.getCameraNumber(v.getLayerCount() - 1);
+        double[] wnes = v.getVisibleRegion(c);
+        // position the fade rectangle so that it covers this region
+        final VRectangle fadeRect = new VRectangle((wnes[0]+wnes[2])/2, (wnes[1]+wnes[3])/2, 0,
+            (wnes[2]-wnes[0]), (wnes[1]-wnes[3]),
+            fadeColor, fadeColor, 1.0f);
+        fadeRect.setDrawBorder(false);
+        c.getOwningSpace().addGlyph(fadeRect);
+        v.setBlank(null);
+        VirtualSpaceManager.INSTANCE.repaint();
 
-	Animation trans = vsm.getAnimationManager().getAnimationFactory()
-	    .createTranslucencyAnim(duration, fadeRect,
-				    0f, false, IdentityInterpolator.getInstance(),
-				    new EndAction(){
-					public void execute(Object subject, Animation.Dimension dimension){
-					    c.getOwningSpace().removeGlyph(fadeRect);
-
-					    if(null != action){
-						action.execute(subject, dimension);
-					    }
-					}
-				    });
-
-	vsm.getAnimationManager().startAnimation(trans, false);
+        Animation trans = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory()
+            .createTranslucencyAnim(duration, fadeRect,
+            0f, false, IdentityInterpolator.getInstance(),
+            new EndAction(){
+                public void execute(Object subject, Animation.Dimension dimension){
+                    c.getOwningSpace().removeGlyph(fadeRect);
+            
+                    if(null != action){
+                        action.execute(subject, dimension);
+                    }
+                }
+        });
+        VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(trans, false);
     }
 
 }

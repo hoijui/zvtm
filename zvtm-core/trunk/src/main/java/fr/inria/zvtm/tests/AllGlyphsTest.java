@@ -328,6 +328,7 @@ class TestEventHandler extends ViewAdapter {
     
     public void enterGlyph(Glyph g){
         g.highlight(true, null);
+        System.out.println(g);
     }
 
     public void exitGlyph(Glyph g){

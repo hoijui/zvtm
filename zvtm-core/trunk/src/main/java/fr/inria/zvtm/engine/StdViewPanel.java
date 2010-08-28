@@ -62,7 +62,7 @@ public class StdViewPanel extends ViewPanel {
 
 	private Timer edtTimer;
 
-	StdViewPanel(Vector cameras,View v, boolean arfome) {
+	StdViewPanel(Vector<Camera> cameras,View v, boolean arfome) {
 		ActionListener taskPerformer = new ActionListener(){
 			public void actionPerformed(ActionEvent evt){
 				drawOffscreen();
@@ -86,7 +86,7 @@ public class StdViewPanel extends ViewPanel {
 		cams=new Camera[cameras.size()];  //array of Camera
 		evHs = new ViewListener[cams.length];
 		for (int nbcam=0;nbcam<cameras.size();nbcam++){
-			cams[nbcam]=(Camera)(cameras.get(nbcam));
+			cams[nbcam] = cameras.get(nbcam);
 		}
 		//init other stuff
 		setBackground(backColor);

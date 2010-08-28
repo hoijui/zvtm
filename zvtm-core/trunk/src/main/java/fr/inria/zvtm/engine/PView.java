@@ -4,7 +4,7 @@
  *   MODIF:              Thu Feb 20 16:31:33 2003 by Emmanuel Pietriga
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2000-2002. All Rights Reserved
  *   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2009. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2010. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -30,27 +30,29 @@ import java.util.Vector;
 
 import fr.inria.zvtm.event.ViewListener;
 
-  /**
-   * A PView (formerly AppletView) is based on a JPanel. It can be inserted anywhere in a Swing component hierarchy.
-   * It can be composed of one or several cameras superimposed.
-   * @author Emmanuel Pietriga
-   **/
+/**
+ * A PView is based on a JPanel. It can be inserted anywhere in a Swing component hierarchy.
+ * It can be composed of one or several cameras superimposed.
+ * Double buffering is implemented manually, so as to enable offscreen buffer modifications
+ * after rendering but before painting on screen, such as when magnifying a region with a Lens. 
+ * @author Emmanuel Pietriga
+ */
 
 public class PView extends View implements KeyListener {
 
 	/**
 		*@param v list of cameras
-		*@param t view name
-		*@param panelWidth width of window in pixels
-		*@param panelHeight height of window in pixels
+		*@param t view name/title
+        *@param w width of window in pixels
+        *@param h height of window in pixels
 		*/
-	protected PView(Vector v,String t,int panelWidth,int panelHeight){
-		mouse=new VCursor(this);
-		name=t;
+	protected PView(Vector<Camera> v, String t, int w, int h){
+		mouse = new VCursor(this);
+		name = t;
 		detectMultipleFullFills = VirtualSpaceManager.INSTANCE.defaultMultiFill;
 		initCameras(v);   //vector -> cast elements as "Camera"
 		panel = new StdViewPanel(v, this, true);
-		panel.setSize(panelWidth,panelHeight);
+		panel.setSize(w, h);
 		panel.addKeyListener(this);
 	}
 

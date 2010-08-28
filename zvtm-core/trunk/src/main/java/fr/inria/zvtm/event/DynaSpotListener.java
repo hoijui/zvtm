@@ -9,7 +9,7 @@ package fr.inria.zvtm.event;
 
 import fr.inria.zvtm.engine.VCursor;
 
-/** Listen to <a href="http://doi.acm.org/10.1145/1518701.1518911">DynaSpot</a> events. */
+/** Listen to <a href="http://zvtm.sourceforge.net/doc/dynaspot.html">DynaSpot</a> events. */
 
 public interface DynaSpotListener {
 	
