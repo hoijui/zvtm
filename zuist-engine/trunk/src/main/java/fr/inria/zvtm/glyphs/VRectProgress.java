@@ -24,9 +24,7 @@ import fr.inria.zvtm.glyphs.VRectangle;
  */
 public class VRectProgress extends VRectangle {
 
-	// The current VirtualSpace
-	private VirtualSpace currentVS;
-
+    // percentage
 	int val = 0;
 	
 	Color barColor;
@@ -44,25 +42,24 @@ public class VRectProgress extends VRectangle {
 	@Override
 	public void draw(Graphics2D g, int vW, int vH, int i, Stroke stdS,
 			AffineTransform stdT, int dx, int dy) {
-
-		if (alphaC != null && alphaC.getAlpha() == 0) {
-			return;
-		}
-
-		// draw just enough
 		super.draw(g, vW - val, vH, i, stdS, stdT, dx, dy);
-
 		g.setColor(barColor);
 		g.fillRect(dx + pc[i].cx - (pc[i].cw), dy + pc[i].cy - pc[i].ch,
-				(int) ((2 * val) * (double) pc[i].cw / 100), 2 * pc[i].ch);		
+				(int) ((2 * val) * pc[i].cw / 100d), 2 * pc[i].ch);		
 	}
 
-	// rough percentage calculator
-	public void setProgress(int count, int ligne) {
-		val = (int) count * 100 / ligne;		
-		VirtualSpaceManager.INSTANCE.repaintNow();
+	/** Set progress value.
+	 *@param count current value
+	 *@param total max (completion) value
+	 */
+	public void setProgress(int count, int total) {
+		val = (int) count * 100 / total;
+		VirtualSpaceManager.INSTANCE.repaint();
 	}
 
+    /** Get current progress.
+     *@return current progress as a percentage.
+     */
 	public int getProgress(){
 		return val;
 	}

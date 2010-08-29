@@ -21,12 +21,12 @@ import fr.inria.zvtm.engine.VCursor;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.VirtualSpace;
-import fr.inria.zvtm.engine.Utilities;
+import fr.inria.zvtm.engine.Utils;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VText;
-import fr.inria.zvtm.engine.ViewEventHandler;
-import fr.inria.zvtm.engine.CameraListener;
+import fr.inria.zvtm.event.ViewListener;
+import fr.inria.zvtm.event.CameraListener;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 
 import fr.inria.zuist.engine.SceneManager;
@@ -34,7 +34,7 @@ import fr.inria.zuist.engine.Region;
 import fr.inria.zuist.engine.ObjectDescription;
 import fr.inria.zuist.engine.TextDescription;
 
-class ViewerEventHandler implements ViewEventHandler, ComponentListener, CameraListener {
+class ViewerEventHandler implements ViewListener, ComponentListener, CameraListener {
 
     static float ZOOM_SPEED_COEF = 1.0f/50.0f;
     static double PAN_SPEED_COEF = 50.0;
@@ -142,7 +142,7 @@ class ViewerEventHandler implements ViewEventHandler, ComponentListener, CameraL
         
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
         application.setCursorCoords(v.getVCursor().vx, v.getVCursor().vy);
-        VirtualSpaceManager.INSTANCE.repaintNow();
+        VirtualSpaceManager.INSTANCE.repaint();
     }
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
@@ -172,12 +172,12 @@ class ViewerEventHandler implements ViewEventHandler, ComponentListener, CameraL
 		if (wheelDirection  == WHEEL_UP){
 			// zooming in
 			application.mCamera.altitudeOffset(a*WHEEL_ZOOMOUT_FACTOR);
-			application.vsm.repaintNow();
+			application.vsm.repaint();
 		}
 		else {
 			//wheelDirection == WHEEL_DOWN, zooming out
 			application.mCamera.altitudeOffset(-a*WHEEL_ZOOMIN_FACTOR);
-			application.vsm.repaintNow();
+			application.vsm.repaint();
 		}
 	}
 
@@ -187,7 +187,7 @@ class ViewerEventHandler implements ViewEventHandler, ComponentListener, CameraL
 			g.highlight(true, null);
 			VirtualSpace vs = application.vsm.getVirtualSpace(application.mnSpaceName);
 			vs.onTop(g);
-			int i = Utilities.indexOfGlyph(application.mainPieMenu.getItems(), g);
+			int i = Utils.indexOfGlyph(application.mainPieMenu.getItems(), g);
 			if (i != -1){
 				vs.onTop(application.mainPieMenu.getLabels()[i]);
 			}

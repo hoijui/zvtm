@@ -25,7 +25,7 @@ import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VText;
-import fr.inria.zvtm.engine.ViewEventHandler;
+import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.engine.portals.Portal;
 import fr.inria.zvtm.engine.portals.OverviewPortal;
 import fr.inria.zvtm.engine.portals.PortalEventHandler;
@@ -36,7 +36,7 @@ import fr.inria.zuist.engine.Region;
 import fr.inria.zuist.engine.ObjectDescription;
 import fr.inria.zuist.engine.TextDescription;
 
-class TIVExplorerEventHandler implements ViewEventHandler, ComponentListener, PortalEventHandler {
+class TIVExplorerEventHandler implements ViewListener, ComponentListener, PortalEventHandler {
 
     static final float WHEEL_ZOOMIN_FACTOR = 21.0f;
     static final float WHEEL_ZOOMOUT_FACTOR = 22.0f;
@@ -241,7 +241,7 @@ class TIVExplorerEventHandler implements ViewEventHandler, ComponentListener, Po
 
     public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
         if (nm.lensType != 0 && nm.lens != null){
-            if (wheelDirection  == ViewEventHandler.WHEEL_UP){
+            if (wheelDirection  == ViewListener.WHEEL_UP){
                 nm.magnifyFocus(TIVNavigationManager.WHEEL_MM_STEP, nm.lensType, application.mCamera);
             }
             else {
@@ -253,12 +253,12 @@ class TIVExplorerEventHandler implements ViewEventHandler, ComponentListener, Po
             if (wheelDirection  == WHEEL_UP){
                 // zooming in
                 application.mCamera.altitudeOffset(a*WHEEL_ZOOMOUT_FACTOR);
-                VirtualSpaceManager.INSTANCE.repaintNow();
+                VirtualSpaceManager.INSTANCE.repaint();
             }
             else {
                 //wheelDirection == WHEEL_DOWN, zooming out
                 application.mCamera.altitudeOffset(-a*WHEEL_ZOOMIN_FACTOR);
-                VirtualSpaceManager.INSTANCE.repaintNow();
+                VirtualSpaceManager.INSTANCE.repaint();
             }
     	}
     }
@@ -318,13 +318,13 @@ class TIVExplorerEventHandler implements ViewEventHandler, ComponentListener, Po
 	public void enterPortal(Portal p){
 		inPortal = true;
 		((OverviewPortal)p).setBorder(TIVNavigationManager.OV_INSIDE_BORDER_COLOR);
-		VirtualSpaceManager.INSTANCE.repaintNow();
+		VirtualSpaceManager.INSTANCE.repaint();
 	}
 
 	public void exitPortal(Portal p){
 		inPortal = false;
 		((OverviewPortal)p).setBorder(TIVNavigationManager.OV_BORDER_COLOR);
-		VirtualSpaceManager.INSTANCE.repaintNow();
+		VirtualSpaceManager.INSTANCE.repaint();
 	}
 	
 	void toggleNavMode(){

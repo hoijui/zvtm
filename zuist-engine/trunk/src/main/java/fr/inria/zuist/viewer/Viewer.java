@@ -50,7 +50,7 @@ import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.View;
-import fr.inria.zvtm.engine.Utilities;
+import fr.inria.zvtm.engine.Utils;
 import fr.inria.zvtm.engine.SwingWorker;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.Translucent;
@@ -171,11 +171,10 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener, Obj
 		gp = new VWGlassPane(this);
 		((JFrame)mView.getFrame()).setGlassPane(gp);
         eh = new ViewerEventHandler(this);
-        mView.setEventHandler(eh, 0);
-        mView.setEventHandler(eh, 1);
-        mView.setEventHandler(ovm, 2);
+        mView.setListener(eh, 0);
+        mView.setListener(eh, 1);
+        mView.setListener(ovm, 2);
 		mCamera.addListener(eh);
-        mView.setNotifyMouseMoved(true);
         mView.setBackgroundColor(Color.WHITE);
 		mView.setAntialiasing(antialiased);
 		mView.setJava2DPainter(this, Java2DPainter.AFTER_PORTALS);
@@ -273,10 +272,10 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener, Obj
 	}
 
     void windowLayout(){
-        if (Utilities.osIsWindows()){
+        if (Utils.osIsWindows()){
             VIEW_X = VIEW_Y = 0;
         }
-        else if (Utilities.osIsMacOS()){
+        else if (Utils.osIsMacOS()){
             VIEW_X = 80;
             SCREEN_WIDTH -= 80;
         }
@@ -538,7 +537,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener, Obj
         else {
             infoMI.setText(Messages.INFO_SHOW);
         }
-        vsm.repaintNow();
+        vsm.repaint();
     }
 
 	static final AlphaComposite acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.7f);
@@ -645,7 +644,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener, Obj
 	void gc(){
 		System.gc();
 		if (SHOW_MISC_INFO){
-			vsm.repaintNow();
+			vsm.repaint();
 		}
     }
     
@@ -685,7 +684,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener, Obj
                 }
             }
 		}
-        if (!fs && Utilities.osIsMacOS()){
+        if (!fs && Utils.osIsMacOS()){
             System.setProperty("apple.laf.useScreenMenuBar", "true");
         }
         System.out.println("--help for command line options");

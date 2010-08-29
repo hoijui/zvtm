@@ -44,7 +44,7 @@ import fr.inria.zvtm.glyphs.VImage;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.glyphs.ClosedShape;
-import fr.inria.zvtm.engine.CameraListener;
+import fr.inria.zvtm.event.CameraListener;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.Camera;
@@ -1010,7 +1010,7 @@ public class SceneManager implements CameraListener {
             if ((goingToLowerAltLevel && !levels[new_depth].contains(levels[depth].regions[i]))
                 || (!goingToLowerAltLevel && !levels[new_depth].contains(levels[depth].regions[i]))){
                     levels[depth].regions[i].hide((goingToLowerAltLevel) ? Region.TTLL : Region.TTUL,
-                        sceneCameras[levels[depth].regions[i].li].posx, sceneCameras[levels[depth].regions[i].li].posy);
+                        sceneCameras[levels[depth].regions[i].li].vx, sceneCameras[levels[depth].regions[i].li].vy);
             }
         }
         if (levelListener != null){

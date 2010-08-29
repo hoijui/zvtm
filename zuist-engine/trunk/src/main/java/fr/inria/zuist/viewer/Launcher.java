@@ -10,7 +10,7 @@ package fr.inria.zuist.viewer;
 import java.io.File;
 import java.io.FilenameFilter;
 
-import fr.inria.zvtm.engine.Utilities;
+import fr.inria.zvtm.engine.Utils;
 
 import fr.inria.zuist.engine.Region;
 
@@ -58,7 +58,7 @@ public class Launcher {
 		if (ogl){
 		    System.setProperty("sun.java2d.opengl", "True");
 		}
-        if (!fs && Utilities.osIsMacOS()){
+        if (!fs && Utils.osIsMacOS()){
             System.setProperty("apple.laf.useScreenMenuBar", "true");
         }
         System.out.println("--help for command line options");

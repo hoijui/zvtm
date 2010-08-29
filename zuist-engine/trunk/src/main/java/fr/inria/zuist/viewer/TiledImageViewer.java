@@ -53,18 +53,18 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewPanel;
-import fr.inria.zvtm.engine.Utilities;
+import fr.inria.zvtm.engine.Utils;
 import fr.inria.zvtm.engine.SwingWorker;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VImage;
 import fr.inria.zvtm.glyphs.Glyph;
-import fr.inria.zvtm.engine.ViewEventHandler;
+import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.glyphs.RImage;
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.EndAction;
 import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
-import fr.inria.zvtm.engine.RepaintListener;
+import fr.inria.zvtm.event.RepaintListener;
 
 import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zuist.engine.Region;
@@ -159,9 +159,8 @@ public class TiledImageViewer {
             mView.setVisible(true);
         }
         eh = new TIVExplorerEventHandler(this);
-        mView.setEventHandler(eh, 0);
-        mView.setEventHandler(ovm, 1);
-        mView.setNotifyMouseMoved(true);
+        mView.setListener(eh, 0);
+        mView.setListener(ovm, 1);
         mView.setBackgroundColor(BACKGROUND_COLOR);
 		mView.setAntialiasing(antialiased);
         mView.getPanel().addComponentListener(eh);
@@ -208,10 +207,10 @@ public class TiledImageViewer {
 	}
 
     void windowLayout(){
-        if (Utilities.osIsWindows()){
+        if (Utils.osIsWindows()){
             VIEW_X = VIEW_Y = 0;
         }
-        else if (Utilities.osIsMacOS()){
+        else if (Utils.osIsMacOS()){
             VIEW_X = 80;
             SCREEN_WIDTH -= 80;
         }
@@ -341,7 +340,7 @@ public class TiledImageViewer {
 		if (ogl){
 		    System.setProperty("sun.java2d.opengl", "True");
 		}
-        if (!fs && Utilities.osIsMacOS()){
+        if (!fs && Utils.osIsMacOS()){
             System.setProperty("apple.laf.useScreenMenuBar", "true");
         }
         System.out.println("--help for command line options");
@@ -425,7 +424,7 @@ class WEGlassPane extends JComponent implements ProgressListener {
     
 }
 
-class Overlay implements ViewEventHandler {
+class Overlay implements ViewListener {
     
     static final Color SAY_MSG_COLOR = Color.LIGHT_GRAY;
     static final Font SAY_MSG_FONT = new Font("Arial", Font.PLAIN, 24);
