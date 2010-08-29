@@ -25,8 +25,8 @@ import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VText;
-import fr.inria.zvtm.engine.ViewEventHandler;
-import fr.inria.zvtm.engine.CameraListener;
+import fr.inria.zvtm.event.ViewListener;
+import fr.inria.zvtm.event.CameraListener;
 import fr.inria.zvtm.engine.portals.Portal;
 import fr.inria.zvtm.engine.portals.OverviewPortal;
 import fr.inria.zvtm.engine.portals.PortalEventHandler;
@@ -37,7 +37,7 @@ import fr.inria.zuist.engine.TextDescription;
 
 import org.geonames.Toponym;
 
-class ExplorerEventHandler implements ViewEventHandler, CameraListener, ComponentListener, PortalEventHandler {
+class ExplorerEventHandler implements ViewListener, CameraListener, ComponentListener, PortalEventHandler {
 
     static final float MAIN_SPEED_FACTOR = 50.0f;
 
@@ -243,7 +243,7 @@ class ExplorerEventHandler implements ViewEventHandler, CameraListener, Componen
 
     public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
         if (nm.lensType != 0 && nm.lens != null){
-            if (wheelDirection  == ViewEventHandler.WHEEL_DOWN){
+            if (wheelDirection  == WHEEL_DOWN){
                 nm.magnifyFocus(NavigationManager.WHEEL_MM_STEP, nm.lensType, application.mCamera);
             }
             else {
@@ -256,13 +256,13 @@ class ExplorerEventHandler implements ViewEventHandler, CameraListener, Componen
                 // zooming in
                 application.mCamera.altitudeOffset(a*WHEEL_ZOOMOUT_FACTOR);
                 dut.requestUpdate();
-                application.vsm.repaintNow();
+                application.vsm.repaint();
             }
             else {
                 //wheelDirection == WHEEL_DOWN, zooming out
                 application.mCamera.altitudeOffset(-a*WHEEL_ZOOMIN_FACTOR);
                 dut.requestUpdate();
-                application.vsm.repaintNow();
+                application.vsm.repaint();
             }
     	}
     }
@@ -338,14 +338,14 @@ class ExplorerEventHandler implements ViewEventHandler, CameraListener, Componen
 	    application.mView.getCursor().activateDynaSpot(false);
 		inPortal = true;
 		((OverviewPortal)p).setBorder(NavigationManager.OV_INSIDE_BORDER_COLOR);
-		application.vsm.repaintNow();
+		application.vsm.repaint();
 	}
 
 	public void exitPortal(Portal p){
 	    application.mView.getCursor().activateDynaSpot(true);
 		inPortal = false;
 		((OverviewPortal)p).setBorder(NavigationManager.OV_BORDER_COLOR);
-		application.vsm.repaintNow();
+		application.vsm.repaint();
 	}
 	
 }

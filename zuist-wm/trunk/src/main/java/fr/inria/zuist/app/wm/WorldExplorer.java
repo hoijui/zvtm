@@ -39,7 +39,7 @@ import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.View;
-import fr.inria.zvtm.engine.Utilities;
+import fr.inria.zvtm.engine.Utils;
 import fr.inria.zvtm.glyphs.VSegment;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.ClosedShape;
@@ -168,9 +168,8 @@ public class WorldExplorer implements Java2DPainter {
         }
 		mView.setAntialiasing(aa);
         eh = new ExplorerEventHandler(this);
-        mView.setEventHandler(eh, 0);
-        mView.setEventHandler(eh, 1);
-        mView.setNotifyMouseMoved(true);
+        mView.setListener(eh, 0);
+        mView.setListener(eh, 1);
         mView.setBackgroundColor(BACKGROUND_COLOR);
 		mView.getCursor().setColor(Color.WHITE);
 		mView.getCursor().setHintColor(Color.WHITE);
@@ -193,10 +192,10 @@ public class WorldExplorer implements Java2DPainter {
     }
 
     void windowLayout(){
-        if (Utilities.osIsWindows()){
+        if (Utils.osIsWindows()){
             VIEW_X = VIEW_Y = 0;
         }
-        else if (Utilities.osIsMacOS()){
+        else if (Utils.osIsMacOS()){
             VIEW_X = 80;
             SCREEN_WIDTH -= 80;
         }
@@ -319,7 +318,7 @@ public class WorldExplorer implements Java2DPainter {
     
     void toggleMemoryUsageDisplay(){
         SHOW_MEMORY_USAGE = !SHOW_MEMORY_USAGE;
-        vsm.repaintNow();
+        vsm.repaint();
     }
 
     void toggleUpdateMaps(){
@@ -330,7 +329,7 @@ public class WorldExplorer implements Java2DPainter {
     void gc(){
         System.gc();
         if (SHOW_MEMORY_USAGE){
-            vsm.repaintNow();
+            vsm.repaint();
         }
     }
     
@@ -438,7 +437,7 @@ public class WorldExplorer implements Java2DPainter {
                 }
             }
 		}
-        if (!fs && Utilities.osIsMacOS()){
+        if (!fs && Utils.osIsMacOS()){
             System.setProperty("apple.laf.useScreenMenuBar", "true");
         }
         System.out.println("--help for command line options");
