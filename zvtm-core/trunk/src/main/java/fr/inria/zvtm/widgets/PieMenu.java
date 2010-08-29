@@ -35,12 +35,12 @@ public abstract class PieMenu {
     /**Virtual space the menu will appear in*/
     VirtualSpace vs;
 
-    /**destroy the pie menu (remove glyphs from virtual space)*/
+    /** Destroy the pie menu (remove glyphs from virtual space). */
     public void destroy(){
-	destroy(0);
+	    destroy(0);
     }
 
-	/**destroy the pie menu (remove glyphs from virtual space)
+	/** Destroy the pie menu (remove glyphs from virtual space).
 	 *@param animLength duration of collapse animation in ms (0 if no animation)
 	 */
 	public void destroy(int animLength){
@@ -78,45 +78,46 @@ public abstract class PieMenu {
 		}
 	}
 
-    /**returns the menu's items counter clockwise,
-     * starting with the element placed at the start angle.<br>
-     * This is useful to associate owners (and events) with items.*/
+    /** Get the menu's items counter clockwise.
+    * Starting with the element placed at the start angle.<br>
+    * This is useful to associate owners (and events) with items.*/
     public Glyph[] getItems(){
-	return items;
+        return items;
     }
 
-    /**returns the menu items' labels counter clockwise,
-       starting with the element placed at the start angle*/
+    /** Get the menu items' labels counter clockwise.
+    * Starting with the element placed at the start angle.
+    */
     public VText[] getLabels(){
-	return labels;
+        return labels;
     }
     
-    /**returns the menu's invisible (but sensitive) boundary*/
+    /** Get the menu's invisible (but sensitive) boundary glyph. */
     public Glyph getBoundary(){
-	return boundary;
+        return boundary;
     }
-
-    /**return the index of the provided glyph in the list of menu items.<br>
-     * Menu items are sorted counter clockwise, starting with the element
-     * placed at the start angle.
-     *@param g a glyph representing one of the menu's items
-     */
+    
+    /** Get index of the provided glyph in the list of menu items.<br>
+    * Menu items are sorted counter clockwise, starting with the element
+    * placed at the start angle.
+    *@param g a glyph representing one of the menu's items
+    */
     public int getItemIndex(Glyph g){
-	for (int i=0;i<items.length;i++){
-	    if (items[i] == g){return i;}
-	}
-	return -1;
+        for (int i=0;i<items.length;i++){
+            if (items[i] == g){return i;}
+        }
+        return -1;
     }
-
+    
     public void setSensitivity(boolean b){
-	for (int i=0;i<items.length;i++){
-	    items[i].setSensitivity(b);
-	}
-	boundary.setSensitivity(b);
+        for (int i=0;i<items.length;i++){
+            items[i].setSensitivity(b);
+        }
+        boundary.setSensitivity(b);
     }
-
+    
     public boolean getSensitivity(){
-	return boundary.isSensitive();
+        return boundary.isSensitive();
     }
 
 }

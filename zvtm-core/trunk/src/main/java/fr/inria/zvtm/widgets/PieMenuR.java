@@ -21,6 +21,8 @@ import fr.inria.zvtm.glyphs.VTextOr;
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
 
+/** Circular pie menu with dead zone at its center. */
+
 public class PieMenuR extends PieMenu {
 
 	public static final int animStartSize = 5;

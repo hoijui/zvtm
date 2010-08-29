@@ -42,10 +42,10 @@ public abstract class PieMenuFactory {
      *@param vsm instance of VirtualSpaceManager
      */
     public static PieMenu createPieMenu(String[] labels, int animLength, View v, VirtualSpaceManager vsm){
-	return new PieMenuR(labels, new Point2D.Double(v.mouse.vx, v.mouse.vy),
-			    v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, RING_INNER_RATIO, ANGLE,
-			    ITEM_FILLCOLOR, ITEM_BORDERCOLOR, ITEM_SFILLCOLOR, ITEM_SBORDERCOLOR, LABEL_COLOR, TRANSLUCENCY,
-			    animLength, SENSIT_BOUNDING_RADIUS, FONT);
+        return new PieMenuR(labels, new Point2D.Double(v.mouse.vx, v.mouse.vy),
+            v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, RING_INNER_RATIO, ANGLE,
+            ITEM_FILLCOLOR, ITEM_BORDERCOLOR, ITEM_SFILLCOLOR, ITEM_SBORDERCOLOR, LABEL_COLOR, TRANSLUCENCY,
+            animLength, SENSIT_BOUNDING_RADIUS, FONT);
     }
 
     /**Standard pie menu creation method.
@@ -65,10 +65,10 @@ public abstract class PieMenuFactory {
     public static PieMenu createPieMenu(String[] labels, int animLength, View v, VirtualSpaceManager vsm,
 					Color[] itemColors, Color[] itembColors, Color[] itemSColors,
 					Color[] itembSColors, Color[] labelColors){
-	return new PieMenuR(labels, new Point2D.Double(v.mouse.vx, v.mouse.vy),
-			    v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, RING_INNER_RATIO, ANGLE,
-			    itemColors, itembColors, itemSColors, itembSColors, labelColors, TRANSLUCENCY,
-			    animLength, SENSIT_BOUNDING_RADIUS, FONT);
+	    return new PieMenuR(labels, new Point2D.Double(v.mouse.vx, v.mouse.vy),
+            v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, RING_INNER_RATIO, ANGLE,
+            itemColors, itembColors, itemSColors, itembSColors, labelColors, TRANSLUCENCY,
+            animLength, SENSIT_BOUNDING_RADIUS, FONT);
     }
 
     /**Standard pie menu creation method.
@@ -82,10 +82,10 @@ public abstract class PieMenuFactory {
      *@param vsm instance of VirtualSpaceManager
      */
     public static PieMenu createPieMenu(String[] labels, Point2D.Double[] labelOffsets, int animLength, View v, VirtualSpaceManager vsm){
-	return new PieMenuR(labels, new Point2D.Double(v.mouse.vx, v.mouse.vy),
-			    v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, RING_INNER_RATIO, ANGLE,
-			    ITEM_FILLCOLOR, ITEM_BORDERCOLOR, ITEM_SFILLCOLOR, ITEM_SBORDERCOLOR, LABEL_COLOR, TRANSLUCENCY,
-			    animLength, SENSIT_BOUNDING_RADIUS, FONT, labelOffsets);
+	    return new PieMenuR(labels, new Point2D.Double(v.mouse.vx, v.mouse.vy),
+	    		    v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, RING_INNER_RATIO, ANGLE,
+	    		    ITEM_FILLCOLOR, ITEM_BORDERCOLOR, ITEM_SFILLCOLOR, ITEM_SBORDERCOLOR, LABEL_COLOR, TRANSLUCENCY,
+	    		    animLength, SENSIT_BOUNDING_RADIUS, FONT, labelOffsets);
     }
 
     /**Standard pie menu creation method.
@@ -106,10 +106,10 @@ public abstract class PieMenuFactory {
     public static PieMenu createPieMenu(String[] labels, Point2D.Double[] labelOffsets, int animLength, View v, VirtualSpaceManager vsm,
 					Color[] itemColors, Color[] itembColors, Color[] itemSColors,
 					Color[] itembSColors, Color[] labelColors){
-	return new PieMenuR(labels, new Point2D.Double(v.mouse.vx, v.mouse.vy),
-			    v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, RING_INNER_RATIO, ANGLE,
-			    itemColors, itembColors, itemSColors, itembSColors,labelColors, TRANSLUCENCY,
-			    animLength, SENSIT_BOUNDING_RADIUS, FONT, labelOffsets);
+	    return new PieMenuR(labels, new Point2D.Double(v.mouse.vx, v.mouse.vy),
+	    		    v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, RING_INNER_RATIO, ANGLE,
+	    		    itemColors, itembColors, itemSColors, itembSColors,labelColors, TRANSLUCENCY,
+	    		    animLength, SENSIT_BOUNDING_RADIUS, FONT, labelOffsets);
     }
 
 
@@ -122,10 +122,10 @@ public abstract class PieMenuFactory {
      *@param vsm instance of VirtualSpaceManager
      */
     public static PieMenu createPolygonalPieMenu(String[] labels, View v, VirtualSpaceManager vsm){
-	return new PieMenuP(labels, new Point2D.Double(v.mouse.vx, v.mouse.vy),
-			    v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, ANGLE,
-			    ITEM_FILLCOLOR, ITEM_BORDERCOLOR, ITEM_SFILLCOLOR, ITEM_SBORDERCOLOR, LABEL_COLOR, TRANSLUCENCY,
-			    SENSIT_BOUNDING_RADIUS, FONT);
+	    return new PieMenuP(labels, new Point2D.Double(v.mouse.vx, v.mouse.vy),
+	    		    v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, ANGLE,
+	    		    ITEM_FILLCOLOR, ITEM_BORDERCOLOR, ITEM_SFILLCOLOR, ITEM_SBORDERCOLOR, LABEL_COLOR, TRANSLUCENCY,
+	    		    SENSIT_BOUNDING_RADIUS, FONT);
     }
 
     /**Polygonal pie menu creation method.
@@ -144,10 +144,10 @@ public abstract class PieMenuFactory {
     public static PieMenu createPolygonalPieMenu(String[] labels, View v, VirtualSpaceManager vsm,
 						 Color[] itemColors, Color[] itembColors, Color[] itemSColors,
 						 Color[] itembSColors, Color[] labelColors){
-	return new PieMenuP(labels, new Point2D.Double(v.mouse.vx, v.mouse.vy),
-			    v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, ANGLE,
-			    itemColors, itembColors, itemSColors, itembSColors, labelColors, TRANSLUCENCY,
-			    SENSIT_BOUNDING_RADIUS, FONT);
+	    return new PieMenuP(labels, new Point2D.Double(v.mouse.vx, v.mouse.vy),
+	    		    v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, ANGLE,
+	    		    itemColors, itembColors, itemSColors, itembSColors, labelColors, TRANSLUCENCY,
+	    		    SENSIT_BOUNDING_RADIUS, FONT);
     }
 
     /**Polygonal pie menu creation method.
@@ -160,10 +160,10 @@ public abstract class PieMenuFactory {
      *@param vsm instance of VirtualSpaceManager
      */
     public static PieMenu createPolygonalPieMenu(String[] labels, Point2D.Double[] labelOffsets, View v, VirtualSpaceManager vsm){
-	return new PieMenuP(labels, new Point2D.Double(v.mouse.vx, v.mouse.vy),
-			    v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, ANGLE,
-			    ITEM_FILLCOLOR, ITEM_BORDERCOLOR, ITEM_SFILLCOLOR, ITEM_SBORDERCOLOR, LABEL_COLOR, TRANSLUCENCY,
-			    SENSIT_BOUNDING_RADIUS, FONT, labelOffsets);
+	    return new PieMenuP(labels, new Point2D.Double(v.mouse.vx, v.mouse.vy),
+			        v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, ANGLE,
+			        ITEM_FILLCOLOR, ITEM_BORDERCOLOR, ITEM_SFILLCOLOR, ITEM_SBORDERCOLOR, LABEL_COLOR, TRANSLUCENCY,
+			        SENSIT_BOUNDING_RADIUS, FONT, labelOffsets);
     }
 
     /**Polygonal pie menu creation method.
@@ -183,102 +183,102 @@ public abstract class PieMenuFactory {
     public static PieMenu createPolygonalPieMenu(String[] labels, Point2D.Double[] labelOffsets, View v, VirtualSpaceManager vsm,
 						 Color[] itemColors, Color[] itembColors, Color[] itemSColors,
 						 Color[] itembSColors, Color[] labelColors){
-	return new PieMenuP(labels, new Point2D.Double(v.mouse.vx, v.mouse.vy),
-			    v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, ANGLE,
-			    itemColors, itembColors, itemSColors, itembSColors, labelColors, TRANSLUCENCY,
-			    SENSIT_BOUNDING_RADIUS, FONT, labelOffsets);
+	    return new PieMenuP(labels, new Point2D.Double(v.mouse.vx, v.mouse.vy),
+	    		    v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, ANGLE,
+	    		    itemColors, itembColors, itemSColors, itembSColors, labelColors, TRANSLUCENCY,
+	    		    SENSIT_BOUNDING_RADIUS, FONT, labelOffsets);
     }
 
-    /**set the radius (in virtual space units) of pie menus that will be created by calls to createPieMenu()*/
+    /** Set the radius (in virtual space units) of pie menus that will be created by calls to create*PieMenu(). */
     public static void setRadius(long r){
-	RADIUS = r;
+	    RADIUS = r;
     }
 
-    /**set the angle offset of the first menu item of pie menus that will be created by calls to createPieMenu()
-     *@param a the angle offset, interpreted relative to the X horizontal axis (counter clockwise)
+    /** Set the angle offset of the first menu item of pie menus that will be created by calls to create*PieMenu().
+     *@param a the angle offset, interpreted relative to the X horizontal axis (running counter clockwise).
      */
     public static void setAngle(double a){
-	ANGLE = a;
+	    ANGLE = a;
     }
 
-    /**set the fill color of pie menu items that will be created by calls to createPieMenu()*/
+    /** Set the fill color of pie menu items that will be created by calls to create*PieMenu(). */
     public static void setItemFillColor(Color c){
-	ITEM_FILLCOLOR = c;
+        ITEM_FILLCOLOR = c;
     }
 
-    /**set the border color of pie menu items that will be created by calls to createPieMenu()*/
+    /** Set the border color of pie menu items that will be created by calls to create*PieMenu(). */
     public static void setItemBorderColor(Color c){
-	ITEM_BORDERCOLOR = c;
+        ITEM_BORDERCOLOR = c;
     }
 
-    /**set the fill color of pie menu items that will be created by calls to createPieMenu() - null if same as unselected*/
+    /** Set the fill color of pie menu items that will be created by calls to create*PieMenu(). Pass null if same as unselected. */
     public static void setSelectedItemFillColor(Color c){
-	ITEM_SFILLCOLOR = c;
+        ITEM_SFILLCOLOR = c;
     }
 
-    /**set the border color of pie menu items that will be created by calls to createPieMenu() - null if same as unselected*/
+    /** Set the border color of pie menu items that will be created by calls to create*PieMenu(). Pass null if same as unselected. */
     public static void setSelectedItemBorderColor(Color c){
-	ITEM_SBORDERCOLOR = c;
+        ITEM_SBORDERCOLOR = c;
     }
 
-    /**set the color of pie menu labels that will be created by calls to createPieMenu()*/
+    /** Set the color of pie menu labels that will be created by calls to create*PieMenu(). */
     public static void setLabelColor(Color c){
-	LABEL_COLOR = c;
+        LABEL_COLOR = c;
     }
 
-    /**set the translucency of pie menus that will be created by calls to createPieMenu()*/
+    /** Set the translucency of pie menus that will be created by calls to create*PieMenu(). */
     public static void setTranslucency(float a){
-	TRANSLUCENCY = a;
+        TRANSLUCENCY = a;
     }
 
-    /**set the bounding shape's radius (as a percentage of the menu's actual radius)*/
+    /** Set the bounding shape's radius (as a percentage of the menu's actual radius). */
     public static void setSensitivityRadius(double p){
-	SENSIT_BOUNDING_RADIUS = p;
+        SENSIT_BOUNDING_RADIUS = p;
     }
 
-    /**set font used for menu labels*/
+    /** Set the font used for menu labels. */
     public static void setFont(Font f){
-	FONT = f;
+        FONT = f;
     }
 
     public static long getRadius(){
-	return RADIUS;
+        return RADIUS;
     }
 
     public static double getAngle(){
-	return ANGLE;
+        return ANGLE;
     }
 
     public static Color getItemFillColor(){
-	return ITEM_FILLCOLOR;
+        return ITEM_FILLCOLOR;
     }
 
     public static Color getItemBorderColor(){
-	return ITEM_BORDERCOLOR;
+        return ITEM_BORDERCOLOR;
     }
 
     public static Color getSelectedItemFillColor(){
-	return ITEM_SFILLCOLOR;
+        return ITEM_SFILLCOLOR;
     }
 
     public static Color getSelectedItemBorderColor(){
-	return ITEM_SBORDERCOLOR;
+        return ITEM_SBORDERCOLOR;
     }
 
     public static Color getLabelColor(){
-	return LABEL_COLOR;
+        return LABEL_COLOR;
     }
 
     public static float getTranslucency(){
-	return TRANSLUCENCY;
+        return TRANSLUCENCY;
     }
 
     public static double getSensitivityRadius(){
-	return SENSIT_BOUNDING_RADIUS;
+        return SENSIT_BOUNDING_RADIUS;
     }
 
     public static Font getFont(){
-	return FONT;
+        return FONT;
     }
-    
+
 }

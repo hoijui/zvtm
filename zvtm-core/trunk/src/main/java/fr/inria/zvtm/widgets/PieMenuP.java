@@ -21,6 +21,8 @@ import fr.inria.zvtm.glyphs.VPolygon;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.glyphs.VTextOr;
 
+/** Polygonal pie menu with no dead zone at its center. */
+
 public class PieMenuP extends PieMenu {
 
     /**Pie Menu constructor - should not be used directly
