@@ -48,6 +48,9 @@ public class PDFResourceHandler implements ResourceHandler {
         documentCache.removeAll();
     }
     
+    /** Get a PDF Document (IcePDF Document instance) given its URL.
+     * The document gets stored in a cache the first time it is fetched, for faster access later.
+     */
     public static Document getDocument(URL pdfURL){
         return (Document)documentCache.get(pdfURL).getObjectValue();
     }

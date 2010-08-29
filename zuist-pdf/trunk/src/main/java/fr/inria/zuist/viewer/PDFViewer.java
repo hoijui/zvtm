@@ -49,16 +49,16 @@ import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.View;
-import fr.inria.zvtm.engine.Utilities;
+import fr.inria.zvtm.engine.Utils;
 import fr.inria.zvtm.engine.SwingWorker;
 import fr.inria.zvtm.engine.Java2DPainter;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.glyphs.Translucent;
 import fr.inria.zvtm.engine.Location;
-import fr.inria.zvtm.engine.ViewEventHandler;
+import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.engine.ViewPanel;
-import fr.inria.zvtm.engine.CameraListener;
+import fr.inria.zvtm.event.CameraListener;
 import fr.inria.zvtm.animation.EndAction;
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
@@ -163,8 +163,7 @@ public class PDFViewer {
 		gp = new VWGlassPane(this);
 		((JFrame)mView.getFrame()).setGlassPane(gp);
         eh = new PDFViewerEventHandler(this);
-        mView.setEventHandler(eh, 0);
-        mView.setNotifyMouseMoved(true);
+        mView.setListener(eh, 0);
         mView.setBackgroundColor(Color.WHITE);
 		mView.getPanel().addComponentListener(eh);
 		ComponentAdapter ca0 = new ComponentAdapter(){
@@ -176,10 +175,10 @@ public class PDFViewer {
     }
 
     void windowLayout(){
-        if (Utilities.osIsWindows()){
+        if (Utils.osIsWindows()){
             VIEW_X = VIEW_Y = 0;
         }
-        else if (Utilities.osIsMacOS()){
+        else if (Utils.osIsMacOS()){
             VIEW_X = 80;
             SCREEN_WIDTH -= 80;
         }
@@ -361,7 +360,7 @@ public class PDFViewer {
                 }
             }
 		}
-        if (!fs && Utilities.osIsMacOS()){
+        if (!fs && Utils.osIsMacOS()){
             System.setProperty("apple.laf.useScreenMenuBar", "true");
         }
         System.out.println("--help for command line options");
@@ -449,7 +448,7 @@ class ConfigManager {
 
 }
 
-class PDFViewerEventHandler implements ViewEventHandler, ComponentListener {
+class PDFViewerEventHandler implements ViewListener, ComponentListener {
 
     static final float MAIN_SPEED_FACTOR = 50.0f;
 
@@ -504,12 +503,12 @@ class PDFViewerEventHandler implements ViewEventHandler, ComponentListener {
 		if (wheelDirection  == WHEEL_UP){
 			// zooming in
 			application.mCamera.altitudeOffset(a*WHEEL_ZOOMOUT_FACTOR);
-			VirtualSpaceManager.INSTANCE.repaintNow();
+			VirtualSpaceManager.INSTANCE.repaint();
 		}
 		else {
 			//wheelDirection == WHEEL_DOWN, zooming out
 			application.mCamera.altitudeOffset(-a*WHEEL_ZOOMIN_FACTOR);
-			VirtualSpaceManager.INSTANCE.repaintNow();
+			VirtualSpaceManager.INSTANCE.repaint();
 		}
 	}
 
