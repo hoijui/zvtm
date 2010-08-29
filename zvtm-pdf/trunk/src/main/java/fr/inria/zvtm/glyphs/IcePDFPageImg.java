@@ -310,7 +310,7 @@ public class IcePDFPageImg extends ZPDFPage {
 		return res;
 	}
 
-    /** Flush image resource. */
+    @Override
 	public void flush(){
 	    if (pageImage != null){
 	        pageImage.flush();
@@ -318,6 +318,8 @@ public class IcePDFPageImg extends ZPDFPage {
 	    }
 	}
 	
+    /** Get rasterized rendering of this page.
+     */
 	public BufferedImage getPageImage() {
 		return pageImage;
 	}

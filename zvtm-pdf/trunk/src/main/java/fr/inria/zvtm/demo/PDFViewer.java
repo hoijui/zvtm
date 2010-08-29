@@ -26,7 +26,7 @@ import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.glyphs.Glyph;
-import fr.inria.zvtm.engine.ViewEventHandler;
+import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.glyphs.IcePDFPageImg;
 
 import org.icepdf.core.pobjects.Document;
@@ -45,7 +45,7 @@ public class PDFViewer {
 
 	VirtualSpace vs;
 	static final String spaceName = "pdfSpace";
-	ViewEventHandler eh;
+	ViewListener eh;
 	Camera mCamera;
 
 	View pdfView;
@@ -64,10 +64,10 @@ public class PDFViewer {
 		pdfView = VirtualSpaceManager.INSTANCE.addFrameView(cameras, "ZVTM PDF Viewer", View.STD_VIEW, 1024, 768, false, true, true, null);
 		pdfView.setBackgroundColor(Color.WHITE);
 		eh = new PDFViewerEventHandler(this);
-		pdfView.setEventHandler(eh);
+		pdfView.setListener(eh);
 		pdfView.setAntialiasing(true);
 		mCamera.setAltitude(0);
-		VirtualSpaceManager.INSTANCE.repaintNow();
+		VirtualSpaceManager.INSTANCE.repaint();
 	}
 
     void load(File f, float detailFactor){
@@ -134,7 +134,7 @@ public class PDFViewer {
 
 }
 
-class PDFViewerEventHandler implements ViewEventHandler {
+class PDFViewerEventHandler implements ViewListener {
 
 	PDFViewer application;
 
@@ -150,7 +150,7 @@ class PDFViewerEventHandler implements ViewEventHandler {
 		lastJPX=jpx;
 		lastJPY=jpy;
 		v.setDrawDrag(true);
-		VirtualSpaceManager.INSTANCE.activeView.mouse.setSensitivity(false);
+		VirtualSpaceManager.INSTANCE.getActiveView().mouse.setSensitivity(false);
 	}
 
 	public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
@@ -158,7 +158,7 @@ class PDFViewerEventHandler implements ViewEventHandler {
         VirtualSpaceManager.INSTANCE.getAnimationManager().setYspeed(0);
         VirtualSpaceManager.INSTANCE.getAnimationManager().setZspeed(0);
 		v.setDrawDrag(false);
-		VirtualSpaceManager.INSTANCE.activeView.mouse.setSensitivity(true);
+		VirtualSpaceManager.INSTANCE.getActiveView().mouse.setSensitivity(true);
 	}
 
 	public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
@@ -214,12 +214,12 @@ class PDFViewerEventHandler implements ViewEventHandler {
 		double a = (c.focal+Math.abs(c.altitude))/c.focal;
 		if (wheelDirection == WHEEL_UP){
 			c.altitudeOffset(-a*5);
-			VirtualSpaceManager.INSTANCE.repaintNow();
+			VirtualSpaceManager.INSTANCE.repaint();
 		}
 		else {
 			//wheelDirection == WHEEL_DOWN
 			c.altitudeOffset(a*5);
-			VirtualSpaceManager.INSTANCE.repaintNow();
+			VirtualSpaceManager.INSTANCE.repaint();
 		}
 	}
 

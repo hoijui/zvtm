@@ -39,13 +39,10 @@ public abstract class ZPDFPage extends ClosedShape implements RectangularShape {
 	/** Aspect ratio: width divided by height (read-only). */
     public double ar;
 
-    /** For internal use. Made public for easier outside package subclassing. */
     public RProjectedCoordsP[] pc;
 	
-	/** For internal use. Made public for easier outside package subclassing. */
     public boolean zoomSensitive = true;
 
-    /** For internal use. Made public for easier outside package subclassing. */
     public double scaleFactor = 1.0f;
     
     /** Indicates when a border is drawn around the image (read-only).
@@ -92,29 +89,18 @@ public abstract class ZPDFPage extends ClosedShape implements RectangularShape {
         size = Math.sqrt(Math.pow(vw,2)+Math.pow(vh,2));
     }
 
-    /** Get glyph's size (radius of bounding circle). */
     @Override
 	public double getSize(){return size;}
 
-    /** Set glyph's size by setting its bounding circle's radius.
-     *@see #reSize(double factor)
-     */
     @Override
  	public void sizeTo(double s){/*XXX:TBW*/}
 
-    /** Set glyph's size by multiplying its bounding circle radius by a factor. 
-     *@see #sizeTo(double radius)
-     */
     @Override
  	public void reSize(double factor){/*XXX:TBW*/}
 
-    /** Get the glyph's orientation. */
     @Override
 	public double getOrient(){/*XXX:TBW*/return 0;}
 
-    /** Set the glyph's absolute orientation.
-     *@param angle in [0:2Pi[ 
-     */
     @Override
  	public void orientTo(double angle){/*XXX:TBW*/}
 
@@ -139,7 +125,7 @@ public abstract class ZPDFPage extends ClosedShape implements RectangularShape {
 	public void setZoomSensitive(boolean b){
 		if (zoomSensitive!=b){
 			zoomSensitive=b;
-			VirtualSpaceManager.INSTANCE.repaintNow();
+			VirtualSpaceManager.INSTANCE.repaint();
 		}
 	}
 
@@ -156,7 +142,7 @@ public abstract class ZPDFPage extends ClosedShape implements RectangularShape {
 	public void setDrawBorderPolicy(short p){
 		if (drawBorder!=p){
 			drawBorder=p;
-			VirtualSpaceManager.INSTANCE.repaintNow();
+			VirtualSpaceManager.INSTANCE.repaint();
 		}
 	}
 	
@@ -240,8 +226,8 @@ public abstract class ZPDFPage extends ClosedShape implements RectangularShape {
 		coef = c.focal/(c.focal+c.altitude);
 		//find coordinates of object's geom center wrt to camera center and project
 		//translate in JPanel coords
-		pc[i].cx = (int)Math.round((d.width/2)+(vx-c.posx)*coef);
-		pc[i].cy = (int)Math.round((d.height/2)-(vy-c.posy)*coef);
+		pc[i].cx = (int)Math.round((d.width/2)+(vx-c.vx)*coef);
+		pc[i].cy = (int)Math.round((d.height/2)-(vy-c.vy)*coef);
 		//project width and height
 		if (zoomSensitive){
 			pc[i].cw = (int)Math.round(vw/2d*coef);
@@ -272,6 +258,7 @@ public abstract class ZPDFPage extends ClosedShape implements RectangularShape {
 		}
 	}
 	
+	/** Flush any resource used. */
 	public abstract void flush();
 
 }
