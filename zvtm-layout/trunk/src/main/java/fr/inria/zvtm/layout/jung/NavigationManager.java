@@ -120,7 +120,7 @@ class NavigationManager {
 
     void toggleOverview(){
         ovPortal.setVisible(!ovPortal.isVisible());
-        vsm.repaintNow(application.mView);
+        vsm.repaint(application.mView);
     }
     
 }

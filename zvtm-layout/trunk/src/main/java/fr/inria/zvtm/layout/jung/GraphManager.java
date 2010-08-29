@@ -177,7 +177,7 @@ class GraphManager {
     
     void toggleLayoutUpdate(){
         lu.setEnabled(!lu.isEnabled());
-        VirtualSpaceManager.INSTANCE.repaintNow();
+        VirtualSpaceManager.INSTANCE.repaint();
     }
     
     int getIterationsPerCycle(){

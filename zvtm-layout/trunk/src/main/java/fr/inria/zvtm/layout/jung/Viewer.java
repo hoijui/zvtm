@@ -38,13 +38,13 @@ import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.EView;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.Camera;
-import fr.inria.zvtm.engine.Utilities;
+import fr.inria.zvtm.engine.Utils;
 import fr.inria.zvtm.engine.SwingWorker;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VImage;
 import fr.inria.zvtm.glyphs.Glyph;
-import fr.inria.zvtm.engine.ViewEventHandler;
+import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.engine.Java2DPainter;
 import fr.inria.zvtm.glyphs.RImage;
 import fr.inria.zvtm.widgets.PieMenu;
@@ -120,10 +120,10 @@ public class Viewer implements Java2DPainter {
 		gp = new VWGlassPane(this);
 		((JFrame)mView.getFrame()).setGlassPane(gp);
         eh = new MainEventHandler(this);
-        mView.setEventHandler(eh, 0);
-        mView.setEventHandler(new PieMenuEventHandler(this), 1);
-        mView.setEventHandler(ovm, 2);
-        mView.setNotifyMouseMoved(true);
+        mView.setListener(eh, 0);
+        mView.setListener(new PieMenuEventHandler(this), 1);
+        mView.setListener(ovm, 2);
+        mView.setNotifyCursorMoved(true);
         mView.setAntialiasing(antialiased);
         mView.setBackgroundColor(ConfigManager.BACKGROUND_COLOR);
 		mView.getPanel().addComponentListener(eh);
@@ -138,10 +138,10 @@ public class Viewer implements Java2DPainter {
     }
 
     void windowLayout(){
-        if (Utilities.osIsWindows()){
+        if (Utils.osIsWindows()){
             VIEW_X = VIEW_Y = 0;
         }
-        else if (Utilities.osIsMacOS()){
+        else if (Utils.osIsMacOS()){
             VIEW_X = 80;
             SCREEN_WIDTH -= 80;
         }
@@ -209,7 +209,7 @@ public class Viewer implements Java2DPainter {
 			PieMenuFactory.setSelectedItemBorderColor(null);
 			PieMenuFactory.setLabelColor(ConfigManager.PIEMENU_BORDER_COLOR);
 			PieMenuFactory.setFont(ConfigManager.PIEMENU_MAIN_FONT);
-			if (Utilities.osIsWindows() || Utilities.osIsMacOS()){
+			if (Utils.osIsWindows() || Utils.osIsMacOS()){
 				PieMenuFactory.setTranslucency(ConfigManager.PIEMENU_MAIN_ALPHA);
 			}
 			PieMenuFactory.setSensitivityRadius(0.5);
@@ -240,7 +240,7 @@ public class Viewer implements Java2DPainter {
 				PieMenuFactory.setSelectedItemBorderColor(null);
 				PieMenuFactory.setSensitivityRadius(1.0);
 				PieMenuFactory.setAngle(Math.PI/2.0);
-				if (Utilities.osIsWindows() || Utilities.osIsMacOS()){
+				if (Utils.osIsWindows() || Utils.osIsMacOS()){
 					PieMenuFactory.setTranslucency(ConfigManager.PIEMENU_SUB_ALPHA);
 				}
 				PieMenuFactory.setRadius(ConfigManager.PIEMENU_SUB_RADIUS);
@@ -323,7 +323,7 @@ public class Viewer implements Java2DPainter {
                 }
             }
 		}
-        if (!fs && Utilities.osIsMacOS()){
+        if (!fs && Utils.osIsMacOS()){
             System.setProperty("apple.laf.useScreenMenuBar", "true");
         }
         System.out.println(Messages.H_4_HELP);
@@ -396,7 +396,7 @@ class VWGlassPane extends JComponent {
     
 }
 
-class Overlay implements ViewEventHandler {
+class Overlay implements ViewListener {
     
     Viewer application;
 
@@ -554,7 +554,7 @@ class Overlay implements ViewEventHandler {
 	}
 }
 
-class PieMenuEventHandler implements ViewEventHandler {
+class PieMenuEventHandler implements ViewListener {
 	
 	Viewer application;
 	
