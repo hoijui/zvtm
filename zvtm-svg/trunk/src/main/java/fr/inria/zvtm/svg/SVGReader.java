@@ -50,7 +50,7 @@ import org.w3c.dom.NodeList;
 
 import org.xml.sax.SAXException;
 
-import fr.inria.zvtm.engine.Utilities;
+import fr.inria.zvtm.engine.Utils;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.glyphs.Glyph;
@@ -488,7 +488,7 @@ public class SVGReader {
             }
             else {
                 Color c;
-                if ((c=Utilities.getColorByKeyword(s))!=null){return c;}
+                if ((c=Utils.getColorByKeyword(s))!=null){return c;}
                 else return null;
             }
         }
@@ -604,7 +604,7 @@ public class SVGReader {
     public static void translateSVGPolygon(String s, Vector<Point2D.Double> res){
         StringBuffer svg=new StringBuffer(s);
         while (svg.length()>0){
-            Utilities.delLeadingSpaces(svg);
+            Utils.delLeadingSpaces(svg);
             processNextSVGCoords(svg,res);
         }
     }
@@ -631,7 +631,7 @@ public class SVGReader {
 
     //utility method used by processNextSVGCoords()
     private static void seekSecondCoord(StringBuffer sb){
-        Utilities.delLeadingSpaces(sb);
+        Utils.delLeadingSpaces(sb);
         while ((sb.length()>0) && ((Character.isWhitespace(sb.charAt(0))) || (sb.charAt(0)==','))){
             sb.deleteCharAt(0);
         }
@@ -656,7 +656,7 @@ public class SVGReader {
         float[] sda = ss.getStrokeDashArray();
         BasicStroke bs;
         if (sda != null){
-            String dashPattern = Utilities.arrayOffloatAsCSStrings(sda);
+            String dashPattern = Utils.arrayOffloatAsCSStrings(sda);
             if (strokes.containsKey(sw)){
                 Hashtable h1 = (Hashtable)strokes.get(sw);
                 if (h1.containsKey(dashPattern)){
@@ -1544,7 +1544,7 @@ public class SVGReader {
         if (checkSVGPath(svg.toString())){
             StringBuffer lastCommand=new StringBuffer("M");
             while (svg.length()>0){
-                Utilities.delLeadingSpaces(svg);
+                Utils.delLeadingSpaces(svg);
                 processNextSVGPathCommand(svg,ph,lastCommand);
             }
             SVGStyle ss=getStyle(e.getAttribute(_style), e);
@@ -1600,7 +1600,7 @@ public class SVGReader {
         if (checkSVGPath(svg.toString())){
             StringBuffer lastCommand=new StringBuffer("M");
             while (svg.length()>0){
-                Utilities.delLeadingSpaces(svg);
+                Utils.delLeadingSpaces(svg);
                 processNextSVGPathCommand(svg,ph,lastCommand);
             }
             if (meta){setMetadata(ph,ctx);}

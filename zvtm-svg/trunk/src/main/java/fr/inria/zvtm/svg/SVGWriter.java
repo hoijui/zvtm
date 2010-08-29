@@ -42,7 +42,7 @@ import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import fr.inria.zvtm.engine.Utilities;
+import fr.inria.zvtm.engine.Utils;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
@@ -557,7 +557,7 @@ public class SVGWriter {
 			shape.setAttribute(SVGReader._width,String.valueOf(i.getWidth()));
 			shape.setAttribute(SVGReader._height,String.valueOf(i.getHeight()));
 			System.err.println("SVGWriter:An error occured while exporting "+i.toString()+" to PNG.\n"+ex);
-			if (!Utilities.javaVersionIs140OrLater()){
+			if (!Utils.javaVersionIs140OrLater()){
 				System.err.println("ZVTM/SVGWriter:Error: the Java Virtual Machine in use seems to be older than version 1.4.0 ; package javax.imageio is probably missing, which prevents generating bitmap files for representing VImage objects. Install a JVM version 1.4.0 or later if you want to use this functionality.");
 			}
 			ex.printStackTrace();

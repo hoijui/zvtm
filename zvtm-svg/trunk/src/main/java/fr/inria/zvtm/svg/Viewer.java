@@ -61,12 +61,12 @@ import org.apache.xml.serialize.DOMSerializer;
 
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.VirtualSpace;
-import fr.inria.zvtm.engine.ViewEventHandler;
+import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.EView;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.Camera;
-import fr.inria.zvtm.engine.Utilities;
+import fr.inria.zvtm.engine.Utils;
 import fr.inria.zvtm.engine.SwingWorker;
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
@@ -155,9 +155,9 @@ public class Viewer {
 		gp = new VWGlassPane(this);
 		((JFrame)mView.getFrame()).setGlassPane(gp);
         eh = new MainEventHandler(this);
-        mView.setEventHandler(eh, 0);
-        mView.setEventHandler(ovm, 1);
-        mView.setNotifyMouseMoved(true);
+        mView.setListener(eh, 0);
+        mView.setListener(ovm, 1);
+        mView.setNotifyCursorMoved(true);
         mView.setAntialiasing(antialiased);
         mView.setBackgroundColor(Config.BACKGROUND_COLOR);
 		mView.getPanel().addComponentListener(eh);
@@ -171,10 +171,10 @@ public class Viewer {
     }
 
     void windowLayout(){
-        if (Utilities.osIsWindows()){
+        if (Utils.osIsWindows()){
             VIEW_X = VIEW_Y = 0;
         }
-        else if (Utilities.osIsMacOS()){
+        else if (Utils.osIsMacOS()){
             VIEW_X = 80;
             SCREEN_WIDTH -= 80;
         }
@@ -314,7 +314,7 @@ public class Viewer {
 			    if (f.exists()){svgF = f;}
 			}
 		}
-        if (!fs && Utilities.osIsMacOS()){
+        if (!fs && Utils.osIsMacOS()){
             System.setProperty("apple.laf.useScreenMenuBar", "true");
         }
         System.out.println(Messages.H_4_HELP);
@@ -387,7 +387,7 @@ class VWGlassPane extends JComponent {
     
 }
 
-class Overlay implements ViewEventHandler {
+class Overlay implements ViewListener {
     
     Viewer application;
 
@@ -545,7 +545,7 @@ class Overlay implements ViewEventHandler {
 	}
 }
 
-class MainEventHandler implements ViewEventHandler, ComponentListener, PortalEventHandler {
+class MainEventHandler implements ViewListener, ComponentListener, PortalEventHandler {
 
     static float ZOOM_SPEED_COEF = 1.0f/50.0f;
     static double PAN_SPEED_COEF = 50.0;
@@ -679,12 +679,12 @@ class MainEventHandler implements ViewEventHandler, ComponentListener, PortalEve
         if (wheelDirection  == WHEEL_UP){
             // zooming in
             application.nm.mCamera.altitudeOffset(a*WHEEL_ZOOMOUT_COEF);
-            VirtualSpaceManager.INSTANCE.repaintNow();
+            VirtualSpaceManager.INSTANCE.repaint();
         }
         else {
             //wheelDirection == WHEEL_DOWN, zooming out
             application.nm.mCamera.altitudeOffset(-a*WHEEL_ZOOMIN_COEF);
-            VirtualSpaceManager.INSTANCE.repaintNow();
+            VirtualSpaceManager.INSTANCE.repaint();
         }            
     }
 
@@ -734,13 +734,13 @@ class MainEventHandler implements ViewEventHandler, ComponentListener, PortalEve
 	public void enterPortal(Portal p){
 		inPortal = true;
 		((OverviewPortal)p).setBorder(Config.OV_INSIDE_BORDER_COLOR);
-		VirtualSpaceManager.INSTANCE.repaintNow();
+		VirtualSpaceManager.INSTANCE.repaint();
 	}
 
 	public void exitPortal(Portal p){
 		inPortal = false;
 		((OverviewPortal)p).setBorder(Config.OV_BORDER_COLOR);
-		VirtualSpaceManager.INSTANCE.repaintNow();
+		VirtualSpaceManager.INSTANCE.repaint();
 	}
 	
 }
@@ -847,7 +847,7 @@ class Navigation {
 
     void toggleOverview(){
         ovPortal.setVisible(!ovPortal.isVisible());
-        vsm.repaintNow(application.mView);
+        vsm.repaint(application.mView);
     }
     
 }
