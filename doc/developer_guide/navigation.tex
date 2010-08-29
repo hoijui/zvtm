@@ -46,7 +46,7 @@ cam.setLocation(new Location(100,-200,150));
 \fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
 \end{small}
 
-A \cd{fr.inria.zvtm.engine.CameraListener} can be associated with a \cd{Camera} to be notified about camera movements (both (x,y) and altitude changes).
+A \cd{fr.inria.zvtm.event.CameraListener} can be associated with a \cd{Camera} to be notified about camera movements (both (x,y) and altitude changes).
 
 \begin{small}
 \begin{SaveVerbatim}{CodeVerb}
@@ -60,16 +60,16 @@ cam.addListener(cl);
 %%%%%%%%%%
 \subsection{Repositioning based on input device events}
 
-In many applications the camera's position and altitude is controlled by pan \& zoom actions initiated by the user through an input device such as a mouse, trackpad, trackball. This is easily implemented in ZVTM with a few lines of code in the application's \cd{ViewEventHandler} (see Section \ref{sec:input} for more detail about this interface).
+In many applications the camera's position and altitude is controlled by pan \& zoom actions initiated by the user through an input device such as a mouse, trackpad, trackball. This is easily implemented in ZVTM with a few lines of code in the application's \cd{ViewListener} (see Section \ref{sec:input} for more detail about this interface).
 
 %%%%%
 \subsubsection{Conventional panning}
 
-The following code shows an example of how to implement conventional panning with the left mouse button, as typically encountered in applications that feature a 2D canvas and provide the "hand" tool to pan the viewport (Adobe Photoshop, Adobe Illustrator, GIMP, etc.). All methods are callbacks declared in \cd{ViewEventHandler}.
+The following code shows an example of how to implement conventional panning with the left mouse button, as typically encountered in applications that feature a 2D canvas and provide the "hand" tool to pan the viewport (Adobe Photoshop, Adobe Illustrator, GIMP, etc.). All methods are callbacks declared in \cd{ViewListener}.
 
 \begin{small}
 \begin{SaveVerbatim}{CodeVerb}
-... implements ViewEventHandler {
+... implements ViewListener {
 
 int lastJPX, lastJPY;
 
@@ -103,7 +103,7 @@ This is a first-order control method for panning. The amount of drag controls th
 
 \begin{small}
 \begin{SaveVerbatim}{CodeVerb}
-... implements ViewEventHandler {
+... implements ViewListener {
 
 int lastJPX, lastJPY;
 
@@ -149,7 +149,7 @@ Note that rate-based scrolling and zooming can easily be combined to implement s
 
 \begin{small}
 \begin{SaveVerbatim}{CodeVerb}
-... implements ViewEventHandler {
+... implements ViewListener {
 
 // wheel speed factor
 static final float WSF = 5f;

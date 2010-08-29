@@ -61,7 +61,7 @@ If ZVTM is instantiated within an applet, you will probably need to call the fol
 %%%%%%%%%%
 \subsection{Virtual Spaces}
 
-Graphical objects are put on infinite\footnote{Actually bounded by the representation of 64-bit integers in the current Java implementation, i.e., $\pm 9 \times 10^{18}$.} 2D canvas (or surfaces), called {\em virtual spaces} \cl{fr.inria.zvtm.engine.VirtualSpace}, in which they have a specified position \cd{vx,vy}. Virtual spaces use a Cartesian coordinate system, meaning that \cd{vx} and \cd{vy} can be negative. As opposed to most computer screen coordinate systems, the Y axis is oriented upward.
+Graphical objects are put on infinite\footnote{Coordinate systems are double-precision floating point values since v0.11.0.} 2D canvas (or surfaces), called {\em virtual spaces} \cl{fr.inria.zvtm.engine.VirtualSpace}, in which they have a specified position \cd{vx,vy}. Virtual spaces use a Cartesian coordinate system, meaning that \cd{vx} and \cd{vy} can be negative. As opposed to most computer screen coordinate systems, the Y axis is oriented upward.
 
 There can be an arbitrary number of virtual spaces. This provides an easy logical separation between graphical scenes/repre\-sen\-tations that are independent from one another.
 
@@ -108,7 +108,7 @@ A view is instantiated through the VSM:
 
 \begin{small}
 \begin{SaveVerbatim}{CodeVerb}
-Vector cameras = new Vector();
+Vector<Camera> cameras = new Vector();
 cameras.add(cam);
 View v = vsm.addFrameView(cameras, "fooview", View.STD_VIEW, 800, 600, true, true);
 \end{SaveVerbatim}
@@ -148,7 +148,7 @@ You may have noticed in the previous section that we are not passing the camera 
 
 \begin{small}
 \begin{SaveVerbatim}{CodeVerb}
-Vector cameras = new Vector();
+Vector<Camera> cameras = new Vector();
 cameras.add(foocam);
 cameras.add(barcam);
 cameras.add(lastcam);
@@ -222,7 +222,7 @@ A portal is a subregion of a view that displays something different. Typically, 
 \begin{SaveVerbatim}{CodeVerb}
 Camera detailCam = ...;
 Camera overviewCam = ...;
-Vector cams = new Vector();
+Vector<Camera> cams = new Vector();
 cams.add(detailCam);
 View v = vsm.addFrameView(cams, ...);
 Portal p = new CameraPortal(0, 0, 100, 50, overviewCam);
@@ -242,11 +242,11 @@ vsm.addPortal(p, v);
 \subsection{Input events}
 \label{sec:input}
 
-It is possible to associated the same event handler with all layers in a view, or to associate different event handlers with each layer of the view. The input event handling interface works in a way similar to conventional AWT/Swing event listeners (using callbacks). There is a single interface for all ZVTM events: \cl{fr.inria.zvtm.engine.ViewEventHandler}. A convenience (default) implementation, which does nothing, is available for subclassing: \cl{DefaultEventHandler}.
+It is possible to associated the same event handler with all layers in a view, or to associate different event handlers with each layer of the view. The input event handling interface works in a way similar to conventional AWT/Swing event listeners (using callbacks). There is a single interface for all ZVTM events: \cl{fr.inria.zvtm.event.ViewListener}. A convenience (default) implementation, which does nothing, is available for subclassing: \cl{ViewAdapter}.
 
-\cd{ViewEventHandler} features callbacks for conventional pointing device events (move, drag, button press/release/click, mouse wheel) and keyboard events. Additional events are triggered when the cursor enters or exits a glyph, unless this glyph has been declared as not sensitive \cl{Glyph.setSensitivity(boolean b)}.
+\cd{ViewListener} features callbacks for conventional pointing device events (move, drag, button press/release/click, mouse wheel) and keyboard events. Additional events are triggered when the cursor enters or exits a glyph, unless this glyph has been declared as not sensitive \cl{Glyph.setSensitivity(boolean b)}.
 
-Portals have their own event interface \cl{fr.inria.zvtm.engine.PortalEventHandler}, that is used to listen for cursor entry/exit.
+Portals have their own event interface \cl{fr.inria.zvtm.event.PortalListener}, that is used to listen for cursor entry/exit.
 
 %%%%%%%%%%
 \subsection{Graphical Object Model}
