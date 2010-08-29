@@ -21,9 +21,9 @@ import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.engine.portals.Portal;
 import fr.inria.zvtm.engine.portals.OverviewPortal;
-import fr.inria.zvtm.engine.portals.PortalEventHandler;
+import fr.inria.zvtm.event.PortalListener;
 
-class MainEventHandler implements ViewListener, ComponentListener, PortalEventHandler {
+class MainEventHandler implements ViewListener, ComponentListener, PortalListener {
 
     static float ZOOM_SPEED_COEF = 1.0f/50.0f;
     static double PAN_SPEED_COEF = 50.0;

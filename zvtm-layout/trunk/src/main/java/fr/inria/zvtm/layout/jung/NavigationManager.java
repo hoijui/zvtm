@@ -97,7 +97,7 @@ class NavigationManager {
 	void createOverview(){
 		ovPortal = new OverviewPortal(application.panelWidth-ConfigManager.OVERVIEW_WIDTH-1, application.panelHeight-ConfigManager.OVERVIEW_HEIGHT-1,
 		                              ConfigManager.OVERVIEW_WIDTH, ConfigManager.OVERVIEW_HEIGHT, ovCamera, mCamera);
-		ovPortal.setPortalEventHandler(application.eh);
+		ovPortal.setPortalListener(application.eh);
 		ovPortal.setBackgroundColor(ConfigManager.BACKGROUND_COLOR);
 		ovPortal.setObservedRegionColor(ConfigManager.OBSERVED_REGION_COLOR);
 		ovPortal.setObservedRegionTranslucency(ConfigManager.OBSERVED_REGION_ALPHA);
