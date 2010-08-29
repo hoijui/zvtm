@@ -47,38 +47,48 @@ public class RoundCameraPortal extends CameraPortal {
         clippingShape = new Ellipse2D.Float(x, y, w, h);
     }
 
-    /**returns bounds of rectangle representing virtual space's region seen through camera c [west,north,east,south].
-       Although the region seen is actually an oval, we approximate it to the bounding rectangle.*/
+    /** Get bounds of rectangular region of the VirtualSpace seen through this camera portal.
+     * Although the region seen is actually an oval, we approximate it to the bounding rectangle.
+     *@return boundaries in VirtualSpace coordinates {west,north,east,south}
+     */
+    @Override
     public double[] getVisibleRegion(){
 	    return super.getVisibleRegion();
     }
 
-    /**detects whether the given point is inside this portal or not 
-     *@param cx horizontal cursor coordinate (JPanel)
-     *@param cy vertical cursor coordinate (JPanel)
-     */
+    @Override
     public boolean coordInside(int cx, int cy){
-	return clippingShape.contains(cx, cy);
+	    return clippingShape.contains(cx, cy);
     }
 
-    /**move the portal by dx and dy inside the view (JPanel coordinates)*/
+    /** Move the portal inside the view (relative).
+     *@param dx x-offset (JPanel coordinates system)
+     *@param dy y-offset (JPanel coordinates system) 
+     */
+    @Override
     public void move(int dx, int dy){
-	super.move(dx, dy);
-	clippingShape.setFrame(x, y, w, h);
+        super.move(dx, dy);
+        clippingShape.setFrame(x, y, w, h);
     }
 
-    /**move the portal by dx and dy inside the view (JPanel coordinates)*/
+    /** Move the portal inside the view (absolute).
+     *@param x new x-coordinate (JPanel coordinates system)
+     *@param y new y-coordinate (JPanel coordinates system) 
+     */
+    @Override
     public void moveTo(int x, int y){
-	super.moveTo(x, y);
-	clippingShape.setFrame(x, y, w, h);
+        super.moveTo(x, y);
+        clippingShape.setFrame(x, y, w, h);
     }
 
+    @Override
     public void updateDimensions(){
-	size.setSize(w, h);
-	if (clippingShape != null){clippingShape.setFrame(x, y, w, h);}
-	else {clippingShape = new Ellipse2D.Float(x, y, w, h);}
+        size.setSize(w, h);
+        if (clippingShape != null){clippingShape.setFrame(x, y, w, h);}
+        else {clippingShape = new Ellipse2D.Float(x, y, w, h);}
     }
     
+    @Override
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
 		if (!visible){return;}
 		if (alphaC != null){

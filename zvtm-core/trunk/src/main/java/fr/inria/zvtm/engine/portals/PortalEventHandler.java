@@ -16,10 +16,10 @@ package fr.inria.zvtm.engine.portals;
 
 public interface PortalEventHandler {
     
-    /**cursor enters portal*/
+    /** Cursor enters portal. */
     public void enterPortal(Portal p);
 
-    /**cursor exits portal*/
+    /** Cursor exits portal. */
     public void exitPortal(Portal p);
 
 }

@@ -34,31 +34,31 @@ public class DraggableCameraPortal extends CameraPortal {
      *@param c camera associated with the portal
      */
     public DraggableCameraPortal(int x, int y, int w, int h, Camera c){
-	super(x, y, w, h, c);
+	    super(x, y, w, h, c);
     }
 
     /**Set color of horizontal bar used to drag the portal.
      *@param bc color of the bar*/
     public void setDragBarColor(Color bc){
-	this.barColor = bc;
+	    this.barColor = bc;
     }
 
     /**Get color of horizontal bar used to drag the portal.
      *@return color of bar*/    
     public Color getDragBarColor(){
-	return barColor;
+	    return barColor;
     }
 
     /**Set height of horizontal bar used to drag the portal.
      *@param bh height of the bar*/    
     public void setDragBarHeight(int bh){
-	this.barHeight = bh;
+	    this.barHeight = bh;
     }
 
     /**Get height of horizontal bar used to drag the portal.
      *@return height of bar*/    
     public int getDragBarHeight(){
-	return barHeight;
+	    return barHeight;
     }
 
     /**detects whether the given point is inside this portal's horizontal bar or not 
@@ -66,10 +66,11 @@ public class DraggableCameraPortal extends CameraPortal {
      *@param cy vertical cursor coordinate (JPanel)
      */
     public boolean coordInsideBar(int cx, int cy){
-	return ((cx >= x) && (cx <= x+w) && 
-		(cy >= y) && (cy <= y+barHeight));
+        return ((cx >= x) && (cx <= x+w) && 
+            (cy >= y) && (cy <= y+barHeight));
     }
 
+    @Override
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
         if (!visible){return;}
         g2d.setClip(x, y, w, h);

@@ -286,7 +286,7 @@ public class VText extends ClosedShape {
     }
     
     /** Get the value under which a VText is drawn as a point/segment instead of an actual text (considered too small to be read).
-     *@reutnr the value compared to the product of the font size by the projection value. Default is 0.5.
+     *@return the value compared to the product of the font size by the projection value. Default is 0.5.
      * Raising this value implies that more text that was still displayed as a string will be displayed as a segment and conversely.
      */
     public static float getTextDisplayedAsSegCoef(){

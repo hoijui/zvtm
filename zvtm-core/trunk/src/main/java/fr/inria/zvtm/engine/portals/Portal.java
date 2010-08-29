@@ -17,48 +17,59 @@ import fr.inria.zvtm.engine.View;
 
 public abstract class Portal {
     
-    /** top-left horizontal coordinate of portal, in parent's JPanel coordinates */
+    /** Top-left x-coordinate of this portal (JPanel coordinates system). */
     public int x;
-    /** top-left vertical coordinate of portal, in parent's JPanel coordinates */
+    /** Top-left y-coordinate of this portal (JPanel coordinates system). */
     public int y;
-    /** Portal dimensions width*/
+    
+    /** Portal dimensions (width). */
     public int w;
-    /** Portal dimensions width*/
+    /** Portal dimensions (height). */
     public int h;
+    
     Dimension size = new Dimension(0,0);
-    /** View embedding this portal */
+    
+    /** View embedding this portal. */
     View owningView;
-    /** handles events occuring inside the portal */
+
+    /** Handles events occuring inside the portal. */
     public PortalEventHandler pevH;
-    /**remembers wether cursor was inside portal or not last time it moved*/
+    
+    /** Was the cursor inside the portal or not last time it moved. */
     public boolean cursorInside = false;
 
 	boolean visible = true;
 
-    /**move the portal by dx and dy inside the view (JPanel coordinates)*/
+    /** Move the portal inside the view (relative).
+     *@param dx x-offset (JPanel coordinates system)
+     *@param dy y-offset (JPanel coordinates system) 
+     */
     public void move(int dx, int dy){
-	x += dx;
-	y += dy;
+        x += dx;
+        y += dy;
     }
 
-    /**move the portal to x,y inside the view (JPanel coordinates)*/
+    /** Move the portal inside the view (absolute).
+     *@param x new x-coordinate (JPanel coordinates system)
+     *@param y new y-coordinate (JPanel coordinates system) 
+     */
     public void moveTo(int x, int y){
-	this.x = x;
-	this.y = y;
+        this.x = x;
+        this.y = y;
     }    
     
-    /**set the portal's size (offset)*/
+    /** Set the portal's size (multiplication factor). */
     public void resize(int dw, int dh){
-	w += dw;
-	h += dh;
-	updateDimensions();
+        w += dw;
+        h += dh;
+        updateDimensions();
     }
 
-    /**set the portal's size (absolute value)*/
+    /** Set the portal's size (absolute value). */
     public void sizeTo(int w, int h){
-	this.w = w;
-	this.h = h;
-	updateDimensions();
+        this.w = w;
+        this.h = h;
+        updateDimensions();
     }
     
     public Dimension getDimensions(){
@@ -66,58 +77,64 @@ public abstract class Portal {
     }
 
     public void updateDimensions(){
-	size.setSize(w, h);
+	    size.setSize(w, h);
     }
     
     /**CALLED INTERNALLY - NOT FOR PUBLIC USE*/
     public void setOwningView(View v){
-	this.owningView = v;
+	    this.owningView = v;
     }
     
-    /**Get the view embedding this portal*/
+    /** Get the view embedding this portal. */
     public View getOwningView(){
-	return owningView;
+	    return owningView;
     }
 
-    /**Set an event handler for mouse and keyboard events occuring inside the portal*/
+    /** Set an event handler for mouse and keyboard events occuring inside the portal. */
     public void setPortalEventHandler(PortalEventHandler peh){
-	this.pevH = peh;
+	    this.pevH = peh;
     }
 
     /**Get the event handler for mouse and keyboard events occuring inside the portal (null if none)*/
     public PortalEventHandler getPortalEventHandler(){
-	return this.pevH;
+	    return this.pevH;
     }
 
     /**detects whether the given point is inside this portal or not 
-     *@param cx horizontal cursor coordinate (JPanel)
-     *@param cy vertical cursor coordinate (JPanel)
+     *@param cx cursor x-coordinate (JPanel coordinates system)
+     *@param cy cursor y-coordinate (JPanel coordinates system) 
      */
     public abstract boolean coordInside(int cx, int cy);
 
 
-    /**Detects cursor entry/exit in/from the portal.
-     *@param cx horizontal cursor coordinate (JPanel)
-     *@param cy vertical cursor coordinate (JPanel)
+    /** Detects cursor entry/exit in/from the portal.
+     *@param cx cursor x-coordinate (JPanel coordinates system)
+     *@param cy cursor y-coordinate (JPanel coordinates system) 
      *@return 1 if cursor has entered the portal, -1 if it has exited the portal, 0 if nothing has changed (meaning it was already inside or outside it)
      */
     public int cursorInOut(int cx,int cy){
-	if (coordInside(cx, cy)){// if the cursor is inside the portal
-	    if (!cursorInside){// if it was not inside it last time, cursor has entered the portal
-		cursorInside = true;
-		if (pevH != null){pevH.enterPortal(this);}
-		return 1;
-	    }
-	    else {return 0;}   // if it was inside last time, nothing has changed
-	}
-	else{// if the cursor is not inside the portal
-	    if (cursorInside){// if it was inside it last time, cursor has exited the portal
-		cursorInside = false;
-		if (pevH != null){pevH.exitPortal(this);}
-		return -1;
-	    }
-	    else {return 0;}  // if it was not inside last time, nothing has changed
-	}
+        if (coordInside(cx, cy)){
+            // if the cursor is inside the portal
+            if (!cursorInside){
+                // if it was not inside it last time, cursor has entered the portal
+                cursorInside = true;
+                if (pevH != null){pevH.enterPortal(this);}
+                return 1;
+            }
+            // if it was inside last time, nothing has changed
+            else {return 0;}
+        }
+        else{
+            // if the cursor is not inside the portal
+            if (cursorInside){
+                // if it was inside it last time, cursor has exited the portal
+                cursorInside = false;
+                if (pevH != null){pevH.exitPortal(this);}
+                return -1;
+            }
+            else {return 0;}
+            // if it was not inside last time, nothing has changed
+        }
     }
 
     /**Computes the distance between a given point (typically the mouse cursor) and each of the four portal borders.
@@ -136,17 +153,19 @@ public abstract class Portal {
      *@return the projected distance between the provided coordinates and the portal's borders
      */
     public int[] getDistanceFromBorders(int cx, int cy, int[] res){
-	res[0] = cx - x;
-	res[1] = cy - y;
-	res[2] = x + w - cx;
-	res[3] = y + h - cy;	
-	return res;
+        res[0] = cx - x;
+        res[1] = cy - y;
+        res[2] = x + w - cx;
+        res[3] = y + h - cy;	
+        return res;
     }
 
+    /** Show/hide this portal. */
 	public void setVisible(boolean b){
 		visible = b;
 	}
 	
+	/** Tells wether this portal is currently visible or not. */
 	public boolean isVisible(){
 		return visible;
 	}

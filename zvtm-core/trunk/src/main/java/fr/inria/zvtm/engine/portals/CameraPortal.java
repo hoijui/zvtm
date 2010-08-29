@@ -94,8 +94,8 @@ public class CameraPortal extends Portal {
         setTranslucencyValue(a);
     }
 
-    /** AlphaComposite used to paint glyph if not opaque. Set to null if glyph is opaque. Temporarily made public until all glyphs get into the same package.*/
-    public AlphaComposite alphaC;
+    /** AlphaComposite used to paint glyph if not opaque. Set to null if glyph is opaque. */
+    AlphaComposite alphaC;
     
     /**
      * Set alpha channel value (translucency).
@@ -120,44 +120,47 @@ public class CameraPortal extends Portal {
 
     /**CALLED INTERNALLY - NOT FOR PUBLIC USE*/
     public void setOwningView(View v){
-	super.setOwningView(v);
-	camera.setOwningView(v);
+        super.setOwningView(v);
+        camera.setOwningView(v);
     }
 
     /**Draw a border delimiting the portal.
-     *@param bc color of the border (null if none)*/    
+     *@param bc color of the portal's border (pass null if none)*/    
     public void setBorder(Color bc){
-	this.borderColor = bc;
+        this.borderColor = bc;
     }
 
     /**Get the color used to draw the border delimiting this portal.
-     *@return color of the border (null if none)*/    
+     *@return color of the portal's border (null if none)*/    
     public Color getBorder(){
-	return borderColor;
+	    return borderColor;
     }
 
     /**Fill background with a color.
-     *@param bc color of the border (null if none)*/    
+     *@param bc color of the border (pass null if none)*/    
     public void setBackgroundColor(Color bc){
-	this.bkgColor = bc;
+	    this.bkgColor = bc;
     }
 
     /**Get the color used to fill the background.
      *@return color of the border (null if none)*/    
     public Color getBackgroundColor(){
-	return bkgColor;
+	    return bkgColor;
     }
 
-    /**Returns the (unprojected) coordinates of point (jpx,jpy) in the virtual space to which the camera associated with this ortal belongs.
-     *@param cx horizontal cursor coordinate (JPanel)
-     *@param cy vertical cursor coordinate (JPanel) 
+    /** Get the (unprojected) coordinates of point (jpx,jpy) in the virtual space to which the camera associated with this portal belongs.
+     *@param cx cursor x-coordinate (JPanel coordinates system)
+     *@param cy cursor y-coordinate (JPanel coordinates system) 
      */
     public Point2D.Double getVSCoordinates(int cx, int cy){
         double uncoef = (camera.focal+camera.altitude) / camera.focal;
         return new Point2D.Double((camera.vx + (cx-x-w/2)*uncoef), (camera.vy - (cy-y-h/2)*uncoef));
     }
     
-    /**returns bounds of rectangle representing virtual space's region seen through camera c [west,north,east,south]*/
+    /** Get bounds of rectangular region of the VirtualSpace seen through this camera portal.
+     *@param res array which will contain the result
+     *@return boundaries in VirtualSpace coordinates {west,north,east,south}
+     */
     public double[] getVisibleRegion(double[] res){
         double uncoef = (camera.focal+camera.altitude) / camera.focal;
         res[0] = camera.vx - (w/2d)*uncoef;
@@ -167,12 +170,14 @@ public class CameraPortal extends Portal {
         return res;
     }
 
-    /**returns bounds of rectangle representing virtual space's region seen through camera c [west,north,east,south]*/
+    /** Get bounds of rectangular region of the VirtualSpace seen through this camera portal.
+     *@return boundaries in VirtualSpace coordinates {west,north,east,south}
+     */
     public double[] getVisibleRegion(){
-	return getVisibleRegion(new double[4]);
+	    return getVisibleRegion(new double[4]);
     }
 
-    /**returns the location from which this portal's camera will see everything visible in the associated virtual space
+    /** Get the location from which this portal's camera will see all glyphs visible in the associated virtual space.
      *@return the location to which the camera should go
      */
     public Location getGlobalView(){
@@ -196,7 +201,7 @@ public class CameraPortal extends Portal {
         return new Location(dx, dy, currentAlt*Math.abs(ratio));
     }
 
-    /**translates and (un)zooms this portal's camera in order to see everything visible in the associated virtual space
+    /** Translates and (un)zooms this portal's camera in order to see everything visible in the associated virtual space.
      *@param d duration of the animation in ms
      *@return the final camera location
      */
@@ -217,8 +222,9 @@ public class CameraPortal extends Portal {
         return l;
     }
 
-    /** Position this portal's camera so that it seamlessly integrates with the surrounding context
-     *@param c camera observing the context (associated with the View)
+    /** Position this portal's camera so that it seamlessly integrates with the surrounding context.
+     *@param c camera observing the context (associated with the View containing the portal)
+     *@return the final camera location
      */
     public Location getSeamlessView(Camera c){
         int hvw = c.getOwningView().getFrame().getWidth() / 2;
@@ -235,6 +241,13 @@ public class CameraPortal extends Portal {
         return new Location((wnes[2]+wnes[0]) / 2d, (wnes[1]+wnes[3]) / 2d, camera.focal * ((wnes[2]-wnes[0])/w));
     }
 
+	/** Get the location from which this portal's camera will focus on a specific rectangular region.
+	 *@param x1 x coord of first point
+	 *@param y1 y coord of first point
+	 *@param x2 x coord of opposite point
+	 *@param y2 y coord of opposite point
+	 *@return the final camera location
+	 */
     public Location centerOnRegion(double x1, double y1, double x2, double y2){
         double minX = Math.min(x1,x2);
 		double minY = Math.min(y1,y2);
@@ -260,6 +273,14 @@ public class CameraPortal extends Portal {
 		return new Location(dx, dy, newAlt);
     }
         
+	/** Translates and (un)zooms this portal's camera in order to focus on a specific rectangular region
+	 *@param d duration of the animation in ms (pass 0 to go there instantanesouly)
+	 *@param x1 x coord of first point
+	 *@param y1 y coord of first point
+	 *@param x2 x coord of opposite point
+	 *@param y2 y coord of opposite point
+	 *@return the final camera location
+	 */
     public Location centerOnRegion(int d, double x1, double y1, double x2, double y2){
         Location l = centerOnRegion(x1, y1, x2, y2);
 		Animation trans = 
@@ -277,15 +298,13 @@ public class CameraPortal extends Portal {
 		return l;
     }
 
-    /**Detects whether the given point is inside this portal or not.
-     *@param cx horizontal cursor coordinate (JPanel)
-     *@param cy vertical cursor coordinate (JPanel)
-     */
+    @Override
     public boolean coordInside(int cx, int cy){
 	return ((cx >= x) && (cx <= x+w) && 
 		(cy >= y) && (cy <= y+h));
     }
 
+    @Override
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
         if (!visible){return;}
         if (alphaC != null){

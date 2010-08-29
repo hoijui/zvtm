@@ -33,14 +33,14 @@ public class OverviewPortal extends CameraPortal {
 
     Color observedRegionColor = Color.GREEN;
 
-    /** for translucency of the rectangle representing the region observed through the main viewport (default is 0.5)*/
+    /** For translucency of the rectangle representing the region observed through the main viewport (default is 0.5)*/
     AlphaComposite acST;
-    /** alpha channel*/
+    /** Alpha channel value. */
     float alpha = 0.5f;
 
     Timer borderTimer;
 
-    /** Builds a new portal displaying what is seen through a camera and the region seen through another camera
+    /** Builds a new portal displaying what is seen through a camera and the region seen through another camera.
      *@param x top-left horizontal coordinate of portal, in parent's JPanel coordinates
      *@param y top-left vertical coordinate of portal, in parent's JPanel coordinates
      *@param w portal width
@@ -59,29 +59,29 @@ public class OverviewPortal extends CameraPortal {
 
     private class BorderTimer extends TimerTask {
 
-	OverviewPortal portal;
-	double[] portalRegion = new double[4];
-	double[] intersection = new double[4];
-	
-	BorderTimer(OverviewPortal p){
-	    super();
-	    this.portal = p;
-	}
-	
-	public void run(){
-	    portal.getVisibleRegion(portalRegion);
-	    intersection[0] = portal.observedRegion[0] - portalRegion[0]; // west
-	    intersection[1] = portal.observedRegion[1] - portalRegion[1]; // north
-	    intersection[2] = portal.observedRegion[2] - portalRegion[2]; // east
-	    intersection[3] = portal.observedRegion[3] - portalRegion[3]; // south
-	    portal.observedRegionIntersects(intersection);
-	}
-	
+        OverviewPortal portal;
+        double[] portalRegion = new double[4];
+        double[] intersection = new double[4];
+
+        BorderTimer(OverviewPortal p){
+            super();
+            this.portal = p;
+        }
+
+        public void run(){
+            portal.getVisibleRegion(portalRegion);
+            intersection[0] = portal.observedRegion[0] - portalRegion[0]; // west
+            intersection[1] = portal.observedRegion[1] - portalRegion[1]; // north
+            intersection[2] = portal.observedRegion[2] - portalRegion[2]; // east
+            intersection[3] = portal.observedRegion[3] - portalRegion[3]; // south
+            portal.observedRegionIntersects(intersection);
+        }
+
     }
 
-    /**detects whether the given point is inside the observed region rectangle depicting what is seen through the main camera 
-     *@param cx horizontal cursor coordinate (JPanel)
-     *@param cy vertical cursor coordinate (JPanel)
+    /** Is the given point inside the observed region rectangle depicting what is seen through the main camera (viewfinder). 
+     *@param cx cursor x-coordinate (JPanel coordinates system)
+     *@param cy cursor y-coordinate (JPanel coordinates system) 
      */
     public boolean coordInsideObservedRegion(int cx, int cy){
 	return (cx >= x+w/2 + Math.round((observedRegion[0]-camera.vx)*orcoef) &&
@@ -90,51 +90,56 @@ public class OverviewPortal extends CameraPortal {
 		cy <= y+h/2 + Math.round((camera.vy-observedRegion[3])*orcoef));
     }
     
+    /** Set color of rectangle depicting what is seen through the main camera. */
     public void setObservedRegionColor(Color c){
-	observedRegionColor = c;
+	    observedRegionColor = c;
     }
 
+    /** Get color of rectangle depicting what is seen through the main camera. */
     public Color getObservedRegionColor(){
-	return observedRegionColor;
+	    return observedRegionColor;
     }
 
     public void setObservedRegionTranslucency(float a){
-	if (a == 1.0f){
-	    acST = null;
-	}
-	else {
-	    acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, a);
-	}
+        if (a == 1.0f){
+            acST = null;
+        }
+        else {
+            acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, a);
+        }
     }
 
     public double getObservedRegionX() {
-	orcoef = camera.focal/(camera.focal+camera.altitude);
-	return x+ (double)w/2.0 + (observedRegion[0]-camera.vx)*orcoef;
+        orcoef = camera.focal/(camera.focal+camera.altitude);
+        return x+ (double)w/2.0 + (observedRegion[0]-camera.vx)*orcoef;
     }
     public double getObservedRegionY() {
-	orcoef = camera.focal/(camera.focal+camera.altitude);
-	return y+ h/2.0 - (observedRegion[1]-camera.vy)*orcoef;
+        orcoef = camera.focal/(camera.focal+camera.altitude);
+        return y+ h/2.0 - (observedRegion[1]-camera.vy)*orcoef;
     }
     public double getObservedRegionW() {
-	orcoef = camera.focal/(camera.focal+camera.altitude);
-	return (observedRegion[2]-observedRegion[0])*orcoef;
+        orcoef = camera.focal/(camera.focal+camera.altitude);
+        return (observedRegion[2]-observedRegion[0])*orcoef;
     }
     public double getObservedRegionH() {
-	orcoef = camera.focal/(camera.focal+camera.altitude);
-	return (observedRegion[1]-observedRegion[3])*orcoef;
+        orcoef = camera.focal/(camera.focal+camera.altitude);
+        return (observedRegion[1]-observedRegion[3])*orcoef;
     }
     public double getObservedRegionCX() {
-	return getObservedRegionX() + getObservedRegionW()/2.0;
+        return getObservedRegionX() + getObservedRegionW()/2.0;
     }
     public double getObservedRegionCY() {
-	return getObservedRegionY() + getObservedRegionH()/2.0;
+        return getObservedRegionY() + getObservedRegionH()/2.0;
     }
     
-    /**returns null if translucency is 1.0f*/
+    /**
+     *@return null if translucency is 1.0f (opaque).
+     */
     public AlphaComposite getObservedRegionTranslucency(){
-	return acST;
+	    return acST;
     }
 
+    @Override
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
         if (!visible){return;}
         g2d.setClip(x, y, w, h);
@@ -196,19 +201,19 @@ public class OverviewPortal extends CameraPortal {
     }
 
     public void dispose(){
-	borderTimer.cancel();
+	    borderTimer.cancel();
     }
 
     ObservedRegionListener observedRegionListener;
 
     public void setObservedRegionListener(ObservedRegionListener orl){
-	this.observedRegionListener = orl;
+	    this.observedRegionListener = orl;
     }
 
     void observedRegionIntersects(double[] wnes){
-	if (observedRegionListener != null){
-	    observedRegionListener.intersectsParentRegion(wnes);
-	}
+        if (observedRegionListener != null){
+            observedRegionListener.intersectsParentRegion(wnes);
+        }
     }
 
 }

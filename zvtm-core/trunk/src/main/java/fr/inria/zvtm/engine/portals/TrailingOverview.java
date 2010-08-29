@@ -73,20 +73,20 @@ public class TrailingOverview extends TrailingCameraPortal {
     }
 
     /**detects whether the given point is inside the observed region rectangle depicting what is seen through the main camera 
-     *@param cx horizontal cursor coordinate (JPanel)
-     *@param cy vertical cursor coordinate (JPanel)
+     *@param cx cursor x-coordinate (JPanel coordinates system)
+     *@param cy cursor y-coordinate (JPanel coordinates system) 
      */
     public boolean coordInsideObservedRegion(int cx, int cy){
-	return (cx >= x+w/2 + Math.round((observedRegion[0]-camera.vx)*orcoef) &&
-		cy >= y+h/2 + Math.round((camera.vy-observedRegion[1])*orcoef) &&
-		cx <= x+w/2 + Math.round((observedRegion[2]-camera.vx)*orcoef) &&
-		cy <= y+h/2 + Math.round((camera.vy-observedRegion[3])*orcoef));
+        return (cx >= x+w/2 + Math.round((observedRegion[0]-camera.vx)*orcoef) &&
+            cy >= y+h/2 + Math.round((camera.vy-observedRegion[1])*orcoef) &&
+            cx <= x+w/2 + Math.round((observedRegion[2]-camera.vx)*orcoef) &&
+            cy <= y+h/2 + Math.round((camera.vy-observedRegion[3])*orcoef));
     }
 
     ObservedRegionListener observedRegionListener;
 
     public void setObservedRegionListener(ObservedRegionListener orl){
-	this.observedRegionListener = orl;
+        this.observedRegionListener = orl;
     }
 
     void observedRegionIntersects(double[] wnes){
@@ -95,6 +95,7 @@ public class TrailingOverview extends TrailingCameraPortal {
         }
     }
 
+    @Override
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
         g2d.setClip(x, y, w, h);
         g2d.setComposite(alphaC);
@@ -155,30 +156,30 @@ public class TrailingOverview extends TrailingCameraPortal {
     }
 
     public void dispose(){
-	super.dispose();
-	borderTimer.cancel();
+        super.dispose();
+        borderTimer.cancel();
     }
 
 
     protected class BorderTimer extends TimerTask {
-	
-	TrailingOverview portal;
-	double[] portalRegion = new double[4];
-	double[] intersection = new double[4];
-	
-	BorderTimer(TrailingOverview p){
-	    super();
-	    this.portal = p;
-	}
-	
-	public void run(){
-	    portal.getVisibleRegion(portalRegion);
-	    intersection[0] = portal.observedRegion[0] - portalRegion[0]; // west
-	    intersection[1] = portal.observedRegion[1] - portalRegion[1]; // north
-	    intersection[2] = portal.observedRegion[2] - portalRegion[2]; // east
-	    intersection[3] = portal.observedRegion[3] - portalRegion[3]; // south
-	    portal.observedRegionIntersects(intersection);
-	}
+
+        TrailingOverview portal;
+        double[] portalRegion = new double[4];
+        double[] intersection = new double[4];
+
+        BorderTimer(TrailingOverview p){
+            super();
+            this.portal = p;
+        }
+
+        public void run(){
+            portal.getVisibleRegion(portalRegion);
+            intersection[0] = portal.observedRegion[0] - portalRegion[0]; // west
+            intersection[1] = portal.observedRegion[1] - portalRegion[1]; // north
+            intersection[2] = portal.observedRegion[2] - portalRegion[2]; // east
+            intersection[3] = portal.observedRegion[3] - portalRegion[3]; // south
+            portal.observedRegionIntersects(intersection);
+        }
 
     }
 

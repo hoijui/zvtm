@@ -157,7 +157,7 @@ public class VirtualSpaceManager implements AWTEventListener {
      * This computation has a cost. Assess its usefulness and evaluate performance (there is tradeoff).
      *@see #getDefaultDetectMultiFills()
      */
-    public void setDefaultMultiFills(boolean b){
+    public void setDefaultDetectMultiFills(boolean b){
 	    defaultMultiFill=b;
     }
 
@@ -167,7 +167,7 @@ public class VirtualSpaceManager implements AWTEventListener {
      * This computation has a cost. Assess its usefulness and evaluate performance (there is tradeoff).
      *@see #setDefaultDetectMultiFills(boolean b)
      */
-    public boolean getDefaultMultiFills(){
+    public boolean getDefaultDetectMultiFills(){
 	    return defaultMultiFill;
     }
 

@@ -18,8 +18,7 @@ import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.LowPassFilter;
 
 /**A portal showing what is seen through a camera, with parameterable alpha channel (translucency).
-   The portal behaves like a trailing widget.
-   The Camera should not be used in any other View or Portal.*/
+   The portal behaves like a trailing widget. The Camera should not be used in any other View or Portal.*/
 
 public class TrailingCameraPortal extends CameraPortal {
 
@@ -51,82 +50,85 @@ public class TrailingCameraPortal extends CameraPortal {
      *@param yo vertical offset (in pixels) between cursor and portal (trailing widget)
      */
     public TrailingCameraPortal(int x, int y, int w, int h, Camera c, float a, int xo, int yo){
-	super(x, y, w, h, c, a);
-	xOffset = xo;
-	yOffset = yo;
-	timer = new Timer();
-	mouseStillUpdater = new TrailingTimer(this);
-	timer.scheduleAtFixedRate(mouseStillUpdater, 40, 40);
+        super(x, y, w, h, c, a);
+        xOffset = xo;
+        yOffset = yo;
+        timer = new Timer();
+        mouseStillUpdater = new TrailingTimer(this);
+        timer.scheduleAtFixedRate(mouseStillUpdater, 40, 40);
     }
 
     public void setCutoffFrequencyParameters(double a, double b){
-	cutoffParamA = a;
-	cutoffParamB = b;
+        cutoffParamA = a;
+        cutoffParamB = b;
     }
 
     public void setTranslucencyParameters(float a, float b){
-	translucencyParamA = a;
-	translucencyParamB = b;
+        translucencyParamA = a;
+        translucencyParamB = b;
     }
 
     public void updateFrequency() {
-	updateFrequency(System.currentTimeMillis());
+        updateFrequency(System.currentTimeMillis());
     }
 
     public void updateFrequency(long currentTime) {
-	if (frequency == -1){
-	    frequency = 1;
-	}
-	else {
-	    if (currentTime != mLastSampleTime){
-		frequency = 1000.0 / ((double)(currentTime - mLastSampleTime));
-	    }
-	}
-	mLastSampleTime = currentTime;
+        if (frequency == -1){
+            frequency = 1;
+        }
+        else {
+            if (currentTime != mLastSampleTime){
+                frequency = 1000.0 / ((double)(currentTime - mLastSampleTime));
+            }
+        }
+        mLastSampleTime = currentTime;
     }
 
     public void updateWidgetLocation(int cx, int cy){
-	parentPos.setLocation(cx, cy);
-	updateWidgetLocation();
+        parentPos.setLocation(cx, cy);
+        updateWidgetLocation();
     }
 
     double distAway = 0;
     float alpha = 0;
 
     public double getDistance(){
-	return distAway;
+        return distAway;
     }
 
     public void updateWidgetLocation(){
-	targetPos.setLocation(parentPos.getX() + xOffset, parentPos.getY() + yOffset);
-	distAway = targetPos.distance(currentPos);
-	double maxDist = 2 * Math.abs(xOffset);
-	double opacity = 1.0 - Math.min(1.0, distAway / maxDist);
- 	filter.setCutOffFrequency(((1.0 - opacity) * cutoffParamA) + cutoffParamB);
-	currentPos = filter.apply(targetPos, frequency);
-	int tx = (int)Math.round(currentPos.getX());
-	int ty = (int)Math.round(currentPos.getY());
-	tx = Math.max(tx, w/2);
- 	ty = Math.min(ty, owningView.getPanelSize().height - h/2);
-	if (x != tx-w/2 || y != ty-h/2){// avoid unnecesarry repaint requests
-	    this.moveTo(tx-w/2, ty-h/2);
-	    // update portal's translucency as a function of its speed
-	    alpha = (float)opacity*translucencyParamA + translucencyParamB;
-	    if (alpha < 0){alpha = 0;}
-	    else if (alpha > 1){alpha = 1.0f;}
-	    setTranslucencyValue(alpha);
-	    owningView.repaint();
-	}
+        targetPos.setLocation(parentPos.getX() + xOffset, parentPos.getY() + yOffset);
+        distAway = targetPos.distance(currentPos);
+        double maxDist = 2 * Math.abs(xOffset);
+        double opacity = 1.0 - Math.min(1.0, distAway / maxDist);
+        filter.setCutOffFrequency(((1.0 - opacity) * cutoffParamA) + cutoffParamB);
+        currentPos = filter.apply(targetPos, frequency);
+        int tx = (int)Math.round(currentPos.getX());
+        int ty = (int)Math.round(currentPos.getY());
+        tx = Math.max(tx, w/2);
+        ty = Math.min(ty, owningView.getPanelSize().height - h/2);
+        if (x != tx-w/2 || y != ty-h/2){
+            // avoid unnecesarry repaint requests
+            this.moveTo(tx-w/2, ty-h/2);
+            // update portal's translucency as a function of its speed
+            alpha = (float)opacity*translucencyParamA + translucencyParamB;
+            if (alpha < 0){alpha = 0;}
+            else if (alpha > 1){alpha = 1.0f;}
+            setTranslucencyValue(alpha);
+            owningView.repaint();
+        }
     }
 
-    /**true -> do not update trailing widget position when mouse does not move at all*/
+    /** Enable/disable update of trailing widget position when cursor does not move at all. 
+     *@param b true to enable. Default is true.
+     */
     public void setNoUpdateWhenMouseStill(boolean b){
-	mouseStillUpdater.setEnabled(!b);
+        mouseStillUpdater.setEnabled(!b);
     }
 
-    /**Dispose of resources associated with this portal*/
+    /** Dispose of resources associated with this portal. */
     public void dispose(){
-	timer.cancel();
+        timer.cancel();
     }
 
 }
