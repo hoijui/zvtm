@@ -159,7 +159,7 @@ class TIVNavigationManager {
 	        ow = Math.round(oh*ar);
 	    }
 		ovPortal = new OverviewPortal(application.panelWidth-ow-1, application.panelHeight-oh-1, ow, oh, application.ovCamera, application.mCamera);
-		ovPortal.setPortalEventHandler(application.eh);
+		ovPortal.setPortalListener(application.eh);
 		ovPortal.setBackgroundColor(TiledImageViewer.BACKGROUND_COLOR);
 		ovPortal.setObservedRegionColor(OBSERVED_REGION_COLOR);
 		ovPortal.setObservedRegionTranslucency(OBSERVED_REGION_ALPHA);

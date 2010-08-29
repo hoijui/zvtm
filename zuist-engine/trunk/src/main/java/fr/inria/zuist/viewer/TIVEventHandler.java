@@ -28,7 +28,7 @@ import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.engine.portals.Portal;
 import fr.inria.zvtm.engine.portals.OverviewPortal;
-import fr.inria.zvtm.engine.portals.PortalEventHandler;
+import fr.inria.zvtm.event.PortalListener;
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.EndAction;
 
@@ -36,7 +36,7 @@ import fr.inria.zuist.engine.Region;
 import fr.inria.zuist.engine.ObjectDescription;
 import fr.inria.zuist.engine.TextDescription;
 
-class TIVExplorerEventHandler implements ViewListener, ComponentListener, PortalEventHandler {
+class TIVExplorerEventHandler implements ViewListener, ComponentListener, PortalListener {
 
     static final float WHEEL_ZOOMIN_FACTOR = 21.0f;
     static final float WHEEL_ZOOMOUT_FACTOR = 22.0f;
