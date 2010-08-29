@@ -14,6 +14,7 @@ import java.awt.Graphics2D;
 import java.awt.Dimension;
 
 import fr.inria.zvtm.engine.View;
+import fr.inria.zvtm.event.PortalListener;
 
 public abstract class Portal {
     
@@ -33,7 +34,7 @@ public abstract class Portal {
     View owningView;
 
     /** Handles events occuring inside the portal. */
-    public PortalEventHandler pevH;
+    PortalListener pevH;
     
     /** Was the cursor inside the portal or not last time it moved. */
     public boolean cursorInside = false;
@@ -91,12 +92,12 @@ public abstract class Portal {
     }
 
     /** Set an event handler for mouse and keyboard events occuring inside the portal. */
-    public void setPortalEventHandler(PortalEventHandler peh){
+    public void setPortalListener(PortalListener peh){
 	    this.pevH = peh;
     }
 
     /**Get the event handler for mouse and keyboard events occuring inside the portal (null if none)*/
-    public PortalEventHandler getPortalEventHandler(){
+    public PortalListener getPortalListener(){
 	    return this.pevH;
     }
 
