@@ -9,7 +9,7 @@ package fr.inria.zvtm.fits.examples;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.engine.View;
-import fr.inria.zvtm.engine.ViewEventHandler;
+import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
@@ -66,7 +66,7 @@ public class FitsExample {
         view = vsm.addFrameView(cameras, "Master View",
                 View.STD_VIEW, 800, 600, false, true, true, null);	
         view.setBackgroundColor(Color.GRAY);
-        view.setEventHandler(new PanZoomEventHandler());
+        view.setListener(new PanZoomEventHandler());
 
         hi = new FitsImage(0,0,0,new URL(imgUrl));
         hi.setScaleMethod(FitsImage.ScaleMethod.LINEAR);
@@ -122,7 +122,7 @@ public class FitsExample {
 		new FitsExample(args[0]);
 	}
 
-	private class PanZoomEventHandler implements ViewEventHandler{
+	private class PanZoomEventHandler implements ViewListener {
 		private int lastJPX;
 		private int lastJPY;
 
@@ -157,7 +157,7 @@ public class FitsExample {
 			lastJPX=jpx;
 			lastJPY=jpy;
 			v.setDrawDrag(true);
-			vsm.activeView.mouse.setSensitivity(false);
+			vsm.getActiveView().mouse.setSensitivity(false);
 			//because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
 		}
 
@@ -166,7 +166,7 @@ public class FitsExample {
 			vsm.getAnimationManager().setYspeed(0);
 			vsm.getAnimationManager().setZspeed(0);
 			v.setDrawDrag(false);
-			vsm.activeView.mouse.setSensitivity(true);
+			vsm.getActiveView().mouse.setSensitivity(true);
 		}
 
 		public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
