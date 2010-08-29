@@ -29,7 +29,7 @@ import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.event.CameraListener;
 import fr.inria.zvtm.engine.portals.Portal;
 import fr.inria.zvtm.engine.portals.OverviewPortal;
-import fr.inria.zvtm.engine.portals.PortalEventHandler;
+import fr.inria.zvtm.event.PortalListener;
 
 import fr.inria.zuist.engine.Region;
 import fr.inria.zuist.engine.ObjectDescription;
@@ -37,7 +37,7 @@ import fr.inria.zuist.engine.TextDescription;
 
 import org.geonames.Toponym;
 
-class ExplorerEventHandler implements ViewListener, CameraListener, ComponentListener, PortalEventHandler {
+class ExplorerEventHandler implements ViewListener, CameraListener, ComponentListener, PortalListener {
 
     static final float MAIN_SPEED_FACTOR = 50.0f;
 
