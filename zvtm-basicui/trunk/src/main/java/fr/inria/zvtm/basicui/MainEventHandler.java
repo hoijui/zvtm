@@ -15,7 +15,7 @@ import java.awt.event.ComponentListener;
 
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.View;
-import fr.inria.zvtm.engine.ViewEventHandler;
+import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.glyphs.Glyph;
@@ -23,7 +23,7 @@ import fr.inria.zvtm.engine.portals.Portal;
 import fr.inria.zvtm.engine.portals.OverviewPortal;
 import fr.inria.zvtm.engine.portals.PortalEventHandler;
 
-class MainEventHandler implements ViewEventHandler, ComponentListener, PortalEventHandler {
+class MainEventHandler implements ViewListener, ComponentListener, PortalEventHandler {
 
     static float ZOOM_SPEED_COEF = 1.0f/50.0f;
     static double PAN_SPEED_COEF = 50.0;
@@ -156,12 +156,12 @@ class MainEventHandler implements ViewEventHandler, ComponentListener, PortalEve
         if (wheelDirection  == WHEEL_UP){
             // zooming in
             application.nm.mCamera.altitudeOffset(a*WHEEL_ZOOMOUT_COEF);
-            VirtualSpaceManager.INSTANCE.repaintNow();
+            VirtualSpaceManager.INSTANCE.repaint();
         }
         else {
             //wheelDirection == WHEEL_DOWN, zooming out
             application.nm.mCamera.altitudeOffset(-a*WHEEL_ZOOMIN_COEF);
-            VirtualSpaceManager.INSTANCE.repaintNow();
+            VirtualSpaceManager.INSTANCE.repaint();
         }            
     }
 
@@ -211,13 +211,13 @@ class MainEventHandler implements ViewEventHandler, ComponentListener, PortalEve
 	public void enterPortal(Portal p){
 		inPortal = true;
 		((OverviewPortal)p).setBorder(Config.OV_INSIDE_BORDER_COLOR);
-		VirtualSpaceManager.INSTANCE.repaintNow();
+		VirtualSpaceManager.INSTANCE.repaint();
 	}
 
 	public void exitPortal(Portal p){
 		inPortal = false;
 		((OverviewPortal)p).setBorder(Config.OV_BORDER_COLOR);
-		VirtualSpaceManager.INSTANCE.repaintNow();
+		VirtualSpaceManager.INSTANCE.repaint();
 	}
 	
 }

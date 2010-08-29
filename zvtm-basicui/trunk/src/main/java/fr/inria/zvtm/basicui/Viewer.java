@@ -38,13 +38,13 @@ import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.EView;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.Camera;
-import fr.inria.zvtm.engine.Utilities;
+import fr.inria.zvtm.engine.Utils;
 import fr.inria.zvtm.engine.SwingWorker;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VImage;
 import fr.inria.zvtm.glyphs.Glyph;
-import fr.inria.zvtm.engine.ViewEventHandler;
+import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.glyphs.RImage;
 
 public class Viewer {
@@ -114,9 +114,8 @@ public class Viewer {
 		gp = new VWGlassPane(this);
 		((JFrame)mView.getFrame()).setGlassPane(gp);
         eh = new MainEventHandler(this);
-        mView.setEventHandler(eh, 0);
-        mView.setEventHandler(ovm, 1);
-        mView.setNotifyMouseMoved(true);
+        mView.setListener(eh, 0);
+        mView.setListener(ovm, 1);
         mView.setAntialiasing(antialiased);
         mView.setBackgroundColor(Config.BACKGROUND_COLOR);
 		mView.getPanel().addComponentListener(eh);
@@ -130,10 +129,10 @@ public class Viewer {
     }
 
     void windowLayout(){
-        if (Utilities.osIsWindows()){
+        if (Utils.osIsWindows()){
             VIEW_X = VIEW_Y = 0;
         }
-        else if (Utilities.osIsMacOS()){
+        else if (Utils.osIsMacOS()){
             VIEW_X = 80;
             SCREEN_WIDTH -= 80;
         }
@@ -169,7 +168,7 @@ public class Viewer {
 				else if (args[i].substring(1).equals("h") || args[i].substring(1).equals("-help")){Messages.printCmdLineHelp();System.exit(0);}
 			}
 		}
-        if (!fs && Utilities.osIsMacOS()){
+        if (!fs && Utils.osIsMacOS()){
             System.setProperty("apple.laf.useScreenMenuBar", "true");
         }
         System.out.println(Messages.H_4_HELP);
@@ -242,7 +241,7 @@ class VWGlassPane extends JComponent {
     
 }
 
-class Overlay implements ViewEventHandler {
+class Overlay implements ViewListener {
     
     Viewer application;
 
