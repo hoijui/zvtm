@@ -38,9 +38,7 @@ public class Metadata {
      */
     public String getURL(){return url;}
     
-    /** Get Title associated with this part of the SVG document tree.
-     *@return null if none specified.
-     */
+    /** Set a Title for this part of the SVG document tree. */
     public void setTitle(String s){title=s;}
     
     /** Get Title associated with this part of the SVG document tree.
