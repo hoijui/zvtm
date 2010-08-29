@@ -130,7 +130,7 @@ public class VTextOr extends VText {
 		if (alphaC != null && alphaC.getAlpha()==0){return;}
 		g.setColor(this.color);
 		double trueCoef = scaleFactor * coef;
-		if (trueCoef*fontSize > VirtualSpaceManager.INSTANCE.getTextDisplayedAsSegCoef() || !zoomSensitive){
+		if (trueCoef*fontSize > VText.TEXT_AS_LINE_PROJ_COEF || !zoomSensitive){
 			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
 			g.setFont((font!=null) ? font : getMainFont());
 			AffineTransform at;
@@ -178,7 +178,7 @@ public class VTextOr extends VText {
 		if (alphaC != null && alphaC.getAlpha()==0){return;}
 		g.setColor(this.color);
 		double trueCoef = scaleFactor * coef;
-		if (trueCoef*fontSize > VirtualSpaceManager.INSTANCE.getTextDisplayedAsSegCoef() || !zoomSensitive){
+		if (trueCoef*fontSize > VText.TEXT_AS_LINE_PROJ_COEF || !zoomSensitive){
 			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
 			g.setFont((font!=null) ? font : getMainFont());
 			AffineTransform at;

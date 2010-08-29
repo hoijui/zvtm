@@ -181,7 +181,7 @@ public class TestAnimStop {
 	    lastJPY=jpy;
 
 	    v.setDrawDrag(true);
-	    application.vsm.activeView.mouse.setSensitivity(false);
+	    application.vsm.getActiveView().mouse.setSensitivity(false);
 	    //because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
 	}
 
@@ -190,7 +190,7 @@ public class TestAnimStop {
 	    application.vsm.getAnimationManager().setYspeed(0);
 	    application.vsm.getAnimationManager().setZspeed(0);
 	    v.setDrawDrag(false);
-	    application.vsm.activeView.mouse.setSensitivity(true);
+	    application.vsm.getActiveView().mouse.setSensitivity(true);
 	}
 
 	public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}

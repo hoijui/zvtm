@@ -178,7 +178,7 @@ public class TestDefaultHandler {
 	    lastJPY=jpy;
 	    //application.vsm.animator.setActiveCam(v.cams[0]);
 	    v.setDrawDrag(true);
-	    application.vsm.activeView.mouse.setSensitivity(false);
+	    application.vsm.getActiveView().mouse.setSensitivity(false);
 	    //because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
 	}
 
@@ -187,7 +187,7 @@ public class TestDefaultHandler {
 	    application.vsm.getAnimationManager().setYspeed(0);
 	    application.vsm.getAnimationManager().setZspeed(0);
 	    v.setDrawDrag(false);
-	    application.vsm.activeView.mouse.setSensitivity(true);
+	    application.vsm.getActiveView().mouse.setSensitivity(true);
 	    /*Camera c=v.cams[0];
 	      application.vsm.getAnimationManager().createCameraAnimation(500,2,new LongPoint(lastX-application.vsm.mouse.vx,lastY-application.vsm.mouse.vy),c.getID());*/
 	}

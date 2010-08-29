@@ -275,6 +275,24 @@ public class VText extends ClosedShape {
 	return zoomSensitive;
     }
 
+    static float TEXT_AS_LINE_PROJ_COEF = .5f;
+
+    /** Set the value under which a VText is drawn as a point/segment instead of an actual text (considered too small to be read).
+     *@param f value compared to the product of the font size by the projection value. Default is 0.5.
+     * Raising this value implies that more text that was still displayed as a string will be displayed as a segment and conversely.
+     */
+    public static void setTextDisplayedAsSegCoef(float f){
+        TEXT_AS_LINE_PROJ_COEF = f;
+    }
+    
+    /** Get the value under which a VText is drawn as a point/segment instead of an actual text (considered too small to be read).
+     *@reutnr the value compared to the product of the font size by the projection value. Default is 0.5.
+     * Raising this value implies that more text that was still displayed as a string will be displayed as a segment and conversely.
+     */
+    public static float getTextDisplayedAsSegCoef(){
+        return TEXT_AS_LINE_PROJ_COEF;
+    }
+
     /** Set the text's background color.
      *@param c background fill color. null if background should not be painted.
      *@see #setColor(Color c)
@@ -453,7 +471,7 @@ public class VText extends ClosedShape {
 		}
         if (alphaC != null && alphaC.getAlpha()==0){return;}
 		double trueCoef = scaleFactor * coef;
-		if (trueCoef*fontSize > VirtualSpaceManager.INSTANCE.getTextDisplayedAsSegCoef() || !zoomSensitive){
+		if (trueCoef*fontSize > VText.TEXT_AS_LINE_PROJ_COEF || !zoomSensitive){
 			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
 			g.setFont((font!=null) ? font : getMainFont());	
 			AffineTransform at;
@@ -510,7 +528,7 @@ public class VText extends ClosedShape {
         if (alphaC != null && alphaC.getAlpha()==0){return;}
 		double trueCoef = scaleFactor * coef;
 		g.setColor(this.color);
-		if (trueCoef*fontSize > VirtualSpaceManager.INSTANCE.getTextDisplayedAsSegCoef() || !zoomSensitive){
+		if (trueCoef*fontSize > VText.TEXT_AS_LINE_PROJ_COEF || !zoomSensitive){
 			g.setFont((font!=null) ? font : getMainFont());
 			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
 			AffineTransform at;

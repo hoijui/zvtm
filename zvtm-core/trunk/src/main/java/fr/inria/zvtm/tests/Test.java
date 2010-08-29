@@ -114,7 +114,7 @@ class EventHandlerTest implements ViewListener {
         lastJPX=jpx;
         lastJPY=jpy;
         v.setDrawDrag(true);
-        application.vsm.activeView.mouse.setSensitivity(false);
+        application.vsm.getActiveView().mouse.setSensitivity(false);
     }
 
     public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
@@ -122,7 +122,7 @@ class EventHandlerTest implements ViewListener {
         application.vsm.getAnimationManager().setYspeed(0);
         application.vsm.getAnimationManager().setZspeed(0);
         v.setDrawDrag(false);
-        application.vsm.activeView.mouse.setSensitivity(true);
+        application.vsm.getActiveView().mouse.setSensitivity(true);
     }
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
