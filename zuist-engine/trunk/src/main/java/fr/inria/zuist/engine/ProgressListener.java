@@ -16,7 +16,7 @@ public interface ProgressListener {
     /** A message to be displayed as a caption to the progress indicator. */
     public void setLabel(String s);
 
-    /** An percentage value indicating overall progress. */
+    /** A percentage value indicating overall progress. */
     public void setValue(int i);
 
 }

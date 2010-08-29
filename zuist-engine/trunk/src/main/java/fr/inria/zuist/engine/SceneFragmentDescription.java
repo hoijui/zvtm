@@ -85,7 +85,6 @@ public class SceneFragmentDescription extends ResourceDescription {
 
     @Override
     public void destroyObject(SceneManager sm, VirtualSpace vs, boolean fadeOut){
-        //System.out.println("Unloading fragment "+src);
         if (regions != null){
             for (Region region:regions){
                 sm.destroyRegion(region);

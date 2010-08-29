@@ -158,49 +158,55 @@ public class Region {
         requestOrder = ro;
     }
 
+    /** Get Region ID. */
     public String getID(){
-	return id;
+	    return id;
     }
     
+    /** Set Region title. */
     public void setTitle(String t){
         this.title = t;
     }
     
+    /** Get Region title. */
     public String getTitle(){
         return title;
     }
 
+    /** Set this region's layer index. */
     void setLayerIndex(int i){
         li = i;
     }
 
+    /** Get this region's layer index. */
     int getLayerIndex(){
         return li;
     }
 
-    /** Get index of highest and lowest level this region belongs to.
+    /** Get index of highest and lowest levels this region belongs to.
      */
     public int getHighestLevel(){
 	    return hli;
     }
 
-    /** Get index of highest and lowest level this region belongs to.
+    /** Get index of highest and lowest levels this region belongs to.
      */
     public int getLowestLevel(){
 	    return lli;
     }
 
+    /** Get containing region, if any has been declared.
+     *@return null if no containing region declared
+     */
     public Region getContainingRegion(){
-	return containingRegion;
+	    return containingRegion;
     }
 
-//    public Region getContainingRegionAtLevel(int level){
-//	      if (lli <= level){return this;}
-//	      else if (containingRegion != null){return containingRegion.getContainingRegionAtLevel(level);}
-//	      else return null;
-//    }
-    
-    public Vector getContainingRegions(Vector cr){
+    /** Get containing regions recursively, if any have been declared.
+     *@param cr an initially empty Vector that will be recursively populated with containing regions up to the root.
+     *@return cr populated with additional regions if any declared.
+     */
+    public Vector<Region> getContainingRegions(Vector<Region> cr){
         cr.insertElementAt(this, 0);
         if (containingRegion != null){
             return containingRegion.getContainingRegions(cr);
@@ -211,7 +217,7 @@ public class Region {
     }
     
     /** Get objects in this region.
-     *@return returns the actual list, not a clone. Do not temper with.
+     *@return the actual list, not a clone. Do not temper with.
      */
     public ObjectDescription[] getObjectsInRegion(){
         return objects;
@@ -222,51 +228,64 @@ public class Region {
         bounds.setSensitivity(isSensitive);
     }
 
+    /** Get the region's bounds as a VRectangle.
+     *@return the actual rectangle, not a clone. Do not temper with.
+     */
     public VRectangle getBounds(){
-	return bounds;
+	    return bounds;
     }
 	
+	/** Get this region's center x-coordinate.
+	 */
 	public double getX(){
 		return x;
 	}
 	
+	/** Get this region's center y-coordinate.
+	 */
 	public double getY(){
 		return y;
 	}
 
+	/** Get this region's width.
+	 */
 	public double getWidth(){
 		return w;
 	}
 	
+	/** Get this region's height.
+	 */
 	public double getHeight(){
 		return h;
 	}
 
+    /** Should the rectangle representing the region's bounds be sensitive to cursor entry/exit. */
     public void setSensitive(boolean b){
         isSensitive = b;
         if (bounds != null){bounds.setSensitivity(b);}
     }
     
+    /** Is the rectangle representing the region's bounds sensitive to cursor entry/exit. */
     public boolean isSensitive(){
         return isSensitive;
     }
 
     void addObject(ObjectDescription od){
-	ObjectDescription[] newObjects = new ObjectDescription[objects.length+1];
-	System.arraycopy(objects, 0, newObjects, 0, objects.length);
-	newObjects[objects.length] = od;
-	objects = newObjects;
+        ObjectDescription[] newObjects = new ObjectDescription[objects.length+1];
+        System.arraycopy(objects, 0, newObjects, 0, objects.length);
+        newObjects[objects.length] = od;
+        objects = newObjects;
     }
 
     public void setContainingRegion(Region r){
-	containingRegion = r;
+        containingRegion = r;
     }
 
     public void addContainedRegion(Region r){
-	Region[] tmpR = new Region[containedRegions.length+1];
-	System.arraycopy(containedRegions, 0, tmpR, 0, containedRegions.length);
-	tmpR[containedRegions.length] = r;
-	containedRegions = tmpR;
+        Region[] tmpR = new Region[containedRegions.length+1];
+        System.arraycopy(containedRegions, 0, tmpR, 0, containedRegions.length);
+        tmpR[containedRegions.length] = r;
+        containedRegions = tmpR;
     }
 
     /*rl can be null*/
@@ -365,54 +384,54 @@ public class Region {
     }
 
     void show(short transition, double  x, double y){
-	if (!wviv){
-	    forceShow(transition, x, y);
-	}
+        if (!wviv){
+            forceShow(transition, x, y);
+        }
     }
 
     void forceShow(short transition, double x, double y){
-	if (requestOrder == ORDERING_DISTANCE){
-	    Arrays.sort(objects, new DistanceComparator(x, y));
-	}
-	boolean fade = (transition == TASL) ? false : transitions[transition] == FADE_IN;
-	for (int i=0;i<objects.length;i++){
-	    sm.glyphLoader.addLoadRequest(li, objects[i], fade);
-	}
-	wviv = true;
+        if (requestOrder == ORDERING_DISTANCE){
+            Arrays.sort(objects, new DistanceComparator(x, y));
+        }
+        boolean fade = (transition == TASL) ? false : transitions[transition] == FADE_IN;
+        for (int i=0;i<objects.length;i++){
+            sm.glyphLoader.addLoadRequest(li, objects[i], fade);
+        }
+        wviv = true;
     }
 
     void hide(short transition, double x, double y){
-	if (wviv){
-	    forceHide(transition, x, y);
-	}
+        if (wviv){
+            forceHide(transition, x, y);
+        }
     }
-    
+
     void forceHide(short transition, double x, double y){
-	if (requestOrder == ORDERING_DISTANCE){
-	    Arrays.sort(objects, new DistanceComparator(x, y));
-	}
-	boolean fade = (transition == TASL) ? false : transitions[transition] == FADE_OUT;
-	for (int i=0;i<objects.length;i++){
-	    sm.glyphLoader.addUnloadRequest(li, objects[i], fade);
-	}
-	wviv = false;
+        if (requestOrder == ORDERING_DISTANCE){
+            Arrays.sort(objects, new DistanceComparator(x, y));
+        }
+        boolean fade = (transition == TASL) ? false : transitions[transition] == FADE_OUT;
+        for (int i=0;i<objects.length;i++){
+            sm.glyphLoader.addUnloadRequest(li, objects[i], fade);
+        }
+        wviv = false;
     }
 
     int getClosestObjectIndex(double x, double y){
-	int res = 0;
-	if (objects.length > 0){
-	    // do not take the square root to get the actual distance as we are just comparing values
-	    double shortestDistance = Math.round(Math.pow(x-objects[0].getX(),2) + Math.pow(y-objects[0].getY(),2));
-	    double distance;
-	    for (int i=1;i<objects.length;i++){
-		distance = Math.round(Math.pow(x-objects[i].getX(),2) + Math.pow(y-objects[i].getY(),2));
-		if (distance < shortestDistance){
-		    shortestDistance = distance;
-		    res = i;
-		}
-	    }
-	}
-	return res;
+        int res = 0;
+        if (objects.length > 0){
+            // do not take the square root to get the actual distance as we are just comparing values
+            double shortestDistance = Math.round(Math.pow(x-objects[0].getX(),2) + Math.pow(y-objects[0].getY(),2));
+            double distance;
+            for (int i=1;i<objects.length;i++){
+                distance = Math.round(Math.pow(x-objects[i].getX(),2) + Math.pow(y-objects[i].getY(),2));
+                if (distance < shortestDistance){
+                    shortestDistance = distance;
+                    res = i;
+                }
+            }
+        }
+        return res;
     }
 
     public String toString(){
@@ -449,5 +468,4 @@ class DistanceComparator implements Comparator<ObjectDescription> {
 		}
 	}
 
-    
 }

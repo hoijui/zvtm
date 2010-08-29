@@ -200,7 +200,6 @@ public class ImageDescription extends ResourceDescription {
 	    return RESOURCE_TYPE_IMG;
 	}
 
-    /** Called automatically by scene manager. But cam ne called by client application to force loading of objects not actually visible. */
     @Override
     public void createObject(final SceneManager sm, final VirtualSpace vs, final boolean fadeIn){
         display = true;

@@ -139,10 +139,12 @@ public class TextDescription extends ObjectDescription {
         }
     }
 
+    /** Get the AWT Font used to draw this text. */
     public void setFont(Font f){
 	    this.font = f;
     }
 
+    /** Get the AWT Font object used to draw this text. */
     public Font getFont(){
 	    return font;
     }
@@ -152,14 +154,17 @@ public class TextDescription extends ObjectDescription {
 	    return glyph;
     }
     
+    /** Get this text object's text string. */
     public String getText(){
         return text;
     }
     
+    /** Get this text object's scale multiplication factor. Default is 1.0. */
     public float getScale(){
         return scale;
     }
     
+    /** Get ZVTM constant value representing anchors "start", "midlle", "end". */
     public static short getAnchor(String anchor){
         if (anchor.equals(_start)){return VText.TEXT_ANCHOR_START;}
         else if (anchor.equals(_end)){return VText.TEXT_ANCHOR_END;}

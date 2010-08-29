@@ -28,26 +28,33 @@ public abstract class ObjectDescription {
     String takesTo;
     short takesToType;
     
-    /** Called automatically by scene manager. But can be called by client application to force loading of objects not actually visible. */
+    /** Called automatically by scene manager. Can be called by client application to force loading of objects not actually visible. */
     public abstract void createObject(SceneManager sm, final VirtualSpace vs, boolean fadeIn);
 
-    /** Called automatically by scene manager. But can be called by client application to force unloading of objects still visible. */
+    /** Called automatically by scene manager. Can be called by client application to force unloading of objects still visible. */
     public abstract void destroyObject(SceneManager sm, final VirtualSpace vs, boolean fadeOut);
 
+    /** Should the object be sensitive to cursor entry/exit. */
     public void setSensitive(boolean b){
 	    sensitive = b;
     }
 
+    /** Is the object sensitive to cursor entry/exit. */
     public boolean isSensitive(){
 	    return sensitive;
     }
 
+    /** Get Glyph described by this description.
+     *@return might return null if the description has not been loaded. This depends on the type of ObjectDescription.
+     */
     public abstract Glyph getGlyph();
     
+    /** Get z-index for this object. */
 	public int getZindex(){
 		return zindex;
 	}
 
+    /** Get Region this object belongs to. */
     public Region getParentRegion(){
 	    return parentRegion;
     }
@@ -79,10 +86,10 @@ public abstract class ObjectDescription {
 	    return id;
     }
     
-    /** Get X-coordinate of object in virtual space. */
+    /** Get x-coordinate of object in virtual space. */
     public abstract double getX();
     
-    /** Get Y-coordinate of object in virtual space. */
+    /** Get y-coordinate of object in virtual space. */
     public abstract double getY();
 
 }

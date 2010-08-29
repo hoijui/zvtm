@@ -61,6 +61,7 @@ public class Level {
 		}
 	}
 	
+	/** Does Region r belongs to this level. */
 	public boolean contains(Region r){
 	    for (int i=0;i<regions.length;i++){
 	        if (regions[i] == r){

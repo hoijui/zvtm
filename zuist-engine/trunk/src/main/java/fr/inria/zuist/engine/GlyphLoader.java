@@ -36,7 +36,10 @@ class GlyphLoader {
         tasks = new ConcurrentHashMap<ObjectDescription, LoadAction>();
     }
 
-    //layerIndex maps to a VirtualSpace
+    /** Add a request to load an object in the queue.
+     *@param od description of object to be loaded.
+     *@param transition one of Region.{APPEAR,FADE_IN}
+     */
     public void addLoadRequest(int layerIndex, ObjectDescription od, boolean transition){
         if(tasks.remove(od, LoadAction.UNLOAD)){
             return;
@@ -51,7 +54,10 @@ class GlyphLoader {
         loader.submit(new Request(this.sceneManager, target, od, transition));	
     }
 
-    //layerIndex maps to a VirtualSpace
+    /** Add a request to unload an object in the queue.
+     *@param od description of object to be loaded.
+     *@param transition one of Region.{DISAPPEAR,FADE_OUT}
+     */
     public void addUnloadRequest(int layerIndex, ObjectDescription od, boolean transition){
         if(tasks.remove(od, LoadAction.LOAD)){
             return;
