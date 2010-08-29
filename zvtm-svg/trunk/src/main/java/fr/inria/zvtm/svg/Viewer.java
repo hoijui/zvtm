@@ -79,7 +79,7 @@ import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.RImage;
 import fr.inria.zvtm.engine.portals.Portal;
 import fr.inria.zvtm.engine.portals.OverviewPortal;
-import fr.inria.zvtm.engine.portals.PortalEventHandler;
+import fr.inria.zvtm.event.PortalListener;
 
 public class Viewer {
 
@@ -545,7 +545,7 @@ class Overlay implements ViewListener {
 	}
 }
 
-class MainEventHandler implements ViewListener, ComponentListener, PortalEventHandler {
+class MainEventHandler implements ViewListener, ComponentListener, PortalListener {
 
     static float ZOOM_SPEED_COEF = 1.0f/50.0f;
     static double PAN_SPEED_COEF = 50.0;
@@ -824,7 +824,7 @@ class Navigation {
 	void createOverview(){
 		ovPortal = new OverviewPortal(application.panelWidth-Config.OVERVIEW_WIDTH-1, application.panelHeight-Config.OVERVIEW_HEIGHT-1,
 		                              Config.OVERVIEW_WIDTH, Config.OVERVIEW_HEIGHT, ovCamera, mCamera);
-		ovPortal.setPortalEventHandler(application.eh);
+		ovPortal.setPortalListener(application.eh);
 		ovPortal.setBackgroundColor(Config.BACKGROUND_COLOR);
 		ovPortal.setObservedRegionColor(Config.OBSERVED_REGION_COLOR);
 		ovPortal.setObservedRegionTranslucency(Config.OBSERVED_REGION_ALPHA);
