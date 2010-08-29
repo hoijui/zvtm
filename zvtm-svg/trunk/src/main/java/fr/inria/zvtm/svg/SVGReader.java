@@ -66,7 +66,10 @@ import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.glyphs.VImage;
 
 /**
- *An SVG interpreter for ZVTM - for now it covers a <i><b>very</b></i> limited subset of the specification (just enough to interpret GraphViz programs SVG output (Ellipse, Text, Path, Rectangle, Circle, limited support for Polygon and Image)).
+ * An <a href="http://www.w3.org/Graphics/SVG/">SVG</a> interpreter for ZVTM.
+ * For now SVGReader covers a <i><b>very</b></i> limited subset of the specification.
+ * Enough to interpret GraphViz layout programs' SVG output (Ellipse, Text, Path, Rectangle, Circle, limited support for Polygon and Image).
+ * The goal is to have it support at least <a href="http://www.w3.org/TR/SVGTiny12/">SVG Tiny</a>.
  *@author Emmanuel Pietriga
  */
 
@@ -167,21 +170,24 @@ public class SVGReader {
     protected static Hashtable strokes = new Hashtable();
     protected static String SOLID_DASH_PATTERN = "solid";
 
-    /** When this is set to something different than 0, all SVG objects will be translated by (dx,dy) in their ZVTM virtual space.
-     * This can be useful if you do not want all objects of the SVG file to all be in the south-east quadrant of the virtual space (SVG files often use positive coordinates only, and their coordinate system is inversed (vertically) w.r.t ZVTM's coordinate system)*/
+    /** Set position offset.
+     * When this is set to something different than (0,0), all SVG objects will be translated by (dx,dy) in the ZVTM virtual space coordinates system.
+     * This can be useful if you do not want all objects of the SVG file to all be in the south-east quadrant of the virtual space.
+     * SVG files often use positive coordinates only, and their coordinate system is inversed (vertically) w.r.t ZVTM's coordinate system.
+     */
     public static void setPositionOffset(double dx, double dy){
 	    xoffset=dx;
 	    yoffset=dy;
     }
 
-    /** Get the position offset (0,0 means no offset).*/
+    /** Get the position offset. (0,0) means no offset. */
     public static Point2D.Double getPositionOffset(){
 	    return new Point2D.Double(xoffset, yoffset);
     }
 
-    /** Check that an SVG path value is supported by ZVTM.
-        * Verifies that all SVG commands are actually supported by ZVTM (M,m,L,l,H,h,V,v,C,c,Q,q)
-        */
+    /** Check that an SVG path expression is supported by ZVTM.
+     * Verifies that all SVG commands are actually supported by ZVTM (M,m,L,l,H,h,V,v,C,c,Q,q)
+     */
     public static boolean checkSVGPath(String svg){
         boolean res=true;
         byte[] chrs=svg.getBytes();

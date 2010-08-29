@@ -16,7 +16,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.util.StringTokenizer;
 
-/**context information that we might want to propagate while walking the SVG DOM tree*/
+/** Context information that is propagated while walking the SVG DOM tree. */
 
 public class Context {
 
@@ -43,12 +43,12 @@ public class Context {
 
     /*give it the value of a style attribute*/
     Context(String s){
-	if (s!=null){processStyleInfo(s);}
+	    if (s!=null){processStyleInfo(s);}
     }
 
     /*give it the value of a style attribute - any previously set value will be overwritten*/
     void add(String s){
-	processStyleInfo(s);
+	    processStyleInfo(s);
     }
 
     void processStyleInfo(String styleInfo){
@@ -83,93 +83,89 @@ public class Context {
 	}
     }
 
-    /**returns true if there is transparency information (the value does not matter)*/
+    /** Has transparency information been declared. The value does not matter. */
     public boolean hasTransparencyInformation(){
-	if (fill_opacity==null){return false;}
-	else {return true;}
+        if (fill_opacity==null){return false;}
+        else {return true;}
     }
 
-    /**returns the fill (interior) color*/
+    /** Get fill (interior) color. */
     public Color getFillColor(){
-	return fill;
+        return fill;
     }
 
-    /**Tells whether there is stroke color information or not.*/
+    /** Has fill information been declared. */
     public boolean hasFillColorInformation(){
-	return fillColorDefined;
+        return fillColorDefined;
     }
 
-	/** Returns the stroke color. */
+	/** Get stroke (border) color. */
 	public Color getStrokeColor(){
 		return stroke;
 	}
 
-	/** Returns the stroke (border) color. 
-		*@deprecated Since 0.9.7
-		*@see #getStrokeColor()
-	*/
-	public Color getBorderColor(){
-		return getStrokeColor();
-	}
-
-    /**Tells whether there is stroke color information or not.*/
+    /** Has stroke color information been declared. */
     public boolean hasStrokeColorInformation(){
 		return strokeColorDefined;
     }
 
-    /**Tells whether there is stroke color information or not.
-		*@deprecated Since 0.9.7
-		*@see #hasStrokeColorInformation()
-		*/
-    public boolean hasBorderColorInformation(){
-		return hasStrokeColorInformation();
-    }
-
-    /**returns the alpha transparency value (1.0 if opaque, 0 is fully transparent)*/
+    /** Get alpha transparency value.
+     *@return alpha value in [0,1f]. 1.0 if opaque, 0 is fully transparent.
+     */
     public float getAlphaTransparencyValue(){
-	if (fill_opacity!=null){return fill_opacity.floatValue();}
-	else return 1.0f;
+        if (fill_opacity!=null){return fill_opacity.floatValue();}
+        else return 1.0f;
     }
 
-    /*returns a Font object if there is enough information to create one, null if not*/
+    /** Get a Font object if there is enough information to create one, null if not. */
     Font getDefinedFont(){
-	if (font_family!=null || font_size!=null || font_style!=null || font_weight!=null){
-	    String fam=(font_family!=null) ? font_family : "Default";
-	    int size;
-	    try {size=(font_size!=null) ? Math.round((new Float(font_size)).floatValue()) : 10;}
-	    catch (NumberFormatException ex){System.err.println("Warning: Font size value not supported (using default): "+font_size);size=10;}
-	    int style;
-	    if (font_style!=null && font_style.equals("italic")){
-		if (font_weight!=null && font_weight.equals("bold")){style=Font.BOLD+Font.ITALIC;}
-		else {style=Font.ITALIC;}
-	    }
-	    else {
-		if (font_weight!=null && font_weight.equals("bold")){style=Font.BOLD;}
-		else {style=Font.PLAIN;}
-	    }
-	    return SVGReader.getFont(fam, style, size);
-	}
-	else {return null;}
+        if (font_family!=null || font_size!=null || font_style!=null || font_weight!=null){
+            String fam=(font_family!=null) ? font_family : "Default";
+            int size;
+            try {size=(font_size!=null) ? Math.round((new Float(font_size)).floatValue()) : 10;}
+            catch (NumberFormatException ex){System.err.println("Warning: Font size value not supported (using default): "+font_size);size=10;}
+            int style;
+            if (font_style!=null && font_style.equals("italic")){
+                if (font_weight!=null && font_weight.equals("bold")){style=Font.BOLD+Font.ITALIC;}
+                else {style=Font.ITALIC;}
+            }
+            else {
+                if (font_weight!=null && font_weight.equals("bold")){style=Font.BOLD;}
+                else {style=Font.PLAIN;}
+            }
+            return SVGReader.getFont(fam, style, size);
+        }
+        else {return null;}
     }
 
+    /** Set a URL for this part of the SVG document tree. */
     public void setURL(String s){url=s;}
 
-    /**null if none*/
+    /** Get URL associated with this part of the SVG document tree.
+     *@return null if none specified.
+     */
     public String getURL(){return url;}
 
+    /** Set a Title for this part of the SVG document tree. */
     public void setTitle(String s){title=s;}
 
-    /**null if none*/
+    /** Get Title associated with this part of the SVG document tree.
+     *@return null if none specified.
+     */
     public String getTitle(){return title;}
 
     public void setClosestAncestorGroupID(String s){closestAncestorGroupID = s;}
     
-    /**null if none*/
+    /**
+     *@return null if none
+     */
     public String getClosestAncestorGroupID(){return closestAncestorGroupID;}
 
     public void setClosestAncestorGroupClass(String s){closestAncestorGroupClass = s;}
     
-    /**null if none*/
+    /**
+     *@return null if none
+     */
     public String getClosestAncestorGroupClass(){return closestAncestorGroupClass;}
 
     public Context duplicate(){

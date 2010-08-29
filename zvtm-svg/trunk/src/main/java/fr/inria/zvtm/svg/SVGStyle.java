@@ -4,7 +4,7 @@
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2000-2002. All Rights Reserved
  *   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2010. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -86,26 +86,26 @@ public class SVGStyle {
 	           requiresSpecialStroke() || font_family != null || font_size != null || font_weight != null || font_style != null;
 	}
 
-    /**returns true if there is transparency information (the value does not matter)*/
+    /** Has transparency information been declared. The value does not matter. */
     public boolean hasTransparencyInformation(){
-	if (alphaValue==null){return false;}
-	else {return true;}
+        if (alphaValue==null){return false;}
+        else {return true;}
     }
 
-    /**set the fill (interior) color*/
+    /** Set fill (interior) color. */
     public void setFillColor(Color c){
-	fillColor=c;
-	fillColorDefined = true;
+        fillColor=c;
+        fillColorDefined = true;
     }
 
-    /**returns the fill (interior) color*/
+    /** Get fill (interior) color. */
     public Color getFillColor(){
-	return fillColor;
+        return fillColor;
     }
 
-    /**Tells whether there is stroke color information or not.*/
+    /** Has fill information been declared. */
     public boolean hasFillColorInformation(){
-	return fillColorDefined;
+        return fillColorDefined;
     }
 
 	/** Set the stroke (border) color. */
@@ -116,187 +116,173 @@ public class SVGStyle {
 		strokeColorDefined = true;
 	}
 
-	/** Set the stroke (border) color.
-		*@deprecated Since 0.9.7
-		*@see #hasStrokeColorInformation
-		*/
-	public void setBorderColor(Color c){
-		setStrokeColor(c);
-	}
-
 	/** Returns the stroke color. */
 	public Color getStrokeColor(){
 		return strokeColor;
 	}
 
-	/** Returns the stroke (border) color. 
-		*@deprecated Since 0.9.7
-		*@see #getStrokeColor()
-	*/
-	public Color getBorderColor(){
-		return getStrokeColor();
-	}
-
-    /**Tells whether there is stroke color information or not.*/
+    /** Has stroke information been declared. */
     public boolean hasStrokeColorInformation(){
 		return strokeColorDefined;
     }
 
-    /**Tells whether there is stroke color information or not.
-		*@deprecated Since 0.9.7
-		*@see #hasStrokeColorInformation()
-		*/
-    public boolean hasBorderColorInformation(){
-		return hasStrokeColorInformation();
-    }
-
-    /**set the transparency value (between 0 (fully transparent) and 1.0 (opaque))*/
+    /** Set alpha transparency value.
+     *@param f alpha value in [0,1f]. 1.0 if opaque, 0 is fully transparent.
+     */
     public void setAlphaTransparencyValue(Float f){
-	alphaValue=f;
+	    alphaValue=f;
     }
 
-    /**returns the alpha transparency value (1.0 if opaque, 0 is fully transparent)*/
+    /** Get alpha transparency value.
+     *@return alpha value in [0,1f]. 1.0 if opaque, 0 is fully transparent.
+     */
     public float getAlphaTransparencyValue(){
-	if (alphaValue!=null){return alphaValue.floatValue();}
-	else return 1.0f;
+        if (alphaValue!=null){return alphaValue.floatValue();}
+        else return 1.0f;
     }
 
-    /**
+    /** Set stroke width.
      *@see <a href="http://www.w3.org/TR/SVG11/painting.html#StrokeProperties">SVG stroke properties</a>
      */
     public void setStrokeWidth(String width){
-	if (width != null && width.length() > 0){
-	    if (width.endsWith("px")){
-		width = width.substring(0, width.length()-2);
-	    }
-	    try {
-		strokeWidth = new Float(width);
-		if (strokeWidth.floatValue() == 1.0f){strokeWidth = null;}
-	    }
-	    catch (NumberFormatException ex){strokeWidth = null;}
-	}
-	else {
-	    strokeWidth = null;
-	}
+        if (width != null && width.length() > 0){
+            if (width.endsWith("px")){
+                width = width.substring(0, width.length()-2);
+            }
+            try {
+                strokeWidth = new Float(width);
+                if (strokeWidth.floatValue() == 1.0f){strokeWidth = null;}
+            }
+            catch (NumberFormatException ex){strokeWidth = null;}
+        }
+        else {
+            strokeWidth = null;
+        }
     }
 
+    /** Get stroke width.
+     *@see <a href="http://www.w3.org/TR/SVG11/painting.html#StrokeProperties">SVG stroke properties</a>
+     */
     public Float getStrokeWidth(){
-	return strokeWidth;
+        return strokeWidth;
     }
 
-    /**
+    /** Set stroke pattern.
      *@see <a href="http://www.w3.org/TR/SVG11/painting.html#StrokeProperties">SVG stroke properties</a>
      */
     public void setStrokeDashArray(String dashArray){
-	if (dashArray != null && !dashArray.equals("none")){
-	    StringTokenizer st = new StringTokenizer(dashArray, ",");
-	    strokeDashArray = new float[st.countTokens()];
-	    int i = 0;
-	    String s = null;
-	    while (st.hasMoreTokens()){
-		try {
-		    s = st.nextToken();
-		    if (s.endsWith("px")){s = s.substring(0, s.length()-2);}
-		    strokeDashArray[i++] = Float.parseFloat(s);
-		}
-		catch (NumberFormatException ex){
-		    strokeDashArray[i-1] = 1.0f;
-		    System.err.println("Style: Error while parsing a stroke dash array: "+s+" is not a positive float value");
-		}
-	    }
-	    //check the array
-	    if (strokeDashArray.length == 0){strokeDashArray = null;}
-	    else {
-		if (strokeDashArray.length % 2 != 0){
-		    // as stated in http://www.w3.org/TR/SVG11/painting.html#StrokeProperties :
-		    // if an odd  number of values is provided, then the list of values is
-		    // repeated to yield an even number of values
-		    float[] tmpArray = new float[strokeDashArray.length * 2];
-		    System.arraycopy(strokeDashArray,0,tmpArray,0,strokeDashArray.length);
-		    System.arraycopy(strokeDashArray,0,tmpArray,strokeDashArray.length,strokeDashArray.length);
-		    strokeDashArray = tmpArray;
-		}
-		boolean nonZero = false;
-		for (int j=0;j<strokeDashArray.length;j++){
-		    if (strokeDashArray[j] != 0.0f){
-			nonZero = true;
-			break;
-		    }
-		}
-		if (!nonZero){strokeDashArray = null;}
-	    }
-	}
-	else {
-	    strokeDashArray = null;
-	}
+        if (dashArray != null && !dashArray.equals("none")){
+            StringTokenizer st = new StringTokenizer(dashArray, ",");
+            strokeDashArray = new float[st.countTokens()];
+            int i = 0;
+            String s = null;
+            while (st.hasMoreTokens()){
+                try {
+                    s = st.nextToken();
+                    if (s.endsWith("px")){s = s.substring(0, s.length()-2);}
+                    strokeDashArray[i++] = Float.parseFloat(s);
+                }
+                catch (NumberFormatException ex){
+                    strokeDashArray[i-1] = 1.0f;
+                    System.err.println("Style: Error while parsing a stroke dash array: "+s+" is not a positive float value");
+                }
+            }
+            //check the array
+            if (strokeDashArray.length == 0){strokeDashArray = null;}
+            else {
+                if (strokeDashArray.length % 2 != 0){
+                    // as stated in http://www.w3.org/TR/SVG11/painting.html#StrokeProperties :
+                    // if an odd  number of values is provided, then the list of values is
+                    // repeated to yield an even number of values
+                    float[] tmpArray = new float[strokeDashArray.length * 2];
+                    System.arraycopy(strokeDashArray,0,tmpArray,0,strokeDashArray.length);
+                    System.arraycopy(strokeDashArray,0,tmpArray,strokeDashArray.length,strokeDashArray.length);
+                    strokeDashArray = tmpArray;
+                }
+                boolean nonZero = false;
+                for (int j=0;j<strokeDashArray.length;j++){
+                    if (strokeDashArray[j] != 0.0f){
+                        nonZero = true;
+                        break;
+                    }
+                }
+                if (!nonZero){strokeDashArray = null;}
+            }
+        }
+        else {
+            strokeDashArray = null;
+        }
     }
 
-    //null if not set
+    /** Get stroke pattern.
+     *@return null if none defined.
+     *@see <a href="http://www.w3.org/TR/SVG11/painting.html#StrokeProperties">SVG stroke properties</a>
+     */
     public float[] getStrokeDashArray(){
-	return strokeDashArray;
+        return strokeDashArray;
     }
 
     public boolean requiresSpecialStroke(){
-	return (strokeWidth != null || strokeDashArray != null);
+        return (strokeWidth != null || strokeDashArray != null);
     }
 
     public void setFontFamily(String family){
-	this.font_family = family;
+        this.font_family = family;
     }
 
     public void setFontSize(String size){
-	this.font_size = size;
-	if (font_size != null && font_size.endsWith(SVGReader._pt)){font_size = font_size.substring(0, font_size.length()-2);}
+        this.font_size = size;
+        if (font_size != null && font_size.endsWith(SVGReader._pt)){font_size = font_size.substring(0, font_size.length()-2);}
     }
 
     public void setFontWeight(String weight){
-	this.font_weight = weight;
+        this.font_weight = weight;
     }
 
     public void setFontStyle(String style){
-	this.font_style = style;
+        this.font_style = style;
     }
 
     /*returns a Font object if there is enough information to create one, null if not*/
     Font getDefinedFont(Context ctx){
-	String fam = (font_family!=null) ? font_family : ((ctx!=null) ? ctx.font_family : null);
-	if (fam == null){
-	    fam = "Default";
-	}
-	int size;
-	if (font_size != null){
-	    try {
-		size = Math.round(Float.parseFloat(font_size));
-	    }
-	    catch (NumberFormatException ex){
-		System.err.println("Warning: Font size value not supported (using default): " + font_size);
-		size = 10;
-	    }
-	}
-	else if (ctx != null && ctx.font_size != null){
-	    try {
-		size = Math.round(Float.parseFloat(ctx.font_size));
-	    }
-	    catch (NumberFormatException ex){
-		System.err.println("Warning: Font size value not supported (using default): " + ctx.font_size);
-		size = 10;
-	    }
-	}
-	else {
-	    size = 10;
-	}
-	String rfont_style = (font_style != null) ? font_style : ((ctx != null) ? ctx.font_style : null);
-	String rfont_weight = (font_weight != null) ? font_weight : ((ctx != null) ? ctx.font_weight : null);
-	int style;
-	if (rfont_style != null && rfont_style.equals("italic")){
-	    if (rfont_weight != null && rfont_weight.equals("bold")){style = Font.BOLD + Font.ITALIC;}
-	    else {style = Font.ITALIC;}
-	}
-	else {
-	    if (rfont_weight != null && rfont_weight.equals("bold")){style = Font.BOLD;}
-	    else {style = Font.PLAIN;}
-	}
-	return SVGReader.getFont(fam, style, size);
+        String fam = (font_family!=null) ? font_family : ((ctx!=null) ? ctx.font_family : null);
+        if (fam == null){
+            fam = "Default";
+        }
+        int size;
+        if (font_size != null){
+            try {
+                size = Math.round(Float.parseFloat(font_size));
+            }
+            catch (NumberFormatException ex){
+                System.err.println("Warning: Font size value not supported (using default): " + font_size);
+                size = 10;
+            }
+        }
+        else if (ctx != null && ctx.font_size != null){
+            try {
+                size = Math.round(Float.parseFloat(ctx.font_size));
+            }
+            catch (NumberFormatException ex){
+                System.err.println("Warning: Font size value not supported (using default): " + ctx.font_size);
+                size = 10;
+            }
+        }
+        else {
+            size = 10;
+        }
+        String rfont_style = (font_style != null) ? font_style : ((ctx != null) ? ctx.font_style : null);
+        String rfont_weight = (font_weight != null) ? font_weight : ((ctx != null) ? ctx.font_weight : null);
+        int style;
+        if (rfont_style != null && rfont_style.equals("italic")){
+            if (rfont_weight != null && rfont_weight.equals("bold")){style = Font.BOLD + Font.ITALIC;}
+            else {style = Font.ITALIC;}
+        }
+        else {
+            if (rfont_weight != null && rfont_weight.equals("bold")){style = Font.BOLD;}
+            else {style = Font.PLAIN;}
+        }
+        return SVGReader.getFont(fam, style, size);
     }
 
 
