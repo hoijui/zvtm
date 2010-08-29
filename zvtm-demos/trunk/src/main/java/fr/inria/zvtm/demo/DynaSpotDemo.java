@@ -28,6 +28,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import fr.inria.zvtm.engine.*;
+import fr.inria.zvtm.event.*;
 import fr.inria.zvtm.glyphs.*;
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
@@ -36,7 +37,7 @@ public class DynaSpotDemo {
 
     VirtualSpaceManager vsm;
     VirtualSpace vs;
-    ViewEventHandler eh;   //class that receives the events sent from views (include mouse click, entering object,...)
+    ViewListener eh;   //class that receives the events sent from views (include mouse click, entering object,...)
 
     View demoView;
 
@@ -59,12 +60,12 @@ public class DynaSpotDemo {
         }
         demoView = vsm.addFrameView(cameras, "DynaSpot Demo", vt, 800, 600, false, true);
         demoView.setBackgroundColor(Color.WHITE);
-        demoView.setEventHandler(eh);
-        demoView.setNotifyMouseMoved(true);
+        demoView.setListener(eh);
+        demoView.setNotifyCursorMoved(true);
         vsm.getVirtualSpace("src").getCamera(0).setAltitude(50);
 		vs.addGlyph(new VCircle(-300,0,0,8,Color.BLACK));
 		vs.addGlyph(new VCircle(300,0,0,8,Color.BLACK));
-        vsm.repaintNow();
+        vsm.repaint();
 		demoView.getCursor().activateDynaSpot(true);
     }
 
@@ -83,7 +84,7 @@ public class DynaSpotDemo {
     
 }
 
-class DynaSpotDemoEvtHdlr implements ViewEventHandler {
+class DynaSpotDemoEvtHdlr implements ViewListener {
 
     DynaSpotDemo application;
 
@@ -124,7 +125,7 @@ class DynaSpotDemoEvtHdlr implements ViewEventHandler {
         lastJPY=jpy;
         //application.vsm.animator.setActiveCam(v.cams[0]);
         v.setDrawDrag(true);
-        application.vsm.activeView.mouse.setSensitivity(false);
+        application.vsm.getActiveView().mouse.setSensitivity(false);
         //because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
     }
 
@@ -133,7 +134,7 @@ class DynaSpotDemoEvtHdlr implements ViewEventHandler {
         application.vsm.getAnimationManager().setYspeed(0);
         application.vsm.getAnimationManager().setZspeed(0);
         v.setDrawDrag(false);
-        application.vsm.activeView.mouse.setSensitivity(true);
+        application.vsm.getActiveView().mouse.setSensitivity(true);
         /*Camera c=v.cams[0];
         application.vsm.getAnimationManager().createCameraAnimation(500,2,new LongPoint(lastX-application.vsm.mouse.vx,lastY-application.vsm.mouse.vy),c.getID());*/
     }
@@ -167,12 +168,12 @@ class DynaSpotDemoEvtHdlr implements ViewEventHandler {
         double a=(c.focal+Math.abs(c.altitude))/c.focal;
         if (wheelDirection == WHEEL_UP){
             c.altitudeOffset(-a*5);
-            application.vsm.repaintNow();
+            application.vsm.repaint();
         }
         else {
             //wheelDirection == WHEEL_DOWN
             c.altitudeOffset(a*5);
-            application.vsm.repaintNow();
+            application.vsm.repaint();
         }
     }
 

@@ -23,9 +23,9 @@ import fr.inria.zvtm.glyphs.Glyph;
 
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
-import fr.inria.zvtm.engine.ViewEventHandler;
+import fr.inria.zvtm.event.ViewListener;
 
-public class FractalEventHandler implements ViewEventHandler {
+public class FractalEventHandler implements ViewListener {
 
     FractalDemo application;
 
@@ -54,7 +54,7 @@ public class FractalEventHandler implements ViewEventHandler {
 	    lastJPX=jpx;
 	    lastJPY=jpy;
 	    v.setDrawDrag(true);
-	    application.vsm.activeView.mouse.setSensitivity(false);  //because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
+	    application.vsm.getActiveView().mouse.setSensitivity(false);  //because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
 	    activeCam=application.vsm.getActiveCamera();
 	}
 	else if (mod == ALT_MOD){
@@ -80,13 +80,13 @@ public class FractalEventHandler implements ViewEventHandler {
 	    application.vsm.getAnimationManager().setYspeed(0);
 	    application.vsm.getAnimationManager().setZspeed(0);
 	    v.setDrawDrag(false);
-	    application.vsm.activeView.mouse.setSensitivity(true);
+	    application.vsm.getActiveView().mouse.setSensitivity(true);
 	    manualLeftButtonMove=false;
 	}
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy, int clickNumber, MouseEvent e){
-	Point2D.Double lp = new Point2D.Double(v.getVCursor().vx - v.cams[0].posx, v.getVCursor().vy - v.cams[0].posy);
+	Point2D.Double lp = new Point2D.Double(v.getVCursor().vx - v.cams[0].vx, v.getVCursor().vy - v.cams[0].vy);
 
 	Animation transAnim = application.vsm.getAnimationManager().getAnimationFactory()
 	    .createCameraTranslation(FractalDemo.ANIM_MOVE_LENGTH, v.cams[0], 
@@ -102,7 +102,7 @@ public class FractalEventHandler implements ViewEventHandler {
 	lastJPX=jpx;
 	lastJPY=jpy;
 	v.setDrawDrag(true);
-	application.vsm.activeView.mouse.setSensitivity(false);  //because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
+	application.vsm.getActiveView().mouse.setSensitivity(false);  //because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
 	activeCam=application.vsm.getActiveCamera();
     }
 
@@ -111,11 +111,11 @@ public class FractalEventHandler implements ViewEventHandler {
 	application.vsm.getAnimationManager().setYspeed(0);
 	application.vsm.getAnimationManager().setZspeed(0);
 	v.setDrawDrag(false);
-	application.vsm.activeView.mouse.setSensitivity(true);
+	application.vsm.getActiveView().mouse.setSensitivity(true);
     }
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy, int clickNumber, MouseEvent e){
-	Point2D.Double lp = new Point2D.Double(v.getVCursor().vx - v.cams[0].posx, v.getVCursor().vy - v.cams[0].posy);
+	Point2D.Double lp = new Point2D.Double(v.getVCursor().vx - v.cams[0].vx, v.getVCursor().vy - v.cams[0].vy);
 
 	Animation transAnim = application.vsm.getAnimationManager().getAnimationFactory()
 	    .createCameraTranslation(FractalDemo.ANIM_MOVE_LENGTH, v.cams[0], 

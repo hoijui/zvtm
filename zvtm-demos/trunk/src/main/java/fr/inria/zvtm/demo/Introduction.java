@@ -55,8 +55,8 @@ import fr.inria.zvtm.animation.EndAction;
 import fr.inria.zvtm.animation.interpolation.ConstantAccInterpolator;
 import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
 import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
-import fr.inria.zvtm.engine.ViewEventHandler;
-import fr.inria.zvtm.engine.TransitionManager;
+import fr.inria.zvtm.event.ViewListener;
+import fr.inria.zvtm.engine.Transitions;
 import fr.inria.zvtm.engine.Location;
 
 import org.jdesktop.animation.timing.interpolation.Interpolator;
@@ -79,7 +79,7 @@ public class Introduction {
 
     IntroPanel iPanel;
 
-    ViewEventHandler eh;
+    ViewListener eh;
 
     String animType = "orient";
     volatile String animScheme = "sig";
@@ -128,16 +128,16 @@ public class Introduction {
 	if (center){
 	    Camera c = demoView.getCameraNumber(0);
 	    Location l = demoView.getGlobalView(c);
-	    c.posx = l.vx;
-	    c.posy = l.vy;
+	    c.vx = l.vx;
+	    c.vy = l.vy;
 	    c.setAltitude(l.alt);
 	}
-	TransitionManager.fadeIn(demoView, 500, vsm);
+	Transitions.fadeIn(demoView, 500);
     }
 
     void cameraDemo(){
 	if (vsm.getView("Demo2")!=null){vsm.getView("Demo2").destroyView();}
-	TransitionManager.fadeOut(demoView, 500, BLANK_COLOR, vsm,
+	Transitions.fadeOut(demoView, 500, BLANK_COLOR,
 				  new EndAction(){
 				      public void execute(Object subject,
 						   Animation.Dimension dimension){
@@ -152,7 +152,7 @@ public class Introduction {
         demoView.setBackgroundColor(Color.WHITE);
         vs1.removeAllGlyphs();
         eh=new CameraDemoEvtHdlr(this);
-        demoView.setEventHandler(eh);
+        demoView.setListener(eh);
         double randomX=0;
         double randomY=0;
         double randomS=0;
@@ -188,7 +188,7 @@ public class Introduction {
     }
 
     void objectFamilies(){
-        TransitionManager.fadeOut(demoView, 500, BLANK_COLOR, vsm,
+        Transitions.fadeOut(demoView, 500, BLANK_COLOR,
         new EndAction(){
             public void execute(Object subject,
             Animation.Dimension dimension){
@@ -203,7 +203,7 @@ public class Introduction {
         demoView.setBackgroundColor(Color.LIGHT_GRAY);
         vs1.removeAllGlyphs();
         eh=new CameraDemoEvtHdlr(this);
-        demoView.setEventHandler(eh);
+        demoView.setListener(eh);
         VRectangle r1=new VRectangle(-600,400,0,200,100,Color.black);
         VRectangle r2=new VRectangle(-200,400,0,100,100,Color.black);
         VRectangleOr r3=new VRectangleOr(200,400,0,60,200,Color.black,0.707f);
@@ -263,7 +263,7 @@ public class Introduction {
     }
 
     void objectAnim(){
-	TransitionManager.fadeOut(demoView, 500, BLANK_COLOR, vsm,
+	Transitions.fadeOut(demoView, 500, BLANK_COLOR,
 				  new EndAction(){
 				      public void execute(Object subject,
 							  Animation.Dimension dimension){
@@ -308,7 +308,7 @@ public class Introduction {
 	vs1.addGlyph(linT);vs1.addGlyph(expT);vs1.addGlyph(sigT);
 	linG.setColor(Introduction.ANIM_BUTTON_COLOR);expG.setColor(Introduction.ANIM_BUTTON_COLOR);sigG.setColor(Introduction.ANIM_SELECTED_BUTTON_COLOR);
 	eh=new AnimationEvtHdlr(this,orG,szG,clG,trG,linG,expG,sigG);
-	demoView.setEventHandler(eh);
+	demoView.setListener(eh);
 
 	VCircle c1=new VCircle(-400,900,0,200,Color.black);c1.setType("an");	
 	VShape t1=new VShape(-400,600,0,200, TRIANGLE_VERTICES, Color.black,0);t1.setType("an");
@@ -365,7 +365,7 @@ public class Introduction {
     }
 
     void multiLayer(){
-	TransitionManager.fadeOut(demoView, 500, BLANK_COLOR, vsm,
+	Transitions.fadeOut(demoView, 500, BLANK_COLOR,
 				  new EndAction(){
 				      public void execute(Object subject,
 							  Animation.Dimension dimension){
@@ -388,8 +388,8 @@ public class Introduction {
         demoView = vsm.getView("Demo");
         demoView.setLocation(IntroPanel.PANEL_WIDTH, 0);
         eh=new MultiLayerEvtHdlr(this);
-        demoView.setEventHandler(eh, 0);
-        demoView.setEventHandler(eh, 1);
+        demoView.setListener(eh, 0);
+        demoView.setListener(eh, 1);
         VRectangle g1=new VRectangle(-2000,0,0,1000,1000,Color.blue, Color.BLACK, 0.5f);
         VShape g2=new VShape(2000,0,0,1000, TRIANGLE_VERTICES, Color.BLUE, Color.BLACK, 0.5f);
         VShape g3=new VShape(0,-2000,0,1000, DIAMOND_VERTICES, Color.BLUE, Color.BLACK, 0.5f);
@@ -402,17 +402,17 @@ public class Introduction {
         VCircle c4=new VCircle(0,2000,0,1000,Color.yellow);
         VShape c5 = new VShape(0, 0, 0, 400, STAR1_VERTICES, Color.YELLOW, Color.BLACK, 0, 0.5f);
         vs1.addGlyph(c1);vs1.addGlyph(c2);vs1.addGlyph(c3);vs1.addGlyph(c4);vs1.addGlyph(c5);
-        vs1.getCamera(0).posx=0;
-        vs1.getCamera(0).posy=0;
+        vs1.getCamera(0).vx=0;
+        vs1.getCamera(0).vy=0;
         vs1.getCamera(0).setAltitude(800.0f);
-        vsm.getVirtualSpace(VS_2).getCamera(0).posx=0;
-        vsm.getVirtualSpace(VS_2).getCamera(0).posy=0;
+        vsm.getVirtualSpace(VS_2).getCamera(0).vx=0;
+        vsm.getVirtualSpace(VS_2).getCamera(0).vy=0;
         vsm.getVirtualSpace(VS_2).getCamera(0).setAltitude(800.0f);
         reveal(false);
     }
 
     void multiView(){
-	TransitionManager.fadeOut(demoView, 500, BLANK_COLOR, vsm,
+	Transitions.fadeOut(demoView, 500, BLANK_COLOR,
 				  new EndAction(){
 				      public void execute(Object subject,
 							  Animation.Dimension dimension){
@@ -428,14 +428,14 @@ public class Introduction {
 	vs1.removeAllGlyphs();
 	vsm.destroyVirtualSpace(VS_2);
 	eh=new CameraDemoEvtHdlr(this);
-	ViewEventHandler eh2=new CameraDemoEvtHdlr(this);
+	ViewListener eh2=new CameraDemoEvtHdlr(this);
 	vs1.addCamera();
 	camNb++;  //keep track of how many cameras have been created in the virtual space
 	Vector vc1=new Vector();
 	vc1.add(vs1.getCamera(camNb));
 	vsm.addFrameView(vc1, "Demo2", View.STD_VIEW, 300, 200, false, true);
-	demoView.setEventHandler(eh);
-	vsm.getView("Demo2").setEventHandler(eh2);
+	demoView.setListener(eh);
+	vsm.getView("Demo2").setListener(eh2);
 	vsm.getView("Demo2").setLocation(0,350);
 	vsm.getView("Demo2").setBackgroundColor(Color.WHITE);
 	VRectangle g1=new VRectangle(200,-200,0,200,100,Color.yellow);
@@ -475,7 +475,7 @@ public class Introduction {
     
 }
 
-class AnimationEvtHdlr implements ViewEventHandler {
+class AnimationEvtHdlr implements ViewListener {
 
     Introduction application;
 
@@ -505,11 +505,11 @@ class AnimationEvtHdlr implements ViewEventHandler {
 	    }
 	}
 	catch (NullPointerException ex){}
-	application.vsm.activeView.mouse.setSensitivity(false);
+	application.vsm.getActiveView().mouse.setSensitivity(false);
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	application.vsm.activeView.mouse.setSensitivity(true);
+	application.vsm.getActiveView().mouse.setSensitivity(true);
 	v.getVCursor().unstickLastGlyph();
     }
 
@@ -608,7 +608,7 @@ class AnimationEvtHdlr implements ViewEventHandler {
 		    sigmoid.setColor(Introduction.ANIM_SELECTED_BUTTON_COLOR);
 		}
 	    }
-	    application.vsm.repaintNow();
+	    application.vsm.repaint();
 	}
     }
 
@@ -621,7 +621,7 @@ class AnimationEvtHdlr implements ViewEventHandler {
 	lastJPY=jpy;
 	//application.vsm.setActiveCamera(v.cams[0]);
 	v.setDrawDrag(true);
-	application.vsm.activeView.mouse.setSensitivity(false);  //because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
+	application.vsm.getActiveView().mouse.setSensitivity(false);  //because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
 	activeCam=v.cams[0];
     }
 
@@ -630,7 +630,7 @@ class AnimationEvtHdlr implements ViewEventHandler {
 	application.vsm.getAnimationManager().setYspeed(0);
 	application.vsm.getAnimationManager().setZspeed(0);
 	v.setDrawDrag(false);
-	application.vsm.activeView.mouse.setSensitivity(true);
+	application.vsm.getActiveView().mouse.setSensitivity(true);
     }
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
@@ -658,11 +658,11 @@ class AnimationEvtHdlr implements ViewEventHandler {
 	double a = (c.focal+Math.abs(c.altitude)) / c.focal;
 	if (wheelDirection == WHEEL_UP){
 	    c.altitudeOffset(-a*5);
-	    application.vsm.repaintNow();
+	    application.vsm.repaint();
 	}
 	else {//wheelDirection == WHEEL_DOWN
 	    c.altitudeOffset(a*5);
-	    application.vsm.repaintNow();
+	    application.vsm.repaint();
 	}
     }
 
@@ -701,7 +701,7 @@ class AnimationEvtHdlr implements ViewEventHandler {
 
 }
 
-class CameraDemoEvtHdlr implements ViewEventHandler {
+class CameraDemoEvtHdlr implements ViewListener {
 
     Introduction application;
 
@@ -726,11 +726,11 @@ class CameraDemoEvtHdlr implements ViewEventHandler {
 	    }
 	}
 	catch (NullPointerException ex){}
-	application.vsm.activeView.mouse.setSensitivity(false);
+	application.vsm.getActiveView().mouse.setSensitivity(false);
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	application.vsm.activeView.mouse.setSensitivity(true);
+	application.vsm.getActiveView().mouse.setSensitivity(true);
 	v.getVCursor().unstickLastGlyph();
     }
 
@@ -745,7 +745,7 @@ class CameraDemoEvtHdlr implements ViewEventHandler {
 	lastJPY=jpy;
 	//application.vsm.setActiveCamera(v.cams[0]);
 	v.setDrawSegment(true);
-	application.vsm.activeView.mouse.setSensitivity(false);  //because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
+	application.vsm.getActiveView().mouse.setSensitivity(false);  //because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
 	activeCam=v.cams[0];
     }
 
@@ -754,7 +754,7 @@ class CameraDemoEvtHdlr implements ViewEventHandler {
 	application.vsm.getAnimationManager().setYspeed(0);
 	application.vsm.getAnimationManager().setZspeed(0);
 	v.setDrawSegment(false);
-	application.vsm.activeView.mouse.setSensitivity(true);
+	application.vsm.getActiveView().mouse.setSensitivity(true);
 	if (autoZoomed){
 	    Animation anim = application.vsm.getAnimationManager().getAnimationFactory()
 		.createCameraAltAnim(300, v.cams[0], -2*v.cams[0].getAltitude()/3.0f, true,
@@ -804,11 +804,11 @@ class CameraDemoEvtHdlr implements ViewEventHandler {
 	double a = (c.focal+Math.abs(c.altitude)) / c.focal;
 	if (wheelDirection == WHEEL_UP){
 	    c.altitudeOffset(-a*5);
-	    application.vsm.repaintNow();
+	    application.vsm.repaint();
 	}
 	else {//wheelDirection == WHEEL_DOWN
 	    c.altitudeOffset(a*5);
-	    application.vsm.repaintNow();
+	    application.vsm.repaint();
 	}
     }
 
@@ -851,7 +851,7 @@ class CameraDemoEvtHdlr implements ViewEventHandler {
 
 }
 
-class MultiLayerEvtHdlr implements ViewEventHandler {
+class MultiLayerEvtHdlr implements ViewListener {
 
     Introduction application;
 
@@ -873,11 +873,11 @@ class MultiLayerEvtHdlr implements ViewEventHandler {
     public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
 	try {v.getVCursor().stickGlyph(v.lastGlyphEntered());application.vsm.getVirtualSpace("vs1").onTop(v.lastGlyphEntered());}
 	catch (NullPointerException ex){}
-	application.vsm.activeView.mouse.setSensitivity(false);
+	application.vsm.getActiveView().mouse.setSensitivity(false);
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	application.vsm.activeView.mouse.setSensitivity(true);
+	application.vsm.getActiveView().mouse.setSensitivity(true);
 	v.getVCursor().unstickLastGlyph();
     }
 
@@ -892,7 +892,7 @@ class MultiLayerEvtHdlr implements ViewEventHandler {
 	lastJPY=jpy;
 	//application.vsm.setActiveCamera(v.cams[0]);
 	v.setDrawDrag(true);
-	application.vsm.activeView.mouse.setSensitivity(false);  //because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
+	application.vsm.getActiveView().mouse.setSensitivity(false);  //because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
 	activeCam=application.vsm.getActiveCamera();
     }
 
@@ -901,7 +901,7 @@ class MultiLayerEvtHdlr implements ViewEventHandler {
 	application.vsm.getAnimationManager().setYspeed(0);
 	application.vsm.getAnimationManager().setZspeed(0);
 	v.setDrawDrag(false);
-	application.vsm.activeView.mouse.setSensitivity(true);
+	application.vsm.getActiveView().mouse.setSensitivity(true);
     }
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
@@ -930,11 +930,11 @@ class MultiLayerEvtHdlr implements ViewEventHandler {
 	double a = (c.focal+Math.abs(c.altitude)) / c.focal;
 	if (wheelDirection == WHEEL_UP){
 	    c.altitudeOffset(-a*5);
-	    application.vsm.repaintNow();
+	    application.vsm.repaint();
 	}
 	else {//wheelDirection == WHEEL_DOWN
 	    c.altitudeOffset(a*5);
-	    application.vsm.repaintNow();
+	    application.vsm.repaint();
 	}
     }
 

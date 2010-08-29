@@ -41,12 +41,12 @@ import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.ConstantAccInterpolator;
 import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
 import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
-import fr.inria.zvtm.engine.TransitionManager;
+import fr.inria.zvtm.engine.Transitions;
 
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewPanel;
-import fr.inria.zvtm.engine.ViewEventHandler;
+import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.VCursor;
@@ -124,7 +124,7 @@ public class AnimationDemo extends JApplet implements MouseListener, KeyListener
 	mView = vsm.getView(APPLET_TITLE);
 	mView.setBackgroundColor(APPLET_BKG_COLOR);
 	eh = new AnimationDemoEventHandler(this);
-	mView.setEventHandler(eh);
+	mView.setListener(eh);
 
  	viewPanel.setPreferredSize(new Dimension(appletWindowWidth-10, appletWindowHeight-40));
 	mView.setAntialiasing(true);
@@ -147,7 +147,7 @@ public class AnimationDemo extends JApplet implements MouseListener, KeyListener
 	buildConstraints(constraints,1,0,1,1,90,0);
 	gridBag.setConstraints(borderPanel, constraints);
 	cpane.add(borderPanel);
-	vsm.repaintNow();
+	vsm.repaint();
 	mCam.setAltitude(150);
     }
 
@@ -453,15 +453,15 @@ public class AnimationDemo extends JApplet implements MouseListener, KeyListener
 
     void fade(boolean out){// true = fade out, false = fade in
 	if (out){
-	    TransitionManager.fadeOut(mView, cmdPanel.getDuration(), Color.BLACK, vsm);
+	    Transitions.fadeOut(mView, cmdPanel.getDuration(), Color.BLACK);
 	}
 	else {
-	    TransitionManager.fadeIn(mView, cmdPanel.getDuration(), vsm);	    
+	    Transitions.fadeIn(mView, cmdPanel.getDuration());	    
 	}
     }
     
 
-    /* Key listener (keyboard events are not sent to ViewEventHandler when View is a JPanel...) */
+    /* Key listener (keyboard events are not sent to ViewListener when View is a JPanel...) */
     
     public void keyPressed(KeyEvent e){
 	mView.getGlobalView(mCam, 400);
@@ -602,7 +602,7 @@ class CommandPanel extends JPanel implements ActionListener {
     
 }
 
-class AnimationDemoEventHandler implements ViewEventHandler {
+class AnimationDemoEventHandler implements ViewListener {
 
     AnimationDemo application;
 
@@ -640,7 +640,7 @@ class AnimationDemoEventHandler implements ViewEventHandler {
 	lastJPX = jpx;
 	lastJPY = jpy;
 	v.setDrawDrag(true);
-	application.vsm.activeView.mouse.setSensitivity(false);
+	application.vsm.getActiveView().mouse.setSensitivity(false);
     }
 
     public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
@@ -648,7 +648,7 @@ class AnimationDemoEventHandler implements ViewEventHandler {
 	application.vsm.getAnimationManager().setYspeed(0);
 	application.vsm.getAnimationManager().setZspeed(0);
 	v.setDrawDrag(false);
-	application.vsm.activeView.mouse.setSensitivity(true);
+	application.vsm.getActiveView().mouse.setSensitivity(true);
     }
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
@@ -680,11 +680,11 @@ class AnimationDemoEventHandler implements ViewEventHandler {
 	double a = (c.focal+Math.abs(c.altitude))/c.focal;
 	if (wheelDirection == WHEEL_UP){
 	    c.altitudeOffset(-a*5);
-	    application.vsm.repaintNow();
+	    application.vsm.repaint();
 	}
 	else {//wheelDirection == WHEEL_DOWN
 	    c.altitudeOffset(a*5);
-	    application.vsm.repaintNow();
+	    application.vsm.repaint();
 	}
     }
 
@@ -712,15 +712,9 @@ class AnimationDemoEventHandler implements ViewEventHandler {
         Glyph res = c.lastGlyphEntered;
         if (res != null){return res;}
         else {
-            Vector<VText> v = c.getIntersectingTexts(application.mCam);
-            if (v != null){
-                res = v.firstElement();
-            }
-            else {
-                Vector<VSegment> v2 = c.getIntersectingSegments(application.mCam, 4);
-                if (v2 != null){
-                    res = v2.firstElement();
-                }
+            Vector<VSegment> v2 = c.getIntersectingSegments(application.mCam, 4);
+            if (v2 != null){
+                res = v2.firstElement();
             }
         }
         return res;

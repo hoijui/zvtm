@@ -21,7 +21,7 @@ import java.awt.event.MouseWheelEvent;
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 import fr.inria.zvtm.engine.Java2DPainter;
-import fr.inria.zvtm.engine.ViewEventHandler;
+import fr.inria.zvtm.event.ViewListener;
 
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.SwingWorker;
@@ -42,7 +42,7 @@ public class ViewDemo {
     String mainSpaceName = "demoSpace";
     String mainViewName = "View";
 
-    ViewEventHandler eh;
+    ViewListener eh;
 
     static short MOVE_UP=0;
     static short MOVE_DOWN=1;
@@ -87,7 +87,7 @@ public class ViewDemo {
 	cameras.add(mCamera);
 	demoView = vsm.addFrameView(cameras, mainViewName, viewType, 800, 600, false, true);
 	demoView.setBackgroundColor(Color.WHITE);
-	demoView.setEventHandler(eh);
+	demoView.setListener(eh);
 	final SwingWorker worker = new SwingWorker(){
 		public Object construct(){
 		    buildGlyphs();
@@ -117,7 +117,7 @@ public class ViewDemo {
 		pf.setPBValue(i+j/100);
 	    }
 	}
-	vsm.repaintNow();
+	vsm.repaint();
 	pf.destroy();
 	demoView.getGlobalView(vsm.getVirtualSpace(mainSpaceName).getCamera(0), 400);
     }
@@ -192,7 +192,7 @@ public class ViewDemo {
 }
 
 
-class ViewDemoEventHandler implements ViewEventHandler {
+class ViewDemoEventHandler implements ViewListener {
 
     ViewDemo application;
 
@@ -221,7 +221,7 @@ class ViewDemoEventHandler implements ViewEventHandler {
 	    lastJPX=jpx;
 	    lastJPY=jpy;
 	    v.setDrawDrag(true);
-	    application.vsm.activeView.mouse.setSensitivity(false);  //because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
+	    application.vsm.getActiveView().mouse.setSensitivity(false);  //because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
 	    activeCam=application.vsm.getActiveCamera();
 	}
 	else if (mod == ALT_MOD){
@@ -247,13 +247,13 @@ class ViewDemoEventHandler implements ViewEventHandler {
 	    application.vsm.getAnimationManager().setYspeed(0);
 	    application.vsm.getAnimationManager().setZspeed(0);
 	    v.setDrawDrag(false);
-	    application.vsm.activeView.mouse.setSensitivity(true);
+	    application.vsm.getActiveView().mouse.setSensitivity(true);
 	    manualLeftButtonMove=false;
 	}
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy, int clickNumber, MouseEvent e){
-	Point2D.Double  lp = new Point2D.Double(v.getVCursor().vx - v.cams[0].posx, v.getVCursor().vy - v.cams[0].posy);
+	Point2D.Double  lp = new Point2D.Double(v.getVCursor().vx - v.cams[0].vx, v.getVCursor().vy - v.cams[0].vy);
 
 	Animation transAnim = application.vsm.getAnimationManager().getAnimationFactory()
 	    .createCameraTranslation(ViewDemo.ANIM_MOVE_LENGTH, v.cams[0], lp, true, 
@@ -269,7 +269,7 @@ class ViewDemoEventHandler implements ViewEventHandler {
 	lastJPX=jpx;
 	lastJPY=jpy;
 	v.setDrawDrag(true);
-	application.vsm.activeView.mouse.setSensitivity(false);  //because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
+	application.vsm.getActiveView().mouse.setSensitivity(false);  //because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
 	activeCam=application.vsm.getActiveCamera();
     }
 
@@ -278,11 +278,11 @@ class ViewDemoEventHandler implements ViewEventHandler {
 	application.vsm.getAnimationManager().setYspeed(0);
 	application.vsm.getAnimationManager().setZspeed(0);
 	v.setDrawDrag(false);
-	application.vsm.activeView.mouse.setSensitivity(true);
+	application.vsm.getActiveView().mouse.setSensitivity(true);
     }
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy, int clickNumber, MouseEvent e){
-	Point2D.Double  lp = new Point2D.Double(v.getVCursor().vx - v.cams[0].posx, v.getVCursor().vy - v.cams[0].posy);
+	Point2D.Double  lp = new Point2D.Double(v.getVCursor().vx - v.cams[0].vx, v.getVCursor().vy - v.cams[0].vy);
 
 	Animation transAnim = application.vsm.getAnimationManager().getAnimationFactory()
 	    .createCameraTranslation(ViewDemo.ANIM_MOVE_LENGTH, v.cams[0], lp, true, 

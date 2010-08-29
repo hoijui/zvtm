@@ -40,7 +40,7 @@ import fr.inria.zvtm.glyphs.VSegment;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.glyphs.Glyph;
-import fr.inria.zvtm.engine.ViewEventHandler;
+import fr.inria.zvtm.event.ViewListener;
 
 
 public class LensApplet extends JApplet {
@@ -91,13 +91,13 @@ public class LensApplet extends JApplet {
  	zvtmV.setPreferredSize(new Dimension(viewWidth-10,viewHeight-80));
 	view = vsm.getView(zvtmView);
 	evt = new LensAppletEvtHdlr(this);
-	view.setEventHandler(evt);
+	view.setListener(evt);
 	view.setBackgroundColor(backgroundColor);
 	cp.add(zvtmV);
 	ActionListener a0 = new ActionListener(){
 		public void actionPerformed(ActionEvent e){
 		    if (lensCB.isSelected()){
-			LensApplet.this.view.repaintNow();
+			LensApplet.this.view.repaint();
 			LensApplet.this.lens = view.setLens(new FSLinearLens(1.0f,100,20));
 			LensApplet.this.lens.setBufferThreshold(1.5f);
 			
@@ -132,14 +132,14 @@ public class LensApplet extends JApplet {
 	VImage i1=new VImage(0,0,0,(new ImageIcon(this.getClass().getResource("/images/logo-futurs-small.png"))).getImage());
 	i1.setDrawBorderPolicy(VImage.DRAW_BORDER_NEVER);
 	vs.addGlyph(i1);
-	vsm.repaintNow();
+	vsm.repaint();
 	view.getGlobalView(vs.getCamera(0),500);
-	vsm.repaintNow();
+	vsm.repaint();
     }
 
 }
 
-class LensAppletEvtHdlr implements ViewEventHandler {
+class LensAppletEvtHdlr implements ViewListener {
 
     LensApplet application;
 
@@ -162,7 +162,7 @@ class LensAppletEvtHdlr implements ViewEventHandler {
 	lastJPX=jpx;
 	lastJPY=jpy;
 	v.setDrawDrag(true);
-	LensApplet.vsm.activeView.mouse.setSensitivity(false);  //because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
+	LensApplet.vsm.getActiveView().mouse.setSensitivity(false);  //because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
 	activeCam=LensApplet.vsm.getActiveCamera();
     }
 
@@ -171,7 +171,7 @@ class LensAppletEvtHdlr implements ViewEventHandler {
 	LensApplet.vsm.getAnimationManager().setYspeed(0);
 	LensApplet.vsm.getAnimationManager().setZspeed(0);
 	v.setDrawDrag(false);
-	LensApplet.vsm.activeView.mouse.setSensitivity(true);
+	LensApplet.vsm.getActiveView().mouse.setSensitivity(true);
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
@@ -184,7 +184,7 @@ class LensAppletEvtHdlr implements ViewEventHandler {
 	lastJPX=jpx;
 	lastJPY=jpy;
 	v.setDrawDrag(true);
-	LensApplet.vsm.activeView.mouse.setSensitivity(false);  //because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
+	LensApplet.vsm.getActiveView().mouse.setSensitivity(false);  //because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
 	activeCam=LensApplet.vsm.getActiveCamera();
     }
 
@@ -193,7 +193,7 @@ class LensAppletEvtHdlr implements ViewEventHandler {
 	LensApplet.vsm.getAnimationManager().setYspeed(0);
 	LensApplet.vsm.getAnimationManager().setZspeed(0);
 	v.setDrawDrag(false);
-	LensApplet.vsm.activeView.mouse.setSensitivity(true);
+	LensApplet.vsm.getActiveView().mouse.setSensitivity(true);
     }
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
@@ -222,11 +222,11 @@ class LensAppletEvtHdlr implements ViewEventHandler {
 	double a=(c.focal+Math.abs(c.altitude))/c.focal;
 	if (wheelDirection == WHEEL_UP){
 	    c.altitudeOffset(-a*5);
-	    application.vsm.repaintNow();
+	    application.vsm.repaint();
 	}
 	else {//wheelDirection == WHEEL_DOWN
 	    c.altitudeOffset(a*5);
-	    application.vsm.repaintNow();
+	    application.vsm.repaint();
 	}
     }
 

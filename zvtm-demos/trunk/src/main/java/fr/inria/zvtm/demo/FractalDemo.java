@@ -18,7 +18,7 @@ import fr.inria.zvtm.engine.VirtualSpace;
 
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
-import fr.inria.zvtm.engine.ViewEventHandler;
+import fr.inria.zvtm.event.ViewListener;
 
 public abstract class FractalDemo {
 
@@ -29,7 +29,7 @@ public abstract class FractalDemo {
     String mainSpaceName = "fractalSpace";
     String mainViewName = "Fractal";
 
-    ViewEventHandler eh;
+    ViewListener eh;
 
     static short MOVE_UP=0;
     static short MOVE_DOWN=1;

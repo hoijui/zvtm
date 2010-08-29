@@ -51,7 +51,7 @@ public class FractalMandelbrot extends FractalDemo {
 	cameras.add(vs.getCamera(0));
 	vsm.addFrameView(cameras, mainViewName, View.STD_VIEW, 800, 600, false, true);
 	View v = vsm.getView(mainViewName);
-	v.setEventHandler(eh);
+	v.setListener(eh);
 	v.setBackgroundColor(Color.black);
 	v.mouse.setColor(Color.white);
 	v.getGlobalView(vs.getCamera(0), 500);

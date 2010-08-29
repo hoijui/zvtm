@@ -16,7 +16,7 @@ import java.awt.geom.Point2D;
 import java.util.Vector;
 
 import fr.inria.zvtm.engine.Camera;
-import fr.inria.zvtm.engine.CameraListener;
+import fr.inria.zvtm.event.CameraListener;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
@@ -26,9 +26,10 @@ import fr.inria.zvtm.engine.SwingWorker;
 
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
-import fr.inria.zvtm.engine.ViewEventHandler;
+import fr.inria.zvtm.event.ViewListener;
+import fr.inria.zvtm.event.ViewAdapter;
 import fr.inria.zvtm.engine.ScrollLayer;
-import fr.inria.zvtm.engine.DefaultScrollEventHandler;
+import fr.inria.zvtm.event.ScrollingListener;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VRectangle;
 
@@ -42,9 +43,9 @@ public class ScrollbarDemo implements CameraListener {
     View demoView;
     Camera mCamera;
 
-    ViewEventHandler meh;
+    ViewListener meh;
     ScrollLayer sl;
-    ViewEventHandler sbeh;
+    ViewListener sbeh;
 
     static final short MOVE_UP = 0;
     static final short MOVE_DOWN = 1;
@@ -61,19 +62,19 @@ public class ScrollbarDemo implements CameraListener {
 	demoSpace = vsm.addVirtualSpace(demoSpaceName);
 	mCamera = demoSpace.addCamera();
 	mCamera.setZoomFloor(0);
-	sl = new ScrollLayer(vsm, mCamera);
+	sl = new ScrollLayer(mCamera);
 	Vector cameras = new Vector();
 	cameras.add(mCamera);
 	cameras.add(sl.getWidgetCamera());
 	demoView = vsm.addFrameView(cameras, demoViewName, View.STD_VIEW, 800, 600, false, true);
 	demoView.setBackgroundColor(Color.WHITE);
 	meh = new ScrollbarDemoEventHandler(this, 0, 1);
-	demoView.setEventHandler(meh, 0);
-	sbeh = new DefaultScrollEventHandler(sl, 1, 0){
+	demoView.setListener(meh, 0);
+	sbeh = new ViewAdapter(){
 		public void viewClosing(View v){System.exit(0);}
 	    };
-	demoView.setEventHandler(sbeh, 1);
-	demoView.setNotifyMouseMoved(true);
+	demoView.setListener(sbeh, 1);
+	demoView.setNotifyCursorMoved(true);
 	sl.setView(demoView);
 	mCamera.addListener(this);
 	final SwingWorker worker = new SwingWorker(){
@@ -99,7 +100,7 @@ public class ScrollbarDemo implements CameraListener {
 	    }
 	}
 	sl.virtualSpaceUpdated();
-	vsm.repaintNow();
+	vsm.repaint();
 	demoView.getGlobalView(demoSpace.getCamera(0), 400);
     }
 
@@ -168,7 +169,7 @@ public class ScrollbarDemo implements CameraListener {
     
 }
 
-class ScrollbarDemoEventHandler implements ViewEventHandler {
+class ScrollbarDemoEventHandler implements ViewListener {
 
     ScrollbarDemo application;
 
@@ -247,11 +248,11 @@ class ScrollbarDemoEventHandler implements ViewEventHandler {
 	double a = (c.focal+Math.abs(c.altitude))/c.focal;
 	if (wheelDirection == WHEEL_UP){
 	    c.altitudeOffset(-a*5);
-	    application.vsm.repaintNow();
+	    application.vsm.repaint();
 	}
 	else {//wheelDirection == WHEEL_DOWN
 	    c.altitudeOffset(a*5);
-	    application.vsm.repaintNow();
+	    application.vsm.repaint();
 	}
     }
 
