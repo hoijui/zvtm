@@ -3,8 +3,10 @@ package fr.inria.zvtm.cluster;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 import fr.inria.zvtm.engine.Camera;
+import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.fits.FitsHistogram;
@@ -40,6 +42,11 @@ public class AstroRad {
         imgCamList.add(imageCamera);
         ArrayList<Camera> controlCamList = new ArrayList<Camera>();
         controlCamList.add(controlCamera);
+        Vector<Camera> cameras = new Vector<Camera>();
+        cameras.add(imageCamera);
+        cameras.add(controlCamera);
+        View view = VirtualSpaceManager.INSTANCE.addFrameView(cameras, "Master View",
+                View.STD_VIEW, 800, 600, false, true, true, null);	
 
         //setup cluster geometry
         ClusterGeometry clGeom = new ClusterGeometry(
