@@ -8,11 +8,12 @@
 package fr.inria.zvtm.nodetrix;
 
 import java.awt.Color;
+import java.awt.geom.Point2D;
+
 import java.util.Vector;
 
 import fr.inria.zvtm.animation.AnimationManager;
 import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator2;
-import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.VRectangle;
@@ -30,9 +31,9 @@ public class NTNode extends LinLogNode{
     Vector<NTEdge> outgoingEdges, incomingEdges;
     
     /* relative offset of horizontal and vertical labels w.r.t matrix's center*/
-	long wdx, wdy, ndx, ndy;
+	double wdx, wdy, ndx, ndy;
 	/* stores the matrix centre coordinates*/
-	long mx, my; 
+	double mx, my; 
 	/* Vertical label, can be null if matrix contains this node only */
 	VTextOr labelN;
 	/* Horizontal label */
@@ -49,7 +50,7 @@ public class NTNode extends LinLogNode{
 	private Object owner;
 	
 	/**Stores the half width, since double width is never used */
-	private long widthHalf = 0;
+	private double widthHalf = 0;
 	
 	/* interaction*/
 	AnimationManager animManager; 
@@ -63,9 +64,9 @@ public class NTNode extends LinLogNode{
 	private String group = null;
 	private boolean reDraw = true;
 
-	private long yOld;
+	private double yOld;
 
-	private long xOld;
+	private double xOld;
 	
 	
 	public NTNode(String name){
@@ -78,7 +79,7 @@ public class NTNode extends LinLogNode{
     
 	
     
-    void createGraphics(long wdx, long wdy, long ndx, long ndy, VirtualSpace vs, boolean single, Color colour)
+    void createGraphics(double wdx, double wdy, double ndx, double ndy, VirtualSpace vs, boolean single, Color colour)
     {
     	cleanGraphics(vs);
     	
@@ -91,13 +92,13 @@ public class NTNode extends LinLogNode{
 	    this.single = single;
 	    
 	    	labelW = new VText(-NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER ,0 , 0, NodeTrixViz.MATRIX_STROKE_COLOR, name, (single) ? VText.TEXT_ANCHOR_MIDDLE : VText.TEXT_ANCHOR_END);
-	    	gBackgroundW = new VRectangle(0, 0, 0, 0, NodeTrixViz.CELL_SIZE/2, backgroundColor);
+	    	gBackgroundW = new VRectangle(0, 0, 0, 0, NodeTrixViz.CELL_SIZE, backgroundColor);
 	    	gBackgroundW.setDrawBorder(false);
 	    	gBackgroundW.stick(this.labelW);
 	    	vs.addGlyph(gBackgroundW);
 	    	vs.addGlyph(labelW);
 	    	
-	    	gBackgroundWSensitive = new VRectangle(2, 2, 0, 0, NodeTrixViz.CELL_SIZE/2 -2, Color.red);
+	    	gBackgroundWSensitive = new VRectangle(2, 2, 0, 0, NodeTrixViz.CELL_SIZE -4, Color.red);
 	    	gBackgroundWSensitive.setTranslucencyValue(0f);
 	    	gBackgroundW.stick(this.gBackgroundWSensitive);
 	    	gBackgroundWSensitive.setOwner(this);
@@ -105,12 +106,12 @@ public class NTNode extends LinLogNode{
 	    
 		    if (!single){
 	    	    labelN = new VTextOr(0, NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER, 0, NodeTrixViz.MATRIX_STROKE_COLOR, name, (float)Math.PI/2f, VText.TEXT_ANCHOR_START);
-	    	    gBackgroundN = new VRectangleOr(0,0, 0, 0, NodeTrixViz.CELL_SIZE/2, backgroundColor, (float)Math.PI/2f);
+	    	    gBackgroundN = new VRectangleOr(0,0, 0, 0, NodeTrixViz.CELL_SIZE, backgroundColor, (float)Math.PI/2f);
 	    	    gBackgroundN.setDrawBorder(false);
 	    	    gBackgroundN.stick(this.labelN);
 	    		vs.addGlyph(gBackgroundN);
 	    		vs.addGlyph(labelN);
-	    		gBackgroundNSensitive = new VRectangleOr(2, 2, 0, 0, NodeTrixViz.CELL_SIZE/2 -2,  Color.red,  (float)Math.PI/2f);
+	    		gBackgroundNSensitive = new VRectangleOr(2, 2, 0, 0, NodeTrixViz.CELL_SIZE -4,  Color.red,  (float)Math.PI/2f);
 	    	    gBackgroundNSensitive.setTranslucencyValue(0f);
 	    	    gBackgroundN.stick(this.gBackgroundNSensitive);
 	    	    gBackgroundNSensitive.setOwner(this);
@@ -118,7 +119,7 @@ public class NTNode extends LinLogNode{
 		   }
     }
     
-    public void moveTo(long mx, long my){
+    public void moveTo(double mx, double my){
         gBackgroundW.moveTo(mx+wdx, my+wdy);
         this.mx = mx; this.my = my;
         if (gBackgroundN != null)	gBackgroundN.moveTo(mx+ndx, my+ndy);            
@@ -127,7 +128,7 @@ public class NTNode extends LinLogNode{
     /** Moves booth labels to differentLocations along the matrix side.
      * This method is used for label reordering. 
      */
-	public void repositionLabels(long wdy, long ndx){
+	public void repositionLabels(double wdy, double ndx){
 		gBackgroundW.move(0, wdy - this.wdy);
 		this.wdy = wdy;
 		if(!single) {
@@ -137,7 +138,7 @@ public class NTNode extends LinLogNode{
 	}
 	
 
-    public void matrixMoved(long mx, long my){
+    public void matrixMoved(double mx, double my){
     	this.mx += mx; 
     	this.my += my;
     	gBackgroundW.move(mx, my);
@@ -156,7 +157,7 @@ public class NTNode extends LinLogNode{
      * @param xNew - absolute value in virtual space
      * @param animated - animated shifting, if true;
      **/
-    public void shiftWesternLabels(long xNew, boolean animated)
+    public void shiftWesternLabels(double xNew, boolean animated)
     {
     	xOld = gBackgroundW.vx;
     	if(animated){
@@ -164,7 +165,7 @@ public class NTNode extends LinLogNode{
     				.createGlyphTranslation(
     						NodeTrixViz.DURATION_NODEMOVE,
     						gBackgroundW, 
-    						new LongPoint(xNew,	gBackgroundW.vy ),
+    						new Point2D.Double(xNew, gBackgroundW.vy ),
     						false, 
     						SlowInSlowOutInterpolator2.getInstance(), 
     						null),
@@ -179,7 +180,7 @@ public class NTNode extends LinLogNode{
      * @param yNew - absolute value in virtual space
      * @param animated - animated shifting, if true;
      **/
-    public void shiftNorthernLabels(long yNew, boolean animated)
+    public void shiftNorthernLabels(double yNew, boolean animated)
     {
     	yOld = gBackgroundN.vy;
     	if(animated){
@@ -187,7 +188,7 @@ public class NTNode extends LinLogNode{
     				.createGlyphTranslation(
     						NodeTrixViz.DURATION_NODEMOVE,
     						gBackgroundN, 
-    						new LongPoint(gBackgroundN.vx, yNew),
+    						new Point2D.Double(gBackgroundN.vx, yNew),
     						false, 
     						SlowInSlowOutInterpolator2.getInstance(), 
     						null),
@@ -208,7 +209,7 @@ public class NTNode extends LinLogNode{
     				.createGlyphTranslation(
     						NodeTrixViz.DURATION_NODEMOVE,
     						gBackgroundN, 
-    						new LongPoint(gBackgroundN.vx, yOld),
+    						new Point2D.Double(gBackgroundN.vx, yOld),
     						false, 
     						SlowInSlowOutInterpolator2.getInstance(), 
     						null),
@@ -228,7 +229,7 @@ public class NTNode extends LinLogNode{
 	        		.createGlyphTranslation(
 	        			NodeTrixViz.DURATION_NODEMOVE,
 	        			gBackgroundW, 
-	        			new LongPoint(xOld, gBackgroundW.vy),
+	        			new Point2D.Double(xOld, gBackgroundW.vy),
 	        			false, 
 	        			SlowInSlowOutInterpolator2.getInstance(), 
 	        			null),
@@ -327,18 +328,18 @@ public class NTNode extends LinLogNode{
     /**Method that sets the background box of this node according to the maximal text length of all nodes in
      * the matrix. A gradiant is applied according to the position of the node in the list.
      */
-	public void setBackgroundBox(long maxLength) {
+	public void setBackgroundBox(double maxLength) {
 		if(widthHalf == 0) this.widthHalf = maxLength/2;
 		wdx -= widthHalf;
 		ndy += widthHalf;
-		this.gBackgroundW.setWidth(widthHalf);
+		this.gBackgroundW.setWidth(2*widthHalf);
 
-		gBackgroundWSensitive.setWidth(widthHalf-2);
+		gBackgroundWSensitive.setWidth(2*widthHalf-4);
 		if (!this.single){
 			this.gBackgroundW.move(-widthHalf, 0);
 			this.labelW.move(widthHalf, 0);
-			gBackgroundN.setWidth(widthHalf);
-			gBackgroundNSensitive.setWidth(widthHalf-2);
+			gBackgroundN.setWidth(widthHalf*2);
+			gBackgroundNSensitive.setWidth(2*widthHalf-4);
 			this.gBackgroundN.move(0, widthHalf);
 			this.labelN.move(0,-widthHalf);
 		}
@@ -349,7 +350,7 @@ public class NTNode extends LinLogNode{
 		return (int)this.widthHalf;
 	}
 
-	public long getWidth() 
+	public double getWidth() 
 	{
 		return this.widthHalf;
 	}
@@ -401,7 +402,7 @@ public class NTNode extends LinLogNode{
     	return owner;
     }
     
-    long getLabelWidth(){
+    double getLabelWidth(){
     	return (labelW == null) ? 0 : labelW.getBounds(0).x;
     }
 

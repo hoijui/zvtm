@@ -8,11 +8,11 @@
 package fr.inria.zvtm.nodetrix;
 
 import java.awt.Color;
+import java.awt.geom.Point2D;
 
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.AnimationManager;
 import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator2;
-import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.DPath;
@@ -63,19 +63,19 @@ public class IntraEdgeAppearance extends EdgeAppearance{
 		double height = (NodeTrixViz.CELL_SIZE-3) / amount;
 			
 		this.animManager = VirtualSpaceManager.INSTANCE.getAnimationManager();
-//    	this.offset = new LongPoint(x, y);
-    	LongPoint mp = edge.tail.getMatrix().getPosition();
+//    	this.offset = new Point2D.Double(x, y);
+    	Point2D.Double mp = edge.tail.getMatrix().getPosition();
     	
-    	long west = mp.x + edge.head.ndx - NodeTrixViz.CELL_SIZE_HALF +2;
-		long north =  mp.y + edge.tail.wdy + NodeTrixViz.CELL_SIZE_HALF;
-		long east = mp.x + edge.head.ndx + NodeTrixViz.CELL_SIZE_HALF -1;
+    	double west = mp.x + edge.head.ndx - NodeTrixViz.CELL_SIZE_HALF +2;
+		double north =  mp.y + edge.tail.wdy + NodeTrixViz.CELL_SIZE_HALF;
+		double east = mp.x + edge.head.ndx + NodeTrixViz.CELL_SIZE_HALF -1;
 		
 		//non translucent glyph part
-    	LongPoint[] p = new LongPoint[4];
-    	p[0] = new LongPoint(east, (north-2) - index*height);
-    	p[1] = new LongPoint(east, (north-2) - (index+1)*height);
-    	p[2] = new LongPoint((west-1) + (index+1)*height, (north-2) - (index+1)*height );
-    	p[3] = new LongPoint(west + index*height, (north-2) - index*height);
+    	Point2D.Double[] p = new Point2D.Double[4];
+    	p[0] = new Point2D.Double(east, (north-2) - index*height);
+    	p[1] = new Point2D.Double(east, (north-2) - (index+1)*height);
+    	p[2] = new Point2D.Double((west-1) + (index+1)*height, (north-2) - (index+1)*height );
+    	p[3] = new Point2D.Double(west + index*height, (north-2) - index*height);
     	gMain = new VPolygon(p, 0, edge.edgeColor, edge.edgeColor);
     	gMain.setDrawBorder(false);
     	gMain.setSensitivity(false);
@@ -85,11 +85,11 @@ public class IntraEdgeAppearance extends EdgeAppearance{
     	System.out.println("[INTAR_EDGE_APP] symmetric " + edge.symmetric);
     	if(edge.symmetric)
     	{
-    		p = new LongPoint[4];
-    		p[0] = new LongPoint(west, (north-2) - index*height );
-    		p[1] = new LongPoint(west + index*height, (north-2) - index*height );
-    		p[2] = new LongPoint((west-1) + (index+1)*height, (north-2) - (index+1)*height );
-    		p[3] = new LongPoint(west, (north-2) - (index+1)*height);
+    		p = new Point2D.Double[4];
+    		p[0] = new Point2D.Double(west, (north-2) - index*height );
+    		p[1] = new Point2D.Double(west + index*height, (north-2) - index*height );
+    		p[2] = new Point2D.Double((west-1) + (index+1)*height, (north-2) - (index+1)*height );
+    		p[3] = new Point2D.Double(west, (north-2) - (index+1)*height);
     		gSymmetry = new VPolygon(p, 0, edge.edgeColor, edge.edgeColor);
     		gSymmetry.setDrawBorder(false);
     		gSymmetry.setSensitivity(false);
@@ -159,7 +159,7 @@ public class IntraEdgeAppearance extends EdgeAppearance{
 	/**Updates the position according to the position of tail and head node.
 	 * */
 	public void updatePosition(){
-		LongPoint mp = edge.tail.getMatrix().getPosition();
+		Point2D.Double mp = edge.tail.getMatrix().getPosition();
 		clearGraphics();
 		createGraphics();
 //		mainGlyph.moveTo(mp.x + edge.head.ndx, mp.y + edge.tail.wdy);

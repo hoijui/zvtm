@@ -44,13 +44,13 @@ import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.EView;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.Camera;
-import fr.inria.zvtm.engine.Utilities;
+import fr.inria.zvtm.engine.Utils;
 import fr.inria.zvtm.engine.SwingWorker;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VImage;
 import fr.inria.zvtm.glyphs.Glyph;
-import fr.inria.zvtm.engine.ViewEventHandler;
+import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.glyphs.RImage;
 
 import fr.inria.zvtm.nodetrix.NodeTrixViz;
@@ -117,9 +117,8 @@ public class Viewer {
 		gp = new VWGlassPane(this);
 		((JFrame)mView.getFrame()).setGlassPane(gp);
         eh = new MainEventHandler(this);
-        mView.setEventHandler(eh, 0);
-        mView.setEventHandler(ovm, 1);
-        mView.setNotifyMouseMoved(true);
+        mView.setListener(eh, 0);
+        mView.setListener(ovm, 1);
         mView.setAntialiasing(antialiased);
         mView.setBackgroundColor(ConfigManager.BACKGROUND_COLOR);
 		mView.getPanel().addComponentListener(eh);
@@ -133,10 +132,10 @@ public class Viewer {
 	}
 
     void windowLayout(){
-        if (Utilities.osIsWindows()){
+        if (Utils.osIsWindows()){
             VIEW_X = VIEW_Y = 0;
         }
-        else if (Utilities.osIsMacOS()){
+        else if (Utils.osIsMacOS()){
             VIEW_X = 80;
             SCREEN_WIDTH -= 80;
         }
@@ -306,7 +305,7 @@ public class Viewer {
                 }
             }
 		}
-        if (!fs && Utilities.osIsMacOS()){
+        if (!fs && Utils.osIsMacOS()){
             System.setProperty("apple.laf.useScreenMenuBar", "true");
         }
         System.out.println(Messages.H_4_HELP);
@@ -379,7 +378,7 @@ class VWGlassPane extends JComponent {
     
 }
 
-class Overlay implements ViewEventHandler {
+class Overlay implements ViewListener {
     
     Viewer application;
 
@@ -400,7 +399,7 @@ class Overlay implements ViewEventHandler {
         application.aboutSpace.addGlyph(fadedRegion);
         fadedRegion.setVisible(false);
         sayGlyph = new VText(0, -10, 0, ConfigManager.SAY_MSG_COLOR, Messages.EMPTY_STRING, VText.TEXT_ANCHOR_MIDDLE);
-        sayGlyph.setSpecialFont(ConfigManager.SAY_MSG_FONT);
+        sayGlyph.setFont(ConfigManager.SAY_MSG_FONT);
         application.aboutSpace.addGlyph(sayGlyph);
         sayGlyph.setVisible(false);
     }
@@ -417,7 +416,7 @@ class Overlay implements ViewEventHandler {
             inriaLogo = new RImage(-150, -40, 0, (new ImageIcon(this.getClass().getResource(ConfigManager.INRIA_LOGO_PATH))).getImage(), 1.0f);
             insituLogo = new RImage(200, -40, 0, (new ImageIcon(this.getClass().getResource(ConfigManager.INSITU_LOGO_PATH))).getImage(), 1.0f);
             aboutLines[3] = new VText(0, -200, 0, Color.WHITE, Messages.ABOUT_DEPENDENCIES, VText.TEXT_ANCHOR_MIDDLE, 2.0f);
-            aboutLines[3].setSpecialFont(ConfigManager.MONOSPACE_ABOUT_FONT);
+            aboutLines[3].setFont(ConfigManager.MONOSPACE_ABOUT_FONT);
             application.aboutSpace.addGlyph(fadeAbout);
             application.aboutSpace.addGlyph(inriaLogo);
             application.aboutSpace.addGlyph(insituLogo);
