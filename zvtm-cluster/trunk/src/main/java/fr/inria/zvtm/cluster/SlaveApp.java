@@ -4,7 +4,7 @@ import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewPanel;
-import fr.inria.zvtm.engine.ViewEventHandler;
+import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
 
@@ -85,7 +85,7 @@ public class SlaveApp {
 				cv.getClusterGeometry().getBlockHeight(), 
                 false, false, !options.undecorated, null);
         view.setBackgroundColor(cv.getBackgroundColor());
-        view.setEventHandler(new SlaveEventHandler());
+        view.setListener(new SlaveEventHandler());
         view.getPanel().setRefreshRate(options.refreshPeriod);
 
         //move cameras to their 'proper' location
@@ -184,7 +184,7 @@ public class SlaveApp {
 
     //Simple event handler. All callbacks are no-ops except viewClosing
     //which should ensure graceful application closure.
-    private static class SlaveEventHandler implements ViewEventHandler {
+    private static class SlaveEventHandler implements ViewListener {
         public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
         public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
         public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}

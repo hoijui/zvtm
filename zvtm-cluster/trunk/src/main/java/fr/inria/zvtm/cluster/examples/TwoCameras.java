@@ -15,7 +15,7 @@ import fr.inria.zvtm.cluster.ClusteredView;
 import fr.inria.zvtm.cluster.ClusterGeometry;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.View;
-import fr.inria.zvtm.engine.ViewEventHandler;
+import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
@@ -65,7 +65,7 @@ public class TwoCameras {
 		//that lets an user navigate the scene
 		View view = vsm.addFrameView(cameras, "Master View",
 			   View.STD_VIEW, 800, 600, false, true, true, null);	
-		view.setEventHandler(new ColorRectEventHandler());
+		view.setListener(new ColorRectEventHandler());
 
 		double xOffset = 0;
 		double yOffset = 0;
@@ -100,7 +100,7 @@ public class TwoCameras {
 		new TwoCameras(options);
 	}
 
-	private class ColorRectEventHandler implements ViewEventHandler{
+	private class ColorRectEventHandler implements ViewListener{
 		private int lastJPX;
 		private int lastJPY;
 
@@ -120,7 +120,7 @@ public class TwoCameras {
 			lastJPX=jpx;
 			lastJPY=jpy;
 			v.setDrawDrag(true);
-			vsm.activeView.mouse.setSensitivity(false);
+			vsm.getActiveView().mouse.setSensitivity(false);
 			//because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
 		}
 
@@ -129,7 +129,7 @@ public class TwoCameras {
 			vsm.getAnimationManager().setYspeed(0);
 			vsm.getAnimationManager().setZspeed(0);
 			v.setDrawDrag(false);
-			vsm.activeView.mouse.setSensitivity(true);
+			vsm.getActiveView().mouse.setSensitivity(true);
 		}
 
 		public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}

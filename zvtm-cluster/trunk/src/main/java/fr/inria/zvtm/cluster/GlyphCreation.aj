@@ -18,11 +18,11 @@ import java.util.ArrayList;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
-import fr.inria.zvtm.glyphs.CircleNR;
+import fr.inria.zvtm.glyphs.SICircle;
 import fr.inria.zvtm.glyphs.ClosedShape;
 import fr.inria.zvtm.glyphs.Composite;
 import fr.inria.zvtm.glyphs.DPath;
-import fr.inria.zvtm.glyphs.RectangleNR;
+import fr.inria.zvtm.glyphs.SIRectangle;
 import fr.inria.zvtm.glyphs.VCircle;
 import fr.inria.zvtm.glyphs.VEllipse;
 import fr.inria.zvtm.glyphs.VImage;
@@ -113,12 +113,12 @@ public aspect GlyphCreation {
         return new VTextOrReplicator(this);
     }
 
-	@Override GlyphReplicator RectangleNR.getReplicator(){
-		return new RectangleNRReplicator(this);
+	@Override GlyphReplicator SIRectangle.getReplicator(){
+		return new SIRectangleReplicator(this);
 	}
 
-	@Override GlyphReplicator CircleNR.getReplicator(){
-		return new CircleNRReplicator(this);
+	@Override GlyphReplicator SICircle.getReplicator(){
+		return new SICircleReplicator(this);
 	}
 
 	@Override GlyphReplicator VImage.getReplicator(){
@@ -331,31 +331,31 @@ public aspect GlyphCreation {
         }
     }
 
-	private static class RectangleNRReplicator extends ClosedShapeReplicator {
+	private static class SIRectangleReplicator extends ClosedShapeReplicator {
 		private final double halfWidth;
 		private final double halfHeight;
 
-		RectangleNRReplicator(RectangleNR source){
+		SIRectangleReplicator(SIRectangle source){
 			super(source);
 			this.halfWidth = source.getWidth();
 			this.halfHeight = source.getHeight();
 		}
 
 		public Glyph doCreateGlyph(){
-			return new RectangleNR(0d,0d,0,halfWidth,halfHeight,Color.BLACK);
+			return new SIRectangle(0d,0d,0,halfWidth,halfHeight,Color.BLACK);
 		}
 	}
 
-	private static class CircleNRReplicator extends ClosedShapeReplicator {
+	private static class SICircleReplicator extends ClosedShapeReplicator {
 		private final double radius;
 		
-		CircleNRReplicator(CircleNR source){
+		SICircleReplicator(SICircle source){
 			super(source);
 			this.radius = source.getSize();
 		}
 
 		public Glyph doCreateGlyph(){
-			return new CircleNR(0d,0d,0,radius,Color.BLACK);
+			return new SICircle(0d,0d,0,radius,Color.BLACK);
 		}
 	}
 
