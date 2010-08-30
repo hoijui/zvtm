@@ -34,7 +34,7 @@ public class ClusteredView extends DefaultIdentifiable {
 	 * @param origin origin (bottom-left) block number
 	 * @param viewRows number of rows in the view (viewRows <= nbRows)
 	 * @param viewCols number of columns in the view (viewCols <= nbCols)
-	 * @param cameas a list of cameras observed by this ClusteredView.
+	 * @param cameras a list of cameras observed by this ClusteredView.
 	 */
 	public ClusteredView(ClusterGeometry clGeom,
             int origin, 
