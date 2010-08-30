@@ -208,9 +208,9 @@ public class MinimizerBarnesHut {
                 octTree.addNode(node, pos, 0);
 				energySum += bestEnergy;
 			}
-//			System.out.println("iteration " + step 
-//			  + "   energy " + energySum
-//			  + "   repulsion " + repuExponent);
+			System.out.println("iteration " + step 
+			  + "   energy " + energySum
+			  + "   repulsion " + repuExponent);
 		}
 		printStatistics(octTree);
         if (octTree.getHeight() >= OctTree.MAX_DEPTH) {

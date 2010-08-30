@@ -190,7 +190,7 @@ public class Viewer {
                 gp.setValue(10);
                 createGraph();
                 gp.setValue(50);
-                ntv.createVisualisation(mSpace);
+                ntv.createViz(mSpace);
                 nm.mCamera.setLocation(mView.getGlobalView(nm.mCamera, 1.05f));
                 sleep(500);
                 ntv.finishCreateViz(mSpace);
@@ -227,7 +227,7 @@ public class Viewer {
         }
         ntv = new NodeTrixViz();
         for (String group : group2node.keySet()){
-            ntv.createAddMatrix(group, group2node.get(group));
+            ntv.addMatrix(group, group2node.get(group));
         }
         for (String tail : edges.keySet()){
             for (String head : edges.get(tail)){
@@ -280,7 +280,7 @@ public class Viewer {
     /* --------------- Main/exit ------------------*/
     
     void exit(){
-    	System.exit(0);
+        System.exit(0);
     }
     
     public static void main(String[] args){
