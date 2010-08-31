@@ -49,15 +49,95 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
     </repository>
   </distributionManagement>
   
-  <!-- Dependencies -->
-  <dependencies>
-	<dependency>
-      <groupId>fr.inria.zvtm</groupId>
-      <artifactId>zvtm-core</artifactId>
-      <version>0.11.0-SNAPSHOT</version>
-    </dependency>
-  </dependencies>
-  
+  <profiles>
+	<profile>
+		<!-- mvn -P main ... -->
+		<id>main</id>
+		<activation>
+          <activeByDefault>true</activeByDefault>
+        </activation>
+	    <dependencies>
+	      <dependency>
+	        <groupId>fr.inria.zvtm</groupId>
+	        <artifactId>zvtm-core</artifactId>
+	        <version>0.11.0-SNAPSHOT</version>
+	      </dependency>
+	    </dependencies>
+		<build>
+			<plugins>
+		      <plugin>
+		        <groupId>org.apache.maven.plugins</groupId>
+		        <artifactId>maven-compiler-plugin</artifactId>
+		        <configuration>
+		          <source>1.6</source>
+		          <target>1.6</target>
+		          <excludes>
+		            <exclude>**/*WILD*.java</exclude>
+		          </excludes>
+		        </configuration>
+		      </plugin>
+		     <plugin>
+		        <groupId>org.apache.maven.plugins</groupId>
+		        <artifactId>maven-jar-plugin</artifactId>
+		        <configuration>
+		          <archive>
+		            <manifest>
+		              <mainClass>fr.inria.zvtm.nodetrix.viewer.Viewer</mainClass>
+		              <packageName>fr.inria.zvtm.nodetrix.viewer</packageName>
+		              <addClasspath>true</addClasspath>
+		            </manifest>
+		            <manifestEntries>
+		              <mode>development</mode>
+		              <url>${pom.url}</url>
+		            </manifestEntries>
+		          </archive>
+		        </configuration>
+		      </plugin>
+			</plugins>
+		</build>
+	</profile>
+	<profile>
+		<!-- mvn -P wild ... -->
+		<id>wild</id>
+		<dependencies>
+		  <dependency>
+	        <groupId>fr.inria.zvtm</groupId>
+	        <artifactId>zvtm-cluster</artifactId>
+	        <version>0.2.5-SNAPSHOT</version>
+	      </dependency>
+        </dependencies>
+		<build>
+			<plugins>
+		      <plugin>
+		        <groupId>org.apache.maven.plugins</groupId>
+		        <artifactId>maven-compiler-plugin</artifactId>
+		        <configuration>
+		          <source>1.6</source>
+		          <target>1.6</target>
+		        </configuration>
+		      </plugin>
+		     <plugin>
+		        <groupId>org.apache.maven.plugins</groupId>
+		        <artifactId>maven-jar-plugin</artifactId>
+		        <configuration>
+		          <archive>
+		            <manifest>
+		              <mainClass>fr.inria.zvtm.nodetrix.viewer.WILDViewer</mainClass>
+		              <packageName>fr.inria.zvtm.nodetrix.viewer</packageName>
+		              <addClasspath>true</addClasspath>
+		            </manifest>
+		            <manifestEntries>
+		              <mode>development</mode>
+		              <url>${pom.url}</url>
+		            </manifestEntries>
+		          </archive>
+		        </configuration>
+		      </plugin>
+			</plugins>
+		</build>
+	</profile>
+  </profiles>
+
   <!-- Build -->
   <build>
     <plugins>
@@ -76,31 +156,6 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
             </configuration>
           </execution>
         </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
-        </configuration>
-      </plugin>
-     <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <configuration>
-          <archive>
-            <manifest>
-              <mainClass>fr.inria.zvtm.nodetrix.viewer.Viewer</mainClass>
-              <packageName>fr.inria.zvtm.nodetrix.viewer</packageName>
-              <addClasspath>true</addClasspath>
-            </manifest>
-            <manifestEntries>
-              <mode>development</mode>
-              <url>${pom.url}</url>
-            </manifestEntries>
-          </archive>
-        </configuration>
       </plugin>
       <plugin>
           <groupId>org.apache.maven.plugins</groupId>
