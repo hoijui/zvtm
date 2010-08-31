@@ -79,13 +79,15 @@ public class Matrix {
                                  nodes.size()*NodeTrixViz.CELL_SIZE, nodes.size()*NodeTrixViz.CELL_SIZE,
                                  NodeTrixViz.MATRIX_FILL_COLOR, NodeTrixViz.MATRIX_STROKE_COLOR);
             vs.addGlyph(bkg);
-            bkg.setOwner(this);
             // matrix label
     	    matrixLbDX = -Math.round(NodeTrixViz.CELL_SIZE/2*(1.1*nodes.size()));
     	    matrixLbDY = -Math.round(NodeTrixViz.CELL_SIZE/2*(nodes.size()+.5+Math.sqrt(2*nodes.size())));
     	    matrixLabel = new VText(x+matrixLbDX, y+matrixLbDY, 0, NodeTrixViz.MATRIX_NODE_LABEL_COLOR, name, VText.TEXT_ANCHOR_END, (float)Math.sqrt(2*nodes.size()));
     	    vs.addGlyph(matrixLabel);
+
+            bkg.setOwner(this);
     	    matrixLabel.setOwner(this);
+
     	    bkg.stick(matrixLabel);
     	    
     	    // node labels
@@ -163,19 +165,19 @@ public class Matrix {
         	
         	//GRID PATTERN
         	VRectangle gGridV = new VRectangle(bkg.vx + n.ndx, bkg.vy,0, NodeTrixViz.CELL_SIZE, bkg.getWidth(), NodeTrixViz.GRID_COLOR, NodeTrixViz.GRID_COLOR, NodeTrixViz.GRID_TRANSLUCENCY);
+        	vs.addGlyph(gGridV);
         	gGridV.setDrawBorder(false);
         	gGridV.setSensitivity(false);
         	gGridV.setVisible(false);
-        	vs.addGlyph(gGridV);
         	vs.above(gGridV, bkg);
         	bkg.stick(gGridV);
         	gridBarsV[i] = gGridV;
         	
         	VRectangle gGridH = new VRectangle(bkg.vx,bkg.vy+ n.wdy,0, bkg.getWidth(), NodeTrixViz.CELL_SIZE, NodeTrixViz.GRID_COLOR, NodeTrixViz.GRID_COLOR, NodeTrixViz.GRID_TRANSLUCENCY);
+            vs.addGlyph(gGridH);
         	gGridH.setDrawBorder(false);
         	gGridH.setSensitivity(false);
            	gGridH.setVisible(false);
-            vs.addGlyph(gGridH);
         	vs.above(gGridH, bkg);
         	bkg.stick(gGridH);
         	gridBarsH[i] = gGridH;
@@ -196,8 +198,8 @@ public class Matrix {
         	
         	//SYMMETRY AXIS
         	VRectangle r = new VRectangle(bkg.vx + n.wdy, bkg.vy + n.ndx, 0, NodeTrixViz.CELL_SIZE, NodeTrixViz.CELL_SIZE, Color.LIGHT_GRAY, Color.LIGHT_GRAY, .4f);
-        	r.setDrawBorder(false);
         	vs.addGlyph(r);
+        	r.setDrawBorder(false);
         	r.setSensitivity(false);
         	this.bkg.stick(r);
         	gridReflexiveSquares[i] = r;
@@ -642,9 +644,9 @@ public class Matrix {
 			double x = -this.bkg.getWidth()/2d - labelWidth - NodeTrixViz.CELL_SIZE_HALF;
 			VRectangle groupLabelW = new VRectangle(bkg.vx + x, bkg.vy + v.firstElement().wdy - (v.size()-1)*NodeTrixViz.CELL_SIZE_HALF, 0, 2*NodeTrixViz.CELL_SIZE, 2*v.size()*NodeTrixViz.CELL_SIZE_HALF,Color.orange);
 			VTextOr groupTextW = new VTextOr(bkg.vx + x, bkg.vy + v.firstElement().wdy - (v.size()-1)*NodeTrixViz.CELL_SIZE_HALF, 0, Color.black, label,  (float)Math.PI/2);
-			groupTextW.setTextAnchor(VText.TEXT_ANCHOR_MIDDLE);
 			vs.addGlyph(groupLabelW);
 			vs.addGlyph(groupTextW);
+            groupTextW.setTextAnchor(VText.TEXT_ANCHOR_MIDDLE);
 			bkg.stick(groupLabelW);
 			bkg.stick(groupTextW);
 			this.groupLabelsW.add(groupLabelW);
@@ -653,9 +655,9 @@ public class Matrix {
 			double y = this.bkg.getWidth()/2d + labelWidth + NodeTrixViz.CELL_SIZE_HALF;
 			VRectangle groupLabelN = new VRectangle(bkg.vx + v.firstElement().ndx + (v.size()-1)*NodeTrixViz.CELL_SIZE_HALF,bkg.vy + y, 0, 2*v.size()*NodeTrixViz.CELL_SIZE_HALF, 2*NodeTrixViz.CELL_SIZE,Color.orange);
 			VText groupTextN = new VText(bkg.vx + v.firstElement().ndx - (v.size()-1)*NodeTrixViz.CELL_SIZE_HALF,bkg.vy + y, 0, Color.black, label);
-			groupTextN.setTextAnchor(VText.TEXT_ANCHOR_MIDDLE);
 			vs.addGlyph(groupLabelN);
 			vs.addGlyph(groupTextN);
+            groupTextN.setTextAnchor(VText.TEXT_ANCHOR_MIDDLE);
 			bkg.stick(groupLabelN);
 			bkg.stick(groupTextN);
 			this.groupLabelsN.add(groupLabelN);
