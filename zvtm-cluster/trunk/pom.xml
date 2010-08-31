@@ -59,6 +59,12 @@
 			<version>0.11.0-SNAPSHOT</version>
             <scope>provided</scope>
 		</dependency>
+		<!-- dependency of zvtm-core, XXX FIX -->
+		<dependency>
+			<groupId>net.java.dev.timingframework</groupId>
+			<artifactId>timingframework</artifactId>
+			<version>1.0</version>
+		</dependency>
 		<dependency>
 			<groupId>org.aspectj</groupId>
 			<artifactId>aspectjrt</artifactId>
