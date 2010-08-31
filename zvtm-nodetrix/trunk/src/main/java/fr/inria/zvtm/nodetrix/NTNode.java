@@ -91,31 +91,32 @@ public class NTNode extends LinLogNode{
 	    this.backgroundColor = colour;
 	    this.single = single;
 	    
+    	    gBackgroundW = new VRectangle(0, 0, 0, 0, NodeTrixViz.CELL_SIZE, backgroundColor);
 	    	labelW = new VText(-NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER ,0 , 0, NodeTrixViz.MATRIX_STROKE_COLOR, name, (single) ? VText.TEXT_ANCHOR_MIDDLE : VText.TEXT_ANCHOR_END);
-	    	gBackgroundW = new VRectangle(0, 0, 0, 0, NodeTrixViz.CELL_SIZE, backgroundColor);
-	    	gBackgroundW.setDrawBorder(false);
-	    	gBackgroundW.stick(this.labelW);
-	    	vs.addGlyph(gBackgroundW);
-	    	vs.addGlyph(labelW);
-	    	
 	    	gBackgroundWSensitive = new VRectangle(2, 2, 0, 0, NodeTrixViz.CELL_SIZE -4, Color.red);
-	    	gBackgroundWSensitive.setTranslucencyValue(0f);
-	    	gBackgroundW.stick(this.gBackgroundWSensitive);
-	    	gBackgroundWSensitive.setOwner(this);
+            vs.addGlyph(gBackgroundW);
+	    	vs.addGlyph(labelW);
 	    	vs.addGlyph(gBackgroundWSensitive);
-	    
+            gBackgroundW.setDrawBorder(false);
+	    	labelW.setOwner(this);
+	    	gBackgroundWSensitive.setOwner(this);
+	    	gBackgroundWSensitive.setTranslucencyValue(0f);
+	    	gBackgroundW.stick(this.labelW);
+            gBackgroundW.stick(this.gBackgroundWSensitive);
+	    	
 		    if (!single){
-	    	    labelN = new VTextOr(0, NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER, 0, NodeTrixViz.MATRIX_STROKE_COLOR, name, (float)Math.PI/2f, VText.TEXT_ANCHOR_START);
 	    	    gBackgroundN = new VRectangleOr(0,0, 0, 0, NodeTrixViz.CELL_SIZE, backgroundColor, (float)Math.PI/2f);
-	    	    gBackgroundN.setDrawBorder(false);
-	    	    gBackgroundN.stick(this.labelN);
+	    	    labelN = new VTextOr(0, NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER, 0, NodeTrixViz.MATRIX_STROKE_COLOR, name, (float)Math.PI/2f, VText.TEXT_ANCHOR_START);
+	    		gBackgroundNSensitive = new VRectangleOr(2, 2, 0, 0, NodeTrixViz.CELL_SIZE -4,  Color.red,  (float)Math.PI/2f);
 	    		vs.addGlyph(gBackgroundN);
 	    		vs.addGlyph(labelN);
-	    		gBackgroundNSensitive = new VRectangleOr(2, 2, 0, 0, NodeTrixViz.CELL_SIZE -4,  Color.red,  (float)Math.PI/2f);
-	    	    gBackgroundNSensitive.setTranslucencyValue(0f);
-	    	    gBackgroundN.stick(this.gBackgroundNSensitive);
-	    	    gBackgroundNSensitive.setOwner(this);
 	    		vs.addGlyph(gBackgroundNSensitive);
+	    	    gBackgroundN.setDrawBorder(false);
+	    	    gBackgroundNSensitive.setTranslucencyValue(0f);
+	    	    gBackgroundN.stick(this.labelN);
+	    	    gBackgroundN.stick(this.gBackgroundNSensitive);
+	    		labelN.setOwner(this);
+	    	    gBackgroundNSensitive.setOwner(this);
 		   }
     }
     
@@ -406,7 +407,10 @@ public class NTNode extends LinLogNode{
     	return (labelW == null) ? 0 : labelW.getBounds(0).x;
     }
 
-
+    public boolean isParentMatrixSingle(){
+        return this.single;
+    }
+    
 //	public Vector<NTIntraEdgeSet> getIntraEdgeSets() {
 //		return this.intraEdgeSets;
 //	}

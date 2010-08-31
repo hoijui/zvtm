@@ -76,7 +76,13 @@ class MainEventHandler implements ViewListener, ComponentListener, PortalListene
             if (g.getOwner() instanceof Matrix){
                 draggedMatrix = (Matrix)g.getOwner();
             }
-		}
+            else if (g.getOwner() instanceof NTNode){
+                NTNode n = (NTNode)g.getOwner();
+                if (n.isParentMatrixSingle()){
+                    draggedMatrix = n.getMatrix();
+                }
+            }
+        }
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
