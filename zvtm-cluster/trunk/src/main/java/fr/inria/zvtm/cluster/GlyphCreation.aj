@@ -29,6 +29,7 @@ import fr.inria.zvtm.glyphs.VImage;
 import fr.inria.zvtm.glyphs.VPoint;
 import fr.inria.zvtm.glyphs.VPolygon;
 import fr.inria.zvtm.glyphs.VRectangle;
+import fr.inria.zvtm.glyphs.VRectangleOr;
 import fr.inria.zvtm.glyphs.VRing;
 import fr.inria.zvtm.glyphs.VSegment;
 import fr.inria.zvtm.glyphs.VText;
@@ -95,6 +96,10 @@ public aspect GlyphCreation {
 	//overrides for various Glyph subclasses
 	@Override GlyphReplicator VRectangle.getReplicator(){
 		return new VRectangleReplicator(this);
+	}
+	
+	@Override GlyphReplicator VRectangleOr.getReplicator(){
+		return new VRectangleOrReplicator(this);
 	}
 
 	@Override GlyphReplicator VCircle.getReplicator(){
@@ -249,8 +254,8 @@ public aspect GlyphCreation {
 	}
 
 	private static class VRectangleReplicator extends ClosedShapeReplicator {
-		private final double halfWidth;
-		private final double halfHeight;
+		protected final double halfWidth;
+		protected final double halfHeight;
 
 		VRectangleReplicator(VRectangle source){
 			super(source);
@@ -265,6 +270,23 @@ public aspect GlyphCreation {
 
 		@Override public String toString(){
 			return "VRectangleReplicator, halfWidth=" + halfWidth
+				+ ", halfHeight=" + halfHeight;
+		}
+	}
+	
+	private static class VRectangleOrReplicator extends VRectangleReplicator {
+
+		VRectangleOrReplicator(VRectangleOr source){
+			super(source);
+		}
+
+		public Glyph doCreateGlyph(){
+			//beware of z-index
+			return new VRectangleOr(0d,0d,0,halfWidth,halfHeight,Color.BLACK,0);
+		}
+
+		@Override public String toString(){
+			return "VRectangleOrReplicator, halfWidth=" + halfWidth
 				+ ", halfHeight=" + halfHeight;
 		}
 	}
