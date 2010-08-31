@@ -17,12 +17,12 @@ import fr.inria.zvtm.glyphs.FitsImage;
  * A clustered viewer for FITS images.
  */
 public class AstroRad {
-    private final VirtualSpace imageSpace = VirtualSpaceManager.INSTANCE.addVirtualSpace("imageSpace");
-    private final VirtualSpace controlSpace = VirtualSpaceManager.INSTANCE.addVirtualSpace("controlSpace");
-    private final Camera imageCamera = imageSpace.addCamera();
-    private final Camera controlCamera = controlSpace.addCamera();
+    private VirtualSpace imageSpace;
+    private VirtualSpace controlSpace;
+    private Camera imageCamera; 
+    private Camera controlCamera; 
     private final List<FitsImage> images = new ArrayList<FitsImage>();
-    private final RangeSelection rangeSel = new RangeSelection();
+    private RangeSelection rangeSel;
     private FitsImage selectedImage;
     private FitsHistogram hist;
 
@@ -38,6 +38,10 @@ public class AstroRad {
 
     private void setup(){
         VirtualSpaceManager.INSTANCE.setMaster("AstroRad");
+        imageSpace = VirtualSpaceManager.INSTANCE.addVirtualSpace("imageSpace");
+        controlSpace = VirtualSpaceManager.INSTANCE.addVirtualSpace("controlSpace");
+        imageCamera = imageSpace.addCamera();
+        controlCamera = controlSpace.addCamera();
         ArrayList<Camera> imgCamList = new ArrayList<Camera>();
         imgCamList.add(imageCamera);
         ArrayList<Camera> controlCamList = new ArrayList<Camera>();
@@ -64,6 +68,7 @@ public class AstroRad {
     }
 
     private void setupControlZone(){
+        rangeSel = new RangeSelection();
         controlSpace.addGlyph(rangeSel);
         rangeSel.sizeTo(2000);
     }
@@ -77,7 +82,7 @@ public class AstroRad {
             System.err.println(ex);
         }
     }
-    
+
     private void removeSelectedImage(){
         if(selectedImage == null){
             return;
@@ -92,7 +97,7 @@ public class AstroRad {
             System.err.println("Usage: AstroRad image_URL");
             System.exit(0);
         }
-        
+
         new AstroRad(new URL(args[0]));
     }
 }
