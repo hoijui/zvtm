@@ -26,6 +26,7 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	<icepdfVersion>4.1.0</icepdfVersion>
   </properties>
   
   <!-- Repositories -->
@@ -69,7 +70,7 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
 	<dependency>
 		<groupId>org.icepdf</groupId>
 		<artifactId>icepdf-core</artifactId>
-		<version>4.1.0</version>
+		<version>${icepdfVersion}</version>
 	</dependency>
     
     <!-- ICEpdf Pro 4.1.x (if available) -->
@@ -85,12 +86,12 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
 	<dependency>
 		<groupId>org.icepdf</groupId>
 		<artifactId>icepdf-pro</artifactId>
-		<version>4.1.0</version>
+		<version>${icepdfVersion}</version>
 	</dependency>
 	<dependency>
 		<groupId>org.icepdf</groupId>
 		<artifactId>icepdf-pro-intl</artifactId>
-		<version>4.1.0</version>
+		<version>${icepdfVersion}</version>
 	</dependency>
 	-->
 	
