@@ -461,11 +461,17 @@ public class Matrix {
     /** Brings all glyphs of this matrix to the top of the drawing stack*/
     public void onTop(VirtualSpace vs)
     {	
-    	vs.onTop(bkg);
-    	for(Glyph g : gridBarsH){ vs.onTop(g); }
-    	for(Glyph g : gridBarsV){ vs.onTop(g); }
-    	for(Glyph g : gridReflexiveSquares){ vs.onTop(g); }
-    	
+        vs.onTop(bkg);
+        //XXX: all g != null tests should not be necessary, find out why g == null sometimes 
+        for(Glyph g : gridBarsH){
+            if (g != null) vs.onTop(g); 
+        }
+        for(Glyph g : gridBarsV){
+            if (g != null) vs.onTop(g); 
+        }
+        for(Glyph g : gridReflexiveSquares){ 
+            if (g != null) vs.onTop(g);
+        }
     	for(NTNode n : this.nodes){
     		n.onTop(); //Virtual space is already known in NTNode
     		for(NTEdge e : n.getOutgoingEdges()){ e.onTop(); }
