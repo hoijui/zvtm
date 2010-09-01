@@ -3,6 +3,20 @@
 $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
 -->
 
+<!--
+ 
+ Use profile 'wild' to build zvtm-nodetrix to run on the WILD wall-sized display [1].
+ [1] http://insitu.lri.fr/Projects/WILD
+
+    mvn -P wild package
+
+
+ Use the default profile otherwise
+
+	mvn package
+	
+-->
+
 <project xmlns="http://maven.apache.org/POM/4.0.0" 
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
