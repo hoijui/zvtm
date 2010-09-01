@@ -113,6 +113,7 @@ public class IcePDFPageImg extends ZPDFPage {
     }
     
     void setPageImage(BufferedImage img){
+        this.pageImage = img;
         this.vw = this.pageImage.getWidth() * scaleFactor;
 		this.vh = this.pageImage.getHeight() * scaleFactor;
 		if (this.vw==0 && this.vh==0){this.ar = 1.0f;}
