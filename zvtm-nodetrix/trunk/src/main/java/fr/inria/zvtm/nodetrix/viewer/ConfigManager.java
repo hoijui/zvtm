@@ -28,7 +28,7 @@ class ConfigManager {
     
     /* Other colors */
     static final Color SAY_MSG_COLOR = Color.LIGHT_GRAY;
-    static Color BACKGROUND_COLOR  = Color.LIGHT_GRAY;
+    static Color BACKGROUND_COLOR  = Color.DARK_GRAY;
 
     static final Color FADE_REGION_FILL = Color.BLACK;
     static final Color FADE_REGION_STROKE = Color.WHITE;
