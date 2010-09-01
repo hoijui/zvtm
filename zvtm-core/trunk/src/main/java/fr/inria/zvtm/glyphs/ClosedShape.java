@@ -91,10 +91,12 @@ public abstract class ClosedShape extends Glyph {
      *@see #setColor(Color c)
      */
     public void setBorderColor(Color c){
-	borderColor = c;
-	bColor = borderColor;
-	HSVb = Color.RGBtoHSB(borderColor.getRed(), borderColor.getGreen(), borderColor.getBlue(), (new float[3]));
-	VirtualSpaceManager.INSTANCE.repaint();
+        borderColor = c;
+        bColor = borderColor;
+        if (borderColor != null){
+            HSVb = Color.RGBtoHSB(borderColor.getRed(), borderColor.getGreen(), borderColor.getBlue(), (new float[3]));            
+        }
+        VirtualSpaceManager.INSTANCE.repaint();
     }
 
     /** Set the glyph's border color (absolute value, HSV color space).
