@@ -395,7 +395,7 @@ class Overlay implements ViewListener {
     }
 
     void init(){
-        fadedRegion = new VRectangle(0, 0, 0, 10, 10, ConfigManager.FADE_REGION_FILL, ConfigManager.FADE_REGION_STROKE, 0.85f);
+        fadedRegion = new VRectangle(0, 0, 0, 20, 20, ConfigManager.FADE_REGION_FILL, ConfigManager.FADE_REGION_STROKE, 0.85f);
         application.aboutSpace.addGlyph(fadedRegion);
         fadedRegion.setVisible(false);
         sayGlyph = new VText(0, -10, 0, ConfigManager.SAY_MSG_COLOR, Messages.EMPTY_STRING, VText.TEXT_ANCHOR_MIDDLE);
@@ -406,11 +406,11 @@ class Overlay implements ViewListener {
     
     void showAbout(){
         if (!showingAbout){
-            fadeAbout = new VRectangle(0, 0, 0, Math.round(application.panelWidth/2.1), Math.round(application.panelHeight/3),
+            fadeAbout = new VRectangle(0, 0, 0, application.panelWidth/1.05, application.panelHeight/1.5,
                 ConfigManager.FADE_REGION_FILL, ConfigManager.FADE_REGION_STROKE, 0.85f);
             aboutLines = new VText[4];
 			aboutLines[0] = new VText(0, 150, 0, Color.WHITE, Messages.APP_NAME, VText.TEXT_ANCHOR_MIDDLE, 4.0f);
-            aboutLines[1] = new VText(0, 110, 0, Color.WHITE, Messages.V+Messages.VERSION, VText.TEXT_ANCHOR_MIDDLE, 2.0f);
+            aboutLines[1] = new VText(0, 110, 0, Color.WHITE, Messages.VERSION, VText.TEXT_ANCHOR_MIDDLE, 2.0f);
             aboutLines[2] = new VText(0, 40, 0, Color.WHITE, Messages.AUTHORS, VText.TEXT_ANCHOR_MIDDLE, 2.0f);
             RImage.setReflectionHeight(0.7f);
             inriaLogo = new RImage(-150, -40, 0, (new ImageIcon(this.getClass().getResource(ConfigManager.INRIA_LOGO_PATH))).getImage(), 1.0f);
@@ -469,8 +469,8 @@ class Overlay implements ViewListener {
 
     void showMessage(String msg){
         synchronized(this){
-            fadedRegion.setWidth(application.panelWidth/2-1);
-            fadedRegion.setHeight(50);
+            fadedRegion.setWidth(application.panelWidth-2);
+            fadedRegion.setHeight(100);
             sayGlyph.setText(msg);
             fadedRegion.setVisible(true);
             sayGlyph.setVisible(true);

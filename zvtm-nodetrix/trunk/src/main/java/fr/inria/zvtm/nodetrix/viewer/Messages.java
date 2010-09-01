@@ -7,12 +7,24 @@
 
 package fr.inria.zvtm.nodetrix.viewer;
 
+import java.util.Scanner;
+
 public class Messages {
 
 	static final String EMPTY_STRING = "";
 
-	static final String V = "v";
-	static final String VERSION = "0.1.0-SNAPSHOT";
+	static String VERSION;
+
+	static {
+	    Scanner sc = new Scanner(Messages.class.getResourceAsStream("/properties")).useDelimiter("\\s*=\\s*");
+        while (sc.hasNext()){
+            String token = sc.next();
+            if (token.equals("version")){
+                Messages.VERSION = sc.next();
+            }
+        }
+	}
+
     static final String AUTHORS = "Author: Emmanuel Pietriga and Benjamin Bach";
     static final String APP_NAME = "ZVTM NodeTrix Visualizer";
     static final String CREDITS_NAMES = "Based on: ZVTM, LinLogLayout";
