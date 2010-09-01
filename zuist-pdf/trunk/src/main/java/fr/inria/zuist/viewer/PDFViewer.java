@@ -196,13 +196,15 @@ public class PDFViewer {
 			mView.setTitle(mViewName + " - " + pdfFile.getCanonicalPath());
 		}
 		catch (IOException ex){}
-		gp.setValue(0);
+		gp.setValue(10);
+		gp.setLabel("Loading "+pdfFile.getName());
 		gp.setVisible(true);
 	    sm.setUpdateLevel(false);
         sm.enableRegionUpdater(false);
 		try {
     		URL pdfURL = pdfFile.toURI().toURL();
     		Document pf = PDFResourceHandler.getDocument(pdfURL);
+    		gp.setLabel("Loading "+pdfFile.getName()+ " (" + pf.getNumberOfPages() + " pages)");
     		float[] alts = new float[pf.getNumberOfPages()];
     		PDimension bbox = pf.getPageDimension(0, 0);
     		alts[0] = 0;
@@ -222,6 +224,7 @@ public class PDFViewer {
                     r.addContainedRegion(prevRegion);
                 }
                 prevRegion = r;
+                gp.setValue(10+Math.round(i*90/(float)pf.getNumberOfPages()));
     		}
     		// last level
     		sm.createLevel(0, Camera.DEFAULT_FOCAL * (float)Math.pow(2, pf.getNumberOfPages()) - Camera.DEFAULT_FOCAL, alts[pf.getNumberOfPages()-1]);
