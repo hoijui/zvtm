@@ -7,11 +7,26 @@
 
 package fr.inria.zvtm.demo;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Dimension;
+import java.awt.Rectangle;
+import java.awt.GradientPaint;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseMotionAdapter;
+import java.awt.event.KeyAdapter;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -49,11 +64,14 @@ public class PDFViewer {
 	Camera mCamera;
 
 	View pdfView;
+	VWGlassPane gp;
 
-	PDFViewer(String pdfFilePath, float df){
+    int panelWidth, panelHeight;
+
+	PDFViewer(String pdfFilePath, float df, float sf){
 		VirtualSpaceManager.INSTANCE.setDebug(true);
 		initGUI();
-		load(new File(pdfFilePath), df);
+		load(new File(pdfFilePath), df, sf);
 	}
 
 	public void initGUI(){
@@ -63,14 +81,35 @@ public class PDFViewer {
 		cameras.add(mCamera);
 		pdfView = VirtualSpaceManager.INSTANCE.addFrameView(cameras, "ZVTM PDF Viewer", View.STD_VIEW, 1024, 768, false, true, true, null);
 		pdfView.setBackgroundColor(Color.WHITE);
+		pdfView.setNotifyCursorMoved(false);
+		updatePanelSize();
+    	ComponentAdapter ca0 = new ComponentAdapter(){
+    		public void componentResized(ComponentEvent e){
+    			updatePanelSize();
+    		}
+    	};
+    	pdfView.getFrame().addComponentListener(ca0);
+		gp = new VWGlassPane(this);
+		((JFrame)pdfView.getFrame()).setGlassPane(gp);
 		eh = new PDFViewerEventHandler(this);
 		pdfView.setListener(eh);
 		pdfView.setAntialiasing(true);
 		mCamera.setAltitude(0);
 		VirtualSpaceManager.INSTANCE.repaint();
-	}
+    }
 
-    void load(File f, float detailFactor){
+    void updatePanelSize(){
+        Dimension d = pdfView.getPanel().getSize();
+        panelWidth = d.width;
+        panelHeight = d.height;
+    }
+
+    /*------------------ PDF loading ------------------ */
+    
+    void load(File f, float detailFactor, float scaleFactor){
+        gp.setLabel("Loading "+f.getName());
+        gp.setValue(10);
+        gp.setVisible(true);
         Document document = new Document();
         try {
             document.setFile(f.getAbsolutePath());
@@ -84,12 +123,18 @@ public class PDFViewer {
             System.out.println("Error handling PDF document " + ex);
         }
         int page_width = (int)document.getPageDimension(0, 0).getWidth();
+        gp.setLabel("Loading "+f.getName()+ " (" + document.getNumberOfPages() + " pages)");
+        Glyph[] pages = new Glyph[document.getNumberOfPages()];
         for (int i = 0; i < document.getNumberOfPages(); i++) {
-            IcePDFPageImg g = new IcePDFPageImg(i*Math.round(page_width*1.1f*detailFactor), 0, 0, document, i, detailFactor, 1.0f);
-            vs.addGlyph(g);
+            pages[i] = new IcePDFPageImg(i*Math.round(page_width*1.1f*detailFactor*scaleFactor), 0, 0, document, i, detailFactor, scaleFactor);
+            gp.setValue(10+Math.round(i*90/(float)document.getNumberOfPages()));
         }
+        vs.addGlyphs(pages, true);
+        // center on first page
+        pdfView.centerOnGlyph(pages[0], mCamera, PDFViewer.NAV_ANIM_DURATION);
         // clean up resources
         document.dispose();
+        gp.setVisible(false);
     }
     
     static String getVersion(){
@@ -129,9 +174,74 @@ public class PDFViewer {
 		System.out.println("User name: "+System.getProperty("user.name"));
 		System.out.println("User home directory: "+System.getProperty("user.home"));
 		System.out.println("-----------------");
-		new PDFViewer((args.length > 0) ? args[0] : null, (args.length > 1) ? Float.parseFloat(args[1]) : 1);
+		new PDFViewer((args.length > 0) ? args[0] : null, (args.length > 1) ? Float.parseFloat(args[1]) : 1, (args.length > 2) ? Float.parseFloat(args[2]) : 1);
 	}
 
+}
+
+class VWGlassPane extends JComponent {
+    
+    static final int BAR_WIDTH = 200;
+    static final int BAR_HEIGHT = 10;
+    
+    static final Font GLASSPANE_FONT = new Font("Arial", Font.PLAIN, 12);
+    static final AlphaComposite GLASS_ALPHA = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.65f);    
+    static final Color MSG_COLOR = Color.DARK_GRAY;
+    GradientPaint PROGRESS_GRADIENT = new GradientPaint(0, 0, Color.ORANGE, 0, BAR_HEIGHT, Color.BLUE);
+
+    String msg = null;
+    int msgX = 0;
+    int msgY = 0;
+    
+    int completion = 0;
+    int prX = 0;
+    int prY = 0;
+    int prW = 0;
+    
+    PDFViewer application;
+    
+    VWGlassPane(PDFViewer app){
+        super();
+        this.application = app;
+        addMouseListener(new MouseAdapter(){});
+        addMouseMotionListener(new MouseMotionAdapter(){});
+        addKeyListener(new KeyAdapter(){});
+    }
+    
+    public void setValue(int c){
+        completion = c;
+        prX = application.panelWidth/2-BAR_WIDTH/2;
+        prY = application.panelHeight/2-BAR_HEIGHT/2;
+        prW = (int)(BAR_WIDTH * ((float)completion) / 100.0f);
+        PROGRESS_GRADIENT = new GradientPaint(0, prY, Color.LIGHT_GRAY, 0, prY+BAR_HEIGHT, Color.DARK_GRAY);
+        repaint(prX, prY, BAR_WIDTH, BAR_HEIGHT);
+    }
+    
+    public void setLabel(String m){
+        msg = m;
+        msgX = application.panelWidth/2-BAR_WIDTH/2;
+        msgY = application.panelHeight/2-BAR_HEIGHT/2 - 10;
+        repaint(msgX, msgY-50, 400, 70);
+    }
+    
+    protected void paintComponent(Graphics g){
+        Graphics2D g2 = (Graphics2D)g;
+        Rectangle clip = g.getClipBounds();
+        g2.setComposite(GLASS_ALPHA);
+        g2.setColor(Color.WHITE);
+        g2.fillRect(clip.x, clip.y, clip.width, clip.height);
+        g2.setComposite(AlphaComposite.Src);
+        if (msg != null && msg.length() > 0){
+            g2.setColor(MSG_COLOR);
+            g2.setFont(GLASSPANE_FONT);
+            g2.drawString(msg, msgX, msgY);
+        }
+        g2.setPaint(PROGRESS_GRADIENT);
+        g2.fillRect(prX, prY, prW, BAR_HEIGHT);
+        g2.setColor(MSG_COLOR);
+        g2.drawRect(prX, prY, BAR_WIDTH, BAR_HEIGHT);
+    }
+    
 }
 
 class PDFViewerEventHandler implements ViewListener {
