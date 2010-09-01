@@ -92,6 +92,10 @@ public class SlaveApp {
         for(Camera cam: clusteredView.getCameras()){
             setCameraLocation(cam.getLocation(), cam);
         }
+        
+        if (options.antialiasing){
+            view.setAntialiasing(true);
+        }
 
         if(!options.fullscreen){
             ((JFrame)view.getFrame()).setLocation(
@@ -219,6 +223,9 @@ class SlaveOptions {
 
 	@Option(name = "-f", aliases = {"--fullscreen"}, usage = "open in full screen mode")
 		boolean fullscreen = false;		
+
+	@Option(name = "-a", aliases = {"--antialiasing"}, usage = "enable antialiased rendering")
+		boolean antialiasing = false;
     
     @Option(name = "-o", usage = "enable OpenGL acceleration")
 		boolean openGl = false;
