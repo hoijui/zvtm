@@ -34,9 +34,9 @@ aspect VirtualSpaceReplication {
 		if(VirtualSpaceManager.INSTANCE.isMaster()) &&
 		(
 		 execution(public void Camera.altitudeOffset(double)) ||
-		 execution(public void Camera.move(long, long)) ||
 		 execution(public void Camera.move(double, double)) ||
-		 execution(public void Camera.moveTo(long, long)) ||
+		 execution(public void Camera.move(double, double)) ||
+		 execution(public void Camera.moveTo(double, double)) ||
 		 execution(public void Camera.setAltitude(double)) ||
 		 execution(public void Camera.setAltitude(double, boolean)) ||
 		 execution(public void Camera.setLocation(Location)) 
