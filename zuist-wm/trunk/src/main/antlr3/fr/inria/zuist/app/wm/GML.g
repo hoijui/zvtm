@@ -1,3 +1,10 @@
+/*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
+ *   Copyright (c) INRIA, 2010. All Rights Reserved
+ *   Licensed under the GNU LGPL. For full terms see the file COPYING.
+ *
+ * $Id$
+ */
+
 grammar GML;
 
 tokens {
@@ -48,6 +55,8 @@ node : NODE SQBRL (attrib)* SQBRR;
 edge : EDGE SQBRL (attrib)* SQBRR;
 
 attrib : NAME (NUMBER | DQUOTE NAME DQUOTE) ;
+
+
 
 /*------------------------------------------------------------------
  * LEXER RULES
