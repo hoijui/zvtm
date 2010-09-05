@@ -69,11 +69,6 @@ $Id$
   
   <!-- Dependencies -->
   <dependencies>
-	<dependency>
-      <groupId>fr.inria.zvtm</groupId>
-      <artifactId>zuist-engine</artifactId>
-      <version>0.4.0-SNAPSHOT</version>
-    </dependency>
     <!-- for GeoTools -->
 	<dependency>
       <groupId>org.geotools</groupId>
@@ -111,6 +106,96 @@ $Id$
   </dependencies>
   
   <!-- Build -->
+
+  <profiles>
+	<profile>
+		<!-- mvn -P main ... -->
+		<id>main</id>
+		<activation>
+          <activeByDefault>true</activeByDefault>
+        </activation>
+	    <dependencies>
+			<dependency>
+		      <groupId>fr.inria.zvtm</groupId>
+		      <artifactId>zuist-engine</artifactId>
+		      <version>0.4.0-SNAPSHOT</version>
+		    </dependency>
+	    </dependencies>
+		<build>
+			<plugins>
+		      <plugin>
+		        <groupId>org.apache.maven.plugins</groupId>
+		        <artifactId>maven-compiler-plugin</artifactId>
+		        <configuration>
+		          <source>1.6</source>
+		          <target>1.6</target>
+		          <excludes>
+		            <exclude>**/*Wild*.java</exclude>
+		          </excludes>
+		        </configuration>
+		      </plugin>
+		     <plugin>
+		        <groupId>org.apache.maven.plugins</groupId>
+		        <artifactId>maven-jar-plugin</artifactId>
+		        <configuration>
+		          <archive>
+		            <manifest>
+		              <mainClass>fr.inria.zuist.app.wm.WorldExplorer</mainClass>
+		              <packageName>fr.inria.zuist.app.wm</packageName>
+		              <addClasspath>true</addClasspath>
+		            </manifest>
+		            <manifestEntries>
+		              <mode>development</mode>
+		              <url>${pom.url}</url>
+		            </manifestEntries>
+		          </archive>
+		        </configuration>
+		      </plugin>
+			</plugins>
+		</build>
+	</profile>
+	<profile>
+		<!-- mvn -P wild ... -->
+		<id>wild</id>
+		<dependencies>
+			<dependency>
+		      <groupId>fr.inria.zvtm</groupId>
+		      <artifactId>zuist-engine</artifactId>
+		      <version>0.4.0-SNAPSHOT</version>
+		    </dependency>
+        </dependencies>
+		<build>
+			<plugins>
+		      <plugin>
+		        <groupId>org.apache.maven.plugins</groupId>
+		        <artifactId>maven-compiler-plugin</artifactId>
+		        <configuration>
+		          <source>1.6</source>
+		          <target>1.6</target>
+		        </configuration>
+		      </plugin>
+		     <plugin>
+		        <groupId>org.apache.maven.plugins</groupId>
+		        <artifactId>maven-jar-plugin</artifactId>
+		        <configuration>
+		          <archive>
+		            <manifest>
+		              <mainClass>fr.inria.zuist.app.wm.WildWorldExplorer</mainClass>
+		              <packageName>fr.inria.zuist.app.wm</packageName>
+		              <addClasspath>true</addClasspath>
+		            </manifest>
+		            <manifestEntries>
+		              <mode>development</mode>
+		              <url>${pom.url}</url>
+		            </manifestEntries>
+		          </archive>
+		        </configuration>
+		      </plugin>
+			</plugins>
+		</build>
+	</profile>
+  </profiles>
+
   <build>
 	<resources> 
 	  <resource>
@@ -175,23 +260,6 @@ $Id$
           <source>1.6</source>
           <target>1.6</target>
 		  <showDeprecation>true</showDeprecation>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-        <configuration>
-          <archive>
-            <manifest>
-              <mainClass>fr.inria.zuist.app.wm.WorldExplorer</mainClass>
-              <packageName>fr.inria.zuist.app.wm</packageName>
-              <addClasspath>true</addClasspath>
-            </manifest>
-            <manifestEntries>
-              <mode>development</mode>
-              <url>${pom.url}</url>
-            </manifestEntries>
-          </archive>
         </configuration>
       </plugin>
       <plugin>
