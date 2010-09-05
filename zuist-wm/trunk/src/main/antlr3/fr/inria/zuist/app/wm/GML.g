@@ -43,27 +43,11 @@ version : VERSION NUMBER ;
 
 directed : DIRECTED NUMBER ;
 
-node : NODE SQBRL id airport cityname x y SQBRR;
+node : NODE SQBRL (attrib)* SQBRR;
 
-edge : EDGE SQBRL source target id weight length SQBRR;
+edge : EDGE SQBRL (attrib)* SQBRR;
 
-id: ID NUMBER ;
-
-airport : AIRPCODE DQUOTE NAME DQUOTE;
-
-cityname : CITYNAME DQUOTE NAME DQUOTE ;
-
-x : X NUMBER ;
-
-y : Y NUMBER ;
-
-source : SOURCE NUMBER ;
-
-target : TARGET NUMBER ;
-
-weight : WEIGHT NUMBER ;
-
-length : LENGTH NUMBER ;
+attrib : NAME (NUMBER | DQUOTE NAME DQUOTE) ;
 
 /*------------------------------------------------------------------
  * LEXER RULES
@@ -77,21 +61,7 @@ VERSION : 'version' ;
 
 NODE : 'node' ;
 
-ID : 'id' ;
-
-AIRPCODE : 'airport_code' ;
-
-CITYNAME : 'city_name' ;
-
-X : 'x' ;
-Y : 'y' ;
-
 EDGE : 'edge' ;
-
-SOURCE : 'source' ;
-TARGET : 'target' ;
-WEIGHT : 'weight' ;
-LENGTH : 'length' ;
 
 NUMBER : ('-')? (DIGIT)+ ('.' (DIGIT)+)? ;
 
