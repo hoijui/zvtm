@@ -80,17 +80,17 @@ aspect SceneManagerReplication {
     }
 
     pointcut createLevel(SceneManager sceneManager,
-            int depth, float ceilingAlt, float floorAlt) :
-        execution(public Level SceneManager.createLevel(int, float, float)) &&
+            int depth, double ceilingAlt, double floorAlt) :
+        execution(public Level SceneManager.createLevel(int, double, double)) &&
         if(VirtualSpaceManager.INSTANCE.isMaster()) &&
         this(sceneManager) &&
         args(depth, ceilingAlt, floorAlt);
 
     after(SceneManager sceneManager, int depth,
-            float ceilingAlt, float floorAlt) 
+            double ceilingAlt, double floorAlt) 
         returning(Level level) : 
         createLevel(sceneManager, depth, ceilingAlt, floorAlt) &&
-        !cflowbelow(createLevel(SceneManager, int, float, float)){
+        !cflowbelow(createLevel(SceneManager, int, double, double)){
             level.setReplicated(true);
 
             LevelCreateDelta delta = new LevelCreateDelta(
@@ -104,11 +104,11 @@ aspect SceneManagerReplication {
         private final ObjId<SceneManager> smId;
         private final ObjId<Level> levelId;
         private final int depth;
-        private final float ceilingAlt;
-        private final float floorAlt;
+        private final double ceilingAlt;
+        private final double floorAlt;
 
         LevelCreateDelta(ObjId<SceneManager> smId, ObjId<Level> levelId,
-                int depth, float ceilingAlt, float floorAlt){
+                int depth, double ceilingAlt, double floorAlt){
             this.smId = smId;
             this.levelId = levelId;
             this.depth = depth;
