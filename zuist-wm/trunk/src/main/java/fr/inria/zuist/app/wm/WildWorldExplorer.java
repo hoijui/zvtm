@@ -76,7 +76,7 @@ public class WildWorldExplorer extends WorldExplorer {
 
     public WildWorldExplorer(boolean queryGN, short lad, boolean air,
                              boolean fullscreen, boolean grid, boolean opengl, boolean aa, File xmlSceneFile){
-        super(queryGN, lad1, air, fullscreen, grid, opengl, aa, xmlSceneFile);
+        super(queryGN, lad, air, fullscreen, grid, opengl, aa, xmlSceneFile);
     }
 
     void initGUI(boolean fullscreen, boolean opengl, boolean aa){
@@ -142,7 +142,7 @@ public class WildWorldExplorer extends WorldExplorer {
 		boolean aa = false;
 		boolean grid = false;
 		boolean queryGN = false;
-		short lad = false;
+		short lad = -1;
 		boolean air = false;
 		for (int i=0;i<args.length;i++){
 			if (args[i].startsWith("-")){
