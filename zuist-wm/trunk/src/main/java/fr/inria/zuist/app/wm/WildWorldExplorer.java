@@ -53,6 +53,9 @@ import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zuist.engine.ProgressListener;
 
+import fr.inria.zvtm.cluster.ClusterGeometry;
+import fr.inria.zvtm.cluster.ClusteredView;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.FactoryConfigurationError;
@@ -79,6 +82,7 @@ public class WildWorldExplorer extends WorldExplorer {
     void initGUI(boolean fullscreen, boolean opengl, boolean aa){
         windowLayout();
         vsm = VirtualSpaceManager.INSTANCE;
+        vsm.setMaster("WildWorldExplorer");
         mSpace = vsm.addVirtualSpace(mSpaceName);
         bSpace = vsm.addVirtualSpace(bSpaceName);
         mCamera = mSpace.addCamera();
@@ -107,6 +111,15 @@ public class WildWorldExplorer extends WorldExplorer {
 		mView.getCursor().activateDynaSpot(true);
         mView.setJava2DPainter(this, Java2DPainter.AFTER_PORTALS);
         updatePanelSize();
+        
+        //ClusterGeometry cg = new ClusterGeometry(2680, 1700, 8, 4);
+        ClusterGeometry cg = new ClusterGeometry(600,400,1,1);
+        Vector ccameras = new Vector();
+        ccameras.add(mCamera);
+        //ClusteredView cv = new ClusteredView(cg, 3, 8, 4, ccameras);
+        ClusteredView cv = new ClusteredView(cg, 0, 1, 1, ccameras);
+        vsm.addClusteredView(cv);
+        
         // console
         JLayeredPane lp = ((JFrame)mView.getFrame()).getRootPane().getLayeredPane();
         console = new TranslucentTextArea(2, 80);

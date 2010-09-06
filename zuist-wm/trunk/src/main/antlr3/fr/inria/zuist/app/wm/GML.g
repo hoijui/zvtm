@@ -7,6 +7,10 @@
 
 grammar GML;
 
+options {
+  output = AST;
+}
+
 tokens {
 	SQBRL 	= '[' ;
 	SQBRR	= ']' ;
@@ -29,7 +33,7 @@ package fr.inria.zuist.app.wm;
         GMLParser parser = new GMLParser(tokens);
 
         try {
-            parser.expr();
+            parser.gmlgr();
         } catch (RecognitionException e)  {
             e.printStackTrace();
         }
@@ -40,23 +44,29 @@ package fr.inria.zuist.app.wm;
  * PARSER RULES
  *------------------------------------------------------------------*/
 
-expr	: graph ;
+gmlgr	: graph EOF!;
 
-graph : GRAPH SQBRL meta (node|edge)* SQBRR ;
+graph : GRAPH SQBRL meta elements SQBRR ;
 
-meta : (directed|version)*;
+meta : (directed|version)* ;
 
-version : VERSION NUMBER ;
+version : VERSION NUMBER -> ^(VERSION NUMBER);
 
-directed : DIRECTED NUMBER ;
+directed : DIRECTED NUMBER -> ^(DIRECTED NUMBER) ;
 
-node : NODE SQBRL (attrib)* SQBRR;
+elements : (element)* ;
 
-edge : EDGE SQBRL (attrib)* SQBRR;
+element : node | edge ;
 
-attrib : NAME (NUMBER | DQUOTE NAME DQUOTE) ;
+node : NODE SQBRL attribs SQBRR -> ^(NODE attribs);
 
+edge : EDGE SQBRL attribs SQBRR -> ^(EDGE attribs);
 
+attribs : (attrib)* ;
+
+attrib : NAME value -> ^(NAME value) ;
+
+value: (NUMBER | QUOTED_NAME) ;
 
 /*------------------------------------------------------------------
  * LEXER RULES
@@ -75,6 +85,8 @@ EDGE : 'edge' ;
 NUMBER : ('-')? (DIGIT)+ ('.' (DIGIT)+)? ;
 
 NAME : ( LETTER | '_' | '-' | '\'' | '/' | '.' | '?' | '(' | ')' )+ ;
+
+QUOTED_NAME : '"' NAME '"' ;
 
 WHITESPACE : ( '\t' | ' ' | '\r' | '\n'| '\u000C' )+ 	{ $channel = HIDDEN; } ;
 

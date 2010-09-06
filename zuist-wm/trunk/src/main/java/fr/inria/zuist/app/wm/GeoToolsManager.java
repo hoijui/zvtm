@@ -57,7 +57,7 @@ class GeoToolsManager {
                                                     1, transitions, Region.ORDERING_DISTANCE,
                                                     false, null, null);
 
-        loadShapes(new File("data/TM_WORLD_BORDERS-0.3.shp"), "Loading countries...", region, COUNTRY_COLOR);
+        //loadShapes(new File("data/TM_WORLD_BORDERS-0.3.shp"), "Loading countries...", region, COUNTRY_COLOR);
         if (loadAdminDiv1){
             loadShapes(new File("data/shapefiles/ca_provinces/province.shp"), "Loading Canadian provinces...", region, ADMIN_DIV_1_COLOR);
             loadShapes(new File("data/shapefiles/us_states/statesp020.shp"), "Loading US states...", region, ADMIN_DIV_1_COLOR);
