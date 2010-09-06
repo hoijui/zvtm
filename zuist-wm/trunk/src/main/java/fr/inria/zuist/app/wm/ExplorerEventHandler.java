@@ -25,6 +25,7 @@ import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VText;
+import fr.inria.zvtm.glyphs.VPolygon;
 import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.event.CameraListener;
 import fr.inria.zvtm.engine.portals.Portal;
@@ -101,7 +102,7 @@ class ExplorerEventHandler implements ViewListener, CameraListener, ComponentLis
 				double a = (application.ovCamera.focal+Math.abs(application.ovCamera.altitude)) / application.ovCamera.focal;
 				application.mCamera.moveTo(a*(jpx-application.nm.ovPortal.x-application.nm.ovPortal.w/2),
 				                           -a*(jpy-application.nm.ovPortal.y-application.nm.ovPortal.h/2));
-				cameraMoved(null, null, 0);
+				cameraMoved(application.mCamera, null, 0);
 				// position camera where user has pressed, and then allow seamless dragging
 				regionStickedToMouse = true;
 			}
@@ -221,9 +222,10 @@ class ExplorerEventHandler implements ViewListener, CameraListener, ComponentLis
             double a = (application.mCamera.focal+Math.abs(application.mCamera.altitude)) / application.mCamera.focal;
             synchronized(application.mCamera){
                 application.mCamera.move(a*(lastJPX-jpx), a*(jpy-lastJPY));
+                application.bCamera.move(a*(lastJPX-jpx), a*(jpy-lastJPY));
                 lastJPX = jpx;
                 lastJPY = jpy;
-                cameraMoved(null, null, 0);
+				cameraMoved(application.mCamera, null, 0);
             }
             if (nm.lensType != 0 && nm.lens != null){
         	    nm.moveLens(jpx, jpy, e.getWhen());
@@ -269,10 +271,18 @@ class ExplorerEventHandler implements ViewListener, CameraListener, ComponentLis
 
     public void enterGlyph(Glyph g){
 //        g.highlight(true, null);
+        if (g instanceof VPolygon){
+            ((VPolygon)g).setFilled(true);
+            g.setTranslucencyValue(.5f);
+        }
     }
 
     public void exitGlyph(Glyph g){
 //        g.highlight(false, null);
+        if (g instanceof VPolygon){
+            ((VPolygon)g).setFilled(false);
+            g.setTranslucencyValue(1f);
+        }
     }
 
     int ci = 1180;
@@ -317,6 +327,8 @@ class ExplorerEventHandler implements ViewListener, CameraListener, ComponentLis
     public void componentShown(ComponentEvent e){}
 
     public void cameraMoved(Camera cam, Point2D.Double coord, double a){
+        application.bCamera.setAltitude(cam.getAltitude());
+        application.bCamera.moveTo(cam.vx, cam.vy);
         dut.requestUpdate();
     }
     

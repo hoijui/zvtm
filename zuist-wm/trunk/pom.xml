@@ -157,6 +157,13 @@ $Id$
 	<profile>
 		<!-- mvn -P wild ... -->
 		<id>wild</id>
+	    <dependencies>
+			<dependency>
+		      <groupId>fr.inria.zvtm</groupId>
+		      <artifactId>zuist-cluster</artifactId>
+		      <version>0.2.0-SNAPSHOT</version>
+		    </dependency>
+	    </dependencies>
 		<build>
 			<plugins>
 		      <plugin>

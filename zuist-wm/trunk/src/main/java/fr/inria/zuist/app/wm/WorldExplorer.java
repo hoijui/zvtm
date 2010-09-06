@@ -125,8 +125,8 @@ public class WorldExplorer implements Java2DPainter {
         ((JFrame)mView.getFrame()).setGlassPane(gp);
         gp.setValue(0);
         gp.setVisible(true);
-        VirtualSpace[]  sceneSpaces = {mSpace, bSpace};
-        Camera[] sceneCameras = {mCamera, bCamera};
+        VirtualSpace[]  sceneSpaces = {mSpace};
+        Camera[] sceneCameras = {mCamera};
 		//vsm.addGlyph(new VImage(0, 0, 0, (new ImageIcon(PATH_TO_HIERARCHY+"/0-0-0-0-0.jpg")).getImage(), 20), mSpace);
         sm = new SceneManager(sceneSpaces, sceneCameras);
         sm.loadScene(parseXML(xmlSceneFile), xmlSceneFile.getParentFile(), true, gp);
@@ -143,11 +143,10 @@ public class WorldExplorer implements Java2DPainter {
                }
            };
         getGlobalView(ea);
-        eh.cameraMoved(null, null, 0);
+        eh.cameraMoved(mCamera, null, 0);
 		nm.createOverview(sm.getRegionsAtLevel(0)[0]);
 		nm.updateOverview();
         console.setVisible(true);
-        mCamera.addListener(eh);
     }
 
     void initGUI(boolean fullscreen, boolean opengl, boolean aa){
@@ -161,7 +160,7 @@ public class WorldExplorer implements Java2DPainter {
         Vector cameras = new Vector();
         cameras.add(mCamera);
         cameras.add(bCamera);
-        mCamera.stick(bCamera, true);
+        //mCamera.stick(bCamera, true);
         mView = vsm.addFrameView(cameras, mViewName, (opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, !fullscreen, null);
         if (fullscreen && GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().isFullScreenSupported()){
             GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow((JFrame)mView.getFrame());
@@ -171,6 +170,7 @@ public class WorldExplorer implements Java2DPainter {
         }
 		mView.setAntialiasing(aa);
         eh = new ExplorerEventHandler(this);
+        mCamera.addListener(eh);
         mView.setListener(eh, 0);
         mView.setListener(eh, 1);
         mView.setBackgroundColor(BACKGROUND_COLOR);

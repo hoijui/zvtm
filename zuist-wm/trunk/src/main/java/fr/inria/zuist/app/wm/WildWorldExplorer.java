@@ -91,7 +91,7 @@ public class WildWorldExplorer extends WorldExplorer {
         Vector cameras = new Vector();
         cameras.add(mCamera);
         cameras.add(bCamera);
-        mCamera.stick(bCamera, true);
+        //mCamera.stick(bCamera, true);
         mView = vsm.addFrameView(cameras, mViewName, (opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, !fullscreen, null);
         if (fullscreen && GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().isFullScreenSupported()){
             GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow((JFrame)mView.getFrame());
@@ -101,6 +101,7 @@ public class WildWorldExplorer extends WorldExplorer {
         }
 		mView.setAntialiasing(aa);
         eh = new ExplorerEventHandler(this);
+        mCamera.addListener(eh);
         mView.setListener(eh, 0);
         mView.setListener(eh, 1);
         mView.setBackgroundColor(BACKGROUND_COLOR);
@@ -116,6 +117,7 @@ public class WildWorldExplorer extends WorldExplorer {
         ClusterGeometry cg = new ClusterGeometry(600,400,1,1);
         Vector ccameras = new Vector();
         ccameras.add(mCamera);
+        ccameras.add(bCamera);
         //ClusteredView cv = new ClusteredView(cg, 3, 8, 4, ccameras);
         ClusteredView cv = new ClusteredView(cg, 0, 1, 1, ccameras);
         vsm.addClusteredView(cv);

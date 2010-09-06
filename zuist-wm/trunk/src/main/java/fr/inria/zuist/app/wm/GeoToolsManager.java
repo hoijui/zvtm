@@ -42,6 +42,7 @@ class GeoToolsManager {
     static final double CC = 21600 * 2 / 180.0;
 
     static final Color COUNTRY_COLOR = Color.YELLOW;
+    static final Color COUNTRY_FILL_HIGHLIGHT_COLOR = Color.GREEN;
     static final Color ADMIN_DIV_1_COLOR = Color.GREEN;
 
     WorldExplorer application;
@@ -53,17 +54,13 @@ class GeoToolsManager {
     
     GeoToolsManager(WorldExplorer app, boolean queryGN, boolean loadAdminDiv1){
         this.application = app;
-        Region region = application.sm.createRegion(0, 0, 84600, 43200, 0, 4, "BR0", "Boundaries",
-                                                    1, transitions, Region.ORDERING_DISTANCE,
-                                                    false, null, null);
-
-        //loadShapes(new File("data/TM_WORLD_BORDERS-0.3.shp"), "Loading countries...", region, COUNTRY_COLOR);
+        loadShapes(new File("data/TM_WORLD_BORDERS-0.3.shp"), "Loading countries...", COUNTRY_COLOR);
         if (loadAdminDiv1){
-            loadShapes(new File("data/shapefiles/ca_provinces/province.shp"), "Loading Canadian provinces...", region, ADMIN_DIV_1_COLOR);
-            loadShapes(new File("data/shapefiles/us_states/statesp020.shp"), "Loading US states...", region, ADMIN_DIV_1_COLOR);
-            loadShapes(new File("data/shapefiles/mx_states/mx_state.shp"), "Loading Mexican states...", region, ADMIN_DIV_1_COLOR);
-            loadShapes(new File("data/shapefiles/russia/RUS1.shp"), "Loading Russian administrative divisions...", region, ADMIN_DIV_1_COLOR);
-            loadShapes(new File("data/shapefiles/china/CHN1.shp"), "Loading Chinese administrative divisions...", region, ADMIN_DIV_1_COLOR);            
+            loadShapes(new File("data/shapefiles/ca_provinces/province.shp"), "Loading Canadian provinces...", ADMIN_DIV_1_COLOR);
+            loadShapes(new File("data/shapefiles/us_states/statesp020.shp"), "Loading US states...", ADMIN_DIV_1_COLOR);
+            loadShapes(new File("data/shapefiles/mx_states/mx_state.shp"), "Loading Mexican states...", ADMIN_DIV_1_COLOR);
+            loadShapes(new File("data/shapefiles/russia/RUS1.shp"), "Loading Russian administrative divisions...", ADMIN_DIV_1_COLOR);
+            loadShapes(new File("data/shapefiles/china/CHN1.shp"), "Loading Chinese administrative divisions...", ADMIN_DIV_1_COLOR);            
         }
         gnp = new GeoNamesParser(application);
         if (queryGN){
@@ -71,7 +68,7 @@ class GeoToolsManager {
         }
     }
 
-    void loadShapes(File shapeFile, String msg, Region region, Color shapeColor){
+    void loadShapes(File shapeFile, String msg, Color shapeColor){
         int progress = 0;
         application.gp.setValue(0);
         application.gp.setLabel(msg);
@@ -112,11 +109,12 @@ class GeoToolsManager {
                                 for (int j=0;j<zvtmCoords.length;j++){
                                     zvtmCoords[j] = (Point2D.Double)points.elementAt(j);
                                 }
-                                VPolygon polygon = new VPolygon(zvtmCoords, 0, Color.BLACK, shapeColor, 1.0f);
+                                VPolygon polygon = new VPolygon(zvtmCoords, 0, COUNTRY_FILL_HIGHLIGHT_COLOR, shapeColor, 1.0f);
                                 polygon.setFilled(false);
-                                application.sm.createClosedShapeDescription(polygon, "B"+Integer.toString(polygonID++),
-                                    polygon.getZindex(),
-                                    region, false);
+                                application.bSpace.addGlyph(polygon);
+                                //application.sm.createClosedShapeDescription(polygon, "B"+Integer.toString(polygonID++),
+                                //    polygon.getZindex(),
+                                //    region, false);
                             }
                             else {
                                 System.err.println("Error: GeoToolsManager.loadShape: Unsupported path iterator element type:" + type);
