@@ -7,7 +7,7 @@
 
 package fr.inria.zuist.cluster.viewer;
 
-import fr.inria.zvtm.engine.LongPoint;
+import java.awt.geom.Point2D;
 
 class Messages {
 		
@@ -29,7 +29,7 @@ class Messages {
     static final String LEVEL = "Level: ";
 
     static final String[] mainMenuLabels = {PM_GLOBALVIEW, PM_OPEN, PM_BACK, PM_RELOAD};
-    static final LongPoint[] mainMenuLabelOffsets = {new LongPoint(10, 0), new LongPoint(0, 0),
-						     new LongPoint(-10, 0), new LongPoint(0, -10)};
+    static final Point2D.Double[] mainMenuLabelOffsets = {new Point2D.Double(10, 0), new Point2D.Double(0, 0),
+						     new Point2D.Double(-10, 0), new Point2D.Double(0, -10)};
 
 }

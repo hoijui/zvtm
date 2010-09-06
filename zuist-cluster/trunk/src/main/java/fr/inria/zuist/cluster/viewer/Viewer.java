@@ -25,6 +25,7 @@ import java.awt.event.MouseMotionAdapter;
 import java.awt.event.KeyAdapter;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
@@ -51,13 +52,12 @@ import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.View;
-import fr.inria.zvtm.engine.LongPoint;
-import fr.inria.zvtm.engine.Utilities;
+import fr.inria.zvtm.engine.Utils;
 import fr.inria.zvtm.engine.SwingWorker;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.Translucent;
-import fr.inria.zvtm.glyphs.PieMenu;
-import fr.inria.zvtm.glyphs.PieMenuFactory;
+import fr.inria.zvtm.widgets.PieMenu;
+import fr.inria.zvtm.widgets.PieMenuFactory;
 import fr.inria.zvtm.engine.Java2DPainter;
 import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.animation.EndAction;
@@ -189,11 +189,11 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		gp = new VWGlassPane(this);
 		((JFrame)mView.getFrame()).setGlassPane(gp);
         eh = new ViewerEventHandler(this);
-        mView.setEventHandler(eh, 0);
-        mView.setEventHandler(eh, 1);
-        mView.setEventHandler(ovm, 2);
+        mView.setListener(eh, 0);
+        mView.setListener(eh, 1);
+        mView.setListener(ovm, 2);
 		mCamera.addListener(eh);
-        mView.setNotifyMouseMoved(true);
+        mView.setNotifyCursorMoved(true);
         mView.setBackgroundColor(Color.WHITE);
 		mView.setAntialiasing(antialiased);
 		mView.setJava2DPainter(this, Java2DPainter.AFTER_PORTALS);
@@ -295,10 +295,10 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 	}
 
     void windowLayout(){
-        if (Utilities.osIsWindows()){
+        if (Utils.osIsWindows()){
             VIEW_X = VIEW_Y = 0;
         }
-        else if (Utilities.osIsMacOS()){
+        else if (Utils.osIsMacOS()){
             VIEW_X = 80;
             SCREEN_WIDTH -= 80;
         }
@@ -386,7 +386,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		}
 		if (l > -1){
 			rememberLocation(mCamera.getLocation());
-			long[] wnes = sm.getLevel(l).getBounds();
+			double[] wnes = sm.getLevel(l).getBounds();
 	        mCamera.getOwningView().centerOnRegion(mCamera, Viewer.ANIM_MOVE_LENGTH, wnes[0], wnes[1], wnes[2], wnes[3], ea);
 		}
     }
@@ -413,24 +413,24 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 
     /* Direction should be one of Viewer.MOVE_* */
     void translateView(short direction){
-        LongPoint trans;
-        long[] rb = mView.getVisibleRegion(mCamera);
+        Point2D.Double trans;
+        double[] rb = mView.getVisibleRegion(mCamera);
         if (direction==MOVE_UP){
-            long qt = Math.round((rb[1]-rb[3])/4.0);
-            trans = new LongPoint(0,qt);
+            double qt = (rb[1]-rb[3])/4.0;
+            trans = new Point2D.Double(0,qt);
         }
         else if (direction==MOVE_DOWN){
-            long qt = Math.round((rb[3]-rb[1])/4.0);
-            trans = new LongPoint(0,qt);
+            double qt = (rb[3]-rb[1])/4.0;
+            trans = new Point2D.Double(0,qt);
         }
         else if (direction==MOVE_RIGHT){
-            long qt = Math.round((rb[2]-rb[0])/4.0);
-            trans = new LongPoint(qt,0);
+            double qt = (rb[2]-rb[0])/4.0;
+            trans = new Point2D.Double(qt,0);
         }
         else {
             // direction==MOVE_LEFT
-            long qt = Math.round((rb[0]-rb[2])/4.0);
-            trans = new LongPoint(qt,0);
+            double qt = (rb[0]-rb[2])/4.0;
+            trans = new Point2D.Double(qt,0);
         }
 //        vsm.animator.createCameraAnimation(Viewer.ANIM_MOVE_LENGTH, AnimManager.CA_TRANS_SIG, trans, mCamera.getID());
         Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(Viewer.ANIM_MOVE_LENGTH, mCamera,
@@ -500,7 +500,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
                 }
             }
             Animation at = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(Viewer.ANIM_MOVE_LENGTH, mSpace.getCamera(0),
-                (LongPoint)animParams.elementAt(1), true, SlowInSlowOutInterpolator.getInstance(), null);
+                (Point2D.Double)animParams.elementAt(1), true, SlowInSlowOutInterpolator.getInstance(), null);
             Animation aa = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(Viewer.ANIM_MOVE_LENGTH, mSpace.getCamera(0),
                 (Float)animParams.elementAt(0), true, SlowInSlowOutInterpolator.getInstance(), new LevelUpdater());
             vsm.getAnimationManager().startAnimation(at, false);
@@ -553,7 +553,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         else {
             infoMI.setText(Messages.INFO_SHOW);
         }
-        vsm.repaintNow();
+        vsm.repaint();
     }
 
 	static final AlphaComposite acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.7f);
@@ -638,7 +638,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 	void gc(){
 		System.gc();
 		if (SHOW_MISC_INFO){
-			vsm.repaintNow();
+			vsm.repaint();
 		}
     }
     
@@ -678,7 +678,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
                 }
             }
 		}
-        if (!fs && Utilities.osIsMacOS()){
+        if (!fs && Utils.osIsMacOS()){
             System.setProperty("apple.laf.useScreenMenuBar", "true");
         }
         System.out.println("--help for command line options");

@@ -12,30 +12,30 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.ComponentEvent;
+import java.awt.geom.Point2D;
 
 import java.util.Vector;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import fr.inria.zvtm.engine.VCursor;
-import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
-import fr.inria.zvtm.engine.Utilities;
+import fr.inria.zvtm.engine.Utils;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VText;
-import fr.inria.zvtm.engine.ViewEventHandler;
-import fr.inria.zvtm.engine.CameraListener;
+import fr.inria.zvtm.event.ViewListener;
+import fr.inria.zvtm.event.CameraListener;
 
 import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zuist.engine.Region;
 import fr.inria.zuist.engine.ObjectDescription;
 import fr.inria.zuist.engine.TextDescription;
 
-class ViewerEventHandler implements ViewEventHandler, ComponentListener, CameraListener {
+class ViewerEventHandler implements ViewListener, ComponentListener, CameraListener {
     
     static float ZOOM_SPEED_COEF = 1.0f/50.0f;
     static double PAN_SPEED_COEF = 50.0;
@@ -145,9 +145,9 @@ class ViewerEventHandler implements ViewEventHandler, ComponentListener, CameraL
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
         Camera c = application.mCamera;
-        float a = (c.focal+Math.abs(c.altitude)) / c.focal;
+        double a = (c.focal+Math.abs(c.altitude)) / c.focal;
         if (zero_order_dragging){
-            c.move(Math.round(a*(lastJPX-jpx)), Math.round(a*(jpy-lastJPY)));
+            c.move(a*(lastJPX-jpx),a*(jpy-lastJPY));
             lastJPX = jpx;
             lastJPY = jpy;
         }
@@ -158,24 +158,24 @@ class ViewerEventHandler implements ViewEventHandler, ComponentListener, CameraL
                 VirtualSpaceManager.INSTANCE.getAnimationManager().setZspeed(((lastJPY-jpy)*(ZOOM_SPEED_COEF)));
             }
             else {
-                VirtualSpaceManager.INSTANCE.getAnimationManager().setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/PAN_SPEED_COEF)) : (long)((jpx-lastJPX)/(a*PAN_SPEED_COEF)));
-                VirtualSpaceManager.INSTANCE.getAnimationManager().setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/PAN_SPEED_COEF)) : (long)((lastJPY-jpy)/(a*PAN_SPEED_COEF)));
+                VirtualSpaceManager.INSTANCE.getAnimationManager().setXspeed((c.altitude>0) ? (jpx-lastJPX)*(a/PAN_SPEED_COEF) : (jpx-lastJPX)/(a*PAN_SPEED_COEF));
+                VirtualSpaceManager.INSTANCE.getAnimationManager().setYspeed((c.altitude>0) ? (lastJPY-jpy)*(a/PAN_SPEED_COEF) : (lastJPY-jpy)/(a*PAN_SPEED_COEF));
                 VirtualSpaceManager.INSTANCE.getAnimationManager().setZspeed(0);
             }
         }
     }
 
 	public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
-		float a = (application.mCamera.focal+Math.abs(application.mCamera.altitude)) / application.mCamera.focal;
+		double a = (application.mCamera.focal+Math.abs(application.mCamera.altitude)) / application.mCamera.focal;
 		if (wheelDirection  == WHEEL_UP){
 			// zooming in
 			application.mCamera.altitudeOffset(a*WHEEL_ZOOMOUT_FACTOR);
-			application.vsm.repaintNow();
+			application.vsm.repaint();
 		}
 		else {
 			//wheelDirection == WHEEL_DOWN, zooming out
 			application.mCamera.altitudeOffset(-a*WHEEL_ZOOMIN_FACTOR);
-			application.vsm.repaintNow();
+			application.vsm.repaint();
 		}
 	}
 
@@ -185,7 +185,7 @@ class ViewerEventHandler implements ViewEventHandler, ComponentListener, CameraL
 			g.highlight(true, null);
 			VirtualSpace vs = application.vsm.getVirtualSpace(application.mnSpaceName);
 			vs.onTop(g);
-			int i = Utilities.indexOfGlyph(application.mainPieMenu.getItems(), g);
+			int i = Utils.indexOfGlyph(application.mainPieMenu.getItems(), g);
 			if (i != -1){
 				vs.onTop(application.mainPieMenu.getLabels()[i]);
 			}
@@ -236,7 +236,7 @@ class ViewerEventHandler implements ViewEventHandler, ComponentListener, CameraL
     }
     public void componentShown(ComponentEvent e){}
     
-    public void cameraMoved(Camera cam, LongPoint coord, float alt){
+    public void cameraMoved(Camera cam, Point2D.Double coord, double alt){
         application.altitudeChanged();
     }
     

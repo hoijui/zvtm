@@ -1,8 +1,9 @@
 package fr.inria.zuist.cluster;
 
+import java.awt.geom.Point2D;
+
 import fr.inria.zvtm.cluster.AbstractAutoReplay;
 import fr.inria.zvtm.cluster.Identifiable;
-import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zuist.engine.Region;
 import fr.inria.zuist.engine.SceneManager;
 
@@ -17,7 +18,7 @@ aspect AutoReplay extends AbstractAutoReplay {
         if(replayTarget.isReplicated()) &&
         (
          execution(public void SceneManager.setUpdateLevel(boolean)) ||
-         execution(public void SceneManager.setOrigin(LongPoint)) ||
+         execution(public void SceneManager.setOrigin(Point2D.Double)) ||
          execution(public void SceneManager.enableRegionUpdater(boolean)) ||
          execution(public void Region.setContainingRegion(Region)) ||
          execution(public void Region.addContainedRegion(Region))
