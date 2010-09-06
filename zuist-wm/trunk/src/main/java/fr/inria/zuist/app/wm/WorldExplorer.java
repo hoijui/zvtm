@@ -117,7 +117,7 @@ public class WorldExplorer implements Java2DPainter {
     
     TranslucentTextArea console;
 
-    public WorldExplorer(boolean queryGN, boolean lad1, boolean air,
+    public WorldExplorer(boolean queryGN, short lad, boolean air,
                          boolean fullscreen, boolean grid, boolean opengl, boolean aa, File xmlSceneFile){
         nm = new NavigationManager(this);
         initGUI(fullscreen, opengl, aa);
@@ -131,7 +131,7 @@ public class WorldExplorer implements Java2DPainter {
         sm = new SceneManager(sceneSpaces, sceneCameras);
         sm.loadScene(parseXML(xmlSceneFile), xmlSceneFile.getParentFile(), true, gp);
         if (grid){buildGrid();}
-        gm = new GeoToolsManager(this, queryGN, lad1);
+        gm = new GeoToolsManager(this, queryGN, lad);
         ga = new AirTrafficManager(this, air);
         gp.setVisible(false);
         gp.setLabel(WEGlassPane.EMPTY_STRING);
@@ -395,7 +395,7 @@ public class WorldExplorer implements Java2DPainter {
     static void printCmdLineHelp(){
         System.out.println("Usage:\n\tjava -Xmx1024M -Xms512M -jar target/zuist-wm-X.X.X.jar <path_to_scene_dir> [options]");
 		System.out.println("\n\tqgn: query geonames.org Web service");
-		System.out.println("\tlad1: display 1st level administrative division boundaries (states, provinces, ...)");
+		System.out.println("\tladN: display N-th level administrative division boundaries (countries, states, provinces, ...)");
 		System.out.println("\tair: display air traffic data");
 		System.out.println("\tfs: run application fullscreen");
 		System.out.println("\tgrid: draw a grid on top of the map");
@@ -411,7 +411,7 @@ public class WorldExplorer implements Java2DPainter {
 		boolean aa = false;
 		boolean grid = false;
 		boolean queryGN = false;
-		boolean lad1 = false;
+		short lad = -1;
 		boolean air = false;
 		for (int i=0;i<args.length;i++){
 			if (args[i].startsWith("-")){
@@ -420,7 +420,7 @@ public class WorldExplorer implements Java2DPainter {
 				else if (args[i].substring(1).equals("aa")){aa = true;}
 				else if (args[i].substring(1).equals("grid")){grid = true;}
 				else if (args[i].substring(1).equals("qgn")){queryGN = true;}
-				else if (args[i].substring(1).equals("lad1")){lad1 = true;}
+				else if (args[i].substring(1).startsWith("lad")){lad = Short.parseShort(args[i].substring(4));}
 				else if (args[i].substring(1).equals("air")){air = true;}
 				else if (args[i].substring(1).equals("h") || args[i].substring(1).equals("--help")){WorldExplorer.printCmdLineHelp();System.exit(0);}
 			}
@@ -448,7 +448,7 @@ public class WorldExplorer implements Java2DPainter {
         }
         System.out.println("--help for command line options");
         System.out.println("Using GeoTools v" + GeoTools.getVersion());
-        new WorldExplorer(queryGN, lad1, air, fs, grid, ogl, aa, xmlSceneFile);
+        new WorldExplorer(queryGN, lad, air, fs, grid, ogl, aa, xmlSceneFile);
     }
 
 }

@@ -74,7 +74,7 @@ import org.geonames.InsufficientStyleException;
 
 public class WildWorldExplorer extends WorldExplorer {
 
-    public WildWorldExplorer(boolean queryGN, boolean lad1, boolean air,
+    public WildWorldExplorer(boolean queryGN, short lad, boolean air,
                              boolean fullscreen, boolean grid, boolean opengl, boolean aa, File xmlSceneFile){
         super(queryGN, lad1, air, fullscreen, grid, opengl, aa, xmlSceneFile);
     }
@@ -142,7 +142,7 @@ public class WildWorldExplorer extends WorldExplorer {
 		boolean aa = false;
 		boolean grid = false;
 		boolean queryGN = false;
-		boolean lad1 = false;
+		short lad = false;
 		boolean air = false;
 		for (int i=0;i<args.length;i++){
 			if (args[i].startsWith("-")){
@@ -151,7 +151,7 @@ public class WildWorldExplorer extends WorldExplorer {
 				else if (args[i].substring(1).equals("aa")){aa = true;}
 				else if (args[i].substring(1).equals("grid")){grid = true;}
 				else if (args[i].substring(1).equals("qgn")){queryGN = true;}
-				else if (args[i].substring(1).equals("lad1")){lad1 = true;}
+				else if (args[i].substring(1).startsWith("lad")){lad = Short.parseShort(args[i].substring(4));}
 				else if (args[i].substring(1).equals("air")){air = true;}
 				else if (args[i].substring(1).equals("h") || args[i].substring(1).equals("--help")){WorldExplorer.printCmdLineHelp();System.exit(0);}
 			}
@@ -179,7 +179,7 @@ public class WildWorldExplorer extends WorldExplorer {
         }
         System.out.println("--help for command line options");
         System.out.println("Using GeoTools v" + GeoTools.getVersion());
-        new WildWorldExplorer(queryGN, lad1, air, fs, grid, ogl, aa, xmlSceneFile);
+        new WildWorldExplorer(queryGN, lad, air, fs, grid, ogl, aa, xmlSceneFile);
     }
 
 }

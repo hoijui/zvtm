@@ -52,10 +52,12 @@ class GeoToolsManager {
 
     int polygonID = 0;
     
-    GeoToolsManager(WorldExplorer app, boolean queryGN, boolean loadAdminDiv1){
+    GeoToolsManager(WorldExplorer app, boolean queryGN, short lad){
         this.application = app;
-        loadShapes(new File("data/TM_WORLD_BORDERS-0.3.shp"), "Loading countries...", COUNTRY_COLOR);
-        if (loadAdminDiv1){
+        if (lad >= 0){
+            loadShapes(new File("data/TM_WORLD_BORDERS-0.3.shp"), "Loading countries...", COUNTRY_COLOR);            
+        }
+        if (lad >= 1){
             loadShapes(new File("data/shapefiles/ca_provinces/province.shp"), "Loading Canadian provinces...", ADMIN_DIV_1_COLOR);
             loadShapes(new File("data/shapefiles/us_states/statesp020.shp"), "Loading US states...", ADMIN_DIV_1_COLOR);
             loadShapes(new File("data/shapefiles/mx_states/mx_state.shp"), "Loading Mexican states...", ADMIN_DIV_1_COLOR);
