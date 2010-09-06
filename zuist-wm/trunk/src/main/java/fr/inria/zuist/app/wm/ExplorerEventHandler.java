@@ -187,6 +187,14 @@ class ExplorerEventHandler implements ViewListener, CameraListener, ComponentLis
                 nm.zoomOutPhase1(jpx, jpy, lastVX, lastVY);
             }            
         }
+        else {
+            Glyph g;
+            if ((g=v.lastGlyphEntered()) != null){
+                if (g instanceof VPolygon){
+                    application.mView.centerOnGlyph(g, application.mCamera, WorldExplorer.ANIM_MOVE_DURATION);
+                }
+            }            
+        }
     }
         
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
