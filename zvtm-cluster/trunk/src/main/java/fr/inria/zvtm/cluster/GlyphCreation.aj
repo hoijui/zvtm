@@ -71,13 +71,14 @@ public aspect GlyphCreation {
 				return;
 			}
 			glyph.setParentSpace(virtualSpace);
+            glyph.setReplicated(true);
 		}
 
 	//advise VirtualSpace.addGlyph
 	after(Glyph glyph, VirtualSpace virtualSpace) returning: 
 		glyphAdd(glyph, virtualSpace) &&
+        if(glyph.isReplicated()) &&
 		!cflowbelow(glyphAdd(Glyph, VirtualSpace)){
-            glyph.setReplicated(true);
             Delta createDelta = new GlyphCreateDelta(glyph.getReplicator(),
                     glyph.getObjId(), glyph.getParentSpace().getObjId());
 			VirtualSpaceManager.INSTANCE.sendDelta(createDelta);
