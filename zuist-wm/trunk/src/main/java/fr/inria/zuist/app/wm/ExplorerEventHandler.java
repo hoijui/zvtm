@@ -312,6 +312,7 @@ class ExplorerEventHandler implements ViewListener, CameraListener, ComponentLis
         else if (code == KeyEvent.VK_B){application.gm.toggleBoundaryDisplay();}
         else if (code == KeyEvent.VK_L){application.nm.toggleLensType();}
         else if (code == KeyEvent.VK_U){application.toggleUpdateMaps();}
+        else if (code == KeyEvent.VK_A){application.ga.toggleTraffic();}
     }
 
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}

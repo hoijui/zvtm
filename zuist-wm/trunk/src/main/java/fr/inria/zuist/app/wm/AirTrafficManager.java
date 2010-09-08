@@ -22,6 +22,9 @@ import java.util.List;
 import fr.inria.zvtm.glyphs.VCircle;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.glyphs.DPath;
+import fr.inria.zvtm.animation.EndAction;
+import fr.inria.zvtm.animation.Animation;
+import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
 
 import org.antlr.runtime.ANTLRFileStream;
 import org.antlr.runtime.CommonTokenStream;
@@ -49,6 +52,8 @@ class AirTrafficManager {
 	LEdge[] allArcs;
 	
     WorldExplorer application;
+    
+    boolean isShowing = false;
     
     AirTrafficManager(WorldExplorer app, boolean show){
         this.application = app;
@@ -122,6 +127,7 @@ class AirTrafficManager {
             e.printStackTrace();
         }
         iata2airport.clear();
+        isShowing = true;
     }
     
     static final String _id = "id";
@@ -198,14 +204,32 @@ class AirTrafficManager {
 		return res;
     }
     
-    void showNetwork(){
-        for (LEdge e:allArcs){
-            
-        }
+    
+    
+    void toggleTraffic(){
+        showNetwork(!isShowing);
     }
     
-    void hideNetwork(){
-        
+    void showNetwork(boolean b){
+        for (final LEdge e:allArcs){
+            if (b){
+                application.bSpace.show(e.getSpline());
+                Animation a = application.vsm.getAnimationManager().getAnimationFactory().createTranslucencyAnim(NavigationManager.ANIM_MOVE_DURATION, e.getSpline(),
+                    1f, false, IdentityInterpolator.getInstance(), null);
+                application.vsm.getAnimationManager().startAnimation(a, false);
+            }
+            else {
+                Animation a = application.vsm.getAnimationManager().getAnimationFactory().createTranslucencyAnim(NavigationManager.ANIM_MOVE_DURATION, e.getSpline(),
+                    0, false, IdentityInterpolator.getInstance(),
+                    new EndAction(){
+                        public void	execute(Object subject, Animation.Dimension dimension){
+                            application.bSpace.show(e.getSpline());
+                        }
+                    });
+                application.vsm.getAnimationManager().startAnimation(a, false);
+            }
+        }
+        isShowing = b;
     }
     
 }
