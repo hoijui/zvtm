@@ -46,7 +46,7 @@ class GeoToolsManager {
     static final double CC = 21600 * 2 / 180.0;
 
     static final Color COUNTRY_COLOR = new Color(245,255,157);
-    static final Color COUNTRY_FILL_HIGHLIGHT_COLOR = Color.GREEN;
+    static final Color COUNTRY_FILL_HIGHLIGHT_COLOR = Color.RED;
     static final Color ADMIN_DIV_1_COLOR = new Color(151,255,151);
     
     /* type of administrative division (0=country, 1= state, province, ...) */
