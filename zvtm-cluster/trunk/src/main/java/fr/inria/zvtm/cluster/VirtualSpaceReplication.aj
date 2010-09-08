@@ -44,8 +44,10 @@ aspect VirtualSpaceReplication {
 		;
 
 	after(Camera camera) :
-		cameraMoved(camera) &&
-		!cflowbelow(cameraMoved(Camera)){
+		cameraMoved(camera) { 
+        //XXX stop-gap measure: disabled !cflowbelow to allow
+        //camera sticking
+		//&& !cflowbelow(cameraMoved(Camera)){
 			Delta delta = new CameraLocationDelta(camera.getObjId(),
 					camera.getLocation());
 			VirtualSpaceManager.INSTANCE.sendDelta(delta);	
