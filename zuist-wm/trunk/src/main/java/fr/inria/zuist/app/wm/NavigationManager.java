@@ -73,18 +73,24 @@ class NavigationManager {
 	
 	double[] scene_bounds = {0, 0, 0, 0};
 	
-	void createOverview(Region rootRegion){
-	    int ow, oh;
-	    float ar = (float)(rootRegion.getWidth() / rootRegion.getHeight());
-	    if (ar > 1){
-	        // wider than high
-	        ow = MAX_OVERVIEW_WIDTH;
-	        oh = Math.round(ow/ar);
+	void createOverview(){
+        int ow = MAX_OVERVIEW_WIDTH;
+        int oh = MAX_OVERVIEW_HEIGHT;
+	    Region[] rootRegions = application.sm.getRegionsAtLevel(0);
+	    if (rootRegions != null){
+    	    float ar = (float)(rootRegions[0].getWidth() / rootRegions[0].getHeight());
+    	    if (ar > 1){
+    	        // wider than high
+    	        oh = Math.round(ow/ar);
+    	    }
+    	    else {
+    	        // higher than wide
+    	        ow = Math.round(oh*ar);
+    	    }	        
 	    }
 	    else {
-	        // higher than wide
-	        oh = MAX_OVERVIEW_HEIGHT;
-	        ow = Math.round(oh*ar);
+	        ow = 1;
+	        oh = 1;
 	    }
 		ovPortal = new OverviewPortal(application.panelWidth-ow-1, application.panelHeight-oh-1, ow, oh, application.ovCamera, application.mCamera);
 		ovPortal.setPortalListener(application.eh);

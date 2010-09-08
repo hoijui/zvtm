@@ -118,7 +118,7 @@ public class WorldExplorer implements Java2DPainter {
     TranslucentTextArea console;
 
     public WorldExplorer(boolean queryGN, short lad, boolean air,
-                         boolean fullscreen, boolean grid, boolean opengl, boolean aa, File xmlSceneFile){
+                         boolean fullscreen, boolean opengl, boolean aa, File xmlSceneFile){
         nm = new NavigationManager(this);
         initGUI(fullscreen, opengl, aa);
         gp = new WEGlassPane(this);
@@ -127,10 +127,10 @@ public class WorldExplorer implements Java2DPainter {
         gp.setVisible(true);
         VirtualSpace[]  sceneSpaces = {mSpace};
         Camera[] sceneCameras = {mCamera};
-		//vsm.addGlyph(new VImage(0, 0, 0, (new ImageIcon(PATH_TO_HIERARCHY+"/0-0-0-0-0.jpg")).getImage(), 20), mSpace);
-        sm = new SceneManager(sceneSpaces, sceneCameras);
-        sm.loadScene(parseXML(xmlSceneFile), xmlSceneFile.getParentFile(), true, gp);
-        if (grid){buildGrid();}
+		sm = new SceneManager(sceneSpaces, sceneCameras);
+		if (xmlSceneFile != null){
+            sm.loadScene(parseXML(xmlSceneFile), xmlSceneFile.getParentFile(), true, gp);
+		}
         gm = new GeoToolsManager(this, queryGN, lad);
         ga = new AirTrafficManager(this, air);
         gp.setVisible(false);
@@ -144,7 +144,7 @@ public class WorldExplorer implements Java2DPainter {
            };
         getGlobalView(ea);
         eh.cameraMoved(mCamera, null, 0);
-		nm.createOverview(sm.getRegionsAtLevel(0)[0]);
+		nm.createOverview();
 		nm.updateOverview();
         console.setVisible(true);
     }
@@ -205,24 +205,7 @@ public class WorldExplorer implements Java2DPainter {
         VIEW_W = (SCREEN_WIDTH <= VIEW_MAX_W) ? SCREEN_WIDTH : VIEW_MAX_W;
         VIEW_H = (SCREEN_HEIGHT <= VIEW_MAX_H) ? SCREEN_HEIGHT : VIEW_MAX_H;
     }
-    
-    static final int GRID_STEP = 2160;
-    
-    void buildGrid(){
-        for (int i=-43200;i<=43200;){
-            VSegment s = new VSegment(i, 0, 0, 21600, 0, Color.RED);
-            s.setSensitivity(false);
-            bSpace.addGlyph(s);
-            i += GRID_STEP;
-        }
-        for (int i=-21600;i<=21600;){
-            VSegment s = new VSegment(0, i, 43200, 0, 0, Color.RED);
-            s.setSensitivity(false);
-            bSpace.addGlyph(s);
-            i += GRID_STEP;
-        }
-    }
-    
+        
     ClosedShape selectedFeature = null;
     
     void displayFeatureInfo(Toponym feature, Glyph g){
@@ -255,6 +238,10 @@ public class WorldExplorer implements Java2DPainter {
     }
     
     /*-------------     Navigation       -------------*/
+    
+    boolean isDynaspotEnabled(){
+        return true;
+    }
 
     void getGlobalView(EndAction ea){
         sm.getGlobalView(mCamera, WorldExplorer.ANIM_MOVE_DURATION, ea);
@@ -398,7 +385,6 @@ public class WorldExplorer implements Java2DPainter {
 		System.out.println("\tladN: display N-th level administrative division boundaries (countries, states, provinces, ...)");
 		System.out.println("\tair: display air traffic data");
 		System.out.println("\tfs: run application fullscreen");
-		System.out.println("\tgrid: draw a grid on top of the map");
 		System.out.println("\topengl: use Java2D OpenGL pipeline for rendering");
         System.out.println("\t-aa: enable antialiasing");
 		System.exit(0);
@@ -409,7 +395,6 @@ public class WorldExplorer implements Java2DPainter {
 		boolean fs = false;
 		boolean ogl = false;
 		boolean aa = false;
-		boolean grid = false;
 		boolean queryGN = false;
 		short lad = -1;
 		boolean air = false;
@@ -418,7 +403,6 @@ public class WorldExplorer implements Java2DPainter {
 				if (args[i].substring(1).equals("fs")){fs = true;}
 				else if (args[i].substring(1).equals("opengl")){ogl = true;}
 				else if (args[i].substring(1).equals("aa")){aa = true;}
-				else if (args[i].substring(1).equals("grid")){grid = true;}
 				else if (args[i].substring(1).equals("qgn")){queryGN = true;}
 				else if (args[i].substring(1).startsWith("lad")){lad = Short.parseShort(args[i].substring(4));}
 				else if (args[i].substring(1).equals("air")){air = true;}
@@ -448,7 +432,7 @@ public class WorldExplorer implements Java2DPainter {
         }
         System.out.println("--help for command line options");
         System.out.println("Using GeoTools v" + GeoTools.getVersion());
-        new WorldExplorer(queryGN, lad, air, fs, grid, ogl, aa, xmlSceneFile);
+        new WorldExplorer(queryGN, lad, air, fs, ogl, aa, xmlSceneFile);
     }
 
 }

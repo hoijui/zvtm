@@ -122,7 +122,7 @@ class ExplorerEventHandler implements ViewListener, CameraListener, ComponentLis
             }
 		}
 		else {
-		    if (v.getVCursor().getDynaSpotRadius() > 0){return;}
+		    if (application.isDynaspotEnabled() && v.getVCursor().getDynaSpotRadius() > 0){return;}
 		    selectingRegion = true;
 			x1 = v.getVCursor().vx;
 			y1 = v.getVCursor().vy;
@@ -131,7 +131,7 @@ class ExplorerEventHandler implements ViewListener, CameraListener, ComponentLis
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-        if (!inPortal && !v.getVCursor().isDynaSpotActivated()){v.getVCursor().activateDynaSpot(true);}
+        if (application.isDynaspotEnabled() && !inPortal && !v.getVCursor().isDynaSpotActivated()){v.getVCursor().activateDynaSpot(true);}
 		regionStickedToMouse = false;
 	    if (selectingRegion){
 			v.setDrawRect(false);
@@ -147,8 +147,10 @@ class ExplorerEventHandler implements ViewListener, CameraListener, ComponentLis
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
         lastVX = v.getVCursor().vx;
     	lastVY = v.getVCursor().vy;
-    	Glyph g = v.getVCursor().dynaPick(application.bCamera);
-    	application.displayFeatureInfo((g != null) ? (Toponym)g.getOwner() : null, g);
+    	if (application.isDynaspotEnabled()){
+        	Glyph g = v.getVCursor().dynaPick(application.bCamera);
+        	application.displayFeatureInfo((g != null) ? (Toponym)g.getOwner() : null, g);    	    
+    	}
     }
 
     public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
@@ -167,7 +169,7 @@ class ExplorerEventHandler implements ViewListener, CameraListener, ComponentLis
 
     public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
         panning = false;
-        if (!v.getVCursor().isDynaSpotActivated()){v.getVCursor().activateDynaSpot(true);}
+        if (application.isDynaspotEnabled() && !v.getVCursor().isDynaSpotActivated()){v.getVCursor().activateDynaSpot(true);}
     }
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
@@ -221,12 +223,14 @@ class ExplorerEventHandler implements ViewListener, CameraListener, ComponentLis
     	if (nm.lensType != 0 && nm.lens != null){
     	    nm.moveLens(jpx, jpy, e.getWhen());
     	}
-    	v.getVCursor().dynaPick(application.bCamera);
+    	if (application.isDynaspotEnabled()){
+        	v.getVCursor().dynaPick(application.bCamera);    	    
+    	}
     }
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
         if (panning){
-            if (v.getVCursor().isDynaSpotActivated()){v.getVCursor().activateDynaSpot(false);}
+            if (application.isDynaspotEnabled() && v.getVCursor().isDynaSpotActivated()){v.getVCursor().activateDynaSpot(false);}
             double a = (application.mCamera.focal+Math.abs(application.mCamera.altitude)) / application.mCamera.focal;
             synchronized(application.mCamera){
                 application.mCamera.move(a*(lastJPX-jpx), a*(jpy-lastJPY));
@@ -247,7 +251,7 @@ class ExplorerEventHandler implements ViewListener, CameraListener, ComponentLis
 			lastJPY = jpy;
 		}
 		else if (selectingRegion){
-		    if (v.getVCursor().isDynaSpotActivated()){v.getVCursor().activateDynaSpot(false);}
+		    if (application.isDynaspotEnabled() && v.getVCursor().isDynaSpotActivated()){v.getVCursor().activateDynaSpot(false);}
 		}
     }
 
@@ -355,14 +359,18 @@ class ExplorerEventHandler implements ViewListener, CameraListener, ComponentLis
 
 	/* Overview Portal */
 	public void enterPortal(Portal p){
-	    application.mView.getCursor().activateDynaSpot(false);
+	    if (application.isDynaspotEnabled()){
+    	    application.mView.getCursor().activateDynaSpot(false);	        
+	    }
 		inPortal = true;
 		((OverviewPortal)p).setBorder(NavigationManager.OV_INSIDE_BORDER_COLOR);
 		application.vsm.repaint();
 	}
 
 	public void exitPortal(Portal p){
-	    application.mView.getCursor().activateDynaSpot(true);
+	    if (application.isDynaspotEnabled()){
+    	    application.mView.getCursor().activateDynaSpot(true);	        
+	    }
 		inPortal = false;
 		((OverviewPortal)p).setBorder(NavigationManager.OV_BORDER_COLOR);
 		application.vsm.repaint();

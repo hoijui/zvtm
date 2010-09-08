@@ -75,8 +75,8 @@ import org.geonames.InsufficientStyleException;
 public class WildWorldExplorer extends WorldExplorer {
 
     public WildWorldExplorer(boolean queryGN, short lad, boolean air,
-                             boolean fullscreen, boolean grid, boolean opengl, boolean aa, File xmlSceneFile){
-        super(queryGN, lad, air, fullscreen, grid, opengl, aa, xmlSceneFile);
+                             boolean fullscreen, boolean opengl, boolean aa, File xmlSceneFile){
+        super(queryGN, lad, air, fullscreen, opengl, aa, xmlSceneFile);
     }
 
     void initGUI(boolean fullscreen, boolean opengl, boolean aa){
@@ -107,19 +107,19 @@ public class WildWorldExplorer extends WorldExplorer {
         mView.setBackgroundColor(BACKGROUND_COLOR);
 		mView.getCursor().setColor(Color.WHITE);
 		mView.getCursor().setHintColor(Color.WHITE);
-		mView.getCursor().setDynaSpotColor(Color.WHITE);
-        mView.getCursor().setDynaSpotLagTime(200);
-		mView.getCursor().activateDynaSpot(true);
+		//mView.getCursor().setDynaSpotColor(Color.WHITE);
+        //mView.getCursor().setDynaSpotLagTime(200);
+		//mView.getCursor().activateDynaSpot(true);
         mView.setJava2DPainter(this, Java2DPainter.AFTER_PORTALS);
         updatePanelSize();
         
-        //ClusterGeometry cg = new ClusterGeometry(2680, 1700, 8, 4);
-        ClusterGeometry cg = new ClusterGeometry(600,400,1,1);
+        ClusterGeometry cg = new ClusterGeometry(2680, 1700, 8, 4);
+        //ClusterGeometry cg = new ClusterGeometry(600,400,1,1);
         Vector ccameras = new Vector();
         ccameras.add(mCamera);
         ccameras.add(bCamera);
-        //ClusteredView cv = new ClusteredView(cg, 3, 8, 4, ccameras);
-        ClusteredView cv = new ClusteredView(cg, 0, 1, 1, ccameras);
+        ClusteredView cv = new ClusteredView(cg, 3, 8, 4, ccameras);
+        //ClusteredView cv = new ClusteredView(cg, 0, 1, 1, ccameras);
         vsm.addClusteredView(cv);
         
         // console
@@ -134,13 +134,16 @@ public class WildWorldExplorer extends WorldExplorer {
         mView.setActiveLayer(1);
         mView.getPanel().addComponentListener(eh);
     }
+    
+    boolean isDynaspotEnabled(){
+        return false;
+    }
 
     public static void main(String[] args){
         File xmlSceneFile = null;
 		boolean fs = false;
 		boolean ogl = false;
 		boolean aa = false;
-		boolean grid = false;
 		boolean queryGN = false;
 		short lad = -1;
 		boolean air = false;
@@ -149,7 +152,6 @@ public class WildWorldExplorer extends WorldExplorer {
 				if (args[i].substring(1).equals("fs")){fs = true;}
 				else if (args[i].substring(1).equals("opengl")){ogl = true;}
 				else if (args[i].substring(1).equals("aa")){aa = true;}
-				else if (args[i].substring(1).equals("grid")){grid = true;}
 				else if (args[i].substring(1).equals("qgn")){queryGN = true;}
 				else if (args[i].substring(1).startsWith("lad")){lad = Short.parseShort(args[i].substring(4));}
 				else if (args[i].substring(1).equals("air")){air = true;}
@@ -179,7 +181,7 @@ public class WildWorldExplorer extends WorldExplorer {
         }
         System.out.println("--help for command line options");
         System.out.println("Using GeoTools v" + GeoTools.getVersion());
-        new WildWorldExplorer(queryGN, lad, air, fs, grid, ogl, aa, xmlSceneFile);
+        new WildWorldExplorer(queryGN, lad, air, fs, ogl, aa, xmlSceneFile);
     }
 
 }
