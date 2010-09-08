@@ -48,7 +48,6 @@ import fr.inria.zvtm.engine.Java2DPainter;
 import fr.inria.zvtm.widgets.TranslucentTextArea;
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.EndAction;
-import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 
 import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zuist.engine.ProgressListener;
@@ -90,13 +89,6 @@ public class WorldExplorer implements Java2DPainter {
     boolean SHOW_MEMORY_USAGE = false;
     
     boolean UPDATE_MAPS = true;
-    
-    /* Navigation constants */
-    static final int ANIM_MOVE_DURATION = 300;
-    static final short MOVE_UP = 0;
-    static final short MOVE_DOWN = 1;
-    static final short MOVE_LEFT = 2;
-    static final short MOVE_RIGHT = 3;
     
     /* ZVTM objects */
     VirtualSpaceManager vsm;
@@ -142,7 +134,7 @@ public class WorldExplorer implements Java2DPainter {
                    sm.enableRegionUpdater(true);
                }
            };
-        getGlobalView(ea);
+        nm.getGlobalView(ea);
         eh.cameraMoved(mCamera, null, 0);
 		nm.createOverview();
 		nm.updateOverview();
@@ -243,54 +235,6 @@ public class WorldExplorer implements Java2DPainter {
         return true;
     }
 
-    void getGlobalView(EndAction ea){
-        sm.getGlobalView(mCamera, WorldExplorer.ANIM_MOVE_DURATION, ea);
-    }
-
-    /* Higher view */
-    void getHigherView(){
-        Float alt = new Float(mCamera.getAltitude() + mCamera.getFocal());
-        //vsm.animator.createCameraAnimation(WorldExplorer.ANIM_MOVE_DURATION, AnimManager.CA_ALT_SIG, alt, mCamera.getID());
-        Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(WorldExplorer.ANIM_MOVE_DURATION, mCamera,
-            alt, true, SlowInSlowOutInterpolator.getInstance(), null);
-        vsm.getAnimationManager().startAnimation(a, false);
-    }
-
-    /* Higher view */
-    void getLowerView(){
-        Float alt=new Float(-(mCamera.getAltitude() + mCamera.getFocal())/2.0f);
-        //vsm.animator.createCameraAnimation(WorldExplorer.ANIM_MOVE_DURATION, AnimManager.CA_ALT_SIG, alt, mCamera.getID());
-        Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(WorldExplorer.ANIM_MOVE_DURATION, mCamera,
-            alt, true, SlowInSlowOutInterpolator.getInstance(), null);
-        vsm.getAnimationManager().startAnimation(a, false);
-    }
-
-    /* Direction should be one of WorldExplorer.MOVE_* */
-    void translateView(short direction){
-        Point2D.Double trans;
-        double[] rb = mView.getVisibleRegion(mCamera);
-        if (direction==MOVE_UP){
-            double qt = (rb[1]-rb[3])/4.0;
-            trans = new Point2D.Double(0,qt);
-        }
-        else if (direction==MOVE_DOWN){
-            double qt = (rb[3]-rb[1])/4.0;
-            trans = new Point2D.Double(0,qt);
-        }
-        else if (direction==MOVE_RIGHT){
-            double qt = (rb[2]-rb[0])/4.0;
-            trans = new Point2D.Double(qt,0);
-        }
-        else {
-            // direction==MOVE_LEFT
-            double qt = (rb[0]-rb[2])/4.0;
-            trans = new Point2D.Double(qt,0);
-        }
-        //vsm.animator.createCameraAnimation(WorldExplorer.ANIM_MOVE_DURATION, AnimManager.CA_TRANS_SIG, trans, mCamera.getID());
-        Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(WorldExplorer.ANIM_MOVE_DURATION, mCamera,
-            trans, true, SlowInSlowOutInterpolator.getInstance(), null);
-        vsm.getAnimationManager().startAnimation(a, false);
-    }
     
     void altitudeChanged(){}
     

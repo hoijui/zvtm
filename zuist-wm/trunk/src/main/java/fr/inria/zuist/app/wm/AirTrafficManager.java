@@ -198,6 +198,16 @@ class AirTrafficManager {
 		return res;
     }
     
+    void showNetwork(){
+        for (LEdge e:allArcs){
+            
+        }
+    }
+    
+    void hideNetwork(){
+        
+    }
+    
 }
 
 class Airport {

@@ -24,10 +24,18 @@ import fr.inria.zvtm.engine.portals.OverviewPortal;
 import fr.inria.zvtm.animation.EndAction;
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
+import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 import fr.inria.zuist.engine.Region;
 
 class NavigationManager {
 
+    /* Navigation constants */
+    static final int ANIM_MOVE_DURATION = 300;
+    static final short MOVE_UP = 0;
+    static final short MOVE_DOWN = 1;
+    static final short MOVE_LEFT = 2;
+    static final short MOVE_RIGHT = 3;
+    
     /* misc. lens settings */
     Lens lens;
     TemporalLens tLens;
@@ -55,9 +63,62 @@ class NavigationManager {
     static final float FLOOR_ALTITUDE = 100.0f;
 
     WorldExplorer application;
+    VirtualSpaceManager vsm;
     
     NavigationManager(WorldExplorer app){
         this.application = app;
+        vsm = VirtualSpaceManager.INSTANCE;
+    }
+
+	/* -------------- pan-zoom ------------------- */
+
+    void getGlobalView(EndAction ea){
+        application.sm.getGlobalView(application.mCamera, NavigationManager.ANIM_MOVE_DURATION, ea);
+    }
+
+    /* Higher view */
+    void getHigherView(){
+        Float alt = new Float(application.mCamera.getAltitude() + application.mCamera.getFocal());
+        //vsm.animator.createCameraAnimation(NavigationManager.ANIM_MOVE_DURATION, AnimManager.CA_ALT_SIG, alt, mCamera.getID());
+        Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(NavigationManager.ANIM_MOVE_DURATION, application.mCamera,
+            alt, true, SlowInSlowOutInterpolator.getInstance(), null);
+        vsm.getAnimationManager().startAnimation(a, false);
+    }
+
+    /* Higher view */
+    void getLowerView(){
+        Float alt=new Float(-(application.mCamera.getAltitude() + application.mCamera.getFocal())/2.0f);
+        //vsm.animator.createCameraAnimation(NavigationManager.ANIM_MOVE_DURATION, AnimManager.CA_ALT_SIG, alt, mCamera.getID());
+        Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(NavigationManager.ANIM_MOVE_DURATION, application.mCamera,
+            alt, true, SlowInSlowOutInterpolator.getInstance(), null);
+        vsm.getAnimationManager().startAnimation(a, false);
+    }
+
+    /* Direction should be one of WorldExplorer.MOVE_* */
+    void translateView(short direction){
+        Point2D.Double trans;
+        double[] rb = application.mView.getVisibleRegion(application.mCamera);
+        if (direction==MOVE_UP){
+            double qt = (rb[1]-rb[3])/4.0;
+            trans = new Point2D.Double(0,qt);
+        }
+        else if (direction==MOVE_DOWN){
+            double qt = (rb[3]-rb[1])/4.0;
+            trans = new Point2D.Double(0,qt);
+        }
+        else if (direction==MOVE_RIGHT){
+            double qt = (rb[2]-rb[0])/4.0;
+            trans = new Point2D.Double(qt,0);
+        }
+        else {
+            // direction==MOVE_LEFT
+            double qt = (rb[0]-rb[2])/4.0;
+            trans = new Point2D.Double(qt,0);
+        }
+        //vsm.animator.createCameraAnimation(NavigationManager.ANIM_MOVE_DURATION, AnimManager.CA_TRANS_SIG, trans, mCamera.getID());
+        Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(NavigationManager.ANIM_MOVE_DURATION, application.mCamera,
+            trans, true, SlowInSlowOutInterpolator.getInstance(), null);
+        vsm.getAnimationManager().startAnimation(a, false);
     }
 
 	/* -------------- Overview ------------------- */
@@ -114,7 +175,7 @@ class NavigationManager {
     		}
     		if (l > -1){
     			scene_bounds = application.sm.getLevel(l).getBounds();
-    	        ovPortal.centerOnRegion(WorldExplorer.ANIM_MOVE_DURATION, scene_bounds[0], scene_bounds[1], scene_bounds[2], scene_bounds[3]);		
+    	        ovPortal.centerOnRegion(NavigationManager.ANIM_MOVE_DURATION, scene_bounds[0], scene_bounds[1], scene_bounds[2], scene_bounds[3]);		
     		}
 		}
 	}

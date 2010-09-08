@@ -44,6 +44,10 @@ class GeoToolsManager {
     static final Color COUNTRY_COLOR = new Color(245,255,157);
     static final Color COUNTRY_FILL_HIGHLIGHT_COLOR = Color.GREEN;
     static final Color ADMIN_DIV_1_COLOR = new Color(151,255,151);
+    
+    /* type of administrative division (0=country, 1= state, province, ...) */
+    static final String LAD0 = "AD0";
+    static final String LAD1 = "AD1";
 
     WorldExplorer application;
     GeoNamesParser gnp;
@@ -55,14 +59,14 @@ class GeoToolsManager {
     GeoToolsManager(WorldExplorer app, boolean queryGN, short lad){
         this.application = app;
         if (lad >= 0){
-            loadShapes(new File("data/TM_WORLD_BORDERS-0.3.shp"), "Loading countries...", COUNTRY_COLOR);            
+            loadShapes(new File("data/TM_WORLD_BORDERS-0.3.shp"), "Loading countries...", COUNTRY_COLOR, LAD0);
         }
         if (lad >= 1){
-            loadShapes(new File("data/shapefiles/ca_provinces/province.shp"), "Loading Canadian provinces...", ADMIN_DIV_1_COLOR);
-            loadShapes(new File("data/shapefiles/us_states/statesp020.shp"), "Loading US states...", ADMIN_DIV_1_COLOR);
-            loadShapes(new File("data/shapefiles/mx_states/mx_state.shp"), "Loading Mexican states...", ADMIN_DIV_1_COLOR);
-            loadShapes(new File("data/shapefiles/russia/RUS1.shp"), "Loading Russian administrative divisions...", ADMIN_DIV_1_COLOR);
-            loadShapes(new File("data/shapefiles/china/CHN1.shp"), "Loading Chinese administrative divisions...", ADMIN_DIV_1_COLOR);            
+            loadShapes(new File("data/shapefiles/ca_provinces/province.shp"), "Loading Canadian provinces...", ADMIN_DIV_1_COLOR, LAD1);
+            loadShapes(new File("data/shapefiles/us_states/statesp020.shp"), "Loading US states...", ADMIN_DIV_1_COLOR, LAD1);
+            loadShapes(new File("data/shapefiles/mx_states/mx_state.shp"), "Loading Mexican states...", ADMIN_DIV_1_COLOR, LAD1);
+            loadShapes(new File("data/shapefiles/russia/RUS1.shp"), "Loading Russian administrative divisions...", ADMIN_DIV_1_COLOR, LAD1);
+            loadShapes(new File("data/shapefiles/china/CHN1.shp"), "Loading Chinese administrative divisions...", ADMIN_DIV_1_COLOR, LAD1);
         }
         gnp = new GeoNamesParser(application);
         if (queryGN){
@@ -70,7 +74,7 @@ class GeoToolsManager {
         }
     }
 
-    void loadShapes(File shapeFile, String msg, Color shapeColor){
+    void loadShapes(File shapeFile, String msg, Color shapeColor, String bt){
         int progress = 0;
         application.gp.setValue(0);
         application.gp.setLabel(msg);
@@ -113,6 +117,7 @@ class GeoToolsManager {
                                 }
                                 VPolygon polygon = new VPolygon(zvtmCoords, 0, COUNTRY_FILL_HIGHLIGHT_COLOR, shapeColor, 1.0f);
                                 polygon.setFilled(false);
+                                polygon.setType(bt);
                                 application.bSpace.addGlyph(polygon);
                                 //application.sm.createClosedShapeDescription(polygon, "B"+Integer.toString(polygonID++),
                                 //    polygon.getZindex(),

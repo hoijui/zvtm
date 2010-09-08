@@ -138,7 +138,7 @@ class ExplorerEventHandler implements ViewListener, CameraListener, ComponentLis
 			x2 = v.getVCursor().vx;
 			y2 = v.getVCursor().vy;
 			if ((Math.abs(x2-x1)>=4) && (Math.abs(y2-y1)>=4)){
-				application.mCamera.getOwningView().centerOnRegion(application.mCamera, WorldExplorer.ANIM_MOVE_DURATION, x1, y1, x2, y2);
+				application.mCamera.getOwningView().centerOnRegion(application.mCamera, NavigationManager.ANIM_MOVE_DURATION, x1, y1, x2, y2);
 			}
 			selectingRegion = false;
 		}
@@ -193,7 +193,7 @@ class ExplorerEventHandler implements ViewListener, CameraListener, ComponentLis
             Glyph g;
             if ((g=v.lastGlyphEntered()) != null){
                 if (g instanceof VPolygon){
-                    application.mView.centerOnGlyph(g, application.mCamera, WorldExplorer.ANIM_MOVE_DURATION);
+                    application.mView.centerOnGlyph(g, application.mCamera, NavigationManager.ANIM_MOVE_DURATION);
                 }
             }            
         }
@@ -300,13 +300,13 @@ class ExplorerEventHandler implements ViewListener, CameraListener, ComponentLis
     int ci = 1180;
 
     public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
-        if (code==KeyEvent.VK_PAGE_UP){application.getHigherView();}
-    	else if (code==KeyEvent.VK_PAGE_DOWN){application.getLowerView();}
-    	else if (code==KeyEvent.VK_HOME){application.getGlobalView(null);}
-    	else if (code==KeyEvent.VK_UP){application.translateView(WorldExplorer.MOVE_UP);}
-    	else if (code==KeyEvent.VK_DOWN){application.translateView(WorldExplorer.MOVE_DOWN);}
-    	else if (code==KeyEvent.VK_LEFT){application.translateView(WorldExplorer.MOVE_LEFT);}
-    	else if (code==KeyEvent.VK_RIGHT){application.translateView(WorldExplorer.MOVE_RIGHT);}
+        if (code==KeyEvent.VK_PAGE_UP){application.nm.getHigherView();}
+    	else if (code==KeyEvent.VK_PAGE_DOWN){application.nm.getLowerView();}
+    	else if (code==KeyEvent.VK_HOME){application.nm.getGlobalView(null);}
+    	else if (code==KeyEvent.VK_UP){application.nm.translateView(NavigationManager.MOVE_UP);}
+    	else if (code==KeyEvent.VK_DOWN){application.nm.translateView(NavigationManager.MOVE_DOWN);}
+    	else if (code==KeyEvent.VK_LEFT){application.nm.translateView(NavigationManager.MOVE_LEFT);}
+    	else if (code==KeyEvent.VK_RIGHT){application.nm.translateView(NavigationManager.MOVE_RIGHT);}
         else if (code == KeyEvent.VK_F1){application.toggleMemoryUsageDisplay();}
         else if (code == KeyEvent.VK_F2){application.gc();}
         else if (code == KeyEvent.VK_B){application.gm.toggleBoundaryDisplay();}
