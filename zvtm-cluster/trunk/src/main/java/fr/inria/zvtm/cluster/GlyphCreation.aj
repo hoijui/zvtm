@@ -416,10 +416,10 @@ public aspect GlyphCreation {
 		}
 	}
 
-	private static class DPathReplicator extends AbstractGlyphReplicator {
+    static class DPathReplicator extends AbstractGlyphReplicator {
 		//note that GeneralPath is only serializable
 		//starting with Java 1.6
-		private final GeneralPath path;
+		protected final GeneralPath path;
 
 		DPathReplicator(DPath source){
 			super(source);
