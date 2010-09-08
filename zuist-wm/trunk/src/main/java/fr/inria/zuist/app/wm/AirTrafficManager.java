@@ -211,6 +211,7 @@ class AirTrafficManager {
     }
     
     void showNetwork(boolean b){
+        if (allArcs == null){return;}
         for (final LEdge e:allArcs){
             if (b){
                 application.bSpace.show(e.getSpline());
@@ -223,10 +224,20 @@ class AirTrafficManager {
                     0, false, IdentityInterpolator.getInstance(),
                     new EndAction(){
                         public void	execute(Object subject, Animation.Dimension dimension){
-                            application.bSpace.show(e.getSpline());
+                            application.bSpace.hide(e.getSpline());
                         }
                     });
                 application.vsm.getAnimationManager().startAnimation(a, false);
+            }
+        }
+        for (final LNode e:allNodes){
+            if (b){
+                application.bSpace.show(e.getShape());
+                application.bSpace.show(e.getLabel());
+            }
+            else {
+                application.bSpace.hide(e.getShape());
+                application.bSpace.hide(e.getLabel());
             }
         }
         isShowing = b;
