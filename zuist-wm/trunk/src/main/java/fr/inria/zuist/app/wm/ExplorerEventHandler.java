@@ -234,7 +234,6 @@ class ExplorerEventHandler implements ViewListener, CameraListener, ComponentLis
             double a = (application.mCamera.focal+Math.abs(application.mCamera.altitude)) / application.mCamera.focal;
             synchronized(application.mCamera){
                 application.mCamera.move(a*(lastJPX-jpx), a*(jpy-lastJPY));
-                application.bCamera.move(a*(lastJPX-jpx), a*(jpy-lastJPY));
                 lastJPX = jpx;
                 lastJPY = jpy;
 				cameraMoved(application.mCamera, null, 0);
