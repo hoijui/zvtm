@@ -72,6 +72,14 @@ public class GPath extends DPath {
         this.gradientColors = gc;
         this.gradientDist = gd;
     }
+
+    public Color[] peekGradientColors(){
+        return gradientColors;
+    }
+
+    public float[] peekGradientSteps(){
+        return gradientDist;
+    }
     
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
         if (alphaC != null && alphaC.getAlpha() == 0){return;}

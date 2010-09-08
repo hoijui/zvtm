@@ -4,7 +4,7 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
 -->
 
 <!--
- 
+
  Use profile 'wild' to build zvtm-nodetrix to run on the WILD wall-sized display [1].
  [1] http://insitu.lri.fr/Projects/WILD
 
@@ -13,200 +13,229 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
 
  Use the default profile otherwise
 
-	mvn package
-	
+    mvn package
+
 -->
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" 
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>fr.inria.zvtm</groupId>
-  <artifactId>zvtm-nodetrix</artifactId>
-  <packaging>jar</packaging>
-  <name>ZVTM-NODETRIX</name>
-  <version>0.3.0-SNAPSHOT</version>
-  <url>http://zvtm.sourceforge.net</url>
-  <licenses>
-    <license>
-      <name>GNU Lesser General Public License (LGPL)</name>
-      <url>http://www.gnu.org/licenses/lgpl.html</url>
-      <distribution>repo</distribution>
-    </license>
-  </licenses>
-  <scm>
-    <url>https://zvtm.svn.sourceforge.net/svnroot/zvtm</url>
-  </scm>
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>fr.inria.zvtm</groupId>
+    <artifactId>zvtm-nodetrix</artifactId>
+    <packaging>jar</packaging>
+    <name>ZVTM-NODETRIX</name>
+    <version>0.3.0-SNAPSHOT</version>
+    <url>http://zvtm.sourceforge.net</url>
+    <licenses>
+        <license>
+            <name>GNU Lesser General Public License (LGPL)</name>
+            <url>http://www.gnu.org/licenses/lgpl.html</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <scm>
+        <url>https://zvtm.svn.sourceforge.net/svnroot/zvtm</url>
+    </scm>
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
-  <!-- Repositories -->
-  <repositories>
-	<repository>
-      <id>zvtm repository</id>
-      <url>http://zvtm.sourceforge.net/maven</url>
-    </repository>
-    <repository>
-      <id>central</id>
-      <name>Maven Repository</name>
-      <url>http://repo1.maven.org/maven2</url>
-    </repository>
-  </repositories>
-  
-  <!-- Distribution - Deploy to FTP -->
-  <distributionManagement>
-	<repository>
-      <id>zvtm.sf.net</id>
-      <url>scp://shell.sourceforge.net/home/groups/z/zv/zvtm/htdocs/maven</url>
-    </repository>
-  </distributionManagement>
-  
-  <profiles>
-	<profile>
-		<!-- mvn -P main ... -->
-		<id>main</id>
-		<activation>
-          <activeByDefault>true</activeByDefault>
-        </activation>
-	    <dependencies>
-	      <dependency>
-	        <groupId>fr.inria.zvtm</groupId>
-	        <artifactId>zvtm-core</artifactId>
-	        <version>0.11.0-SNAPSHOT</version>
-	      </dependency>
-	    </dependencies>
-		<build>
-			<plugins>
-		      <plugin>
-		        <groupId>org.apache.maven.plugins</groupId>
-		        <artifactId>maven-compiler-plugin</artifactId>
-		        <configuration>
-		          <source>1.6</source>
-		          <target>1.6</target>
-		          <excludes>
-		            <exclude>**/*WILD*.java</exclude>
-		          </excludes>
-		        </configuration>
-		      </plugin>
-		     <plugin>
-		        <groupId>org.apache.maven.plugins</groupId>
-		        <artifactId>maven-jar-plugin</artifactId>
-		        <configuration>
-		          <archive>
-		            <manifest>
-		              <mainClass>fr.inria.zvtm.nodetrix.viewer.Viewer</mainClass>
-		              <packageName>fr.inria.zvtm.nodetrix.viewer</packageName>
-		              <addClasspath>true</addClasspath>
-		            </manifest>
-		            <manifestEntries>
-		              <mode>development</mode>
-		              <url>${pom.url}</url>
-		            </manifestEntries>
-		          </archive>
-		        </configuration>
-		      </plugin>
-			</plugins>
-		</build>
-	</profile>
-	<profile>
-		<!-- mvn -P wild ... -->
-		<id>wild</id>
-		<dependencies>
-		  <dependency>
-	        <groupId>fr.inria.zvtm</groupId>
-	        <artifactId>zvtm-cluster</artifactId>
-	        <version>0.2.5-SNAPSHOT</version>
-	      </dependency>
-        </dependencies>
-		<build>
-			<plugins>
-		      <plugin>
-		        <groupId>org.apache.maven.plugins</groupId>
-		        <artifactId>maven-compiler-plugin</artifactId>
-		        <configuration>
-		          <source>1.6</source>
-		          <target>1.6</target>
-		        </configuration>
-		      </plugin>
-		     <plugin>
-		        <groupId>org.apache.maven.plugins</groupId>
-		        <artifactId>maven-jar-plugin</artifactId>
-		        <configuration>
-		          <archive>
-		            <manifest>
-		              <mainClass>fr.inria.zvtm.nodetrix.viewer.WILDViewer</mainClass>
-		              <packageName>fr.inria.zvtm.nodetrix.viewer</packageName>
-		              <addClasspath>true</addClasspath>
-		            </manifest>
-		            <manifestEntries>
-		              <mode>development</mode>
-		              <url>${pom.url}</url>
-		            </manifestEntries>
-		          </archive>
-		        </configuration>
-		      </plugin>
-			</plugins>
-		</build>
-	</profile>
+    <!-- Repositories -->
+    <repositories>
+        <repository>
+            <id>zvtm repository</id>
+            <url>http://zvtm.sourceforge.net/maven</url>
+        </repository>
+        <repository>
+            <id>central</id>
+            <name>Maven Repository</name>
+            <url>http://repo1.maven.org/maven2</url>
+        </repository>
+    </repositories>
+
+    <!-- Distribution - Deploy to FTP -->
+    <distributionManagement>
+        <repository>
+            <id>zvtm.sf.net</id>
+            <url>scp://shell.sourceforge.net/home/groups/z/zv/zvtm/htdocs/maven</url>
+        </repository>
+    </distributionManagement>
+
+    <profiles>
+        <profile>
+            <!-- mvn -P main ... -->
+            <id>main</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>fr.inria.zvtm</groupId>
+                    <artifactId>zvtm-core</artifactId>
+                    <version>0.11.0-SNAPSHOT</version>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <source>1.6</source>
+                            <target>1.6</target>
+                            <excludes>
+                                <exclude>**/*WILD*.java</exclude>
+                            </excludes>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <mainClass>fr.inria.zvtm.nodetrix.viewer.Viewer</mainClass>
+                                    <packageName>fr.inria.zvtm.nodetrix.viewer</packageName>
+                                    <addClasspath>true</addClasspath>
+                                </manifest>
+                                <manifestEntries>
+                                    <mode>development</mode>
+                                    <url>${pom.url}</url>
+                                </manifestEntries>
+                            </archive>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <!-- mvn -P wild ... -->
+            <id>wild</id>
+            <dependencies>
+                <dependency>
+                    <groupId>fr.inria.zvtm</groupId>
+                    <artifactId>zvtm-cluster</artifactId>
+                    <version>0.2.5-SNAPSHOT</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.aspectj</groupId>
+                    <artifactId>aspectjrt</artifactId>
+                    <version>1.6.2</version>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <source>1.6</source>
+                            <target>1.6</target>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <configuration>
+                            <archive>
+                                <manifest>
+                                    <mainClass>fr.inria.zvtm.nodetrix.viewer.WILDViewer</mainClass>
+                                    <packageName>fr.inria.zvtm.nodetrix.viewer</packageName>
+                                    <addClasspath>true</addClasspath>
+                                </manifest>
+                                <manifestEntries>
+                                    <mode>development</mode>
+                                    <url>${pom.url}</url>
+                                </manifestEntries>
+                            </archive>
+                        </configuration>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>aspectj-maven-plugin</artifactId>
+                        <version>1.2</version>
+                        <configuration>
+                            <!-- <weaveDependencies>
+                        <weaveDependency>
+                            <groupId>fr.inria.zvtm</groupId>
+                            <artifactId>zvtm-cluster</artifactId>
+                        </weaveDependency> 
+                    </weaveDependencies> -->
+                    <source>1.6</source>
+                    <target>1.6</target>
+                    <showWeaveInfo>true</showWeaveInfo>
+                </configuration>				
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>compile</goal>       
+                            <goal>test-compile</goal>  
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</profile>
   </profiles>
 
   <!-- Build -->
   <build>
-	<resources>
-	  <resource>
-	    <directory>src/main/resources/p</directory>
-	    <filtering>true</filtering>
-	  </resource>
-	  <resource>
-        <directory>src/main/resources</directory>
-      </resource>
-	</resources>
-    <plugins>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>dependency-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>copy-dependencies</id>
-            <phase>package</phase>
-            <goals>
-              <goal>copy-dependencies</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${project.build.directory}</outputDirectory>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-eclipse-plugin</artifactId>
-          <configuration>
-              <downloadSources>true</downloadSources>
-          </configuration>
-      </plugin>
-    </plugins>
+      <resources>
+          <resource>
+              <directory>src/main/resources/p</directory>
+              <filtering>true</filtering>
+          </resource>
+          <resource>
+              <directory>src/main/resources</directory>
+          </resource>
+      </resources>
+      <plugins>
+          <plugin>
+              <groupId>org.codehaus.mojo</groupId>
+              <artifactId>dependency-maven-plugin</artifactId>
+              <executions>
+                  <execution>
+                      <id>copy-dependencies</id>
+                      <phase>package</phase>
+                      <goals>
+                          <goal>copy-dependencies</goal>
+                      </goals>
+                      <configuration>
+                          <outputDirectory>${project.build.directory}</outputDirectory>
+                      </configuration>
+                  </execution>
+              </executions>
+          </plugin>
+          <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-eclipse-plugin</artifactId>
+              <configuration>
+                  <downloadSources>true</downloadSources>
+              </configuration>
+          </plugin>
+      </plugins>
   </build>
-  
+
   <!-- Reporting -->
   <reporting>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-javadoc-plugin</artifactId>
-        <configuration>
-          <aggregate>true</aggregate>
-          <doctitle><![CDATA[<h1>ZVTM API documentation</h1>]]></doctitle>
-          <bottom><![CDATA[Copyright &#169; 2009-2010 INRIA. All Rights Reserved<br />Licensed under the GNU LGPL. For full terms see the file COPYING.</i>]]></bottom>
-          <links> 
-            <link>http://java.sun.com/j2se/1.5.0/docs/api</link>
-            <link>http://zvtm.sourceforge.net/apidocs</link>
-          </links>
-        </configuration>
+      <plugins>
+          <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-javadoc-plugin</artifactId>
+              <configuration>
+                  <aggregate>true</aggregate>
+                  <doctitle><![CDATA[<h1>ZVTM API documentation</h1>]]></doctitle>
+                  <bottom><![CDATA[Copyright &#169; 2009-2010 INRIA. All Rights Reserved<br />Licensed under the GNU LGPL. For full terms see the file COPYING.</i>]]></bottom>
+              <links> 
+                  <link>http://java.sun.com/j2se/1.5.0/docs/api</link>
+                  <link>http://zvtm.sourceforge.net/apidocs</link>
+              </links>
+          </configuration>
       </plugin>
-    </plugins>
+  </plugins>
   </reporting>
 
 </project>
