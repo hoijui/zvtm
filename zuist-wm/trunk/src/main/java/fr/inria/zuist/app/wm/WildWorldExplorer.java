@@ -113,13 +113,13 @@ public class WildWorldExplorer extends WorldExplorer {
         mView.setJava2DPainter(this, Java2DPainter.AFTER_PORTALS);
         updatePanelSize();
         
-        ClusterGeometry cg = new ClusterGeometry(2680, 1700, 8, 4);
-        //ClusterGeometry cg = new ClusterGeometry(600,400,1,1);
+        //ClusterGeometry cg = new ClusterGeometry(2680, 1700, 8, 4);
+        ClusterGeometry cg = new ClusterGeometry(600,400,1,1);
         Vector ccameras = new Vector();
         ccameras.add(mCamera);
         ccameras.add(bCamera);
-        ClusteredView cv = new ClusteredView(cg, 3, 8, 4, ccameras);
-        //ClusteredView cv = new ClusteredView(cg, 0, 1, 1, ccameras);
+        //ClusteredView cv = new ClusteredView(cg, 3, 8, 4, ccameras);
+        ClusteredView cv = new ClusteredView(cg, 0, 1, 1, ccameras);
         vsm.addClusteredView(cv);
         
         // console

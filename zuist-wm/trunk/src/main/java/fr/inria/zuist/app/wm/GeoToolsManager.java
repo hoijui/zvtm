@@ -36,6 +36,10 @@ import com.vividsolutions.jts.geom.util.PolygonExtracter;
 
 import fr.inria.zvtm.glyphs.VPolygon;
 import fr.inria.zuist.engine.Region;
+import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.animation.EndAction;
+import fr.inria.zvtm.animation.Animation;
+import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
 
 class GeoToolsManager {
     
@@ -48,6 +52,7 @@ class GeoToolsManager {
     /* type of administrative division (0=country, 1= state, province, ...) */
     static final String LAD0 = "AD0";
     static final String LAD1 = "AD1";
+    static final String CTRY = "CTRY";
 
     WorldExplorer application;
     GeoNamesParser gnp;
@@ -55,6 +60,8 @@ class GeoToolsManager {
     static final short[] transitions = {Region.APPEAR, Region.APPEAR, Region.DISAPPEAR, Region.DISAPPEAR};
 
     int polygonID = 0;
+    
+    boolean isShowing = false;
     
     GeoToolsManager(WorldExplorer app, boolean queryGN, short lad){
         this.application = app;
@@ -144,10 +151,52 @@ class GeoToolsManager {
         catch (IOException ioex){
             ioex.printStackTrace();
         }
+        isShowing = true;
     }
     
-    void toggleBoundaryDisplay(){
-        application.bCamera.setEnabled(!application.bCamera.isEnabled());
+    void toggleCountryDisplay(){
+        showCountries(!isShowing);
+    }
+    
+    void showCountries(boolean b){
+        Vector<Glyph> boundaries = application.bSpace.getGlyphsOfType(LAD0);
+        for (final Glyph g:boundaries){
+            if (b){
+                application.bSpace.show(g);
+            }
+            else {
+                application.bSpace.hide(g);                
+            }
+        }
+        boundaries = application.bSpace.getGlyphsOfType(LAD1);
+        for (final Glyph g:boundaries){
+            if (b){
+                application.bSpace.show(g);
+            }
+            else {
+                application.bSpace.hide(g);                
+            }
+        }
+        Vector<Glyph> ctryNames = application.bSpace.getGlyphsOfType(CTRY);
+        for (final Glyph g:ctryNames){
+            if (b){
+                application.bSpace.show(g);
+                Animation a = application.vsm.getAnimationManager().getAnimationFactory().createTranslucencyAnim(NavigationManager.ANIM_MOVE_DURATION, g,
+                    1f, false, IdentityInterpolator.getInstance(), null);
+                application.vsm.getAnimationManager().startAnimation(a, false);
+            }
+            else {
+                Animation a = application.vsm.getAnimationManager().getAnimationFactory().createTranslucencyAnim(NavigationManager.ANIM_MOVE_DURATION, g,
+                    0, false, IdentityInterpolator.getInstance(),
+                    new EndAction(){
+                        public void	execute(Object subject, Animation.Dimension dimension){
+                            application.bSpace.hide(g);
+                        }
+                    });
+                application.vsm.getAnimationManager().startAnimation(a, false);
+            }
+        }
+        isShowing = b;
     }
     
     void loadEntities(){

@@ -308,7 +308,7 @@ class ExplorerEventHandler implements ViewListener, CameraListener, ComponentLis
     	else if (code==KeyEvent.VK_RIGHT){application.nm.translateView(NavigationManager.MOVE_RIGHT);}
         else if (code == KeyEvent.VK_F1){application.toggleMemoryUsageDisplay();}
         else if (code == KeyEvent.VK_F2){application.gc();}
-        else if (code == KeyEvent.VK_B){application.gm.toggleBoundaryDisplay();}
+        else if (code == KeyEvent.VK_B){application.gm.toggleCountryDisplay();}
         else if (code == KeyEvent.VK_L){application.nm.toggleLensType();}
         else if (code == KeyEvent.VK_U){application.toggleUpdateMaps();}
         else if (code == KeyEvent.VK_A){application.ga.toggleTraffic();}

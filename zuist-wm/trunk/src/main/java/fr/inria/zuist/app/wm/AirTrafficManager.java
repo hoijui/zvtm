@@ -204,8 +204,6 @@ class AirTrafficManager {
 		return res;
     }
     
-    
-    
     void toggleTraffic(){
         showNetwork(!isShowing);
     }

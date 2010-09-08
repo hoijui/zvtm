@@ -111,6 +111,7 @@ public class GeoNamesParser {
                 long population = Long.parseLong(nextLine[3]);
                 float popFactor = (float)(2*Math.log10(population));
                 VText t = new VText(GeoToolsManager.CC*lon, GeoToolsManager.CC*lat, 1, COUNTRY_LABEL_COLOR, country, VText.TEXT_ANCHOR_MIDDLE, popFactor);
+                t.setType(GeoToolsManager.CTRY);
                 application.bSpace.addGlyph(t);
             }
         }
