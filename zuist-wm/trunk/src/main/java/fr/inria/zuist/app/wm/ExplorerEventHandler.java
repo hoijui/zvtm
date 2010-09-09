@@ -121,6 +121,11 @@ class ExplorerEventHandler implements ViewListener, CameraListener, ComponentLis
                 nm.zoomInPhase1(jpx, jpy);
             }
 		}
+		else if ((g = v.lastGlyphEntered()) != null){
+		    if (g.getType().equals(AirTrafficManager.AIRP)){
+    			application.ga.bringFor(g);		        
+		    }
+		}
 		else {
 		    if (application.isDynaspotEnabled() && v.getVCursor().getDynaSpotRadius() > 0){return;}
 		    selectingRegion = true;
@@ -131,6 +136,9 @@ class ExplorerEventHandler implements ViewListener, CameraListener, ComponentLis
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+        if (application.ga.isBringingAndGoing){
+			application.ga.endBringAndGo(v.lastGlyphEntered());
+		}
         if (application.isDynaspotEnabled() && !inPortal && !v.getVCursor().isDynaSpotActivated()){v.getVCursor().activateDynaSpot(true);}
 		regionStickedToMouse = false;
 	    if (selectingRegion){
@@ -149,7 +157,9 @@ class ExplorerEventHandler implements ViewListener, CameraListener, ComponentLis
     	lastVY = v.getVCursor().vy;
     	if (application.isDynaspotEnabled()){
         	Glyph g = v.getVCursor().dynaPick(application.bCamera);
-        	application.displayFeatureInfo((g != null) ? (Toponym)g.getOwner() : null, g);    	    
+        	if (g.getType().equals(GeoToolsManager.CITY)){
+            	application.displayFeatureInfo((g != null) ? (Toponym)g.getOwner() : null, g);        	    
+        	}
     	}
     }
 
@@ -229,6 +239,7 @@ class ExplorerEventHandler implements ViewListener, CameraListener, ComponentLis
     }
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
+        if (application.ga.isBringingAndGoing){return;}
         if (panning){
             if (application.isDynaspotEnabled() && v.getVCursor().isDynaSpotActivated()){v.getVCursor().activateDynaSpot(false);}
             double a = (application.mCamera.focal+Math.abs(application.mCamera.altitude)) / application.mCamera.focal;
@@ -281,15 +292,17 @@ class ExplorerEventHandler implements ViewListener, CameraListener, ComponentLis
     }
 
     public void enterGlyph(Glyph g){
-//        g.highlight(true, null);
-        if (g instanceof VPolygon){
+		if (application.ga.isBringingAndGoing && g.getType().equals(AirTrafficManager.AIRP)){
+			application.ga.attemptToBring(g);
+		}
+        else if (g instanceof VPolygon){
             ((VPolygon)g).setFilled(true);
             g.setTranslucencyValue(.5f);
         }
+
     }
 
     public void exitGlyph(Glyph g){
-//        g.highlight(false, null);
         if (g instanceof VPolygon){
             ((VPolygon)g).setFilled(false);
             g.setTranslucencyValue(1f);

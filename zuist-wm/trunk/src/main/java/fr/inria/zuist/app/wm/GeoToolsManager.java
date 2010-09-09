@@ -53,6 +53,7 @@ class GeoToolsManager {
     static final String LAD0 = "AD0";
     static final String LAD1 = "AD1";
     static final String CTRY = "CTRY";
+    static final String CITY = "CITY";
 
     WorldExplorer application;
     GeoNamesParser gnp;

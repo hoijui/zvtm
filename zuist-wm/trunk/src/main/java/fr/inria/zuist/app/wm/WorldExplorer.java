@@ -108,6 +108,8 @@ public class WorldExplorer implements Java2DPainter {
     WEGlassPane gp;
     
     TranslucentTextArea console;
+    
+    boolean antialiasing = false;
 
     public WorldExplorer(boolean queryGN, short lad, boolean air,
                          boolean fullscreen, boolean opengl, boolean aa, File xmlSceneFile){
@@ -121,6 +123,7 @@ public class WorldExplorer implements Java2DPainter {
         Camera[] sceneCameras = {mCamera};
 		sm = new SceneManager(sceneSpaces, sceneCameras);
 		if (xmlSceneFile != null){
+            gp.setLabel("Loading "+xmlSceneFile.getName());
             sm.loadScene(parseXML(xmlSceneFile), xmlSceneFile.getParentFile(), true, gp);
 		}
         gm = new GeoToolsManager(this, queryGN, lad);
@@ -143,6 +146,7 @@ public class WorldExplorer implements Java2DPainter {
 
     void initGUI(boolean fullscreen, boolean opengl, boolean aa){
         windowLayout();
+        antialiasing = aa;
         vsm = VirtualSpaceManager.INSTANCE;
         mSpace = vsm.addVirtualSpace(mSpaceName);
         bSpace = vsm.addVirtualSpace(bSpaceName);
@@ -160,7 +164,7 @@ public class WorldExplorer implements Java2DPainter {
         else {
             mView.setVisible(true);
         }
-		mView.setAntialiasing(aa);
+		mView.setAntialiasing(antialiasing);
         eh = new ExplorerEventHandler(this);
         mCamera.addListener(eh);
         mView.setListener(eh, 0);
@@ -197,6 +201,12 @@ public class WorldExplorer implements Java2DPainter {
         VIEW_W = (SCREEN_WIDTH <= VIEW_MAX_W) ? SCREEN_WIDTH : VIEW_MAX_W;
         VIEW_H = (SCREEN_HEIGHT <= VIEW_MAX_H) ? SCREEN_HEIGHT : VIEW_MAX_H;
     }
+    
+    /* tells whether antialising was requested at launch time or not */
+    boolean isAAEnabled(){
+        return antialiasing;
+    }
+    
         
     ClosedShape selectedFeature = null;
     

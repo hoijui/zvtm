@@ -131,6 +131,7 @@ public class GeoNamesParser {
             for (Toponym toponym : searchResult.getToponyms()){
                 ClosedShape g = new SIRectangle(GeoToolsManager.CC*toponym.getLongitude(), GeoToolsManager.CC*toponym.getLatitude(),
                                                 2, 6, 6, FEATURE_COLOR);
+                g.setType(GeoToolsManager.CITY);
                 application.bSpace.addGlyph(g);
                 g.setCursorInsideFillColor(Color.RED);
                 g.setOwner(toponym);
