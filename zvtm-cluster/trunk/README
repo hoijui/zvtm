@@ -12,7 +12,7 @@ To compile and package the sources, execute:
 
 Dependencies:
 zvtm-cluster depends on
-  zvtm
+  zvtm-core
   aspectJ
   jgroups
   args4j 
