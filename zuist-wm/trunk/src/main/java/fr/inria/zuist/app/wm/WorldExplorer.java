@@ -110,9 +110,10 @@ public class WorldExplorer implements Java2DPainter {
     TranslucentTextArea console;
     
     boolean antialiasing = false;
-
+    
     public WorldExplorer(boolean queryGN, short lad, boolean air,
                          boolean fullscreen, boolean opengl, boolean aa, File xmlSceneFile){
+        VirtualSpaceManager.INSTANCE.getAnimationManager().setResolution(80);
         nm = new NavigationManager(this);
         initGUI(fullscreen, opengl, aa);
         gp = new WEGlassPane(this);

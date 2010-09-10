@@ -123,7 +123,9 @@ class ExplorerEventHandler implements ViewListener, CameraListener, ComponentLis
 		}
 		else if ((g = v.lastGlyphEntered()) != null){
 		    if (g.getType().equals(AirTrafficManager.AIRP)){
-    			application.ga.bringFor(g);		        
+		        if (mode == MODE_BRINGANDGO){
+        			application.ga.bringFor(g);		            
+		        }
 		    }
 		}
 		else {
@@ -295,6 +297,9 @@ class ExplorerEventHandler implements ViewListener, CameraListener, ComponentLis
 		if (application.ga.isBringingAndGoing && g.getType().equals(AirTrafficManager.AIRP)){
 			application.ga.attemptToBring(g);
 		}
+		else if (mode == MODE_HIGHLIGHTING){
+		    application.ga.highlight(g);
+		}
         else if (g instanceof VPolygon){
             ((VPolygon)g).setFilled(true);
             g.setTranslucencyValue(.5f);
@@ -307,6 +312,9 @@ class ExplorerEventHandler implements ViewListener, CameraListener, ComponentLis
             ((VPolygon)g).setFilled(false);
             g.setTranslucencyValue(1f);
         }
+		else if (mode == MODE_HIGHLIGHTING){
+		    application.ga.unhighlight(g);
+		}
     }
 
     int ci = 1180;
@@ -325,7 +333,23 @@ class ExplorerEventHandler implements ViewListener, CameraListener, ComponentLis
         else if (code == KeyEvent.VK_L){application.nm.toggleLensType();}
         else if (code == KeyEvent.VK_U){application.toggleUpdateMaps();}
         else if (code == KeyEvent.VK_A){application.ga.toggleTraffic();}
+        else if (code == KeyEvent.VK_N){toggleTopoNav();}
+        
     }
+    
+    static final short MODE_HIGHLIGHTING = 0;
+	static final short MODE_BRINGANDGO = 1;
+	//static final short MODE_LINKSLIDER = 2;
+	short mode = MODE_HIGHLIGHTING;
+	
+	void toggleTopoNav(){
+		switch(mode){
+			case MODE_HIGHLIGHTING:{mode = MODE_BRINGANDGO;break;}
+			case MODE_BRINGANDGO:{mode = MODE_HIGHLIGHTING;break;}
+			//case MODE_BRINGANDGO:{mode = MODE_LINKSLIDER;break;}
+			//case MODE_LINKSLIDER:{mode = MODE_HIGHLIGHTING;break;}
+		}
+	}
 
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 

@@ -80,6 +80,7 @@ public class WildWorldExplorer extends WorldExplorer {
     }
 
     void initGUI(boolean fullscreen, boolean opengl, boolean aa){
+        AirTrafficManager.EDGE_STROKE_WIDTH = 2f;
         windowLayout();
         vsm = VirtualSpaceManager.INSTANCE;
         vsm.setMaster("WildWorldExplorer");
@@ -113,7 +114,7 @@ public class WildWorldExplorer extends WorldExplorer {
         mView.setJava2DPainter(this, Java2DPainter.AFTER_PORTALS);
         updatePanelSize();
         
-        ClusterGeometry cg = new ClusterGeometry(2680, 1700, 8, 4);
+        ClusterGeometry cg = new ClusterGeometry(2760, 1800, 8, 4);
         //ClusterGeometry cg = new ClusterGeometry(600,400,1,1);
         Vector ccameras = new Vector();
         ccameras.add(mCamera);

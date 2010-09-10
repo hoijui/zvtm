@@ -29,6 +29,7 @@ import fr.inria.zvtm.glyphs.ClosedShape;
 import fr.inria.zvtm.glyphs.VCircle;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.glyphs.DPath;
+import fr.inria.zvtm.glyphs.Translucent;
 import fr.inria.zvtm.animation.EndAction;
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
@@ -45,7 +46,8 @@ class AirTrafficManager {
 	
 	static final int AIRPORT_NODE_SIZE = 25;
 	
-	static final float DEFAULT_ARC_ALPHA = 0.7f;
+	static final float DEFAULT_ARC_ALPHA = 1f;
+	static float EDGE_STROKE_WIDTH = 1f;
 	static final double QUAD_ANGLE = Math.PI / 6.0;
 	
 	static final Color AIRPORT_FILL_COLOR = Color.YELLOW;
@@ -209,6 +211,7 @@ class AirTrafficManager {
 				double cx = tail.getShape().vx + rho*Math.cos(alpha+QUAD_ANGLE);
 				double cy = tail.getShape().vy + rho*Math.sin(alpha+QUAD_ANGLE);
 				DPath p = new DPath(tail.getShape().vx, tail.getShape().vy, 5, AIRPORT_FILL_COLOR, DEFAULT_ARC_ALPHA);
+				p.setStrokeWidth(EDGE_STROKE_WIDTH);
 				p.addQdCurve(head.getShape().vx, head.getShape().vy, cx, cy, true);
 				application.bSpace.addGlyph(p);
 				res = new LEdge(weight, p);
@@ -258,6 +261,56 @@ class AirTrafficManager {
         }
         isShowing = b;
     }
+
+    /* ------------------ highlighting ---------------------------- */
+    
+    static final Color HIGHLIGHT_COLOR = Color.RED;
+	static final float DIMMED_ARC_ALPHA = 0.2f;
+	
+    Vector highlightedElements = new Vector();
+	Vector dimmedElements = new Vector();
+	
+	void highlight(Glyph g){
+		g.setColor(HIGHLIGHT_COLOR);
+		LNode n = (LNode)g.getOwner();
+		if (n != null){
+			for (int i=0;i<allArcs.length;i++){
+				dimmedElements.add(allArcs[i].getSpline());			
+			}
+			LEdge[] arcs = n.getAllArcs();
+			Glyph g2;
+			for (int i=0;i<arcs.length;i++){
+				dimmedElements.remove(arcs[i].getSpline());
+				g2 = arcs[i].getSpline();
+				g2.setColor(HIGHLIGHT_COLOR);
+				g2.setStrokeWidth(EDGE_STROKE_WIDTH*2);
+				application.bSpace.onTop(g2, 0);
+				highlightedElements.add(g2);
+				g2 = arcs[i].getOtherEnd(n).getShape();
+				g2.setColor(HIGHLIGHT_COLOR);
+				highlightedElements.add(g2);
+			}
+			for (int i=0;i<dimmedElements.size();i++){
+				((Translucent)dimmedElements.elementAt(i)).setTranslucencyValue(DIMMED_ARC_ALPHA);
+			}
+		}
+	}
+
+	void unhighlight(Glyph g){
+		g.setColor(AIRPORT_FILL_COLOR);
+		Glyph g2;
+		for (int i=0;i<highlightedElements.size();i++){
+			g2 = (Glyph)highlightedElements.elementAt(i);
+			g2.setColor(AIRPORT_FILL_COLOR);
+			g2.setStrokeWidth(EDGE_STROKE_WIDTH);
+			application.bSpace.atBottom(g2, 0);
+		}
+		for (int i=0;i<dimmedElements.size();i++){
+			((Translucent)dimmedElements.elementAt(i)).setTranslucencyValue(DEFAULT_ARC_ALPHA);
+		}
+		highlightedElements.clear();
+		dimmedElements.clear();
+	}
     
     /* ---------------------- Bring and go -----------------------------*/
     
@@ -371,7 +424,7 @@ class AirTrafficManager {
     		be.restorePreviousState(BRING_ANIM_DURATION);
     		// get the remembered location as the animation won't have finished before we need that
     		// location to compute new edge end points
-    		updateEdges(n1, ((BroughtNode)be).previousLocations[0]);
+    		updateEdges(n1, ((BroughtNode)be).previousLocation);
     		Vector<LNode> nodesToSendBack = new Vector();
     		synchronized(broughtnode2broughtby){
     			Iterator<LNode> it = broughtnode2broughtby.keySet().iterator();
@@ -443,7 +496,7 @@ class AirTrafficManager {
     			//XXX:TBW add more tests to do this translation only if its worth it (far away enough)
     			// translate camera to node in which button was released
     			followedNode = n;
-    			Point2D.Double lp = bn.previousLocations[0];
+    			Point2D.Double lp = bn.previousLocation;
     			Point2D.Double trans = new Point2D.Double((lp.x-application.mCamera.vx)/2d, (lp.y-application.mCamera.vy)/2d);
 
     			//XXX:TBW compute altitude offset to see everything on the path at apex, but not higher
@@ -895,26 +948,19 @@ abstract class BroughtElement {
 
 class BroughtNode extends BroughtElement {
 	
-	Glyph[] glyphs;
-	Point2D.Double[] previousLocations;
+	Glyph glyph;
+	Point2D.Double previousLocation;
 	
 	BroughtNode(LNode n){
 		owner = n;
-		glyphs = new Glyph[1];
-		glyphs[0] = n.getShape();
-		//glyphs[1] = n.getLabel();
-		previousLocations = new Point2D.Double[glyphs.length];
-		for (int i=0;i<glyphs.length;i++){
-			previousLocations[i] = glyphs[i].getLocation();
-		}
+		glyph = n.getShape();
+		previousLocation = glyph.getLocation();
 	}
 
 	void restorePreviousState(int duration){
-		for (int i=0;i<glyphs.length;i++){
-		    Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createGlyphTranslation(duration, glyphs[i],
-                new Point2D.Double(previousLocations[i].x, previousLocations[i].y), false, IdentityInterpolator.getInstance(), null);
-            VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
-		}
+        Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createGlyphTranslation(duration, glyph,
+            new Point2D.Double(previousLocation.x, previousLocation.y), false, IdentityInterpolator.getInstance(), null);
+        VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
 	}
 	
 }
