@@ -223,6 +223,25 @@ class AirTrafficManager {
 		return res;
     }
     
+    static final float MIN_ALPHA = .2f;
+    static final float MAX_ALPHA = 1f;
+
+    void setTranslucencyByWeight(){
+        int minW = Integer.MAX_VALUE;
+        int maxW = 0;
+        // find min and max weights for current network
+        for (LEdge e:allArcs){
+            if (e.weight > maxW){maxW = e.weight;}
+            if (e.weight < minW){minW = e.weight;}
+        }
+        float a = (MAX_ALPHA - MIN_ALPHA) / (float)(maxW - minW);
+        float b = (MIN_ALPHA * maxW - MAX_ALPHA * minW) / (float)(maxW - minW);
+        // assign alpha value based on min weight, max weight and edge's weight
+        for (LEdge e:allArcs){
+            e.getSpline().setTranslucencyValue(a*e.weight+b);
+        }
+    }
+    
     /* ------------------ network visibility ---------------------------- */
     
     void toggleTraffic(){
@@ -290,9 +309,6 @@ class AirTrafficManager {
 				g2.setColor(HIGHLIGHT_COLOR);
 				highlightedElements.add(g2);
 			}
-			for (int i=0;i<dimmedElements.size();i++){
-				((Translucent)dimmedElements.elementAt(i)).setTranslucencyValue(DIMMED_ARC_ALPHA);
-			}
 		}
 	}
 
@@ -304,9 +320,6 @@ class AirTrafficManager {
 			g2.setColor(AIRPORT_FILL_COLOR);
 			g2.setStrokeWidth(EDGE_STROKE_WIDTH);
 			application.bSpace.atBottom(g2, 0);
-		}
-		for (int i=0;i<dimmedElements.size();i++){
-			((Translucent)dimmedElements.elementAt(i)).setTranslucencyValue(DEFAULT_ARC_ALPHA);
 		}
 		highlightedElements.clear();
 		dimmedElements.clear();
@@ -407,13 +420,6 @@ class AirTrafficManager {
     		ClosedShape otherEndShape = otherEnd.getShape();
     		bring(e, otherEnd, n, thisEndShape.vx, thisEndShape.vy, otherEndShape.vx, otherEndShape.vy, node2bposition);
     	}
-    	// fade elements outside bring and go scope
-    	//for (int i=0;i<arcsOutsideScope.size();i++){
-    	//	arcsOutsideScope.elementAt(i).setTranslucency(OUTSIDE_BNG_SCOPE_TRANSLUCENCY);
-    	//}
-    	//for (int i=0;i<nodesOutsideScope.size();i++){
-    	//	nodesOutsideScope.elementAt(i).setTranslucency(OUTSIDE_BNG_SCOPE_TRANSLUCENCY);
-    	//}
     }
     
     // n1 is the node for which we attempt to send back connected nodes
@@ -447,14 +453,9 @@ class AirTrafficManager {
     		LEdge[] arcs = n2.getAllArcs();
     		LNode oe;
     		for (int i=0;i<arcs.length;i++){
-    			//arcs[i].setTranslucency(1.0f);
     			oe = arcs[i].getOtherEnd(n2);
-    			//oe.setTranslucency(1.0f);
     			oe.getShape().setSensitivity(true);
     			LEdge[] arcs2 = oe.getOtherArcs(arcs[i]);
-    			//for (int j=0;j<arcs2.length;j++){
-    			//	arcs2[j].setTranslucency(SECOND_BNG_STEP_TRANSLUCENCY);
-    			//}
     		}
     	}
     }
@@ -550,12 +551,6 @@ class AirTrafficManager {
     		}
     		broughtStack.clear();
     	}
-    	//for (int i=0;i<allArcs.length;i++){
-    	//	allArcs[i].setTranslucency(1.0f);
-    	//}
-    	//for (int i=0;i<allNodes.length;i++){
-    	//	allNodes[i].setTranslucency(1.0f);
-    	//}
     	nodesOutsideScope.clear();
     	arcsOutsideScope.clear();
     }
@@ -602,7 +597,6 @@ class AirTrafficManager {
             flatCoords, false, SlowInSlowOutInterpolator.getInstance(), null);
         AM.startAnimation(a, true);
     	// brought elements should not be faded
-    	//node.setTranslucency(1.0f);
     	nodesOutsideScope.remove(node);
     	arcsOutsideScope.remove(arc);
     	LEdge[] otherArcs = node.getOtherArcs(arc);
@@ -631,10 +625,9 @@ class AirTrafficManager {
     			}
     		}
     		flatCoords = DPath.getFlattenedCoordinates(spline, sp, ep, true);
-    		//a = AM.getAnimationFactory().createPathAnim(BRING_ANIM_DURATION, spline,
-            //    flatCoords, false, SlowInSlowOutInterpolator.getInstance(), null);
-            //AM.startAnimation(a, true);
-    		//otherArcs[i].setTranslucency(SECOND_BNG_STEP_TRANSLUCENCY);
+    		a = AM.getAnimationFactory().createPathAnim(BRING_ANIM_DURATION, spline,
+                flatCoords, false, SlowInSlowOutInterpolator.getInstance(), null);
+            AM.startAnimation(a, true);
     		// 2nd step brought elements should not be faded
     		arcsOutsideScope.remove(otherArcs[i]);
     	}		
@@ -655,13 +648,11 @@ class AirTrafficManager {
     void sendBack(LNode n){
     	BroughtElement be = brought2location.get(n);
     	be.restorePreviousState(BRING_ANIM_DURATION);
-    	//n.setTranslucency(OUTSIDE_BNG_SCOPE_TRANSLUCENCY);
     }
     
     void sendBack(LEdge e){
     	BroughtElement be = brought2location.get(e);
     	be.restorePreviousState(BRING_ANIM_DURATION);
-    	//e.setTranslucency(OUTSIDE_BNG_SCOPE_TRANSLUCENCY);
     }
     
     // n1 is the node for which we attempt to send back connected nodes
@@ -674,12 +665,8 @@ class AirTrafficManager {
     		if (broughtnode2broughtby.get(oe) == n1 && !broughtStack.contains(oe)){
     			// hide nodes that are brought by some node in the brought stack but not by the current one
     			// do not send them back, just hide them in place (and don't do it for nodes in the brought stack)
-    			//oe.setTranslucency(0.0f);
     			oe.getShape().setSensitivity(false);
     			LEdge[] arcs2 = oe.getAllArcs();
-    			//for (int j=0;j<arcs2.length;j++){
-    			//	arcs2[j].setTranslucency(OUTSIDE_BNG_SCOPE_TRANSLUCENCY);
-    			//}
     		}
     	}
     }
@@ -703,8 +690,6 @@ class Airport {
 }
 
 abstract class LElem {
-
-	abstract void setTranslucency(float a);
 	
 }
 
@@ -830,11 +815,6 @@ class LNode extends LElem {
 		return nodeLabel;
 	}
 	
-	void setTranslucency(float a){
-		//nodeShape.setTranslucencyValue(a);
-		//nodeLabel.setTranslucencyValue(a);
-	}
-
 	public String toString(){
 		String res = code + " " + name + "[";
 		for (int i=0;i<edges.length;i++){
@@ -916,10 +896,6 @@ class LEdge extends LElem {
 		return edgeSpline;
 	}
 
-	void setTranslucency(float a){
-		//edgeSpline.setTranslucencyValue(a);
-	}
-
 	public String toString(){
 		return weight + "@" + hashCode() + " [" + 
 			((tail != null) ? tail.getCode() + "@" + tail.hashCode() : "NULL")+
@@ -984,7 +960,6 @@ class BroughtEdge extends BroughtElement {
 	    Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createPathAnim(duration, spline,
             splineCoords, false, SlowInSlowOutInterpolator.getInstance(), null);
         VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, true);
-		//spline.setTranslucencyValue(splineAlpha);
 	}
 	
 }
