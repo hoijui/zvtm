@@ -42,7 +42,7 @@ import org.antlr.runtime.tree.CommonTree;
 
 class AirTrafficManager {
     
-	static int MAX_WEIGHT = 400000;
+	static int MIN_WEIGHT = 400000;
 	
 	static final int AIRPORT_NODE_SIZE = 25;
 	
@@ -200,7 +200,7 @@ class AirTrafficManager {
 		//   2000 leaves 10412 edges
 		// 500000 leaves 462 edges
 		// 800000 leaves 120 edges
-        if (weight > MAX_WEIGHT){
+        if (weight > MIN_WEIGHT){
 			LNode tail = id2node.get(src);
 			LNode head = id2node.get(tgt);
 			if (tail != null && head != null){

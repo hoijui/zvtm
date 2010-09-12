@@ -155,7 +155,10 @@ public class WildWorldExplorer extends WorldExplorer {
 				else if (args[i].substring(1).equals("aa")){aa = true;}
 				else if (args[i].substring(1).equals("qgn")){queryGN = true;}
 				else if (args[i].substring(1).startsWith("lad")){lad = Short.parseShort(args[i].substring(4));}
-				else if (args[i].substring(1).equals("air")){air = true;}
+				else if (args[i].substring(1).startsWith("air")){
+				    air = true;
+				    if (args[i].length() > 4){AirTrafficManager.MIN_WEIGHT = Integer.parseInt(args[i].substring(4));}
+				}
 				else if (args[i].substring(1).equals("h") || args[i].substring(1).equals("--help")){WorldExplorer.printCmdLineHelp();System.exit(0);}
 			}
             else {
