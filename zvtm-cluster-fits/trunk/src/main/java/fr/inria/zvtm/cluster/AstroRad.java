@@ -21,6 +21,7 @@ import fr.inria.zvtm.fits.RangeSelection;
 import fr.inria.zvtm.glyphs.FitsImage;
 import fr.inria.zvtm.glyphs.Glyph;
 
+import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -68,6 +69,7 @@ public class AstroRad {
         View view = vsm.addFrameView(cameras, "Master View",
                 View.STD_VIEW, 800, 600, false, true, true, null);	
         view.setListener(new PanZoomEventHandler());
+        view.getCursor().setColor(Color.GREEN);
 
         ClusterGeometry clGeom;
         ClusteredView imageView;
@@ -79,7 +81,7 @@ public class AstroRad {
                 400,
                 2, //columns
                 1);
-            imageView = new ClusteredView(clGeom,1,1,0,imgCamList);
+            imageView = new ClusteredView(clGeom,0,1,1,imgCamList);
             controlView = new ClusteredView(clGeom,1,1,1,controlCamList);
         } else {
             //WILD view
@@ -103,8 +105,8 @@ public class AstroRad {
     private void setupControlZone(){
         rangeSel = new RangeSelection();
         controlSpace.addGlyph(rangeSel);
-        rangeSel.reSize(10);
-        rangeSel.move(-1000, 1000);
+        //rangeSel.reSize(10);
+        //rangeSel.move(-1000, 1000);
     }
 
     private void addImage(URL imgUrl){
@@ -234,6 +236,6 @@ class AROptions {
 
         // receives other command line parameters than options
         @Argument
-        List arguments = new ArrayList();
+        List<String> arguments = new ArrayList();
 }
 
