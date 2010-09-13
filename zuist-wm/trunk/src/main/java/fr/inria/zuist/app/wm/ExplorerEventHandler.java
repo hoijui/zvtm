@@ -335,6 +335,7 @@ class ExplorerEventHandler implements ViewListener, CameraListener, ComponentLis
         else if (code == KeyEvent.VK_A){application.ga.toggleTraffic();}
         else if (code == KeyEvent.VK_N){toggleTopoNav();}
         else if (code == KeyEvent.VK_W){application.ga.setTranslucencyByWeight();}        
+        else if (code == KeyEvent.VK_T){new Preferences(application);}        
     }
     
     static final short MODE_HIGHLIGHTING = 0;

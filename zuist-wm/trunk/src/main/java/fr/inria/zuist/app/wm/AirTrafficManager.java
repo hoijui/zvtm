@@ -223,8 +223,10 @@ class AirTrafficManager {
 		return res;
     }
     
-    static final float MIN_ALPHA = .2f;
-    static final float MAX_ALPHA = 1f;
+    static float MIN_ALPHA = .2f;
+    static float MAX_ALPHA = 1f;
+    float alpha_a = 0;
+    float alpha_b = 1f;
 
     void setTranslucencyByWeight(){
         int minW = Integer.MAX_VALUE;
@@ -234,11 +236,11 @@ class AirTrafficManager {
             if (e.weight > maxW){maxW = e.weight;}
             if (e.weight < minW){minW = e.weight;}
         }
-        float a = (MAX_ALPHA - MIN_ALPHA) / (float)(maxW - minW);
-        float b = (MIN_ALPHA * maxW - MAX_ALPHA * minW) / (float)(maxW - minW);
+        alpha_a = (MAX_ALPHA - MIN_ALPHA) / (float)(maxW - minW);
+        alpha_b = (MIN_ALPHA * maxW - MAX_ALPHA * minW) / (float)(maxW - minW);
         // assign alpha value based on min weight, max weight and edge's weight
         for (LEdge e:allArcs){
-            e.getSpline().setTranslucencyValue(a*e.weight+b);
+            e.getSpline().setTranslucencyValue(alpha_a*e.weight + alpha_b);
         }
     }
     
@@ -303,6 +305,7 @@ class AirTrafficManager {
 				g2 = arcs[i].getSpline();
 				g2.setColor(HIGHLIGHT_COLOR);
 				g2.setStrokeWidth(EDGE_STROKE_WIDTH*2);
+				g2.setTranslucencyValue(1f);
 				application.bSpace.onTop(g2, 0);
 				highlightedElements.add(g2);
 				g2 = arcs[i].getOtherEnd(n).getShape();
@@ -319,6 +322,9 @@ class AirTrafficManager {
 			g2 = (Glyph)highlightedElements.elementAt(i);
 			g2.setColor(AIRPORT_FILL_COLOR);
 			g2.setStrokeWidth(EDGE_STROKE_WIDTH);
+			if (g2 instanceof DPath){
+    			g2.setTranslucencyValue(alpha_a*((LEdge)g2.getOwner()).weight + alpha_b);			    
+			}
 			application.bSpace.atBottom(g2, 0);
 		}
 		highlightedElements.clear();
