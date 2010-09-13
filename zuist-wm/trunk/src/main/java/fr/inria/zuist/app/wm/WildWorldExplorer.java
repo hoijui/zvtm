@@ -80,7 +80,7 @@ public class WildWorldExplorer extends WorldExplorer {
     }
 
     void initGUI(boolean fullscreen, boolean opengl, boolean aa){
-        AirTrafficManager.EDGE_STROKE_WIDTH = 2f;
+        AirTrafficManager.EDGE_STROKE_WIDTH = 4f;
         AirTrafficManager.MIN_ALPHA = .3f;
         windowLayout();
         vsm = VirtualSpaceManager.INSTANCE;
