@@ -5,6 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
+import org.kohsuke.args4j.Argument;
+import org.kohsuke.args4j.CmdLineException;
+import org.kohsuke.args4j.CmdLineParser;
+import org.kohsuke.args4j.Option;
+
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewPanel;
@@ -34,13 +39,15 @@ public class AstroRad {
     private FitsImage selectedImage;
     private FitsHistogram hist;
     private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE;
+    private AROptions options;
 
     //todo:
     // - image thumbnail (tile)
     // - xfer function chooser
     // - color map chooser
 
-    private AstroRad(URL imgUrl){
+    private AstroRad(URL imgUrl, AROptions options){
+        this.options = options;
         setup();
         addImage(imgUrl);
     }
@@ -62,15 +69,31 @@ public class AstroRad {
                 View.STD_VIEW, 800, 600, false, true, true, null);	
         view.setListener(new PanZoomEventHandler());
 
-        //setup cluster geometry
-        ClusterGeometry clGeom = new ClusterGeometry(
-                2840,
-                1800,
-                8,
-                4);
-        //setup clustered views
-        ClusteredView imageView = new ClusteredView(clGeom, 3, 6, 4, imgCamList);
-        ClusteredView controlView = new ClusteredView(clGeom, 27, 2, 4, controlCamList);
+        ClusterGeometry clGeom;
+        ClusteredView imageView;
+        ClusteredView controlView;
+        if(options.debugView){
+            //debugging clustered view, suitable for a single host
+            clGeom = new ClusterGeometry(
+                600,
+                400,
+                2, //columns
+                1);
+            imageView = new ClusteredView(clGeom,1,1,0,imgCamList);
+            controlView = new ClusteredView(clGeom,1,1,1,controlCamList);
+        } else {
+            //WILD view
+            clGeom = new ClusterGeometry(
+                    2840,
+                    1800,
+                    8,
+                    4);
+            imageView = new ClusteredView(clGeom, 3, 6, 4, imgCamList);
+            controlView = new ClusteredView(clGeom, 27, 2, 4, controlCamList);
+        }
+        assert(clGeom != null);
+        assert(imageView != null);
+        assert(controlView != null);
         vsm.addClusteredView(imageView);
         vsm.addClusteredView(controlView);
 
@@ -104,12 +127,22 @@ public class AstroRad {
     }
 
     public static void main(String[] args) throws Exception{
-        if(args.length < 1){
-            System.err.println("Usage: AstroRad image_URL");
+        AROptions options = new AROptions();
+        CmdLineParser parser = new CmdLineParser(options);
+        try{
+            parser.parseArgument(args);
+        } catch(CmdLineException ex){
+            System.err.println(ex.getMessage());
+            parser.printUsage(System.err);
+            return;
+        }
+
+        if(options.arguments.size() < 1){
+            System.err.println("Usage: AstroRad [options] image_URL");
             System.exit(0);
         }
 
-        new AstroRad(new URL(args[0]));
+        new AstroRad(new URL(args[0]), options);
     }
 
     private class PanZoomEventHandler implements ViewListener{
@@ -188,8 +221,19 @@ public class AstroRad {
 
         public void viewDeiconified(View v){}
 
-        public void viewClosing(View v){System.exit(0);}
-
+        public void viewClosing(View v){
+            vsm.stop();
+            System.exit(0);
+        }
     }
+}
+
+class AROptions {
+        @Option(name = "-d", aliases = {"--debug-view"}, usage = "debug view") 
+        boolean debugView = false;
+
+        // receives other command line parameters than options
+        @Argument
+        List arguments = new ArrayList();
 }
 
