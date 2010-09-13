@@ -64,8 +64,8 @@ public class AstroRad {
 
         //setup cluster geometry
         ClusterGeometry clGeom = new ClusterGeometry(
-                2740,
-                1560,
+                2840,
+                1800,
                 8,
                 4);
         //setup clustered views
