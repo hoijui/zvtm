@@ -10,7 +10,9 @@ import fr.inria.zvtm.glyphs.Glyph;
 class GlyphAttributes implements Serializable {
 	private final double x;
 	private final double y;
-	//private final int z; ??
+    //z-index may be set provided that setZindex is called
+    //before adding the slave Glyph to the virtual space.
+	private final int z;
 	private final double orientation;
 	private final Color borderColor;
 	private final Color mainColor;
@@ -20,6 +22,7 @@ class GlyphAttributes implements Serializable {
 	private final float translucency;
 
 	private GlyphAttributes(double x, double y, 
+            int z,
 			double orientation,
 			Color borderColor, Color mainColor,
 			boolean sensitive,
@@ -28,6 +31,7 @@ class GlyphAttributes implements Serializable {
 			float translucency){
 		this.x = x;
 		this.y = y;
+        this.z = z;
 		this.orientation = orientation;
 		this.borderColor = borderColor;
 		this.mainColor = mainColor;
@@ -40,6 +44,7 @@ class GlyphAttributes implements Serializable {
 	static GlyphAttributes fromGlyph(Glyph glyph){
 		Point2D.Double loc = glyph.getLocation();
 		return new GlyphAttributes(loc.x, loc.y,
+                glyph.getZindex(),
 				glyph.getOrient(),
 				glyph.getBorderColor(), glyph.getDefaultColor(),
 				glyph.isSensitive(),
@@ -50,6 +55,7 @@ class GlyphAttributes implements Serializable {
 
 	void moveAttributesToGlyph(Glyph target){
 		target.moveTo(x,y);
+        target.setZindex(z); // ensure this call is made before the Glyph is added to the VirtualSpace
 		target.orientTo(orientation);
 		target.setBorderColor(borderColor);
 		target.setColor(mainColor);
