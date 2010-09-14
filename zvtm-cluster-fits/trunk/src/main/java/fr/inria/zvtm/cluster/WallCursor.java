@@ -17,7 +17,7 @@ class WallCursor {
     private SIRectangle vRect;
 
     WallCursor(VirtualSpace target){
-        this(target, 10, 80, Color.RED);
+        this(target, 20, 160, Color.RED);
     }
 
     WallCursor(VirtualSpace target, double thickness, double length){
