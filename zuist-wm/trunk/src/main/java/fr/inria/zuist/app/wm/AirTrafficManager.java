@@ -27,6 +27,7 @@ import fr.inria.zvtm.animation.AnimationManager;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.ClosedShape;
 import fr.inria.zvtm.glyphs.VCircle;
+import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.glyphs.DPath;
 import fr.inria.zvtm.glyphs.Translucent;
@@ -132,6 +133,10 @@ class AirTrafficManager {
                 }
             }
             allArcs = (LEdge[])aes.toArray(new LEdge[aes.size()]);
+            //for (LNode airport:allNodes){
+            //    application.bSpace.onTop(airport.getShape());
+            //    application.bSpace.onTop(airport.getLabel());
+            //}
     		System.out.println("Constructing " + allNodes.length + " airports");
     		System.out.println("Constructing " + allArcs.length + " connections");
             id2node.clear();    		
@@ -177,7 +182,7 @@ class AirTrafficManager {
 		application.bSpace.addGlyph(shape);
 		application.bSpace.addGlyph(label);
 		Glyph.stickToGlyph(label, shape);
-		id2node.put(id, new LNode(iataCode, ap.name, shape, label));
+		id2node.put(id, new LNode(iataCode, ap.name, ap.lat, ap.lng, shape, label));
     }
     
     LEdge createFlightEdge(CommonTree node, HashMap<String,LNode> id2node){
@@ -291,6 +296,8 @@ class AirTrafficManager {
     Vector highlightedElements = new Vector();
 	Vector dimmedElements = new Vector();
 	
+	Glyph[] airportInfo = new Glyph[5];
+	
 	void highlight(Glyph g){
 		g.setColor(HIGHLIGHT_COLOR);
 		LNode n = (LNode)g.getOwner();
@@ -306,17 +313,29 @@ class AirTrafficManager {
 				g2.setColor(HIGHLIGHT_COLOR);
 				g2.setStrokeWidth(EDGE_STROKE_WIDTH*2);
 				g2.setTranslucencyValue(1f);
-				application.bSpace.onTop(g2, 0);
+				application.bSpace.onTop(g2, 5);
 				highlightedElements.add(g2);
 				g2 = arcs[i].getOtherEnd(n).getShape();
 				g2.setColor(HIGHLIGHT_COLOR);
 				highlightedElements.add(g2);
+			}
+			airportInfo[0] = new VRectangle(n.getShape().vx+100, n.getShape().vy+100, 20, 400, 100, Color.BLACK, Color.WHITE, .8f);
+			airportInfo[1] = new VText(airportInfo[0].vx-190, airportInfo[0].vy+30, 20, Color.WHITE, "IATA: "+n.getCode());
+			airportInfo[2] = new VText(airportInfo[0].vx-190, airportInfo[0].vy+10, 20, Color.WHITE, "Name: "+n.getName());
+			airportInfo[3] = new VText(airportInfo[0].vx-190, airportInfo[0].vy-10, 20, Color.WHITE, "Lat: "+n.getLatitude());
+			airportInfo[4] = new VText(airportInfo[0].vx-190, airportInfo[0].vy-30, 20, Color.WHITE, "Lon: "+n.getLongitude());
+			for (Glyph g3:airportInfo){
+    			application.bSpace.addGlyph(g3);			    
 			}
 		}
 	}
 
 	void unhighlight(Glyph g){
 		g.setColor(AIRPORT_FILL_COLOR);
+		for (Glyph g3:airportInfo){
+            if (g3 == null){continue;}
+		    application.bSpace.removeGlyph(g3);
+		}
 		Glyph g2;
 		for (int i=0;i<highlightedElements.size();i++){
 			g2 = (Glyph)highlightedElements.elementAt(i);
@@ -701,7 +720,7 @@ abstract class LElem {
 
 class LNode extends LElem {
 
-    String code, name;
+    String code, name, lat, lon;
 
     LEdge[] edges;
     short[] edgeDirections;
@@ -709,9 +728,11 @@ class LNode extends LElem {
 	VCircle nodeShape;
 	VText nodeLabel;
 
-    LNode(String code, String name, VCircle nodeShape, VText nodeLabel){
+    LNode(String code, String name, double lat, double lon, VCircle nodeShape, VText nodeLabel){
         this.code = code;
         this.name = name;
+        this.lat = String.valueOf(lat);
+        this.lon = String.valueOf(lon);
 		this.nodeShape = nodeShape;
 		this.nodeLabel = nodeLabel;
 		this.nodeShape.setOwner(this);
@@ -726,6 +747,14 @@ class LNode extends LElem {
 
     String getName(){
         return name;
+    }
+    
+    String getLatitude(){
+        return lat;
+    }
+    
+    String getLongitude(){
+        return lon;
     }
 
 	void addArc(LEdge e, short direction){
