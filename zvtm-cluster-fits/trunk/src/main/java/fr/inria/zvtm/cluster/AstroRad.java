@@ -39,6 +39,8 @@ public class AstroRad {
     private RangeSelection rangeSel;
     private FitsImage selectedImage;
     private FitsHistogram hist;
+    private WallCursor ctrlCursor;
+    private WallCursor imgCursor;
     private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE;
     private AROptions options;
 
@@ -109,7 +111,7 @@ public class AstroRad {
         //rangeSel.move(-1000, 1000);
     }
 
-    private void addImage(URL imgUrl){
+    private void addImage(URL imgUrl, double x, double y){
         try{
             FitsImage image = new FitsImage(0,0,0,imgUrl);
             images.add(image);
@@ -117,6 +119,10 @@ public class AstroRad {
         } catch(Exception ex){
             System.err.println(ex);
         }
+    }
+
+    private void addImage(URL imgUrl){
+        addImage(imgUrl, 0, 0);
     }
 
     private void removeSelectedImage(){
