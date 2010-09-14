@@ -101,6 +101,8 @@ public class AstroRad {
         vsm.addClusteredView(imageView);
         vsm.addClusteredView(controlView);
 
+        ctrlCursor = new WallCursor(controlSpace);
+
         setupControlZone();
     }
 
@@ -116,6 +118,9 @@ public class AstroRad {
             FitsImage image = new FitsImage(0,0,0,imgUrl);
             images.add(image);
             imageSpace.addGlyph(image);
+            controlSpace.removeGlyph(hist);
+            hist = FitsHistogram.fromFitsImage(image);
+            controlSpace.addGlyph(hist);
         } catch(Exception ex){
             System.err.println(ex);
         }
