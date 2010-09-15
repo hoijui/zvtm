@@ -11,6 +11,7 @@ import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
 import fr.inria.zvtm.engine.Camera;
+import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.VirtualSpace;
@@ -22,6 +23,7 @@ import fr.inria.zvtm.glyphs.FitsImage;
 import fr.inria.zvtm.glyphs.Glyph;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.geom.Point2D;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -43,6 +45,10 @@ public class AstroRad {
     private WallCursor imgCursor;
     private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE;
     private AROptions options;
+
+    private boolean dragLeft = false; //XXX change
+    private boolean dragRight = false; //XXX change
+    private View masterView;
 
     //todo:
     // - image thumbnail (tile)
@@ -68,10 +74,10 @@ public class AstroRad {
         Vector<Camera> cameras = new Vector<Camera>();
         cameras.add(imageCamera);
         cameras.add(controlCamera);
-        View view = vsm.addFrameView(cameras, "Master View",
+        masterView = vsm.addFrameView(cameras, "Master View",
                 View.STD_VIEW, 800, 600, false, true, true, null);	
-        view.setListener(new PanZoomEventHandler());
-        view.getCursor().setColor(Color.GREEN);
+        masterView.setListener(new PanZoomEventHandler());
+        masterView.getCursor().setColor(Color.GREEN);
 
         ClusterGeometry clGeom;
         ClusteredView imageView;
@@ -118,9 +124,7 @@ public class AstroRad {
             FitsImage image = new FitsImage(0,0,0,imgUrl);
             images.add(image);
             imageSpace.addGlyph(image);
-            controlSpace.removeGlyph(hist);
-            hist = FitsHistogram.fromFitsImage(image);
-            controlSpace.addGlyph(hist);
+            imageFocusChanged(image);
         } catch(Exception ex){
             System.err.println(ex);
         }
@@ -128,6 +132,19 @@ public class AstroRad {
 
     private void addImage(URL imgUrl){
         addImage(imgUrl, 0, 0);
+    }
+
+    private void imageFocusChanged(FitsImage focused){
+        if(focused == null){
+            return;
+        }
+        if(hist != null){
+            controlSpace.removeGlyph(hist);
+        }
+        hist = FitsHistogram.fromFitsImage(focused);
+        controlSpace.addGlyph(hist);
+        // XXX rangeSel.setTicksVal();
+        selectedImage = focused;
     }
 
     private void removeSelectedImage(){
@@ -158,15 +175,47 @@ public class AstroRad {
         new AstroRad(new URL(args[0]), options);
     }
 
+    private Point2D.Double viewToSpace(Camera cam, int jpx, int jpy){
+        Location camLoc = cam.getLocation();
+        double focal = cam.getFocal();
+        double altCoef = (focal + camLoc.alt) / focal;
+        Dimension viewSize = masterView.getPanelSize();
+
+        //find coords of view origin in the virtual space
+        double viewOrigX = camLoc.vx - 0.5*viewSize.width*altCoef;
+        double viewOrigY = camLoc.vy + 0.5*viewSize.height*altCoef;
+
+        return new Point2D.Double(
+                viewOrigX + altCoef*jpx,
+                viewOrigY - altCoef*jpy);
+    }
+
     private class PanZoomEventHandler implements ViewListener{
         private int lastJPX;
         private int lastJPY;
 
-        public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+        public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+            Point2D.Double cursorPos = viewToSpace(vsm.getActiveCamera(), jpx, jpy);
+            if(rangeSel.overLeftTick(cursorPos.x, cursorPos.y)){
+                dragLeft = true;
+            } else if(rangeSel.overRightTick(cursorPos.x, cursorPos.y)){
+                dragRight = true;
+            }
+        }
 
-        public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+        public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+            dragLeft = false;
+            dragRight = false;
+            double min = selectedImage.getUnderlyingImage().getHistogram().getMin();
+            double max = selectedImage.getUnderlyingImage().getHistogram().getMax();
+            selectedImage.rescale(min + rangeSel.getLeftValue()*(max - min),
+                    min + rangeSel.getRightValue()*(max - min),
+                    1);
+        }
 
-        public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
+        public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
+            // dispatchMouseEvent()
+        }
 
         public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
@@ -195,6 +244,14 @@ public class AstroRad {
         public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){}
 
         public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
+            if(buttonNumber == 1){
+                if(dragLeft) {
+                    rangeSel.setLeftTickPos(viewToSpace(vsm.getActiveCamera(), jpx, jpy).x);
+                } else if(dragRight){
+                    rangeSel.setRightTickPos(viewToSpace(vsm.getActiveCamera(), jpx, jpy).x);
+                }
+            }
+
             if (buttonNumber == 3 || ((mod == META_MOD || mod == META_SHIFT_MOD) && buttonNumber == 1)){
                 Camera c=vsm.getActiveCamera();
                 double a=(c.focal+Math.abs(c.altitude))/c.focal;

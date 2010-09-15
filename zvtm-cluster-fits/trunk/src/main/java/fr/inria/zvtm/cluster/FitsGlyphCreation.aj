@@ -5,10 +5,15 @@ import java.net.URL;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.glyphs.FitsImage;
 import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.fits.RangeSelection;
 
 public aspect FitsGlyphCreation {
     @Override GlyphReplicator FitsImage.getReplicator(){
         return new FitsImageReplicator(this);
+    }
+
+    @Override GlyphReplicator RangeSelection.getReplicator(){
+        return new RangeSelectionReplicator(this);
     }
 
     private static class FitsImageReplicator extends GlyphCreation.ClosedShapeReplicator {
@@ -28,6 +33,23 @@ public aspect FitsGlyphCreation {
                 //XXX error handling
                 throw new Error(e);
             }
+        }
+    }
+
+    private static class RangeSelectionReplicator extends GlyphCreation.AbstractGlyphReplicator {
+        private final double leftTickPos;
+        private final double rightTickPos;
+
+        RangeSelectionReplicator(RangeSelection source){
+            super(source);
+            this.leftTickPos = source.getLeftValue();
+            this.rightTickPos = source.getRightValue();
+        }
+
+        Glyph doCreateGlyph(){
+            RangeSelection retval = new RangeSelection();
+            retval.setTicksVal(leftTickPos, rightTickPos);
+            return retval;
         }
     }
 }
