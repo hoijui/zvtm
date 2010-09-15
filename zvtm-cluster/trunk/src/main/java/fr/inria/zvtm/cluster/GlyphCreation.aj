@@ -203,7 +203,7 @@ public aspect GlyphCreation {
         }
     }
 
-	private static abstract class AbstractGlyphReplicator implements GlyphReplicator {
+	static abstract class AbstractGlyphReplicator implements GlyphReplicator {
 		private final GlyphAttributes baseAttr;
 
 		AbstractGlyphReplicator(Glyph source){
