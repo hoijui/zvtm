@@ -19,6 +19,7 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.fits.FitsHistogram;
 import fr.inria.zvtm.fits.RangeSelection;
+import fr.inria.zvtm.fits.ZScale;
 import fr.inria.zvtm.glyphs.FitsImage;
 import fr.inria.zvtm.glyphs.Glyph;
 
@@ -49,6 +50,8 @@ public class AstroRad {
     private boolean dragLeft = false; //XXX change
     private boolean dragRight = false; //XXX change
     private View masterView;
+
+    //add web interface? (embedded server, 'addImage' operation...?)
 
     //todo:
     // - image thumbnail (tile)
@@ -124,7 +127,12 @@ public class AstroRad {
             FitsImage image = new FitsImage(0,0,0,imgUrl);
             images.add(image);
             imageSpace.addGlyph(image);
-            imageFocusChanged(image);
+            imageSpace.onTop(image);
+            double[] scaleBounds = ZScale.computeScale(image.getUnderlyingImage());
+            if(scaleBounds != null){
+                image.rescale(scaleBounds[0], scaleBounds[1], 1.);
+            }
+            imageFocusChanged(image, scaleBounds[0], scaleBounds[1]);
         } catch(Exception ex){
             System.err.println(ex);
         }
@@ -134,7 +142,8 @@ public class AstroRad {
         addImage(imgUrl, 0, 0);
     }
 
-    private void imageFocusChanged(FitsImage focused){
+    private void imageFocusChanged(FitsImage focused, double lowCut, 
+            double highCut){
         if(focused == null){
             return;
         }
@@ -142,8 +151,25 @@ public class AstroRad {
             controlSpace.removeGlyph(hist);
         }
         hist = FitsHistogram.fromFitsImage(focused);
+        double histWidth = hist.getBounds()[2] - hist.getBounds()[0];
+        double rsWidth = rangeSel.getBounds()[2] - rangeSel.getBounds()[0];
+        System.err.println("histWidth: " + histWidth);
+        System.err.println("hist size: " + hist.getSize());
+        System.err.println("rsWidth: " + rsWidth);
+        System.err.println("rs size: " + rangeSel.getSize());
         controlSpace.addGlyph(hist);
-        // XXX rangeSel.setTicksVal();
+        System.err.println("new hist size: " + rsWidth * hist.getSize()/histWidth);
+        hist.sizeTo(rsWidth * hist.getSize()/histWidth * 0.9);
+        System.err.println("new hist size(control): " + hist.getSize());
+        System.err.println("new hist width: " + (hist.getBounds()[2] - hist.getBounds()[0]));
+        hist.move(-rsWidth/2, 30);
+
+        //draw bounding boxes around histogram and range selection?
+
+        double min = focused.getUnderlyingImage().getHistogram().getMin();
+        double max = focused.getUnderlyingImage().getHistogram().getMax();
+        rangeSel.setTicksVal((lowCut-min)/(max-min), (highCut-min)/(max-min));
+
         selectedImage = focused;
     }
 
