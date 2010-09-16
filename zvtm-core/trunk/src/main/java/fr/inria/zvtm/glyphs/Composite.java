@@ -64,8 +64,7 @@ public class Composite extends Glyph {
         return children;
     }
 
-    //mainly for debug purposes
-    public double[] getBoundingBox(){
+    @Override public double[] getBounds(){
         double[] retval = new double[bbox.length];
         System.arraycopy(bbox, 0, retval, 0, bbox.length);
         return retval;
