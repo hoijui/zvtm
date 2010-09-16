@@ -74,192 +74,187 @@ public class Composite extends Glyph {
      * {@inheritDoc}
      */
     @Override
-    public Composite clone(){
-        Composite retval = (Composite)super.clone();  
-        retval.children = new ArrayList<Glyph>();
-        for(Glyph g: children){
-            retval.children.add((Glyph)g.clone());
-        } 
-        return retval;
-    }
+        public Composite clone(){
+            Composite retval = (Composite)super.clone();  
+            retval.children = new ArrayList<Glyph>();
+            for(Glyph g: children){
+                retval.children.add((Glyph)g.clone());
+            } 
+            return retval;
+        }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean fillsView(double w, double h, int camIndex){
-        return false; //safe option
-    }
+        public boolean fillsView(double w, double h, int camIndex){
+            return false; //safe option
+        }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
-        //XXX implement
-        return NO_CURSOR_EVENT;
-    }
+        public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
+            //XXX implement
+            return NO_CURSOR_EVENT;
+        }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void resetMouseIn(){
-        //XXX ?
-    }
+        public void resetMouseIn(){
+            //XXX ?
+        }
 
     /**
      * {@inheritDoc}
      */
     @Override 
-    public void resetMouseIn(int i){
-        //XXX ?
-    }
+        public void resetMouseIn(int i){
+            //XXX ?
+        }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
-        //XXX implement
-        return true;
-    }
+        public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
+            //XXX implement
+            return true;
+        }
 
     //XXX implement visibleInRegion (clipping)
 
     @Override 
-    public void removeCamera(int index){
-        for(Glyph child: children){
-            child.removeCamera(index);
+        public void removeCamera(int index){
+            for(Glyph child: children){
+                child.removeCamera(index);
+            }
         }
-    }
 
     @Override 
-    public void addCamera(int index){
-        for(Glyph child: children){
-            child.addCamera(index);
+        public void addCamera(int index){
+            for(Glyph child: children){
+                child.addCamera(index);
+            }
         }
-    }
 
     @Override
-    public void initCams(int nbCam){
-       for(Glyph child: children){
-           child.initCams(nbCam);
-       } 
-    }
-
-    @Override
-    public void drawForLens(Graphics2D g,
-           int vW,
-           int vH,
-           int i,
-           Stroke stdS,
-           AffineTransform stdT,
-           int dx,
-           int dy){
-        for(Glyph child: children){
-            child.drawForLens(g,vW,vH,i,stdS,stdT,dx,dy);
+        public void initCams(int nbCam){
+            for(Glyph child: children){
+                child.initCams(nbCam);
+            } 
         }
-  }
 
     @Override
-    public void draw(Graphics2D g,
-                          int vW,
-                          int vH,
-                          int i,
-                          Stroke stdS,
-                          AffineTransform stdT,
-                          int dx,
-                          int dy){
-        for(Glyph child: children){
-            child.draw(g,vW,vH,i,stdS,stdT,dx,dy);
+        public void drawForLens(Graphics2D g,
+                int vW,
+                int vH,
+                int i,
+                Stroke stdS,
+                AffineTransform stdT,
+                int dx,
+                int dy){
+            for(Glyph child: children){
+                child.drawForLens(g,vW,vH,i,stdS,stdT,dx,dy);
+            }
         }
-    }
 
     @Override
-    public void projectForLens(Camera c,
-                                    int lensWidth,
-                                    int lensHeight,
-                                    float lensMag,
-                                    double lensx,
-                                    double lensy){
-        for(Glyph child: children){
-            child.projectForLens(c,lensWidth,lensHeight,lensMag,lensx,lensy);
+        public void draw(Graphics2D g,
+                int vW,
+                int vH,
+                int i,
+                Stroke stdS,
+                AffineTransform stdT,
+                int dx,
+                int dy){
+            for(Glyph child: children){
+                child.draw(g,vW,vH,i,stdS,stdT,dx,dy);
+            }
         }
-    }
 
     @Override
-    public void project(Camera c,
-            Dimension d){
-        for(Glyph child: children){
-            child.project(c,d);
+        public void projectForLens(Camera c,
+                int lensWidth,
+                int lensHeight,
+                float lensMag,
+                double lensx,
+                double lensy){
+            for(Glyph child: children){
+                child.projectForLens(c,lensWidth,lensHeight,lensMag,lensx,lensy);
+            }
         }
-    }
 
     @Override
-    public void highlight(boolean b,
-                               Color selectedColor){
-        for(Glyph g: children){
-            g.highlight(b, selectedColor);
+        public void project(Camera c,
+                Dimension d){
+            for(Glyph child: children){
+                child.project(c,d);
+            }
         }
-    }
 
     @Override
-    public void orientTo(double angle){
-        //XXX ?
-        //At the moment, a Composite glyph's orientation may not be changed.
-    }
+        public void highlight(boolean b,
+                Color selectedColor){
+            for(Glyph g: children){
+                g.highlight(b, selectedColor);
+            }
+        }
 
     @Override
-    public double getOrient(){
-        return 0f;
-    }
+        public void orientTo(double angle){
+            //XXX ?
+            //At the moment, a Composite glyph's orientation may not be changed.
+        }
+
+    @Override
+        public double getOrient(){
+            return 0f;
+        }
 
     @Override 
-    public void reSize(double factor){
-        for(Glyph child: children){
-            child.reSize(factor);
+        public void reSize(double factor){
+            for(Glyph child: children){
+                child.reSize(factor);
 
-            child.move((vx - child.vx) * (1. - factor), 
-                    (vy - child.vy) * (1. - factor));
+                child.move((vx - child.vx) * (1. - factor), 
+                        (vy - child.vy) * (1. - factor));
+            }
+            computeBoundingBox();
         }
-        computeBoundingBox();
-    }
 
     @Override
-    public void sizeTo(double newDiameter){
-        reSize(newDiameter/diameter()); 
-    }
-
-    @Override
-    public double getSize(){
-        return diameter();
-    }
+        public void sizeTo(double newSize){
+            reSize(newSize/getSize()); 
+        }
 
     @Override 
-    public void move(double dx, double dy){
-        vx += dx;
-        vy += dy;
-        for(Glyph child: children){
-            child.move(dx, dy);
-        } 
-        translateBoundingBox(dx, dy);
-    }
+        public void move(double dx, double dy){
+            vx += dx;
+            vy += dy;
+            for(Glyph child: children){
+                child.move(dx, dy);
+            } 
+            translateBoundingBox(dx, dy);
+        }
 
     @Override
-    public void moveTo(double x, double y){
-        move(x - vx, y - vy);
-    }
+        public void moveTo(double x, double y){
+            move(x - vx, y - vy);
+        }
 
     @Override
-    public boolean visibleInRegion(double wb, double nb, double eb, double sb, int i){
-        double vw = (bbox[2] - bbox[0])/2d;
-        double vh = (bbox[1] - bbox[3])/2d; 
-        double cx = bbox[0] + vw;
-        double cy = bbox[3] + vh; 
-        return ((cx-vw)<=eb) && ((cx+vw)>=wb) && 
-            ((cy-vh)<=nb) && ((cy+vh)>=sb);
-    }
+        public boolean visibleInRegion(double wb, double nb, double eb, double sb, int i){
+            double vw = (bbox[2] - bbox[0])/2d;
+            double vh = (bbox[1] - bbox[3])/2d; 
+            double cx = bbox[0] + vw;
+            double cy = bbox[3] + vh; 
+            return ((cx-vw)<=eb) && ((cx+vw)>=wb) && 
+                ((cy-vh)<=nb) && ((cy+vh)>=sb);
+        }
 
     private void translateBoundingBox(double dx, double dy){
         bbox[0] += dx;
@@ -295,9 +290,10 @@ public class Composite extends Glyph {
         }
     }
 
-    private double diameter(){
-        return (Math.sqrt((bbox[1] - bbox[3])*(bbox[1] - bbox[3]) + 
-                (bbox[2] - bbox[0])*(bbox[2] - bbox[0])));
-    }
+    @Override 
+        public double getSize(){
+            return (Math.sqrt((bbox[1] - bbox[3])*(bbox[1] - bbox[3]) + 
+                        (bbox[2] - bbox[0])*(bbox[2] - bbox[0])));
+        }
 }
 
