@@ -33,8 +33,7 @@ public class Composite extends Glyph {
 
     /**
      * Adds a child Glyph to this Composite.
-     * Contrary to CGlyph, you should <i>not</i> add the children 
-     * to the virtual space.
+     * Do <i>not</i> add the children to the virtual space.
      * @param child Glyph to add
      */
     public void addChild(Glyph child){
