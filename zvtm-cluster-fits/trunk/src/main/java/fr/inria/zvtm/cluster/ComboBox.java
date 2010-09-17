@@ -8,7 +8,6 @@ import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VText;
 
-
 interface ComboStateObserver {
     void onStateChange(ComboBox source, int activeIdx, String label);
 }
@@ -56,6 +55,17 @@ class ComboBox {
         }
     }
 
+    void addObserver(ComboStateObserver obs){
+        assert(obs != null);
+        if(!observers.contains(obs)){
+            observers.add(obs);
+        }
+    }
+
+    void removeObserver(ComboStateObserver obs){
+        observers.remove(obs);
+    }
+
     void onPress1(double x, double y){}
     void onRelease1(double x, double y){}
     //x and y in virtualspace coords
@@ -67,7 +77,7 @@ class ComboBox {
         stateChanged(bIdx, labels.get(bIdx).getText());
     }
 
-    void stateChanged(int activeIdx, String label){
+    private void stateChanged(int activeIdx, String label){
         for(ComboStateObserver obs: observers){
             obs.onStateChange(this, activeIdx, label);
         }
