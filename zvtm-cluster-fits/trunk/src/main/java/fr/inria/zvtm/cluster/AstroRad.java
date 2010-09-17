@@ -22,6 +22,7 @@ import fr.inria.zvtm.fits.RangeSelection;
 import fr.inria.zvtm.fits.ZScale;
 import fr.inria.zvtm.glyphs.FitsImage;
 import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.glyphs.VRectangle;
 
 import java.awt.Color;
 import java.awt.Dimension;
@@ -50,6 +51,8 @@ public class AstroRad {
     private boolean dragLeft = false; //XXX change
     private boolean dragRight = false; //XXX change
     private View masterView;
+
+    private ComboBox combo;
 
     //add web interface? (embedded server, 'addImage' operation...?)
 
@@ -118,6 +121,13 @@ public class AstroRad {
     private void setupControlZone(){
         rangeSel = new RangeSelection();
         controlSpace.addGlyph(rangeSel);
+
+        combo = new ComboBox(controlSpace, 0, -50, 
+                new String[]{"nop", "heat", "rainbow"}, 
+                new Color[]{Color.GRAY, Color.ORANGE, Color.PINK},
+                60
+                );
+
         //rangeSel.reSize(10);
         //rangeSel.move(-1000, 1000);
     }
@@ -240,7 +250,8 @@ public class AstroRad {
         }
 
         public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-            // dispatchMouseEvent()
+            Point2D.Double spcCoords = viewToSpace(vsm.getActiveCamera(), jpx, jpy);
+            combo.onClick1(spcCoords.x, spcCoords.y);
         }
 
         public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
