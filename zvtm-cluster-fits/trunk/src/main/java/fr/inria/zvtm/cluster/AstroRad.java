@@ -127,6 +127,22 @@ public class AstroRad {
                 new Color[]{Color.GRAY, Color.ORANGE, Color.PINK},
                 60
                 );
+        //XXX maybe separate this step from construction to avoid escaping 'this'
+        combo.addObserver(new ComboStateObserver(){
+            public void onStateChange(ComboBox source, int activeIdx, String label){
+                if(selectedImage == null){
+                    return;
+                }
+
+                if(activeIdx == 0){
+                    selectedImage.setColorFilter(FitsImage.ColorFilter.NOP);
+                } else if(activeIdx == 1){
+                    selectedImage.setColorFilter(FitsImage.ColorFilter.HEAT);
+                } else {
+                    selectedImage.setColorFilter(FitsImage.ColorFilter.RAINBOW);
+                }
+            }
+        });
 
         //rangeSel.reSize(10);
         //rangeSel.move(-1000, 1000);
