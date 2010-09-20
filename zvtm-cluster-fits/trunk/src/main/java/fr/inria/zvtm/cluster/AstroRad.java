@@ -40,16 +40,14 @@ public class AstroRad {
     private Camera imageCamera; 
     private Camera controlCamera; 
     private final List<FitsImage> images = new ArrayList<FitsImage>();
-    private RangeSelection rangeSel;
+    private RangeManager range;
     private FitsImage selectedImage;
     private FitsHistogram hist;
     private WallCursor ctrlCursor;
-    private WallCursor imgCursor;
+    //private WallCursor imgCursor;
     private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE;
     private AROptions options;
 
-    private boolean dragLeft = false; //XXX change
-    private boolean dragRight = false; //XXX change
     private View masterView;
 
     private ComboBox combo;
@@ -127,15 +125,27 @@ public class AstroRad {
     //@param width approximate width for the control zone 
     //@param height approximate height for the control zone
     private void setupControlZone(double x, double y, double width, double height){
-        rangeSel = new RangeSelection();
-        controlSpace.addGlyph(rangeSel);
-        rangeSel.sizeTo(width);
+        range = new RangeManager(controlSpace, 0, 0, width);
 
-        combo = new ComboBox(controlSpace, 0, -50, 
+        combo = new ComboBox(controlSpace, 0, -height/3, 
                 new String[]{"gray", "heat", "rainbow"}, 
                 new Color[]{Color.LIGHT_GRAY, Color.ORANGE, Color.PINK},
                 60
                 );
+
+        range.addObserver(new RangeStateObserver(){
+            public void onStateChange(RangeManager source, double low, double high){
+                if(selectedImage == null){
+                    return;
+                }
+                double min = selectedImage.getUnderlyingImage().getHistogram().getMin();
+                double max = selectedImage.getUnderlyingImage().getHistogram().getMax();
+                selectedImage.rescale(min + low*(max - min),
+                    min + high*(max - min),
+                    1);
+            }
+        });
+
         //XXX maybe separate this step from construction to avoid escaping 'this'
         combo.addObserver(new ComboStateObserver(){
             public void onStateChange(ComboBox source, int activeIdx, String label){
@@ -170,7 +180,8 @@ public class AstroRad {
         }
     }
 
-    private void addImage(URL imgUrl){
+    //package-accessible (may be invoked by an embedded web server)
+    void addImage(URL imgUrl){
         addImage(imgUrl, 0, 0);
     }
 
@@ -183,24 +194,25 @@ public class AstroRad {
             controlSpace.removeGlyph(hist);
         }
         hist = FitsHistogram.fromFitsImage(focused);
-        double histWidth = hist.getBounds()[2] - hist.getBounds()[0];
-        double rsWidth = rangeSel.getBounds()[2] - rangeSel.getBounds()[0];
+       // double histWidth = hist.getBounds()[2] - hist.getBounds()[0];
+       // double rsWidth = rangeSel.getBounds()[2] - rangeSel.getBounds()[0];
        // System.err.println("histWidth: " + histWidth);
        // System.err.println("hist size: " + hist.getSize());
        // System.err.println("rsWidth: " + rsWidth);
        // System.err.println("rs size: " + rangeSel.getSize());
         controlSpace.addGlyph(hist);
        // System.err.println("new hist size: " + rsWidth * hist.getSize()/histWidth);
-        hist.sizeTo(rsWidth * hist.getSize()/histWidth * 0.9);
+       // hist.sizeTo(rsWidth * hist.getSize()/histWidth * 0.9);
        // System.err.println("new hist size(control): " + hist.getSize());
        // System.err.println("new hist width: " + (hist.getBounds()[2] - hist.getBounds()[0]));
-        hist.move(-rsWidth/2, 30);
+        //hist.move(-rsWidth/2, 30);
+        hist.move(0, 30);
 
         //draw bounding boxes around histogram and range selection?
 
         double min = focused.getUnderlyingImage().getHistogram().getMin();
         double max = focused.getUnderlyingImage().getHistogram().getMax();
-        rangeSel.setTicksVal((lowCut-min)/(max-min), (highCut-min)/(max-min));
+        range.setTicksVal((lowCut-min)/(max-min), (highCut-min)/(max-min));
 
         selectedImage = focused;
     }
@@ -254,22 +266,12 @@ public class AstroRad {
         private int lastJPY;
 
         public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-            Point2D.Double cursorPos = viewToSpace(controlCamera, jpx, jpy);
-            if(rangeSel.overLeftTick(cursorPos.x, cursorPos.y)){
-                dragLeft = true;
-            } else if(rangeSel.overRightTick(cursorPos.x, cursorPos.y)){
-                dragRight = true;
-            }
+            Point2D.Double spcCoords = viewToSpace(controlCamera, jpx, jpy);
+            range.onPress1(spcCoords.x, spcCoords.y);
         }
 
         public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-            dragLeft = false;
-            dragRight = false;
-            double min = selectedImage.getUnderlyingImage().getHistogram().getMin();
-            double max = selectedImage.getUnderlyingImage().getHistogram().getMax();
-            selectedImage.rescale(min + rangeSel.getLeftValue()*(max - min),
-                    min + rangeSel.getRightValue()*(max - min),
-                    1);
+            range.onRelease1();
         }
 
         public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
@@ -305,11 +307,8 @@ public class AstroRad {
 
         public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
             if(buttonNumber == 1){
-                if(dragLeft) {
-                    rangeSel.setLeftTickPos(viewToSpace(controlCamera, jpx, jpy).x);
-                } else if(dragRight){
-                    rangeSel.setRightTickPos(viewToSpace(controlCamera, jpx, jpy).x);
-                }
+                Point2D.Double spcCoords = viewToSpace(controlCamera, jpx, jpy);
+                range.onDrag(spcCoords.x, spcCoords.y); 
             }
 
             if (buttonNumber == 3 || ((mod == META_MOD || mod == META_SHIFT_MOD) && buttonNumber == 1)){

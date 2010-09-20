@@ -16,7 +16,7 @@ interface ComboStateObserver {
 //A Combo box is a number of horizontally aligned VRectangles, at most
 //one of which is selected at a given time
 class ComboBox {
-    private VirtualSpace parentSpace;
+    private final VirtualSpace parentSpace;
     private final ArrayList<VRectangle> buttons = new ArrayList();
     private final ArrayList<VText> labels = new ArrayList();
 
@@ -33,6 +33,7 @@ class ComboBox {
     ComboBox(VirtualSpace parentSpace, double x, double y, 
             String[] labels, Color[] colors, double itemSize){
         assert(labels.length == colors.length);
+        this.parentSpace = parentSpace;
         for(int i=0; i<labels.length; ++i){
             VRectangle button = new VRectangle(x + i*(1.25*itemSize), y, 0, 
                     itemSize, itemSize, colors[i]);
@@ -66,8 +67,6 @@ class ComboBox {
         observers.remove(obs);
     }
 
-    void onPress1(double x, double y){}
-    void onRelease1(double x, double y){}
     //x and y in virtualspace coords
     void onClick1(double x, double y){
         int bIdx = buttonIndex(x, y);
