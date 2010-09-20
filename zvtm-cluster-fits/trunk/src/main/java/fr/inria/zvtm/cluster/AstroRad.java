@@ -115,16 +115,25 @@ public class AstroRad {
 
         ctrlCursor = new WallCursor(controlSpace);
 
-        setupControlZone();
+        if(options.debugView){
+            setupControlZone(0, 0, 400, 300);
+        } else {
+            setupControlZone(0,0, 4000, 5000);
+        }
     }
 
-    private void setupControlZone(){
+    //@param x
+    //@param y
+    //@param width approximate width for the control zone 
+    //@param height approximate height for the control zone
+    private void setupControlZone(double x, double y, double width, double height){
         rangeSel = new RangeSelection();
         controlSpace.addGlyph(rangeSel);
+        rangeSel.sizeTo(width);
 
         combo = new ComboBox(controlSpace, 0, -50, 
-                new String[]{"nop", "heat", "rainbow"}, 
-                new Color[]{Color.GRAY, Color.ORANGE, Color.PINK},
+                new String[]{"gray", "heat", "rainbow"}, 
+                new Color[]{Color.LIGHT_GRAY, Color.ORANGE, Color.PINK},
                 60
                 );
         //XXX maybe separate this step from construction to avoid escaping 'this'
@@ -143,9 +152,6 @@ public class AstroRad {
                 }
             }
         });
-
-        //rangeSel.reSize(10);
-        //rangeSel.move(-1000, 1000);
     }
 
     private void addImage(URL imgUrl, double x, double y){
@@ -179,15 +185,15 @@ public class AstroRad {
         hist = FitsHistogram.fromFitsImage(focused);
         double histWidth = hist.getBounds()[2] - hist.getBounds()[0];
         double rsWidth = rangeSel.getBounds()[2] - rangeSel.getBounds()[0];
-        System.err.println("histWidth: " + histWidth);
-        System.err.println("hist size: " + hist.getSize());
-        System.err.println("rsWidth: " + rsWidth);
-        System.err.println("rs size: " + rangeSel.getSize());
+       // System.err.println("histWidth: " + histWidth);
+       // System.err.println("hist size: " + hist.getSize());
+       // System.err.println("rsWidth: " + rsWidth);
+       // System.err.println("rs size: " + rangeSel.getSize());
         controlSpace.addGlyph(hist);
-        System.err.println("new hist size: " + rsWidth * hist.getSize()/histWidth);
+       // System.err.println("new hist size: " + rsWidth * hist.getSize()/histWidth);
         hist.sizeTo(rsWidth * hist.getSize()/histWidth * 0.9);
-        System.err.println("new hist size(control): " + hist.getSize());
-        System.err.println("new hist width: " + (hist.getBounds()[2] - hist.getBounds()[0]));
+       // System.err.println("new hist size(control): " + hist.getSize());
+       // System.err.println("new hist width: " + (hist.getBounds()[2] - hist.getBounds()[0]));
         hist.move(-rsWidth/2, 30);
 
         //draw bounding boxes around histogram and range selection?
@@ -225,6 +231,7 @@ public class AstroRad {
         }
 
         new AstroRad(new URL(args[0]), options);
+        //plug web interface: at least addImage(URL)
     }
 
     private Point2D.Double viewToSpace(Camera cam, int jpx, int jpy){
@@ -247,7 +254,7 @@ public class AstroRad {
         private int lastJPY;
 
         public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-            Point2D.Double cursorPos = viewToSpace(vsm.getActiveCamera(), jpx, jpy);
+            Point2D.Double cursorPos = viewToSpace(controlCamera, jpx, jpy);
             if(rangeSel.overLeftTick(cursorPos.x, cursorPos.y)){
                 dragLeft = true;
             } else if(rangeSel.overRightTick(cursorPos.x, cursorPos.y)){
@@ -266,7 +273,7 @@ public class AstroRad {
         }
 
         public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-            Point2D.Double spcCoords = viewToSpace(vsm.getActiveCamera(), jpx, jpy);
+            Point2D.Double spcCoords = viewToSpace(controlCamera, jpx, jpy);
             combo.onClick1(spcCoords.x, spcCoords.y);
         }
 
@@ -299,9 +306,9 @@ public class AstroRad {
         public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
             if(buttonNumber == 1){
                 if(dragLeft) {
-                    rangeSel.setLeftTickPos(viewToSpace(vsm.getActiveCamera(), jpx, jpy).x);
+                    rangeSel.setLeftTickPos(viewToSpace(controlCamera, jpx, jpy).x);
                 } else if(dragRight){
-                    rangeSel.setRightTickPos(viewToSpace(vsm.getActiveCamera(), jpx, jpy).x);
+                    rangeSel.setRightTickPos(viewToSpace(controlCamera, jpx, jpy).x);
                 }
             }
 

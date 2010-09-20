@@ -27,8 +27,8 @@ class ComboBox {
     /**
      * @param parentSpace parent VirtualSpace (new glyphs will be added to parentSpace)
      * @param labels combo box labels
-     * @param x origin x-coordinate
-     * @param y origin y-coordinate
+     * @param x origin x-coordinate (center of the leftmost button)
+     * @param y origin y-coordinate (center of the leftmost button)
      */
     ComboBox(VirtualSpace parentSpace, double x, double y, 
             String[] labels, Color[] colors, double itemSize){
