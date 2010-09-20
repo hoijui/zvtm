@@ -10,6 +10,13 @@ import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
+import fr.inria.vit.pan.IPhodPan;
+import fr.inria.vit.pan.PanEventSource;
+import fr.inria.vit.point.ClutchEventType;
+import fr.inria.vit.point.DefaultLaserPoint;
+import fr.inria.vit.point.PointEventSource;
+import fr.inria.vit.point.PointListener;
+
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.engine.View;
@@ -41,23 +48,23 @@ public class AstroRad {
     private Camera controlCamera; 
     private final List<FitsImage> images = new ArrayList<FitsImage>();
     private RangeManager range;
+    private ComboBox combo;
     private FitsImage selectedImage;
     private FitsHistogram hist;
     private WallCursor ctrlCursor;
     //private WallCursor imgCursor;
+
+    private PanEventSource panSource;
+    private PointEventSource pointSource;
+
     private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE;
     private AROptions options;
 
     private View masterView;
 
-    private ComboBox combo;
-
-    //add web interface? (embedded server, 'addImage' operation...?)
-
     //todo:
     // - image thumbnail (tile)
     // - xfer function chooser
-    // - color map chooser
 
     private AstroRad(URL imgUrl, AROptions options){
         this.options = options;
@@ -112,6 +119,19 @@ public class AstroRad {
         vsm.addClusteredView(controlView);
 
         ctrlCursor = new WallCursor(controlSpace);
+
+        panSource = new IPhodPan();
+        pointSource = new DefaultLaserPoint();
+       // panSource.addListener();
+        pointSource.addListener(new PointListener(){
+               public void coordsChanged(double x, double y, boolean relative){
+                   System.err.println("Coords changed: x= " + x + ", y = "
+                       + y + ", relative = " + relative);
+               }
+               public void pressed(boolean pressed){}
+               public void clutched(ClutchEventType event){}
+
+        });
 
         if(options.debugView){
             setupControlZone(0, 0, 400, 300);
