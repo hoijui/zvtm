@@ -42,6 +42,9 @@ import java.awt.event.MouseWheelEvent;
  * A clustered viewer for FITS images.
  */
 public class AstroRad {
+    private static final double CTRLVIEW_XOFFSET = 7*2840;
+    private static final double VIEW_YOFFSET = 2*1800;
+
     private VirtualSpace imageSpace;
     private VirtualSpace controlSpace;
     private Camera imageCamera; 
@@ -55,7 +58,7 @@ public class AstroRad {
     //private WallCursor imgCursor;
 
     private PanEventSource panSource;
-    private PointEventSource pointSource;
+    private DefaultLaserPoint pointSource;
 
     private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE;
     private AROptions options;
@@ -120,18 +123,22 @@ public class AstroRad {
 
         ctrlCursor = new WallCursor(controlSpace);
 
-        panSource = new IPhodPan();
+        //panSource = new IPhodPan();
         pointSource = new DefaultLaserPoint();
        // panSource.addListener();
         pointSource.addListener(new PointListener(){
                public void coordsChanged(double x, double y, boolean relative){
                    System.err.println("Coords changed: x= " + x + ", y = "
                        + y + ", relative = " + relative);
+                   ctrlCursor.moveTo(x-CTRLVIEW_XOFFSET, -y+VIEW_YOFFSET);
                }
-               public void pressed(boolean pressed){}
+               public void pressed(boolean pressed){
+                System.err.println("pow!");
+               }
                public void clutched(ClutchEventType event){}
 
         });
+        pointSource.start();
 
         if(options.debugView){
             setupControlZone(0, 0, 400, 300);

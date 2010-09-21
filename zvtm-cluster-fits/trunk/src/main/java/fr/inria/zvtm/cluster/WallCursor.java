@@ -43,7 +43,7 @@ class WallCursor {
         target.removeGlyph(vRect);
     }
 
-    void moveTo(double x, long y){
+    void moveTo(double x, double y){
         hRect.moveTo(x, y);
         vRect.moveTo(x, y);
     }
