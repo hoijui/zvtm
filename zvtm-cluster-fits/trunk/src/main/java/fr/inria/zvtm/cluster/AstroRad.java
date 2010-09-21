@@ -43,6 +43,7 @@ import java.awt.event.MouseWheelEvent;
  */
 public class AstroRad {
     private static final double CTRLVIEW_XOFFSET = 7*2840;
+    private static final double IMGVIEW_XOFFSET = 3*2840;
     private static final double VIEW_YOFFSET = 2*1800;
 
     private VirtualSpace imageSpace;
@@ -55,7 +56,7 @@ public class AstroRad {
     private FitsImage selectedImage;
     private FitsHistogram hist;
     private WallCursor ctrlCursor;
-    //private WallCursor imgCursor;
+    private WallCursor imgCursor;
 
     private PanEventSource panSource;
     private DefaultLaserPoint pointSource;
@@ -114,6 +115,7 @@ public class AstroRad {
                     4);
             imageView = new ClusteredView(clGeom, 3, 6, 4, imgCamList);
             controlView = new ClusteredView(clGeom, 27, 2, 4, controlCamList);
+            controlView.setBackgroundColor(new Color(0, 40, 0));
         }
         assert(clGeom != null);
         assert(imageView != null);
@@ -122,15 +124,16 @@ public class AstroRad {
         vsm.addClusteredView(controlView);
 
         ctrlCursor = new WallCursor(controlSpace);
+        imgCursor = new WallCursor(imageSpace, 20, 160, Color.GREEN);
 
         //panSource = new IPhodPan();
         pointSource = new DefaultLaserPoint();
        // panSource.addListener();
         pointSource.addListener(new PointListener(){
                public void coordsChanged(double x, double y, boolean relative){
-                   System.err.println("Coords changed: x= " + x + ", y = "
-                       + y + ", relative = " + relative);
+                   assert(!relative);
                    ctrlCursor.moveTo(x-CTRLVIEW_XOFFSET, -y+VIEW_YOFFSET);
+                   imgCursor.moveTo(x-IMGVIEW_XOFFSET, -y+VIEW_YOFFSET);
                }
                public void pressed(boolean pressed){
                 System.err.println("pow!");
