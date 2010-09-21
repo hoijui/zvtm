@@ -28,8 +28,8 @@ class RangeManager {
         this.parentSpace = parentSpace;
         rangeSel = new RangeSelection();
         rangeSel.moveTo(x, y);
-        rangeSel.sizeTo(size);
         parentSpace.addGlyph(rangeSel);
+        rangeSel.sizeTo(size);
     }
 
     void dispose(){

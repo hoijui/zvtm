@@ -13,7 +13,7 @@ import org.kohsuke.args4j.Option;
 import fr.inria.vit.pan.IPhodPan;
 import fr.inria.vit.pan.PanEventSource;
 import fr.inria.vit.point.ClutchEventType;
-import fr.inria.vit.point.DefaultLaserPoint;
+import fr.inria.vit.point.MouseLaserPoint;
 import fr.inria.vit.point.PointEventSource;
 import fr.inria.vit.point.PointListener;
 
@@ -59,7 +59,7 @@ public class AstroRad {
     private WallCursor imgCursor;
 
     private PanEventSource panSource;
-    private DefaultLaserPoint pointSource;
+    private MouseLaserPoint pointSource;
 
     private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE;
     private AROptions options;
@@ -127,7 +127,7 @@ public class AstroRad {
         imgCursor = new WallCursor(imageSpace, 20, 160, Color.GREEN);
 
         //panSource = new IPhodPan();
-        pointSource = new DefaultLaserPoint();
+        pointSource = new MouseLaserPoint(masterView.getPanel());
        // panSource.addListener();
         pointSource.addListener(new PointListener(){
                public void coordsChanged(double x, double y, boolean relative){
@@ -136,7 +136,14 @@ public class AstroRad {
                    imgCursor.moveTo(x-IMGVIEW_XOFFSET, -y+VIEW_YOFFSET);
                }
                public void pressed(boolean pressed){
-                System.err.println("pow!");
+                   //forward click events to RangeSel
+                   //forward click events to ComboBox 
+                   Point2D.Double pos = ctrlCursor.getPosition();
+                   if(pressed){
+                       
+                   } else {
+                       combo.onClick1(pos.x, pos.y);
+                   }
                }
                public void clutched(ClutchEventType event){}
 
@@ -155,12 +162,12 @@ public class AstroRad {
     //@param width approximate width for the control zone 
     //@param height approximate height for the control zone
     private void setupControlZone(double x, double y, double width, double height){
-        range = new RangeManager(controlSpace, 0, 0, width);
+        range = new RangeManager(controlSpace, 0, 500, width);
 
-        combo = new ComboBox(controlSpace, 0, -height/3, 
+        combo = new ComboBox(controlSpace, -height/4, -height/3, 
                 new String[]{"gray", "heat", "rainbow"}, 
                 new Color[]{Color.LIGHT_GRAY, Color.ORANGE, Color.PINK},
-                60
+                height/5
                 );
 
         range.addObserver(new RangeStateObserver(){

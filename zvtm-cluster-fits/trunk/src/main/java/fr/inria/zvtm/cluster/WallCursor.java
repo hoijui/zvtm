@@ -1,6 +1,7 @@
 package fr.inria.zvtm.cluster;
 
 import java.awt.Color;
+import java.awt.geom.Point2D;
 
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.glyphs.SIRectangle;
@@ -44,8 +45,14 @@ class WallCursor {
     }
 
     void moveTo(double x, double y){
+        xPos = x;
+        yPos = y;
         hRect.moveTo(x, y);
         vRect.moveTo(x, y);
+    }
+
+    Point2D.Double getPosition(){
+        return new Point2D.Double(xPos, yPos);
     }
 
     void setVisible(boolean v) { hRect.setVisible(v); vRect.setVisible(v);}
