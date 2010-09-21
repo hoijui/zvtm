@@ -130,19 +130,29 @@ public class AstroRad {
         pointSource = new MouseLaserPoint(masterView.getPanel());
        // panSource.addListener();
         pointSource.addListener(new PointListener(){
+            boolean dragging = false;
+
                public void coordsChanged(double x, double y, boolean relative){
                    assert(!relative);
                    ctrlCursor.moveTo(x-CTRLVIEW_XOFFSET, -y+VIEW_YOFFSET);
                    imgCursor.moveTo(x-IMGVIEW_XOFFSET, -y+VIEW_YOFFSET);
+
+                   Point2D.Double pos = ctrlCursor.getPosition();
+                   if(dragging){
+                       range.onDrag(pos.x, pos.y);
+                   }
                }
                public void pressed(boolean pressed){
                    //forward click events to RangeSel
                    //forward click events to ComboBox 
                    Point2D.Double pos = ctrlCursor.getPosition();
                    if(pressed){
-                       
+                      dragging = true; 
+                      range.onPress1(pos.x, pos.y);
                    } else {
+                       dragging = false;
                        combo.onClick1(pos.x, pos.y);
+                       range.onRelease1();
                    }
                }
                public void clutched(ClutchEventType event){}

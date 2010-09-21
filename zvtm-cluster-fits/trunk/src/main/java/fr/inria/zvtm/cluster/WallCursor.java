@@ -37,6 +37,8 @@ class WallCursor {
         vRect.setDrawBorder(false);
         target.addGlyph(hRect);
         target.addGlyph(vRect);
+        target.onTop(hRect, 1); //XXX make configurable
+        target.onTop(vRect, 1); //XXX make configurable
     }
 
     void dispose(){
