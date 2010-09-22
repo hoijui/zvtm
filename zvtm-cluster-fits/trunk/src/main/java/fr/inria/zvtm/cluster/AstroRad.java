@@ -29,6 +29,7 @@ import fr.inria.zvtm.fits.RangeSelection;
 import fr.inria.zvtm.fits.ZScale;
 import fr.inria.zvtm.glyphs.FitsImage;
 import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.glyphs.VImage;
 import fr.inria.zvtm.glyphs.VRectangle;
 
 import java.awt.Color;
@@ -237,6 +238,13 @@ public class AstroRad {
         if(focused == null){
             return;
         }
+        for(FitsImage img: images){
+            img.setDrawBorder(false);
+        }
+        focused.setBorderColor(Color.PINK);
+        focused.setDrawBorder(true);
+        focused.setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
+        focused.setStrokeWidth(5);
         if(hist != null){
             controlSpace.removeGlyph(hist);
         }
@@ -289,8 +297,9 @@ public class AstroRad {
             System.exit(0);
         }
 
-        new AstroRad(new URL(args[0]), options);
-        //plug web interface: at least addImage(URL)
+        AstroRad ar = new AstroRad(new URL(args[0]), options);
+        new AstroServer(ar, 8000);
+
     }
 
     private Point2D.Double viewToSpace(Camera cam, int jpx, int jpy){
