@@ -17,11 +17,6 @@ class AstroServer extends NanoHTTPD {
     {
         //crude query handling. we only serve one type
         //of request, so no need for sophistication here
-        System.out.println("uri: " + uri);
-        System.out.println("method: " + method);
-        System.out.println("header: " + header);
-        System.out.println("parms: " + parms);
-
         if(!uri.equals("/addImage")){
             return new NanoHTTPD.Response(HTTP_BADREQUEST, MIME_PLAINTEXT, "operation not supported\n");
         }

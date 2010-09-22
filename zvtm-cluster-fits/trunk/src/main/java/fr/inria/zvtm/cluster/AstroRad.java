@@ -239,12 +239,10 @@ public class AstroRad {
             return;
         }
         for(FitsImage img: images){
-            img.setDrawBorder(false);
+            img.setDrawBorderPolicy(VImage.DRAW_BORDER_NEVER);
         }
         focused.setBorderColor(Color.PINK);
-        focused.setDrawBorder(true);
         focused.setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
-        focused.setStrokeWidth(5);
         if(hist != null){
             controlSpace.removeGlyph(hist);
         }
