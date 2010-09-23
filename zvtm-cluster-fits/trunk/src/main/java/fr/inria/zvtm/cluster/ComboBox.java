@@ -87,17 +87,12 @@ class ComboBox {
      */
     private int buttonIndex(double x, double y){
         for(int i=0; i<buttons.size(); ++i){
-           if(isInside(buttons.get(i), x, y)){
+           if(AstroUtil.isInside(buttons.get(i), x, y)){
                return i;
            } 
         }
         return -1;
     }
 
-    private static boolean isInside(Glyph glyph, double x, double y){
-        double[] wnes = glyph.getBounds(); 
-        return((x >= wnes[0]) && (x <= wnes[2]) &&
-                (y >= wnes[3]) && (y <= wnes[1]));
-    }
 }
 

@@ -54,7 +54,8 @@ public class AstroRad {
     private final List<FitsImage> images = new ArrayList<FitsImage>();
     private RangeManager range;
     private ComboBox combo;
-    private FitsImage selectedImage;
+    private FitsImage selectedImage = null;
+    private FitsImage draggedImage = null;
     private FitsHistogram hist;
     private WallCursor ctrlCursor;
     private WallCursor imgCursor;
@@ -139,18 +140,23 @@ public class AstroRad {
                    imgCursor.moveTo(x-IMGVIEW_XOFFSET, -y+VIEW_YOFFSET);
 
                    Point2D.Double pos = ctrlCursor.getPosition();
+                   Point2D.Double imgCurPos = imgCursor.getPosition();
                    if(dragging){
                        range.onDrag(pos.x, pos.y);
+                       imgCursorDragged(imgCurPos.x, imgCurPos.y);
                    }
                }
                public void pressed(boolean pressed){
                    //forward click events to RangeSel
                    //forward click events to ComboBox 
                    Point2D.Double pos = ctrlCursor.getPosition();
+                   Point2D.Double imgCurPos = imgCursor.getPosition();
                    if(pressed){
                       dragging = true; 
                       range.onPress1(pos.x, pos.y);
+                      imgCursorPressed(imgCurPos.x, imgCurPos.y);
                    } else {
+                       draggedImage = null;
                        dragging = false;
                        combo.onClick1(pos.x, pos.y);
                        range.onRelease1();
@@ -210,6 +216,22 @@ public class AstroRad {
                 }
             }
         });
+    }
+
+    private void imgCursorPressed(double x, double y){
+        int highestZindex = -1;
+        for(FitsImage img: images){
+            if(AstroUtil.isInside(img, x, y) && (img.getZindex() > highestZindex)){
+                draggedImage = img;
+            }
+        }
+    }
+
+    private void imgCursorDragged(double x, double y){
+        if(draggedImage == null){
+            return;
+        }
+        draggedImage.moveTo(x, y);
     }
 
     private void addImage(URL imgUrl, double x, double y){
