@@ -70,6 +70,7 @@ public class RangeSelection extends Composite {
     //The next couple of methods are a kludge to start giving some
     //interactivity to RangeSelection. We need a better event system
     //but right now I just need to get started.
+    //XXX make more robust
     public boolean overLeftTick(double xPos, double yPos){
         //approximate tick by the lower, rectangular part
         Point2D.Double[] tickCoords = leftTick.getAbsoluteVertices();
@@ -78,18 +79,19 @@ public class RangeSelection extends Composite {
     }
 
     //See above method
+    //XXX make more robust
     public boolean overRightTick(double xPos, double yPos){
         //approximate tick by the lower, rectangular part
         Point2D.Double[] tickCoords = rightTick.getAbsoluteVertices();
         return (xPos >= tickCoords[2].x) && (xPos <= tickCoords[4].x) &&
-            (yPos <= tickCoords[2].y) && (yPos >= tickCoords[4].y); 
+            (yPos >= tickCoords[2].y) && (yPos <= tickCoords[4].y); 
     }
 
-    private static final double[] tickCoordsX = {0, 0, -5, -5, 5, 5, 0};
+    private static final double[] tickCoordsX = {0, 0, -25, -25, 25, 25, 0};
     private static final double[] tickCoordsLY = {0, -BAR_HEIGHT, -BAR_HEIGHT-5, 
         -BAR_HEIGHT-5-22, -BAR_HEIGHT-5-22, -BAR_HEIGHT-5, -BAR_HEIGHT};
-    private static final double[] tickCoordsRY = {0, -BAR_HEIGHT, -BAR_HEIGHT-5, 
-        -BAR_HEIGHT-5-32, -BAR_HEIGHT-5-32, -BAR_HEIGHT-5, -BAR_HEIGHT};
+    private static final double[] tickCoordsRY = {-BAR_HEIGHT, 0, 5, 
+        5+22, 5+22, 5, 0};
 
     private static final Point2D.Double[] getTickCoords(double[] yCoords){
         Point2D.Double retval[] = new Point2D.Double[7];
@@ -100,15 +102,19 @@ public class RangeSelection extends Composite {
     }
 
     private static final VPolygon makeLeftTick(){
-        return new VPolygon(getTickCoords(tickCoordsLY), 0, 
+        VPolygon retval = new VPolygon(getTickCoords(tickCoordsLY), 0, 
                 new Color(200, 0, 0, 120),
                 Color.RED);
+        retval.setStrokeWidth(2);
+        return retval;
     }
 
     private static final VPolygon makeRightTick(){
-        return new VPolygon(getTickCoords(tickCoordsRY), 0, 
+        VPolygon retval = new VPolygon(getTickCoords(tickCoordsRY), 0, 
                 new Color(200, 200, 0, 120),
                 Color.YELLOW);
+        retval.setStrokeWidth(2);
+        return retval;
     }
 }
 
