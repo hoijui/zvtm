@@ -46,6 +46,11 @@ class WallCursor {
         target.removeGlyph(vRect);
     }
 
+    void setZindex(int zIndex){
+        hRect.setZindex(zIndex);
+        vRect.setZindex(zIndex);
+    }
+
     void moveTo(double x, double y){
         xPos = x;
         yPos = y;

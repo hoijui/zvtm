@@ -47,6 +47,9 @@ public class AstroRad {
     private static final double IMGVIEW_XOFFSET = 3*2840;
     private static final double VIEW_YOFFSET = 2*1800;
 
+    private static final int IMG_ZINDEX = 0;
+    private static final int IMGCURSOR_ZINDEX = 1;
+
     private VirtualSpace imageSpace;
     private VirtualSpace controlSpace;
     private Camera imageCamera; 
@@ -60,7 +63,6 @@ public class AstroRad {
     private WallCursor ctrlCursor;
     private WallCursor imgCursor;
 
-    private PanEventSource panSource;
     private MouseLaserPoint pointSource;
 
     private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE;
@@ -127,10 +129,9 @@ public class AstroRad {
 
         ctrlCursor = new WallCursor(controlSpace);
         imgCursor = new WallCursor(imageSpace, 20, 160, Color.GREEN);
+        imgCursor.setZindex(IMGCURSOR_ZINDEX);
 
-        //panSource = new IPhodPan();
         pointSource = new MouseLaserPoint(masterView.getPanel());
-       // panSource.addListener();
         pointSource.addListener(new PointListener(){
             boolean dragging = false;
 
@@ -225,6 +226,9 @@ public class AstroRad {
                 draggedImage = img;
             }
         }
+        if(draggedImage != null){
+            imageSpace.onTop(draggedImage, IMG_ZINDEX);
+        }
     }
 
     private void imgCursorDragged(double x, double y){
@@ -239,7 +243,7 @@ public class AstroRad {
             FitsImage image = new FitsImage(0,0,0,imgUrl);
             images.add(image);
             imageSpace.addGlyph(image);
-            imageSpace.onTop(image);
+            imageSpace.onTop(image, IMG_ZINDEX);
             double[] scaleBounds = ZScale.computeScale(image.getUnderlyingImage());
             if(scaleBounds != null){
                 image.rescale(scaleBounds[0], scaleBounds[1], 1.);

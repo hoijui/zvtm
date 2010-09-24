@@ -36,6 +36,10 @@ class RangeManager {
         parentSpace.removeGlyph(rangeSel);
     }
 
+    void setZindex(int zIndex){
+        rangeSel.setZindex(zIndex);
+    }
+
     void setTicksVal(double lowCut, double highCut){
         rangeSel.setTicksVal(lowCut, highCut);
     }
