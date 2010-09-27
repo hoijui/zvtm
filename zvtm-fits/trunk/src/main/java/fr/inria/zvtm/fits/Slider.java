@@ -15,7 +15,7 @@ public class Slider extends Composite {
     VPolygon tick;
 
     public Slider(){
-        bar = new VRectangle(0,0,0,BAR_WIDTH,BAR_HEIGHT,new Color(0,200,0,180));
+        bar = new VRectangle(0,0,0,BAR_WIDTH,BAR_HEIGHT,new Color(100,30,90,180));
         tick = makeTick();
         tick.move(-BAR_WIDTH/2 + 20, BAR_HEIGHT/2);
         addChild(bar);
