@@ -236,9 +236,16 @@ public class VImageOr extends VImage {
                     else {
                         g.drawImage(image,at,null);
                     }
-                    if ((drawBorder==1 && pc[i].prevMouseIn) || drawBorder==2){
-                        g.setColor(borderColor);
-                        g.drawPolygon(pc[i].p);
+                    if (paintBorder){
+                        g.setColor(borderColor);                        
+                        if (stroke!=null) {
+                            g.setStroke(stroke);
+                            g.drawPolygon(pc[i].p);
+                            g.setStroke(stdS);
+                        }
+                        else {
+                            g.drawPolygon(pc[i].p);
+                        }
                     }
                     g.setComposite(acO);
                 }
@@ -252,9 +259,16 @@ public class VImageOr extends VImage {
                     else {
                         g.drawImage(image,at,null);
                     }
-                    if ((drawBorder==1 && pc[i].prevMouseIn) || drawBorder==2){
+                    if (paintBorder){
                         g.setColor(borderColor);
-                        g.drawPolygon(pc[i].p);
+                        if (stroke!=null) {
+                            g.setStroke(stroke);
+                            g.drawPolygon(pc[i].p);
+                            g.setStroke(stdS);
+                        }
+                        else {
+                            g.drawPolygon(pc[i].p);
+                        }
                     }
                 }
             }
@@ -274,9 +288,16 @@ public class VImageOr extends VImage {
                         // draw
                         g.drawImage(image,at,null);
                     }
-                    if ((drawBorder==1 && pc[i].prevMouseIn) || drawBorder==2){
+                    if (paintBorder){
                         g.setColor(borderColor);
-                        g.drawPolygon(pc[i].p);
+                        if (stroke!=null) {
+                            g.setStroke(stroke);
+                            g.drawPolygon(pc[i].p);
+                            g.setStroke(stdS);
+                        }
+                        else {
+                            g.drawPolygon(pc[i].p);
+                        }
                     }
                     g.setComposite(acO);
                 }
@@ -294,9 +315,16 @@ public class VImageOr extends VImage {
                         // draw
                         g.drawImage(image,at,null);
                     }
-                    if ((drawBorder==1 && pc[i].prevMouseIn) || drawBorder==2){
+                    if (paintBorder){
                         g.setColor(borderColor);
-                        g.drawPolygon(pc[i].p);
+                        if (stroke!=null) {
+                            g.setStroke(stroke);
+                            g.drawPolygon(pc[i].p);
+                            g.setStroke(stdS);
+                        }
+                        else {
+                            g.drawPolygon(pc[i].p);
+                        }
                     }
                 }
             }
@@ -340,9 +368,16 @@ public class VImageOr extends VImage {
                     else {
                         g.drawImage(image,at,null);
                     }
-                    if ((drawBorder==1 && pc[i].prevMouseIn) || drawBorder==2){
+                    if (paintBorder){
                         g.setColor(borderColor);
-                        g.drawPolygon(pc[i].lp);
+                        if (stroke!=null) {
+                            g.setStroke(stroke);
+                            g.drawPolygon(pc[i].lp);
+                            g.setStroke(stdS);
+                        }
+                        else {
+                            g.drawPolygon(pc[i].lp);
+                        }
                     }
                     g.setComposite(acO);
                 }
@@ -356,9 +391,16 @@ public class VImageOr extends VImage {
                     else {
                         g.drawImage(image,at,null);
                     }
-                    if ((drawBorder==1 && pc[i].prevMouseIn) || drawBorder==2){
+                    if (paintBorder){
                         g.setColor(borderColor);
-                        g.drawPolygon(pc[i].lp);
+                        if (stroke!=null) {
+                            g.setStroke(stroke);
+                            g.drawPolygon(pc[i].lp);
+                            g.setStroke(stdS);
+                        }
+                        else {
+                            g.drawPolygon(pc[i].lp);
+                        }
                     }
                 }
             }
@@ -378,9 +420,16 @@ public class VImageOr extends VImage {
                         // draw
                         g.drawImage(image,at,null);
                     }
-                    if ((drawBorder==1 && pc[i].prevMouseIn) || drawBorder==2){
+                    if (paintBorder){
                         g.setColor(borderColor);
-                        g.drawPolygon(pc[i].lp);
+                        if (stroke!=null) {
+                            g.setStroke(stroke);
+                            g.drawPolygon(pc[i].lp);
+                            g.setStroke(stdS);
+                        }
+                        else {
+                            g.drawPolygon(pc[i].lp);
+                        }
                     }
                     g.setComposite(acO);
                 }
@@ -398,9 +447,16 @@ public class VImageOr extends VImage {
                         // draw
                         g.drawImage(image,at,null);
                     }
-                    if ((drawBorder==1 && pc[i].prevMouseIn) || drawBorder==2){
+                    if (paintBorder){
                         g.setColor(borderColor);
-                        g.drawPolygon(pc[i].lp);
+                        if (stroke!=null) {
+                            g.setStroke(stroke);
+                            g.drawPolygon(pc[i].lp);
+                            g.setStroke(stdS);
+                        }
+                        else {
+                            g.drawPolygon(pc[i].lp);
+                        }
                     }
                 }
             }
@@ -419,7 +475,6 @@ public class VImageOr extends VImage {
         res.borderColor=this.borderColor;
         res.cursorInsideColor=this.cursorInsideColor;
         res.bColor=this.bColor;
-        res.setDrawBorderPolicy(drawBorder);
         res.setZoomSensitive(zoomSensitive);
         return res;
     }

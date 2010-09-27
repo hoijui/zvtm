@@ -117,7 +117,7 @@ public class RImage extends VImage {
         vh = Math.round(image.getHeight(null)/2.0);
         ar = vw / vh;
         computeSize();
-	VirtualSpaceManager.INSTANCE.repaint();
+	    VirtualSpaceManager.INSTANCE.repaint();
     }
     
     @Override
@@ -133,7 +133,6 @@ public class RImage extends VImage {
     	res.borderColor = this.borderColor;
     	res.cursorInsideColor = this.cursorInsideColor;
     	res.bColor = this.bColor;
-    	res.setDrawBorderPolicy(drawBorder);
     	res.setZoomSensitive(zoomSensitive);
     	return res;
     }

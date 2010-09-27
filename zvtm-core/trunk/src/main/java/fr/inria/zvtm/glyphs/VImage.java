@@ -44,10 +44,6 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 
 public class VImage extends ClosedShape implements RectangularShape {
 
-    public static final short DRAW_BORDER_NEVER = 0;
-    public static final short DRAW_BORDER_MOUSE_INSIDE = 1;
-    public static final short DRAW_BORDER_ALWAYS = 2;
-
     /** Width in virtual space (read-only). */
     public double vw;
     /** Height in virtual space (read-only). */
@@ -63,11 +59,6 @@ public class VImage extends ClosedShape implements RectangularShape {
 
     /** For internal use. Made public for easier outside package subclassing. */
     public Image image;
-
-    /** Indicates when a border is drawn around the image (read-only).
-     * One of DRAW_BORDER_*
-     */
-    public short drawBorder = DRAW_BORDER_NEVER;
 
     /** For internal use. Made public for easier outside package subclassing. */
     public boolean zoomSensitive = true;
@@ -276,16 +267,6 @@ public class VImage extends ClosedShape implements RectangularShape {
 	    return zoomSensitive;
     }
 
-    /** Should a border be drawn around the bitmap image.
-     *@param p one of DRAW_BORDER_*
-     */
-    public void setDrawBorderPolicy(short p){
-        if (drawBorder!=p){
-            drawBorder=p;
-            VirtualSpaceManager.INSTANCE.repaint();
-        }
-    }
-
     @Override
     public boolean fillsView(double w,double h,int camIndex){
         //can contain transparent pixel (we have no way of knowing without analysing the image data -could be done when constructing the object or setting the image)
@@ -409,9 +390,16 @@ public class VImage extends ClosedShape implements RectangularShape {
                         g.drawImage(image,AffineTransform.getScaleInstance(trueCoef,trueCoef),null);
                     }
                     g.setTransform(stdT);
-                    if ((drawBorder==1 && pc[i].prevMouseIn) || drawBorder==2){
+                    if (paintBorder){
                         g.setColor(borderColor);
-                        g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
+                        if (stroke!=null) {
+                            g.setStroke(stroke);
+                            g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);                            
+                            g.setStroke(stdS);
+                        }
+                        else {
+                            g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
+                        }
                     }
                     g.setComposite(acO);
                 }
@@ -426,9 +414,16 @@ public class VImage extends ClosedShape implements RectangularShape {
                         g.drawImage(image,AffineTransform.getScaleInstance(trueCoef,trueCoef),null);
                     }
                     g.setTransform(stdT);
-                    if ((drawBorder==1 && pc[i].prevMouseIn) || drawBorder==2){
+                    if (paintBorder){
                         g.setColor(borderColor);
-                        g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
+                        if (stroke!=null) {
+                            g.setStroke(stroke);
+                            g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);                            
+                            g.setStroke(stdS);
+                        }
+                        else {
+                            g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
+                        }
                     }
                 }
             }
@@ -437,18 +432,32 @@ public class VImage extends ClosedShape implements RectangularShape {
                     // translucent
                     g.setComposite(alphaC);
                     g.drawImage(image,dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,null);
-                    if ((drawBorder==1 && pc[i].prevMouseIn) || drawBorder==2){
+                    if (paintBorder){
                         g.setColor(borderColor);
-                        g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
+                        if (stroke!=null) {
+                            g.setStroke(stroke);
+                            g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);                            
+                            g.setStroke(stdS);
+                        }
+                        else {
+                            g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
+                        }
                     }
                     g.setComposite(acO);
                 }
                 else {
                     // opaque
                     g.drawImage(image,dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,null);
-                    if ((drawBorder==1 && pc[i].prevMouseIn) || drawBorder==2){
+                    if (paintBorder){
                         g.setColor(borderColor);
-                        g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
+                        if (stroke!=null) {
+                            g.setStroke(stroke);
+                            g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);                            
+                            g.setStroke(stdS);
+                        }
+                        else {
+                            g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
+                        }
                     }
                 }
             }
@@ -481,9 +490,16 @@ public class VImage extends ClosedShape implements RectangularShape {
                         g.drawImage(image,AffineTransform.getScaleInstance(trueCoef,trueCoef),null);
                     }
                     g.setTransform(stdT);
-                    if ((drawBorder==1 && pc[i].prevMouseIn) || drawBorder==2){
+                    if (paintBorder){
                         g.setColor(borderColor);
-                        g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
+                        if (stroke!=null) {
+                            g.setStroke(stroke);
+                            g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
+                            g.setStroke(stdS);
+                        }
+                        else {
+                            g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
+                        }                        
                     }
                     g.setComposite(acO);
                 }
@@ -498,9 +514,16 @@ public class VImage extends ClosedShape implements RectangularShape {
                         g.drawImage(image,AffineTransform.getScaleInstance(trueCoef,trueCoef),null);
                     }
                     g.setTransform(stdT);
-                    if ((drawBorder==1 && pc[i].prevMouseIn) || drawBorder==2){
+                    if (paintBorder){
                         g.setColor(borderColor);
-                        g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
+                        if (stroke!=null) {
+                            g.setStroke(stroke);
+                            g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
+                            g.setStroke(stdS);
+                        }
+                        else {
+                            g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
+                        }                        
                     }
                 }
             }
@@ -509,18 +532,32 @@ public class VImage extends ClosedShape implements RectangularShape {
                     // translucent
                     g.setComposite(alphaC);
                     g.drawImage(image, dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, null);
-                    if ((drawBorder==1 && pc[i].prevMouseIn) || drawBorder==2){
+                    if (paintBorder){
                         g.setColor(borderColor);
-                        g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
+                        if (stroke!=null) {
+                            g.setStroke(stroke);
+                            g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
+                            g.setStroke(stdS);
+                        }
+                        else {
+                            g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
+                        }                        
                     }
                     g.setComposite(acO);
                 }
                 else {
                     // opaque
                     g.drawImage(image, dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, null);
-                    if ((drawBorder==1 && pc[i].prevMouseIn) || drawBorder==2){
+                    if (paintBorder){
                         g.setColor(borderColor);
-                        g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
+                        if (stroke!=null) {
+                            g.setStroke(stroke);
+                            g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
+                            g.setStroke(stdS);
+                        }
+                        else {
+                            g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
+                        }                        
                     }
                 }
             }
@@ -556,7 +593,6 @@ public class VImage extends ClosedShape implements RectangularShape {
         res.borderColor=this.borderColor;
         res.cursorInsideColor=this.cursorInsideColor;
         res.bColor=this.bColor;
-        res.setDrawBorderPolicy(drawBorder);
         res.setZoomSensitive(zoomSensitive);
         return res;
     }
