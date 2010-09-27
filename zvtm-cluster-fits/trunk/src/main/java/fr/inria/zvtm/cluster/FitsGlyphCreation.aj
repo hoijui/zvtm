@@ -6,6 +6,7 @@ import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.glyphs.FitsImage;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.fits.RangeSelection;
+import fr.inria.zvtm.fits.Slider;
 
 public aspect FitsGlyphCreation {
     @Override GlyphReplicator FitsImage.getReplicator(){
@@ -14,6 +15,10 @@ public aspect FitsGlyphCreation {
 
     @Override GlyphReplicator RangeSelection.getReplicator(){
         return new RangeSelectionReplicator(this);
+    }
+
+    @Override GlyphReplicator Slider.getReplicator(){
+        return new SliderReplicator(this);
     }
 
     private static class FitsImageReplicator extends GlyphCreation.ClosedShapeReplicator {
@@ -49,6 +54,21 @@ public aspect FitsGlyphCreation {
         Glyph doCreateGlyph(){
             RangeSelection retval = new RangeSelection();
             retval.setTicksVal(leftTickPos, rightTickPos);
+            return retval;
+        }
+    }
+
+    private static class SliderReplicator extends GlyphCreation.AbstractGlyphReplicator {
+        private final double tickVal;
+
+        SliderReplicator(Slider source){
+            super(source);
+            this.tickVal = source.getValue();
+        }
+
+        Glyph doCreateGlyph(){
+            Slider retval = new Slider();
+            retval.setTickVal(tickVal);
             return retval;
         }
     }

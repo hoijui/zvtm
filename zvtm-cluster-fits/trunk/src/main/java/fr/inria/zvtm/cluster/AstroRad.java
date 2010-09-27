@@ -56,6 +56,7 @@ public class AstroRad {
     private Camera controlCamera; 
     private final List<FitsImage> images = new ArrayList<FitsImage>();
     private RangeManager range;
+    private SliderManager slider;
     private ComboBox combo;
     private FitsImage selectedImage = null;
     private FitsImage draggedImage = null;
@@ -144,6 +145,7 @@ public class AstroRad {
                    Point2D.Double imgCurPos = imgCursor.getPosition();
                    if(dragging){
                        range.onDrag(pos.x, pos.y);
+                       slider.onDrag(pos.x, pos.y);
                        imgCursorDragged(imgCurPos.x, imgCurPos.y);
                    }
                }
@@ -155,12 +157,14 @@ public class AstroRad {
                    if(pressed){
                       dragging = true; 
                       range.onPress1(pos.x, pos.y);
+                      slider.onPress1(pos.x, pos.y);
                       imgCursorPressed(imgCurPos.x, imgCurPos.y);
                    } else {
                        draggedImage = null;
                        dragging = false;
                        combo.onClick1(pos.x, pos.y);
                        range.onRelease1();
+                       slider.onRelease1();
                    }
                }
                public void clutched(ClutchEventType event){}
@@ -182,11 +186,13 @@ public class AstroRad {
     private void setupControlZone(double x, double y, double width, double height){
         range = new RangeManager(controlSpace, 0, 500, width);
 
-        combo = new ComboBox(controlSpace, -height/4, -height/3, 
+        combo = new ComboBox(controlSpace, -height/4, -height/5, 
                 new String[]{"gray", "heat", "rainbow"}, 
                 new Color[]{Color.LIGHT_GRAY, Color.ORANGE, Color.PINK},
                 height/5
                 );
+        //slider = new SliderManager(controlSpace, 0, -height/3, width);
+        slider = new SliderManager(controlSpace, 0, -200, width);
 
         range.addObserver(new RangeStateObserver(){
             public void onStateChange(RangeManager source, double low, double high){
@@ -217,6 +223,16 @@ public class AstroRad {
                 }
             }
         });
+
+        slider.addObserver(new SliderStateObserver(){
+            public void onStateChange(SliderManager source, double value){
+                if(selectedImage == null){
+                    return;
+                }
+
+                selectedImage.setTranslucencyValue((float)value);
+            }
+        });
     }
 
     private void imgCursorPressed(double x, double y){
@@ -228,6 +244,7 @@ public class AstroRad {
         }
         if(draggedImage != null){
             imageSpace.onTop(draggedImage, IMG_ZINDEX);
+            imageFocusChanged(draggedImage);
         }
     }
 
@@ -248,7 +265,7 @@ public class AstroRad {
             if(scaleBounds != null){
                 image.rescale(scaleBounds[0], scaleBounds[1], 1.);
             }
-            imageFocusChanged(image, scaleBounds[0], scaleBounds[1]);
+            imageFocusChanged(image);
         } catch(Exception ex){
             System.err.println(ex);
         }
@@ -259,8 +276,7 @@ public class AstroRad {
         addImage(imgUrl, 0, 0);
     }
 
-    private void imageFocusChanged(FitsImage focused, double lowCut, 
-            double highCut){
+    private void imageFocusChanged(FitsImage focused){
         if(focused == null){
             return;
         }
@@ -273,6 +289,7 @@ public class AstroRad {
             controlSpace.removeGlyph(hist);
         }
         hist = FitsHistogram.fromFitsImage(focused);
+        slider.setTickVal(focused.getTranslucencyValue());
        // double histWidth = hist.getBounds()[2] - hist.getBounds()[0];
        // double rsWidth = rangeSel.getBounds()[2] - rangeSel.getBounds()[0];
        // System.err.println("histWidth: " + histWidth);
@@ -291,7 +308,8 @@ public class AstroRad {
 
         double min = focused.getUnderlyingImage().getHistogram().getMin();
         double max = focused.getUnderlyingImage().getHistogram().getMax();
-        range.setTicksVal((lowCut-min)/(max-min), (highCut-min)/(max-min));
+        double[] scaleParams = focused.getScaleParams();
+        range.setTicksVal((scaleParams[0]-min)/(max-min), (scaleParams[1]-min)/(max-min));
 
         selectedImage = focused;
     }

@@ -3,6 +3,7 @@ package fr.inria.zvtm.cluster;
 import fr.inria.zvtm.cluster.Identifiable;
 import fr.inria.zvtm.glyphs.FitsImage;
 import fr.inria.zvtm.fits.RangeSelection;
+import fr.inria.zvtm.fits.Slider;
 
 /**
  * Add methods that should be replay by the generic Delta here.
@@ -19,7 +20,9 @@ aspect FitsAutoReplay extends AbstractAutoReplay {
          execution(public void FitsImage.setColorFilter(FitsImage.ColorFilter)) ||
          execution(public void RangeSelection.setTicksVal(double, double)) ||
          execution(public void RangeSelection.setLeftTickPos(double)) ||
-         execution(public void RangeSelection.setRightTickPos(double)) 
+         execution(public void RangeSelection.setRightTickPos(double)) ||
+         execution(public void Slider.setTickVal(double)) ||
+         execution(public void Slider.setTickPos(double)) 
         );
 }
 
