@@ -191,8 +191,8 @@ public class AstroRad {
                 new Color[]{Color.LIGHT_GRAY, Color.ORANGE, Color.PINK},
                 height/5
                 );
-        //slider = new SliderManager(controlSpace, 0, -height/3, width);
-        slider = new SliderManager(controlSpace, 0, -200, width);
+        slider = new SliderManager(controlSpace, 0, -2.*height/5, width);
+        //slider = new SliderManager(controlSpace, 0, -200, width);
 
         range.addObserver(new RangeStateObserver(){
             public void onStateChange(RangeManager source, double low, double high){
@@ -281,10 +281,11 @@ public class AstroRad {
             return;
         }
         for(FitsImage img: images){
-            img.setDrawBorderPolicy(VImage.DRAW_BORDER_NEVER);
+            img.setDrawBorder(false);
         }
-        focused.setBorderColor(Color.PINK);
-        focused.setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
+        focused.setBorderColor(Color.PINK); //XXX move to addImage
+        focused.setStrokeWidth(3); //XXX move to addImage
+        focused.setDrawBorder(true);
         if(hist != null){
             controlSpace.removeGlyph(hist);
         }
