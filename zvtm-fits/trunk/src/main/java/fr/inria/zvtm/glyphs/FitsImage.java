@@ -33,12 +33,24 @@ import fr.inria.zvtm.fits.DefaultSampler;
 import fr.inria.zvtm.fits.Sampler;
 import fr.inria.zvtm.fits.ZScale;
 
+//provide an accessor to scale parameters
+class ExFITSImage extends FITSImage{
+    ExFITSImage(URL imgUrl) throws Exception{
+        super(imgUrl);
+    }
+
+    double[] getScaleParams(){ 
+        return new double[]{ _min, _max };
+    }
+
+}
+
 /**
  * Basic FITS image support. Use the IVOA FITS library internally.
  */
 public class FitsImage extends VImage {
     //original image (dataset preserved)
-    private final FITSImage fitsImage;
+    private final ExFITSImage fitsImage;
     private ImageFilter filter;
     private ScaleMethod scaleMethod = ScaleMethod.LINEAR;
 
@@ -129,8 +141,12 @@ public class FitsImage extends VImage {
         super(x,y,z,new BufferedImage(10,10,BufferedImage.TYPE_INT_RGB),scaleFactor);
         this.imgUrl = imgUrl;
         filter = ColorFilter.NOP.getFilter();
-        //create compatible image and use this for display
-        fitsImage = (FITSImage)(ImageIO.read(imgUrl));
+
+        try{
+            fitsImage = new ExFITSImage(imgUrl);
+        } catch(Exception e){
+            throw new Error(e);
+        }
         fitsImage.setScaleMethod(scaleMethod.toIvoaValue());
         if(useDataMinMax){
             try{
@@ -177,6 +193,13 @@ public class FitsImage extends VImage {
      */
     public ScaleMethod getScaleMethod(){
         return scaleMethod; 
+    }
+
+    /**
+     * Returns an array containing {min, max}
+     */
+    public double[] getScaleParams(){
+        return fitsImage.getScaleParams();
     }
 
     public URL getImageLocation(){
