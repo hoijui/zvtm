@@ -219,24 +219,18 @@ public class AllGlyphsTest {
         // images
         String path_to_img = "src/main/resources/test.jpg";
         VImage im = new VImage(0, 360, 0, (new ImageIcon(path_to_img)).getImage());
-        im.setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
         vs.addGlyph(im);
         im = new VImage(0, 360, 0, (new ImageIcon(path_to_img)).getImage());
-        im.setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
         im.moveTo(40, 360);
         vs.addGlyph(im);
         im = new VImageOr(80, 360, 0, (new ImageIcon(path_to_img)).getImage(), (float)Math.PI/2f);
-        im.setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
         vs.addGlyph(im);
         im = new VImageOr(80, 360, 0, (new ImageIcon(path_to_img)).getImage(), (float)Math.PI/2f);
-        im.setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
         im.moveTo(120, 360);
         vs.addGlyph(im);
         im = new RImage(160, 360, 0, (new ImageIcon(path_to_img)).getImage(), 1f);
-        im.setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
         vs.addGlyph(im);
         im = new RImage(160, 360, 0, (new ImageIcon(path_to_img)).getImage(), 1f);
-        im.setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
         im.moveTo(200, 360);
         vs.addGlyph(im);
     }
