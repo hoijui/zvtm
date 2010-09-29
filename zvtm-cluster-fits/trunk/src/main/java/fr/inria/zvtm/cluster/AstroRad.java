@@ -119,6 +119,7 @@ public class AstroRad {
                     8,
                     4);
             imageView = new ClusteredView(clGeom, 3, 6, 4, imgCamList);
+            imageView.setBackgroundColor(Color.BLACK);
             controlView = new ClusteredView(clGeom, 27, 2, 4, controlCamList);
             controlView.setBackgroundColor(new Color(0, 40, 0));
         }
@@ -192,7 +193,6 @@ public class AstroRad {
                 height/5
                 );
         slider = new SliderManager(controlSpace, 0, -2.*height/5, width);
-        //slider = new SliderManager(controlSpace, 0, -200, width);
 
         range.addObserver(new RangeStateObserver(){
             public void onStateChange(RangeManager source, double low, double high){
@@ -289,7 +289,7 @@ public class AstroRad {
         if(hist != null){
             controlSpace.removeGlyph(hist);
         }
-        hist = FitsHistogram.fromFitsImage(focused);
+        hist = FitsHistogram.fromFitsImage(focused, Color.YELLOW);
         slider.setTickVal(focused.getTranslucencyValue());
        // double histWidth = hist.getBounds()[2] - hist.getBounds()[0];
        // double rsWidth = rangeSel.getBounds()[2] - rangeSel.getBounds()[0];
@@ -298,12 +298,13 @@ public class AstroRad {
        // System.err.println("rsWidth: " + rsWidth);
        // System.err.println("rs size: " + rangeSel.getSize());
         controlSpace.addGlyph(hist);
+        hist.sizeTo(3000);
        // System.err.println("new hist size: " + rsWidth * hist.getSize()/histWidth);
        // hist.sizeTo(rsWidth * hist.getSize()/histWidth * 0.9);
        // System.err.println("new hist size(control): " + hist.getSize());
        // System.err.println("new hist width: " + (hist.getBounds()[2] - hist.getBounds()[0]));
         //hist.move(-rsWidth/2, 30);
-        hist.move(0, 30);
+        hist.move(-2500, 1300);
 
         //draw bounding boxes around histogram and range selection?
 
