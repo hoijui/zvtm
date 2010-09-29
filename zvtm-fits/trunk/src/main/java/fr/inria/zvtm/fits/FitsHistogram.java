@@ -14,18 +14,24 @@ import edu.jhu.pha.sdss.fits.Histogram;
  */
 public class FitsHistogram extends Composite {
     private static final double DEFAULT_BIN_WIDTH = 8;
+    private static final Color DEFAULT_FILL_COLOR = new Color(0,0,255,127);
+    private static final Color DEFAULT_BORDER_COLOR = new Color(0,0,255,180);
 
-    public FitsHistogram(int[] data, int min, int max){
+    public FitsHistogram(int[] data, int min, int max, Color fillColor){
         int i = 0;
         double height = 100;
         for(int val: data){
             double h = (Math.sqrt(val) * height) / Math.sqrt(max - min); 
             VRectangle bar = new VRectangle(i, h/2, 0, DEFAULT_BIN_WIDTH, h, 
-                    new Color(0,0,255,127));
-            bar.setBorderColor(new Color(0,0,255,180));
+                    fillColor);
+            bar.setBorderColor(DEFAULT_BORDER_COLOR);
             addChild(bar);
             i += DEFAULT_BIN_WIDTH;
         }
+    }
+
+    public FitsHistogram(int[] data, int min, int max){
+        this(data, min, max, DEFAULT_FILL_COLOR);
     }
 
     public static FitsHistogram fromFitsImage(FitsImage image){
