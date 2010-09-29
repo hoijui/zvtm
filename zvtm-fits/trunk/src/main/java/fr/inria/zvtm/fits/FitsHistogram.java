@@ -34,7 +34,7 @@ public class FitsHistogram extends Composite {
         this(data, min, max, DEFAULT_FILL_COLOR);
     }
 
-    public static FitsHistogram fromFitsImage(FitsImage image){
+    public static FitsHistogram fromFitsImage(FitsImage image, Color fillColor){
         Histogram hist = image.getUnderlyingImage().getHistogram();
         int[] data = new int[128]; 
         for(int i=0; i<hist.getCounts().length; ++i){
@@ -50,7 +50,11 @@ public class FitsHistogram extends Composite {
                 max = data[j];
             }
         }
-        return new FitsHistogram(data, min, max);
+        return new FitsHistogram(data, min, max, fillColor);
+    }
+
+    public static FitsHistogram fromFitsImage(FitsImage image){
+        return fromFitsImage(image, DEFAULT_FILL_COLOR);
     }
 }
 
