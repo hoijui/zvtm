@@ -541,12 +541,12 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	vsm.repaintNow();
     }
 
-    void centerRADAR_VIEW_NAME(){
-	if (rView != null){
-	    rView.getGlobalView(mSpace.getCamera(1),ConfigManager.ANIM_MOVE_LENGTH);
-	    cameraMoved(null, null, 0);
-	}
-    }
+    //void centerRadarView(){
+	//if (rView != null){
+	//    rView.getGlobalView(mSpace.getCamera(1),ConfigManager.ANIM_MOVE_LENGTH);
+	//    cameraMoved(null, null, 0);
+	//}
+    //}
 
     /*--------------------------- Lens management --------------------------*/
 
