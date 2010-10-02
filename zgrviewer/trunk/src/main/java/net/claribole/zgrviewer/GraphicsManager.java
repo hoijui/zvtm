@@ -499,12 +499,13 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
                 vsm.addFrameView(cameras, RADAR_VIEW_NAME, View.STD_VIEW, ConfigManager.rdW, ConfigManager.rdH, false, true);
                 reh = new RadarEvtHdlr(this);
                 rView = vsm.getView(RADAR_VIEW_NAME);
+                rView.getFrame().addComponentListener(this);
                 rView.setBackgroundColor(cfgMngr.backgroundColor);
                 // same event handler handling all layers for now
                 //XXX: TBD: refactor event handler code taking advantage of new one-handler-per-layer functionality 
                 rView.setEventHandler(reh, 0);
                 rView.setEventHandler(reh, 1);
-                rView.setResizable(false);
+                rView.setResizable(true);
                 rView.setActiveLayer(1);
                 rView.setCursorIcon(java.awt.Cursor.MOVE_CURSOR);
                 rView.getGlobalView(mSpace.getCamera(1),100);
@@ -881,14 +882,18 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     }
     
     public void componentResized(ComponentEvent e){
-	if (e.getSource() == mainView.getFrame()){
-	    updatePanelSize();
-	    //update rectangle showing observed region in radar view when main view's aspect ratio changes
-	    cameraMoved(null, null, 0);
-	    //update SD_ZOOM_THRESHOLD
-	    Dimension sz = mainView.getFrame().getSize();
-	    cfgMngr.setSDZoomThreshold(0.3 * Math.sqrt(Math.pow(sz.width, 2) + Math.pow(sz.height, 2)));
-	}
+        if (e.getSource() == mainView.getFrame()){
+            updatePanelSize();
+            //update rectangle showing observed region in radar view when main view's aspect ratio changes
+            cameraMoved(null, null, 0);
+            //update SD_ZOOM_THRESHOLD
+            Dimension sz = mainView.getFrame().getSize();
+            cfgMngr.setSDZoomThreshold(0.3 * Math.sqrt(Math.pow(sz.width, 2) + Math.pow(sz.height, 2)));
+        }
+        else if (e.getSource() == rView.getFrame()){
+    		rView.getGlobalView(mSpace.getCamera(1), 100);
+    		cameraMoved(null, null, 0);
+        }
     }
 
     public void componentHidden(ComponentEvent e){}
