@@ -2,7 +2,7 @@
  *   DATE OF CREATION:   Thu Jan 09 14:14:35 2003
  *   AUTHOR :            Emmanuel Pietriga (emmanuel@w3.org)
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) Emmanuel Pietriga, 2002. All Rights Reserved
+ *   Copyright (c) Emmanuel Pietriga, 2002-2010. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  */ 
 
