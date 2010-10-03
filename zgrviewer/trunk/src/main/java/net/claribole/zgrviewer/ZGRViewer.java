@@ -33,9 +33,8 @@ import javax.swing.KeyStroke;
 import fr.inria.zvtm.engine.SwingWorker;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.glyphs.Glyph;
-import fr.inria.zvtm.engine.ViewEventHandler;
-import fr.inria.zvtm.glyphs.PieMenu;
-import fr.inria.zvtm.glyphs.PieMenuFactory;
+import fr.inria.zvtm.widgets.PieMenu;
+import fr.inria.zvtm.widgets.PieMenuFactory;
 
 import javax.swing.ImageIcon;
 import javax.swing.SwingUtilities;
@@ -257,7 +256,7 @@ public class ZGRViewer implements ZGRApplication {
     }
 
     void savePNG(){
-    	final long[] vr = grMngr.mainView.getVisibleRegion(grMngr.mSpace.getCamera(0));
+    	final double[] vr = grMngr.mainView.getVisibleRegion(grMngr.mSpace.getCamera(0));
     	SwingWorker sw = new SwingWorker(){
 		public 	Object construct(){
 		    new PNGExportWindow(vr[2] - vr[0], vr[1]-vr[3], grMngr);
@@ -302,7 +301,7 @@ public class ZGRViewer implements ZGRApplication {
     }
 
     void print(){
-    	final long[] vr = grMngr.mainView.getVisibleRegion(grMngr.mSpace.getCamera(0));
+    	final double[] vr = grMngr.mainView.getVisibleRegion(grMngr.mSpace.getCamera(0));
     	SwingWorker sw = new SwingWorker(){
 		public 	Object construct(){
 		    new PrintWindow(vr[2] - vr[0], vr[1]-vr[3], grMngr);

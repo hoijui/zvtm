@@ -91,7 +91,7 @@ public class PrintWindow
      * @param   h   starting pixel height
      *@param gm GraphicsManager instantiated by the parent ZGRViewer/ZGRApplet
      */
-    public PrintWindow(long w, long h, GraphicsManager gm){
+    public PrintWindow(double w, double h, GraphicsManager gm){
 	this.grMngr = gm;
 	if ( w < 1 || h < 1){
 	    JOptionPane.showMessageDialog(grMngr.mainView.getFrame(), "Can not export visible region of size 0.", "Export to PNG error", JOptionPane.ERROR_MESSAGE);
@@ -187,7 +187,7 @@ public class PrintWindow
 		Vector layers = new Vector();
 		layers.add(grMngr.mainCamera);
 
-		java.awt.image.BufferedImage bi = grMngr.mainView.rasterize((int)realWidth, (int)realHeight, grMngr.vsm, layers);
+		java.awt.image.BufferedImage bi = grMngr.mainView.rasterize((int)realWidth, (int)realHeight, layers);
 
 		if (bi!=null){
 		    PrintUtilities pu=new PrintUtilities(bi);

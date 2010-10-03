@@ -13,8 +13,7 @@ import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.EndAction;
 import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
-import fr.inria.zvtm.engine.LongPoint;
-import fr.inria.zvtm.engine.Utilities;
+import java.awt.geom.Point2D;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.glyphs.DPath;
@@ -28,36 +27,36 @@ abstract class BroughtElement {
 	}
 
 	Glyph[] glyphs;
-	LongPoint[] previousLocations;
+	Point2D.Double[] previousLocations;
 	
-	abstract LongPoint restorePreviousState(int duration, Glyph g);
+	abstract Point2D.Double restorePreviousState(int duration, Glyph g);
 		
 }
 
 class BroughtNode extends BroughtElement {
 	
-	float[] previousSize;
+	double[] previousSize;
 	
 	BroughtNode(LNode n){
 		glyphs = n.getGlyphs();
-		previousLocations = new LongPoint[glyphs.length];
-		previousSize = new float[glyphs.length];
+		previousLocations = new Point2D.Double[glyphs.length];
+		previousSize = new double[glyphs.length];
 		for (int i=0;i<glyphs.length;i++){
 			previousLocations[i] = glyphs[i].getLocation();
             previousSize[i] = (glyphs[i] instanceof VText) ? ((VText)glyphs[i]).getScale() : glyphs[i].getSize();
 		}
 	}
 
-	LongPoint restorePreviousState(int duration, Glyph g){
+	Point2D.Double restorePreviousState(int duration, Glyph g){
 		for (int i=0;i<glyphs.length;i++){
 		    if (glyphs[i] instanceof VText){
 		        final VText t = (VText)glyphs[i];
-		        final float sz = previousSize[i];
+		        final double sz = previousSize[i];
     		    Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createGlyphTranslation(
     		        duration, glyphs[i], previousLocations[i], false, SlowInSlowOutInterpolator.getInstance(),
     		        new EndAction(){
     		            public void execute(Object subject, Animation.Dimension dimension){
-                            t.setScale(sz);
+                            t.setScale((float)sz);
     		            }
     		        }
     		    );
@@ -74,7 +73,7 @@ class BroughtNode extends BroughtElement {
                 }		        
 		    }
         }
-		int i = Utilities.indexOfGlyph(glyphs, g);
+		int i = fr.inria.zvtm.engine.Utils.indexOfGlyph(glyphs, g);
         return (i != -1) ? previousLocations[i] : null;
 	}
 	
@@ -84,7 +83,7 @@ class BroughtEdge extends BroughtElement {
 
 	DPath spline;
 	float splineAlpha;
-	LongPoint[] splineCoords;
+	Point2D.Double[] splineCoords;
 	
 	BroughtEdge(LEdge e){
 		glyphs = e.getGlyphs();
@@ -93,7 +92,7 @@ class BroughtEdge extends BroughtElement {
 			splineCoords = spline.getAllPointsCoordinates();
 			splineAlpha = spline.getTranslucencyValue();
 		}
-		previousLocations = new LongPoint[glyphs.length];
+		previousLocations = new Point2D.Double[glyphs.length];
 		for (int i=0;i<glyphs.length;i++){
 			if (glyphs[i] == spline){
 				previousLocations[i] = null;
@@ -108,7 +107,7 @@ class BroughtEdge extends BroughtElement {
 		}
 	}
 	
-	LongPoint restorePreviousState(int duration, Glyph g){
+	Point2D.Double restorePreviousState(int duration, Glyph g){
 	    Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createPathAnim(
 	        duration, spline, splineCoords,
 		    false, SlowInSlowOutInterpolator.getInstance(), null);

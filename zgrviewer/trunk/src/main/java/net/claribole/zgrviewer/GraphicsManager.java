@@ -39,17 +39,16 @@ import java.util.Arrays;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VCursor;
 import fr.inria.zvtm.engine.Location;
-import fr.inria.zvtm.engine.DraggableCameraPortal;
+import fr.inria.zvtm.engine.portals.DraggableCameraPortal;
 import fr.inria.zvtm.lens.Lens;
 import fr.inria.zvtm.lens.FixedSizeLens;
 import fr.inria.zvtm.lens.LInfSCBLens;
 import fr.inria.zvtm.lens.SCBLens;
 import fr.inria.zvtm.lens.FSGaussianLens;
-import fr.inria.zvtm.engine.CameraListener;
+import fr.inria.zvtm.event.CameraListener;
 import fr.inria.zvtm.engine.Java2DPainter;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.ViewPanel;
-import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.SwingWorker;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.VirtualSpace;
@@ -58,15 +57,15 @@ import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.ClosedShape;
 import fr.inria.zvtm.glyphs.Translucent;
 import fr.inria.zvtm.glyphs.VText;
-import fr.inria.zvtm.glyphs.RectangleNR;
-import fr.inria.zvtm.glyphs.CircleNR;
+import fr.inria.zvtm.glyphs.SIRectangle;
+import fr.inria.zvtm.glyphs.SICircle;
 import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VRectangleOr;
 import fr.inria.zvtm.glyphs.DPath;
 import fr.inria.zvtm.svg.Metadata;
-import fr.inria.zvtm.engine.ViewEventHandler;
-import fr.inria.zvtm.engine.PortalEventHandler;
-import fr.inria.zvtm.engine.TransitionManager;
+import fr.inria.zvtm.event.ViewListener;
+import fr.inria.zvtm.event.PortalListener;
+import fr.inria.zvtm.engine.Transitions;
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.AnimationManager;
 import fr.inria.zvtm.animation.EndAction;
@@ -202,13 +201,13 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         rSpace.addCamera();
         // DragMag portal camera (camera #2)
         dmCamera = mSpace.addCamera();
-        RectangleNR seg1;
-        RectangleNR seg2;
+        SIRectangle seg1;
+        SIRectangle seg2;
         observedRegion = new VRectangle(0, 0, 0, 10, 10, ConfigManager.OBSERVED_REGION_COLOR, ConfigManager.OBSERVED_REGION_CROSSHAIR_COLOR, 0.5f);
         //500 should be sufficient as the radar window is
-        seg1 = new RectangleNR(0, 0, 0, 0, 500, ConfigManager.OBSERVED_REGION_CROSSHAIR_COLOR);
+        seg1 = new SIRectangle(0, 0, 0, 0, 500, ConfigManager.OBSERVED_REGION_CROSSHAIR_COLOR);
         //not resizable and is 300x200 (see rdW,rdH below)
-        seg2 = new RectangleNR(0, 0, 0, 500, 0, ConfigManager.OBSERVED_REGION_CROSSHAIR_COLOR);
+        seg2 = new SIRectangle(0, 0, 0, 500, 0, ConfigManager.OBSERVED_REGION_CROSSHAIR_COLOR);
         if (!(Utils.osIsWindows() || Utils.osIsMacOS())){
             observedRegion.setFilled(false);
         }
@@ -248,10 +247,10 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	meh = eh;
 	// same event handler handling all layers for now
 	//XXX: TBD: refactor event handler code taking advantage of new one handler per layer functionality 
-	mainView.setEventHandler((ViewEventHandler)eh, 0);
-	mainView.setEventHandler((ViewEventHandler)eh, 1);
-	mainView.setEventHandler((ViewEventHandler)eh, 2);
-	mainView.setNotifyMouseMoved(true);
+	mainView.setListener((ViewListener)eh, 0);
+	mainView.setListener((ViewListener)eh, 1);
+	mainView.setListener((ViewListener)eh, 2);
+	mainView.setNotifyCursorMoved(true);
     mainCamera.addListener(this);
 
 	mainView.setVisible(true);
@@ -380,12 +379,11 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	void reveal(){
 		Camera c = mSpace.getCamera(0);
 		Location l = mainView.getGlobalView(c);
-		c.posx = l.vx;
-		c.posy = l.vy;
-		c.updatePrecisePosition();
+		c.vx = l.vx;
+		c.vy = l.vy;
 		c.setAltitude(l.alt-c.getFocal());
 		rememberLocation(mSpace.getCamera(0).getLocation());
-		TransitionManager.fadeIn(mainView, 500, vsm);
+		Transitions.fadeIn(mainView, 500);
 		getGlobalView();
 	}
 
@@ -420,44 +418,44 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     void translateView(short direction){
         Camera c=mainView.getCameraNumber(0);
         rememberLocation(c.getLocation());
-        LongPoint trans;
-        long[] rb=mainView.getVisibleRegion(c);
+        Point2D.Double trans;
+        double[] rb = mainView.getVisibleRegion(c);
         if (direction==MOVE_UP){
-            long qt=Math.round((rb[1]-rb[3])/2.4);
-            trans=new LongPoint(0,qt);
+            double qt = (rb[1]-rb[3])/2.4;
+            trans = new Point2D.Double(0,qt);
         }
         else if (direction==MOVE_DOWN){
-            long qt=Math.round((rb[3]-rb[1])/2.4);
-            trans=new LongPoint(0,qt);
+            double qt = (rb[3]-rb[1])/2.4;
+            trans  =new Point2D.Double(0,qt);
         }
         else if (direction==MOVE_RIGHT){
-            long qt=Math.round((rb[2]-rb[0])/2.4);
-            trans=new LongPoint(qt,0);
+            double qt = (rb[2]-rb[0])/2.4;
+            trans = new Point2D.Double(qt,0);
         }
         else if (direction==MOVE_LEFT){
-            long qt=Math.round((rb[0]-rb[2])/2.4);
-            trans=new LongPoint(qt,0);
+            double qt = (rb[0]-rb[2])/2.4;
+            trans = new Point2D.Double(qt,0);
         }
         else if (direction==MOVE_UP_LEFT){
-            long qt=Math.round((rb[3]-rb[1])/2.4);
-            long qt2=Math.round((rb[2]-rb[0])/2.4);
-            trans=new LongPoint(qt,qt2);
+            double qt = (rb[3]-rb[1])/2.4;
+            double qt2 = (rb[2]-rb[0])/2.4;
+            trans = new Point2D.Double(qt,qt2);
         }
         else if (direction==MOVE_UP_RIGHT){
-            long qt=Math.round((rb[1]-rb[3])/2.4);
-            long qt2=Math.round((rb[2]-rb[0])/2.4);
-            trans=new LongPoint(qt,qt2);
+            double qt = (rb[1]-rb[3])/2.4;
+            double qt2 = (rb[2]-rb[0])/2.4;
+            trans = new Point2D.Double(qt,qt2);
         }
         else if (direction==MOVE_DOWN_RIGHT){
-            long qt=Math.round((rb[1]-rb[3])/2.4);
-            long qt2=Math.round((rb[0]-rb[2])/2.4);
-            trans=new LongPoint(qt,qt2);
+            double qt = (rb[1]-rb[3])/2.4;
+            double qt2 = (rb[0]-rb[2])/2.4;
+            trans = new Point2D.Double(qt,qt2);
         }
         else {
             //direction==DOWN_LEFT
-            long qt=Math.round((rb[3]-rb[1])/2.4);
-            long qt2=Math.round((rb[0]-rb[2])/2.4);
-            trans=new LongPoint(qt,qt2);
+            double qt = (rb[3]-rb[1])/2.4;
+            double qt2 = (rb[0]-rb[2])/2.4;
+            trans = new Point2D.Double(qt,qt2);
         }
         Animation a = animator.getAnimationFactory().createCameraTranslation(ConfigManager.ANIM_MOVE_LENGTH, c,
             trans, true, SlowInSlowOutInterpolator.getInstance(), null);
@@ -480,7 +478,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         if (previousLocations.size()>0){
             Vector animParams = Location.getDifference(mSpace.getCamera(0).getLocation(), (Location)previousLocations.lastElement());
             Animation at = animator.getAnimationFactory().createCameraTranslation(ConfigManager.ANIM_MOVE_LENGTH, mSpace.getCamera(0),
-                (LongPoint)animParams.elementAt(1), true, SlowInSlowOutInterpolator.getInstance(), null);
+                (Point2D.Double)animParams.elementAt(1), true, SlowInSlowOutInterpolator.getInstance(), null);
             Animation aa = animator.getAnimationFactory().createCameraAltAnim(ConfigManager.ANIM_MOVE_LENGTH, mSpace.getCamera(0),
                 (Float)animParams.elementAt(0), true, SlowInSlowOutInterpolator.getInstance(), null);
             animator.startAnimation(at, false);
@@ -503,8 +501,8 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
                 rView.setBackgroundColor(cfgMngr.backgroundColor);
                 // same event handler handling all layers for now
                 //XXX: TBD: refactor event handler code taking advantage of new one-handler-per-layer functionality 
-                rView.setEventHandler(reh, 0);
-                rView.setEventHandler(reh, 1);
+                rView.setListener(reh, 0);
+                rView.setListener(reh, 1);
                 rView.setResizable(true);
                 rView.setActiveLayer(1);
                 rView.setCursorIcon(java.awt.Cursor.MOVE_CURSOR);
@@ -513,33 +511,32 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
                 cameraMoved(null, null, 0);
             }
             else {
-                rView.toFront();
+                ((JFrame)rView.getFrame()).toFront();
             }
         }
     }
 
-    public void cameraMoved(Camera cam, LongPoint coord, float alt){
+    public void cameraMoved(Camera cam, Point2D.Double coord, double alt){
         if (rView!=null){
             Camera c0=mSpace.getCamera(1);
             Camera c1=rSpace.getCamera(0);
-            c1.posx=c0.posx;
-            c1.posy=c0.posy;
+            c1.vx=c0.vx;
+            c1.vy=c0.vy;
             c1.focal=c0.focal;
             c1.altitude=c0.altitude;
-            c1.updatePrecisePosition();
-            long[] wnes=mainView.getVisibleRegion(mSpace.getCamera(0));
+            double[] wnes = mainView.getVisibleRegion(mSpace.getCamera(0));
             observedRegion.moveTo((wnes[0]+wnes[2])/2,(wnes[3]+wnes[1])/2);
             observedRegion.setWidth((wnes[2]-wnes[0])/2);
             observedRegion.setHeight((wnes[1]-wnes[3])/2);
         }
-        vsm.repaintNow();
+        vsm.repaint();
     }
 
     void updateMainViewFromRadar(){
-	Camera c0 = mSpace.getCamera(0);
-	c0.posx = observedRegion.vx;
-	c0.posy = observedRegion.vy;
-	vsm.repaintNow();
+        Camera c0 = mSpace.getCamera(0);
+        c0.vx = observedRegion.vx;
+        c0.vy = observedRegion.vy;
+        vsm.repaint();
     }
 
     //void centerRadarView(){
@@ -562,7 +559,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	else {// dealing with a probing lens
 	    lens.setAbsolutePosition(x, y);
 	}
-	vsm.repaintNow();
+	vsm.repaint();
     }
 
     void zoomInPhase1(int x, int y){
@@ -577,19 +574,19 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         setLens(GraphicsManager.ZOOMIN_LENS);
     }
     
-    void zoomInPhase2(long mx, long my){
+    void zoomInPhase2(double mx, double my){
         // compute camera animation parameters
-        float cameraAbsAlt = mainCamera.getAltitude()+mainCamera.getFocal();
-        long c2x = Math.round(mx - INV_MAG_FACTOR * (mx - mainCamera.posx));
-        long c2y = Math.round(my - INV_MAG_FACTOR * (my - mainCamera.posy));
+        double cameraAbsAlt = mainCamera.getAltitude()+mainCamera.getFocal();
+        double c2x = mx - INV_MAG_FACTOR * (mx - mainCamera.vx);
+        double c2y = my - INV_MAG_FACTOR * (my - mainCamera.vy);
         //Vector cadata = new Vector();
         // -(cameraAbsAlt)*(MAG_FACTOR-1)/MAG_FACTOR
-        Float deltAlt = new Float((cameraAbsAlt)*(1-MAG_FACTOR)/MAG_FACTOR);
+        Double deltAlt = new Double((cameraAbsAlt)*(1-MAG_FACTOR)/MAG_FACTOR);
         if (cameraAbsAlt + deltAlt.floatValue() > FLOOR_ALTITUDE){
             Animation al = animator.getAnimationFactory().createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens,
                 new Float(-MAG_FACTOR+1), true, IdentityInterpolator.getInstance(), new ZP2LensAction(this));
             Animation at = animator.getAnimationFactory().createCameraTranslation(LENS_ANIM_TIME, mainCamera,
-                new LongPoint(c2x-mainCamera.posx, c2y-mainCamera.posy), true, IdentityInterpolator.getInstance(), null);
+                new Point2D.Double(c2x-mainCamera.vx, c2y-mainCamera.vy), true, IdentityInterpolator.getInstance(), null);
             Animation aa = animator.getAnimationFactory().createCameraAltAnim(LENS_ANIM_TIME, mainCamera,
                 deltAlt, true, IdentityInterpolator.getInstance(), null);
             animator.startAnimation(al, false);
@@ -597,12 +594,12 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
             animator.startAnimation(aa, false);
         }
         else {
-            Float actualDeltAlt = new Float(FLOOR_ALTITUDE - cameraAbsAlt);
-            double ratio = actualDeltAlt.floatValue() / deltAlt.floatValue();
+            Double actualDeltAlt = new Double(FLOOR_ALTITUDE - cameraAbsAlt);
+            double ratio = actualDeltAlt.doubleValue() / deltAlt.doubleValue();
             Animation al = animator.getAnimationFactory().createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens,
                 new Float(-MAG_FACTOR+1), true, IdentityInterpolator.getInstance(), new ZP2LensAction(this));
             Animation at = animator.getAnimationFactory().createCameraTranslation(LENS_ANIM_TIME, mainCamera,
-                new LongPoint(Math.round((c2x-mainCamera.posx)*ratio), Math.round((c2y-mainCamera.posy)*ratio)), true, IdentityInterpolator.getInstance(), null);
+                new Point2D.Double((c2x-mainCamera.vx)*ratio, (c2y-mainCamera.vy)*ratio), true, IdentityInterpolator.getInstance(), null);
             Animation aa = animator.getAnimationFactory().createCameraAltAnim(LENS_ANIM_TIME, mainCamera,
                 actualDeltAlt, true, IdentityInterpolator.getInstance(), null);
             animator.startAnimation(al, false);
@@ -611,11 +608,11 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         }
     }
 
-    void zoomOutPhase1(int x, int y, long mx, long my){
+    void zoomOutPhase1(int x, int y, double mx, double my){
         // compute camera animation parameters
-        float cameraAbsAlt = mainCamera.getAltitude()+mainCamera.getFocal();
-        long c2x = Math.round(mx - MAG_FACTOR * (mx - mainCamera.posx));
-        long c2y = Math.round(my - MAG_FACTOR * (my - mainCamera.posy));
+        double cameraAbsAlt = mainCamera.getAltitude()+mainCamera.getFocal();
+        double c2x = mx - MAG_FACTOR * (mx - mainCamera.vx);
+        double c2y = my - MAG_FACTOR * (my - mainCamera.vy);
         // create lens if it does not exist
         if (lens == null){
             lens = mainView.setLens(getLensDefinition(x, y));
@@ -625,9 +622,9 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         Animation al = animator.getAnimationFactory().createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens,
             new Float(MAG_FACTOR-1), true, IdentityInterpolator.getInstance(), null);
         Animation at = animator.getAnimationFactory().createCameraTranslation(LENS_ANIM_TIME, mainCamera,
-            new LongPoint(c2x-mainCamera.posx, c2y-mainCamera.posy), true, IdentityInterpolator.getInstance(), null);
+            new Point2D.Double(c2x-mainCamera.vx, c2y-mainCamera.vy), true, IdentityInterpolator.getInstance(), null);
         Animation aa = animator.getAnimationFactory().createCameraAltAnim(LENS_ANIM_TIME, mainCamera,
-            new Float(cameraAbsAlt*(MAG_FACTOR-1)), true, IdentityInterpolator.getInstance(), null);
+            new Double(cameraAbsAlt*(MAG_FACTOR-1)), true, IdentityInterpolator.getInstance(), null);
         animator.startAnimation(al, false);
         animator.startAnimation(at, false);
         animator.startAnimation(aa, false);
@@ -656,7 +653,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
                         this means that camera altitude must be adjusted to keep altitude + lens mag
                         factor constant in the lens focus region. The camera must also be translated
                         to keep the same region of the virtual space under the focus region */
-                        float a1 = mainCamera.getAltitude();
+                    double a1 = mainCamera.getAltitude();
                     lens.setMaximumMagnification((float)nmf, true);
                     /* explanation for the altitude offset computation: the projected size of an object
                         in the focus region (in lens space) should remain the same before and after the
@@ -667,7 +664,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
                         move:
                     MAG_FACTOR * F / (F + a1) = MAG_FACTOR + magOffset * F / (F + a2)
                         From this we can get the altitude difference (a2 - a1)                       */
-                        mainCamera.altitudeOffset((float)((a1+mainCamera.getFocal())*magOffset/(MAG_FACTOR-magOffset)));
+                        mainCamera.altitudeOffset((a1+mainCamera.getFocal())*magOffset/(MAG_FACTOR-magOffset));
                     /* explanation for the X offset computation: the position in X of an object in the
                         focus region (lens space) should remain the same before and after the change of
                         magnification factor. This means that the following equation must be true (taken
@@ -675,15 +672,15 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
                     (vx-(lensx1))*coef1 = (vx-(lensx2))*coef2
                         -- coef1 is actually MAG_FACTOR * F/(F+a1)
                         -- coef2 is actually (MAG_FACTOR + magOffset) * F/(F+a2)
-                        -- lensx1 is actually camera.posx1 + ((F+a1)/F) * lens.lx
-                        -- lensx2 is actually camera.posx2 + ((F+a2)/F) * lens.lx
+                        -- lensx1 is actually camera.vx1 + ((F+a1)/F) * lens.lx
+                        -- lensx2 is actually camera.vx2 + ((F+a2)/F) * lens.lx
                         Given that (MAG_FACTOR + magOffset) / (F+a2) = MAG_FACTOR / (F+a1)
                         we eventually have:
                     Xoffset = (a1 - a2) / F * lens.lx   (lens.lx being the position of the lens's center in
                         JPanel coordinates w.r.t the view's center - see Lens.java)
                         */
-                        mainCamera.move(Math.round((a1-mainCamera.getAltitude())/mainCamera.getFocal()*lens.lx),
-                        -Math.round((a1-mainCamera.getAltitude())/mainCamera.getFocal()*lens.ly));
+                        mainCamera.move((a1-mainCamera.getAltitude()/mainCamera.getFocal()*lens.lx),
+                                        -(a1-mainCamera.getAltitude()/mainCamera.getFocal()*lens.ly));
                 }
                 else {
                     Animation a = animator.getAnimationFactory().createLensMagAnim(WHEEL_ANIM_TIME, (FixedSizeLens)lens,
@@ -722,16 +719,16 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 
     void createDM(int x, int y){
         dmPortal = new DraggableCameraPortal(x, y, GraphicsManager.DM_PORTAL_WIDTH, GraphicsManager.DM_PORTAL_HEIGHT, dmCamera);
-        dmPortal.setPortalEventHandler((PortalEventHandler)meh);
+        dmPortal.setPortalListener((PortalListener)meh);
         dmPortal.setBackgroundColor(mainView.getBackgroundColor());
         vsm.addPortal(dmPortal, mainView);
         dmPortal.setBorder(GraphicsManager.DM_COLOR);
         Location l = dmPortal.getSeamlessView(mainCamera);
         dmCamera.moveTo(l.vx, l.vy);
-        dmCamera.setAltitude((float)((mainCamera.getAltitude()+mainCamera.getFocal())/(DEFAULT_MAG_FACTOR)-mainCamera.getFocal()));
+        dmCamera.setAltitude(((mainCamera.getAltitude()+mainCamera.getFocal())/(DEFAULT_MAG_FACTOR)-mainCamera.getFocal()));
         updateMagWindow();
-        int w = Math.round(magWindow.getWidth() * 2 * mainCamera.getFocal() / ((float)(mainCamera.getFocal()+mainCamera.getAltitude())));
-        int h = Math.round(magWindow.getHeight() * 2 * mainCamera.getFocal() / ((float)(mainCamera.getFocal()+mainCamera.getAltitude())));
+        int w = (int)Math.round(magWindow.getWidth() * 2 * mainCamera.getFocal() / ((float)(mainCamera.getFocal()+mainCamera.getAltitude())));
+        int h = (int)Math.round(magWindow.getHeight() * 2 * mainCamera.getFocal() / ((float)(mainCamera.getFocal()+mainCamera.getAltitude())));
         dmPortal.sizeTo(w, h);
         mSpace.onTop(magWindow);
         mSpace.show(magWindow);
@@ -757,12 +754,12 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	meh.resetDragMagInteraction();
     }
 
-    long[] dmwnes = new long[4];
+    double[] dmwnes = new double[4];
 
     void updateMagWindow(){
 	if (dmPortal == null){return;}
 	dmPortal.getVisibleRegion(dmwnes);
-	magWindow.moveTo(dmCamera.posx, dmCamera.posy);
+	magWindow.moveTo(dmCamera.vx, dmCamera.vy);
 	magWindow.setWidth((dmwnes[2]-dmwnes[0]) / 2 + 1);
 	magWindow.setHeight((dmwnes[1]-dmwnes[3]) / 2 + 1);
     }
@@ -774,11 +771,11 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     /*Java2DPainter interface*/
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
 	if (paintLinks){
-	    float coef=(float)(mainCamera.focal/(mainCamera.focal+mainCamera.altitude));
-	    int magWindowX = (viewWidth/2) + Math.round((magWindow.vx-mainCamera.posx)*coef);
-	    int magWindowY = (viewHeight/2) - Math.round((magWindow.vy-mainCamera.posy)*coef);
-	    int magWindowW = Math.round(magWindow.getWidth()*coef);
-	    int magWindowH = Math.round(magWindow.getHeight()*coef);
+	    double coef = mainCamera.focal/(mainCamera.focal+mainCamera.altitude);
+	    int magWindowX = (int)Math.round((viewWidth/2) + (magWindow.vx-mainCamera.vx)*coef);
+	    int magWindowY = (int)Math.round((viewHeight/2) - (magWindow.vy-mainCamera.vy)*coef);
+	    int magWindowW = (int)Math.round(magWindow.getWidth()*coef);
+	    int magWindowH = (int)Math.round(magWindow.getHeight()*coef);
 	    g2d.setColor(GraphicsManager.DM_COLOR);
 	    g2d.drawLine(magWindowX-magWindowW, magWindowY-magWindowH, dmPortal.x, dmPortal.y);
 	    g2d.drawLine(magWindowX+magWindowW, magWindowY-magWindowH, dmPortal.x+dmPortal.w, dmPortal.y);
@@ -797,7 +794,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	if (s.length()>0){
 	    if (!s.toLowerCase().equals(lastSearchedString)){//searching a new string - reinitialize everything
 		resetSearch(s);
-		Glyph[] gl = mSpace.getVisibleGlyphList();
+		Glyph[] gl = mSpace.getVisibleGlyphsList();
 		for (int i=0;i<gl.length;i++){
 		    if (gl[i] instanceof VText){
 			if ((((VText)gl[i]).getText() != null) &&
@@ -828,7 +825,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 		// g is the lastMatchingEntity
 		mainView.centerOnGlyph(g, mSpace.getCamera(0), ConfigManager.ANIM_MOVE_LENGTH, true, ConfigManager.MAG_FACTOR * 1.5f);
 		highlight(g);
-		vsm.repaintNow();
+		vsm.repaint();
 	    }
 	    else {
 		zapp.setStatusBarText("No match");
@@ -866,7 +863,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     /* -------------- Font management ----------------*/
 
     void assignFontToGraph(){
-	Font f = fr.inria.zvtm.fonts.FontDialog.getFontDialog((JFrame)mainView.getFrame(), ConfigManager.defaultFont);
+	Font f = fr.inria.zvtm.widgets.FontDialog.getFontDialog((JFrame)mainView.getFrame(), ConfigManager.defaultFont);
 	if (f!=null){
 	    ConfigManager.defaultFont=f;
 	    Vector glyphs = mSpace.getAllGlyphs();
@@ -874,7 +871,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	    for (int i=0;i<glyphs.size();i++){
 		g = glyphs.elementAt(i);
 		if (g instanceof VText){
-		    ((VText)g).setSpecialFont(null);
+		    ((VText)g).setFont(null);
 		}
 	    }
 	    VText.setMainFont(ConfigManager.defaultFont);
@@ -943,38 +940,32 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     Vector originalNodeStroke = new Vector();
 
     void highlightElement(Glyph g, Camera cam, VCursor cursor, boolean highlight){
-	Object o = null;
-	if (g != null && g != boundingBox){// clicked inside a node
-	    o = g.getOwner();
-	}
-	else {
-	    // if cursor was not in a shape, try to detect a label
-	    Vector otherGlyphs = cursor.getIntersectingTexts(cam);
-	    if (otherGlyphs != null && otherGlyphs.size() > 0){
-		g = (Glyph)otherGlyphs.firstElement();
-		if (g.getOwner() != null){o = g.getOwner();}
-	    }
-	    // or an edge
-	    else {
-		otherGlyphs = cursor.getIntersectingPaths(cam);
-		if (otherGlyphs != null && otherGlyphs.size() > 0){
-		    g = (Glyph)otherGlyphs.firstElement();
-		    if (g.getOwner() != null){o = g.getOwner();}
-		}
-		else {// could not detect anything, consider that user clicked on background
-		    // unhighlight anything that could have been highlighted
-		    unhighlightAll();
-		}
-	    }
-	}
-	if (o != null){
-	    if (o instanceof LNode){
-		highlightNode((LNode)o, highlight);
-	    }
-	    else if (o instanceof LEdge){
-		highlightEdge((LEdge)o, highlight);
-	    }
-	}
+        Object o = null;
+        if (g != null && g != boundingBox){
+            // clicked inside a node
+            o = g.getOwner();
+        }
+        else {
+            // if cursor was not in a shape, try to detect a label or an edge           
+            Vector otherGlyphs = cursor.getIntersectingGlyphs(cam);
+            if (otherGlyphs != null && otherGlyphs.size() > 0){
+                g = (Glyph)otherGlyphs.firstElement();
+                if (g.getOwner() != null){o = g.getOwner();}
+            }
+            else {
+                // could not detect anything, consider that user clicked on background
+                // unhighlight anything that could have been highlighted
+                unhighlightAll();
+            }
+        }
+        if (o != null){
+            if (o instanceof LNode){
+                highlightNode((LNode)o, highlight);
+            }
+            else if (o instanceof LEdge){
+                highlightEdge((LEdge)o, highlight);
+            }
+        }
     }
 
     synchronized void highlightNode(LNode n, boolean highlight){
@@ -1198,9 +1189,9 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
             Ring ring = rm.getRing(Math.atan2(otherEndShape.vy-thisEndShape.vy, otherEndShape.vx-thisEndShape.vx), thisEndShape.getSize(), RING_STEP);
             double bd = ring.rank * RING_STEP;
             double ratio = bd / d;
-            long bx = thisEndShape.vx + Math.round(ratio * (otherEndShape.vx-thisEndShape.vx));
-            long by = thisEndShape.vy + Math.round(ratio * (otherEndShape.vy-thisEndShape.vy));
-            node2broughtPosition.put(otherEnd, new LongPoint(bx, by));
+            double bx = thisEndShape.vx + ratio * (otherEndShape.vx-thisEndShape.vx);
+            double by = thisEndShape.vy + ratio * (otherEndShape.vy-thisEndShape.vy);
+            node2broughtPosition.put(otherEnd, new Point2D.Double(bx, by));
         }
         // actually bring the arcs and nodes (animation)
         for (int i=0;i<arcs.length;i++){
@@ -1228,10 +1219,10 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	void endBringAndGo(Glyph g){
         isBringingAndGoing = false;
         // new camera location (if g != null)
-        LongPoint newCameraLocation = null;
+        Point2D.Double newCameraLocation = null;
         if (!broughtElements.isEmpty()){
             for (int i=broughtElements.size()-1;i>=0;i--){
-                LongPoint l = sendBack((BroughtElement)broughtElements.elementAt(i), g);
+                Point2D.Double l = sendBack((BroughtElement)broughtElements.elementAt(i), g);
                 if (l != null){
                     newCameraLocation = l;
                 }
@@ -1255,7 +1246,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         }
 	}
 	
-	void bring(LEdge arc, LNode node, long sx, long sy, long ex, long ey, float size, Hashtable node2broughtPosition){
+	void bring(LEdge arc, LNode node, double sx, double sy, double ex, double ey, double size, Hashtable node2broughtPosition){
 	    broughtElements.add(BroughtElement.rememberPreviousState(node));
 	    broughtElements.add(BroughtElement.rememberPreviousState(arc));
 		// deal with node glyphs
@@ -1269,14 +1260,14 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
             animator.startAnimation(szAnim, true);
             VText label = node.getLabel();
             if (label != null){
-                label.setScale(size/nodeShape.getSize());
+                label.setScale((float)(size/nodeShape.getSize()));
             }
         }
 
 
 		elementsToFade.remove(nodeShape);
-		LongPoint bposition = (LongPoint)node2broughtPosition.get(node);
-		LongPoint translation = new LongPoint(bposition.x-nodeShape.vx, bposition.y-nodeShape.vy);
+		Point2D.Double bposition = (Point2D.Double)node2broughtPosition.get(node);
+		Point2D.Double translation = new Point2D.Double(bposition.x-nodeShape.vx, bposition.y-nodeShape.vy);
 		Glyph[] glyphs = node.getGlyphs();
 		for (int i=0;i<glyphs.length;i++){
 			elementsToFade.remove(glyphs[i]);
@@ -1291,19 +1282,19 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 		// deal with the edge's spline
 		DPath spline = arc.getSpline();
 		elementsToFade.remove(spline);
-		LongPoint asp = spline.getStartPoint();
-		LongPoint aep = spline.getEndPoint();
-		LongPoint sp, ep;
+		Point2D.Double asp = spline.getStartPoint();
+		Point2D.Double aep = spline.getEndPoint();
+		Point2D.Double sp, ep;
 		if (Math.sqrt(Math.pow(asp.x-ex,2) + Math.pow(asp.y-ey,2)) < Math.sqrt(Math.pow(asp.x-sx,2) + Math.pow(asp.y-sy,2))){
-			sp = new LongPoint(bposition.x, bposition.y);
-			ep = new LongPoint(sx, sy);
+			sp = new Point2D.Double(bposition.x, bposition.y);
+			ep = new Point2D.Double(sx, sy);
 		}
 		else {
-			sp = new LongPoint(sx, sy);
-			ep = new LongPoint(bposition.x, bposition.y);
+			sp = new Point2D.Double(sx, sy);
+			ep = new Point2D.Double(bposition.x, bposition.y);
 		}
 		mSpace.above(spline, boundingBox);
-		LongPoint[] flatCoords = DPath.getFlattenedCoordinates(spline, sp, ep, true);
+		Point2D.Double[] flatCoords = DPath.getFlattenedCoordinates(spline, sp, ep, true);
 		Animation a = animator.getAnimationFactory().createPathAnim(BRING_ANIM_DURATION, spline, flatCoords,
 		    false, SlowInSlowOutInterpolator.getInstance(), null);
 		animator.startAnimation(a, true);
@@ -1315,7 +1306,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 				if (glyphs[i] instanceof VText){
 					// put any label at the center of the edge (simplest thing we can do)
 					a = animator.getAnimationFactory().createGlyphTranslation(
-					    BRING_ANIM_DURATION, glyphs[i], new LongPoint(bposition.x-sx, bposition.y-sy),
+					    BRING_ANIM_DURATION, glyphs[i], new Point2D.Double(bposition.x-sx, bposition.y-sy),
                         true, SlowInSlowOutInterpolator.getInstance(), null);
                     animator.startAnimation(a, true);
 				}
@@ -1335,18 +1326,18 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 			aep = spline.getEndPoint();
 			if (node2broughtPosition.containsKey(otherArcs[i].getTail())
 			    && node2broughtPosition.containsKey(otherArcs[i].getHead())){
-				sp = (LongPoint)node2broughtPosition.get(otherArcs[i].getTail());
-				ep = (LongPoint)node2broughtPosition.get(otherArcs[i].getHead());
+				sp = (Point2D.Double)node2broughtPosition.get(otherArcs[i].getTail());
+				ep = (Point2D.Double)node2broughtPosition.get(otherArcs[i].getHead());
 			}
 			else {
 				oe = otherArcs[i].getOtherEnd(node).getShape();
 				if (Math.sqrt(Math.pow(asp.x-ex,2) + Math.pow(asp.y-ey,2)) <= Math.sqrt(Math.pow(aep.x-ex,2) + Math.pow(aep.y-ey,2))){
-					sp = new LongPoint(bposition.x, bposition.y);
+					sp = new Point2D.Double(bposition.x, bposition.y);
 					ep = oe.getLocation();
 				}
 				else {
 					sp = oe.getLocation();
-					ep = new LongPoint(bposition.x, bposition.y);
+					ep = new Point2D.Double(bposition.x, bposition.y);
 				}
 			}
 			flatCoords = DPath.getFlattenedCoordinates(spline, sp, ep, true);
@@ -1358,7 +1349,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 		}		
     }
     
-    LongPoint sendBack(BroughtElement be, Glyph g){
+    Point2D.Double sendBack(BroughtElement be, Glyph g){
 		broughtElements.remove(be);
         return be.restorePreviousState(BRING_ANIM_DURATION, g);
     }
@@ -1379,7 +1370,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	Color slidingLinkActualColor = null;
 	Point2D mPos = new Point2D.Double();
 	
-	CircleNR slideCursor, selectionRadius;
+	SICircle slideCursor, selectionRadius;
 	Point2D cPos;
 
     LNode closestNode;
@@ -1389,8 +1380,8 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	
 	Point2D mtPos = new Point2D.Double();
 	
-	void attemptLinkSliding(long press_vx, long press_vy, int scr_x, int scr_y){
-		long vieww = mainView.getVisibleRegionWidth(mainCamera);
+	void attemptLinkSliding(double press_vx, double press_vy, int scr_x, int scr_y){
+		double vieww = mainView.getVisibleRegionWidth(mainCamera);
 		lsci = 0;
 	    if (lstruct != null){
     		closestNode = lstruct.nodes[0];
@@ -1442,7 +1433,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         }
 	}
 	
-	void startLinkSliding(final long press_vx, final long press_vy, int px, int py){
+	void startLinkSliding(final double press_vx, final double press_vy, int px, int py){
 		mainView.getCursor().setVisibility(false);
 		isLinkSliding = true;
 		screen_cursor_x = px + panelWidth/2;
@@ -1458,24 +1449,24 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 		slidingLinkActualColor = slidingLink.getColor();
 		slidingLink.setColor(ConfigManager.HIGHLIGHT_COLOR);
 		// add cursor on link
-		slideCursor = new CircleNR(press_vx, press_vy, 0, SLIDER_CURSOR_SIZE, SLIDER_CURSOR_FILL, ConfigManager.HIGHLIGHT_COLOR);
+		slideCursor = new SICircle(press_vx, press_vy, 0, SLIDER_CURSOR_SIZE, SLIDER_CURSOR_FILL, ConfigManager.HIGHLIGHT_COLOR);
 		slideCursor.setStrokeWidth(SLIDER_CURSOR_SIZE/2.0f);
 		mSpace.addGlyph(slideCursor);
 		// display selection radius, circular zone that allows for arc switching when starting from a node
 		if (closestNode != null){
-    		selectionRadius = new CircleNR(closestNode.getShape().vx, closestNode.getShape().vy, 0, SELECTION_RADIUS, Color.WHITE, SELECTION_RADIUS_COLOR);
+    		selectionRadius = new SICircle(closestNode.getShape().vx, closestNode.getShape().vy, 0, SELECTION_RADIUS, Color.WHITE, SELECTION_RADIUS_COLOR);
     		selectionRadius.setFilled(false);
     		selectionRadius.setStrokeWidth(2.0f);
     		mSpace.addGlyph(selectionRadius);	    
 		}
 		// center camera on selection
-	    Animation a = animator.getAnimationFactory().createCameraTranslation(200, mainCamera, new LongPoint(press_vx, press_vy), false,
+	    Animation a = animator.getAnimationFactory().createCameraTranslation(200, mainCamera, new Point2D.Double(press_vx, press_vy), false,
 	                                                                                          SlowInSlowOutInterpolator.getInstance(),
 	                                                                                          new EndAction(){public void execute(Object subject, Animation.Dimension dimension){linkSlider(press_vx, press_vy, true);}});
 	    animator.startAnimation(a, false);
 	}
 	
-	void linkSlider(long vx, long vy, boolean centerCursor){
+	void linkSlider(double vx, double vy, boolean centerCursor){
         boolean withinSelectionRadius = mainView.getCursor().isUnderCursor(selectionRadius);
 		mPos.setLocation(vx, vy);
 		lscs[lsci].updateMousePosition(mPos);
@@ -1644,7 +1635,7 @@ class Ring {
 //  /* nodes on this ring */
 //  LNode[] nodes = new LNode[0];
 //  /* nodes on this ring */
-//  LongPoint[] broughtPositions = new LongPoint[0];
+//  Point2D.Double[] broughtPositions = new Point2D.Double[0];
 //  /* cones of influence, for each item, first element is the smallest angle in [0, 2Pi[, second the largest angle in [0, 2Pi[ */
 	double[][] cones = new double[0][2];
 	
@@ -1652,7 +1643,7 @@ class Ring {
 		this.rank = r;
 	}
 	
-//	void addNode(/*LNode n, LongPoint p,*/ double a1, double a2){
+//	void addNode(/*LNode n, Point2D.Double p,*/ double a1, double a2){
 	void addNode(double a1, double a2){
 //		// add node
 //		LNode[] ta = new LNode[nodes.length+1];
@@ -1660,7 +1651,7 @@ class Ring {
 //		ta[nodes.length] = n;
 //		nodes = ta;
 //		// add node
-//		LongPoint[] tp = new LongPoint[broughtPositions.length+1];
+//		Point2D.Double[] tp = new Point2D.Double[broughtPositions.length+1];
 //		System.arraycopy(broughtPositions, 0, tp, 0, broughtPositions.length);
 //		tp[nodes.length] = p;
 //		broughtPositions = tp;

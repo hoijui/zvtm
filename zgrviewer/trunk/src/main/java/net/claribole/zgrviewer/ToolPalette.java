@@ -11,10 +11,10 @@
 package net.claribole.zgrviewer;
 
 import java.awt.Cursor;
+import java.awt.geom.Point2D;
 import javax.swing.ImageIcon;
 
 import fr.inria.zvtm.engine.Camera;
-import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.glyphs.VImage;
@@ -83,8 +83,6 @@ public class ToolPalette {
 				    (new ImageIcon(this.getClass().getResource(ICON_PATHS[i]))).getImage());
 	    selectedButtons[i] = new VImage(0, -i*VERTICAL_STEP_BETWEEN_ICONS, 0,
 					    (new ImageIcon(this.getClass().getResource(SELECTED_ICON_PATHS[i]))).getImage());
-	    buttons[i].setDrawBorderPolicy(VImage.DRAW_BORDER_MOUSE_INSIDE);
-	    selectedButtons[i].setDrawBorderPolicy(VImage.DRAW_BORDER_MOUSE_INSIDE);
 	    paletteSpace.addGlyph(buttons[i]);
 	    paletteSpace.addGlyph(selectedButtons[i]);
 	}
@@ -186,7 +184,7 @@ public class ToolPalette {
     }
 
     void updateHiddenPosition(){
-	long[] wnes = grMngr.mainView.getVisibleRegion(paletteCamera);
+	double[] wnes = grMngr.mainView.getVisibleRegion(paletteCamera);
 	for (int i=0;i<buttons.length;i++){
 	    buttons[i].moveTo(wnes[0]-buttons[i].getWidth()+1, wnes[1]-(i+1)*VERTICAL_STEP_BETWEEN_ICONS);
 	    selectedButtons[i].moveTo(wnes[0]-buttons[i].getWidth()+1, wnes[1]-(i+1)*VERTICAL_STEP_BETWEEN_ICONS);
@@ -199,7 +197,7 @@ public class ToolPalette {
             visible = true;
             grMngr.meh.toolPaletteIsActive = true;
             Animation a = grMngr.vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(ANIM_TIME, paletteCamera,
-                new LongPoint(-2*buttons[0].getWidth()-5, 0), true,
+                new Point2D.Double(-2*buttons[0].getWidth()-5, 0), true,
                 SlowInSlowOutInterpolator.getInstance(), null);
             grMngr.vsm.getAnimationManager().startAnimation(a, false);
             grMngr.mainView.setCursorIcon(Cursor.HAND_CURSOR);
@@ -211,7 +209,7 @@ public class ToolPalette {
         if (visible){
             visible = false;
             Animation a = grMngr.vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(ANIM_TIME, paletteCamera,
-                new LongPoint(2*buttons[0].getWidth()+5, 0), true,
+                new Point2D.Double(2*buttons[0].getWidth()+5, 0), true,
                 SlowInSlowOutInterpolator.getInstance(), null);
             grMngr.vsm.getAnimationManager().startAnimation(a, false);
             grMngr.mainView.setCursorIcon(Cursor.CUSTOM_CURSOR);

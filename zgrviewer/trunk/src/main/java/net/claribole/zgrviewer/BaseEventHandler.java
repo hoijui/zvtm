@@ -14,10 +14,10 @@ import java.awt.Point;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.glyphs.VSegment;
 
-import fr.inria.zvtm.engine.Portal;
-import fr.inria.zvtm.engine.PortalEventHandler;
+import fr.inria.zvtm.engine.portals.Portal;
+import fr.inria.zvtm.event.PortalListener;
 
-public abstract class BaseEventHandler implements PortalEventHandler {
+public abstract class BaseEventHandler implements PortalListener {
 
     static final float WHEEL_ZOOMOUT_FACTOR = 21.0f;
     static final float WHEEL_ZOOMIN_FACTOR = 22.0f;
@@ -32,11 +32,11 @@ public abstract class BaseEventHandler implements PortalEventHandler {
 
     // remember last mouse coords to compute translation  (dragging)
     int lastJPX,lastJPY;
-    long lastVX, lastVY;
-    long jpxD, jpyD;
-    float tfactor;
+    double lastVX, lastVY;
+    int jpxD, jpyD;
+    double tfactor;
     // remember last mouse coords to display selection rectangle (dragging)
-    long x1,y1,x2,y2;
+    double x1,y1,x2,y2;
     
     // lens optimization
     int lx, ly;
@@ -59,7 +59,7 @@ public abstract class BaseEventHandler implements PortalEventHandler {
     boolean draggingZoomWindowContent = false;
     
     /* Link Sliding */
-	long LS_SX, LS_SY;
+	double LS_SX, LS_SY;
 	Point relative;
 
     /**cursor enters portal*/

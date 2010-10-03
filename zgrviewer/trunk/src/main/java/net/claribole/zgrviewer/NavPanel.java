@@ -93,8 +93,8 @@ class NavPanel extends JPanel implements ActionListener, ChangeListener {
 		grMngr.rView.setBackgroundColor(grMngr.cfgMngr.backgroundColor);
 		// same event handler handling all layers for now
 		//XXX: TBD: refactor event handler code taking advantage of new one handler per layer functionality 
-		grMngr.rView.setEventHandler(grMngr.reh, 0);
-		grMngr.rView.setEventHandler(grMngr.reh, 1);
+		grMngr.rView.setListener(grMngr.reh, 0);
+		grMngr.rView.setListener(grMngr.reh, 1);
 		grMngr.rView.setActiveLayer(1);
 		grMngr.rView.setCursorIcon(java.awt.Cursor.MOVE_CURSOR);
 		grMngr.rView.getGlobalView(grMngr.mSpace.getCamera(1),100);

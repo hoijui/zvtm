@@ -10,7 +10,7 @@
 
 package net.claribole.zgrviewer;
 
-import fr.inria.zvtm.engine.LongPoint;
+import java.awt.geom.Point2D;
 
 public class Messages {
     
@@ -80,8 +80,8 @@ public class Messages {
     static final String PM_GLOBALVIEW = "Global View";
 
     static final String[] mainMenuLabels = {PM_GLOBALVIEW, PM_FILE, PM_BACK, PM_EXPORT};
-    static final LongPoint[] mainMenuLabelOffsets = {new LongPoint(5, -4), new LongPoint(0, 4),
-						     new LongPoint(-5, -4), new LongPoint(0, -15)};
+    static final Point2D.Double[] mainMenuLabelOffsets = {new Point2D.Double(5, -4), new Point2D.Double(0, 4),
+						     new Point2D.Double(-5, -4), new Point2D.Double(0, -15)};
 
     static final String PM_OPENDOTSVG = "Dot (SVG)";
     static final String PM_OPENCIRCOSVG = "Circo (SVG)";
@@ -92,16 +92,16 @@ public class Messages {
 
     static final String[] fileMenuLabels = {PM_OPENSVG, PM_OPENCIRCOSVG, PM_OPENDOTSVG,
 					    PM_OPENNEATOSVG, PM_OPENTWOPISVG, PM_OPENOTHER};
-    static final LongPoint[] fileMenuLabelOffsets = {new LongPoint(16, 6), new LongPoint(16, -10),
-						     new LongPoint(0, 20), new LongPoint(-10, -10),
-						     new LongPoint(-10, 6), new LongPoint(0, -32)};
+    static final Point2D.Double[] fileMenuLabelOffsets = {new Point2D.Double(16, 6), new Point2D.Double(16, -10),
+						     new Point2D.Double(0, 20), new Point2D.Double(-10, -10),
+						     new Point2D.Double(-10, 6), new Point2D.Double(0, -32)};
 
     static final String PM_EXPSVG = "Export (SVG)";
     static final String PM_EXPPNG = "Export (PNG)";
     static final String PM_EXPPRINT = "Print";
 
     static final String[] exportMenuLabels = {PM_EXPSVG, PM_EXPPNG, PM_EXPPRINT};
-    static final LongPoint[] exportMenuLabelOffsets = {new LongPoint(4, 0), new LongPoint(-2, 0), new LongPoint(4, -10)};
+    static final Point2D.Double[] exportMenuLabelOffsets = {new Point2D.Double(4, 0), new Point2D.Double(-2, 0), new Point2D.Double(4, -10)};
 
     static final String LOADING_SVG = "Loading Graphviz/SVG...";
 

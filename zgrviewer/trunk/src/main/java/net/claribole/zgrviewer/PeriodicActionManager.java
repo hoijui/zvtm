@@ -20,12 +20,9 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.Rectangle2D;
 
-import fr.inria.zvtm.glyphs.RectangleNR;
-//import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.svg.Metadata;
-import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.Java2DPainter;
 
 class PeriodicActionManager implements Runnable, MouseMotionListener, Java2DPainter {
@@ -94,7 +91,7 @@ class PeriodicActionManager implements Runnable, MouseMotionListener, Java2DPain
 		    lX = grMngr.mainView.mouse.getPanelXCoordinate() + TP_MARGIN;
 		    lY = grMngr.mainView.mouse.getPanelYCoordinate() + TP_MARGIN;
 		    invalidBounds = true;
-		    grMngr.vsm.repaintNow();
+		    grMngr.vsm.repaint();
 		}
 	    }
 	}
@@ -104,7 +101,7 @@ class PeriodicActionManager implements Runnable, MouseMotionListener, Java2DPain
 	tipLabel = null;
 	tippedGlyph = null;
 	invalidBounds = true;
-	grMngr.vsm.repaintNow();
+	grMngr.vsm.repaint();
     }
 
     void computeTipRectangle(int labelWidth, int labelHeight){

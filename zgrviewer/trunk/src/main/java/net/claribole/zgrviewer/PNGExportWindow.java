@@ -18,6 +18,7 @@ import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 import java.util.Vector;
 
 import javax.swing.BorderFactory;
@@ -35,6 +36,9 @@ import javax.swing.SwingConstants;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+
+import java.awt.image.BufferedImage;
+import javax.imageio.ImageIO;
 
 public class PNGExportWindow {
 
@@ -96,7 +100,7 @@ public class PNGExportWindow {
      * @param   h   starting pixel height
      *@param gm GraphicsManager instantiated by the parent ZGRViewer/ZGRApplet
      */
-    public PNGExportWindow(long w, long h, GraphicsManager gm){
+    public PNGExportWindow(double w, double h, GraphicsManager gm){
 	this.grMngr = gm;
 	if ( w < 1 || h < 1){
 	    JOptionPane.showMessageDialog(grMngr.mainView.getFrame(), "Can not export visible region of size 0.", "Export to PNG error", JOptionPane.ERROR_MESSAGE);
@@ -228,18 +232,25 @@ public class PNGExportWindow {
         }
         
         class ExportActionListener implements ActionListener{
-	    public void actionPerformed(ActionEvent e){
-		hide();
-		grMngr.mainView.setStatusBarText("Exporting to PNG "+filePath.getText()+" ... (This operation can take some time)");
-		
-		realWidth = unitToPixel(realWidth, widthUnit.getSelectedIndex());
-		realHeight = unitToPixel(realHeight, heightUnit.getSelectedIndex());
-		
-		Vector layers = new Vector();
-		layers.add(grMngr.mainCamera);
-		grMngr.mainView.rasterize((int)realWidth, (int)realHeight, grMngr.vsm, new File(filePath.getText()), layers);
-		grMngr.mainView.setStatusBarText("Exporting to PNG "+filePath.getText()+" ...done");
-	    }
+            public void actionPerformed(ActionEvent e){
+                hide();
+                grMngr.mainView.setStatusBarText("Exporting to PNG "+filePath.getText()+" ... (This operation can take some time)");
+
+                realWidth = unitToPixel(realWidth, widthUnit.getSelectedIndex());
+                realHeight = unitToPixel(realHeight, heightUnit.getSelectedIndex());
+
+                Vector layers = new Vector();
+                layers.add(grMngr.mainCamera);
+                BufferedImage bi = grMngr.mainView.rasterize((int)realWidth, (int)realHeight, layers);
+                try {
+                    ImageIO.write(bi, "png", new File(filePath.getText()));                    
+                }
+                catch (IOException ex){
+                    System.err.println("ZGRViewer::Error while exporting current view to PNG file "+filePath.getText());
+                    ex.printStackTrace();
+                }
+                grMngr.mainView.setStatusBarText("Exporting to PNG "+filePath.getText()+" ...done");
+            }
         }
         
         export = new JButton("Export");

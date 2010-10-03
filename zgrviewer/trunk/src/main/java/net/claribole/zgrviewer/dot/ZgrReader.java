@@ -13,9 +13,6 @@ import java.awt.Color;
 import java.awt.Font;
 import java.util.Vector;
 
-import fr.inria.zvtm.glyphs.CGlyph;
-import fr.inria.zvtm.glyphs.SGlyph;
-
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.glyphs.Glyph;
@@ -237,30 +234,34 @@ public class ZgrReader {
                         primary.setBorderColor(border);
                         vs.addGlyph(primary);
 
-                        SGlyph[] secondaries = new SGlyph[node.peripheries - 1];
-                        for (int j = 0; j < secondaries.length; j++) {
-                            Glyph ellipse;
-                            if (node.regular) {
-                                ellipse = new VCircle(node.pos.coords[0],
-                                        node.pos.coords[1], 1,
-                                        (long) (inches * Math.max(node.width,
-                                                node.height))
-                                                - spacingPeripheries * (j + 1),
-                                        fill);
-                            } else {
-                                ellipse = new VEllipse(node.pos.coords[0],
-                                        node.pos.coords[1], 1,
-                                        (long) (inches * node.width)
-                                                - spacingPeripheries * (j + 1),
-                                        (long) (inches * node.height)
-                                                - spacingPeripheries * (j + 1),
-                                        fill);
-                            }
-                            ellipse.setBorderColor(border);
-                            vs.addGlyph(ellipse);
-                            secondaries[j] = new SGlyph(ellipse, 0, 0);
-                        }
-                        nodeGlyph = new CGlyph(primary, secondaries);
+                        //XXX: use new Composite
+
+                        //SGlyph[] secondaries = new SGlyph[node.peripheries - 1];
+                        //for (int j = 0; j < secondaries.length; j++) {
+                        //    Glyph ellipse;
+                        //    if (node.regular) {
+                        //        ellipse = new VCircle(node.pos.coords[0],
+                        //                node.pos.coords[1], 1,
+                        //                (long) (inches * Math.max(node.width,
+                        //                        node.height))
+                        //                        - spacingPeripheries * (j + 1),
+                        //                fill);
+                        //    } else {
+                        //        ellipse = new VEllipse(node.pos.coords[0],
+                        //                node.pos.coords[1], 1,
+                        //                (long) (inches * node.width)
+                        //                        - spacingPeripheries * (j + 1),
+                        //                (long) (inches * node.height)
+                        //                        - spacingPeripheries * (j + 1),
+                        //                fill);
+                        //    }
+                        //    ellipse.setBorderColor(border);
+                        //    vs.addGlyph(ellipse);
+                            
+                            
+                            //secondaries[j] = new SGlyph(ellipse, 0, 0);
+                        //}
+                        //nodeGlyph = new CGlyph(primary, secondaries);
                     }
                     break;
 
@@ -474,7 +475,7 @@ public class ZgrReader {
                     VText g = new VText(x, y + 1 + texts.length * interline / 2
                             - (k + 1) * (interline - 1), 1, color, text
                             .replaceAll("\\\\", ""), VText.TEXT_ANCHOR_MIDDLE);
-                    g.setSpecialFont(Font.decode(fontname + "-PLAIN-" + s));
+                    g.setFont(Font.decode(fontname + "-PLAIN-" + s));
                     vs.addGlyph(g);
                     g.setOwner(owner);
                 }

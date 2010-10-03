@@ -39,7 +39,7 @@ import java.net.URL;
 import java.net.MalformedURLException;
 
 import fr.inria.zvtm.engine.Location;
-import fr.inria.zvtm.engine.RepaintListener;
+import fr.inria.zvtm.event.RepaintListener;
 
 import org.w3c.dom.Document;
 
@@ -241,7 +241,7 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
             public Object construct(){
                 sleep(1000);
                 requestFocus();
-                grMngr.vsm.repaintNow();
+                grMngr.vsm.repaint();
                 URL svgUrl = null;
                 try {
                     svgUrl = new URL(getDocumentBase(), getParameter(SVG_FILE_URL_PARAM));
@@ -254,14 +254,14 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
                 // override SVG's background color if background color is specified in applet params
                 if (graphBkgColorSpecifiedF){grMngr.mainView.setBackgroundColor(cfgMngr.backgroundColor);}
                 grMngr.tp.updateHiddenPosition();
-                grMngr.vsm.repaintNow(grMngr.mainView, ZGRApplet.this);
+                grMngr.vsm.repaint(grMngr.mainView, ZGRApplet.this);
                 while (!ZGRApplet.this.paintedAtLeastOnce){
                     sleep(500);
                 }
                 if (centerOnLabelF != null){
                     grMngr.search(centerOnLabelF, 1);
                 }
-                grMngr.vsm.repaintNow();
+                grMngr.vsm.repaint();
                 gp.setVisible(false);
                 return null; 
             }
@@ -336,7 +336,7 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
                 meh.tfactor = (grMngr.dmCamera.focal+Math.abs(grMngr.dmCamera.altitude))/grMngr.dmCamera.focal;
                 grMngr.dmCamera.altitudeOffset(-meh.tfactor*BaseEventHandler.WHEEL_ZOOMIN_FACTOR);
                 grMngr.updateMagWindow();
-                grMngr.vsm.repaintNow();
+                grMngr.vsm.repaint();
             }
             else {
                 meh.tfactor = (grMngr.mainCamera.focal+Math.abs(grMngr.mainCamera.altitude))/grMngr.mainCamera.focal;
@@ -352,7 +352,7 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
                 meh.tfactor = (grMngr.dmCamera.focal+Math.abs(grMngr.dmCamera.altitude))/grMngr.dmCamera.focal;
                 grMngr.dmCamera.altitudeOffset(meh.tfactor*BaseEventHandler.WHEEL_ZOOMOUT_FACTOR);
                 grMngr.updateMagWindow();
-                grMngr.vsm.repaintNow();
+                grMngr.vsm.repaint();
             }
             else {
                 meh.tfactor = (grMngr.mainCamera.focal+Math.abs(grMngr.mainCamera.altitude))/grMngr.mainCamera.focal;

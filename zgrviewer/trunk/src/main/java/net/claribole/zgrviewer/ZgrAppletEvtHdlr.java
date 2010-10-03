@@ -18,7 +18,6 @@ import java.util.Vector;
 //import fr.inria.zvtm.engine.AnimManager;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VCursor;
-import fr.inria.zvtm.engine.Utilities;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.VirtualSpace;
@@ -26,15 +25,15 @@ import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VSegment;
 import fr.inria.zvtm.glyphs.VImage;
 import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
-import fr.inria.zvtm.engine.ViewEventHandler;
-import fr.inria.zvtm.engine.Portal;
+import fr.inria.zvtm.event.ViewListener;
+import fr.inria.zvtm.engine.portals.Portal;
 import fr.inria.zvtm.animation.Animation;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
-public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandler {
+public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewListener {
 
     ZGRApplet application;
     GraphicsManager grMngr;
@@ -81,7 +80,7 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandl
                     lastJPY=jpy;
                     //grMngr.vsm.setActiveCamera(v.cams[0]);
                     v.setDrawDrag(true);
-                    grMngr.vsm.activeView.mouse.setSensitivity(false);  //because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
+                    v.getVCursor().setSensitivity(false);  //because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
                     activeCam=grMngr.vsm.getActiveCamera();
                 }
                 else if (mod == ALT_MOD){
@@ -124,7 +123,7 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandl
                 grMngr.vsm.getAnimationManager().setYspeed(0);
                 grMngr.vsm.getAnimationManager().setZspeed(0);
                 v.setDrawDrag(false);
-                grMngr.vsm.activeView.mouse.setSensitivity(true);
+                v.getVCursor().setSensitivity(true);
                 if (autoZooming){unzoom(v);}
                 manualLeftButtonMove=false;
             }
@@ -270,7 +269,7 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandl
                 grMngr.dmPortal.move(jpx-lastJPX, jpy-lastJPY);
                 lastJPX = jpx;
                 lastJPY = jpy;
-                grMngr.vsm.repaintNow();
+                grMngr.vsm.repaint();
             }
             else if (draggingZoomWindowContent){
                 tfactor = (grMngr.dmCamera.focal+(grMngr.dmCamera.altitude))/grMngr.dmCamera.focal;
@@ -296,8 +295,8 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandl
                 else {
                     jpxD = jpx-lastJPX;
                     jpyD = lastJPY-jpy;
-                    grMngr.vsm.getAnimationManager().setXspeed((activeCam.altitude>0) ? (long)(jpxD*(tfactor/PAN_SPEED_FACTOR)) : (long)(jpxD/(tfactor*PAN_SPEED_FACTOR)));
-                    grMngr.vsm.getAnimationManager().setYspeed((activeCam.altitude>0) ? (long)(jpyD*(tfactor/PAN_SPEED_FACTOR)) : (long)(jpyD/(tfactor*PAN_SPEED_FACTOR)));
+                    grMngr.vsm.getAnimationManager().setXspeed((activeCam.altitude>0) ? jpxD*(tfactor/PAN_SPEED_FACTOR) : jpxD/(tfactor*PAN_SPEED_FACTOR));
+                    grMngr.vsm.getAnimationManager().setYspeed((activeCam.altitude>0) ? jpyD*(tfactor/PAN_SPEED_FACTOR) : jpyD/(tfactor*PAN_SPEED_FACTOR));
                     grMngr.vsm.getAnimationManager().setZspeed(0);
                     if (application.cfgMngr.isSDZoomEnabled()){
                         dragValue = Math.sqrt(Math.pow(jpxD, 2) + Math.pow(jpyD, 2));
@@ -319,7 +318,7 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandl
 
     public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
         if (grMngr.lensType != GraphicsManager.NO_LENS && grMngr.lens != null){
-            if (wheelDirection  == ViewEventHandler.WHEEL_UP){
+            if (wheelDirection  == ViewListener.WHEEL_UP){
                 grMngr.magnifyFocus(GraphicsManager.WHEEL_MM_STEP, grMngr.lensType, grMngr.mainCamera);
             }
             else {
@@ -337,7 +336,7 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandl
                 grMngr.dmCamera.altitudeOffset(tfactor*WHEEL_ZOOMIN_FACTOR);
             }
             grMngr.updateMagWindow();
-            grMngr.vsm.repaintNow();
+            grMngr.vsm.repaint();
         }
         else {
             tfactor = (grMngr.mainCamera.focal+Math.abs(grMngr.mainCamera.altitude))/grMngr.mainCamera.focal;
@@ -412,19 +411,12 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewEventHandl
     public void viewClosing(View v){}
 
     void attemptDisplayEdgeURL(VCursor mouse,Camera cam){
-	Glyph g;
-	Vector otherGlyphs=mouse.getIntersectingTexts(cam);
-	if (otherGlyphs!=null && otherGlyphs.size()>0){
-	    g=(Glyph)otherGlyphs.firstElement();
-	    if (g.getOwner()!=null){getAndDisplayURL((LElem)g.getOwner(), g);}
-	}
-	else {
-	    otherGlyphs=mouse.getIntersectingPaths(cam);
-	    if (otherGlyphs!=null && otherGlyphs.size()>0){
-		g=(Glyph)otherGlyphs.firstElement();
-		if (g.getOwner()!=null){getAndDisplayURL((LElem)g.getOwner(), g);}
-	    }
-	}
+        Glyph g;
+        Vector otherGlyphs=mouse.getIntersectingGlyphs(cam);
+        if (otherGlyphs!=null && otherGlyphs.size()>0){
+            g = (Glyph)otherGlyphs.firstElement();
+            if (g.getOwner()!=null){getAndDisplayURL((LElem)g.getOwner(), g);}
+        }
     }
 
     void getAndDisplayURL(LElem noa, Glyph g){
