@@ -216,7 +216,6 @@ public class ImageDescription extends ResourceDescription {
             }
             if (strokeColor != null){
                 glyph.setBorderColor(strokeColor);
-                glyph.setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
             }
             if (!sensitive){glyph.setSensitivity(false);}
             glyph.setInterpolationMethod(interpolationMethod);
@@ -241,7 +240,6 @@ public class ImageDescription extends ResourceDescription {
             }
             if (strokeColor != null){
                 glyph.setBorderColor(strokeColor);
-                glyph.setDrawBorderPolicy(VImage.DRAW_BORDER_ALWAYS);
             }
             if (!sensitive){glyph.setSensitivity(false);}
             glyph.setInterpolationMethod(interpolationMethod);
