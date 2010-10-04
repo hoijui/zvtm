@@ -1359,7 +1359,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	static final int SLIDER_CURSOR_SIZE = 6;
 	static final Color SLIDER_CURSOR_FILL = Color.WHITE;
 	
-	static final int SELECTION_RADIUS = 100;
+	static final int SELECTION_RADIUS = 200;
 	static final Color SELECTION_RADIUS_COLOR = Color.RED;
 	
 	boolean isLinkSliding = false;
@@ -1450,7 +1450,8 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 		slidingLink.setColor(ConfigManager.HIGHLIGHT_COLOR);
 		// add cursor on link
 		slideCursor = new SICircle(press_vx, press_vy, 0, SLIDER_CURSOR_SIZE, SLIDER_CURSOR_FILL, ConfigManager.HIGHLIGHT_COLOR);
-		slideCursor.setStrokeWidth(SLIDER_CURSOR_SIZE/2.0f);
+		slideCursor.setStrokeWidth(2f);
+		//slideCursor.setFilled(false);
 		mSpace.addGlyph(slideCursor);
 		// display selection radius, circular zone that allows for arc switching when starting from a node
 		if (closestNode != null){
