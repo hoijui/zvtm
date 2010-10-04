@@ -954,7 +954,7 @@ public class DPath extends Glyph implements RectangularShape {
 	/** Get an SVG-compatible path iterator for this DPath. */
     public PathIterator getSVGPathIterator(){
 		GeneralPath res = new GeneralPath();
-		res.moveTo(spx, -spy);
+		res.moveTo((float)spx, (float)-spy);
 		for (int i = 0; i < this.getElementsCount(); i++){
 			int elType = this.getElementType(i);
 			Point2D.Double[] pts = this.getElementPointsCoordinates(i);
@@ -983,7 +983,7 @@ public class DPath extends Glyph implements RectangularShape {
 	/** Update the Java2D GeneralPath representing this DPath. */
 	public void updateJava2DGeneralPath(){
 	    gp = new GeneralPath();
-        gp.moveTo(spx, spy);
+        gp.moveTo((float)spx, (float)spy);
 		for (int i = 0; i < this.getElementsCount(); i++){
 			int elType = this.getElementType(i);
 			Point2D.Double[] pts = this.getElementPointsCoordinates(i);
