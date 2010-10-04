@@ -102,16 +102,12 @@ public abstract class ZPDFPage extends ClosedShape implements RectangularShape {
 	@Override
 	public void highlight(boolean b, Color selectedColor){}
 
-	@Override
 	public void setWidth(double w){/*XXX:TBW*/}
 
-	@Override
 	public void setHeight(double h){/*XXX:TBW*/}
 
-	@Override
 	public double getWidth(){return vw;}
 
-	@Override
 	public double getHeight(){return vh;}
 
 	/** Set to false if the image should not be scaled according to camera's altitude. Its size can still be changed, but its apparent size will always be the same, no matter the camera's altitude.
