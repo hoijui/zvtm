@@ -30,7 +30,6 @@ public class TranslucentListCellRenderer extends JLabel implements
 	static final String ELLIPSIS = "...";
 	static final int MAX_BOUND = 27;
 
-	@Override
 	public Component getListCellRendererComponent(JList list, Object value, // value
 			// to
 			// display

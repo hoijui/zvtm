@@ -226,10 +226,8 @@ public class VSegment extends Glyph implements RectangularShape {
         else if(orient==0 && vw<0){orient=Math.PI;}	    
     }
 
-    @Override
     public double getWidth(){return vw;}
 
-    @Override
     public double getHeight(){return vh;}
 
     @Override
@@ -246,14 +244,12 @@ public class VSegment extends Glyph implements RectangularShape {
         VirtualSpaceManager.INSTANCE.repaint();
     }
 
-    @Override
     public void setWidth(double w){
         vw = w;
         computeSize();
         VirtualSpaceManager.INSTANCE.repaint();
     }
 
-    @Override
     public void setHeight(double h){
         vh = h;
         computeSize();

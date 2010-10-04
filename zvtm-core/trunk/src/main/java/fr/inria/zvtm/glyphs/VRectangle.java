@@ -167,10 +167,8 @@ public class VRectangle extends ClosedShape implements RectangularShape {
     @Override
     public double getSize(){return size;}
 
-    @Override
     public double getWidth(){return vw;}
 
-    @Override
     public double getHeight(){return vh;}
 
     void computeSize(){
@@ -186,7 +184,6 @@ public class VRectangle extends ClosedShape implements RectangularShape {
         VirtualSpaceManager.INSTANCE.repaint();
     }
 
-    @Override
     public void setWidth(double w){ 
         vw = w;
         ar = vw / vh;
@@ -194,7 +191,6 @@ public class VRectangle extends ClosedShape implements RectangularShape {
         VirtualSpaceManager.INSTANCE.repaint();
     }
 
-    @Override
     public void setHeight(double h){
         vh = h;
         ar = vw / vh;

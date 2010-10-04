@@ -184,7 +184,6 @@ public class VImage extends ClosedShape implements RectangularShape {
         size = Math.sqrt(Math.pow(vw,2)+Math.pow(vh,2));
     }
 
-    @Override
     public void setWidth(double w){
         vw = w;
         vh = vw / ar;
@@ -193,7 +192,6 @@ public class VImage extends ClosedShape implements RectangularShape {
         VirtualSpaceManager.INSTANCE.repaint();
     }
 
-    @Override
     public void setHeight(double h){
         vh = h;
         vw = vh * ar;
@@ -202,10 +200,8 @@ public class VImage extends ClosedShape implements RectangularShape {
         VirtualSpaceManager.INSTANCE.repaint();
     }
 
-    @Override
     public double getWidth(){return vw;}
 
-    @Override
     public double getHeight(){return vh;}
 
     @Override

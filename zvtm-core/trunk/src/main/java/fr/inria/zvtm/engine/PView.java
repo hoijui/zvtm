@@ -92,7 +92,6 @@ public class PView extends View implements KeyListener {
         VirtualSpaceManager.INSTANCE.destroyView(this.name);
     }
 
-    @Override
     public void keyTyped(KeyEvent e){
         if (e.isShiftDown()) {
             if (e.isControlDown()) {panel.evHs[panel.activeLayer].Ktype(panel,e.getKeyChar(),e.getKeyCode(),ViewListener.CTRL_SHIFT_MOD, e);}
@@ -104,7 +103,6 @@ public class PView extends View implements KeyListener {
         }
     }
 
-    @Override
     public void keyPressed(KeyEvent e){
         if (e.isShiftDown()) {
             if (e.isControlDown()) {panel.evHs[panel.activeLayer].Kpress(panel,e.getKeyChar(),e.getKeyCode(),ViewListener.CTRL_SHIFT_MOD, e);}

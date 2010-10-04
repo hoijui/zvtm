@@ -183,24 +183,20 @@ public class VEllipse extends ClosedShape implements RectangularShape {
         VirtualSpaceManager.INSTANCE.repaint();
     }
 
-    @Override
     public void setWidth(double w){ 
         vw = w;
         computeSize();
         VirtualSpaceManager.INSTANCE.repaint();
     }
 
-    @Override
     public void setHeight(double h){
         vh = h;
         computeSize();
         VirtualSpaceManager.INSTANCE.repaint();
     }
 
-    @Override
     public double getWidth(){return vw;}
 
-    @Override
     public double getHeight(){return vh;}
 
     @Override

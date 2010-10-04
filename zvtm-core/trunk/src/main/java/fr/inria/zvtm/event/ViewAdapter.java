@@ -25,78 +25,56 @@ import fr.inria.zvtm.glyphs.Glyph;
 
 public class ViewAdapter implements ViewListener {
     
-    @Override
     public void press1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){}
 
-    @Override
     public void release1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){}
     
-    @Override
     public void click1(ViewPanel v, int mod, int jpx, int jpy, int clickNumber, MouseEvent e){}
 
-    @Override
     public void press2(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){}
 
-    @Override
     public void release2(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){}
 
-    @Override
     public void click2(ViewPanel v, int mod, int jpx, int jpy, int clickNumber, MouseEvent e){}
 
-    @Override
     public void press3(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){}
 
-    @Override
     public void release3(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){}
 
-    @Override
     public void click3(ViewPanel v, int mod, int jpx, int jpy, int clickNumber, MouseEvent e){}
 
 
 
-    @Override
     public void mouseMoved(ViewPanel v, int jpx, int jpy, MouseEvent e){}
 
-    @Override
     public void mouseDragged(ViewPanel v, int mod, int buttonNumber, int jpx, int jpy, MouseEvent e){}
 
-    @Override
     public void mouseWheelMoved(ViewPanel v, short wheelDirection, int jpx, int jpy, MouseWheelEvent e){}
 
 
 
-    @Override
     public void enterGlyph(Glyph g){}
 
-    @Override
     public void exitGlyph(Glyph g){}
 
 
 
-    @Override
     public void Ktype(ViewPanel v, char c, int code, int mod, KeyEvent e){}
     
-    @Override
     public void Kpress(ViewPanel v, char c, int code, int mod, KeyEvent e){}
     
-    @Override
     public void Krelease(ViewPanel v, char c, int code, int mod, KeyEvent e){}
 
 
 
-    @Override
     public void viewActivated(View v){}
 
-    @Override
     public void viewDeactivated(View v){}
 
-    @Override
     public void viewIconified(View v){}
 
-    @Override
     public void viewDeiconified(View v){}
 
-    @Override
     public void viewClosing(View v){}
 
 }

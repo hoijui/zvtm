@@ -270,19 +270,15 @@ public class DPath extends Glyph implements RectangularShape {
 	/* ------------- implementation of RectangularShape --------------- */
 
 	/** Get the horizontal distance from western-most point to the eastern-most one. */
-    @Override
     public double getWidth(){return vw;}
 
 	/** Get the vertical distance from northern-most point to the southern-most one. */
-    @Override
     public double getHeight(){return vh;}
 
 	/** Not implemented yet. */
-    @Override
     public void setWidth(double w){}
 
 	/** Not implemented yet. */
-    @Override
     public void setHeight(double h){}
 
 	public Point2D.Double getStartPoint(){
@@ -964,19 +960,19 @@ public class DPath extends Glyph implements RectangularShape {
 			Point2D.Double[] pts = this.getElementPointsCoordinates(i);
 			switch(elType){
 				case DPath.CBC:{
-					res.curveTo(pts[1].x, -pts[1].y, pts[2].x, -pts[2].y, pts[3].x, -pts[3].y);
+					res.curveTo((float)pts[1].x, (float)-pts[1].y, (float)pts[2].x, (float)-pts[2].y, (float)pts[3].x, (float)-pts[3].y);
 					break;
 				}
 				case DPath.QDC:{
-					res.quadTo(pts[1].x, -pts[1].y, pts[2].x, -pts[2].y);
+					res.quadTo((float)pts[1].x, (float)-pts[1].y, (float)pts[2].x, (float)-pts[2].y);
 					break;
 				}
 				case DPath.SEG:{
-					res.lineTo(pts[1].x, -pts[1].y);
+					res.lineTo((float)pts[1].x, (float)-pts[1].y);
 					break;
 				}
 				case DPath.MOV:{
-					res.moveTo(pts[1].x, -pts[1].y);
+					res.moveTo((float)pts[1].x, (float)-pts[1].y);
 					break;
 				}
 			}
@@ -993,19 +989,19 @@ public class DPath extends Glyph implements RectangularShape {
 			Point2D.Double[] pts = this.getElementPointsCoordinates(i);
 			switch(elType){
 				case DPath.CBC:{
-					gp.curveTo(pts[1].x, pts[1].y, pts[2].x, pts[2].y, pts[3].x, pts[3].y);
+					gp.curveTo((float)pts[1].x, (float)pts[1].y, (float)pts[2].x, (float)pts[2].y, (float)pts[3].x, (float)pts[3].y);
 					break;
 				}
 				case DPath.QDC:{
-					gp.quadTo(pts[1].x, pts[1].y, pts[2].x, pts[2].y);
+					gp.quadTo((float)pts[1].x, (float)pts[1].y, (float)pts[2].x, (float)pts[2].y);
 					break;
 				}
 				case DPath.SEG:{
-					gp.lineTo(pts[1].x, pts[1].y);
+					gp.lineTo((float)pts[1].x, (float)pts[1].y);
 					break;
 				}
 				case DPath.MOV:{
-					gp.moveTo(pts[1].x, pts[1].y);
+					gp.moveTo((float)pts[1].x, (float)pts[1].y);
 					break;
 				}
 			}

@@ -186,7 +186,6 @@ public class JPanelView extends View implements KeyListener {
     }
 
 
-    @Override
     public void keyTyped(KeyEvent e){
         if (e.isShiftDown()) {
             if (e.isControlDown()) {panel.evHs[panel.activeLayer].Ktype(panel,e.getKeyChar(),e.getKeyCode(),ViewListener.CTRL_SHIFT_MOD, e);}
@@ -198,7 +197,6 @@ public class JPanelView extends View implements KeyListener {
         }
     }
 
-    @Override
     public void keyPressed(KeyEvent e){
         if (e.isShiftDown()) {
             if (e.isControlDown()) {panel.evHs[panel.activeLayer].Kpress(panel,e.getKeyChar(),e.getKeyCode(),ViewListener.CTRL_SHIFT_MOD, e);}
@@ -210,7 +208,6 @@ public class JPanelView extends View implements KeyListener {
         }
     }
 
-    @Override
     public void keyReleased(KeyEvent e) {
         if (e.isShiftDown()) {
             if (e.isControlDown()) {panel.evHs[panel.activeLayer].Krelease(panel,e.getKeyChar(),e.getKeyCode(),ViewListener.CTRL_SHIFT_MOD, e);}
