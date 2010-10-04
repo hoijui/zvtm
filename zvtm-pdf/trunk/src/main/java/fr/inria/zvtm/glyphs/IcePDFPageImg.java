@@ -150,9 +150,16 @@ public class IcePDFPageImg extends ZPDFPage {
                         g.drawImage(pageImage,AffineTransform.getScaleInstance(trueCoef,trueCoef),null);
                     }
     				g.setTransform(stdT);
-                    if ((drawBorder==1 && pc[i].prevMouseIn) || drawBorder==2){
+                    if (paintBorder){
                         g.setColor(borderColor);
-                        g.drawRect(dx+pc[i].cx-pc[i].cw, dy+pc[i].cy-pc[i].ch, 2*pc[i].cw-1, 2*pc[i].ch-1);
+                        if (stroke!=null) {
+                            g.setStroke(stroke);
+                            g.drawRect(dx+pc[i].cx-pc[i].cw, dy+pc[i].cy-pc[i].ch, 2*pc[i].cw-1, 2*pc[i].ch-1);
+                            g.setStroke(stdS);
+                        }
+                        else {
+                            g.drawRect(dx+pc[i].cx-pc[i].cw, dy+pc[i].cy-pc[i].ch, 2*pc[i].cw-1, 2*pc[i].ch-1);
+                        }
                     }
                     g.setComposite(acO);
                 }
@@ -168,9 +175,16 @@ public class IcePDFPageImg extends ZPDFPage {
                         g.drawImage(pageImage,AffineTransform.getScaleInstance(trueCoef,trueCoef),null);
                     }
     				g.setTransform(stdT);
-                    if ((drawBorder==1 && pc[i].prevMouseIn) || drawBorder==2){
+                    if (paintBorder){
                         g.setColor(borderColor);
-                        g.drawRect(dx+pc[i].cx-pc[i].cw, dy+pc[i].cy-pc[i].ch, 2*pc[i].cw-1, 2*pc[i].ch-1);
+                        if (stroke!=null) {
+                            g.setStroke(stroke);
+                            g.drawRect(dx+pc[i].cx-pc[i].cw, dy+pc[i].cy-pc[i].ch, 2*pc[i].cw-1, 2*pc[i].ch-1);
+                            g.setStroke(stdS);
+                        }
+                        else {
+                            g.drawRect(dx+pc[i].cx-pc[i].cw, dy+pc[i].cy-pc[i].ch, 2*pc[i].cw-1, 2*pc[i].ch-1);
+                        }
                     }
                 }
             }
@@ -186,10 +200,17 @@ public class IcePDFPageImg extends ZPDFPage {
                     else {
                         g.drawImage(pageImage, dx+pc[i].cx-pc[i].cw, dy+pc[i].cy-pc[i].ch, null);
                     }
-    				if ((drawBorder == 1 && pc[i].prevMouseIn) || drawBorder == 2){
-    					g.setColor(borderColor);
-    					g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
-    				}
+                    if (paintBorder){
+                        g.setColor(borderColor);
+                        if (stroke!=null) {
+                            g.setStroke(stroke);
+                            g.drawRect(dx+pc[i].cx-pc[i].cw, dy+pc[i].cy-pc[i].ch, 2*pc[i].cw-1, 2*pc[i].ch-1);
+                            g.setStroke(stdS);
+                        }
+                        else {
+                            g.drawRect(dx+pc[i].cx-pc[i].cw, dy+pc[i].cy-pc[i].ch, 2*pc[i].cw-1, 2*pc[i].ch-1);
+                        }
+                    }
                     g.setComposite(acO);
                 }
                 else {
@@ -202,10 +223,17 @@ public class IcePDFPageImg extends ZPDFPage {
                     else {
                         g.drawImage(pageImage, dx+pc[i].cx-pc[i].cw, dy+pc[i].cy-pc[i].ch, null);
                     }
-    				if ((drawBorder == 1 && pc[i].prevMouseIn) || drawBorder == 2){
-    					g.setColor(borderColor);
-    					g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
-    				}
+                    if (paintBorder){
+                        g.setColor(borderColor);
+                        if (stroke!=null) {
+                            g.setStroke(stroke);
+                            g.drawRect(dx+pc[i].cx-pc[i].cw, dy+pc[i].cy-pc[i].ch, 2*pc[i].cw-1, 2*pc[i].ch-1);
+                            g.setStroke(stdS);
+                        }
+                        else {
+                            g.drawRect(dx+pc[i].cx-pc[i].cw, dy+pc[i].cy-pc[i].ch, 2*pc[i].cw-1, 2*pc[i].ch-1);
+                        }
+                    }
                 }
 			}
 		}
@@ -239,10 +267,17 @@ public class IcePDFPageImg extends ZPDFPage {
                         g.drawImage(pageImage, AffineTransform.getScaleInstance(trueCoef,trueCoef), null);
                     }
     				g.setTransform(stdT);
-    				if ((drawBorder==1 && pc[i].prevMouseIn) || drawBorder==2){
-    					g.setColor(borderColor);
-    					g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
-    				}
+    				if (paintBorder){
+                        g.setColor(borderColor);
+                        if (stroke!=null) {
+                            g.setStroke(stroke);
+        					g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
+                            g.setStroke(stdS);
+                        }
+                        else {
+        					g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
+                        }
+                    }
                     g.setComposite(acO);
                 }
                 else {
@@ -255,10 +290,17 @@ public class IcePDFPageImg extends ZPDFPage {
                         g.drawImage(pageImage, AffineTransform.getScaleInstance(trueCoef,trueCoef), null);
                     }
     				g.setTransform(stdT);
-    				if ((drawBorder==1 && pc[i].prevMouseIn) || drawBorder==2){
-    					g.setColor(borderColor);
-    					g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
-    				}
+    				if (paintBorder){
+                        g.setColor(borderColor);
+                        if (stroke!=null) {
+                            g.setStroke(stroke);
+        					g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
+                            g.setStroke(stdS);
+                        }
+                        else {
+        					g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
+                        }
+                    }
                 }				
 			}
 			else {
@@ -273,10 +315,17 @@ public class IcePDFPageImg extends ZPDFPage {
                     else {
         				g.drawImage(pageImage, dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, null);
                     }
-    				if ((drawBorder == 1 && pc[i].prevMouseIn) || drawBorder == 2){
-    					g.setColor(borderColor);
-    					g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
-    				}
+    				if (paintBorder){
+                        g.setColor(borderColor);
+                        if (stroke!=null) {
+                            g.setStroke(stroke);
+        					g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
+                            g.setStroke(stdS);
+                        }
+                        else {
+        					g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
+                        }
+                    }
                     g.setComposite(acO);
                 }
                 else {
@@ -288,10 +337,17 @@ public class IcePDFPageImg extends ZPDFPage {
                     else {
         				g.drawImage(pageImage, dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, null);
                     }
-    				if ((drawBorder == 1 && pc[i].prevMouseIn) || drawBorder == 2){
-    					g.setColor(borderColor);
-    					g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
-    				}                    
+    				if (paintBorder){
+                        g.setColor(borderColor);
+                        if (stroke!=null) {
+                            g.setStroke(stroke);
+        					g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
+                            g.setStroke(stdS);
+                        }
+                        else {
+        					g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
+                        }
+                    }
                 }
 			}
 		}

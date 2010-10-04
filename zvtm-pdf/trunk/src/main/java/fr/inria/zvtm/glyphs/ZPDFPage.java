@@ -45,11 +45,6 @@ public abstract class ZPDFPage extends ClosedShape implements RectangularShape {
 
     public double scaleFactor = 1.0f;
     
-    /** Indicates when a border is drawn around the image (read-only).
-     * One of DRAW_BORDER_*
-     */
-    public short drawBorder = VImage.DRAW_BORDER_ALWAYS;
-    
 	@Override
 	public void initCams(int nbCam){
 		pc=new RProjectedCoordsP[nbCam];
@@ -136,16 +131,6 @@ public abstract class ZPDFPage extends ClosedShape implements RectangularShape {
 		return zoomSensitive;
 	}
 
-	/** Should a border be drawn around the page.
-	 *@param p one of VImage.DRAW_BORDER_*
-	 */
-	public void setDrawBorderPolicy(short p){
-		if (drawBorder!=p){
-			drawBorder=p;
-			VirtualSpaceManager.INSTANCE.repaint();
-		}
-	}
-	
 	@Override
 	public boolean fillsView(double w,double h,int camIndex){
 		//can contain transparent pixel (we have no way of knowing without analysing the image data -could be done when constructing the object or setting the image)
