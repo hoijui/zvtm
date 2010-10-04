@@ -84,9 +84,12 @@ public class WILDViewer extends Viewer {
         mView = (EView)vsm.addFrameView(cameras, Messages.mViewName, (opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H,
                                         false, false, !fullscreen, (!fullscreen) ? ConfigManager.initMenu(this) : null);
         ClusterGeometry cg = new ClusterGeometry(2680, 1700, 8, 4);
+        //ClusterGeometry cg = new ClusterGeometry(800, 600, 1, 1);
         Vector ccameras = new Vector();
         ccameras.add(mCamera);
+        mCamera.setZoomFloor(-99);
         ClusteredView cv = new ClusteredView(cg, 3, 8, 4, ccameras);
+        //ClusteredView cv = new ClusteredView(cg, 0, 1, 1, ccameras);
         vsm.addClusteredView(cv);
         if (fullscreen){
             GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow((JFrame)mView.getFrame());
