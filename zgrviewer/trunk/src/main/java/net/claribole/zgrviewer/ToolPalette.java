@@ -186,8 +186,8 @@ public class ToolPalette {
     void updateHiddenPosition(){
 	double[] wnes = grMngr.mainView.getVisibleRegion(paletteCamera);
 	for (int i=0;i<buttons.length;i++){
-	    buttons[i].moveTo(wnes[0]-buttons[i].getWidth()+1, wnes[1]-(i+1)*VERTICAL_STEP_BETWEEN_ICONS);
-	    selectedButtons[i].moveTo(wnes[0]-buttons[i].getWidth()+1, wnes[1]-(i+1)*VERTICAL_STEP_BETWEEN_ICONS);
+	    buttons[i].moveTo(wnes[0]-buttons[i].getWidth()/2+1, wnes[1]-(i+1)*VERTICAL_STEP_BETWEEN_ICONS);
+	    selectedButtons[i].moveTo(wnes[0]-buttons[i].getWidth()/2+1, wnes[1]-(i+1)*VERTICAL_STEP_BETWEEN_ICONS);
 	}
 	displayPalette(true);
     }
@@ -197,7 +197,7 @@ public class ToolPalette {
             visible = true;
             grMngr.meh.toolPaletteIsActive = true;
             Animation a = grMngr.vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(ANIM_TIME, paletteCamera,
-                new Point2D.Double(-2*buttons[0].getWidth()-5, 0), true,
+                new Point2D.Double(-buttons[0].getWidth()-2, 0), true,
                 SlowInSlowOutInterpolator.getInstance(), null);
             grMngr.vsm.getAnimationManager().startAnimation(a, false);
             grMngr.mainView.setCursorIcon(Cursor.HAND_CURSOR);
@@ -209,7 +209,7 @@ public class ToolPalette {
         if (visible){
             visible = false;
             Animation a = grMngr.vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(ANIM_TIME, paletteCamera,
-                new Point2D.Double(2*buttons[0].getWidth()+5, 0), true,
+                new Point2D.Double(buttons[0].getWidth()+2, 0), true,
                 SlowInSlowOutInterpolator.getInstance(), null);
             grMngr.vsm.getAnimationManager().startAnimation(a, false);
             grMngr.mainView.setCursorIcon(Cursor.CUSTOM_CURSOR);
