@@ -727,8 +727,8 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         dmCamera.moveTo(l.vx, l.vy);
         dmCamera.setAltitude(((mainCamera.getAltitude()+mainCamera.getFocal())/(DEFAULT_MAG_FACTOR)-mainCamera.getFocal()));
         updateMagWindow();
-        int w = (int)Math.round(magWindow.getWidth() * 2 * mainCamera.getFocal() / ((float)(mainCamera.getFocal()+mainCamera.getAltitude())));
-        int h = (int)Math.round(magWindow.getHeight() * 2 * mainCamera.getFocal() / ((float)(mainCamera.getFocal()+mainCamera.getAltitude())));
+        int w = (int)Math.round(magWindow.getWidth() * mainCamera.getFocal() / ((float)(mainCamera.getFocal()+mainCamera.getAltitude())));
+        int h = (int)Math.round(magWindow.getHeight() * mainCamera.getFocal() / ((float)(mainCamera.getFocal()+mainCamera.getAltitude())));
         dmPortal.sizeTo(w, h);
         mSpace.onTop(magWindow);
         mSpace.show(magWindow);
@@ -760,8 +760,8 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	if (dmPortal == null){return;}
 	dmPortal.getVisibleRegion(dmwnes);
 	magWindow.moveTo(dmCamera.vx, dmCamera.vy);
-	magWindow.setWidth((dmwnes[2]-dmwnes[0]) / 2 + 1);
-	magWindow.setHeight((dmwnes[1]-dmwnes[3]) / 2 + 1);
+	magWindow.setWidth((dmwnes[2]-dmwnes[0]) + 1);
+	magWindow.setHeight((dmwnes[1]-dmwnes[3]) + 1);
     }
 
     void updateZoomWindow(){
@@ -774,8 +774,8 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	    double coef = mainCamera.focal/(mainCamera.focal+mainCamera.altitude);
 	    int magWindowX = (int)Math.round((viewWidth/2) + (magWindow.vx-mainCamera.vx)*coef);
 	    int magWindowY = (int)Math.round((viewHeight/2) - (magWindow.vy-mainCamera.vy)*coef);
-	    int magWindowW = (int)Math.round(magWindow.getWidth()*coef);
-	    int magWindowH = (int)Math.round(magWindow.getHeight()*coef);
+	    int magWindowW = (int)Math.round(magWindow.getWidth()*coef/2);
+	    int magWindowH = (int)Math.round(magWindow.getHeight()*coef/2);
 	    g2d.setColor(GraphicsManager.DM_COLOR);
 	    g2d.drawLine(magWindowX-magWindowW, magWindowY-magWindowH, dmPortal.x, dmPortal.y);
 	    g2d.drawLine(magWindowX+magWindowW, magWindowY-magWindowH, dmPortal.x+dmPortal.w, dmPortal.y);
