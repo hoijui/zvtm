@@ -506,9 +506,12 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
                 rView.setResizable(true);
                 rView.setActiveLayer(1);
                 rView.setCursorIcon(java.awt.Cursor.MOVE_CURSOR);
-                rView.getGlobalView(mSpace.getCamera(1),100);
+                mSpace.getCamera(1).setLocation(rView.getGlobalView(mSpace.getCamera(1)));
+                
+                //rView.getGlobalView(mSpace.getCamera(1),100);
                 // give null arguments because the method does not really care
                 cameraMoved(null, null, 0);
+                vsm.repaint();
             }
             else {
                 ((JFrame)rView.getFrame()).toFront();
@@ -526,8 +529,9 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
             c1.altitude=c0.altitude;
             double[] wnes = mainView.getVisibleRegion(mSpace.getCamera(0));
             observedRegion.moveTo((wnes[0]+wnes[2])/2,(wnes[3]+wnes[1])/2);
-            observedRegion.setWidth((wnes[2]-wnes[0])/2);
-            observedRegion.setHeight((wnes[1]-wnes[3])/2);
+            observedRegion.setWidth((wnes[2]-wnes[0]));
+            observedRegion.setHeight((wnes[1]-wnes[3]));
+            System.out.print(".");
         }
         vsm.repaint();
     }
@@ -888,8 +892,9 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
             cfgMngr.setSDZoomThreshold(0.3 * Math.sqrt(Math.pow(sz.width, 2) + Math.pow(sz.height, 2)));
         }
         else if (e.getSource() == rView.getFrame()){
-    		rView.getGlobalView(mSpace.getCamera(1), 100);
+    		mSpace.getCamera(1).setLocation(rView.getGlobalView(mSpace.getCamera(1)));
     		cameraMoved(null, null, 0);
+    		vsm.repaint();
         }
     }
 
