@@ -217,6 +217,9 @@ public class ImageDescription extends ResourceDescription {
             if (strokeColor != null){
                 glyph.setBorderColor(strokeColor);
             }
+            else {
+                glyph.setDrawBorder(false);
+            }
             if (!sensitive){glyph.setSensitivity(false);}
             glyph.setInterpolationMethod(interpolationMethod);
             if (showFeedbackWhenFetching){
@@ -240,6 +243,9 @@ public class ImageDescription extends ResourceDescription {
             }
             if (strokeColor != null){
                 glyph.setBorderColor(strokeColor);
+            }
+            else {
+                glyph.setDrawBorder(false);
             }
             if (!sensitive){glyph.setSensitivity(false);}
             glyph.setInterpolationMethod(interpolationMethod);
