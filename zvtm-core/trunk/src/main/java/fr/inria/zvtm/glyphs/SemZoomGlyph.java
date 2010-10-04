@@ -21,6 +21,15 @@ public class SemZoomGlyph extends Glyph {
 
     //note: the glyph should maintain bounds that are the union of
     //underlying glyph bounds
+    public SemZoomGlyph(Glyph[] glyphs, double[] transitions){
+        if(glyphs == null){
+            throw new IllegalArgumentException("null array of Glyphs");
+        }
+        if(transitions.length != (glyphs.length - 1)){
+            throw new IllegalArgumentException("incorrect number of transitions (" + (glyphs.length - 1) + " transitions expected)");
+        }
+        //check that transitions are ordered? (and possibly unique?)
+    }
 
     /**
      * {@inheritDoc}
@@ -94,7 +103,8 @@ public class SemZoomGlyph extends Glyph {
                 AffineTransform stdT,
                 int dx,
                 int dy){
-            //XXX implement
+            Glyph glyph = selectChild(i); 
+            glyph.drawForLens(g, vW, vH, i, stdS, stdT, dx, dy);
         }
 
     @Override
@@ -162,5 +172,10 @@ public class SemZoomGlyph extends Glyph {
         public double getSize(){
             return 10;// XXX implement
         }
+
+    //private methods
+    private Glyph selectChild(int camIndex){
+        return null;
+    }
 }
 
