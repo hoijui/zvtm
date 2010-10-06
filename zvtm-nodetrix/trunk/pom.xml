@@ -25,7 +25,7 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
     <artifactId>zvtm-nodetrix</artifactId>
     <packaging>jar</packaging>
     <name>ZVTM-NODETRIX</name>
-    <version>0.3.0-SNAPSHOT</version>
+    <version>0.4.0-SNAPSHOT</version>
     <url>http://zvtm.sourceforge.net</url>
     <licenses>
         <license>
