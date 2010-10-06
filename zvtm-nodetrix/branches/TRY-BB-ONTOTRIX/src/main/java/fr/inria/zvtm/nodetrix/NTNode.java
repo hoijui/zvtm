@@ -83,6 +83,9 @@ public class NTNode extends LinLogNode{
       	incomingEdges = new Vector<NTEdge>();
     }
     
+    public VRectangle getWesternNodeBkg(){
+        return gBackgroundW;
+    }
 	
     
     void createGraphics(long wdx, long wdy, long ndx, long ndy, VirtualSpace vs, boolean single, Color colour)
