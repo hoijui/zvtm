@@ -5,7 +5,9 @@ import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
+import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.List;
 
 import fr.inria.zvtm.engine.Camera;
 
@@ -16,19 +18,22 @@ import fr.inria.zvtm.engine.Camera;
  * to the appropriate underlying Glyph.
  */
 public class SemZoomGlyph extends Glyph {
-    private final ArrayList<Glyph> glyphs = new ArrayList<Glyph>();
-    private final ArrayList<Double> transitions = new ArrayList<Double>();
+    private final ArrayList<Glyph> glyphs;
+    private final ArrayList<Double> transitions;
 
     //note: the glyph should maintain bounds that are the union of
     //underlying glyph bounds
-    public SemZoomGlyph(Glyph[] glyphs, double[] transitions){
+    public SemZoomGlyph(List<Glyph> glyphs, List<Double> transitions){
         if(glyphs == null){
             throw new IllegalArgumentException("null array of Glyphs");
         }
-        if(transitions.length != (glyphs.length - 1)){
-            throw new IllegalArgumentException("incorrect number of transitions (" + (glyphs.length - 1) + " transitions expected)");
+        if(transitions.size() != (glyphs.size() - 1)){
+            throw new IllegalArgumentException("incorrect number of transitions (" + (glyphs.size() - 1) + " transitions expected)");
         }
         //check that transitions are ordered? (and possibly unique?)
+        this.glyphs = new ArrayList<Glyph>(glyphs);
+        this.transitions = new ArrayList<Double>(transitions);
+
     }
 
     /**
