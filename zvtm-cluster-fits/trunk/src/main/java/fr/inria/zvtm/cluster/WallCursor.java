@@ -37,8 +37,8 @@ class WallCursor {
         vRect.setDrawBorder(false);
         target.addGlyph(hRect);
         target.addGlyph(vRect);
-        target.onTop(hRect, 1); //XXX make configurable
-        target.onTop(vRect, 1); //XXX make configurable
+        target.onTop(hRect, 0);
+        target.onTop(vRect, 0);
     }
 
     void dispose(){
@@ -46,9 +46,9 @@ class WallCursor {
         target.removeGlyph(vRect);
     }
 
-    void setZindex(int zIndex){
-        hRect.setZindex(zIndex);
-        vRect.setZindex(zIndex);
+    void onTop(int zIndex){
+        target.onTop(hRect, zIndex);
+        target.onTop(vRect, zIndex);
     }
 
     void moveTo(double x, double y){

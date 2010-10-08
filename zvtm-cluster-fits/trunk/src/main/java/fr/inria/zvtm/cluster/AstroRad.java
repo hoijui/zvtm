@@ -47,8 +47,10 @@ public class AstroRad {
     private static final double IMGVIEW_XOFFSET = 3*2840;
     private static final double VIEW_YOFFSET = 2*1800;
 
-    private static final int IMG_ZINDEX = 0;
-    private static final int IMGCURSOR_ZINDEX = 1;
+    private static final int UNSEL_IMG_ZINDEX = 0;
+    private static final int SEL_IMG_ZINDEX = 1; //selected image z-index
+    private static final int IMGCURSOR_ZINDEX = 2;
+    private static final int CTRLCURSOR_ZINDEX = 2;
 
     private VirtualSpace imageSpace;
     private VirtualSpace controlSpace;
@@ -130,8 +132,9 @@ public class AstroRad {
         vsm.addClusteredView(controlView);
 
         ctrlCursor = new WallCursor(controlSpace);
+        ctrlCursor.onTop(CTRLCURSOR_ZINDEX);
         imgCursor = new WallCursor(imageSpace, 20, 160, Color.GREEN);
-        imgCursor.setZindex(IMGCURSOR_ZINDEX);
+        imgCursor.onTop(IMGCURSOR_ZINDEX);
 
         pointSource = new MouseLaserPoint(masterView.getPanel());
         pointSource.addListener(new PointListener(){
@@ -243,7 +246,7 @@ public class AstroRad {
             }
         }
         if(draggedImage != null){
-            imageSpace.onTop(draggedImage, IMG_ZINDEX);
+            imageSpace.onTop(draggedImage, SEL_IMG_ZINDEX);
             imageFocusChanged(draggedImage);
         }
     }
@@ -260,7 +263,6 @@ public class AstroRad {
             FitsImage image = new FitsImage(0,0,0,imgUrl);
             images.add(image);
             imageSpace.addGlyph(image);
-            imageSpace.onTop(image, IMG_ZINDEX);
             double[] scaleBounds = ZScale.computeScale(image.getUnderlyingImage());
             if(scaleBounds != null){
                 image.rescale(scaleBounds[0], scaleBounds[1], 1.);
@@ -282,10 +284,12 @@ public class AstroRad {
         }
         for(FitsImage img: images){
             img.setDrawBorder(false);
+            imageSpace.atBottom(img, UNSEL_IMG_ZINDEX); 
         }
         focused.setBorderColor(Color.PINK); //XXX move to addImage
         focused.setStrokeWidth(3); //XXX move to addImage
         focused.setDrawBorder(true);
+        imageSpace.onTop(focused, SEL_IMG_ZINDEX);
         if(hist != null){
             controlSpace.removeGlyph(hist);
         }
@@ -304,7 +308,7 @@ public class AstroRad {
        // System.err.println("new hist size(control): " + hist.getSize());
        // System.err.println("new hist width: " + (hist.getBounds()[2] - hist.getBounds()[0]));
         //hist.move(-rsWidth/2, 30);
-        hist.move(-2500, 1300);
+        hist.move(-1500, 1300);
 
         //draw bounding boxes around histogram and range selection?
 
