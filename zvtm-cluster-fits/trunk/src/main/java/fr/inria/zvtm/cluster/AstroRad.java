@@ -13,7 +13,8 @@ import org.kohsuke.args4j.Option;
 import fr.inria.vit.pan.IPhodPan;
 import fr.inria.vit.pan.PanEventSource;
 import fr.inria.vit.point.ClutchEventType;
-import fr.inria.vit.point.MouseLaserPoint;
+import fr.inria.vit.point.DefaultLaserPoint;
+//import fr.inria.vit.point.MouseLaserPoint;
 import fr.inria.vit.point.PointEventSource;
 import fr.inria.vit.point.PointListener;
 
@@ -66,7 +67,8 @@ public class AstroRad {
     private WallCursor ctrlCursor;
     private WallCursor imgCursor;
 
-    private MouseLaserPoint pointSource;
+    //private MouseLaserPoint pointSource;
+    private DefaultLaserPoint pointSource;
 
     private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE;
     private AROptions options;
@@ -136,7 +138,8 @@ public class AstroRad {
         imgCursor = new WallCursor(imageSpace, 20, 160, Color.GREEN);
         imgCursor.onTop(IMGCURSOR_ZINDEX);
 
-        pointSource = new MouseLaserPoint(masterView.getPanel());
+        //pointSource = new MouseLaserPoint(masterView.getPanel());
+        pointSource = new DefaultLaserPoint();
         pointSource.addListener(new PointListener(){
             boolean dragging = false;
 
