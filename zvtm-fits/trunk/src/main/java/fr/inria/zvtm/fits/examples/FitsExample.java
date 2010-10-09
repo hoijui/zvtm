@@ -16,16 +16,14 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.FitsImage;
 import fr.inria.zvtm.fits.FitsHistogram;
-import fr.inria.zvtm.fits.HeatFilter;
-import fr.inria.zvtm.fits.NopFilter;
-import fr.inria.zvtm.fits.RainbowFilter;
+import fr.inria.zvtm.fits.gradients.HeatFilter;
+import fr.inria.zvtm.fits.gradients.NopFilter;
+import fr.inria.zvtm.fits.gradients.RainbowFilter;
 import fr.inria.zvtm.fits.RangeSelection;
 import fr.inria.zvtm.fits.Utils;
 import fr.inria.zvtm.fits.ZScale;
 
 import fr.inria.zvtm.glyphs.PRectangle;
-
-
 
 import java.awt.GradientPaint;
 import java.awt.LinearGradientPaint;
