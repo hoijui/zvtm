@@ -2,6 +2,7 @@ package fr.inria.zvtm.fits.filters;
 
 import java.awt.Color;
 import java.awt.image.RGBImageFilter;
+import java.awt.LinearGradientPaint;
 
 //data set taken from jsky (http://jsky.sf.net)
 public class HeatFilter extends RGBImageFilter {
@@ -268,6 +269,14 @@ public class HeatFilter extends RGBImageFilter {
 
     public int filterRGB(int x, int y, int rgb) {
         return map[rgb & 0xff].getRGB();
+    }
+    
+    public LinearGradientPaint getGradient(){
+        float[] fractions = new float[256];
+        for (int i=0;i<fractions.length;i++){
+            fractions[i] = i / (float)fractions.length;
+        }
+        return new LinearGradientPaint(0, 0, 400, 0, fractions, map);
     }
 
 }

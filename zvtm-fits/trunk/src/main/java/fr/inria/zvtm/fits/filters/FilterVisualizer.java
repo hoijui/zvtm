@@ -23,6 +23,7 @@ import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.glyphs.PRectangle;
 
 public class FilterVisualizer {
 
@@ -44,7 +45,13 @@ public class FilterVisualizer {
         mView.getCursor().setColor(Color.WHITE);
         mView.getCursor().setHintColor(Color.WHITE);
         mView.setListener(eh);
+        loadFilters();
         vsm.repaint();
+    }
+    
+    void loadFilters(){
+        PRectangle p = new PRectangle(0, 0, 0, 400, 20, (new HeatFilter()).getGradient(), Color.WHITE);
+        vs.addGlyph(p);
     }
 
     public static void main(String[] args){
