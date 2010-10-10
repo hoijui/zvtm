@@ -19,7 +19,7 @@ def generateJavaClass(lut_file, src_dir, tgt_dir):
     jf = open(ofp, 'w')
     # header
     jf.write("/* Generated with zvtm-fits/src/main/resources/scripts/lut.py */\n\n")
-    jf.write("package fr.inria.zvtm.fits.gradients;\n\n")
+    jf.write("package fr.inria.zvtm.fits.filters;\n\n")
     jf.write("import java.awt.Color;\n")
     jf.write("import java.awt.image.RGBImageFilter;\n\n")
     jf.write("public class %s extends RGBImageFilter {\n\n" % className)
