@@ -26,9 +26,9 @@ import edu.jhu.pha.sdss.fits.imageio.FITSReaderSpi;
 
 import nom.tam.fits.FitsException;
 
-import fr.inria.zvtm.fits.gradients.HeatFilter;
-import fr.inria.zvtm.fits.gradients.NopFilter;
-import fr.inria.zvtm.fits.gradients.RainbowFilter;
+import fr.inria.zvtm.fits.filters.HeatFilter;
+import fr.inria.zvtm.fits.filters.NopFilter;
+import fr.inria.zvtm.fits.filters.RainbowFilter;
 import fr.inria.zvtm.fits.DefaultSampler;
 import fr.inria.zvtm.fits.Sampler;
 import fr.inria.zvtm.fits.ZScale;

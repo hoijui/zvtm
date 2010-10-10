@@ -1,4 +1,4 @@
-package fr.inria.zvtm.fits.gradients;
+package fr.inria.zvtm.fits.filters;
 
 import java.awt.Color;
 import java.awt.image.RGBImageFilter;
