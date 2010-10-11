@@ -6,11 +6,25 @@ import java.awt.MultipleGradientPaint;
 import java.awt.geom.Point2D;
 import java.awt.image.RGBImageFilter;
 
+import java.util.Scanner;
+
 /**
  * Miscellaneous utility functions
  */
 public class Utils {
     private static final int NB_POINTS = 20;
+
+    public static String VERSION;
+
+	static {
+	    Scanner sc = new Scanner(Utils.class.getResourceAsStream("/properties")).useDelimiter("\\s*=\\s*");
+        while (sc.hasNext()){
+            String token = sc.next();
+            if (token.equals("version")){
+                Utils.VERSION = sc.next().trim();
+            }
+        }
+	}
 
     private Utils(){}
 

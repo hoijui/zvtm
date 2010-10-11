@@ -22,10 +22,11 @@ def generateJavaClass(lut_file, src_dir, tgt_dir):
     jf.write("package fr.inria.zvtm.fits.filters;\n\n")
     jf.write("import java.awt.Color;\n")
     jf.write("import java.awt.image.RGBImageFilter;\n\n")
-    jf.write("public class %s extends RGBImageFilter {\n\n" % className)
-    jf.write("    private Color[] map = new Color[128];\n\n")
-    jf.write("    public %s(){\n" % className)
+    jf.write("import java.awt.LinearGradientPaint;\n\n")
+    jf.write("public class %s extends RGBImageFilter implements ColorGradient {\n\n" % className)
+    jf.write("    private static final Color[] map = new Color[128];\n\n")
     #values
+    jf.write("    static {\n")
     i = 0
     for line in lf.readlines():
         # rgb components separated by one or more white spaces in .lut file
@@ -34,10 +35,27 @@ def generateJavaClass(lut_file, src_dir, tgt_dir):
         i += 1
     #footer
     jf.write("    }\n\n")
+
+    jf.write("    public %s(){}\n\n" % className)
+
     jf.write("    public int filterRGB(int x, int y, int rgb){\n")
-    jf.write("        return map[rgb & 0x7f].getRGB();\n")
+    jf.write("        return map[(rgb & 0xff)/2].getRGB();\n")
     jf.write("    }\n\n")
+    
+    jf.write("    public LinearGradientPaint getGradient(float w){\n")
+    jf.write("        return getGradientS(w);\n")
+    jf.write("    }\n\n")
+
+    jf.write("    public static LinearGradientPaint getGradientS(float w){\n")
+    jf.write("        float[] fractions = new float[map.length];\n")
+    jf.write("        for (int i=0;i<fractions.length;i++){\n")
+    jf.write("            fractions[i] = i / (float)fractions.length;\n")
+    jf.write("        }\n")
+    jf.write("        return new LinearGradientPaint(0, 0, w, 0, fractions, map);\n")
+    jf.write("    }\n\n")
+    
     jf.write("}\n")
+
     jf.flush()
     jf.close()
     return

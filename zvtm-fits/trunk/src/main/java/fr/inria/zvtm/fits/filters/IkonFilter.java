@@ -5,11 +5,13 @@ package fr.inria.zvtm.fits.filters;
 import java.awt.Color;
 import java.awt.image.RGBImageFilter;
 
-public class IkonFilter extends RGBImageFilter {
+import java.awt.LinearGradientPaint;
 
-    private Color[] map = new Color[128];
+public class IkonFilter extends RGBImageFilter implements ColorGradient {
 
-    public IkonFilter(){
+    private static final Color[] map = new Color[128];
+
+    static {
         map[0] = new Color(.00000f, .00000f, .00000f);
         map[1] = new Color(.00000f, .28240f, .00000f);
         map[2] = new Color(.00000f, .56470f, .00000f);
@@ -140,8 +142,22 @@ public class IkonFilter extends RGBImageFilter {
         map[127] = new Color(.98820f, .84710f, .98820f);
     }
 
+    public IkonFilter(){}
+
     public int filterRGB(int x, int y, int rgb){
-        return map[rgb & 0x7f].getRGB();
+        return map[(rgb & 0xff)/2].getRGB();
+    }
+
+    public LinearGradientPaint getGradient(float w){
+        return getGradientS(w);
+    }
+
+    public static LinearGradientPaint getGradientS(float w){
+        float[] fractions = new float[map.length];
+        for (int i=0;i<fractions.length;i++){
+            fractions[i] = i / (float)fractions.length;
+        }
+        return new LinearGradientPaint(0, 0, w, 0, fractions, map);
     }
 
 }

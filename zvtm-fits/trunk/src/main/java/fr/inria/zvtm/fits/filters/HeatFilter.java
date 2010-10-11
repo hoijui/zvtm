@@ -5,10 +5,11 @@ import java.awt.image.RGBImageFilter;
 import java.awt.LinearGradientPaint;
 
 //data set taken from jsky (http://jsky.sf.net)
-public class HeatFilter extends RGBImageFilter {
-    private Color[] map = new Color[256];
+public class HeatFilter extends RGBImageFilter implements ColorGradient {
+    
+    private static final Color[] map = new Color[256];
 
-    public HeatFilter(){
+    static {
         map[0] = new Color(0.00000f, 0.00000f, 0.00000f);
         map[1] = new Color(0.01176f, 0.00392f, 0.00000f);
         map[2] = new Color(0.02353f, 0.00784f, 0.00000f);
@@ -267,17 +268,22 @@ public class HeatFilter extends RGBImageFilter {
         map[255] = new Color(1.00000f, 1.00000f, 1.00000f);
     }
 
+    public HeatFilter(){}
+
     public int filterRGB(int x, int y, int rgb) {
         return map[rgb & 0xff].getRGB();
     }
     
-    public LinearGradientPaint getGradient(){
-        float[] fractions = new float[256];
+    public LinearGradientPaint getGradient(float w){
+        return getGradientS(w);
+    }
+    
+    public static LinearGradientPaint getGradientS(float w){
+        float[] fractions = new float[map.length];
         for (int i=0;i<fractions.length;i++){
             fractions[i] = i / (float)fractions.length;
         }
-        return new LinearGradientPaint(0, 0, 400, 0, fractions, map);
+        return new LinearGradientPaint(0, 0, w, 0, fractions, map);
     }
 
 }
-

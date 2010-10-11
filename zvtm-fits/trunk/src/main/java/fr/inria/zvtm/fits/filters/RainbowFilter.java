@@ -2,11 +2,14 @@ package fr.inria.zvtm.fits.filters;
 
 import java.awt.Color;
 import java.awt.image.RGBImageFilter;
+import java.awt.LinearGradientPaint;
 
 //data set origin:
-public class RainbowFilter extends RGBImageFilter {
-    private Color[] map = new Color[256];
-    public RainbowFilter(){
+public class RainbowFilter extends RGBImageFilter implements ColorGradient {
+
+    private static final Color[] map = new Color[256];
+
+    static {
         map[  0] = new Color(  0,   0,   0);
         map[  1] = new Color( 45,   0,  36);
         map[  2] = new Color( 56,   0,  46);
@@ -265,8 +268,22 @@ public class RainbowFilter extends RGBImageFilter {
         map[255] = new Color(255, 255, 255);
     }
 
+    public RainbowFilter(){}
+    
     public int filterRGB(int x, int y, int rgb) {
         return map[rgb & 0xff].getRGB();
     }
+    
+    public LinearGradientPaint getGradient(float w){
+        return getGradientS(w);
+    }
+    
+    public static LinearGradientPaint getGradientS(float w){
+        float[] fractions = new float[map.length];
+        for (int i=0;i<fractions.length;i++){
+            fractions[i] = i / (float)fractions.length;
+        }
+        return new LinearGradientPaint(0, 0, w, 0, fractions, map);
+    }
+    
 }
-

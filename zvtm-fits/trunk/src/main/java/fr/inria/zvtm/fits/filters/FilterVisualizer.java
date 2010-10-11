@@ -15,6 +15,16 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
 import java.util.Vector;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Enumeration;
+import java.util.jar.JarInputStream;
+import java.util.jar.JarEntry;
+import java.util.Iterator;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.URL;
 
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.Camera;
@@ -24,6 +34,9 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.PRectangle;
+import fr.inria.zvtm.glyphs.VText;
+
+import fr.inria.zvtm.fits.Utils;
 
 public class FilterVisualizer {
 
@@ -31,7 +44,7 @@ public class FilterVisualizer {
     VirtualSpace vs;
     ViewListener eh;
     View mView;
-    
+
     FilterVisualizer(){
         vsm = VirtualSpaceManager.INSTANCE;
         eh = new FVListener(this);
@@ -50,8 +63,49 @@ public class FilterVisualizer {
     }
     
     void loadFilters(){
-        PRectangle p = new PRectangle(0, 0, 0, 400, 20, (new HeatFilter()).getGradient(), Color.WHITE);
-        vs.addGlyph(p);
+        try {
+            Iterator<String> filterClasses = getFilterClasses().iterator();
+            int y = 0;
+            while (filterClasses.hasNext()){
+                String className = filterClasses.next();
+                Class c = ClassLoader.getSystemClassLoader().loadClass(className);
+                ColorGradient cg = (ColorGradient)c.newInstance();
+                vs.addGlyph(new PRectangle(0, y, 0, 400, 20, cg.getGradient(400), Color.WHITE));
+                vs.addGlyph(new VText(300, y, 0, Color.WHITE, className.substring(FILTER_PACKAGE_NAME.length()+1)));
+                y -= 40;
+            }
+        }
+        catch (Exception ex){
+            ex.printStackTrace();
+        }
+    }
+
+    static String JAR_NAME = "target/zvtm-fits-"+Utils.VERSION+".jar";
+    static String FILTER_PACKAGE_NAME = "fr.inria.zvtm.fits.filters";
+    
+    public static List getFilterClasses(){
+        ArrayList classes = new ArrayList();
+        String packageName = FILTER_PACKAGE_NAME.replaceAll("\\." , "/");
+        System.out.println("Jar " + JAR_NAME + " looking for " + FILTER_PACKAGE_NAME);
+        try {
+            JarInputStream jarFile = new JarInputStream(new FileInputStream(JAR_NAME));
+            JarEntry jarEntry;
+            while(true) {
+                jarEntry=jarFile.getNextJarEntry();
+                if (jarEntry == null){
+                    break;
+                }
+                if ((jarEntry.getName().startsWith(packageName)) &&
+                    (jarEntry.getName().endsWith("Filter.class"))){
+                    String className = jarEntry.getName().replaceAll("/", "\\.");
+                    classes.add(className.substring(0, className.length()-6));
+                }
+            }
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+        return classes;
     }
 
     public static void main(String[] args){

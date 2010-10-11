@@ -70,6 +70,12 @@ $Id: pom.xml 3429 2010-07-20 07:32:30Z rprimet $
   
   <!-- Build -->
   <build>
+    <resources>
+        <resource>
+            <directory>src/main/resources/p</directory>
+            <filtering>true</filtering>
+        </resource>
+    </resources>
     <plugins>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
