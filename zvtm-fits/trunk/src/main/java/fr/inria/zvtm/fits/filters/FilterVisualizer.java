@@ -71,7 +71,7 @@ public class FilterVisualizer {
                 Class c = ClassLoader.getSystemClassLoader().loadClass(className);
                 ColorGradient cg = (ColorGradient)c.newInstance();
                 vs.addGlyph(new PRectangle(0, y, 0, 400, 20, cg.getGradient(400), Color.WHITE));
-                vs.addGlyph(new VText(300, y, 0, Color.WHITE, className.substring(FILTER_PACKAGE_NAME.length()+1)));
+                vs.addGlyph(new VText(300, y, 0, Color.WHITE, className.substring(FILTER_PACKAGE_NAME.length()+1, className.length()-6)));
                 y -= 40;
             }
         }
