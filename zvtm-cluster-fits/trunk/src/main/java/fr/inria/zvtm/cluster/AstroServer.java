@@ -5,7 +5,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Properties;
 
-class AstroServer extends NanoHTTPD {
+public class AstroServer extends NanoHTTPD {
     private final AstroRad delegate;
 
     public AstroServer(AstroRad delegate, int port) throws IOException{

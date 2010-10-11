@@ -77,7 +77,7 @@ public class AstroRad {
     // - image thumbnail (tile)
     // - xfer function chooser
 
-    private AstroRad(URL imgUrl, AROptions options){
+    public AstroRad(URL imgUrl, AROptions options){
         this.options = options;
         setup();
         addImage(imgUrl);
