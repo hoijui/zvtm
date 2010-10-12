@@ -3,6 +3,7 @@ package fr.inria.zvtm.fits.examples;
 import edu.jhu.pha.sdss.fits.FITSImage;  
 import java.net.URL;
 import jsky.coords.WCSTransform;
+import jsky.coords.WorldCoords;
 
 import fr.inria.zvtm.fits.NomWcsKeywordProvider;
 import fr.inria.zvtm.glyphs.FitsImage;
@@ -21,7 +22,7 @@ class WCSExample {
         FITSImage fImg = img.getUnderlyingImage();
         NomWcsKeywordProvider provider = new NomWcsKeywordProvider(fImg.getFits().getHDU(0).getHeader());        
         WCSTransform transform = new WCSTransform(provider);
-        System.out.println(transform.pix2wcs(Double.parseDouble(args[1]), Double.parseDouble(args[2])));
+        System.out.println(new WorldCoords(transform.pix2wcs(Double.parseDouble(args[1]), Double.parseDouble(args[2]))));
     }
 }
 
