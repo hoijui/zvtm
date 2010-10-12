@@ -11,6 +11,7 @@ import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.FilteredImageSource;
 import java.awt.image.ImageFilter;
@@ -24,12 +25,15 @@ import javax.imageio.spi.IIORegistry;
 import edu.jhu.pha.sdss.fits.FITSImage;  
 import edu.jhu.pha.sdss.fits.imageio.FITSReaderSpi;
 
+import jsky.coords.WCSTransform;
+
 import nom.tam.fits.FitsException;
 
 import fr.inria.zvtm.fits.filters.HeatFilter;
 import fr.inria.zvtm.fits.filters.NopFilter;
 import fr.inria.zvtm.fits.filters.RainbowFilter;
 import fr.inria.zvtm.fits.DefaultSampler;
+import fr.inria.zvtm.fits.NomWcsKeywordProvider;
 import fr.inria.zvtm.fits.Sampler;
 import fr.inria.zvtm.fits.ZScale;
 
@@ -53,6 +57,7 @@ public class FitsImage extends VImage {
     private final ExFITSImage fitsImage;
     private ImageFilter filter;
     private ScaleMethod scaleMethod = ScaleMethod.LINEAR;
+    private WCSTransform wcsTransform;
 
     static {
         IIORegistry.getDefaultInstance().
@@ -144,6 +149,7 @@ public class FitsImage extends VImage {
 
         try{
             fitsImage = new ExFITSImage(imgUrl);
+            wcsTransform = new WCSTransform(new NomWcsKeywordProvider(fitsImage.getFits().getHDU(0).getHeader()));
         } catch(Exception e){
             throw new Error(e);
         }
@@ -266,6 +272,20 @@ public class FitsImage extends VImage {
      */
     public ImageFilter getColorFilter(){
         return filter;
+    }
+
+    /**
+     * Converts pixel coordinates to World Coordinates. Returns null if the WCSTransform is not valid.
+     */
+    public Point2D.Double pix2wcs(double x, double y){
+        return wcsTransform.pix2wcs(x, y);
+    }
+
+    /**
+     * Converts World Coordinates to pixel coordinates. Returns null if the WCSTransform is invalid, or if the WCS position does not fall within the image.
+     */
+    public Point2D.Double wcs2pix(double ra, double dec){
+        return wcsTransform.wcs2pix(ra, dec);
     }
 
     private void recreateDisplayImage(){
