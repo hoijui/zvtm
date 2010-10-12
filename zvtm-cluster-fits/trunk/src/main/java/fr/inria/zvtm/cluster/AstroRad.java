@@ -26,6 +26,7 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.fits.FitsHistogram;
 import fr.inria.zvtm.fits.RangeSelection;
+import fr.inria.zvtm.fits.filters.*;
 import fr.inria.zvtm.fits.ZScale;
 import fr.inria.zvtm.glyphs.FitsImage;
 import fr.inria.zvtm.glyphs.Glyph;
@@ -33,6 +34,7 @@ import fr.inria.zvtm.glyphs.VImage;
 import fr.inria.zvtm.glyphs.VRectangle;
 
 import java.awt.Color;
+import java.awt.LinearGradientPaint;
 import java.awt.Dimension;
 import java.awt.geom.Point2D;
 import java.awt.event.KeyEvent;
@@ -192,7 +194,7 @@ public class AstroRad {
 
         combo = new ComboBox(controlSpace, -height/4, -height/5, 
                 new String[]{"gray", "heat", "rainbow"}, 
-                new Color[]{Color.LIGHT_GRAY, Color.ORANGE, Color.PINK},
+                new LinearGradientPaint[]{NopFilter.getGradientS((float)height/5f), HeatFilter.getGradientS((float)height/5f), RainbowFilter.getGradientS((float)height/5f)},
                 height/5
                 );
         slider = new SliderManager(controlSpace, 0, -2.*height/5, width);

@@ -1,11 +1,13 @@
 package fr.inria.zvtm.cluster;
 
 import java.awt.Color;
+import java.awt.LinearGradientPaint;
+
 import java.util.ArrayList;
 
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.glyphs.Glyph;
-import fr.inria.zvtm.glyphs.VRectangle;
+import fr.inria.zvtm.glyphs.LGRectangle;
 import fr.inria.zvtm.glyphs.VText;
 
 interface ComboStateObserver {
@@ -17,7 +19,7 @@ interface ComboStateObserver {
 //one of which is selected at a given time
 class ComboBox {
     private final VirtualSpace parentSpace;
-    private final ArrayList<VRectangle> buttons = new ArrayList();
+    private final ArrayList<LGRectangle> buttons = new ArrayList();
     private final ArrayList<VText> labels = new ArrayList();
 
     private final ArrayList<ComboStateObserver> observers = new ArrayList();
@@ -31,15 +33,15 @@ class ComboBox {
      * @param y origin y-coordinate (center of the leftmost button)
      */
     ComboBox(VirtualSpace parentSpace, double x, double y, 
-            String[] labels, Color[] colors, double itemSize){
-        assert(labels.length == colors.length);
+            String[] labels, LinearGradientPaint[] gradients, double itemSize){
+        assert(labels.length == gradients.length);
         this.parentSpace = parentSpace;
         for(int i=0; i<labels.length; ++i){
-            VRectangle button = new VRectangle(x + i*(1.25*itemSize), y, 0, 
-                    itemSize, itemSize, colors[i]);
+            LGRectangle button = new LGRectangle(x + i*(1.25*itemSize), y, 0, 
+                    itemSize, itemSize/4, gradients[i], Color.WHITE);
             VText label = new VText(x + i*(1.25*itemSize), 
                     y-(itemSize * 0.5)-LABEL_OFFSET, 0,
-                    colors[i], labels[i]);
+                    Color.WHITE, labels[i]);
             this.buttons.add(button);
             this.labels.add(label);
             parentSpace.addGlyph(button);
@@ -48,7 +50,7 @@ class ComboBox {
     }
 
     void dispose(){
-        for(VRectangle button: buttons){
+        for(LGRectangle button: buttons){
             parentSpace.removeGlyph(button);
         }
         for(VText label: labels){
