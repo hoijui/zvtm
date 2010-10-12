@@ -90,7 +90,7 @@ public class ClusteredView extends DefaultIdentifiable {
 	}
 
 	/**
-	 * @throw IllegalArgumentException If cam does not belong to this
+	 * @throws IllegalArgumentException If cam does not belong to this
 	 *                                 ClusteredView
 	 * @param xPos point x-coordinate, in VirtualSpace coords
 	 * @param yPos point y-coordinate, in VirtualSpace coords
@@ -115,7 +115,7 @@ public class ClusteredView extends DefaultIdentifiable {
 	/**
 	 * Converts the coordinates of a point given in ClusteredView 
 	 * coordinates into VirtualSpace coordinates.
-	 * @throw IllegalArgumentException If cam does not belong to this
+	 * @throws IllegalArgumentException If cam does not belong to this
 	 *                                 ClusteredView
 	 * @param xPos point x-coodinate, in View coords
 	 * @param yPos point y-coordinate, in View coords
