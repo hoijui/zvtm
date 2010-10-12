@@ -60,11 +60,22 @@ $Id: pom.xml 3429 2010-07-20 07:32:30Z rprimet $
 	Get it from http://skyservice.pha.jhu.edu/develop/vo/ivoafits/
 	Install the JAR files in your local repository using the following command line:
         mvn install:install-file -Dfile=ivoafits-0.3.jar -DgroupId=ivoa.fits -DartifactId=fits -Dversion=0.3.0 -Dpackaging=jar
+
+    Alternatively, simply run the 'prebuild.sh' script
 -->
 	<dependency>
       <groupId>ivoa.fits</groupId>
       <artifactId>fits</artifactId>
       <version>0.3.0</version>
+    </dependency>
+
+    <!-- skyview is currently unavailable in any maven repository. 
+         use prebuild.sh to install it
+    -->
+	<dependency>
+      <groupId>skyview</groupId>
+      <artifactId>skyview</artifactId>
+      <version>2.4b</version>
     </dependency>
   </dependencies>
   
