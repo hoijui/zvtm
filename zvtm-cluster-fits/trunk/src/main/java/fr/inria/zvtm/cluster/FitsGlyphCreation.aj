@@ -1,10 +1,15 @@
 package fr.inria.zvtm.cluster;
 
+import java.awt.geom.Point2D;
+import java.awt.Color;
+import java.awt.LinearGradientPaint;
+
 import java.net.URL;
 
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.glyphs.FitsImage;
 import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.glyphs.LGRectangle;
 import fr.inria.zvtm.fits.RangeSelection;
 import fr.inria.zvtm.fits.Slider;
 
@@ -19,6 +24,10 @@ public aspect FitsGlyphCreation {
 
     @Override GlyphReplicator Slider.getReplicator(){
         return new SliderReplicator(this);
+    }
+    
+    @Override GlyphReplicator LGRectangle.getReplicator(){
+        return new LGRectangleReplicator(this);
     }
 
     private static class FitsImageReplicator extends GlyphCreation.ClosedShapeReplicator {
@@ -72,5 +81,26 @@ public aspect FitsGlyphCreation {
             return retval;
         }
     }
-}
+    
+    private static class LGRectangleReplicator extends GlyphCreation.VRectangleReplicator {
 
+        private final Point2D startPoint;
+        private final Point2D endPoint;
+        private final float[] fractions;
+        private final Color[] colors;
+
+        LGRectangleReplicator(LGRectangle source){
+            super(source);
+            startPoint = source.getGradient().getStartPoint();
+            endPoint = source.getGradient().getEndPoint();
+            fractions = source.getGradient().getFractions();
+            colors = source.getGradient().getColors();
+        }
+
+        public Glyph doCreateGlyph(){
+            LGRectangle retval = new LGRectangle(0, 0, 0, width, height, new LinearGradientPaint(startPoint, endPoint, fractions, colors));
+            return retval;
+        }
+    }
+    
+}
