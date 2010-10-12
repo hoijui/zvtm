@@ -255,23 +255,23 @@ public aspect GlyphCreation {
 	}
 
 	static class VRectangleReplicator extends ClosedShapeReplicator {
-		protected final double halfWidth;
-		protected final double halfHeight;
+		protected final double width;
+		protected final double height;
 
 		VRectangleReplicator(VRectangle source){
 			super(source);
-			this.halfWidth = source.getWidth();
-			this.halfHeight = source.getHeight();
+			this.width = source.getWidth();
+			this.height = source.getHeight();
 		}
 
 		public Glyph doCreateGlyph(){
 			//beware of z-index
-			return new VRectangle(0d,0d,0,halfWidth,halfHeight,Color.BLACK);
+			return new VRectangle(0d,0d,0,width,height,Color.BLACK);
 		}
 
 		@Override public String toString(){
-			return "VRectangleReplicator, halfWidth=" + halfWidth
-				+ ", halfHeight=" + halfHeight;
+			return "VRectangleReplicator, width=" + width
+				+ ", height=" + height;
 		}
 	}
 	
@@ -283,12 +283,12 @@ public aspect GlyphCreation {
 
 		public Glyph doCreateGlyph(){
 			//beware of z-index
-			return new VRectangleOr(0d,0d,0,halfWidth,halfHeight,Color.BLACK,0);
+			return new VRectangleOr(0d,0d,0,width,height,Color.BLACK,0);
 		}
 
 		@Override public String toString(){
-			return "VRectangleOrReplicator, halfWidth=" + halfWidth
-				+ ", halfHeight=" + halfHeight;
+			return "VRectangleOrReplicator, width=" + width
+				+ ", height=" + height;
 		}
 	}
 
