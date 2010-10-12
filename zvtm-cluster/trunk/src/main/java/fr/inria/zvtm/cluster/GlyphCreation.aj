@@ -254,7 +254,7 @@ public aspect GlyphCreation {
 		}
 	}
 
-	private static class VRectangleReplicator extends ClosedShapeReplicator {
+	static class VRectangleReplicator extends ClosedShapeReplicator {
 		protected final double halfWidth;
 		protected final double halfHeight;
 
