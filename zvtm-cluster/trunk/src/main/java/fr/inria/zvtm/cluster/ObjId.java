@@ -34,7 +34,7 @@ public class ObjId<T> implements Serializable {
 	 * equal, then the owning objects are considered identical
 	 * (even though they are not in the Java sense, as they are
 	 * mirrored on different machines). 
-	 * @InheritDoc
+	 * @inheritDoc
 	 */	
 	@Override public boolean equals(Object other){
 		if(null == other){
@@ -49,7 +49,7 @@ public class ObjId<T> implements Serializable {
 	}
 
 	/**
-	 * @InheritDoc
+	 * @inheritDoc
 	 */
 	@Override public int hashCode(){
 		return (int)(id % Integer.MAX_VALUE);
