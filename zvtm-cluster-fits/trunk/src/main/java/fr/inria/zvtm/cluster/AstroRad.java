@@ -32,6 +32,7 @@ import fr.inria.zvtm.glyphs.FitsImage;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VImage;
 import fr.inria.zvtm.glyphs.VRectangle;
+import fr.inria.zvtm.glyphs.VText;
 
 import java.awt.Color;
 import java.awt.LinearGradientPaint;
@@ -65,6 +66,7 @@ public class AstroRad {
     private FitsImage selectedImage = null;
     private FitsImage draggedImage = null;
     private FitsHistogram hist;
+    private VText wcsCoords;
     private WallCursor ctrlCursor;
     private WallCursor imgCursor;
 
@@ -238,6 +240,9 @@ public class AstroRad {
                 selectedImage.setTranslucencyValue((float)value);
             }
         });
+
+        wcsCoords = new VText(-width/4, height/3, 0, Color.YELLOW, "unknown coords");
+        controlSpace.addGlyph(wcsCoords);
     }
 
     private void imgCursorPressed(double x, double y){
@@ -409,7 +414,13 @@ public class AstroRad {
 
         public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
-        public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){}
+        public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
+            if(options.debugView && selectedImage != null){
+                Point2D.Double spcCoords = viewToSpace(imageCamera, jpx, jpy);
+                Point2D.Double coords = selectedImage.pix2wcs(spcCoords.x - (selectedImage.vx - (selectedImage.getWidth()/2)), spcCoords.y - (selectedImage.vy - (selectedImage.getHeight()/2)));
+                wcsCoords.setText(coords == null? "unknown coords" : coords.x + ", " + coords.y); 
+            }
+        }
 
         public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
             if(buttonNumber == 1){
