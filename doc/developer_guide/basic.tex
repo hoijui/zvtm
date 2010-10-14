@@ -33,17 +33,15 @@ On top of these concepts are implemented various interaction techniques that can
 
 Toolkits such as Java2D are powerful but difficult to use, requiring the programmer to deal with low-level graphical operations and implementation problems. ZVTM allows the programmer to consider the task at a more abstract level by automatically handling the following operations:
 
-{\bf Graphical Object Model: }ZVTM is a structured graphics toolkit. The developer manipulates actual graphical objects whose properties can be changed, not low-level primitives as found in Java2D's Graphics2D component. Operations can be performed on glyphs, either abruptly or through animations, and information about their status can easily be accessed.
+{\bf Graphical Object Model:} ZVTM is a structured graphics toolkit. The developer manipulates actual graphical objects whose properties can be changed, not low-level primitives as found in Java2D's Graphics2D component. Operations can be performed on glyphs, either abruptly or through animations, and information about their status can easily be accessed.
 
-{\bf Clipping:} the toolkit is designed to handle many glyphs while maintaining an acceptable refresh rate. Two ZUI\footnote{Zoomable User Interface}-aware clipping algorithms contribute to this: an analytical clipping pass that determines whether each glyph should be projected and painted or not (based on its bounding box in virtual space), and an optional top-down pass that can detect some occlusion configurations and ignore glyphs that will not be visible in the final rendering (taking glyph translucency into account).
+{\bf Clipping:} The toolkit is designed to handle many glyphs while maintaining an acceptable refresh rate. Two ZUI\footnote{Zoomable User Interface}-aware clipping algorithms contribute to this: an analytical clipping pass that determines whether each glyph should be projected and painted or not (based on its bounding box in virtual space), and an optional top-down pass that can detect some occlusion configurations and ignore glyphs that will not be visible in the final rendering (taking glyph translucency into account).
 
-{\bf Multi-threading and consistency:} multiple cameras associated with different views can exist simultaneously, observing the same or different regions of (possibly different) virtual space(s). A glyph observed through different cameras simultaneously is actually a single object with multiple projected coordinates. As a consequence, the synchronization and consistency of multiple views is automatic.
+{\bf Synchronization and Repaint Requests:} Multiple cameras associated with different views can exist simultaneously, observing the same or different regions of (possibly different) virtual space(s). A glyph observed through different cameras simultaneously is actually a single object with multiple projected coordinates. As a consequence, the synchronization and consistency of multiple views is automatic. Views are refreshed lazily, i.e., only upon request. Such repaint requests are fired automatically, so that the programmer only has to assign new values to visual attributes (glyphs, cameras). Each camera is associated with a view.
 
-{\bf Repaint requests:} views are refreshed lazily, i.e., only upon request. Such repaint requests are fired automatically, so that the programmer only has to assign new values to visual properties. Each camera is associated with a view that runs in its own thread. Each thread tries to provide a frame rate as close to 25 images per second as possible (unless specified otherwise).
+{\bf Animation Management:} All camera, glyph, portal and lens animations are handled by the same module, which offers a simple and unified API based on Sun's Timing Framework\fref{https://timingframework.dev.java.net/} for their declarative specification. The module manages a queue of pending animations and can handle concurrent animations affecting orthogonal visual variables of the same object (glyph or camera).
 
-{\bf Animation management:} all camera, glyph, portal and lens animations are handled by the same module, which offers a simple and unified API based on Sun's Timing Framework\fref{https://timingframework.dev.java.net/} for their declarative specification. The module manages a queue of pending animations and can handle concurrent animations affecting orthogonal visual variables of the same object.
-
-{\bf Hardware acceleration:} various graphics acceleration methods are available, such as Java Volatile Images and the OpenGL rendering pipeline. ZVTM features different types of views that provide hardware acceleration based on these methods while sharing the exact same API.
+{\bf Hardware Acceleration:} various graphics acceleration methods are available, such as Java Volatile Images and the OpenGL rendering pipeline. ZVTM features different types of views that provide hardware acceleration based on these methods while sharing the exact same API.
 
 %%%%%%%%%%
 \subsection{Virtual Space Manager}
@@ -216,7 +214,7 @@ class D2P implements Java2DPainter {
 %%%%%%%%%%
 \subsection{Portals}
 
-A portal is a subregion of a view that displays something different. Typically, a portal will display what is seen through another camera than the camera associated with the main view\cl{fr.inria.zvtm.engine.CameraPortal}. Camera portals can be considered as smaller views inset within views. Figure \ref{fig:portal} shows an example of a camera portal displaying an overview of a virtual space containing a map. One camera (associated with the main view) observes Central America. This camera is moved freely by the user (position and altitude). A second fixed camera is positioned so as to observe the entire world (associated with the portal in the lower-left corner). See Section \ref{sec:bifocal} for more information about bi-focal displays.
+A portal is a subregion of a view that displays something different. Typically, a portal will display what is seen through another camera than the camera associated with the main view\cl{fr.inria.zvtm.engine.portals.CameraPortal}. Camera portals can be considered as smaller views inset within views. Figure \ref{fig:portal} shows an example of a camera portal displaying an overview of a virtual space containing a map. One camera (associated with the main view) observes Central America. This camera is moved freely by the user (position and altitude). A second fixed camera is positioned so as to observe the entire world (associated with the portal in the lower-left corner). See Section \ref{sec:bifocal} for more information about bi-focal displays.
 
 \begin{small}
 \begin{SaveVerbatim}{CodeVerb}
@@ -231,6 +229,8 @@ vsm.addPortal(p, v);
 \fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
 \end{small}
 
+Various portals ship with \cd{zvtm-core}, including portals that implement an interactive overview (Figure \ref{fig:portal}).
+
 \begin{figure}[!ht]
 \centering
   \fbox{\includegraphics[width=16cm]{images/portal.png}}
@@ -242,11 +242,77 @@ vsm.addPortal(p, v);
 \subsection{Input events}
 \label{sec:input}
 
+%%%%%%%%%%
+\subsubsection{Views, Glyph, Mouse and Keyboard Events}
+
 It is possible to associated the same event handler with all layers in a view, or to associate different event handlers with each layer of the view. The input event handling interface works in a way similar to conventional AWT/Swing event listeners (using callbacks). There is a single interface for all ZVTM events: \cl{fr.inria.zvtm.event.ViewListener}. A convenience (default) implementation, which does nothing, is available for subclassing: \cl{ViewAdapter}.
 
 \cd{ViewListener} features callbacks for conventional pointing device events (move, drag, button press/release/click, mouse wheel) and keyboard events. Additional events are triggered when the cursor enters or exits a glyph, unless this glyph has been declared as not sensitive \cl{Glyph.setSensitivity(boolean b)}.
 
+%%%%%%%%%%
+\subsubsection{Portal Events}
+
 Portals have their own event interface \cl{fr.inria.zvtm.event.PortalListener}, that is used to listen for cursor entry/exit.
+
+%%%%%%%%%%
+\subsubsection{Camera Events}
+
+One can also listen to camera movement events (position and altitude changes) using interface\\ \cl{fr.inria.zvtm.event.CameraListener}.
+
+\begin{small}
+\begin{SaveVerbatim}{CodeVerb}
+class Foo implements CameraListener {
+
+  ...
+
+  public void cameraMoved(Camera cam, Point2D.Double coord, double alt)
+    System.out.println("The camera has moved to coordinates (" + 
+                         coord.getX()+", "+coord.getY()+") at altitude "+alt);
+  }
+
+}
+
+...
+Camera c = ...;
+Foo cc = ...;
+c.addListener(cc);
+
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+\end{small}
+
+%%%%%%%%%%
+\subsubsection{Repaint Events}
+
+View repaint events being handled asynchronously, it can be desirable to know when exactly a view gets repainted by AWT's Event Dispatching Thread and execute instructions afterwards. This can be done by implementing interface\\ \cl{fr.inria.zvtm.event.RepaintListener}.
+
+A reference to the implementation of this interface is the passed to \cd{View.repaint(...)}.
+
+\begin{small}
+\begin{SaveVerbatim}{CodeVerb}
+class Foo implements RepaintListener {
+
+  ...
+
+   public void viewRepainted(View v){
+     System.out.println("View " + v.getName() + " just got repainted".);
+   }
+
+}
+
+...
+
+View v = ...;
+Foo vc = ...;
+v.repaint(vc);
+
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+\end{small}
+
+The call to \cd{View.repaint(vc)} sets the listener permanently. It must be removed explicitly if you are not interested in being notified about following repaint cycles.
+
+A convenience (default) implementation, which does nothing, is available for subclassing: \cl{RepaintAdapter}.
 
 %%%%%%%%%%
 \subsection{Graphical Object Model}
@@ -267,3 +333,31 @@ All glyphs are defined by the following orthogonal attributes: the cartesian coo
 
 The resulting representation system, with its orthogonal visual variables that mirror perceptual dimensions, makes mapping data to graphical attributes easy. A direct manipulation user interface (Figure \ref{fig:vshape}) facilitates the dynamic definition of glyphs, drawing a parallel with \cite{douglas99} which demonstrates the importance, for color selection, of a well-designed interface over the supposed intuitiveness of color models.
 
+The following types of glyphs are available in \cd{zvtm-core}.
+
+%%%%%%%%%%
+\subsubsection{Basic Closed Shapes}
+
+\begin{itemize}
+\item{VCircle: } a plain circle, with fill and stroke colors.
+\item{VRectangle: } a plain rectangle, with fill and stroke colors.
+\item{VRectangleOr: } same as above, but can be re-oriented.
+\item{SIRectangle:} a plain rectangle whose size is scale-insensitive. No matter the observing camera's altitude, the projected width and height of this rectangle in pixels are always those declared in virtual space units. This can be convenient to implement, e.g., shape resizing handles.
+\item{FRectangle: } a rectangle becoming gradually translucent.
+\item{PRectangle: } a rectangle with a customizable AWT \cd{Paint} fill pattern, such as a \cd{Gradient}.
+\item{} \ldots{}
+\end{itemize}
+
+%%%%%%%%%%
+\subsubsection{Paths}
+
+\begin{itemize}
+\item{DPath:} an arbitrary concatenation of segments, quadratic curves, cubic curves and jumps. Similar to an AWT \cd{GeneralPath}, but mutable (existing segments can be modified, and both position and control points can be animated).
+\end{itemize}
+
+%%%%%%%%%%
+\subsubsection{Composites}
+
+\begin{itemize}
+\item{Composite:} 
+\end{itemize}
