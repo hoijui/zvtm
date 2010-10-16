@@ -101,7 +101,7 @@ class DOTLexer extends Lexer;
 options {
 	exportVocab           = DOT;
 	k                     = 2;
-	charVocabulary        = '\u0003'..'\ufffe'; // Unicode
+	charVocabulary        = '\u0000'..'\uffee'; // Unicode
 	testLiterals          = false;
 	caseSensitiveLiterals = false;
 }
@@ -111,7 +111,7 @@ options {
 	testLiterals = true;
 	paraphrase   = "an identifier";
 }
-	: ( 'a'..'z' | 'A'..'Z' | '_' ) ( 'a'..'z' | 'A'..'Z' | '_' | '0'..'9' ) *
+	: (( 'a'..'z' | 'A'..'Z' | '_' )|(('\u0080'..'\ufffe'))) (( 'a'..'z' | 'A'..'Z' | '_' | '0'..'9' )|('\u0080'..'\ufffe')) *
 	| ( '.' ( '0'..'9' ) + | ( '0'..'9' ) + ( '.' ( '0'..'9' ) * ) ? )
 	| ( '-' )
 	  ( ( '-' { $setType(ND_EDGE_OP); }
