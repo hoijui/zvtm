@@ -2,13 +2,14 @@ package fr.inria.zvtm.cluster.wis;
 
 import fr.lri.insitu.wild.wildinputserver.plugins.FlowStatesPlugin;
 import fr.lri.insitu.wild.wildinputserver.plugins.AbstractPlugin;
+import fr.lri.insitu.wild.wildinputserver.plugins.AbstractFlowStatesPlugin;
 import fr.lri.insitu.FlowStates.sm.IConStateMachine;
 
 import java.net.URL;
 import fr.inria.zvtm.cluster.AstroRad;
 import fr.inria.zvtm.cluster.AstroServer;
 
-public class AstroRadWISPlugin extends AbstractPlugin implements FlowStatesPlugin {
+public class AstroRadWISPlugin extends AbstractFlowStatesPlugin {
     
     AstroRad ar;
     
@@ -26,7 +27,7 @@ public class AstroRadWISPlugin extends AbstractPlugin implements FlowStatesPlugi
     }
     
     public IConStateMachine[] getStateMachines(){
-        return null;
+        return new IConStateMachine[]{new TranslucencySM("TranslucencyController", canvas, ar)};
     }
     
     public boolean isSupported(){

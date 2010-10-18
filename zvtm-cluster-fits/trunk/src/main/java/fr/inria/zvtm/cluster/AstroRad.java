@@ -46,6 +46,7 @@ import java.awt.event.MouseWheelEvent;
  * A clustered viewer for FITS images.
  */
 public class AstroRad {
+    
     private static final double CTRLVIEW_XOFFSET = 7*2840;
     private static final double IMGVIEW_XOFFSET = 3*2840;
     private static final double VIEW_YOFFSET = 2*1800;
@@ -108,7 +109,8 @@ public class AstroRad {
         ClusterGeometry clGeom;
         ClusteredView imageView;
         ClusteredView controlView;
-        if(options.debugView){
+        if(true){
+        //if(options.debugView){
             //debugging clustered view, suitable for a single host
             clGeom = new ClusterGeometry(
                 600,
@@ -180,7 +182,8 @@ public class AstroRad {
         });
         pointSource.start();
 
-        if(options.debugView){
+        if(true){
+        //if(options.debugView){
             setupControlZone(0, 0, 400, 300);
         } else {
             setupControlZone(0,0, 4000, 5000);
