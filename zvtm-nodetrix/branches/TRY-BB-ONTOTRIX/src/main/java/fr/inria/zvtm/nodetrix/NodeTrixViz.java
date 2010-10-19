@@ -35,7 +35,7 @@ public class NodeTrixViz {
 	public static final long CELL_SIZE = 20;
     public static final long CELL_SIZE_HALF = CELL_SIZE/2;
     public static final int GROUP_LABEL_HALF_WIDTH = 50;
-    public static final int LINLOG_ITERATIONS = 20;
+    public static final int LINLOG_ITERATIONS = 100;
     public static final int MATRIX_NODE_LABEL_DIST_BORDER = 3;
     public static final int MATRIX_NODE_LABEL_OCCLUSION_WIDTH = 150; //half of the width/lenght in pixel that can be occupied by labels when enabling local exploration
     
@@ -65,6 +65,11 @@ public class NodeTrixViz {
 	public static final int APPEARANCE_INTRA_EDGE = 1;  
 	private VirtualSpace vs;
 	
+	// have to find something better than this constant...
+    double SCALE = 40;
+    double REPU_EXPONENT = -1.0;
+    double ATTR_EXPONENT = 2.0;
+    double GRAV_FACTOR = 0.05;
 	
     private Vector<Matrix> matrices = new Vector<Matrix>();
     private HashSet<NTNode> nodes = new HashSet<NTNode>();
@@ -76,9 +81,14 @@ public class NodeTrixViz {
 	
     /**Vector that stores all edges considered by the linLog cluster algorithm*
      */
-    
-    public NodeTrixViz(){
 
+    public NodeTrixViz(){}
+
+    public NodeTrixViz(double s, double re, double ae, double gv){
+        SCALE = s;
+        REPU_EXPONENT = re;
+        ATTR_EXPONENT = ae;
+        GRAV_FACTOR = gv;
     }
     
     //-------------BUILDING COMPONENTS----------BUILDING COMPONENTS----------BUILDING COMPONENTS----------BUILDING COMPONENTS----------
@@ -218,13 +228,7 @@ public class NodeTrixViz {
 //    }
 //    public Vector<Matrix> getMatrices(){
 //        return matrices;
-//    }
-    
-    // have to find something better than this constant...
-    double SCALE = 40;
-    
-    
-    
+//    }    
     
     //---------------------VISUALISE---------------------VISUALISE---------------------VISUALISE---------------------VISUALISE---------------------VISUALISE
     
@@ -264,7 +268,7 @@ public class NodeTrixViz {
 		Map<Node,double[]> nodeToPosition = makeInitialPositions(llnodes);
 		// see class MinimizerBarnesHut for a description of the parameters;
 		// for classical "nice" layout (uniformly distributed nodes), use
-		new MinimizerBarnesHut(llnodes, lledges, -1.0, 2.0, 0.05).minimizeEnergy(nodeToPosition, LINLOG_ITERATIONS);
+		new MinimizerBarnesHut(llnodes, lledges, REPU_EXPONENT, ATTR_EXPONENT, GRAV_FACTOR).minimizeEnergy(nodeToPosition, LINLOG_ITERATIONS);
 		// following might actually be useless, not sure yet...
 		//Map<Node,Integer> nodeToCluster = new OptimizerModularity().execute(llnodes, lledges, false);
 		// EOU		
