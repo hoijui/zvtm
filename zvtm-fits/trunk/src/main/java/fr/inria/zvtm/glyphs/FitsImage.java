@@ -33,6 +33,7 @@ import fr.inria.zvtm.fits.filters.HeatFilter;
 import fr.inria.zvtm.fits.filters.NopFilter;
 import fr.inria.zvtm.fits.filters.RainbowFilter;
 import fr.inria.zvtm.fits.DefaultSampler;
+import fr.inria.zvtm.fits.Grid;
 import fr.inria.zvtm.fits.NomWcsKeywordProvider;
 import fr.inria.zvtm.fits.Sampler;
 import fr.inria.zvtm.fits.ZScale;
@@ -58,6 +59,7 @@ public class FitsImage extends VImage {
     private ImageFilter filter;
     private ScaleMethod scaleMethod = ScaleMethod.LINEAR;
     private WCSTransform wcsTransform;
+    private Grid grid = null;
 
     static {
         IIORegistry.getDefaultInstance().
@@ -288,6 +290,17 @@ public class FitsImage extends VImage {
      */
     public Point2D.Double wcs2pix(double ra, double dec){
         return wcsTransform.wcs2pix(ra, dec);
+    }
+
+    public void setGrid(Grid grid){
+        this.grid = grid;
+    }
+
+    /**
+     * May return null
+     */
+    public Grid getGrid(){
+        return grid;
     }
 
     private void recreateDisplayImage(){
