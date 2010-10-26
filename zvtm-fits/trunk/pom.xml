@@ -62,6 +62,8 @@ $Id: pom.xml 3429 2010-07-20 07:32:30Z rprimet $
         mvn install:install-file -Dfile=ivoafits-0.3.jar -DgroupId=ivoa.fits -DartifactId=fits -Dversion=0.3.0 -Dpackaging=jar
 
     Alternatively, simply run the 'prebuild.sh' script
+
+    jsky is supplied in the 'libs' directory
 -->
 	<dependency>
       <groupId>ivoa.fits</groupId>

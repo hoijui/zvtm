@@ -276,6 +276,8 @@ public class FitsImage extends VImage {
 
     /**
      * Converts pixel coordinates to World Coordinates. Returns null if the WCSTransform is not valid.
+     * @param x x-coordinates, in the FITS system: (0,0) lower left, x axis increases to the right, y axis increases upwards
+     * @param y y-coordinates, in the FITS system: (0,0) lower left, x axis increases to the right, y axis increases upwards
      */
     public Point2D.Double pix2wcs(double x, double y){
         return wcsTransform.pix2wcs(x, y);
