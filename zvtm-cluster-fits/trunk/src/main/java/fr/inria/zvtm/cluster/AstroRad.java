@@ -25,6 +25,7 @@ import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.fits.FitsHistogram;
+import fr.inria.zvtm.fits.Grid;
 import fr.inria.zvtm.fits.RangeSelection;
 import fr.inria.zvtm.fits.filters.*;
 import fr.inria.zvtm.fits.ZScale;
@@ -109,8 +110,7 @@ public class AstroRad {
         ClusterGeometry clGeom;
         ClusteredView imageView;
         ClusteredView controlView;
-        if(true){
-        //if(options.debugView){
+        if(options.debugView){
             //debugging clustered view, suitable for a single host
             clGeom = new ClusterGeometry(
                 600,
@@ -182,8 +182,7 @@ public class AstroRad {
         });
         pointSource.start();
 
-        if(true){
-        //if(options.debugView){
+        if(options.debugView){
             setupControlZone(0, 0, 400, 300);
         } else {
             setupControlZone(0,0, 4000, 5000);
@@ -273,6 +272,9 @@ public class AstroRad {
             FitsImage image = new FitsImage(0,0,0,imgUrl);
             images.add(image);
             imageSpace.addGlyph(image);
+            Grid grid = Grid.makeGrid(image, 130, 80);
+            image.setGrid(grid);
+            imageSpace.addGlyph(grid);
             double[] scaleBounds = ZScale.computeScale(image.getUnderlyingImage());
             if(scaleBounds != null){
                 image.rescale(scaleBounds[0], scaleBounds[1], 1.);
@@ -300,6 +302,9 @@ public class AstroRad {
         focused.setStrokeWidth(3); //XXX move to addImage
         focused.setDrawBorder(true);
         imageSpace.onTop(focused, SEL_IMG_ZINDEX);
+        if(focused.getGrid() != null){
+            imageSpace.above(focused.getGrid(), focused);
+        }
         if(hist != null){
             controlSpace.removeGlyph(hist);
         }
