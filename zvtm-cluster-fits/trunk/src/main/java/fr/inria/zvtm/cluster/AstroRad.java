@@ -365,27 +365,12 @@ public class AstroRad {
 
     }
 
-    private Point2D.Double viewToSpace(Camera cam, int jpx, int jpy){
-        Location camLoc = cam.getLocation();
-        double focal = cam.getFocal();
-        double altCoef = (focal + camLoc.alt) / focal;
-        Dimension viewSize = masterView.getPanelSize();
-
-        //find coords of view origin in the virtual space
-        double viewOrigX = camLoc.vx - 0.5*viewSize.width*altCoef;
-        double viewOrigY = camLoc.vy + 0.5*viewSize.height*altCoef;
-
-        return new Point2D.Double(
-                viewOrigX + altCoef*jpx,
-                viewOrigY - altCoef*jpy);
-    }
-
     private class PanZoomEventHandler implements ViewListener{
         private int lastJPX;
         private int lastJPY;
 
         public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-            Point2D.Double spcCoords = viewToSpace(controlCamera, jpx, jpy);
+            Point2D.Double spcCoords = masterView.getPanel().viewToSpaceCoords(controlCamera, jpx, jpy);
             range.onPress1(spcCoords.x, spcCoords.y);
         }
 
@@ -394,7 +379,7 @@ public class AstroRad {
         }
 
         public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-            Point2D.Double spcCoords = viewToSpace(controlCamera, jpx, jpy);
+            Point2D.Double spcCoords = masterView.getPanel().viewToSpaceCoords(controlCamera, jpx, jpy);
             combo.onClick1(spcCoords.x, spcCoords.y);
         }
 
@@ -424,7 +409,7 @@ public class AstroRad {
 
         public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
             if(options.debugView && selectedImage != null){
-                Point2D.Double spcCoords = viewToSpace(imageCamera, jpx, jpy);
+                Point2D.Double spcCoords = masterView.getPanel().viewToSpaceCoords(imageCamera, jpx, jpy);
                 Point2D.Double coords = selectedImage.pix2wcs(spcCoords.x - (selectedImage.vx - (selectedImage.getWidth()/2)), spcCoords.y - (selectedImage.vy - (selectedImage.getHeight()/2)));
                 wcsCoords.setText(coords == null? "unknown coords" : coords.x + ", " + coords.y); 
             }
@@ -432,7 +417,7 @@ public class AstroRad {
 
         public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
             if(buttonNumber == 1){
-                Point2D.Double spcCoords = viewToSpace(controlCamera, jpx, jpy);
+                Point2D.Double spcCoords = masterView.getPanel().viewToSpaceCoords(controlCamera, jpx, jpy);
                 range.onDrag(spcCoords.x, spcCoords.y); 
             }
 
