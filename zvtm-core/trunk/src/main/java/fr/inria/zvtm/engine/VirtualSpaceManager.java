@@ -31,6 +31,7 @@ import java.awt.event.WindowEvent;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Vector;
 
 import javax.swing.JMenuBar;
@@ -224,8 +225,8 @@ public class VirtualSpaceManager implements AWTEventListener {
      *@param bar true -&gt; add a status bar to this view (below main panel)
      *@param visible should the view be made visible automatically or not
      */
-    public View addFrameView(Vector<Camera> c, String name, short viewType, int w, int h, boolean bar, boolean visible){
-	    return addFrameView(c, name, viewType, w, h, bar, visible, null);
+    public View addFrameView(List<Camera> c, String name, short viewType, int w, int h, boolean bar, boolean visible){
+	    return addFrameView(new Vector<Camera>(c), name, viewType, w, h, bar, visible, null);
     }
 
     /** Create a new External View.<br>
@@ -240,9 +241,9 @@ public class VirtualSpaceManager implements AWTEventListener {
      *@param mnb a menu bar (null if none), already configured with ActionListeners already attached to items (it is just added to the view)
      *@see #addFrameView(Vector c, String name, short viewType, int w, int h, boolean bar, boolean visible, boolean decorated, JMenuBar mnb)
      */
-    public View addFrameView(Vector<Camera> c, String name, short viewType, int w, int h,
+    public View addFrameView(List<Camera> c, String name, short viewType, int w, int h,
 				boolean bar, boolean visible, JMenuBar mnb){
-	    return addFrameView(c, name, viewType, w, h, bar, visible, true, mnb);
+	    return addFrameView(new Vector<Camera>(c), name, viewType, w, h, bar, visible, true, mnb);
     }
     
     /**Create a new external view.<br>
@@ -258,18 +259,18 @@ public class VirtualSpaceManager implements AWTEventListener {
      *@param mnb a menu bar (null if none), already configured with ActionListeners already attached to items (it is just added to the view)
      *@see #addFrameView(Vector c, String name, short viewType, int w, int h, boolean bar, boolean visible, JMenuBar mnb)
      */
-    public View addFrameView(Vector<Camera> c, String name, short viewType, int w, int h,
+    public View addFrameView(List<Camera> c, String name, short viewType, int w, int h,
 				boolean bar, boolean visible, boolean decorated, JMenuBar mnb){
         View v = null;
         switch(viewType){
             case View.STD_VIEW:{
-                v = (mnb != null) ? new EView(c, name, w, h, bar, visible, decorated, mnb) : new EView(c, name, w, h, bar, visible, decorated);
+                v = (mnb != null) ? new EView(new Vector<Camera>(c), name, w, h, bar, visible, decorated, mnb) : new EView(new Vector<Camera>(c), name, w, h, bar, visible, decorated);
                 addView(v);
                 v.setRepaintPolicy(generalRepaintPolicy);
                 break;
             }
             case View.OPENGL_VIEW:{
-                v = (mnb != null) ? new GLEView(c, name, w, h, bar, visible, decorated, mnb) : new GLEView(c, name, w, h, bar, visible, decorated);
+                v = (mnb != null) ? new GLEView(new Vector<Camera>(c), name, w, h, bar, visible, decorated, mnb) : new GLEView(new Vector<Camera>(c), name, w, h, bar, visible, decorated);
                 addView(v);
                 v.setRepaintPolicy(generalRepaintPolicy);
                 break;
@@ -284,8 +285,8 @@ public class VirtualSpaceManager implements AWTEventListener {
      *@param w width of window in pixels
      *@param h height of window in pixels
      */
-    public JPanel addPanelView(Vector<Camera> c,String name,int w,int h){
-        PView tvi = new PView(c, name, w, h);
+    public JPanel addPanelView(List<Camera> c,String name,int w,int h){
+        PView tvi = new PView(new Vector<Camera>(c), name, w, h);
         addView(tvi);
         tvi.setRepaintPolicy(generalRepaintPolicy);
         return tvi.panel;
@@ -326,10 +327,10 @@ public class VirtualSpaceManager implements AWTEventListener {
 	 * (This is to be compatible with the <code>View</code> API.)
 	 * @return	View	The created view.
 	 */
-    public View addFrameView(Vector<Camera> cameraList, String name, int panelWidth, int panelHeight,
+    public View addFrameView(List<Camera> cameraList, String name, int panelWidth, int panelHeight,
 				boolean visible, boolean decorated, short viewType,
 				JPanel parentPanel, JFrame frame) {
-    	View v = new JPanelView(cameraList, name, panelWidth, panelHeight,
+    	View v = new JPanelView(new Vector<Camera>(cameraList), name, panelWidth, panelHeight,
             visible, decorated, viewType,
             parentPanel, frame);
         addView(v);
