@@ -688,7 +688,7 @@ public abstract class Glyph implements Cloneable, Translucent {
      *@param jpy provide projected JPanel coordinates of the associated view, not virtual space coordinates
      *@param cvx virtual space coordinates
      *@param cvy virtual space coordinates 
-     *@return VCurcor.ENTERED_GLYPH if cursor has entered the glyph, VCurcor.EXITED_GLYPH if it has exited the glyph, VCursor.NO_CURSOR_EVENT if nothing has changed (meaning the cursor was already inside or outside it)
+     *@return VCursor.ENTERED_GLYPH if cursor has entered the glyph, VCursor.EXITED_GLYPH if it has exited the glyph, VCursor.NO_CURSOR_EVENT if nothing has changed (meaning the cursor was already inside or outside it)
      */
     public abstract short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy);
 
