@@ -31,8 +31,8 @@ public class ZOrderTest extends TestCase {
     }
 
     public void setUp(){
-	vsm = VirtualSpaceManager.INSTANCE;
-	vs = vsm.addVirtualSpace("testVS");
+        vsm = VirtualSpaceManager.INSTANCE;
+        vs = vsm.addVirtualSpace("testVS");
     }
 
     public void testNullGlyphAbove(){
