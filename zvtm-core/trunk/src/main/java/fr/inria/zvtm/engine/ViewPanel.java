@@ -47,6 +47,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -254,6 +255,28 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 	awtCursor = c;
 	drawVTMcursor = false;
 	this.setCursor(awtCursor);
+    }
+
+    /**
+     * Converts between view coordinates and virtualspace coordinates for
+     * a given camera.
+     * @param cam camera
+     * @param jpx x coordinate in the panel system
+     * @param jpx y coordinate in the panel system
+     */
+    public Point2D.Double viewToSpaceCoords(Camera cam, int jpx, int jpy){
+        Location camLoc = cam.getLocation();
+        double focal = cam.getFocal();
+        double altCoef = (focal + camLoc.alt) / focal;
+        Dimension viewSize = getSize();
+
+        //find coords of view origin in the virtual space
+        double viewOrigX = camLoc.vx - 0.5*viewSize.width*altCoef;
+        double viewOrigY = camLoc.vy + 0.5*viewSize.height*altCoef;
+
+        return new Point2D.Double(
+                viewOrigX + altCoef*jpx,
+                viewOrigY - altCoef*jpy);
     }
     
     /**true will draw a segment between origin of drag and current cursor pos until drag is finished (still visible for backward compatibility reasons - should use setDrawSegment instead)*/
