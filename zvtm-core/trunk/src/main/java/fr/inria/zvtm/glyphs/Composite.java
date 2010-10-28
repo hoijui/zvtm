@@ -38,7 +38,7 @@ public class Composite extends Glyph {
      */
     public void addChild(Glyph child){
         children.add(child);
-        computeBoundingBox();
+        computeBounds();
     }
 
     /**
@@ -50,7 +50,7 @@ public class Composite extends Glyph {
     public boolean removeChild(Glyph child){
         boolean removed = children.remove(child);
         if(removed){
-            computeBoundingBox();
+            computeBounds();
         }
         return removed;
     }
@@ -222,7 +222,7 @@ public class Composite extends Glyph {
                 child.move((vx - child.vx) * (1. - factor), 
                         (vy - child.vy) * (1. - factor));
             }
-            computeBoundingBox();
+            computeBounds();
         }
 
     @Override
@@ -262,7 +262,13 @@ public class Composite extends Glyph {
         bbox[3] += dy;
     }
 
-    private void computeBoundingBox(){
+    /**
+     * Re-computes the bounds of this Composite.
+     * This method is called automatically after external operations
+     * affecting the Composite size (such as adding or deleting a child) but
+     * should be called manually after modifying a child's size or position. 
+     */
+    public void computeBounds(){
         bbox[0] = Double.MAX_VALUE;
         bbox[1] = Double.MIN_VALUE;
         bbox[2] = Double.MIN_VALUE;
