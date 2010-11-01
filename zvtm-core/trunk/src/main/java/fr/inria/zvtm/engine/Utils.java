@@ -297,6 +297,13 @@ public class Utils {
 		return -1;
 	}
 
+    public static double[] widthHeight (Glyph glyph) {
+        double[] wnes = glyph.getBounds();
+        double glyphHeight = wnes[1] - wnes[3];
+        double glyphWidth = wnes[2] - wnes[0];
+        return new double[]{glyphWidth, glyphHeight};
+    }
+
     public static void tile(String src, String targetPattern, int tileSize){
         try {
             File source = new File(src);
