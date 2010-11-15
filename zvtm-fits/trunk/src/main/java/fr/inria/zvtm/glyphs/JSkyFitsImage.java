@@ -27,6 +27,8 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
     /** Height in virtual space (read-only). */
     private double vh;
 
+    private double scale = 1;
+
     private RProjectedCoordsP[] pc;
 
     public JSkyFitsImage(String fileOrUrl){
@@ -36,6 +38,8 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
             //XXX change
             throw new Error("Could not create FitsImage: " + e);
         }
+        vw = fitsImage.getWidth() * scale;
+        vh = fitsImage.getHeight() * scale;
     }
 
     @Override public double getWidth(){
@@ -57,12 +61,6 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
     }
 
     public void setScale(float scaleFactor){
-        //trigger a repaint if necessary
-        try{ 
-            fitsImage.setScale(scaleFactor);
-        } catch(Exception swallowed){
-            //dbg trace
-        }
     }
 
     @Override public double[] getBounds(){
@@ -112,8 +110,6 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
             return true;
         }
 
-    //XXX implement visibleInRegion (clipping)
-
     @Override 
         public void removeCamera(int index){
         }
@@ -129,14 +125,14 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
                     }
                     pc[pc.length-1]=new RProjectedCoordsP();
                 }
-                else {System.err.println("VImage:Error while adding camera "+verifIndex);}
+                else {System.err.println("JSkyFitsImage:Error while adding camera "+verifIndex);}
             }
             else {
                 if (verifIndex==0){
                     pc=new RProjectedCoordsP[1];
                     pc[0]=new RProjectedCoordsP();
                 }
-                else {System.err.println("VImage:Error while adding camera "+verifIndex);}
+                else {System.err.println("JSkyFitsImage:Error while adding camera "+verifIndex);}
             }
         }
 
