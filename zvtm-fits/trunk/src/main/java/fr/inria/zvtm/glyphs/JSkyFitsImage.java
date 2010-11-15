@@ -63,10 +63,14 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
     public void setScale(float scaleFactor){
     }
 
-    @Override public double[] getBounds(){
-        double[] retval = new double[4];
-        return retval;
-    }
+    /** Get the bounding box of this Glyph in virtual space coordinates.
+     *@return west, north, east and south bounds in virtual space.
+     */
+    @Override
+        public double[] getBounds(){
+            double[] res = {vx-vw/2d,vy+vh/2d,vx+vw/2d,vy-vh/2d};
+            return res;
+        }
 
     /**
      * {@inheritDoc}
@@ -112,6 +116,7 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
 
     @Override 
         public void removeCamera(int index){
+            pc[index]=null;
         }
 
     @Override 
@@ -170,6 +175,7 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
             AffineTransform at = AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch);
             g.setTransform(at);
             g.drawRenderedImage(fitsImage, AffineTransform.getScaleInstance(trueCoef,trueCoef));
+            g.setTransform(stdT);
         }
 
     @Override
