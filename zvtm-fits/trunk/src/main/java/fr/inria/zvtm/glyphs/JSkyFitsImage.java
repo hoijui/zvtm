@@ -42,6 +42,10 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
         vh = fitsImage.getHeight() * scale;
     }
 
+    public FITSImage getUnderlyingImage(){
+        return fitsImage;
+    }
+
     @Override public double getWidth(){
         return vw;
     }
