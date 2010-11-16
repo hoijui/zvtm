@@ -104,6 +104,21 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
         proc.update();
     }
 
+    /**
+     * Sets the image cut levels automatically using median filtering on the given area of the image.
+     */
+    public void autoSetCutLevels(Rectangle2D.Double rect){
+        proc.autoSetCutLevels(rect);
+        proc.update();
+    }
+
+    /**
+     * Sets the image cut levels automatically using median filtering. 
+     */
+    public void autoSetCutLevels(){
+        autoSetCutLevels(new Rectangle2D.Double(0,0,fitsImage.getWidth(),fitsImage.getHeight()));
+    }
+
     /** 
      * Gets the bounding box of this Glyph in virtual space coordinates.
      * @return west, north, east and south bounds in virtual space.
