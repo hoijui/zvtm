@@ -15,13 +15,8 @@ import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.JSkyFitsImage;
-import fr.inria.zvtm.fits.FitsHistogram;
-import fr.inria.zvtm.fits.filters.HeatFilter;
-import fr.inria.zvtm.fits.filters.NopFilter;
-import fr.inria.zvtm.fits.filters.RainbowFilter;
 import fr.inria.zvtm.fits.RangeSelection;
 import fr.inria.zvtm.fits.Utils;
-import fr.inria.zvtm.fits.ZScale;
 
 import fr.inria.zvtm.glyphs.PRectangle;
 
@@ -43,16 +38,16 @@ import java.awt.event.MouseWheelEvent;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+
 /**
  * Sample FITS application.
  */
 public class JSkyFitsExample {
 	//shortcut
 	private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE; 
-    private JSkyFitsImage hi;
+    private JSkyFitsImage img;
     private double[] scaleBounds;
     private boolean dragLeft = false, dragRight = false;
-    private RangeSelection rs;
     private View view;
 
 	JSkyFitsExample(String imgUrl) throws IOException {
@@ -66,23 +61,10 @@ public class JSkyFitsExample {
         view.setBackgroundColor(Color.GRAY);
         view.setListener(new PanZoomEventHandler());
 
-        hi = new JSkyFitsImage(imgUrl);
-       // hi.setScaleMethod(JSkyFitsImage.ScaleMethod.LINEAR);
-        vs.addGlyph(hi, false);	
-       
-       // scaleBounds = ZScale.computeScale(hi.getUnderlyingImage());
-       // hi.rescale(scaleBounds[0], scaleBounds[1], 1);
-
-       // FitsHistogram hist = FitsHistogram.fromJSkyFitsImage(hi);
-       // hist.reSize(0.8f);
-       // vs.addGlyph(hist);
-      //  rs = new RangeSelection();
-      //  double min = hi.getUnderlyingImage().getHistogram().getMin();
-       // double max = hi.getUnderlyingImage().getHistogram().getMax();
-       // rs.setTicksVal((scaleBounds[0]-min)/(max-min), (scaleBounds[1]-min)/(max-min));
-       // vs.addGlyph(rs);
-       // rs.move(0, -30);
-        
+        img = new JSkyFitsImage(imgUrl);
+       // img.setColorLookupTable("Heat");
+       // img.setScaleAlgorithm(JSkyFitsImage.ScaleAlgorithm.SQRT);
+        vs.addGlyph(img, false);	
     }
 
     private Point2D.Double viewToSpace(Camera cam, int jpx, int jpy){
@@ -114,21 +96,11 @@ public class JSkyFitsExample {
 
 		public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
             Point2D.Double cursorPos = viewToSpace(vsm.getActiveCamera(), jpx, jpy);
-            if(rs.overLeftTick(cursorPos.x, cursorPos.y)){
-                dragLeft = true;
-            } else if(rs.overRightTick(cursorPos.x, cursorPos.y)){
-                dragRight = true;
-            }
         }
 
 		public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
             dragLeft = false;
             dragRight = false;
-            //double min = hi.getUnderlyingImage().getHistogram().getMin();
-            //double max = hi.getUnderlyingImage().getHistogram().getMax();
-            //hi.rescale(min + rs.getLeftValue()*(max - min),
-            //        min + rs.getRightValue()*(max - min),
-           //         1);
         }
 
 		public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
@@ -161,11 +133,6 @@ public class JSkyFitsExample {
 
 		public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
             if(buttonNumber == 1){
-                if(dragLeft) {
-                    rs.setLeftTickPos(viewToSpace(vsm.getActiveCamera(), jpx, jpy).x);
-                } else if(dragRight){
-                    rs.setRightTickPos(viewToSpace(vsm.getActiveCamera(), jpx, jpy).x);
-                }
             }
 
 			if (buttonNumber == 3 || ((mod == META_MOD || mod == META_SHIFT_MOD) && buttonNumber == 1)){
@@ -195,10 +162,10 @@ public class JSkyFitsExample {
 		public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){
             if(c == '-'){
                 scaleBounds[1] -= 100;
-              //  hi.rescale(scaleBounds[0], scaleBounds[1], 1);
+              //  img.rescale(scaleBounds[0], scaleBounds[1], 1);
             } else if (c == '+'){
                 scaleBounds[1] += 100;
-              //  hi.rescale(scaleBounds[0], scaleBounds[1], 1);
+              //  img.rescale(scaleBounds[0], scaleBounds[1], 1);
             }
         }
 

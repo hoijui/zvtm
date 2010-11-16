@@ -73,14 +73,29 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
     }
 
     public void setScale(float scaleFactor){
+        //XXX
     }
 
+    /**
+     * Sets the color lookup table.
+     * Currently, accepted values are: "Background", "Blue", "Heat", "Isophot", "Light", "Pastel", "Ramp", "Real", "Smooth", "Staircase", "Standard".
+     */
     public void setColorLookupTable(String tableName){
         proc.setColorLookupTable(tableName);
+        proc.update();
     }
 
-    /** Get the bounding box of this Glyph in virtual space coordinates.
-     *@return west, north, east and south bounds in virtual space.
+    /**
+     * Sets the scale algorithm.
+     */
+    public void setScaleAlgorithm(ScaleAlgorithm algorithm){
+        proc.setScaleAlgorithm(algorithm.toJSkyValue());
+        proc.update();
+    }
+
+    /** 
+     * Gets the bounding box of this Glyph in virtual space coordinates.
+     * @return west, north, east and south bounds in virtual space.
      */
     @Override
         public double[] getBounds(){
@@ -271,5 +286,28 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
             return 0;
         }
 
+    public enum ScaleAlgorithm {
+        LINEAR{
+            @Override int toJSkyValue(){
+                return ImageLookup.LINEAR_SCALE;
+            }
+        },
+            LOG{
+                @Override int toJSkyValue(){
+                    return ImageLookup.LOG_SCALE;
+                }
+            },
+            HIST_EQ{
+                @Override int toJSkyValue(){
+                    return ImageLookup.HIST_EQ;
+                }
+            },
+            SQRT{
+                @Override int toJSkyValue(){
+                    return ImageLookup.SQRT_SCALE;
+                }
+            };
+        abstract int toJSkyValue();
+    }
 }
 
