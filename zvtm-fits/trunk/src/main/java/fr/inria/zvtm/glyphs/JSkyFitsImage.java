@@ -11,11 +11,16 @@ import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
 
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.glyphs.projection.RProjectedCoordsP;
 
 import jsky.image.fits.codec.FITSImage;
+import jsky.image.ImageProcessor;
+import jsky.image.ImageLookup;
+
+import javax.media.jai.RenderedImageAdapter;
 
 //Fits support provided by JSky instead of IVOA FITS
 //Note: JSkyFitsImage requires JAI (Java Advanced Imaging)
@@ -31,6 +36,8 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
 
     private RProjectedCoordsP[] pc;
 
+    private ImageProcessor proc;
+
     public JSkyFitsImage(String fileOrUrl){
         try{
             fitsImage = new FITSImage(fileOrUrl);
@@ -40,6 +47,7 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
         }
         vw = fitsImage.getWidth() * scale;
         vh = fitsImage.getHeight() * scale;
+        proc = new ImageProcessor(new RenderedImageAdapter(fitsImage), new Rectangle2D.Double(0,0, fitsImage.getWidth(), fitsImage.getHeight()));
     }
 
     public FITSImage getUnderlyingImage(){
@@ -65,6 +73,10 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
     }
 
     public void setScale(float scaleFactor){
+    }
+
+    public void setColorLookupTable(String tableName){
+        proc.setColorLookupTable(tableName);
     }
 
     /** Get the bounding box of this Glyph in virtual space coordinates.
@@ -178,7 +190,7 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
             double trueCoef = 1; //scaleFactor * coef
             AffineTransform at = AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch);
             g.setTransform(at);
-            g.drawRenderedImage(fitsImage, AffineTransform.getScaleInstance(trueCoef,trueCoef));
+            g.drawRenderedImage(proc.getDisplayImage(), AffineTransform.getScaleInstance(trueCoef,trueCoef));
             g.setTransform(stdT);
         }
 
