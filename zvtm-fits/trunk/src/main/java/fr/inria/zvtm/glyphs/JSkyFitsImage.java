@@ -50,6 +50,9 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
         proc = new ImageProcessor(new RenderedImageAdapter(fitsImage), new Rectangle2D.Double(0,0, fitsImage.getWidth(), fitsImage.getHeight()));
     }
 
+    /**
+     * Returns the underlying FITSImage
+     */
     public FITSImage getUnderlyingImage(){
         return fitsImage;
     }
@@ -90,6 +93,14 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
      */
     public void setScaleAlgorithm(ScaleAlgorithm algorithm){
         proc.setScaleAlgorithm(algorithm.toJSkyValue());
+        proc.update();
+    }
+
+    /**
+     * Sets the cut levels for this image.
+     */
+    public void setCutLevels(double lowCut, double highCut){
+        proc.setCutLevels(lowCut, highCut);
         proc.update();
     }
 
