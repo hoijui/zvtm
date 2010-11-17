@@ -27,9 +27,9 @@ import javax.media.jai.RenderedImageAdapter;
 public class JSkyFitsImage extends ClosedShape implements RectangularShape {
     private FITSImage fitsImage;
 
-    /** Width in virtual space (read-only). */
+    /** Width in virtual space */
     private double vw;
-    /** Height in virtual space (read-only). */
+    /** Height in virtual space */
     private double vh;
 
     private double scale = 1;
@@ -102,6 +102,13 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
     public void setCutLevels(double lowCut, double highCut){
         proc.setCutLevels(lowCut, highCut);
         proc.update();
+    }
+
+    /**
+     * Returns an array containing [lowCut, highCut]
+     */
+    public double[] getCutLevels(){
+        return new double[]{proc.getLowCut(), proc.getHighCut()};
     }
 
     /**
