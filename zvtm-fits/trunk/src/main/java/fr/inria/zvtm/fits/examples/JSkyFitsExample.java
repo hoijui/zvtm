@@ -62,9 +62,6 @@ public class JSkyFitsExample {
         view.setListener(new PanZoomEventHandler());
 
         img = new JSkyFitsImage(imgUrl);
-        //img.setColorLookupTable("Heat");
-       //img.setScaleAlgorithm(JSkyFitsImage.ScaleAlgorithm.SQRT);
-        //img.autoSetCutLevels();
         vs.addGlyph(img, false);	
     }
 

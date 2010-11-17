@@ -75,6 +75,13 @@ $Id: pom.xml 3429 2010-07-20 07:32:30Z rprimet $
       <artifactId>jsky</artifactId>
       <version>3.0</version>
     </dependency>
+    
+    <!-- quick fix for jsky dependencies, should be improved -->
+    <dependency>
+        <groupId>hcompress</groupId>
+        <artifactId>hcompress</artifactId>
+        <version>0.52</version>
+    </dependency>
   </dependencies>
   
   <!-- Build -->
