@@ -14,6 +14,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 
 import fr.inria.zvtm.engine.Camera;
+import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.projection.RProjectedCoordsP;
 
 import jsky.image.fits.codec.FITSImage;
@@ -48,6 +49,7 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
         vw = fitsImage.getWidth() * scale;
         vh = fitsImage.getHeight() * scale;
         proc = new ImageProcessor(new RenderedImageAdapter(fitsImage), new Rectangle2D.Double(0,0, fitsImage.getWidth(), fitsImage.getHeight()));
+        VirtualSpaceManager.INSTANCE.repaint();
     }
 
     /**
@@ -86,6 +88,7 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
     public void setColorLookupTable(String tableName){
         proc.setColorLookupTable(tableName);
         proc.update();
+        VirtualSpaceManager.INSTANCE.repaint();
     }
 
     /**
@@ -94,6 +97,7 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
     public void setScaleAlgorithm(ScaleAlgorithm algorithm){
         proc.setScaleAlgorithm(algorithm.toJSkyValue());
         proc.update();
+        VirtualSpaceManager.INSTANCE.repaint();
     }
 
     /**
@@ -102,6 +106,7 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
     public void setCutLevels(double lowCut, double highCut){
         proc.setCutLevels(lowCut, highCut);
         proc.update();
+        VirtualSpaceManager.INSTANCE.repaint();
     }
 
     /**
