@@ -26,7 +26,8 @@ import javax.media.jai.RenderedImageAdapter;
 //Fits support provided by JSky instead of IVOA FITS
 //Note: JSkyFitsImage requires JAI (Java Advanced Imaging)
 public class JSkyFitsImage extends ClosedShape implements RectangularShape {
-    private FITSImage fitsImage;
+    private final FITSImage fitsImage;
+    private final String imageLocation;
 
     /** Width in virtual space */
     private double vw;
@@ -46,6 +47,7 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
             //XXX change
             throw new Error("Could not create FitsImage: " + e);
         }
+        imageLocation = fileOrUrl;
         vw = fitsImage.getWidth() * scale;
         vh = fitsImage.getHeight() * scale;
         proc = new ImageProcessor(new RenderedImageAdapter(fitsImage), new Rectangle2D.Double(0,0, fitsImage.getWidth(), fitsImage.getHeight()));
@@ -71,6 +73,10 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
     }
 
     @Override public void setHeight(double h){
+    }
+
+    public String getImageLocation(){
+        return imageLocation;
     }
 
     public float getScale(){
