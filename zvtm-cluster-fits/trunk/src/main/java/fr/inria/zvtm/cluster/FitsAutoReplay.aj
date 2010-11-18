@@ -1,6 +1,7 @@
 package fr.inria.zvtm.cluster;
 
 import fr.inria.zvtm.cluster.Identifiable;
+import fr.inria.zvtm.glyphs.JSkyFitsImage;
 import fr.inria.zvtm.glyphs.FitsImage;
 import fr.inria.zvtm.fits.RangeSelection;
 import fr.inria.zvtm.fits.Slider;
@@ -18,6 +19,9 @@ aspect FitsAutoReplay extends AbstractAutoReplay {
          execution(public void FitsImage.rescale(double, double, double)) ||
          execution(public void FitsImage.zRescale()) ||
          execution(public void FitsImage.setColorFilter(FitsImage.ColorFilter)) ||
+         execution(public void JSkyFitsImage.setColorLookupTable(String)) ||
+         execution(public void JSkyFitsImage.setCutLevels(double, double)) ||
+         execution(public void JSkyFitsImage.setScaleAlgorithm(JSkyFitsImage.ScaleAlgorithm)) ||
          execution(public void RangeSelection.setTicksVal(double, double)) ||
          execution(public void RangeSelection.setLeftTickPos(double)) ||
          execution(public void RangeSelection.setRightTickPos(double)) ||

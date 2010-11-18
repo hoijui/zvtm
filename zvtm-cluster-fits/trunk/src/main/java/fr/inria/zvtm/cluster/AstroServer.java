@@ -31,14 +31,7 @@ public class AstroServer extends NanoHTTPD {
             return new NanoHTTPD.Response(HTTP_BADREQUEST, MIME_PLAINTEXT, "missing parameter 'image'\n");
         }
 
-        URL imgUrl;
-        try{
-            imgUrl = new URL(image);
-        } catch (MalformedURLException ex){
-            return new NanoHTTPD.Response(HTTP_BADREQUEST, MIME_PLAINTEXT, "image URL error (required image: " + image + ")\n");
-        } 
-
-        delegate.addImage(imgUrl);
+        delegate.addImage(image);
 
         return new NanoHTTPD.Response(HTTP_OK, MIME_PLAINTEXT, "addpage successful\n");
     }

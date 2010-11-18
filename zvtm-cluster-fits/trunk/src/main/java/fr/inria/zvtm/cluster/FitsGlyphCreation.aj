@@ -8,6 +8,7 @@ import java.net.URL;
 
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.glyphs.FitsImage;
+import fr.inria.zvtm.glyphs.JSkyFitsImage;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.LGRectangle;
 import fr.inria.zvtm.fits.RangeSelection;
@@ -16,6 +17,10 @@ import fr.inria.zvtm.fits.Slider;
 public aspect FitsGlyphCreation {
     @Override GlyphReplicator FitsImage.getReplicator(){
         return new FitsImageReplicator(this);
+    }
+
+    @Override GlyphReplicator JSkyFitsImage.getReplicator(){
+        return new JSkyFitsImageReplicator(this);
     }
 
     @Override GlyphReplicator RangeSelection.getReplicator(){
@@ -43,6 +48,24 @@ public aspect FitsGlyphCreation {
         Glyph doCreateGlyph(){
             try{
                 return new FitsImage(0.,0.,0,imageLocation, scaleFactor);
+            } catch(Exception e){
+                //XXX error handling
+                throw new Error(e);
+            }
+        }
+    }
+
+    private static class JSkyFitsImageReplicator extends GlyphCreation.ClosedShapeReplicator {
+        private final String fileOrUrl;
+        
+        JSkyFitsImageReplicator(JSkyFitsImage source){
+            super(source);
+            this.fileOrUrl = source.getImageLocation();
+        }
+
+        Glyph doCreateGlyph(){
+            try{
+                return new JSkyFitsImage(fileOrUrl);
             } catch(Exception e){
                 //XXX error handling
                 throw new Error(e);

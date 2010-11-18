@@ -29,13 +29,14 @@ import fr.inria.zvtm.fits.Grid;
 import fr.inria.zvtm.fits.RangeSelection;
 import fr.inria.zvtm.fits.filters.*;
 import fr.inria.zvtm.fits.ZScale;
-import fr.inria.zvtm.glyphs.FitsImage;
+import fr.inria.zvtm.glyphs.JSkyFitsImage;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VImage;
 import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VText;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.LinearGradientPaint;
 import java.awt.Dimension;
 import java.awt.geom.Point2D;
@@ -61,12 +62,12 @@ public class AstroRad {
     private VirtualSpace controlSpace;
     private Camera imageCamera; 
     private Camera controlCamera; 
-    private final List<FitsImage> images = new ArrayList<FitsImage>();
+    private final List<JSkyFitsImage> images = new ArrayList<JSkyFitsImage>();
     private RangeManager range;
     private SliderManager slider;
     private ComboBox combo;
-    private FitsImage selectedImage = null;
-    private FitsImage draggedImage = null;
+    private JSkyFitsImage selectedImage = null;
+    private JSkyFitsImage draggedImage = null;
     private FitsHistogram hist;
     private VText wcsCoords;
     private WallCursor ctrlCursor;
@@ -83,10 +84,10 @@ public class AstroRad {
     // - image thumbnail (tile)
     // - xfer function chooser
 
-    public AstroRad(URL imgUrl, AROptions options){
+    public AstroRad(String fileOrUrl, AROptions options){
         this.options = options;
         setup();
-        addImage(imgUrl);
+        addImage(fileOrUrl);
     }
 
     private void setup(){
@@ -158,6 +159,12 @@ public class AstroRad {
                        slider.onDrag(pos.x, pos.y);
                        imgCursorDragged(imgCurPos.x, imgCurPos.y);
                    }
+
+                   if(selectedImage != null){
+                       Point2D.Double coords = selectedImage.pix2wcs(imgCurPos.x - (selectedImage.vx - (selectedImage.getWidth()/2)), imgCurPos.y - (selectedImage.vy - (selectedImage.getHeight()/2)));
+                       wcsCoords.setText(coords == null? "unknown coords" : String.format("%+09.4f %+09.4f", coords.x, coords.y)); 
+
+                   }
                }
                public void pressed(boolean pressed){
                    //forward click events to RangeSel
@@ -194,7 +201,7 @@ public class AstroRad {
     //@param width approximate width for the control zone 
     //@param height approximate height for the control zone
     private void setupControlZone(double x, double y, double width, double height){
-        range = new RangeManager(controlSpace, 0, 500, width);
+        range = new RangeManager(controlSpace, 0, height/8, width);
 
         combo = new ComboBox(controlSpace, -height/4, -height/5, 
                 new String[]{"gray", "heat", "rainbow"}, 
@@ -208,11 +215,10 @@ public class AstroRad {
                 if(selectedImage == null){
                     return;
                 }
-                double min = selectedImage.getUnderlyingImage().getHistogram().getMin();
-                double max = selectedImage.getUnderlyingImage().getHistogram().getMax();
-                selectedImage.rescale(min + low*(max - min),
-                    min + high*(max - min),
-                    1);
+                double min = selectedImage.getMinValue();
+                double max = selectedImage.getMaxValue();
+                selectedImage.setCutLevels(min + low*(max - min),
+                    min + high*(max - min));
             }
         });
 
@@ -224,11 +230,11 @@ public class AstroRad {
                 }
 
                 if(activeIdx == 0){
-                    selectedImage.setColorFilter(FitsImage.ColorFilter.NOP);
+                    selectedImage.setColorLookupTable("Ramp");
                 } else if(activeIdx == 1){
-                    selectedImage.setColorFilter(FitsImage.ColorFilter.HEAT);
+                    selectedImage.setColorLookupTable("Heat");
                 } else {
-                    selectedImage.setColorFilter(FitsImage.ColorFilter.RAINBOW);
+                    selectedImage.setColorLookupTable("Standard");
                 }
             }
         });
@@ -243,13 +249,14 @@ public class AstroRad {
             }
         });
 
-        wcsCoords = new VText(-width/4, height/3, 0, Color.YELLOW, "unknown coords");
+        wcsCoords = new VText(-width/4 + 100, height/3 - 100, 0, Color.YELLOW, "unknown coords", VText.TEXT_ANCHOR_MIDDLE, 15);
         controlSpace.addGlyph(wcsCoords);
+        wcsCoords.setFont(new Font("Monospaced", Font.PLAIN, 12));
     }
 
     private void imgCursorPressed(double x, double y){
         int highestZindex = -1;
-        for(FitsImage img: images){
+        for(JSkyFitsImage img: images){
             if(AstroUtil.isInside(img, x, y) && (img.getZindex() > highestZindex)){
                 draggedImage = img;
             }
@@ -267,17 +274,18 @@ public class AstroRad {
         draggedImage.moveTo(x, y);
     }
 
-    private void addImage(URL imgUrl, double x, double y){
+    private void addImage(String imgUrl, double x, double y){
         try{
-            FitsImage image = new FitsImage(0,0,0,imgUrl);
+            JSkyFitsImage image = new JSkyFitsImage(imgUrl);
             images.add(image);
             imageSpace.addGlyph(image);
-            Grid grid = Grid.makeGrid(image, 130, 80);
-            image.setGrid(grid);
-            imageSpace.addGlyph(grid);
-            double[] scaleBounds = ZScale.computeScale(image.getUnderlyingImage());
+            //Grid grid = Grid.makeGrid(image, 130, 80);
+            //image.setGrid(grid);
+            //imageSpace.addGlyph(grid);
+            //double[] scaleBounds = ZScale.computeScale(image.getUnderlyingImage());
+            double[] scaleBounds = null;
             if(scaleBounds != null){
-                image.rescale(scaleBounds[0], scaleBounds[1], 1.);
+                image.setCutLevels(scaleBounds[0], scaleBounds[1]);
             }
             imageFocusChanged(image);
         } catch(Exception ex){
@@ -286,15 +294,15 @@ public class AstroRad {
     }
 
     //package-accessible (may be invoked by an embedded web server)
-    void addImage(URL imgUrl){
-        addImage(imgUrl, 0, 0);
+    void addImage(String fileOrUrl){
+        addImage(fileOrUrl, 0, 0);
     }
 
-    private void imageFocusChanged(FitsImage focused){
+    private void imageFocusChanged(JSkyFitsImage focused){
         if(focused == null){
             return;
         }
-        for(FitsImage img: images){
+        for(JSkyFitsImage img: images){
             img.setDrawBorder(false);
             imageSpace.atBottom(img, UNSEL_IMG_ZINDEX); 
         }
@@ -302,34 +310,23 @@ public class AstroRad {
         focused.setStrokeWidth(3); //XXX move to addImage
         focused.setDrawBorder(true);
         imageSpace.onTop(focused, SEL_IMG_ZINDEX);
-        if(focused.getGrid() != null){
-            imageSpace.above(focused.getGrid(), focused);
-        }
+        //if(focused.getGrid() != null){
+        //    imageSpace.above(focused.getGrid(), focused);
+        //}
         if(hist != null){
             controlSpace.removeGlyph(hist);
         }
-        hist = FitsHistogram.fromFitsImage(focused, Color.YELLOW);
+        //hist = FitsHistogram.fromJSkyFitsImage(focused, Color.YELLOW);
+        //controlSpace.addGlyph(hist);
+        //hist.sizeTo(3000);
+        //hist.move(-1500, 1300);
         slider.setTickVal(focused.getTranslucencyValue());
-       // double histWidth = hist.getBounds()[2] - hist.getBounds()[0];
-       // double rsWidth = rangeSel.getBounds()[2] - rangeSel.getBounds()[0];
-       // System.err.println("histWidth: " + histWidth);
-       // System.err.println("hist size: " + hist.getSize());
-       // System.err.println("rsWidth: " + rsWidth);
-       // System.err.println("rs size: " + rangeSel.getSize());
-        controlSpace.addGlyph(hist);
-        hist.sizeTo(3000);
-       // System.err.println("new hist size: " + rsWidth * hist.getSize()/histWidth);
-       // hist.sizeTo(rsWidth * hist.getSize()/histWidth * 0.9);
-       // System.err.println("new hist size(control): " + hist.getSize());
-       // System.err.println("new hist width: " + (hist.getBounds()[2] - hist.getBounds()[0]));
-        //hist.move(-rsWidth/2, 30);
-        hist.move(-1500, 1300);
 
         //draw bounding boxes around histogram and range selection?
 
-        double min = focused.getUnderlyingImage().getHistogram().getMin();
-        double max = focused.getUnderlyingImage().getHistogram().getMax();
-        double[] scaleParams = focused.getScaleParams();
+        double min = focused.getMinValue();
+        double max = focused.getMaxValue();
+        double[] scaleParams = focused.getCutLevels();
         range.setTicksVal((scaleParams[0]-min)/(max-min), (scaleParams[1]-min)/(max-min));
 
         selectedImage = focused;
@@ -360,7 +357,7 @@ public class AstroRad {
             System.exit(0);
         }
 
-        AstroRad ar = new AstroRad(new URL(args[0]), options);
+        AstroRad ar = new AstroRad(args[0], options);
         new AstroServer(ar, 8000);
 
     }
@@ -409,9 +406,9 @@ public class AstroRad {
 
         public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
             if(options.debugView && selectedImage != null){
-                Point2D.Double spcCoords = masterView.getPanel().viewToSpaceCoords(imageCamera, jpx, jpy);
-                Point2D.Double coords = selectedImage.pix2wcs(spcCoords.x - (selectedImage.vx - (selectedImage.getWidth()/2)), spcCoords.y - (selectedImage.vy - (selectedImage.getHeight()/2)));
-                wcsCoords.setText(coords == null? "unknown coords" : coords.x + ", " + coords.y); 
+               // Point2D.Double spcCoords = masterView.getPanel().viewToSpaceCoords(imageCamera, jpx, jpy);
+               // Point2D.Double coords = selectedImage.pix2wcs(spcCoords.x - (selectedImage.vx - (selectedImage.getWidth()/2)), spcCoords.y - (selectedImage.vy - (selectedImage.getHeight()/2)));
+               // wcsCoords.setText(coords == null? "unknown coords" : coords.x + ", " + coords.y); 
             }
         }
 
