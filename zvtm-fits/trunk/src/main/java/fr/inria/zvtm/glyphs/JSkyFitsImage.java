@@ -51,7 +51,6 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
         vw = fitsImage.getWidth() * scale;
         vh = fitsImage.getHeight() * scale;
         proc = new ImageProcessor(new RenderedImageAdapter(fitsImage), new Rectangle2D.Double(0,0, fitsImage.getWidth(), fitsImage.getHeight()));
-        VirtualSpaceManager.INSTANCE.repaint();
     }
 
     /**
@@ -77,6 +76,14 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
 
     public String getImageLocation(){
         return imageLocation;
+    }
+
+    public double getMinValue(){
+        return proc.getMinValue();
+    }
+    
+    public double getMaxValue(){
+        return proc.getMaxValue();
     }
 
     public float getScale(){
@@ -249,7 +256,11 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
             double trueCoef = 1; //scaleFactor * coef
             AffineTransform at = AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch);
             g.setTransform(at);
+            if(alphaC != null){
+                g.setComposite(alphaC);
+            }
             g.drawRenderedImage(proc.getDisplayImage(), AffineTransform.getScaleInstance(trueCoef,trueCoef));
+            g.setComposite(acO);
             g.setTransform(stdT);
         }
 
