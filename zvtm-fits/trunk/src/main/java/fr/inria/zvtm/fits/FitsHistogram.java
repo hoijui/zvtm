@@ -56,5 +56,6 @@ public class FitsHistogram extends Composite {
     public static FitsHistogram fromFitsImage(FitsImage image){
         return fromFitsImage(image, DEFAULT_FILL_COLOR);
     }
+
 }
 

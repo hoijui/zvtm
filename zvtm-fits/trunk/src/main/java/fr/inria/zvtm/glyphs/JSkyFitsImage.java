@@ -11,12 +11,15 @@ import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.projection.RProjectedCoordsP;
 
+import jsky.coords.WCSTransform;
+import jsky.image.fits.FITSKeywordProvider;
 import jsky.image.fits.codec.FITSImage;
 import jsky.image.ImageProcessor;
 import jsky.image.ImageLookup;
@@ -28,6 +31,8 @@ import javax.media.jai.RenderedImageAdapter;
 public class JSkyFitsImage extends ClosedShape implements RectangularShape {
     private final FITSImage fitsImage;
     private final String imageLocation;
+    private final WCSTransform wcsTransform;
+    private final ImageProcessor proc;
 
     /** Width in virtual space */
     private double vw;
@@ -38,7 +43,6 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
 
     private RProjectedCoordsP[] pc;
 
-    private ImageProcessor proc;
 
     public JSkyFitsImage(String fileOrUrl){
         try{
@@ -51,6 +55,7 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
         vw = fitsImage.getWidth() * scale;
         vh = fitsImage.getHeight() * scale;
         proc = new ImageProcessor(new RenderedImageAdapter(fitsImage), new Rectangle2D.Double(0,0, fitsImage.getWidth(), fitsImage.getHeight()));
+        wcsTransform = new WCSTransform(new FITSKeywordProvider(fitsImage));
     }
 
     /**
@@ -142,6 +147,22 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
      */
     public void autoSetCutLevels(){
         autoSetCutLevels(new Rectangle2D.Double(0,0,fitsImage.getWidth(),fitsImage.getHeight()));
+    }
+
+    /**
+     * Converts pixel coordinates to World Coordinates. Returns null if the WCSTransform is not valid.
+     * @param x x-coordinates, in the FITS system: (0,0) lower left, x axis increases to the right, y axis increases upwards
+     * @param y y-coordinates, in the FITS system: (0,0) lower left, x axis increases to the right, y axis increases upwards
+     */
+    public Point2D.Double pix2wcs(double x, double y){
+        return wcsTransform.pix2wcs(x, y);
+    }
+
+    /**
+     * Converts World Coordinates to pixel coordinates. Returns null if the WCSTransform is invalid, or if the WCS position does not fall within the image.
+     */
+    public Point2D.Double wcs2pix(double ra, double dec){
+        return wcsTransform.wcs2pix(ra, dec);
     }
 
     /** 
