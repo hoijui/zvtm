@@ -25,7 +25,7 @@ import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.fits.FitsHistogram;
-import fr.inria.zvtm.fits.Grid;
+//import fr.inria.zvtm.fits.Grid;
 import fr.inria.zvtm.fits.RangeSelection;
 import fr.inria.zvtm.fits.filters.*;
 import fr.inria.zvtm.fits.ZScale;
@@ -271,7 +271,38 @@ public class AstroRad {
         if(draggedImage == null){
             return;
         }
-        draggedImage.moveTo(x, y);
+        //implement snapping here
+        JSkyFitsImage snapTo = getSnapCandidate(draggedImage);
+        double UNSNAP_DISTANCE = 100;
+        if((snapTo != null) && (distance(x, y, draggedImage) < draggedImage.getSize() + UNSNAP_DISTANCE)){
+            draggedImage.moveTo(snapTo.vx, snapTo.vy);
+        } else {
+            draggedImage.moveTo(x, y);
+        }
+    }
+
+    /**
+     * Returns the first snap candidate.
+     */
+    private JSkyFitsImage getSnapCandidate(JSkyFitsImage image){
+        final double SNAP_DISTANCE = 90; //pixels
+        JSkyFitsImage retval = null;
+        for(JSkyFitsImage candidate: images){
+            if((candidate != image) && 
+                    (distance(candidate, image) <= SNAP_DISTANCE)){
+                retval = candidate;
+            }
+        }
+        return retval;
+    }
+
+    //manhattan distance
+    private double distance(JSkyFitsImage a, JSkyFitsImage b){
+        return Math.abs(a.vx - b.vx) + Math.abs(a.vy - b.vy);
+    }
+
+    private double distance(double x, double y, JSkyFitsImage image){
+        return Math.abs(x-image.vx) + Math.abs(y-image.vy);
     }
 
     private void addImage(String imgUrl, double x, double y){
