@@ -357,9 +357,7 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
 
     @Override 
         public double getSize(){
-            //return (Math.sqrt((bbox[1] - bbox[3])*(bbox[1] - bbox[3]) + 
-            //            (bbox[2] - bbox[0])*(bbox[2] - bbox[0])));
-            return 0;
+            return Math.sqrt(getWidth() * getWidth() + getHeight() * getHeight());
         }
 
     public enum ScaleAlgorithm {
