@@ -273,8 +273,8 @@ public class AstroRad {
         }
         //implement snapping here
         JSkyFitsImage snapTo = getSnapCandidate(draggedImage);
-        double UNSNAP_DISTANCE = 100;
-        if((snapTo != null) && (distance(x, y, draggedImage) < draggedImage.getSize() + UNSNAP_DISTANCE)){
+        double UNSNAP_DISTANCE = 200;
+        if((snapTo != null) && (distance(x, y, draggedImage) < UNSNAP_DISTANCE)){
             draggedImage.moveTo(snapTo.vx, snapTo.vy);
         } else {
             draggedImage.moveTo(x, y);
