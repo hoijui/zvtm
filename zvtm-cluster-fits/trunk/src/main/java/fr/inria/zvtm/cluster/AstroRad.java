@@ -310,10 +310,6 @@ public class AstroRad {
             JSkyFitsImage image = new JSkyFitsImage(imgUrl);
             images.add(image);
             imageSpace.addGlyph(image);
-            //Grid grid = Grid.makeGrid(image, 130, 80);
-            //image.setGrid(grid);
-            //imageSpace.addGlyph(grid);
-            //double[] scaleBounds = ZScale.computeScale(image.getUnderlyingImage());
             double[] scaleBounds = null;
             if(scaleBounds != null){
                 image.setCutLevels(scaleBounds[0], scaleBounds[1]);
@@ -341,9 +337,6 @@ public class AstroRad {
         focused.setStrokeWidth(3); //XXX move to addImage
         focused.setDrawBorder(true);
         imageSpace.onTop(focused, SEL_IMG_ZINDEX);
-        //if(focused.getGrid() != null){
-        //    imageSpace.above(focused.getGrid(), focused);
-        //}
         if(hist != null){
             controlSpace.removeGlyph(hist);
         }
