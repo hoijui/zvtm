@@ -80,10 +80,6 @@ public class AstroRad {
 
     private View masterView;
 
-    //todo:
-    // - image thumbnail (tile)
-    // - xfer function chooser
-
     public AstroRad(String fileOrUrl, AROptions options){
         this.options = options;
         setup();
@@ -305,11 +301,16 @@ public class AstroRad {
         return Math.abs(x-image.vx) + Math.abs(y-image.vy);
     }
 
-    private void addImage(String imgUrl, double x, double y){
+    private void addImage(String fileOrUrl, double x, double y){
         try{
-            JSkyFitsImage image = new JSkyFitsImage(imgUrl);
+            JSkyFitsImage image = new JSkyFitsImage(fileOrUrl);
             images.add(image);
             imageSpace.addGlyph(image);
+            VText source = new VText(0,0,0, Color.PINK, fileOrUrl, VText.TEXT_ANCHOR_START, 6);
+            source.moveTo(image.vx - image.getWidth()/2, image.vy - (image.getHeight()/2 + 70));
+            imageSpace.addGlyph(source);
+            image.stick(source);
+            
             double[] scaleBounds = null;
             if(scaleBounds != null){
                 image.setCutLevels(scaleBounds[0], scaleBounds[1]);
