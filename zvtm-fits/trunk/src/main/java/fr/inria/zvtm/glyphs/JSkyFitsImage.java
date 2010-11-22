@@ -333,17 +333,6 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
             reSize(newSize/getSize()); 
         }
 
-    @Override 
-        public void move(double dx, double dy){
-            vx += dx;
-            vy += dy;
-        }
-
-    @Override
-        public void moveTo(double x, double y){
-            move(x - vx, y - vy);
-        }
-
     @Override
         public boolean visibleInRegion(double wb, double nb, double eb, double sb, int i){
            return true;
