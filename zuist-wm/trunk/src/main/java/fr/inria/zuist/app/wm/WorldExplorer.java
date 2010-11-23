@@ -336,11 +336,11 @@ public class WorldExplorer implements Java2DPainter {
 
     static void printCmdLineHelp(){
         System.out.println("Usage:\n\tjava -Xmx1024M -Xms512M -jar target/zuist-wm-X.X.X.jar <path_to_scene_dir> [options]");
-		System.out.println("\n\tqgn: query geonames.org Web service");
-		System.out.println("\tladN: display N-th level administrative division boundaries (countries, states, provinces, ...)");
-		System.out.println("\tair: display air traffic data");
-		System.out.println("\tfs: run application fullscreen");
-		System.out.println("\topengl: use Java2D OpenGL pipeline for rendering");
+		System.out.println("\n\t-qgn: query geonames.org Web service");
+		System.out.println("\t-ladN: display N-th level administrative division boundaries (countries, states, provinces, ...)");
+		System.out.println("\t-air[N]: display air traffic data, optional N integer value represents min route weight to be displayed");
+		System.out.println("\t-fs: run application fullscreen");
+		System.out.println("\t-opengl: use Java2D OpenGL pipeline for rendering");
         System.out.println("\t-aa: enable antialiasing");
 		System.exit(0);
     }
