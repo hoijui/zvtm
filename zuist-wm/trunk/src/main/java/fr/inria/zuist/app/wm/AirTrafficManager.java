@@ -43,7 +43,7 @@ import org.antlr.runtime.tree.CommonTree;
 
 class AirTrafficManager {
     
-	static int MIN_WEIGHT = 400000;
+	static int MIN_WEIGHT = 500000;
 	
 	static final int AIRPORT_NODE_SIZE = 25;
 	
@@ -298,6 +298,8 @@ class AirTrafficManager {
 	
 	Glyph[] airportInfo = new Glyph[5];
 	
+	boolean isHighlighting = false;
+	
 	void highlight(Glyph g){
 		g.setColor(HIGHLIGHT_COLOR);
 		LNode n = (LNode)g.getOwner();
@@ -327,10 +329,12 @@ class AirTrafficManager {
 			for (Glyph g3:airportInfo){
     			application.bSpace.addGlyph(g3);			    
 			}
+			isHighlighting = true;
 		}
 	}
 
 	void unhighlight(Glyph g){
+	    if (g == null){return;}
 		g.setColor(AIRPORT_FILL_COLOR);
 		for (Glyph g3:airportInfo){
             if (g3 == null){continue;}
@@ -348,6 +352,7 @@ class AirTrafficManager {
 		}
 		highlightedElements.clear();
 		dimmedElements.clear();
+	    isHighlighting = false;
 	}
     
     /* ---------------------- Bring and go -----------------------------*/
@@ -537,15 +542,15 @@ class AirTrafficManager {
     			}
     			
     			Animation a1 = AM.getAnimationFactory().createCameraAltAnim(FOLLOW_ANIM_DURATION/2, application.mCamera,
-                    zoomout, false, IdentityInterpolator.getInstance(), null);
+                    zoomout, true, IdentityInterpolator.getInstance(), null);
     			Animation a2 = AM.getAnimationFactory().createCameraTranslation(FOLLOW_ANIM_DURATION/2, application.mCamera,
-                    trans, false, IdentityInterpolator.getInstance(), null);
+                    trans, true, IdentityInterpolator.getInstance(), null);
                 AM.startAnimation(a1, false);
                 AM.startAnimation(a2, false);
     			a1 = AM.getAnimationFactory().createCameraAltAnim(FOLLOW_ANIM_DURATION/2, application.mCamera,
-                    zoomin, false, IdentityInterpolator.getInstance(), null);
+                    zoomin, true, IdentityInterpolator.getInstance(), null);
     			a2 = AM.getAnimationFactory().createCameraTranslation(FOLLOW_ANIM_DURATION/2, application.mCamera,
-                    trans, false, IdentityInterpolator.getInstance(),
+                    trans, true, IdentityInterpolator.getInstance(),
                     new EndAction(){
                         public void execute(Object subject, Animation.Dimension dimension){
                             application.sm.setUpdateLevel(true);

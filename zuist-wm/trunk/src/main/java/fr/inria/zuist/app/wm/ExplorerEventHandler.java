@@ -126,6 +126,9 @@ class ExplorerEventHandler implements ViewListener, CameraListener, ComponentLis
 		        if (mode == MODE_BRINGANDGO){
         			application.ga.bringFor(g);		            
 		        }
+		        else if (mode == MODE_HIGHLIGHTING){
+        		    application.ga.highlight(g);
+        		}
 		    }
 		}
 		else {
@@ -140,6 +143,9 @@ class ExplorerEventHandler implements ViewListener, CameraListener, ComponentLis
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
         if (application.ga.isBringingAndGoing){
 			application.ga.endBringAndGo(v.lastGlyphEntered());
+		}
+		if (application.ga.isHighlighting){
+		    application.ga.unhighlight(g);
 		}
         if (application.isDynaspotEnabled() && !inPortal && !v.getVCursor().isDynaSpotActivated()){v.getVCursor().activateDynaSpot(true);}
 		regionStickedToMouse = false;
@@ -159,8 +165,13 @@ class ExplorerEventHandler implements ViewListener, CameraListener, ComponentLis
     	lastVY = v.getVCursor().vy;
     	if (application.isDynaspotEnabled()){
         	Glyph g = v.getVCursor().dynaPick(application.bCamera);
-        	if (g.getType().equals(GeoToolsManager.CITY)){
-            	application.displayFeatureInfo((g != null) ? (Toponym)g.getOwner() : null, g);        	    
+        	if (g != null){
+        	    if (g.getType().equals(GeoToolsManager.CITY)){
+            	    application.displayFeatureInfo((g != null) ? (Toponym)g.getOwner() : null, g);
+            	}
+            	else if (mode == MODE_HIGHLIGHTING && g.getType().equals(AirTrafficManager.AIRP)){
+        		    application.ga.highlight(g);
+            	}     	    
         	}
     	}
     }
@@ -297,24 +308,18 @@ class ExplorerEventHandler implements ViewListener, CameraListener, ComponentLis
 		if (application.ga.isBringingAndGoing && g.getType().equals(AirTrafficManager.AIRP)){
 			application.ga.attemptToBring(g);
 		}
-		else if (mode == MODE_HIGHLIGHTING){
-		    application.ga.highlight(g);
-		}
-        else if (g instanceof VPolygon){
-            ((VPolygon)g).setFilled(true);
-            g.setTranslucencyValue(.5f);
-        }
+        //else if (g instanceof VPolygon){
+        //    ((VPolygon)g).setFilled(true);
+        //    g.setTranslucencyValue(.1f);
+        //}
 
     }
 
     public void exitGlyph(Glyph g){
-        if (g instanceof VPolygon){
-            ((VPolygon)g).setFilled(false);
-            g.setTranslucencyValue(1f);
-        }
-		else if (mode == MODE_HIGHLIGHTING){
-		    application.ga.unhighlight(g);
-		}
+        //if (g instanceof VPolygon){
+        //    ((VPolygon)g).setFilled(false);
+        //    g.setTranslucencyValue(1f);
+        //}
     }
 
     int ci = 1180;
@@ -341,7 +346,7 @@ class ExplorerEventHandler implements ViewListener, CameraListener, ComponentLis
     static final short MODE_HIGHLIGHTING = 0;
 	static final short MODE_BRINGANDGO = 1;
 	//static final short MODE_LINKSLIDER = 2;
-	short mode = MODE_HIGHLIGHTING;
+	short mode = MODE_BRINGANDGO;
 	
 	void toggleTopoNav(){
 		switch(mode){
