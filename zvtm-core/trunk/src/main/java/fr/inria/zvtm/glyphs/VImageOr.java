@@ -331,7 +331,7 @@ public class VImageOr extends VImage {
         }
         else {
             g.setColor(this.borderColor);
-            g.fillRect(pc[i].lcx,pc[i].lcy,1,1);
+            g.fillRect(pc[i].cx, pc[i].cy, 1, 1);
         }
     }
 
