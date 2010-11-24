@@ -38,8 +38,10 @@ public aspect AutoReplay extends AbstractAutoReplay {
         if(replayTarget.isReplicated()) && 
         (
          //Glyph methods
-         execution(public void Glyph.move(double, double))	||
-         execution(public void Glyph.moveTo(double, double))	||
+
+         //Glyph.move and Glyph.moveTo moved to a static Delta (see GlyphReplication)
+         //execution(public void Glyph.move(double, double))	||
+         //execution(public void Glyph.moveTo(double, double))	||
          execution(public void Glyph.reSize(double))	||
          execution(public void Glyph.sizeTo(double))	||
          execution(public void Glyph.setBorderColor(Color))	||
@@ -60,7 +62,8 @@ public aspect AutoReplay extends AbstractAutoReplay {
          execution(public void DPath.addSegment(double, double, boolean)) ||  
          execution(public void DPath.addCbCurve(double, double, double, double, double, double, boolean)) ||  
          execution(public void DPath.addQdCurve(double, double, double, double, boolean)) ||  
-         execution(public void DPath.edit(Point2D.Double[], boolean)) ||  
+         //DPath.edit moved to a static Delta (see GlyphReplication)
+         //execution(public void DPath.edit(Point2D.Double[], boolean)) ||  
          execution(public void RectangularShape.setHeight(double)) ||  
          execution(public void RectangularShape.setWidth(double)) ||
          execution(public void VirtualSpace.show(Glyph)) ||

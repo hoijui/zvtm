@@ -1,3 +1,6 @@
+Moved some common operations from AutoReplay to static Deltas in GlyphReplication.
+This is meant to increase performance, especially where animations are concerned.
+
 Added z-index replication at glyph construction (in addition to the already
 existing onTop... support)
 
