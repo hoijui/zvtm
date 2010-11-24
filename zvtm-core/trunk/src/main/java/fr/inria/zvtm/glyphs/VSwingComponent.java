@@ -86,8 +86,8 @@ public class VSwingComponent extends ClosedShape implements RectangularShape {
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
      *@param z z-index (pass 0 if you do not use z-ordering)
-     *@param img image to be displayed
      *@param c Swing component to be displayed
+     *@param scale scaleFactor w.r.t original component size
      */
     public VSwingComponent(double x, double y, int z, JComponent c, double scale){
         this(x, y, z, c, scale, 0, 1.0f);

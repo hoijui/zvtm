@@ -262,7 +262,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
      * a given camera.
      * @param cam camera
      * @param jpx x coordinate in the panel system
-     * @param jpx y coordinate in the panel system
+     * @param jpy y coordinate in the panel system
      */
     public Point2D.Double viewToSpaceCoords(Camera cam, int jpx, int jpy){
         Location camLoc = cam.getLocation();

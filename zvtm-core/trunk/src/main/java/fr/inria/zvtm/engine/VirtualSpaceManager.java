@@ -239,7 +239,7 @@ public class VirtualSpaceManager implements AWTEventListener {
      *@param bar true -&gt; add a status bar to this view (below main panel)
      *@param visible should the view be made visible automatically or not
      *@param mnb a menu bar (null if none), already configured with ActionListeners already attached to items (it is just added to the view)
-     *@see #addFrameView(Vector c, String name, short viewType, int w, int h, boolean bar, boolean visible, boolean decorated, JMenuBar mnb)
+     *@see #addFrameView(List c, String name, short viewType, int w, int h, boolean bar, boolean visible, boolean decorated, JMenuBar mnb)
      */
     public View addFrameView(List<Camera> c, String name, short viewType, int w, int h,
 				boolean bar, boolean visible, JMenuBar mnb){
@@ -257,7 +257,7 @@ public class VirtualSpaceManager implements AWTEventListener {
      *@param visible should the view be made visible automatically or not
      *@param decorated should the view be decorated with the underlying window manager's window frame or not
      *@param mnb a menu bar (null if none), already configured with ActionListeners already attached to items (it is just added to the view)
-     *@see #addFrameView(Vector c, String name, short viewType, int w, int h, boolean bar, boolean visible, JMenuBar mnb)
+     *@see #addFrameView(List c, String name, short viewType, int w, int h, boolean bar, boolean visible, JMenuBar mnb)
      */
     public View addFrameView(List<Camera> c, String name, short viewType, int w, int h,
 				boolean bar, boolean visible, boolean decorated, JMenuBar mnb){
