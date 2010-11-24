@@ -185,7 +185,7 @@
         <dependency>
             <groupId>fr.inria.zvtm</groupId>
             <artifactId>zvtm-cluster</artifactId>
-            <version>0.2.5-SNAPSHOT</version>
+            <version>0.2.6-SNAPSHOT</version>
             <exclusions>
                 <exclusion>
                     <groupId>fr.inria.zvtm</groupId> 
