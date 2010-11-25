@@ -117,7 +117,7 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
                 <dependency>
                     <groupId>fr.inria.zvtm</groupId>
                     <artifactId>zvtm-cluster</artifactId>
-                    <version>0.2.5-SNAPSHOT</version>
+                    <version>0.2.6-SNAPSHOT</version>
                 </dependency>
                 <dependency>
                     <groupId>org.aspectj</groupId>
