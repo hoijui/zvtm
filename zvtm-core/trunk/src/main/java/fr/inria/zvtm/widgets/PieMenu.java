@@ -108,6 +108,33 @@ public abstract class PieMenu {
         }
         return -1;
     }
+
+	/** Get the menu item at a given index. 
+	 * Menu items are ordered counter clockwise, starting with the element placed at the start angle.
+	 *@param i item index
+	 *@return null if i > item count 
+	 */
+	public Glyph getItem(int i){
+		if (i < items.length){
+			return items[i];
+		}
+		else {
+			return null;
+		}
+	}
+	
+	/** Get the menu item that has a given label.
+	 *@param label item label.
+	 *@return null if no item has this label.
+	 */
+	public Glyph getItem(String label){
+		for (int i=0;i<items.length;i++){
+			if (labels[i].getText().equals(label)){
+				return items[i];
+			}
+		}
+		return null;
+	}
     
     public void setSensitivity(boolean b){
         for (int i=0;i<items.length;i++){
