@@ -718,7 +718,7 @@ public abstract class View {
         *@param c Camera to be moved
         *@param d duration of the animation in ms
         *@param z if false, do not (un)zoom, just translate (default is true)
-        *@param mFactor magnification factor: 1.0 (default) means that the glyph will occupy the whole screen. mFactor < 1 will make the glyph smaller (zoom out). mFactor > 1 will make the glyph appear bigger (zoom in)
+        *@param mFactor magnification factor: 1.0 (default) means that the glyph will occupy the whole screen. mFactor > 1 will make the glyph smaller (zoom out). mFactor < 1 will make the glyph appear bigger (zoom in).
         *@param endAction end action to execute after camera reaches its final position
         *@return the final camera location, null if the camera is not associated with this view.
         */
@@ -755,55 +755,46 @@ public abstract class View {
             SlowInSlowOutInterpolator.getInstance(),
             endAction);
         VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(trans, false);
-
-        double currentAlt=c.getAltitude()+c.getFocal();
-        if (z){
-            double[] regBounds = this.getVisibleRegion(c);
-            // region that will be visible after translation, but before zoom/unzoom  (need to compute zoom) ;
-            // we only take left and down because ratios are equals for left and right, up and down
-            double[] trRegBounds = {regBounds[0]+dx, regBounds[3]+dy};
-            double ratio = 0;
-            //compute the mult factor for altitude to see glyph g entirely
-            if (trRegBounds[0]!=0){
+        if (z){			
+            double newAlt = 0;
+            // compute the new altitude to see glyph g entirely horizontally
+            if (panel.getSize().width!=0){
                 if (g instanceof VText){
-                    ratio = (((VText)g).getBounds(c.getIndex()).x) / (g.vx-trRegBounds[0]);
+                    newAlt = ((VText)g).getBounds(c.getIndex()).x * c.focal / panel.getSize().width - c.focal;
                 }
                 else if (g instanceof RectangularShape){
-                    ratio = (((RectangularShape)g).getWidth()/2d) / (g.vx-trRegBounds[0]);
+                    newAlt = ((RectangularShape)g).getWidth() * c.focal / panel.getSize().width - c.focal;
                 }
                 else {
-                    ratio = g.getSize() / 2d / (g.vx-trRegBounds[0]);
+                    newAlt = g.getSize() * c.focal / panel.getSize().width - c.focal;
                 }
             }
-            //same for Y ; take the max of both
-            if (trRegBounds[1]!=0){
-                double tmpRatio;
+            // compute the new altitude to see glyph g entirely vertically, take max of vertical and horizontal
+            if (panel.getSize().height!=0){
+                double tmpAlt;
                 if (g instanceof VText){
-                    tmpRatio = (((VText)g).getBounds(c.getIndex()).y) / (g.vy-trRegBounds[1]);
+                    tmpAlt = ((VText)g).getBounds(c.getIndex()).y * c.focal / panel.getSize().height - c.focal;
                 }
                 else if (g instanceof RectangularShape){
-                    tmpRatio = (((RectangularShape)g).getHeight()/2d) / (g.vy-trRegBounds[1]);
+                    tmpAlt = ((RectangularShape)g).getHeight() * c.focal / panel.getSize().height - c.focal;
                 }
                 else {
-                    tmpRatio = g.getSize() / 2d / (g.vy-trRegBounds[1]);
+                    tmpAlt = g.getSize() * c.focal / panel.getSize().height - c.focal;
                 }
-                if (tmpRatio>ratio){ratio=tmpRatio;}
+                if (tmpAlt > newAlt){newAlt = tmpAlt;}
             }
-            ratio *= mFactor;
-            double newAlt=currentAlt*Math.abs(ratio);
-
+            newAlt *= mFactor;
             Animation altAnim = 
                 VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().
                 createCameraAltAnim(d, c, 
                 newAlt, false,
                 SlowInSlowOutInterpolator.getInstance(),
-                null);
+				null);
             VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(altAnim, false);
-
-            return new Location(g.vx,g.vy,newAlt);
+            return new Location(g.vx, g.vy, newAlt);
         }
         else {
-            return new Location(g.vx,g.vy,currentAlt);
+            return new Location(g.vx, g.vy, c.getAltitude());
         }
     }
  
@@ -836,7 +827,7 @@ public abstract class View {
      *@param c Camera to be moved
      *@param d duration of the animation in ms
      *@param z if false, do not (un)zoom, just translate (default is true)
-     *@param mFactor magnification factor - 1.0 (default) means that the glyph will occupy the whole screen. mFactor < 1 will make the glyph smaller (zoom out). mFactor > 1 will make the glyph appear bigger (zoom in)
+     *@param mFactor magnification factor: 1.0 (default) means that the glyph will occupy the whole screen. mFactor > 1 will make the glyph smaller (zoom out). mFactor < 1 will make the glyph appear bigger (zoom in).
      *@return the final camera location, null if the camera is not associated with this view.
      */
     public Location centerOnGlyph(Glyph g, Camera c, int d, boolean z, float mFactor){
