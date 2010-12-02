@@ -447,13 +447,21 @@ public class VirtualSpace {
         double[] res = new double[4];
         return findFarmostGlyphCoords(res);
     }
-    
+
     /** Get the bounding box of all glyphs visible in this virtual space.
      *@param res array which will contain the result
      *@return boundaries in VirtualSpace coordinates {west,north,east,south}
      */
 	public double[] findFarmostGlyphCoords(double[] res){
-		Glyph[] gl = this.getVisibleGlyphsList();
+		return findFarmostGlyphCoords(getVisibleGlyphsList(), res);
+	}
+	    
+    /** Get the bounding box of all glyphs visible in this virtual space.
+     *@param list of glyphs to iterate upon (will typically be a subset of all glyphs in the virtual space)
+     *@param res array which will contain the result
+     *@return boundaries in VirtualSpace coordinates {west,north,east,south}
+     */
+	public double[] findFarmostGlyphCoords(Glyph[] gl, double[] res){
 		if (gl.length > 0){
 			RectangularShape rs;
 			double size;
