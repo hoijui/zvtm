@@ -27,16 +27,16 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.Stroke;
+import java.awt.Point;
 import java.awt.Shape;
+import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
 import java.awt.geom.Point2D;
-
-import fr.inria.zvtm.glyphs.projection.ProjText;
+import java.awt.geom.Rectangle2D;
 
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
+import fr.inria.zvtm.glyphs.projection.ProjText;
 
 /**
  * Standalone Text.  This version is the most efficient, but it cannot be reoriented (see VTextOr*).<br>
@@ -465,8 +465,8 @@ public class VText extends ClosedShape {
 			g.setFont((font!=null) ? font : getMainFont());
 			Rectangle2D bounds = g.getFontMetrics().getStringBounds(text,g);
 			// cw and ch actually hold width and height of text *in virtual space*
-			pc[i].cw = (int)Math.round((bounds.getWidth() + 2*paddingX) * scaleFactor);
-			pc[i].ch = (int)Math.round((bounds.getHeight() + 2*paddingY)* scaleFactor);
+			pc[i].cw = (int)Math.round(bounds.getWidth() * scaleFactor);
+			pc[i].ch = (int)Math.round(bounds.getHeight() * scaleFactor);
 			pc[i].valid=true;
 		}
         if (alphaC != null && alphaC.getAlpha()==0){return;}
@@ -693,5 +693,14 @@ public class VText extends ClosedShape {
             VirtualSpaceManager.INSTANCE.repaint();
         }
     }
+
+	public void setPadding(int x, int y){
+		paddingX = x;
+		paddingY = y;
+	}
+	
+	public Point getPadding(){
+		return new Point(paddingX, paddingY);
+	}
 
 }
