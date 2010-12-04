@@ -32,6 +32,7 @@ import java.awt.event.WindowEvent;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.UUID;
 import java.util.Vector;
 
 import javax.swing.JMenuBar;
@@ -443,6 +444,14 @@ public class VirtualSpaceManager implements AWTEventListener {
         allVirtualSpaces.put(n,tvs);
         return tvs;
     }
+
+	public VirtualSpace createVirtualSpace(){
+		String uuid = UUID.randomUUID().toString();
+		while (allVirtualSpaces.containsKey(uuid)){
+			uuid = UUID.randomUUID().toString();
+		}
+		return addVirtualSpace(uuid);
+	}
 
     /** Destroy a virtual space.
      *@param n name of this virtual space
