@@ -487,17 +487,22 @@ public class VText extends ClosedShape {
 			if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(trueCoef, trueCoef));}
 			g.setTransform(at);
 			int rectH = Math.round(pc[i].ch / scaleFactor);
-			if (isBorderDrawn()){
-			    g.setColor(borderColor);
-                g.fillRect(dx-paddingX, dy-rectH+1+2*paddingY, Math.round(pc[i].cw / scaleFactor), rectH-1);
-			}
-    		g.setColor(this.color);
 			if (alphaC != null){
 				g.setComposite(alphaC);
+				if (isBorderDrawn()){
+				    g.setColor(borderColor);
+	                g.fillRect(dx-paddingX, dy-rectH+1+2*paddingY, Math.round(pc[i].cw / scaleFactor+paddingX), rectH-1+2*paddingY);
+				}
+	    		g.setColor(this.color);
 				g.drawString(text, 0.0f, 0.0f);
 				g.setComposite(acO);
 			}
 			else {
+				if (isBorderDrawn()){
+				    g.setColor(borderColor);
+	                g.fillRect(dx-paddingX, dy-rectH+1+2*paddingY, Math.round(pc[i].cw / scaleFactor+paddingX), rectH-1+2*paddingY);
+				}
+	    		g.setColor(this.color);
 				g.drawString(text, 0.0f, 0.0f);
 			}
 			g.setTransform(stdT);
