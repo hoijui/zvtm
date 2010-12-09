@@ -1,6 +1,6 @@
 package fr.inria.zvtm.treemap;
 
-public interface Traverser {
+public interface Walker {
   public void visitNode(Mappable node);
 }
 

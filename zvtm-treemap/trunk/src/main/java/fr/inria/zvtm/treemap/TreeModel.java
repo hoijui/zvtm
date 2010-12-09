@@ -210,20 +210,20 @@ public class TreeModel implements MapModel
     /**
      * Do a preorder traversal of this TreeModel
      */
-    public void traversePre(Traverser t){
-      t.visitNode(this.getMapItem());
+    public void traversePre(Walker walker){
+      walker.visitNode(this.getMapItem());
       for(int i=0; i<childCount(); ++i){
-        getChild(i).traversePre(t);
+        getChild(i).traversePre(walker);
       }
     }
 
     /**
      * Do a postorder traversal of this TreeModel
      */
-    public void traversePost(Traverser t){
+    public void traversePost(Walker walker){
       for(int i=0; i<childCount(); ++i){
-        getChild(i).traversePost(t);
+        getChild(i).traversePost(walker);
       }
-      t.visitNode(this.getMapItem());
+      walker.visitNode(this.getMapItem());
     }
 }
