@@ -1,6 +1,9 @@
+/**
+ * @author Romain Primet
+ */
 package fr.inria.zvtm.treemap;
 
-public interface Walker {
-  public void visitNode(Mappable node);
+public interface Walker<T> {
+  public void visitNode(T node);
 }
 

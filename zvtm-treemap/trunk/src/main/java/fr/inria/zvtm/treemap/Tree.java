@@ -214,7 +214,7 @@ public class Tree implements MapModel
     /**
      * Do a preorder traversal of this Tree
      */
-    public void traversePre(Walker walker){
+    public void traversePre(Walker<Mappable> walker){
       walker.visitNode(this.getMapItem());
       for(int i=0; i<childCount(); ++i){
         getChild(i).traversePre(walker);
@@ -224,7 +224,7 @@ public class Tree implements MapModel
     /**
      * Do a postorder traversal of this Tree
      */
-    public void traversePost(Walker walker){
+    public void traversePost(Walker<Mappable> walker){
       for(int i=0; i<childCount(); ++i){
         getChild(i).traversePost(walker);
       }
