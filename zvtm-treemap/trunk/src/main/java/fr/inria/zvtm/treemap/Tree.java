@@ -95,10 +95,10 @@ public class Tree implements MapModel
         mapItem.setBounds(bounds);
         if (!hasChildren()) return;
         double s=sum();
-	      bounds.x += icomp.getXinsetLeft(this);
-	      bounds.y += icomp.getYinsetBottom(this);
-	      bounds.w -= (icomp.getXinsetLeft(this) + icomp.getXinsetRight(this));
-	      bounds.h -= (icomp.getYinsetTop(this) + icomp.getYinsetBottom(this));
+	      bounds.x += icomp.getXleft(this);
+	      bounds.y += icomp.getYbottom(this);
+	      bounds.w -= (icomp.getXleft(this) + icomp.getXright(this));
+	      bounds.h -= (icomp.getYtop(this) + icomp.getYbottom(this));
 	      tiling.layout(this, bounds);
 	      for (int i=childCount()-1; i>=0; i--)
             getChild(i).layout(tiling, icomp);
