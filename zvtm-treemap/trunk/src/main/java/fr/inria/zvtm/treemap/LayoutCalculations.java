@@ -39,7 +39,7 @@ public class LayoutCalculations
         return s/n;
     }
 
-    public static double getReadability(TreeModel tree)
+    public static double getReadability(Tree tree)
     {
         return getReadability(tree.getLeafModels());
     }

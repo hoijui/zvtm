@@ -18,24 +18,28 @@ import java.util.*;
  * handle structural changes to the tree, since it
  * caches a fair amount of information.
  *
+ * Note: this class was called TreeModel in the original
+ * UMD library. It was renamed to Tree because TreeModel is a well-known
+ * Swing class that is likely to be used together with Tree instances, and
+ * using the fully qualified names is a pain.
  */
-public class TreeModel implements MapModel
+public class Tree implements MapModel
 {
     private Mappable mapItem;
     private Mappable[] childItems;
     private Mappable[] cachedTreeItems; // we assume tree structure doesn't change.
     private MapModel[] cachedLeafModels;
-    private TreeModel parent;
-    private Vector<TreeModel> children=new Vector<TreeModel>();
+    private Tree parent;
+    private Vector<Tree> children=new Vector<Tree>();
     private boolean sumsChildren;
     
-    public TreeModel()
+    public Tree()
     {
         this.mapItem=new MapItem();
         sumsChildren=true;
     }
     
-    public TreeModel(Mappable mapItem)
+    public Tree(Mappable mapItem)
     {
         this.mapItem=mapItem;
     }
@@ -161,21 +165,21 @@ public class TreeModel implements MapModel
         return mapItem;
     }
     
-    public void addChild(TreeModel child)
+    public void addChild(Tree child)
     {
         child.setParent(this);
         children.addElement(child);
         childItems=null;
     }
     
-    public void setParent(TreeModel parent)
+    public void setParent(Tree parent)
     {
-        for (TreeModel p=parent; p!=null; p=p.getParent())
+        for (Tree p=parent; p!=null; p=p.getParent())
             if (p==this) throw new IllegalArgumentException("Circular ancestry!");
         this.parent=parent;
     }
     
-    public TreeModel getParent()
+    public Tree getParent()
     {
         return parent;
     }
@@ -185,7 +189,7 @@ public class TreeModel implements MapModel
         return children.size();
     }
     
-    public TreeModel getChild(int n)
+    public Tree getChild(int n)
     {
         return children.elementAt(n);
     }
@@ -208,7 +212,7 @@ public class TreeModel implements MapModel
     }
 
     /**
-     * Do a preorder traversal of this TreeModel
+     * Do a preorder traversal of this Tree
      */
     public void traversePre(Walker walker){
       walker.visitNode(this.getMapItem());
@@ -218,7 +222,7 @@ public class TreeModel implements MapModel
     }
 
     /**
-     * Do a postorder traversal of this TreeModel
+     * Do a postorder traversal of this Tree
      */
     public void traversePost(Walker walker){
       for(int i=0; i<childCount(); ++i){
