@@ -124,6 +124,7 @@ class ExplorerEventHandler implements ViewListener, CameraListener, ComponentLis
 		else if ((g = v.lastGlyphEntered()) != null){
 		    if (g.getType().equals(AirTrafficManager.AIRP)){
 		        if (mode == MODE_BRINGANDGO){
+        		    application.ga.highlight(g);
         			application.ga.bringFor(g);		            
 		        }
 		        else if (mode == MODE_HIGHLIGHTING){
@@ -142,6 +143,7 @@ class ExplorerEventHandler implements ViewListener, CameraListener, ComponentLis
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
         if (application.ga.isBringingAndGoing){
+		    application.ga.unhighlight(g);
 			application.ga.endBringAndGo(v.lastGlyphEntered());
 		}
 		if (application.ga.isHighlighting){

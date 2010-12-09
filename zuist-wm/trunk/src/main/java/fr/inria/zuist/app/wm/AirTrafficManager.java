@@ -321,14 +321,14 @@ class AirTrafficManager {
 				g2.setColor(HIGHLIGHT_COLOR);
 				highlightedElements.add(g2);
 			}
-			airportInfo[0] = new VRectangle(n.getShape().vx+100, n.getShape().vy+100, 20, 400, 100, Color.BLACK, Color.WHITE, .8f);
-			airportInfo[1] = new VText(airportInfo[0].vx-190, airportInfo[0].vy+30, 20, Color.WHITE, "IATA: "+n.getCode());
-			airportInfo[2] = new VText(airportInfo[0].vx-190, airportInfo[0].vy+10, 20, Color.WHITE, "Name: "+n.getName());
-			airportInfo[3] = new VText(airportInfo[0].vx-190, airportInfo[0].vy-10, 20, Color.WHITE, "Lat: "+n.getLatitude());
-			airportInfo[4] = new VText(airportInfo[0].vx-190, airportInfo[0].vy-30, 20, Color.WHITE, "Lon: "+n.getLongitude());
-			for (Glyph g3:airportInfo){
-    			application.bSpace.addGlyph(g3);			    
-			}
+		//	airportInfo[0] = new VRectangle(n.getShape().vx+100, n.getShape().vy+100, 20, 400, 100, Color.BLACK, Color.WHITE, .8f);
+		//	airportInfo[1] = new VText(airportInfo[0].vx-190, airportInfo[0].vy+30, 20, Color.WHITE, "IATA: "+n.getCode());
+		//	airportInfo[2] = new VText(airportInfo[0].vx-190, airportInfo[0].vy+10, 20, Color.WHITE, "Name: "+n.getName());
+		//	airportInfo[3] = new VText(airportInfo[0].vx-190, airportInfo[0].vy-10, 20, Color.WHITE, "Lat: "+n.getLatitude());
+		//	airportInfo[4] = new VText(airportInfo[0].vx-190, airportInfo[0].vy-30, 20, Color.WHITE, "Lon: "+n.getLongitude());
+		//	for (Glyph g3:airportInfo){
+    	//		application.bSpace.addGlyph(g3);			    
+		//	}
 			isHighlighting = true;
 		}
 	}
@@ -336,10 +336,10 @@ class AirTrafficManager {
 	void unhighlight(Glyph g){
 	    if (g == null){return;}
 		g.setColor(AIRPORT_FILL_COLOR);
-		for (Glyph g3:airportInfo){
-            if (g3 == null){continue;}
-		    application.bSpace.removeGlyph(g3);
-		}
+	//	for (Glyph g3:airportInfo){
+    //        if (g3 == null){continue;}
+	//	    application.bSpace.removeGlyph(g3);
+	//	}
 		Glyph g2;
 		for (int i=0;i<highlightedElements.size();i++){
 			g2 = (Glyph)highlightedElements.elementAt(i);

@@ -50,6 +50,9 @@ public class FitsImageDescription extends ResourceDescription {
         }
     }
 
+    public void rescale(){
+    }
+
     public void createObject(final VirtualSpace vs, final boolean fadeIn){
         try{
             glyph = new FitsImage(vx,vy,zindex,src,scaleFactor,true);

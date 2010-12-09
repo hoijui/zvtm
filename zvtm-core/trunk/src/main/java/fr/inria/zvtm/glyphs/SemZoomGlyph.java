@@ -33,7 +33,6 @@ public class SemZoomGlyph extends Glyph {
         //check that transitions are ordered? (and possibly unique?)
         this.glyphs = new ArrayList<Glyph>(glyphs);
         this.transitions = new ArrayList<Double>(transitions);
-
     }
 
     /**
@@ -41,6 +40,7 @@ public class SemZoomGlyph extends Glyph {
      */
     @Override
         public boolean fillsView(double w, double h, int camIndex){
+            //delegate to largest underlying glyph?
             return false; //safe option
         }
 
@@ -121,7 +121,8 @@ public class SemZoomGlyph extends Glyph {
                 AffineTransform stdT,
                 int dx,
                 int dy){
-            //XXX implement
+            Glyph glyph = selectChild(i);
+            glyph.draw(g, vW, vH, i, stdS, stdT, dx, dy);
         }
 
     @Override
@@ -131,7 +132,10 @@ public class SemZoomGlyph extends Glyph {
                 float lensMag,
                 double lensx,
                 double lensy){
-            //XXX implement
+            for(Glyph glyph: glyphs){
+                glyph.projectForLens(c, lensWidth, lensHeight,
+                        lensMag, lensx, lensy);
+            }
         }
 
     @Override
@@ -179,7 +183,10 @@ public class SemZoomGlyph extends Glyph {
         }
 
     //private methods
-    private Glyph selectChild(int camIndex){
+
+    //Returns the child that should be displayed by the
+    //camera at 'camIndex'
+    protected Glyph selectChild(int camIndex){
         return null;
     }
 }
