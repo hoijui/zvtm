@@ -1,4 +1,11 @@
+/**
+ * @author Romain Primet
+ */
 package fr.inria.zvtm.treemap;
+
+import java.awt.Toolkit;
+
+import fr.inria.zvtm.glyphs.VText;
 
 public class TreemapUtils {
     /**
@@ -26,5 +33,31 @@ public class TreemapUtils {
         }
     }
 
+    /**
+     * Fits a VText instance to the given bounds, obeying a maximum height 
+     * constraint
+     */
+    public static void fitText(VText text, Rect bounds, double maxHeight){
+        double textLen = getVTextWidth(text);
+        text.setScale(text.getScale() * (float)(bounds.w/textLen));
+        double textHeight = getVTextHeight(text);
+        if(textHeight >= maxHeight){
+            text.setScale((float)(text.getScale() * maxHeight/textHeight));
+        }
+    }
+
+    /**
+     * Returns an <b>approximate</b> height of a VText
+     */ 
+    public static double getVTextHeight(VText text){
+        return text.getScale()*Toolkit.getDefaultToolkit().getFontMetrics(text.getMainFont()).getHeight();
+    }
+
+    /**
+     * Returns an <b>approximate</b> width of a VText
+     */ 
+    public static double getVTextWidth(VText text){
+        return text.getScale()*Toolkit.getDefaultToolkit().getFontMetrics(text.getMainFont()).charWidth('a')*text.getText().length();
+    }
 }
 
