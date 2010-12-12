@@ -16,17 +16,17 @@ package fr.inria.zvtm.treemap;
  */
 public class BinaryTreeLayout extends AbstractMapLayout
 {
-    public void layout(Mappable[] items, Rect bounds)
+    public void layout(Mappable[] items, Rect bounds, Insets insets)
     {
-        layout(items,0,items.length-1,bounds);
+        layout(items,0,items.length-1,bounds,insets);
     }
     
-    public void layout(Mappable[] items, int start, int end, Rect bounds)
+    public void layout(Mappable[] items, int start, int end, Rect bounds, Insets insets)
     {
-        layout(items, start, end, bounds, true);
+        layout(items, start, end, bounds, true, insets);
     }
     
-    public void layout(Mappable[] items, int start, int end, Rect bounds, boolean vertical)
+    public void layout(Mappable[] items, int start, int end, Rect bounds, boolean vertical, Insets insets)
     {
         if (start>end) return;
             //throw new IllegalArgumentException("start, end= "+start+", "+end);
@@ -49,15 +49,15 @@ public class BinaryTreeLayout extends AbstractMapLayout
         {
             Rect b1=new Rect(x,y,w*a,h);
             Rect b2=new Rect(x+w*a,y,w*(1-a),h);
-            layout(items, start,mid, b1, !vertical);
-            layout(items, mid+1,end, b2, !vertical);
+            layout(items, start,mid, b1, !vertical, insets);
+            layout(items, mid+1,end, b2, !vertical, insets);
         }
         else
         {
             Rect b1=new Rect(x,y,w,h*a);
             Rect b2=new Rect(x,y+h*a,w,h*(1-a));
-            layout(items, start,mid, b1, !vertical);
-            layout(items, mid+1,end, b2, !vertical);
+            layout(items, start,mid, b1, !vertical, insets);
+            layout(items, mid+1,end, b2, !vertical, insets);
         }
         
     }

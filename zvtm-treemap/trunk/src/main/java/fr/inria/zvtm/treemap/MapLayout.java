@@ -28,7 +28,7 @@ public interface MapLayout
      * @param model The MapModel.
      * @param bounds The boundsing rectangle for the layout.
      */
-    public void layout(MapModel model, Rect bounds);
+    public void layout(MapModel model, Rect bounds, Insets insets);
     
     /**
      * Return a human-readable name for this layout;

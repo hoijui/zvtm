@@ -14,19 +14,19 @@ package fr.inria.zvtm.treemap;
  */
 public class SquarifiedLayout extends AbstractMapLayout
 {
-    public void layout(Mappable[] items, Rect bounds)
+    public void layout(Mappable[] items, Rect bounds, Insets insets)
     {
         
-        layout(sortDescending(items),0,items.length-1,bounds);
+        layout(sortDescending(items),0,items.length-1,bounds,insets);
     }
     
-    public void layout(Mappable[] items, int start, int end, Rect bounds)
+    public void layout(Mappable[] items, int start, int end, Rect bounds, Insets insets)
     {
         if (start>end) return;
             
         if (end-start<2)
         {
-            SliceLayout.layoutBest(items,start,end,bounds);
+            SliceLayout.layoutBest(items,start,end,bounds,insets);
             return;
         }
         
@@ -48,8 +48,8 @@ public class SquarifiedLayout extends AbstractMapLayout
                 mid++;
                 b+=q;
             }
-            SliceLayout.layoutBest(items,start,mid,new Rect(x,y,w,h*b));
-            layout(items,mid+1,end,new Rect(x,y+h*b,w,h*(1-b)));
+            SliceLayout.layoutBest(items,start,mid,insets.applyVert(new Rect(x,y,w,h*b)), insets);
+            layout(items,mid+1,end,insets.applyVert(new Rect(x,y+h*b,w,h*(1-b))), insets);
         }
         else
         {
@@ -62,8 +62,8 @@ public class SquarifiedLayout extends AbstractMapLayout
                 mid++;
                 b+=q;
             }
-            SliceLayout.layoutBest(items,start,mid,new Rect(x,y,w*b,h));
-            layout(items,mid+1,end,new Rect(x+w*b,y,w*(1-b),h));
+            SliceLayout.layoutBest(items,start,mid,insets.applyHoriz(new Rect(x,y,w*b,h)), insets);
+            layout(items,mid+1,end,insets.applyHoriz(new Rect(x+w*b,y,w*(1-b),h)), insets);
         }
         
     }

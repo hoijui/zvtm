@@ -22,11 +22,11 @@ public abstract class AbstractMapLayout implements MapLayout
     public static final int ASCENDING=0, DESCENDING=1;
     
     /** Subclasses implement this method themselves. */
-    public abstract void layout(Mappable[] items, Rect bounds);
+    public abstract void layout(Mappable[] items, Rect bounds, Insets insets);
     
-    public void layout(MapModel model, Rect bounds)
+    public void layout(MapModel model, Rect bounds, Insets insets)
     {
-        layout(model.getItems(), bounds);
+        layout(model.getItems(), bounds, insets);
     }
 
     public static double totalSize(Mappable[] items)
@@ -67,12 +67,12 @@ public abstract class AbstractMapLayout implements MapLayout
         return s;
     }
 
-    public static void sliceLayout(Mappable[] items, int start, int end, Rect bounds, int orientation)
+    public static void sliceLayout(Mappable[] items, int start, int end, Rect bounds, int orientation, Insets insets)
     {
-        sliceLayout(items,start,end,bounds,orientation,ASCENDING);
+        sliceLayout(items,start,end,bounds,orientation,ASCENDING, insets);
     }
     
-    public static void sliceLayout(Mappable[] items, int start, int end, Rect bounds, int orientation, int order)
+    public static void sliceLayout(Mappable[] items, int start, int end, Rect bounds, int orientation, int order, Insets insets)
     {
         double total=totalSize(items, start, end);
         double a=0;
@@ -102,7 +102,7 @@ public abstract class AbstractMapLayout implements MapLayout
                 r.y=bounds.y;
                 r.h=bounds.h;
             }
-            items[i].setBounds(r);
+            items[i].setBounds(vertical? insets.applyVert(r) : insets.applyHoriz(r));
             a+=b;
         }
     }

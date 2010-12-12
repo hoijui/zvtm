@@ -85,23 +85,26 @@ public class Tree implements MapModel
         return 1+parent.depth();
     }
     
-    public void layout(MapLayout tiling, InsetComputer icomp)
+    public void layout(MapLayout tiling, double textHeight, Insets insets)
     {
-        layout(tiling, mapItem.getBounds(), icomp);
+        layout(tiling, mapItem.getBounds(), textHeight, insets);
     }
     
-    public void layout(MapLayout tiling, Rect bounds, InsetComputer icomp)
+    public void layout(MapLayout tiling, Rect bounds, double textHeight, Insets insets)
     {
         mapItem.setBounds(bounds);
-        if (!hasChildren()) return;
+        //if (!hasChildren()) return;
+        if(!hasChildren()){
+            Rect leafBounds = new Rect(bounds);
+            leafBounds.h -= textHeight;
+            mapItem.setBounds(leafBounds);
+            return;
+        }
         double s=sum();
-        bounds.x += icomp.getXleft(this);
-        bounds.y += icomp.getYbottom(this);
-        bounds.w -= (icomp.getXleft(this) + icomp.getXright(this));
-        bounds.h -= (icomp.getYtop(this) + icomp.getYbottom(this));
-        tiling.layout(this, bounds);
+        bounds.h -= textHeight;
+        tiling.layout(this, bounds, insets);
         for (int i=childCount()-1; i>=0; i--)
-            getChild(i).layout(tiling, icomp);
+            getChild(i).layout(tiling, textHeight, insets);
     }
     
     public Mappable[] getTreeItems()

@@ -45,7 +45,7 @@ public class OrderedTreemap implements MapLayout
 	this.pivotType = pivotType;
     }
     
-    public void layout(MapModel model, Rect bounds)
+    public void layout(MapModel model, Rect bounds, Insets insets)
     {
         Rect r=new Rect(0,0,bounds.w,bounds.h);
         layoutAtOrigin(model, r);

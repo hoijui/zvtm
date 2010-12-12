@@ -23,9 +23,9 @@ public class PivotByMiddle implements MapLayout
         orderedTreemap.setPivotType(OrderedTreemap.PIVOT_BY_MIDDLE);
     }
     
-    public void layout(MapModel model, Rect bounds)
+    public void layout(MapModel model, Rect bounds, Insets insets)
     {
-        orderedTreemap.layout(model, bounds);
+        orderedTreemap.layout(model, bounds, insets);
     }
     
     public String getName() {return "Pivot by Mid. / Ben B.";}

@@ -23,9 +23,9 @@ public class PivotBySplitSize implements MapLayout
         orderedTreemap.setPivotType(OrderedTreemap.PIVOT_BY_SPLIT_SIZE);
     }
     
-    public void layout(MapModel model, Rect bounds)
+    public void layout(MapModel model, Rect bounds, Insets insets)
     {
-        orderedTreemap.layout(model, bounds);
+        orderedTreemap.layout(model, bounds, insets);
     }
     
     public String getName() {return "Pivot by Split Size";}

@@ -8,13 +8,15 @@ import java.util.Arrays;
 import java.util.Vector;
 import javax.swing.JTree;
 
+import java.io.File;
+
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VText;
-import fr.inria.zvtm.treemap.InsetComputer;
+import fr.inria.zvtm.treemap.Insets;
 import fr.inria.zvtm.treemap.Mappable;
 import fr.inria.zvtm.treemap.Rect;
 import fr.inria.zvtm.treemap.SquarifiedLayout;
@@ -25,20 +27,8 @@ import fr.inria.zvtm.treemap.ZMapItem;
 
 class Demo {
     private static final Rect TREEMAP_RECT = new Rect(0,0,800000,400000);
-    private static final InsetComputer INSET = new InsetComputer(){
-        public double getXleft(Tree tree){
-            return TREEMAP_RECT.h / 30.;
-        }
-        public double getXright(Tree tree){
-            return TREEMAP_RECT.h / 30.;
-        }
-        public double getYtop(Tree tree){
-            return TREEMAP_RECT.h / 10.;
-        }
-        public double getYbottom(Tree tree){
-            return TREEMAP_RECT.h / 30.;
-        }
-    };
+    private static final Insets INSETS = new Insets(8000, 8000, 4500, 4500);
+    private static final double LABEL_HEIGHT = 24000;
     private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE;
     private VirtualSpace demoSpace;
     private Camera cam;
@@ -51,8 +41,9 @@ class Demo {
                 "Treemap demo", View.STD_VIEW, 800, 600, false, true);
         view.getCursor().setColor(Color.GREEN);
 
-        Tree tree = TreemapUtils.swingToUmd(new JTree().getModel());
-        tree.layout(new SquarifiedLayout(), TREEMAP_RECT, INSET);
+        //Tree tree = TreemapUtils.swingToUmd(new JTree().getModel());
+        Tree tree = TreemapUtils.swingToUmd(new FileTreeModel(new File("/home/rprimet/temp/foo")));
+        tree.layout(new SquarifiedLayout(), TREEMAP_RECT, LABEL_HEIGHT, INSETS);
         makeRepr(tree, demoSpace);
         view.getGlobalView(cam, 500);
     }
@@ -68,20 +59,12 @@ class Demo {
                     0, 
                     bounds.w, bounds.h, Color.GRAY);
                 rect.setBorderColor(Color.WHITE);
-                //XXX yet another inset computation!
-                if(!t.hasChildren() && (t.getParent() != null)){
-                    rect.move(INSET.getXleft(t), -INSET.getYtop(t));
-                    ZMapItem parentItem = (ZMapItem)(t.getParent().getMapItem());
-                    Rect parentBounds = parentItem.getBounds();
-                    double fx = (parentBounds.w - INSET.getXleft(t) - INSET.getXright(t))/parentBounds.w;
-                    double fy = (parentBounds.h - INSET.getYtop(t) - INSET.getYbottom(t))/parentBounds.h;
-                    rect.setHeight(fx*rect.getHeight());
-                    rect.setWidth(fy*rect.getWidth());
-                }
+                String txt = item.getUserObject() instanceof File? 
+                    ((File)item.getUserObject()).getName() : item.getUserObject().toString();
                 VText text = new VText(rect.vx-rect.getWidth()*0.5, rect.vy+rect.getHeight()*0.5, 0, 
-                    Color.WHITE, item.getUserObject().toString(), 
+                    Color.WHITE, txt, 
                     VText.TEXT_ANCHOR_START, 1f);
-                text.setScale((float)(text.getScale()*INSET.getYtop(tree)/TreemapUtils.getVTextHeight(text)));
+                text.setScale((float)(text.getScale()*LABEL_HEIGHT/TreemapUtils.getVTextHeight(text)));
                 text.move(0, -TreemapUtils.getVTextHeight(text));
                 item.putGraphicalObject("RECT", rect);
                 item.putGraphicalObject("TEXT", text);
@@ -89,6 +72,11 @@ class Demo {
                 vs.addGlyph(text);
             }
         });
+    }
+
+    Tree makeTestTree(){
+        Tree retval = new Tree();
+        return retval;
     }
 
     public static void main(String[] args){

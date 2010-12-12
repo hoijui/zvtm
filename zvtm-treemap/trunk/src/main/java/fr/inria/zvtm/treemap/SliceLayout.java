@@ -26,33 +26,33 @@ public class SliceLayout extends AbstractMapLayout
         this.orientation=orientation;
     }
     
-    public void layout(Mappable[] items, Rect bounds)
+    public void layout(Mappable[] items, Rect bounds, Insets insets)
     {
         if (items.length==0) return;
         int o=orientation;
         if (o==BEST)
-            layoutBest(items, 0, items.length-1, bounds);
+            layoutBest(items, 0, items.length-1, bounds, insets);
         else if (o==ALTERNATE)
-            layout(items,bounds,items[0].getDepth()%2);
+            layout(items,bounds,items[0].getDepth()%2, insets);
         else
-            layout(items,bounds,o);
+            layout(items,bounds,o, insets);
     }
 
-    public static void layoutBest(Mappable[] items, int start, int end, Rect bounds)
+    public static void layoutBest(Mappable[] items, int start, int end, Rect bounds, Insets insets)
     {
         sliceLayout(items,start,end,bounds,
-                    bounds.w>bounds.h ? HORIZONTAL : VERTICAL, ASCENDING);
+                    bounds.w>bounds.h ? HORIZONTAL : VERTICAL, ASCENDING, insets);
     }
 
-    public static void layoutBest(Mappable[] items, int start, int end, Rect bounds, int order)
+    public static void layoutBest(Mappable[] items, int start, int end, Rect bounds, int order, Insets insets)
     {
         sliceLayout(items,start,end,bounds,
-                    bounds.w>bounds.h ? HORIZONTAL : VERTICAL, order);
+                    bounds.w>bounds.h ? HORIZONTAL : VERTICAL, order, insets);
     }
 
-    public static void layout(Mappable[] items, Rect bounds, int orientation)
+    public static void layout(Mappable[] items, Rect bounds, int orientation, Insets insets)
     {
-        sliceLayout(items,0,items.length-1,bounds,orientation);
+        sliceLayout(items,0,items.length-1,bounds,orientation, insets);
     }
 
     public String getName()

@@ -30,7 +30,7 @@ public class StripTreemap implements MapLayout {
 	this.lookahead = lookahead;
     }
 
-    public void layout(MapModel model, Rect bounds) {
+    public void layout(MapModel model, Rect bounds, Insets insets) {
 	items = model.getItems();
 	layoutBox = bounds;
 
