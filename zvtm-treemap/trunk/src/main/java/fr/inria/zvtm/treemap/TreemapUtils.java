@@ -12,11 +12,11 @@ public class TreemapUtils {
      * Returns a new UMD Tree instance that is equivalent to the 
      * given Swing TreeModel
      */
-    public static Tree swingToUmd(javax.swing.tree.TreeModel srcModel){
+    public static Tree<ZMapItem> swingToUmd(javax.swing.tree.TreeModel srcModel){
         return swingToUmd(srcModel, srcModel.getRoot());
     }
 
-    private static Tree swingToUmd(javax.swing.tree.TreeModel srcModel, Object node){
+    private static Tree<ZMapItem> swingToUmd(javax.swing.tree.TreeModel srcModel, Object node){
         if(node == null){
             throw new Error("Building an empty tree is unsupported");
         } 

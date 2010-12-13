@@ -41,17 +41,17 @@ class Demo {
                 "Treemap demo", View.STD_VIEW, 800, 600, false, true);
         view.getCursor().setColor(Color.GREEN);
 
-        //Tree tree = TreemapUtils.swingToUmd(new JTree().getModel());
-        Tree tree = TreemapUtils.swingToUmd(new FileTreeModel(new File("/home/rprimet/temp/foo")));
+        Tree<ZMapItem> tree = TreemapUtils.swingToUmd(new JTree().getModel());
+        //Tree tree = TreemapUtils.swingToUmd(new FileTreeModel(new File("/home/rprimet/temp/foo")));
         tree.layout(new SquarifiedLayout(), TREEMAP_RECT, LABEL_HEIGHT, INSETS);
         makeRepr(tree, demoSpace);
         view.getGlobalView(cam, 500);
     }
 
     private static void makeRepr(final Tree tree, final VirtualSpace vs){
-        tree.traversePre(new Walker<Tree>(){
-            public void visitNode(Tree t){
-                ZMapItem item = (ZMapItem)(t.getMapItem());
+        tree.traversePre(new Walker<Tree<ZMapItem>>(){
+            public void visitNode(Tree<ZMapItem> t){
+                ZMapItem item = t.getMapItem();
                 System.out.println(item.getUserObject());
                 Rect bounds = item.getBounds();
                 VRectangle rect = new VRectangle(bounds.x + bounds.w*0.5, 
@@ -72,11 +72,6 @@ class Demo {
                 vs.addGlyph(text);
             }
         });
-    }
-
-    Tree makeTestTree(){
-        Tree retval = new Tree();
-        return retval;
     }
 
     public static void main(String[] args){

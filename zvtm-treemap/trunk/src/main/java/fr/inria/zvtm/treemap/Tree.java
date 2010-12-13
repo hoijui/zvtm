@@ -23,9 +23,9 @@ import java.util.*;
  * Swing class that is likely to be used together with Tree instances, and
  * using the fully qualified names is a pain.
  */
-public class Tree implements MapModel
+public class Tree<M extends Mappable> implements MapModel
 {
-    private Mappable mapItem;
+    private M mapItem;
     private Mappable[] childItems;
     private Mappable[] cachedTreeItems; // we assume tree structure doesn't change.
     private MapModel[] cachedLeafModels;
@@ -33,13 +33,13 @@ public class Tree implements MapModel
     private Vector<Tree> children=new Vector<Tree>();
     private boolean sumsChildren;
     
-    public Tree()
-    {
-        this.mapItem=new MapItem();
-        sumsChildren=true;
-    }
+ //   public Tree()
+ //   {
+ //       this.mapItem=new MapItem();
+ //       sumsChildren=true;
+ //   }
     
-    public Tree(Mappable mapItem)
+    public Tree(M mapItem)
     {
         this.mapItem=mapItem;
     }
@@ -163,12 +163,12 @@ public class Tree implements MapModel
         return childItems;
     }
     
-    public Mappable getMapItem()
+    public M getMapItem()
     {
         return mapItem;
     }
     
-    public void addChild(Tree child)
+    public void addChild(Tree<M> child)
     {
         child.setParent(this);
         children.addElement(child);
@@ -217,7 +217,7 @@ public class Tree implements MapModel
     /**
      * Do a preorder traversal of this Tree
      */
-    public void traversePre(Walker<Tree> walker){
+    public void traversePre(Walker<Tree<M>> walker){
       walker.visitNode(this);
       for(int i=0; i<childCount(); ++i){
         getChild(i).traversePre(walker);
@@ -227,7 +227,7 @@ public class Tree implements MapModel
     /**
      * Do a postorder traversal of this Tree
      */
-    public void traversePost(Walker<Tree> walker){
+    public void traversePost(Walker<Tree<M>> walker){
       for(int i=0; i<childCount(); ++i){
         getChild(i).traversePost(walker);
       }
