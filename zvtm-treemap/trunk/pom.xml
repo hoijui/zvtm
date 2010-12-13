@@ -18,6 +18,7 @@
     </licenses>
     <scm>
         <url>https://zvtm.svn.sourceforge.net/svnroot/zvtm</url>
+        <developerConnection>scm:svn:https://zvtm.svn.sourceforge.net/svnroot/zvtm/zvtm-treemap/trunk/</developerConnection>
     </scm>
 
     <properties>
