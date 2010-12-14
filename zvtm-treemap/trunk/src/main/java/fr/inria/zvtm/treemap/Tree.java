@@ -79,6 +79,9 @@ public class Tree<M extends Mappable> implements MapModel
         
     }
     
+    /**
+     * Returns the depth of the tree. The root node is at depth 0.
+     */
     public int depth()
     {
         if (parent==null) return 0;
