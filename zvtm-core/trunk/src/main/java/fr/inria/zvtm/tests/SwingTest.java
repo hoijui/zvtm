@@ -6,6 +6,7 @@ import java.util.Vector;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 
@@ -26,7 +27,7 @@ public class SwingTest {
     View view;
     VirtualSpace testSpace;
     
-    public SwingTest(){
+    public SwingTest() throws Exception {
         TableModel dataModel = new AbstractTableModel() {
             public int getColumnCount() { return 10; }
             public int getRowCount() { return 10;}
@@ -36,8 +37,17 @@ public class SwingTest {
         table.setVisible(true);
         table.setSize(200, 100);
         drawnPanel = new JPanel();
+        drawnPanel.setBounds(0,0,300,300);
         drawnPanel.add(table);
-        VSwingComponent vsc = new VSwingComponent(table);
+        JButton btn = new JButton("42");
+        btn.setSize(50, 20);
+        drawnPanel.add(btn);
+        SwingUtilities.invokeAndWait(new Runnable(){
+            public void run(){
+                drawnPanel.doLayout();
+            }
+        });
+        VSwingComponent vsc = new VSwingComponent(drawnPanel);
 
         testSpace = vsm.addVirtualSpace("testSpace");
         cam = testSpace.addCamera();
@@ -48,7 +58,7 @@ public class SwingTest {
         //view.getGlobalView(cam, 500);
     }
 
-    public static void main(String[] args){
+    public static void main(String[] args) throws Exception {
         new SwingTest();    
     }
 }
