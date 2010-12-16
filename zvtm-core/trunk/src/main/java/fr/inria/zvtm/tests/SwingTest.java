@@ -35,12 +35,10 @@ public class SwingTest {
         };
         JTable table = new JTable(dataModel);
         table.setVisible(true);
-        table.setSize(200, 100);
         drawnPanel = new JPanel();
         drawnPanel.setBounds(0,0,300,300);
         drawnPanel.add(table);
         JButton btn = new JButton("42");
-        btn.setSize(50, 20);
         drawnPanel.add(btn);
         SwingUtilities.invokeAndWait(new Runnable(){
             public void run(){
