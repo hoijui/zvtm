@@ -66,6 +66,8 @@ public class SwingTest {
 
         testSpace = vsm.addVirtualSpace("testSpace");
         cam = testSpace.addCamera();
+        cam.altitudeOffset(30); //check that event redirection works correctly at any zoom level
+        vsc.move(100, -50);
         testSpace.addGlyph(vsc);
         view = vsm.addFrameView(new Vector(Arrays.asList(new Camera[]{cam})),
                 "VSwingTest", View.STD_VIEW, 800, 600, false, true);
