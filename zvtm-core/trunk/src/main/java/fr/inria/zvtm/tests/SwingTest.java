@@ -160,6 +160,7 @@ public class SwingTest {
                     (int)(deepestCoords.getY() - evt.getY()));
             evt.setSource(cmp);
             cmp.dispatchEvent(evt);
+            VirtualSpaceManager.INSTANCE.repaint(); //XXX quick fix
         }
 
         Point2D spaceToComponent(VSwingComponent c, Point2D vsCoords){
