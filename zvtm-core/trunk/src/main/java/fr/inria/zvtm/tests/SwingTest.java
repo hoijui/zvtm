@@ -154,19 +154,12 @@ public class SwingTest {
             System.err.println("Deepest coords: " + 
                     (int)(deepestCoords.getX()) + ", " +
                     (int)(deepestCoords.getY()));
-            evt.translatePoint((int)(deepestCoords.getX() - evt.getX()),
-                    (int)(deepestCoords.getY() - evt.getY()));
             System.out.println("Event coords: " +
                     evt.getX() + ", " + evt.getY());
-            //java.awt.EventQueue.postEvent(evt);
+            evt.translatePoint((int)(deepestCoords.getX() - evt.getX()),
+                    (int)(deepestCoords.getY() - evt.getY()));
             evt.setSource(cmp);
-            try{
-            SwingUtilities.invokeLater(new Runnable(){
-                public void run(){
-                    cmp.dispatchEvent(evt);
-                }
-            });
-            } catch (Exception swallowed){}
+            cmp.dispatchEvent(evt);
         }
 
         Point2D spaceToComponent(VSwingComponent c, Point2D vsCoords){
