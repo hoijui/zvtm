@@ -88,7 +88,7 @@ public class SwingTest {
             }
             Glyph pickedGlyph = pickList[pickList.length - 1];
             if(pickedGlyph instanceof VSwingComponent){
-                redispatch(v, e, (VSwingComponent)pickedGlyph);
+                redispatchMouse(v, e, (VSwingComponent)pickedGlyph);
             }
             System.err.println("press1");
         }
@@ -102,11 +102,11 @@ public class SwingTest {
             }
             Glyph pickedGlyph = pickList[pickList.length - 1];
             if(pickedGlyph instanceof VSwingComponent){
-                redispatch(v, e, (VSwingComponent)pickedGlyph);
+                redispatchMouse(v, e, (VSwingComponent)pickedGlyph);
             }
         }
 
-        public void click1(ViewPanel v, int mod, int jpx, int jpy, int clickNumber, MouseEvent e){
+        @Override public void click1(ViewPanel v, int mod, int jpx, int jpy, int clickNumber, MouseEvent e){
             //pick glyph under cursor, redispatch if it is an instance
             //of VSwingComponent
             Glyph[] pickList = v.getVCursor().getGlyphsUnderMouseList();
@@ -115,31 +115,31 @@ public class SwingTest {
             }
             Glyph pickedGlyph = pickList[pickList.length - 1];
             if(pickedGlyph instanceof VSwingComponent){
-                redispatch(v, e, (VSwingComponent)pickedGlyph);
+                redispatchMouse(v, e, (VSwingComponent)pickedGlyph);
             }
         }
-        public void click2(ViewPanel v, int mod, int jpx, int jpy, int clickNumber, MouseEvent e){
+        @Override public void click2(ViewPanel v, int mod, int jpx, int jpy, int clickNumber, MouseEvent e){
             Glyph[] pickList = v.getVCursor().getGlyphsUnderMouseList();
             if(pickList.length == 0){
                 return;
             }
             Glyph pickedGlyph = pickList[pickList.length - 1];
             if(pickedGlyph instanceof VSwingComponent){
-                redispatch(v, e, (VSwingComponent)pickedGlyph);
+                redispatchMouse(v, e, (VSwingComponent)pickedGlyph);
             }
         }
-        public void click3(ViewPanel v, int mod, int jpx, int jpy, int clickNumber, MouseEvent e){
+        @Override public void click3(ViewPanel v, int mod, int jpx, int jpy, int clickNumber, MouseEvent e){
             Glyph[] pickList = v.getVCursor().getGlyphsUnderMouseList();
             if(pickList.length == 0){
                 return;
             }
             Glyph pickedGlyph = pickList[pickList.length - 1];
             if(pickedGlyph instanceof VSwingComponent){
-                redispatch(v, e, (VSwingComponent)pickedGlyph);
+                redispatchMouse(v, e, (VSwingComponent)pickedGlyph);
             }
         }
 
-        void redispatch(ViewPanel v, final MouseEvent evt, VSwingComponent c){
+        void redispatchMouse(ViewPanel v, final MouseEvent evt, VSwingComponent c){
             //we have an event location in View coordinates
             //- transform into VS coords.
             //- transform VS coords into "global component" (VSC) coords
@@ -150,14 +150,8 @@ public class SwingTest {
             Point2D vsCoords = v.viewToSpaceCoords(v.cams[v.activeLayer], evt.getX(), evt.getY()); //XXX replace v.cams... by v.getActiveCamera
             Point2D pt = spaceToComponent(c, vsCoords);
             final Component cmp = SwingUtilities.getDeepestComponentAt(c.getComponent(), (int)pt.getX(), (int)pt.getY());
-            //System.out.println("Deepest component: " + cmp);
             Point2D deepestCoords = new Point2D.Double(pt.getX() - cmp.getX(),
                     pt.getY() - cmp.getY());
-            System.err.println("Deepest coords: " + 
-                    (int)(deepestCoords.getX()) + ", " +
-                    (int)(deepestCoords.getY()));
-            System.out.println("Event coords: " +
-                    evt.getX() + ", " + evt.getY());
             evt.translatePoint((int)(deepestCoords.getX() - evt.getX()),
                     (int)(deepestCoords.getY() - evt.getY()));
             evt.setSource(cmp);
