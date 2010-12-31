@@ -12,6 +12,7 @@ import java.util.Vector;
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
@@ -54,6 +55,7 @@ public class SwingTest {
             }
         });
         drawnPanel.add(btn);
+        drawnPanel.add(new JTextField("if(cesfo) assert(!frites)"));
         SwingUtilities.invokeAndWait(new Runnable(){
             public void run(){
                 drawnPanel.doLayout();
@@ -66,7 +68,8 @@ public class SwingTest {
 
         testSpace = vsm.addVirtualSpace("testSpace");
         cam = testSpace.addCamera();
-        cam.altitudeOffset(30); //check that event redirection works correctly at any zoom level
+        cam.setZoomFloor(-90);
+        cam.altitudeOffset(-20); //check that event redirection works correctly at any zoom level
         vsc.move(100, -50);
         testSpace.addGlyph(vsc);
         view = vsm.addFrameView(new Vector(Arrays.asList(new Camera[]{cam})),
@@ -90,7 +93,6 @@ public class SwingTest {
             if(pickedGlyph instanceof VSwingComponent){
                 redispatchMouse(v, e, (VSwingComponent)pickedGlyph);
             }
-            System.err.println("press1");
         }
 
         @Override public void release1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){

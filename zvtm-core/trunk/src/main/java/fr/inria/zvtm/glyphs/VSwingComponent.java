@@ -8,6 +8,8 @@
 package fr.inria.zvtm.glyphs;
 
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
@@ -690,6 +692,26 @@ public class VSwingComponent extends ClosedShape implements RectangularShape {
         res.bColor = this.bColor;
         res.setZoomSensitive(zoomSensitive);
         return res;
+    }
+
+    /**
+     * Utility function: to ensure proper display, it is necessary
+     * to set the size of 'standalone' Components, or to force the 
+     * layout of Containers.
+     * @see forceLayout
+     */
+    public static void setSizeToPreferred(Component cmp){
+      cmp.setSize(cmp.getPreferredSize());
+    }
+
+    /**
+     * Utility function: to ensure proper display, it is necessary
+     * to set the size of 'standalone' Components, or to force the 
+     * layout of Containers.
+     * @see setSizeToPreferred
+     */
+    public static void forceLayout(Container container){
+      container.doLayout();
     }
 
 }
