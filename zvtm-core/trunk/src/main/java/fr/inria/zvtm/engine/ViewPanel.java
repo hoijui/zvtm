@@ -488,7 +488,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 	}
     }
 
-    /**mouse entered this view*/
+    /** Mouse cursor entered this view. */
     public void mouseEntered(MouseEvent e){
         //make the view active any time the mouse enters it
         active = true;
@@ -500,11 +500,14 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
         }
     }
 
-    /**mouse exited this view*/
+    /** Mouse cursor exited this view. */
     public void mouseExited(MouseEvent e){
-	inside=false;
-	if ((!parent.isSelected()) && (!alwaysRepaintMe)){active=false;}
+        inside=false;
+        if ((!parent.isSelected()) && (!alwaysRepaintMe)){active=false;}
+        eraseCursor();
     }
+    
+    void eraseCursor(){}
     
     /** Should the viewpanel automatically request focus when cursor enters it or not.
      *  Default is false for external views (EView).

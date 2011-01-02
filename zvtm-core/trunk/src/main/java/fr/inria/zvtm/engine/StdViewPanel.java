@@ -357,19 +357,19 @@ public class StdViewPanel extends ViewPanel {
 					updateMouseOnly=false; // do this first as the thread can be interrupted inside this
 					doCursorPicking();
 					if (drawVTMcursor){
-						try {
-							stableRefToBackBufferGraphics.setXORMode(backColor);
-							stableRefToBackBufferGraphics.setColor(parent.mouse.color);
-							stableRefToBackBufferGraphics.drawLine(oldX-parent.mouse.size,oldY,oldX+parent.mouse.size,oldY);
-							stableRefToBackBufferGraphics.drawLine(oldX,oldY-parent.mouse.size,oldX,oldY+parent.mouse.size);
-							stableRefToBackBufferGraphics.drawLine(parent.mouse.mx-parent.mouse.size,parent.mouse.my,parent.mouse.mx+parent.mouse.size,parent.mouse.my);
-							stableRefToBackBufferGraphics.drawLine(parent.mouse.mx,parent.mouse.my-parent.mouse.size,parent.mouse.mx,parent.mouse.my+parent.mouse.size);
-							oldX = parent.mouse.mx;
-							oldY = parent.mouse.my;							        
-						}
-						//XXX: a nullpointerex on stableRefToBackBufferGraphics seems to occur from time to time when going in or exiting from blank mode
-						//just catch it and wait for next loop until we find out what's causing this
-						catch (NullPointerException ex47){if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.runview.drawVTMcursor "+ex47);}} 
+                        try {
+                            stableRefToBackBufferGraphics.setXORMode(backColor);
+                            stableRefToBackBufferGraphics.setColor(parent.mouse.color);
+                            stableRefToBackBufferGraphics.drawLine(oldX-parent.mouse.size,oldY,oldX+parent.mouse.size,oldY);
+                            stableRefToBackBufferGraphics.drawLine(oldX,oldY-parent.mouse.size,oldX,oldY+parent.mouse.size);
+                            stableRefToBackBufferGraphics.drawLine(parent.mouse.mx-parent.mouse.size,parent.mouse.my,parent.mouse.mx+parent.mouse.size,parent.mouse.my);
+                            stableRefToBackBufferGraphics.drawLine(parent.mouse.mx,parent.mouse.my-parent.mouse.size,parent.mouse.mx,parent.mouse.my+parent.mouse.size);
+                            oldX = parent.mouse.mx;
+                            oldY = parent.mouse.my;							        
+                        }
+                        //XXX: a nullpointerex on stableRefToBackBufferGraphics seems to occur from time to time when going in or exiting from blank mode
+                        //just catch it and wait for next loop until we find out what's causing this
+                        catch (NullPointerException ex47){if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.runview.drawVTMcursor "+ex47);}} 					        
 					}
 					paintImmediately(0,0,size.width,size.height);
 				}
@@ -387,6 +387,14 @@ public class StdViewPanel extends ViewPanel {
 			portalsHook();				
 			paintImmediately(0,0,size.width,size.height);
 		}
+	}
+	
+    void eraseCursor(){
+        stableRefToBackBufferGraphics.setXORMode(backColor);
+        stableRefToBackBufferGraphics.setColor(parent.mouse.color);
+        stableRefToBackBufferGraphics.drawLine(parent.mouse.mx-parent.mouse.size,parent.mouse.my,parent.mouse.mx+parent.mouse.size,parent.mouse.my);
+        stableRefToBackBufferGraphics.drawLine(parent.mouse.mx,parent.mouse.my-parent.mouse.size,parent.mouse.mx,parent.mouse.my+parent.mouse.size);
+        paintImmediately(0,0,size.width,size.height);
 	}
 
     @Override
