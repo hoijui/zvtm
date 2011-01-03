@@ -7,11 +7,8 @@
 package fr.inria.zvtm.glyphs;
 
 import java.awt.Color;
-import java.awt.AlphaComposite;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.Stroke;
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.awt.GradientPaint;
 
@@ -20,7 +17,6 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 import fr.inria.zvtm.engine.VirtualSpaceManager;
-import fr.inria.zvtm.glyphs.Translucent;
 import fr.inria.zvtm.glyphs.VImage;
 
 /**

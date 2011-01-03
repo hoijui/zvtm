@@ -7,10 +7,6 @@
 
 package fr.inria.zvtm.lens;
 
-import java.awt.geom.Point2D;
-import java.util.Timer;
-import java.util.TimerTask;
-
 public interface TemporalLens {
 
     /**set the position of the lens inside the view

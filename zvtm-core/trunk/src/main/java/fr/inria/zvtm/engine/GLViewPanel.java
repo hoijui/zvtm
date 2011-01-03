@@ -9,7 +9,6 @@
 
 package fr.inria.zvtm.engine;
 
-import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -24,7 +23,6 @@ import javax.swing.Timer;
 import java.util.Vector;
 
 import fr.inria.zvtm.glyphs.VText;
-import fr.inria.zvtm.engine.Java2DPainter;
 import fr.inria.zvtm.event.ViewListener;
 
 /**

@@ -8,15 +8,7 @@
 package fr.inria.zvtm.tests;
 
 import java.awt.Color;
-import java.awt.geom.Point2D;
-import java.util.Arrays;
-import java.util.Vector;
-
-import junit.framework.Test;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
-
-import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.engine.Utils;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;

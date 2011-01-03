@@ -9,10 +9,6 @@ package fr.inria.zvtm.glyphs;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.Graphics2D;
-import java.awt.Stroke;
-import java.awt.geom.AffineTransform;
-
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.glyphs.VCircle;
 

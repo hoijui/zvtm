@@ -29,18 +29,13 @@ import java.awt.AlphaComposite;
 import java.awt.geom.GeneralPath;
 
 import java.util.Vector;
-import java.util.Hashtable;
 import java.util.HashMap;
-import java.util.Arrays;
 import java.util.Set;
 
 import fr.inria.zvtm.event.ViewListener;
-import fr.inria.zvtm.lens.Lens;
-
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.DPath;
 import fr.inria.zvtm.glyphs.VSegment;
-import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.glyphs.Translucent;
 
 /* For DynaSpot */
@@ -48,9 +43,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.awt.geom.Point2D;
 import java.awt.geom.Ellipse2D;
-import java.awt.geom.Area;
-import java.awt.Point;
-
 import fr.inria.zvtm.event.DynaSpotListener;
 import fr.inria.zvtm.event.SelectionListener;
 import fr.inria.zvtm.glyphs.Translucency;

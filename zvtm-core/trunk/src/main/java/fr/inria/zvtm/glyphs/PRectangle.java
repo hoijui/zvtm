@@ -7,11 +7,8 @@
 package fr.inria.zvtm.glyphs;
 
 import java.awt.Color;
-import java.awt.AlphaComposite;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.Stroke;
-import java.awt.geom.Point2D;
 import java.awt.geom.AffineTransform;
 import java.awt.Paint;
 

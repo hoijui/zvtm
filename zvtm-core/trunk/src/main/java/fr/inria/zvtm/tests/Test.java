@@ -23,7 +23,6 @@
 package fr.inria.zvtm.tests;
 
 import java.awt.*;
-import javax.swing.*;
 import java.awt.event.*;
 
 import java.util.Vector;
@@ -31,10 +30,6 @@ import java.util.Vector;
 import fr.inria.zvtm.engine.*;
 import fr.inria.zvtm.glyphs.*;
 import fr.inria.zvtm.event.*;
-import fr.inria.zvtm.animation.*;
-import fr.inria.zvtm.animation.interpolation.*;
-import fr.inria.zvtm.lens.*;
-import fr.inria.zvtm.widgets.*;
 
 public class Test {
 

@@ -25,7 +25,6 @@ import fr.inria.zvtm.animation.AnimationManager;
 import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
 
 import fr.inria.zvtm.glyphs.*;
-import fr.inria.zvtm.glyphs.*;
 
 /** Add VirtualSpace content- and scale-aware scroll bars to a View. */
 

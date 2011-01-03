@@ -10,7 +10,6 @@ package fr.inria.zvtm.glyphs;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Dimension;
-import java.awt.Polygon;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Arc2D;
@@ -18,8 +17,6 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Area;
 import java.awt.Shape;
 import java.awt.geom.Point2D;
-import java.awt.Polygon;
-
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.Utils;

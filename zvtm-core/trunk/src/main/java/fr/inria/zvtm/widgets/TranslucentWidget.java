@@ -8,10 +8,6 @@
 package fr.inria.zvtm.widgets;
 
 import java.awt.AlphaComposite;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Graphics;
-import javax.swing.JButton;
 
 /** Translucent widgets to be overlaid on top of ZVTM views.
 *@author Emmanuel Pietriga

@@ -9,14 +9,11 @@ package fr.inria.zvtm.tests;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.event.ViewAdapter;
 import fr.inria.zvtm.engine.View;
-import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.Composite;
 import fr.inria.zvtm.glyphs.VCircle;
-import fr.inria.zvtm.glyphs.VRectangle;
-
 import java.awt.Color;
 import java.util.Vector;
 

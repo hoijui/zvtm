@@ -11,13 +11,11 @@ import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Graphics;
-import java.awt.event.MouseListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseAdapter;
 import javax.swing.JButton;
 import javax.swing.Action;
 import javax.swing.Icon;
-import javax.swing.BorderFactory;
 
 /** Translucent text area, typically used in an overlay pane.
 <p>Example of use, setting a white text on a dark translucent background:</p>

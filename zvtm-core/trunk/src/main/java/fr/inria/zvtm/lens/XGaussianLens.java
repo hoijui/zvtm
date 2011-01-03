@@ -9,7 +9,6 @@
 
 package fr.inria.zvtm.lens;
 
-import java.awt.image.DataBuffer;
 import java.awt.image.SinglePixelPackedSampleModel;
 import java.awt.image.WritableRaster;
 

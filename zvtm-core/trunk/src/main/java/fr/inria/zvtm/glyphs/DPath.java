@@ -12,11 +12,9 @@ package fr.inria.zvtm.glyphs;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
-import fr.inria.zvtm.glyphs.Translucent;
 import fr.inria.zvtm.glyphs.RectangularShape;
 import fr.inria.zvtm.glyphs.projection.ProjectedCoords;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;

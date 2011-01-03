@@ -11,7 +11,6 @@
 
 package fr.inria.zvtm.lens;
 
-import java.awt.Color;
 import java.awt.Graphics2D;
 
 /**Profile: manhattan - Distance metric: L(2) (circular shape)<br>Size expressed as an absolute value in pixels*/

@@ -32,14 +32,12 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 import java.awt.GridBagConstraints;
-import java.awt.event.ComponentListener;
 import java.awt.image.BufferedImage;
 import java.util.Vector;
 
 import javax.swing.JLabel;
 
 import fr.inria.zvtm.animation.Animation;
-import fr.inria.zvtm.animation.AnimationManager;
 import fr.inria.zvtm.animation.EndAction;
 import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 import fr.inria.zvtm.engine.Java2DPainter;

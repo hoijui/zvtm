@@ -1,12 +1,8 @@
 package fr.inria.zvtm.tests;
 
-import java.awt.AWTEvent;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.geom.Point2D;
 import java.util.Arrays;
 import java.util.Vector;
 import javax.swing.JButton;
@@ -19,11 +15,9 @@ import javax.swing.table.TableModel;
 
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.View;
-import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.event.SwingListener;
-import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VSwingComponent;
 
 /**
@@ -51,7 +45,7 @@ public class SwingTest {
         JButton btn = new JButton("42");
         btn.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent ae){
-                System.out.println("OMG I got clicked!!");
+                System.out.println("I got clicked!!");
             }
         });
         drawnPanel.add(btn);

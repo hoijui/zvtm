@@ -21,8 +21,6 @@
 package fr.inria.zvtm.animation.examples;
 
 import java.awt.*;
-import javax.swing.*;
-
 import java.util.Vector;
 
 import java.awt.event.KeyEvent;
@@ -32,11 +30,8 @@ import java.awt.event.MouseWheelEvent;
 import fr.inria.zvtm.engine.*;
 import fr.inria.zvtm.glyphs.*;
 import fr.inria.zvtm.event.*;
-import fr.inria.zvtm.widgets.*;
-
 import fr.inria.zvtm.animation.*;
 import fr.inria.zvtm.animation.interpolation.*;
-import org.jdesktop.animation.timing.*;
 import org.jdesktop.animation.timing.interpolation.*;
 
 // A simple camera animation.
