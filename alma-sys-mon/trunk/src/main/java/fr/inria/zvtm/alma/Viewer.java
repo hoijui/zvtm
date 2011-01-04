@@ -29,6 +29,7 @@ import javax.swing.JFrame;
 import javax.swing.JFileChooser;
 import javax.swing.ImageIcon;
 
+import java.io.File;
 import java.util.Vector;
 import java.util.Scanner;
 
@@ -40,12 +41,15 @@ import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.Utils;
 import fr.inria.zvtm.engine.SwingWorker;
+import fr.inria.zvtm.glyphs.IcePDFPageImg;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VImage;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.glyphs.RImage;
+
+import org.icepdf.core.pobjects.Document;
 
 public class Viewer {
 
@@ -71,9 +75,10 @@ public class Viewer {
     
     /* --------------- init ------------------*/
 
-    public Viewer(boolean fullscreen, boolean opengl, boolean antialiased){
+    public Viewer(String filename, boolean fullscreen, boolean opengl, boolean antialiased){
         init();
         initGUI(fullscreen, opengl, antialiased);
+        loadDocument(filename);
     }
     
     void init(){
@@ -128,6 +133,23 @@ public class Viewer {
 		nm.createOverview();
     }
 
+    void loadDocument(String filename){
+      if(!new File(filename).exists()){
+        System.err.println("No such file: " + filename);
+        return;
+      }
+      Document doc = new Document();
+      try{
+        doc.setFile(filename);
+      } catch (Exception ex){
+        ex.printStackTrace();
+        System.exit(1);
+      }
+      Glyph page =  new IcePDFPageImg(doc, 1);
+      mSpace.addGlyph(page);
+      doc.dispose();
+    }
+
     void windowLayout(){
         if (Utils.osIsWindows()){
             VIEW_X = VIEW_Y = 0;
@@ -157,6 +179,7 @@ public class Viewer {
 		boolean fs = false;
 		boolean ogl = false;
 		boolean aa = true;
+    String filename = "";
 		for (int i=0;i<args.length;i++){
 			if (args[i].startsWith("-")){
 				if (args[i].substring(1).equals("fs")){fs = true;}
@@ -166,13 +189,15 @@ public class Viewer {
 				}
 				else if (args[i].substring(1).equals("noaa")){aa = false;}
 				else if (args[i].substring(1).equals("h") || args[i].substring(1).equals("-help")){Messages.printCmdLineHelp();System.exit(0);}
-			}
+			} else {
+        filename = args[i];
+      }
 		}
         if (!fs && Utils.osIsMacOS()){
             System.setProperty("apple.laf.useScreenMenuBar", "true");
         }
         System.out.println(Messages.H_4_HELP);
-        new Viewer(fs, ogl, aa);
+        new Viewer(filename, fs, ogl, aa);
     }
     
 }
