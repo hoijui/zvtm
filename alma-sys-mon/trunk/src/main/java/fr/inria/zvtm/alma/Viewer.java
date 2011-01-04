@@ -104,7 +104,7 @@ public class Viewer {
         errorSpace = vsm.addVirtualSpace("errorSpace");
         Camera bgCamera = bgSpace.addCamera();
         Camera errorCamera = errorSpace.addCamera();
-        nm.ovCamera = errorCamera; 
+        nm.ovCamera = errorSpace.addCamera(); 
         errorCamera.stick(bgCamera); //stick background camera to main (error) camera
         aboutSpace = vsm.addVirtualSpace(Messages.aboutSpaceName);
         aboutSpace.addCamera();
