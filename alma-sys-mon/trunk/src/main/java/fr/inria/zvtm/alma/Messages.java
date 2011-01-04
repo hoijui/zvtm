@@ -24,7 +24,7 @@ public class Messages {
     
     static final String PROCESSING = "Processing ";
     
-    static final String mSpaceName = "VS1";
+    static final String bgSpaceName = "VS1";
     static final String aboutSpaceName = "About layer";
     static final String mViewName = "Basic UI";
     

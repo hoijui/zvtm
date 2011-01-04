@@ -64,7 +64,7 @@ public class Viewer {
     int panelWidth, panelHeight;
     
     VirtualSpaceManager vsm;
-    VirtualSpace mSpace, aboutSpace;
+    VirtualSpace bgSpace, aboutSpace;
     EView mView;
     
     MainEventHandler eh;
@@ -97,9 +97,9 @@ public class Viewer {
         vsm = VirtualSpaceManager.INSTANCE;
         ovm = new Overlay(this);
         nm = new Navigation(this);
-        mSpace = vsm.addVirtualSpace(Messages.mSpaceName);
-        Camera mCamera = mSpace.addCamera();
-        nm.ovCamera = mSpace.addCamera();
+        bgSpace = vsm.addVirtualSpace(Messages.bgSpaceName);
+        Camera mCamera = bgSpace.addCamera();
+        nm.ovCamera = bgSpace.addCamera();
         aboutSpace = vsm.addVirtualSpace(Messages.aboutSpaceName);
 		aboutSpace.addCamera();
         Vector cameras = new Vector();
@@ -146,7 +146,7 @@ public class Viewer {
         System.exit(1);
       }
       Glyph page =  new IcePDFPageImg(doc, 0);
-      mSpace.addGlyph(page);
+      bgSpace.addGlyph(page);
       doc.dispose();
       nm.updateOverview();
     }
