@@ -145,9 +145,10 @@ public class Viewer {
         ex.printStackTrace();
         System.exit(1);
       }
-      Glyph page =  new IcePDFPageImg(doc, 1);
+      Glyph page =  new IcePDFPageImg(doc, 0);
       mSpace.addGlyph(page);
       doc.dispose();
+      nm.updateOverview();
     }
 
     void windowLayout(){
