@@ -56,15 +56,15 @@ public class Viewer {
     /* screen dimensions, actual dimensions of windows */
     static int SCREEN_WIDTH =  Toolkit.getDefaultToolkit().getScreenSize().width;
     static int SCREEN_HEIGHT =  Toolkit.getDefaultToolkit().getScreenSize().height;
-    static int VIEW_MAX_W = 1024;  // 1400
-    static int VIEW_MAX_H = 768;   // 1050
+    static int VIEW_MAX_W = 800;  // 1400
+    static int VIEW_MAX_H = 550;   // 1050
     int VIEW_W, VIEW_H;
     int VIEW_X, VIEW_Y;
     /* dimensions of zoomable panel */
     int panelWidth, panelHeight;
     
     VirtualSpaceManager vsm;
-    VirtualSpace bgSpace, aboutSpace;
+    VirtualSpace bgSpace, errorSpace, aboutSpace;
     EView mView;
     
     MainEventHandler eh;
@@ -72,6 +72,8 @@ public class Viewer {
     Overlay ovm;
     
     VWGlassPane gp;
+
+    private IcePDFPageImg backgroundPage;
     
     /* --------------- init ------------------*/
 
@@ -79,6 +81,7 @@ public class Viewer {
         init();
         initGUI(fullscreen, opengl, antialiased);
         loadDocument(filename);
+        populateErrorSpace();
     }
     
     void init(){
@@ -98,13 +101,17 @@ public class Viewer {
         ovm = new Overlay(this);
         nm = new Navigation(this);
         bgSpace = vsm.addVirtualSpace(Messages.bgSpaceName);
-        Camera mCamera = bgSpace.addCamera();
-        nm.ovCamera = bgSpace.addCamera();
+        errorSpace = vsm.addVirtualSpace("errorSpace");
+        Camera bgCamera = bgSpace.addCamera();
+        Camera errorCamera = errorSpace.addCamera();
+        nm.ovCamera = errorCamera; 
+        errorCamera.stick(bgCamera); //stick background camera to main (error) camera
         aboutSpace = vsm.addVirtualSpace(Messages.aboutSpaceName);
-		aboutSpace.addCamera();
+        aboutSpace.addCamera();
         Vector cameras = new Vector();
-        cameras.add(mCamera);
-        nm.setCamera(mCamera);
+        cameras.add(bgCamera);
+        cameras.add(errorCamera);
+        nm.setCamera(errorCamera);
         cameras.add(aboutSpace.getCamera(0));
         mView = (EView)vsm.addFrameView(cameras, Messages.mViewName, (opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H,
                                         false, false, !fullscreen, (!fullscreen) ? Config.initMenu(this) : null);
@@ -133,7 +140,7 @@ public class Viewer {
 		nm.createOverview();
     }
 
-    void loadDocument(String filename){
+    private void loadDocument(String filename){
       if(!new File(filename).exists()){
         System.err.println("No such file: " + filename);
         return;
@@ -143,11 +150,35 @@ public class Viewer {
         doc.setFile(filename);
       } catch (Exception ex){
         ex.printStackTrace();
-        System.exit(1);
+        return;
       }
-      Glyph page =  new IcePDFPageImg(doc, 0);
-      bgSpace.addGlyph(page);
+      backgroundPage =  new IcePDFPageImg(doc, 0);
+      bgSpace.addGlyph(backgroundPage);
       doc.dispose();
+    }
+
+    // Demo: place random-like error boxes over the system schematics
+    private void populateErrorSpace(){
+      if(backgroundPage == null){
+        System.err.println("oops");
+        return;
+      }
+
+      final double[] xPos = new double[]{
+        0.77, 0.59, 0.34, 0.85,
+        0.75, 0.02, 0.90, 0.33,
+        0.60, 0.21};
+      final double[] yPos = new double[]{
+        0.72, 0.61, 0.97, 0.72,
+        0.55, 0.50, 0.38, 0.83,
+        0.74,0.90};
+
+      for(int i=0; i<xPos.length; ++i){
+        Glyph rect = new VRectangle((xPos[i] - 0.5)*backgroundPage.getWidth(),
+            (yPos[i] - 0.5)*backgroundPage.getHeight(),
+            0,200,200,Color.RED);
+        errorSpace.addGlyph(rect);
+      }
       nm.updateOverview();
     }
 
