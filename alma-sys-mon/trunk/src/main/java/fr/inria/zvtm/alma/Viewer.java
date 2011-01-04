@@ -176,7 +176,7 @@ public class Viewer {
       for(int i=0; i<xPos.length; ++i){
         Glyph rect = new VRectangle((xPos[i] - 0.5)*backgroundPage.getWidth(),
             (yPos[i] - 0.5)*backgroundPage.getHeight(),
-            0,200,200,Color.RED);
+            0,50,30,Color.RED);
         errorSpace.addGlyph(rect);
       }
       nm.updateOverview();
@@ -371,7 +371,7 @@ class Overlay implements ViewListener {
 	            }				
 			}
 		}
-		application.mView.setActiveLayer(0);
+		application.mView.setActiveLayer(1);
 		application.nm.ovPortal.setVisible(true);
 	}
 
