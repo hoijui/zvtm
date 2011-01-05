@@ -59,7 +59,7 @@ class MainEventHandler implements ViewListener, ComponentListener, PortalListene
     public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
         Point2D spcCoords = v.viewToSpaceCoords(application.nm.mCamera, 
                 jpx, jpy);
-        System.out.println("space coords: " + spcCoords.getX() + ", " + spcCoords.getY());
+        System.out.println("error space coords: " + spcCoords.getX() + ", " + spcCoords.getY());
         lastJPX = jpx;
         lastJPY = jpy;
         if (inPortal){
@@ -94,7 +94,14 @@ class MainEventHandler implements ViewListener, ComponentListener, PortalListene
 		}
     }
 
-    public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
+    public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
+        Glyph[] pickList = v.getVCursor().getGlyphsUnderMouseList();
+        if(pickList.length == 0){
+            return;
+        }
+        Glyph pickedGlyph = pickList[pickList.length - 1];
+        v.parent.centerOnGlyph(pickedGlyph, application.nm.mCamera, 500);
+    }
 
     public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
