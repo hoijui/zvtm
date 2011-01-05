@@ -153,9 +153,10 @@ public class Viewer {
         ex.printStackTrace();
         return;
       }
-      backgroundPage =  new IcePDFPageImg(doc, 0);
+      backgroundPage =  new IcePDFPageImg(0, 0, 0, doc, 0, 2f, 1);
       bgSpace.addGlyph(backgroundPage);
       doc.dispose();
+      nm.updateOverview();
     }
 
     // Demo: place random-like error boxes over the system schematics
@@ -165,22 +166,26 @@ public class Viewer {
         return;
       }
 
-      final double[] xPos = new double[]{
-        0.77, 0.59, 0.34, 0.85,
-        0.75, 0.02, 0.90, 0.33,
-        0.60, 0.21};
-      final double[] yPos = new double[]{
-        0.72, 0.61, 0.97, 0.72,
-        0.55, 0.50, 0.38, 0.83,
-        0.74,0.90};
-
-      for(int i=0; i<xPos.length; ++i){
-        Glyph rect = new VRectangle((xPos[i] - 0.5)*backgroundPage.getWidth(),
-            (yPos[i] - 0.5)*backgroundPage.getHeight(),
-            0,50,30,Color.RED, Color.BLACK, 0.4f);
-        errorSpace.addGlyph(rect);
+      final double[][] rects = new double[][]{
+          {71,285,336,182},
+          {305,-686,705,-828},
+          {1364, -610, 1655, -680}
+      }; 
+      for(int i=0; i<rects.length; ++i){
+        Glyph rect = makeRect(rects[i][0],
+                rects[i][1], rects[i][2], rects[i][3]);
+            errorSpace.addGlyph(rect);
       }
       nm.updateOverview();
+    }
+
+    private static VRectangle makeRect(double x1, double y1, 
+            double x2, double y2){
+        double w = Math.abs(x1 - x2);
+        double h = Math.abs(y1 - y2);
+        double cx = Math.min(x1, x2) + (w/2.);
+        double cy = Math.min(y1, y2) + (h/2.);
+        return new VRectangle(cx, cy, 0, w, h, Color.RED, Color.BLACK, 0.4f);
     }
 
     void windowLayout(){

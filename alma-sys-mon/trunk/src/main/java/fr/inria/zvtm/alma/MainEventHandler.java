@@ -7,6 +7,7 @@
 
 package fr.inria.zvtm.alma;
 
+import java.awt.geom.Point2D;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
@@ -56,6 +57,9 @@ class MainEventHandler implements ViewListener, ComponentListener, PortalListene
     }
 
     public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+        Point2D spcCoords = v.viewToSpaceCoords(application.nm.mCamera, 
+                jpx, jpy);
+        System.out.println("space coords: " + spcCoords.getX() + ", " + spcCoords.getY());
         lastJPX = jpx;
         lastJPY = jpy;
         if (inPortal){
