@@ -167,7 +167,7 @@ public class Viewer {
       }
 
       final double[][] rects = new double[][]{
-          {71,285,336,182},
+          {71,285,336,162},
           {305,-686,705,-828},
           {1364, -610, 1655, -680}
       }; 
@@ -180,7 +180,7 @@ public class Viewer {
         Glyph rect = makeRect(rects[i][0],
                 rects[i][1], rects[i][2], rects[i][3]);
         errorSpace.addGlyph(rect);
-        VText text = new VText(rects[i][0], rects[i][1]+20, 0, Color.YELLOW, errorMessages[i]);
+        VText text = new VText(rects[i][0], rects[i][1]+20, 0, new Color(255, 100, 100), errorMessages[i]);
         text.setBorderColor(Color.BLACK);
         text.setDrawBorder(true);
         text.setScale(3f);
