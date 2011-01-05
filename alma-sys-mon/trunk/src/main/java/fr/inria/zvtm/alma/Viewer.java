@@ -226,6 +226,7 @@ public class Viewer {
               mView.centerOnGlyph(g, nm.mCamera, 500);
           }
       });
+      lst.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
       lp.add(lst, (Integer)(JLayeredPane.DEFAULT_LAYER+50));
       lst.setBounds(0,0,150,300);
 
