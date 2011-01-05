@@ -38,7 +38,7 @@ public class TranslucentListCellRenderer extends JLabel implements
 			boolean cellHasFocus) // the list and the cell have the focus
 	{
 		setBorder(BorderFactory.createCompoundBorder(BorderFactory
-				.createMatteBorder(0, 0, 0, 0, Color.lightGray), BorderFactory
+				.createMatteBorder(0, 0, 0, 2, Color.LIGHT_GRAY), BorderFactory
 				.createEmptyBorder(1, 6, 1, 3)));
 		if (list.getName() != null) {
 			String str = ((String) value).substring(0, ((String) value)
@@ -52,8 +52,7 @@ public class TranslucentListCellRenderer extends JLabel implements
 			}
 		}
 		setText(value.toString());
-		setBackground(isSelected ? new Color(0, 255, 0, 40) : new Color(0, 0,
-				0, 40));
+		setBackground(isSelected ? Color.BLACK : Color.DARK_GRAY);
 		setForeground(isSelected ? list.getSelectionForeground() : list
 				.getForeground());
 		setEnabled(list.isEnabled());
