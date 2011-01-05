@@ -24,12 +24,19 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import javax.swing.AbstractListModel;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JFileChooser;
 import javax.swing.ImageIcon;
+import javax.swing.JLayeredPane;
+import javax.swing.JList;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.ListSelectionModel;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Vector;
 import java.util.Scanner;
 
@@ -46,6 +53,7 @@ import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VImage;
 import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.widgets.TranslucentJList;
 import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.glyphs.RImage;
 
@@ -159,6 +167,15 @@ public class Viewer {
       nm.updateOverview();
     }
 
+    class ErrorRepr {
+        String msg;
+        VRectangle box;
+        VText textMsg;
+        public String toString(){
+            return msg;
+        }
+    }
+
     // Demo: place random-like error boxes over the system schematics
     private void populateErrorSpace(){
       if(backgroundPage == null){
@@ -176,8 +193,10 @@ public class Viewer {
           "Wrong clock reference",
           "Lost master clock"
       };
+      final ArrayList<ErrorRepr> errors = new ArrayList<ErrorRepr>();
       for(int i=0; i<rects.length; ++i){
-        Glyph rect = makeRect(rects[i][0],
+        ErrorRepr er = new ErrorRepr();
+        VRectangle rect = makeRect(rects[i][0],
                 rects[i][1], rects[i][2], rects[i][3]);
         errorSpace.addGlyph(rect);
         VText text = new VText(rects[i][0], rects[i][1]+20, 0, new Color(255, 100, 100), errorMessages[i]);
@@ -185,7 +204,31 @@ public class Viewer {
         text.setDrawBorder(true);
         text.setScale(3f);
         errorSpace.addGlyph(text);
+        er.msg = errorMessages[i];
+        er.box = rect;
+        er.textMsg = text;
+        errors.add(er);
       }
+
+      JFrame frm = (JFrame)(mView.getFrame());
+      JLayeredPane lp = frm.getRootPane().getLayeredPane();
+      JList lst = new TranslucentJList(new AbstractListModel(){
+          public int getSize() { return errors.size(); }
+          public Object getElementAt(int index) { return errors.get(index); }
+      });
+      lst.addListSelectionListener(new ListSelectionListener(){
+          public void valueChanged(ListSelectionEvent lse){
+              if(!lse.getValueIsAdjusting()) return;
+              JList lst = (JList)lse.getSource();
+              ErrorRepr er = (ErrorRepr)lst.getSelectedValue();
+              if(er == null) return;
+              Glyph g = er.box;
+              mView.centerOnGlyph(g, nm.mCamera, 500);
+          }
+      });
+      lp.add(lst, (Integer)(JLayeredPane.DEFAULT_LAYER+50));
+      lst.setBounds(0,0,150,300);
+
       nm.updateOverview();
     }
 
