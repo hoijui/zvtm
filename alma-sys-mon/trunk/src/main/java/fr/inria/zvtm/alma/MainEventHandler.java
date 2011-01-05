@@ -136,7 +136,7 @@ class MainEventHandler implements ViewListener, ComponentListener, PortalListene
 			lastJPY = jpy;
 		}
 		else if (panning){
-            Camera c = v.cams[0];
+            Camera c = application.nm.mCamera;
             double a = (c.focal+Math.abs(c.altitude))/c.focal;
             if (mod == META_SHIFT_MOD) {
                 application.vsm.getAnimationManager().setXspeed(0);

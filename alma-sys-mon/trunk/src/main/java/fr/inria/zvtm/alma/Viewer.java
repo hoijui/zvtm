@@ -52,7 +52,7 @@ import fr.inria.zvtm.glyphs.RImage;
 import org.icepdf.core.pobjects.Document;
 
 public class Viewer {
-
+    private static final int ERROR_LAYER = 1;
     /* screen dimensions, actual dimensions of windows */
     static int SCREEN_WIDTH =  Toolkit.getDefaultToolkit().getScreenSize().width;
     static int SCREEN_HEIGHT =  Toolkit.getDefaultToolkit().getScreenSize().height;
@@ -127,7 +127,7 @@ public class Viewer {
 		((JFrame)mView.getFrame()).setGlassPane(gp);
         eh = new MainEventHandler(this);
         mView.setListener(eh, 0);
-        mView.setListener(ovm, 1);
+        mView.setListener(eh, 1);
         mView.setAntialiasing(antialiased);
         mView.setBackgroundColor(Config.BACKGROUND_COLOR);
 		mView.getPanel().addComponentListener(eh);
@@ -137,6 +137,7 @@ public class Viewer {
 			}
 		};
 		mView.getFrame().addComponentListener(ca0);
+        mView.setActiveLayer(ERROR_LAYER);
 		nm.createOverview();
     }
 
@@ -176,7 +177,7 @@ public class Viewer {
       for(int i=0; i<xPos.length; ++i){
         Glyph rect = new VRectangle((xPos[i] - 0.5)*backgroundPage.getWidth(),
             (yPos[i] - 0.5)*backgroundPage.getHeight(),
-            0,50,30,Color.RED);
+            0,50,30,Color.RED, Color.BLACK, 0.4f);
         errorSpace.addGlyph(rect);
       }
       nm.updateOverview();
