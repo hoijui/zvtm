@@ -171,10 +171,20 @@ public class Viewer {
           {305,-686,705,-828},
           {1364, -610, 1655, -680}
       }; 
+      final String[] errorMessages = new String[]{
+          "Power supply fault",
+          "Wrong clock reference",
+          "Lost master clock"
+      };
       for(int i=0; i<rects.length; ++i){
         Glyph rect = makeRect(rects[i][0],
                 rects[i][1], rects[i][2], rects[i][3]);
-            errorSpace.addGlyph(rect);
+        errorSpace.addGlyph(rect);
+        VText text = new VText(rects[i][0], rects[i][1]+20, 0, Color.YELLOW, errorMessages[i]);
+        text.setBorderColor(Color.BLACK);
+        text.setDrawBorder(true);
+        text.setScale(3f);
+        errorSpace.addGlyph(text);
       }
       nm.updateOverview();
     }
