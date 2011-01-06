@@ -39,17 +39,6 @@ public class TranslucentListCellRenderer extends JLabel implements
 	private int startColor = 0;
 	private int endColor = 1;
 
-	public TranslucentListCellRenderer(JList list) {
-		setBorder(BorderFactory.createCompoundBorder(BorderFactory
-				.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY), BorderFactory
-				.createEmptyBorder(1, 6, 1, 3)));
-
-		setEnabled(list.isEnabled());
-		setFont(list.getFont());
-		setBackground(Color.GRAY);
-		setOpaque(true);
-	}
-
 	public Component getListCellRendererComponent(JList list, Object value, // value
 			// to
 			// display
@@ -57,6 +46,10 @@ public class TranslucentListCellRenderer extends JLabel implements
 			boolean isSelected, // is the cell selected
 			boolean cellHasFocus) // the list and the cell have the focus
 	{
+		setBorder(BorderFactory.createCompoundBorder(BorderFactory
+				.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY), BorderFactory
+				.createEmptyBorder(1, 6, 1, 3)));
+
 		if (list.getName() != null) {
 			String str = ((String) value).substring(0, ((String) value)
 					.length() - 4);
@@ -72,21 +65,25 @@ public class TranslucentListCellRenderer extends JLabel implements
 		setBackground(isSelected ? Color.BLACK : Color.DARK_GRAY);
 		setForeground(isSelected ? list.getSelectionForeground() : list
 				.getForeground());
-		if (value.toString().length() > 0) {
+		setEnabled(list.isEnabled());
+		setFont(list.getFont());
+		setOpaque(true);
+		/*if (value.toString().length() > 0) {
 			as = new AttributedString(value.toString());
 			as.addAttribute(TextAttribute.FOREGROUND, Color.RED, startColor,
 					endColor);
 		}
+		*/
 
 		return this;
 	}
 
-	public void paint(Graphics g) {
+/*	public void paint(Graphics g) {
 		g.drawString(as.getIterator(), 4, 12);
 	}
 
 	public void setInterval(int start, int end) {
 		startColor = start;
 		endColor = end;
-	}
+	}*/
 }
