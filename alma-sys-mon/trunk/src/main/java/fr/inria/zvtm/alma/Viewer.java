@@ -64,20 +64,19 @@ public class Viewer {
     /* screen dimensions, actual dimensions of windows */
     static int SCREEN_WIDTH =  Toolkit.getDefaultToolkit().getScreenSize().width;
     static int SCREEN_HEIGHT =  Toolkit.getDefaultToolkit().getScreenSize().height;
-    static int VIEW_MAX_W = 800;  // 1400
-    static int VIEW_MAX_H = 550;   // 1050
+    static int VIEW_MAX_W = 1024;  // 1400
+    static int VIEW_MAX_H = 600;   // 1050
     int VIEW_W, VIEW_H;
     int VIEW_X, VIEW_Y;
     /* dimensions of zoomable panel */
     int panelWidth, panelHeight;
     
     VirtualSpaceManager vsm;
-    VirtualSpace bgSpace, errorSpace, aboutSpace;
+    VirtualSpace bgSpace, errorSpace;
     EView mView;
     
     MainEventHandler eh;
     Navigation nm;
-    Overlay ovm;
     
     VWGlassPane gp;
 
@@ -106,7 +105,6 @@ public class Viewer {
     void initGUI(boolean fullscreen, boolean opengl, boolean antialiased){
         windowLayout();
         vsm = VirtualSpaceManager.INSTANCE;
-        ovm = new Overlay(this);
         nm = new Navigation(this);
         bgSpace = vsm.addVirtualSpace(Messages.bgSpaceName);
         errorSpace = vsm.addVirtualSpace("errorSpace");
@@ -114,13 +112,10 @@ public class Viewer {
         Camera errorCamera = errorSpace.addCamera();
         nm.ovCamera = errorSpace.addCamera(); 
         errorCamera.stick(bgCamera); //stick background camera to main (error) camera
-        aboutSpace = vsm.addVirtualSpace(Messages.aboutSpaceName);
-        aboutSpace.addCamera();
         Vector cameras = new Vector();
         cameras.add(bgCamera);
         cameras.add(errorCamera);
         nm.setCamera(errorCamera);
-        cameras.add(aboutSpace.getCamera(0));
         mView = (EView)vsm.addFrameView(cameras, Messages.mViewName, (opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H,
                                         false, false, !fullscreen, (!fullscreen) ? Config.initMenu(this) : null);
         if (fullscreen){
@@ -130,7 +125,6 @@ public class Viewer {
             mView.setVisible(true);
         }
         updatePanelSize();
-        ovm.init();
 		gp = new VWGlassPane(this);
 		((JFrame)mView.getFrame()).setGlassPane(gp);
         eh = new MainEventHandler(this);
@@ -162,6 +156,7 @@ public class Viewer {
         return;
       }
       backgroundPage =  new IcePDFPageImg(0, 0, 0, doc, 0, 2f, 1);
+      backgroundPage.setInterpolationMethod(java.awt.RenderingHints.VALUE_INTERPOLATION_BILINEAR);
       bgSpace.addGlyph(backgroundPage);
       doc.dispose();
       nm.updateOverview();
@@ -199,7 +194,7 @@ public class Viewer {
         VRectangle rect = makeRect(rects[i][0],
                 rects[i][1], rects[i][2], rects[i][3]);
         errorSpace.addGlyph(rect);
-        VText text = new VText(rects[i][0], rects[i][1]+20, 0, new Color(255, 100, 100), errorMessages[i]);
+        VText text = new VText(rects[i][0], rects[i][1]+20, 0, Color.RED, errorMessages[i]);
         text.setBorderColor(Color.BLACK);
         text.setDrawBorder(true);
         text.setScale(3f);
@@ -228,7 +223,7 @@ public class Viewer {
       });
       lst.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
       lp.add(lst, (Integer)(JLayeredPane.DEFAULT_LAYER+50));
-      lst.setBounds(0,0,150,300);
+      lst.setBounds(0,0,Config.OVERVIEW_WIDTH,200);
 
       nm.updateOverview();
     }
@@ -239,7 +234,7 @@ public class Viewer {
         double h = Math.abs(y1 - y2);
         double cx = Math.min(x1, x2) + (w/2.);
         double cy = Math.min(y1, y2) + (h/2.);
-        return new VRectangle(cx, cy, 0, w, h, Color.RED, Color.BLACK, 0.4f);
+        return new VRectangle(cx, cy, 0, w, h, Color.RED, Color.BLACK, 0.7f);
     }
 
     void windowLayout(){
@@ -356,162 +351,4 @@ class VWGlassPane extends JComponent {
         g2.drawRect(prX, prY, BAR_WIDTH, BAR_HEIGHT);
     }
     
-}
-
-class Overlay implements ViewListener {
-    
-    Viewer application;
-
-    boolean showingAbout = false;
-    VRectangle fadeAbout;
-    VImage insituLogo, inriaLogo;
-    VText[] aboutLines;
-
-    VRectangle fadedRegion;
-    VText sayGlyph;
-
-    Overlay(Viewer app){
-        this.application = app;
-    }
-
-    void init(){
-        fadedRegion = new VRectangle(0, 0, 0, 20, 20, Config.FADE_REGION_FILL, Config.FADE_REGION_STROKE, 0.85f);
-        application.aboutSpace.addGlyph(fadedRegion);
-        fadedRegion.setVisible(false);
-        sayGlyph = new VText(0, -10, 0, Config.SAY_MSG_COLOR, Messages.EMPTY_STRING, VText.TEXT_ANCHOR_MIDDLE);
-        sayGlyph.setFont(Config.SAY_MSG_FONT);
-        application.aboutSpace.addGlyph(sayGlyph);
-        sayGlyph.setVisible(false);
-    }
-    
-    void showAbout(){
-        if (!showingAbout){
-            fadeAbout = new VRectangle(0, 0, 0, Math.round(application.panelWidth/1.05), Math.round(application.panelHeight/1.5),
-                Config.FADE_REGION_FILL, Config.FADE_REGION_STROKE, 0.85f);
-            aboutLines = new VText[4];
-			aboutLines[0] = new VText(0, 150, 0, Color.WHITE, Messages.APP_NAME, VText.TEXT_ANCHOR_MIDDLE, 4.0f);
-            aboutLines[1] = new VText(0, 110, 0, Color.WHITE, Messages.V+Messages.VERSION, VText.TEXT_ANCHOR_MIDDLE, 2.0f);
-            aboutLines[2] = new VText(0, 40, 0, Color.WHITE, Messages.AUTHORS, VText.TEXT_ANCHOR_MIDDLE, 2.0f);
-            RImage.setReflectionHeight(0.7f);
-            inriaLogo = new RImage(-150, -40, 0, (new ImageIcon(this.getClass().getResource(Config.INRIA_LOGO_PATH))).getImage(), 1.0f);
-            insituLogo = new RImage(200, -40, 0, (new ImageIcon(this.getClass().getResource(Config.INSITU_LOGO_PATH))).getImage(), 1.0f);
-            aboutLines[3] = new VText(0, -200, 0, Color.WHITE, Messages.ABOUT_DEPENDENCIES, VText.TEXT_ANCHOR_MIDDLE, 2.0f);
-            aboutLines[3].setFont(Config.MONOSPACE_ABOUT_FONT);
-            application.aboutSpace.addGlyph(fadeAbout);
-            application.aboutSpace.addGlyph(inriaLogo);
-            application.aboutSpace.addGlyph(insituLogo);
-			for (int i=0;i<aboutLines.length;i++){
-	            application.aboutSpace.addGlyph(aboutLines[i]);				
-			}
-            showingAbout = true;
-        }
-		application.mView.setActiveLayer(1);
-		if (application.nm.ovPortal.isVisible()){application.nm.toggleOverview();}
-    }
-
-    void hideAbout(){
-        if (showingAbout){
-            showingAbout = false;
-            if (insituLogo != null){
-                application.aboutSpace.removeGlyph(insituLogo);
-                insituLogo = null;
-            }
-            if (inriaLogo != null){
-                application.aboutSpace.removeGlyph(inriaLogo);
-                inriaLogo = null;
-            }
-            if (fadeAbout != null){
-                application.aboutSpace.removeGlyph(fadeAbout);
-                fadeAbout = null;
-            }
-			for (int i=0;i<aboutLines.length;i++){
-	            if (aboutLines[i] != null){
-	                application.aboutSpace.removeGlyph(aboutLines[i]);
-	                aboutLines[i] = null;
-	            }				
-			}
-		}
-		application.mView.setActiveLayer(1);
-		application.nm.ovPortal.setVisible(true);
-	}
-
-    void say(final String msg){
-    	final SwingWorker worker = new SwingWorker(){
-    		public Object construct(){
-    		    showMessage(msg);
-    		    sleep(Config.SAY_DURATION);
-    		    hideMessage();
-    		    return null;
-    		}
-    	    };
-    	worker.start();
-    }
-
-    void showMessage(String msg){
-        synchronized(this){
-            fadedRegion.setWidth(application.panelWidth/2-1);
-            fadedRegion.setHeight(50);
-            sayGlyph.setText(msg);
-            fadedRegion.setVisible(true);
-            sayGlyph.setVisible(true);
-        }
-    }
-
-    void hideMessage(){
-        synchronized(this){
-            fadedRegion.setVisible(false);
-            sayGlyph.setVisible(false);
-        }
-    }
-
-	public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	}
-
-	public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
-
-	public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-		hideAbout();
-	}
-
-	public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
-
-	public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
-
-	public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
-
-	public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
-
-	public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
-
-	public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
-
-	public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){}
-
-	public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){}
-
-	public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){}
-
-	public void enterGlyph(Glyph g){}
-
-	public void exitGlyph(Glyph g){}
-
-	public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
-		hideAbout();
-	}
-
-	public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
-
-	public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
-
-	public void viewActivated(View v){}
-
-	public void viewDeactivated(View v){}
-
-	public void viewIconified(View v){}
-
-	public void viewDeiconified(View v){}
-
-	public void viewClosing(View v){
-		application.exit();
-	}
 }

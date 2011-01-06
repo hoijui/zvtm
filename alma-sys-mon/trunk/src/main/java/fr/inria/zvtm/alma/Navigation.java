@@ -118,7 +118,7 @@ class Navigation {
 	OverviewPortal ovPortal;
 	
 	void createOverview(){
-		ovPortal = new OverviewPortal(application.panelWidth-Config.OVERVIEW_WIDTH-1, application.panelHeight-Config.OVERVIEW_HEIGHT-1,
+		ovPortal = new OverviewPortal(0, application.panelHeight-Config.OVERVIEW_HEIGHT-1,
 		                              Config.OVERVIEW_WIDTH, Config.OVERVIEW_HEIGHT, ovCamera, mCamera);
 		ovPortal.setPortalListener(application.eh);
 		ovPortal.setBackgroundColor(Config.BACKGROUND_COLOR);
@@ -137,7 +137,7 @@ class Navigation {
 	
 	void updateOverviewLocation(){
 	    if (ovPortal != null){
-	        ovPortal.moveTo(application.panelWidth-Config.OVERVIEW_WIDTH-1, application.panelHeight-Config.OVERVIEW_HEIGHT-1);
+	        ovPortal.moveTo(0, application.panelHeight-Config.OVERVIEW_HEIGHT-1);
 	    }
 	}
 
