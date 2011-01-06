@@ -74,7 +74,10 @@ public class Matrix {
 	 * */
     public Matrix(String name, Vector<NTNode> nodes){
         this.name = name;
-        this.nodes = nodes;
+        for(NTNode n : nodes)
+        {
+        	this.addNode(n);
+        }
     }
     
     void createNodeGraphics(long x, long y, VirtualSpace vs){

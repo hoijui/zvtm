@@ -56,6 +56,8 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
 		long x1, y1, x2, y2;
 		
         offsets = new LongPoint[2];
+        
+     //   System.out.println("Name: " + edge.getTail().getName());
         LongPoint tmp = edge.getTail().getMatrix().getPosition();
         LongPoint hmp = edge.getHead().getMatrix().getPosition();
         double angle = Math.atan2(edge.tail.getMatrix().bkg.vy-edge.head.getMatrix().bkg.vy, edge.tail.getMatrix().bkg.vx-edge.head.getMatrix().bkg.vx) + Math.PI;       

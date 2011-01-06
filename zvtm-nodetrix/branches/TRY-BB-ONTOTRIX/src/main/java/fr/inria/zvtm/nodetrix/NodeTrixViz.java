@@ -94,7 +94,7 @@ public class NodeTrixViz {
     //-------------BUILDING COMPONENTS----------BUILDING COMPONENTS----------BUILDING COMPONENTS----------BUILDING COMPONENTS----------
     
     public Matrix createAddMatrix(String name, Vector<NTNode> nodes){
-        Matrix m = new Matrix(name, nodes);
+    	Matrix m = new Matrix(name, nodes);
 //      for(NTNode 	n : nodes){
 //      	n.setMatrix(m);
 //      }
@@ -140,9 +140,8 @@ public class NodeTrixViz {
 				m = new Matrix("[" + cluster + "]", new Vector<NTNode>());
 				newMatrices.put(cluster, m);
 			}
+			//System.out.println("createMatricesByClustering");
 			m.addNode(n);
-//			n.setMatrix(m);
-			
 		}
 		return newMatrices.values().toArray(new Matrix[0]);
 //		
