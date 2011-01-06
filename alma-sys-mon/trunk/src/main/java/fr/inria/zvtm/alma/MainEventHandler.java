@@ -34,7 +34,7 @@ class MainEventHandler implements ViewListener, ComponentListener, PortalListene
     
     //remember last mouse coords
     int lastJPX,lastJPY;
-    long lastVX, lastVY;
+    double lastVX, lastVY;
     
     Viewer application;
     
@@ -95,12 +95,30 @@ class MainEventHandler implements ViewListener, ComponentListener, PortalListene
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-        Glyph[] pickList = v.getVCursor().getGlyphsUnderMouseList();
-        if(pickList.length == 0){
-            return;
+        if (mod == SHIFT_MOD){
+            lastVX = v.getVCursor().vx;
+            lastVY = v.getVCursor().vy;
+            if (!inPortal){
+                if (application.nm.lensType != Navigation.NO_LENS){
+                    application.nm.zoomInPhase2(lastVX, lastVY);
+                }
+                else {
+                    if (cursorNearBorder){
+                        // do not activate the lens when cursor is near the border
+                        return;
+                    }
+                    application.nm.zoomInPhase1(jpx, jpy);
+                }            
+            }
         }
-        Glyph pickedGlyph = pickList[pickList.length - 1];
-        v.parent.centerOnGlyph(pickedGlyph, application.nm.mCamera, 500);
+        else {
+            Glyph[] pickList = v.getVCursor().getGlyphsUnderMouseList();
+            if (pickList.length == 0){
+                return;
+            }
+            Glyph pickedGlyph = pickList[pickList.length - 1];
+            v.parent.centerOnGlyph(pickedGlyph, application.nm.mCamera, 500);            
+        }
     }
 
     public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
@@ -125,12 +143,51 @@ class MainEventHandler implements ViewListener, ComponentListener, PortalListene
 	}
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-        if (v.lastGlyphEntered() != null){
-    		application.mView.centerOnGlyph(v.lastGlyphEntered(), v.cams[0], Config.ANIM_MOVE_LENGTH, true, 1.0f);				
-		}
+        if (mod == SHIFT_MOD || mod == META_SHIFT_MOD){
+            lastVX = v.getVCursor().vx;
+            lastVY = v.getVCursor().vy;
+            if (application.nm.lensType != Navigation.NO_LENS){
+                application.nm.zoomOutPhase2();
+            }
+            else {
+                if (cursorNearBorder){
+                    // do not activate the lens when cursor is near the border
+                    return;
+                }
+                application.nm.zoomOutPhase1(jpx, jpy, lastVX, lastVY);
+            }
+        }
+        else {
+            if (v.lastGlyphEntered() != null){
+        		application.mView.centerOnGlyph(v.lastGlyphEntered(), v.cams[0], Config.ANIM_MOVE_LENGTH, true, 1.0f);				
+    		}            
+        }
     }
         
-    public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){}
+    public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
+        if ((jpx-Navigation.LENS_R1) < 0){
+    	    jpx = Navigation.LENS_R1;
+    	    cursorNearBorder = true;
+    	}
+    	else if ((jpx+Navigation.LENS_R1) > application.panelWidth){
+    	    jpx = application.panelWidth - Navigation.LENS_R1;
+    	    cursorNearBorder = true;
+    	}
+    	else {
+    	    cursorNearBorder = false;
+    	}
+    	if ((jpy-Navigation.LENS_R1) < 0){
+    	    jpy = Navigation.LENS_R1;
+    	    cursorNearBorder = true;
+    	}
+    	else if ((jpy+Navigation.LENS_R1) > application.panelHeight){
+    	    jpy = application.panelHeight - Navigation.LENS_R1;
+    	    cursorNearBorder = true;
+    	}
+    	if (application.nm.lensType != 0 && application.nm.lens != null){
+    	    application.nm.moveLens(jpx, jpy, e.getWhen());
+    	}
+    }
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
         if (regionStickedToMouse){
@@ -163,17 +220,27 @@ class MainEventHandler implements ViewListener, ComponentListener, PortalListene
     }
 
     public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
-        double a = (application.nm.mCamera.focal+Math.abs(application.nm.mCamera.altitude)) / application.nm.mCamera.focal;
-        if (wheelDirection  == WHEEL_UP){
-            // zooming in
-            application.nm.mCamera.altitudeOffset(a*WHEEL_ZOOMOUT_COEF);
-            VirtualSpaceManager.INSTANCE.repaint();
+        if (application.nm.lensType != 0 && application.nm.lens != null){
+            if (wheelDirection  == ViewListener.WHEEL_UP){
+                application.nm.magnifyFocus(Navigation.WHEEL_MM_STEP, application.nm.lensType, application.nm.mCamera);
+            }
+            else {
+                application.nm.magnifyFocus(-Navigation.WHEEL_MM_STEP, application.nm.lensType, application.nm.mCamera);
+            }
         }
         else {
-            //wheelDirection == WHEEL_DOWN, zooming out
-            application.nm.mCamera.altitudeOffset(-a*WHEEL_ZOOMIN_COEF);
-            VirtualSpaceManager.INSTANCE.repaint();
-        }            
+            double a = (application.nm.mCamera.focal+Math.abs(application.nm.mCamera.altitude)) / application.nm.mCamera.focal;
+            if (wheelDirection  == WHEEL_UP){
+                // zooming in
+                application.nm.mCamera.altitudeOffset(a*WHEEL_ZOOMOUT_COEF);
+                VirtualSpaceManager.INSTANCE.repaint();
+            }
+            else {
+                //wheelDirection == WHEEL_DOWN, zooming out
+                application.nm.mCamera.altitudeOffset(-a*WHEEL_ZOOMIN_COEF);
+                VirtualSpaceManager.INSTANCE.repaint();
+            }
+    	}
     }
 
 	public void enterGlyph(Glyph g){
