@@ -32,9 +32,6 @@ public class TranslucentListCellRenderer extends JLabel implements
 	// This is the only method defined by ListCellRenderer.
 	// We just reconfigure the JLabel each time we're called.
 
-	static final String ELLIPSIS = "...";
-	static final int MAX_BOUND = 27;
-
 	private AttributedString as;
 	private int startColor = 0;
 	private int endColor = 1;
@@ -50,17 +47,6 @@ public class TranslucentListCellRenderer extends JLabel implements
 				.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY), BorderFactory
 				.createEmptyBorder(1, 6, 1, 3)));
 
-		if (list.getName() != null) {
-			String str = ((String) value).substring(0, ((String) value)
-					.length() - 4);
-			if (str.length() > MAX_BOUND) {
-				String cardinality = ((String) value).substring(
-						((String) value).length() - 4, ((String) value)
-								.length());
-				value = value.toString().substring(0, MAX_BOUND) + ELLIPSIS
-						+ cardinality;
-			}
-		}
 		setText(value.toString());
 		setBackground(isSelected ? Color.BLACK : Color.DARK_GRAY);
 		setForeground(isSelected ? list.getSelectionForeground() : list
@@ -68,22 +54,20 @@ public class TranslucentListCellRenderer extends JLabel implements
 		setEnabled(list.isEnabled());
 		setFont(list.getFont());
 		setOpaque(true);
-		/*if (value.toString().length() > 0) {
-			as = new AttributedString(value.toString());
-			as.addAttribute(TextAttribute.FOREGROUND, Color.RED, startColor,
-					endColor);
-		}
-		*/
+		/*
+		 * if (value.toString().length() > 0) { as = new
+		 * AttributedString(value.toString());
+		 * as.addAttribute(TextAttribute.FOREGROUND, Color.RED, startColor,
+		 * endColor); }
+		 */
 
 		return this;
 	}
 
-/*	public void paint(Graphics g) {
-		g.drawString(as.getIterator(), 4, 12);
-	}
-
-	public void setInterval(int start, int end) {
-		startColor = start;
-		endColor = end;
-	}*/
+	/*
+	 * public void paint(Graphics g) { g.drawString(as.getIterator(), 4, 12); }
+	 * 
+	 * public void setInterval(int start, int end) { startColor = start;
+	 * endColor = end; }
+	 */
 }
