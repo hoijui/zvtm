@@ -36,6 +36,8 @@ public class TranslucentListCellRenderer extends JLabel implements
 	static final int MAX_BOUND = 27;
 
 	private AttributedString as;
+	private int startColor = 0;
+	private int endColor = 1;
 
 	public TranslucentListCellRenderer(JList list) {
 		setBorder(BorderFactory.createCompoundBorder(BorderFactory
@@ -72,14 +74,19 @@ public class TranslucentListCellRenderer extends JLabel implements
 				.getForeground());
 		if (value.toString().length() > 0) {
 			as = new AttributedString(value.toString());
-			as.addAttribute(TextAttribute.FOREGROUND, Color.RED, 0, 1);
+			as.addAttribute(TextAttribute.FOREGROUND, Color.RED, startColor,
+					endColor);
 		}
 
 		return this;
 	}
 
-	protected void paintComponent(Graphics g) {
+	public void paint(Graphics g) {
 		g.drawString(as.getIterator(), 4, 12);
 	}
 
+	public void setInterval(int start, int end) {
+		startColor = start;
+		endColor = end;
+	}
 }
