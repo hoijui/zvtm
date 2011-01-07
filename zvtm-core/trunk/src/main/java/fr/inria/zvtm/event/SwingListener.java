@@ -1,6 +1,7 @@
 package fr.inria.zvtm.event;
 
 import java.awt.Component;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
 import javax.swing.SwingUtilities;
@@ -11,6 +12,8 @@ import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VSwingComponent;
 
 public class SwingListener extends ViewAdapter {
+    private Component focusedComponent = null;
+
     @Override public void press1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){
         pickAndForward(v, e);
     }
@@ -28,8 +31,36 @@ public class SwingListener extends ViewAdapter {
     @Override public void click3(ViewPanel v, int mod, int jpx, int jpy, int clickNumber, MouseEvent e){
       pickAndForward(v, e); 
     }
+
+    @Override public void Kpress(ViewPanel v, char c, int code, int mod, KeyEvent e){
+        if(focusedComponent == null){
+            return;
+        }
+        e.setSource(focusedComponent);
+        focusedComponent.dispatchEvent(e);
+        VirtualSpaceManager.INSTANCE.repaint(); //XXX quick fix
+    }
+
+    @Override public void Krelease(ViewPanel v, char c, int code, int mod, KeyEvent e){
+        if(focusedComponent == null){
+            return;
+        }
+        e.setSource(focusedComponent);
+        focusedComponent.dispatchEvent(e);
+        VirtualSpaceManager.INSTANCE.repaint(); //XXX quick fix
+    }
+
+    @Override public void Ktype(ViewPanel v, char c, int code, int mod, KeyEvent e){
+        if(focusedComponent == null){
+            return;
+        }
+        e.setSource(focusedComponent);
+        focusedComponent.dispatchEvent(e);
+        VirtualSpaceManager.INSTANCE.repaint(); //XXX quick fix
+    }
     
 	private void pickAndForward(ViewPanel v, MouseEvent e) {
+        focusedComponent = null;
 		//pick glyph under cursor, redispatch if it is an instance
         //of VSwingComponent
         Glyph[] pickList = v.getVCursor().getGlyphsUnderMouseList();
@@ -53,6 +84,10 @@ public class SwingListener extends ViewAdapter {
         Point2D vsCoords = v.viewToSpaceCoords(v.cams[v.activeLayer], evt.getX(), evt.getY()); //XXX replace v.cams... by v.getActiveCamera
         Point2D pt = spaceToComponent(c, vsCoords);
         final Component cmp = SwingUtilities.getDeepestComponentAt(c.getComponent(), (int)pt.getX(), (int)pt.getY());
+        if(cmp.isFocusable()){
+            focusedComponent = cmp;
+            System.out.println("focus: " + focusedComponent);
+        }
         Point2D deepestCoords = new Point2D.Double(pt.getX() - cmp.getX(),
                 pt.getY() - cmp.getY());
         evt.translatePoint((int)(deepestCoords.getX() - evt.getX()),
