@@ -86,7 +86,6 @@ public class SwingListener extends ViewAdapter {
         final Component cmp = SwingUtilities.getDeepestComponentAt(c.getComponent(), (int)pt.getX(), (int)pt.getY());
         if(cmp.isFocusable()){
             focusedComponent = cmp;
-            System.out.println("focus: " + focusedComponent);
         }
         Point2D deepestCoords = new Point2D.Double(pt.getX() - cmp.getX(),
                 pt.getY() - cmp.getY());
