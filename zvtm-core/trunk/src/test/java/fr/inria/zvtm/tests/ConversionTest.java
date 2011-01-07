@@ -20,6 +20,7 @@ import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
+import fr.inria.zvtm.event.RepaintListener;
 
 public class ConversionTest extends TestCase {
     public ConversionTest(String name){
@@ -38,14 +39,22 @@ public class ConversionTest extends TestCase {
     public void testVscBase(){
         int xmid = view.getPanel().getWidth()/2;
         int ymid = view.getPanel().getHeight()/2;
-        Point2D.Double spaceCoords = view.getPanel().viewToSpaceCoords(cam, xmid, ymid);
-        assertEquals(cam.getLocation().vx, spaceCoords.x, 2.);
-        assertEquals(cam.getLocation().vy, spaceCoords.y, 2.);
-
+        final Point2D.Double spaceCoords = view.getPanel().viewToSpaceCoords(cam, xmid, ymid);
+        vsm.repaint(view, new RepaintListener(){
+            public void viewRepainted(View v){
+                assertEquals(cam.getLocation().vx, spaceCoords.x, 2.);
+                assertEquals(cam.getLocation().vy, spaceCoords.y, 2.);
+            }
+        });
+       
         cam.move(300, 3.14*4);
-        Point2D.Double spaceCoords2 = view.getPanel().viewToSpaceCoords(cam, xmid, ymid);
-        assertEquals(cam.getLocation().vx, spaceCoords2.x, 2.);
-        assertEquals(cam.getLocation().vy, spaceCoords2.y, 2.);
+        final Point2D.Double spaceCoords2 = view.getPanel().viewToSpaceCoords(cam, xmid, ymid);
+        vsm.repaint(view, new RepaintListener(){
+            public void viewRepainted(View v){
+                assertEquals(cam.getLocation().vx, spaceCoords2.x, 2.);
+                assertEquals(cam.getLocation().vy, spaceCoords2.y, 2.);
+            }
+        });
     }
 
     public void testVscUnzoom(){
@@ -53,9 +62,13 @@ public class ConversionTest extends TestCase {
         int ymid = view.getPanel().getHeight()/2;
         cam.setFocal(100f);
         cam.setLocation(new Location(-100, 200, 100));
-        Point2D.Double spaceCoords = view.getPanel().viewToSpaceCoords(cam, xmid + 10, ymid + 20);
-        assertEquals(-80, spaceCoords.x, 2.);
-        assertEquals(160, spaceCoords.y, 2.);
+        final Point2D.Double spaceCoords = view.getPanel().viewToSpaceCoords(cam, xmid + 10, ymid + 20);
+        vsm.repaint(view, new RepaintListener(){
+            public void viewRepainted(View v){
+                assertEquals(-80, spaceCoords.x, 2.);
+                assertEquals(160, spaceCoords.y, 2.);
+            }
+        });
     }
 
     public static Test suite() {
