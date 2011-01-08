@@ -492,12 +492,26 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
     public void mouseEntered(MouseEvent e){
         //make the view active any time the mouse enters it
         active = true;
-        repaintASAP = true;
         inside = true;
         VirtualSpaceManager.INSTANCE.setActiveView(this.parent);
         if (autoRequestFocusOnMouseEnter){
             requestFocus();
         }
+        if (parent.mouse.sync){
+            parent.mouse.moveTo(e.getX(),e.getY());
+            updateMouseOnly = true;
+            //translate glyphs sticked to mouse
+            parent.mouse.propagateMove();
+            // find out is the cursor is inside one (or more) portals
+            updateCursorInsidePortals(e.getX(), e.getY());
+            // forward mouseMoved event to View event handler
+            if (evHs[activeLayer] != null){
+                if (parent.notifyCursorMoved){
+                    evHs[activeLayer].mouseMoved(this, e.getX(), e.getY(), e);
+                }
+            }
+        }        
+        repaintASAP = true;
     }
 
     /** Mouse cursor exited this view. */
