@@ -62,6 +62,7 @@ class NavigationManager {
         vsm.getAnimationManager().startAnimation(a, false);
     }
 
+    /* Direction should be one of Viewer.MOVE_* */
     void translateView(short direction){
         Point2D.Double trans;
         double[] rb = application.mView.getVisibleRegion(mCamera);
@@ -82,11 +83,12 @@ class NavigationManager {
             double qt = (rb[0]-rb[2])/4.0;
             trans = new Point2D.Double(qt,0);
         }
+        //vsm.animator.createCameraAnimation(TIVNavigationManager.ANIM_MOVE_DURATION, AnimManager.CA_TRANS_SIG, trans, mCamera.getID());
         Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(ConfigManager.ANIM_MOVE_LENGTH, mCamera,
             trans, true, SlowInSlowOutInterpolator.getInstance(), null);
         vsm.getAnimationManager().startAnimation(a, false);
     }
-    
+
     /* -------------- Overview ------------------- */
 	
 	OverviewPortal ovPortal;

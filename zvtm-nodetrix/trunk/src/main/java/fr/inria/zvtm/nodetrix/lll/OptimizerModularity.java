@@ -96,8 +96,7 @@ public class OptimizerModularity {
         // greedily move nodes between clusters 
         double prevQuality = Double.MAX_VALUE;
         double quality = quality(interAtedges, interAtpairs, atedges, atpairs);
-        System.out.println("Refining " + nodeToCluster.keySet().size() 
-                                       + " nodes, initial modularity " + -quality);
+//        System.out.println("Refining " + nodeToCluster.keySet().size() + " nodes, initial modularity " + -quality);
         while (quality < prevQuality) {
             prevQuality = quality;
             for (Node node : nodeToCluster.keySet()) {
@@ -133,8 +132,7 @@ public class OptimizerModularity {
                     nodeToCluster.put(node, bestCluster);
                     maxCluster = Math.max(maxCluster, bestCluster);
                     quality = bestQuality; interAtedges = bestInterAtedges; interAtpairs = bestInterAtpairs;
-                    System.out.println(" Moving " + node + " to " + bestCluster + ", " 
-                            + "new modularity " + -quality);
+                    System.out.println(" Moving " + node + " to " + bestCluster + ", " + "new modularity " + -quality);
                 }
             }
         }
@@ -152,7 +150,7 @@ public class OptimizerModularity {
      */
     private Map<Node,Integer> cluster(final Collection<Node> nodes, final List<Edge> edges, 
             final double atedges, final double atpairs) {
-        System.out.println("Contracting " + nodes.size() + " nodes, " + edges.size() + " edges");
+//        System.out.println("Contracting " + nodes.size() + " nodes, " + edges.size() + " edges");
         
         // contract nodes
         Collections.sort(edges, new Comparator<Edge>() { 
@@ -170,7 +168,7 @@ public class OptimizerModularity {
             // randomize contraction
             // if (!nodeToContr.isEmpty() && Math.random() < 0.5) continue;
             
-            System.out.println(" Contracting " + edge);
+//            System.out.println(" Contracting " + edge);
             Node contrNode = new Node(
                     null,
                     edge.startNode.weight + edge.endNode.weight);

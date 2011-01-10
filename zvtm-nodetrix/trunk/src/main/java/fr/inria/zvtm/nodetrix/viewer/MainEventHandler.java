@@ -18,8 +18,8 @@ import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.Camera;
-import fr.inria.zvtm.engine.portals.Portal;
 import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.engine.portals.Portal;
 import fr.inria.zvtm.engine.portals.OverviewPortal;
 import fr.inria.zvtm.event.PortalListener;
 
@@ -82,7 +82,7 @@ class MainEventHandler implements ViewListener, ComponentListener, PortalListene
                     draggedMatrix = n.getMatrix();
                 }
             }
-        }
+		}
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
@@ -136,14 +136,14 @@ class MainEventHandler implements ViewListener, ComponentListener, PortalListene
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
         if (regionStickedToMouse){
 			double a = (application.nm.ovCamera.focal+Math.abs(application.nm.ovCamera.altitude)) / application.nm.ovCamera.focal;
-			application.nm.mCamera.move(Math.round(a*(jpx-lastJPX)), Math.round(a*(lastJPY-jpy)));
+			application.nm.mCamera.move(a*(jpx-lastJPX), a*(lastJPY-jpy));
 			lastJPX = jpx;
 			lastJPY = jpy;
 		}
 		else if (pcameraStickedToMouse){
 			double a = (application.nm.ovCamera.focal+Math.abs(application.nm.ovCamera.altitude))/application.nm.ovCamera.focal;
-			application.nm.ovCamera.move(Math.round(a*(lastJPX-jpx)), Math.round(a*(jpy-lastJPY)));
-			application.nm.mCamera.move(Math.round(a*(lastJPX-jpx)), Math.round(a*(jpy-lastJPY)));
+			application.nm.ovCamera.move(a*(lastJPX-jpx), a*(jpy-lastJPY));
+			application.nm.mCamera.move(a*(lastJPX-jpx), a*(jpy-lastJPY));
 			lastJPX = jpx;
 			lastJPY = jpy;
 		}
@@ -156,14 +156,14 @@ class MainEventHandler implements ViewListener, ComponentListener, PortalListene
                 application.vsm.getAnimationManager().setZspeed(((lastJPY-jpy)*(ZOOM_SPEED_COEF)));
             }
             else {
-                application.vsm.getAnimationManager().setXspeed((long)((jpx-lastJPX)*(a/PAN_SPEED_COEF)));
-                application.vsm.getAnimationManager().setYspeed((long)((lastJPY-jpy)*(a/PAN_SPEED_COEF)));
+                application.vsm.getAnimationManager().setXspeed(((jpx-lastJPX)*(a/PAN_SPEED_COEF)));
+                application.vsm.getAnimationManager().setYspeed(((lastJPY-jpy)*(a/PAN_SPEED_COEF)));
                 application.vsm.getAnimationManager().setZspeed(0);
             }		    
 		}
 		else if (draggedMatrix != null){
 		    double a = (application.nm.mCamera.focal+Math.abs(application.nm.mCamera.altitude)) / application.nm.mCamera.focal;
-		    draggedMatrix.move(Math.round(a*(jpx-lastJPX)), Math.round(a*(lastJPY-jpy)));
+		    draggedMatrix.move(a*(jpx-lastJPX), a*(lastJPY-jpy));
 			lastJPX = jpx;
 			lastJPY = jpy;
 		}
