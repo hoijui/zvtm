@@ -130,7 +130,6 @@ public class LensApplet extends JApplet {
 	    vs.addGlyph(s2);
 	}
 	VImage i1=new VImage(0,0,0,(new ImageIcon(this.getClass().getResource("/images/logo-futurs-small.png"))).getImage());
-	i1.setDrawBorderPolicy(VImage.DRAW_BORDER_NEVER);
 	vs.addGlyph(i1);
 	vsm.repaint();
 	view.getGlobalView(vs.getCamera(0),500);

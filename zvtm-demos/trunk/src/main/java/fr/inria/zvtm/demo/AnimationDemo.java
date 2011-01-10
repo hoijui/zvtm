@@ -185,7 +185,6 @@ public class AnimationDemo extends JApplet implements MouseListener, KeyListener
 	text.setFont(new Font("Arial", Font.PLAIN, 48));
 	image = new VImageOr(COL2_X, ROW2_Y, 0, (new ImageIcon(this.getClass().getResource("/images/logo-futurs-small.png"))).getImage(), 0, 1.0f);
 	image.setBorderColor(GLYPH_BORDER_COLOR);
-	image.setDrawBorderPolicy(VImageOr.DRAW_BORDER_MOUSE_INSIDE);
 	float[] irregVertices = {1.0f, 0.2f, 0.7f, 0.3f, 0.5f, 0.1f, 0.8f, 1.0f, 0.4f, 0.4f, 0.3f, 0.6f};
 	irregularShape = new VShape(COL3_X, ROW2_Y, 0, (long)SIZE, irregVertices, ROW2_COLOR, GLYPH_BORDER_COLOR, 0, 1.0f);
 	// 3rd row

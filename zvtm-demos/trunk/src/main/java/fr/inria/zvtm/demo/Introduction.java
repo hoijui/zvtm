@@ -229,7 +229,7 @@ public class Introduction {
         x2.setDashed(true);
         vs1.addGlyph(x1);vs1.addGlyph(x2);vs1.addGlyph(x4);
         x1.setHSVColor(0.2f,0.55f,0.95f);x2.setHSVColor(0.2f,0.55f,0.95f);x4.setHSVColor(0.2f,0.55f,0.95f);
-        VImage i1=new VImage(0,-400,0,(new ImageIcon(this.getClass().getResource("/images/logo-futurs-small.png"))).getImage());i1.setDrawBorderPolicy(VImage.DRAW_BORDER_MOUSE_INSIDE);
+        VImage i1=new VImage(0,-400,0,(new ImageIcon(this.getClass().getResource("/images/logo-futurs-small.png"))).getImage());
         vs1.addGlyph(i1);
         float[] vs={0.1f,0.5f,0.3f,0.5f,1f,0.5f,1f,0.5f};
         VShape s1=new VShape(-600,-400,0,100,vs,Color.gray,Color.BLACK, 0, 0.5f);vs1.addGlyph(s1);
@@ -321,7 +321,7 @@ public class Introduction {
     t1.setColor(Introduction.ANIM_OBJECT_COLOR);
 	r1.setColor(Introduction.ANIM_OBJECT_COLOR);
 	d1.setColor(Introduction.ANIM_OBJECT_COLOR);
-	VImageOr i1=new VImageOr(-400,-600,0,(new ImageIcon(this.getClass().getResource("/images/xrce.gif"))).getImage(),0.0f);i1.setDrawBorderPolicy(VImage.DRAW_BORDER_MOUSE_INSIDE);
+	VImageOr i1=new VImageOr(-400,-600,0,(new ImageIcon(this.getClass().getResource("/images/xrce.gif"))).getImage(),0.0f);
 	vs1.addGlyph(i1);i1.setType("an");
 	i1.sizeTo(200);
 	float[] vs={1f,0.4f,1f,0.4f,0.8f,0.5f,0.3f,1f};
