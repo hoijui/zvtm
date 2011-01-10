@@ -32,10 +32,6 @@ public class TranslucentListCellRenderer extends JLabel implements
 	// This is the only method defined by ListCellRenderer.
 	// We just reconfigure the JLabel each time we're called.
 
-	private AttributedString as;
-	private int startColor = 0;
-	private int endColor = 1;
-
 	public Component getListCellRendererComponent(JList list, Object value, // value
 			// to
 			// display
@@ -44,7 +40,7 @@ public class TranslucentListCellRenderer extends JLabel implements
 			boolean cellHasFocus) // the list and the cell have the focus
 	{
 		setBorder(BorderFactory.createCompoundBorder(BorderFactory
-				.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY), BorderFactory
+				.createMatteBorder(0, 0, 0, 0, Color.LIGHT_GRAY), BorderFactory
 				.createEmptyBorder(1, 6, 1, 3)));
 
 		setText(value.toString());
@@ -54,20 +50,7 @@ public class TranslucentListCellRenderer extends JLabel implements
 		setEnabled(list.isEnabled());
 		setFont(list.getFont());
 		setOpaque(true);
-		/*
-		 * if (value.toString().length() > 0) { as = new
-		 * AttributedString(value.toString());
-		 * as.addAttribute(TextAttribute.FOREGROUND, Color.RED, startColor,
-		 * endColor); }
-		 */
 
 		return this;
 	}
-
-	/*
-	 * public void paint(Graphics g) { g.drawString(as.getIterator(), 4, 12); }
-	 * 
-	 * public void setInterval(int start, int end) { startColor = start;
-	 * endColor = end; }
-	 */
 }
