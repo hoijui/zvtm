@@ -40,7 +40,7 @@ public class GPath extends DPath {
 		*@param z z-index (pass 0 if you do not use z-ordering)
 		*@param c color
 		*/
-	public GPath(long x, long y, int z, Color c){
+	public GPath(double x, double y, int z, Color c){
 	    super(x, y, z, c);
     }
     
@@ -51,7 +51,7 @@ public class GPath extends DPath {
 		*@param c color
 		*@param alpha alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
 		*/
-	public GPath(long x, long y, int z, Color c, float alpha){
+	public GPath(double x, double y, int z, Color c, float alpha){
 		super(x, y, z, c, alpha);
 	}
 

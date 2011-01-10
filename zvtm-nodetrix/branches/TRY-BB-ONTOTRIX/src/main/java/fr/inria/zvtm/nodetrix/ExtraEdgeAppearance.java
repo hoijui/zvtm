@@ -8,8 +8,8 @@
 package fr.inria.zvtm.nodetrix;
 
 import java.awt.Color;
+import java.awt.geom.Point2D;
 
-import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.glyphs.GPath;
 import fr.inria.zvtm.glyphs.Glyph;
@@ -18,8 +18,8 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
 
 	private GPath edgePath;
 	// start and end point offsets w.r.t respective matrices
-	LongPoint[] offsets;
-	static long CONTROL_POINT_OFFSET = NodeTrixViz.CELL_SIZE * 3;
+	Point2D.Double[] offsets;
+	static double CONTROL_POINT_OFFSET = NodeTrixViz.CELL_SIZE * 3;
 	private float alpha = 1f;
 	private static Color[] gradientColors = new Color[2];
 	
@@ -50,16 +50,16 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
 	}
 	
 	@Override
-//	public void createGraphics(long x1, long y1, long x2, long y2, VirtualSpace vs) {
+//	public void createGraphics(double x1, double y1, double x2, double y2, VirtualSpace vs) {
 	public void createGraphics() {
 		if(vs == null) return;
-		long x1, y1, x2, y2;
+		double x1, y1, x2, y2;
 		
-        offsets = new LongPoint[2];
+        offsets = new Point2D.Double[2];
         
      //   System.out.println("Name: " + edge.getTail().getName());
-        LongPoint tmp = edge.getTail().getMatrix().getPosition();
-        LongPoint hmp = edge.getHead().getMatrix().getPosition();
+        Point2D.Double tmp = edge.getTail().getMatrix().getPosition();
+        Point2D.Double hmp = edge.getHead().getMatrix().getPosition();
         double angle = Math.atan2(edge.tail.getMatrix().bkg.vy-edge.head.getMatrix().bkg.vy, edge.tail.getMatrix().bkg.vx-edge.head.getMatrix().bkg.vx) + Math.PI;       
            
         if (angle > 7*Math.PI/4.0 || angle < Math.PI/4.0){
@@ -68,8 +68,8 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
             y1 = edge.tail.wdy;
             x2 = (edge.head.getMatrix().nodes.size() > 1) ? -NodeTrixViz.CELL_SIZE*edge.head.getMatrix().nodes.size()/2-2*edge.head.getMatrix().nodes.firstElement().getLabelHalfWidth() : -edge.head.getLabelHalfWidth();
             y2 = edge.head.wdy;
-            offsets[0] = new LongPoint(x1, y1);
-            offsets[1] = new LongPoint(x2, y2);
+            offsets[0] = new Point2D.Double(x1, y1);
+            offsets[1] = new Point2D.Double(x2, y2);
             edgePath = new GPath(tmp.x+offsets[0].x, tmp.y+offsets[0].y, 0, edge.getColor());
             edgePath.addCbCurve(hmp.x+offsets[1].x, hmp.y+offsets[1].y,
                                 tmp.x+offsets[0].x+CONTROL_POINT_OFFSET, tmp.y+offsets[0].y,
@@ -81,8 +81,8 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
             y1 = (edge.tail.getMatrix().nodes.size() > 1) ? -NodeTrixViz.CELL_SIZE*edge.tail.getMatrix().nodes.size()/2 : -edge.tail.getHeight();
             x2 = edge.head.ndx;
             y2 = (edge.head.getMatrix().nodes.size() > 1) ? NodeTrixViz.CELL_SIZE*edge.head.getMatrix().nodes.size()/2+2*edge.head.getMatrix().nodes.firstElement().getLabelHalfWidth() : edge.head.getHeight();
-            offsets[0] = new LongPoint(x1, y1);
-            offsets[1] = new LongPoint(x2, y2);
+            offsets[0] = new Point2D.Double(x1, y1);
+            offsets[1] = new Point2D.Double(x2, y2);
             edgePath = new GPath(tmp.x+offsets[0].x, tmp.y+offsets[0].y, 0, edge.getColor());
             edgePath.addCbCurve(hmp.x+offsets[1].x, hmp.y+offsets[1].y,
                                 tmp.x+offsets[0].x, tmp.y+offsets[0].y-CONTROL_POINT_OFFSET,
@@ -94,8 +94,8 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
             y1 = edge.tail.wdy;
             x2 = (edge.head.getMatrix().nodes.size() > 1) ? NodeTrixViz.CELL_SIZE*edge.head.getMatrix().nodes.size()/2 : edge.head.getLabelHalfWidth();
             y2 = edge.head.wdy;
-            offsets[0] = new LongPoint(x1, y1);
-            offsets[1] = new LongPoint(x2, y2);
+            offsets[0] = new Point2D.Double(x1, y1);
+            offsets[1] = new Point2D.Double(x2, y2);
             edgePath = new GPath(tmp.x+offsets[0].x, tmp.y+offsets[0].y, 0, edge.getColor());
             edgePath.addCbCurve(hmp.x+offsets[1].x, hmp.y+offsets[1].y,
                                 tmp.x+offsets[0].x-CONTROL_POINT_OFFSET, tmp.y+offsets[0].y,
@@ -108,8 +108,8 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
             y1 = (edge.tail.getMatrix().nodes.size() > 1) ? NodeTrixViz.CELL_SIZE * edge.tail.getMatrix().nodes.size()/2+2*edge.tail.getMatrix().nodes.firstElement().getLabelHalfWidth() : edge.tail.getHeight();
             x2 = edge.head.ndx;
             y2 = (edge.head.getMatrix().nodes.size() > 1) ? -NodeTrixViz.CELL_SIZE*edge.head.getMatrix().nodes.size()/2 : -edge.head.getHeight();
-            offsets[0] = new LongPoint(x1, y1);
-            offsets[1] = new LongPoint(x2, y2);
+            offsets[0] = new Point2D.Double(x1, y1);
+            offsets[1] = new Point2D.Double(x2, y2);
             edgePath = new GPath(tmp.x+offsets[0].x, tmp.y+offsets[0].y, 0, edge.getColor());
             edgePath.addCbCurve(hmp.x+offsets[1].x, hmp.y+offsets[1].y,
                                 tmp.x+offsets[0].x, tmp.y+offsets[0].y+CONTROL_POINT_OFFSET,
@@ -148,12 +148,12 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
 	}
 
 	@Override
-	public void move(long x, long y) {
+	public void move(double x, double y) {
     	if(this.edgePath == null) return;
     	// x & y are actually ignored, computing new path geometry from matrix position
-        LongPoint tmp = edge.getTail().getMatrix().getPosition();
-        LongPoint hmp = edge.getHead().getMatrix().getPosition();
-        LongPoint[] npos = new LongPoint[4];        
+        Point2D.Double tmp = edge.getTail().getMatrix().getPosition();
+        Point2D.Double hmp = edge.getHead().getMatrix().getPosition();
+        Point2D.Double[] npos = new Point2D.Double[4];        
         double angle = Math.atan2(edge.tail.getMatrix().bkg.vy-edge.head.getMatrix().bkg.vy, edge.tail.getMatrix().bkg.vx-edge.head.getMatrix().bkg.vx) + Math.PI;        
         if (angle > 7*Math.PI/4.0 || angle < Math.PI/4.0){
             // eastward
@@ -164,10 +164,10 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
             offsets[1].
             setLocation((edge.head.getMatrix().nodes.size() > 1) ? -NodeTrixViz.CELL_SIZE*edge.head.getMatrix().nodes.size()/2-2*edge.head.getMatrix().nodes.firstElement().getLabelHalfWidth() : -edge.head.getLabelHalfWidth(),
                                    edge.head.wdy);
-            npos[0] = new LongPoint(tmp.x+offsets[0].x, tmp.y+offsets[0].y);
-            npos[1] = new LongPoint(tmp.x+offsets[0].x+CONTROL_POINT_OFFSET, tmp.y+offsets[0].y);
-            npos[2] = new LongPoint(hmp.x+offsets[1].x-CONTROL_POINT_OFFSET, hmp.y+offsets[1].y);
-            npos[3] = new LongPoint(hmp.x+offsets[1].x, hmp.y+offsets[1].y);
+            npos[0] = new Point2D.Double(tmp.x+offsets[0].x, tmp.y+offsets[0].y);
+            npos[1] = new Point2D.Double(tmp.x+offsets[0].x+CONTROL_POINT_OFFSET, tmp.y+offsets[0].y);
+            npos[2] = new Point2D.Double(hmp.x+offsets[1].x-CONTROL_POINT_OFFSET, hmp.y+offsets[1].y);
+            npos[3] = new Point2D.Double(hmp.x+offsets[1].x, hmp.y+offsets[1].y);
         }
         else if (angle > 5*Math.PI/4.0){
             // southward
@@ -177,10 +177,10 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
             offsets[1].
             setLocation(edge.head.ndx,
                                    (edge.head.getMatrix().nodes.size() > 1) ? NodeTrixViz.CELL_SIZE*edge.head.getMatrix().nodes.size()/2+2*edge.head.getMatrix().nodes.firstElement().getLabelHalfWidth() : edge.head.getHeight());
-            npos[0] = new LongPoint(tmp.x+offsets[0].x, tmp.y+offsets[0].y);
-            npos[1] = new LongPoint(tmp.x+offsets[0].x, tmp.y+offsets[0].y-CONTROL_POINT_OFFSET);
-            npos[2] = new LongPoint(hmp.x+offsets[1].x, hmp.y+offsets[1].y+CONTROL_POINT_OFFSET);
-            npos[3] = new LongPoint(hmp.x+offsets[1].x, hmp.y+offsets[1].y);
+            npos[0] = new Point2D.Double(tmp.x+offsets[0].x, tmp.y+offsets[0].y);
+            npos[1] = new Point2D.Double(tmp.x+offsets[0].x, tmp.y+offsets[0].y-CONTROL_POINT_OFFSET);
+            npos[2] = new Point2D.Double(hmp.x+offsets[1].x, hmp.y+offsets[1].y+CONTROL_POINT_OFFSET);
+            npos[3] = new Point2D.Double(hmp.x+offsets[1].x, hmp.y+offsets[1].y);
         }
         else if (angle > 3*Math.PI/4.0){
             // westward
@@ -190,10 +190,10 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
             offsets[1].
             setLocation((edge.head.getMatrix().nodes.size() > 1) ? NodeTrixViz.CELL_SIZE*edge.head.getMatrix().nodes.size()/2 : edge.head.getLabelHalfWidth(),
                                    edge.head.wdy);
-            npos[0] = new LongPoint(tmp.x+offsets[0].x, tmp.y+offsets[0].y);
-            npos[1] = new LongPoint(tmp.x+offsets[0].x-CONTROL_POINT_OFFSET, tmp.y+offsets[0].y);
-            npos[2] = new LongPoint(hmp.x+offsets[1].x+CONTROL_POINT_OFFSET, hmp.y+offsets[1].y);
-            npos[3] = new LongPoint(hmp.x+offsets[1].x, hmp.y+offsets[1].y);
+            npos[0] = new Point2D.Double(tmp.x+offsets[0].x, tmp.y+offsets[0].y);
+            npos[1] = new Point2D.Double(tmp.x+offsets[0].x-CONTROL_POINT_OFFSET, tmp.y+offsets[0].y);
+            npos[2] = new Point2D.Double(hmp.x+offsets[1].x+CONTROL_POINT_OFFSET, hmp.y+offsets[1].y);
+            npos[3] = new Point2D.Double(hmp.x+offsets[1].x, hmp.y+offsets[1].y);
         }
         else {
             // angle >= Math.PI/4.0
@@ -204,10 +204,10 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
             offsets[1].
             setLocation(edge.head.ndx,
                                    (edge.head.getMatrix().nodes.size() > 1) ? -NodeTrixViz.CELL_SIZE*edge.head.getMatrix().nodes.size()/2 : -edge.head.getHeight());
-            npos[0] = new LongPoint(tmp.x+offsets[0].x, tmp.y+offsets[0].y);
-            npos[1] = new LongPoint(tmp.x+offsets[0].x, tmp.y+offsets[0].y+CONTROL_POINT_OFFSET);
-            npos[2] = new LongPoint(hmp.x+offsets[1].x, hmp.y+offsets[1].y-CONTROL_POINT_OFFSET);
-            npos[3] = new LongPoint(hmp.x+offsets[1].x, hmp.y+offsets[1].y);
+            npos[0] = new Point2D.Double(tmp.x+offsets[0].x, tmp.y+offsets[0].y);
+            npos[1] = new Point2D.Double(tmp.x+offsets[0].x, tmp.y+offsets[0].y+CONTROL_POINT_OFFSET);
+            npos[2] = new Point2D.Double(hmp.x+offsets[1].x, hmp.y+offsets[1].y-CONTROL_POINT_OFFSET);
+            npos[3] = new Point2D.Double(hmp.x+offsets[1].x, hmp.y+offsets[1].y);
         }
         edgePath.edit(npos, true);
         assignAlpha();
@@ -218,7 +218,7 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
      */
     private void assignAlpha()
     {
-    	alpha = 1 - Math.min(Math.max(edgePath.getSize(), NodeTrixViz.EXTRA_ALPHA_MIN_LENGHT), NodeTrixViz.EXTRA_ALPHA_MAX_LENGHT)/(NodeTrixViz.EXTRA_ALPHA_MAX_LENGHT * (1 + NodeTrixViz.EXTRA_ALPHA_MIN));
+    	alpha = 1 - (float)Math.min(Math.max(edgePath.getSize(), NodeTrixViz.EXTRA_ALPHA_MIN_LENGHT), NodeTrixViz.EXTRA_ALPHA_MAX_LENGHT)/(NodeTrixViz.EXTRA_ALPHA_MAX_LENGHT * (1 + NodeTrixViz.EXTRA_ALPHA_MIN));
     	edgePath.setTranslucencyValue(alpha);
     }
     

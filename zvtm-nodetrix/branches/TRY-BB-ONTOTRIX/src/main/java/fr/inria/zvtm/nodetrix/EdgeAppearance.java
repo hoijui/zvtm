@@ -34,7 +34,7 @@ public abstract class EdgeAppearance {
 	}
 	
 	//GENERAL BEHAVIOUR
-	public abstract void move(long x, long y);
+	public abstract void move(double x, double y);
 	public abstract void onTop();
 	public abstract void updatePosition();
 	public abstract void updateColor();

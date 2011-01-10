@@ -85,7 +85,7 @@ public class NTEdge extends LinLogEdge{
 	    interactionState = newInteractionState;
     }
     
-    public void createGraphics( VirtualSpace vs)
+    public void createGraphics(VirtualSpace vs)
     {
     	if(appearance == null) return;
     	appearance.createGraphics(vs);
@@ -105,7 +105,7 @@ public class NTEdge extends LinLogEdge{
     }
 
     
-    public void move(long x, long y){
+    public void move(double x, double y){
     	if(appearance == null) return;
     	appearance.move(x, y);
     }

@@ -32,8 +32,8 @@ import fr.inria.zvtm.nodetrix.MatrixSizeComparator;
 
 public class NodeTrixViz {
 
-	public static final long CELL_SIZE = 20;
-    public static final long CELL_SIZE_HALF = CELL_SIZE/2;
+	public static final double CELL_SIZE = 20;
+    public static final double CELL_SIZE_HALF = CELL_SIZE/2;
     public static final int GROUP_LABEL_HALF_WIDTH = 50;
     public static final int LINLOG_ITERATIONS = 100;
     public static final int MATRIX_NODE_LABEL_DIST_BORDER = 3;
@@ -530,12 +530,12 @@ public class NodeTrixViz {
         	//compute centre of new matrix
         	// and put nodes into lists
         	Matrix firstMatrix =  mergeMatrices.firstElement();
-        	long xStart = firstMatrix.getPosition().x - firstMatrix.getBackgroundWidth();	//center of new matrix
-        	long yStart = firstMatrix.getPosition().y + firstMatrix.getBackgroundWidth();	//center of new matrix
+        	double xStart = firstMatrix.getPosition().x - firstMatrix.getBackgroundWidth();	//center of new matrix
+        	double yStart = firstMatrix.getPosition().y + firstMatrix.getBackgroundWidth();	//center of new matrix
 
         	//position matrix to be merged together
 
-        	long offset = 0; // offset to next matrix for lay-outing
+        	double offset = 0; // offset to next matrix for lay-outing
         	for(Matrix m : mergeMatrices){
 //        		System.out.println("[NODE_TRIX_VIZ] MOVE MATRIX " + m.getName());
         		offset += m.getBackgroundWidth();
@@ -566,8 +566,8 @@ public class NodeTrixViz {
     		//compute centre of new matrix
     		Matrix firstMatrix =  mergeMatrices.firstElement();
     		Matrix lastMatrix =  mergeMatrices.lastElement();
-        	long xCentre = (firstMatrix.getPosition().x - firstMatrix.getBackgroundWidth()) + (lastMatrix.getPosition().x + lastMatrix.getBackgroundWidth());	//center of new matrix
-        	long yCentre = firstMatrix.getPosition().y + firstMatrix.getBackgroundWidth() + (lastMatrix.getPosition().x - lastMatrix.getBackgroundWidth());	//center of new matrix
+        	double xCentre = (firstMatrix.getPosition().x - firstMatrix.getBackgroundWidth()) + (lastMatrix.getPosition().x + lastMatrix.getBackgroundWidth());	//center of new matrix
+        	double yCentre = firstMatrix.getPosition().y + firstMatrix.getBackgroundWidth() + (lastMatrix.getPosition().x - lastMatrix.getBackgroundWidth());	//center of new matrix
         	for(Matrix m : mergeMatrices){
         		xCentre += m.getPosition().x;
            		yCentre += m.getPosition().y;
