@@ -20,7 +20,7 @@ public class NTInfoBox {
 	//STATIC VARS
 	static int INFO_BOX_PADDING = 10;
 	static int INFO_BOX_LINE_HEIGHT = 13;
-	static int INFO_BOX_WIDTH = 200;
+	static int INFO_BOX_WIDTH = 400;
 	
 	//MODEL
 	Object owner;
@@ -45,21 +45,30 @@ public class NTInfoBox {
 	public void createGraphics(VirtualSpace vs){
 		this.vs = vs;
 		
-		//title
-		long currentRowIntend = -INFO_BOX_PADDING*2;
-		gTitle = new VText(INFO_BOX_PADDING, currentRowIntend+3, 0, ProjectColors.NODE_TEXT[ProjectColors.COLOR_SCHEME], node.getName());
+		long boxWidth = INFO_BOX_WIDTH;
+		
+		gTitleBox = new VRectangle(0, 0 ,0, boxWidth, INFO_BOX_LINE_HEIGHT * 2, ProjectColors.NODE_BACKGROUND[ProjectColors.COLOR_SCHEME]);
+		gTitleBox.setSensitivity(false);
+		gTitleBox.setOwner(this);
+		vs.addGlyph(gTitleBox);
+		
+
+		gTitle = new VText((-gTitleBox.getWidth() /2) + INFO_BOX_PADDING, 0 , 0, ProjectColors.NODE_TEXT[ProjectColors.COLOR_SCHEME], node.getName());
 		gTitle.setSensitivity(false);
 		vs.addGlyph(gTitle);
-		currentRowIntend -= INFO_BOX_LINE_HEIGHT*2; 
+		gTitleBox.stick(gTitle);
+		gTitleBox.setOwner(this);
+
 		
+		long currentRowIntend = -INFO_BOX_LINE_HEIGHT *2;
 		VText gText;
 		for(String[] sEntry : sEntries){
 			VText gEntry[] = new VText[fields];
 			int i = 0;
 			for(String s : sEntry){
-				gText = new VText(INFO_BOX_PADDING, currentRowIntend,0 ,ProjectColors.NODE_TEXT[ProjectColors.COLOR_SCHEME], s);
-				gText.setSensitivity(false);
+				gText = new VText((-gTitleBox.getWidth() /2) + INFO_BOX_PADDING, currentRowIntend,0 ,ProjectColors.NODE_TEXT[ProjectColors.COLOR_SCHEME], s);
 				vs.addGlyph(gText);
+				gText.setSensitivity(false);
 				gEntry[i] = gText;
 				i++;
 				currentRowIntend -= INFO_BOX_LINE_HEIGHT; //height of text 
@@ -68,17 +77,15 @@ public class NTInfoBox {
 			gEntries.add(gEntry);
 		}
 		
-		long height = (currentRowIntend - INFO_BOX_PADDING) / -2; 
-		long width = INFO_BOX_WIDTH;
-		gBox = new VRectangle(width, -height,0,width, height, ProjectColors.NODE_BACKGROUND[ProjectColors.COLOR_SCHEME]);
-		gBox.stick(gTitle);
-		gBox.setOwner(this);
+		long boxHeight = - (currentRowIntend - INFO_BOX_PADDING); 
+		gBox = new VRectangle(0,-((INFO_BOX_LINE_HEIGHT ) + boxHeight /2),0 ,boxWidth, boxHeight, ProjectColors.NODE_BACKGROUND[ProjectColors.COLOR_SCHEME]);
 		vs.addGlyph(gBox);
+		gBox.setOwner(this);
+
 		
-		gTitleBox = new VRectangle(width, -INFO_BOX_LINE_HEIGHT,0, width, INFO_BOX_LINE_HEIGHT, ProjectColors.NODE_BACKGROUND[ProjectColors.COLOR_SCHEME]);
-		gTitleBox.setSensitivity(false);
-		vs.addGlyph(gTitleBox);
-		gBox.stick(gTitleBox);
+		gTitleBox.stick(gBox);
+		
+	
 		
 		for(VText[] gEntry : gEntries){
 			for(VText g : gEntry){
@@ -105,16 +112,16 @@ public class NTInfoBox {
 	/**Must be called before showing the box.
 	 * */
 	public void alignToWesternLabel(long x, long y){
-	    if (gBox == null){return;} //XXX: temporary fix, I don't know why it is null in case of single node matrices
-		gBox.moveTo(x - gBox.getWidth(), y - gBox.getHeight());
+	    if (gTitleBox == null){return;} //XXX: temporary fix, I don't know why it is null in case of single node matrices
+		gTitleBox.moveTo(x - gTitleBox.getWidth() /2, y - gTitleBox.getHeight());
 	}
 	public void alignToNorthernLabel(long x, long y){
-	    if (gBox == null){return;} //XXX: temporary fix, I don't know why it is null in case of single node matrices
-		gBox.moveTo(x + gBox.getWidth(), y - gBox.getHeight());
+	    if (gTitleBox == null){return;} //XXX: temporary fix, I don't know why it is null in case of single node matrices
+		gTitleBox.moveTo(x + gTitleBox.getWidth(), y - gTitleBox.getHeight() /2);
 	}
 	public void move(long x, long y){
-	    if (gBox == null){return;} //XXX: temporary fix, I don't know why it is null in case of single node matrices
-		gBox.move(x, y);
+	    if (gTitleBox == null){return;} //XXX: temporary fix, I don't know why it is null in case of single node matrices
+		gTitleBox.move(x, y);
 	}
 	
 	public void hide(){

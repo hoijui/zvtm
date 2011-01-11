@@ -310,7 +310,7 @@ public class NTNode extends LinLogNode{
     
     private void highlight(Color c)
     {
-    	System.out.println("[NTNODE] HIGHLIGHT " + this.name);
+//    	System.out.println("[NTNODE] HIGHLIGHT " + this.name);
 
 //    	boolean oldNorth = this.permanentNorth;
 //    	boolean oldWest = this.permanentWest;

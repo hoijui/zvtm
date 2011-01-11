@@ -633,7 +633,7 @@ public class Matrix {
 	public void addGroupLabel(Vector<NTNode> v, String label){
 		if(vs == null) return;
 		if(nodes.size() > 1){
-			double dx = - this.bkg.getWidth()/2.0 - maxLabelWidth - NodeTrixViz.GROUP_LABEL_HALF_WIDTH;
+			double dx = - this.bkg.getWidth()/2 - maxLabelWidth - NodeTrixViz.GROUP_LABEL_HALF_WIDTH;
 			VRectangle groupLabelW = new VRectangle(bkg.vx + dx, bkg.vy + v.firstElement().wdy - (v.size()-1)*NodeTrixViz.CELL_SIZE_HALF, 0, NodeTrixViz.GROUP_LABEL_HALF_WIDTH*2, v.size()*NodeTrixViz.CELL_SIZE_HALF*2,ProjectColors.MATRIX_GROUP_LABEL_BACKGROUND[ProjectColors.COLOR_SCHEME]);
 			VTextOr groupTextW = new VTextOr(bkg.vx + dx, bkg.vy + v.firstElement().wdy - (v.size()-1)*NodeTrixViz.CELL_SIZE_HALF, 0, ProjectColors.MATRIX_GROUP_LABEL_TEXT[ProjectColors.COLOR_SCHEME], label, 0);
 			groupTextW.setTextAnchor(VText.TEXT_ANCHOR_MIDDLE);
@@ -644,8 +644,8 @@ public class Matrix {
 			this.groupLabelsW.add(groupLabelW);
 			this.groupLabelsW.add(groupTextW);
 				
-			double dy = this.bkg.getWidth() + maxLabelWidth + NodeTrixViz.GROUP_LABEL_HALF_WIDTH;
-			VRectangle groupLabelN = new VRectangle(bkg.vx + v.firstElement().ndx + (v.size()-1)*NodeTrixViz.CELL_SIZE_HALF,bkg.vy + dy, 0, v.size()*NodeTrixViz.CELL_SIZE_HALF*2, NodeTrixViz.GROUP_LABEL_HALF_WIDTH*2, ProjectColors.MATRIX_GROUP_LABEL_BACKGROUND[ProjectColors.COLOR_SCHEME]);
+			double dy = this.bkg.getHeight()/2 + maxLabelWidth + NodeTrixViz.GROUP_LABEL_HALF_WIDTH;
+			VRectangle groupLabelN = new VRectangle(bkg.vx + v.firstElement().ndx + (v.size()-1)*NodeTrixViz.CELL_SIZE_HALF, bkg.vy + dy, 0, v.size()*NodeTrixViz.CELL_SIZE, NodeTrixViz.GROUP_LABEL_HALF_WIDTH*2, ProjectColors.MATRIX_GROUP_LABEL_BACKGROUND[ProjectColors.COLOR_SCHEME]);
 			VTextOr groupTextN = new VTextOr(bkg.vx + v.firstElement().ndx + (v.size()-1)*NodeTrixViz.CELL_SIZE_HALF , bkg.vy + dy, 0, ProjectColors.MATRIX_GROUP_LABEL_TEXT[ProjectColors.COLOR_SCHEME], label, (float)Math.PI/2);
 			groupTextN.setTextAnchor(VText.TEXT_ANCHOR_MIDDLE);
 			vs.addGlyph(groupLabelN);

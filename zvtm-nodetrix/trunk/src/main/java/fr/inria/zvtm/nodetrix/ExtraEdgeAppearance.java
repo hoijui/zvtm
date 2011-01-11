@@ -125,11 +125,11 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
 
 	@Override
 	public void fade() {
-		System.out.println("[EXTRA_EDGE] FADE");
+//		System.out.println("[EXTRA_EDGE] FADE");
 //		edgePath.setVisible(false);
 		gradientColors[0] = ProjectColors.EXTRA_COLOR_FADE_OUT[ProjectColors.COLOR_SCHEME];
 		gradientColors[1] = ProjectColors.EXTRA_COLOR_FADE_OUT[ProjectColors.COLOR_SCHEME];	
-//		edgePath.setGradientColors(gradientColors);
+		edgePath.setGradientColors(gradientColors);
 		edgePath.setSensitivity(false);
 	}
 	
