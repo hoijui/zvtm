@@ -33,10 +33,10 @@ public abstract class ResourceDescription extends ObjectDescription {
 	static final String FILE_PROTOCOL = "file";
 	
 	/** URL identifying this resource. */
-	URL src;
+	protected URL src;
 
     /* necessary info about a resource for instantiation */
-    double vx, vy;
+    protected double vx, vy;
 
     @Override
     public double getX(){

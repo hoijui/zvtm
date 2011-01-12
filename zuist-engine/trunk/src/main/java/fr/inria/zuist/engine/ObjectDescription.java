@@ -17,16 +17,16 @@ import fr.inria.zvtm.glyphs.Glyph;
 
 public abstract class ObjectDescription {
 
-    String id;
+    protected String id;
 
-	int zindex = 0;
+	protected int zindex = 0;
 
-    boolean sensitive = true;
+    protected boolean sensitive = true;
 
-    Region parentRegion;
+    protected Region parentRegion;
 
-    String takesTo;
-    short takesToType;
+    protected String takesTo;
+    protected short takesToType;
     
     /** Called automatically by scene manager. Can be called by client application to force loading of objects not actually visible. */
     public abstract void createObject(SceneManager sm, final VirtualSpace vs, boolean fadeIn);
@@ -53,12 +53,20 @@ public abstract class ObjectDescription {
 	public int getZindex(){
 		return zindex;
 	}
+	
+	protected void setZindex(int i){
+		zindex = i;
+	}
 
     /** Get Region this object belongs to. */
     public Region getParentRegion(){
 	    return parentRegion;
     }
 
+	protected void setParentRegion(Region pr){
+		parentRegion = pr;
+	}
+	
     /** Should take/"transport" to object/region whose ID is id
      *@param id set to null if should not take anywhere 
      */

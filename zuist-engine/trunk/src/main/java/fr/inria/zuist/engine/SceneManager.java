@@ -381,13 +381,15 @@ public class SceneManager implements CameraListener {
         return objectListener;
     }
     
-    void objectCreated(ObjectDescription od){
+	/** For internal use. */
+    public void objectCreated(ObjectDescription od){
         if (objectListener != null){
             objectListener.objectCreated(od);
         }
     }
 
-    void objectDestroyed(ObjectDescription od){
+	/** For internal use. Made public for outside package subclassing  */
+    public void objectDestroyed(ObjectDescription od){
         if (objectListener != null){
             objectListener.objectDestroyed(od);
         }

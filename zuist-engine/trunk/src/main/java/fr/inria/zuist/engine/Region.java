@@ -307,7 +307,8 @@ public class Region {
         return isSensitive;
     }
 
-    void addObject(ObjectDescription od){
+	/** For internal use. Outside-package subclassing. */
+    public void addObject(ObjectDescription od){
         ObjectDescription[] newObjects = new ObjectDescription[objects.length+1];
         System.arraycopy(objects, 0, newObjects, 0, objects.length);
         newObjects[objects.length] = od;
