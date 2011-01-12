@@ -44,6 +44,7 @@ public class NTInfoBox {
 	//----GRAPHICS----
 	public void createGraphics(VirtualSpace vs){
 		this.vs = vs;
+		if(gBox != null) return;
 		
 		long boxWidth = INFO_BOX_WIDTH;
 		

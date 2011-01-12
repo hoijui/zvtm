@@ -16,7 +16,7 @@ public class ProjectColors {
     public static final Color[] HIGHLIGHT_RELATED = {Color.yellow.darker(), Color.orange.brighter()};
     
     //COLOR DEFINITIONS
-    public static final Color MATRIX_BACKGROUND = Color.WHITE;	
+    public static final Color[] MATRIX_BACKGROUND = {Color.WHITE, Color.WHITE};	
 	public static final Color[] MATRIX_SYMMETRY_FIELDS = {Color.LIGHT_GRAY, new Color(245,245,245)};	
 	public static final Color[] MATRIX_GROUP_LABEL_BACKGROUND = {Color.DARK_GRAY, Color.LIGHT_GRAY}	;	
 	public static final Color[] MATRIX_GROUP_LABEL_TEXT = {Color.LIGHT_GRAY, Color.BLACK};	

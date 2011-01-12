@@ -106,10 +106,14 @@ public class NTNode extends LinLogNode{
 	    
 	    	labelW = new VText(-NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER ,0 , 0, ProjectColors.NODE_TEXT[ProjectColors.COLOR_SCHEME], getName(), (single) ? VText.TEXT_ANCHOR_MIDDLE : VText.TEXT_ANCHOR_END);
 	    	labelW.setSensitivity(false);
+	    		
 	    	gBackgroundW = new VRectangle(0, 0, 0, 0, NodeTrixViz.CELL_SIZE, backgroundColor);
 	    	gBackgroundW.setDrawBorder(false);
 	    	gBackgroundW.setSensitivity(false);
 	    	gBackgroundW.stick(this.labelW);
+	    	//System.out.println("vs: " + vs);
+	    	//System.out.println("gBackgroundW: " + gBackgroundW);
+	    	
 	    	vs.addGlyph(gBackgroundW);
 	    	vs.addGlyph(labelW);
 //	    	System.out.println("[NTNODE] LABELWIDTH " + getName() +", "+ labelW.getBounds(0).x);
@@ -123,6 +127,7 @@ public class NTNode extends LinLogNode{
 		    if (!single){
 	    	    labelN = new VTextOr(0, NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER, 0, ProjectColors.NODE_TEXT[ProjectColors.COLOR_SCHEME], getName(), (float)Math.PI/2f, VText.TEXT_ANCHOR_START);
     	    	labelN.setSensitivity(false);
+    	   
 	    	    gBackgroundN = new VRectangleOr(0,0, 0, 0, NodeTrixViz.CELL_SIZE, backgroundColor, (float)Math.PI/2f);
 	    	    gBackgroundN.setDrawBorder(false);
 	    	    gBackgroundN.setSensitivity(false);

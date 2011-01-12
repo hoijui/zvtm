@@ -90,7 +90,7 @@ public class Matrix {
             // matrix background
             bkg = new VRectangle(x, y, 0,
                                  nodes.size()*NodeTrixViz.CELL_SIZE, nodes.size()*NodeTrixViz.CELL_SIZE,
-                                 ProjectColors.MATRIX_BACKGROUND, ProjectColors.MATRIX_BACKGROUND);
+                                 ProjectColors.MATRIX_BACKGROUND[ProjectColors.COLOR_SCHEME], ProjectColors.MATRIX_BACKGROUND[ProjectColors.COLOR_SCHEME]);
             vs.addGlyph(bkg);
             
             // matrix label
@@ -118,9 +118,9 @@ public class Matrix {
         	                            NodeTrixViz.CELL_SIZE/2*nodes.size(),
         	                            vs, false, ProjectColors.NODE_BACKGROUND[ProjectColors.COLOR_SCHEME]);
         	    nodes.get(i).moveTo(x, y);
-                if (nodes.get(i).getInfoBox() != null){
+             //   if (nodes.get(i).getInfoBox() != null){
             	    nodes.get(i).getInfoBox().createGraphics(vs); // not yet on the right position.                     
-                }
+             //  }
     	    }	        
 	    }
 	    else {
@@ -128,7 +128,7 @@ public class Matrix {
 	        nodes.firstElement().createGraphics(0, 0, 0, 0, vs, true, ProjectColors.NODE_BACKGROUND[ProjectColors.COLOR_SCHEME]);
     	    nodes.firstElement().moveTo(x, y);
 //    	    nodes.firstElement().getInfoBox().createGraphics(vs); // not yet on the right position. 
-    	    bkg = new VRectangle(x, y, 0, NodeTrixViz.CELL_SIZE/2, 1, ProjectColors.MATRIX_BACKGROUND,  ProjectColors.MATRIX_BACKGROUND);
+    	    bkg = new VRectangle(x, y, 0, NodeTrixViz.CELL_SIZE/2, 1, ProjectColors.MATRIX_BACKGROUND[ProjectColors.COLOR_SCHEME],  ProjectColors.MATRIX_BACKGROUND[ProjectColors.COLOR_SCHEME]);
 	    }
     	bkg.setOwner(this);
     	//Creating and disabling the overview glyph
