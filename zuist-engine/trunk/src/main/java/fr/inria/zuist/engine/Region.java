@@ -289,6 +289,11 @@ public class Region {
         wnes[1] = y + h/2;
         wnes[2] = x + w/2;
         wnes[3] = y - h/2;
+		if (bounds != null){
+			bounds.moveTo(x, y);
+			bounds.setWidth(w);
+			bounds.setHeight(h);
+		}
 	}
 
     /** Should the rectangle representing the region's bounds be sensitive to cursor entry/exit. */
