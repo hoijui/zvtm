@@ -181,6 +181,15 @@ public class TextDescription extends ObjectDescription {
         return vy;
     }
     
+    @Override
+    public void moveTo(double x, double y){
+        this.vx = x;
+        this.vy = y;
+        if (glyph != null){
+            glyph.moveTo(vx, vy);
+        }
+    }
+    
 }
 
 class TextHideAction implements EndAction {

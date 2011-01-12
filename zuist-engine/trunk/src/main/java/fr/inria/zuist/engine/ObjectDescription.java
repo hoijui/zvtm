@@ -91,5 +91,7 @@ public abstract class ObjectDescription {
     
     /** Get y-coordinate of object in virtual space. */
     public abstract double getY();
+    
+    public abstract void moveTo(double x, double y);
 
 }

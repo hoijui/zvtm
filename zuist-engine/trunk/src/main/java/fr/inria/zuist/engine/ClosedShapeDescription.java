@@ -118,6 +118,11 @@ public class ClosedShapeDescription extends ObjectDescription {
         return glyph.vy;
     }
     
+    @Override
+    public void moveTo(double x, double y){
+        this.glyph.moveTo(x, y);
+    }
+    
 }
 
 class ClosedShapeHideAction implements EndAction {

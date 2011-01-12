@@ -273,6 +273,14 @@ public class ImageDescription extends ResourceDescription {
 	    return glyph;
     }
     
+    @Override
+    public void moveTo(double x, double y){
+        super.moveTo(x, y);
+        if (glyph != null){
+            glyph.moveTo(vx, vy);
+        }
+    }
+    
 }
 
 class ImageHideAction implements EndAction {

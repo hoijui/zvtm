@@ -47,6 +47,12 @@ public abstract class ResourceDescription extends ObjectDescription {
     public double getY(){
         return vy;
     }
+    
+    @Override
+    public void moveTo(double x, double y){
+        this.vx = x;
+        this.vy = y;
+    }
 
 	/** Type of resource.
 	 *@return type of resource.

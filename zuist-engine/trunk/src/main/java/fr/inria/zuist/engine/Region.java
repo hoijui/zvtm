@@ -148,10 +148,7 @@ public class Region {
         this.lli = lowestLevel;
         this.li = li;
         wnes = new double[4];
-        wnes[0] = x - w/2;
-        wnes[1] = y + h/2;
-        wnes[2] = x + w/2;
-        wnes[3] = y - h/2;
+        setGeometry(x, y, w, h);
         this.id = id;
         this.sm = sm;
         transitions = trans;
@@ -257,6 +254,41 @@ public class Region {
 	 */
 	public double getHeight(){
 		return h;
+	}
+	
+	/** Set this region's center (x,y)-coordinates.
+	 */
+	public void moveTo(double x, double y){
+	    this.x = x;
+	    this.y = y;
+	    updateGeometry();
+	}
+	
+	/** Set this region's width.
+	 */
+	public void setWidth(double w){
+	    this.w = w;
+	    updateGeometry();
+	}
+	
+	/** Set this region's height.
+	 */
+	public void setHeight(double h){
+	    this.h = h;
+	    updateGeometry();
+	}
+	
+	void updateGeometry(){
+	    setGeometry(this.x, this.y, this.w, this.h);
+	}
+	
+	/** Set this region's center (x,y)-coordinates, width and height.
+	 */
+	public void setGeometry(double x, double y, double w, double h){
+	    wnes[0] = x - w/2;
+        wnes[1] = y + h/2;
+        wnes[2] = x + w/2;
+        wnes[3] = y - h/2;
 	}
 
     /** Should the rectangle representing the region's bounds be sensitive to cursor entry/exit. */
