@@ -486,7 +486,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener, Obj
 	}
 	
     void altitudeChanged(){
-        mCameraAltStr = Messages.ALTITUDE + String.valueOf(mCamera.altitude);
+        mCameraAltStr = Messages.ALTITUDE + String.format("%d", Math.round(mCamera.altitude));
     }
     
     void updatePanelSize(){
