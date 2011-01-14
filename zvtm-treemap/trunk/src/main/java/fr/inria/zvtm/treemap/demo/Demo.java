@@ -67,8 +67,7 @@ class Demo {
                     0, 
                     bounds.w, bounds.h, new Color(220, 220, 220));
                 rect.setBorderColor(Color.BLACK);
-                String txt = item.getUserObject() instanceof File? 
-                    ((File)item.getUserObject()).getName() : item.getUserObject().toString();
+                String txt = item.getUserObject().toString();
                 VText text = new VText(rect.vx, rect.vy+rect.getHeight()*0.5, 0, 
                     Color.BLACK, txt, 
                     VText.TEXT_ANCHOR_MIDDLE, 1.2f);
