@@ -14,6 +14,9 @@ import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
+import fr.inria.zvtm.event.ViewAdapter;
+import fr.inria.zvtm.event.ViewListener;
+import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.treemap.Mappable;
@@ -24,11 +27,14 @@ import fr.inria.zvtm.treemap.TreemapUtils;
 import fr.inria.zvtm.treemap.Walker;
 import fr.inria.zvtm.treemap.ZMapItem;
 
+/**
+ * Builds a treemap representation from the default model of a JTree.
+ */
 class Demo {
     private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE;
-    private VirtualSpace demoSpace;
-    private Camera cam;
-    private View view;
+    private final VirtualSpace demoSpace;
+    private final Camera cam;
+    private final View view;
 
     Demo(){
         demoSpace = vsm.addVirtualSpace("demoSpace");
@@ -41,7 +47,11 @@ class Demo {
         tree.sum();
         Squarified.INSTANCE.computeShapes(new Rect(0, 0, 1024, 768), tree);
         makeRepr(tree, demoSpace);
-        view.getGlobalView(cam, 500);
+        view.getGlobalView(cam, 500); 
+    }
+
+    private void setListener(ViewListener listener){
+        view.setListener(listener);
     }
 
     private static void makeRepr(final Tree tree, final VirtualSpace vs){
@@ -64,17 +74,31 @@ class Demo {
                 text.move(0, -TreemapUtils.getVTextHeight(text));
                 if(t.isLeaf()){
                     text.moveTo(rect.vx, rect.vy);
+                } else {
+                    rect.setCursorInsideFillColor(new Color(237, 245, 7));
                 }
                 item.putGraphicalObject("RECT", rect);
                 item.putGraphicalObject("TEXT", text);
                 vs.addGlyph(rect);
                 vs.addGlyph(text);
+                // needs to happen after the glyph is added to the virtual
+                // space for some reason
+                rect.setCursorInsideHighlightColor(new Color(30, 30, 30));
             }
         });
     }
 
     public static void main(String[] args){
-        new Demo(); 
+        Demo demo = new Demo(); 
+        demo.setListener(new ViewAdapter(){
+            public void enterGlyph(Glyph g){
+                g.highlight(true, null);
+            }
+
+            public void exitGlyph(Glyph g){
+                g.highlight(false, null);
+            }
+        });
     }
 }
 
