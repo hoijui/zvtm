@@ -25,8 +25,6 @@ import fr.inria.zvtm.treemap.Walker;
 import fr.inria.zvtm.treemap.ZMapItem;
 
 class Demo {
-    private static final Rect TREEMAP_RECT = new Rect(0,0,800000,400000);
-    private static final double LABEL_HEIGHT = 24000;
     private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE;
     private VirtualSpace demoSpace;
     private Camera cam;
@@ -41,7 +39,6 @@ class Demo {
 
         Tree<ZMapItem> tree = TreemapUtils.swingToUmd(new JTree().getModel());
         //Tree tree = TreemapUtils.swingToUmd(new FileTreeModel(new File("/home/rprimet/temp/foo")));
-        //tree.layout(new SquarifiedLayout(), TREEMAP_RECT, LABEL_HEIGHT, INSETS);
         tree.sum();
         Squarified.INSTANCE.computeShapes(new Rect(0, 0, 1024, 768), tree);
         makeRepr(tree, demoSpace);
@@ -57,19 +54,22 @@ class Demo {
                 VRectangle rect = new VRectangle(bounds.x + bounds.w*0.5, 
                     bounds.y + bounds.h * 0.5, 
                     0, 
-                    bounds.w, bounds.h, new Color(200, 200, 200));
-                rect.setBorderColor(Color.WHITE);
+                    bounds.w, bounds.h, new Color(220, 220, 220));
+                rect.setBorderColor(Color.BLACK);
                 String txt = item.getUserObject() instanceof File? 
                     ((File)item.getUserObject()).getName() : item.getUserObject().toString();
-               // VText text = new VText(rect.vx-rect.getWidth()*0.5, rect.vy+rect.getHeight()*0.5, 0, 
-               //     Color.WHITE, txt, 
-               //     VText.TEXT_ANCHOR_START, 1f);
+                VText text = new VText(rect.vx, rect.vy+rect.getHeight()*0.5, 0, 
+                    Color.BLACK, txt, 
+                    VText.TEXT_ANCHOR_MIDDLE, 1.2f);
                // text.setScale((float)(text.getScale()*LABEL_HEIGHT/TreemapUtils.getVTextHeight(text)));
-               // text.move(0, -TreemapUtils.getVTextHeight(text));
+                text.move(0, -TreemapUtils.getVTextHeight(text));
+                if(t.isLeaf()){
+                    text.moveTo(rect.vx, rect.vy);
+                }
                 item.putGraphicalObject("RECT", rect);
-               // item.putGraphicalObject("TEXT", text);
+                item.putGraphicalObject("TEXT", text);
                 vs.addGlyph(rect);
-               // vs.addGlyph(text);
+                vs.addGlyph(text);
             }
         });
     }
