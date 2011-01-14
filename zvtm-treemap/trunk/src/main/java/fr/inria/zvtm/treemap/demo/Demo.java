@@ -18,6 +18,7 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.event.ViewAdapter;
 import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.glyphs.PRectangle;
 import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.treemap.Mappable;
@@ -36,6 +37,8 @@ class Demo {
     private final VirtualSpace demoSpace;
     private final Camera cam;
     private final View view;
+    private static final Color DEFAULT_FILL = new Color(220, 220, 220);
+    private static final Color HIGHLIGHT_FILL = new Color(217, 225, 7);
 
     Demo(){
         demoSpace = vsm.addVirtualSpace("demoSpace");
@@ -60,23 +63,23 @@ class Demo {
         tree.traversePre(new Walker<Tree<ZMapItem>>(){
             public void visitNode(Tree<ZMapItem> t){
                 ZMapItem item = t.getMapItem();
-                System.out.println(item.getUserObject());
+                //System.out.println(item.getUserObject());
                 Rect bounds = item.getBounds();
-                VRectangle rect = new VRectangle(bounds.x + bounds.w*0.5, 
-                    bounds.y + bounds.h * 0.5, 
-                    0, 
-                    bounds.w, bounds.h, new Color(220, 220, 220));
+                VRectangle rect = new PRectangle(bounds.x + bounds.w*0.5,
+                    bounds.y + bounds.h * 0.5,
+                    0,
+                    bounds.w, bounds.h,
+                    TreemapUtils.makeDiagGradient((float)bounds.w, (float)bounds.h, DEFAULT_FILL));
                 rect.setBorderColor(Color.BLACK);
                 String txt = item.getUserObject().toString();
                 VText text = new VText(rect.vx, rect.vy+rect.getHeight()*0.5, 0, 
                     Color.BLACK, txt, 
                     VText.TEXT_ANCHOR_MIDDLE, 1.2f);
-               // text.setScale((float)(text.getScale()*LABEL_HEIGHT/TreemapUtils.getVTextHeight(text)));
                 text.move(0, -TreemapUtils.getVTextHeight(text));
                 if(t.isLeaf()){
                     text.moveTo(rect.vx, rect.vy);
                 } else {
-                    rect.setCursorInsideFillColor(new Color(237, 245, 7));
+                    //rect.setCursorInsideFillColor(new Color(237, 245, 7));
                 }
                 item.putGraphicalObject("RECT", rect);
                 item.putGraphicalObject("TEXT", text);
@@ -93,12 +96,19 @@ class Demo {
         Demo demo = new Demo(); 
         demo.setListener(new ViewAdapter(){
             public void enterGlyph(Glyph g){
-                g.highlight(true, null);
+                if(!(g instanceof PRectangle)){
+                    return;
+                }
+                PRectangle rect = (PRectangle)g;
+                rect.setPaint(TreemapUtils.makeDiagGradient((float)rect.getWidth(), (float)rect.getHeight(), HIGHLIGHT_FILL));
             }
 
             public void exitGlyph(Glyph g){
-                g.highlight(false, null);
-            }
+                if(!(g instanceof PRectangle)){
+                    return;
+                }
+                PRectangle rect = (PRectangle)g;
+                rect.setPaint(TreemapUtils.makeDiagGradient((float)rect.getWidth(), (float)rect.getHeight(), DEFAULT_FILL));}
         });
     }
 }
