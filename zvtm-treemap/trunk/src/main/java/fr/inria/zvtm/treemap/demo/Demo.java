@@ -6,6 +6,7 @@ package fr.inria.zvtm.treemap.demo;
 import java.awt.Color;
 import java.util.Arrays;
 import java.util.Vector;
+import javax.swing.JFrame;
 import javax.swing.JTree;
 
 import java.io.File;
@@ -48,6 +49,7 @@ class Demo {
         Squarified.INSTANCE.computeShapes(new Rect(0, 0, 1024, 768), tree);
         makeRepr(tree, demoSpace);
         view.getGlobalView(cam, 500); 
+        ((JFrame)view.getFrame()).setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
     private void setListener(ViewListener listener){
