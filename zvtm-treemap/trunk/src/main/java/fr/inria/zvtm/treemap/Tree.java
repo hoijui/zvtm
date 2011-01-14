@@ -43,6 +43,14 @@ public class Tree<M extends Mappable> implements MapModel
     {
         this.mapItem=mapItem;
     }
+
+    public List<Tree> peekAtChildren(){
+        return Collections.unmodifiableList(children);
+    }
+
+    public ListIterator<Tree> childrenIterator(){
+        return children.listIterator();
+    }
     
     
     public void setOrder(int order)
@@ -88,28 +96,6 @@ public class Tree<M extends Mappable> implements MapModel
         return 1+parent.depth();
     }
     
-    public void layout(MapLayout tiling, double textHeight, Insets insets)
-    {
-        layout(tiling, mapItem.getBounds(), textHeight, insets);
-    }
-    
-    public void layout(MapLayout tiling, Rect bounds, double textHeight, Insets insets)
-    {
-        mapItem.setBounds(bounds);
-        //if (!hasChildren()) return;
-        if(!hasChildren()){
-            Rect leafBounds = new Rect(bounds);
-            leafBounds.h -= textHeight;
-            mapItem.setBounds(leafBounds);
-            return;
-        }
-        double s=sum();
-        bounds.h -= textHeight;
-        tiling.layout(this, bounds, insets);
-        for (int i=childCount()-1; i>=0; i--)
-            getChild(i).layout(tiling, textHeight, insets);
-    }
-    
     public Mappable[] getTreeItems()
     {
         if (cachedTreeItems!=null)
@@ -138,7 +124,7 @@ public class Tree<M extends Mappable> implements MapModel
 	     }
     }
     
-    private double sum()
+    /* private */ public double sum()
     {
         //if (!sumsChildren)
         //    return mapItem.getSize();
@@ -203,6 +189,11 @@ public class Tree<M extends Mappable> implements MapModel
     public boolean hasChildren()
     {
         return children.size()>0;
+    }
+
+    public boolean isLeaf()
+    {
+        return children.isEmpty();
     }
     
     public void print()

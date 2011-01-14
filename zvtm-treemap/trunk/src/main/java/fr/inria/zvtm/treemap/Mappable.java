@@ -8,6 +8,8 @@
 
 package fr.inria.zvtm.treemap;
 
+import java.awt.geom.Rectangle2D;
+
 /** 
  *
  * Interface representing an object that can be placed

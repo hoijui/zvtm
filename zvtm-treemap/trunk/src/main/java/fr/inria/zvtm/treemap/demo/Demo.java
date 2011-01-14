@@ -16,10 +16,9 @@ import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VText;
-import fr.inria.zvtm.treemap.Insets;
 import fr.inria.zvtm.treemap.Mappable;
 import fr.inria.zvtm.treemap.Rect;
-import fr.inria.zvtm.treemap.SquarifiedLayout;
+import fr.inria.zvtm.treemap.Squarified;
 import fr.inria.zvtm.treemap.Tree;
 import fr.inria.zvtm.treemap.TreemapUtils;
 import fr.inria.zvtm.treemap.Walker;
@@ -27,7 +26,6 @@ import fr.inria.zvtm.treemap.ZMapItem;
 
 class Demo {
     private static final Rect TREEMAP_RECT = new Rect(0,0,800000,400000);
-    private static final Insets INSETS = new Insets(8000, 8000, 4500, 4500);
     private static final double LABEL_HEIGHT = 24000;
     private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE;
     private VirtualSpace demoSpace;
@@ -43,7 +41,9 @@ class Demo {
 
         Tree<ZMapItem> tree = TreemapUtils.swingToUmd(new JTree().getModel());
         //Tree tree = TreemapUtils.swingToUmd(new FileTreeModel(new File("/home/rprimet/temp/foo")));
-        tree.layout(new SquarifiedLayout(), TREEMAP_RECT, LABEL_HEIGHT, INSETS);
+        //tree.layout(new SquarifiedLayout(), TREEMAP_RECT, LABEL_HEIGHT, INSETS);
+        tree.sum();
+        Squarified.INSTANCE.computeShapes(new Rect(0, 0, 1024, 768), tree);
         makeRepr(tree, demoSpace);
         view.getGlobalView(cam, 500);
     }
@@ -57,19 +57,19 @@ class Demo {
                 VRectangle rect = new VRectangle(bounds.x + bounds.w*0.5, 
                     bounds.y + bounds.h * 0.5, 
                     0, 
-                    bounds.w, bounds.h, Color.GRAY);
+                    bounds.w, bounds.h, new Color(200, 200, 200));
                 rect.setBorderColor(Color.WHITE);
                 String txt = item.getUserObject() instanceof File? 
                     ((File)item.getUserObject()).getName() : item.getUserObject().toString();
-                VText text = new VText(rect.vx-rect.getWidth()*0.5, rect.vy+rect.getHeight()*0.5, 0, 
-                    Color.WHITE, txt, 
-                    VText.TEXT_ANCHOR_START, 1f);
-                text.setScale((float)(text.getScale()*LABEL_HEIGHT/TreemapUtils.getVTextHeight(text)));
-                text.move(0, -TreemapUtils.getVTextHeight(text));
+               // VText text = new VText(rect.vx-rect.getWidth()*0.5, rect.vy+rect.getHeight()*0.5, 0, 
+               //     Color.WHITE, txt, 
+               //     VText.TEXT_ANCHOR_START, 1f);
+               // text.setScale((float)(text.getScale()*LABEL_HEIGHT/TreemapUtils.getVTextHeight(text)));
+               // text.move(0, -TreemapUtils.getVTextHeight(text));
                 item.putGraphicalObject("RECT", rect);
-                item.putGraphicalObject("TEXT", text);
+               // item.putGraphicalObject("TEXT", text);
                 vs.addGlyph(rect);
-                vs.addGlyph(text);
+               // vs.addGlyph(text);
             }
         });
     }

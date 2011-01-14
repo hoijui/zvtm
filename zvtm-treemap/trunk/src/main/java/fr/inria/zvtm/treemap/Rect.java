@@ -42,6 +42,22 @@ public class Rect
     {
         return Math.max(w/h, h/w);
     }
+
+    public double getX(){
+        return x;
+    }
+
+    public double getY(){
+        return y;
+    }
+
+    public double getMaxX(){
+        return x + w;
+    }
+
+    public double getMaxY(){
+        return y + h;
+    }
     
     public double distance(Rect r)
     {
