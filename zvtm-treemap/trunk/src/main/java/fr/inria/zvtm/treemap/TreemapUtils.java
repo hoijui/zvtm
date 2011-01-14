@@ -8,6 +8,9 @@ import java.awt.Toolkit;
 import fr.inria.zvtm.glyphs.VText;
 
 public class TreemapUtils {
+    //let's not instantiate this
+    private TreemapUtils(){}
+
     /**
      * Returns a new UMD Tree instance that is equivalent to the 
      * given Swing TreeModel
