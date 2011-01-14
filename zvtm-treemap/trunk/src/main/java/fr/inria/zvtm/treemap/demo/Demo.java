@@ -38,7 +38,6 @@ class Demo {
         view.getCursor().setColor(Color.GREEN);
 
         Tree<ZMapItem> tree = TreemapUtils.swingToUmd(new JTree().getModel());
-        //Tree tree = TreemapUtils.swingToUmd(new FileTreeModel(new File("/home/rprimet/temp/foo")));
         tree.sum();
         Squarified.INSTANCE.computeShapes(new Rect(0, 0, 1024, 768), tree);
         makeRepr(tree, demoSpace);
