@@ -47,14 +47,14 @@ public class TreemapUtils {
     }
 
     /**
-     * Returns an <b>approximate</b> height of a VText
+     * Returns the <b>approximate</b> height of a VText
      */ 
     public static double getVTextHeight(VText text){
         return text.getScale()*Toolkit.getDefaultToolkit().getFontMetrics(text.getMainFont()).getHeight();
     }
 
     /**
-     * Returns an <b>approximate</b> width of a VText
+     * Returns the <b>approximate</b> width of a VText
      */ 
     public static double getVTextWidth(VText text){
         return text.getScale()*Toolkit.getDefaultToolkit().getFontMetrics(text.getMainFont()).charWidth('a')*text.getText().length();
