@@ -10,6 +10,8 @@ package fr.inria.zvtm.nodetrix;
 import java.awt.Color;
 import java.awt.geom.Point2D;
 
+import javax.swing.SwingUtilities;
+
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.glyphs.GPath;
 import fr.inria.zvtm.glyphs.Glyph;
@@ -40,7 +42,13 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
 	protected void clearGraphics() 
 	{
 		if(vs == null) return;
-		vs.removeGlyph(edgePath);
+		SwingUtilities.invokeLater(new Runnable()
+    	{
+    		public void run()
+    		{
+    			vs.removeGlyph(edgePath);
+    		}
+    	});
 	}
 
 	@Override 
@@ -78,9 +86,9 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
         else if (angle > 5*Math.PI/4.0){
             // southward
             x1 = edge.tail.ndx;
-            y1 = (edge.tail.getMatrix().nodes.size() > 1) ? -NodeTrixViz.CELL_SIZE*edge.tail.getMatrix().nodes.size()/2 : -edge.tail.getHeight();
+            y1 = (edge.tail.getMatrix().nodes.size() > 1) ? -NodeTrixViz.CELL_SIZE*edge.tail.getMatrix().nodes.size()/2 : -edge.tail.getLabelHeight();
             x2 = edge.head.ndx;
-            y2 = (edge.head.getMatrix().nodes.size() > 1) ? NodeTrixViz.CELL_SIZE*edge.head.getMatrix().nodes.size()/2+2*edge.head.getMatrix().nodes.firstElement().getLabelHalfWidth() : edge.head.getHeight();
+            y2 = (edge.head.getMatrix().nodes.size() > 1) ? NodeTrixViz.CELL_SIZE*edge.head.getMatrix().nodes.size()/2+2*edge.head.getMatrix().nodes.firstElement().getLabelHalfWidth() : edge.head.getLabelHeight();
             offsets[0] = new Point2D.Double(x1, y1);
             offsets[1] = new Point2D.Double(x2, y2);
             edgePath = new GPath(tmp.x+offsets[0].x, tmp.y+offsets[0].y, 0, edge.getColor());
@@ -105,9 +113,9 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
             // angle >= Math.PI/4.0
             // northward
             x1 = edge.tail.ndx;
-            y1 = (edge.tail.getMatrix().nodes.size() > 1) ? NodeTrixViz.CELL_SIZE * edge.tail.getMatrix().nodes.size()/2+2*edge.tail.getMatrix().nodes.firstElement().getLabelHalfWidth() : edge.tail.getHeight();
+            y1 = (edge.tail.getMatrix().nodes.size() > 1) ? NodeTrixViz.CELL_SIZE * edge.tail.getMatrix().nodes.size()/2+2*edge.tail.getMatrix().nodes.firstElement().getLabelHalfWidth() : edge.tail.getLabelHeight();
             x2 = edge.head.ndx;
-            y2 = (edge.head.getMatrix().nodes.size() > 1) ? -NodeTrixViz.CELL_SIZE*edge.head.getMatrix().nodes.size()/2 : -edge.head.getHeight();
+            y2 = (edge.head.getMatrix().nodes.size() > 1) ? -NodeTrixViz.CELL_SIZE*edge.head.getMatrix().nodes.size()/2 : -edge.head.getLabelHeight();
             offsets[0] = new Point2D.Double(x1, y1);
             offsets[1] = new Point2D.Double(x2, y2);
             edgePath = new GPath(tmp.x+offsets[0].x, tmp.y+offsets[0].y, 0, edge.getColor());
@@ -115,11 +123,21 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
                                 tmp.x+offsets[0].x, tmp.y+offsets[0].y+CONTROL_POINT_OFFSET,
                                 hmp.x+offsets[1].x, hmp.y+offsets[1].y-CONTROL_POINT_OFFSET, true);
         }
-        vs.addGlyph(edgePath);
+        
+
         edgePath.setColor(edge.getColor());
         edgePath.setStrokeWidth(2);
         edgePath.setOwner(edge);
         assignAlpha();
+
+        SwingUtilities.invokeLater(new Runnable()
+        {
+        	public void run()
+        	{
+        		vs.addGlyph(edgePath);
+        	}
+        });
+        
         onTop();
 	}
 
@@ -135,7 +153,13 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
 	
 	@Override
 	public void show(){
-		edgePath.setVisible(true);
+		SwingUtilities.invokeLater(new Runnable()
+    	{
+    		public void run()
+    		{
+    			edgePath.setVisible(true);
+    		}
+    	});
 		edgePath.setColor(edge.getColor());
 		edgePath.setSensitivity(true);
 		assignAlpha();
@@ -173,10 +197,10 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
             // southward
             offsets[0].
             setLocation(edge.tail.ndx,
-                                   (edge.tail.getMatrix().nodes.size() > 1) ? -NodeTrixViz.CELL_SIZE*edge.tail.getMatrix().nodes.size()/2 : -edge.tail.getHeight());
+                                   (edge.tail.getMatrix().nodes.size() > 1) ? -NodeTrixViz.CELL_SIZE*edge.tail.getMatrix().nodes.size()/2 : -edge.tail.getLabelHeight());
             offsets[1].
             setLocation(edge.head.ndx,
-                                   (edge.head.getMatrix().nodes.size() > 1) ? NodeTrixViz.CELL_SIZE*edge.head.getMatrix().nodes.size()/2+2*edge.head.getMatrix().nodes.firstElement().getLabelHalfWidth() : edge.head.getHeight());
+                                   (edge.head.getMatrix().nodes.size() > 1) ? NodeTrixViz.CELL_SIZE*edge.head.getMatrix().nodes.size()/2+2*edge.head.getMatrix().nodes.firstElement().getLabelHalfWidth() : edge.head.getLabelHeight());
             npos[0] = new Point2D.Double(tmp.x+offsets[0].x, tmp.y+offsets[0].y);
             npos[1] = new Point2D.Double(tmp.x+offsets[0].x, tmp.y+offsets[0].y-CONTROL_POINT_OFFSET);
             npos[2] = new Point2D.Double(hmp.x+offsets[1].x, hmp.y+offsets[1].y+CONTROL_POINT_OFFSET);
@@ -200,10 +224,10 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
             // northward
             offsets[0].
             setLocation(edge.tail.ndx,
-                                   (edge.tail.getMatrix().nodes.size() > 1) ? NodeTrixViz.CELL_SIZE*edge.tail.getMatrix().nodes.size()/2+2*edge.tail.getMatrix().nodes.firstElement().getLabelHalfWidth() : edge.tail.getHeight());
+                                   (edge.tail.getMatrix().nodes.size() > 1) ? NodeTrixViz.CELL_SIZE*edge.tail.getMatrix().nodes.size()/2+2*edge.tail.getMatrix().nodes.firstElement().getLabelHalfWidth() : edge.tail.getLabelHeight());
             offsets[1].
             setLocation(edge.head.ndx,
-                                   (edge.head.getMatrix().nodes.size() > 1) ? -NodeTrixViz.CELL_SIZE*edge.head.getMatrix().nodes.size()/2 : -edge.head.getHeight());
+                                   (edge.head.getMatrix().nodes.size() > 1) ? -NodeTrixViz.CELL_SIZE*edge.head.getMatrix().nodes.size()/2 : -edge.head.getLabelHeight());
             npos[0] = new Point2D.Double(tmp.x+offsets[0].x, tmp.y+offsets[0].y);
             npos[1] = new Point2D.Double(tmp.x+offsets[0].x, tmp.y+offsets[0].y+CONTROL_POINT_OFFSET);
             npos[2] = new Point2D.Double(hmp.x+offsets[1].x, hmp.y+offsets[1].y-CONTROL_POINT_OFFSET);
@@ -229,7 +253,6 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
     
 	@Override
 	public void onTop() {
-		// TODO Auto-generated method stub
 	}
 
 	@Override

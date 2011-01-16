@@ -20,6 +20,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 
+import javax.swing.SwingUtilities;
+
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.AnimationManager;
 import fr.inria.zvtm.animation.EndAction;
@@ -81,61 +83,62 @@ public class Matrix {
         }
     }
     
-    void createNodeGraphics(double x, double y, VirtualSpace vs){
+    void createNodeGraphics(double mx, double my, final VirtualSpace vs){
     	// nodes
     	this.vs = vs;
     	
+    	bkg = new VRectangle(mx, my, 0,
+    			nodes.size()*NodeTrixViz.CELL_SIZE, nodes.size()*NodeTrixViz.CELL_SIZE,
+    			ProjectColors.MATRIX_BACKGROUND[ProjectColors.COLOR_SCHEME], ProjectColors.MATRIX_BACKGROUND[ProjectColors.COLOR_SCHEME], .2f);
     	if (nodes.size() > 1){
     		
             // matrix background
-            bkg = new VRectangle(x, y, 0,
-                                 nodes.size()*NodeTrixViz.CELL_SIZE, nodes.size()*NodeTrixViz.CELL_SIZE,
-                                 ProjectColors.MATRIX_BACKGROUND[ProjectColors.COLOR_SCHEME], ProjectColors.MATRIX_BACKGROUND[ProjectColors.COLOR_SCHEME]);
-            vs.addGlyph(bkg);
             
             // matrix label
     	    matrixLbDX = -Math.round(NodeTrixViz.CELL_SIZE/2*(1.1 * nodes.size()));
     	    matrixLbDY = -Math.round(NodeTrixViz.CELL_SIZE/2*(nodes.size() + .5 + Math.sqrt(2*nodes.size())));
-    	    matrixLabel = new VText(x+matrixLbDX, y+matrixLbDY, 0, ProjectColors.NODE_TEXT[ProjectColors.COLOR_SCHEME], name, VText.TEXT_ANCHOR_END, (float)Math.sqrt(4*nodes.size()));
-    	    vs.addGlyph(matrixLabel);
-    	    matrixLabel.setSensitivity(false);
+    	    matrixLabel = new VText(mx+matrixLbDX, my+matrixLbDY, 0, ProjectColors.NODE_TEXT[ProjectColors.COLOR_SCHEME], name, VText.TEXT_ANCHOR_END, (float)Math.sqrt(4*nodes.size()));
     	    bkg.stick(matrixLabel);
     	    // node labels
-//    	    Color c;
-//        	float b;
-//    	    int a = this.nodes.size();
-//        	float min = .7f;
-//        	float max = 1.0f;
-//        	float diff = max-min;
-//        	float step = (1/((float)a-1))*diff;
         	for (int i=0 ; i < nodes.size() ; i++ )
     	    {
-//        		b = max - step*i;
-//        		c = Color.getHSBColor(0.1f, 0.8f, b);
-        		nodes.get(i).createGraphics(-NodeTrixViz.CELL_SIZE/2*nodes.size(),
+        		nodes.get(i).createGraphics(-NodeTrixViz.CELL_SIZE/2 * nodes.size(),
         	                            Math.round(NodeTrixViz.CELL_SIZE/2*(nodes.size()-2*i-1)),
         	                            Math.round(NodeTrixViz.CELL_SIZE/2*(-nodes.size()+2*i+1)),
         	                            NodeTrixViz.CELL_SIZE/2*nodes.size(),
         	                            vs, false, ProjectColors.NODE_BACKGROUND[ProjectColors.COLOR_SCHEME]);
-        	    nodes.get(i).moveTo(x, y);
-             //   if (nodes.get(i).getInfoBox() != null){
-            	    nodes.get(i).getInfoBox().createGraphics(vs); // not yet on the right position.                     
-             //  }
+        	    nodes.get(i).moveTo(mx, my);
     	    }	        
+        	
+        	SwingUtilities.invokeLater(new Runnable()
+        	{
+        		public void run()
+        		{
+        			vs.addGlyph(matrixLabel);
+        			matrixLabel.setSensitivity(false);
+        		}
+        	});
+
 	    }
 	    else {
 	        // if matrix contains a single node, only show a horizontal label
 	        nodes.firstElement().createGraphics(0, 0, 0, 0, vs, true, ProjectColors.NODE_BACKGROUND[ProjectColors.COLOR_SCHEME]);
-    	    nodes.firstElement().moveTo(x, y);
-//    	    nodes.firstElement().getInfoBox().createGraphics(vs); // not yet on the right position. 
-    	    bkg = new VRectangle(x, y, 0, NodeTrixViz.CELL_SIZE/2, 1, ProjectColors.MATRIX_BACKGROUND[ProjectColors.COLOR_SCHEME],  ProjectColors.MATRIX_BACKGROUND[ProjectColors.COLOR_SCHEME]);
-	    }
+    	    nodes.firstElement().moveTo(mx, my);
+        }
     	bkg.setOwner(this);
     	//Creating and disabling the overview glyph
     	gOverview = new VRectangle(0,0,0, NodeTrixViz.MATRIX_NODE_LABEL_OCCLUSION_WIDTH/2, NodeTrixViz.MATRIX_NODE_LABEL_OCCLUSION_WIDTH/2, Color.white );
-    	vs.addGlyph(gOverview);
     	gOverview.setSensitivity(false);
     	gOverview.setTranslucencyValue(0);
+    	
+    	SwingUtilities.invokeLater(new Runnable()
+    	{
+    		public void run()
+    		{
+    			vs.addGlyph(bkg);
+    			vs.addGlyph(gOverview);
+    		}
+    	});
     }
     
     /**Has to be called when node order has changed
@@ -152,7 +155,7 @@ public class Matrix {
  	    }
     }
     
-    void finishCreateNodeGraphics(VirtualSpace vs){
+    void finishCreateNodeGraphics(final VirtualSpace vs){
         //estimating maximal length of node labels
     	maxLabelWidth = 0;
         for (NTNode n : nodes){
@@ -176,20 +179,18 @@ public class Matrix {
         	if(this.nodes.size() == 1) break;
         	
         	//GRID PATTERN
-        	VRectangle gGridV = new VRectangle(bkg.vx + n.ndx, bkg.vy,0, NodeTrixViz.CELL_SIZE, bkg.getWidth(), ProjectColors.MATRIX_GRID[ProjectColors.COLOR_SCHEME], ProjectColors.MATRIX_GRID[ProjectColors.COLOR_SCHEME], ProjectColors.MATRIX_GRID_TRANSLUCENCY);
+        	final VRectangle gGridV = new VRectangle(bkg.vx + n.ndx, bkg.vy,0, NodeTrixViz.CELL_SIZE, bkg.getWidth(), ProjectColors.MATRIX_GRID[ProjectColors.COLOR_SCHEME], ProjectColors.MATRIX_GRID[ProjectColors.COLOR_SCHEME], ProjectColors.MATRIX_GRID_TRANSLUCENCY);
         	gGridV.setDrawBorder(false);
         	gGridV.setSensitivity(false);
         	gGridV.setVisible(false);
-        	vs.addGlyph(gGridV);
         	vs.above(gGridV, bkg);
         	bkg.stick(gGridV);
         	gridBarsV[i] = gGridV;
         	
-        	VRectangle gGridH = new VRectangle(bkg.vx,bkg.vy+ n.wdy,0, bkg.getWidth(), NodeTrixViz.CELL_SIZE, ProjectColors.MATRIX_GRID[ProjectColors.COLOR_SCHEME], ProjectColors.MATRIX_GRID[ProjectColors.COLOR_SCHEME], ProjectColors.MATRIX_GRID_TRANSLUCENCY);
+        	final VRectangle gGridH = new VRectangle(bkg.vx,bkg.vy+ n.wdy,0, bkg.getWidth(), NodeTrixViz.CELL_SIZE, ProjectColors.MATRIX_GRID[ProjectColors.COLOR_SCHEME], ProjectColors.MATRIX_GRID[ProjectColors.COLOR_SCHEME], ProjectColors.MATRIX_GRID_TRANSLUCENCY);
         	gGridH.setDrawBorder(false);
         	gGridH.setSensitivity(false);
            	gGridH.setVisible(false);
-            vs.addGlyph(gGridH);
         	vs.above(gGridH, bkg);
         	bkg.stick(gGridH);
         	gridBarsH[i] = gGridH;
@@ -202,23 +203,25 @@ public class Matrix {
         		gGridH.setVisible(true);
         		
         	}
-//        		else if(i % 10 == 0){
-//        		gGridV.setColor(Color.LIGHT_GRAY);
-//        		gGridV.setVisible(true);
-//        		gGridH.setColor(Color.LIGHT_GRAY);
-//        		gGridH.setVisible(true);
-//        	}   
         	
         	//SYMMETRY AXIS
-        	VRectangle r = new VRectangle(bkg.vx + n.wdy, bkg.vy + n.ndx, 0, NodeTrixViz.CELL_SIZE, NodeTrixViz.CELL_SIZE, ProjectColors.MATRIX_SYMMETRY_FIELDS[ProjectColors.COLOR_SCHEME], ProjectColors.MATRIX_SYMMETRY_FIELDS[ProjectColors.COLOR_SCHEME], .4f);
+        	final VRectangle r = new VRectangle(bkg.vx + n.wdy, bkg.vy + n.ndx, 0, NodeTrixViz.CELL_SIZE, NodeTrixViz.CELL_SIZE, ProjectColors.MATRIX_SYMMETRY_FIELDS[ProjectColors.COLOR_SCHEME], ProjectColors.MATRIX_SYMMETRY_FIELDS[ProjectColors.COLOR_SCHEME], .4f);
         	r.setDrawBorder(false);
-        	vs.addGlyph(r);
         	r.setSensitivity(false);
         	this.bkg.stick(r);
         	gridReflexiveSquares[i] = r;
 
         	i++;
-//        	System.out.println("[MATRIX] FINISHED NODE GRAPHICS " + name);
+        	
+        	SwingUtilities.invokeLater(new Runnable()
+        	{
+        		public void run()
+        		{
+        	    	vs.addGlyph(gGridV);
+		        	vs.addGlyph(gGridH);
+		        	vs.addGlyph(r);
+        		}
+        	});
 
         }
     }
@@ -414,21 +417,28 @@ public class Matrix {
     /** Brings all glyphs of this matrix to the top of the drawing stack*/
     public void onTop(final VirtualSpace vs)
     {	
-        vs.onTop(bkg);
-        for(Glyph g : gridBarsH){
-            if (g!=null){vs.onTop(g); }
-        }
-        for(Glyph g : gridBarsV){
-            if (g!=null){vs.onTop(g); }
-        }
-        for(Glyph g : gridReflexiveSquares){
-            if (g!=null){vs.onTop(g); }
-        }
-        for(NTNode n : this.nodes){
-            n.onTop(); //Virtual space is already known in NTNode
-            for(NTEdge e : n.getOutgoingEdges()){ e.onTop(); }
-        }
-        vs.onTop(gOverview);
+    	SwingUtilities.invokeLater(new Runnable()
+    	{
+    		public void run()
+    		{
+    			vs.onTop(bkg);
+    			for(Glyph g : gridBarsH){
+    				if (g!=null){vs.onTop(g); }
+    			}
+    			for(Glyph g : gridBarsV){
+    				if (g!=null){vs.onTop(g); }
+    			}
+    			for(Glyph g : gridReflexiveSquares){
+    				if (g!=null){vs.onTop(g); }
+    			}
+    			for(NTNode n : nodes){
+    				n.onTop(); //Virtual space is already known in NTNode
+    				for(NTEdge e : n.getOutgoingEdges()){ e.onTop(); }
+    			}
+    			vs.onTop(gOverview);
+    		}
+    	});
+
     }
    
     public void highlightGrid(NTNode tail, NTNode head, Color c)
@@ -508,14 +518,7 @@ public class Matrix {
     
     
     public void move(double x, double y){
-//    	if(nodes.size() <= 1) {
-////    		nodes.firstElement().moveTo(x, y);
-//    		return;
-//    	}
 
-//    	if(animated){
-//    		Animation a = am.getAnimationFactory().createGlyphTranslatei
-//    	}
     	bkg.move(x, y);
         double[] p = new double[2];
         double offset = 0;
@@ -537,14 +540,12 @@ public class Matrix {
     				node.shiftNorthernLabels((p[1] - offset) + maxLabelWidth/2, false);
     				node.matrixMoved(x, 0);
     			}else{
-//    				node.resetNorthernLabels(bkg.vy + bkg.getHeight() + labelWidth/2, false);
        				node.resetNorthernLabels(false);
        			}
     			if(nodesUnvisibleW){
     				node.shiftWesternLabels((p[0] + offset) - maxLabelWidth/2, false);
     				node.matrixMoved(0, y);
     			}else{
-//    				node.resetWesternLabels(bkg.vx - bkg.getHeight() - labelWidth/2, false);
     				node.resetWesternLabels(false);
     			}
     		}else{
@@ -869,43 +870,56 @@ public class Matrix {
 		nodes = finalOrdering;
 	}
 	
-	public void cleanGraphics(AnimationManager am){
+	public void cleanGraphics(final AnimationManager am){
 		if(nodes.size() < 2) return;
 		
 		cleanGroupLabels();
 		
-		Animation a;
-		int duration = 3000;
-		a = am.getAnimationFactory().createTranslucencyAnim(duration, bkg, 0, false, SlowInSlowOutInterpolator2.getInstance(), 
+		final Animation a1, a2;
+		final int duration = 3000;
+		a1 = am.getAnimationFactory().createTranslucencyAnim(duration, bkg, 0, false, SlowInSlowOutInterpolator2.getInstance(), 
 				new EndAction(){
 			public void execute(Object o, Animation.Dimension dimension){
 				vs.removeGlyph((Glyph)o);}});
-		am.startAnimation(a, true);
-		a = am.getAnimationFactory().createTranslucencyAnim(duration, matrixLabel, 0, false, SlowInSlowOutInterpolator2.getInstance(), 
+		am.startAnimation(a1, true);
+		a2 = am.getAnimationFactory().createTranslucencyAnim(duration, matrixLabel, 0, false, SlowInSlowOutInterpolator2.getInstance(), 
 				new EndAction(){public void execute(Object o, Animation.Dimension dimension){
 					vs.removeGlyph((Glyph)o);}});
-		am.startAnimation(a, true);
+		am.startAnimation(a2, true);
 		
-		for(Glyph g : this.gridBarsH){a = am.getAnimationFactory().createTranslucencyAnim(duration, g, 0, false, SlowInSlowOutInterpolator2.getInstance(), 
-				new EndAction(){public void execute(Object o, Animation.Dimension dimension){
-					vs.removeGlyph((Glyph)o);}});
-			am.startAnimation(a, true);}
-		for(Glyph g : this.gridBarsV){a = am.getAnimationFactory().createTranslucencyAnim(duration, g, 0, false, SlowInSlowOutInterpolator2.getInstance(), 
-				new EndAction(){public void execute(Object o, Animation.Dimension dimension){
-					vs.removeGlyph((Glyph)o);}});
-			am.startAnimation(a, true);}
-		for(Glyph g : this.groupLabelsN){a = am.getAnimationFactory().createTranslucencyAnim(duration, g, 0, false, SlowInSlowOutInterpolator2.getInstance(), 
-				new EndAction(){public void execute(Object o, Animation.Dimension dimension){
-					vs.removeGlyph((Glyph)o);}});
-			am.startAnimation(a, true);}
-		for(Glyph g : this.groupLabelsW){a = am.getAnimationFactory().createTranslucencyAnim(duration, g, 0, false, SlowInSlowOutInterpolator2.getInstance(), 
-				new EndAction(){public void execute(Object o, Animation.Dimension dimension){
-					vs.removeGlyph((Glyph)o);}});
-			am.startAnimation(a, true);}
-		for(Glyph g : this.gridReflexiveSquares){a = am.getAnimationFactory().createTranslucencyAnim(duration, g, 0, false, SlowInSlowOutInterpolator2.getInstance(), 
-				new EndAction(){public void execute(Object o, Animation.Dimension dimension){
-					vs.removeGlyph((Glyph)o);}});
-			am.startAnimation(a, true);}
+		SwingUtilities.invokeLater(new Runnable()
+		{
+			public void run()
+			{
+				for(Glyph g : gridBarsH)
+				{
+					am.startAnimation(am.getAnimationFactory().createTranslucencyAnim(duration, g, 0, false, SlowInSlowOutInterpolator2.getInstance(), 
+							new EndAction(){public void execute(Object o, Animation.Dimension dimension){
+								vs.removeGlyph((Glyph)o);}}), true);
+				}
+				for(Glyph g : gridBarsV){
+					am.startAnimation(am.getAnimationFactory().createTranslucencyAnim(duration, g, 0, false, SlowInSlowOutInterpolator2.getInstance(), 
+							new EndAction(){public void execute(Object o, Animation.Dimension dimension){
+								vs.removeGlyph((Glyph)o);}}), true);
+				}
+				for(Glyph g : groupLabelsN){
+					am.startAnimation(am.getAnimationFactory().createTranslucencyAnim(duration, g, 0, false, SlowInSlowOutInterpolator2.getInstance(), 
+							new EndAction(){public void execute(Object o, Animation.Dimension dimension){
+								vs.removeGlyph((Glyph)o);}}), true);
+				}
+				for(Glyph g : groupLabelsW){
+					am.startAnimation(am.getAnimationFactory().createTranslucencyAnim(duration, g, 0, false, SlowInSlowOutInterpolator2.getInstance(), 
+							new EndAction(){public void execute(Object o, Animation.Dimension dimension){
+								vs.removeGlyph((Glyph)o);}}), true);
+				}
+				for(Glyph g : gridReflexiveSquares){
+					am.startAnimation(am.getAnimationFactory().createTranslucencyAnim(duration, g, 0, false, SlowInSlowOutInterpolator2.getInstance(), 
+							new EndAction(){public void execute(Object o, Animation.Dimension dimension){
+								vs.removeGlyph((Glyph)o);}}), true);
+				}		
+			}
+		});
+
 	}
 	
 	

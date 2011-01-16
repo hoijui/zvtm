@@ -94,8 +94,6 @@ public class NTEdge extends LinLogEdge{
     	performInteractionStateChange();
     	
     	if(!visible){
-//    		System.out.println("NOT VISIBLE");
-//    		setVisibility(false);
     		appearance.fade();
     	}
     }

@@ -12,6 +12,8 @@ import java.awt.geom.Point2D;
 
 import java.util.Vector;
 
+import javax.swing.SwingUtilities;
+
 import fr.inria.zvtm.animation.AnimationManager;
 import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator2;
 import fr.inria.zvtm.engine.VirtualSpace;
@@ -42,9 +44,9 @@ public class NTNode extends LinLogNode{
 	VTextOr labelN;
 	/** Horizontal label */
 	VText labelW;
-	/**Stores the half width of the whole label (not only the text!), since double width is never used */
-	private double widthHalf = 0;
-	private double heightHalf = 0;
+	/**Stores the width of the node labels */
+	private double labelWidth = 0;
+	private double labelHeight = 0;
 	/**Width of the text glyph only*/
 	private double textWidth = -1; //-1 means that it is not yet set.
 	/** Background box*/
@@ -92,7 +94,7 @@ public class NTNode extends LinLogNode{
         return gBackgroundN;
     }	
     
-    void createGraphics(double wdx, double wdy, double ndx, double ndy, VirtualSpace vs, boolean single, Color colour)
+    void createGraphics(double wdx, double wdy, double ndx, double ndy, final VirtualSpace vs, boolean single, Color colour)
     {
     	cleanGraphics(vs);
     	
@@ -103,49 +105,63 @@ public class NTNode extends LinLogNode{
 	    this.vs = vs;
 	    this.backgroundColor = colour;
 	    this.single = single;
+	    this.setLabelHeight(NodeTrixViz.CELL_SIZE);
 	    
-	    	labelW = new VText(-NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER ,0 , 0, ProjectColors.NODE_TEXT[ProjectColors.COLOR_SCHEME], getName(), (single) ? VText.TEXT_ANCHOR_MIDDLE : VText.TEXT_ANCHOR_END);
+	    	labelW = new VText(-NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER ,2 , 0, ProjectColors.NODE_TEXT[ProjectColors.COLOR_SCHEME], getName(), (single) ? VText.TEXT_ANCHOR_MIDDLE : VText.TEXT_ANCHOR_END);
 	    	labelW.setSensitivity(false);
-	    		
+	    	
 	    	gBackgroundW = new VRectangle(0, 0, 0, 0, NodeTrixViz.CELL_SIZE, backgroundColor);
 	    	gBackgroundW.setDrawBorder(false);
 	    	gBackgroundW.setSensitivity(false);
-	    	gBackgroundW.stick(this.labelW);
-	    	//System.out.println("vs: " + vs);
-	    	//System.out.println("gBackgroundW: " + gBackgroundW);
 	    	
-	    	vs.addGlyph(gBackgroundW);
-	    	vs.addGlyph(labelW);
-//	    	System.out.println("[NTNODE] LABELWIDTH " + getName() +", "+ labelW.getBounds(0).x);
-	    	
-	    	gSensitiveW = new VRectangle(2, 2, 0, 0, NodeTrixViz.CELL_SIZE-4, Color.red);
+	    	gSensitiveW = new VRectangle(0, 0, 0, 0, NodeTrixViz.CELL_SIZE-4, Color.red);
 	    	gSensitiveW.setVisible(false);
-	    	gBackgroundW.stick(this.gSensitiveW);
 	    	gSensitiveW.setOwner(this);
-	    	vs.addGlyph(gSensitiveW);
-	    
+
+	    	gBackgroundW.stick(labelW);
+	    	gBackgroundW.stick(gSensitiveW);
+	    	
+	    	SwingUtilities.invokeLater(new Runnable()
+	    	{
+	    		public void run()
+	    		{
+	    			vs.addGlyph(gBackgroundW);
+	    			vs.addGlyph(labelW);
+	    			vs.addGlyph(gSensitiveW);
+	    		}
+	    	});
+
 		    if (!single){
-	    	    labelN = new VTextOr(0, NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER, 0, ProjectColors.NODE_TEXT[ProjectColors.COLOR_SCHEME], getName(), (float)Math.PI/2f, VText.TEXT_ANCHOR_START);
+	    	    labelN = new VTextOr(2, 2, 0, ProjectColors.NODE_TEXT[ProjectColors.COLOR_SCHEME], getName(), (float)Math.PI/2f, VText.TEXT_ANCHOR_START);
     	    	labelN.setSensitivity(false);
     	   
-	    	    gBackgroundN = new VRectangleOr(0,0, 0, 0, NodeTrixViz.CELL_SIZE, backgroundColor, (float)Math.PI/2f);
+	    	    gBackgroundN = new VRectangleOr(0, -NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER, 0, 0, NodeTrixViz.CELL_SIZE, backgroundColor, (float)Math.PI/2f);
 	    	    gBackgroundN.setDrawBorder(false);
 	    	    gBackgroundN.setSensitivity(false);
-	    	    gBackgroundN.stick(this.labelN);
-	    		vs.addGlyph(gBackgroundN);
-	    		vs.addGlyph(labelN);
-	    		gSensitiveN = new VRectangleOr(2, 2, 0, 0, NodeTrixViz.CELL_SIZE-4,  Color.red,  (float)Math.PI/2f);
-	    	    gSensitiveN.setVisible(false);
-	    	    gBackgroundN.stick(this.gSensitiveN);
+	    		gSensitiveN = new VRectangleOr(0, 0, 0, 0, NodeTrixViz.CELL_SIZE-4,  Color.red,  (float)Math.PI/2f);
 	    	    gSensitiveN.setOwner(this);
-	    		vs.addGlyph(gSensitiveN);
+	    		
+	    		SwingUtilities.invokeLater(new Runnable()
+		    	{
+		    		public void run()
+		    		{
+		    			gSensitiveN.setVisible(false);
+		    			vs.addGlyph(gBackgroundN);
+		    			vs.addGlyph(labelN);
+		    			vs.addGlyph(gSensitiveN);
+		    		}
+		    	});
+
+	    		gBackgroundN.stick(labelN);
+	    		gBackgroundN.stick(gSensitiveN);
+		    
 		   }
     }
     
     public void moveTo(double mx, double my){
-        gBackgroundW.moveTo(mx+wdx, my+wdy);
-        this.matrixX = mx; this.matrixY = my;
-        if (gBackgroundN != null)	gBackgroundN.moveTo(mx+ndx, my+ndy);            
+    	this.matrixX = mx; this.matrixY = my;
+        gBackgroundW.moveTo(mx + wdx, my + wdy);
+        if (gBackgroundN != null)	gBackgroundN.moveTo(mx + ndx, my + ndy);            
     }
 	
     /** Moves booth labels to differentLocations along the matrix side.
@@ -165,12 +181,13 @@ public class NTNode extends LinLogNode{
     	this.matrixX += dmx; 
     	this.matrixY += dmy;
     	gBackgroundW.move(dmx, dmy);
-//    	this.yOld += dmy;
-    	
-        if (!single){
+    	labelW.move(dmx, dmy);
+    	gSensitiveW.move(dmx, dmy);
+  
+    	if (!single){
         	gBackgroundN.move(dmx,dmy);        
-//        	this.xOld += dmy;
-        	
+          	labelN.move(dmx, dmy);
+           	gSensitiveN.move(dmx, dmy); 
         }
     }
     
@@ -299,8 +316,6 @@ public class NTNode extends LinLogNode{
 		gBackgroundW.setTranslucencyValue(1);
 		labelW.setColor(ProjectColors.NODE_TEXT[ProjectColors.COLOR_SCHEME]);
 		
-//		if(!matrix.isNodesVisibleNorth()) gBackgroundN.setTranslucencyValue(NodeTrixViz.MATRIX_NODE_BKG_TRANSLUCENCY);
-//		if(!matrix.isNodesVisibleWest()) gBackgroundW.setTranslucencyValue(NodeTrixViz.MATRIX_NODE_BKG_TRANSLUCENCY);
 		
 		if(!single)
 		{
@@ -378,31 +393,27 @@ public class NTNode extends LinLogNode{
      * the matrix. A gradient is also applied according to the position of the node in the list.
      */
 	public void setLabelWidth(double maxLength) {
-		this.widthHalf = maxLength/2;
-		if (heightHalf == 0){
-		    this.heightHalf = gBackgroundW.getHeight();
-		}
+		this.labelWidth = maxLength;
 		    
-		wdx -= widthHalf;
-		ndy += widthHalf;
+		wdx -= labelWidth/2;
+		ndy += labelWidth/2;
 		
-		this.gBackgroundW.setWidth(2*widthHalf);
-		gSensitiveW.setWidth(2*widthHalf-4);
+		this.gBackgroundW.setWidth(labelWidth);
+		gSensitiveW.setWidth(labelWidth-2);
 		
-//		System.out.println("[NODE] " + this.widthHalf);
 		if (!this.single){
-			this.gBackgroundW.move(-widthHalf, 0);
-			this.labelW.move(widthHalf, 0);
-			gBackgroundN.setWidth(2*widthHalf);
-			gSensitiveN.setWidth(2*widthHalf-4);
-			this.gBackgroundN.move(0, widthHalf);
-			this.labelN.move(0,-widthHalf);
+			this.gBackgroundW.move(-labelWidth/2, 0);
+	//		this.labelW.move(-labelWidth/2, 0);
+			gBackgroundN.setWidth(labelWidth);
+			gSensitiveN.setWidth(labelWidth-2);
+			this.gBackgroundN.move(0, labelWidth/2);
+	//		this.labelN.move(0,-labelWidth/2);
 		}
 	}
 
 	public double getLabelHalfWidth() 
 	{
-		return this.widthHalf;
+		return this.labelWidth/2;
 	}
 	
 	public double getTextWidth(){
@@ -412,9 +423,6 @@ public class NTNode extends LinLogNode{
 		return textWidth;	
 	}
 
-	public double getHeight(){
-		return this.heightHalf;
-	}
 
     public void addOutgoingEdge(NTEdge e){
     	outgoingEdges.add(e);
@@ -507,13 +515,20 @@ public class NTNode extends LinLogNode{
 
 
 
-	void cleanGraphics(VirtualSpace vs) {
-		if(gBackgroundW != null) vs.removeGlyph(this.gBackgroundW);
-		if(labelW != null) vs.removeGlyph(this.labelW);
-		if(gSensitiveW != null) vs.removeGlyph(gSensitiveW);
-		if(gBackgroundN != null) vs.removeGlyph(this.gBackgroundN);
-		if(labelN != null) vs.removeGlyph(this.labelN);
-		if(gSensitiveN != null) vs.removeGlyph(gSensitiveN);
+	void cleanGraphics(final VirtualSpace vs) 
+	{
+		SwingUtilities.invokeLater(new Runnable()
+    	{
+    		public void run()
+    		{
+			if(gBackgroundW != null) vs.removeGlyph(gBackgroundW);
+			if(labelW != null) vs.removeGlyph(labelW);
+			if(gSensitiveW != null) vs.removeGlyph(gSensitiveW);
+			if(gBackgroundN != null) vs.removeGlyph(gBackgroundN);
+			if(labelN != null) vs.removeGlyph(labelN);
+			if(gSensitiveN != null) vs.removeGlyph(gSensitiveN);
+    		}
+    	});
 	}
 
 
@@ -548,6 +563,14 @@ public class NTNode extends LinLogNode{
 
 	public String getName() {
 		return name;
+	}
+
+	public void setLabelHeight(double labelHeight) {
+		this.labelHeight = labelHeight;
+	}
+
+	public double getLabelHeight() {
+		return labelHeight;
 	}
 
 

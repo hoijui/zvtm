@@ -10,6 +10,8 @@ package fr.inria.zvtm.nodetrix;
 import java.awt.Color;
 import java.awt.geom.Point2D;
 
+import javax.swing.SwingUtilities;
+
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.AnimationManager;
 import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator2;
@@ -73,12 +75,9 @@ public class IntraEdgeAppearance extends EdgeAppearance{
 		//this glyph is never shown.
     	gHighlight = new VCircle(mp.x + edge.head.ndx, mp.y + edge.tail.wdy, 0, 2*radius, Color.red);
     	gHighlight.setDrawBorder(false);
-    	gHighlight.setVisible(false);
-    	vs.addGlyph(gHighlight);
     	allGlyphs[0] = gHighlight;
 		
 		//LABEL
-//    	gLabel = new VText(mp.x + edge.head.ndx, south - 10, 0, Color.black, edge.owner));
     	
 		//MAIN GLYPH
     	Point2D.Double[] p = new Point2D.Double[4];
@@ -89,12 +88,20 @@ public class IntraEdgeAppearance extends EdgeAppearance{
     	gPrimary = new VPolygon(p, 0, edge.getColor(), edge.getColor());
     	gPrimary.setDrawBorder(false);
     	gPrimary.setSensitivity(false);
-//    	gPrimary.stick(gHighlight);
     	gHighlight.stick(gPrimary);
     	allGlyphs[1] = gPrimary;
     	gPrimary.setOwner(edge);
-    	vs.addGlyph(gPrimary);
-   	
+    	
+    	SwingUtilities.invokeLater(new Runnable()
+    	{
+    		public void run()
+    		{
+    			vs.addGlyph(gHighlight);
+    			gHighlight.setVisible(false);
+    			vs.addGlyph(gPrimary);
+    		}
+    	});
+    	
     	//SYMMETRIC GLYPH
     	if(edge.isSymmetric() || edge.hasInverse())
     	{
@@ -113,14 +120,20 @@ public class IntraEdgeAppearance extends EdgeAppearance{
 //    		gPrimary.stick(gSecondary);
     	   	gHighlight.stick(gSecondary);
         	allGlyphs[2] = gSecondary;
-     		vs.addGlyph(gSecondary);
+        	SwingUtilities.invokeLater(new Runnable()
+        	{
+        		public void run()
+        		{
+        			vs.addGlyph(gSecondary);
+        		}
+        	});
+
     	}
     	
     	//FRAMEGLYPHS
     	gLeftFrameFragment = new DPath(west-2, (north - index*height)-2, 0, edge.getColor());
     	gLeftFrameFragment.addSegment(west-2, (north - (index+1)*height)-2, true);
     	gLeftFrameFragment.setSensitivity(false);
-    	vs.addGlyph(gLeftFrameFragment);
       	gHighlight.stick(gLeftFrameFragment);
     	allGlyphs[3] = gLeftFrameFragment;
     	
@@ -128,9 +141,18 @@ public class IntraEdgeAppearance extends EdgeAppearance{
     	gRightFrameFragment.addSegment(east+1,  (north - (index+1)*height)-2, true);
     	gRightFrameFragment.setSensitivity(false);
 //    	gPrimary.stick(gRightFrameFragment);
-    	vs.addGlyph(gRightFrameFragment);
        	gHighlight.stick(gRightFrameFragment);
     	allGlyphs[4] = gRightFrameFragment;
+    	
+    	SwingUtilities.invokeLater(new Runnable()
+    	{
+    		public void run()
+    		{
+    			vs.addGlyph(gLeftFrameFragment);
+    			vs.addGlyph(gRightFrameFragment);
+    		}
+    	});
+
  
 
     	if(index == 0){
@@ -140,7 +162,14 @@ public class IntraEdgeAppearance extends EdgeAppearance{
         	gUpperFrameFragment.addSegment(east+1, north-2, true);
         	gUpperFrameFragment.setSensitivity(false);
 //        	gPrimary.stick(gUpperFrameFragment);
-        	vs.addGlyph(gUpperFrameFragment);
+        	SwingUtilities.invokeLater(new Runnable()
+        	{
+        		public void run()
+        		{
+        			vs.addGlyph(gUpperFrameFragment);
+        		}
+        	});
+
            	gHighlight.stick(gUpperFrameFragment);
         	allGlyphs[5] = gUpperFrameFragment;        	
     	}
@@ -150,23 +179,35 @@ public class IntraEdgeAppearance extends EdgeAppearance{
         	gLowerFrameFragment.addSegment(east+1,  ((north-3) - (index+1)*height), true);
         	gLowerFrameFragment.addSegment(east+1,  ((north) - (index+1)*height), true);
         	gLowerFrameFragment.setSensitivity(false);
-//        	gPrimary.stick(gLowerFrameFragment);
-        	vs.addGlyph(gLowerFrameFragment);
         	gHighlight.stick(gLowerFrameFragment);
         	allGlyphs[6] = gLowerFrameFragment;        
-        	
+        	SwingUtilities.invokeLater(new Runnable()
+        	{
+        		public void run()
+        		{
+        			vs.addGlyph(gLowerFrameFragment);
+        		}
+        	});
+  	
     	}
     	
     	//SENSITIE RECTANGLE
     	gSensitive = new VRectangle(mp.x + edge.head.ndx, ((north-2) - (index+.5)*height),0 ,NodeTrixViz.CELL_SIZE_HALF,  height/2 - 1, Color.black);
     	gSensitive.setTranslucencyValue(.2f);
-    	gSensitive.setVisible(false);
     	gSensitive.setOwner(edge);
 //    	gPrimary.stick(gSensitive);
-    	vs.addGlyph(gSensitive);
     	gHighlight.stick(gSensitive);
     	allGlyphs[7] = gSensitive;        
     	
+    	SwingUtilities.invokeLater(new Runnable()
+    	{
+    		public void run()
+    		{
+    			vs.addGlyph(gSensitive);
+    			gSensitive.setVisible(false);
+    		}
+    	});
+
     	onTop();
 	}
 
@@ -174,20 +215,21 @@ public class IntraEdgeAppearance extends EdgeAppearance{
 	protected void clearGraphics() 
 	{
 		if(vs == null) return;
-		for(Glyph g : allGlyphs){
-			if(g == null) continue;
-			vs.removeGlyph(g);
-		}
+		SwingUtilities.invokeLater(new Runnable()
+    	{
+    		public void run()
+    		{
+    			for(Glyph g : allGlyphs){
+    				if(g == null) continue;
+    				vs.removeGlyph(g);
+    			}
+    		}
+    	});
+
 	}
 	
 	@Override
 	public void fade() {
-//		for(Glyph g : allGlyphs){
-//			if(g == null) continue;
-//			g.setVisible(false);
-//			g.setSensitivity(false);
-//		}	
-//		this.gHighlight.setVisible(false);
 		this.gPrimary.setColor(ProjectColors.INTRA_FADE);
 		if(gSecondary != null) this.gSecondary.setColor(ProjectColors.INTRA_FADE);
 		this.gLeftFrameFragment.setColor(ProjectColors.INTRA_FADE);
@@ -198,12 +240,6 @@ public class IntraEdgeAppearance extends EdgeAppearance{
 	
 	@Override
 	public void show(){
-//		for(Glyph g : allGlyphs){
-//			if(g == null) continue;
-//			g.setVisible(true);
-//			g.setSensitivity(true);
-//		}	
-//		gSensitive.setVisible(false);
 	
 		this.gPrimary.setColor(edge.getColor());
 		if(gSecondary != null) this.gSecondary.setColor(edge.getColor());
@@ -235,18 +271,25 @@ public class IntraEdgeAppearance extends EdgeAppearance{
 	@Override
 	public void onTop() 
 	{
-		if(vs == null) return;
-		vs.onTop(gHighlight);
-		vs.onTop(this.gPrimary);
-		if(gSecondary != null) vs.onTop(this.gSecondary);
-		vs.onTop(this.gLeftFrameFragment);
-		vs.onTop(this.gRightFrameFragment);
-	 	if(gSecondary != null) vs.onTop(gSecondary);
-     	if(gLeftFrameFragment != null) vs.onTop(gLeftFrameFragment);
-     	if(gRightFrameFragment != null) vs.onTop(gRightFrameFragment);
-     	if(gUpperFrameFragment != null) vs.onTop(gUpperFrameFragment);
-     	if(gLowerFrameFragment != null) vs.onTop(gLowerFrameFragment);
-     	vs.onTop(gSensitive);
+		SwingUtilities.invokeLater(new Runnable()
+    	{
+    		public void run()
+    		{
+      			if(vs == null) return;
+    			vs.onTop(gHighlight);
+    			vs.onTop(gPrimary);
+    			if(gSecondary != null) vs.onTop(gSecondary);
+    			vs.onTop(gLeftFrameFragment);
+    			vs.onTop(gRightFrameFragment);
+    			if(gSecondary != null) vs.onTop(gSecondary);
+    			if(gLeftFrameFragment != null) vs.onTop(gLeftFrameFragment);
+    			if(gRightFrameFragment != null) vs.onTop(gRightFrameFragment);
+    			if(gUpperFrameFragment != null) vs.onTop(gUpperFrameFragment);
+    			if(gLowerFrameFragment != null) vs.onTop(gLowerFrameFragment);
+    			vs.onTop(gSensitive);
+    		}
+    	});
+
    }
 
 	@Override
