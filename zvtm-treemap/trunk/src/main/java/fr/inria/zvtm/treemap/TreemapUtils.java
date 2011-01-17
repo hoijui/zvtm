@@ -52,14 +52,16 @@ public class TreemapUtils {
     }
 
     /**
-     * Returns the <b>approximate</b> height of a VText
+     * Returns the <b>approximate</b> height of a VText, in 
+     * virtual space units.
      */ 
     public static double getVTextHeight(VText text){
         return text.getScale()*Toolkit.getDefaultToolkit().getFontMetrics(text.getMainFont()).getHeight();
     }
 
     /**
-     * Returns the <b>approximate</b> width of a VText
+     * Returns the <b>approximate</b> width of a VText, in 
+     * virtual space units.
      */ 
     public static double getVTextWidth(VText text){
         return text.getScale()*Toolkit.getDefaultToolkit().getFontMetrics(text.getMainFont()).charWidth('a')*text.getText().length();
@@ -75,8 +77,8 @@ public class TreemapUtils {
                 centerColor.getGreen(),
                 centerColor.getBlue(),
                 hsb);
-        float lightB = (float)Math.min(1, hsb[2]*1.1);
-        float darkB = (float)Math.max(0, hsb[2]*0.9);
+        float lightB = (float)Math.min(1, hsb[2]*1.2);
+        float darkB = (float)Math.max(0, hsb[2]*0.8);
         Color lighter = Color.getHSBColor(hsb[0], hsb[1], lightB);
         Color darker = Color.getHSBColor(hsb[0], hsb[1], darkB);
         return new GradientPaint(0f, 0f, lighter, width, height, darker);
