@@ -12,6 +12,7 @@ import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.Paint;
 
+import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.VRectangle;
 
 /**
@@ -27,6 +28,8 @@ import fr.inria.zvtm.glyphs.VRectangle;
 public class PRectangle extends VRectangle {
 
     Paint gp;
+    Paint highlightPaint = null;
+    volatile boolean highlighted = false;
 
     AffineTransform at;
 
@@ -77,6 +80,20 @@ public class PRectangle extends VRectangle {
 	    return gp;
 	}
 
+    /**
+     * Sets the highlight Paint.
+     * @param p the Paint to use when highlighting this PRectangle,
+     * or null to disable highlighting.
+     */
+    public void setCursorInsidePaint(Paint p){
+        highlightPaint = p;
+    }
+
+    @Override public void highlight(boolean h, Color unused){
+        highlighted = h;
+        VirtualSpaceManager.INSTANCE.repaint();
+    }
+
 	@Override
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 		if ((pc[i].cw>1) && (pc[i].ch>1)){
@@ -85,7 +102,7 @@ public class PRectangle extends VRectangle {
 			g.setTransform(at);
 			//repaint only if object is visible
 			if (isFilled()){
-			    g.setPaint(gp);
+			    g.setPaint((highlighted && highlightPaint != null) ? highlightPaint : gp);
 				g.fillRect(0, 0, (int)Math.round(vw), (int)Math.round(vh));
 			}
 			if (isBorderDrawn()){
@@ -122,7 +139,7 @@ public class PRectangle extends VRectangle {
 			g.setTransform(at);
 			//repaint only if object is visible
 			if (isFilled()){
-			    g.setPaint(gp);
+			    g.setPaint((highlighted && highlightPaint != null) ? highlightPaint : gp);
 				g.fillRect(0, 0, (int)Math.round(vw), (int)Math.round(vh));
 			}
 			if (isBorderDrawn()){
