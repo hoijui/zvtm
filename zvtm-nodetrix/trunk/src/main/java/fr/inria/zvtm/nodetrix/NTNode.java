@@ -113,7 +113,7 @@ public class NTNode extends LinLogNode{
 	    	gBackgroundW.setSensitivity(false);
 	    	
 	    	gSensitiveW = new VRectangle(0, 0, 0, 0, NodeTrixViz.CELL_SIZE-4, Color.red);
-	    	gSensitiveW.setVisible(false);
+	    	//gSensitiveW.setVisible(false);
 	    	gSensitiveW.setOwner(this);
 
 	    	
