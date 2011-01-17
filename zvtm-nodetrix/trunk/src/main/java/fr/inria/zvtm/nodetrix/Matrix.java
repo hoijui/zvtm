@@ -103,7 +103,7 @@ public class Matrix {
 
     	    for (int i=0 ; i < nodes.size() ; i++ )
     	    {	
-    	    	nodes.get(i).cleanGraphics(vs);
+    	    	nodes.get(i).cleanGraphics();
         		nodes.get(i).createGraphics(-NodeTrixViz.CELL_SIZE/2 * nodes.size(),
         	                            Math.round(NodeTrixViz.CELL_SIZE/2*(nodes.size()-2*i-1)),
         	                            Math.round(NodeTrixViz.CELL_SIZE/2*(-nodes.size()+2*i+1)),
@@ -748,7 +748,7 @@ public class Matrix {
 		Matrix mNew = null;
 		double x = 0, y = 0;
 		for(NTNode n : nodes){
-			n.cleanGraphics(vs);
+			n.cleanGraphics();
 			if(!n.getGroupName().equals(groupname)){
 				//finish old matrix
 				if(mNew != null){

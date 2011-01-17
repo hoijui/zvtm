@@ -509,7 +509,7 @@ public class NodeTrixViz {
 
     	for (NTNode n : this.nodes)
     	{
-    		n.cleanGraphics(vs);
+    		n.cleanGraphics();
     	}
     	
     	// GROUP MATRICES ACCORDING NAMES MATRIX

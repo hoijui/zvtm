@@ -514,9 +514,8 @@ public class NTNode extends LinLogNode{
 
 
 
-	public void cleanGraphics(final VirtualSpace vsLocal) 
+	public void cleanGraphics() 
 	{
-		this.vs = vsLocal;
 		SwingUtilities.invokeLater(new Runnable()
     	{
     		public void run()
