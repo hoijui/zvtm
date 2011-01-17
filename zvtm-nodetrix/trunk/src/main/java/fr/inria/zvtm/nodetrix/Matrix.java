@@ -89,7 +89,7 @@ public class Matrix {
     	
     	bkg = new VRectangle(mx, my, 0,
     			nodes.size()*NodeTrixViz.CELL_SIZE, nodes.size()*NodeTrixViz.CELL_SIZE,
-    			ProjectColors.MATRIX_BACKGROUND[ProjectColors.COLOR_SCHEME], ProjectColors.MATRIX_BACKGROUND[ProjectColors.COLOR_SCHEME], .2f);
+    			ProjectColors.MATRIX_BACKGROUND[ProjectColors.COLOR_SCHEME], ProjectColors.MATRIX_BACKGROUND[ProjectColors.COLOR_SCHEME]);
     	if (nodes.size() > 1){
     		
             // matrix background
@@ -100,14 +100,15 @@ public class Matrix {
     	    matrixLabel = new VText(mx+matrixLbDX, my+matrixLbDY, 0, ProjectColors.NODE_TEXT[ProjectColors.COLOR_SCHEME], name, VText.TEXT_ANCHOR_END, (float)Math.sqrt(4*nodes.size()));
     	    bkg.stick(matrixLabel);
     	    // node labels
-        	for (int i=0 ; i < nodes.size() ; i++ )
+
+    	    for (int i=0 ; i < nodes.size() ; i++ )
     	    {
         		nodes.get(i).createGraphics(-NodeTrixViz.CELL_SIZE/2 * nodes.size(),
         	                            Math.round(NodeTrixViz.CELL_SIZE/2*(nodes.size()-2*i-1)),
         	                            Math.round(NodeTrixViz.CELL_SIZE/2*(-nodes.size()+2*i+1)),
         	                            NodeTrixViz.CELL_SIZE/2*nodes.size(),
         	                            vs, false, ProjectColors.NODE_BACKGROUND[ProjectColors.COLOR_SCHEME]);
-        	    nodes.get(i).moveTo(mx, my);
+        		nodes.get(i).moveTo(mx, my);
     	    }	        
         	
         	SwingUtilities.invokeLater(new Runnable()
@@ -601,7 +602,6 @@ public class Matrix {
     		groupLabelsN = new Vector<Glyph>();
     	}
     	if(groupLabelsW.size() > 0){
-//    		this.maxLabelWidth  -= NodeTrixViz.GROUP_LABEL_HALF_WIDTH;
         	for(Glyph g : groupLabelsW){
         		vs.removeGlyph(g);
         	}
@@ -747,6 +747,7 @@ public class Matrix {
 		Matrix mNew = null;
 		double x = 0, y = 0;
 		for(NTNode n : nodes){
+			n.cleanGraphics(vs);
 			if(!n.getGroupName().equals(groupname)){
 				//finish old matrix
 				if(mNew != null){
@@ -870,6 +871,9 @@ public class Matrix {
 		nodes = finalOrdering;
 	}
 	
+	/**
+	 * Removes all matrix relevant glyphs that do not belong to nodes nor relations.
+	 * */
 	public void cleanGraphics(final AnimationManager am){
 		if(nodes.size() < 2) return;
 		

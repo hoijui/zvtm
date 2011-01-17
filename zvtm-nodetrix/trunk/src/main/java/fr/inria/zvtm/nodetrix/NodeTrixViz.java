@@ -130,7 +130,7 @@ public class NodeTrixViz {
 		llNodes.addAll(nodes);
 		Map<LinLogNode, Integer> clusterMap = llalgo.execute(llNodes, edges , false);
 		
-		//Obtain clusters and create matrices
+		//Obtain clusters and create matrices	
 		HashMap<Integer, Matrix> newMatrices = new HashMap<Integer, Matrix>();
 		for(LinLogNode lln : clusterMap.keySet()){
 			NTNode n = (NTNode)lln;
@@ -506,7 +506,11 @@ public class NodeTrixViz {
      * */
     public void mergeMatrices(VirtualSpace vs, AnimationManager am)
     {
-//    	System.out.println("[NODE_TRIX_VIZ] -- MERGE "+ matrices.size() +" MATRICES ");
+
+    	for (NTNode n : this.nodes)
+    	{
+    		n.cleanGraphics(vs);
+    	}
     	
     	// GROUP MATRICES ACCORDING NAMES MATRIX
 		HashMap<String, Vector<Matrix>> mergeMap = new HashMap<String, Vector<Matrix>>();
@@ -576,7 +580,7 @@ public class NodeTrixViz {
            	yCentre /= (mergeMatrices.size() + 2);
            	
 
-           	//draw new matrix;                                                              
+           	//draw new matrix;    
 			newMatrix.createNodeGraphics(xCentre, yCentre, vs);
 			newMatrix.finishCreateNodeGraphics(vs);
 			// set node labels to old positions

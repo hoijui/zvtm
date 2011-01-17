@@ -34,10 +34,6 @@ public class NTEdge extends LinLogEdge{
     	this.head = endNode;
     }
 
-//    public void setNodes(NTNode t, NTNode h){
-//    	this.tail = t;
-//        this.head = h;
-//    }
     
     public void adjustAppearanceState(){
     	if(tail.matrix == null || head.matrix == null){

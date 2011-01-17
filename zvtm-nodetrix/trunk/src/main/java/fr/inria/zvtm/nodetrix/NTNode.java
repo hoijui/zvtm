@@ -96,9 +96,7 @@ public class NTNode extends LinLogNode{
     
     void createGraphics(double wdx, double wdy, double ndx, double ndy, final VirtualSpace vs, boolean single, Color colour)
     {
-    	cleanGraphics(vs);
-    	
-        this.wdx = wdx;
+    	this.wdx = wdx;
 	    this.wdy = wdy;
 	    this.ndx = ndx;
 	    this.ndy = ndy;
@@ -118,8 +116,6 @@ public class NTNode extends LinLogNode{
 	    	gSensitiveW.setVisible(false);
 	    	gSensitiveW.setOwner(this);
 
-	    	gBackgroundW.stick(labelW);
-	    	gBackgroundW.stick(gSensitiveW);
 	    	
 	    	SwingUtilities.invokeLater(new Runnable()
 	    	{
@@ -131,7 +127,10 @@ public class NTNode extends LinLogNode{
 	    		}
 	    	});
 
-		    if (!single){
+	    	gBackgroundW.stick(labelW);
+	    	gBackgroundW.stick(gSensitiveW);
+
+	    	if (!single){
 	    	    labelN = new VTextOr(2, 2, 0, ProjectColors.NODE_TEXT[ProjectColors.COLOR_SCHEME], getName(), (float)Math.PI/2f, VText.TEXT_ANCHOR_START);
     	    	labelN.setSensitivity(false);
     	   
@@ -142,7 +141,7 @@ public class NTNode extends LinLogNode{
 	    	    gSensitiveN.setOwner(this);
 	    		
 	    		SwingUtilities.invokeLater(new Runnable()
-		    	{
+	    		{
 		    		public void run()
 		    		{
 		    			gSensitiveN.setVisible(false);
@@ -181,13 +180,13 @@ public class NTNode extends LinLogNode{
     	this.matrixX += dmx; 
     	this.matrixY += dmy;
     	gBackgroundW.move(dmx, dmy);
-    	labelW.move(dmx, dmy);
-    	gSensitiveW.move(dmx, dmy);
+ //   	labelW.move(dmx, dmy);
+   // 	gSensitiveW.move(dmx, dmy);
   
     	if (!single){
         	gBackgroundN.move(dmx,dmy);        
-          	labelN.move(dmx, dmy);
-           	gSensitiveN.move(dmx, dmy); 
+     //     	labelN.move(dmx, dmy);
+       //    	gSensitiveN.move(dmx, dmy); 
         }
     }
     
@@ -403,17 +402,17 @@ public class NTNode extends LinLogNode{
 		
 		if (!this.single){
 			this.gBackgroundW.move(-labelWidth/2, 0);
-	//		this.labelW.move(-labelWidth/2, 0);
+			this.labelW.move(labelWidth/2, 0);
 			gBackgroundN.setWidth(labelWidth);
 			gSensitiveN.setWidth(labelWidth-2);
 			this.gBackgroundN.move(0, labelWidth/2);
-	//		this.labelN.move(0,-labelWidth/2);
+			this.labelN.move(0,-labelWidth/2);
 		}
 	}
 
-	public double getLabelHalfWidth() 
+	public double getLabelWidth() 
 	{
-		return this.labelWidth/2;
+		return this.labelWidth;
 	}
 	
 	public double getTextWidth(){
@@ -515,18 +514,23 @@ public class NTNode extends LinLogNode{
 
 
 
-	void cleanGraphics(final VirtualSpace vs) 
+	public void cleanGraphics(final VirtualSpace vsLocal) 
 	{
+		this.vs = vsLocal;
 		SwingUtilities.invokeLater(new Runnable()
     	{
     		public void run()
     		{
-			if(gBackgroundW != null) vs.removeGlyph(gBackgroundW);
-			if(labelW != null) vs.removeGlyph(labelW);
-			if(gSensitiveW != null) vs.removeGlyph(gSensitiveW);
-			if(gBackgroundN != null) vs.removeGlyph(gBackgroundN);
-			if(labelN != null) vs.removeGlyph(labelN);
-			if(gSensitiveN != null) vs.removeGlyph(gSensitiveN);
+    			System.out.println("gBackgroundW: " + gBackgroundW);
+    			if(vs.getAllGlyphs().contains(gBackgroundW)){ 
+        			System.out.println("gBackgroundW on vs: " + gBackgroundW);
+        			vs.removeGlyph(gBackgroundW);
+        		}
+    			if(vs.getAllGlyphs().contains(labelW)) vs.removeGlyph(labelW);
+    			if(vs.getAllGlyphs().contains(gSensitiveW)) vs.removeGlyph(gSensitiveW);
+    			if(vs.getAllGlyphs().contains(gBackgroundN)) vs.removeGlyph(gBackgroundN);
+    			if(vs.getAllGlyphs().contains(labelN)) vs.removeGlyph(labelN);
+    			if(vs.getAllGlyphs().contains(gSensitiveN))  vs.removeGlyph(gSensitiveN);
     		}
     	});
 	}
