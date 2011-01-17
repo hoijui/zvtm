@@ -19,7 +19,6 @@ import fr.inria.zvtm.event.ViewAdapter;
 import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.PRectangle;
-import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.treemap.Mappable;
 import fr.inria.zvtm.treemap.Rect;
@@ -65,12 +64,13 @@ class Demo {
                 ZMapItem item = t.getMapItem();
                 //System.out.println(item.getUserObject());
                 Rect bounds = item.getBounds();
-                VRectangle rect = new PRectangle(bounds.x + bounds.w*0.5,
+                PRectangle rect = new PRectangle(bounds.x + bounds.w*0.5,
                     bounds.y + bounds.h * 0.5,
                     0,
                     bounds.w, bounds.h,
                     TreemapUtils.makeDiagGradient((float)bounds.w, (float)bounds.h, DEFAULT_FILL));
                 rect.setBorderColor(Color.BLACK);
+                rect.setCursorInsidePaint(TreemapUtils.makeDiagGradient((float)rect.getWidth(), (float)rect.getHeight(), HIGHLIGHT_FILL));
                 String txt = item.getUserObject().toString();
                 VText text = new VText(rect.vx, rect.vy+rect.getHeight()*0.5, 0, 
                     Color.BLACK, txt, 
@@ -78,9 +78,7 @@ class Demo {
                 text.move(0, -TreemapUtils.getVTextHeight(text));
                 if(t.isLeaf()){
                     text.moveTo(rect.vx, rect.vy);
-                } else {
-                    //rect.setCursorInsideFillColor(new Color(237, 245, 7));
-                }
+                } 
                 item.putGraphicalObject("RECT", rect);
                 item.putGraphicalObject("TEXT", text);
                 vs.addGlyph(rect);
@@ -96,19 +94,12 @@ class Demo {
         Demo demo = new Demo(); 
         demo.setListener(new ViewAdapter(){
             public void enterGlyph(Glyph g){
-                if(!(g instanceof PRectangle)){
-                    return;
-                }
-                PRectangle rect = (PRectangle)g;
-                rect.setPaint(TreemapUtils.makeDiagGradient((float)rect.getWidth(), (float)rect.getHeight(), HIGHLIGHT_FILL));
+                g.highlight(true, null);
             }
 
             public void exitGlyph(Glyph g){
-                if(!(g instanceof PRectangle)){
-                    return;
-                }
-                PRectangle rect = (PRectangle)g;
-                rect.setPaint(TreemapUtils.makeDiagGradient((float)rect.getWidth(), (float)rect.getHeight(), DEFAULT_FILL));}
+                g.highlight(false, null);
+        }
         });
     }
 }
