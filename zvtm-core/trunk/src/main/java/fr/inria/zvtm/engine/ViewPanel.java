@@ -708,7 +708,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 	return this.lens;
     }
 
-    /** set a padding for customizing the region inside the view for which objects are actually visibles
+    /** set a padding for customizing the region inside the view for which objects are actually visible
      *@param wnesPadding padding values in pixels for the west, north, east and south borders
     */
     protected void setVisibilityPadding(int[] wnesPadding){
