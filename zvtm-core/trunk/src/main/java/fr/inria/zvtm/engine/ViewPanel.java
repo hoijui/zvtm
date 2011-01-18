@@ -715,7 +715,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 	visibilityPadding = wnesPadding;
     }
 
-    /** get the padding values customizing the region inside the view for which objects are actually visibles
+    /** get the padding values customizing the region inside the view for which objects are actually visible
      *@return padding values in pixels for the west, north, east and south borders
     */
     protected int[] getVisibilityPadding(){
