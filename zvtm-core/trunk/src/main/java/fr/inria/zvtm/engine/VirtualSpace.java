@@ -154,6 +154,7 @@ public class VirtualSpace {
     /** Add glyph g to this virtual space. */
     public void addGlyph(Glyph g, boolean initColors, boolean repaint){
         if (g == null){return;}
+        if (visualEnts.contains(g)){System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"+g);}
         if (initColors){g.setCursorInsideHighlightColor(Glyph.getDefaultCursorInsideHighlightColor());}
         g.initCams(cm.cameraList.length);
         visualEnts.add(g);
@@ -291,6 +292,9 @@ public class VirtualSpace {
         *@param repaint should the view be updated automatically or not once the glyph has been removed. Default is true.
         */
     public void removeGlyph(Glyph g, boolean repaint){
+        if (!visualEnts.contains(g)){
+            System.out.println("((((((((((((((((((((((()))))))))))))))))))))))"+g);
+        }
         try {
             if (g.stickedTo!=null){
                 if (g.stickedTo instanceof Glyph){((Glyph)g.stickedTo).unstick(g);}
@@ -505,78 +509,68 @@ public class VirtualSpace {
 		}
 	}
 
-    protected void addGlyphToDrawingList(Glyph g){
-        synchronized(drawingList){
-            int zindex = g.getZindex();
-            // insert at bottom of list if no other glyph has a lower z-index
-            int insertAt = 0;
-            // insert glyph in the drawing list so that 
-            // it is the last glyph to be drawn for a given z-index
-            for (int i=drawingList.length-1;i>=0;i--){
-                if (drawingList[i].getZindex() <= zindex){
-                    insertAt = i + 1;
-                    break;
+    protected synchronized void addGlyphToDrawingList(Glyph g){
+        int zindex = g.getZindex();
+        // insert at bottom of list if no other glyph has a lower z-index
+        int insertAt = 0;
+        // insert glyph in the drawing list so that 
+        // it is the last glyph to be drawn for a given z-index
+        for (int i=drawingList.length-1;i>=0;i--){
+            if (drawingList[i].getZindex() <= zindex){
+                insertAt = i + 1;
+                break;
+            }
+        }
+        insertGlyphInDrawingList(g, insertAt);            
+    }
+
+    protected synchronized void addGlyphsToDrawingList(Glyph[] glyphs){
+        //create a new drawingList array of the right size
+        Glyph[] newDrawingList = new Glyph[drawingList.length + glyphs.length];
+        //merge glyphs and drawingList into the new array
+        System.arraycopy(drawingList,0,newDrawingList,0,drawingList.length);
+        System.arraycopy(glyphs,0,newDrawingList,drawingList.length,
+            glyphs.length);
+        Arrays.sort(newDrawingList,
+        new java.util.Comparator<Glyph>(){
+            public int compare(Glyph g1, Glyph g2){
+                if(g1.getZindex() < g2.getZindex()){
+                    return -1;
+                } else if (g1.getZindex() > g2.getZindex()){
+                    return 1;
+                } else {
+                    return 0;
                 }
             }
-            insertGlyphInDrawingList(g, insertAt);            
-        }
+        });
+        //overwrite drawingList
+        drawingList = newDrawingList;
     }
 
-    protected void addGlyphsToDrawingList(Glyph[] glyphs){
-        synchronized(drawingList){
-            //create a new drawingList array of the right size
-            Glyph[] newDrawingList = new Glyph[drawingList.length + glyphs.length];
-            //merge glyphs and drawingList into the new array
-            System.arraycopy(drawingList,0,newDrawingList,0,drawingList.length);
-            System.arraycopy(glyphs,0,newDrawingList,drawingList.length,
-                glyphs.length);
-            Arrays.sort(newDrawingList,
-            new java.util.Comparator<Glyph>(){
-                public int compare(Glyph g1, Glyph g2){
-                    if(g1.getZindex() < g2.getZindex()){
-                        return -1;
-                    } else if (g1.getZindex() > g2.getZindex()){
-                        return 1;
-                    } else {
-                        return 0;
-                    }
-                }
-            });
-            //overwrite drawingList
-            drawingList = newDrawingList;
-        }
+    protected synchronized void insertGlyphInDrawingList(Glyph g, int index){
+        Glyph[] newDrawingList = new Glyph[drawingList.length + 1];
+        System.arraycopy(drawingList, 0, newDrawingList, 0, index);
+        newDrawingList[index] = g;
+        System.arraycopy(drawingList, index, newDrawingList, index+1, drawingList.length-index);
+        drawingList = newDrawingList;
     }
 
-    protected void insertGlyphInDrawingList(Glyph g, int index){
-        synchronized(drawingList){
-            Glyph[] newDrawingList = new Glyph[drawingList.length + 1];
-            System.arraycopy(drawingList, 0, newDrawingList, 0, index);
-            newDrawingList[index] = g;
-            System.arraycopy(drawingList, index, newDrawingList, index+1, drawingList.length-index);
-            drawingList = newDrawingList;
-        }
-    }
-
-    protected void removeGlyphFromDrawingList(Glyph g){
-        synchronized(drawingList){
-            for (int i=0;i<drawingList.length;i++){
-                if (drawingList[i] == g){
-                    Glyph[] newDrawingList = new Glyph[drawingList.length - 1];
-                    System.arraycopy(drawingList, 0, newDrawingList, 0, i);
-                    System.arraycopy(drawingList, i+1, newDrawingList, i, drawingList.length-i-1);
-                    drawingList = newDrawingList;
-                    break;
-                }
+    protected synchronized void removeGlyphFromDrawingList(Glyph g){
+        for (int i=0;i<drawingList.length;i++){
+            if (drawingList[i] == g){
+                Glyph[] newDrawingList = new Glyph[drawingList.length - 1];
+                System.arraycopy(drawingList, 0, newDrawingList, 0, i);
+                System.arraycopy(drawingList, i+1, newDrawingList, i, drawingList.length-i-1);
+                drawingList = newDrawingList;
+                break;
             }
         }
     }
 
-    protected int glyphIndexInDrawingList(Glyph g){
-        synchronized(drawingList){
-            for (int i=0;i<drawingList.length;i++){
-                if (drawingList[i] == g){
-                    return i;
-                }
+    protected synchronized int glyphIndexInDrawingList(Glyph g){
+        for (int i=0;i<drawingList.length;i++){
+            if (drawingList[i] == g){
+                return i;
             }
         }
         return -1;
