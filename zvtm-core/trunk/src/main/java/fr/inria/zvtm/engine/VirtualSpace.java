@@ -154,7 +154,6 @@ public class VirtualSpace {
     /** Add glyph g to this virtual space. */
     public void addGlyph(Glyph g, boolean initColors, boolean repaint){
         if (g == null){return;}
-        if (visualEnts.contains(g)){System.out.println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"+g);}
         if (initColors){g.setCursorInsideHighlightColor(Glyph.getDefaultCursorInsideHighlightColor());}
         g.initCams(cm.cameraList.length);
         visualEnts.add(g);
@@ -292,9 +291,6 @@ public class VirtualSpace {
         *@param repaint should the view be updated automatically or not once the glyph has been removed. Default is true.
         */
     public void removeGlyph(Glyph g, boolean repaint){
-        if (!visualEnts.contains(g)){
-            System.out.println("((((((((((((((((((((((()))))))))))))))))))))))"+g);
-        }
         try {
             if (g.stickedTo!=null){
                 if (g.stickedTo instanceof Glyph){((Glyph)g.stickedTo).unstick(g);}
