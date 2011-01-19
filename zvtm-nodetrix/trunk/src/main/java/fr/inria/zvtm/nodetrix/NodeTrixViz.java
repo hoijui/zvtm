@@ -448,6 +448,9 @@ public class NodeTrixViz {
     	for(NTEdge e : highlightedEdges){
     		e.setNewInteractionState(IA_STATE_DEFAULT);
     		e.performInteractionStateChange();
+//    		if(e.isIntraEdge()){
+////    			e.head.getMatrix().resetGrid(e.tail, e.head);
+//    		}
     	}
     	highlightedEdges.clear();
     }
