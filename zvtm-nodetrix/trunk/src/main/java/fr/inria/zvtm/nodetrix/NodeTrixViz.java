@@ -439,7 +439,6 @@ public class NodeTrixViz {
    }
     
     public void resetAllContext(){
-//    	System.out.println("[NTV] RESET " + highlightedNodes.size());
     	for(NTNode n : highlightedNodes){
     		n.setNewInteractionState(IA_STATE_DEFAULT, true, true);
     		n.perfomStateChange();
@@ -449,9 +448,6 @@ public class NodeTrixViz {
     	for(NTEdge e : highlightedEdges){
     		e.setNewInteractionState(IA_STATE_DEFAULT);
     		e.performInteractionStateChange();
-//    		if(e.isIntraEdge()){
-////    			e.head.getMatrix().resetGrid(e.tail, e.head);
-//    		}
     	}
     	highlightedEdges.clear();
     }
@@ -537,16 +533,16 @@ public class NodeTrixViz {
         	//compute centre of new matrix
         	// and put nodes into lists
         	Matrix firstMatrix =  mergeMatrices.firstElement();
-        	double xStart = firstMatrix.getPosition().x - firstMatrix.getBackgroundWidth();	//center of new matrix
-        	double yStart = firstMatrix.getPosition().y + firstMatrix.getBackgroundWidth();	//center of new matrix
+        	double xStart = firstMatrix.getPosition().x - firstMatrix.getBackgroundWidth()/2;	//center of new matrix
+        	double yStart = firstMatrix.getPosition().y + firstMatrix.getBackgroundWidth()/2;	//center of new matrix
 
         	//position matrix to be merged together
 
         	double offset = 0; // offset to next matrix for lay-outing
         	for(Matrix m : mergeMatrices){
-        		offset += m.getBackgroundWidth();
+        		offset += m.getBackgroundWidth()/2;
         		m.move(xStart + offset - m.getPosition().x , yStart - offset - m.getPosition().y);
-        		offset += m.getBackgroundWidth();
+        		offset += m.getBackgroundWidth()/2;
         	}
     	}
     	

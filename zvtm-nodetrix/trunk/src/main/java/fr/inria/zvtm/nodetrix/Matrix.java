@@ -10,13 +10,9 @@ package fr.inria.zvtm.nodetrix;
 import java.awt.Color;
 import java.awt.geom.Point2D;
 
-import java.io.File;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
 
@@ -55,7 +51,7 @@ public class Matrix {
     private boolean exploringModeGlobal = false;
 	private Glyph gOverview;
 	
-	private AnimationManager am;
+//	private AnimationManager am;
 	private VirtualSpace vs;
 	private boolean grouped = false;
 	
@@ -94,20 +90,17 @@ public class Matrix {
     
     /**
      * */
-    void createNodeGraphics(final double mx, final double my, final VirtualSpace vs){
-    	// nodes
+    void createNodeGraphics(final double mx, final double my, final VirtualSpace vs)
+    {
     	this.vs = vs;
-	
-    	// matrix background
-    	bkg = new VRectangle(mx, my, 0,
+		bkg = new VRectangle(mx, my, 0,
     			nodes.size()*NodeTrixViz.CELL_SIZE, nodes.size()*NodeTrixViz.CELL_SIZE,
     			ProjectColors.MATRIX_BACKGROUND[ProjectColors.COLOR_SCHEME], ProjectColors.MATRIX_BACKGROUND[ProjectColors.COLOR_SCHEME]);
     	gridBarsH = new VRectangle[nodes.size()];
         gridBarsV = new VRectangle[nodes.size()];
         bkg.setDrawBorder(false);
         bkg.setOwner(this);
-       
-        
+
         if(!(name.startsWith("[") && nodes.size() == 1))
         {
         	matrixLabel_DX = -Math.round(NodeTrixViz.CELL_SIZE/2*(1.1 * nodes.size()));
@@ -120,8 +113,7 @@ public class Matrix {
         
 		if (nodes.size() > 1)
 		{
-			vs.addGlyph(bkg);
-    	     
+    	    vs.addGlyph(bkg);
     	    		for (int i=0 ; i < nodes.size() ; i++ )
 		    	    {	
     	    			double wdx = -NodeTrixViz.CELL_SIZE * nodes.size()/2;
@@ -399,6 +391,13 @@ public class Matrix {
     		public void run()
     		{
     			vs.onTop(bkg);
+    			
+    			for(Glyph g : groupLabelsW){
+    				if (g!=null){vs.onTop(g); }
+    			}
+    			for(Glyph g : groupLabelsN){
+    				if (g!=null){vs.onTop(g); }
+    			}
     			for(Glyph g : gridBarsH){
     				if (g!=null){vs.onTop(g); }
     			}
@@ -834,21 +833,27 @@ public class Matrix {
 	 * Removes all matrix relevant glyphs that do not belong to nodes nor relations.
 	 * */
 	public void cleanGraphics(final AnimationManager am){
+		final Animation a1, a2;
+		final int duration = 3000;
+	
+		if(vs.getAllGlyphs().contains(matrixLabel))
+		{
+			a1 = am.getAnimationFactory().createTranslucencyAnim(duration, matrixLabel, 0, false, SlowInSlowOutInterpolator2.getInstance(), 
+					new EndAction(){public void execute(Object o, Animation.Dimension dimension){
+						vs.removeGlyph((Glyph)o);}});
+			am.startAnimation(a1, true);
+		}
+		
 		if(nodes.size() < 2) return;
 		
 		cleanGroupLabels();
-		
-		final Animation a1, a2;
-		final int duration = 3000;
-		a1 = am.getAnimationFactory().createTranslucencyAnim(duration, bkg, 0, false, SlowInSlowOutInterpolator2.getInstance(), 
+
+		a2 = am.getAnimationFactory().createTranslucencyAnim(duration, bkg, 0, false, SlowInSlowOutInterpolator2.getInstance(), 
 				new EndAction(){
 			public void execute(Object o, Animation.Dimension dimension){
 				vs.removeGlyph((Glyph)o);}});
-		am.startAnimation(a1, true);
-		a2 = am.getAnimationFactory().createTranslucencyAnim(duration, matrixLabel, 0, false, SlowInSlowOutInterpolator2.getInstance(), 
-				new EndAction(){public void execute(Object o, Animation.Dimension dimension){
-					vs.removeGlyph((Glyph)o);}});
 		am.startAnimation(a2, true);
+			
 		
 		SwingUtilities.invokeLater(new Runnable()
 		{

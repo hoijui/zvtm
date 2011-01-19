@@ -205,10 +205,10 @@ public class IntraEdgeAppearance extends EdgeAppearance{
     		{
     			vs.addGlyph(gSensitive);
     			gSensitive.setVisible(false);
+    			onTop();
     		}
     	});
 
-    	onTop();
 	}
 
 	@Override
@@ -230,12 +230,12 @@ public class IntraEdgeAppearance extends EdgeAppearance{
 	
 	@Override
 	public void fade() {
-		this.gPrimary.setColor(ProjectColors.INTRA_FADE);
-		if(gSecondary != null) this.gSecondary.setColor(ProjectColors.INTRA_FADE);
-		this.gLeftFrameFragment.setColor(ProjectColors.INTRA_FADE);
-		this.gRightFrameFragment.setColor(ProjectColors.INTRA_FADE);
-		if(gUpperFrameFragment != null ) gUpperFrameFragment.setColor(ProjectColors.INTRA_FADE);
-		if(gUpperFrameFragment != null ) gLowerFrameFragment.setColor(ProjectColors.INTRA_FADE);
+		this.gPrimary.setColor(ProjectColors.INTRA_EDGE_FADE_OUT);
+		if(gSecondary != null) this.gSecondary.setColor(ProjectColors.INTRA_EDGE_FADE_OUT);
+		this.gLeftFrameFragment.setColor(ProjectColors.INTRA_EDGE_FADE_OUT);
+		this.gRightFrameFragment.setColor(ProjectColors.INTRA_EDGE_FADE_OUT);
+		if(gUpperFrameFragment != null ) gUpperFrameFragment.setColor(ProjectColors.INTRA_EDGE_FADE_OUT);
+		if(gLowerFrameFragment != null ) gLowerFrameFragment.setColor(ProjectColors.INTRA_EDGE_FADE_OUT);
 	}
 	
 	@Override
@@ -246,7 +246,7 @@ public class IntraEdgeAppearance extends EdgeAppearance{
 		this.gLeftFrameFragment.setColor(edge.getColor());
 		this.gRightFrameFragment.setColor(edge.getColor());
 		if(gUpperFrameFragment != null ) gUpperFrameFragment.setColor(edge.getColor());
-		if(gUpperFrameFragment != null ) gLowerFrameFragment.setColor(edge.getColor());
+		if(gLowerFrameFragment != null ) gLowerFrameFragment.setColor(edge.getColor());
 	}
 
 	@Override
@@ -271,8 +271,8 @@ public class IntraEdgeAppearance extends EdgeAppearance{
 	@Override
 	public void onTop() 
 	{
-	  			if(vs == null) return;
-    			vs.onTop(gHighlight);
+		if(vs == null) return;
+    	vs.onTop(gHighlight);
     			vs.onTop(gPrimary);
     			if(gSecondary != null) vs.onTop(gSecondary);
     			vs.onTop(gLeftFrameFragment);

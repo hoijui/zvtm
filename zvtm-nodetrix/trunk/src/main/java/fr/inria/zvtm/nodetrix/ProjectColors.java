@@ -25,11 +25,11 @@ public class ProjectColors {
 	
 	public static final Color[] EXTRA_COLOR_GRADIENT_END = {Color.gray, Color.gray};
 	public static final Color[] EXTRA_COLOR_GRADIENT_START = {new Color(70,70,70), new Color(220,220,220)};
-	public static final Color[] EXTRA_COLOR_FADE_OUT = {Color.GRAY.darker(), new Color(245,245,245)};
+	public static final Color[] EXTRA_EDGE_FADE_OUT = {new Color(40,40,40), new Color(245,245,245)};
 	
 	public static final float INTRA_TRANSLUCENCY = .7f;
 	public static final float INTRA_TRANSLUCENCY_DIMMFACTOR = .5f;
-	public static final Color INTRA_FADE = Color.LIGHT_GRAY.brighter();
+	public static final Color INTRA_EDGE_FADE_OUT = Color.LIGHT_GRAY;
 	public static final Color INTRA_COLOR_DEFAULT = Color.BLUE;
 	
 	public static final Color[] NODE_TEXT = {Color.LIGHT_GRAY, Color.BLACK};

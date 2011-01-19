@@ -24,6 +24,7 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
 	static double CONTROL_POINT_OFFSET = NodeTrixViz.CELL_SIZE * 3;
 	private float alpha = 1f;
 	private static Color[] gradientColors = new Color[2];
+	private boolean faded = false;
 	
 	public static void setControlPointOffset(double s){
 	    CONTROL_POINT_OFFSET = Math.round(NodeTrixViz.CELL_SIZE * s);
@@ -34,7 +35,9 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
 	}
 
 	public void updateColor(){
-		if(edgePath.getColor() != null && edgePath.getColor().equals(ProjectColors.EXTRA_COLOR_FADE_OUT[ProjectColors.COLOR_SCHEME])) return;
+	//	if(edgePath.getColor() != null && edgePath.getColor().equals(ProjectColors.EXTRA_EDGE_FADE_OUT[ProjectColors.COLOR_SCHEME])) 
+	//		return;
+		if(faded) return;
 		edgePath.setColor(edge.getColor());
 	}
 	
@@ -143,14 +146,16 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
 
 	@Override
 	public void fade() {
-		gradientColors[0] = ProjectColors.EXTRA_COLOR_FADE_OUT[ProjectColors.COLOR_SCHEME];
-		gradientColors[1] = ProjectColors.EXTRA_COLOR_FADE_OUT[ProjectColors.COLOR_SCHEME];	
+		gradientColors[0] = ProjectColors.EXTRA_EDGE_FADE_OUT[ProjectColors.COLOR_SCHEME];
+		gradientColors[1] = ProjectColors.EXTRA_EDGE_FADE_OUT[ProjectColors.COLOR_SCHEME];	
 		edgePath.setGradientColors(gradientColors);
 		edgePath.setSensitivity(false);
+		faded = true;
 	}
 	
 	@Override
 	public void show(){
+		faded = false;
 		SwingUtilities.invokeLater(new Runnable()
     	{
     		public void run()
