@@ -407,7 +407,10 @@ public class Matrix {
     			}
     			for(NTNode n : nodes){
     				n.onTop(); //Virtual space is already known in NTNode
-    				for(NTEdge e : n.getOutgoingEdges()){ e.onTop(); }
+    				for(NTEdge e : n.getOutgoingEdges())
+    				{
+    					e.onTop(); 
+    				}
     			}
     			vs.onTop(gOverview);
     		}

@@ -271,11 +271,7 @@ public class IntraEdgeAppearance extends EdgeAppearance{
 	@Override
 	public void onTop() 
 	{
-		SwingUtilities.invokeLater(new Runnable()
-    	{
-    		public void run()
-    		{
-      			if(vs == null) return;
+	  			if(vs == null) return;
     			vs.onTop(gHighlight);
     			vs.onTop(gPrimary);
     			if(gSecondary != null) vs.onTop(gSecondary);
@@ -287,9 +283,7 @@ public class IntraEdgeAppearance extends EdgeAppearance{
     			if(gUpperFrameFragment != null) vs.onTop(gUpperFrameFragment);
     			if(gLowerFrameFragment != null) vs.onTop(gLowerFrameFragment);
     			vs.onTop(gSensitive);
-    		}
-    	});
-
+   
    }
 
 	@Override
