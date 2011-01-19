@@ -41,13 +41,13 @@ public class Matrix {
 
     //GLYPHS
     VRectangle bkg;
-    VText matrixLabel;
-    VRectangle[] gridBarsH, gridBarsV, gridReflexiveSquares;
+    private VText matrixLabel;
+    VRectangle[] gridBarsH, gridBarsV;
     Vector<Glyph> groupLabelsW = new Vector<Glyph>();
     Vector<Glyph> groupLabelsN = new Vector<Glyph>();
     
-    double matrixLbDX = 0;
-    double matrixLbDY = 0;
+    double matrixLabel_DX = 0;
+    double matrixLabel_DY = 0;
 	
 	private double maxLabelWidth; // maximal length of label in pixel
 	private boolean nodesUnvisibleN = false;
@@ -80,79 +80,110 @@ public class Matrix {
         for(NTNode n : nodes)
         {
         	this.addNode(n);
+        	n.setMatrix(this);
         }
     }
     
-    void createNodeGraphics(double mx, double my, final VirtualSpace vs){
+    public void cleanNodeGraphics()
+    {
+    	for (int i=0 ; i < nodes.size() ; i++ )
+	    {	
+    		nodes.get(i).cleanGraphics();
+	    }
+    }
+    
+    /**
+     * */
+    void createNodeGraphics(final double mx, final double my, final VirtualSpace vs){
     	// nodes
     	this.vs = vs;
-    	
+	
+    	// matrix background
     	bkg = new VRectangle(mx, my, 0,
     			nodes.size()*NodeTrixViz.CELL_SIZE, nodes.size()*NodeTrixViz.CELL_SIZE,
     			ProjectColors.MATRIX_BACKGROUND[ProjectColors.COLOR_SCHEME], ProjectColors.MATRIX_BACKGROUND[ProjectColors.COLOR_SCHEME]);
-    	if (nodes.size() > 1){
-    		
-            // matrix background
-            
-            // matrix label
-    	    matrixLbDX = -Math.round(NodeTrixViz.CELL_SIZE/2*(1.1 * nodes.size()));
-    	    matrixLbDY = -Math.round(NodeTrixViz.CELL_SIZE/2*(nodes.size() + .5 + Math.sqrt(2*nodes.size())));
-    	    matrixLabel = new VText(mx+matrixLbDX, my+matrixLbDY, 0, ProjectColors.NODE_TEXT[ProjectColors.COLOR_SCHEME], name, VText.TEXT_ANCHOR_END, (float)Math.sqrt(4*nodes.size()));
-    	    bkg.stick(matrixLabel);
-    	    // node labels
-
-    	    for (int i=0 ; i < nodes.size() ; i++ )
-    	    {	
-    	    	nodes.get(i).cleanGraphics();
-        		nodes.get(i).createGraphics(-NodeTrixViz.CELL_SIZE/2 * nodes.size(),
-        	                            Math.round(NodeTrixViz.CELL_SIZE/2*(nodes.size()-2*i-1)),
-        	                            Math.round(NodeTrixViz.CELL_SIZE/2*(-nodes.size()+2*i+1)),
-        	                            NodeTrixViz.CELL_SIZE/2*nodes.size(),
-        	                            vs, false, ProjectColors.NODE_BACKGROUND[ProjectColors.COLOR_SCHEME]);
-        		nodes.get(i).moveTo(mx, my);
-    	    }	        
-        	
-        	SwingUtilities.invokeLater(new Runnable()
-        	{
-        		public void run()
-        		{
-        			vs.addGlyph(matrixLabel);
-        			matrixLabel.setSensitivity(false);
-        		}
-        	});
-
+    	gridBarsH = new VRectangle[nodes.size()];
+        gridBarsV = new VRectangle[nodes.size()];
+        bkg.setDrawBorder(false);
+        bkg.setOwner(this);
+       
+        
+        if(!(name.startsWith("[") && nodes.size() == 1))
+        {
+        	matrixLabel_DX = -Math.round(NodeTrixViz.CELL_SIZE/2*(1.1 * nodes.size()));
+        	matrixLabel_DY = -Math.round(NodeTrixViz.CELL_SIZE/2*(nodes.size() + .7 + Math.sqrt(2*nodes.size())));
+        	matrixLabel = new VText(mx + matrixLabel_DX, my + matrixLabel_DY, 0, ProjectColors.NODE_TEXT[ProjectColors.COLOR_SCHEME], name, VText.TEXT_ANCHOR_END, (float)Math.sqrt(4*nodes.size()));
+        	bkg.stick(matrixLabel);
+        	vs.addGlyph(matrixLabel);
+        	matrixLabel.setSensitivity(false);
+        }
+        
+		if (nodes.size() > 1)
+		{
+			vs.addGlyph(bkg);
+    	     
+    	    		for (int i=0 ; i < nodes.size() ; i++ )
+		    	    {	
+    	    			double wdx = -NodeTrixViz.CELL_SIZE * nodes.size()/2;
+    	    			double wdy = Math.round(NodeTrixViz.CELL_SIZE * (nodes.size()-2*i-1) /2);
+    	    			double ndx = Math.round(NodeTrixViz.CELL_SIZE * (-nodes.size()+2*i+1) /2);
+    	    			double ndy = NodeTrixViz.CELL_SIZE * nodes.size()/2;
+    	    			
+		    	    	nodes.get(i).createGraphics(wdx, wdy, ndx, ndy, vs, false, ProjectColors.NODE_BACKGROUND[ProjectColors.COLOR_SCHEME]);
+		        		nodes.get(i).moveTo(mx, my);
+		        		System.out.println("new node " + i + ": " + nodes.get(i).getName());	
+		        		
+		        		//GRID PATTERN
+			        	VRectangle gGridV = new VRectangle(bkg.vx + ndx, bkg.vy, 0, NodeTrixViz.CELL_SIZE, bkg.getWidth(), ProjectColors.MATRIX_GRID[ProjectColors.COLOR_SCHEME], ProjectColors.MATRIX_GRID[ProjectColors.COLOR_SCHEME], ProjectColors.MATRIX_GRID_TRANSLUCENCY);
+			        	gGridV.setDrawBorder(false);
+			        	gGridV.setOwner(this);
+			        	vs.above(gGridV, bkg);
+			        	bkg.stick(gGridV);
+			        	gridBarsV[i] = gGridV;
+			        	
+			        	final VRectangle gGridH = new VRectangle(bkg.vx, bkg.vy + wdy, 0, bkg.getWidth(), NodeTrixViz.CELL_SIZE, ProjectColors.MATRIX_GRID[ProjectColors.COLOR_SCHEME], ProjectColors.MATRIX_GRID[ProjectColors.COLOR_SCHEME], ProjectColors.MATRIX_GRID_TRANSLUCENCY);
+			        	gGridH.setDrawBorder(false);
+			        	gGridH.setSensitivity(false);
+			        	gGridH.setOwner(this);
+			        	vs.above(gGridH, bkg);
+			        	bkg.stick(gGridH);
+			        	gridBarsH[i] = gGridH;
+			        	
+			        	if(i % 2 == 0)
+			        	{
+			        		gGridV.setVisible(false);
+			        		gGridH.setVisible(false);
+			        	}
+			        	
+			        	vs.addGlyph(gGridV);
+					    vs.addGlyph(gGridH);
+					}	
+    	    		
 	    }
 	    else {
-	        // if matrix contains a single node, only show a horizontal label
-	        nodes.firstElement().createGraphics(0, 0, 0, 0, vs, true, ProjectColors.NODE_BACKGROUND[ProjectColors.COLOR_SCHEME]);
-    	    nodes.firstElement().moveTo(mx, my);
-        }
+	    	nodes.firstElement().createGraphics(0, 0, 0, 0, vs, true, ProjectColors.NODE_BACKGROUND[ProjectColors.COLOR_SCHEME]);
+	    	nodes.firstElement().moveTo(mx, my);
+	    }
+		
     	bkg.setOwner(this);
     	//Creating and disabling the overview glyph
     	gOverview = new VRectangle(0,0,0, NodeTrixViz.MATRIX_NODE_LABEL_OCCLUSION_WIDTH/2, NodeTrixViz.MATRIX_NODE_LABEL_OCCLUSION_WIDTH/2, Color.white );
     	gOverview.setSensitivity(false);
     	gOverview.setTranslucencyValue(0);
     	
-    	SwingUtilities.invokeLater(new Runnable()
-    	{
-    		public void run()
-    		{
-    			vs.addGlyph(bkg);
     			vs.addGlyph(gOverview);
-    		}
-    	});
     }
     
     /**Has to be called when node order has changed
-     * 
      */
-    public void updateNodePosition()
+    public void updateNodePositions()
     {
     	if(vs == null) return;
+    	
     	for(int i=0 ; i < nodes.size() ; i++ )
 	    {
-    		nodes.get(i).updateLabelPosition(Math.round(NodeTrixViz.CELL_SIZE/2*(nodes.size()-2*i-1)),
-                    				 Math.round(NodeTrixViz.CELL_SIZE/2*(-nodes.size()+2*i+1)));
+    		nodes.get(i).updateLabelPosition(	Math.round(NodeTrixViz.CELL_SIZE/2*(nodes.size()-2*i-1)),
+    											Math.round(NodeTrixViz.CELL_SIZE/2*(-nodes.size()+2*i+1))	);
     		nodes.get(i).updataRelationPositions();
  	    }
     }
@@ -165,68 +196,13 @@ public class Matrix {
                 maxLabelWidth = n.getTextWidth();
             }
         }
-//        System.out.println("[MATRIX] MAX_LENGHT " + maxLabelWidth);
         maxLabelWidth += (NodeTrixViz.MATRIX_NODE_LABEL_DIST_BORDER * 2);
         
-        //creating grid for each node
-        int i = 0;
-        gridBarsH = new VRectangle[nodes.size()];
-        gridBarsV = new VRectangle[nodes.size()];
-        gridReflexiveSquares = new VRectangle[nodes.size()];
-        
-        for(NTNode n : nodes)
+        for (NTNode n : nodes)
         {
-//        	System.out.println("[MATRIX] FINISH NODE GRAPHICS " + name);
         	n.setLabelWidth(maxLabelWidth);
-        	if(this.nodes.size() == 1) break;
-        	
-        	//GRID PATTERN
-        	final VRectangle gGridV = new VRectangle(bkg.vx + n.ndx, bkg.vy,0, NodeTrixViz.CELL_SIZE, bkg.getWidth(), ProjectColors.MATRIX_GRID[ProjectColors.COLOR_SCHEME], ProjectColors.MATRIX_GRID[ProjectColors.COLOR_SCHEME], ProjectColors.MATRIX_GRID_TRANSLUCENCY);
-        	gGridV.setDrawBorder(false);
-        	gGridV.setSensitivity(false);
-        	gGridV.setVisible(false);
-        	vs.above(gGridV, bkg);
-        	bkg.stick(gGridV);
-        	gridBarsV[i] = gGridV;
-        	
-        	final VRectangle gGridH = new VRectangle(bkg.vx,bkg.vy+ n.wdy,0, bkg.getWidth(), NodeTrixViz.CELL_SIZE, ProjectColors.MATRIX_GRID[ProjectColors.COLOR_SCHEME], ProjectColors.MATRIX_GRID[ProjectColors.COLOR_SCHEME], ProjectColors.MATRIX_GRID_TRANSLUCENCY);
-        	gGridH.setDrawBorder(false);
-        	gGridH.setSensitivity(false);
-           	gGridH.setVisible(false);
-        	vs.above(gGridH, bkg);
-        	bkg.stick(gGridH);
-        	gridBarsH[i] = gGridH;
-        	
-        	if(i % 2 == 0)
-        	{
-        		gGridV.setColor(ProjectColors.MATRIX_GRID[ProjectColors.COLOR_SCHEME]);
-        		gGridV.setVisible(true);
-        		gGridH.setColor(ProjectColors.MATRIX_GRID[ProjectColors.COLOR_SCHEME]);
-        		gGridH.setVisible(true);
-        		
-        	}
-        	
-        	//SYMMETRY AXIS
-        	final VRectangle r = new VRectangle(bkg.vx + n.wdy, bkg.vy + n.ndx, 0, NodeTrixViz.CELL_SIZE, NodeTrixViz.CELL_SIZE, ProjectColors.MATRIX_SYMMETRY_FIELDS[ProjectColors.COLOR_SCHEME], ProjectColors.MATRIX_SYMMETRY_FIELDS[ProjectColors.COLOR_SCHEME], .4f);
-        	r.setDrawBorder(false);
-        	r.setSensitivity(false);
-        	this.bkg.stick(r);
-        	gridReflexiveSquares[i] = r;
-
-        	i++;
-        	
-        	SwingUtilities.invokeLater(new Runnable()
-        	{
-        		public void run()
-        		{
-        	    	vs.addGlyph(gGridV);
-		        	vs.addGlyph(gGridH);
-		        	vs.addGlyph(r);
-        		}
-        	});
-
         }
-    }
+  }
     
     
     void createEdgeGraphics(VirtualSpace vs){
@@ -249,12 +225,11 @@ public class Matrix {
              	
              	for (NTEdge e : n.getOutgoingEdges()){
                      // values that are 0 is because we do not care (not used)
-             		if (e.getState() == NodeTrixViz.APPEARANCE_INTRA_EDGE){
+             		if (e.getState() == NodeTrixViz.APPEARANCE_INTRA_EDGE)
+             		{
                  		if (e.tail == e.head && nodes.size() == 1){
                  			e.createGraphics(vs);
-
-                             // remember
-                             reflexiveProp4SingleNodeMatOffset += NodeTrixViz.CELL_SIZE;
+                            reflexiveProp4SingleNodeMatOffset += NodeTrixViz.CELL_SIZE;
                      	}else {
                      		// add intraedge to edgeset
                          	intraEdgeSetMap.get(e.head).add(e);
@@ -430,9 +405,6 @@ public class Matrix {
     			for(Glyph g : gridBarsV){
     				if (g!=null){vs.onTop(g); }
     			}
-    			for(Glyph g : gridReflexiveSquares){
-    				if (g!=null){vs.onTop(g); }
-    			}
     			for(NTNode n : nodes){
     				n.onTop(); //Virtual space is already known in NTNode
     				for(NTEdge e : n.getOutgoingEdges()){ e.onTop(); }
@@ -449,14 +421,14 @@ public class Matrix {
     	if(nodes.contains(tail))
     	{
     		int i1 = nodes.indexOf(tail);
-    		Glyph g1 = tail.matrix.gridBarsH[i1];
+    		Glyph g1 = gridBarsH[i1];
     		g1.setColor(c);
     		g1.setVisible(true);
     	}
     	if(nodes.contains(head))
     	{
     		int i2 = nodes.indexOf(head);
-    		Glyph g2 = tail.matrix.gridBarsV[i2];
+    		Glyph g2 = gridBarsV[i2];
     		g2.setColor(c);
     		g2.setVisible(true);
     	}
@@ -470,14 +442,14 @@ public class Matrix {
     		int i1 = nodes.indexOf(tail);
     		Glyph g1 = tail.matrix.gridBarsH[i1];
     		g1.setColor(ProjectColors.MATRIX_GRID[ProjectColors.COLOR_SCHEME]);
-    		if(i1 % 2 != 0) g1.setVisible(false);
+    		if(i1 % 2 == 0) g1.setVisible(false);
     	}
     	if(nodes.contains(head))
     	{
     		int i2 = nodes.indexOf(head);
     		Glyph g2 = tail.matrix.gridBarsV[i2];
     		g2.setColor(ProjectColors.MATRIX_GRID[ProjectColors.COLOR_SCHEME]);
-    		if(i2 % 2 != 0) g2.setVisible(false);
+    		if(i2 % 2 == 0) g2.setVisible(false);
     	}
     }
     
@@ -489,14 +461,14 @@ public class Matrix {
     	for(Glyph g : gridBarsH)
     	{
     		g.setColor(ProjectColors.MATRIX_GRID[ProjectColors.COLOR_SCHEME]);
-    		if(i % 2 != 0) g.setVisible(false);
+    		if(i % 2 == 0) g.setVisible(false);
     		i++;
     	}
     	i = 0;
     	for(Glyph g : gridBarsV)
     	{
     		g.setColor(ProjectColors.MATRIX_GRID[ProjectColors.COLOR_SCHEME]);
-    		if(i % 2 != 0) g.setVisible(false);
+    		if(i % 2 == 0) g.setVisible(false);
     		i++;
     	}
     	
@@ -700,7 +672,6 @@ public class Matrix {
 		
 		//removing old groupLabels
 		if(vs == null) return;
-		cleanGroupLabels();
 		
 		//grouping Nodes
 		HashMap<String, Vector<NTNode>> groups = new HashMap<String, Vector<NTNode>>();
@@ -726,84 +697,69 @@ public class Matrix {
 		
 		
 		//repositioning nodes
-		updateNodePosition();
+		updateNodePositions();
 		
 		//add new group labels
 		for(Vector<NTNode> v : groups.values()){
 			addGroupLabel(v, v.firstElement().getGroupName());
 		}
 
-//		//update labelsize of matrix
-//		this.maxLabelWidth  += NodeTrixViz.GROUP_LABEL_HALF_WIDTH*2;
 	}
 	
 	public Vector<Matrix> splitMatrix(AnimationManager am)
 	{
 		if(nodes.size() <= 1 || !grouped) return new Vector<Matrix>();
 		try{
-		
-		// 1. CREATE MATRICES
-		Vector<Matrix> newMatrices = new Vector<Matrix>();
-		String groupname = "";
-		Matrix mNew = null;
-		double x = 0, y = 0;
-		for(NTNode n : nodes){
-			n.cleanGraphics();
-			if(!n.getGroupName().equals(groupname)){
-				//finish old matrix
-				if(mNew != null){
-//					System.out.println("[MATRIX] NEW MATRIX " + mNew.name + " CONTAINING " + mNew.getSize() + " NODES");
-					mNew.createNodeGraphics(bkg.vx + x/mNew.getSize(), bkg.vy + y/mNew.getSize(), vs);
-					mNew.finishCreateNodeGraphics(vs);
-					x = 0;y = 0;
+			Vector<Matrix> newMatrices = new Vector<Matrix>();
+			String groupname = "";
+			Matrix mNew = null;
+			double x = this.getPosition().x - bkg.vw /2;
+			double y = this.getPosition().y + bkg.vh /2;
+			double mNew_width = 0;
+			for(NTNode n : nodes){
+				n.cleanGraphics();
+				if(!n.getGroupName().equals(groupname)){
+					if(mNew != null){
+						//finish old matrix
+						mNew_width = mNew.getNodeAmount() * CELL_SIZE;
+						mNew.reorderCutHillMcKee();
+						mNew.createNodeGraphics(x + mNew_width, y - mNew_width, vs);
+						mNew.finishCreateNodeGraphics(vs);
+						x += mNew_width*2;
+						y -= mNew_width*2;
+					}
+					//-- create new matrix
+					groupname = n.getGroupName();
+					mNew = new Matrix(groupname, new Vector<NTNode>());
+					newMatrices.add(mNew);
 				}
-				//-- create new matrix
-				groupname = n.getGroupName();
-				mNew = new Matrix(groupname, new Vector<NTNode>());
-				newMatrices.add(mNew);
+				mNew.addNode(n);
+				n.setMatrix(mNew);
 			}
-			mNew.addNode(n);
-			x += n.ndx;
-			y += n.wdy;
-		}
-		mNew.createNodeGraphics(bkg.vx + x/mNew.getSize(), bkg.vy + y/mNew.getSize(), vs);
-		mNew.finishCreateNodeGraphics(vs);
-		
-		// 2. SHIFT LABELS TO OLD PLACES
-		for(Matrix m : newMatrices){
-			for(NTNode n : m.nodes){
-				n.shiftNorthernLabels(bkg.vy + bkg.vw, false);
-				n.shiftWesternLabels(bkg.vx - bkg.vw, false);
+			mNew.reorderCutHillMcKee();
+			mNew.createNodeGraphics(x + mNew.getNodeAmount() * CELL_SIZE, y - mNew.getNodeAmount() * CELL_SIZE , vs);
+			mNew.finishCreateNodeGraphics(vs);
+			
+			cleanGraphics(am);
+			
+			for(Matrix mNew1 : newMatrices){
+				mNew1.adjustEdgeAppearance();
+				mNew1.performEdgeAppearanceChange();
 			}
-			// 3. ADJUST EDGES
-			m.adjustEdgeAppearance();
-		}
-		
-		// 4. FADE OUT GRAPHICS OF OLD MATRIX
-		cleanGraphics(am);
-		
-		// 6. RESET NEW NODE LABELS 
-		for(Matrix m : newMatrices){
-			for(NTNode n : m.nodes){
-				n.resetNorthernLabels(true);
-				n.resetWesternLabels(true);
+			for(Matrix mNew1 : newMatrices)
+			{
+				mNew1.createEdgeGraphics(vs);
+				mNew1.onTop(vs);
 			}
-			m.performEdgeAppearanceChange();
-		}
-		
-		// 6. DISPLACE MATRICES 
-		// 7. CREATE NEW EDGE GRAPHICS
-		for(Matrix m : newMatrices)
+	
+			return newMatrices;
+	
+		} catch(Exception e) 
 		{
-			m.createEdgeGraphics(vs);
-			m.onTop(vs);
+			e.printStackTrace();
 		}
-
-		return newMatrices;
-		} catch(Exception e) {e.printStackTrace();}
 		return null;
 	}
-	
 	
 	/** Sets a new appearance of the edges according to their context. The new appearance is 
 	 * not yet set, just calculated.
@@ -838,7 +794,7 @@ public class Matrix {
 		return bkg.getLocation();
 	}
 	
-	public int getSize(){
+	public int getNodeAmount(){
 		return nodes.size();
 	}
 	
@@ -864,7 +820,6 @@ public class Matrix {
 	
 	public void addNode(NTNode n){
 		nodes.add(n);
-		n.setMatrix(this);
 	}
 	
 	
@@ -917,11 +872,6 @@ public class Matrix {
 							new EndAction(){public void execute(Object o, Animation.Dimension dimension){
 								vs.removeGlyph((Glyph)o);}}), true);
 				}
-				for(Glyph g : gridReflexiveSquares){
-					am.startAnimation(am.getAnimationFactory().createTranslucencyAnim(duration, g, 0, false, SlowInSlowOutInterpolator2.getInstance(), 
-							new EndAction(){public void execute(Object o, Animation.Dimension dimension){
-								vs.removeGlyph((Glyph)o);}}), true);
-				}		
 			}
 		});
 
@@ -933,7 +883,7 @@ public class Matrix {
 		move(v,v);
 	}
 	
-	public double getLabelWidth(){
+	public double getMaxLabelWidth(){
 		return maxLabelWidth;
 	}
 	public double getBackgroundWidth(){

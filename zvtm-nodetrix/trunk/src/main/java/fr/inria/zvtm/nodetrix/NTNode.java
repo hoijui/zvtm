@@ -50,8 +50,8 @@ public class NTNode extends LinLogNode{
 	/**Width of the text glyph only*/
 	private double textWidth = -1; //-1 means that it is not yet set.
 	/** Background box*/
-	VRectangle gBackgroundW, gSensitiveW;
-	VRectangleOr gBackgroundN, gSensitiveN;
+	private VRectangle gBackgroundW, gSensitiveW;
+	private VRectangleOr gBackgroundN, gSensitiveN;
 	Color backgroundColor;
 	/** If this node has no matrix*/
 	boolean single;
@@ -101,6 +101,7 @@ public class NTNode extends LinLogNode{
 	    this.ndx = ndx;
 	    this.ndy = ndy;
 	    this.vs = vs;
+	    
 	    this.backgroundColor = colour;
 	    this.single = single;
 	    this.setLabelHeight(NodeTrixViz.CELL_SIZE);
@@ -113,20 +114,13 @@ public class NTNode extends LinLogNode{
 	    	gBackgroundW.setSensitivity(false);
 	    	
 	    	gSensitiveW = new VRectangle(0, 0, 0, 0, NodeTrixViz.CELL_SIZE-4, Color.red);
-	    	//gSensitiveW.setVisible(false);
+	    	gSensitiveW.setVisible(false);
 	    	gSensitiveW.setOwner(this);
 
-	    	
-	    	SwingUtilities.invokeLater(new Runnable()
-	    	{
-	    		public void run()
-	    		{
-	    			vs.addGlyph(gBackgroundW);
-	    			vs.addGlyph(labelW);
-	    			vs.addGlyph(gSensitiveW);
-	    		}
-	    	});
-
+	    	vs.addGlyph(gBackgroundW);
+	    	vs.addGlyph(labelW);
+	   		vs.addGlyph(gSensitiveW);
+	   
 	    	gBackgroundW.stick(labelW);
 	    	gBackgroundW.stick(gSensitiveW);
 
@@ -140,27 +134,25 @@ public class NTNode extends LinLogNode{
 	    		gSensitiveN = new VRectangleOr(0, 0, 0, 0, NodeTrixViz.CELL_SIZE-4,  Color.red,  (float)Math.PI/2f);
 	    	    gSensitiveN.setOwner(this);
 	    		
-	    		SwingUtilities.invokeLater(new Runnable()
-	    		{
-		    		public void run()
-		    		{
-		    			gSensitiveN.setVisible(false);
-		    			vs.addGlyph(gBackgroundN);
-		    			vs.addGlyph(labelN);
-		    			vs.addGlyph(gSensitiveN);
-		    		}
-		    	});
-
-	    		gBackgroundN.stick(labelN);
+		    	gSensitiveN.setVisible(false);
+		    	vs.addGlyph(gBackgroundN);
+		    	vs.addGlyph(labelN);
+		    	vs.addGlyph(gSensitiveN);
+		   
+		    	gBackgroundN.stick(labelN);
 	    		gBackgroundN.stick(gSensitiveN);
 		    
 		   }
     }
     
-    public void moveTo(double mx, double my){
-    	this.matrixX = mx; this.matrixY = my;
+    public void moveTo(double mx, double my)
+    {
+    	this.matrixX = mx; 
+    	this.matrixY = my;
         gBackgroundW.moveTo(mx + wdx, my + wdy);
-        if (gBackgroundN != null)	gBackgroundN.moveTo(mx + ndx, my + ndy);            
+    
+        if (gBackgroundN != null)	
+        	gBackgroundN.moveTo(mx + ndx, my + ndy);            
     }
 	
     /** Moves booth labels to differentLocations along the matrix side.
@@ -180,13 +172,9 @@ public class NTNode extends LinLogNode{
     	this.matrixX += dmx; 
     	this.matrixY += dmy;
     	gBackgroundW.move(dmx, dmy);
- //   	labelW.move(dmx, dmy);
-   // 	gSensitiveW.move(dmx, dmy);
   
     	if (!single){
         	gBackgroundN.move(dmx,dmy);        
-     //     	labelN.move(dmx, dmy);
-       //    	gSensitiveN.move(dmx, dmy); 
         }
     }
     
@@ -516,22 +504,19 @@ public class NTNode extends LinLogNode{
 
 	public void cleanGraphics() 
 	{
-		SwingUtilities.invokeLater(new Runnable()
-    	{
-    		public void run()
-    		{
-    			System.out.println("gBackgroundW: " + gBackgroundW);
-    			if(vs.getAllGlyphs().contains(gBackgroundW)){ 
-        			System.out.println("gBackgroundW on vs: " + gBackgroundW);
+		if(vs == null) return;
+    			//if( gBackgroundW != null || vs.getAllGlyphs().contains(gBackgroundW)) 
         			vs.removeGlyph(gBackgroundW);
-        		}
-    			if(vs.getAllGlyphs().contains(labelW)) vs.removeGlyph(labelW);
-    			if(vs.getAllGlyphs().contains(gSensitiveW)) vs.removeGlyph(gSensitiveW);
-    			if(vs.getAllGlyphs().contains(gBackgroundN)) vs.removeGlyph(gBackgroundN);
-    			if(vs.getAllGlyphs().contains(labelN)) vs.removeGlyph(labelN);
-    			if(vs.getAllGlyphs().contains(gSensitiveN))  vs.removeGlyph(gSensitiveN);
-    		}
-    	});
+      //  		if(vs.getAllGlyphs().contains(labelW)  || labelW != null) 
+    				vs.removeGlyph(labelW);
+    	//		if(vs.getAllGlyphs().contains(gSensitiveW) || gSensitiveW != null) 
+    				vs.removeGlyph(gSensitiveW);
+    	//		if(vs.getAllGlyphs().contains(gBackgroundN) || gBackgroundN != null) 
+    				vs.removeGlyph(gBackgroundN);
+    		//	if(vs.getAllGlyphs().contains(labelN) || labelN != null)
+    				vs.removeGlyph(labelN);
+    	//		if(vs.getAllGlyphs().contains(gSensitiveN) || gSensitiveN != null)  
+    				vs.removeGlyph(gSensitiveN);
 	}
 
 

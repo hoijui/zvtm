@@ -41,7 +41,7 @@ public class NTEdge extends LinLogEdge{
     		return;
     	}
 
-    	if(tail.matrix.getName().equals(head.matrix.getName())){
+    	if(tail.matrix.equals(head.matrix)){
     		newAppearance = new IntraEdgeAppearance(this);
         }else{
         	newAppearance = new ExtraEdgeAppearance(this);
@@ -111,7 +111,8 @@ public class NTEdge extends LinLogEdge{
     
     public int getState(){
     	if(appearance instanceof ExtraEdgeAppearance) return NodeTrixViz.APPEARANCE_EXTRA_EDGE;
-    	else return NodeTrixViz.APPEARANCE_INTRA_EDGE;
+    	
+    	return NodeTrixViz.APPEARANCE_INTRA_EDGE;
     }
     
     public boolean isIntraEdge(){

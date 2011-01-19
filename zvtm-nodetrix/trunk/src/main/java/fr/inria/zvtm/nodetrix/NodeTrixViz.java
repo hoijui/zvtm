@@ -20,6 +20,8 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.Map.Entry;
 
+import javax.swing.SwingUtilities;
+
 import fr.inria.zvtm.animation.AnimationManager;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.nodetrix.lll.Edge;
@@ -110,11 +112,6 @@ public class NodeTrixViz {
     	}
     }
     
-//    public Matrix addMatrix(Matrix res){
-//      matrices.add(res);
-//      return res;
-//    }
-	
 	/**This method causes the NTNodes to be clustered using the LinLog Algorithm.
 	 * It returns a HashMap mapping each NTNode to an integer depicting its cluster.
 	 * The created matrices are returned but not added to the global matrix list.As
@@ -142,6 +139,7 @@ public class NodeTrixViz {
 			}
 			//System.out.println("createMatricesByClustering");
 			m.addNode(n);
+			n.setMatrix(m);
 		}
 		return newMatrices.values().toArray(new Matrix[0]);
 //		
@@ -231,7 +229,8 @@ public class NodeTrixViz {
     
     //---------------------VISUALISE---------------------VISUALISE---------------------VISUALISE---------------------VISUALISE---------------------VISUALISE
     
-    public void createVisualisation(VirtualSpace vs){
+    public void createVisualisation(final VirtualSpace vs)
+    {
     	this.vs = vs;
         Map<Matrix,Map<Matrix,Double>> llg = new HashMap<Matrix,Map<Matrix,Double>>();
         // keep trace of matrices tha are not part of the graph ; we still want to display them
@@ -264,17 +263,23 @@ public class NodeTrixViz {
         Map<Matrix,Node> matrixToLLNode = makeNodes(llg);
         List<Node> llnodes = new ArrayList<Node>(matrixToLLNode.values());
         List<Edge> lledges = makeEdges(llg, matrixToLLNode);
-		Map<Node,double[]> nodeToPosition = makeInitialPositions(llnodes);
+		final Map<Node,double[]> nodeToPosition = makeInitialPositions(llnodes);
 		// see class MinimizerBarnesHut for a description of the parameters;
 		// for classical "nice" layout (uniformly distributed nodes), use
 		new MinimizerBarnesHut(llnodes, lledges, REPU_EXPONENT, ATTR_EXPONENT, GRAV_FACTOR).minimizeEnergy(nodeToPosition, LINLOG_ITERATIONS);
 		// following might actually be useless, not sure yet...
 		//Map<Node,Integer> nodeToCluster = new OptimizerModularity().execute(llnodes, lledges, false);
 		// EOU		
-        for (Node node : nodeToPosition.keySet()) {
-			double[] position = nodeToPosition.get(node);
-			node.getMatrix().createNodeGraphics(Math.round(position[0]*SCALE), Math.round(position[1]*SCALE), vs);
-		}
+	    SwingUtilities.invokeLater(new Runnable()
+	    {
+  	   		public void run()
+  	   		{
+		        for (Node node : nodeToPosition.keySet()) {
+					double[] position = nodeToPosition.get(node);
+					node.getMatrix().createNodeGraphics(Math.round(position[0]*SCALE), Math.round(position[1]*SCALE), vs);
+				}
+  	   		}
+	    });
     }
 
 	/** Finish creating the visualization.
@@ -383,6 +388,7 @@ public class NodeTrixViz {
     public void cleanMatrices(AnimationManager am){
     	for(Matrix m : matrices){
     		m.cleanGraphics(am);
+    		m.cleanNodeGraphics();
     	}
     	matrices.clear();
     }
@@ -390,17 +396,11 @@ public class NodeTrixViz {
     public void highlightNodeContext(NTNode n, boolean context){
     	//care about node.
     	Matrix m = n.getMatrix();
-//    	System.out.println("[NTV] 1");
     	m.resetGrid();
-//    	System.out.println("[NTV] 2");
     	m.highlightGrid(n, n, ProjectColors.HIGHLIGHT[ProjectColors.COLOR_SCHEME]);
-//    	System.out.println("[NTV] 3");
     	highlightedNodes.add(n);
-//    	System.out.println("[NTV] 4");
     	n.setNewInteractionState(IA_STATE_HIGHLIGHT, true, true);
-//    	System.out.println("[NTV] 5");
     	n.perfomStateChange();
-//    	System.out.println("[NTV] 6-");
 
     	//care about related if necessary.
     	if(context){
@@ -458,6 +458,9 @@ public class NodeTrixViz {
     
     
     public void highlightEdgeContext(NTEdge e){
+		System.out.println("-- highlight edge context -- ");		
+
+    	
     	highlightedEdges.add(e);
     	e.setNewInteractionState(NodeTrixViz.IA_STATE_HIGHLIGHT_OUTGOING);
     	e.performInteractionStateChange();
@@ -466,12 +469,18 @@ public class NodeTrixViz {
 		highlightedNodes.add(head);
     	NTNode tail = e.getTail();
 		highlightedNodes.add(tail);
-		head.setNewInteractionState(NodeTrixViz.IA_STATE_HIGHLIGHT, false, true);
+		head.setNewInteractionState(NodeTrixViz.IA_STATE_HIGHLIGHT, true, true);
 		head.perfomStateChange();
-		tail.setNewInteractionState(NodeTrixViz.IA_STATE_HIGHLIGHT, false, true);
+		tail.setNewInteractionState(NodeTrixViz.IA_STATE_HIGHLIGHT, true, true);
 		tail.perfomStateChange();
 
+		System.out.println("\t tail: " + tail.getName());		
+		System.out.println("\t head: " + head.getName());		
+		System.out.print("edge is intra edge?");		
 		if(e.isIntraEdge()){
+			System.out.println("\t yes");
+			System.out.println("\t matrix: " + tail.getMatrix().getName());
+
 			tail.getMatrix().highlightGrid(tail, head, ProjectColors.HIGHLIGHT[ProjectColors.COLOR_SCHEME]);
 		}
     }
@@ -498,24 +507,20 @@ public class NodeTrixViz {
     	}
 
     	matrices.addAll(newMatrices);
-    	reorderMatricesCMK();
+    	//reorderMatricesCMK();
     }
     
     
     /** Causes matrices to merge according their name. So matrices with 
      * */
-    public void mergeMatrices(VirtualSpace vs, AnimationManager am)
+    public void mergeMatrices(final VirtualSpace vs, final AnimationManager am)
     {
 
-    	for (NTNode n : this.nodes)
-    	{
-    		n.cleanGraphics();
-    	}
-    	
+	   
     	// GROUP MATRICES ACCORDING NAMES MATRIX
-		HashMap<String, Vector<Matrix>> mergeMap = new HashMap<String, Vector<Matrix>>();
+		final HashMap<String, Vector<Matrix>> mergeMap = new HashMap<String, Vector<Matrix>>();
     	for(Matrix m : matrices){
-//    		System.out.println("[NODE_TRIX_VIZ] GROUING " + m.getName());
+    		//m.cleanNodeGraphics();
     		String name = m.getName();
     		if(!mergeMap.containsKey(name)){
     			mergeMap.put(name, new Vector<Matrix>());
@@ -524,11 +529,9 @@ public class NodeTrixViz {
     	}	
        	
         // POSITION MATRICES THAT TEND TO BE MERGED IN A ROW 
-//    	System.out.println("[NODE_TRIX_VIZ] -- CREATING NEW MATRICES " + mergeMap.size());
     	for(Entry<String, Vector<Matrix>> entry : mergeMap.entrySet())
     	{
     		Vector<Matrix> mergeMatrices = entry.getValue();
-//        	System.out.println("[NODE_TRIX_VIZ] " + entry.getKey() + " CONTAINIG " + mergeMatrices.size());
         	if(mergeMatrices.size() < 2) continue;
 
         	//compute centre of new matrix
@@ -541,7 +544,6 @@ public class NodeTrixViz {
 
         	double offset = 0; // offset to next matrix for lay-outing
         	for(Matrix m : mergeMatrices){
-//        		System.out.println("[NODE_TRIX_VIZ] MOVE MATRIX " + m.getName());
         		offset += m.getBackgroundWidth();
         		m.move(xStart + offset - m.getPosition().x , yStart - offset - m.getPosition().y);
         		offset += m.getBackgroundWidth();
@@ -550,69 +552,69 @@ public class NodeTrixViz {
     	
     	
     	//CREATE NEW MATRICES
-//		System.out.println("[NTV] MERGE --------");
 
-    	Vector<Matrix> newMatrices = new Vector<Matrix>();
-    	int clusterNumber = 0;
-    	for(Entry<String, Vector<Matrix>> entry : mergeMap.entrySet()){
-    		Vector<Matrix> mergeMatrices = entry.getValue();
-    		//put nodes in new matrix
-    		Matrix newMatrix = new Matrix(entry.getKey(), new Vector<NTNode>());
-    		clusterNumber++;
-    		
-    		newMatrices.add(newMatrix);
-    		for(Matrix m : mergeMatrices){
-    			for(NTNode n : m.nodes){
-    				newMatrix.addNode(n);
-    			}
-    		}
-    		
-    		//compute centre of new matrix
-    		Matrix firstMatrix =  mergeMatrices.firstElement();
-    		Matrix lastMatrix =  mergeMatrices.lastElement();
-        	double xCentre = (firstMatrix.getPosition().x - firstMatrix.getBackgroundWidth()) + (lastMatrix.getPosition().x + lastMatrix.getBackgroundWidth());	//center of new matrix
-        	double yCentre = firstMatrix.getPosition().y + firstMatrix.getBackgroundWidth() + (lastMatrix.getPosition().x - lastMatrix.getBackgroundWidth());	//center of new matrix
-        	for(Matrix m : mergeMatrices){
-        		xCentre += m.getPosition().x;
-           		yCentre += m.getPosition().y;
-        	}
-        	xCentre /= (mergeMatrices.size() + 2);
-           	yCentre /= (mergeMatrices.size() + 2);
-           	
+    	final Vector<Matrix> newMatrices = new Vector<Matrix>();
+	    SwingUtilities.invokeLater(new Runnable()
+  	    {
+  	   		public void run()
+  	   		{
 
-           	//draw new matrix;    
-			newMatrix.createNodeGraphics(xCentre, yCentre, vs);
-			newMatrix.finishCreateNodeGraphics(vs);
-			// set node labels to old positions
-			// and put old matrices to front
-			for(Matrix m : mergeMatrices){
-				m.onTop(vs);
-    			//shift labels to old places
-    			int xNew = (int) (m.getPosition().x - (m.getBackgroundWidth() + m.getLabelWidth()));
-    			int yNew = (int) (m.getPosition().y + m.getBackgroundWidth() + m.getLabelWidth());
-    			for(NTNode n : m.nodes){
-    				n.shiftNorthernLabels(yNew, false);
-    				n.shiftWesternLabels(xNew, false);
-    			}
-    		}
-    		
-			//fade out old matrices
-			for(Matrix m : mergeMatrices){
-				m.cleanGraphics(am);
-			}
-    		
+  	   			int clusterNumber = 0;
+		    	for(Entry<String, Vector<Matrix>> entry : mergeMap.entrySet())
+		    	{
+		    		Vector<Matrix> mergeMatrices = entry.getValue();
+		    		//put nodes in new matrix
+		    		Matrix newMatrix = new Matrix(entry.getKey(), new Vector<NTNode>());
+		    		clusterNumber++;
+		    		
+		    		newMatrices.add(newMatrix);
+		    		for(Matrix m : mergeMatrices){
+		    			for(NTNode n : m.nodes){
+		    				newMatrix.addNode(n);
+		    				n.setMatrix(newMatrix);
+		    			}
+		    			m.cleanNodeGraphics();
+		    		}
+		    		
+		    		//compute centre of new matrix
+		    		Matrix firstMatrix =  mergeMatrices.firstElement();
+		    		Matrix lastMatrix =  mergeMatrices.lastElement();
+		        	double xCentre = (firstMatrix.getPosition().x - firstMatrix.getBackgroundWidth()) + (lastMatrix.getPosition().x + lastMatrix.getBackgroundWidth());	//center of new matrix
+		        	double yCentre = firstMatrix.getPosition().y + firstMatrix.getBackgroundWidth() + (lastMatrix.getPosition().x - lastMatrix.getBackgroundWidth());	//center of new matrix
+		        	for(Matrix m : mergeMatrices){
+		        		xCentre += m.getPosition().x;
+		           		yCentre += m.getPosition().y;
+		        	}
+		        	xCentre /= (mergeMatrices.size() + 2);
+		           	yCentre /= (mergeMatrices.size() + 2);
+		           	
+		
+		           	//draw new matrix;    
+					newMatrix.createNodeGraphics(xCentre, yCentre, vs);
+					newMatrix.finishCreateNodeGraphics(vs);
+					// set node labels to old positions
+					// and put old matrices to front
+					for(Matrix m : mergeMatrices){
+						m.onTop(vs);
+		    			//shift labels to old places
+		    			int xNew = (int) (m.getPosition().x - (m.getBackgroundWidth() + m.getMaxLabelWidth()));
+		    			int yNew = (int) (m.getPosition().y + m.getBackgroundWidth() + m.getMaxLabelWidth());
+		    		}
+		    		
+					//fade out old matrices
+					for(Matrix m : mergeMatrices){
+						m.cleanGraphics(am);
+					}
+		    				    		
+		    		//adjust edge appearance
+		    		newMatrix.adjustEdgeAppearance();
+		    		newMatrix.performEdgeAppearanceChange();
+		    		newMatrix.createEdgeGraphics(vs);
 
-    		//reset nodes to original places
-    		for(NTNode n : newMatrix.nodes){
-    			n.resetNorthernLabels(true);
-    			n.resetWesternLabels(true);
-    		}
-    		
-    		//adjust edge appearance
-    		newMatrix.adjustEdgeAppearance();
-    		newMatrix.performEdgeAppearanceChange();
-    		matrices.removeAll(mergeMatrices);
-    	}
+		    		matrices.removeAll(mergeMatrices);
+		    	}
+  	   		}
+  	    });
     		
     	//create edge graphics
     	for(Matrix newMatrix : newMatrices){
@@ -631,6 +633,7 @@ public class NodeTrixViz {
     public void regroupMatrices()
     {
    		for(Matrix m : matrices){
+   			m.cleanGroupLabels();
    			m.group();
    		}
     }

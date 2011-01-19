@@ -74,7 +74,7 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
             // eastward
             x1 = (edge.tail.getMatrix().nodes.size() > 1) ? NodeTrixViz.CELL_SIZE*edge.tail.getMatrix().nodes.size()/2 : edge.tail.getLabelWidth()/2;
             y1 = edge.tail.wdy;
-            x2 = (edge.head.getMatrix().nodes.size() > 1) ? -NodeTrixViz.CELL_SIZE*edge.head.getMatrix().nodes.size()/2-2*edge.head.getMatrix().nodes.firstElement().getLabelWidth() : -edge.head.getLabelWidth()/2;
+            x2 = (edge.head.getMatrix().nodes.size() > 1) ? -NodeTrixViz.CELL_SIZE*edge.head.getMatrix().nodes.size()/2-2*edge.head.getMatrix().nodes.firstElement().getLabelWidth()/2 : -edge.head.getLabelWidth()/2;
             y2 = edge.head.wdy;
             offsets[0] = new Point2D.Double(x1, y1);
             offsets[1] = new Point2D.Double(x2, y2);
@@ -86,9 +86,9 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
         else if (angle > 5*Math.PI/4.0){
             // southward
             x1 = edge.tail.ndx;
-            y1 = (edge.tail.getMatrix().nodes.size() > 1) ? -NodeTrixViz.CELL_SIZE*edge.tail.getMatrix().nodes.size()/2 : -edge.tail.getLabelHeight();
+            y1 = (edge.tail.getMatrix().nodes.size() > 1) ? -NodeTrixViz.CELL_SIZE*edge.tail.getMatrix().nodes.size()/2 : -edge.tail.getLabelHeight()/2;
             x2 = edge.head.ndx;
-            y2 = (edge.head.getMatrix().nodes.size() > 1) ? NodeTrixViz.CELL_SIZE*edge.head.getMatrix().nodes.size()/2+2*edge.head.getMatrix().nodes.firstElement().getLabelWidth() : edge.head.getLabelHeight();
+            y2 = (edge.head.getMatrix().nodes.size() > 1) ? NodeTrixViz.CELL_SIZE*edge.head.getMatrix().nodes.size()/2+2*edge.head.getMatrix().nodes.firstElement().getLabelWidth()/2 : edge.head.getLabelHeight()/2;
             offsets[0] = new Point2D.Double(x1, y1);
             offsets[1] = new Point2D.Double(x2, y2);
             edgePath = new GPath(tmp.x+offsets[0].x, tmp.y+offsets[0].y, 0, edge.getColor());
@@ -113,7 +113,7 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
             // angle >= Math.PI/4.0
             // northward
             x1 = edge.tail.ndx;
-            y1 = (edge.tail.getMatrix().nodes.size() > 1) ? NodeTrixViz.CELL_SIZE * edge.tail.getMatrix().nodes.size()/2+2*edge.tail.getMatrix().nodes.firstElement().getLabelWidth()/2 : edge.tail.getLabelHeight();
+            y1 = (edge.tail.getMatrix().nodes.size() > 1) ? NodeTrixViz.CELL_SIZE * edge.tail.getMatrix().nodes.size()/2+2*edge.tail.getMatrix().nodes.firstElement().getLabelWidth()/2 : edge.tail.getLabelHeight()/2;
             x2 = edge.head.ndx;
             y2 = (edge.head.getMatrix().nodes.size() > 1) ? -NodeTrixViz.CELL_SIZE*edge.head.getMatrix().nodes.size()/2 : -edge.head.getLabelHeight()/2;
             offsets[0] = new Point2D.Double(x1, y1);
@@ -143,8 +143,6 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
 
 	@Override
 	public void fade() {
-//		System.out.println("[EXTRA_EDGE] FADE");
-//		edgePath.setVisible(false);
 		gradientColors[0] = ProjectColors.EXTRA_COLOR_FADE_OUT[ProjectColors.COLOR_SCHEME];
 		gradientColors[1] = ProjectColors.EXTRA_COLOR_FADE_OUT[ProjectColors.COLOR_SCHEME];	
 		edgePath.setGradientColors(gradientColors);
