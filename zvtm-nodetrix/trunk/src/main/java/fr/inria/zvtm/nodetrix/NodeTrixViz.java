@@ -61,7 +61,7 @@ public class NodeTrixViz {
 	public static final float EXTRA_ALPHA_MIN_LENGHT = 100;  
 	public static final float EXTRA_ALPHA_MIN = .5f;
 	
-	public static final double LINLOG_QUALITY = 10;
+	public static final double LINLOG_QUALITY = 100;
 	
 	public static final int APPEARANCE_EXTRA_EDGE = 0;  
 	public static final int APPEARANCE_INTRA_EDGE = 1;  
@@ -473,13 +473,8 @@ public class NodeTrixViz {
 		tail.setNewInteractionState(NodeTrixViz.IA_STATE_HIGHLIGHT, true, true);
 		tail.perfomStateChange();
 
-		System.out.println("\t tail: " + tail.getName());		
-		System.out.println("\t head: " + head.getName());		
-		System.out.print("edge is intra edge?");		
 		if(e.isIntraEdge()){
-			System.out.println("\t yes");
-			System.out.println("\t matrix: " + tail.getMatrix().getName());
-
+		
 			tail.getMatrix().highlightGrid(tail, head, ProjectColors.HIGHLIGHT[ProjectColors.COLOR_SCHEME]);
 		}
     }

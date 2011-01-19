@@ -123,7 +123,6 @@ public class Matrix {
     	    			
 		    	    	nodes.get(i).createGraphics(wdx, wdy, ndx, ndy, vs, false, ProjectColors.NODE_BACKGROUND[ProjectColors.COLOR_SCHEME]);
 		        		nodes.get(i).moveTo(mx, my);
-		        		System.out.println("new node " + i + ": " + nodes.get(i).getName());	
 		        		
 		        		//GRID PATTERN
 			        	VRectangle gGridV = new VRectangle(bkg.vx + ndx, bkg.vy, 0, NodeTrixViz.CELL_SIZE, bkg.getWidth(), ProjectColors.MATRIX_GRID[ProjectColors.COLOR_SCHEME], ProjectColors.MATRIX_GRID[ProjectColors.COLOR_SCHEME], ProjectColors.MATRIX_GRID_TRANSLUCENCY);
@@ -591,7 +590,7 @@ public class Matrix {
 		NTNode xnRel;
 		for(NTEdge xr : xn.getOutgoingEdges())
 		{
-            if (xr.getState() == NodeTrixViz.APPEARANCE_EXTRA_EDGE)
+            if (xr.getHead().getMatrix().equals(this))
             {
 				xnRel = xr.getHead();
 				if(xn.equals(xnRel)) continue;
@@ -600,7 +599,7 @@ public class Matrix {
 				initialOrdering.remove(xnRel);
 			}
 		}
-		
+
 		Collections.sort(orderedChildren, new NTNodeDegreeComparator());
 		queue.addAll(orderedChildren);
 	}
@@ -647,14 +646,14 @@ public class Matrix {
 		if(initialOrdering.size() == 1) return;
 		Collections.sort(initialOrdering, new NTNodeDegreeComparator());
 		
-		NTNode xnStart;
+		NTNode nodeStart;
 		while(!initialOrdering.isEmpty())
 		{
-			xnStart = initialOrdering.remove(0);
-			finalOrdering.add(xnStart);
-			initialOrdering.remove(xnStart);
-			addChildrenToQueue(xnStart, queue, initialOrdering);
-
+			nodeStart = initialOrdering.remove(0);
+			finalOrdering.add(nodeStart);
+			initialOrdering.remove(nodeStart);
+			addChildrenToQueue(nodeStart, queue, initialOrdering);
+				
 			while(!queue.isEmpty())
 			{
 				NTNode xn = queue.remove(0);

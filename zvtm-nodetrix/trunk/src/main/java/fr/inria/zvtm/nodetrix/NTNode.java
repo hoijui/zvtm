@@ -473,13 +473,13 @@ public class NTNode extends LinLogNode{
 //	}
 
 
-	public int getDegree() {
+	public int getIntraEdgeOutDegree() {
 		int degree = 0;
 		for(NTEdge e : outgoingEdges){
 			if(e.getState() == NodeTrixViz.APPEARANCE_INTRA_EDGE){
 				degree++;
 			}
-		}
+		}	
 		return degree;
 	}
 
