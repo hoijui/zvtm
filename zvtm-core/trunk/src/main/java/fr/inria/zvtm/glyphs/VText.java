@@ -90,6 +90,9 @@ public class VText extends ClosedShape {
 	 */
 	public int paddingY = 1;
     
+    /**
+     * @param t text string
+     */
     public VText(String t){
 		this(0, 0, 0, Color.BLACK, null, t, TEXT_ANCHOR_START, 1f, 1f);
     }
