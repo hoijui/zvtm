@@ -7,6 +7,9 @@ import java.awt.Toolkit;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 
+import fr.inria.zvtm.text.PrefixTextShortener;
+import fr.inria.zvtm.text.TextShortener;
+
 /**
  * An adaptative version of VText
  */

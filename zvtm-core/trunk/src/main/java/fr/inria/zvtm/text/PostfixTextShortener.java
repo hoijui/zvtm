@@ -1,4 +1,4 @@
-package fr.inria.zvtm.glyphs;
+package fr.inria.zvtm.text;
 
 public class PostfixTextShortener implements TextShortener {
     public static final PostfixTextShortener INSTANCE = 

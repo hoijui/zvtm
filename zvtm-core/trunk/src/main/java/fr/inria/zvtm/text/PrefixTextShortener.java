@@ -1,4 +1,4 @@
-package fr.inria.zvtm.glyphs;
+package fr.inria.zvtm.text;
 
 public class PrefixTextShortener implements TextShortener {
     /**

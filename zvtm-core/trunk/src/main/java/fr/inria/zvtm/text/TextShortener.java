@@ -1,4 +1,4 @@
-package fr.inria.zvtm.glyphs;
+package fr.inria.zvtm.text;
 
 /**
  * Shortens a String to (at most) a given length.
