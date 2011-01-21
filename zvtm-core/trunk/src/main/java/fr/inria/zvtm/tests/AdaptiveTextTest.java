@@ -14,7 +14,8 @@ import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.AdaptiveText;
-import fr.inria.zvtm.glyphs.VCircle;
+import fr.inria.zvtm.glyphs.VRectangle;
+import fr.inria.zvtm.glyphs.VText;
 
 import java.awt.Color;
 import java.awt.event.KeyEvent;
@@ -42,9 +43,13 @@ public class AdaptiveTextTest {
         view.setListener(new AdaptiveTestEventHandler());
 
         AdaptiveText adt = new AdaptiveText(0,0,0,Color.BLUE, 
-                "Forty-two is six multiplied by nine.", 100, 20);
+                "Forty-two is six multiplied by nine.", 100, 27);
+        adt.setTextAnchor(VText.TEXT_ANCHOR_MIDDLE); //XXX
         vs.addGlyph(adt);
-        view.getGlobalView(cam, 500);
+        VRectangle rect = new VRectangle(0,0,0,100,27,new Color(100, 100, 100, 0));
+        rect.setBorderColor(Color.RED);
+        vs.addGlyph(rect);
+       // view.getGlobalView(cam, 500);
     }
 
     public static void main(String[] args){

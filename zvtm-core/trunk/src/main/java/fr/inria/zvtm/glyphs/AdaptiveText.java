@@ -15,11 +15,11 @@ public class AdaptiveText extends VText {
     private TextShortener shortener = PrefixTextShortener.INSTANCE;
     private double vsHeight;
     private double vsWidth; //virtual space width (max)
-    //private double minHeightPx = 8; //minimum real (screen) text height
     private double textPxWidth;
     private double textPxHeight;
-
-    public AdaptiveText(double x, double y, int z, Color c, String t, double vsHeight, double vsWidth){
+    //note: we use the font size as the minimal pixel text height
+    
+    public AdaptiveText(double x, double y, int z, Color c, String t, double vsWidth, double vsHeight){
         super(x,y,z,c,t);
         this.vsHeight = vsHeight;
         this.vsWidth = vsWidth;
@@ -81,8 +81,9 @@ public class AdaptiveText extends VText {
         String finalTxt = getText();
         double xscr = vsWidth*coef; //vsWidth, translated to pixels
         double yscr = vsHeight*coef; //vsHeight, translated to pixels
-        System.err.println("xscr = " + xscr + ", vsWidth = " + vsWidth);
-        System.err.println("yscr = " + yscr + ", vsHeight = " + vsHeight);
+        System.err.println("coef = " + coef);
+        System.err.println("xscr = " + xscr + ", textPxWidth = " + textPxWidth);
+        System.err.println("yscr = " + yscr + ", textPxHeight = " + textPxHeight);
         if(yscr < textPxHeight){
             setScale((float)(yscr/textPxHeight));
         }
