@@ -26,6 +26,7 @@ public class AdaptiveText extends VText {
         super(x,y,z,c,t);
         this.vsHeight = vsHeight;
         this.vsWidth = vsWidth;
+        super.setTextAnchor(VText.TEXT_ANCHOR_MIDDLE);
         invalidatePixelBounds();
     }
     
@@ -68,6 +69,11 @@ public class AdaptiveText extends VText {
      * Ignored (AdaptiveText is zoom sensitive)
      */
     @Override public void setZoomSensitive(boolean ignored){} 
+
+    /**
+     * Ignored.
+     */
+    @Override public void setTextAnchor(short ignored){}
 
     /**
      * Since we specify a width and height, visibility rules
