@@ -44,12 +44,11 @@ public class AdaptiveTextTest {
 
         AdaptiveText adt = new AdaptiveText(0,0,0,Color.BLUE, 
                 "Forty-two is six multiplied by nine.", 100, 27);
-        adt.setTextAnchor(VText.TEXT_ANCHOR_MIDDLE); //XXX
         vs.addGlyph(adt);
         VRectangle rect = new VRectangle(0,0,0,100,27,new Color(100, 100, 100, 0));
         rect.setBorderColor(Color.RED);
         vs.addGlyph(rect);
-       // view.getGlobalView(cam, 500);
+        view.getGlobalView(cam, 500);
     }
 
     public static void main(String[] args){
