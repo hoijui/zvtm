@@ -108,10 +108,6 @@ public class AdaptiveText extends VText {
             int txLen = (int)Math.floor(xscr/(textPxBounds.getWidth()*txtScale)*getText().length());
             finalTxt = shortener.shorten(finalTxt, txLen);
         }
-        //if there is "extra room" left, grow text
-        double ca = xscr / (textPxBounds.getWidth()*txtScale);
-        double cb = yscr / (textPxBounds.getHeight()*txtScale);
-        txtScale *= Math.max(1, Math.min(ca, cb));
      
         if (alphaC != null && alphaC.getAlpha()==0){return;}
         g.setFont((font!=null) ? font : getMainFont());	
