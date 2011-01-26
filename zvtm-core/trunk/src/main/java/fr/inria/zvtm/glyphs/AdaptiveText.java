@@ -111,10 +111,10 @@ public class AdaptiveText extends VText {
      
         if (alphaC != null && alphaC.getAlpha()==0){return;}
         g.setFont((font!=null) ? font : getMainFont());	
-        AffineTransform at = AffineTransform.getTranslateInstance(dx+pc[i].cx-vsWidth*coef/2.0f,dy+pc[i].cy);
+        AffineTransform at = AffineTransform.getTranslateInstance(dx+pc[i].cx-(textPxBounds.getWidth()*txtScale*finalTxt.length()/getText().length()*0.5),dy+pc[i].cy+(textPxBounds.getHeight()*0.5*txtScale));
         at.concatenate(AffineTransform.getScaleInstance(txtScale, txtScale));
         g.setTransform(at);
-        int rectH = Math.round(pc[i].ch / scaleFactor);
+        //int rectH = Math.round(pc[i].ch / scaleFactor);
         if (alphaC != null){
             g.setComposite(alphaC);
             if (isBorderDrawn()){
