@@ -72,7 +72,7 @@ public class Squarified {
     } 
 
     private Rect borderShape(double xmin, double ymin, double xmax, double ymax, Tree node){
-        return new Rect(xmin, ymin, xmax-xmin, ymax-ymin); //XXX
+        return new Rect(xmin, ymin, xmax-xmin, ymax-ymin); 
     }
 
     private void removeBorder(Rect box, Tree node){

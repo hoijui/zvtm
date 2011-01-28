@@ -64,7 +64,7 @@ public class TreemapUtils {
      * virtual space units.
      */ 
     public static double getVTextWidth(VText text){
-        return text.getScale()*Toolkit.getDefaultToolkit().getFontMetrics(text.getMainFont()).charWidth('a')*text.getText().length();
+        return text.getScale()*Toolkit.getDefaultToolkit().getFontMetrics(text.getMainFont()).charWidth('e')*text.getText().length();
     }
 
     /**

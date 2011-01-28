@@ -19,7 +19,7 @@ import fr.inria.zvtm.event.ViewAdapter;
 import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.PRectangle;
-import fr.inria.zvtm.glyphs.VText;
+import fr.inria.zvtm.glyphs.AdaptiveText;
 import fr.inria.zvtm.treemap.Mappable;
 import fr.inria.zvtm.treemap.Rect;
 import fr.inria.zvtm.treemap.Squarified;
@@ -72,9 +72,9 @@ class Demo {
                 rect.setBorderColor(Color.BLACK);
                 rect.setCursorInsidePaint(TreemapUtils.makeDiagGradient((float)rect.getWidth(), (float)rect.getHeight(), HIGHLIGHT_FILL));
                 String txt = item.getUserObject().toString();
-                VText text = new VText(rect.vx, rect.vy+rect.getHeight()*0.5, 0, 
+                AdaptiveText text = new AdaptiveText(rect.vx, rect.vy+rect.getHeight()*0.5, 0, 
                     Color.BLACK, txt, 
-                    VText.TEXT_ANCHOR_MIDDLE, 1.2f);
+                    rect.getWidth(), 11);
                 text.move(0, -TreemapUtils.getVTextHeight(text));
                 if(t.isLeaf()){
                     text.moveTo(rect.vx, rect.vy);
@@ -83,9 +83,6 @@ class Demo {
                 item.putGraphicalObject("TEXT", text);
                 vs.addGlyph(rect);
                 vs.addGlyph(text);
-                // needs to happen after the glyph is added to the virtual
-                // space for some reason
-                rect.setCursorInsideHighlightColor(new Color(30, 30, 30));
             }
         });
     }
