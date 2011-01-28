@@ -2,6 +2,8 @@ package fr.inria.zvtm.treemap.demo;
 
 import java.util.HashMap;
 
+//First names given in Paris in 2010.
+//Source http://opendata.paris.fr
 public class Names {
     public static final HashMap<String, Integer> NAMES = new HashMap();
     static {
