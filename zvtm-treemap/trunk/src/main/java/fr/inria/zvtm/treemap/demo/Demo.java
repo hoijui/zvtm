@@ -62,7 +62,6 @@ class Demo {
         tree.traversePre(new Walker<Tree<ZMapItem>>(){
             public void visitNode(Tree<ZMapItem> t){
                 ZMapItem item = t.getMapItem();
-                //System.out.println(item.getUserObject());
                 Rect bounds = item.getBounds();
                 PRectangle rect = new PRectangle(bounds.x + bounds.w*0.5,
                     bounds.y + bounds.h * 0.5,
