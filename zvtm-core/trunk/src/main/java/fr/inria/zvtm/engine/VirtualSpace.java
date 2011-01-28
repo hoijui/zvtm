@@ -457,7 +457,7 @@ public class VirtualSpace {
 	}
 	    
     /** Get the bounding box of all glyphs visible in this virtual space.
-     *@param list of glyphs to iterate upon (will typically be a subset of all glyphs in the virtual space)
+     *@param gl list of glyphs to iterate upon (will typically be a subset of all glyphs in the virtual space)
      *@param res array which will contain the result
      *@return boundaries in VirtualSpace coordinates {west,north,east,south}
      */

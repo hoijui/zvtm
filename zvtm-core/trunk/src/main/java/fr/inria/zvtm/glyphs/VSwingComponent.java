@@ -120,6 +120,7 @@ public class VSwingComponent extends ClosedShape implements RectangularShape {
         vy = y;
         vz = z;
         this.sc = c;
+		this.sc.setDoubleBuffered(false);
         vw = sc.getWidth() * scale;
         vh = sc.getHeight() * scale;
         if (vw==0 && vh==0){ar = 1.0f;}
@@ -249,6 +250,7 @@ public class VSwingComponent extends ClosedShape implements RectangularShape {
     /** Set Swing component to be displayed. */
     public void setComponent(JComponent c){
         sc = c;
+		sc.setDoubleBuffered(false);
         vw = sc.getWidth() * scaleFactor;
         vh = sc.getHeight() * scaleFactor;
         ar = vw / vh;
@@ -697,7 +699,7 @@ public class VSwingComponent extends ClosedShape implements RectangularShape {
      * Utility function: to ensure proper display, it is necessary
      * to set the size of 'standalone' Components, or to force the 
      * layout of Containers.
-     * @see forceLayout
+     * @see #forceLayout(Container container)
      */
     public static void setSizeToPreferred(Component cmp){
       cmp.setSize(cmp.getPreferredSize());
@@ -707,7 +709,7 @@ public class VSwingComponent extends ClosedShape implements RectangularShape {
      * Utility function: to ensure proper display, it is necessary
      * to set the size of 'standalone' Components, or to force the 
      * layout of Containers.
-     * @see setSizeToPreferred
+     * @see #setSizeToPreferred(Component cmp)
      */
     public static void forceLayout(Container container){
       container.doLayout();

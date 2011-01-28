@@ -437,6 +437,9 @@ public class VirtualSpaceManager implements AWTEventListener {
         return tvs;
     }
 
+    /** Create a new virtual space. The virtual space's name is generated automatically and guaranteed to be unique.
+     *@return the new virtual space
+     */
 	public VirtualSpace createVirtualSpace(){
 		String uuid = UUID.randomUUID().toString();
 		while (allVirtualSpaces.containsKey(uuid)){
