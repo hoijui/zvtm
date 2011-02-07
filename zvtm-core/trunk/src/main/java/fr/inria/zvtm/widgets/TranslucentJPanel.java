@@ -1,4 +1,4 @@
-package fr.inria.halz.view;
+package fr.inria.zvtm.widgets;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
