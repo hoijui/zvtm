@@ -20,7 +20,7 @@ import os, sys, math
 from copy import copy
 
 # http://effbot.org/zone/element-index.htm
-import elementtree.ElementTree as ET
+import xml.etree.ElementTree as ET
 
 SUCCEEDED_IMPORTING_PIL = True
 SUCCEEDED_IMPORTING_CG = True
@@ -93,6 +93,8 @@ ID_PREFIX = ""
 PDF_SCALE_FACTOR = 5
 
 COLOR_SPACE = None
+
+USE_GRAPHICSMAGICK = False
 
 ################################################################################
 # Create target directory if it does not exist yet
@@ -198,10 +200,14 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
             bitmap.writeToFile(tilePath, kCGImageFormatPNG)
         else:
             ccl = "convert %s -crop %dx%d+%d+%d -quality 95 %s" % (SRC_PATH, aw, ah, x, y, tilePath)
+            if USE_GRAPHICSMAGICK:
+                ccl = "%s %s" % ("gm", ccl)
             os.system(ccl)
             log("Cropping: %s" % ccl, 3)
             if scale > 1.0:
                 ccl = "convert %s -resize %dx%d -quality 95 %s" % (tilePath, aw/scale, ah/scale, tilePath)
+                if USE_GRAPHICSMAGICK:
+                    ccl = "%s %s" % ("gm", ccl)
                 os.system(ccl)
                 log("Rescaling %s" % ccl, 3)
     # generate ZUIST region and image object
@@ -311,6 +317,9 @@ if len(sys.argv) > 2:
             elif arg == "-f":
                 FORCE_GENERATE_TILES = True
                 log("Force tile generation")
+            elif arg == "-gm":
+                USE_GRAPHICSMAGICK = True
+                log("Use GraphicsMagick")
             elif arg.startswith("-tl="):
                 TRACE_LEVEL = int(arg[4:])
             elif arg == "-cg":
