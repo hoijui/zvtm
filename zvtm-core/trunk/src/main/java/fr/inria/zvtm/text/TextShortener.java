@@ -10,7 +10,7 @@ public interface TextShortener {
     /**
      * Returns a string which is at most <code>len</code> characters
      * in length (but may be less).
-     * @throw IllegalArgumentException - if <code>len</code> is negative.
+     * @throws IllegalArgumentException - if <code>len</code> is negative.
      */
     public String shorten(String original, int len);
 }
