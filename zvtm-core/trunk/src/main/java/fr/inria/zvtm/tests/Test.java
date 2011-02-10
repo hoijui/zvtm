@@ -45,6 +45,8 @@ public class Test {
         initTest(ogl);
     }
 
+    Glyph g;
+
     public void initTest(short ogl){
         eh=new EventHandlerTest(this);
         vs = vsm.addVirtualSpace("src");
@@ -56,11 +58,19 @@ public class Test {
         switch(ogl){
             case View.OPENGL_VIEW:{vt = View.OPENGL_VIEW;break;}
         }
-        testView = vsm.addFrameView(cameras, "Test", vt, 800, 600, false, true, false, null);
+        testView = vsm.addFrameView(cameras, "Test", vt, 800, 600, false, true, true, null);
         testView.setBackgroundColor(Color.LIGHT_GRAY);
         testView.setListener(eh);
+		g = new VRectangle(200,100, 0, 1000,200, Color.RED);
+        //g = new VCircle(2000, 1000, 0, 1000, Color.RED);
+		vs.addGlyph(g);
+        
         vsm.repaint();
     }
+    
+	void doIt(){
+		testView.centerOnGlyph(g, vsm.getVirtualSpace("src").getCamera(0), 500, true, .5f);
+	}
 
     public static void main(String[] args){
         System.out.println("-----------------");
@@ -93,7 +103,9 @@ class EventHandlerTest implements ViewListener {
         application=appli;
     }
     
-    public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+    public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+		application.doIt();
+	}
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
@@ -169,9 +181,7 @@ class EventHandlerTest implements ViewListener {
 
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
     
-    public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
-        
-    }
+    public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){}
     
     public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 
