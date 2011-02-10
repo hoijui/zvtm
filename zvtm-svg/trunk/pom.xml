@@ -84,6 +84,7 @@ $Id: pom.xml 2405 2009-09-25 09:07:33Z epietrig $
     <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>dependency-maven-plugin</artifactId>
+        <version>1.0</version>
         <executions>
           <execution>
             <id>copy-dependencies</id>
@@ -100,6 +101,7 @@ $Id: pom.xml 2405 2009-09-25 09:07:33Z epietrig $
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
+    	<version>2.3.2</version>
         <configuration>
           <source>1.5</source>
           <target>1.5</target>
@@ -109,6 +111,7 @@ $Id: pom.xml 2405 2009-09-25 09:07:33Z epietrig $
       <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-eclipse-plugin</artifactId>
+        	<version>2.8</version>
           <configuration>
               <downloadSources>true</downloadSources>
           </configuration>
@@ -116,6 +119,7 @@ $Id: pom.xml 2405 2009-09-25 09:07:33Z epietrig $
  	  <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
+    	<version>2.3.1</version>
         <configuration>
           <archive>
             <manifest>
@@ -125,7 +129,7 @@ $Id: pom.xml 2405 2009-09-25 09:07:33Z epietrig $
             </manifest>
             <manifestEntries>
               <mode>development</mode>
-              <url>${pom.url}</url>
+              <url>${project.url}</url>
             </manifestEntries>
           </archive>
         </configuration>
@@ -139,6 +143,7 @@ $Id: pom.xml 2405 2009-09-25 09:07:33Z epietrig $
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
+    	<version>2.7</version>
         <configuration>
           <code>javadoc:aggregate</code>
           <overview>${basedir}/overview.html</overview>
