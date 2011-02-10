@@ -336,8 +336,6 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
     @Override
         public boolean visibleInRegion(double wb, double nb, double eb, double sb, int i){
            return true;
-           return (vx) && (vx) 
-               && (vy) && (vy);
         }
 
     @Override 
