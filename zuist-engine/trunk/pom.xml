@@ -83,6 +83,7 @@ $Id$
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>dependency-maven-plugin</artifactId>
+        <version>1.0</version>
         <executions>
           <execution>
             <id>copy-dependencies</id>
@@ -99,6 +100,7 @@ $Id$
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
+    	<version>2.3.2</version>
         <configuration>
           <source>1.5</source>
           <target>1.5</target>
@@ -108,6 +110,7 @@ $Id$
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
+    	<version>2.3.1</version>
         <configuration>
           <archive>
             <manifest>
@@ -117,7 +120,7 @@ $Id$
             </manifest>
             <manifestEntries>
               <mode>development</mode>
-              <url>${pom.url}</url>
+              <url>${project.url}</url>
             </manifestEntries>
           </archive>
         </configuration>
@@ -125,6 +128,7 @@ $Id$
       <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-eclipse-plugin</artifactId>
+      	<version>2.8</version>
           <configuration>
               <downloadSources>true</downloadSources>
           </configuration>
@@ -138,6 +142,7 @@ $Id$
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
+    	<version>2.7</version>
         <configuration>
           <code>javadoc:aggregate</code>
           <overview>${basedir}/overview.html</overview>
