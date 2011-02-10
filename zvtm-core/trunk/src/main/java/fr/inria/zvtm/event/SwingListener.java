@@ -59,7 +59,7 @@ public class SwingListener extends ViewAdapter {
         VirtualSpaceManager.INSTANCE.repaint(); //XXX quick fix
     }
     
-	private void pickAndForward(ViewPanel v, MouseEvent e) {
+	protected void pickAndForward(ViewPanel v, MouseEvent e) {
         focusedComponent = null;
 		//pick glyph under cursor, redispatch if it is an instance
         //of VSwingComponent
@@ -73,7 +73,7 @@ public class SwingListener extends ViewAdapter {
         }
 	}
 
-    void redispatchMouse(ViewPanel v, final MouseEvent evt, VSwingComponent c){
+    private void redispatchMouse(ViewPanel v, final MouseEvent evt, VSwingComponent c){
         //we have an event location in View coordinates
         //- transform into VS coords.
         //- transform VS coords into "global component" (VSC) coords
@@ -96,7 +96,7 @@ public class SwingListener extends ViewAdapter {
         VirtualSpaceManager.INSTANCE.repaint(); //XXX quick fix
     }
 
-    Point2D spaceToComponent(VSwingComponent c, Point2D vsCoords){
+    protected Point2D spaceToComponent(VSwingComponent c, Point2D vsCoords){
         return new Point2D.Double(vsCoords.getX() - (c.vx - c.getWidth()/2),
                 (c.vy + c.getHeight()/2) - vsCoords.getY());
     }
