@@ -388,11 +388,13 @@ public class StdViewPanel extends ViewPanel {
 	}
 	
     void eraseCursor(){
-        stableRefToBackBufferGraphics.setXORMode(backColor);
-        stableRefToBackBufferGraphics.setColor(parent.mouse.color);
-        stableRefToBackBufferGraphics.drawLine(parent.mouse.mx-parent.mouse.size,parent.mouse.my,parent.mouse.mx+parent.mouse.size,parent.mouse.my);
-        stableRefToBackBufferGraphics.drawLine(parent.mouse.mx,parent.mouse.my-parent.mouse.size,parent.mouse.mx,parent.mouse.my+parent.mouse.size);
-        paintImmediately(0,0,size.width,size.height);
+        if (drawVTMcursor){
+            stableRefToBackBufferGraphics.setXORMode(backColor);
+            stableRefToBackBufferGraphics.setColor(parent.mouse.color);
+            stableRefToBackBufferGraphics.drawLine(parent.mouse.mx-parent.mouse.size,parent.mouse.my,parent.mouse.mx+parent.mouse.size,parent.mouse.my);
+            stableRefToBackBufferGraphics.drawLine(parent.mouse.mx,parent.mouse.my-parent.mouse.size,parent.mouse.mx,parent.mouse.my+parent.mouse.size);
+            paintImmediately(0,0,size.width,size.height);            
+        }
 	}
 
     @Override
