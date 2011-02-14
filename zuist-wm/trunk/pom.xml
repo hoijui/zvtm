@@ -58,15 +58,7 @@ $Id$
 	      <url>http://download.osgeo.org/webdav/geotools/</url>
 	    </repository>
   </repositories>
-  
-  <!-- Distribution - Deploy to FTP -->
-  <distributionManagement>
-	<repository>
-      <id>zvtm repository</id>
-      <url>scp://web.sourceforge.net/home/groups/z/zv/zvtm/htdocs/maven</url>
-    </repository>
-  </distributionManagement>
-  
+    
   <!-- Dependencies -->
   <dependencies>
     <!-- for GeoTools -->
