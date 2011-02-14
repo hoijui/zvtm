@@ -55,6 +55,7 @@ This class provides a number of Animation creation methods.
 The TimingHandler interface defines a number of callbacks that custom animation developers
 need to implement.
 It looks like this:
+
 \begin{small}
 \begin{SaveVerbatim}{CodeVerb}
 public interface TimingHandler {
@@ -144,6 +145,7 @@ The target/type combinations provided are:
 \end{itemize}
 
 An example of animation created in this way is:
+
 \begin{small}
 \begin{SaveVerbatim}{CodeVerb}
 Animation anim = vsm.getAnimationManager().getAnimationFactory().createLensMagAnim(
@@ -206,12 +208,12 @@ both of which take the animation to pause or resume as their only parameter, and
 indicating whether the animation was successfully paused or resumed.
 
 %%%%%%%%%%
-\subsection{Current Camera Animation}  
+\subsection{Camera Animation}  
 Parallel to the animation mechanism described above, the AnimationManager has a 
-built-in mechanism to animate the current Camera in an interactive fashion. This is
-typically used to implement rate-based scrolling and zooming.
+built-in mechanism to animate the camera in an interactive fashion. This is
+typically used to implement rate-based scrolling and zooming (1st order of control).
 
-To directly animate the current Camera, set its X, Y, and Z speeds using the corresponding AnimationManager
+To directly animate a Camera, set its X, Y, and Z speeds using the corresponding
 methods \cd{setXspeed}, \cd{setYspeed} and \cd{setZspeed}.
 The X, Y, and Z speed units are arbitrary, but the X and Y speed units are consistent
 (if the X speed and Y speed are equal, the camera will move at the same rate 
@@ -221,13 +223,14 @@ Examples of rate-based scrolling using the current camera animation are found in
 throughout the code, for instance every Animation example (in 
 package \cd{fr.inria.zvtm.animation.examples}) implements it.
 
-The current camera animation never conflicts with animations in the queue system
+These camera animations never conflicts with animations in the queue system
 (i.e. it will run concurrently with any animation in the queue system).
 
 %%%%%%%%%%
 \subsection{Example of Custom Glyph Variable Animation}
 
 Ready-made animation factory methods only cover the generic visual variables that apply to all types of glyphs. To animate visual variables defined only for some specific type of glyph, one can use the \cd{createAnimation()} methods of \cd{AnimationFactory}. The following example shows how to animate a \cd{VRing} so that it behaves like a circular progress indicator:
+
 \begin{small}
 \begin{SaveVerbatim}{CodeVerb}
 Animation anim = 

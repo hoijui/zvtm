@@ -117,9 +117,10 @@ public void press1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){
 }
 
 public void release1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){
-    VirtualSpaceManager.INSTANCE.getAnimationManager().setXspeed(0);
-    VirtualSpaceManager.INSTANCE.getAnimationManager().setYspeed(0);
-    VirtualSpaceManager.INSTANCE.getAnimationManager().setZspeed(0);
+    Camera c = VirtualSpaceManager.INSTANCE.getActiveCamera();
+    c.setXspeed(0);
+    c.setYspeed(0);
+    c.setZspeed(0);
     v.setDrawDrag(false);
 }
 
@@ -127,13 +128,13 @@ public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy,
                          MouseEvent e){
     if (buttonNumber == 3){
         Camera c = VirtualSpaceManager.INSTANCE.getActiveCamera();
-        VirtualSpaceManager.INSTANCE.getAnimationManager().setXspeed(
+        c.setXspeed(
             (c.altitude>0) ? (jpx-lastJPX)*(a/RBSSF)
                            : (jpx-lastJPX)/(a*RBSSF));
-        VirtualSpaceManager.INSTANCE.getAnimationManager().setYspeed(
+        c.setYspeed(
             (c.altitude>0) ? (lastJPY-jpy)*(a/RBSSF)
                            : (lastJPY-jpy)/(a*RBSSF));
-        VirtualSpaceManager.INSTANCE.getAnimationManager().setZspeed(0);
+        c.setZspeed(0);
     }
 }
 
