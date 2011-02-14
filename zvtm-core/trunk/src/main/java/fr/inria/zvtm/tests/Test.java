@@ -59,7 +59,7 @@ public class Test {
         switch(ogl){
             case View.OPENGL_VIEW:{vt = View.OPENGL_VIEW;break;}
         }
-        testView = vsm.addFrameView(cameras, "Test", vt, 800, 600, false, true, true, null);
+        testView = vsm.addFrameView(cameras, null, vt, 800, 600, false, true, true, null);
         testView.setBackgroundColor(Color.LIGHT_GRAY);
         testView.setListener(eh);
 		g = new VRectangle(200,100, 0, 1000,200, Color.RED);

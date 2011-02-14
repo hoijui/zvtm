@@ -213,10 +213,10 @@ public class VirtualSpaceManager implements AWTEventListener {
 	}
 
     /* ----------------- VIEWS ---------------- */
-
+    
     /** Create a new External View.<br>
      *@param c vector of cameras making this view (if more than one camera, cameras will be superimposed on different layers)
-     *@param name view name
+     *@param name view name - pass null to generate a unique, random name.
      *@param viewType one of View.STD_VIEW, View.VOLATILE_VIEW, View.OPENGL_VIEW - determines the type of view and acceleration method
      *@param w width of window in pixels
      *@param h height of window in pixels
@@ -230,7 +230,7 @@ public class VirtualSpaceManager implements AWTEventListener {
     /** Create a new External View.<br>
      * The use of OPENGL_VIEW requires the following Java property: -Dsun.java2d.opengl=true
      *@param c vector of cameras making this view (if more than one camera, cameras will be superimposed on different layers)
-     *@param name view name
+     *@param name view name - pass null to generate a unique, random name.
      *@param viewType one of View.STD_VIEW, View.VOLATILE_VIEW, View.OPENGL_VIEW - determines the type of view and acceleration method
      *@param w width of window in pixels
      *@param h height of window in pixels
@@ -247,7 +247,7 @@ public class VirtualSpaceManager implements AWTEventListener {
     /**Create a new external view.<br>
      * The use of OPENGL_VIEW requires the following Java property: -Dsun.java2d.opengl=true
      *@param c vector of cameras making this view (if more than one camera, cameras will be superimposed on different layers)
-     *@param name view name
+     *@param name view name - pass null to generate a unique, random name.
      *@param viewType one of View.STD_VIEW, View.VOLATILE_VIEW, View.OPENGL_VIEW - determines the type of view and acceleration method
      *@param w width of window in pixels
      *@param h height of window in pixels
@@ -260,6 +260,12 @@ public class VirtualSpaceManager implements AWTEventListener {
     public View addFrameView(List<Camera> c, String name, short viewType, int w, int h,
 				boolean bar, boolean visible, boolean decorated, JMenuBar mnb){
         View v = null;
+        if (name == null){
+            name = UUID.randomUUID().toString();
+    		while (name2viewIndex.containsKey(name)){
+    			name = UUID.randomUUID().toString();
+    		}            
+        }
         switch(viewType){
             case View.STD_VIEW:{
                 v = (mnb != null) ? new EView(new Vector<Camera>(c), name, w, h, bar, visible, decorated, mnb) : new EView(new Vector<Camera>(c), name, w, h, bar, visible, decorated);
@@ -279,11 +285,17 @@ public class VirtualSpaceManager implements AWTEventListener {
 
     /**Create a new view embedded in a JPanel, suitable for inclusion in any Swing component hierarchy, including a JApplet.
      *@param c vector of cameras superimposed in this view
-     *@param name view name
+     *@param name view name - pass null to generate a unique, random name.
      *@param w width of window in pixels
      *@param h height of window in pixels
      */
     public JPanel addPanelView(List<Camera> c,String name,int w,int h){
+        if (name == null){
+            name = UUID.randomUUID().toString();
+    		while (name2viewIndex.containsKey(name)){
+    			name = UUID.randomUUID().toString();
+    		}            
+        }
         PView tvi = new PView(new Vector<Camera>(c), name, w, h);
         addView(tvi);
         tvi.setRepaintPolicy(generalRepaintPolicy);
@@ -309,7 +321,7 @@ public class VirtualSpaceManager implements AWTEventListener {
 	 * @param cameraList vector of cameras superimposed in this view
 	 * @param name	View name. Since this view is
 	 * not itself a window, this does not affect the
-	 * window's title: use setTitle() for that.
+	 * window's title: use setTitle() for that. Pass null to generate a unique, random name.
 	 * @param panelWidth	width of panel in pixels
 	 * @param panelHeight	width of panel in pixels
 	 * @param visible	should the view be made visible automatically or not
@@ -328,6 +340,12 @@ public class VirtualSpaceManager implements AWTEventListener {
     public View addFrameView(List<Camera> cameraList, String name, int panelWidth, int panelHeight,
 				boolean visible, boolean decorated, short viewType,
 				JPanel parentPanel, JFrame frame) {
+		if (name == null){
+            name = UUID.randomUUID().toString();
+        	while (name2viewIndex.containsKey(name)){
+        		name = UUID.randomUUID().toString();
+        	}            
+        }
     	View v = new JPanelView(new Vector<Camera>(cameraList), name, panelWidth, panelHeight,
             visible, decorated, viewType,
             parentPanel, frame);

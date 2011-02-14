@@ -146,9 +146,7 @@ public class VirtualSpace {
 		for (int i=0;i<cm.cameraList.length;i++){
 			this.removeCamera(i);
 		}
-		for (Enumeration e=visualEnts.elements();e.hasMoreElements();){
-			this.removeGlyph((Glyph)e.nextElement());
-		}
+		removeAllGlyphs(false);
 	}
 
     /** Add glyph g to this virtual space. */
@@ -271,15 +269,24 @@ public class VirtualSpace {
         }
         return v;
     }
-    
-    /** Remove all glyphs from this virtual space.
+
+    /** Remove all glyphs from this virtual space. And then repaint all views.
      */
     public void removeAllGlyphs(){
+        removeAllGlyphs(true);
+    }
+        
+    /** Remove all glyphs from this virtual space.
+     *@param repaint true to repaint all views afterwards, false otherwise
+     */
+    public void removeAllGlyphs(boolean repaint){
         Vector entClone = (Vector)getAllGlyphs().clone();
         for (int i=0;i<entClone.size();i++){
             removeGlyph((Glyph)entClone.elementAt(i), false);
         }
-        VirtualSpaceManager.INSTANCE.repaint();        
+        if (repaint){
+            VirtualSpaceManager.INSTANCE.repaint();            
+        }
     }
 
     /** Remove glyph g from this virtual space. ZVTM no longer holds a reference to it. View will be updated. */
