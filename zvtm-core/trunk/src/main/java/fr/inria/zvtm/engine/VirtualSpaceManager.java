@@ -289,7 +289,7 @@ public class VirtualSpaceManager implements AWTEventListener {
      *@param w width of window in pixels
      *@param h height of window in pixels
      */
-    public JPanel addPanelView(List<Camera> c,String name,int w,int h){
+    public PView addPanelView(List<Camera> c,String name,int w,int h){
         if (name == null){
             name = UUID.randomUUID().toString();
     		while (name2viewIndex.containsKey(name)){
@@ -299,7 +299,7 @@ public class VirtualSpaceManager implements AWTEventListener {
         PView tvi = new PView(new Vector<Camera>(c), name, w, h);
         addView(tvi);
         tvi.setRepaintPolicy(generalRepaintPolicy);
-        return tvi.panel;
+        return tvi;
     }
 
     /**
