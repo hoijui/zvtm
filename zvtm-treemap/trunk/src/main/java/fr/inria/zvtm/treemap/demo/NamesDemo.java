@@ -123,15 +123,15 @@ class NamesDemo {
                     Camera c=VirtualSpaceManager.INSTANCE.getActiveCamera();
                     double a=(c.focal+Math.abs(c.altitude))/c.focal;
                     if (mod == META_SHIFT_MOD) {
-                        VirtualSpaceManager.INSTANCE.getAnimationManager().setXspeed(0);
-                        VirtualSpaceManager.INSTANCE.getAnimationManager().setYspeed(0);
-                        VirtualSpaceManager.INSTANCE.getAnimationManager().setZspeed(((lastJPY-jpy)*(ZOOM_SPEED_COEF)));
+                        c.setXspeed(0);
+                        c.setYspeed(0);
+                        c.setZspeed(((lastJPY-jpy)*(ZOOM_SPEED_COEF)));
                         //50 is just a speed factor (too fast otherwise)
                     }
                     else {
-                        VirtualSpaceManager.INSTANCE.getAnimationManager().setXspeed((c.altitude>0) ? ((jpx-lastJPX)*(a/PAN_SPEED_COEF)) : ((jpx-lastJPX)/(a*PAN_SPEED_COEF)));
-                        VirtualSpaceManager.INSTANCE.getAnimationManager().setYspeed((c.altitude>0) ? ((lastJPY-jpy)*(a/PAN_SPEED_COEF)) : ((lastJPY-jpy)/(a*PAN_SPEED_COEF)));
-                        VirtualSpaceManager.INSTANCE.getAnimationManager().setZspeed(0);
+                        c.setXspeed((c.altitude>0) ? ((jpx-lastJPX)*(a/PAN_SPEED_COEF)) : ((jpx-lastJPX)/(a*PAN_SPEED_COEF)));
+                        c.setYspeed((c.altitude>0) ? ((lastJPY-jpy)*(a/PAN_SPEED_COEF)) : ((lastJPY-jpy)/(a*PAN_SPEED_COEF)));
+                        c.setZspeed(0);
                     }
                 }
             }
@@ -158,9 +158,10 @@ class NamesDemo {
             }
 
             @Override public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-                VirtualSpaceManager.INSTANCE.getAnimationManager().setXspeed(0);
-                VirtualSpaceManager.INSTANCE.getAnimationManager().setYspeed(0);
-                VirtualSpaceManager.INSTANCE.getAnimationManager().setZspeed(0);
+                Camera c=VirtualSpaceManager.INSTANCE.getActiveCamera();
+                c.setXspeed(0);
+                c.setYspeed(0);
+                c.setZspeed(0);
                 v.setDrawDrag(false);
                 VirtualSpaceManager.INSTANCE.getActiveView().mouse.setSensitivity(true);
             }
