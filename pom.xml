@@ -41,14 +41,6 @@ $Id$
     </repository>
   </repositories>
   
-  <!-- Deployment -->
-  <distributionManagement>
-	<repository>
-      <id>zvtm.sf.net</id>
-      <url>scp://shell.sourceforge.net/home/groups/z/zv/zvtm/htdocs/maven</url>
-    </repository>
-  </distributionManagement>
-
   <!-- Modules -->
   <modules>
     <module>zvtm-core/trunk</module>
@@ -58,6 +50,7 @@ $Id$
     <module>zuist-pdf/trunk</module>
     <module>zvtm-fits/trunk</module>
     <module>zvtm-cluster/trunk</module>
+    <module>zvtm-layout/trunk</module>
   </modules>
 
   <!-- Reporting -->
