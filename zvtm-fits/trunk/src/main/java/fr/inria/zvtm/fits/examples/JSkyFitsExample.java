@@ -118,9 +118,9 @@ public class JSkyFitsExample {
 		}
 
 		public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-			vsm.getAnimationManager().setXspeed(0);
-			vsm.getAnimationManager().setYspeed(0);
-			vsm.getAnimationManager().setZspeed(0);
+			v.cams[0].setXspeed(0);
+			v.cams[0].setYspeed(0);
+			v.cams[0].setZspeed(0);
 			v.setDrawDrag(false);
 			vsm.getActiveView().mouse.setSensitivity(true);
 		}
@@ -137,14 +137,15 @@ public class JSkyFitsExample {
 				Camera c=vsm.getActiveCamera();
 				double a=(c.focal+Math.abs(c.altitude))/c.focal;
 				if (mod == META_SHIFT_MOD) {
-					vsm.getAnimationManager().setXspeed(0);
-					vsm.getAnimationManager().setYspeed(0);
-					vsm.getAnimationManager().setZspeed((c.altitude>0) ? (lastJPY-jpy)*(a/4.0) : (lastJPY-jpy)/(a*4));
+					v.cams[0].setXspeed(0);
+					v.cams[0].setYspeed(0);
+					v.cams[0].setZspeed((c.altitude>0) ? (lastJPY-jpy)*(a/4.0) : (lastJPY-jpy)/(a*4));
 
 				}
 				else {
-					vsm.getAnimationManager().setXspeed((c.altitude>0) ? (jpx-lastJPX)*(a/4.0) : (jpx-lastJPX)/(a*4));
-					vsm.getAnimationManager().setYspeed((c.altitude>0) ? (lastJPY-jpy)*(a/4.0) : (lastJPY-jpy)/(a*4));
+					v.cams[0].setXspeed((c.altitude>0) ? (jpx-lastJPX)*(a/4.0) : (jpx-lastJPX)/(a*4));
+					v.cams[0].setYspeed((c.altitude>0) ? (lastJPY-jpy)*(a/4.0) : (lastJPY-jpy)/(a*4));
+					v.cams[0].setZspeed(0);
 				}
 			}
 		}

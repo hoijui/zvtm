@@ -133,9 +133,9 @@ class FVListener implements ViewListener {
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-        application.vsm.getAnimationManager().setXspeed(0);
-        application.vsm.getAnimationManager().setYspeed(0);
-        application.vsm.getAnimationManager().setZspeed(0);
+        v.cams[0].setXspeed(0);
+        v.cams[0].setYspeed(0);
+        v.cams[0].setZspeed(0);
         v.setDrawDrag(false);
         application.vsm.getActiveView().mouse.setSensitivity(true);
     }
@@ -164,15 +164,15 @@ class FVListener implements ViewListener {
             Camera c=application.vsm.getActiveCamera();
             double a=(c.focal+Math.abs(c.altitude))/c.focal;
             if (mod == SHIFT_MOD) {
-                application.vsm.getAnimationManager().setXspeed(0);
-                application.vsm.getAnimationManager().setYspeed(0);
-                application.vsm.getAnimationManager().setZspeed(((lastJPY-jpy)*(ZOOM_SPEED_COEF)));
+                v.cams[0].setXspeed(0);
+                v.cams[0].setYspeed(0);
+                v.cams[0].setZspeed(((lastJPY-jpy)*(ZOOM_SPEED_COEF)));
                 //50 is just a speed factor (too fast otherwise)
             }
             else {
-                application.vsm.getAnimationManager().setXspeed((c.altitude>0) ? ((jpx-lastJPX)*(a/PAN_SPEED_COEF)) : ((jpx-lastJPX)/(a*PAN_SPEED_COEF)));
-                application.vsm.getAnimationManager().setYspeed((c.altitude>0) ? ((lastJPY-jpy)*(a/PAN_SPEED_COEF)) : ((lastJPY-jpy)/(a*PAN_SPEED_COEF)));
-                application.vsm.getAnimationManager().setZspeed(0);
+                v.cams[0].setXspeed((c.altitude>0) ? ((jpx-lastJPX)*(a/PAN_SPEED_COEF)) : ((jpx-lastJPX)/(a*PAN_SPEED_COEF)));
+                v.cams[0].setYspeed((c.altitude>0) ? ((lastJPY-jpy)*(a/PAN_SPEED_COEF)) : ((lastJPY-jpy)/(a*PAN_SPEED_COEF)));
+                v.cams[0].setZspeed(0);
             }
         }
     }
