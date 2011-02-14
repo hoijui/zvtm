@@ -119,9 +119,9 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewListener {
                 zoomingInRegion=false;
             }
             else if (manualLeftButtonMove){
-				grMngr.vsm.getAnimationManager().setXspeed(0);
-                grMngr.vsm.getAnimationManager().setYspeed(0);
-                grMngr.vsm.getAnimationManager().setZspeed(0);
+				grMngr.mainCamera.setXspeed(0);
+                grMngr.mainCamera.setYspeed(0);
+                grMngr.mainCamera.setZspeed(0);
                 v.setDrawDrag(false);
                 v.getVCursor().setSensitivity(true);
                 if (autoZooming){unzoom(v);}
@@ -287,17 +287,17 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewListener {
             else {
                 tfactor=(activeCam.focal+Math.abs(activeCam.altitude))/activeCam.focal;
                 if (mod == SHIFT_MOD || mod == META_SHIFT_MOD){
-                    grMngr.vsm.getAnimationManager().setXspeed(0);
-                    grMngr.vsm.getAnimationManager().setYspeed(0);
-                    grMngr.vsm.getAnimationManager().setZspeed((lastJPY-jpy)*ZOOM_SPEED_COEF);
+                    grMngr.mainCamera.setXspeed(0);
+                    grMngr.mainCamera.setYspeed(0);
+                    grMngr.mainCamera.setZspeed((lastJPY-jpy)*ZOOM_SPEED_COEF);
                     //50 is just a speed factor (too fast otherwise)
                 }
                 else {
                     jpxD = jpx-lastJPX;
                     jpyD = lastJPY-jpy;
-                    grMngr.vsm.getAnimationManager().setXspeed((activeCam.altitude>0) ? jpxD*(tfactor/PAN_SPEED_FACTOR) : jpxD/(tfactor*PAN_SPEED_FACTOR));
-                    grMngr.vsm.getAnimationManager().setYspeed((activeCam.altitude>0) ? jpyD*(tfactor/PAN_SPEED_FACTOR) : jpyD/(tfactor*PAN_SPEED_FACTOR));
-                    grMngr.vsm.getAnimationManager().setZspeed(0);
+                    grMngr.mainCamera.setXspeed((activeCam.altitude>0) ? jpxD*(tfactor/PAN_SPEED_FACTOR) : jpxD/(tfactor*PAN_SPEED_FACTOR));
+                    grMngr.mainCamera.setYspeed((activeCam.altitude>0) ? jpyD*(tfactor/PAN_SPEED_FACTOR) : jpyD/(tfactor*PAN_SPEED_FACTOR));
+                    grMngr.mainCamera.setZspeed(0);
                     if (application.cfgMngr.isSDZoomEnabled()){
                         dragValue = Math.sqrt(Math.pow(jpxD, 2) + Math.pow(jpyD, 2));
                         if (!autoZooming && dragValue > application.cfgMngr.SD_ZOOM_THRESHOLD){
