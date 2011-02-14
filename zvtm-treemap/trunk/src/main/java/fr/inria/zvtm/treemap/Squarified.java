@@ -23,6 +23,11 @@ public class Squarified {
     protected static final double topInset = 20;
     protected static final double bottomInset = 3;
 
+    //We never want to propagate this exception to callers
+    private static class MissingSpaceException extends RuntimeException {
+        MissingSpaceException(String reason){ super(reason); }
+    }
+
     public String getName() {
         return "Squarified";
     }
@@ -30,26 +35,62 @@ public class Squarified {
     /**
      * Lays out a tree.
      */
-    public void computeShapes(
-            Rect bounds,
-            Tree node) {
+    public void computeShapes(Rect bounds,Tree node) {
+        //the "0" magic constants are unused; the are only useful
+        //when requesting an exception if the available space is 
+        //insufficient, usually in order to redo the layout with
+        //a bigger surface
         visit(bounds.getX(), bounds.getY(), 
-              bounds.getMaxX(), bounds.getMaxY(),
-              node);
+                bounds.getMaxX(), bounds.getMaxY(),
+                node, false, 0, 0);
     }
 
-    //stub implementation
-    protected boolean beginBox(Rect box){
-        return true;
+    /**
+     * Lays out a tree.
+     */
+    public Rect computeShapesResize(Rect bounds, Tree node, double minWidth, double minHeight){
+        if(bounds.getWidth() <= 0 ||
+                bounds.getHeight() <=0){
+            throw new IllegalArgumentException("Gimme some space");
+        }
+        final double R2 = 1.414; 
+        Rect finalBounds = new Rect(bounds);
+        while(true){
+            try{
+                visit(finalBounds.getX(), finalBounds.getY(), 
+                    finalBounds.getMaxX(), finalBounds.getMaxY(),
+                    node, true, minWidth, minHeight);
+                break;
+            } catch(MissingSpaceException ex){
+                finalBounds.setRect(finalBounds.getX(),
+                        finalBounds.getY(),
+                        finalBounds.getWidth() * R2,
+                        finalBounds.getHeight() * R2);
+            }
+        }
+        return finalBounds;
+    }
+
+    protected boolean beginBox(Rect box, double minWidth, 
+            double minHeight){
+        return box.getWidth() >= minWidth &&
+            box.getHeight() >= minHeight;
+        //return true;
     }
 
     protected int visit(double xmin, double ymin, double xmax,
-            double ymax, Tree node) {
+            double ymax, Tree node, 
+            boolean throwIfMissingSpace, 
+            double minWidth, double minHeight) {
         Rect box = new Rect();
         box.setRect(xmin, ymin, (xmax - xmin), (ymax - ymin));
-        if (!beginBox(box)) {
-            node.getMapItem().setBounds(box);
-            return 0;
+        if (!beginBox(box, minWidth, minHeight)) {
+            if(throwIfMissingSpace){
+                throw new MissingSpaceException("insufficient space");
+            } else {
+               // node.getMapItem().setBounds(box);
+               // return 0;
+            }
         }
 
         int ret = 1;
@@ -66,7 +107,10 @@ public class Squarified {
                     box.y,
                     box.x + box.w,
                     box.y + box.h, 
-                    node);
+                    node,
+                    throwIfMissingSpace,
+                    minWidth,
+                    minHeight);
         }
         return ret;
     } 
@@ -93,7 +137,7 @@ public class Squarified {
      *  
      */
     protected int visitStrips(double xmin, double ymin, double xmax,
-            double ymax, Tree node) {
+            double ymax, Tree node, boolean throwIfMissingSpace, double minWidth, double minHeight) {
         double tw = node.getMapItem().getSize();
         int ret = 1;
 
@@ -137,7 +181,10 @@ public class Squarified {
                             y, 
                             xmin + width,
                             y + nh,
-                            i);
+                            i,
+                            throwIfMissingSpace,
+                            minWidth,
+                            minHeight);
                     y += nh;
                 }
 
@@ -163,7 +210,10 @@ public class Squarified {
                             ymin, 
                             x + nw,
                             ymin + height, 
-                            i);
+                            i,
+                            throwIfMissingSpace,
+                            minWidth,
+                            minHeight);
                     x += nw;
                 }
 

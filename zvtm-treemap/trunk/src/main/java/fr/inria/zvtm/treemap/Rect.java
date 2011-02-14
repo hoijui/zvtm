@@ -58,6 +58,14 @@ public class Rect
     public double getMaxY(){
         return y + h;
     }
+
+    public double getWidth(){
+        return w;
+    }
+
+    public double getHeight(){
+        return h;
+    }
     
     public double distance(Rect r)
     {
