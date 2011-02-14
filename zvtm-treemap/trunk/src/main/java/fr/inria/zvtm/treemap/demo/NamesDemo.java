@@ -52,7 +52,7 @@ class NamesDemo {
 
         Tree<ZMapItem> tree = buildTree();
         tree.sum(); //XXX
-        Squarified.INSTANCE.computeShapes(new Rect(0, 0, 10240, 7680), tree);
+        Squarified.INSTANCE.computeShapesResize(new Rect(-200, 300, 1024, 768), tree, 20, 12);
         makeRepr(tree, demoSpace);
         view.getGlobalView(cam, 500); 
         ((JFrame)view.getFrame()).setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
