@@ -41,7 +41,7 @@
     <distributionManagement>
         <repository>
             <id>zvtm.sf.net</id>
-            <url>scp://shell.sourceforge.net/home/groups/z/zv/zvtm/htdocs/maven</url>
+            <url>scp://shell.sourceforge.net/home/project-web/zvtm/htdocs/maven</url>
         </repository>
     </distributionManagement>
 
@@ -64,6 +64,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-compiler-plugin</artifactId>
+                        <version>2.3.2</version>
                         <configuration>
                             <source>1.6</source>
                             <target>1.6</target>
@@ -72,6 +73,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-jar-plugin</artifactId>
+                        <version>2.3.1</version>
                         <configuration>
                             <archive>
                                 <manifest>
@@ -81,7 +83,7 @@
                                 </manifest>
                                 <manifestEntries>
                                     <mode>development</mode>
-                                    <url>${pom.url}</url>
+                                    <url>${project.url}</url>
                                 </manifestEntries>
                             </archive>
                         </configuration>
@@ -97,6 +99,7 @@
           <plugin>
               <groupId>org.codehaus.mojo</groupId>
               <artifactId>dependency-maven-plugin</artifactId>
+              <version>1.0</version>
               <executions>
                   <execution>
                       <id>copy-dependencies</id>
@@ -113,6 +116,7 @@
           <plugin>
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-eclipse-plugin</artifactId>
+			  <version>2.8</version>
               <configuration>
                   <downloadSources>true</downloadSources>
               </configuration>
@@ -126,10 +130,11 @@
           <plugin>
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-javadoc-plugin</artifactId>
+              <version>2.7</version>
               <configuration>
                   <aggregate>true</aggregate>
                   <doctitle><![CDATA[<h1>ZVTM API documentation</h1>]]></doctitle>
-                  <bottom><![CDATA[Copyright &#169; 2009-2010 INRIA. All Rights Reserved<br />Licensed under the GNU LGPL. For full terms see the file COPYING.</i>]]></bottom>
+                  <bottom><![CDATA[Copyright &#169; 2009-2011 INRIA. All Rights Reserved<br />Licensed under the GNU LGPL. For full terms see the file COPYING.</i>]]></bottom>
               <links> 
                   <link>http://java.sun.com/j2se/1.5.0/docs/api</link>
                   <link>http://zvtm.sourceforge.net/apidocs</link>
