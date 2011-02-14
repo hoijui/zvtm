@@ -79,9 +79,10 @@ class ViewerEventHandler implements ViewListener, ComponentListener, CameraListe
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
         zero_order_dragging = false;
         if (first_order_dragging){
-            application.vsm.getAnimationManager().setXspeed(0);
-            application.vsm.getAnimationManager().setYspeed(0);
-            application.vsm.getAnimationManager().setZspeed(0);
+            Camera c = application.mCamera;
+            c.setXspeed(0);
+            c.setYspeed(0);
+            c.setZspeed(0);
             v.setDrawDrag(false);
             first_order_dragging = false;
         }
@@ -155,14 +156,14 @@ class ViewerEventHandler implements ViewListener, ComponentListener, CameraListe
         }
         else if (first_order_dragging){
             if (mod == SHIFT_MOD){
-                VirtualSpaceManager.INSTANCE.getAnimationManager().setXspeed(0);
-                VirtualSpaceManager.INSTANCE.getAnimationManager().setYspeed(0);
-                VirtualSpaceManager.INSTANCE.getAnimationManager().setZspeed(((lastJPY-jpy)*(ZOOM_SPEED_COEF)));
+                c.setXspeed(0);
+                c.setYspeed(0);
+                c.setZspeed(((lastJPY-jpy)*(ZOOM_SPEED_COEF)));
             }
             else {
-                VirtualSpaceManager.INSTANCE.getAnimationManager().setXspeed((c.altitude>0) ? (jpx-lastJPX)*(a/PAN_SPEED_COEF) : (jpx-lastJPX)/(a*PAN_SPEED_COEF));
-                VirtualSpaceManager.INSTANCE.getAnimationManager().setYspeed((c.altitude>0) ? (lastJPY-jpy)*(a/PAN_SPEED_COEF) : (lastJPY-jpy)/(a*PAN_SPEED_COEF));
-                VirtualSpaceManager.INSTANCE.getAnimationManager().setZspeed(0);
+                c.setXspeed((c.altitude>0) ? (jpx-lastJPX)*(a/PAN_SPEED_COEF) : (jpx-lastJPX)/(a*PAN_SPEED_COEF));
+                c.setYspeed((c.altitude>0) ? (lastJPY-jpy)*(a/PAN_SPEED_COEF) : (lastJPY-jpy)/(a*PAN_SPEED_COEF));
+                c.setZspeed(0);
             }
         }
     }
