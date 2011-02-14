@@ -42,6 +42,7 @@ public class TestCameraAnim {
     ViewListener eh;   //class that receives the events sent from views (include mouse click, entering object,...)
 
     View testView;
+    Camera cam;
 
     AnimationManager am;
     volatile boolean paused = false;
@@ -55,10 +56,10 @@ public class TestCameraAnim {
     public void startAnim(short ogl){
         eh=new TestCameraAnim.MyEventHandler(this);
         vs = vsm.addVirtualSpace("src");
-        vs.addCamera();
+        cam = vs.addCamera();
         Vector cameras=new Vector();
-        cameras.add(vsm.getVirtualSpace("src").getCamera(0));
-        vsm.getVirtualSpace("src").getCamera(0).setZoomFloor(-90f);
+        cameras.add(cam);
+        cam.setZoomFloor(-90f);
         short vt = View.STD_VIEW;
         switch(ogl){
 	case View.OPENGL_VIEW:{vt = View.OPENGL_VIEW;break;}
@@ -66,7 +67,7 @@ public class TestCameraAnim {
         testView = vsm.addFrameView(cameras, "Test", vt, 800, 600, false, true);
         testView.setBackgroundColor(Color.LIGHT_GRAY);
         testView.setListener(eh);
-        vsm.getVirtualSpace("src").getCamera(0).setAltitude(50);
+        cam.setAltitude(50);
 
 	am = vsm.getAnimationManager();
 
@@ -115,7 +116,7 @@ public class TestCameraAnim {
 	Animation cameraPos = am.getAnimationFactory().createAnimation(4000, 
 						 2f,
 						 Animation.RepeatBehavior.LOOP,
-						 vsm.getVirtualSpace("src").getCamera(0),
+						 cam,
 						 Animation.Dimension.POSITION,
 						 new DefaultTimingHandler(){
 						     						     
@@ -136,7 +137,7 @@ public class TestCameraAnim {
 	Animation cameraAlt = am.getAnimationFactory().createAnimation(4000, 
 						 2f,
 						 Animation.RepeatBehavior.REVERSE,
-						 vsm.getVirtualSpace("src").getCamera(0),
+						 cam,
 						 Animation.Dimension.ALTITUDE,
 						 new DefaultTimingHandler(){
 					
@@ -229,9 +230,9 @@ public class TestCameraAnim {
 	}
 
 	public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	    application.vsm.getAnimationManager().setXspeed(0);
-	    application.vsm.getAnimationManager().setYspeed(0);
-	    application.vsm.getAnimationManager().setZspeed(0);
+	    application.cam.setXspeed(0);
+	    application.cam.setYspeed(0);
+	    application.cam.setZspeed(0);
 	    v.setDrawDrag(false);
 	    application.vsm.getActiveView().mouse.setSensitivity(true);
 	}
@@ -247,15 +248,15 @@ public class TestCameraAnim {
 		Camera c=application.vsm.getActiveCamera();
 		double a=(c.focal+Math.abs(c.altitude))/c.focal;
 		if (mod == META_SHIFT_MOD) {
-		    application.vsm.getAnimationManager().setXspeed(0);
-		    application.vsm.getAnimationManager().setYspeed(0);
-		    application.vsm.getAnimationManager().setZspeed((c.altitude>0) ? ((lastJPY-jpy)*(a/50.0f)) : ((lastJPY-jpy)/(a*50)));
+		    application.cam.setXspeed(0);
+		    application.cam.setYspeed(0);
+		    application.cam.setZspeed((c.altitude>0) ? ((lastJPY-jpy)*(a/50.0f)) : ((lastJPY-jpy)/(a*50)));
 		    //50 is just a speed factor (too fast otherwise)
 		}
 		else {
-		    application.vsm.getAnimationManager().setXspeed((c.altitude>0) ? ((jpx-lastJPX)*(a/50.0f)) : ((jpx-lastJPX)/(a*50)));
-		    application.vsm.getAnimationManager().setYspeed((c.altitude>0) ? ((lastJPY-jpy)*(a/50.0f)) : ((lastJPY-jpy)/(a*50)));
-		    application.vsm.getAnimationManager().setZspeed(0);
+		    application.cam.setXspeed((c.altitude>0) ? ((jpx-lastJPX)*(a/50.0f)) : ((jpx-lastJPX)/(a*50)));
+		    application.cam.setYspeed((c.altitude>0) ? ((lastJPY-jpy)*(a/50.0f)) : ((lastJPY-jpy)/(a*50)));
+		    application.cam.setZspeed(0);
 		}
 	    }
 	}

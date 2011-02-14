@@ -72,8 +72,8 @@ public class AdaptiveTextTest {
         }
 
         public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-            VirtualSpaceManager.INSTANCE.getAnimationManager().setXspeed(0);
-            VirtualSpaceManager.INSTANCE.getAnimationManager().setYspeed(0);
+            v.cams[0].setXspeed(0);
+            v.cams[0].setYspeed(0);
             v.setDrawDrag(false);
         }
 
@@ -81,8 +81,8 @@ public class AdaptiveTextTest {
             if (buttonNumber == 1){
                 Camera c = cam;
                 double a = (c.focal+Math.abs(c.altitude)) / c.focal;
-                VirtualSpaceManager.INSTANCE.getAnimationManager().setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/PAN_SPEED_COEF)) : (long)((jpx-lastJPX)/(a*PAN_SPEED_COEF)));
-                VirtualSpaceManager.INSTANCE.getAnimationManager().setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/PAN_SPEED_COEF)) : (long)((lastJPY-jpy)/(a*PAN_SPEED_COEF)));
+                v.cams[0].setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/PAN_SPEED_COEF)) : (long)((jpx-lastJPX)/(a*PAN_SPEED_COEF)));
+                v.cams[0].setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/PAN_SPEED_COEF)) : (long)((lastJPY-jpy)/(a*PAN_SPEED_COEF)));
             }
         }
 

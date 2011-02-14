@@ -45,6 +45,7 @@ public class TestCameraPosition {
     AnimationManager am;
 
     View testView;
+    Camera cam;
 
     TestCameraPosition(){
         vsm=VirtualSpaceManager.INSTANCE;
@@ -55,10 +56,10 @@ public class TestCameraPosition {
     public void startAnim(short ogl){
         eh=new TestCameraPosition.MyEventHandler(this);
         vs = vsm.addVirtualSpace("src");
-        vs.addCamera();
+        cam = vs.addCamera();
         Vector cameras=new Vector();
-        cameras.add(vsm.getVirtualSpace("src").getCamera(0));
-        vsm.getVirtualSpace("src").getCamera(0).setZoomFloor(-90);
+        cameras.add(cam);
+        cam.setZoomFloor(-90);
         short vt = View.STD_VIEW;
         switch(ogl){
 	case View.OPENGL_VIEW:{vt = View.OPENGL_VIEW;break;}
@@ -101,7 +102,7 @@ public class TestCameraPosition {
 	    am.startAnimation(anim, false);
 	}
 
-	vsm.getVirtualSpace("src").getCamera(0).setLocation(testView.getGlobalView(vsm.getVirtualSpace("src").getCamera(0)));
+	cam.setLocation(testView.getGlobalView(cam));
     }
     
     public static void main(String[] args){
@@ -141,13 +142,13 @@ public class TestCameraPosition {
 	public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
 	    //Animate from the current position to the target position 
 	    //over the course of a second
-	    final double sx = vsm.getVirtualSpace("src").getCamera(0).vx;
-	    final double sy = vsm.getVirtualSpace("src").getCamera(0).vy;
+	    final double sx = cam.vx;
+	    final double sy = cam.vy;
 	    final double ex = v.getVCursor().vx;
 	    final double ey = v.getVCursor().vy;
 
 	    Animation trans = am.getAnimationFactory().createAnimation(1000, 1f, Animation.RepeatBehavior.LOOP,
-						 vsm.getVirtualSpace("src").getCamera(0),
+						 cam,
 						 Animation.Dimension.POSITION,
 						  new DefaultTimingHandler(){
 						      final double startX = sx;
@@ -165,10 +166,10 @@ public class TestCameraPosition {
 						 SlowInSlowOutInterpolator.getInstance());
 
 	    Animation altitude = am.getAnimationFactory().createAnimation(1000,
-						    vsm.getVirtualSpace("src").getCamera(0),
+						    cam,
 						    Animation.Dimension.ALTITUDE,
 						    new DefaultTimingHandler(){
-							final double initZ = vsm.getVirtualSpace("src").getCamera(0).getAltitude();
+							final double initZ = cam.getAltitude();
 							public void timingEvent(float fraction, 
 										Object subject, Animation.Dimension dim){
 							    Camera c = (Camera)subject;
@@ -207,9 +208,6 @@ public class TestCameraPosition {
 	}
 
 	public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	    application.vsm.getAnimationManager().setXspeed(0);
-	    application.vsm.getAnimationManager().setYspeed(0);
-	    application.vsm.getAnimationManager().setZspeed(0);
 	    v.setDrawDrag(false);
 	    application.vsm.getActiveView().mouse.setSensitivity(true);
 	}

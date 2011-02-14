@@ -38,6 +38,7 @@ public class Test {
     ViewListener eh;
 
     View testView;
+    Camera cam;
     
     Test(short ogl){
         vsm=VirtualSpaceManager.INSTANCE;
@@ -50,7 +51,7 @@ public class Test {
     public void initTest(short ogl){
         eh=new EventHandlerTest(this);
         vs = vsm.addVirtualSpace("src");
-        vs.addCamera();
+        cam = vs.addCamera();
         Vector cameras=new Vector();
         cameras.add(vsm.getVirtualSpace("src").getCamera(0));
         vsm.getVirtualSpace("src").getCamera(0).setZoomFloor(-90f);
@@ -125,9 +126,9 @@ class EventHandlerTest implements ViewListener {
     }
 
     public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-        application.vsm.getAnimationManager().setXspeed(0);
-        application.vsm.getAnimationManager().setYspeed(0);
-        application.vsm.getAnimationManager().setZspeed(0);
+        application.cam.setXspeed(0);
+        application.cam.setYspeed(0);
+        application.cam.setZspeed(0);
         v.setDrawDrag(false);
         application.vsm.getActiveView().mouse.setSensitivity(true);
     }
@@ -144,15 +145,15 @@ class EventHandlerTest implements ViewListener {
             Camera c=application.vsm.getActiveCamera();
             double a=(c.focal+Math.abs(c.altitude))/c.focal;
             if (mod == META_SHIFT_MOD) {
-                application.vsm.getAnimationManager().setXspeed(0);
-                application.vsm.getAnimationManager().setYspeed(0);
-                application.vsm.getAnimationManager().setZspeed(((lastJPY-jpy)*(ZOOM_SPEED_COEF)));
+                application.cam.setXspeed(0);
+                application.cam.setYspeed(0);
+                application.cam.setZspeed(((lastJPY-jpy)*(ZOOM_SPEED_COEF)));
                 //50 is just a speed factor (too fast otherwise)
             }
             else {
-                application.vsm.getAnimationManager().setXspeed((c.altitude>0) ? ((jpx-lastJPX)*(a/PAN_SPEED_COEF)) : ((jpx-lastJPX)/(a*PAN_SPEED_COEF)));
-                application.vsm.getAnimationManager().setYspeed((c.altitude>0) ? ((lastJPY-jpy)*(a/PAN_SPEED_COEF)) : ((lastJPY-jpy)/(a*PAN_SPEED_COEF)));
-                application.vsm.getAnimationManager().setZspeed(0);
+                application.cam.setXspeed((c.altitude>0) ? ((jpx-lastJPX)*(a/PAN_SPEED_COEF)) : ((jpx-lastJPX)/(a*PAN_SPEED_COEF)));
+                application.cam.setYspeed((c.altitude>0) ? ((lastJPY-jpy)*(a/PAN_SPEED_COEF)) : ((lastJPY-jpy)/(a*PAN_SPEED_COEF)));
+                application.cam.setZspeed(0);
             }
         }
     }

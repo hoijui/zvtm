@@ -277,12 +277,12 @@ class TestEventHandler extends ViewAdapter {
     static float ZOOM_SPEED_COEF = 1.0f/50.0f;
     static double PAN_SPEED_COEF = 50.0;
     
-    AllGlyphsTest test;
+    AllGlyphsTest application;
     
     int lastJPX,lastJPY;
     
     TestEventHandler(AllGlyphsTest t){
-        this.test = t;
+        this.application = t;
     }
     
     public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
@@ -292,22 +292,22 @@ class TestEventHandler extends ViewAdapter {
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-        VirtualSpaceManager.INSTANCE.getAnimationManager().setXspeed(0);
-        VirtualSpaceManager.INSTANCE.getAnimationManager().setYspeed(0);
+        application.mCam.setXspeed(0);
+        application.mCam.setYspeed(0);
         v.setDrawDrag(false);
     }
     
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
         if (buttonNumber == 1){
-            Camera c = test.mCam;
+            Camera c = application.mCam;
             double a = (c.focal+Math.abs(c.altitude)) / c.focal;
-            VirtualSpaceManager.INSTANCE.getAnimationManager().setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/PAN_SPEED_COEF)) : (long)((jpx-lastJPX)/(a*PAN_SPEED_COEF)));
-            VirtualSpaceManager.INSTANCE.getAnimationManager().setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/PAN_SPEED_COEF)) : (long)((lastJPY-jpy)/(a*PAN_SPEED_COEF)));
+            application.mCam.setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/PAN_SPEED_COEF)) : (long)((jpx-lastJPX)/(a*PAN_SPEED_COEF)));
+            application.mCam.setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/PAN_SPEED_COEF)) : (long)((lastJPY-jpy)/(a*PAN_SPEED_COEF)));
         }
     }
     
     public void mouseWheelMoved(ViewPanel v, short wheelDirection, int jpx, int jpy, MouseWheelEvent e){
-        Camera c = test.mCam;
+        Camera c = application.mCam;
         double a = (c.focal+Math.abs(c.altitude)) / c.focal;
         if (wheelDirection == WHEEL_DOWN){
             c.altitudeOffset(-a*5);
@@ -330,8 +330,8 @@ class TestEventHandler extends ViewAdapter {
     }
     
     public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
-        if (c == 't'){test.translate();}
-        else if (c == 'r'){test.rotate();}
+        if (c == 't'){application.translate();}
+        else if (c == 'r'){application.rotate();}
     }
     
     public void viewClosing(View v){

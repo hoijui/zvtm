@@ -29,9 +29,11 @@ import java.awt.event.WindowEvent;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.Vector;
+import java.util.Collections;
 
 import javax.swing.JMenuBar;
 import javax.swing.JPanel;
@@ -79,6 +81,8 @@ public class VirtualSpaceManager implements AWTEventListener {
 
     /**key is space name (String)*/
     protected Hashtable<String,VirtualSpace> allVirtualSpaces;
+    private List<VirtualSpace> virtualSpaceList;
+    
     /**All views managed by this VSM*/
     protected View[] allViews;
     /**used to quickly retrieve a view by its name (gives its index position in the list of views)*/
@@ -106,6 +110,7 @@ public class VirtualSpaceManager implements AWTEventListener {
 		if (debug){System.out.println("Debug mode ON");}
 		animationManager = new AnimationManager(this);
 		allVirtualSpaces=new Hashtable<String,VirtualSpace>();
+		virtualSpaceList = new ArrayList(0);
 		allViews = new View[0];
 		name2viewIndex = new Hashtable<String,Integer>();
 	}
@@ -434,6 +439,7 @@ public class VirtualSpaceManager implements AWTEventListener {
     public VirtualSpace addVirtualSpace(String n){
         VirtualSpace tvs=new VirtualSpace(n);
         allVirtualSpaces.put(n,tvs);
+        virtualSpaceList = new ArrayList(allVirtualSpaces.values());
         return tvs;
     }
 
@@ -455,6 +461,7 @@ public class VirtualSpaceManager implements AWTEventListener {
         if (allVirtualSpaces.containsKey(n)){
             allVirtualSpaces.get(n).destroy();
             allVirtualSpaces.remove(n);
+            virtualSpaceList = new ArrayList(allVirtualSpaces.values());
         }
     }
 
@@ -466,6 +473,7 @@ public class VirtualSpaceManager implements AWTEventListener {
         String n = vs.getName();
         if (allVirtualSpaces.containsKey(n)){
             allVirtualSpaces.remove(n);
+            virtualSpaceList = new ArrayList(allVirtualSpaces.values());
         }
     }
 
@@ -484,6 +492,12 @@ public class VirtualSpaceManager implements AWTEventListener {
      */
     public VirtualSpace getVirtualSpace(String n){
 	    return allVirtualSpaces.get(n);
+    }
+    
+    /** Get all virtual spaces.
+     */
+    public List<VirtualSpace> getVirtualSpaces(){
+        return Collections.unmodifiableList(virtualSpaceList);
     }
 
     /** Get active virtual space, i.e., the space owning the camera currently active.

@@ -27,6 +27,7 @@ import org.jdesktop.animation.timing.TimingSource;
 
 //for active Camera animation
 import fr.inria.zvtm.engine.VirtualSpaceManager;
+import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.Location;
 
@@ -243,37 +244,37 @@ public class AnimationManager {
 	tickThread.setResolution(resolution);
     }
 
-    /**
-     * Sets the active camera X speed.
-     * @param dx active camera X speed
-     */
-    public void setXspeed(double dx){
-	currentCamAnim.setXspeed(dx);
-    }
-
-    /**
-     * Sets the active camera Y speed
-     * @param dy active camera Y speed
-     */
-    public void setYspeed(double dy){
-	currentCamAnim.setYspeed(dy);
-    }
-
-    /**
-     * Sets the active camera Z speed
-     * @param dz active camera Z speed
-     */
-    public void setZspeed(double dz){
-	currentCamAnim.setZspeed(dz);
-    }
-    
-    public void setZoomInvariantLocation(double x, double y){
-        currentCamAnim.setZoomInvariantLocation(x,y);
-    }
-    
-    public void enableCustomZoomInvariantLocation(boolean b){
-        currentCamAnim.enableCustomZoomInvariantLocation(b);
-    }
+    ///**
+    // * Sets the active camera X speed.
+    // * @param dx active camera X speed
+    // */
+    //public void setXspeed(double dx){
+	//currentCamAnim.setXspeed(dx);
+    //}
+    //
+    ///**
+    // * Sets the active camera Y speed
+    // * @param dy active camera Y speed
+    // */
+    //public void setYspeed(double dy){
+	//currentCamAnim.setYspeed(dy);
+    //}
+    //
+    ///**
+    // * Sets the active camera Z speed
+    // * @param dz active camera Z speed
+    // */
+    //public void setZspeed(double dz){
+	//currentCamAnim.setZspeed(dz);
+    //}
+    //
+    //public void setZoomInvariantLocation(double x, double y){
+    //    currentCamAnim.setZoomInvariantLocation(x,y);
+    //}
+    //
+    //public void enableCustomZoomInvariantLocation(boolean b){
+    //    currentCamAnim.enableCustomZoomInvariantLocation(b);
+    //}
 
     void onAnimationEnded(Animation anim){
 	listsLock.lock();
@@ -381,94 +382,94 @@ public class AnimationManager {
     private static class InteractiveCameraAnimation extends DefaultTimingHandler {
 	InteractiveCameraAnimation(VirtualSpaceManager vsm){
 	    this.vsm = vsm;
-	    dx = 0d;
-	    dy = 0d;
-	    dz = 0f;
+	    //dx = 0d;
+	    //dy = 0d;
+	    //dz = 0f;
 	}
 	
-	@Override public void timingEvent(float fraction, 
-					  Object subject, 
-					  Animation.Dimension dim){
-	    Camera cam = vsm.getActiveCamera();
-	    if(null != cam){
-		if((dx != 0) || (dy != 0)){
-		    cam.move(dx, dy);
-		}
-
-        if(dz != 0){
-            if (zile){
-                cam.setLocation(new Location(cam.vx+Math.round((cam.vx-zilX)*dz/(cam.getAltitude()+cam.focal)),
-                    cam.vy+Math.round((cam.vy-zilY)*dz/(cam.getAltitude()+cam.focal)),
-                    cam.getAltitude()+dz));
+	@Override public void timingEvent(float fraction, Object subject, Animation.Dimension dim){
+	    for (VirtualSpace vs:vsm.getVirtualSpaces()){
+	        for (Camera cam:vs.getCameraListAsArray()){
+    	        animateInteractiveCamera(cam);	            
+	        }
+	    }
+	}
+	
+    private void animateInteractiveCamera(Camera cam){
+        if (null != cam){
+            if ((cam.getXspeed() != 0) || (cam.getYspeed() != 0)){
+                cam.move(cam.getXspeed(), cam.getYspeed());
             }
-	    else
-	    {
-		// was: cam.altitudeOffset(dz);  
-		double a = (double)cam.getAltitude();
-		double b = 0;
+            if (cam.getZspeed() != 0){
+                if (cam.isCustomZoomInvariantLocationEnabled()){
+                    cam.setLocation(new Location(cam.vx+Math.round((cam.vx-cam.getZilX())*cam.getZspeed()/(cam.getAltitude()+cam.focal)),
+                        cam.vy+Math.round((cam.vy-cam.getZilY())*cam.getZspeed()/(cam.getAltitude()+cam.focal)),
+                        cam.getAltitude()+cam.getZspeed()));
+                }
+                else {
+                    // was: cam.altitudeOffset(dz);  
+                    double a = cam.getAltitude();
+                    double b = 0;
+                    // FIXME !?!
+                    if (a < 10.0 && a >= 0) {
+                        a = 10.0;
+                    }
+                    if (a > -10.0 && a < 0) {
+                        a = -10.0;
+                    }
 
-		// FIXME !?!
-		if (a < 10.0 && a >= 0) {
-		    a = 10.0;
-		}
-		if (a > -10.0 && a < 0) {
-		    a = -10.0;
-		}
-
-		if (dz != 0.0) {
-		    b = a + a*0.01*(double)dz;
-		}
-		else {
-		    return;
-		}
-
-		cam.altitudeOffset((float)(b-a));
-	    }
+                    if (cam.getZspeed() != 0.0) {
+                        b = a + a*0.01*cam.getZspeed();
+                    }
+                    else {
+                        return;
+                    }
+                    cam.altitudeOffset(b-a);
+                }
+            }
         }
-		
-	    }
-	}
-
-	public void setXspeed(double dx){
-	    this.dx = dx;
-	}
-
-	public void setYspeed(double dy){
-	    this.dy = dy;
-	}
-
-	public void setZspeed(double dz){
-	    this.dz = dz;
-	}
-
-	public double getXspeed(){
-	    return dx;
-	}
-
-	public double getYspeed(){
-	    return dy;
-	}
-
-	public double getZspeed(){
-	    return dz;
-	}
-
-    public void setZoomInvariantLocation(double x, double y){
-        zilX = x;
-        zilY = y;
     }
-    
-    public void enableCustomZoomInvariantLocation(boolean b){
-        zile = b;
-    }
+
+	//public void setXspeed(double dx){
+	//    this.dx = dx;
+	//}
+    //
+	//public void setYspeed(double dy){
+	//    this.dy = dy;
+	//}
+    //
+	//public void setZspeed(double dz){
+	//    this.dz = dz;
+	//}
+
+	//public double getXspeed(){
+	//    return dx;
+	//}
+    //
+	//public double getYspeed(){
+	//    return dy;
+	//}
+    //
+	//public double getZspeed(){
+	//    return dz;
+	//}
+
+    //public void setZoomInvariantLocation(double x, double y){
+    //    zilX = x;
+    //    zilY = y;
+    //}
+    //
+    //public void enableCustomZoomInvariantLocation(boolean b){
+    //    zile = b;
+    //}
     
 	private final VirtualSpaceManager vsm;
-	private volatile double dx;
-	private volatile double dy;
-	private volatile double dz;
+	//private volatile double dx;
+	//private volatile double dy;
+	//private volatile double dz;
 	
-	private boolean zile = false;
-	private double zilX, zilY;
+	//private boolean zile = false;
+	//private double zilX, zilY;
 
 	
     }

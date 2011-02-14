@@ -97,9 +97,9 @@ class MyEventListener extends SwingListener {
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-        application.vsm.getAnimationManager().setXspeed(0);
-        application.vsm.getAnimationManager().setYspeed(0);
-        application.vsm.getAnimationManager().setZspeed(0);
+        application.cam.setXspeed(0);
+        application.cam.setYspeed(0);
+        application.cam.setZspeed(0);
         v.setDrawDrag(false);
 		pickAndForward(v, e);
     }
@@ -109,15 +109,15 @@ class MyEventListener extends SwingListener {
             Camera c = v.cams[0];
             double a = (c.focal+Math.abs(c.altitude)) / c.focal;
             if (mod == SHIFT_MOD) {
-                application.vsm.getAnimationManager().setXspeed(0);
-                application.vsm.getAnimationManager().setYspeed(0);
-                application.vsm.getAnimationManager().setZspeed(((lastJPY-jpy)*(ZOOM_SPEED_COEF)));
+                application.cam.setXspeed(0);
+                application.cam.setYspeed(0);
+                application.cam.setZspeed(((lastJPY-jpy)*(ZOOM_SPEED_COEF)));
                 //50 is just a speed factor (too fast otherwise)
             }
             else {
-                application.vsm.getAnimationManager().setXspeed((c.altitude>0) ? ((jpx-lastJPX)*(a/PAN_SPEED_COEF)) : ((jpx-lastJPX)/(a*PAN_SPEED_COEF)));
-                application.vsm.getAnimationManager().setYspeed((c.altitude>0) ? ((lastJPY-jpy)*(a/PAN_SPEED_COEF)) : ((lastJPY-jpy)/(a*PAN_SPEED_COEF)));
-                application.vsm.getAnimationManager().setZspeed(0);
+                application.cam.setXspeed((c.altitude>0) ? ((jpx-lastJPX)*(a/PAN_SPEED_COEF)) : ((jpx-lastJPX)/(a*PAN_SPEED_COEF)));
+                application.cam.setYspeed((c.altitude>0) ? ((lastJPY-jpy)*(a/PAN_SPEED_COEF)) : ((lastJPY-jpy)/(a*PAN_SPEED_COEF)));
+                application.cam.setZspeed(0);
             }
         }
     }

@@ -229,6 +229,80 @@ public class Camera {
 	return new Location(vx,vy,altitude);
     }
     
+    /*------------------ 1st order control ----------------------*/
+    
+    protected volatile double dx, dy, dz;
+    protected volatile boolean zile = false;
+	protected volatile double zilX, zilY;
+    
+    /**
+     * Sets the camera's horizontal speed
+     * @param dx camera's x-axis speed
+     */
+    public void setXspeed(double dx){
+	    this.dx = dx;
+    }
+
+    /**
+     * Sets the camera's vertical speed
+     * @param dy camera's y-axis speed
+     */
+    public void setYspeed(double dy){
+        this.dy = dy;
+    }
+
+    /**
+     * Sets the camera's zooming speed
+     * @param dz camera's z-axis speed
+     */
+    public void setZspeed(double dz){
+        this.dz = dz;
+    }
+    
+    public void setZoomInvariantLocation(double x, double y){
+        zilX = x;
+        zilY = y;
+    }
+    
+    public void enableCustomZoomInvariantLocation(boolean b){
+        zile = b;
+    }
+    
+    public double getZilX(){
+        return zilX;
+    }
+
+    public double getZilY(){
+        return zilY;
+    }
+    
+    public boolean isCustomZoomInvariantLocationEnabled(){
+        return zile;
+    }
+    
+    /**
+     * Get the camera's horizontal speed
+     */
+    public double getXspeed(){
+	    return dx;
+	}
+
+    /**
+     * Get the camera's vertical speed
+     */
+	public double getYspeed(){
+	    return dy;
+	}
+
+    /**
+     * Get the camera's zooming speed
+     */
+	public double getZspeed(){
+	    return dz;
+	}
+    
+    /*------------------ Events --------------------*/
+    
     /**
      * Registers a CameraListener for this Camera
      */
