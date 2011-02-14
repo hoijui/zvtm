@@ -41,14 +41,6 @@ $Id$
     </repository>
   </repositories>
   
-  <!-- Distribution - Deploy to FTP -->
-  <distributionManagement>
-	<repository>
-      <id>zvtm.sf.net</id>
-      <url>scp://shell.sourceforge.net/home/groups/z/zv/zvtm/htdocs/maven</url>
-    </repository>
-  </distributionManagement>
-  
   <!-- Dependencies -->
   <dependencies>
 	<dependency>
