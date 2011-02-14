@@ -264,9 +264,9 @@ class PDFViewerEventHandler implements ViewListener {
 	}
 
 	public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-		VirtualSpaceManager.INSTANCE.getAnimationManager().setXspeed(0);
-        VirtualSpaceManager.INSTANCE.getAnimationManager().setYspeed(0);
-        VirtualSpaceManager.INSTANCE.getAnimationManager().setZspeed(0);
+		application.mCamera.setXspeed(0);
+        application.mCamera.setYspeed(0);
+        application.mCamera.setZspeed(0);
 		v.setDrawDrag(false);
 		VirtualSpaceManager.INSTANCE.getActiveView().mouse.setSensitivity(true);
 	}
@@ -306,15 +306,15 @@ class PDFViewerEventHandler implements ViewListener {
 			Camera c = VirtualSpaceManager.INSTANCE.getActiveCamera();
 			double a = (c.focal+Math.abs(c.altitude))/c.focal;
 			if (mod == SHIFT_MOD) {
-			    VirtualSpaceManager.INSTANCE.getAnimationManager().setXspeed(0);
-                VirtualSpaceManager.INSTANCE.getAnimationManager().setYspeed(0);
-                VirtualSpaceManager.INSTANCE.getAnimationManager().setZspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
+			    application.mCamera.setXspeed(0);
+                application.mCamera.setYspeed(0);
+                application.mCamera.setZspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
 				//50 is just a speed factor (too fast otherwise)
 			}
 			else {
-			    VirtualSpaceManager.INSTANCE.getAnimationManager().setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/50.0f)) : (long)((jpx-lastJPX)/(a*50)));
-                VirtualSpaceManager.INSTANCE.getAnimationManager().setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
-                VirtualSpaceManager.INSTANCE.getAnimationManager().setZspeed(0);
+			    application.mCamera.setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/50.0f)) : (long)((jpx-lastJPX)/(a*50)));
+                application.mCamera.setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
+                application.mCamera.setZspeed(0);
 			}
 		}
 	}
