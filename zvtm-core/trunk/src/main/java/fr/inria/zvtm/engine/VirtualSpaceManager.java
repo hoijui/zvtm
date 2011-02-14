@@ -439,7 +439,7 @@ public class VirtualSpaceManager implements AWTEventListener {
     public VirtualSpace addVirtualSpace(String n){
         VirtualSpace tvs=new VirtualSpace(n);
         allVirtualSpaces.put(n,tvs);
-        virtualSpaceList = new ArrayList(allVirtualSpaces.values());
+        updateVirtualSpaceList();
         return tvs;
     }
 
@@ -461,7 +461,7 @@ public class VirtualSpaceManager implements AWTEventListener {
         if (allVirtualSpaces.containsKey(n)){
             allVirtualSpaces.get(n).destroy();
             allVirtualSpaces.remove(n);
-            virtualSpaceList = new ArrayList(allVirtualSpaces.values());
+            updateVirtualSpaceList();
         }
     }
 
@@ -473,8 +473,12 @@ public class VirtualSpaceManager implements AWTEventListener {
         String n = vs.getName();
         if (allVirtualSpaces.containsKey(n)){
             allVirtualSpaces.remove(n);
-            virtualSpaceList = new ArrayList(allVirtualSpaces.values());
+            updateVirtualSpaceList();
         }
+    }
+    
+    void updateVirtualSpaceList(){
+        virtualSpaceList = new ArrayList(allVirtualSpaces.values());
     }
 
     /** Get the virtual space owning Glyph g. */
@@ -495,6 +499,7 @@ public class VirtualSpaceManager implements AWTEventListener {
     }
     
     /** Get all virtual spaces.
+     *@return an unmodifiable list of all virtual spaces managed by this VSM.
      */
     public List<VirtualSpace> getVirtualSpaces(){
         return Collections.unmodifiableList(virtualSpaceList);

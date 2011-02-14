@@ -368,7 +368,7 @@ public class AnimationManager {
 
     private final AnimationFactory animationFactory;
 
-    //infinite animation that handles the current camera x-y-speed and altitude
+    //infinite animation that handles cameras x-y-speed and altitude
     //typically used to implement user-directed camera movement (mouse handlers...)
     private final InteractiveCameraAnimation currentCamAnim; 
 
@@ -382,9 +382,6 @@ public class AnimationManager {
     private static class InteractiveCameraAnimation extends DefaultTimingHandler {
 	InteractiveCameraAnimation(VirtualSpaceManager vsm){
 	    this.vsm = vsm;
-	    //dx = 0d;
-	    //dy = 0d;
-	    //dz = 0f;
 	}
 	
 	@Override public void timingEvent(float fraction, Object subject, Animation.Dimension dim){
@@ -430,47 +427,7 @@ public class AnimationManager {
         }
     }
 
-	//public void setXspeed(double dx){
-	//    this.dx = dx;
-	//}
-    //
-	//public void setYspeed(double dy){
-	//    this.dy = dy;
-	//}
-    //
-	//public void setZspeed(double dz){
-	//    this.dz = dz;
-	//}
-
-	//public double getXspeed(){
-	//    return dx;
-	//}
-    //
-	//public double getYspeed(){
-	//    return dy;
-	//}
-    //
-	//public double getZspeed(){
-	//    return dz;
-	//}
-
-    //public void setZoomInvariantLocation(double x, double y){
-    //    zilX = x;
-    //    zilY = y;
-    //}
-    //
-    //public void enableCustomZoomInvariantLocation(boolean b){
-    //    zile = b;
-    //}
-    
 	private final VirtualSpaceManager vsm;
-	//private volatile double dx;
-	//private volatile double dy;
-	//private volatile double dz;
-	
-	//private boolean zile = false;
-	//private double zilX, zilY;
-
 	
     }
 

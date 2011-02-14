@@ -238,6 +238,11 @@ public class Camera {
     /**
      * Sets the camera's horizontal speed
      * @param dx camera's x-axis speed
+     *@see #setYspeed(double dy)
+     *@see #setZspeed(double dz)
+     *@see #getXspeed()
+     *@see #getYspeed()
+     *@see #getZspeed()
      */
     public void setXspeed(double dx){
 	    this.dx = dx;
@@ -246,6 +251,11 @@ public class Camera {
     /**
      * Sets the camera's vertical speed
      * @param dy camera's y-axis speed
+     *@see #setXspeed(double dx)
+     *@see #setZspeed(double dz)
+     *@see #getXspeed()
+     *@see #getYspeed()
+     *@see #getZspeed()
      */
     public void setYspeed(double dy){
         this.dy = dy;
@@ -254,34 +264,74 @@ public class Camera {
     /**
      * Sets the camera's zooming speed
      * @param dz camera's z-axis speed
+     *@see #setXspeed(double dx)
+     *@see #setYspeed(double dy)
+     *@see #getXspeed()
+     *@see #getYspeed()
+     *@see #getZspeed()
      */
     public void setZspeed(double dz){
         this.dz = dz;
     }
     
+    /** Set zoom-invariant point's coordinates in virtual space.
+     *@see #enableCustomZoomInvariantLocation(boolean b)
+     *@see #isCustomZoomInvariantLocationEnabled()
+     *@see #getZilX()
+     *@see #getZilY()
+     */
     public void setZoomInvariantLocation(double x, double y){
         zilX = x;
         zilY = y;
     }
     
+    /** Use a specific zoom-invariant point or use the camera's (x,y) coords are used (default).
+     *@see #setZoomInvariantLocation(double x, double y)
+     *@see #isCustomZoomInvariantLocationEnabled()
+     *@see #getZilX()
+     *@see #getZilY()
+     */
     public void enableCustomZoomInvariantLocation(boolean b){
         zile = b;
     }
     
+    /** Get zoom-invariant point's x-coordinate in virtual space.
+     *@see #setZoomInvariantLocation(double x, double y)
+     *@see #enableCustomZoomInvariantLocation(boolean b)
+     *@see #isCustomZoomInvariantLocationEnabled()
+     *@see #getZilY()
+     */
     public double getZilX(){
         return zilX;
     }
 
+    /** Get zoom-invariant point's y-coordinate in virtual space.
+     *@see #setZoomInvariantLocation(double x, double y)
+     *@see #enableCustomZoomInvariantLocation(boolean b)
+     *@see #isCustomZoomInvariantLocationEnabled()
+     *@see #getZilX()
+     */
     public double getZilY(){
         return zilY;
     }
     
+    /** Tells whether a specific zoom-invariant point is being used or if the camera's (x,y) coords are used (default).
+     *@see #setZoomInvariantLocation(double x, double y)
+     *@see #enableCustomZoomInvariantLocation(boolean b)
+     *@see #getZilX()
+     *@see #getZilY()
+     */
     public boolean isCustomZoomInvariantLocationEnabled(){
         return zile;
     }
     
     /**
      * Get the camera's horizontal speed
+     *@see #setXspeed(double dx)
+     *@see #setYspeed(double dy)
+     *@see #setZspeed(double dz)
+     *@see #getYspeed()
+     *@see #getZspeed()
      */
     public double getXspeed(){
 	    return dx;
@@ -289,6 +339,11 @@ public class Camera {
 
     /**
      * Get the camera's vertical speed
+     *@see #setXspeed(double dx)
+     *@see #setYspeed(double dy)
+     *@see #setZspeed(double dz)
+     *@see #getXspeed()
+     *@see #getZspeed()
      */
 	public double getYspeed(){
 	    return dy;
@@ -296,6 +351,11 @@ public class Camera {
 
     /**
      * Get the camera's zooming speed
+     *@see #setXspeed(double dx)
+     *@see #setYspeed(double dy)
+     *@see #setZspeed(double dz)
+     *@see #getXspeed()
+     *@see #getYspeed()
      */
 	public double getZspeed(){
 	    return dz;
