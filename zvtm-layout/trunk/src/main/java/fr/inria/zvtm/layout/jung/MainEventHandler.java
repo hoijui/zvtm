@@ -92,9 +92,9 @@ class MainEventHandler implements ViewListener, ComponentListener, PortalListene
 			selectingRegion = false;
 		}
 		else if (panning){
-		    application.vsm.getAnimationManager().setXspeed(0);
-            application.vsm.getAnimationManager().setYspeed(0);
-            application.vsm.getAnimationManager().setZspeed(0);
+		    application.nm.mCamera.setXspeed(0);
+            application.nm.mCamera.setYspeed(0);
+            application.nm.mCamera.setZspeed(0);
             v.setDrawDrag(false);
             panning = false;
 		}
@@ -141,14 +141,14 @@ class MainEventHandler implements ViewListener, ComponentListener, PortalListene
             Camera c = v.cams[0];
             double a = (c.focal+Math.abs(c.altitude))/c.focal;
             if (mod == META_SHIFT_MOD) {
-                application.vsm.getAnimationManager().setXspeed(0);
-                application.vsm.getAnimationManager().setYspeed(0);
-                application.vsm.getAnimationManager().setZspeed(((lastJPY-jpy)*(ZOOM_SPEED_COEF)));
+                application.nm.mCamera.setXspeed(0);
+                application.nm.mCamera.setYspeed(0);
+                application.nm.mCamera.setZspeed(((lastJPY-jpy)*(ZOOM_SPEED_COEF)));
             }
             else {
-                application.vsm.getAnimationManager().setXspeed((jpx-lastJPX)*(a/PAN_SPEED_COEF));
-                application.vsm.getAnimationManager().setYspeed((lastJPY-jpy)*(a/PAN_SPEED_COEF));
-                application.vsm.getAnimationManager().setZspeed(0);
+                application.nm.mCamera.setXspeed((jpx-lastJPX)*(a/PAN_SPEED_COEF));
+                application.nm.mCamera.setYspeed((lastJPY-jpy)*(a/PAN_SPEED_COEF));
+                application.nm.mCamera.setZspeed(0);
             }		    
 		}
     }
