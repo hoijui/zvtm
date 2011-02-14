@@ -47,7 +47,7 @@ $Id: pom.xml 2427 2009-09-29 07:29:08Z epietrig $
   <distributionManagement>
 	<repository>
       <id>zvtm.sf.net</id>
-      <url>scp://shell.sourceforge.net/home/groups/z/zv/zvtm/htdocs/maven</url>
+      <url>scp://shell.sourceforge.net/home/project-web/zvtm/htdocs/maven</url>
     </repository>
   </distributionManagement>
   
