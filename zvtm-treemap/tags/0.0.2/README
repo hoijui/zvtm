@@ -1,0 +1,12 @@
+This library includes code from the UMD Treemap Library.
+For more information see http://www.cs.umd.edu/hcil/treemap-history/
+The UMD Treemap Library is released under the Mozilla Public License version 1.1
+
+This library includes code from the Infovis toolkit. 
+For more information see http://ivtk.sourceforge.net/ 
+The Infovis toolkit is licensed under the X11 license.
+
+Some treemap documentation:
+
+* 10 lessons about treemap design: http://smartdatacollective.com/Home/16512
+
