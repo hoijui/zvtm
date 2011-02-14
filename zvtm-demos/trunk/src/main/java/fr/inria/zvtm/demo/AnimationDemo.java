@@ -643,9 +643,9 @@ class AnimationDemoEventHandler implements ViewListener {
     }
 
     public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	application.vsm.getAnimationManager().setXspeed(0);
-	application.vsm.getAnimationManager().setYspeed(0);
-	application.vsm.getAnimationManager().setZspeed(0);
+	v.cams[0].setXspeed(0);
+	v.cams[0].setYspeed(0);
+	v.cams[0].setZspeed(0);
 	v.setDrawDrag(false);
 	application.vsm.getActiveView().mouse.setSensitivity(true);
     }
@@ -662,14 +662,14 @@ class AnimationDemoEventHandler implements ViewListener {
 	    Camera c = application.vsm.getActiveCamera();
 	    double a = (c.focal+Math.abs(c.altitude))/c.focal;
 	    if (mod == META_SHIFT_MOD) {
-		application.vsm.getAnimationManager().setXspeed(0);
-		application.vsm.getAnimationManager().setYspeed(0);
-		application.vsm.getAnimationManager().setZspeed((c.altitude>0) ? (lastJPY-jpy) * (a/SPEED_FACTOR) : (lastJPY-jpy) / (a*SPEED_FACTOR));
+		v.cams[0].setXspeed(0);
+		v.cams[0].setYspeed(0);
+		v.cams[0].setZspeed((c.altitude>0) ? (lastJPY-jpy) * (a/SPEED_FACTOR) : (lastJPY-jpy) / (a*SPEED_FACTOR));
 	    }
 	    else {
-		application.vsm.getAnimationManager().setXspeed((c.altitude>0) ? (jpx-lastJPX) * (a/SPEED_FACTOR) : (jpx-lastJPX) / (a*SPEED_FACTOR));
-		application.vsm.getAnimationManager().setYspeed((c.altitude>0) ? (lastJPY-jpy) * (a/SPEED_FACTOR) : (lastJPY-jpy) / (a*SPEED_FACTOR));
-		application.vsm.getAnimationManager().setZspeed(0);
+		v.cams[0].setXspeed((c.altitude>0) ? (jpx-lastJPX) * (a/SPEED_FACTOR) : (jpx-lastJPX) / (a*SPEED_FACTOR));
+		v.cams[0].setYspeed((c.altitude>0) ? (lastJPY-jpy) * (a/SPEED_FACTOR) : (lastJPY-jpy) / (a*SPEED_FACTOR));
+		v.cams[0].setZspeed(0);
 	    }
 	}
     }

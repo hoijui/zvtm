@@ -626,9 +626,9 @@ class AnimationEvtHdlr implements ViewListener {
     }
 
     public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	application.vsm.getAnimationManager().setXspeed(0);
-	application.vsm.getAnimationManager().setYspeed(0);
-	application.vsm.getAnimationManager().setZspeed(0);
+	v.cams[0].setXspeed(0);
+	v.cams[0].setYspeed(0);
+	v.cams[0].setZspeed(0);
 	v.setDrawDrag(false);
 	application.vsm.getActiveView().mouse.setSensitivity(true);
     }
@@ -641,14 +641,14 @@ class AnimationEvtHdlr implements ViewListener {
 	if (buttonNumber == 3 || ((mod == META_MOD || mod == META_SHIFT_MOD) && buttonNumber == 1)){
 	    tfactor=(activeCam.focal+Math.abs(activeCam.altitude))/activeCam.focal;
 	    if (mod == META_SHIFT_MOD) {
-		application.vsm.getAnimationManager().setXspeed(0);
-		application.vsm.getAnimationManager().setYspeed(0);
- 		application.vsm.getAnimationManager().setZspeed((activeCam.altitude>0) ? (lastJPY-jpy)*(tfactor/cfactor) : (lastJPY-jpy)/(tfactor*cfactor));  //50 is just a speed factor (too fast otherwise)
+		v.cams[0].setXspeed(0);
+		v.cams[0].setYspeed(0);
+ 		v.cams[0].setZspeed((activeCam.altitude>0) ? (lastJPY-jpy)*(tfactor/cfactor) : (lastJPY-jpy)/(tfactor*cfactor));  //50 is just a speed factor (too fast otherwise)
 	    }
 	    else {
-		application.vsm.getAnimationManager().setXspeed((activeCam.altitude>0) ? (jpx-lastJPX)*(tfactor/cfactor) : (jpx-lastJPX)/(tfactor*cfactor));
-		application.vsm.getAnimationManager().setYspeed((activeCam.altitude>0) ? (lastJPY-jpy)*(tfactor/cfactor) : (lastJPY-jpy)/(tfactor*cfactor));
-		application.vsm.getAnimationManager().setZspeed(0);
+		v.cams[0].setXspeed((activeCam.altitude>0) ? (jpx-lastJPX)*(tfactor/cfactor) : (jpx-lastJPX)/(tfactor*cfactor));
+		v.cams[0].setYspeed((activeCam.altitude>0) ? (lastJPY-jpy)*(tfactor/cfactor) : (lastJPY-jpy)/(tfactor*cfactor));
+		v.cams[0].setZspeed(0);
 	    }
 	}
     }
@@ -750,9 +750,9 @@ class CameraDemoEvtHdlr implements ViewListener {
     }
 
     public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	application.vsm.getAnimationManager().setXspeed(0);
-	application.vsm.getAnimationManager().setYspeed(0);
-	application.vsm.getAnimationManager().setZspeed(0);
+	v.cams[0].setXspeed(0);
+	v.cams[0].setYspeed(0);
+	v.cams[0].setZspeed(0);
 	v.setDrawSegment(false);
 	application.vsm.getActiveView().mouse.setSensitivity(true);
 	if (autoZoomed){
@@ -776,14 +776,14 @@ class CameraDemoEvtHdlr implements ViewListener {
 	if (buttonNumber == 3 || ((mod == META_MOD || mod == META_SHIFT_MOD) && buttonNumber == 1)){
 	    tfactor=(activeCam.focal+Math.abs(activeCam.altitude))/activeCam.focal;
 	    if (mod == META_SHIFT_MOD) {
-		application.vsm.getAnimationManager().setXspeed(0);
-		application.vsm.getAnimationManager().setYspeed(0);
- 		application.vsm.getAnimationManager().setZspeed((activeCam.altitude>0) ? (lastJPY-jpy)*(tfactor/cfactor) : (lastJPY-jpy)/(tfactor*cfactor));  //50 is just a speed factor (too fast otherwise)
+		v.cams[0].setXspeed(0);
+		v.cams[0].setYspeed(0);
+ 		v.cams[0].setZspeed((activeCam.altitude>0) ? (lastJPY-jpy)*(tfactor/cfactor) : (lastJPY-jpy)/(tfactor*cfactor));  //50 is just a speed factor (too fast otherwise)
 	    }
 	    else {
-		application.vsm.getAnimationManager().setXspeed((activeCam.altitude>0) ? (jpx-lastJPX)*(tfactor/cfactor) : (jpx-lastJPX)/(tfactor*cfactor));
-		application.vsm.getAnimationManager().setYspeed((activeCam.altitude>0) ? (lastJPY-jpy)*(tfactor/cfactor) : (lastJPY-jpy)/(tfactor*cfactor));
-		application.vsm.getAnimationManager().setZspeed(0);
+		v.cams[0].setXspeed((activeCam.altitude>0) ? (jpx-lastJPX)*(tfactor/cfactor) : (jpx-lastJPX)/(tfactor*cfactor));
+		v.cams[0].setYspeed((activeCam.altitude>0) ? (lastJPY-jpy)*(tfactor/cfactor) : (lastJPY-jpy)/(tfactor*cfactor));
+		v.cams[0].setZspeed(0);
 		if (application.isAutoZoomEnabled()){
 		    drag = Math.sqrt(Math.pow(jpx-lastJPX, 2) + Math.pow(jpy-lastJPY, 2));
 		    if (!autoZoomed && drag > 300.0f){
@@ -897,11 +897,11 @@ class MultiLayerEvtHdlr implements ViewListener {
     }
 
     public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	application.vsm.getAnimationManager().setXspeed(0);
-	application.vsm.getAnimationManager().setYspeed(0);
-	application.vsm.getAnimationManager().setZspeed(0);
-	v.setDrawDrag(false);
-	application.vsm.getActiveView().mouse.setSensitivity(true);
+        application.vsm.getActiveCamera().setXspeed(0);
+        application.vsm.getActiveCamera().setYspeed(0);
+        application.vsm.getActiveCamera().setZspeed(0);
+        v.setDrawDrag(false);
+        application.vsm.getActiveView().mouse.setSensitivity(true);
     }
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
@@ -909,20 +909,21 @@ class MultiLayerEvtHdlr implements ViewListener {
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){}
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
-	//activeCam has been initialized in press3()
-	if (buttonNumber == 3 || ((mod == META_MOD || mod == META_SHIFT_MOD) && buttonNumber == 1)){
-	    tfactor=(activeCam.focal+Math.abs(activeCam.altitude))/activeCam.focal;
-	    if (mod == META_SHIFT_MOD) {
-		application.vsm.getAnimationManager().setXspeed(0);
-		application.vsm.getAnimationManager().setYspeed(0);
- 		application.vsm.getAnimationManager().setZspeed((activeCam.altitude>0) ? (lastJPY-jpy)*(tfactor/cfactor) : (lastJPY-jpy)/(tfactor*cfactor));  //50 is just a speed factor (too fast otherwise)
-	    }
-	    else {
-		application.vsm.getAnimationManager().setXspeed((activeCam.altitude>0) ? (jpx-lastJPX)*(tfactor/cfactor) : (jpx-lastJPX)/(tfactor*cfactor));
-		application.vsm.getAnimationManager().setYspeed((activeCam.altitude>0) ? (lastJPY-jpy)*(tfactor/cfactor) : (lastJPY-jpy)/(tfactor*cfactor));
-		application.vsm.getAnimationManager().setZspeed(0);
-	    }
-	}
+        //activeCam has been initialized in press3()
+        if (buttonNumber == 3 || ((mod == META_MOD || mod == META_SHIFT_MOD) && buttonNumber == 1)){
+            tfactor=(activeCam.focal+Math.abs(activeCam.altitude))/activeCam.focal;
+            if (mod == META_SHIFT_MOD) {
+                application.vsm.getActiveCamera().setXspeed(0);
+                application.vsm.getActiveCamera().setYspeed(0);
+                application.vsm.getActiveCamera().setZspeed((activeCam.altitude>0) ? (lastJPY-jpy)*(tfactor/cfactor) : (lastJPY-jpy)/(tfactor*cfactor));
+                //50 is just a speed factor (too fast otherwise)
+            }
+            else {
+                application.vsm.getActiveCamera().setXspeed((activeCam.altitude>0) ? (jpx-lastJPX)*(tfactor/cfactor) : (jpx-lastJPX)/(tfactor*cfactor));
+                application.vsm.getActiveCamera().setYspeed((activeCam.altitude>0) ? (lastJPY-jpy)*(tfactor/cfactor) : (lastJPY-jpy)/(tfactor*cfactor));
+                application.vsm.getActiveCamera().setZspeed(0);
+            }
+        }
     }
 
     public void mouseWheelMoved(ViewPanel v, short wheelDirection, int jpx, int jpy, MouseWheelEvent e){

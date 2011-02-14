@@ -195,9 +195,9 @@ class ScrollbarDemoEventHandler implements ViewListener {
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	application.vsm.getAnimationManager().setXspeed(0);
-	application.vsm.getAnimationManager().setYspeed(0);
-	application.vsm.getAnimationManager().setZspeed(0);
+	v.cams[0].setXspeed(0);
+	v.cams[0].setYspeed(0);
+	v.cams[0].setZspeed(0);
 	v.setDrawDrag(false);
 	application.demoView.mouse.setSensitivity(true);
     }
@@ -231,14 +231,14 @@ class ScrollbarDemoEventHandler implements ViewListener {
 	    Camera c = application.demoView.getCameraNumber(0);
 	    double a = (c.focal+Math.abs(c.altitude))/c.focal;
 	    if (mod == SHIFT_MOD) {
-		application.vsm.getAnimationManager().setXspeed(0);
-		application.vsm.getAnimationManager().setYspeed(0);
-		application.vsm.getAnimationManager().setZspeed((c.altitude>0) ? (lastJPY-jpy)*(a/50.0f) : (lastJPY-jpy)/(a*50));  //50 is just a speed factor (too fast otherwise)
+		v.cams[0].setXspeed(0);
+		v.cams[0].setYspeed(0);
+		v.cams[0].setZspeed((c.altitude>0) ? (lastJPY-jpy)*(a/50.0f) : (lastJPY-jpy)/(a*50));  //50 is just a speed factor (too fast otherwise)
 	    }
 	    else {
-		application.vsm.getAnimationManager().setXspeed((c.altitude>0) ? (jpx-lastJPX)*(a/50.0f) : (jpx-lastJPX)/(a*50));
-		application.vsm.getAnimationManager().setYspeed((c.altitude>0) ? (lastJPY-jpy)*(a/50.0f) : (lastJPY-jpy)/(a*50));
-		application.vsm.getAnimationManager().setZspeed(0);
+		v.cams[0].setXspeed((c.altitude>0) ? (jpx-lastJPX)*(a/50.0f) : (jpx-lastJPX)/(a*50));
+		v.cams[0].setYspeed((c.altitude>0) ? (lastJPY-jpy)*(a/50.0f) : (lastJPY-jpy)/(a*50));
+		v.cams[0].setZspeed(0);
 	    }
 	}
     }

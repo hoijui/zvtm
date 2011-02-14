@@ -243,9 +243,9 @@ class ViewDemoEventHandler implements ViewListener {
 	    zoomingInRegion=false;
 	}
 	else if (manualLeftButtonMove){
-	    application.vsm.getAnimationManager().setXspeed(0);
-	    application.vsm.getAnimationManager().setYspeed(0);
-	    application.vsm.getAnimationManager().setZspeed(0);
+	    v.cams[0].setXspeed(0);
+	    v.cams[0].setYspeed(0);
+	    v.cams[0].setZspeed(0);
 	    v.setDrawDrag(false);
 	    application.vsm.getActiveView().mouse.setSensitivity(true);
 	    manualLeftButtonMove=false;
@@ -274,9 +274,9 @@ class ViewDemoEventHandler implements ViewListener {
     }
 
     public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	application.vsm.getAnimationManager().setXspeed(0);
-	application.vsm.getAnimationManager().setYspeed(0);
-	application.vsm.getAnimationManager().setZspeed(0);
+	v.cams[0].setXspeed(0);
+	v.cams[0].setYspeed(0);
+	v.cams[0].setZspeed(0);
 	v.setDrawDrag(false);
 	application.vsm.getActiveView().mouse.setSensitivity(true);
     }
@@ -296,17 +296,17 @@ class ViewDemoEventHandler implements ViewListener {
 	if (mod != ALT_MOD && (buttonNumber == 1 || buttonNumber == 3)){
 	    tfactor=(activeCam.focal+Math.abs(activeCam.altitude))/activeCam.focal;
 	    if (mod == SHIFT_MOD || mod == META_SHIFT_MOD){
-		application.vsm.getAnimationManager().setXspeed(0);
-		application.vsm.getAnimationManager().setYspeed(0);
-		application.vsm.getAnimationManager().setZspeed((activeCam.altitude>0) ? (lastJPY-jpy)*(tfactor/cfactor) : (lastJPY-jpy)/(tfactor*cfactor));
+		v.cams[0].setXspeed(0);
+		v.cams[0].setYspeed(0);
+		v.cams[0].setZspeed((activeCam.altitude>0) ? (lastJPY-jpy)*(tfactor/cfactor) : (lastJPY-jpy)/(tfactor*cfactor));
 		//50 is just a speed factor (too fast otherwise)
 	    }
 	    else {
 		jpxD = jpx-lastJPX;
 		jpyD = lastJPY-jpy;
-		application.vsm.getAnimationManager().setXspeed((activeCam.altitude>0) ? jpxD*(tfactor/cfactor) : jpxD/(tfactor*cfactor));
-		application.vsm.getAnimationManager().setYspeed((activeCam.altitude>0) ? jpyD*(tfactor/cfactor) : jpyD/(tfactor*cfactor));
-		application.vsm.getAnimationManager().setZspeed(0);
+		v.cams[0].setXspeed((activeCam.altitude>0) ? jpxD*(tfactor/cfactor) : jpxD/(tfactor*cfactor));
+		v.cams[0].setYspeed((activeCam.altitude>0) ? jpyD*(tfactor/cfactor) : jpyD/(tfactor*cfactor));
+		v.cams[0].setZspeed(0);
 	    }
 	}
     }
