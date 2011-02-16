@@ -87,7 +87,8 @@ class NavPanel extends JPanel implements ActionListener, ChangeListener {
 		Vector cameras = new Vector();	
 		cameras.add(grMngr.mSpace.getCamera(1));
 		cameras.add(grMngr.rSpace.getCamera(0));
-		JPanel ovPanel = grMngr.vsm.addPanelView(cameras, GraphicsManager.RADAR_VIEW_NAME, 100, 100);
+		View pv = grMngr.vsm.addPanelView(cameras, GraphicsManager.RADAR_VIEW_NAME, 100, 100);
+		JPanel ovPanel = pv.getPanel();
 		grMngr.reh = new RadarEvtHdlr(grMngr);
 		grMngr.rView = grMngr.vsm.getView(GraphicsManager.RADAR_VIEW_NAME);
 		grMngr.rView.setBackgroundColor(grMngr.cfgMngr.backgroundColor);
