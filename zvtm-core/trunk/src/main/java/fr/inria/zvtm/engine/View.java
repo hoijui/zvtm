@@ -276,6 +276,20 @@ public abstract class View {
         panel.activeLayer=i;
     }
 
+    /** 
+     * Sets which layer (camera) is currently active (getting events).
+     * @param cam a <code>Camera</code> that represents the active layer.
+     */
+    public void setActiveLayer(Camera cam){
+        int camIdx = cameras.indexOf(cam);
+        if(camIdx == -1){
+            System.err.println("invalid Camera " + cam +  
+                    "in view " + this);
+            return;
+        }
+        setActiveLayer(camIdx);
+    }
+
     /** Get index of layer (camera) currently active (getting events).
      *@return layer index. 0 is the deepest layer (first camera given in the Vector at construction time).
      */
