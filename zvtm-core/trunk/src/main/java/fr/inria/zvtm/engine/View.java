@@ -170,11 +170,20 @@ public abstract class View {
     }
 
     /** Set application class instance to which events are sent for a given layer.
-    *@param eh client application implementation of ViewListener
+     *@param eh client application implementation of ViewListener
      *@param layer depth of layer to which the event handler should be associated.
      */
     public void setListener(ViewListener eh, int layer){
 	    panel.setListener(eh, layer);
+    }
+
+    public void setListener(ViewListener eh, Camera cam){
+        int camIdx = cameras.indexOf(cam);
+        if(camIdx == -1){
+            throw new IllegalArgumentException("invalid Camera " + cam +  
+                    "in view " + this);
+        }
+        setListener(eh, camIdx);
     }
 
     /** Sets whether the mouseMoved callback in ViewListener is triggered when the cursor moves.
@@ -283,9 +292,8 @@ public abstract class View {
     public void setActiveLayer(Camera cam){
         int camIdx = cameras.indexOf(cam);
         if(camIdx == -1){
-            System.err.println("invalid Camera " + cam +  
+            throw new IllegalArgumentException("invalid Camera " + cam +  
                     "in view " + this);
-            return;
         }
         setActiveLayer(camIdx);
     }
