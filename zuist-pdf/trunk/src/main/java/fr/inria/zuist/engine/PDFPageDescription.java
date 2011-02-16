@@ -47,6 +47,8 @@ public class PDFPageDescription extends ResourceDescription {
     Object interpolationMethod = RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
 
     private volatile IcePDFPageImg glyph;
+    // progress indicator
+    private volatile VImage pi;
     int page = 0;
     private static final ThreadPoolExecutor pageLoader, pageUnloader;
     private Future loadTask;
@@ -80,14 +82,11 @@ public class PDFPageDescription extends ResourceDescription {
         public void run(){
             if (glyph == null){
                 if (showFeedbackWhenFetching){
-                    final VImage vrp = new VImage(vx, vy, zindex, (new ImageIcon(this.getClass().getResource("/images/cprogress_32.gif"))).getImage(), 1);
-                    vrp.setZoomSensitive(false);
-                    vs.addGlyph(vrp);
-                    finishCreatingObject(sm, vs, PDFResourceHandler.getDocument(src), vrp, fadeIn);
+                    PDFPageDescription.this.pi = new VImage(vx, vy, zindex, (new ImageIcon(this.getClass().getResource("/images/cprogress_32.gif"))).getImage(), 1);
+                    PDFPageDescription.this.pi.setZoomSensitive(false);
+                    vs.addGlyph(PDFPageDescription.this.pi);
                 }
-                else {
-                    finishCreatingObject(sm, vs, PDFResourceHandler.getDocument(src), null, fadeIn);
-                }
+                finishCreatingObject(sm, vs, PDFResourceHandler.getDocument(src), fadeIn);
             }
         }
     }
@@ -110,6 +109,10 @@ public class PDFPageDescription extends ResourceDescription {
             } 
             catch(InterruptedException ie){ /* swallow */ }
             catch(ExecutionException ee){ /* swallow */ }
+            if (pi != null){
+                vs.removeGlyph(pi);
+                pi = null;
+            }
             if (glyph != null){
                 if (fadeOut){
                     Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, glyph,
@@ -189,7 +192,7 @@ public class PDFPageDescription extends ResourceDescription {
         loadTask = pageLoader.submit(new PageLoadTask(sm, vs, fadeIn));
     }
     
-    private void finishCreatingObject(final SceneManager sm, final VirtualSpace vs, final Document doc, Glyph vrp, boolean fadeIn){
+    private void finishCreatingObject(final SceneManager sm, final VirtualSpace vs, final Document doc, boolean fadeIn){
         glyph = new IcePDFPageImg(vx, vy, zindex, doc, page, detail, scale);        
         if(!display){
             glyph.setVisible(false);
@@ -214,7 +217,7 @@ public class PDFPageDescription extends ResourceDescription {
 
             if (showFeedbackWhenFetching){
                 // remove visual feedback about loading (smoothly)
-                Animation a2 = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, vrp,
+                Animation a2 = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, pi,
                     1.0f, false, IdentityInterpolator.getInstance(), new FeedbackHideAction(vs));
                 VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a2, false);                    
             }
@@ -225,7 +228,8 @@ public class PDFPageDescription extends ResourceDescription {
         }
         else {
             if (showFeedbackWhenFetching){
-                vs.removeGlyph(vrp);
+                vs.removeGlyph(pi);
+                pi = null;
             }
             assert(!SwingUtilities.isEventDispatchThread());
             try {
