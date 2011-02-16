@@ -177,6 +177,12 @@ public abstract class View {
 	    panel.setListener(eh, layer);
     }
 
+    /** 
+     * Sets the ViewListener instance to which events are sent for a 
+     * given layer.
+     *@param eh client application implementation of ViewListener
+     *@param cam Camera to which the event handler should be associated.
+     */
     public void setListener(ViewListener eh, Camera cam){
         int camIdx = cameras.indexOf(cam);
         if(camIdx == -1){
