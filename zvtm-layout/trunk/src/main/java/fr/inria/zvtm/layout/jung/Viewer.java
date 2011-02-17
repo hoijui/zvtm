@@ -577,7 +577,7 @@ class PieMenuEventHandler implements ViewListener {
     public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
 	public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-		Glyph g = v.getVCursor().lastGlyphEntered;
+		Glyph g = v.getVCursor().getPicker().lastGlyphEntered();
 		if (g != null && g.getType() == Messages.PM_ENTRY){
 			application.pieMenuEvent(g);
 		}
@@ -605,7 +605,7 @@ class PieMenuEventHandler implements ViewListener {
 	public void exitGlyph(Glyph g){
 		g.highlight(false, null);
 		if (application.mainPieMenu != null && g == application.mainPieMenu.getBoundary()){
-			Glyph lge = application.vsm.getActiveView().mouse.lastGlyphEntered;
+			Glyph lge = application.vsm.getActiveView().mouse.getPicker().lastGlyphEntered();
 			if (lge != null && lge.getType() == Messages.PM_SUBMN){
 				application.mainPieMenu.setSensitivity(false);
 				application.displaySubMenu(lge, true);
