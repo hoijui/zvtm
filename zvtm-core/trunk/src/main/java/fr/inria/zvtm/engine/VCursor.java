@@ -268,7 +268,7 @@ public class VCursor {
         return picker;
     }
     
-    public DynaPicker getdynaPicker(){
+    public DynaPicker getDynaPicker(){
         return dynaPicker;
     }
 
