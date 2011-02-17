@@ -85,8 +85,8 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewListener {
                 }
                 else if (mod == ALT_MOD){
                     zoomingInRegion=true;
-                    x1=v.getVCursor().vx;
-                    y1=v.getVCursor().vy;
+                    x1=v.getVCursor().getVSXCoordinate();
+                    y1=v.getVCursor().getVSYCoordinate();
                     v.setDrawRect(true);
                 }
             }
@@ -111,8 +111,8 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewListener {
             }
             if (zoomingInRegion){
                 v.setDrawRect(false);
-                x2=v.getVCursor().vx;
-                y2=v.getVCursor().vy;
+                x2=v.getVCursor().getVSXCoordinate();
+                y2=v.getVCursor().getVSYCoordinate();
                 if ((Math.abs(x2-x1)>=4) && (Math.abs(y2-y1)>=4)){
                     grMngr.mainView.centerOnRegion(grMngr.vsm.getActiveCamera(),ConfigManager.ANIM_MOVE_LENGTH,x1,y1,x2,y2);
                 }
@@ -139,8 +139,8 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewListener {
             if (grMngr.tp.isFadingLensNavMode() || grMngr.tp.isProbingLensNavMode()){
                 lastJPX = jpx;
                 lastJPY = jpy;
-                lastVX = v.getVCursor().vx;
-                lastVY = v.getVCursor().vy;
+                lastVX = v.getVCursor().getVSXCoordinate();
+                lastVY = v.getVCursor().getVSYCoordinate();
                 if (grMngr.lensType != GraphicsManager.NO_LENS){
                     grMngr.zoomInPhase2(lastVX, lastVY);
                 }
@@ -207,8 +207,8 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewListener {
 	    if (grMngr.tp.isFadingLensNavMode() || grMngr.tp.isProbingLensNavMode()){
 		lastJPX = jpx;
 		lastJPY = jpy;
-		lastVX = v.getVCursor().vx;
-		lastVY = v.getVCursor().vy;
+		lastVX = v.getVCursor().getVSXCoordinate();
+		lastVY = v.getVCursor().getVSYCoordinate();
 		if (grMngr.lensType != GraphicsManager.NO_LENS){
 		    grMngr.zoomOutPhase2();
 		}
@@ -412,7 +412,7 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewListener {
 
     void attemptDisplayEdgeURL(VCursor mouse,Camera cam){
         Glyph g;
-        Vector otherGlyphs=mouse.getIntersectingGlyphs(cam);
+        Vector otherGlyphs = mouse.getPicker().getIntersectingGlyphs(cam);
         if (otherGlyphs!=null && otherGlyphs.size()>0){
             g = (Glyph)otherGlyphs.firstElement();
             if (g.getOwner()!=null){getAndDisplayURL((LElem)g.getOwner(), g);}

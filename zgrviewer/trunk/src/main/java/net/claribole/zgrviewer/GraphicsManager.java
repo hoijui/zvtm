@@ -260,7 +260,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	mainView.setJava2DPainter(this, Java2DPainter.FOREGROUND);
 
     activateDynaSpot(ConfigManager.DYNASPOT, false);
-    mainView.getCursor().setDynaSpotColor(Color.RED);
+    mainView.getCursor().getDynaPicker().setDynaSpotColor(Color.RED);
 
 	mainViewPanel = mainView.getPanel();
 	setAntialiasing(ConfigManager.ANTIALIASING);
@@ -273,7 +273,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 
     void activateDynaSpot(boolean b, boolean updatePrefs){
         if (updatePrefs){ConfigManager.DYNASPOT = b;}
-        mainView.getCursor().activateDynaSpot(b);
+        mainView.getCursor().getDynaPicker().activateDynaSpot(b);
     }
 
     void setConfigManager(ConfigManager cm){
@@ -952,7 +952,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         }
         else {
             // if cursor was not in a shape, try to detect a label or an edge           
-            Vector otherGlyphs = cursor.getIntersectingGlyphs(cam);
+            Vector otherGlyphs = cursor.getPicker().getIntersectingGlyphs(cam);
             if (otherGlyphs != null && otherGlyphs.size() > 0){
                 g = (Glyph)otherGlyphs.firstElement();
                 if (g.getOwner() != null){o = g.getOwner();}
@@ -1429,7 +1429,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	    }
         // else select the edge hovered by the cursor (if any) - works even if no knowledge about logical structure
         closestNode = null;
-        Vector pum = mainView.getCursor().getIntersectingPaths(mainCamera, 10);
+        Vector pum = mainView.getCursor().getPicker().getIntersectingPaths(mainCamera, 10);
         if (pum.size() > 0){
             slidingLink = (DPath)pum.firstElement();
             lscs = new LinkSliderCalc[1];
@@ -1473,7 +1473,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	}
 	
 	void linkSlider(double vx, double vy, boolean centerCursor){
-        boolean withinSelectionRadius = mainView.getCursor().isUnderCursor(selectionRadius);
+        boolean withinSelectionRadius = mainView.getCursor().getPicker().isPicked(selectionRadius);
 		mPos.setLocation(vx, vy);
 		lscs[lsci].updateMousePosition(mPos);
 		if (!withinSelectionRadius || centerCursor){

@@ -71,8 +71,8 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
             else if (grMngr.tp.isLinkSlidingMode()){
                 Point location = e.getComponent().getLocationOnScreen();
                 relative = e.getPoint();
-                LS_SX = v.getVCursor().vx;
-                LS_SY = v.getVCursor().vy;
+                LS_SX = v.getVCursor().getVSXCoordinate();
+                LS_SY = v.getVCursor().getVSYCoordinate();
                 grMngr.attemptLinkSliding(LS_SX, LS_SY, location.x, location.y);
             }
 			else {
@@ -93,8 +93,8 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 				}
 				else if (mod == ALT_MOD){
 					zoomingInRegion=true;
-					x1=v.getVCursor().vx;
-					y1=v.getVCursor().vy;
+					x1=v.getVCursor().getVSXCoordinate();
+					y1=v.getVCursor().getVSYCoordinate();
 					v.setDrawRect(true);
 				}
 			}
@@ -102,7 +102,7 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 	}
 
 	public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	    if (ConfigManager.DYNASPOT && !toolPaletteIsActive && !v.getVCursor().isDynaSpotActivated()){grMngr.activateDynaSpot(true, false);}
+	    if (ConfigManager.DYNASPOT && !toolPaletteIsActive && !v.getVCursor().getDynaPicker().isDynaSpotActivated()){grMngr.activateDynaSpot(true, false);}
 		if (grMngr.isBringingAndGoing){
 			grMngr.endBringAndGo(v.lastGlyphEntered());
 		}
@@ -119,8 +119,8 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 			}
 			if (zoomingInRegion){
 				v.setDrawRect(false);
-				x2=v.getVCursor().vx;
-				y2=v.getVCursor().vy;
+				x2=v.getVCursor().getVSXCoordinate();
+				y2=v.getVCursor().getVSYCoordinate();
 				if ((Math.abs(x2-x1)>=4) && (Math.abs(y2-y1)>=4)){
 					grMngr.mainView.centerOnRegion(grMngr.vsm.getActiveCamera(),ConfigManager.ANIM_MOVE_LENGTH,x1,y1,x2,y2);
 				}
@@ -147,8 +147,8 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 			if (grMngr.tp.isFadingLensNavMode() || grMngr.tp.isProbingLensNavMode()){
 				lastJPX = jpx;
 				lastJPY = jpy;
-				lastVX = v.getVCursor().vx;
-				lastVY = v.getVCursor().vy;
+				lastVX = v.getVCursor().getVSXCoordinate();
+				lastVY = v.getVCursor().getVSYCoordinate();
 				if (grMngr.lensType != GraphicsManager.NO_LENS){
 					grMngr.zoomInPhase2(lastVX, lastVY);
 				}
@@ -217,7 +217,7 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 	    if (ConfigManager.DYNASPOT){grMngr.activateDynaSpot(true, false);}
 		if (toolPaletteIsActive){return;}
 		else {
-			Glyph g = v.getVCursor().lastGlyphEntered;
+			Glyph g = v.getVCursor().getPicker().lastGlyphEntered();
 			if (g != null && g.getType() == Messages.PM_ENTRY){
 				application.pieMenuEvent(g);
 			}
@@ -237,8 +237,8 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 			if (grMngr.tp.isFadingLensNavMode() || grMngr.tp.isProbingLensNavMode()){
 				lastJPX = jpx;
 				lastJPY = jpy;
-				lastVX = v.getVCursor().vx;
-				lastVY = v.getVCursor().vy;
+				lastVX = v.getVCursor().getVSXCoordinate();
+				lastVY = v.getVCursor().getVSYCoordinate();
 				if (grMngr.lensType != GraphicsManager.NO_LENS){
 					grMngr.zoomOutPhase2();
 				}
@@ -287,16 +287,16 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 			}
 		}
 		if (ConfigManager.DYNASPOT){
-		    v.getVCursor().dynaPick(grMngr.mainCamera);
+		    v.getVCursor().getDynaPicker().dynaPick(grMngr.mainCamera);
 	    }
 	}
 
 	public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
 		if (toolPaletteIsActive || grMngr.isBringingAndGoing){return;}
-		if (v.getVCursor().isDynaSpotActivated()){grMngr.activateDynaSpot(false, false);}
+		if (v.getVCursor().getDynaPicker().isDynaSpotActivated()){grMngr.activateDynaSpot(false, false);}
 		if (grMngr.isLinkSliding){
 			// ignore events triggered by AWT robot
-			grMngr.linkSlider(v.getVCursor().vx, v.getVCursor().vy, false);
+			grMngr.linkSlider(v.getVCursor().getVSXCoordinate(), v.getVCursor().getVSYCoordinate(), false);
 		}
 		else if (mod != ALT_MOD && buttonNumber == 1){
 			if (draggingZoomWindow){
@@ -373,8 +373,8 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 		}
 		else {
 			tfactor = (grMngr.mainCamera.focal+Math.abs(grMngr.mainCamera.altitude))/grMngr.mainCamera.focal;
-			mvx = v.getVCursor().vx;
-			mvy = v.getVCursor().vy;
+			mvx = v.getVCursor().getVSXCoordinate();
+			mvy = v.getVCursor().getVSYCoordinate();
 			if (wheelDirection == WHEEL_UP){
 				// zooming out
 				grMngr.mainCamera.vx -= Math.round((mvx - grMngr.mainCamera.vx) * WHEEL_ZOOMOUT_FACTOR / grMngr.mainCamera.focal);
@@ -440,7 +440,7 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 		if (grMngr.vsm.getActiveView().getActiveLayer() == 1){
 			g.highlight(false, null);
 			if (application.mainPieMenu != null && g == application.mainPieMenu.getBoundary()){
-				Glyph lge = grMngr.vsm.getActiveView().mouse.lastGlyphEntered;
+				Glyph lge = grMngr.vsm.getActiveView().mouse.getPicker().lastGlyphEntered();
 				if (lge != null && lge.getType() == Messages.PM_SUBMN){
 					application.mainPieMenu.setSensitivity(false);
 					application.displaySubMenu(lge, true);
@@ -497,7 +497,7 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 
 	void attemptDisplayEdgeURL(VCursor mouse,Camera cam){
 		Glyph g;
-		Vector otherGlyphs = mouse.getIntersectingGlyphs(cam);
+		Vector otherGlyphs = mouse.getPicker().getIntersectingGlyphs(cam);
 		if (otherGlyphs!=null && otherGlyphs.size()>0){
 			g = (Glyph)otherGlyphs.firstElement();
 			if (g.getOwner()!=null){getAndDisplayURL((LElem)g.getOwner(), g);}
