@@ -56,6 +56,11 @@ public class AllGlyphsTest {
         vs.getCamera(0).setAltitude(0);
         populate();
         testView.getGlobalView(mCam, 500, 1.5f);
+        testView.setNotifyCursorMoved(true);        
+    }
+    
+    void toggleDynaSpot(){
+        testView.getCursor().getDynaPicker().activateDynaSpot(!testView.getCursor().getDynaPicker().isDynaSpotActivated());
     }
 
     void populate(){
@@ -297,6 +302,12 @@ class TestEventHandler extends ViewAdapter {
         v.setDrawDrag(false);
     }
     
+    public void mouseMoved(ViewPanel v, int jpx, int jpy, MouseEvent e){
+        if (application.testView.getCursor().getDynaPicker().isDynaSpotActivated()){
+            v.getVCursor().getDynaPicker().dynaPick(application.mCam);            
+        }
+    }
+    
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
         if (buttonNumber == 1){
             Camera c = application.mCam;
@@ -332,6 +343,7 @@ class TestEventHandler extends ViewAdapter {
     public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
         if (c == 't'){application.translate();}
         else if (c == 'r'){application.rotate();}
+        else if (c == 'd'){application.toggleDynaSpot();}        
     }
     
     public void viewClosing(View v){
