@@ -211,7 +211,7 @@ public class Picker {
 	 * It can thus be much more computationaly expensive than getpickedGlyphsList()
 	 *@param c a camera (the active camera can be obtained by VirtualSpaceManager.getActiveCamera())
 	 *@return a list of glyphs under the mouse cursor, sorted by drawing order; null if no object under the cursor.
-	 *@see #getpickedGlyphsList()
+	 *@see #getPickedGlyphsList()
 	 */
 	public Vector<Glyph> getIntersectingGlyphs(Camera c){
         Vector res = new Vector();
