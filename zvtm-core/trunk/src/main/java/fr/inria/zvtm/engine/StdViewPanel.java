@@ -272,31 +272,31 @@ public class StdViewPanel extends ViewPanel {
 
 	private void drawCursor(){
 		stableRefToBackBufferGraphics.setColor(parent.mouse.hcolor);
-		if (drawDrag){stableRefToBackBufferGraphics.drawLine(origDragx,origDragy,parent.mouse.mx,parent.mouse.my);}
+		if (drawDrag){stableRefToBackBufferGraphics.drawLine(origDragx,origDragy,parent.mouse.jpx,parent.mouse.jpy);}
 		if (drawRect){
-			stableRefToBackBufferGraphics.drawRect(Math.min(origDragx,parent.mouse.mx),
-					Math.min(origDragy,parent.mouse.my),
-					Math.max(origDragx,parent.mouse.mx)-Math.min(origDragx,parent.mouse.mx),
-					Math.max(origDragy,parent.mouse.my)-Math.min(origDragy,parent.mouse.my));}
+			stableRefToBackBufferGraphics.drawRect(Math.min(origDragx,parent.mouse.jpx),
+					Math.min(origDragy,parent.mouse.jpy),
+					Math.max(origDragx,parent.mouse.jpx)-Math.min(origDragx,parent.mouse.jpx),
+					Math.max(origDragy,parent.mouse.jpy)-Math.min(origDragy,parent.mouse.jpy));}
 		if (drawOval){
 			if (circleOnly){
-				stableRefToBackBufferGraphics.drawOval(origDragx-Math.abs(origDragx-parent.mouse.mx),
-						origDragy-Math.abs(origDragx-parent.mouse.mx),
-						2*Math.abs(origDragx-parent.mouse.mx),
-						2*Math.abs(origDragx-parent.mouse.mx));
+				stableRefToBackBufferGraphics.drawOval(origDragx-Math.abs(origDragx-parent.mouse.jpx),
+						origDragy-Math.abs(origDragx-parent.mouse.jpx),
+						2*Math.abs(origDragx-parent.mouse.jpx),
+						2*Math.abs(origDragx-parent.mouse.jpx));
 			}
 			else {
-				stableRefToBackBufferGraphics.drawOval(origDragx-Math.abs(origDragx-parent.mouse.mx),
-						origDragy-Math.abs(origDragy-parent.mouse.my),
-						2*Math.abs(origDragx-parent.mouse.mx),
-						2*Math.abs(origDragy-parent.mouse.my));
+				stableRefToBackBufferGraphics.drawOval(origDragx-Math.abs(origDragx-parent.mouse.jpx),
+						origDragy-Math.abs(origDragy-parent.mouse.jpy),
+						2*Math.abs(origDragx-parent.mouse.jpx),
+						2*Math.abs(origDragy-parent.mouse.jpy));
 			}
 		}
 		if (drawVTMcursor){
 			stableRefToBackBufferGraphics.setXORMode(backColor);
 			parent.mouse.draw(stableRefToBackBufferGraphics);
-			oldX = parent.mouse.mx;
-			oldY = parent.mouse.my;			    
+			oldX = parent.mouse.jpx;
+			oldY = parent.mouse.jpy;			    
 		}
 
 	}
@@ -304,7 +304,7 @@ public class StdViewPanel extends ViewPanel {
 	private void doCursorPicking(){
 		try {                  // branch and we want to catch new requests for repaint
 			parent.mouse.unProject(cams[activeLayer],this); //we project the mouse cursor wrt the appropriate coord sys
-			if (parent.mouse.isSensitive()){parent.mouse.computeCursorOverList(evHs[activeLayer],cams[activeLayer], this);}
+			if (parent.mouse.isSensitive()){parent.mouse.getPicker().computePickedGlyphList(evHs[activeLayer],cams[activeLayer], this);}
 		}
 		catch (NullPointerException ex) {if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.drawdrag "+ex);}}
 	}
@@ -360,10 +360,10 @@ public class StdViewPanel extends ViewPanel {
                             stableRefToBackBufferGraphics.setColor(parent.mouse.color);
                             stableRefToBackBufferGraphics.drawLine(oldX-parent.mouse.size,oldY,oldX+parent.mouse.size,oldY);
                             stableRefToBackBufferGraphics.drawLine(oldX,oldY-parent.mouse.size,oldX,oldY+parent.mouse.size);
-                            stableRefToBackBufferGraphics.drawLine(parent.mouse.mx-parent.mouse.size,parent.mouse.my,parent.mouse.mx+parent.mouse.size,parent.mouse.my);
-                            stableRefToBackBufferGraphics.drawLine(parent.mouse.mx,parent.mouse.my-parent.mouse.size,parent.mouse.mx,parent.mouse.my+parent.mouse.size);
-                            oldX = parent.mouse.mx;
-                            oldY = parent.mouse.my;							        
+                            stableRefToBackBufferGraphics.drawLine(parent.mouse.jpx-parent.mouse.size,parent.mouse.jpy,parent.mouse.jpx+parent.mouse.size,parent.mouse.jpy);
+                            stableRefToBackBufferGraphics.drawLine(parent.mouse.jpx,parent.mouse.jpy-parent.mouse.size,parent.mouse.jpx,parent.mouse.jpy+parent.mouse.size);
+                            oldX = parent.mouse.jpx;
+                            oldY = parent.mouse.jpy;							        
                         }
                         //XXX: a nullpointerex on stableRefToBackBufferGraphics seems to occur from time to time when going in or exiting from blank mode
                         //just catch it and wait for next loop until we find out what's causing this
@@ -391,8 +391,8 @@ public class StdViewPanel extends ViewPanel {
         if (drawVTMcursor){
             stableRefToBackBufferGraphics.setXORMode(backColor);
             stableRefToBackBufferGraphics.setColor(parent.mouse.color);
-            stableRefToBackBufferGraphics.drawLine(parent.mouse.mx-parent.mouse.size,parent.mouse.my,parent.mouse.mx+parent.mouse.size,parent.mouse.my);
-            stableRefToBackBufferGraphics.drawLine(parent.mouse.mx,parent.mouse.my-parent.mouse.size,parent.mouse.mx,parent.mouse.my+parent.mouse.size);
+            stableRefToBackBufferGraphics.drawLine(parent.mouse.jpx-parent.mouse.size,parent.mouse.jpy,parent.mouse.jpx+parent.mouse.size,parent.mouse.jpy);
+            stableRefToBackBufferGraphics.drawLine(parent.mouse.jpx,parent.mouse.jpy-parent.mouse.size,parent.mouse.jpx,parent.mouse.jpy+parent.mouse.size);
             paintImmediately(0,0,size.width,size.height);            
         }
 	}

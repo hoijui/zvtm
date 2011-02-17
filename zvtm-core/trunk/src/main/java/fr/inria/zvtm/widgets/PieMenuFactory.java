@@ -42,7 +42,7 @@ public abstract class PieMenuFactory {
      *@param vsm instance of VirtualSpaceManager
      */
     public static PieMenu createPieMenu(String[] labels, int animLength, View v, VirtualSpaceManager vsm){
-        return new PieMenuR(labels, new Point2D.Double(v.mouse.vx, v.mouse.vy),
+        return new PieMenuR(labels, new Point2D.Double(v.mouse.getVSXCoordinate(), v.mouse.getVSYCoordinate()),
             v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, RING_INNER_RATIO, ANGLE,
             ITEM_FILLCOLOR, ITEM_BORDERCOLOR, ITEM_SFILLCOLOR, ITEM_SBORDERCOLOR, LABEL_COLOR, TRANSLUCENCY,
             animLength, SENSIT_BOUNDING_RADIUS, FONT);
@@ -65,7 +65,7 @@ public abstract class PieMenuFactory {
     public static PieMenu createPieMenu(String[] labels, int animLength, View v, VirtualSpaceManager vsm,
 					Color[] itemColors, Color[] itembColors, Color[] itemSColors,
 					Color[] itembSColors, Color[] labelColors){
-	    return new PieMenuR(labels, new Point2D.Double(v.mouse.vx, v.mouse.vy),
+	    return new PieMenuR(labels, new Point2D.Double(v.mouse.getVSXCoordinate(), v.mouse.getVSYCoordinate()),
             v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, RING_INNER_RATIO, ANGLE,
             itemColors, itembColors, itemSColors, itembSColors, labelColors, TRANSLUCENCY,
             animLength, SENSIT_BOUNDING_RADIUS, FONT);
@@ -82,7 +82,7 @@ public abstract class PieMenuFactory {
      *@param vsm instance of VirtualSpaceManager
      */
     public static PieMenu createPieMenu(String[] labels, Point2D.Double[] labelOffsets, int animLength, View v, VirtualSpaceManager vsm){
-	    return new PieMenuR(labels, new Point2D.Double(v.mouse.vx, v.mouse.vy),
+	    return new PieMenuR(labels, new Point2D.Double(v.mouse.getVSXCoordinate(), v.mouse.getVSYCoordinate()),
 	    		    v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, RING_INNER_RATIO, ANGLE,
 	    		    ITEM_FILLCOLOR, ITEM_BORDERCOLOR, ITEM_SFILLCOLOR, ITEM_SBORDERCOLOR, LABEL_COLOR, TRANSLUCENCY,
 	    		    animLength, SENSIT_BOUNDING_RADIUS, FONT, labelOffsets);
@@ -106,7 +106,7 @@ public abstract class PieMenuFactory {
     public static PieMenu createPieMenu(String[] labels, Point2D.Double[] labelOffsets, int animLength, View v, VirtualSpaceManager vsm,
 					Color[] itemColors, Color[] itembColors, Color[] itemSColors,
 					Color[] itembSColors, Color[] labelColors){
-	    return new PieMenuR(labels, new Point2D.Double(v.mouse.vx, v.mouse.vy),
+	    return new PieMenuR(labels, new Point2D.Double(v.mouse.getVSXCoordinate(), v.mouse.getVSYCoordinate()),
 	    		    v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, RING_INNER_RATIO, ANGLE,
 	    		    itemColors, itembColors, itemSColors, itembSColors,labelColors, TRANSLUCENCY,
 	    		    animLength, SENSIT_BOUNDING_RADIUS, FONT, labelOffsets);
@@ -122,7 +122,7 @@ public abstract class PieMenuFactory {
      *@param vsm instance of VirtualSpaceManager
      */
     public static PieMenu createPolygonalPieMenu(String[] labels, View v, VirtualSpaceManager vsm){
-	    return new PieMenuP(labels, new Point2D.Double(v.mouse.vx, v.mouse.vy),
+	    return new PieMenuP(labels, new Point2D.Double(v.mouse.getVSXCoordinate(), v.mouse.getVSYCoordinate()),
 	    		    v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, ANGLE,
 	    		    ITEM_FILLCOLOR, ITEM_BORDERCOLOR, ITEM_SFILLCOLOR, ITEM_SBORDERCOLOR, LABEL_COLOR, TRANSLUCENCY,
 	    		    SENSIT_BOUNDING_RADIUS, FONT);
@@ -144,7 +144,7 @@ public abstract class PieMenuFactory {
     public static PieMenu createPolygonalPieMenu(String[] labels, View v, VirtualSpaceManager vsm,
 						 Color[] itemColors, Color[] itembColors, Color[] itemSColors,
 						 Color[] itembSColors, Color[] labelColors){
-	    return new PieMenuP(labels, new Point2D.Double(v.mouse.vx, v.mouse.vy),
+	    return new PieMenuP(labels, new Point2D.Double(v.mouse.getVSXCoordinate(), v.mouse.getVSYCoordinate()),
 	    		    v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, ANGLE,
 	    		    itemColors, itembColors, itemSColors, itembSColors, labelColors, TRANSLUCENCY,
 	    		    SENSIT_BOUNDING_RADIUS, FONT);
@@ -160,7 +160,7 @@ public abstract class PieMenuFactory {
      *@param vsm instance of VirtualSpaceManager
      */
     public static PieMenu createPolygonalPieMenu(String[] labels, Point2D.Double[] labelOffsets, View v, VirtualSpaceManager vsm){
-	    return new PieMenuP(labels, new Point2D.Double(v.mouse.vx, v.mouse.vy),
+	    return new PieMenuP(labels, new Point2D.Double(v.mouse.getVSXCoordinate(), v.mouse.getVSYCoordinate()),
 			        v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, ANGLE,
 			        ITEM_FILLCOLOR, ITEM_BORDERCOLOR, ITEM_SFILLCOLOR, ITEM_SBORDERCOLOR, LABEL_COLOR, TRANSLUCENCY,
 			        SENSIT_BOUNDING_RADIUS, FONT, labelOffsets);
@@ -183,7 +183,7 @@ public abstract class PieMenuFactory {
     public static PieMenu createPolygonalPieMenu(String[] labels, Point2D.Double[] labelOffsets, View v, VirtualSpaceManager vsm,
 						 Color[] itemColors, Color[] itembColors, Color[] itemSColors,
 						 Color[] itembSColors, Color[] labelColors){
-	    return new PieMenuP(labels, new Point2D.Double(v.mouse.vx, v.mouse.vy),
+	    return new PieMenuP(labels, new Point2D.Double(v.mouse.getVSXCoordinate(), v.mouse.getVSYCoordinate()),
 	    		    v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, ANGLE,
 	    		    itemColors, itembColors, itemSColors, itembSColors, labelColors, TRANSLUCENCY,
 	    		    SENSIT_BOUNDING_RADIUS, FONT, labelOffsets);

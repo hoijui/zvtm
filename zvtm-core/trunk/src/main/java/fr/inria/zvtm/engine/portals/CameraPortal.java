@@ -233,10 +233,10 @@ public class CameraPortal extends Portal {
         double uncoef = (c.focal+c.altitude) / (float)c.focal;
         //XXX: FIXME works only when portal right under mouse cursor
         //     fix by taking the portal's visible region bounds in virtual space
-        double[] wnes = {(c.getOwningView().mouse.vx - w/2d*uncoef),
-            c.getOwningView().mouse.vy + h/2d*uncoef,
-            c.getOwningView().mouse.vx + w/2d*uncoef,
-            c.getOwningView().mouse.vy - h/2d*uncoef};
+        double[] wnes = {(c.getOwningView().mouse.getVSXCoordinate() - w/2d*uncoef),
+            c.getOwningView().mouse.getVSYCoordinate() + h/2d*uncoef,
+            c.getOwningView().mouse.getVSXCoordinate() + w/2d*uncoef,
+            c.getOwningView().mouse.getVSYCoordinate() - h/2d*uncoef};
         // compute the portal camera's new (x,y) coordinates and altitude
         return new Location((wnes[2]+wnes[0]) / 2d, (wnes[1]+wnes[3]) / 2d, camera.focal * ((wnes[2]-wnes[0])/w));
     }

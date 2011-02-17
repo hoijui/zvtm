@@ -63,7 +63,7 @@ public class SwingListener extends ViewAdapter {
         focusedComponent = null;
 		//pick glyph under cursor, redispatch if it is an instance
         //of VSwingComponent
-        Glyph[] pickList = v.getVCursor().getGlyphsUnderMouseList();
+        Glyph[] pickList = v.getVCursor().getPicker().getPickedGlyphList();
         if(pickList.length == 0){
             return;
         }

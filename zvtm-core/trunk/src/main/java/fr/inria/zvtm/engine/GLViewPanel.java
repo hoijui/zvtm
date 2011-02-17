@@ -148,25 +148,25 @@ public class GLViewPanel extends ViewPanel {
                         //we project the mouse cursor wrt the appropriate coord sys
                         parent.mouse.unProject(cams[activeLayer],this);
                         if (parent.mouse.isSensitive()){
-                            parent.mouse.computeCursorOverList(evHs[activeLayer],cams[activeLayer]);
+                            parent.mouse.getPicker().computePickedGlyphList(evHs[activeLayer],cams[activeLayer]);
                         }
                     }
                     catch (NullPointerException ex) {if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.drawdrag "+ex);}}
                     stableRefToBackBufferGraphics.setColor(parent.mouse.hcolor);
-                    if (drawDrag){stableRefToBackBufferGraphics.drawLine(origDragx,origDragy,parent.mouse.mx,parent.mouse.my);}
-                    if (drawRect){stableRefToBackBufferGraphics.drawRect(Math.min(origDragx,parent.mouse.mx),Math.min(origDragy,parent.mouse.my),Math.max(origDragx,parent.mouse.mx)-Math.min(origDragx,parent.mouse.mx),Math.max(origDragy,parent.mouse.my)-Math.min(origDragy,parent.mouse.my));}
+                    if (drawDrag){stableRefToBackBufferGraphics.drawLine(origDragx,origDragy,parent.mouse.jpx,parent.mouse.jpy);}
+                    if (drawRect){stableRefToBackBufferGraphics.drawRect(Math.min(origDragx,parent.mouse.jpx),Math.min(origDragy,parent.mouse.jpy),Math.max(origDragx,parent.mouse.jpx)-Math.min(origDragx,parent.mouse.jpx),Math.max(origDragy,parent.mouse.jpy)-Math.min(origDragy,parent.mouse.jpy));}
                     if (drawOval){
                         if (circleOnly){
-                            stableRefToBackBufferGraphics.drawOval(origDragx-Math.abs(origDragx-parent.mouse.mx),origDragy-Math.abs(origDragx-parent.mouse.mx),2*Math.abs(origDragx-parent.mouse.mx),2*Math.abs(origDragx-parent.mouse.mx));
+                            stableRefToBackBufferGraphics.drawOval(origDragx-Math.abs(origDragx-parent.mouse.jpx),origDragy-Math.abs(origDragx-parent.mouse.jpx),2*Math.abs(origDragx-parent.mouse.jpx),2*Math.abs(origDragx-parent.mouse.jpx));
                         }
                         else {
-                            stableRefToBackBufferGraphics.drawOval(origDragx-Math.abs(origDragx-parent.mouse.mx),origDragy-Math.abs(origDragy-parent.mouse.my),2*Math.abs(origDragx-parent.mouse.mx),2*Math.abs(origDragy-parent.mouse.my));
+                            stableRefToBackBufferGraphics.drawOval(origDragx-Math.abs(origDragx-parent.mouse.jpx),origDragy-Math.abs(origDragy-parent.mouse.jpy),2*Math.abs(origDragx-parent.mouse.jpx),2*Math.abs(origDragy-parent.mouse.jpy));
                         }
                     }
                     if (drawVTMcursor){
                         parent.mouse.draw(stableRefToBackBufferGraphics);
-                        oldX=parent.mouse.mx;
-                        oldY=parent.mouse.my;
+                        oldX=parent.mouse.jpx;
+                        oldY=parent.mouse.jpy;
                     }
                 }
                 //end drawing here

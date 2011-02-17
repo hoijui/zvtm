@@ -498,7 +498,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
             requestFocus();
         }
         if (parent.mouse.sync){
-            parent.mouse.moveTo(e.getX(),e.getY());
+            parent.mouse.setJPanelCoordinates(e.getX(),e.getY());
             updateMouseOnly = true;
             //translate glyphs sticked to mouse
             parent.mouse.propagateMove();
@@ -565,7 +565,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
     public void mouseMoved(MouseEvent e){
         try {
             if (parent.mouse.sync && (e.getX() != ix || e.getY() != iy)){
-                    parent.mouse.moveTo(e.getX(),e.getY());
+                    parent.mouse.setJPanelCoordinates(e.getX(),e.getY());
                     //we project the mouse cursor wrt the appropriate coord sys
                     //parent.mouse.unProject(cams[activeLayer],this);
                     updateMouseOnly=true;
@@ -579,7 +579,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
                         evHs[activeLayer].mouseMoved(this, e.getX(), e.getY(), e);
                     }
                     if (parent.mouse.isSensitive()){
-                        if (parent.mouse.computeCursorOverList(evHs[activeLayer], cams[activeLayer], this)){
+                        if (parent.mouse.getPicker().computePickedGlyphList(evHs[activeLayer], cams[activeLayer], this)){
                             parent.repaint();
                         }
                     }
@@ -595,7 +595,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
             if (parent.mouse.sync && (e.getX() != ix || e.getY() != iy)){
                 int whichButton=e.getModifiers();
                 int buttonNumber=0;
-                    parent.mouse.moveTo(e.getX(), e.getY());
+                    parent.mouse.setJPanelCoordinates(e.getX(), e.getY());
                     //we project the mouse cursor wrt the appropriate coord sys
                     parent.mouse.unProject(cams[activeLayer], this);                    
                 //translate glyphs sticked to mouse
@@ -629,7 +629,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
                 //assign anyway, even if the current drag command does not want to display a segment
                 curDragx=e.getX();curDragy=e.getY();  
                 parent.repaint();
-                if (parent.mouse.isSensitive()){parent.mouse.computeCursorOverList(evHs[activeLayer],cams[activeLayer],this);}
+                if (parent.mouse.isSensitive()){parent.mouse.getPicker().computePickedGlyphList(evHs[activeLayer],cams[activeLayer],this);}
             }
         }	
         catch (NullPointerException ex) {if (VirtualSpaceManager.INSTANCE.debugModeON()){System.err.println("viewpanel.mousedragged "+ex);}}
@@ -652,15 +652,15 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 
     /**last glyph the mouse entered in  (for this view and current active layer)*/
     public Glyph lastGlyphEntered(){
-	return parent.mouse.lastGlyphEntered;
+	return parent.mouse.getPicker().lastGlyphEntered();
     }
 
-    /**get the list of glyphs currently under mouse (last entry is last glyph entered)
+    /** Get the list of glyphs currently under mouse (last entry is last glyph entered)
      * This returns a <em>copy</em> of the actual array managed by VCursor at the time the method is called
      * (in other words, the array returned by this method is not synchronized with the actual list over time)
      */
-    public Glyph[] getGlyphsUnderMouseList(){
-	return parent.mouse.getGlyphsUnderMouseList();
+    public Glyph[] getGlyphsUnderCursorList(){
+	    return parent.mouse.getPicker().getPickedGlyphList();
     }
 
     //get the BufferedImage or VolatileImage for this view

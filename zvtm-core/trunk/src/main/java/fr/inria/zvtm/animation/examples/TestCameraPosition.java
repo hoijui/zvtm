@@ -144,8 +144,8 @@ public class TestCameraPosition {
 	    //over the course of a second
 	    final double sx = cam.vx;
 	    final double sy = cam.vy;
-	    final double ex = v.getVCursor().vx;
-	    final double ey = v.getVCursor().vy;
+	    final double ex = v.getVCursor().getVSXCoordinate();
+	    final double ey = v.getVCursor().getVSYCoordinate();
 
 	    Animation trans = am.getAnimationFactory().createAnimation(1000, 1f, Animation.RepeatBehavior.LOOP,
 						 cam,

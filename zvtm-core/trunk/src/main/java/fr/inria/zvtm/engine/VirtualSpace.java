@@ -313,7 +313,7 @@ public class VirtualSpace {
             View v;
             for (int i=0;i<cm.cameraList.length;i++){
                 if (cm.cameraList[i] != null && cm.cameraList[i].view != null){
-                    cm.cameraList[i].view.mouse.removeGlyphFromList(g);
+                    cm.cameraList[i].view.mouse.getPicker().removeGlyphFromList(g);
                 }
             }
             visualEnts.remove(g);
@@ -347,7 +347,7 @@ public class VirtualSpace {
         View v;
         for (int i=0;i<cm.cameraList.length;i++){
             if (cm.cameraList[i] != null && cm.cameraList[i].view != null){
-                cm.cameraList[i].view.mouse.removeGlyphFromList(g);
+                cm.cameraList[i].view.mouse.getPicker().removeGlyphFromList(g);
             }
         }
         VirtualSpaceManager.INSTANCE.repaint();

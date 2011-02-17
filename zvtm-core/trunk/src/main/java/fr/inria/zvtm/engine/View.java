@@ -286,8 +286,7 @@ public abstract class View {
     public void setActiveLayer(int i){
         Camera c = (Camera)cameras.elementAt(i);
         mouse.unProject(c, panel);
-        mouse.resetGlyphsUnderMouseList(c.parentSpace,
-            c.getIndex());
+        mouse.getPicker().resetPickedGlyphsList(c.parentSpace, c.getIndex());
         panel.activeLayer=i;
     }
 
