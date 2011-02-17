@@ -293,7 +293,7 @@ Dependency on \cd{zvtm-fits} is declared as follows:
 \subsection{Tree and Graph Layout}
 \label{sec:layout}
 
-\subsubsection{Using Jung 2.0}
+\subsubsection{Node-link diagram layout with Jung 2.0}
 \label{sec:jung}
 
 ZVTM Layout uses the Jung 2.0\fref{http://jung.sf.net} (Java Universal Network/Graph) framework to layout complex data structures such as trees or graphs represented as ZVTM glyphs in virtual spaces.
@@ -311,10 +311,17 @@ Dependency on \cd{zvtm-layout} is declared as follows:
 \end{SaveVerbatim}
 \fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
 
-\subsubsection{Using NodeTrix}
+\subsubsection{NodeTrix}
 \label{sec:nodetrix}
 
-\todo{Refer to paper, show screenshots}
+Implementation of the NodeTrix network visualization technique \cite{nodetrix07}, combining node-link and adjacency matrix representations.
+
+\begin{figure}
+\centering
+ \includegraphics[width=\columnwidth]{images/ontotrix.png}
+   \caption{Example NodeTrix-based visualization for ontologies with OntoTrix \cite{bach11}}
+   \label{fig:ontotrix}
+\end{figure}
 
 Dependency on \cd{zvtm-nodetrix} is declared as follows:
 
@@ -322,7 +329,30 @@ Dependency on \cd{zvtm-nodetrix} is declared as follows:
 <dependency>
   <groupId>fr.inria.zvtm</groupId>
   <artifactId>zvtm-nodetrix</artifactId>
-  <version>0.2.0</version> <!-- or any newer version -->
+  <version>0.4.0</version> <!-- or any newer version -->
 </dependency>
 \end{SaveVerbatim}
 \fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+
+\subsubsection{Treemaps}
+\label{sec:treemap}
+
+Implementation of the squarified treemap layout algorithm \cite{bruls99}. See Figure \ref{fig:treemap}. In addition to smooth panning and zooming (as available in any ZVTM view/camera), this implementation features some navigation features drawn from Zoomable Treemaps \cite{blanch07}, including Zoom Menus.
+
+Dependency on \cd{zvtm-treemap} is declared as follows:
+
+\begin{SaveVerbatim}{CodeVerb}
+<dependency>
+  <groupId>fr.inria.zvtm</groupId>
+  <artifactId>zvtm-treemap</artifactId>
+  <version>0.0.3-SNAPSHOT</version> <!-- or any newer version -->
+</dependency>
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+
+\begin{figure}
+\centering
+ \includegraphics[width=.8\columnwidth]{images/treemap.jpg}
+   \caption{Example Treemap used in ALMA Observatory's Operations Monitoring and Control software}
+   \label{fig:treemap}
+\end{figure}
