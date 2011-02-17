@@ -59,8 +59,8 @@ public class FractalEventHandler implements ViewListener {
 	}
 	else if (mod == ALT_MOD){
 	    zoomingInRegion=true;
-	    x1=v.getVCursor().vx;
-	    y1=v.getVCursor().vy;
+	    x1=v.getVCursor().getVSXCoordinate();
+	    y1=v.getVCursor().getVSYCoordinate();
 	    v.setDrawRect(true);
 	}
     }
@@ -68,8 +68,8 @@ public class FractalEventHandler implements ViewListener {
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
 	if (zoomingInRegion){
 	    v.setDrawRect(false);
-	    x2=v.getVCursor().vx;
-	    y2=v.getVCursor().vy;
+	    x2=v.getVCursor().getVSXCoordinate();
+	    y2=v.getVCursor().getVSYCoordinate();
 	    if ((Math.abs(x2-x1)>=4) && (Math.abs(y2-y1)>=4)){
 		v.parent.centerOnRegion(application.vsm.getActiveCamera(),FractalDemo.ANIM_MOVE_LENGTH,x1,y1,x2,y2);
 	    }
@@ -86,7 +86,7 @@ public class FractalEventHandler implements ViewListener {
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy, int clickNumber, MouseEvent e){
-	Point2D.Double lp = new Point2D.Double(v.getVCursor().vx - v.cams[0].vx, v.getVCursor().vy - v.cams[0].vy);
+	Point2D.Double lp = new Point2D.Double(v.getVCursor().getVSXCoordinate() - v.cams[0].vx, v.getVCursor().getVSYCoordinate() - v.cams[0].vy);
 
 	Animation transAnim = application.vsm.getAnimationManager().getAnimationFactory()
 	    .createCameraTranslation(FractalDemo.ANIM_MOVE_LENGTH, v.cams[0], 
@@ -115,7 +115,7 @@ public class FractalEventHandler implements ViewListener {
     }
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy, int clickNumber, MouseEvent e){
-	Point2D.Double lp = new Point2D.Double(v.getVCursor().vx - v.cams[0].vx, v.getVCursor().vy - v.cams[0].vy);
+	Point2D.Double lp = new Point2D.Double(v.getVCursor().getVSXCoordinate() - v.cams[0].vx, v.getVCursor().getVSYCoordinate() - v.cams[0].vy);
 
 	Animation transAnim = application.vsm.getAnimationManager().getAnimationFactory()
 	    .createCameraTranslation(FractalDemo.ANIM_MOVE_LENGTH, v.cams[0], 

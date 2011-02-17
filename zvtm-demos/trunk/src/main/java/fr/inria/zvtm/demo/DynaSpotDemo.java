@@ -66,11 +66,11 @@ public class DynaSpotDemo {
 		vs.addGlyph(new VCircle(-300,0,0,8,Color.BLACK));
 		vs.addGlyph(new VCircle(300,0,0,8,Color.BLACK));
         vsm.repaint();
-		demoView.getCursor().activateDynaSpot(true);
+		demoView.getCursor().getDynaPicker().activateDynaSpot(true);
     }
 
 	void setDynaSpotVisibility(short v){
-		demoView.getCursor().setDynaSpotVisibility(v);
+		demoView.getCursor().getDynaPicker().setDynaSpotVisibility(v);
 	}
     
     public static void main(String[] args){
@@ -142,7 +142,7 @@ class DynaSpotDemoEvtHdlr implements ViewListener {
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
-        v.getVCursor().dynaPick(v.cams[0]);
+        v.getVCursor().getDynaPicker().dynaPick(v.cams[0]);
     }
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){

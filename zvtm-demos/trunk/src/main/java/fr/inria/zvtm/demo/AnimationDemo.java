@@ -120,8 +120,8 @@ public class AnimationDemo extends JApplet implements MouseListener, KeyListener
 	mCam = mSpace.addCamera();
 	Vector cameras = new Vector();
 	cameras.add(mCam);
-	viewPanel = vsm.addPanelView(cameras, APPLET_TITLE, appletWindowWidth, appletWindowHeight-40);
-	mView = vsm.getView(APPLET_TITLE);
+	mView = vsm.addPanelView(cameras, APPLET_TITLE, appletWindowWidth, appletWindowHeight-40);
+	viewPanel = mView.getPanel();
 	mView.setBackgroundColor(APPLET_BKG_COLOR);
 	eh = new AnimationDemoEventHandler(this);
 	mView.setListener(eh);
@@ -708,10 +708,10 @@ class AnimationDemoEventHandler implements ViewListener {
     public void viewClosing(View v){}
 
     Glyph getGlyph(VCursor c){
-        Glyph res = c.lastGlyphEntered;
+        Glyph res = c.getPicker().lastGlyphEntered();
         if (res != null){return res;}
         else {
-            Vector<VSegment> v2 = c.getIntersectingSegments(application.mCam, 4);
+            Vector<VSegment> v2 = c.getPicker().getIntersectingSegments(application.mCam, 4);
             if (v2 != null){
                 res = v2.firstElement();
             }
