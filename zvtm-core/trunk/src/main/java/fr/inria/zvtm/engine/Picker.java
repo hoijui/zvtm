@@ -10,7 +10,6 @@ package fr.inria.zvtm.engine;
 import java.awt.geom.GeneralPath;
 
 import java.util.Vector;
-//import java.util.Set;
 import java.util.Arrays;
 
 import fr.inria.zvtm.event.ViewListener;
