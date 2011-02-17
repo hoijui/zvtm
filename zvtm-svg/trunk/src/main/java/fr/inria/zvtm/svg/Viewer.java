@@ -590,8 +590,8 @@ class MainEventHandler implements ViewListener, ComponentListener, PortalListene
 		}
 		else if (mod == ALT_MOD){
             selectingRegion = true;
-            x1 = v.getVCursor().vx;
-            y1 = v.getVCursor().vy;
+            x1 = v.getVCursor().getVSXCoordinate();
+            y1 = v.getVCursor().getVSYCoordinate();
             v.setDrawRect(true);
         }
         else {
@@ -607,8 +607,8 @@ class MainEventHandler implements ViewListener, ComponentListener, PortalListene
 	    pcameraStickedToMouse = false;
 	    if (selectingRegion){
 			v.setDrawRect(false);
-			x2 = v.getVCursor().vx;
-			y2 = v.getVCursor().vy;
+			x2 = v.getVCursor().getVSXCoordinate();
+			y2 = v.getVCursor().getVSYCoordinate();
 			if ((Math.abs(x2-x1)>=4) && (Math.abs(y2-y1)>=4)){
 				application.nm.mCamera.getOwningView().centerOnRegion(application.nm.mCamera, Config.ANIM_MOVE_LENGTH,
 				                                                      x1, y1, x2, y2);
