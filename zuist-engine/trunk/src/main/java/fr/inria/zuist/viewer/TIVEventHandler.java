@@ -76,8 +76,8 @@ class TIVExplorerEventHandler implements ViewListener, ComponentListener, Portal
     public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
         lastJPX = jpx;
         lastJPY = jpy;
-        lastVX = v.getVCursor().vx;
-    	lastVY = v.getVCursor().vy;
+        lastVX = v.getVCursor().getVSXCoordinate();
+    	lastVY = v.getVCursor().getVSYCoordinate();
 		if (inPortal){
 		    if (application.nm.ovPortal.coordInsideObservedRegion(jpx, jpy)){
 				regionStickedToMouse = true;
@@ -93,8 +93,8 @@ class TIVExplorerEventHandler implements ViewListener, ComponentListener, Portal
 		}
         else if (mod == ALT_MOD){
             selectingRegion = true;
-            x1 = v.getVCursor().vx;
-            y1 = v.getVCursor().vy;
+            x1 = v.getVCursor().getVSXCoordinate();
+            y1 = v.getVCursor().getVSYCoordinate();
             v.setDrawRect(true);
         }
         else {
@@ -122,8 +122,8 @@ class TIVExplorerEventHandler implements ViewListener, ComponentListener, Portal
         }
 	    if (selectingRegion){
 			v.setDrawRect(false);
-			x2 = v.getVCursor().vx;
-			y2 = v.getVCursor().vy;
+			x2 = v.getVCursor().getVSXCoordinate();
+			y2 = v.getVCursor().getVSYCoordinate();
 			if ((Math.abs(x2-x1)>=4) && (Math.abs(y2-y1)>=4)){
 			    application.sm.setUpdateLevel(false);
 				application.mCamera.getOwningView().centerOnRegion(application.mCamera, TIVNavigationManager.ANIM_MOVE_DURATION,
@@ -135,8 +135,8 @@ class TIVExplorerEventHandler implements ViewListener, ComponentListener, Portal
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-        lastVX = v.getVCursor().vx;
-        lastVY = v.getVCursor().vy;
+        lastVX = v.getVCursor().getVSXCoordinate();
+        lastVY = v.getVCursor().getVSYCoordinate();
         if (!inPortal){
             if (nm.lensType != TIVNavigationManager.NO_LENS){
                 nm.zoomInPhase2(lastVX, lastVY);
@@ -165,8 +165,8 @@ class TIVExplorerEventHandler implements ViewListener, ComponentListener, Portal
     public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-        lastVX = v.getVCursor().vx;
-        lastVY = v.getVCursor().vy;
+        lastVX = v.getVCursor().getVSXCoordinate();
+        lastVY = v.getVCursor().getVSYCoordinate();
         if (nm.lensType != TIVNavigationManager.NO_LENS){
             nm.zoomOutPhase2();
         }

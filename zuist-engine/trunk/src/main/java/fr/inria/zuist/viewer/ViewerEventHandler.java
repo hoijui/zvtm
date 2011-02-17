@@ -89,7 +89,7 @@ class ViewerEventHandler implements ViewListener, ComponentListener, CameraListe
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-		Vector gum = v.getVCursor().getIntersectingGlyphs(v.cams[0]);
+		Vector gum = v.getVCursor().getPicker().getIntersectingGlyphs(v.cams[0]);
 		if (gum == null){
 			return;
 		}
@@ -142,7 +142,7 @@ class ViewerEventHandler implements ViewListener, ComponentListener, CameraListe
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
         
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
-        application.setCursorCoords(v.getVCursor().vx, v.getVCursor().vy);
+        application.setCursorCoords(v.getVCursor().getVSXCoordinate(), v.getVCursor().getVSYCoordinate());
         VirtualSpaceManager.INSTANCE.repaint();
     }
 
