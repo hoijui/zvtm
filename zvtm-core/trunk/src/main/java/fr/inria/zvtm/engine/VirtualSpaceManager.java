@@ -216,7 +216,7 @@ public class VirtualSpaceManager implements AWTEventListener {
     
     /** Create a new External View.<br>
      *@param c vector of cameras making this view (if more than one camera, cameras will be superimposed on different layers)
-     *@param name view name - pass null to generate a unique, random name.
+     *@param name view name - pass View.ANONYMOUS to generate a unique, random name.
      *@param viewType one of View.STD_VIEW, View.VOLATILE_VIEW, View.OPENGL_VIEW - determines the type of view and acceleration method
      *@param w width of window in pixels
      *@param h height of window in pixels
@@ -230,7 +230,7 @@ public class VirtualSpaceManager implements AWTEventListener {
     /** Create a new External View.<br>
      * The use of OPENGL_VIEW requires the following Java property: -Dsun.java2d.opengl=true
      *@param c vector of cameras making this view (if more than one camera, cameras will be superimposed on different layers)
-     *@param name view name - pass null to generate a unique, random name.
+     *@param name view name - pass View.ANONYMOUS to generate a unique, random name.
      *@param viewType one of View.STD_VIEW, View.VOLATILE_VIEW, View.OPENGL_VIEW - determines the type of view and acceleration method
      *@param w width of window in pixels
      *@param h height of window in pixels
@@ -247,7 +247,7 @@ public class VirtualSpaceManager implements AWTEventListener {
     /**Create a new external view.<br>
      * The use of OPENGL_VIEW requires the following Java property: -Dsun.java2d.opengl=true
      *@param c vector of cameras making this view (if more than one camera, cameras will be superimposed on different layers)
-     *@param name view name - pass null to generate a unique, random name.
+     *@param name view name - pass View.ANONYMOUS to generate a unique, random name.
      *@param viewType one of View.STD_VIEW, View.VOLATILE_VIEW, View.OPENGL_VIEW - determines the type of view and acceleration method
      *@param w width of window in pixels
      *@param h height of window in pixels
@@ -260,7 +260,7 @@ public class VirtualSpaceManager implements AWTEventListener {
     public View addFrameView(List<Camera> c, String name, short viewType, int w, int h,
 				boolean bar, boolean visible, boolean decorated, JMenuBar mnb){
         View v = null;
-        if (name == null){
+        if (name == View.ANONYMOUS){
             name = UUID.randomUUID().toString();
     		while (name2viewIndex.containsKey(name)){
     			name = UUID.randomUUID().toString();
@@ -285,12 +285,12 @@ public class VirtualSpaceManager implements AWTEventListener {
 
     /**Create a new view embedded in a JPanel, suitable for inclusion in any Swing component hierarchy, including a JApplet.
      *@param c vector of cameras superimposed in this view
-     *@param name view name - pass null to generate a unique, random name.
+     *@param name view name - pass View.ANONYMOUS to generate a unique, random name.
      *@param w width of window in pixels
      *@param h height of window in pixels
      */
     public PView addPanelView(List<Camera> c,String name,int w,int h){
-        if (name == null){
+        if (name == View.ANONYMOUS){
             name = UUID.randomUUID().toString();
     		while (name2viewIndex.containsKey(name)){
     			name = UUID.randomUUID().toString();
@@ -321,7 +321,7 @@ public class VirtualSpaceManager implements AWTEventListener {
 	 * @param cameraList vector of cameras superimposed in this view
 	 * @param name	View name. Since this view is
 	 * not itself a window, this does not affect the
-	 * window's title: use setTitle() for that. Pass null to generate a unique, random name.
+	 * window's title: use setTitle() for that. Pass View.ANONYMOUS to generate a unique, random name.
 	 * @param panelWidth	width of panel in pixels
 	 * @param panelHeight	width of panel in pixels
 	 * @param visible	should the view be made visible automatically or not
@@ -340,7 +340,7 @@ public class VirtualSpaceManager implements AWTEventListener {
     public View addFrameView(List<Camera> cameraList, String name, int panelWidth, int panelHeight,
 				boolean visible, boolean decorated, short viewType,
 				JPanel parentPanel, JFrame frame) {
-		if (name == null){
+		if (name == View.ANONYMOUS){
             name = UUID.randomUUID().toString();
         	while (name2viewIndex.containsKey(name)){
         		name = UUID.randomUUID().toString();
@@ -451,11 +451,11 @@ public class VirtualSpaceManager implements AWTEventListener {
     /* ----------- VIRTUAL SPACE --------------- */
 
     /** Create a new virtual space.
-     *@param name name of this virtual space. Pass null to generate a name randomly (guaranteed to be unique).
+     *@param name name of this virtual space. Pass VirtualSpace.ANONYMOUS to generate a name randomly (guaranteed to be unique).
      *@return the new virtual space
      */
     public VirtualSpace addVirtualSpace(String name){
-		if (name == null){
+		if (name == VirtualSpace.ANONYMOUS){
 			name = UUID.randomUUID().toString();
 			while (allVirtualSpaces.containsKey(name)){
 				name = UUID.randomUUID().toString();

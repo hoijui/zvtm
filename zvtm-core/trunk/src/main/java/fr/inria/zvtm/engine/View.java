@@ -56,6 +56,9 @@ import fr.inria.zvtm.engine.portals.Portal;
    **/
 
 public abstract class View {
+    
+    /** Anonymous view. Will generate a random name (guaranteed to be unique). */
+    public static final String ANONYMOUS = "AnonView";
 
     /**Standard ZVTM view, with no particular acceleration method*/
     public static final short STD_VIEW = 0;

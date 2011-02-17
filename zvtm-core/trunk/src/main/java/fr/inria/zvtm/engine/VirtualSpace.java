@@ -38,6 +38,9 @@ import java.util.Vector;
  */
 
 public class VirtualSpace {
+    
+    /** Anonymous virtual space. Will generate a random name (guaranteed to be unique). */
+    public static final String ANONYMOUS = "AnonVS";
 
     /**
      * Compute the geometrical center of a set of glyphs (takes glyph sizes into account)
