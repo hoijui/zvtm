@@ -168,13 +168,13 @@ The paper is available from the ACM Digital Library\footnote{\url{http://doi.acm
 
 {\bf Abstract taken from the paper:} We present DynaSpot, a new technique for acquiring targets based on the area cursor. DynaSpot couples the cursor's activation area with its speed, behaving like a point cursor at low speed or when motionless. This technique minimizes visual distraction and allows pointing anywhere in empty space without requiring an explicit mode switch, thus enabling users to perform common interactions such as region selections seamlessly. The results of our controlled experiments show that the performance of DynaSpot can be modeled by Fitts' law, and that DynaSpot significantly outperforms the point cursor and achieves, in most conditions, the same level of performance as one of the most promising techniques to date, the Bubble cursor.
 
-In ZVTM, the DynaSpot behavior must be activated in \cd{VCursor}, calling:
+In ZVTM, the DynaSpot behavior must be activated in \cd{VCursor}'s \cd{DynaPicker}, calling:
 
-\codebox{v.getCursor().activateDynaSpot(true);}
+\codebox{v.getCursor().getDynaPicker().activateDynaSpot(true);}
 
-In the \cd{mouseMoved(...)} method of the associated \cd{ViewEventHandler} (or wherever it makes sense), call:
+In the \cd{mouseMoved(...)} method of the associated \cd{ViewListener} (or wherever it makes sense), call:
 
-\codebox{vp.getVCursor().dynaPick(c); // where c is the active camera}
+\codebox{vp.getVCursor().getDynaPicker().dynaPick(c); // where c is the active camera}
 
 This updates the list of glyphs intersected by the DynaSpot circular area (disc), and identifies the one glyph actually selected (which is returned and usually highlighted in the interface).
 
@@ -184,9 +184,9 @@ A table on the Web site\footnote{\url{http://zvtm.sourceforge.net/doc/dynaspot.h
 
 For DynaSpot to be efficient, it is necessary to give the user continuous visual feedback about the currently selected target (if any). The default behavior when DynaSpot is active in ZVTM is to highlight the glyph currently selected using its highlight color.
 
-It is also possible to customize the behavior. This is done by implementing interface\\ \cl{fr.inria.zvtm.engine.SelectionListener} and associating that listener with the ZVTM cursor:
+It is also possible to customize the behavior. This is done by implementing interface\\ \cl{fr.inria.zvtm.event.SelectionListener} and associating that listener with the ZVTM cursor's \cd{DynaPicker}:
 
-\codebox{VCursor.setSelectionListener(...)}
+\codebox{cursor.getDynaPicker().setSelectionListener(...)}
 
 There is a single callback method, \cd{glyphSelected(Glyph g, boolean b)} which gets called whenever a glyph gets selected \cd{(b=true)} or unselected \cd{(b=false)} by DynaSpot. Setting your own SelectionListener completely overrides the default highlighting behavior (it does not supplement it).
 

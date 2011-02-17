@@ -245,7 +245,7 @@ Various portals ship with \cd{zvtm-core}, including portals that implement an in
 %%%%%%%%%%
 \subsubsection{Views, Glyph, Mouse and Keyboard Events}
 
-It is possible to associated the same event handler with all layers in a view, or to associate different event handlers with each layer of the view. The input event handling interface works in a way similar to conventional AWT/Swing event listeners (using callbacks). There is a single interface for all ZVTM events: \cl{fr.inria.zvtm.event.ViewListener}. A convenience (default) implementation, which does nothing, is available for subclassing: \cl{ViewAdapter}.
+It is possible to associated the same event listener with all layers in a view, or to associate different event listeners with each layer of the view. The input event handling interface works in a way similar to conventional AWT/Swing event listeners (using callbacks). There is a single interface for all ZVTM events: \cl{fr.inria.zvtm.event.ViewListener}. A convenience (default) implementation, which does nothing, is available for subclassing: \cl{ViewAdapter}.
 
 \cd{ViewListener} features callbacks for conventional pointing device events (move, drag, button press/release/click, mouse wheel) and keyboard events. Additional events are triggered when the cursor enters or exits a glyph, unless this glyph has been declared as not sensitive \cl{Glyph.setSensitivity(boolean b)}.
 
