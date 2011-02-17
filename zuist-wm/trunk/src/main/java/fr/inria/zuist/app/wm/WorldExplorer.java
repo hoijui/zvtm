@@ -173,9 +173,9 @@ public class WorldExplorer implements Java2DPainter {
         mView.setBackgroundColor(BACKGROUND_COLOR);
 		mView.getCursor().setColor(Color.WHITE);
 		mView.getCursor().setHintColor(Color.WHITE);
-		mView.getCursor().setDynaSpotColor(Color.WHITE);
-        mView.getCursor().setDynaSpotLagTime(200);
-		mView.getCursor().activateDynaSpot(true);
+		mView.getCursor().getDynaPicker().setDynaSpotColor(Color.WHITE);
+        mView.getCursor().getDynaPicker().setDynaSpotLagTime(200);
+		mView.getCursor().getDynaPicker().activateDynaSpot(true);
         mView.setJava2DPainter(this, Java2DPainter.AFTER_PORTALS);
         updatePanelSize();
         // console

@@ -108,8 +108,8 @@ class ExplorerEventHandler implements ViewListener, CameraListener, ComponentLis
 			}
 		}
         else if (mod == SHIFT_MOD){
-            lastVX = v.getVCursor().vx;
-            lastVY = v.getVCursor().vy;
+            lastVX = v.getVCursor().getVSXCoordinate();
+            lastVY = v.getVCursor().getVSYCoordinate();
             if (nm.lensType != NavigationManager.NO_LENS){
                 nm.zoomInPhase2(lastVX, lastVY);
             }
@@ -133,10 +133,10 @@ class ExplorerEventHandler implements ViewListener, CameraListener, ComponentLis
 		    }
 		}
 		else {
-		    if (application.isDynaspotEnabled() && v.getVCursor().getDynaSpotRadius() > 0){return;}
+		    if (application.isDynaspotEnabled() && v.getVCursor().getDynaPicker().getDynaSpotRadius() > 0){return;}
 		    selectingRegion = true;
-			x1 = v.getVCursor().vx;
-			y1 = v.getVCursor().vy;
+			x1 = v.getVCursor().getVSXCoordinate();
+			y1 = v.getVCursor().getVSYCoordinate();
 			v.setDrawRect(true);
 		}
     }
@@ -149,12 +149,12 @@ class ExplorerEventHandler implements ViewListener, CameraListener, ComponentLis
 		if (application.ga.isHighlighting){
 		    application.ga.unhighlight(g);
 		}
-        if (application.isDynaspotEnabled() && !inPortal && !v.getVCursor().isDynaSpotActivated()){v.getVCursor().activateDynaSpot(true);}
+        if (application.isDynaspotEnabled() && !inPortal && !v.getVCursor().getDynaPicker().isDynaSpotActivated()){v.getVCursor().getDynaPicker().activateDynaSpot(true);}
 		regionStickedToMouse = false;
 	    if (selectingRegion){
 			v.setDrawRect(false);
-			x2 = v.getVCursor().vx;
-			y2 = v.getVCursor().vy;
+			x2 = v.getVCursor().getVSXCoordinate();
+			y2 = v.getVCursor().getVSYCoordinate();
 			if ((Math.abs(x2-x1)>=4) && (Math.abs(y2-y1)>=4)){
 				application.mCamera.getOwningView().centerOnRegion(application.mCamera, NavigationManager.ANIM_MOVE_DURATION, x1, y1, x2, y2);
 			}
@@ -163,10 +163,10 @@ class ExplorerEventHandler implements ViewListener, CameraListener, ComponentLis
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-        lastVX = v.getVCursor().vx;
-    	lastVY = v.getVCursor().vy;
+        lastVX = v.getVCursor().getVSXCoordinate();
+    	lastVY = v.getVCursor().getVSYCoordinate();
     	if (application.isDynaspotEnabled()){
-        	Glyph g = v.getVCursor().dynaPick(application.bCamera);
+        	Glyph g = v.getVCursor().getDynaPicker().dynaPick(application.bCamera);
         	if (g != null){
         	    if (g.getType().equals(GeoToolsManager.CITY)){
             	    application.displayFeatureInfo((g != null) ? (Toponym)g.getOwner() : null, g);
@@ -194,14 +194,14 @@ class ExplorerEventHandler implements ViewListener, CameraListener, ComponentLis
 
     public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
         panning = false;
-        if (application.isDynaspotEnabled() && !v.getVCursor().isDynaSpotActivated()){v.getVCursor().activateDynaSpot(true);}
+        if (application.isDynaspotEnabled() && !v.getVCursor().getDynaPicker().isDynaSpotActivated()){v.getVCursor().getDynaPicker().activateDynaSpot(true);}
     }
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
         lastJPX = jpx;
         lastJPY = jpy;
-        lastVX = v.getVCursor().vx;
-        lastVY = v.getVCursor().vy;
+        lastVX = v.getVCursor().getVSXCoordinate();
+        lastVY = v.getVCursor().getVSYCoordinate();
         if (mod == META_SHIFT_MOD){
             if (nm.lensType != NavigationManager.NO_LENS){
                 nm.zoomOutPhase2();
@@ -249,14 +249,14 @@ class ExplorerEventHandler implements ViewListener, CameraListener, ComponentLis
     	    nm.moveLens(jpx, jpy, e.getWhen());
     	}
     	if (application.isDynaspotEnabled()){
-        	v.getVCursor().dynaPick(application.bCamera);    	    
+        	v.getVCursor().getDynaPicker().dynaPick(application.bCamera);    	    
     	}
     }
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
         if (application.ga.isBringingAndGoing){return;}
         if (panning){
-            if (application.isDynaspotEnabled() && v.getVCursor().isDynaSpotActivated()){v.getVCursor().activateDynaSpot(false);}
+            if (application.isDynaspotEnabled() && v.getVCursor().getDynaPicker().isDynaSpotActivated()){v.getVCursor().getDynaPicker().activateDynaSpot(false);}
             double a = (application.mCamera.focal+Math.abs(application.mCamera.altitude)) / application.mCamera.focal;
             synchronized(application.mCamera){
                 application.mCamera.move(a*(lastJPX-jpx), a*(jpy-lastJPY));
@@ -276,7 +276,7 @@ class ExplorerEventHandler implements ViewListener, CameraListener, ComponentLis
 			lastJPY = jpy;
 		}
 		else if (selectingRegion){
-		    if (application.isDynaspotEnabled() && v.getVCursor().isDynaSpotActivated()){v.getVCursor().activateDynaSpot(false);}
+		    if (application.isDynaspotEnabled() && v.getVCursor().getDynaPicker().isDynaSpotActivated()){v.getVCursor().getDynaPicker().activateDynaSpot(false);}
 		}
     }
 
@@ -405,7 +405,7 @@ class ExplorerEventHandler implements ViewListener, CameraListener, ComponentLis
 	/* Overview Portal */
 	public void enterPortal(Portal p){
 	    if (application.isDynaspotEnabled()){
-    	    application.mView.getCursor().activateDynaSpot(false);	        
+    	    application.mView.getCursor().getDynaPicker().activateDynaSpot(false);	        
 	    }
 		inPortal = true;
 		((OverviewPortal)p).setBorder(NavigationManager.OV_INSIDE_BORDER_COLOR);
@@ -414,7 +414,7 @@ class ExplorerEventHandler implements ViewListener, CameraListener, ComponentLis
 
 	public void exitPortal(Portal p){
 	    if (application.isDynaspotEnabled()){
-    	    application.mView.getCursor().activateDynaSpot(true);	        
+    	    application.mView.getCursor().getDynaPicker().activateDynaSpot(true);	        
 	    }
 		inPortal = false;
 		((OverviewPortal)p).setBorder(NavigationManager.OV_BORDER_COLOR);
