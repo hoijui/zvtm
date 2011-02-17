@@ -451,34 +451,29 @@ public class VirtualSpaceManager implements AWTEventListener {
     /* ----------- VIRTUAL SPACE --------------- */
 
     /** Create a new virtual space.
-     *@param n name of this virtual space
+     *@param name name of this virtual space. Pass null to generate a name randomly (guaranteed to be unique).
      *@return the new virtual space
      */
-    public VirtualSpace addVirtualSpace(String n){
-        VirtualSpace tvs=new VirtualSpace(n);
-        allVirtualSpaces.put(n,tvs);
+    public VirtualSpace addVirtualSpace(String name){
+		if (name == null){
+			name = UUID.randomUUID().toString();
+			while (allVirtualSpaces.containsKey(name)){
+				name = UUID.randomUUID().toString();
+			}			
+		}
+        VirtualSpace tvs = new VirtualSpace(name);
+        allVirtualSpaces.put(name, tvs);
         updateVirtualSpaceList();
         return tvs;
     }
 
-    /** Create a new virtual space. The virtual space's name is generated automatically and guaranteed to be unique.
-     *@return the new virtual space
-     */
-	public VirtualSpace createVirtualSpace(){
-		String uuid = UUID.randomUUID().toString();
-		while (allVirtualSpaces.containsKey(uuid)){
-			uuid = UUID.randomUUID().toString();
-		}
-		return addVirtualSpace(uuid);
-	}
-
     /** Destroy a virtual space.
-     *@param n name of this virtual space
+     *@param name name of this virtual space
      */
-    public void destroyVirtualSpace(String n){
-        if (allVirtualSpaces.containsKey(n)){
-            allVirtualSpaces.get(n).destroy();
-            allVirtualSpaces.remove(n);
+    public void destroyVirtualSpace(String name){
+        if (allVirtualSpaces.containsKey(name)){
+            allVirtualSpaces.get(name).destroy();
+            allVirtualSpaces.remove(name);
             updateVirtualSpaceList();
         }
     }
