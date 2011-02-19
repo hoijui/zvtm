@@ -7,15 +7,15 @@
   
 The source code is available in each zvtm-sources release on SourceForge.net\fref{http://sourceforge.net/project/showfiles.php?group_id=63244&package_id=69949} and via the SVN repository\fref{http://zvtm.sourceforge.net/download.html\#svn}.
 
-The core zvtm module is \cd{zvtm}. See section \ref{sec:modules} for a list and short description of all modules.
+The core zvtm module is now named \cd{zvtm-core}. See section \ref{sec:modules} for a list and short description of all modules.
   
-\subsection{Building with Maven 2.x}
+\subsection{Building with Maven 2.x or 3.x}
  
 Maven is a very powerful management system. Visit the Maven web site to get more information\fref{http://maven.apache.org/guides/index.html}.
     
 In the following we only give a brief summary of useful commands to compile and package ZVTM.
 
-The main \cd{zvtm} directory contains a \cd{pom.xml} file that contains the Maven configuration for ZVTM. All commands are issued from that directory.
+The root \cd{zvtm-core} directory contains a \cd{pom.xml} file that contains the Maven configuration for ZVTM. All commands are issued from that directory.
 
 \subsubsection{Compile}
 
@@ -29,7 +29,7 @@ To build ZVTM's JAR file, issue the following command.
 
 \codebox{mvn package}
 
-If necessary, Maven will go through the compilation goal and all other intermediate goals before packaging. The resulting JAR file is put in directory \cd{target/}. As opposed to builds in earlier releases managed with Ant, the JAR file name now containsthe version number, such as \cd{zvtm-0.9.7.jar} or \cd{zvtm-0.9.8-SNAPSHOT.jar}.
+If necessary, Maven will go through the compilation goal and all other intermediate goals before packaging. The resulting JAR file is put in directory \cd{target/}. As opposed to builds in earlier releases managed with Ant, the JAR file name now contains the version number, such as \cd{zvtm-0.10.0.jar} or \cd{zvtm-0.11.0-SNAPSHOT.jar}.
 
 \subsubsection{Install ZVTM in local repository}
 
@@ -45,15 +45,20 @@ To recompile all classes, simply erase the target directory with the following c
 
 \subsubsection{Generating JavaDoc}
 
-ZVTM's javadoc can be generated with the following command:
+\cd{zvtm-core}'s javadoc can be generated with the following command:
 
 \codebox{mvn javadoc:javadoc}
 
 The resulting \cd{apidocs/} directory is put in \cd{target/site/}.
 
+When checking out the whole \cd{zvtm} project from SVN, one can generate javadoc for all modules at once (from that directory):
+
+\codebox{mvn javadoc:aggregate}
+
 \subsubsection{Declaring ZVTM as a dependency in your own Maven-managed project}
 
 Declare the following repository:
+
 \begin{SaveVerbatim}{CodeVerb}
 <repository>
   <id>zvtm repository</id>
@@ -95,7 +100,7 @@ The following modules provide additional features for ZVTM. All are available fr
 \hline
 Module Name & Name in SVN/Maven & Description & Section \\
 \hline
-ZVTM & \cd{zvtm} & Core ZVTM module with engine, glyphs, etc. & \ref{sec:basic}, \ref{sec:animations}, \ref{sec:nav}, \ref{sec:advanced} \\
+ZVTM & \cd{zvtm-core} & Core ZVTM module with engine, glyphs, etc. & \ref{sec:basic}, \ref{sec:animations}, \ref{sec:nav}, \ref{sec:advanced} \\
 \hline
 ZVTM Cluster & \cd{zvtm-cluster} & Run ZVTM applications on clusters of computers driving high-resolution large displays such as the WILD wall-sized display \url{http://insitu.lri.fr/Projects/WILD} & \ref{sec:clustering} \\
 \hline
