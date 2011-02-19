@@ -67,6 +67,10 @@ The following creates a virtual space whose name is \cd{foo}.
 
 \codebox{VirtualSpace vs = vsm.addVirtualSpace("foo");}
 
+Anonymous virtual spaces can be created as follows. The virtual space's name is generated using a universal unique identifier (UUID).
+
+\codebox{VirtualSpace vs = vsm.addVirtualSpace(VirtualSpace.ANONYMOUS);}
+
 Glyphs are put on the surface of virtual spaces. A given glyph can only belong to one virtual space.
 
 \begin{SaveVerbatim}{CodeVerb}
@@ -117,11 +121,17 @@ There are a number of variations depending on whether you want to attach a menu 
 
 Special case of panel views:
 
-\codebox{JPanel p = vsm.addPanelView(cameras, "fooView", 800, 600);}
+\codebox{PView v = vsm.addPanelView(cameras, "fooView", 800, 600);}
 
-This method returns the JPanel encapsulated by the view instead of returning the view itself, for straightforward (possible inlined) integration within a Swing component hierarchy. The \cd{View} instance itself can easily be retrieved by a call to:
+Integration within a Swing component hierarchy requires getting a reference on the underlying JPanel:
 
-\codebox{View v = vsm.getView("fooview");}
+\codebox{JPanel p = v.getPanel();}
+
+The \cd{View} instance itself can easily be retrieved by a call to:
+
+\codebox{View v = vsm.getView("fooView");}
+
+Anonymous views can be created by passing View.ANONYMOUS as the view's name parameter. The view's name is generated using a universal unique identifier (UUID).
 
 An external view can be set to run in full-screen exclusive mode, as is possible with any JFrame. Usually the View will have been initialized undecorated (no title bar).
 
@@ -248,6 +258,11 @@ Various portals ship with \cd{zvtm-core}, including portals that implement an in
 It is possible to associated the same event listener with all layers in a view, or to associate different event listeners with each layer of the view. The input event handling interface works in a way similar to conventional AWT/Swing event listeners (using callbacks). There is a single interface for all ZVTM events: \cl{fr.inria.zvtm.event.ViewListener}. A convenience (default) implementation, which does nothing, is available for subclassing: \cl{ViewAdapter}.
 
 \cd{ViewListener} features callbacks for conventional pointing device events (move, drag, button press/release/click, mouse wheel) and keyboard events. Additional events are triggered when the cursor enters or exits a glyph, unless this glyph has been declared as not sensitive \cl{Glyph.setSensitivity(boolean b)}.
+
+%%%%%%%%%%
+\subsubsection{Picking}
+
+\cd{VCursor.getPicker()} \ldots{}
 
 %%%%%%%%%%
 \subsubsection{Portal Events}
