@@ -1,7 +1,7 @@
 /*   FILE: GraphicsManager.java
  *   DATE OF CREATION:   Mon Nov 27 08:30:31 2006
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2006-2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2006-2011. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  *   $Id$
@@ -72,7 +72,7 @@ import fr.inria.zvtm.animation.EndAction;
 import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
 
-/* Multiscale feature manager */
+/* Multiscale navigation manager */
 
 public class GraphicsManager implements ComponentListener, CameraListener, Java2DPainter {
 
@@ -1598,6 +1598,25 @@ class ZGRGlassPane extends JComponent {
         g2.fillRect(prX, prY, prW, BAR_HEIGHT);
         g2.setColor(MSG_COLOR);
         g2.drawRect(prX, prY, BAR_WIDTH, BAR_HEIGHT);
+    }
+    
+}
+
+class ZP2LensAction implements EndAction {
+
+    GraphicsManager grMngr;
+    
+    public ZP2LensAction(GraphicsManager gm){
+	    this.grMngr = gm;
+    }
+    
+    public void	execute(Object subject, Animation.Dimension dimension){
+        ((Lens)subject).getOwningView().setLens(null);
+        ((Lens)subject).dispose();
+        grMngr.setMagFactor(GraphicsManager.DEFAULT_MAG_FACTOR);
+        grMngr.lens.dispose();
+        grMngr.lens = null;
+        grMngr.setLens(GraphicsManager.NO_LENS);
     }
     
 }
