@@ -21,6 +21,7 @@ class LElem {
     // URLs associated with each glyph (there might be different URLs associated with
     // the various glyphs constituting a node or edge)
     String[] URLs;
+    String[] tooltips;
 
     Glyph[] glyphs;
 
@@ -28,8 +29,8 @@ class LElem {
 
     LElem(Metadata md){
         this.title = md.getTitle();
-        this.URLs = new String[1];
-        this.URLs[0] = md.getURL();
+        this.URLs = new String[]{md.getURL()};
+        this.tooltips = new String[]{md.getURLTitle()};
     }
 
     String getTitle(){
@@ -39,6 +40,10 @@ class LElem {
     String getURL(Glyph g){
         return URLs[0];
     }
+
+	String getTooltip(Glyph g){
+		return tooltips[0];
+	}
 
 	Glyph[] getGlyphs(){
 		Glyph[] res = new Glyph[glyphs.length];

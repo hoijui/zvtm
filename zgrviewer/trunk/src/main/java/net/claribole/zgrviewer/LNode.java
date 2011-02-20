@@ -26,12 +26,14 @@ class LNode extends LElem {
         this.title = title;
         this.glyphs = new Glyph[glyphs.size()];
         this.URLs = new String[glyphs.size()];
+        this.tooltips = new String[glyphs.size()];
         for (int i=0;i<this.glyphs.length;i++){
             this.glyphs[i] = (Glyph)glyphs.elementAt(i);
             // URL associated with each glyph (there might be different URLs associated with
             // the various glyphs constituting a node or edge)
             if (this.glyphs[i].getOwner() != null){
                 URLs[i] = ((Metadata)this.glyphs[i].getOwner()).getURL();
+                tooltips[i] = ((Metadata)this.glyphs[i].getOwner()).getURLTitle();
             }
         }
         for (int i=0;i<this.glyphs.length;i++){
@@ -45,6 +47,15 @@ class LNode extends LElem {
         for (int i=0;i<glyphs.length;i++){
             if (g == glyphs[i]){
                 return URLs[i];
+            }
+        }
+        return null;
+    }
+
+    String getTooltip(Glyph g){
+        for (int i=0;i<glyphs.length;i++){
+            if (g == glyphs[i]){
+                return tooltips[i];
             }
         }
         return null;

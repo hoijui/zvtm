@@ -85,7 +85,7 @@ class PeriodicActionManager implements Runnable, MouseMotionListener, Java2DPain
 	    if (g != null && g != grMngr.boundingBox && tippedGlyph != g){
 		tippedGlyph = g;
 		if (tippedGlyph.getOwner() != null){
-		    tipLabel = ((LElem)tippedGlyph.getOwner()).getTitle();
+		    tipLabel = ((LElem)tippedGlyph.getOwner()).getTooltip(tippedGlyph);
 		}
 		if (tipLabel != null && tipLabel.length() > 0){
 		    lX = grMngr.mainView.mouse.getPanelXCoordinate() + TP_MARGIN;
