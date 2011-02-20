@@ -1832,6 +1832,10 @@ public class SVGReader {
                 if (ctx==null){ctx=new Context();}
                 ctx.setURL(e.getAttributeNS(xlinkURI,_href));
             }
+            if (e.hasAttributeNS(xlinkURI,_title)){
+                if (ctx == null){ctx = new Context();}
+                ctx.setURLTitle(e.getAttributeNS(xlinkURI, _title));
+            }
             for (int i=0;i<objects.getLength();i++){
                 Node obj=objects.item(i);
                 if (obj.getNodeType()==Node.ELEMENT_NODE){
@@ -1888,8 +1892,10 @@ public class SVGReader {
     }
 
     private static void setMetadata(Glyph g,Context ctx){
-        if (ctx!=null && (ctx.getURL()!=null || ctx.getTitle()!=null || ctx.getClosestAncestorGroupID() != null || ctx.getClosestAncestorGroupClass() != null)){
-            g.setOwner(new Metadata(ctx.getURL(), ctx.getTitle(), ctx.getClosestAncestorGroupID(), ctx.getClosestAncestorGroupClass()));
+        if (ctx!=null &&
+            (ctx.getURL()!=null || ctx.getURLTitle()!=null || ctx.getTitle()!=null ||
+             ctx.getClosestAncestorGroupID() != null || ctx.getClosestAncestorGroupClass() != null)){
+            g.setOwner(new Metadata(ctx.getURL(), ctx.getTitle(), ctx.getURLTitle(), ctx.getClosestAncestorGroupID(), ctx.getClosestAncestorGroupClass()));
         }
     }
 

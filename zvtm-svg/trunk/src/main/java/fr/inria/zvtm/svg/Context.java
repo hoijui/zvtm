@@ -31,9 +31,13 @@ public class Context {
 //     int stroke_width;
     Float fill_opacity;
 
-    /*metadata associated with a group/link*/
-    String url;
+	// title of the closest <g> ancestor (group)
     String title;
+	// xlink:href of the closest <a> ancestor (link)
+    String url;
+	// xlink:title of the closest <a> ancestor (link)
+	String url_title;
+	
     String css_class;
     String closestAncestorGroupID;
     String closestAncestorGroupClass;
@@ -146,6 +150,16 @@ public class Context {
      */
     public String getURL(){return url;}
 
+	/** Set a URL's title for this part of the SVG document tree. */
+	public void setURLTitle(String s){
+		url_title = s;
+	}
+	
+	/** Get the URL's title associated with this part of the SVG document tree.
+	 *@return null if none specified.
+	 */
+	public String getURLTitle(){return url_title;}
+
     /** Set a Title for this part of the SVG document tree. */
     public void setTitle(String s){title=s;}
 
@@ -181,6 +195,7 @@ public class Context {
         copy.fill_opacity = this.fill_opacity;
         copy.url = this.url;
         copy.title = this.title;
+        copy.url_title = this.url_title;
         copy.closestAncestorGroupID = this.closestAncestorGroupID;
         copy.closestAncestorGroupClass = this.closestAncestorGroupClass;
         return copy;

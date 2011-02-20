@@ -20,12 +20,14 @@ public class Metadata {
 
     String url;
     String title;
+	String url_title;
     String closestAncestorGroupClass;
     String closestGroupID;
 
-    public Metadata(String url, String title, String cagid, String cagc){
+    public Metadata(String url, String title, String url_title, String cagid, String cagc){
         this.url=url;
         this.title=title;
+		this.url_title = url_title;
         this.closestGroupID = cagid;
         this.closestAncestorGroupClass = cagc;
     }
@@ -37,6 +39,14 @@ public class Metadata {
      *@return null if none specified.
      */
     public String getURL(){return url;}
+
+	/** Set a URL's title for this part of the SVG document tree. */
+	public void setURLTitle(String s){url_title = s;}
+	
+	/** Get the URL's title associated with this part of the SVG document tree.
+	 *@return null if none specified.
+	 */
+	public String getURLTitle(){return url_title;}
     
     /** Set a Title for this part of the SVG document tree. */
     public void setTitle(String s){title=s;}
@@ -61,7 +71,10 @@ public class Metadata {
     public String getClosestAncestorGroupID(){return closestGroupID;}
 
     public String toString(){
-	    return "url=" + ((url != null) ? url : "") + " title=" + ((title != null) ? title : "") + " group ID=" + ((closestGroupID != null) ? closestGroupID : "");
+	    return "title=" + ((title != null) ? title : SVGReader.EMPTY_STRING) +
+	 		   " url=" + ((url != null) ? url : SVGReader.EMPTY_STRING) +
+			   " url_title=" + ((url_title != null) ? url_title : SVGReader.EMPTY_STRING) +
+	 		   " group ID=" + ((closestGroupID != null) ? closestGroupID : SVGReader.EMPTY_STRING);
     }
     
 }
