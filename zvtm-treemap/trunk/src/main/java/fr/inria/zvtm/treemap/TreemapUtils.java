@@ -1,6 +1,3 @@
-/**
- * @author Romain Primet
- */
 package fr.inria.zvtm.treemap;
 
 import java.awt.Color;
@@ -9,6 +6,9 @@ import java.awt.Toolkit;
 
 import fr.inria.zvtm.glyphs.VText;
 
+/**
+ * @author Romain Primet
+ */
 public class TreemapUtils {
     //let's not instantiate this
     private TreemapUtils(){}

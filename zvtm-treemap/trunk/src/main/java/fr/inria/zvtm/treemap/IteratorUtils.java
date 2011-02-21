@@ -3,7 +3,10 @@ package fr.inria.zvtm.treemap;
 import java.util.List;
 import java.util.ListIterator;
 
-//Utilities needed for compatibility with IVTK code
+/**
+ * Utilities needed for compatibility with IVTK code.
+ * @author Romain Primet
+ */
 class IteratorUtils {
     //let's not instantiate this
     private IteratorUtils(){}

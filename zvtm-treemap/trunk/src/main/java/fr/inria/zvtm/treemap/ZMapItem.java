@@ -9,6 +9,7 @@ import fr.inria.zvtm.glyphs.Glyph;
  * A MapItem class that also provides a user object
  * and a map of ZVTM glyphs that can be used to represent 
  * the tree.
+ * @author Romain Primet
  */
 public class ZMapItem extends MapItem {
   protected Object userObject;
