@@ -12,7 +12,6 @@ package fr.inria.zvtm.treemap;
 import java.util.*;
 
 /**
- *
  * An implementation of MapModel that represents
  * a hierarchical structure. It currently cannot
  * handle structural changes to the tree, since it
@@ -117,6 +116,10 @@ public class Tree<M extends Mappable> implements MapModel
 	     }
     }
     
+    /**
+     * Recursively sets the size (weight) of this Tree to the
+     * sum of the sizes of its children.
+     */
     public double sum()
     {
         if(!hasChildren())
