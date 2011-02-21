@@ -31,13 +31,6 @@ public class Tree<M extends Mappable> implements MapModel
     private MapModel[] cachedLeafModels;
     private Tree parent;
     private Vector<Tree> children=new Vector<Tree>();
-    private boolean sumsChildren;
-    
- //   public Tree()
- //   {
- //       this.mapItem=new MapItem();
- //       sumsChildren=true;
- //   }
     
     public Tree(M mapItem)
     {
@@ -124,11 +117,9 @@ public class Tree<M extends Mappable> implements MapModel
 	     }
     }
     
-    /* private */ public double sum()
+    public double sum()
     {
-        //if (!sumsChildren)
-        //    return mapItem.getSize();
-	      if(!hasChildren())
+        if(!hasChildren())
 		    return mapItem.getSize();
 
         double s=0;
@@ -228,3 +219,4 @@ public class Tree<M extends Mappable> implements MapModel
       walker.visitNode(this);
     }
 }
+
