@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 //Utilities needed to support various feketeries
-public class IteratorUtils {
+class IteratorUtils {
     //let's not instantiate this
     private IteratorUtils(){}
 
