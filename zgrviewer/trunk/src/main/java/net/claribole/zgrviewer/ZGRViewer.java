@@ -42,17 +42,14 @@ import javax.swing.SwingUtilities;
 import org.apache.xerces.dom.DOMImplementationImpl;
 import org.w3c.dom.Document;
 
-
 public class ZGRViewer implements ZGRApplication {
 
     static ConfigManager cfgMngr;
     static DOTManager dotMngr;
 
     public GVLoader gvLdr;
-    public GraphicsManager grMngr;
+    GraphicsManager grMngr;
 
-    ZgrvEvtHdlr meh;
-    
     static File cmdLineDOTFile=null;
     static String cmdLinePrg=null;
 
@@ -60,11 +57,19 @@ public class ZGRViewer implements ZGRApplication {
 
 
     ZGRViewer(short acc){
-	initConfig();
-	//init GUI after config as we load some GUI prefs from the config file
-	initGUI(acc);
-	if (cmdLineDOTFile!=null){loadCmdLineFile();}
-    }
+		initConfig();
+		//init GUI after config as we load some GUI prefs from the config file
+		initGUI(acc);
+		if (cmdLineDOTFile!=null){loadCmdLineFile();}
+	}
+	
+	public GraphicsManager getGraphicsManager(){
+		return grMngr;
+	}
+	
+	public LogicalStructure getLogicalStructure(){
+		return grMngr.lstruct;
+	}
 
     void loadCmdLineFile(){
 	if (cmdLinePrg!=null){
@@ -110,11 +115,12 @@ public class ZGRViewer implements ZGRApplication {
     }
 
     void initGUI(short acc){
-	Utils.initLookAndFeel();
-	JMenuBar jmb = initViewMenu(acc);
-	grMngr.createFrameView(grMngr.createZVTMelements(false), acc, jmb);
-	grMngr.parameterizeView(new ZgrvEvtHdlr(this, this.grMngr));
-    }
+		Utils.initLookAndFeel();
+		JMenuBar jmb = initViewMenu(acc);
+		grMngr.createFrameView(grMngr.createZVTMelements(false), acc, jmb);
+		grMngr.parameterizeView(new ZgrvEvtHdlr(this, this.grMngr));
+		cfgMngr.notifyPlugins(Plugin.NOTIFY_PLUGIN_GUI_INITIALIZED);
+	}
 
     JMenuBar initViewMenu(int accelerationMode){
  	JMenu open=new JMenu("Open");

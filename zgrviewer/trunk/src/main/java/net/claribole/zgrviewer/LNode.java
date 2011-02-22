@@ -17,7 +17,7 @@ import fr.inria.zvtm.glyphs.ClosedShape;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.svg.Metadata;
 
-class LNode extends LElem {
+public class LNode extends LElem {
 
     LEdge[] edges;
     short[] edgeDirections;
@@ -43,7 +43,7 @@ class LNode extends LElem {
         edgeDirections = new short[0];
     }
     
-    String getURL(Glyph g){
+    public String getURL(Glyph g){
         for (int i=0;i<glyphs.length;i++){
             if (g == glyphs[i]){
                 return URLs[i];
@@ -52,7 +52,7 @@ class LNode extends LElem {
         return null;
     }
 
-    String getTooltip(Glyph g){
+    public String getTooltip(Glyph g){
         for (int i=0;i<glyphs.length;i++){
             if (g == glyphs[i]){
                 return tooltips[i];
@@ -72,14 +72,14 @@ class LNode extends LElem {
 	edgeDirections = nedgeDirections;
     }
 
-	LEdge[] getAllArcs(){
+	public LEdge[] getAllArcs(){
 		LEdge[] res = new LEdge[edges.length];
 		System.arraycopy(edges, 0, res, 0, edges.length);
 		return res;
 	}
 	
 	/** Get all arcs incoming or outgoing from this node, except for the specified one. */
-	LEdge[] getOtherArcs(LEdge arc){
+	public LEdge[] getOtherArcs(LEdge arc){
 		int count = 0;
 		for (int i=0;i<edges.length;i++){
 			if (arc != edges[i]){count++;}
@@ -92,7 +92,7 @@ class LNode extends LElem {
 		return res;
 	}
 
-    LEdge[] getOutgoingArcs(){
+    public LEdge[] getOutgoingArcs(){
 	int oaCount = 0;
 	for (int i=0;i<edgeDirections.length;i++){
 	    if (edgeDirections[i] == LEdge.OUTGOING){oaCount++;}
@@ -107,7 +107,7 @@ class LNode extends LElem {
 	return res;
     }
 
-    LEdge[] getIncomingArcs(){
+    public LEdge[] getIncomingArcs(){
 	int oaCount = 0;
 	for (int i=0;i<edgeDirections.length;i++){
 	    if (edgeDirections[i] == LEdge.INCOMING){oaCount++;}
@@ -122,7 +122,7 @@ class LNode extends LElem {
 	return res;
     }
 
-    LEdge[] getUndirectedArcs(){
+    public LEdge[] getUndirectedArcs(){
 	int oaCount = 0;
 	for (int i=0;i<edgeDirections.length;i++){
 	    if (edgeDirections[i] == LEdge.UNDIRECTED){oaCount++;}
@@ -137,14 +137,14 @@ class LNode extends LElem {
 	return res;
     }
 
-    ClosedShape getShape(){
+    public ClosedShape getShape(){
         for (int i=0;i<glyphs.length;i++){
             if (glyphs[i] instanceof ClosedShape){return (ClosedShape)glyphs[i];}
         }
         return null;
     }
 
-    VText getLabel(){
+    public VText getLabel(){
         for (int i=0;i<glyphs.length;i++){
             if (glyphs[i] instanceof VText){return (VText)glyphs[i];}
         }

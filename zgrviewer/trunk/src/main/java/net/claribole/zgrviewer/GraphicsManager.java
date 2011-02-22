@@ -132,14 +132,14 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     static final float FLOOR_ALTITUDE = -90.0f;
 
     /*translation constants*/
-    static final short MOVE_UP=0;
-    static final short MOVE_DOWN=1;
-    static final short MOVE_LEFT=2;
-    static final short MOVE_RIGHT=3;
-    static final short MOVE_UP_LEFT=4;
-    static final short MOVE_UP_RIGHT=5;
-    static final short MOVE_DOWN_LEFT=6;
-    static final short MOVE_DOWN_RIGHT=7;
+    public static final short MOVE_UP=0;
+    public static final short MOVE_DOWN=1;
+    public static final short MOVE_LEFT=2;
+    public static final short MOVE_RIGHT=3;
+    public static final short MOVE_UP_LEFT=4;
+    public static final short MOVE_UP_RIGHT=5;
+    public static final short MOVE_DOWN_LEFT=6;
+    public static final short MOVE_DOWN_RIGHT=7;
 
     ToolPalette tp;
 
@@ -240,6 +240,18 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	mainView = vsm.getView(ConfigManager.MAIN_TITLE);
 	return mainView.getPanel();
     }
+
+	public View getView(){
+		return mainView;
+	}
+	
+	public Camera getMainCamera(){
+		return mainCamera;
+	}
+	
+	public BaseEventHandler getViewListener(){
+		return meh;
+	}
 
     void parameterizeView(BaseEventHandler eh){
 	paMngr = new PeriodicActionManager(this);
@@ -389,13 +401,13 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 
     /*-------------     Navigation              -------------*/
 
-    void getGlobalView(){
+    public void getGlobalView(){
 	Location l = mainView.getGlobalView(mSpace.getCamera(0),ConfigManager.ANIM_MOVE_LENGTH);
 	rememberLocation(mSpace.getCamera(0).getLocation());
     }
 
     /*higher view (multiply altitude by altitudeFactor)*/
-    void getHigherView(){
+    public void getHigherView(){
         Camera c=mainView.getCameraNumber(0);
         rememberLocation(c.getLocation());
         Float alt=new Float(c.getAltitude()+c.getFocal());
@@ -405,7 +417,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     }
 
     /*higher view (multiply altitude by altitudeFactor)*/
-    void getLowerView(){
+    public void getLowerView(){
         Camera c=mainView.getCameraNumber(0);
         rememberLocation(c.getLocation());
         Float alt=new Float(-(c.getAltitude()+c.getFocal())/2.0f);
@@ -415,7 +427,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     }
 
     /* Direction should be one of GraphicsManager.MOVE_* */
-    void translateView(short direction){
+    public void translateView(short direction){
         Camera c=mainView.getCameraNumber(0);
         rememberLocation(c.getLocation());
         Point2D.Double trans;
@@ -906,30 +918,32 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 
     /* ------------- Logical structure ----------------- */
     void buildLogicalStructure(){
-	// clone the structure as we are about to remove elements from it for convenience (it is supposed to be read-only)
-	Vector glyphs = (Vector)mSpace.getAllGlyphs().clone();
-	glyphs.remove(magWindow);
-	glyphs.remove(boundingBox);
-	lstruct = LogicalStructure.build(glyphs);
-	if (lstruct == null){// building the logical structure failed
-	    tp.hideLogicalTools();
-	    mainView.setStatusBarText(Messages.FAILED_TO_BUILD_LOGICAL_STRUCT);
+		// clone the structure as we are about to remove elements from it for convenience (it is supposed to be read-only)
+		Vector glyphs = (Vector)mSpace.getAllGlyphs().clone();
+		glyphs.remove(magWindow);
+		glyphs.remove(boundingBox);
+		lstruct = LogicalStructure.build(glyphs);
+		if (lstruct == null){
+			// building the logical structure failed
+			tp.hideLogicalTools();
+			mainView.setStatusBarText(Messages.FAILED_TO_BUILD_LOGICAL_STRUCT);
+		}
+		else {
+			tp.showLogicalTools();
+		}
+		/* take care of converting the owner of glyphs that were not processed as structural elements
+		(which should have remained Metadata instances). Convert these old owners into LElem instances
+		(as this is what ZGRViewer now expects to get when calling Glyph.getOwner()) */
+		glyphs = mSpace.getAllGlyphs(); // not cloning here because we are just reading the structure
+		Glyph g;
+		for (int i=0;i<glyphs.size();i++){
+			g = (Glyph)glyphs.elementAt(i);
+			if (g.getOwner() != null && g.getOwner() instanceof Metadata){
+				g.setOwner(new LElem((Metadata)g.getOwner()));
+			}
+		}
+		cfgMngr.notifyPlugins(Plugin.NOTIFY_PLUGIN_LOGICAL_STRUCTURE_CHANGED);
 	}
-	else {
-	    tp.showLogicalTools();
-	}
-	/* take care of converting the owner of glyphs that were not processed as structural elements
-	   (which should have remained Metadata instances). Convert these old owners into LElem instances
-	   (as this is what ZGRViewer now expects to get when calling Glyph.getOwner()) */
-	glyphs = mSpace.getAllGlyphs(); // not cloning here because we are just reading the structure
-	Glyph g;
-	for (int i=0;i<glyphs.size();i++){
-	    g = (Glyph)glyphs.elementAt(i);
-	    if (g.getOwner() != null && g.getOwner() instanceof Metadata){
-		g.setOwner(new LElem((Metadata)g.getOwner()));
-	    }
-	}
-    }
 
     /* ------------- Highlighting ----------------- */
 

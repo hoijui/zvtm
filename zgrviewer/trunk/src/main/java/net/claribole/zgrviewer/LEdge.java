@@ -16,7 +16,7 @@ import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.DPath;
 import fr.inria.zvtm.svg.Metadata;
 
-class LEdge extends LElem {
+public class LEdge extends LElem {
 
     static final short UNDIRECTED = 0;
     static final short INCOMING = 1;
@@ -31,7 +31,7 @@ class LEdge extends LElem {
     LNode head;
 
     LEdge(String title, Vector glyphs){
-        this.title = title;
+		this.title = title;
         this.glyphs = new Glyph[glyphs.size()];
         this.URLs = new String[glyphs.size()];
         this.tooltips = new String[glyphs.size()];
@@ -44,12 +44,19 @@ class LEdge extends LElem {
                 tooltips[i] = ((Metadata)this.glyphs[i].getOwner()).getURLTitle();
             }
         }
-        for (int i=0;i<this.glyphs.length;i++){
+		if (this.glyphs.length > 0){
+	        this.groupID = ((Metadata)this.glyphs[0].getOwner()).getClosestAncestorGroupID();			
+		}
+		for (int i=0;i<this.glyphs.length;i++){
             this.glyphs[i].setOwner(this);
         }
     }
 
-    String getURL(Glyph g){
+	public String getGroupID(){
+		return groupID;
+	}
+
+    public String getURL(Glyph g){
         for (int i=0;i<glyphs.length;i++){
             if (g == glyphs[i]){
                 return URLs[i];
@@ -58,7 +65,7 @@ class LEdge extends LElem {
         return null;
     }
 
-    String getTooltip(Glyph g){
+    public String getTooltip(Glyph g){
         for (int i=0;i<glyphs.length;i++){
             if (g == glyphs[i]){
                 return tooltips[i];
@@ -75,7 +82,7 @@ class LEdge extends LElem {
 	return directed;
     }
 
-	boolean isLoop(){
+	public boolean isLoop(){
 		return tail == head;
 	}
 
@@ -93,24 +100,24 @@ class LEdge extends LElem {
 	}
     }
 
-    LNode getTail(){
-	return tail;
+    public LNode getTail(){
+		return tail;
     }
 
-    LNode getHead(){
-	return head;
+    public LNode getHead(){
+		return head;
     }
 
-    LNode getOtherEnd(LNode n){
-	return (n == tail) ? head : tail;
+    public LNode getOtherEnd(LNode n){
+		return (n == tail) ? head : tail;
     }
 
-    DPath getSpline(){
-	for (int i=0;i<glyphs.length;i++){
-	    if (glyphs[i] instanceof DPath){return (DPath)glyphs[i];}
+    public DPath getSpline(){
+		for (int i=0;i<glyphs.length;i++){
+			if (glyphs[i] instanceof DPath){return (DPath)glyphs[i];}
+		}
+		return null;
 	}
-	return null;
-    }
 
     public String toString(){
 	return title + "@" + hashCode() + " [" + 

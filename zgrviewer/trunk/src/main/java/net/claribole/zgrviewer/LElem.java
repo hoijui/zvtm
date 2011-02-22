@@ -13,10 +13,11 @@ package net.claribole.zgrviewer;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.svg.Metadata;
 
-class LElem {
+public class LElem {
 	
 	static final String PORT_SEPARATOR = ":";
 
+	String groupID;
     String title;
     // URLs associated with each glyph (there might be different URLs associated with
     // the various glyphs constituting a node or edge)
@@ -28,24 +29,25 @@ class LElem {
     LElem(){}
 
     LElem(Metadata md){
+		this.groupID = md.getClosestAncestorGroupID();
         this.title = md.getTitle();
         this.URLs = new String[]{md.getURL()};
         this.tooltips = new String[]{md.getURLTitle()};
     }
 
-    String getTitle(){
+    public String getTitle(){
         return title;
     }
 
-    String getURL(Glyph g){
+    public String getURL(Glyph g){
         return URLs[0];
     }
 
-	String getTooltip(Glyph g){
+	public String getTooltip(Glyph g){
 		return tooltips[0];
 	}
 
-	Glyph[] getGlyphs(){
+	public Glyph[] getGlyphs(){
 		Glyph[] res = new Glyph[glyphs.length];
 		System.arraycopy(glyphs, 0, res, 0, glyphs.length);
 		return res;

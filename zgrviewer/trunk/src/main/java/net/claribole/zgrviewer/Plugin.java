@@ -65,5 +65,15 @@ public interface Plugin {
      **/
     public java.net.URL getURL();
 
+	/** Event triggered when the graph's logical structure has changed. */
+	public static final short NOTIFY_PLUGIN_LOGICAL_STRUCTURE_CHANGED = 0;
+	/** Event triggered when ZGRViewer's UI has been instantiated and has finished initializing. */
+	public static final short NOTIFY_PLUGIN_GUI_INITIALIZED = 1;
+
+	/** Event notification
+	 *@param event one of NOTIFY_* events
+	 */
+	public void eventOccured(short event);
+
 }
 

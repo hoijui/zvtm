@@ -634,6 +634,13 @@ class ConfigManager {
 	}
     }
 
+	// event should be one of Plugin.NOTIFY_PLUGIN_*;
+	void notifyPlugins(short event){
+		for (int i=0;i<plugins.length;i++){
+		    plugins[i].eventOccured(event);
+		}		
+	}
+
     protected void terminatePlugins(){
 	for (int i=0;i<plugins.length;i++){
 	    plugins[i].terminate();

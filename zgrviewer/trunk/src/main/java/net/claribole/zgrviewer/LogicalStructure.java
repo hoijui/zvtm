@@ -17,7 +17,7 @@ import java.util.Vector;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.svg.Metadata;
 
-class LogicalStructure {
+public class LogicalStructure {
 
     static final String NODE_PREFIX = "node";    
     static final String EDGE_PREFIX = "edge";
@@ -140,8 +140,16 @@ class LogicalStructure {
 			}
 		}
 	}
+	
+	public LNode[] getAllNodes(){
+		return nodes;
+	}
+	
+	public LEdge[] getAllEdges(){
+		return edges;
+	}
 
-	LNode getNode(String title){
+	public LNode getNode(String title){
 		LNode res = null;
 		// starting with GV 2.24, edge titles now include port in situations where they did not previously
 		// if we manage to find a matching node with port information, then use it
@@ -177,7 +185,7 @@ class LogicalStructure {
 	/** Get the logical node corresponding to this glyph.
 	*@return null if g is not associated to a logical node.
 	*/
-	static LNode getNode(Glyph g){
+	public static LNode getNode(Glyph g){
 		Object o = (g != null) ? g.getOwner() : null;
 		if (o != null){
 			return (o instanceof LNode) ? (LNode)o : null;
@@ -188,7 +196,7 @@ class LogicalStructure {
 	/** Get the logical arc corresponding to this glyph.
 	*@return null if g is not associated to a logical arc.
 	*/
-	static LEdge getEdge(Glyph g){
+	public static LEdge getEdge(Glyph g){
 		Object o = (g != null) ? g.getOwner() : null;
 		if (o != null){
 			return (o instanceof LEdge) ? (LEdge)o : null;
