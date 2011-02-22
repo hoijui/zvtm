@@ -558,18 +558,29 @@ class ConfigManager {
 
 	/* ------------------------ Plugins ----------------------------- */
 
+	static File[] pluginJARs = null;
+	
+	static void setPlugInJARs(String[] list){
+		pluginJARs = new File[list.length];
+		for (int i=0;i<list.length;i++){
+			pluginJARs[i] = new File(list[i]);
+		}
+	}
+
     protected void initPlugins(ZGRViewer application){
 	Vector plgs = new Vector();
 	//list all files in 'plugins' dir
-	File[] jars = ConfigManager.plugInDir.listFiles();
-	if (jars != null && jars.length>0){
-	    URL[] urls = new URL[jars.length];
+	if (pluginJARs == null){
+		pluginJARs = ConfigManager.plugInDir.listFiles();		
+	}
+	if (pluginJARs != null && pluginJARs.length>0){
+	    URL[] urls = new URL[pluginJARs.length];
 	    //store path to each JAR file in plugins dir as a URL so that they can be added
 	    //later dynamically to the classpath (through a new ClassLoader)
-	    for (int i=0;i<jars.length;i++){
+	    for (int i=0;i<pluginJARs.length;i++){
 		try {
 		    // going through URI and then URL as advised in JDK 1.6
-		    urls[i] = jars[i].toURI().toURL();
+		    urls[i] = pluginJARs[i].toURI().toURL();
 		}
 		catch(MalformedURLException mue){System.err.println("Failed to instantiate a class loader for plug-ins: "+mue);}
 	    }
@@ -579,9 +590,9 @@ class ConfigManager {
 	    String s;
 	    Object plgInstance = null;
 	    //for each of these JAR files
-	    for (int i=0;i<jars.length;i++){
+	    for (int i=0;i<pluginJARs.length;i++){
 		try {
-		    jf = new JarFile(jars[i]);
+		    jf = new JarFile(pluginJARs[i]);
 		    //get all CLASS entries
 		    for (Enumeration e=jf.entries();e.hasMoreElements();){
 			s = ((JarEntry)e.nextElement()).getName();
@@ -620,7 +631,7 @@ class ConfigManager {
 			}
 		    }
 		}
-		catch (IOException ex2){System.err.println("Failed to load plug-in from JAR file "+jars[i].getAbsolutePath());}
+		catch (IOException ex2){System.err.println("Failed to load plug-in from JAR file "+pluginJARs[i].getAbsolutePath());}
 		catch (NoClassDefFoundError ex2){System.err.println("One or more plugins might have failed to initialize because of the following error:\nNo Class Definition Found for "+ex2.getMessage());}
 		catch (ClassFormatError ex2){System.err.println("One or more plugins might have failed to initialize because of the following error:\nClass Format Error for "+ex2.getMessage());}
 	    }
