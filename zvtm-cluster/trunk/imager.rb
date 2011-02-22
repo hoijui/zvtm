@@ -69,7 +69,7 @@ class MyViewListener < ViewAdapter
 
     def viewClosing(v)
         VirtualSpaceManager::INSTANCE.stop
-        System.exit 0
+        java.lang.System.exit 0
     end
 end
 
