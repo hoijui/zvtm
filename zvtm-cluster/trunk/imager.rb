@@ -1,5 +1,9 @@
+# The program takes an image (make sure it is not too big -- 100x100
+# is probably a maximum) and generates a zvtm-cluster scene where
+# each pixel of the original image is replaced by a 'primitive' image.
+#
 # Example use: jruby -J-Djava.n.preferIPv4Stack=true -J-Djgroups.bind_addr="192.168.0.87" imager.rb test.jpg
-# set CLASSPATH beforehand
+
 require 'java'
 require 'image_distance'
 
@@ -19,6 +23,7 @@ end
     java_import "fr.inria.zvtm.cluster.#{name}"
 end
 
+# Returns a BufferedImage instace given a file path
 def get_buf_img(image_file)
     ImageIO.read File.new(image_file)
 end
