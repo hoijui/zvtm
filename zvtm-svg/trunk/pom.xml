@@ -123,6 +123,7 @@ $Id: pom.xml 2405 2009-09-25 09:07:33Z epietrig $
         <configuration>
           <archive>
             <manifest>
+              <useUniqueVersions>false</useUniqueVersions>
               <mainClass>fr.inria.zvtm.svg.Viewer</mainClass>
               <packageName>fr.inria.zvtm.svg</packageName>
               <addClasspath>true</addClasspath>
