@@ -476,6 +476,14 @@ public class ZGRViewer implements ZGRApplication {
 	System.exit(0);
     }
 
+	static void printCmdLineHelp(){
+		System.out.println("\njava -jar zgrviewer-0.9.0-SNAPSHOT.jar [options] [file]\n");
+        System.out.println("[options] -opengl           ZVTM will run in OpenGL accelerated mode (requires JDK 1.5 or later)");
+        System.out.println("          -Pxxx             where xxx={dot, neato, svg} to specify what program to use to compute the [file]'s layout");
+		System.out.println("          -pluginDir=<path> where <path> is the relative of full path to the directory where to look for plugins\n");
+        System.out.println("[file]    can be a relative or full path ; use the native OS syntax\n\n");
+	}
+
     public static void main(String[] args){
         if (Utils.osIsMacOS()){
             System.setProperty("apple.laf.useScreenMenuBar", "true");
@@ -483,12 +491,9 @@ public class ZGRViewer implements ZGRApplication {
         short acceleratedView = View.STD_VIEW;
         for (int i=0;i<args.length;i++){
             if (args[i].startsWith("-")){
-                if (args[i].equals("--help")){
-                    System.out.println("\n\njava net.claribole.zgrviewer.ZGRViewer [options] [file]");
-                    System.out.println("[options] -opengl   ZVTM will run in OpenGL accelerated mode (requires JDK 1.5 or later)");
-                    System.out.println("          -Pxxx     where xxx={dot, neato, svg} to specify what program to use to compute the [file]'s layout");
-                    System.out.println("[file]    can be a relative or full path ; use the native OS syntax\n\n");
-                    System.exit(0);
+                if (args[i].equals("--help") || args[i].equals("-h")){
+					printCmdLineHelp();
+			        System.exit(0);
                 }
                 else if (args[i].equals("-opengl")){
                     System.setProperty("sun.java2d.opengl", "true");
@@ -496,6 +501,9 @@ public class ZGRViewer implements ZGRApplication {
                     acceleratedView = View.OPENGL_VIEW;
                 }
                 else if (args[i].startsWith("-P")){cmdLinePrg=args[i];}
+				else if (args[i].startsWith("-pluginDir=")){
+					ConfigManager.plugInDir = new File(args[i].substring(11));
+				}
             }
             else {
                 //the only other stuff allowed as a cmd line param is a dot file

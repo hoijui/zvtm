@@ -139,7 +139,7 @@ class ConfigManager {
 
     GraphicsManager grMngr;
 
-	ConfigManager(GraphicsManager gm, boolean applet){
+	ConfigManager(GraphicsManager gm, boolean applet){		
 		this.grMngr = gm;
 		LAST_COMMANDS = new Vector();
 		if (!applet){m_TmpDir = new File(System.getProperty("java.io.tmpdir"));}
@@ -555,6 +555,8 @@ class ConfigManager {
 	    System.getProperties().put("proxySet","false");
 	}
     }
+
+	/* ------------------------ Plugins ----------------------------- */
 
     protected void initPlugins(ZGRViewer application){
 	Vector plgs = new Vector();
