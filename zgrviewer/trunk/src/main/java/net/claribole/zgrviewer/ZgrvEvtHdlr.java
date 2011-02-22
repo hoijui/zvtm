@@ -47,15 +47,8 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 		this.application = app;
 		this.grMngr = gm;
 	}
-	
-	ViewListener rerouteEventTarget = null;
-	
-	public void rerouteEventsTo(ViewListener vl){
-		rerouteEventTarget = vl;
-	}
-	
+		
 	public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-		if (rerouteEventTarget != null){rerouteEventTarget.press1(v, mod, jpx, jpy, e);return;}
 		if (toolPaletteIsActive){return;}
 		lastJPX = jpx;
 		lastJPY = jpy;
@@ -108,7 +101,6 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 	}
 
 	public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-		if (rerouteEventTarget != null){rerouteEventTarget.release1(v, mod, jpx, jpy, e);return;}
 	    if (ConfigManager.DYNASPOT && !toolPaletteIsActive && !v.getVCursor().getDynaPicker().isDynaSpotActivated()){grMngr.activateDynaSpot(true, false);}
 		if (grMngr.isBringingAndGoing){
 			grMngr.endBringAndGo(v.lastGlyphEntered());
@@ -144,7 +136,6 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 	}
 
 	public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-		if (rerouteEventTarget != null){rerouteEventTarget.click1(v, mod, jpx, jpy, clickNumber, e);return;}
 		if (toolPaletteIsActive){
 			if (v.lastGlyphEntered() != null){grMngr.tp.selectButton((VImage)v.lastGlyphEntered());}
 		}
@@ -187,16 +178,11 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 		}
 	}
 
-	public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-		if (rerouteEventTarget != null){rerouteEventTarget.press2(v, mod, jpx, jpy, e);return;}
-	}
+	public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
-	public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-		if (rerouteEventTarget != null){rerouteEventTarget.release2(v, mod, jpx, jpy, e);return;}
-	}
+	public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
 	public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-		if (rerouteEventTarget != null){rerouteEventTarget.click2(v, mod, jpx, jpy, clickNumber, e);return;}
 		if (toolPaletteIsActive){return;}
 		Glyph g=v.lastGlyphEntered();
 		if (g!=null && g != grMngr.boundingBox){
@@ -210,7 +196,6 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 	}
 
 	public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-		if (rerouteEventTarget != null){rerouteEventTarget.press3(v, mod, jpx, jpy, e);return;}
 	    if (ConfigManager.DYNASPOT){grMngr.activateDynaSpot(false, false);}
 		if (toolPaletteIsActive){return;}
 		if (grMngr.tp.isFadingLensNavMode() || grMngr.tp.isProbingLensNavMode()){
@@ -224,7 +209,6 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 	}
 
 	public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-		if (rerouteEventTarget != null){rerouteEventTarget.release3(v, mod, jpx, jpy, e);return;}
 	    if (ConfigManager.DYNASPOT){grMngr.activateDynaSpot(true, false);}
 		if (toolPaletteIsActive){return;}
 		Glyph g = v.getVCursor().getPicker().lastGlyphEntered();
@@ -241,7 +225,6 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 	}
 
 	public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-		if (rerouteEventTarget != null){rerouteEventTarget.click3(v, mod, jpx, jpy, clickNumber, e);return;}
 		if (toolPaletteIsActive){return;}
 		if (grMngr.tp.isFadingLensNavMode() || grMngr.tp.isProbingLensNavMode()){
 			lastJPX = jpx;
@@ -262,7 +245,6 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 	}
 
 	public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
-		if (rerouteEventTarget != null){rerouteEventTarget.mouseMoved(v, jpx, jpy, e);return;}
 		lx = jpx;
 		ly = jpy;
 		if ((jpx-grMngr.LENS_R1) < 0){
@@ -301,7 +283,6 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 	}
 
 	public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
-		if (rerouteEventTarget != null){rerouteEventTarget.mouseDragged(v, mod, buttonNumber, jpx, jpy, e);return;}
 		if (toolPaletteIsActive || grMngr.isBringingAndGoing){return;}
 		if (v.getVCursor().getDynaPicker().isDynaSpotActivated()){grMngr.activateDynaSpot(false, false);}
 		if (grMngr.isLinkSliding){
@@ -360,7 +341,6 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 	}
 
 	public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
-		if (rerouteEventTarget != null){rerouteEventTarget.mouseWheelMoved(v, wheelDirection, jpx, jpy, e);return;}
 		if (grMngr.lensType != GraphicsManager.NO_LENS && grMngr.lens != null){
 			if (wheelDirection  == ViewListener.WHEEL_UP){
 				grMngr.magnifyFocus(GraphicsManager.WHEEL_MM_STEP, grMngr.lensType, grMngr.mainCamera);
@@ -406,7 +386,6 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 	}
 
 	public void enterGlyph(Glyph g){
-		if (rerouteEventTarget != null){rerouteEventTarget.enterGlyph(g);return;}
 		grMngr.mainView.setStatusBarText(Messages.SPACE_STRING);
 		if (g == grMngr.magWindow){
 			inMagWindow = true;
@@ -443,7 +422,6 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 	}
 
 	public void exitGlyph(Glyph g){
-		if (rerouteEventTarget != null){rerouteEventTarget.exitGlyph(g);return;}
 		if (g == grMngr.magWindow){
 			inMagWindow = false;
 			return;
@@ -475,12 +453,9 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 		}
 	}
 
-	public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){
-		if (rerouteEventTarget != null){rerouteEventTarget.Ktype(v, c, code, mod, e);return;}
-	}
+	public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 
 	public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
-		if (rerouteEventTarget != null){rerouteEventTarget.Kpress(v, c, code, mod, e);return;}
 		if(code==KeyEvent.VK_PAGE_UP){grMngr.getHigherView();}
 		else if (code==KeyEvent.VK_PAGE_DOWN){grMngr.getLowerView();}
 		else if (code==KeyEvent.VK_HOME){grMngr.getGlobalView();}
@@ -499,9 +474,7 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 		}
 	}
 
-	public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){
-		if (rerouteEventTarget != null){rerouteEventTarget.Krelease(v, c, code, mod, e);return;}
-	}
+	public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 
 	public void viewActivated(View v){}
 
