@@ -114,6 +114,7 @@ $Id$
         <configuration>
           <archive>
             <manifest>
+              <useUniqueVersions>false</useUniqueVersions>
               <mainClass>fr.inria.zvtm.basicui.Viewer</mainClass>
               <packageName>fr.inria.zvtm.basicui</packageName>
               <addClasspath>true</addClasspath>

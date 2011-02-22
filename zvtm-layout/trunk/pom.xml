@@ -122,6 +122,7 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
         <configuration>
           <archive>
             <manifest>
+              <useUniqueVersions>false</useUniqueVersions>
               <mainClass>fr.inria.zvtm.layout.jung.Viewer</mainClass>
               <packageName>fr.inria.zvtm.layout.jung</packageName>
               <addClasspath>true</addClasspath>

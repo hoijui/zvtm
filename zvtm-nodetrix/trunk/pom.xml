@@ -98,6 +98,7 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
                         <configuration>
                             <archive>
                                 <manifest>
+                                    <useUniqueVersions>false</useUniqueVersions>
                                     <mainClass>fr.inria.zvtm.nodetrix.viewer.Viewer</mainClass>
                                     <packageName>fr.inria.zvtm.nodetrix.viewer</packageName>
                                     <addClasspath>true</addClasspath>
@@ -145,6 +146,7 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
                         <configuration>
                             <archive>
                                 <manifest>
+                                    <useUniqueVersions>false</useUniqueVersions>
                                     <mainClass>fr.inria.zvtm.nodetrix.viewer.WILDViewer</mainClass>
                                     <packageName>fr.inria.zvtm.nodetrix.viewer</packageName>
                                     <addClasspath>true</addClasspath>

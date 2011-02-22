@@ -109,6 +109,7 @@ $Id$
         <configuration>
           <archive>
             <manifest>
+              <useUniqueVersions>false</useUniqueVersions>
               <mainClass>fr.inria.zvtm.demo.Introduction</mainClass>
               <packageName>fr.inria.zvtm.demo</packageName>
               <addClasspath>true</addClasspath>

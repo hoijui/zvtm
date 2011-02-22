@@ -134,6 +134,7 @@ $Id: pom.xml 3429 2010-07-20 07:32:30Z rprimet $
         <configuration>
           <archive>
             <manifest>
+              <useUniqueVersions>false</useUniqueVersions>
               <mainClass>fr.inria.zvtm.fits.examples.FitsExample</mainClass>
               <packageName>fr.inria.zvtm.fits.examples</packageName>
               <addClasspath>true</addClasspath>
