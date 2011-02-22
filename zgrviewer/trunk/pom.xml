@@ -65,7 +65,7 @@ $Id$
 	<dependency>
       <groupId>fr.inria.zvtm</groupId>
       <artifactId>zvtm-svg</artifactId>
-      <version>0.2.0</version>
+      <version>0.2.0-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>xml-apis</groupId>
@@ -160,6 +160,7 @@ $Id$
 	      <configuration>
           <archive>
             <manifest>
+              <useUniqueVersions>false</useUniqueVersions>
               <mainClass>net.claribole.zgrviewer.ZGRViewer</mainClass>
               <packageName>net.claribole.zgrviewer</packageName>
               <addClasspath>true</addClasspath>
