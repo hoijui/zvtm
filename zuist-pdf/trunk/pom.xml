@@ -153,6 +153,7 @@ $Id: pom.xml 2427 2009-09-29 07:29:08Z epietrig $
         <configuration>
           <archive>
             <manifest>
+              <useUniqueVersions>false</useUniqueVersions>
               <mainClass>fr.inria.zuist.viewer.PDFViewer</mainClass>
               <packageName>fr.inria.zuist.viewer</packageName>
               <addClasspath>true</addClasspath>

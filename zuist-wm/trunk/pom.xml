@@ -134,6 +134,7 @@ $Id$
 		        <configuration>
 		          <archive>
 		            <manifest>
+                        <useUniqueVersions>false</useUniqueVersions>
 		              <mainClass>fr.inria.zuist.app.wm.WorldExplorer</mainClass>
 		              <packageName>fr.inria.zuist.app.wm</packageName>
 		              <addClasspath>true</addClasspath>
@@ -176,6 +177,7 @@ $Id$
 		        <configuration>
 		          <archive>
 		            <manifest>
+                        <useUniqueVersions>false</useUniqueVersions>
 		              <mainClass>fr.inria.zuist.app.wm.WildWorldExplorer</mainClass>
 		              <packageName>fr.inria.zuist.app.wm</packageName>
 		              <addClasspath>true</addClasspath>
