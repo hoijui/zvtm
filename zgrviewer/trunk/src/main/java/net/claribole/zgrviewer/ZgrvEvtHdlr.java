@@ -271,10 +271,10 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 		}
 		else if (grMngr.tp.isEnabled()){
 			if (grMngr.tp.insidePaletteTriggerZone(jpx, jpy)){
-				if (!grMngr.tp.isShowing()){grMngr.tp.show();}
+				if (!grMngr.tp.isShowing()){grMngr.tp.show();toolPaletteIsActive = true;}
 			}
 			else {
-				if (grMngr.tp.isShowing()){grMngr.tp.hide();}
+				if (grMngr.tp.isShowing()){grMngr.tp.hide();toolPaletteIsActive = false;}
 			}
 		}
 		if (ConfigManager.DYNASPOT){

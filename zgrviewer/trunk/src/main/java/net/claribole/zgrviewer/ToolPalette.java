@@ -195,7 +195,6 @@ public class ToolPalette {
     public void show(){
         if (!visible){
             visible = true;
-            grMngr.meh.toolPaletteIsActive = true;
             Animation a = grMngr.vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(ANIM_TIME, paletteCamera,
                 new Point2D.Double(-buttons[0].getWidth()-2, 0), true,
                 SlowInSlowOutInterpolator.getInstance(), null);
@@ -214,7 +213,6 @@ public class ToolPalette {
             grMngr.vsm.getAnimationManager().startAnimation(a, false);
             grMngr.mainView.setCursorIcon(Cursor.CUSTOM_CURSOR);
             grMngr.mainView.setActiveLayer(0);	
-            grMngr.meh.toolPaletteIsActive = false;
         }
     }
 
