@@ -32,9 +32,9 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-class ConfigManager {
+public class ConfigManager {
 
-    static final String zgrvURI = "http://zvtm.sourceforge.net/zgrviewer";
+    public static final String zgrvURI = "http://zvtm.sourceforge.net/zgrviewer";
 
     static final String MAIN_TITLE = "ZGRViewer";
 
@@ -56,20 +56,20 @@ class ConfigManager {
     Color backgroundColor = Color.WHITE;
     static Color HIGHLIGHT_COLOR = Color.RED;
 
-    static Color OBSERVED_REGION_COLOR = new Color(186,135,186);
-    static Color OBSERVED_REGION_BORDER_COLOR = Color.getHSBColor(0.83519f,0.28f,0.45f); //rgb(299,28,45)
-	static Color OBSERVED_REGION_CROSSHAIR_COLOR = new Color(115, 83, 115);
+    public static Color OBSERVED_REGION_COLOR = new Color(186,135,186);
+    public static Color OBSERVED_REGION_BORDER_COLOR = Color.getHSBColor(0.83519f,0.28f,0.45f); //rgb(299,28,45)
+	public static Color OBSERVED_REGION_CROSSHAIR_COLOR = new Color(115, 83, 115);
 	static {
 		if (!(Utils.osIsWindows() || Utils.osIsMacOS())){
 			OBSERVED_REGION_BORDER_COLOR = OBSERVED_REGION_CROSSHAIR_COLOR = Color.RED;
 		}
 	}
 
-    static Color PIEMENU_FILL_COLOR = Color.BLACK;
-    static Color PIEMENU_BORDER_COLOR = Color.WHITE;
-    static Color PIEMENU_INSIDE_COLOR = Color.DARK_GRAY;
-	static final float PIEMENU_MAIN_ALPHA = 0.85f;
-	static final float PIEMENU_SUB_ALPHA = 0.95f;
+    public static Color PIEMENU_FILL_COLOR = Color.BLACK;
+    public static Color PIEMENU_BORDER_COLOR = Color.WHITE;
+    public static Color PIEMENU_INSIDE_COLOR = Color.DARK_GRAY;
+	public static final float PIEMENU_MAIN_ALPHA = 0.85f;
+	public static final float PIEMENU_SUB_ALPHA = 0.95f;
 	
 
     /* Misc. Prefs */
@@ -105,12 +105,12 @@ class ConfigManager {
     static String PREFS_FILE_NAME = ".zgrviewer";
     static String OLD_PREFS_FILE_NAME = "zgrviewer.cfg";
 
-    static int ANIM_MOVE_LENGTH=300;
+    public static final int ANIM_MOVE_LENGTH = 300;
 
     /*magnification factor when centering on a glyph - 1.0 (default) means that
       the glyph will occupy the whole screen. mFactor < 1 will make the glyph
       smaller (zoom out). mFactor > 1 will make the glyph appear bigger (zoom in)*/
-    static float MAG_FACTOR = 2.0f;
+    public static float MAG_FACTOR = 2.0f;
 
     /*External (platform-dependant) browser*/
     //a class to access a platform-specific web browser (not initialized at startup, but only on demand)
@@ -513,6 +513,10 @@ class ConfigManager {
     /*threshold beyond which autozooming is triggered (usually a percentage of the View's size in pixels)*/
     public void setSDZoomThreshold(double t){
 	SD_ZOOM_THRESHOLD = t;
+    }
+
+    public double getSDZoomThreshold(){
+		return SD_ZOOM_THRESHOLD;
     }
 
     public void setMagnificationFactor(float f){

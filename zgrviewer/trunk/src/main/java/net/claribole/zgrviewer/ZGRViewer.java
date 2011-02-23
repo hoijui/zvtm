@@ -317,7 +317,7 @@ public class ZGRViewer implements ZGRApplication {
 		sw.start();
 	}
 
-    void displayMainPieMenu(boolean b){
+    public void displayMainPieMenu(boolean b){
 		if (b){
 			PieMenuFactory.setItemFillColor(ConfigManager.PIEMENU_FILL_COLOR);
 			PieMenuFactory.setItemBorderColor(ConfigManager.PIEMENU_BORDER_COLOR);
@@ -342,7 +342,7 @@ public class ZGRViewer implements ZGRApplication {
 		}
 	}
 
-    void displaySubMenu(Glyph menuItem, boolean b){
+    public void displaySubMenu(Glyph menuItem, boolean b){
 		if (b){
 			int index = mainPieMenu.getItemIndex(menuItem);
 			if (index != -1){
@@ -378,7 +378,7 @@ public class ZGRViewer implements ZGRApplication {
 		}
 	}
 
-    void pieMenuEvent(Glyph menuItem){
+    public void pieMenuEvent(Glyph menuItem){
 		int index = mainPieMenu.getItemIndex(menuItem);
 		String label;
 		if (index != -1){
@@ -401,6 +401,14 @@ public class ZGRViewer implements ZGRApplication {
 				else if (label == Messages.PM_EXPPRINT){print();}
 			}
 		}
+	}
+	
+	public PieMenu getMainPieMenu(){
+		return mainPieMenu;
+	}
+	
+	public PieMenu getSubPieMenu(){
+		return subPieMenu;
 	}
 
     /* Web & URL */
@@ -468,12 +476,12 @@ public class ZGRViewer implements ZGRApplication {
         }
     }
 
-    void exit(){
-	cfgMngr.saveCommandLines();
-	grMngr.paMngr.stop();
-	cfgMngr.terminatePlugins();
-	System.exit(0);
-    }
+    public void exit(){
+		cfgMngr.saveCommandLines();
+		grMngr.paMngr.stop();
+		cfgMngr.terminatePlugins();
+		System.exit(0);
+	}
 
 	static void printCmdLineHelp(){
 		System.out.println("\njava -jar zgrviewer-0.9.0-SNAPSHOT.jar [options] [file]\n");

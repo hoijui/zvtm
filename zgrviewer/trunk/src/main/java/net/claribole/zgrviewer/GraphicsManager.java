@@ -101,27 +101,34 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     /*dimensions of zoomable panel*/
     int panelWidth, panelHeight;
 
+	public int getPanelWidth(){
+		return panelWidth;
+	}
+
+	public int getPanelHeight(){
+		return panelHeight;
+	}
     
     /* misc. lens settings */
     Lens lens;
     SCBLens fLens;
-    static int LENS_R1 = 100;
-    static int LENS_R2 = 50;
-    static final int WHEEL_ANIM_TIME = 50;
-    static final int LENS_ANIM_TIME = 300;
-    static final double DEFAULT_MAG_FACTOR = 4.0;
+    public static final int LENS_R1 = 100;
+    public static final int LENS_R2 = 50;
+    public static final int WHEEL_ANIM_TIME = 50;
+    public static final int LENS_ANIM_TIME = 300;
+    public static final double DEFAULT_MAG_FACTOR = 4.0;
     static double MAG_FACTOR = DEFAULT_MAG_FACTOR;
     static double INV_MAG_FACTOR = 1/MAG_FACTOR;
-    static final float WHEEL_MM_STEP = 1.0f;
-    static final float MAX_MAG_FACTOR = 12.0f;
+    public static final float WHEEL_MM_STEP = 1.0f;
+    public static final float MAX_MAG_FACTOR = 12.0f;
 
     /* DragMag */
-    static final int DM_PORTAL_WIDTH = 200;
-    static final int DM_PORTAL_HEIGHT = 200;
-    static final int DM_PORTAL_INITIAL_X_OFFSET = 150;
-    static final int DM_PORTAL_INITIAL_Y_OFFSET = 150;
-    static final int DM_PORTAL_ANIM_TIME = 150;
-    static final Color DM_COLOR = Color.RED;
+    public static final int DM_PORTAL_WIDTH = 200;
+    public static final int DM_PORTAL_HEIGHT = 200;
+    public static final int DM_PORTAL_INITIAL_X_OFFSET = 150;
+    public static final int DM_PORTAL_INITIAL_Y_OFFSET = 150;
+    public static final int DM_PORTAL_ANIM_TIME = 150;
+    public static final Color DM_COLOR = Color.RED;
     Camera dmCamera;
     DraggableCameraPortal dmPortal;
     VRectangle magWindow;
@@ -152,9 +159,9 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     static final int MAX_PREV_LOC=10;
     Vector previousLocations;
 
-    static final int NO_LENS = 0;
-    static final int ZOOMIN_LENS = 1;
-    static final int ZOOMOUT_LENS = -1;
+    public static final int NO_LENS = 0;
+    public static final int ZOOMIN_LENS = 1;
+    public static final int ZOOMOUT_LENS = -1;
     int lensType = NO_LENS;
 
     /*quick search variables*/
@@ -241,16 +248,36 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	return mainView.getPanel();
     }
 
+	public VirtualSpace getGraphSpace(){
+		return mSpace;
+	}
+	
+	public VirtualSpace getMenuSpace(){
+		return mnSpace;
+	}
+
 	public View getView(){
 		return mainView;
 	}
 	
-	public Camera getMainCamera(){
+	public Camera getGraphCamera(){
 		return mainCamera;
 	}
 	
 	public BaseEventHandler getViewListener(){
 		return meh;
+	}
+	
+	public ToolPalette getToolPalette(){
+		return tp;
+	}
+	
+	public VRectangle getMagWindow(){
+		return magWindow;
+	}
+	
+	public VRectangleOr getBoundingBox(){
+		return boundingBox;
 	}
 
     void parameterizeView(BaseEventHandler eh){
@@ -474,19 +501,20 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         animator.startAnimation(a, false);
     }
 
-    void rememberLocation(Location l){
-	if (previousLocations.size()>=MAX_PREV_LOC){// as a result of release/click being undifferentiated)
-	    previousLocations.removeElementAt(0);
+    public void rememberLocation(Location l){
+		if (previousLocations.size()>=MAX_PREV_LOC){
+			// as a result of release/click being undifferentiated)
+			previousLocations.removeElementAt(0);
+		}
+		if (previousLocations.size()>0){
+			if (!Location.equals((Location)previousLocations.lastElement(),l)){
+				previousLocations.add(l);
+			}
+		}
+		else {previousLocations.add(l);}
 	}
-	if (previousLocations.size()>0){
-	    if (!Location.equals((Location)previousLocations.lastElement(),l)){
-		previousLocations.add(l);
-	    }
-	}
-	else {previousLocations.add(l);}
-    }
 
-    void moveBack(){
+    public void moveBack(){
         if (previousLocations.size()>0){
             Vector animParams = Location.getDifference(mSpace.getCamera(0).getLocation(), (Location)previousLocations.lastElement());
             Animation at = animator.getAnimationFactory().createCameraTranslation(ConfigManager.ANIM_MOVE_LENGTH, mSpace.getCamera(0),
@@ -500,7 +528,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     }
 
     /*show/hide radar view*/
-    void showRadarView(boolean b){
+    public void showRadarView(boolean b){
         if (b){
             if (rView == null){
                 Vector cameras = new Vector();
@@ -548,7 +576,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         vsm.repaint();
     }
 
-    void updateMainViewFromRadar(){
+    public void updateMainViewFromRadar(){
         Camera c0 = mSpace.getCamera(0);
         c0.vx = observedRegion.vx;
         c0.vy = observedRegion.vy;
@@ -564,21 +592,31 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 
     /*--------------------------- Lens management --------------------------*/
 
-    void setLens(int t){
-	lensType = t;
-    }
-
-    void moveLens(int x, int y, long absTime){
-	if (fLens != null){// dealing with a fading lens
-	    fLens.setAbsolutePosition(x, y, absTime);
+    public void setLens(int t){
+		lensType = t;
 	}
-	else {// dealing with a probing lens
-	    lens.setAbsolutePosition(x, y);
+	
+	public int getLensType(){
+		return lensType;
 	}
-	vsm.repaint();
-    }
 
-    void zoomInPhase1(int x, int y){
+	public void moveLens(int x, int y, long absTime){
+		if (fLens != null){
+			// dealing with a fading lens
+			fLens.setAbsolutePosition(x, y, absTime);
+		}
+		else {
+			// dealing with a probing lens
+			lens.setAbsolutePosition(x, y);
+		}
+		vsm.repaint();
+	}
+	
+	public Lens getLens(){
+		return lens;
+	}
+
+    public void zoomInPhase1(int x, int y){
         // create lens if it does not exist
         if (lens == null){
             lens = mainView.setLens(getLensDefinition(x, y));
@@ -590,7 +628,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         setLens(GraphicsManager.ZOOMIN_LENS);
     }
     
-    void zoomInPhase2(double mx, double my){
+    public void zoomInPhase2(double mx, double my){
         // compute camera animation parameters
         double cameraAbsAlt = mainCamera.getAltitude()+mainCamera.getFocal();
         double c2x = mx - INV_MAG_FACTOR * (mx - mainCamera.vx);
@@ -624,7 +662,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         }
     }
 
-    void zoomOutPhase1(int x, int y, double mx, double my){
+    public void zoomOutPhase1(int x, int y, double mx, double my){
         // compute camera animation parameters
         double cameraAbsAlt = mainCamera.getAltitude()+mainCamera.getFocal();
         double c2x = mx - MAG_FACTOR * (mx - mainCamera.vx);
@@ -647,19 +685,19 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         setLens(GraphicsManager.ZOOMOUT_LENS);
     }
 
-    void zoomOutPhase2(){
+    public void zoomOutPhase2(){
         // make lens disappear (killing anim)
         Animation a = animator.getAnimationFactory().createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens,
             new Float(-MAG_FACTOR+1), true, IdentityInterpolator.getInstance(), new ZP2LensAction(this));
         animator.startAnimation(a, false);
     }
 
-    void setMagFactor(double m){
-	MAG_FACTOR = m;
-	INV_MAG_FACTOR = 1 / MAG_FACTOR;
-    }
+    public void setMagFactor(double m){
+		MAG_FACTOR = m;
+		INV_MAG_FACTOR = 1 / MAG_FACTOR;
+	}
 
-    synchronized void magnifyFocus(double magOffset, int zooming, Camera ca){
+    public synchronized void magnifyFocus(double magOffset, int zooming, Camera ca){
         synchronized (lens){
             double nmf = MAG_FACTOR + magOffset;
             if (nmf <= MAX_MAG_FACTOR && nmf > 1.0f){
@@ -724,14 +762,24 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     
     /*-------------        DragMag        -----------------*/
 
-    void triggerDM(int x, int y){
-	if (dmPortal != null){// portal is active, destroy it
-	    killDM();
+	public Camera getDragMagCamera(){
+		return dmCamera;
 	}
-	else {// portal not active, create it
-	    createDM(x, y);
-	}	
-    }
+	
+	public DraggableCameraPortal getDragMagPortal(){
+		return dmPortal;
+	}
+
+    public void triggerDM(int x, int y){
+		if (dmPortal != null){
+			// portal is active, destroy it
+			killDM();
+		}
+		else {
+			// portal not active, create it
+			createDM(x, y);
+		}	
+	}
 
     void createDM(int x, int y){
         dmPortal = new DraggableCameraPortal(x, y, GraphicsManager.DM_PORTAL_WIDTH, GraphicsManager.DM_PORTAL_HEIGHT, dmCamera);
@@ -772,16 +820,16 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 
     double[] dmwnes = new double[4];
 
-    void updateMagWindow(){
-	if (dmPortal == null){return;}
-	dmPortal.getVisibleRegion(dmwnes);
-	magWindow.moveTo(dmCamera.vx, dmCamera.vy);
-	magWindow.setWidth((dmwnes[2]-dmwnes[0]) + 1);
-	magWindow.setHeight((dmwnes[1]-dmwnes[3]) + 1);
-    }
+    public void updateMagWindow(){
+		if (dmPortal == null){return;}
+		dmPortal.getVisibleRegion(dmwnes);
+		magWindow.moveTo(dmCamera.vx, dmCamera.vy);
+		magWindow.setWidth((dmwnes[2]-dmwnes[0]) + 1);
+		magWindow.setHeight((dmwnes[1]-dmwnes[3]) + 1);
+	}
 
-    void updateZoomWindow(){
-	dmCamera.moveTo(magWindow.vx, magWindow.vy);
+    public void updateZoomWindow(){
+		dmCamera.moveTo(magWindow.vx, magWindow.vy);
     }
 
     /*Java2DPainter interface*/
@@ -958,7 +1006,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     Vector originalNodeFillColor = new Vector();
     Vector originalNodeStroke = new Vector();
 
-    void highlightElement(Glyph g, Camera cam, VCursor cursor, boolean highlight){
+    public void highlightElement(Glyph g, Camera cam, VCursor cursor, boolean highlight){
         Object o = null;
         if (g != null && g != boundingBox){
             // clicked inside a node
@@ -1106,7 +1154,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         g.setStroke(HIGHLIGHT_STROKE);
     }
 
-    void unhighlightAll(){
+    public void unhighlightAll(){
         unhighlightAllEdges();
         unhighlightAllNodes();
     }
@@ -1162,7 +1210,11 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	static final float SECOND_STEP_TRANSLUCENCY = 0.3f;
 	
 	boolean isBringingAndGoing = false;
-	
+
+	public boolean isBringingAndGoing(){
+		return isBringingAndGoing;
+	}
+
 	Vector broughtElements = new Vector();
 	
 	Vector elementsToFade;
@@ -1382,6 +1434,11 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	static final Color SELECTION_RADIUS_COLOR = Color.RED;
 	
 	boolean isLinkSliding = false;
+	
+	public boolean isLinkSliding(){
+		return isLinkSliding;
+	}
+	
 	LinkSliderCalc[] lscs;
 	int lsci = -1;
 	
@@ -1399,7 +1456,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	
 	Point2D mtPos = new Point2D.Double();
 	
-	void attemptLinkSliding(double press_vx, double press_vy, int scr_x, int scr_y){
+	public void attemptLinkSliding(double press_vx, double press_vy, int scr_x, int scr_y){
 		double vieww = mainView.getVisibleRegionWidth(mainCamera);
 		lsci = 0;
 	    if (lstruct != null){
@@ -1452,7 +1509,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         }
 	}
 	
-	void startLinkSliding(final double press_vx, final double press_vy, int px, int py){
+	public void startLinkSliding(final double press_vx, final double press_vy, int px, int py){
 		mainView.getCursor().setVisibility(false);
 		isLinkSliding = true;
 		screen_cursor_x = px + panelWidth/2;
@@ -1486,7 +1543,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	    animator.startAnimation(a, false);
 	}
 	
-	void linkSlider(double vx, double vy, boolean centerCursor){
+	public void linkSlider(double vx, double vy, boolean centerCursor){
         boolean withinSelectionRadius = mainView.getCursor().getPicker().isPicked(selectionRadius);
 		mPos.setLocation(vx, vy);
 		lscs[lsci].updateMousePosition(mPos);
@@ -1533,7 +1590,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 		//mainCamera.setAltitude((float)(Camera.DEFAULT_FOCAL/lsc.getScale() - Camera.DEFAULT_FOCAL));
 	}
 	
-	void endLinkSliding(){
+	public void endLinkSliding(){
 		mainView.getPanel().setNoEventCoordinates(ViewPanel.NO_COORDS, ViewPanel.NO_COORDS);
         mainView.getCursor().setVisibility(true);
 		mSpace.removeGlyph(slideCursor);

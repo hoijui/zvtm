@@ -1,7 +1,7 @@
 /*   FILE: BaseEventHandler.java
  *   DATE OF CREATION:   Mon Nov 27 08:30:31 2006
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2006-2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2006-2011. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  *   $Id$
@@ -19,66 +19,64 @@ import fr.inria.zvtm.event.PortalListener;
 
 public abstract class BaseEventHandler implements PortalListener {
 
-    static final float WHEEL_ZOOMOUT_FACTOR = 21.0f;
-    static final float WHEEL_ZOOMIN_FACTOR = 22.0f;
+    protected static final float WHEEL_ZOOMOUT_FACTOR = 21.0f;
+    protected static final float WHEEL_ZOOMIN_FACTOR = 22.0f;
     
-    static final float ZOOM_SPEED_COEF = 1.0f/50.0f;
-    static final float PAN_SPEED_FACTOR = 50.0f;
+    protected static final float ZOOM_SPEED_COEF = 1.0f/50.0f;
+    protected static final float PAN_SPEED_FACTOR = 50.0f;
 
-    Camera activeCam;
-    VSegment navSeg;
+    protected Camera activeCam;
+    protected VSegment navSeg;
 
-    boolean cursorNearBorder = false;
+    protected boolean cursorNearBorder = false;
 
     // remember last mouse coords to compute translation  (dragging)
-    int lastJPX,lastJPY;
-    double lastVX, lastVY;
-    int jpxD, jpyD;
-    double tfactor;
+    protected int lastJPX,lastJPY;
+    protected double lastVX, lastVY;
+    protected int jpxD, jpyD;
+    protected double tfactor;
     // remember last mouse coords to display selection rectangle (dragging)
-    double x1,y1,x2,y2;
+    protected double x1,y1,x2,y2;
     
     // lens optimization
-    int lx, ly;
+    protected int lx, ly;
 
-    boolean zoomingInRegion=false;
-    boolean manualLeftButtonMove=false;
-    boolean manualRightButtonMove=false;
+    protected boolean zoomingInRegion=false;
+    protected boolean manualLeftButtonMove=false;
+    protected boolean manualRightButtonMove=false;
 
     /*speed-dependant autozoom data*/
-    boolean autoZooming = false;
-    double dragValue;
+    protected boolean autoZooming = false;
+    protected double dragValue;
 
-    boolean toolPaletteIsActive = false;
+    protected boolean toolPaletteIsActive = false;
 
     /* DragMag interaction */
-    boolean inZoomWindow = false;
-    boolean inMagWindow = false;
-    boolean draggingMagWindow = false;
-    boolean draggingZoomWindow = false;
-    boolean draggingZoomWindowContent = false;
+    protected boolean inZoomWindow = false;
+    protected boolean inMagWindow = false;
+    protected boolean draggingMagWindow = false;
+    protected boolean draggingZoomWindow = false;
+    protected boolean draggingZoomWindowContent = false;
     
     /* Link Sliding */
-	double LS_SX, LS_SY;
-	Point relative;
+	protected double LS_SX, LS_SY;
+	protected Point relative;
 
     /**cursor enters portal*/
     public void enterPortal(Portal p){
-	inZoomWindow = true;
+		inZoomWindow = true;
     }
 
     /**cursor exits portal*/
     public void exitPortal(Portal p){
-	inZoomWindow = false;
+		inZoomWindow = false;
     }
 
     void resetDragMagInteraction(){
-	inMagWindow = false;
-	inZoomWindow = false;
-	draggingZoomWindow = false;
-	draggingZoomWindowContent = false;
-    }
-
-
-
+		inMagWindow = false;
+		inZoomWindow = false;
+		draggingZoomWindow = false;
+		draggingZoomWindowContent = false;
+	}
+	
 }

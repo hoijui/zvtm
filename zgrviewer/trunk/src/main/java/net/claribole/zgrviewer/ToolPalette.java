@@ -63,70 +63,70 @@ public class ToolPalette {
     boolean paintPalette = true; // set to false temporarily during panel resizing operations ; used as an optimization indicator
     boolean enabled = true;
 
-    static final int ANIM_TIME = 200;
-    static final int TRIGGER_ZONE_WIDTH = 48;
-    static final int TRIGGER_ZONE_HEIGHT = ICON_PATHS.length * (VERTICAL_STEP_BETWEEN_ICONS) + 24;
+    public static final int ANIM_TIME = 200;
+    public static final int TRIGGER_ZONE_WIDTH = 48;
+    public static final int TRIGGER_ZONE_HEIGHT = ICON_PATHS.length * (VERTICAL_STEP_BETWEEN_ICONS) + 24;
 
-    ToolPalette(GraphicsManager gm){
-	this.grMngr = gm;
-	initZVTMelements();
-    }
+	ToolPalette(GraphicsManager gm){
+		this.grMngr = gm;
+		initZVTMelements();
+	}
     
     void initZVTMelements(){
-	paletteSpace = grMngr.vsm.addVirtualSpace(PALETTE_SPACE_NAME);
-	paletteCamera = paletteSpace.addCamera();
-	paletteCamera.setAltitude(0);
-	buttons = new VImage[ICON_PATHS.length];
-	selectedButtons = new VImage[ICON_PATHS.length];
-	for (int i=0;i<buttons.length;i++){
-	    buttons[i] = new VImage(0, -i*VERTICAL_STEP_BETWEEN_ICONS, 0,
-				    (new ImageIcon(this.getClass().getResource(ICON_PATHS[i]))).getImage());
-	    selectedButtons[i] = new VImage(0, -i*VERTICAL_STEP_BETWEEN_ICONS, 0,
-					    (new ImageIcon(this.getClass().getResource(SELECTED_ICON_PATHS[i]))).getImage());
-	    paletteSpace.addGlyph(buttons[i]);
-	    paletteSpace.addGlyph(selectedButtons[i]);
+		paletteSpace = grMngr.vsm.addVirtualSpace(PALETTE_SPACE_NAME);
+		paletteCamera = paletteSpace.addCamera();
+		paletteCamera.setAltitude(0);
+		buttons = new VImage[ICON_PATHS.length];
+		selectedButtons = new VImage[ICON_PATHS.length];
+		for (int i=0;i<buttons.length;i++){
+			buttons[i] = new VImage(0, -i*VERTICAL_STEP_BETWEEN_ICONS, 0,
+				(new ImageIcon(this.getClass().getResource(ICON_PATHS[i]))).getImage());
+			selectedButtons[i] = new VImage(0, -i*VERTICAL_STEP_BETWEEN_ICONS, 0,
+				(new ImageIcon(this.getClass().getResource(SELECTED_ICON_PATHS[i]))).getImage());
+			paletteSpace.addGlyph(buttons[i]);
+			paletteSpace.addGlyph(selectedButtons[i]);
+		}
+		selectButton(buttons[0]);
 	}
-	selectButton(buttons[0]);
-    }
     
-    void setEnabled(boolean b){
+    public void setEnabled(boolean b){
         enabled = b;
 		paletteCamera.setEnabled(b);
     }
     
-    boolean isEnabled(){
+    public boolean isEnabled(){
         return enabled;
     }
 
-    boolean isStdNavMode(){
+    public boolean isStdNavMode(){
 	return selectedIconIndex == STD_NAV_MODE;
     }
 
-    boolean isFadingLensNavMode(){
+    public boolean isFadingLensNavMode(){
 	return selectedIconIndex == FL_NAV_MODE;
     }
 
-    boolean isDragMagNavMode(){
+    public boolean isDragMagNavMode(){
 	return selectedIconIndex == DM_NAV_MODE;
     }
 
-    boolean isProbingLensNavMode(){
+    public boolean isProbingLensNavMode(){
 	return selectedIconIndex == PL_NAV_MODE;
     }
 
-    boolean isHighlightMode(){
+    public boolean isHighlightMode(){
 	return selectedIconIndex == HIGHLIGHT_MODE;
     }
 
-    boolean isBringAndGoMode(){
+    public boolean isBringAndGoMode(){
 		return selectedIconIndex == BRING_AND_GO_MODE;
     }
 
-    boolean isLinkSlidingMode(){
+    public boolean isLinkSlidingMode(){
 		return selectedIconIndex == LINK_SLIDING_MODE;
     }
 
-    void selectButton(VImage icon){
+    public void selectButton(VImage icon){
         boolean newIconSelected = false;
         int oldSelectedIconIndex = selectedIconIndex;
         for (int i=0;i<buttons.length;i++){
@@ -174,25 +174,25 @@ public class ToolPalette {
     /* Called with false when resizing the main view to temporarily hide the palette
        until it actually gets relocated to the top-left corner of that window.
        It is then called with true.*/
-    void displayPalette(boolean b){
-	if (paintPalette == b){return;}
-	for (int i=0;i<buttons.length;i++){
-	    buttons[i].setVisible(b);
-	    selectedButtons[i].setVisible(b);
+    public void displayPalette(boolean b){
+		if (paintPalette == b){return;}
+		for (int i=0;i<buttons.length;i++){
+			buttons[i].setVisible(b);
+			selectedButtons[i].setVisible(b);
+		}
+		paintPalette = b;
 	}
-	paintPalette = b;
-    }
 
-    void updateHiddenPosition(){
-	double[] wnes = grMngr.mainView.getVisibleRegion(paletteCamera);
-	for (int i=0;i<buttons.length;i++){
-	    buttons[i].moveTo(wnes[0]-buttons[i].getWidth()/2+1, wnes[1]-(i+1)*VERTICAL_STEP_BETWEEN_ICONS);
-	    selectedButtons[i].moveTo(wnes[0]-buttons[i].getWidth()/2+1, wnes[1]-(i+1)*VERTICAL_STEP_BETWEEN_ICONS);
+    public void updateHiddenPosition(){
+		double[] wnes = grMngr.mainView.getVisibleRegion(paletteCamera);
+		for (int i=0;i<buttons.length;i++){
+			buttons[i].moveTo(wnes[0]-buttons[i].getWidth()/2+1, wnes[1]-(i+1)*VERTICAL_STEP_BETWEEN_ICONS);
+			selectedButtons[i].moveTo(wnes[0]-buttons[i].getWidth()/2+1, wnes[1]-(i+1)*VERTICAL_STEP_BETWEEN_ICONS);
+		}
+		displayPalette(true);
 	}
-	displayPalette(true);
-    }
 
-    void show(){
+    public void show(){
         if (!visible){
             visible = true;
             grMngr.meh.toolPaletteIsActive = true;
@@ -205,7 +205,7 @@ public class ToolPalette {
         }
     }
 
-    void hide(){
+    public void hide(){
         if (visible){
             visible = false;
             Animation a = grMngr.vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(ANIM_TIME, paletteCamera,
@@ -218,20 +218,20 @@ public class ToolPalette {
         }
     }
 
-    boolean insidePaletteTriggerZone(int jpx, int jpy){
+    public boolean insidePaletteTriggerZone(int jpx, int jpy){
 	// return false if palette is temporarily disabled
 	return (paintPalette && jpx < TRIGGER_ZONE_WIDTH && jpy < TRIGGER_ZONE_HEIGHT);
     }
 
-    boolean isShowing(){
+    public boolean isShowing(){
 	return visible;
     }
 
-    Camera getPaletteCamera(){
+    public Camera getPaletteCamera(){
 	return paletteCamera;
     }
 
-    void showLogicalTools(){
+    public void showLogicalTools(){
         for (int i=4;i<=6;i++){
             if (!buttons[i].isSensitive()){buttons[i].setSensitivity(true);}
             if (!buttons[i].isVisible()){buttons[i].setVisible(true);}
@@ -240,7 +240,7 @@ public class ToolPalette {
         }
     }
 
-	void hideLogicalTools(){
+	public void hideLogicalTools(){
 		if (isHighlightMode() || isBringAndGoMode() || isLinkSlidingMode()){
 			// if a tool that makes needs to know about the logical structure is selected,
 			// select something else as they are about to be disabled
