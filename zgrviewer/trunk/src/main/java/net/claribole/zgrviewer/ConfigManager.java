@@ -3,7 +3,7 @@
  *   AUTHOR :            Emmanuel Pietriga (emmanuel@claribole.net)
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Emmanuel Pietriga, 2002. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2011. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  *   $Id$
@@ -272,29 +272,29 @@ public class ConfigManager {
 	}
 
     void loadPluginPreferences(Element pluginsEL){
-	NodeList nl = pluginsEL.getElementsByTagNameNS(ConfigManager.zgrvURI, "plugin");
-	Element pluginEL, settingEL;
-	Node txtVal;
-	String pluginName, settingName, settingValue;
-	Hashtable ht;
-	NodeList nl2;
-	tmpPluginSettings = new Hashtable();
-	for (int i=0;i<nl.getLength();i++){
-	    pluginEL = (Element)nl.item(i);
-	    pluginName = pluginEL.getAttribute("name");
-	    ht = new Hashtable();
-	    nl2 = pluginEL.getElementsByTagNameNS(ConfigManager.zgrvURI, "setting");
-	    for (int j=0;j<nl2.getLength();j++){
-		settingEL = (Element)nl2.item(j);
-		try {
-		    txtVal = settingEL.getFirstChild();
-		    ht.put(settingEL.getAttribute("name"), (txtVal != null) ? txtVal.getNodeValue() : null);
+		NodeList nl = pluginsEL.getElementsByTagNameNS(ConfigManager.zgrvURI, "plugin");
+		Element pluginEL, settingEL;
+		Node txtVal;
+		String pluginName, settingName, settingValue;
+		Hashtable ht;
+		NodeList nl2;
+		tmpPluginSettings = new Hashtable();
+		for (int i=0;i<nl.getLength();i++){
+			pluginEL = (Element)nl.item(i);
+			pluginName = pluginEL.getAttribute("name");
+			ht = new Hashtable();
+			nl2 = pluginEL.getElementsByTagNameNS(ConfigManager.zgrvURI, "setting");
+			for (int j=0;j<nl2.getLength();j++){
+				settingEL = (Element)nl2.item(j);
+				try {
+					txtVal = settingEL.getFirstChild();
+					ht.put(settingEL.getAttribute("name"), (txtVal != null) ? txtVal.getNodeValue() : null);
+				}
+				catch (Exception ex){System.err.println("Failed to set some plugin preferences for "+pluginName);}
+			}
+			tmpPluginSettings.put(pluginName, ht);
 		}
-		catch (Exception ex){System.err.println("Failed to set some plugin preferences for "+pluginName);}
-	    }
-	    tmpPluginSettings.put(pluginName, ht);
 	}
-    }
 
 	/*save user prefs to config file*/
 	void saveConfig(){
@@ -447,118 +447,118 @@ public class ConfigManager {
 		catch (Exception ex){}
 	}
 
-    static boolean checkProgram(short prg){
-	switch (prg){
-	case DOTManager.DOT_PROGRAM:{return (m_TmpDir.exists() && ConfigManager.m_DotPath.exists());}
-	case DOTManager.NEATO_PROGRAM:{return (m_TmpDir.exists() && ConfigManager.m_NeatoPath.exists());}
-	case DOTManager.TWOPI_PROGRAM:{return (m_TmpDir.exists() && ConfigManager.m_TwopiPath.exists());}
-	case DOTManager.CIRCO_PROGRAM:{return (m_TmpDir.exists() && ConfigManager.m_CircoPath.exists());}
-	default:{return false;}
+	static boolean checkProgram(short prg){
+		switch (prg){
+			case DOTManager.DOT_PROGRAM:{return (m_TmpDir.exists() && ConfigManager.m_DotPath.exists());}
+			case DOTManager.NEATO_PROGRAM:{return (m_TmpDir.exists() && ConfigManager.m_NeatoPath.exists());}
+			case DOTManager.TWOPI_PROGRAM:{return (m_TmpDir.exists() && ConfigManager.m_TwopiPath.exists());}
+			case DOTManager.CIRCO_PROGRAM:{return (m_TmpDir.exists() && ConfigManager.m_CircoPath.exists());}
+			default:{return false;}
+		}
 	}
-    }
 
-    static String getDirStatus(){
-	StringBuffer sb=new StringBuffer();
-	sb.append("Temp Directory (required): ");
-	sb.append((m_TmpDir.exists()) ? m_TmpDir.toString() : Messages.PATH_NOT_SET);
-	sb.append("\n");
-	sb.append("Absolute Path to dot (required if using dot): ");
-	sb.append((m_DotPath.exists()) ? m_DotPath.toString() : Messages.PATH_NOT_SET);
-	sb.append("\n");
-	sb.append("Absolute Path to neato (required if using neato): ");
-	sb.append((m_NeatoPath.exists()) ? m_NeatoPath.toString() : Messages.PATH_NOT_SET);
-	sb.append("\n");
-	sb.append("Absolute Path to circo (required if using circo): ");
-	sb.append((m_CircoPath.exists()) ? m_CircoPath.toString() : Messages.PATH_NOT_SET);
-	sb.append("\n");
-	sb.append("Absolute Path to twopi (required if using twopi): ");
-	sb.append((m_TwopiPath.exists()) ? m_TwopiPath.toString() : Messages.PATH_NOT_SET);
-	sb.append("\n");
-	sb.append("GraphViz Font Directory (optional): ");
-	sb.append((m_GraphVizFontDir.exists()) ? m_GraphVizFontDir.toString() : Messages.PATH_NOT_SET);
-	sb.append("\n");
-	sb.append("Are you sure you want to continue?");
-	return sb.toString();
-    }
+	static String getDirStatus(){
+		StringBuffer sb=new StringBuffer();
+		sb.append("Temp Directory (required): ");
+		sb.append((m_TmpDir.exists()) ? m_TmpDir.toString() : Messages.PATH_NOT_SET);
+		sb.append("\n");
+		sb.append("Absolute Path to dot (required if using dot): ");
+		sb.append((m_DotPath.exists()) ? m_DotPath.toString() : Messages.PATH_NOT_SET);
+		sb.append("\n");
+		sb.append("Absolute Path to neato (required if using neato): ");
+		sb.append((m_NeatoPath.exists()) ? m_NeatoPath.toString() : Messages.PATH_NOT_SET);
+		sb.append("\n");
+		sb.append("Absolute Path to circo (required if using circo): ");
+		sb.append((m_CircoPath.exists()) ? m_CircoPath.toString() : Messages.PATH_NOT_SET);
+		sb.append("\n");
+		sb.append("Absolute Path to twopi (required if using twopi): ");
+		sb.append((m_TwopiPath.exists()) ? m_TwopiPath.toString() : Messages.PATH_NOT_SET);
+		sb.append("\n");
+		sb.append("GraphViz Font Directory (optional): ");
+		sb.append((m_GraphVizFontDir.exists()) ? m_GraphVizFontDir.toString() : Messages.PATH_NOT_SET);
+		sb.append("\n");
+		sb.append("Are you sure you want to continue?");
+		return sb.toString();
+	}
 
     /*update window position and size variables prior to saving them in the config file*/
     void updateWindowVariables(){
-	mainViewX = grMngr.mainView.getFrame().getX();
-	mainViewY = grMngr.mainView.getFrame().getY();
-	mainViewW = grMngr.mainView.getFrame().getWidth();
-	mainViewH = grMngr.mainView.getFrame().getHeight();
-    }
+		mainViewX = grMngr.mainView.getFrame().getX();
+		mainViewY = grMngr.mainView.getFrame().getY();
+		mainViewW = grMngr.mainView.getFrame().getWidth();
+		mainViewH = grMngr.mainView.getFrame().getHeight();
+	}
 
     /*set speed-dependent automatic zooming*/
     public void setSDZoomEnabled(boolean b){
-	SD_ZOOM_ENABLED = b;
-    }
+		SD_ZOOM_ENABLED = b;
+	}
 
-    /*speed-dependent automatic zooming status*/
-    public boolean isSDZoomEnabled(){
-	return SD_ZOOM_ENABLED;
-    }
+	/*speed-dependent automatic zooming status*/
+	public boolean isSDZoomEnabled(){
+		return SD_ZOOM_ENABLED;
+	}
 
     /*amount of autozoom ; f belongs to [2.0, 10.0] <- values allowed by Pref window slider*/
     public void setSDZoomFactor(double f){
-	autoZoomFactor = f - 1;
-	autoUnzoomFactor = (1 - f) / f;
-    }
+		autoZoomFactor = f - 1;
+		autoUnzoomFactor = (1 - f) / f;
+	}
 
-    /*amount of autozoom ; res belongs to [2.0, 10.0]*/
-    public int getSDZoomFactor(){
-	return (int)autoZoomFactor + 1;
-    }
+	/*amount of autozoom ; res belongs to [2.0, 10.0]*/
+	public int getSDZoomFactor(){
+		return (int)autoZoomFactor + 1;
+	}
 
-    /*threshold beyond which autozooming is triggered (usually a percentage of the View's size in pixels)*/
-    public void setSDZoomThreshold(double t){
-	SD_ZOOM_THRESHOLD = t;
-    }
+	/*threshold beyond which autozooming is triggered (usually a percentage of the View's size in pixels)*/
+	public void setSDZoomThreshold(double t){
+		SD_ZOOM_THRESHOLD = t;
+	}
 
     public double getSDZoomThreshold(){
 		return SD_ZOOM_THRESHOLD;
     }
 
-    public void setMagnificationFactor(float f){
-	MAG_FACTOR = f;
-    }
+	public void setMagnificationFactor(float f){
+		MAG_FACTOR = f;
+	}
 
-    public float getMagnificationFactor(){
-	return MAG_FACTOR;
-    }
+	public float getMagnificationFactor(){
+		return MAG_FACTOR;
+	}
 
     /*remember command lines input in CallBox*/
     void rememberCommandLine(String cmdLine){
-	boolean exists = false;
-	for (int i=0;i<LAST_COMMANDS.size();i++){
-	    if (((String)LAST_COMMANDS.elementAt(i)).equals(cmdLine)){
-		if (i > 0){
-		    String tmp = (String)LAST_COMMANDS.firstElement();
-		    LAST_COMMANDS.setElementAt(cmdLine, 0);
-		    LAST_COMMANDS.setElementAt(tmp, i);
+		boolean exists = false;
+		for (int i=0;i<LAST_COMMANDS.size();i++){
+			if (((String)LAST_COMMANDS.elementAt(i)).equals(cmdLine)){
+				if (i > 0){
+					String tmp = (String)LAST_COMMANDS.firstElement();
+					LAST_COMMANDS.setElementAt(cmdLine, 0);
+					LAST_COMMANDS.setElementAt(tmp, i);
+				}
+				return;
+			}
 		}
-		return;
-	    }
+		LAST_COMMANDS.insertElementAt(cmdLine, 0);
+		if (LAST_COMMANDS.size() > COMMAND_LIMIT){LAST_COMMANDS.removeElementAt(COMMAND_LIMIT);}  //we limit the list to COMMAND_LIMIT elements
 	}
-	LAST_COMMANDS.insertElementAt(cmdLine, 0);
-	if (LAST_COMMANDS.size() > COMMAND_LIMIT){LAST_COMMANDS.removeElementAt(COMMAND_LIMIT);}  //we limit the list to COMMAND_LIMIT elements
-    }
 
     /*could also be set at runtime from command line
       java -DproxySet=true -DproxyHost=proxy_host -DproxyPort=proxy_port*/
     static void updateProxy(boolean use,String hostname,String port){
-	ConfigManager.useProxy=use;
-	ConfigManager.proxyHost=hostname;
-	ConfigManager.proxyPort=port;
-	if (ConfigManager.useProxy){
-	    System.getProperties().put("proxySet","true");
-	    System.getProperties().put("proxyHost",ConfigManager.proxyHost);
-	    System.getProperties().put("proxyPort",ConfigManager.proxyPort);
+		ConfigManager.useProxy=use;
+		ConfigManager.proxyHost=hostname;
+		ConfigManager.proxyPort=port;
+		if (ConfigManager.useProxy){
+			System.getProperties().put("proxySet","true");
+			System.getProperties().put("proxyHost",ConfigManager.proxyHost);
+			System.getProperties().put("proxyPort",ConfigManager.proxyPort);
+		}
+		else {
+			System.getProperties().put("proxySet","false");
+		}
 	}
-	else {
-	    System.getProperties().put("proxySet","false");
-	}
-    }
 
 	/* ------------------------ Plugins ----------------------------- */
 
@@ -571,85 +571,85 @@ public class ConfigManager {
 		}
 	}
 
-    protected void initPlugins(ZGRViewer application){
-	Vector plgs = new Vector();
-	//list all files in 'plugins' dir
-	if (pluginJARs == null){
-		pluginJARs = ConfigManager.plugInDir.listFiles();		
-	}
-	if (pluginJARs != null && pluginJARs.length>0){
-	    URL[] urls = new URL[pluginJARs.length];
-	    //store path to each JAR file in plugins dir as a URL so that they can be added
-	    //later dynamically to the classpath (through a new ClassLoader)
-	    for (int i=0;i<pluginJARs.length;i++){
-		try {
-		    // going through URI and then URL as advised in JDK 1.6
-		    urls[i] = pluginJARs[i].toURI().toURL();
+	protected void initPlugins(ZGRViewer application){
+		Vector plgs = new Vector();
+		//list all files in 'plugins' dir
+		if (pluginJARs == null){
+			pluginJARs = ConfigManager.plugInDir.listFiles();		
 		}
-		catch(MalformedURLException mue){System.err.println("Failed to instantiate a class loader for plug-ins: "+mue);}
-	    }
-	    //instantiate a new class loader with a classpath containing all JAR files in plugins directory
-	    URLClassLoader ucl = new URLClassLoader(urls);
-	    JarFile jf;
-	    String s;
-	    Object plgInstance = null;
-	    //for each of these JAR files
-	    for (int i=0;i<pluginJARs.length;i++){
-		try {
-		    jf = new JarFile(pluginJARs[i]);
-		    //get all CLASS entries
-		    for (Enumeration e=jf.entries();e.hasMoreElements();){
-			s = ((JarEntry)e.nextElement()).getName();
-			if (s.endsWith(".class")){
-			    //replace directory / by package .
-			    s = Utils.replaceString(s,"/",".");
-			    //get rid of .class at the end of the jar entry
-			    s = s.substring(0,s.length()-6);
-			    try {
-				//for each class entry, get the Class definition
-				Class c = ucl.loadClass(s);
-				Class[] interfaces = c.getInterfaces();
+		if (pluginJARs != null && pluginJARs.length>0){
+			URL[] urls = new URL[pluginJARs.length];
+			//store path to each JAR file in plugins dir as a URL so that they can be added
+			//later dynamically to the classpath (through a new ClassLoader)
+			for (int i=0;i<pluginJARs.length;i++){
 				try {
-				    //find out if it implements Plugin (if it does, instantiate and store it)
-				    for (int j = 0;j<interfaces.length;j++){
-					if (interfaces[j].getName().equals("net.claribole.zgrviewer.Plugin")){
-					    plgInstance = c.newInstance();
-					    ((Plugin)plgInstance).setApplication(application);
-					    plgs.add(plgInstance);
-					}
-				    }
-				    plgInstance = null;
+					// going through URI and then URL as advised in JDK 1.6
+					urls[i] = pluginJARs[i].toURI().toURL();
 				}
-				catch (InstantiationException ie) {
-				    System.err.println("Unable to create plug-in object for class "+
-						       s + ": " + ie.getMessage());
-				    ie.printStackTrace();
-				}
-				catch (IllegalAccessException ie) {
-				    System.err.println("Unable to create plug-in object for class "+
-						       s + ": " + ie.getMessage());
-				    ie.printStackTrace();
-				}
-			    }
-			    catch (ClassNotFoundException ex){System.err.println("Failed to load plug-in class "+s);}
+				catch(MalformedURLException mue){System.err.println("Failed to instantiate a class loader for plug-ins: "+mue);}
 			}
-		    }
+			//instantiate a new class loader with a classpath containing all JAR files in plugins directory
+			URLClassLoader ucl = new URLClassLoader(urls);
+			JarFile jf;
+			String s;
+			Object plgInstance = null;
+			//for each of these JAR files
+			for (int i=0;i<pluginJARs.length;i++){
+				try {
+					jf = new JarFile(pluginJARs[i]);
+					//get all CLASS entries
+					for (Enumeration e=jf.entries();e.hasMoreElements();){
+						s = ((JarEntry)e.nextElement()).getName();
+						if (s.endsWith(".class")){
+							//replace directory / by package .
+							s = Utils.replaceString(s,"/",".");
+							//get rid of .class at the end of the jar entry
+							s = s.substring(0,s.length()-6);
+							try {
+								//for each class entry, get the Class definition
+								Class c = ucl.loadClass(s);
+								Class[] interfaces = c.getInterfaces();
+								try {
+									//find out if it implements Plugin (if it does, instantiate and store it)
+									for (int j = 0;j<interfaces.length;j++){
+										if (interfaces[j].getName().equals("net.claribole.zgrviewer.Plugin")){
+											plgInstance = c.newInstance();
+											((Plugin)plgInstance).setApplication(application);
+											plgs.add(plgInstance);
+										}
+									}
+									plgInstance = null;
+								}
+								catch (InstantiationException ie) {
+									System.err.println("Unable to create plug-in object for class "+
+										s + ": " + ie.getMessage());
+									ie.printStackTrace();
+								}
+								catch (IllegalAccessException ie) {
+									System.err.println("Unable to create plug-in object for class "+
+										s + ": " + ie.getMessage());
+									ie.printStackTrace();
+								}
+							}
+							catch (ClassNotFoundException ex){System.err.println("Failed to load plug-in class "+s);}
+						}
+					}
+				}
+				catch (IOException ex2){System.err.println("Failed to load plug-in from JAR file "+pluginJARs[i].getAbsolutePath());}
+				catch (NoClassDefFoundError ex2){System.err.println("One or more plugins might have failed to initialize because of the following error:\nNo Class Definition Found for "+ex2.getMessage());}
+				catch (ClassFormatError ex2){System.err.println("One or more plugins might have failed to initialize because of the following error:\nClass Format Error for "+ex2.getMessage());}
+			}
 		}
-		catch (IOException ex2){System.err.println("Failed to load plug-in from JAR file "+pluginJARs[i].getAbsolutePath());}
-		catch (NoClassDefFoundError ex2){System.err.println("One or more plugins might have failed to initialize because of the following error:\nNo Class Definition Found for "+ex2.getMessage());}
-		catch (ClassFormatError ex2){System.err.println("One or more plugins might have failed to initialize because of the following error:\nClass Format Error for "+ex2.getMessage());}
-	    }
+		//store the plugins in arrays instead of vectors
+		plugins = new Plugin[plgs.size()];
+		for (int i=0;i<plgs.size();i++){
+			plugins[i] = (Plugin)plgs.elementAt(i);
+			try {
+				plugins[i].loadPreferences((Hashtable)tmpPluginSettings.get(plugins[i].getName()));
+			}
+			catch (NullPointerException ex){}
+		}
 	}
-	//store the plugins in arrays instead of vectors
-	plugins = new Plugin[plgs.size()];
-	for (int i=0;i<plgs.size();i++){
-	    plugins[i] = (Plugin)plgs.elementAt(i);
-	    try {
-		plugins[i].loadPreferences((Hashtable)tmpPluginSettings.get(plugins[i].getName()));
-	    }
-	    catch (NullPointerException ex){}
-	}
-    }
 
 	// event should be one of Plugin.NOTIFY_PLUGIN_*;
 	void notifyPlugins(short event){
@@ -659,9 +659,9 @@ public class ConfigManager {
 	}
 
     protected void terminatePlugins(){
-	for (int i=0;i<plugins.length;i++){
-	    plugins[i].terminate();
-	}
+		for (int i=0;i<plugins.length;i++){
+			plugins[i].terminate();
+		}
     }
 
 }

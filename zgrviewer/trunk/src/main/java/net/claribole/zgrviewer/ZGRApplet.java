@@ -5,6 +5,8 @@
  *   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
  *   Copyright (c) INRIA, 2004-2010. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
+ *
+ * $Id$
  */ 
 
 package net.claribole.zgrviewer;

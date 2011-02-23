@@ -3,7 +3,7 @@
  *   AUTHOR :            Emmanuel Pietriga (emmanuel@w3.org)
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2011. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  *   $Id$

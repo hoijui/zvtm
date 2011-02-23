@@ -1,10 +1,11 @@
 /*   FILE: ZgrAppletEvtHdlr.java
  *   DATE OF CREATION:   Fri May 09 09:54:03 2003
  *   AUTHOR :            Emmanuel Pietriga (emmanuel@w3.org)
- *   MODIF:              Fri May 09 10:09:49 2003 by Emmanuel Pietriga (emmanuel@w3.org, emmanuel@claribole.net)
  *   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2011. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
+ *
+ *$Id$
  */ 
 
 package net.claribole.zgrviewer;

@@ -4,6 +4,8 @@
  *   MODIF:              Wed Dec 03 09:33:52 2003 by Emmanuel Pietriga
  *   Copyright (c) Emmanuel Pietriga, 2002. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
+ *
+ * $Id$
  */
 
 package net.claribole.zgrviewer;
