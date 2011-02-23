@@ -149,7 +149,7 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewListener {
                 }
             }
             else if (grMngr.tp.isDragMagNavMode()){
-                grMngr.triggerDM(jpx, jpy);
+                grMngr.triggerDM(jpx, jpy, this);
             }
             else {
                 if (clickNumber == 2){click2(v, mod, jpx, jpy, clickNumber, e);}

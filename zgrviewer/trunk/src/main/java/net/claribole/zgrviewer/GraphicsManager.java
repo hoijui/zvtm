@@ -770,20 +770,20 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 		return dmPortal;
 	}
 
-    public void triggerDM(int x, int y){
+    public void triggerDM(int x, int y, PortalListener pl){
 		if (dmPortal != null){
 			// portal is active, destroy it
 			killDM();
 		}
 		else {
 			// portal not active, create it
-			createDM(x, y);
+			createDM(x, y, pl);
 		}	
 	}
 
-    void createDM(int x, int y){
+    void createDM(int x, int y, PortalListener pl){
         dmPortal = new DraggableCameraPortal(x, y, GraphicsManager.DM_PORTAL_WIDTH, GraphicsManager.DM_PORTAL_HEIGHT, dmCamera);
-        dmPortal.setPortalListener((PortalListener)meh);
+        dmPortal.setPortalListener(pl);
         dmPortal.setBackgroundColor(mainView.getBackgroundColor());
         vsm.addPortal(dmPortal, mainView);
         dmPortal.setBorder(GraphicsManager.DM_COLOR);
