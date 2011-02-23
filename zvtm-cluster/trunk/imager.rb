@@ -35,7 +35,9 @@ def process_pixels(image_file, space)
            posx = 75*col
            posy = -75*row
            cl_img = ImageDistance.closest_image Color.new(bimg.getRGB(col, row))
-           space.addGlyph VImage.new(posx, posy, 0, ImageIcon.new("images/" + cl_img).getImage)
+           vimg = VImage.new(posx, posy, 0, ImageIcon.new("images/" + cl_img).getImage)
+           vimg.setDrawBorder false
+           space.addGlyph vimg 
        end
    end
 end
@@ -94,7 +96,7 @@ def main
     puts 'now building the image'
     puts ARGV[0]
     process_pixels ARGV[0], space 
-    #view.getGlobalView cam, 500
+    view.getGlobalView cam, 500
 end
 
 main
