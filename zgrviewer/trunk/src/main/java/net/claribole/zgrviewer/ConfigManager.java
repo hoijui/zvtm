@@ -614,9 +614,10 @@ public class ConfigManager {
 									for (int j = 0;j<interfaces.length;j++){
 										if (interfaces[j].getName().equals("net.claribole.zgrviewer.Plugin")){
 											plgInstance = (Plugin)c.newInstance();
-											System.out.println("Loading plugin: "+plgInstance.getName()+" "+plgInstance.getVersion());
+											System.out.print("Loading plugin: "+plgInstance.getName()+" "+plgInstance.getVersion()+"... ");
 											plgInstance.setApplication(application);
 											plgs.add(plgInstance);
+											System.out.println("OK");
 										}
 									}
 									plgInstance = null;
