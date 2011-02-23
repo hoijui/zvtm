@@ -263,6 +263,10 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	public Camera getGraphCamera(){
 		return mainCamera;
 	}
+
+	public Camera getMenuCamera(){
+		return mnSpace.getCamera(0);
+	}
 	
 	public BaseEventHandler getViewListener(){
 		return meh;
