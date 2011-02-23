@@ -174,7 +174,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 	evHs[layer] = eh;
     }
 
-	public ViewListener[] getEventHandlers(){
+	public ViewListener[] getListeners(){
 		return evHs;
 	}
 
