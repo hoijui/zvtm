@@ -1,8 +1,8 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2008. All Rights Reserved
+ *   Copyright (c) INRIA, 2008-2009. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: $
+ * $Id$
  */
 
 package fr.inria.zvtm.glyphs.projection;

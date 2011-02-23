@@ -3,6 +3,7 @@
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@xrce.xerox.com)
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2002. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2009. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -15,6 +16,8 @@
  * Lesser General Public License for more details.
  *
  * For full terms see the file COPYING.
+ *
+ * $Id$
  */
 
 package fr.inria.zvtm.glyphs.projection;
