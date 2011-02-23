@@ -128,4 +128,6 @@ public class Messages {
 
     public static final String SVG_PARSING_ERROR = "SVG parsing error";
 
+	public static final String ABOUT_PLUGINS = "Installed ZGRViewer Plugins";
+
 }

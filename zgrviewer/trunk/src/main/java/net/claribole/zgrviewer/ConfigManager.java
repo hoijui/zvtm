@@ -660,10 +660,24 @@ public class ConfigManager {
 		}		
 	}
 
-    protected void terminatePlugins(){
+    void terminatePlugins(){
 		for (int i=0;i<plugins.length;i++){
 			plugins[i].terminate();
 		}
     }
+
+	void showPluginInfo(){
+		StringBuffer info = new StringBuffer();
+		for (int i=0;i<plugins.length;i++){
+		    info.append(plugins[i].getName()
+		                +"\nVersion: "+plugins[i].getVersion()
+		                +"\nAuthors: "+plugins[i].getAuthor()+"\n");
+			if (plugins[i].getURL() != null){
+				info.append("More information:" + plugins[i].getURL().toString() + "\n");
+			}
+			info.append("\n");
+		}
+		new TextViewer(info, Messages.ABOUT_PLUGINS, 0, 0, 0, 400, 300, false);
+	}
 
 }
