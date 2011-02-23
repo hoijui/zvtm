@@ -592,7 +592,7 @@ public class ConfigManager {
 			URLClassLoader ucl = new URLClassLoader(urls);
 			JarFile jf;
 			String s;
-			Object plgInstance = null;
+			Plugin plgInstance = null;
 			//for each of these JAR files
 			for (int i=0;i<pluginJARs.length;i++){
 				try {
@@ -613,8 +613,9 @@ public class ConfigManager {
 									//find out if it implements Plugin (if it does, instantiate and store it)
 									for (int j = 0;j<interfaces.length;j++){
 										if (interfaces[j].getName().equals("net.claribole.zgrviewer.Plugin")){
-											plgInstance = c.newInstance();
-											((Plugin)plgInstance).setApplication(application);
+											plgInstance = (Plugin)c.newInstance();
+											System.out.println("Loading plugin: "+plgInstance.getName()+" "+plgInstance.getVersion());
+											plgInstance.setApplication(application);
 											plgs.add(plgInstance);
 										}
 									}
