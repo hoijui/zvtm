@@ -1,5 +1,5 @@
 /*   AUTHOR :           Julien Husson (jhusson@lri.fr)
- *   Copyright (c) INRIA, 2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2010-2011. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$

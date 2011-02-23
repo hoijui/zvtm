@@ -1,3 +1,9 @@
+/*   Copyright (c) INRIA, 2010-2011. All Rights Reserved
+ *   Licensed under the GNU LGPL. For full terms see the file COPYING.
+ *
+ * $Id$
+ */
+
 package fr.inria.zvtm.widgets;
 
 import java.awt.AlphaComposite;
