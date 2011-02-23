@@ -35,7 +35,7 @@ The Animation module in ZVTM is heavily based upon the Timing Framework.
 
 From this framework, we borrow the concepts of Timing Sources, Interpolators and Timing Targets 
 (called Timing Handlers in our API). 
-We discard the idea of an Animator targetting multiple receivers in favor of an Animation class
+We discard the idea of an Animator targeting multiple receivers in favor of an Animation class
 that animates a single object (Glyph, Camera, Portal, Lens or Translucent).
 Sun's Timing Framework also provides animation triggers, which are not
 replicated in our API.
@@ -89,7 +89,7 @@ Animation cameraAlt =
   am.getAnimationManager().getAnimationFactory().createAnimation(
    4000, 
    2f,
-   Animator.RepeatBehavior.REVERSE,
+   Animation.RepeatBehavior.REVERSE,
    vsm.getVirtualSpace("src").getCamera(0),
    Animation.Dimension.ALTITUDE,
    new DefaultTimingHandler(){
