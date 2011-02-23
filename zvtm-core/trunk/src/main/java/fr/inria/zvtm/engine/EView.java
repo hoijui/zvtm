@@ -17,6 +17,8 @@
  * Lesser General Public License for more details.
  *
  * For full terms see the file COPYING.
+ *
+ * $Id$
  */
 
 package fr.inria.zvtm.engine;
