@@ -1,20 +1,7 @@
-/*   FILE: TestCircle.java
- *   DATE OF CREATION:   Jul 11 2000
- *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@xrce.xerox.com)
- *   MODIF:              Romain Primet
- *   Copyright (c) INRIA, 2009
+/*   AUTHOR : Romain Primet (romain.primet@inria.fr)
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
- * 
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * For full terms see the file COPYING.
+ *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009-2011.
+ *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$ 
  */
