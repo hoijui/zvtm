@@ -4,6 +4,7 @@
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Emmanuel Pietriga, 2002. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
+ * $Id $
  */ 
 
 package fr.inria.zvtm.demo;

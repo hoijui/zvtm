@@ -2,7 +2,7 @@
  *   DATE OF CREATION:  Fri Aug 26 15:12:06 2005
  *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2004-2009. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2011. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$

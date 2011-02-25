@@ -1,8 +1,10 @@
 /*   FILE: AnimationDemo.java
  *   DATE OF CREATION:   Thu Mar 22 17:20:34 2007
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2007-2009. All Rights Reserved
+ *   Copyright (c) INRIA, 2007-2010. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
+ *
+ * $Id $
  */ 
 
 package fr.inria.zvtm.demo;
