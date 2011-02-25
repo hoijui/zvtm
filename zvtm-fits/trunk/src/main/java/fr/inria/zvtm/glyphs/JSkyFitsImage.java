@@ -3,6 +3,7 @@
  *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2010.
  *  Licensed under the GNU GPL. For full terms see the file COPYING.
  *
+ * $Id:$
  */ 
 package fr.inria.zvtm.glyphs;
 
