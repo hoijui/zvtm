@@ -3,7 +3,7 @@
  *   AUTHOR :            Emmanuel Pietriga (emmanuel@claribole.net)
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Emmanuel Pietriga, 2003. All Rights Reserved
- *   Copyright (c) INRIA, 2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2010-2011. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$  
