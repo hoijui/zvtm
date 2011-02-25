@@ -1,9 +1,7 @@
 /*   FILE: WebBrowser.java
  *   DATE OF CREATION:   Wed Dec 03 09:11:41 2003
- *   AUTHOR :            Emmanuel Pietriga (emmanuel@claribole.net)
- *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Emmanuel Pietriga, 2002. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2011. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *   $Id$
  */ 

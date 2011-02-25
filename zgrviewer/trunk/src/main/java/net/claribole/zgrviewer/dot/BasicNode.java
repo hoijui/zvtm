@@ -1,7 +1,7 @@
 /*   FILE: BasicNode.java
  *   DATE OF CREATION:   Apr 4 2005
  *   AUTHOR :            Eric Mounhem (skbo@lri.fr)
- *   Copyright (c) INRIA, 2004-2005. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  * 
  * $Id$

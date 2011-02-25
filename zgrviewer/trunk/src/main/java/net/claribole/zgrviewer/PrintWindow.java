@@ -1,7 +1,5 @@
 /*   FILE: PrintWindow.java
  *   DATE OF CREATION:  Wed Jun  1 16:28:18 2005
- *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) INRIA, 2004-2011. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *

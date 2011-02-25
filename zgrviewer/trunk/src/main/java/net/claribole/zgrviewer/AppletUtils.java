@@ -1,8 +1,6 @@
 /*   FILE: Utils.java
  *   DATE OF CREATION:   Thu Jan 09 14:14:35 2003
- *   AUTHOR :            Emmanuel Pietriga (emmanuel@w3.org)
- *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) Emmanuel Pietriga, 2002-2010. All Rights Reserved
+ *   Copyright (c) Emmanuel Pietriga, 2002-2011. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  *$Id$
@@ -25,7 +23,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
-
 
 
 public class AppletUtils {

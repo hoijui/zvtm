@@ -1,8 +1,7 @@
 /*   FILE: TextViewer.java
  *   DATE OF CREATION:   Wed Dec 03 09:31:46 2003
- *   AUTHOR :            Emmanuel Pietriga (emmanuel@claribole.net)
- *   MODIF:              Wed Dec 03 09:33:52 2003 by Emmanuel Pietriga
  *   Copyright (c) Emmanuel Pietriga, 2002. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2011. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$

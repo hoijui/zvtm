@@ -1,7 +1,5 @@
 /*   FILE: ConfigManager.java
  *   DATE OF CREATION:   Thu Jan 09 14:14:35 2003
- *   AUTHOR :            Emmanuel Pietriga (emmanuel@claribole.net)
- *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Emmanuel Pietriga, 2002. All Rights Reserved
  *   Copyright (c) INRIA, 2004-2011. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
