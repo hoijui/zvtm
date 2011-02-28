@@ -10,6 +10,7 @@ package fr.inria.zvtm.widgets;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.geom.Point2D;
+import java.util.Arrays;
 
 import fr.inria.zvtm.engine.Utils;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
@@ -27,6 +28,18 @@ public class PieMenuR extends PieMenu {
 
 	public static final int animStartSize = 5;
 	
+    private static Color[] nCopies(Color value, int length){
+        Color[] retval = new Color[length];
+        Arrays.fill(retval, value);
+        return retval;
+    }
+
+    private static Point2D.Double[] nCopies(Point2D.Double value, int length){
+        Point2D.Double[] retval = new Point2D.Double[length];
+        Arrays.fill(retval, value);
+        return retval;
+    }
+
     /**Pie Menu constructor - should not be used directly
         *@param stringLabels text label of each menu item
         *@param menuCenterCoordinates (mouse cursor's coordinates in virtual space as a Point2D.Double)
@@ -49,60 +62,13 @@ public class PieMenuR extends PieMenu {
                     double radius, float irr, double startAngle,
                     Color fillColor, Color borderColor, Color fillSColor, Color borderSColor, Color labelColor, float alphaT,
                     int animDuration, double sensitRadius, Font font){
-        this.vs = vsm.getVirtualSpace(vsName);
-        double vx = menuCenterCoordinates.x;
-        double vy = menuCenterCoordinates.y;
-        items = new VRing[stringLabels.length];
-        labels = new VTextOr[stringLabels.length];
-        double angle = startAngle;
-        double angleDelta = 2 * Math.PI/((double)stringLabels.length);
-        double pieMenuRadius = radius;
-        double textAngle;
-        for (int i=0;i<labels.length;i++){
-            angle += angleDelta;
-            items[i] = new VRing(vx, vy, 0, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, irr, angle, fillColor, borderColor, alphaT);
-            items[i].setCursorInsideFillColor(fillSColor);
-            items[i].setCursorInsideHighlightColor(borderSColor);
-            vs.addGlyph(items[i], false, false);
-            if (stringLabels[i] != null && stringLabels[i].length() > 0){
-                if (orientText){
-                    textAngle = angle ;
-                    if (angle > Utils.HALF_PI){
-                        if (angle >= Math.PI){
-                            if (angle < Utils.THREE_HALF_PI){textAngle -= Math.PI;}
-                            //else {textAngle +=Math.PI;}
-                        }
-                        else {textAngle +=Math.PI;}
-                    }
-                    labels[i] = new VTextOr(vx+Math.cos(angle)*pieMenuRadius/2,
-                        vy+Math.sin(angle)*pieMenuRadius/2,
-                        0, labelColor, stringLabels[i], textAngle, VText.TEXT_ANCHOR_MIDDLE);
-                }
-                else {
-                    labels[i] = new VTextOr(vx+Math.cos(angle)*pieMenuRadius/2,
-                        vy+Math.sin(angle)*pieMenuRadius/2,
-                        0, labelColor, stringLabels[i], 0, VText.TEXT_ANCHOR_MIDDLE);
-                }
-                labels[i].setFont(font);
-                labels[i].setSensitivity(false);
-                vs.addGlyph(labels[i]);
-            }
-        }
-        if (animDuration > 0){
-            for (int i=0;i<items.length;i++){
-              	Animation sizeAnim = vsm.getAnimationManager().getAnimationFactory()
-		    .createGlyphSizeAnim(animDuration, items[i],
-					 (float)pieMenuRadius,
-					 false,
-					 IdentityInterpolator.getInstance(),
-					 null);
-		vsm.getAnimationManager().startAnimation(sizeAnim, false);
-            }
-        }
-        boundary = new VCircle(vx, vy, 0, pieMenuRadius*sensitRadius*2, Color.white);
-        boundary.setVisible(false);
-        vs.addGlyph(boundary);
-        vs.atBottom(boundary);
+          this(stringLabels, menuCenterCoordinates, vsName, vsm, 
+                radius, irr, startAngle, nCopies(fillColor, stringLabels.length), 
+                nCopies(borderColor, stringLabels.length), 
+                nCopies(fillSColor, stringLabels.length), 
+                nCopies(borderSColor, stringLabels.length), 
+                nCopies(labelColor, stringLabels.length), alphaT, animDuration, sensitRadius, 
+                font);
     }
 
     /**Pie Menu constructor - should not be used directly
@@ -127,60 +93,8 @@ public class PieMenuR extends PieMenu {
                     double radius, float irr, double startAngle,
                     Color[] fillColors, Color[] borderColors, Color[] fillSColors, Color[] borderSColors, Color[] labelColors, float alphaT,
                     int animDuration, double sensitRadius, Font font){
-        this.vs = vsm.getVirtualSpace(vsName);
-        double vx = menuCenterCoordinates.x;
-        double vy = menuCenterCoordinates.y;
-        items = new VRing[stringLabels.length];
-        labels = new VTextOr[stringLabels.length];
-        double angle = startAngle;
-        double angleDelta = 2 * Math.PI/((double)stringLabels.length);
-        double pieMenuRadius = radius;
-        double textAngle;
-        for (int i=0;i<labels.length;i++){
-            angle += angleDelta;
-            items[i] = new VRing(vx, vy, 0, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, irr, angle, fillColors[i], borderColors[i], alphaT);
-            items[i].setCursorInsideFillColor(fillSColors[i]);
-            items[i].setCursorInsideHighlightColor(borderSColors[i]);
-            vs.addGlyph(items[i], false, false);
-            if (stringLabels[i] != null && stringLabels[i].length() > 0){
-                if (orientText){
-                    textAngle = angle ;
-                    if (angle > Utils.HALF_PI){
-                        if (angle > Math.PI){
-                            if (angle < Utils.THREE_HALF_PI){textAngle -= Math.PI;}
-                        }
-                        else {textAngle +=Math.PI;}
-                    }
-                    labels[i] = new VTextOr(vx+Math.cos(angle)*pieMenuRadius/2,
-                        vy+Math.sin(angle)*pieMenuRadius/2,
-                        0, labelColors[i], stringLabels[i], textAngle, VText.TEXT_ANCHOR_MIDDLE);
-                }
-                else {
-                    labels[i] = new VTextOr(vx+Math.cos(angle)*pieMenuRadius/2,
-                        vy+Math.sin(angle)*pieMenuRadius/2,
-                        0, labelColors[i], stringLabels[i], 0, VText.TEXT_ANCHOR_MIDDLE);
-                }
-                labels[i].setBorderColor(borderColors[i]);
-                labels[i].setFont(font);
-                labels[i].setSensitivity(false);
-                vs.addGlyph(labels[i]);
-            }
-        }
-        if (animDuration > 0){
-            for (int i=0;i<items.length;i++){
-		Animation sizeAnim = vsm.getAnimationManager().getAnimationFactory()
-		    .createGlyphSizeAnim(animDuration, items[i],
-					 (float)pieMenuRadius,
-					 false,
-					 IdentityInterpolator.getInstance(),
-					 null);
-		vsm.getAnimationManager().startAnimation(sizeAnim, false);
-	    }
-        }
-        boundary = new VCircle(vx, vy, 0, pieMenuRadius*sensitRadius*2, Color.white);
-        boundary.setVisible(false);
-        vs.addGlyph(boundary);
-        vs.atBottom(boundary);
+        this(stringLabels, menuCenterCoordinates, vsName, vsm, 
+                radius, irr, startAngle, fillColors, borderColors, fillSColors, borderSColors, labelColors, alphaT, animDuration, sensitRadius, font, nCopies(new Point2D.Double(0, 0), stringLabels.length));
     }
 
     /**Pie Menu constructor - should not be used directly
@@ -206,60 +120,13 @@ public class PieMenuR extends PieMenu {
                     double radius, float irr, double startAngle,
                     Color fillColor, Color borderColor, Color fillSColor, Color borderSColor, Color labelColor, float alphaT,
                     int animDuration, double sensitRadius, Font font, Point2D.Double[] labelOffsets){
-        this.vs = vsm.getVirtualSpace(vsName);
-        double vx = menuCenterCoordinates.x;
-        double vy = menuCenterCoordinates.y;
-        items = new VRing[stringLabels.length];
-        labels = new VTextOr[stringLabels.length];
-        double angle = startAngle;
-        double angleDelta = 2 * Math.PI/((double)stringLabels.length);
-        double pieMenuRadius = radius;
-        double textAngle;
-        for (int i=0;i<labels.length;i++){
-            angle += angleDelta;
-            items[i] = new VRing(vx, vy, 0, (animDuration > 0) ? animStartSize : pieMenuRadius, angleDelta, irr, angle, fillColor, borderColor, alphaT);
-            items[i].setCursorInsideFillColor(fillSColor);
-            items[i].setCursorInsideHighlightColor(borderSColor);
-            vs.addGlyph(items[i], false, false);
-            if (stringLabels[i] != null && stringLabels[i].length() > 0){
-                if (orientText){
-                    textAngle = angle ;
-                    if (angle > Utils.HALF_PI){
-                        if (angle >= Math.PI){
-                            if (angle < Utils.THREE_HALF_PI){textAngle -= Math.PI;}
-                            //else {textAngle +=Math.PI;}
-                        }
-                        else {textAngle +=Math.PI;}
-                    }
-                    labels[i] = new VTextOr(vx+Math.cos(angle)*pieMenuRadius/2 + labelOffsets[i].x,
-                        vy+Math.sin(angle)*pieMenuRadius/2 + labelOffsets[i].y,
-                        0, labelColor, stringLabels[i], textAngle, VText.TEXT_ANCHOR_MIDDLE);
-                }
-                else {
-                    labels[i] = new VTextOr(vx+Math.cos(angle)*pieMenuRadius/2 + labelOffsets[i].x,
-                        vy+Math.sin(angle)*pieMenuRadius/2 + labelOffsets[i].y,
-                        0, labelColor, stringLabels[i], 0, VText.TEXT_ANCHOR_MIDDLE);                    
-                }
-                labels[i].setFont(font);
-                labels[i].setSensitivity(false);
-                vs.addGlyph(labels[i]);
-            }
-        }
-        if (animDuration > 0){
-            for (int i=0;i<items.length;i++){
-		Animation sizeAnim = vsm.getAnimationManager().getAnimationFactory()
-		    .createGlyphSizeAnim(animDuration, items[i],
-					 (float)pieMenuRadius,
-					 false,
-					 IdentityInterpolator.getInstance(),
-					 null);
-		vsm.getAnimationManager().startAnimation(sizeAnim, false);
-	    }
-        }
-        boundary = new VCircle(vx, vy, 0, pieMenuRadius*sensitRadius*2, Color.white);
-        boundary.setVisible(false);
-        vs.addGlyph(boundary);
-        vs.atBottom(boundary);
+        this(stringLabels, menuCenterCoordinates, vsName, vsm, 
+                radius, irr, startAngle, nCopies(fillColor, stringLabels.length), 
+                nCopies(borderColor, stringLabels.length), 
+                nCopies(fillSColor, stringLabels.length),
+                nCopies(borderSColor, stringLabels.length), 
+                nCopies(labelColor, stringLabels.length), alphaT, animDuration,
+                sensitRadius, font, labelOffsets);
     }
 
     /**Pie Menu constructor - should not be used directly
