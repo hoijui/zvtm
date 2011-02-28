@@ -47,7 +47,7 @@ public class PieMenuR extends PieMenu {
         */
     public PieMenuR(String[] stringLabels, Point2D.Double menuCenterCoordinates, 
                     String vsName, VirtualSpaceManager vsm,
-                    double radius, float irr, double startAngle,
+                    double radius, float irr, double startAngle, double angleWidth,
                     Color[] fillColors, Color[] borderColors, Color[] fillSColors, Color[] borderSColors, Color[] labelColors, float alphaT,
                     int animDuration, double sensitRadius, Font font, Point2D.Double[] labelOffsets){
         this.vs = vsm.getVirtualSpace(vsName);
@@ -56,7 +56,7 @@ public class PieMenuR extends PieMenu {
         items = new VRing[stringLabels.length];
         labels = new VTextOr[stringLabels.length];
         double angle = startAngle;
-        double angleDelta = 2 * Math.PI/((double)stringLabels.length);
+        double angleDelta = angleWidth/((double)stringLabels.length);
         double pieMenuRadius = radius;
         double textAngle;
         for (int i=0;i<labels.length;i++){

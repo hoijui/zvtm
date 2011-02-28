@@ -32,6 +32,7 @@ public abstract class PieMenuFactory {
     static double SENSIT_BOUNDING_RADIUS = 1.0f;
     static Font FONT = VText.getMainFont();
 	static float RING_INNER_RATIO = 0.1f;
+    static double ANGLE_WITDH = 2 * Math.PI;
 
     private static Color[] nCopies(Color value, int length){
         Color[] retval = new Color[length];
@@ -56,7 +57,7 @@ public abstract class PieMenuFactory {
      */
     public static PieMenu createPieMenu(String[] labels, int animLength, View v, VirtualSpaceManager vsm){
         return new PieMenuR(labels, new Point2D.Double(v.mouse.getVSXCoordinate(), v.mouse.getVSYCoordinate()),
-            v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, RING_INNER_RATIO, ANGLE,
+            v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, RING_INNER_RATIO, ANGLE, ANGLE_WITDH,
             nCopies(ITEM_FILLCOLOR, labels.length), 
             nCopies(ITEM_BORDERCOLOR, labels.length), 
             nCopies(ITEM_SFILLCOLOR, labels.length),
@@ -84,7 +85,7 @@ public abstract class PieMenuFactory {
 					Color[] itemColors, Color[] itembColors, Color[] itemSColors,
 					Color[] itembSColors, Color[] labelColors){
 	    return new PieMenuR(labels, new Point2D.Double(v.mouse.getVSXCoordinate(), v.mouse.getVSYCoordinate()),
-            v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, RING_INNER_RATIO, ANGLE,
+            v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, RING_INNER_RATIO, ANGLE, ANGLE_WITDH,
             itemColors, itembColors, itemSColors, itembSColors, labelColors, TRANSLUCENCY,
             animLength, SENSIT_BOUNDING_RADIUS, FONT, nCopies(new Point2D.Double(0, 0), labels.length));
     }
@@ -101,7 +102,7 @@ public abstract class PieMenuFactory {
      */
     public static PieMenu createPieMenu(String[] labels, Point2D.Double[] labelOffsets, int animLength, View v, VirtualSpaceManager vsm){
 	    return new PieMenuR(labels, new Point2D.Double(v.mouse.getVSXCoordinate(), v.mouse.getVSYCoordinate()),
-	    		    v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, RING_INNER_RATIO, ANGLE,
+	    		    v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, RING_INNER_RATIO, ANGLE, ANGLE_WITDH,
 	    		    nCopies(ITEM_FILLCOLOR, labels.length), 
                     nCopies(ITEM_BORDERCOLOR, labels.length),
                     nCopies(ITEM_SFILLCOLOR, labels.length),
@@ -129,7 +130,7 @@ public abstract class PieMenuFactory {
 					Color[] itemColors, Color[] itembColors, Color[] itemSColors,
 					Color[] itembSColors, Color[] labelColors){
 	    return new PieMenuR(labels, new Point2D.Double(v.mouse.getVSXCoordinate(), v.mouse.getVSYCoordinate()),
-	    		    v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, RING_INNER_RATIO, ANGLE,
+	    		    v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, RING_INNER_RATIO, ANGLE, ANGLE_WITDH,
 	    		    itemColors, itembColors, itemSColors, itembSColors,labelColors, TRANSLUCENCY,
 	    		    animLength, SENSIT_BOUNDING_RADIUS, FONT, labelOffsets);
     }
@@ -269,6 +270,14 @@ public abstract class PieMenuFactory {
 
     public static double getAngle(){
         return ANGLE;
+    }
+
+    public static double getAngleWidth(){
+        return ANGLE_WITDH;
+    }
+
+    public static void setAngleWidth(double aw){
+        ANGLE_WITDH = aw;
     }
 
     public static Color getItemFillColor(){
