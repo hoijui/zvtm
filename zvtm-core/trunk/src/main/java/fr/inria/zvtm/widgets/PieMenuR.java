@@ -10,7 +10,6 @@ package fr.inria.zvtm.widgets;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.geom.Point2D;
-import java.util.Arrays;
 
 import fr.inria.zvtm.engine.Utils;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
@@ -28,107 +27,6 @@ public class PieMenuR extends PieMenu {
 
 	public static final int animStartSize = 5;
 	
-    private static Color[] nCopies(Color value, int length){
-        Color[] retval = new Color[length];
-        Arrays.fill(retval, value);
-        return retval;
-    }
-
-    private static Point2D.Double[] nCopies(Point2D.Double value, int length){
-        Point2D.Double[] retval = new Point2D.Double[length];
-        Arrays.fill(retval, value);
-        return retval;
-    }
-
-    /**Pie Menu constructor - should not be used directly
-        *@param stringLabels text label of each menu item
-        *@param menuCenterCoordinates (mouse cursor's coordinates in virtual space as a Point2D.Double)
-        *@param vsName name of the virtual space in which to create the pie menu
-        *@param vsm instance of VirtualSpaceManager
-        *@param radius radius of pie menu
-        *@param irr Inner ring boundary radius as a percentage of outer ring boundary radius
-        *@param startAngle first menu item will have an offset of startAngle interpreted relative to the X horizontal axis (counter clockwise)
-        *@param fillColor menu items' fill color
-        *@param borderColor menu items' border color
-        *@param fillSColor menu items' fill color, when selected<br>can be null if color should not change
-        *@param borderSColor menu items' border color, when selected<br>can be null if color should not change
-        *@param alphaT menu items' translucency value: between 0 (transparent) and 1.0 (opaque)
-        *@param animDuration duration in ms of animation creating the menu (expansion) - 0 for instantaneous display
-        *@param sensitRadius sensitivity radius (as a percentage of the menu's actual radius)
-        *@param font font used for menu labels
-        */
-    public PieMenuR(String[] stringLabels, Point2D.Double menuCenterCoordinates, 
-                    String vsName, VirtualSpaceManager vsm,
-                    double radius, float irr, double startAngle,
-                    Color fillColor, Color borderColor, Color fillSColor, Color borderSColor, Color labelColor, float alphaT,
-                    int animDuration, double sensitRadius, Font font){
-          this(stringLabels, menuCenterCoordinates, vsName, vsm, 
-                radius, irr, startAngle, nCopies(fillColor, stringLabels.length), 
-                nCopies(borderColor, stringLabels.length), 
-                nCopies(fillSColor, stringLabels.length), 
-                nCopies(borderSColor, stringLabels.length), 
-                nCopies(labelColor, stringLabels.length), alphaT, animDuration, sensitRadius, 
-                font);
-    }
-
-    /**Pie Menu constructor - should not be used directly
-        *@param stringLabels text label of each menu item
-        *@param menuCenterCoordinates (mouse cursor's coordinates in virtual space as a Point2D.Double)
-        *@param vsName name of the virtual space in which to create the pie menu
-        *@param vsm instance of VirtualSpaceManager
-        *@param radius radius of pie menu
-        *@param irr Inner ring boundary radius as a percentage of outer ring boundary radius
-        *@param startAngle first menu item will have an offset of startAngle interpreted relative to the X horizontal axis (counter clockwise)
-        *@param fillColors menu items' fill colors (this array should have the same length as the stringLabels array)
-        *@param borderColors menu items' border colors (this array should have the same length as the stringLabels array)
-        *@param fillSColors menu items' fill colors, when selected (this array should have the same length as the stringLabels array)<br>elements can be null if color should not change
-        *@param borderSColors menu items' border colors, when selected (this array should have the same length as the stringLabels array)<br>elements can be null if color should not change
-        *@param alphaT menu items' translucency value: between 0 (transparent) and 1.0 (opaque)
-        *@param animDuration duration in ms of animation creating the menu (expansion) - 0 for instantaneous display
-        *@param sensitRadius sensitivity radius (as a percentage of the menu's actual radius)
-        *@param font font used for menu labels
-        */
-    public PieMenuR(String[] stringLabels, Point2D.Double menuCenterCoordinates, 
-                    String vsName, VirtualSpaceManager vsm,
-                    double radius, float irr, double startAngle,
-                    Color[] fillColors, Color[] borderColors, Color[] fillSColors, Color[] borderSColors, Color[] labelColors, float alphaT,
-                    int animDuration, double sensitRadius, Font font){
-        this(stringLabels, menuCenterCoordinates, vsName, vsm, 
-                radius, irr, startAngle, fillColors, borderColors, fillSColors, borderSColors, labelColors, alphaT, animDuration, sensitRadius, font, nCopies(new Point2D.Double(0, 0), stringLabels.length));
-    }
-
-    /**Pie Menu constructor - should not be used directly
-        *@param stringLabels text label of each menu item
-        *@param menuCenterCoordinates (mouse cursor's coordinates in virtual space as a Point2D.Double)
-        *@param vsName name of the virtual space in which to create the pie menu
-        *@param vsm instance of VirtualSpaceManager
-        *@param radius radius of pie menu
-        *@param irr Inner ring boundary radius as a percentage of outer ring boundary radius
-        *@param startAngle first menu item will have an offset of startAngle interpreted relative to the X horizontal axis (counter clockwise)
-        *@param fillColor menu items' fill color
-        *@param borderColor menu items' border color
-        *@param fillSColor menu items' fill color, when selected<br>can be null if color should not change
-        *@param borderSColor menu items' border color, when selected<br>can be null if color should not change
-        *@param alphaT menu items' translucency value: between 0 (transparent) and 1.0 (opaque)
-        *@param animDuration duration in ms of animation creating the menu (expansion) - 0 for instantaneous display
-        *@param sensitRadius sensitivity radius (as a percentage of the menu's actual radius)
-        *@param font font used for menu labels
-        *@param labelOffsets x,y offset of each menu label w.r.t their default posisition, in virtual space units<br>(this array should have the same length as the labels array)
-        */
-    public PieMenuR(String[] stringLabels, Point2D.Double menuCenterCoordinates, 
-                    String vsName, VirtualSpaceManager vsm,
-                    double radius, float irr, double startAngle,
-                    Color fillColor, Color borderColor, Color fillSColor, Color borderSColor, Color labelColor, float alphaT,
-                    int animDuration, double sensitRadius, Font font, Point2D.Double[] labelOffsets){
-        this(stringLabels, menuCenterCoordinates, vsName, vsm, 
-                radius, irr, startAngle, nCopies(fillColor, stringLabels.length), 
-                nCopies(borderColor, stringLabels.length), 
-                nCopies(fillSColor, stringLabels.length),
-                nCopies(borderSColor, stringLabels.length), 
-                nCopies(labelColor, stringLabels.length), alphaT, animDuration,
-                sensitRadius, font, labelOffsets);
-    }
-
     /**Pie Menu constructor - should not be used directly
         *@param stringLabels text label of each menu item
         *@param menuCenterCoordinates (mouse cursor's coordinates in virtual space as a Point2D.Double)

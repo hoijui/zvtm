@@ -13,6 +13,7 @@ package fr.inria.zvtm.widgets;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.geom.Point2D;
+import java.util.Arrays;
 
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
@@ -32,6 +33,18 @@ public abstract class PieMenuFactory {
     static Font FONT = VText.getMainFont();
 	static float RING_INNER_RATIO = 0.1f;
 
+    private static Color[] nCopies(Color value, int length){
+        Color[] retval = new Color[length];
+        Arrays.fill(retval, value);
+        return retval;
+    }
+
+    private static Point2D.Double[] nCopies(Point2D.Double value, int length){
+        Point2D.Double[] retval = new Point2D.Double[length];
+        Arrays.fill(retval, value);
+        return retval;
+    }
+
     /**Standard pie menu creation method.
      *
      * When calling this method, the layer associated with the
@@ -44,8 +57,13 @@ public abstract class PieMenuFactory {
     public static PieMenu createPieMenu(String[] labels, int animLength, View v, VirtualSpaceManager vsm){
         return new PieMenuR(labels, new Point2D.Double(v.mouse.getVSXCoordinate(), v.mouse.getVSYCoordinate()),
             v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, RING_INNER_RATIO, ANGLE,
-            ITEM_FILLCOLOR, ITEM_BORDERCOLOR, ITEM_SFILLCOLOR, ITEM_SBORDERCOLOR, LABEL_COLOR, TRANSLUCENCY,
-            animLength, SENSIT_BOUNDING_RADIUS, FONT);
+            nCopies(ITEM_FILLCOLOR, labels.length), 
+            nCopies(ITEM_BORDERCOLOR, labels.length), 
+            nCopies(ITEM_SFILLCOLOR, labels.length),
+            nCopies(ITEM_SBORDERCOLOR, labels.length),
+            nCopies(LABEL_COLOR, labels.length),
+            TRANSLUCENCY,
+            animLength, SENSIT_BOUNDING_RADIUS, FONT, nCopies(new Point2D.Double(0, 0), labels.length));
     }
 
     /**Standard pie menu creation method.
@@ -68,7 +86,7 @@ public abstract class PieMenuFactory {
 	    return new PieMenuR(labels, new Point2D.Double(v.mouse.getVSXCoordinate(), v.mouse.getVSYCoordinate()),
             v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, RING_INNER_RATIO, ANGLE,
             itemColors, itembColors, itemSColors, itembSColors, labelColors, TRANSLUCENCY,
-            animLength, SENSIT_BOUNDING_RADIUS, FONT);
+            animLength, SENSIT_BOUNDING_RADIUS, FONT, nCopies(new Point2D.Double(0, 0), labels.length));
     }
 
     /**Standard pie menu creation method.
@@ -84,7 +102,11 @@ public abstract class PieMenuFactory {
     public static PieMenu createPieMenu(String[] labels, Point2D.Double[] labelOffsets, int animLength, View v, VirtualSpaceManager vsm){
 	    return new PieMenuR(labels, new Point2D.Double(v.mouse.getVSXCoordinate(), v.mouse.getVSYCoordinate()),
 	    		    v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, RING_INNER_RATIO, ANGLE,
-	    		    ITEM_FILLCOLOR, ITEM_BORDERCOLOR, ITEM_SFILLCOLOR, ITEM_SBORDERCOLOR, LABEL_COLOR, TRANSLUCENCY,
+	    		    nCopies(ITEM_FILLCOLOR, labels.length), 
+                    nCopies(ITEM_BORDERCOLOR, labels.length),
+                    nCopies(ITEM_SFILLCOLOR, labels.length),
+                    nCopies(ITEM_SBORDERCOLOR, labels.length),
+                    nCopies(LABEL_COLOR, labels.length), TRANSLUCENCY,
 	    		    animLength, SENSIT_BOUNDING_RADIUS, FONT, labelOffsets);
     }
 
