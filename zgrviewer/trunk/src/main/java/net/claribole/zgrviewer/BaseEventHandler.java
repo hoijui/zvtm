@@ -71,7 +71,7 @@ public abstract class BaseEventHandler implements PortalListener {
 		inZoomWindow = false;
     }
 
-    void resetDragMagInteraction(){
+    protected void resetDragMagInteraction(){
 		inMagWindow = false;
 		inZoomWindow = false;
 		draggingZoomWindow = false;

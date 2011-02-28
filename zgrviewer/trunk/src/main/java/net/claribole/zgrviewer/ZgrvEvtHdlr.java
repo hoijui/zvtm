@@ -36,10 +36,10 @@ import java.awt.event.MouseWheelEvent;
 
 public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 
-	ZGRViewer application;
-	GraphicsManager grMngr;
+	protected ZGRViewer application;
+	protected GraphicsManager grMngr;
 	
-	double mvx, mvy;
+	protected double mvx, mvy;
 
 	ZgrvEvtHdlr(ZGRViewer app, GraphicsManager gm){
 		this.application = app;
