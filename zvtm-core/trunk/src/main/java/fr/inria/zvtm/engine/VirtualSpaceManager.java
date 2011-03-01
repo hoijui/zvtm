@@ -92,9 +92,6 @@ public class VirtualSpaceManager implements AWTEventListener {
     View activeView;
     protected int activeViewIndex = -1;
 
-    /**default policy for view repainting - true means all views are repainted even if ((not active) or (mouse not inside the view)) - false means only the active view and the view in which the mouse is currently located (if different) are repainted - default is true*/
-    boolean generalRepaintPolicy=true;
-
     /**enables detection of multiple full fills in one view repaint - default value assigned to new views  - STILL VERY BUGGY - ONLY SUPPORTS VRectangle and VCircle for now - setting it to true will prevent some glyphs from being painted if they are not visible in the final rendering (because of occlusion). This can enhance performance (in configurations where occlusion does happen).*/
     boolean defaultMultiFill=false;
 
@@ -130,25 +127,6 @@ public class VirtualSpaceManager implements AWTEventListener {
     public AnimationManager getAnimationManager(){
 	    return animationManager;
     }
-
-    /** Sets the policy for repainting views.
-     *@param b true means all views are repainted even if ((not active) or (mouse not inside the view)).
-     * Policy is forwarded to all existing views (no matter its current policy) and will be applied to future ones (but it can be changed for each single view).
-     */
-    public void setRepaintPolicy(boolean b){
-        if (b!=generalRepaintPolicy){
-            generalRepaintPolicy=b;
-            for (int i=0;i<allViews.length;i++){
-                allViews[i].setRepaintPolicy(generalRepaintPolicy);
-            }
-        }
-    }
-
-    /** Get the policy for repainting views.
-     *@return true means all views are repainted even if ((not active) or (mouse not inside the view)).
-     * Policy is forwarded to all existing views (no matter its current policy) and will be applied to future ones (but it can be changed for each single view).
-     */
-    public boolean getRepaintPolicy(){return generalRepaintPolicy;}
 
     /** Enable/disable detection of multiple full fills in one view repaint for this View.
      * Off by default.
@@ -270,13 +248,11 @@ public class VirtualSpaceManager implements AWTEventListener {
             case View.STD_VIEW:{
                 v = (mnb != null) ? new EView(new Vector<Camera>(c), name, w, h, bar, visible, decorated, mnb) : new EView(new Vector<Camera>(c), name, w, h, bar, visible, decorated);
                 addView(v);
-                v.setRepaintPolicy(generalRepaintPolicy);
                 break;
             }
             case View.OPENGL_VIEW:{
                 v = (mnb != null) ? new GLEView(new Vector<Camera>(c), name, w, h, bar, visible, decorated, mnb) : new GLEView(new Vector<Camera>(c), name, w, h, bar, visible, decorated);
                 addView(v);
-                v.setRepaintPolicy(generalRepaintPolicy);
                 break;
             }
         }
@@ -298,7 +274,6 @@ public class VirtualSpaceManager implements AWTEventListener {
         }
         PView tvi = new PView(new Vector<Camera>(c), name, w, h);
         addView(tvi);
-        tvi.setRepaintPolicy(generalRepaintPolicy);
         return tvi;
     }
 
@@ -350,7 +325,6 @@ public class VirtualSpaceManager implements AWTEventListener {
             visible, decorated, viewType,
             parentPanel, frame);
         addView(v);
-        v.setRepaintPolicy(generalRepaintPolicy);
         return v;
     }
 
