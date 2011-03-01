@@ -50,11 +50,11 @@ public class Test {
 
     public void initTest(short ogl){
         eh=new EventHandlerTest(this);
-        vs = vsm.addVirtualSpace("src");
+        vs = vsm.addVirtualSpace(VirtualSpace.ANONYMOUS);
         cam = vs.addCamera();
         Vector cameras=new Vector();
-        cameras.add(vsm.getVirtualSpace("src").getCamera(0));
-        vsm.getVirtualSpace("src").getCamera(0).setZoomFloor(-90f);
+        cameras.add(vs.getCamera(0));
+        vs.getCamera(0).setZoomFloor(-90f);
         short vt = View.STD_VIEW;
         switch(ogl){
             case View.OPENGL_VIEW:{vt = View.OPENGL_VIEW;break;}
