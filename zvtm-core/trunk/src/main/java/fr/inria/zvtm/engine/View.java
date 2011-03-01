@@ -65,6 +65,9 @@ public abstract class View {
     /**ZVTM view based on Java 5's OpenGL rendering pipeline; does accelerate rendering but requires a JVM 1.5 or later*/
     public static final short OPENGL_VIEW = 1;
 
+    //will repaint periodically even in the absence of paint requests
+    protected volatile boolean activePainting = false;
+
     /**list of Camera objects used in this view*/
     Vector<Camera> cameras;
 
@@ -152,6 +155,16 @@ public abstract class View {
      */
     public void setCursorIcon(int cursorType){
 	    panel.setAWTCursor(cursorType);
+    }
+
+    /**
+     * Sets the painting mode for this View.
+     * @param active true if periodic repaints are to be performed
+     * even in the absence of updates, false otherwise. The default
+     * is false.
+     */
+    public void setActivePainting(boolean active){
+        this.activePainting = active;
     }
 
     /**Set the cursor for this view.
