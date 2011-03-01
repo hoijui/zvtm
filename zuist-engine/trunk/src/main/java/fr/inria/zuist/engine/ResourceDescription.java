@@ -112,7 +112,7 @@ public abstract class ResourceDescription extends ObjectDescription {
 	Color bgColor = DEFAULT_BAR_BKG_COLOR;
 	Color barColor = DEFAULT_BAR_COLOR;
 	
-	public static void setProgressColors(Color bkg, Color bar) {
+	public static void setProgressBarDefaultColors(Color bkg, Color bar) {
 		DEFAULT_BAR_BKG_COLOR = bkg;
 		DEFAULT_BAR_COLOR = bar;
 	}
