@@ -19,7 +19,6 @@ import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
-import javax.swing.Timer;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 
@@ -41,21 +40,15 @@ public class SwingTest {
     Camera cam;
     View view;
     VirtualSpace testSpace;
-    int fact = 1;
     
     public SwingTest() throws Exception {
         TableModel dataModel = new AbstractTableModel() {
             public int getColumnCount() { return 10; }
             public int getRowCount() { return 10;}
-            public Object getValueAt(int row, int col) { return new Integer(row*col+fact); }
+            public Object getValueAt(int row, int col) { return new Integer(row*col); }
         };
         JTable table = new JTable(dataModel);
         table.setVisible(true);
-        new Timer(500, new ActionListener(){
-            public void actionPerformed(ActionEvent ae){
-                fact += 1;
-            }
-        }).start();
         drawnPanel = new JPanel();
         drawnPanel.setBounds(0,0,300,300);
         drawnPanel.add(table);
@@ -73,7 +66,7 @@ public class SwingTest {
             }
         });
         VSwingComponent vsc = new VSwingComponent(drawnPanel);
-        testSpace = vsm.addVirtualSpace("testSpace");
+	testSpace = vsm.addVirtualSpace("testSpace");
         cam = testSpace.addCamera();
         cam.setZoomFloor(-90);
         cam.altitudeOffset(-20); //check that event redirection works correctly at any zoom level
@@ -81,7 +74,6 @@ public class SwingTest {
         testSpace.addGlyph(vsc);
         view = vsm.addFrameView(new Vector(Arrays.asList(new Camera[]{cam})),
                 "VSwingTest", View.STD_VIEW, 800, 600, false, true);
-        view.setActivePainting(true);
         view.getCursor().setColor(Color.GREEN);
         view.setListener(new MyEventListener(this));
     }

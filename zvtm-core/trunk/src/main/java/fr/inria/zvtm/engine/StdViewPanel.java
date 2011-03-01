@@ -315,7 +315,7 @@ public class StdViewPanel extends ViewPanel {
 		oldSize=getSize();
 		if (notBlank){
 			if (repaintable){
-				if (repaintASAP || parent.activePainting){
+				if (repaintASAP){
 					try {
 						repaintASAP=false; //do this first as the thread can be interrupted inside
 						//this branch and we want to catch new requests for repaint
