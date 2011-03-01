@@ -32,10 +32,13 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
 import java.awt.GridBagConstraints;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.util.Vector;
 
 import javax.swing.JLabel;
+import javax.swing.Timer;
 
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.EndAction;
@@ -56,6 +59,13 @@ import fr.inria.zvtm.engine.portals.Portal;
    **/
 
 public abstract class View {
+
+    protected final Timer activeRepaintTimer = new Timer(300, 
+            new ActionListener(){
+                public void actionPerformed(ActionEvent ae){
+                    repaint();
+                }
+            });
     
     /** Anonymous view. Will generate a random name (guaranteed to be unique). */
     public static final String ANONYMOUS = "AnonView";
@@ -109,6 +119,20 @@ public abstract class View {
 
     /**mouse glyph*/
     public VCursor mouse;
+
+    /**
+     * Sets the active repaint interval for this View. 
+     * By default, active repaint is disabled.
+     * @param timeMillis active repaint interval, in milliseconds.
+     *                   if <= 0, active repaint will be disabled.
+     */
+    public void setActiveRepaintInterval(int timeMillis){
+        activeRepaintTimer.stop();
+        if(timeMillis > 0){
+            activeRepaintTimer.setDelay(timeMillis);
+            activeRepaintTimer.start();
+        }
+    }
 
 	/** Get this View's cursor object. */
 	public VCursor getCursor(){
