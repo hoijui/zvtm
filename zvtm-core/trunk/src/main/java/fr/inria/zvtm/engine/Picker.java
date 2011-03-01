@@ -208,10 +208,10 @@ public class Picker {
     /** Get a list of all Glyphs (including segments and paths) picked.
 	 * This method is especially useful when the camera of interest is not the active camera for the associated view (i.e. another layer is active).
 	 * Beware of the fact that this method returns glyphs of any kind, not just ClosedShape instances.
-	 * It can thus be much more computationaly expensive than getpickedGlyphsList()
+	 * It can thus be much more computationaly expensive than getpickedGlyphList()
 	 *@param c a camera (the active camera can be obtained by VirtualSpaceManager.getActiveCamera())
 	 *@return a list of glyphs under the mouse cursor, sorted by drawing order; null if no object under the cursor.
-	 *@see #getPickedGlyphsList()
+	 *@see #getPickedGlyphList()
 	 */
 	public Vector<Glyph> getIntersectingGlyphs(Camera c){
         Vector res = new Vector();

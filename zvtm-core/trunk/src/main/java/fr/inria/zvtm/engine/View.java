@@ -423,13 +423,6 @@ public abstract class View {
 	    return panel.getRefreshRate();
     }
 
-    /*XXX:should repaint this view on a regular basis or not (even if not activated, but does not apply to iconified views)*/
-    public void setRepaintPolicy(boolean b){
-        panel.alwaysRepaintMe=b;
-        if (b){panel.active=true;}
-        else {if ((!isSelected()) && (!panel.inside)){panel.active=false;}}
-    }
-
     /**
      * Make a view blank. The view is erased and filled with a uniform color.
      *@param c blank color (will fill the entire view) - pass null to exit blank mode.
@@ -458,32 +451,47 @@ public abstract class View {
         else return null;
     }
 
-    /** Activating the view means that it will be repainted. */
+    /** Activating the view means that repainting will be enabled on it.
+     * This triggers the viewActivated(View v) callback for the ViewListener associated with the active camera layer in this view.
+     *@see ViewListener#viewActivated(View v)
+     */
     public void activate(){
         VirtualSpaceManager.INSTANCE.setActiveView(this);
-        panel.active=true;
+        panel.repaintable = true;
         if (panel.evHs[panel.activeLayer]!=null){panel.evHs[panel.activeLayer].viewActivated(this);}
     }
     
-    /** Deactivating the view (will not be repainted unless setRepaintPolicy(true) or mouse inside the view)*/
+    /** Deactivating the view means that repainting will be disabled on it.
+     * This triggers the viewDeactivated(View v) callback for the ViewListener associated with the active camera layer in this view.
+     *@see ViewListener#viewDeactivated(View v)
+     */
     public void deactivate(){
-        if ((!panel.alwaysRepaintMe) && (!panel.inside)){panel.active=false;}
+        if (!panel.cursor_inside){panel.repaintable = false;}
         if (panel.evHs[panel.activeLayer]!=null){panel.evHs[panel.activeLayer].viewDeactivated(this);}
     }
 
-    /** Called from the window listener when the window is iconified - repaint is automatically disabled. */
+    /** Called from the window listener when the window is iconified. Repainting is automatically disabled.
+     * This triggers the viewIconified(View v) callback for the ViewListener associated with the active camera layer in this view.
+     *@see ViewListener#viewIconified(View v)
+     */
     void iconify(){
-        panel.active=false;
+        panel.repaintable = false;
         if (panel.evHs[panel.activeLayer]!=null){panel.evHs[panel.activeLayer].viewIconified(this);}
     }
 
-    /** Called from the window listener when the window is deiconified - repaint is automatically re-enabled. */
+    /** Called from the window listener when the window is deiconified. Repainting is automatically re-enabled.
+     * This triggers the viewIconified(View v) callback for the ViewListener associated with the active camera layer in this view.
+     *@see ViewListener#viewIconified(View v)
+     */
     void deiconify(){
-        panel.active=true;
+        panel.repaintable = true;
         if (panel.evHs[panel.activeLayer]!=null){panel.evHs[panel.activeLayer].viewDeiconified(this);}
     }
 
-    /** Called from the window listener when the window is closed. */
+    /** Called from the window listener when the window is closed. Repainting is automatically re-enabled.
+     * This triggers the viewClosing(View v) callback for the ViewListener associated with the active camera layer in this view.
+     *@see ViewListener#viewClosing(View v)
+     */
     protected void close(){
 	    if (panel.evHs[panel.activeLayer]!=null){panel.evHs[panel.activeLayer].viewClosing(this);}
     }

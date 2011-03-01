@@ -79,11 +79,11 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
     /**view*/
     public View parent;
 
-    /**mouse is inside this component*/
-    boolean inside=false;
+    /** Mouse cursor is inside this View component. */
+    boolean cursor_inside = false;
 
-    /**active means that this view should be repainted on a regular basis*/
-    boolean active=true;
+    /** Repaintable means that this view should be repainted on a regular basis, whenever it makes sense. This is false, e.g., when the view is iconified. */
+    boolean repaintable = true;
 
     /**send events to this class (application side)*/
     ViewListener[] evHs;
@@ -93,10 +93,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
     RepaintListener repaintListener;
 
     /**only repaint mouse cursor (using XOR mode)*/
-    boolean updateMouseOnly=false;
-
-    /**should repaint this view on a regular basis or not (even if not activated, but does not apply to iconified views)*/
-    boolean alwaysRepaintMe=false;
+    boolean updateCursorOnly=false;
 
     /**for blank mode (methods to enter/exit blank mode are in View)*/
     boolean notBlank=true;
@@ -118,10 +115,11 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 
     Dimension size;
 
-    //index of a camera (passed to drawMe())
+    // index of a camera (passed to drawMe())
     int camIndex;
 
-    int beginAt=0; //index of first glyph that entirely fills the view (reset for each layer) when scanned in reverse order (list of drawnGlyphs)
+    // index of first glyph that entirely fills the view (reset for each layer) when scanned in reverse order (list of drawnGlyphs)
+    int beginAt=0;
     Vector drawnGlyphs;
     Glyph gl;
     Glyph[] gll;
@@ -491,15 +489,15 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
     /** Mouse cursor entered this view. */
     public void mouseEntered(MouseEvent e){
         //make the view active any time the mouse enters it
-        active = true;
-        inside = true;
+        repaintable = true;
+        cursor_inside = true;
         VirtualSpaceManager.INSTANCE.setActiveView(this.parent);
         if (autoRequestFocusOnMouseEnter){
             requestFocus();
         }
         if (parent.mouse.sync){
             parent.mouse.setJPanelCoordinates(e.getX(),e.getY());
-            updateMouseOnly = true;
+            updateCursorOnly = true;
             //translate glyphs sticked to mouse
             parent.mouse.propagateMove();
             // find out is the cursor is inside one (or more) portals
@@ -516,8 +514,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 
     /** Mouse cursor exited this view. */
     public void mouseExited(MouseEvent e){
-        inside=false;
-        if ((!parent.isSelected()) && (!alwaysRepaintMe)){active=false;}
+        cursor_inside = false;
         eraseCursor();
     }
     
@@ -568,7 +565,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
                     parent.mouse.setJPanelCoordinates(e.getX(),e.getY());
                     //we project the mouse cursor wrt the appropriate coord sys
                     //parent.mouse.unProject(cams[activeLayer],this);
-                    updateMouseOnly=true;
+                    updateCursorOnly=true;
                 //translate glyphs sticked to mouse
                 parent.mouse.propagateMove();
                 // find out is the cursor is inside one (or more) portals

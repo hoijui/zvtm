@@ -92,7 +92,7 @@ public class GLViewPanel extends ViewPanel {
         // (simply reusing an already declared var instead of creating a new one for nothing)
         stableRefToBackBufferGraphics = (Graphics2D)g;
         try {
-            updateMouseOnly = false;
+            updateCursorOnly = false;
             size = this.getSize();
             if (size.width != oldSize.width || size.height != oldSize.height) {
                 if (VirtualSpaceManager.debugModeON()){System.out.println("Resizing JPanel: ("+oldSize.width+"x"+oldSize.height+") -> ("+size.width+"x"+size.height+")");}
@@ -142,7 +142,7 @@ public class GLViewPanel extends ViewPanel {
                 afterLensHook();
                 drawPortals();
                 portalsHook();
-                if (inside){
+                if (cursor_inside){
                     //deal with mouse glyph only if mouse cursor is inside this window
                     try {
                         //we project the mouse cursor wrt the appropriate coord sys

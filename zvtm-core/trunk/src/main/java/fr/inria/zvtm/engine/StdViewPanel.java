@@ -314,12 +314,12 @@ public class StdViewPanel extends ViewPanel {
 	public void drawOffscreen() {
 		oldSize=getSize();
 		if (notBlank){
-			if (active){
+			if (repaintable){
 				if (repaintASAP){
 					try {
 						repaintASAP=false; //do this first as the thread can be interrupted inside
 						//this branch and we want to catch new requests for repaint
-						updateMouseOnly=false;
+						updateCursorOnly=false;
 						updateOffscreenBuffer();
 						stableRefToBackBufferGraphics.setPaintMode();
 						stableRefToBackBufferGraphics.setBackground(backColor);
@@ -334,8 +334,8 @@ public class StdViewPanel extends ViewPanel {
 						afterLensHook();
 						drawPortals();
 						portalsHook();
-
-						if (inside){//deal with mouse glyph only if mouse cursor is inside this window
+						if (cursor_inside){
+						    //deal with mouse glyph only if mouse cursor is inside this window
 							doCursorPicking();
 							drawCursor();
 						}
@@ -351,8 +351,8 @@ public class StdViewPanel extends ViewPanel {
 						}
 					}
 				}
-				else if (updateMouseOnly){
-					updateMouseOnly=false; // do this first as the thread can be interrupted inside this
+				else if (updateCursorOnly){
+					updateCursorOnly=false; // do this first as the thread can be interrupted inside this
 					doCursorPicking();
 					if (drawVTMcursor){
                         try {
@@ -371,13 +371,10 @@ public class StdViewPanel extends ViewPanel {
 					}
 					paintImmediately(0,0,size.width,size.height);
 				}
-				else {
-				}
-			}
-			else {
 			}
 		}
 		else {
+		    // blank screen
 			updateOffscreenBuffer();	
 			stableRefToBackBufferGraphics.setPaintMode();
 			stableRefToBackBufferGraphics.setColor(blankColor);
