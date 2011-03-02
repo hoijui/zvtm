@@ -43,7 +43,7 @@ public class GLViewPanel extends ViewPanel {
                 repaint();
             }
         };
-        edtTimer = new Timer(frameTime, taskPerformer);
+        edtTimer = new Timer(25, taskPerformer);
         addHierarchyListener(
         new HierarchyListener() {
             public void hierarchyChanged(HierarchyEvent e) {
@@ -71,7 +71,7 @@ public class GLViewPanel extends ViewPanel {
         setAutoRequestFocusOnMouseEnter(arfome);
         setAWTCursor(Cursor.CUSTOM_CURSOR);  //custom cursor means VTM cursor
         this.size = this.getSize();
-        if (VirtualSpaceManager.debugModeON()){System.out.println("View refresh time set to "+frameTime+"ms");}
+        if (VirtualSpaceManager.debugModeON()){System.out.println("View refresh time set to "+getRefreshRate()+"ms");}
         start();
     }
 
@@ -180,6 +180,18 @@ public class GLViewPanel extends ViewPanel {
         }
         catch (NullPointerException ex0){if (VirtualSpaceManager.debugModeON()){System.err.println("GLViewPanel.paint "+ex0);}}
         if (repaintListener != null){repaintListener.viewRepainted(this.parent);}
+    }
+
+    @Override 
+    public void setRefreshRate(int rr){
+        if(rr > 0){
+            edtTimer.setDelay(rr);
+        }
+    }
+
+    @Override
+    public int getRefreshRate(){
+        return edtTimer.getDelay();
     }
 
     /** Not implemented yet. */

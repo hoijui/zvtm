@@ -99,9 +99,6 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
     boolean notBlank=true;
     Color blankColor=null;
 
-    /**minimum time in ms between two consecutive repaints (refresh rate)*/
-    int frameTime = 25;
-
     /**view's backgorund color (default is black)*/
     Color backColor = Color.BLACK;
 
@@ -663,24 +660,17 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
     //get the BufferedImage or VolatileImage for this view
     public abstract java.awt.image.BufferedImage getImage();
 
-    /**Set the maximum view refresh rate by giving the minimum refresh period (below which ZVTM won't go even if it can) 
+    /**
+     * Sets the maximum view refresh rate by giving the minimum refresh period (below which ZVTM won't go even if it can) 
      *@param r positive integer in milliseconds
      */
-    public void setRefreshRate(int r){
-	if (r>0){
-	    frameTime=r;
-	}
-	else {
-	    System.err.println("Error: trying to set a negative refresh rate : "+r+" ms");
-	}
-    }
+    public abstract void setRefreshRate(int r);
 
-    /**Get the maximum view refresh rate as the minimum refresh period (below which ZVTM won't go even if it can) 
+    /**
+     * Gets the maximum view refresh rate as the minimum refresh period (below which ZVTM won't go even if it can) 
      *@return positive integer in milliseconds
      */
-    public int getRefreshRate(){
-	return frameTime;
-    }
+    public abstract int getRefreshRate();
 
 	/**set a lens for this view ; set to null to remove an existing lens*/
 	protected Lens setLens(Lens l){

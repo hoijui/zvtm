@@ -47,6 +47,16 @@ public class OffscreenViewPanel extends ViewPanel {
     
     void stop(){}
 
+    @Override
+    public void setRefreshRate(int rr){
+        throw new Error("not implemented");
+    }
+
+    @Override
+    public int getRefreshRate(){
+        throw new Error("not implemented");
+    }
+
     public Dimension getSize(){
 	    return (size != null) ? size : new Dimension(0,0);
     }

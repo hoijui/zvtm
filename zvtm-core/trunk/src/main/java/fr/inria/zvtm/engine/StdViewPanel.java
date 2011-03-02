@@ -66,7 +66,7 @@ public class StdViewPanel extends ViewPanel {
 				drawOffscreen();
 			}
 		};
-		edtTimer = new Timer(frameTime, taskPerformer);
+		edtTimer = new Timer(25, taskPerformer);
 
 		addHierarchyListener(
 				new HierarchyListener() {
@@ -96,7 +96,7 @@ public class StdViewPanel extends ViewPanel {
 		setAutoRequestFocusOnMouseEnter(arfome);
 		setAWTCursor(Cursor.CUSTOM_CURSOR);  //custom cursor means VTM cursor
 		this.size = this.getSize();
-		if (VirtualSpaceManager.debugModeON()){System.out.println("View refresh time set to "+frameTime+"ms");}
+		if (VirtualSpaceManager.debugModeON()){System.out.println("View refresh time set to "+getRefreshRate()+"ms");}
 	}
 
 	private void start(){
@@ -409,8 +409,12 @@ public class StdViewPanel extends ViewPanel {
 
     @Override
     public void setRefreshRate(int rr){
-        super.setRefreshRate(rr);
         edtTimer.setDelay(rr);
     }
 
+    @Override
+    public int getRefreshRate(){
+        return edtTimer.getDelay();
+    }
 }
+
