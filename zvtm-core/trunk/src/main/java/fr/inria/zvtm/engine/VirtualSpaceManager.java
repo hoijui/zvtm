@@ -195,7 +195,7 @@ public class VirtualSpaceManager implements AWTEventListener {
     /** Create a new External View.<br>
      *@param c vector of cameras making this view (if more than one camera, cameras will be superimposed on different layers)
      *@param name view name - pass View.ANONYMOUS to generate a unique, random name.
-     *@param viewType one of View.STD_VIEW, View.VOLATILE_VIEW, View.OPENGL_VIEW - determines the type of view and acceleration method
+     *@param viewType one of View.STD_VIEW, View.OPENGL_VIEW - determines the type of view and acceleration method
      *@param w width of window in pixels
      *@param h height of window in pixels
      *@param bar true -&gt; add a status bar to this view (below main panel)
@@ -209,7 +209,7 @@ public class VirtualSpaceManager implements AWTEventListener {
      * The use of OPENGL_VIEW requires the following Java property: -Dsun.java2d.opengl=true
      *@param c vector of cameras making this view (if more than one camera, cameras will be superimposed on different layers)
      *@param name view name - pass View.ANONYMOUS to generate a unique, random name.
-     *@param viewType one of View.STD_VIEW, View.VOLATILE_VIEW, View.OPENGL_VIEW - determines the type of view and acceleration method
+     *@param viewType one of View.STD_VIEW, View.OPENGL_VIEW - determines the type of view and acceleration method
      *@param w width of window in pixels
      *@param h height of window in pixels
      *@param bar true -&gt; add a status bar to this view (below main panel)
@@ -226,7 +226,7 @@ public class VirtualSpaceManager implements AWTEventListener {
      * The use of OPENGL_VIEW requires the following Java property: -Dsun.java2d.opengl=true
      *@param c vector of cameras making this view (if more than one camera, cameras will be superimposed on different layers)
      *@param name view name - pass View.ANONYMOUS to generate a unique, random name.
-     *@param viewType one of View.STD_VIEW, View.VOLATILE_VIEW, View.OPENGL_VIEW - determines the type of view and acceleration method
+     *@param viewType one of View.STD_VIEW, View.OPENGL_VIEW - determines the type of view and acceleration method
      *@param w width of window in pixels
      *@param h height of window in pixels
      *@param bar true -&gt; add a status bar to this view (below main panel)
@@ -288,44 +288,6 @@ public class VirtualSpaceManager implements AWTEventListener {
         allViews = tmpA;
         name2viewIndex.put(v.name, new Integer(allViews.length-1));
         animationManager.start(); //starts animationManager if not already running
-    }
-
-    /**
-     * Creates an external view which presents itself
-     * in a JPanel in a window (JFrame) provided by the client application (and which can contain other components).
-	 * @param cameraList vector of cameras superimposed in this view
-	 * @param name	View name. Since this view is
-	 * not itself a window, this does not affect the
-	 * window's title: use setTitle() for that. Pass View.ANONYMOUS to generate a unique, random name.
-	 * @param panelWidth	width of panel in pixels
-	 * @param panelHeight	width of panel in pixels
-	 * @param visible	should the view be made visible automatically or not
-	 * @param decorated	should the view be decorated with the underlying window manager's window frame or not
-	 * @param viewType	One of <code>View.STD_VIEW</code>,
-	 * <code>View.OPENGL_VIEW</code>,
-	 * or <code>View.VOLATILE_VIEW</code>.
-	 * @param parentPanel	This is the parent panel for this view. A JPanel
-	 * presenting this view will be created as a child of this panel.
-	 * If the parent is <code>null</code>, the frame's content panel
-	 * will be used as the parent.
-	 * @param frame	The frame in which this panel will be created.
-	 * (This is to be compatible with the <code>View</code> API.)
-	 * @return	View	The created view.
-	 */
-    public View addFrameView(List<Camera> cameraList, String name, int panelWidth, int panelHeight,
-				boolean visible, boolean decorated, short viewType,
-				JPanel parentPanel, JFrame frame) {
-		if (name == View.ANONYMOUS){
-            name = UUID.randomUUID().toString();
-        	while (name2viewIndex.containsKey(name)){
-        		name = UUID.randomUUID().toString();
-        	}            
-        }
-    	View v = new JPanelView(new Vector<Camera>(cameraList), name, panelWidth, panelHeight,
-            visible, decorated, viewType,
-            parentPanel, frame);
-        addView(v);
-        return v;
     }
 
     /** Get index of View whose name is n (-1 if view does not exist) .*/
