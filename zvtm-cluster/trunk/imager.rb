@@ -57,16 +57,16 @@ class MyViewListener < ViewAdapter
     end
 
     def release3(v, mod, jpx, jpy, e)
-        VirtualSpaceManager::INSTANCE.getAnimationManager.setXspeed 0
-        VirtualSpaceManager::INSTANCE.getAnimationManager.setYspeed 0
-        VirtualSpaceManager::INSTANCE.getAnimationManager.setZspeed 0
+        @cam.setXspeed 0
+        @cam.setYspeed 0
+        @cam.setZspeed 0
         @view.mouse.setSensitivity true
     end
 
     def mouseDragged(v, mod, buttonNumber, jpx, jpy, e)
         a = (@cam.focal+@cam.altitude)/@cam.focal
-        VirtualSpaceManager::INSTANCE.getAnimationManager.setXspeed((@cam.altitude>0) ? (jpx-@lastJPX)*(a/4.0) : (jpx-@lastJPX)/(a*4))
-        VirtualSpaceManager::INSTANCE.getAnimationManager.setYspeed((@cam.altitude>0) ? (@lastJPY-jpy)*(a/4.0) : (@lastJPY-jpy)/(a*4))
+        @cam.setXspeed((@cam.altitude>0) ? (jpx-@lastJPX)*(a/4.0) : (jpx-@lastJPX)/(a*4))
+        @cam.setYspeed((@cam.altitude>0) ? (@lastJPY-jpy)*(a/4.0) : (@lastJPY-jpy)/(a*4))
     end
 
     def viewClosing(v)

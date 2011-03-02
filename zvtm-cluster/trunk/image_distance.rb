@@ -28,7 +28,8 @@ module ImageDistance
             c("f1bbab"), "pink.jpg",
             c("000435"), "blue_black.jpg",
             c("6e4010"), "brown.jpg",
-            c("ebe54c"), "yellow_green.jpg"
+            c("ebe54c"), "yellow_green.jpg",
+            c("8e39ef"), "mauve.jpg"
         }
     end
 
