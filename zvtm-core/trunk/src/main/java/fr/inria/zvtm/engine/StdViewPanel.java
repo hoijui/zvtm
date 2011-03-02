@@ -407,4 +407,10 @@ public class StdViewPanel extends ViewPanel {
 		return this.backBuffer;
 	}
 
+    @Override
+    public void setRefreshRate(int rr){
+        super.setRefreshRate(rr);
+        edtTimer.setDelay(rr);
+    }
+
 }
