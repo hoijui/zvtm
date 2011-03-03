@@ -54,7 +54,7 @@ public class ZGRViewer implements ZGRApplication {
     PieMenu mainPieMenu, subPieMenu;
 
 
-    ZGRViewer(short acc){
+    ZGRViewer(boolean acc){
 		initConfig();
 		//init GUI after config as we load some GUI prefs from the config file
 		initGUI(acc);
@@ -112,15 +112,15 @@ public class ZGRViewer implements ZGRApplication {
 	cfgMngr.initPlugins(this);
     }
 
-    void initGUI(short acc){
+    void initGUI(boolean acc){
 		Utils.initLookAndFeel();
 		JMenuBar jmb = initViewMenu(acc);
-		grMngr.createFrameView(grMngr.createZVTMelements(false), acc, jmb);
+		grMngr.createFrameView(grMngr.createZVTMelements(false), acc ? View.OPENGL_VIEW : View.STD_VIEW, jmb);
 		grMngr.parameterizeView(new ZgrvEvtHdlr(this, this.grMngr));
 		cfgMngr.notifyPlugins(Plugin.NOTIFY_PLUGIN_GUI_INITIALIZED);
 	}
 
-	JMenuBar initViewMenu(int accelerationMode){
+	JMenuBar initViewMenu(boolean accelerationMode){
 		JMenu open=new JMenu("Open");
 		JMenu openD = new JMenu("Open with dot...");
 		JMenu openN = new JMenu("Open with neato...");
@@ -259,7 +259,6 @@ public class ZGRViewer implements ZGRApplication {
 		versionI.addActionListener(a0);
 		pluginsI.addActionListener(a0);
 		aboutI.addActionListener(a0);
-		if (accelerationMode == 2){printI.setEnabled(false);}
 		return jmb;
 	}
 
@@ -508,7 +507,7 @@ public class ZGRViewer implements ZGRApplication {
         if (Utils.osIsMacOS()){
             System.setProperty("apple.laf.useScreenMenuBar", "true");
         }
-        short acceleratedView = View.STD_VIEW;
+        boolean acceleratedView = false;
         for (int i=0;i<args.length;i++){
             if (args[i].startsWith("-")){
                 if (args[i].equals("--help") || args[i].equals("-h")){
@@ -518,7 +517,7 @@ public class ZGRViewer implements ZGRApplication {
                 else if (args[i].equals("-opengl")){
                     System.setProperty("sun.java2d.opengl", "true");
                     System.out.println("OpenGL accelerated mode");
-                    acceleratedView = View.OPENGL_VIEW;
+                    acceleratedView = true;
                 }
                 else if (args[i].startsWith("-P")){cmdLinePrg=args[i];}
 				else if (args[i].startsWith("-pluginDir=")){
@@ -535,7 +534,7 @@ public class ZGRViewer implements ZGRApplication {
             }
         }
         System.out.println("--help for command line options");
-        final short av = acceleratedView;
+        final boolean av = acceleratedView;
         new ZGRViewer(av);
     }
     

@@ -231,10 +231,10 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         return cameras;
     }
 
-    void createFrameView(Vector cameras, short vt, JMenuBar jmb){
+    void createFrameView(Vector cameras, String vt, JMenuBar jmb){
         mainView = vsm.addFrameView(cameras, ConfigManager.MAIN_TITLE, vt,
             ConfigManager.mainViewW, ConfigManager.mainViewH,
-            true, false, jmb);
+            true, false, true, jmb);
         mainView.setLocation(ConfigManager.mainViewX,ConfigManager.mainViewY);
         mainView.getFrame().addComponentListener(this);
         gp = new ZGRGlassPane(this);
@@ -242,9 +242,9 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     }
 
     JPanel createPanelView(Vector cameras, int w, int h){
-	vsm.addPanelView(cameras, ConfigManager.MAIN_TITLE, w, h);
-	mainView = vsm.getView(ConfigManager.MAIN_TITLE);
-	return mainView.getPanel();
+        vsm.addPanelView(cameras, ConfigManager.MAIN_TITLE, View.STD_VIEW, w, h);
+        mainView = vsm.getView(ConfigManager.MAIN_TITLE);
+        return mainView.getPanel();
     }
 
 	public VirtualSpace getGraphSpace(){
@@ -537,7 +537,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
                 Vector cameras = new Vector();
                 cameras.add(mSpace.getCamera(1));
                 cameras.add(rSpace.getCamera(0));
-                vsm.addFrameView(cameras, RADAR_VIEW_NAME, View.STD_VIEW, ConfigManager.rdW, ConfigManager.rdH, false, true);
+                vsm.addFrameView(cameras, RADAR_VIEW_NAME, View.STD_VIEW, ConfigManager.rdW, ConfigManager.rdH, true);
                 reh = new RadarEvtHdlr(this);
                 rView = vsm.getView(RADAR_VIEW_NAME);
                 rView.getFrame().addComponentListener(this);
