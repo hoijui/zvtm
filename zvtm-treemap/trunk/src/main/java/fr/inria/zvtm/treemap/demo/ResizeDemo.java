@@ -43,7 +43,7 @@ class ResizeDemo {
         demoSpace = vsm.addVirtualSpace("demoSpace");
         cam = demoSpace.addCamera();
         view = vsm.addFrameView(new Vector(Arrays.asList(new Camera[]{cam})),
-                "Treemap demo", View.STD_VIEW, 800, 600, false, true);
+                "Treemap demo", View.STD_VIEW, 800, 600, true);
         view.getCursor().setColor(Color.GREEN);
 
         Tree<ZMapItem> tree = TreemapUtils.swingToUmd(new JTree().getModel());
