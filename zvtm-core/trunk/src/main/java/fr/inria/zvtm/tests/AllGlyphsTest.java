@@ -33,23 +33,19 @@ public class AllGlyphsTest {
 
     View testView;
     
-    AllGlyphsTest(short ogl){
+    AllGlyphsTest(String vt){
         vsm = VirtualSpaceManager.INSTANCE;
         vsm.setDebug(true);
-        initTest(ogl);
+        initTest(vt);
     }
 
-    public void initTest(short ogl){
+    public void initTest(String vt){
         eh = new TestEventHandler(this);
         vs = vsm.addVirtualSpace("s1");
         mCam = vs.addCamera();
         Vector cameras = new Vector();
         cameras.add(mCam);
         vs.getCamera(0).setZoomFloor(-90f);
-        short vt = View.STD_VIEW;
-        switch(ogl){
-            case View.OPENGL_VIEW:{vt = View.OPENGL_VIEW;break;}
-        }
         testView = vsm.addFrameView(cameras, "All Glyphs Test", vt, 1024, 768, false, true, true, null);
         testView.setBackgroundColor(Color.LIGHT_GRAY);
         testView.setListener(eh);
@@ -272,7 +268,7 @@ public class AllGlyphsTest {
         System.out.println("User name: "+System.getProperty("user.name"));
         System.out.println("User home directory: "+System.getProperty("user.home"));
         System.out.println("-----------------");
-        new AllGlyphsTest((args.length > 0) ? Short.parseShort(args[0]) : 0);
+        new AllGlyphsTest((args.length > 0) ? args[0] : View.STD_VIEW);
     }
     
 }

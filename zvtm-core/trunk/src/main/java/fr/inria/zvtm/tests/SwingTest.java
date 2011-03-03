@@ -80,7 +80,7 @@ public class SwingTest {
         vsc.move(100, -50);
         testSpace.addGlyph(vsc);
         view = vsm.addFrameView(new Vector(Arrays.asList(new Camera[]{cam})),
-                "VSwingTest", View.STD_VIEW, 800, 600, false, true);
+                "VSwingTest", View.STD_VIEW, 800, 600, true);
         view.setActiveRepaintInterval(500);
         view.getCursor().setColor(Color.GREEN);
         view.setListener(new MyEventListener(this));

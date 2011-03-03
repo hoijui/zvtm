@@ -32,7 +32,7 @@ public class ConversionTest extends TestCase {
         vs = vsm.addVirtualSpace("testVS");
         cam = vs.addCamera();
         view = vsm.addFrameView(new Vector(Arrays.asList(cam)), "ConversionTest",
-                View.STD_VIEW, 300, 200, false, false);
+                View.STD_VIEW, 300, 200, false);
     }
 
     //test that the center of the panel is aligned with the camera coordinates

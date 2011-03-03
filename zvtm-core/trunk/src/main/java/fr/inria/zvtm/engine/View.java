@@ -35,10 +35,11 @@ import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
-import java.util.Vector;
-
 import javax.swing.JLabel;
 import javax.swing.Timer;
+
+import java.util.Vector;
+import java.util.Hashtable;
 
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.EndAction;
@@ -59,7 +60,7 @@ import fr.inria.zvtm.engine.portals.Portal;
    **/
 
 public abstract class View {
-
+    
     protected final Timer activeRepaintTimer = new Timer(300, 
             new ActionListener(){
                 public void actionPerformed(ActionEvent ae){
@@ -70,11 +71,57 @@ public abstract class View {
     /** Anonymous view. Will generate a random name (guaranteed to be unique). */
     public static final String ANONYMOUS = "AnonView";
 
-    /**Standard ZVTM view, with no particular acceleration method*/
-    public static final short STD_VIEW = 0;
-    /**ZVTM view based on Java 5's OpenGL rendering pipeline; does accelerate rendering but requires a JVM 1.5 or later*/
-    public static final short OPENGL_VIEW = 1;
+    /* ----------------- View types --------------------------*/
 
+    /**Standard ZVTM view, with no particular acceleration method*/
+    public static final String STD_VIEW = "std";
+    /**ZVTM view based on Java 5's OpenGL rendering pipeline; does accelerate rendering but requires a JVM 1.5 or later. The use of OPENGL_VIEW requires the following Java property: -Dsun.java2d.opengl=true*/
+    public static final String OPENGL_VIEW = "ogl";
+
+    /**
+     * Declare a new type of panel to draw on in a View. Two panel types are available in zvtm-core:
+     * <ul>
+         <li>View.STD_VIEW:double-buffered panel, drawing in an offscreen BufferedImage, supports lenses</li>
+         <li>View.OPENGL_VIEW: direct rendering on screen, works with Sun's OpenGL Java2D rendering pipeline </li>
+     * </ul>
+     *@param ptID unique ID identifying the new panel type. This is the ID passed to view creation methods (viewType) to specifiy the type of view.
+     *@param pt a class that can make new instances of the corresponding ViewPanel, to be included in the View.
+     *@return true if the new view panel type was registered successfully
+     */
+    public static boolean registerViewPanelType(String ptID, PanelType pt){
+        if (!VIEW_TYPES.containsKey(ptID)){
+            VIEW_TYPES.put(ptID, pt);
+            return true;
+        }
+        else {
+            if (VirtualSpaceManager.INSTANCE.debugModeON()){
+                System.err.println("Error registering view panel type: "+ptID+" already exists.");
+            }
+            return false;            
+        }
+    }
+    
+    /**
+     * Two panel types are available in zvtm-core:
+     * <ul>
+         <li>View.STD_VIEW:double-buffered panel, drawing in an offscreen BufferedImage, supports lenses</li>
+         <li>View.OPENGL_VIEW: direct rendering on screen, works with Sun's OpenGL Java2D rendering pipeline </li>
+     * </ul>
+     *@param ptID unique ID identifying the new panel type. This is the ID passed to view creation methods (viewType) to specifiy the type of view.
+     *@return pt an instance of PanelType that can make new instances of the corresponding ViewPanel, to be included in the View.
+     */
+    public static PanelType getPanelType(String ptID){
+        return VIEW_TYPES.get(ptID);
+    }
+
+    static Hashtable<String,PanelType> VIEW_TYPES = new Hashtable(2);
+    static {
+        registerViewPanelType(View.STD_VIEW, new StdViewPanelType());
+        registerViewPanelType(View.OPENGL_VIEW, new GLViewPanelType());
+    }
+    
+    /* ----------------- Cameras --------------------------*/    
+    
     /**list of Camera objects used in this view*/
     Vector<Camera> cameras;
 
@@ -997,3 +1044,21 @@ public abstract class View {
    
 }
 
+
+/** Instantiator for StdViewPanel */
+class StdViewPanelType implements PanelType {
+    
+    public ViewPanel getNewInstance(Vector<Camera> cameras, View v, boolean arfome){
+        return new StdViewPanel(cameras, v, arfome);
+    }
+    
+}
+
+/** Instantiator for GLViewPanel */
+class GLViewPanelType implements PanelType {
+    
+    public ViewPanel getNewInstance(Vector<Camera> cameras, View v, boolean arfome){
+        return new GLViewPanel(cameras, v, arfome);
+    }
+    
+}

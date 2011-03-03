@@ -4,7 +4,7 @@
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2000-2002. All Rights Reserved
  *   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2011. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -53,20 +53,21 @@ public class EView extends View implements KeyListener{
     JMenuBar jmb;
 
     /**
+     *@param viewType one of View.STD_VIEW, View.OPENGL_VIEW - determines the type of view and acceleration method. The use of OPENGL_VIEW requires the following Java property: -Dsun.java2d.opengl=true
      *@param v list of cameras that will constitue the layers of this View.
      *@param t view name/title.
      *@param w width of window in pixels
      *@param h height of window in pixels
-     *@param bar true -&gt; add a status bar to this view (below main panel)
      *@param visible should the view be made visible automatically or not
      *@param decorated should the view be decorated with the underlying window manager's window frame or not
      */
-    protected EView(Vector<Camera> v, String t, int w, int h,
-		    boolean bar, boolean visible, boolean decorated){
-		this(v, t, w, h, bar, visible, decorated, null);
+    protected EView(String viewType, Vector<Camera> v, String t, int w, int h,
+		    boolean visible, boolean decorated){
+		this(viewType, v, t, w, h, false, visible, decorated, null);
 	}
 
     /**
+     *@param viewType one of View.STD_VIEW, View.OPENGL_VIEW - determines the type of view and acceleration method. The use of OPENGL_VIEW requires the following Java property: -Dsun.java2d.opengl=true
      *@param v list of cameras
      *@param t view name
      *@param w width of window in pixels
@@ -76,7 +77,7 @@ public class EView extends View implements KeyListener{
      *@param decorated should the view be decorated with the underlying window manager's window frame or not
      *@param mnb a menu bar, already configured with actionListeners already attached to items (it is just added to the view). No effect if null.
      */
-    protected EView(Vector<Camera> v,String t,int w, int h,
+    protected EView(String viewType, Vector<Camera> v, String t, int w, int h,
 		    boolean bar,boolean visible, boolean decorated,
 		    JMenuBar mnb){
         frame=new JFrame();
@@ -98,7 +99,8 @@ public class EView extends View implements KeyListener{
             buildConstraints(constraints,0,0,1,1,100,90);
             constraints.fill=GridBagConstraints.BOTH;
             constraints.anchor=GridBagConstraints.CENTER;
-            panel=new StdViewPanel(v,this, false);
+            //panel= (viewType.equals(View.OPENGL_VIEW)) ? new GLViewPanel(v, this, false) : new StdViewPanel(v, this, false);
+            panel = View.getPanelType(viewType).getNewInstance(v, this, false);
             panel.setSize(w, h);
             gridBag.setConstraints(panel,constraints);
             cpane.add(panel);
@@ -112,7 +114,7 @@ public class EView extends View implements KeyListener{
             buildConstraints(constraints,0,0,1,1,100,90);
             constraints.fill=GridBagConstraints.BOTH;
             constraints.anchor=GridBagConstraints.CENTER;
-            panel=new StdViewPanel(v,this, false);
+            panel = View.getPanelType(viewType).getNewInstance(v, this, false);
             panel.setSize(w, h);
             gridBag.setConstraints(panel,constraints);
             cpane.add(panel);

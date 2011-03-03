@@ -41,18 +41,14 @@ public class TestCameraPosition {
         vsm.setDebug(true);
     }
 
-    public void startAnim(short ogl){
+    public void startAnim(String vt){
         eh=new TestCameraPosition.MyEventHandler(this);
         vs = vsm.addVirtualSpace("src");
         cam = vs.addCamera();
         Vector cameras=new Vector();
         cameras.add(cam);
         cam.setZoomFloor(-90);
-        short vt = View.STD_VIEW;
-        switch(ogl){
-	case View.OPENGL_VIEW:{vt = View.OPENGL_VIEW;break;}
-        }
-        testView = vsm.addFrameView(cameras, "Test", vt, 800, 600, false, true);
+        testView = vsm.addFrameView(cameras, "Test", vt, 800, 600, true);
         testView.setBackgroundColor(Color.LIGHT_GRAY);
         testView.setListener(eh);
 
@@ -109,7 +105,7 @@ public class TestCameraPosition {
         System.out.println("User home directory: "+System.getProperty("user.home"));
         System.out.println("-----------------");
 	System.out.println("Left-click in the view to move the camera");
-        new TestCameraPosition().startAnim((args.length > 0) ? Short.parseShort(args[0]) : 0);
+        new TestCameraPosition().startAnim((args.length > 0) ? args[0] : View.STD_VIEW);
     }
 
     class MyEventHandler implements ViewListener{

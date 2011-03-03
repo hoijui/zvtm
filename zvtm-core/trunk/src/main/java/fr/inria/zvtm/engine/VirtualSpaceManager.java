@@ -195,31 +195,14 @@ public class VirtualSpaceManager implements AWTEventListener {
     /** Create a new External View.<br>
      *@param c vector of cameras making this view (if more than one camera, cameras will be superimposed on different layers)
      *@param name view name - pass View.ANONYMOUS to generate a unique, random name.
-     *@param viewType one of View.STD_VIEW, View.OPENGL_VIEW - determines the type of view and acceleration method
+     *@param viewType one of View.STD_VIEW, View.OPENGL_VIEW - determines the type of view and acceleration method.The use of OPENGL_VIEW requires the following Java property: -Dsun.java2d.opengl=true
      *@param w width of window in pixels
      *@param h height of window in pixels
-     *@param bar true -&gt; add a status bar to this view (below main panel)
      *@param visible should the view be made visible automatically or not
+     *@see #addFrameView(List c, String name, String viewType, int w, int h, boolean bar, boolean visible, boolean decorated, JMenuBar mnb)
      */
-    public View addFrameView(List<Camera> c, String name, short viewType, int w, int h, boolean bar, boolean visible){
-	    return addFrameView(new Vector<Camera>(c), name, viewType, w, h, bar, visible, null);
-    }
-
-    /** Create a new External View.<br>
-     * The use of OPENGL_VIEW requires the following Java property: -Dsun.java2d.opengl=true
-     *@param c vector of cameras making this view (if more than one camera, cameras will be superimposed on different layers)
-     *@param name view name - pass View.ANONYMOUS to generate a unique, random name.
-     *@param viewType one of View.STD_VIEW, View.OPENGL_VIEW - determines the type of view and acceleration method
-     *@param w width of window in pixels
-     *@param h height of window in pixels
-     *@param bar true -&gt; add a status bar to this view (below main panel)
-     *@param visible should the view be made visible automatically or not
-     *@param mnb a menu bar (null if none), already configured with ActionListeners already attached to items (it is just added to the view)
-     *@see #addFrameView(List c, String name, short viewType, int w, int h, boolean bar, boolean visible, boolean decorated, JMenuBar mnb)
-     */
-    public View addFrameView(List<Camera> c, String name, short viewType, int w, int h,
-				boolean bar, boolean visible, JMenuBar mnb){
-	    return addFrameView(new Vector<Camera>(c), name, viewType, w, h, bar, visible, true, mnb);
+    public View addFrameView(List<Camera> c, String name, String viewType, int w, int h, boolean visible){
+	    return addFrameView(new Vector<Camera>(c), name, viewType, w, h, false, visible, true, null);
     }
     
     /**Create a new external view.<br>
@@ -233,9 +216,9 @@ public class VirtualSpaceManager implements AWTEventListener {
      *@param visible should the view be made visible automatically or not
      *@param decorated should the view be decorated with the underlying window manager's window frame or not
      *@param mnb a menu bar (null if none), already configured with ActionListeners already attached to items (it is just added to the view)
-     *@see #addFrameView(List c, String name, short viewType, int w, int h, boolean bar, boolean visible, JMenuBar mnb)
+     *@see #addFrameView(List c, String name, String viewType, int w, int h, boolean visible)
      */
-    public View addFrameView(List<Camera> c, String name, short viewType, int w, int h,
+    public View addFrameView(List<Camera> c, String name, String viewType, int w, int h,
 				boolean bar, boolean visible, boolean decorated, JMenuBar mnb){
         View v = null;
         if (name == View.ANONYMOUS){
@@ -244,35 +227,26 @@ public class VirtualSpaceManager implements AWTEventListener {
     			name = UUID.randomUUID().toString();
     		}            
         }
-        switch(viewType){
-            case View.STD_VIEW:{
-                v = (mnb != null) ? new EView(new Vector<Camera>(c), name, w, h, bar, visible, decorated, mnb) : new EView(new Vector<Camera>(c), name, w, h, bar, visible, decorated);
-                addView(v);
-                break;
-            }
-            case View.OPENGL_VIEW:{
-                v = (mnb != null) ? new GLEView(new Vector<Camera>(c), name, w, h, bar, visible, decorated, mnb) : new GLEView(new Vector<Camera>(c), name, w, h, bar, visible, decorated);
-                addView(v);
-                break;
-            }
-        }
+        v = (mnb != null) ? new EView(viewType, new Vector<Camera>(c), name, w, h, bar, visible, decorated, mnb) : new EView(viewType, new Vector<Camera>(c), name, w, h, visible, decorated);
+        addView(v);
         return v;
     }
 
     /**Create a new view embedded in a JPanel, suitable for inclusion in any Swing component hierarchy, including a JApplet.
      *@param c vector of cameras superimposed in this view
      *@param name view name - pass View.ANONYMOUS to generate a unique, random name.
+     *@param viewType one of View.STD_VIEW, View.OPENGL_VIEW - determines the type of view and acceleration method.The use of OPENGL_VIEW requires the following Java property: -Dsun.java2d.opengl=true
      *@param w width of window in pixels
      *@param h height of window in pixels
      */
-    public PView addPanelView(List<Camera> c,String name,int w,int h){
+    public PView addPanelView(List<Camera> c, String name, String viewType, int w, int h){
         if (name == View.ANONYMOUS){
             name = UUID.randomUUID().toString();
     		while (name2viewIndex.containsKey(name)){
     			name = UUID.randomUUID().toString();
     		}            
         }
-        PView tvi = new PView(new Vector<Camera>(c), name, w, h);
+        PView tvi = new PView(viewType, new Vector<Camera>(c), name, w, h);
         addView(tvi);
         return tvi;
     }

@@ -4,7 +4,7 @@
  *   MODIF:              Thu Feb 20 16:31:33 2003 by Emmanuel Pietriga
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2000-2002. All Rights Reserved
  *   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2011. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -41,17 +41,19 @@ import fr.inria.zvtm.event.ViewListener;
 public class PView extends View implements KeyListener {
 
 	/**
-		*@param v list of cameras
-		*@param t view name/title
-        *@param w width of window in pixels
-        *@param h height of window in pixels
-		*/
-	protected PView(Vector<Camera> v, String t, int w, int h){
+     *@param viewType one of View.STD_VIEW, View.OPENGL_VIEW - determines the type of view and acceleration method. The use of OPENGL_VIEW requires the following Java property: -Dsun.java2d.opengl=true
+	 *@param v list of cameras
+	 *@param t view name/title
+     *@param w width of window in pixels
+     *@param h height of window in pixels
+	 */
+	protected PView(String viewType, Vector<Camera> v, String t, int w, int h){
 		mouse = new VCursor(this);
 		name = t;
 		detectMultipleFullFills = VirtualSpaceManager.INSTANCE.defaultMultiFill;
 		initCameras(v);   //vector -> cast elements as "Camera"
-		panel = new StdViewPanel(v, this, true);
+        //panel = (viewType.equals(View.OPENGL_VIEW)) ? new GLViewPanel(v, this, true) : new StdViewPanel(v, this, true);
+        panel = View.getPanelType(viewType).getNewInstance(v, this, true);
 		panel.setSize(w, h);
 		panel.addKeyListener(this);
 	}

@@ -36,18 +36,14 @@ public class TestAnimStop {
         vsm.setDebug(true);
     }
 
-    public void startAnim(short ogl){
+    public void startAnim(String vt){
         eh=new TestAnimStop.MyEventHandler(this);
         vs = vsm.addVirtualSpace("src");
         cam = vs.addCamera();
         Vector cameras=new Vector();
         cameras.add(cam);
         cam.setZoomFloor(-90);
-        short vt = View.STD_VIEW;
-        switch(ogl){
-	case View.OPENGL_VIEW:{vt = View.OPENGL_VIEW;break;}
-        }
-        testView = vsm.addFrameView(cameras, "Test", vt, 800, 600, false, true);
+        testView = vsm.addFrameView(cameras, "Test", vt, 800, 600, true);
         testView.setBackgroundColor(Color.LIGHT_GRAY);
         testView.setListener(eh);
         cam.setAltitude(50);
@@ -126,7 +122,7 @@ public class TestAnimStop {
         System.out.println("User name: "+System.getProperty("user.name"));
         System.out.println("User home directory: "+System.getProperty("user.home"));
         System.out.println("-----------------");
-        new TestAnimStop().startAnim((args.length > 0) ? Short.parseShort(args[0]) : 0);
+        new TestAnimStop().startAnim((args.length > 0) ? args[0] : View.STD_VIEW);
     }
 
     class MyEventHandler implements ViewListener{
