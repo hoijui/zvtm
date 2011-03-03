@@ -11,7 +11,11 @@ package fr.inria.zvtm.engine;
 
 import java.util.Vector;
 
-public class AgilePanelType {
+import fr.inria.zvtm.engine.PanelType;
+
+public class AgilePanelType implements PanelType {
+	
+	public static final String AGILE_VIEW = "a2d";
     
     public ViewPanel getNewInstance(Vector<Camera> cameras, View v, boolean arfome){
         return new AgileViewPanel(cameras, v, arfome);
