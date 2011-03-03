@@ -41,24 +41,20 @@ public class DynaSpotDemo {
 
     View demoView;
 
-    DynaSpotDemo(short ogl){
+    DynaSpotDemo(String vt){
         vsm = VirtualSpaceManager.INSTANCE;
         vsm.setDebug(true);
-        initTest(ogl);
+        initTest(vt);
     }
 
-    public void initTest(short ogl){
+    public void initTest(String vt){
         eh=new DynaSpotDemoEvtHdlr(this);
         vs = vsm.addVirtualSpace("src");
         vs.addCamera();
         Vector cameras=new Vector();
         cameras.add(vsm.getVirtualSpace("src").getCamera(0));
         vsm.getVirtualSpace("src").getCamera(0).setZoomFloor(-90);
-        short vt = View.STD_VIEW;
-        switch(ogl){
-            case View.OPENGL_VIEW:{vt = View.OPENGL_VIEW;break;}
-        }
-        demoView = vsm.addFrameView(cameras, "DynaSpot Demo", vt, 800, 600, false, true);
+        demoView = vsm.addFrameView(cameras, "DynaSpot Demo", vt, 800, 600, true);
         demoView.setBackgroundColor(Color.WHITE);
         demoView.setListener(eh);
         demoView.setNotifyCursorMoved(true);
@@ -79,7 +75,7 @@ public class DynaSpotDemo {
         System.out.println("JVM version: "+System.getProperty("java.vm.vendor")+" "+System.getProperty("java.vm.name")+" "+System.getProperty("java.vm.version"));
         System.out.println("OS type: "+System.getProperty("os.name")+" "+System.getProperty("os.version")+"/"+System.getProperty("os.arch")+" "+System.getProperty("sun.cpu.isalist"));
         System.out.println("-----------------");
-        new DynaSpotDemo((args.length > 0) ? Short.parseShort(args[0]) : 0);
+        new DynaSpotDemo((args.length > 0) ? args[0] : View.STD_VIEW);
     }
     
 }

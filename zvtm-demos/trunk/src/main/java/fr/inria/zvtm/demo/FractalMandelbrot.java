@@ -2,7 +2,7 @@
  *   DATE OF CREATION:  Thu Dec 30 12:53:03 2004
  *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2004-201. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2011. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -42,19 +42,19 @@ public class FractalMandelbrot extends FractalDemo {
     }
 
     public void init(){
-	eh=new FractalEventHandler(this);
-	vs = vsm.addVirtualSpace(mainSpaceName);
-	buildMandelbrot();
-	vs.addCamera();
-	vs.getCamera(0).setZoomFloor(-90);
-	Vector cameras=new Vector();
-	cameras.add(vs.getCamera(0));
-	vsm.addFrameView(cameras, mainViewName, View.STD_VIEW, 800, 600, false, true);
-	View v = vsm.getView(mainViewName);
-	v.setListener(eh);
-	v.setBackgroundColor(Color.black);
-	v.mouse.setColor(Color.white);
-	v.getGlobalView(vs.getCamera(0), 500);
+        eh=new FractalEventHandler(this);
+        vs = vsm.addVirtualSpace(mainSpaceName);
+        buildMandelbrot();
+        vs.addCamera();
+        vs.getCamera(0).setZoomFloor(-90);
+        Vector cameras=new Vector();
+        cameras.add(vs.getCamera(0));
+        vsm.addFrameView(cameras, mainViewName, View.STD_VIEW, 800, 600, true);
+        View v = vsm.getView(mainViewName);
+        v.setListener(eh);
+        v.setBackgroundColor(Color.black);
+        v.mouse.setColor(Color.white);
+        v.getGlobalView(vs.getCamera(0), 500);
     }
 
     void reset(){

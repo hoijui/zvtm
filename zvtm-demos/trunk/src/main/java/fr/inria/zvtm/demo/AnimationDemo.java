@@ -1,10 +1,10 @@
 /*   FILE: AnimationDemo.java
  *   DATE OF CREATION:   Thu Mar 22 17:20:34 2007
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2007-2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2007-2011. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id $
+ * $Id$
  */ 
 
 package fr.inria.zvtm.demo;
@@ -122,7 +122,7 @@ public class AnimationDemo extends JApplet implements MouseListener, KeyListener
 	mCam = mSpace.addCamera();
 	Vector cameras = new Vector();
 	cameras.add(mCam);
-	mView = vsm.addPanelView(cameras, APPLET_TITLE, appletWindowWidth, appletWindowHeight-40);
+	mView = vsm.addPanelView(cameras, APPLET_TITLE, View.STD_VIEW, appletWindowWidth, appletWindowHeight-40);
 	viewPanel = mView.getPanel();
 	mView.setBackgroundColor(APPLET_BKG_COLOR);
 	eh = new AnimationDemoEventHandler(this);

@@ -66,7 +66,7 @@ public class ScrollbarDemo implements CameraListener {
 	Vector cameras = new Vector();
 	cameras.add(mCamera);
 	cameras.add(sl.getWidgetCamera());
-	demoView = vsm.addFrameView(cameras, demoViewName, View.STD_VIEW, 800, 600, false, true);
+	demoView = vsm.addFrameView(cameras, demoViewName, View.STD_VIEW, 800, 600, true);
 	demoView.setBackgroundColor(Color.WHITE);
 	meh = new ScrollbarDemoEventHandler(this, 0, 1);
 	demoView.setListener(meh, 0);

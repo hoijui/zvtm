@@ -87,7 +87,7 @@ public class LensApplet extends JApplet {
 	cams.add(vsm.getVirtualSpace(demoVS).getCamera(0));
 	this.setSize(viewWidth-10,viewHeight-10);
 	cp.setSize(viewWidth,viewHeight);
-	view = vsm.addPanelView(cams,zvtmView,viewWidth-10,viewHeight-10);
+	view = vsm.addPanelView(cams, zvtmView, View.STD_VIEW, viewWidth-10, viewHeight-10);
  	JPanel zvtmV = view.getPanel();
  	zvtmV.setPreferredSize(new Dimension(viewWidth-10,viewHeight-80));
 	evt = new LensAppletEvtHdlr(this);

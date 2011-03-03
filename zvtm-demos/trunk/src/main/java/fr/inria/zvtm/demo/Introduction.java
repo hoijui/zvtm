@@ -117,7 +117,7 @@ public class Introduction {
 	if (screenDimension.height < PREFERRED_VIEW_HEIGHT){
 	    viewHeight = screenDimension.height;
 	}
-	demoView = vsm.addFrameView(vc1, "Demo", View.STD_VIEW, viewWidth, viewHeight, false, true);
+	demoView = vsm.addFrameView(vc1, "Demo", View.STD_VIEW, viewWidth, viewHeight, true);
 	demoView.setBackgroundColor(Color.BLACK);
 	demoView.setLocation(IntroPanel.PANEL_WIDTH, 0);
 	iPanel=new IntroPanel(this);
@@ -384,7 +384,7 @@ public class Introduction {
         vs2 = vsm.addVirtualSpace(VS_2);
         vs2.addCamera();
         Vector vc1=new Vector();vc1.add(vs1.getCamera(0));vc1.add(vsm.getVirtualSpace(VS_2).getCamera(0));
-        vsm.addFrameView(vc1, "Demo", View.STD_VIEW, viewWidth, viewHeight, false, true).setBackgroundColor(MULTI_LAYER_BKG_COLOR);
+        vsm.addFrameView(vc1, "Demo", View.STD_VIEW, viewWidth, viewHeight, true).setBackgroundColor(MULTI_LAYER_BKG_COLOR);
         demoView = vsm.getView("Demo");
         demoView.setLocation(IntroPanel.PANEL_WIDTH, 0);
         eh=new MultiLayerEvtHdlr(this);
@@ -433,7 +433,7 @@ public class Introduction {
 	camNb++;  //keep track of how many cameras have been created in the virtual space
 	Vector vc1=new Vector();
 	vc1.add(vs1.getCamera(camNb));
-	vsm.addFrameView(vc1, "Demo2", View.STD_VIEW, 300, 200, false, true);
+	vsm.addFrameView(vc1, "Demo2", View.STD_VIEW, 300, 200, true);
 	demoView.setListener(eh);
 	vsm.getView("Demo2").setListener(eh2);
 	vsm.getView("Demo2").setLocation(0,350);

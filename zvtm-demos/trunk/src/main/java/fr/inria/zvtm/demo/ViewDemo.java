@@ -54,47 +54,44 @@ public class ViewDemo {
     Camera mCamera;
 
     short translucentMode = 0;
-    short viewType = 0;
+    String viewType = View.STD_VIEW;
 
     String tms, vts;
 
     ViewDemo(short vt, short translucent){
-	    vsm = VirtualSpaceManager.INSTANCE;
-	translucentMode = translucent;
-	if (translucentMode == 1){
-	    tms = "Translucency: ON";
-	}
-	else {
-	    tms = "Translucency: OFF";
-	}
-	// get View type from command line argument
-	viewType = View.STD_VIEW;
-	vts = "View type: Standard";
-	switch(vt){
-	case View.OPENGL_VIEW:{viewType = View.OPENGL_VIEW;vts = "View type: OpenGL";break;}
-	}
-	init();
+        vsm = VirtualSpaceManager.INSTANCE;
+        translucentMode = translucent;
+        if (translucentMode == 1){
+            tms = "Translucency: ON";
+        }
+        else {
+            tms = "Translucency: OFF";
+        }
+        // get View type from command line argument
+        viewType = (vt == 1) ? View.OPENGL_VIEW : View.STD_VIEW;
+        vts = (vt == 1) ? "View type: OpenGL" : "View type: Standard";
+        init();
     }
 
     ProgFrame pf;
 
     public void init(){
-	eh=new ViewDemoEventHandler(this);
-	vs = vsm.addVirtualSpace(mainSpaceName);
-	Vector cameras=new Vector();
-	mCamera = vs.addCamera();
-	mCamera.setZoomFloor(-90);
-	cameras.add(mCamera);
-	demoView = vsm.addFrameView(cameras, mainViewName, viewType, 800, 600, false, true);
-	demoView.setBackgroundColor(Color.WHITE);
-	demoView.setListener(eh);
-	final SwingWorker worker = new SwingWorker(){
-		public Object construct(){
-		    buildGlyphs();
-		    return null; 
-		}
-	    };
-	worker.start();
+        eh=new ViewDemoEventHandler(this);
+        vs = vsm.addVirtualSpace(mainSpaceName);
+        Vector cameras=new Vector();
+        mCamera = vs.addCamera();
+        mCamera.setZoomFloor(-90);
+        cameras.add(mCamera);
+        demoView = vsm.addFrameView(cameras, mainViewName, viewType, 800, 600, true);
+        demoView.setBackgroundColor(Color.WHITE);
+        demoView.setListener(eh);
+        final SwingWorker worker = new SwingWorker(){
+            public Object construct(){
+                buildGlyphs();
+                return null; 
+            }
+        };
+        worker.start();
     }
     
     void buildGlyphs(){
