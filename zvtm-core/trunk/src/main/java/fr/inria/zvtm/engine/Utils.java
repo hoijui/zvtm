@@ -11,7 +11,9 @@
 package fr.inria.zvtm.engine;
 
 import java.awt.Color;
+import java.awt.GradientPaint;
 import java.awt.Image;
+import java.awt.Paint;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
@@ -362,6 +364,26 @@ public class Utils {
             System.err.println("Failed to load image "+filePath);
             return null;
         }
+    }
+
+     /**
+     * Returns a diagonal gradient centered around a color (upper left 
+     * corner is lighter, lower right corner is darker)
+     * @param width gradient width
+     * @param height gradient height
+     * @param centerColor center color
+     */
+    public static Paint makeDiagGradient(float width, float height, Color centerColor){
+        float[] hsb = new float[3];
+        Color.RGBtoHSB(centerColor.getRed(),
+                centerColor.getGreen(),
+                centerColor.getBlue(),
+                hsb);
+        float lightB = (float)Math.min(1, hsb[2]*1.2);
+        float darkB = (float)Math.max(0, hsb[2]*0.8);
+        Color lighter = Color.getHSBColor(hsb[0], hsb[1], lightB);
+        Color darker = Color.getHSBColor(hsb[0], hsb[1], darkB);
+        return new GradientPaint(0f, 0f, lighter, width, height, darker);
     }
 
     /**
