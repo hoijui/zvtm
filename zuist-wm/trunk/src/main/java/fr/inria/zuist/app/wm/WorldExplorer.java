@@ -188,7 +188,7 @@ public class WorldExplorer implements Java2DPainter {
         console.setMargin(new java.awt.Insets(5,5,5,5));
         console.setVisible(false);
         mView.setActiveLayer(1);
-        mView.getPanel().addComponentListener(eh);
+        mView.getPanel().getComponent().addComponentListener(eh);
     }
 
     void windowLayout(){
@@ -250,7 +250,7 @@ public class WorldExplorer implements Java2DPainter {
     void altitudeChanged(){}
     
     void updatePanelSize(){
-        Dimension d = mView.getPanel().getSize();
+        Dimension d = mView.getPanel().getComponent().getSize();
         panelWidth = d.width;
         panelHeight = d.height;
         if (nm != null && nm.ovPortal != null){
