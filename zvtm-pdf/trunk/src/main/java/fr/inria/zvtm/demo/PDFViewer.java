@@ -99,7 +99,7 @@ public class PDFViewer {
     }
 
     void updatePanelSize(){
-        Dimension d = pdfView.getPanel().getSize();
+        Dimension d = pdfView.getPanel().getComponent().getSize();
         panelWidth = d.width;
         panelHeight = d.height;
     }
