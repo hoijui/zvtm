@@ -41,11 +41,12 @@ public class PDFResourceHandler implements ResourceHandler {
     public static final String _df = "df=";
     
     /** Memory Cache*/
-    static SelfPopulatingCache documentCache = new SelfPopulatingCache((new CacheManager()).getCache("zuistPDFCache"), new CachedDocumentFactory());
+    static CacheManager cacheManager = new CacheManager();
+    static SelfPopulatingCache documentCache = new SelfPopulatingCache(cacheManager.getCache("zuistPDFCache"), new CachedDocumentFactory());
     
     /** Reset memory cache*/
     public static void resetCache(){
-        documentCache.removeAll();
+        cacheManager.clearAll();
     }
     
     /** Get a PDF Document (IcePDF Document instance) given its URL.
