@@ -244,7 +244,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     JPanel createPanelView(Vector cameras, int w, int h){
         vsm.addPanelView(cameras, ConfigManager.MAIN_TITLE, View.STD_VIEW, w, h);
         mainView = vsm.getView(ConfigManager.MAIN_TITLE);
-        return mainView.getPanel();
+        return (JPanel)mainView.getPanel().getComponent();
     }
 
 	public VirtualSpace getGraphSpace(){
@@ -296,7 +296,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     mainCamera.addListener(this);
 
 	mainView.setVisible(true);
-	mainView.getPanel().addMouseMotionListener(paMngr);
+	mainView.getPanel().getComponent().addMouseMotionListener(paMngr);
 	paMngr.start();
 	mainView.setJava2DPainter(paMngr, Java2DPainter.AFTER_PORTALS);
 	mainView.setJava2DPainter(this, Java2DPainter.FOREGROUND);
@@ -304,7 +304,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     activateDynaSpot(ConfigManager.DYNASPOT, false);
     mainView.getCursor().getDynaPicker().setDynaSpotColor(Color.RED);
 
-	mainViewPanel = mainView.getPanel();
+	mainViewPanel = (JPanel)mainView.getPanel().getComponent();
 	setAntialiasing(ConfigManager.ANTIALIASING);
 
 	initDM();
@@ -574,7 +574,6 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
             observedRegion.moveTo((wnes[0]+wnes[2])/2,(wnes[3]+wnes[1])/2);
             observedRegion.setWidth((wnes[2]-wnes[0]));
             observedRegion.setHeight((wnes[1]-wnes[3]));
-            System.out.print(".");
         }
         vsm.repaint();
     }
