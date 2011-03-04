@@ -123,7 +123,7 @@ public class AnimationDemo extends JApplet implements MouseListener, KeyListener
 	Vector cameras = new Vector();
 	cameras.add(mCam);
 	mView = vsm.addPanelView(cameras, APPLET_TITLE, View.STD_VIEW, appletWindowWidth, appletWindowHeight-40);
-	viewPanel = mView.getPanel();
+	viewPanel = (JPanel)mView.getPanel().getComponent();
 	mView.setBackgroundColor(APPLET_BKG_COLOR);
 	eh = new AnimationDemoEventHandler(this);
 	mView.setListener(eh);
