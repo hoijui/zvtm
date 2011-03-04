@@ -366,3 +366,44 @@ Dependency on \cd{zvtm-treemap} is declared as follows:
 The zvtm-treemap library computes the layout of a given tree within a rectangle, but does not provide a graphical representation. It is up to the user to transform the layout information into a graphical representation. Examples are provided in the package \texttt{fr.inria.zvtm.treemap.demo}.
 
 When fitting text within a treemap rectangle, using \texttt{AdaptiveText} (part of the core set of Glyphs) may be helpful. \texttt{AdaptiveText} fits a text within a given rectangle, shortening it if necessary. Shortening rules may be specified by the user. For instance, a reasonable default would be to use as many characters as possible starting from the left, but filesystem path information might be better conveyed by keeping the rightmost information, and US states could be shortened to their two-letter abbreviation.
+
+%%%%%
+\subsection{OpenGL Java2D rendering with Agile2D}
+\label{sec:agile2d}
+
+\cd{zvtm-agile2d} provides a new type of ZVTM view that uses the OpenGL-backed Java2D renderer called Agile2D. Agile2D depends on JOGL 2.0 \footnote{\url{http://jogamp.org/jogl/www/}}.
+
+Dependency on \cd{zvtm-agile2d} is declared as follows:
+
+\begin{SaveVerbatim}{CodeVerb}
+<dependency>
+  <groupId>fr.inria.zvtm</groupId>
+  <artifactId>zvtm-agile2d</artifactId>
+  <version>0.0.1-SNAPSHOT</version> <!-- or any newer version -->
+</dependency>
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+
+
+The client application must register the new view type at initialization in ZVTM:
+
+\begin{small}
+\begin{SaveVerbatim}{CodeVerb}
+import import fr.inria.zvtm.engine.AgilePanelType;
+
+...
+
+View.registerViewPanelType(AgilePanelType.AGILE_VIEW, new AgilePanelType());
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+\end{small}
+
+Then the view gets created the usual way, but using \cd{AgilePanelType.AGILE\_VIEW} as the view type:
+
+\begin{small}
+\begin{SaveVerbatim}{CodeVerb}
+View v = VirtualSpaceManager.INSTANCE.addFrameView(cameras, View.ANONYMOUS,
+                                              AgilePanelType.AGILE_VIEW, 800, 600, true);
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+\end{small}

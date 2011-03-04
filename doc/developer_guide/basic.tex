@@ -112,7 +112,7 @@ A view is instantiated through the VSM:
 \begin{SaveVerbatim}{CodeVerb}
 Vector<Camera> cameras = new Vector();
 cameras.add(cam);
-View v = vsm.addFrameView(cameras, "fooview", View.STD_VIEW, 800, 600, true, true);
+View v = vsm.addFrameView(cameras, "fooview", View.STD_VIEW, 800, 600, true);
 \end{SaveVerbatim}
 \fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
 \end{small}
@@ -121,7 +121,7 @@ There are a number of variations depending on whether you want to attach a menu 
 
 Special case of panel views:
 
-\codebox{PView v = vsm.addPanelView(cameras, "fooView", 800, 600);}
+\codebox{PView v = vsm.addPanelView(cameras, "fooView", View.STD\_VIEW, 800, 600);}
 
 Integration within a Swing component hierarchy requires getting a reference on the underlying JPanel:
 
@@ -160,7 +160,7 @@ Vector<Camera> cameras = new Vector();
 cameras.add(foocam);
 cameras.add(barcam);
 cameras.add(lastcam);
-View v = vsm.addFrameView(cameras, "3_layer_view", View.STD_VIEW, 800, 600, true, true);
+View v = vsm.addFrameView(cameras, "3_layer_view", View.STD_VIEW, 800, 600, true);
 \end{SaveVerbatim}
 \fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
 \end{small}
