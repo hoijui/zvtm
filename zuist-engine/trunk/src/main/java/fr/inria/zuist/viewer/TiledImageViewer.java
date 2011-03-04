@@ -163,7 +163,7 @@ public class TiledImageViewer {
         mView.setListener(ovm, 1);
         mView.setBackgroundColor(BACKGROUND_COLOR);
 		mView.setAntialiasing(antialiased);
-        mView.getPanel().addComponentListener(eh);
+        mView.getPanel().getComponent().addComponentListener(eh);
         updatePanelSize();
         mView.setActiveLayer(0);
     }
@@ -284,7 +284,7 @@ public class TiledImageViewer {
 	}
     
     void updatePanelSize(){
-        Dimension d = mView.getPanel().getSize();
+        Dimension d = mView.getPanel().getComponent().getSize();
         panelWidth = d.width;
         panelHeight = d.height;
         if (nm != null && nm.ovPortal != null){

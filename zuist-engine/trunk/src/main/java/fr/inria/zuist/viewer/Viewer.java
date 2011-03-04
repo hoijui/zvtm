@@ -178,7 +178,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener, Obj
         mView.setBackgroundColor(Color.WHITE);
 		mView.setAntialiasing(antialiased);
 		mView.setJava2DPainter(this, Java2DPainter.AFTER_PORTALS);
-		mView.getPanel().addComponentListener(eh);
+		mView.getPanel().getComponent().addComponentListener(eh);
 		ComponentAdapter ca0 = new ComponentAdapter(){
 			public void componentResized(ComponentEvent e){
 				updatePanelSize();
@@ -490,7 +490,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener, Obj
     }
     
     void updatePanelSize(){
-        Dimension d = mView.getPanel().getSize();
+        Dimension d = mView.getPanel().getComponent().getSize();
         panelWidth = d.width;
 		panelHeight = d.height;
 		if (ovm.console != null){
