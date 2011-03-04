@@ -51,31 +51,30 @@ public class AgileViewPanel extends ViewPanel implements GLEventListener {
         return panel;
     }
     
-    Dimension oldSize;
-	//Timer edtTimer;
+	Timer edtTimer;
 
     AgileViewPanel(Vector cameras, View v, boolean arfome) {
         
         
         panel = new GLCanvas();
         
-        //ActionListener taskPerformer = new ActionListener(){
-        //    public void actionPerformed(ActionEvent evt){
-        //        repaint();
-        //    }
-        //};
-        //edtTimer = new Timer(25, taskPerformer);
-        //addHierarchyListener(
-        //new HierarchyListener() {
-        //    public void hierarchyChanged(HierarchyEvent e) {
-        //        if (isShowing()) {
-        //            start();
-        //        } else {
-        //            stop();
-        //        }
-        //    }
-        //}
-        //);
+        ActionListener taskPerformer = new ActionListener(){
+            public void actionPerformed(ActionEvent evt){
+                panel.display();
+            }
+        };
+        edtTimer = new Timer(20, taskPerformer);
+        panel.addHierarchyListener(
+            new HierarchyListener() {
+                public void hierarchyChanged(HierarchyEvent e) {
+                    if (panel.isShowing()) {
+                        start();
+                    } else {
+                        stop();
+                    }
+                }
+            }
+        );
         parent=v;
         //init of camera array
         cams=new Camera[cameras.size()];  //array of Camera
@@ -84,11 +83,10 @@ public class AgileViewPanel extends ViewPanel implements GLEventListener {
             cams[nbcam]=(Camera)(cameras.get(nbcam));
         }
         //init other stuff
-        //setBackground(backColor);
-        //addMouseListener(this);
-        //addMouseMotionListener(this);
-        //addMouseWheelListener(this);
-        //addComponentListener(this);
+        panel.addMouseListener(this);
+        panel.addMouseMotionListener(this);
+        panel.addMouseWheelListener(this);
+        panel.addComponentListener(this);
         setAutoRequestFocusOnMouseEnter(arfome);
         setAWTCursor(Cursor.CUSTOM_CURSOR);  //custom cursor means VTM cursor
         //this.size = this.getSize();
@@ -97,18 +95,13 @@ public class AgileViewPanel extends ViewPanel implements GLEventListener {
     }
 
     private void start(){
-        //size = getSize();
-        //oldSize = size;
-        //edtTimer.start();
-
+        edtTimer.start();
         panel.addGLEventListener(this);
         //this.setRoot(canvas);
-        //panel.setSize();
-
     }
 
     void stop(){
-        //edtTimer.stop();
+        edtTimer.stop();
     }
     
     public void init(GLAutoDrawable drawable){
@@ -217,7 +210,6 @@ public class AgileViewPanel extends ViewPanel implements GLEventListener {
                 //end drawing here
             }
             else {
-                stableRefToBackBufferGraphics.setPaintMode();
                 stableRefToBackBufferGraphics.setColor(blankColor);
                 stableRefToBackBufferGraphics.fillRect(0, 0, size.width, size.height);
                 portalsHook();
@@ -227,11 +219,15 @@ public class AgileViewPanel extends ViewPanel implements GLEventListener {
         if (repaintListener != null){repaintListener.viewRepainted(this.parent);}
     }
 
-    @Override 
-    public void setRefreshRate(int rr){}
+    @Override
+    public void setRefreshRate(int rr){
+        edtTimer.setDelay(rr);
+    }
 
     @Override
-    public int getRefreshRate(){return 0;}
+    public int getRefreshRate(){
+        return edtTimer.getDelay();
+    }
 
     /** Not implemented yet. */
     @Override
