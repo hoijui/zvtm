@@ -45,6 +45,7 @@ public class AgileTest {
 	
 	void populate(){
 		mSpace.addGlyph(new VCircle(0, 0, 0, 10, Color.WHITE));
+		mSpace.addGlyph(new VRectangle(100, 0, 0, 50, 10, Color.RED));
 	}
 	
 	public static void main(String[] args){

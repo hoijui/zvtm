@@ -7,7 +7,9 @@
 
 package fr.inria.zvtm.engine;
 
+import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -23,35 +25,57 @@ import java.util.Vector;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.event.ViewListener;
 
+import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
+import javax.media.opengl.GLAutoDrawable;
+import javax.media.opengl.awt.GLCanvas;
+import javax.media.opengl.GLEventListener;
+
+import agile2d.AgileGraphics2D;
+import agile2d.AgileState;
+
 /**
  * JPanel used to paint the content of a view (all camera layers).
  * Uses OpenGL acceletation provided by the Agile2D rendering pipeline (itself based upon JOGL 2.0).
  * @author Emmanuel Pietriga, Rodrigo A. B. de Almeida
  */
 
-public class AgileViewPanel extends ViewPanel {
+public class AgileViewPanel extends ViewPanel implements GLEventListener {
+    
+    private AgileGraphics2D jgraphics;
+    private Component       root;
+    
+    protected GLCanvas panel;
+    
+    public Component getComponent(){
+        return panel;
+    }
     
     Dimension oldSize;
-	Timer edtTimer;
+	//Timer edtTimer;
 
     AgileViewPanel(Vector cameras, View v, boolean arfome) {
-        ActionListener taskPerformer = new ActionListener(){
-            public void actionPerformed(ActionEvent evt){
-                repaint();
-            }
-        };
-        edtTimer = new Timer(25, taskPerformer);
-        addHierarchyListener(
-        new HierarchyListener() {
-            public void hierarchyChanged(HierarchyEvent e) {
-                if (isShowing()) {
-                    start();
-                } else {
-                    stop();
-                }
-            }
-        }
-        );
+        
+        
+        panel = new GLCanvas();
+        
+        //ActionListener taskPerformer = new ActionListener(){
+        //    public void actionPerformed(ActionEvent evt){
+        //        repaint();
+        //    }
+        //};
+        //edtTimer = new Timer(25, taskPerformer);
+        //addHierarchyListener(
+        //new HierarchyListener() {
+        //    public void hierarchyChanged(HierarchyEvent e) {
+        //        if (isShowing()) {
+        //            start();
+        //        } else {
+        //            stop();
+        //        }
+        //    }
+        //}
+        //);
         parent=v;
         //init of camera array
         cams=new Camera[cameras.size()];  //array of Camera
@@ -60,57 +84,81 @@ public class AgileViewPanel extends ViewPanel {
             cams[nbcam]=(Camera)(cameras.get(nbcam));
         }
         //init other stuff
-        setBackground(backColor);
-        this.addMouseListener(this);
-        this.addMouseMotionListener(this);
-        this.addMouseWheelListener(this);
-        this.addComponentListener(this);
+        //setBackground(backColor);
+        //addMouseListener(this);
+        //addMouseMotionListener(this);
+        //addMouseWheelListener(this);
+        //addComponentListener(this);
         setAutoRequestFocusOnMouseEnter(arfome);
         setAWTCursor(Cursor.CUSTOM_CURSOR);  //custom cursor means VTM cursor
-        this.size = this.getSize();
+        //this.size = this.getSize();
         if (VirtualSpaceManager.debugModeON()){System.out.println("View refresh time set to "+getRefreshRate()+"ms");}
         start();
     }
 
     private void start(){
-        size = getSize();
-        oldSize = size;
-        edtTimer.start();
+        //size = getSize();
+        //oldSize = size;
+        //edtTimer.start();
+
+        panel.addGLEventListener(this);
+        //this.setRoot(canvas);
+        //panel.setSize();
+
     }
 
     void stop(){
-        edtTimer.stop();
+        //edtTimer.stop();
+    }
+    
+    public void init(GLAutoDrawable drawable){
+        // Called by the drawable immediately after the OpenGL context is initialized.
+        jgraphics = new AgileGraphics2D(drawable);
+        GL2 gl = drawable.getGL().getGL2();
+        if (VirtualSpaceManager.INSTANCE.debugModeON()){
+            System.out.println("Agile2D:: INIT GL IS: " + gl.getClass().getName());
+        }
+        gl.setSwapInterval(1);
     }
 
-    @Override
-    public void paint(Graphics g) {
-        super.paint(g);
+    public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height){
+        // Called by the drawable during the first repaint after the component has been resized.
+        size = new Dimension(width, height);
+    }
+
+    public void dispose(GLAutoDrawable drawable){
+        // Notifies the listener to perform the release of all OpenGL resources per GLContext, such as memory buffers and GLSL programs.
+
+    }
+
+    public void display(GLAutoDrawable drawable){
+        // Called by the drawable to initiate OpenGL rendering by the client.
+        GL2 gl = drawable.getGL().getGL2();
+        AgileState glState = AgileState.get(gl);
+        gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
+        // Restore all the Java2D Graphics defaults
+        jgraphics.resetAll(drawable);        
+    	this.paint(jgraphics);
+    }
+
+    void paint(Graphics g) {
         // stableRefToBackBufferGraphics is used here not as a Graphics from a back buffer image, but directly as the OpenGL graphics context
         // (simply reusing an already declared var instead of creating a new one for nothing)
         stableRefToBackBufferGraphics = (Graphics2D)g;
         try {
             updateCursorOnly = false;
-            size = this.getSize();
-            if (size.width != oldSize.width || size.height != oldSize.height) {
-                if (VirtualSpaceManager.debugModeON()){System.out.println("Resizing JPanel: ("+oldSize.width+"x"+oldSize.height+") -> ("+size.width+"x"+size.height+")");}
-                oldSize=size;
-                updateAntialias=true;
-                updateFont=true;
-            }
-            if (updateFont){stableRefToBackBufferGraphics.setFont(VText.getMainFont());updateFont=false;}
-            if (updateAntialias){if (antialias){stableRefToBackBufferGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);} else {stableRefToBackBufferGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_OFF);}updateAntialias=false;}
-            standardStroke=stableRefToBackBufferGraphics.getStroke();
-            standardTransform=stableRefToBackBufferGraphics.getTransform();
+            standardStroke = stableRefToBackBufferGraphics.getStroke();
+            standardTransform = stableRefToBackBufferGraphics.getTransform();
             if (notBlank){
-                stableRefToBackBufferGraphics.setPaintMode();
+                //stableRefToBackBufferGraphics.setPaintMode();
                 stableRefToBackBufferGraphics.setBackground(backColor);
-                stableRefToBackBufferGraphics.clearRect(0,0,getWidth(),getHeight());
+                stableRefToBackBufferGraphics.clearRect(0, 0, size.width, size.height);
                 backgroundHook();
                 //begin actual drawing here
                 for (int nbcam=0;nbcam<cams.length;nbcam++){
                     if ((cams[nbcam]!=null) && (cams[nbcam].enabled) && ((cams[nbcam].eager) || (cams[nbcam].shouldRepaint()))){
-                        camIndex=cams[nbcam].getIndex();
-                        drawnGlyphs=cams[nbcam].parentSpace.getDrawnGlyphs(camIndex);
+                        camIndex = cams[nbcam].getIndex();
+                        drawnGlyphs = cams[nbcam].parentSpace.getDrawnGlyphs(camIndex);
                         drawnGlyphs.removeAllElements();
                         double uncoef = (cams[nbcam].focal+cams[nbcam].altitude) / cams[nbcam].focal;
                         //compute region seen from this view through camera
@@ -126,7 +174,7 @@ public class AgileViewPanel extends ViewPanel {
                                 //if glyph is at least partially visible in the reg. seen from this view, display
                                 gll[i].project(cams[nbcam], size);
                                 if (gll[i].isVisible()){
-                                    gll[i].draw(stableRefToBackBufferGraphics,size.width,size.height,cams[nbcam].getIndex(),standardStroke,standardTransform, 0, 0);
+                                    gll[i].draw(stableRefToBackBufferGraphics, size.width, size.height, cams[nbcam].getIndex(), standardStroke, standardTransform, 0, 0);
                                 }
                                 // notifying outside if branch because glyph sensitivity is not
                                 // affected by glyph visibility when managed through Glyph.setVisible()
@@ -143,9 +191,9 @@ public class AgileViewPanel extends ViewPanel {
                     //deal with mouse glyph only if mouse cursor is inside this window
                     try {
                         //we project the mouse cursor wrt the appropriate coord sys
-                        parent.mouse.unProject(cams[activeLayer],this);
+                        parent.mouse.unProject(cams[activeLayer], this);
                         if (parent.mouse.isSensitive()){
-                            parent.mouse.getPicker().computePickedGlyphList(evHs[activeLayer],cams[activeLayer]);
+                            parent.mouse.getPicker().computePickedGlyphList(evHs[activeLayer], cams[activeLayer]);
                         }
                     }
                     catch (NullPointerException ex) {if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.drawdrag "+ex);}}
@@ -171,25 +219,19 @@ public class AgileViewPanel extends ViewPanel {
             else {
                 stableRefToBackBufferGraphics.setPaintMode();
                 stableRefToBackBufferGraphics.setColor(blankColor);
-                stableRefToBackBufferGraphics.fillRect(0, 0, getWidth(), getHeight());
+                stableRefToBackBufferGraphics.fillRect(0, 0, size.width, size.height);
                 portalsHook();
             }
         }
-        catch (NullPointerException ex0){if (VirtualSpaceManager.debugModeON()){System.err.println("GLViewPanel.paint "+ex0);}}
+        catch (NullPointerException ex0){if (VirtualSpaceManager.debugModeON()){System.err.println("AgileViewPanel.paint "+ex0);}}
         if (repaintListener != null){repaintListener.viewRepainted(this.parent);}
     }
 
     @Override 
-    public void setRefreshRate(int rr){
-        if(rr > 0){
-            edtTimer.setDelay(rr);
-        }
-    }
+    public void setRefreshRate(int rr){}
 
     @Override
-    public int getRefreshRate(){
-        return edtTimer.getDelay();
-    }
+    public int getRefreshRate(){return 0;}
 
     /** Not implemented yet. */
     @Override
