@@ -165,7 +165,7 @@ public class PDFViewer {
         eh = new PDFViewerEventHandler(this);
         mView.setListener(eh, 0);
         mView.setBackgroundColor(Color.WHITE);
-		mView.getPanel().addComponentListener(eh);
+		mView.getPanel().getComponent().addComponentListener(eh);
 		ComponentAdapter ca0 = new ComponentAdapter(){
 			public void componentResized(ComponentEvent e){
 				updatePanelSize();
@@ -323,7 +323,7 @@ public class PDFViewer {
     void altitudeChanged(){ }
     
     void updatePanelSize(){
-        Dimension d = mView.getPanel().getSize();
+        Dimension d = mView.getPanel().getComponent().getSize();
         panelWidth = d.width;
 		panelHeight = d.height;
 	}
