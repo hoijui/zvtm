@@ -145,8 +145,8 @@ public class ScrollLayer implements ComponentListener {
      */
     public void setView(View v){
         controlledView = v;
-        controlledView.getPanel().addComponentListener(this);
-        updateViewSize(v.getPanel());
+        controlledView.getPanel().getComponent().addComponentListener(this);
+        updateViewSize(v.getPanel().getComponent());
         updateScrollBars();
     }
 

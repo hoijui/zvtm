@@ -11,10 +11,13 @@
 package fr.inria.zvtm.engine;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
+import javax.swing.JPanel;
+
 import java.util.Vector;
 
 import fr.inria.zvtm.glyphs.VText;
@@ -25,6 +28,12 @@ import fr.inria.zvtm.glyphs.VText;
  * @author Emmanuel Pietriga
  */
 public class OffscreenViewPanel extends ViewPanel {
+
+    protected JPanel panel;
+    
+    public Component getComponent(){
+        return panel;
+    }
 
     /**for Double Buffering*/
     BufferedImage buffImg;
@@ -41,8 +50,8 @@ public class OffscreenViewPanel extends ViewPanel {
             cams[nbcam] = (Camera)(cameras.get(nbcam));
         }
         //init other stuff
-        setBackground(Color.white);
-        this.size = this.getSize();
+        panel.setBackground(Color.white);
+        this.size = panel.getSize();
     }
     
     void stop(){}

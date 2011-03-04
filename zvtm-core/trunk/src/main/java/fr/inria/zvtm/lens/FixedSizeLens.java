@@ -143,7 +143,7 @@ public abstract class FixedSizeLens extends Lens {
     /**Should not be called directly ; used to update buffer image caracteristics when lens outer radius changes*/
     public void setLensBuffer(ViewPanel p){
 	owningView = p;
-	Dimension s = p.getSize();
+	Dimension s = p.getComponent().getSize();
 	w = s.width;
 	h = s.height;
 	sw = w / 2;
@@ -158,7 +158,7 @@ public abstract class FixedSizeLens extends Lens {
 	if (lurd[3] > h){lurd[3] = h;}
 	lensWidth = lurd[2] - lurd[0];
 	lensHeight = lurd[3] - lurd[1];
-	BufferedImage tbi = (BufferedImage)p.createImage(1,1);
+	BufferedImage tbi = (BufferedImage)p.getComponent().createImage(1,1);
 	imageType = tbi.getType();
 	transferType = tbi.getRaster().getTransferType();
 	initBuffers((lensWidth)*(lensHeight), (mbw)*(mbh));
@@ -344,8 +344,8 @@ public abstract class FixedSizeLens extends Lens {
 		}
 		first = false;
 		owningView.setDrawCursor(!isFocusControlled);
-		lensX = lx + (int)owningView.getSize().getWidth() / 2;
-		lensY = ly + (int)owningView.getSize().getHeight() / 2;
+		lensX = lx + (int)owningView.getComponent().getSize().getWidth() / 2;
+		lensY = ly + (int)owningView.getComponent().getSize().getHeight() / 2;
 		owningView.parent.repaint();
 	}
 
@@ -355,7 +355,7 @@ public abstract class FixedSizeLens extends Lens {
     private void doFocusControledOffsets(int deltaX, int deltaY, double magFactor, long currentTime) {
 	if(robot != null) {
 	    ptRobot.setLocation(lensX, lensY);
-	    SwingUtilities.convertPointToScreen(ptRobot, owningView);
+	    SwingUtilities.convertPointToScreen(ptRobot, owningView.getComponent());
 	    robot.mouseMove((int)ptRobot.getX(), (int)ptRobot.getY());
 	}
 	if( 
@@ -378,8 +378,8 @@ public abstract class FixedSizeLens extends Lens {
     // FIXME: synchronized !
     //public synchronized void moveLensBy(int dx, int dy, long currentTime) {
     	public void moveLensBy(int dx, int dy, long currentTime) {
-		lensX = lx + (int)owningView.getSize().getWidth() / 2;
-		lensY = ly + (int)owningView.getSize().getHeight() / 2;
+		lensX = lx + (int)owningView.getComponent().getSize().getWidth() / 2;
+		lensY = ly + (int)owningView.getComponent().getSize().getHeight() / 2;
 		//System.out.println("- lensX="+lensX+"+"+getXfocusOffset()+", lensY="+lensY+"+"+getYfocusOffset());
 		if(lastX == Integer.MAX_VALUE && lastY == Integer.MAX_VALUE)	{
 			lastX = lensX; lastY = lensY;

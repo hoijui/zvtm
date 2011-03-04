@@ -25,6 +25,7 @@ package fr.inria.zvtm.engine;
 
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -33,9 +34,11 @@ import java.awt.event.ActionListener;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.awt.image.BufferedImage;
-import java.util.Vector;
 
 import javax.swing.Timer;
+import javax.swing.JPanel;
+
+import java.util.Vector;
 
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.event.ViewListener;
@@ -49,6 +52,12 @@ import fr.inria.zvtm.event.ViewListener;
 
 public class StdViewPanel extends ViewPanel {
 
+    protected JPanel panel;
+    
+    public Component getComponent(){
+        return panel;
+    }
+
 	/** Double Buffering uses a BufferedImage as the back buffer. */
 	BufferedImage backBuffer;
 	int backBufferW = 0;
@@ -61,6 +70,16 @@ public class StdViewPanel extends ViewPanel {
 	private Timer edtTimer;
 
 	StdViewPanel(Vector<Camera> cameras,View v, boolean arfome) {
+	    panel = new JPanel(){
+	        @Override
+        	public void paint(Graphics g) {
+        		if (backBuffer != null){
+        			g.drawImage(backBuffer, 0, 0, panel);
+        			if (repaintListener != null){repaintListener.viewRepainted(StdViewPanel.this.parent);}
+        		}
+        	}
+	    };
+	    
 		ActionListener taskPerformer = new ActionListener(){
 			public void actionPerformed(ActionEvent evt){
 				drawOffscreen();
@@ -68,10 +87,10 @@ public class StdViewPanel extends ViewPanel {
 		};
 		edtTimer = new Timer(25, taskPerformer);
 
-		addHierarchyListener(
+		panel.addHierarchyListener(
 				new HierarchyListener() {
 					public void hierarchyChanged(HierarchyEvent e) {
-						if (isShowing()) {
+						if (panel.isShowing()) {
 							start();
 						} else {
 							stop();
@@ -87,15 +106,15 @@ public class StdViewPanel extends ViewPanel {
 			cams[nbcam] = cameras.get(nbcam);
 		}
 		//init other stuff
-		setBackground(backColor);
-		this.addMouseListener(this);
-		this.addMouseMotionListener(this);
-		this.addMouseWheelListener(this);
-		this.addComponentListener(this);
-		this.setDoubleBuffered(false);
+		panel.setBackground(backColor);
+		panel.addMouseListener(this);
+		panel.addMouseMotionListener(this);
+		panel.addMouseWheelListener(this);
+		panel.addComponentListener(this);
+		panel.setDoubleBuffered(false);
 		setAutoRequestFocusOnMouseEnter(arfome);
 		setAWTCursor(Cursor.CUSTOM_CURSOR);  //custom cursor means VTM cursor
-		this.size = this.getSize();
+		this.size = panel.getSize();
 		if (VirtualSpaceManager.debugModeON()){System.out.println("View refresh time set to "+getRefreshRate()+"ms");}
 	}
 
@@ -112,7 +131,7 @@ public class StdViewPanel extends ViewPanel {
 	}
 
 	private void updateOffscreenBuffer(){
-		size = this.getSize();
+		size = panel.getSize();
 		if (size.width != oldSize.width || size.height != oldSize.height || backBufferW != size.width || backBufferH != size.height) {
 			//each time the parent window is resized, adapt the buffer image size
 			backBuffer = null;
@@ -135,7 +154,7 @@ public class StdViewPanel extends ViewPanel {
 			updateFont=true;
 		}
 		if (backBuffer == null){
-			gconf = getGraphicsConfiguration();
+			gconf = panel.getGraphicsConfiguration();
 			// assign minimal size of 1
 			backBuffer = gconf.createCompatibleImage((size.width > 0) ? size.width : 1, (size.height > 0) ? size.height : 1);
 			backBufferW = backBuffer.getWidth();
@@ -312,7 +331,7 @@ public class StdViewPanel extends ViewPanel {
 	//draw ONCE (no more infinite thread loop; will be driven
 	//from an EDT timer)
 	public void drawOffscreen() {
-		oldSize=getSize();
+		oldSize = panel.getSize();
 		if (notBlank){
 			if (repaintable){
 				if (repaintASAP){
@@ -341,7 +360,7 @@ public class StdViewPanel extends ViewPanel {
 						}
 						//end drawing here
 						if (stableRefToBackBufferGraphics == backBufferGraphics) {
-							paintImmediately(0,0,size.width,size.height);
+							panel.paintImmediately(0,0,size.width,size.height);
 						}
 					}
 					catch (NullPointerException ex0){
@@ -369,7 +388,7 @@ public class StdViewPanel extends ViewPanel {
                         //just catch it and wait for next loop until we find out what's causing this
                         catch (NullPointerException ex47){if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.runview.drawVTMcursor "+ex47);}} 					        
 					}
-					paintImmediately(0,0,size.width,size.height);
+					panel.paintImmediately(0,0,size.width,size.height);
 				}
 			}
 		}
@@ -378,9 +397,9 @@ public class StdViewPanel extends ViewPanel {
 			updateOffscreenBuffer();	
 			stableRefToBackBufferGraphics.setPaintMode();
 			stableRefToBackBufferGraphics.setColor(blankColor);
-			stableRefToBackBufferGraphics.fillRect(0,0,getWidth(),getHeight());
+			stableRefToBackBufferGraphics.fillRect(0, 0, panel.getWidth(), panel.getHeight());
 			portalsHook();				
-			paintImmediately(0,0,size.width,size.height);
+			panel.paintImmediately(0,0,size.width,size.height);
 		}
 	}
 	
@@ -390,16 +409,8 @@ public class StdViewPanel extends ViewPanel {
             stableRefToBackBufferGraphics.setColor(parent.mouse.color);
             stableRefToBackBufferGraphics.drawLine(parent.mouse.jpx-parent.mouse.size,parent.mouse.jpy,parent.mouse.jpx+parent.mouse.size,parent.mouse.jpy);
             stableRefToBackBufferGraphics.drawLine(parent.mouse.jpx,parent.mouse.jpy-parent.mouse.size,parent.mouse.jpx,parent.mouse.jpy+parent.mouse.size);
-            paintImmediately(0,0,size.width,size.height);            
+            panel.paintImmediately(0,0,size.width,size.height);            
         }
-	}
-
-    @Override
-	public void paint(Graphics g) {
-		if (backBuffer != null){
-			g.drawImage(backBuffer, 0, 0, this);
-			if (repaintListener != null){repaintListener.viewRepainted(this.parent);}
-		}
 	}
 
     @Override

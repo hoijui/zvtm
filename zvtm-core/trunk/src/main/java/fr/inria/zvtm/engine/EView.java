@@ -23,6 +23,7 @@
 
 package fr.inria.zvtm.engine;
 
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -31,6 +32,8 @@ import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import javax.swing.JPanel;
+
 import java.util.Vector;
 
 import javax.swing.JFrame;
@@ -101,9 +104,9 @@ public class EView extends View implements KeyListener{
             constraints.anchor=GridBagConstraints.CENTER;
             //panel= (viewType.equals(View.OPENGL_VIEW)) ? new GLViewPanel(v, this, false) : new StdViewPanel(v, this, false);
             panel = View.getPanelType(viewType).getNewInstance(v, this, false);
-            panel.setSize(w, h);
-            gridBag.setConstraints(panel,constraints);
-            cpane.add(panel);
+            panel.getComponent().setSize(w, h);
+            gridBag.setConstraints(panel.getComponent(), constraints);
+            cpane.add(panel.getComponent());
             buildConstraints(constraints,0,1,1,1,0,0);
             constraints.anchor=GridBagConstraints.WEST;
             statusBar=new JLabel(" ");
@@ -115,9 +118,9 @@ public class EView extends View implements KeyListener{
             constraints.fill=GridBagConstraints.BOTH;
             constraints.anchor=GridBagConstraints.CENTER;
             panel = View.getPanelType(viewType).getNewInstance(v, this, false);
-            panel.setSize(w, h);
-            gridBag.setConstraints(panel,constraints);
-            cpane.add(panel);
+            panel.getComponent().setSize(w, h);
+            gridBag.setConstraints(panel.getComponent(), constraints);
+            cpane.add(panel.getComponent());
         }
         frame.setTitle(t);
         WindowListener l=new WindowAdapter(){
@@ -135,7 +138,7 @@ public class EView extends View implements KeyListener{
     }
 
     @Override
-    public Container getFrame(){return frame;}
+    public Component getFrame(){return frame;}
 
     @Override
     public boolean isSelected(){

@@ -24,7 +24,7 @@
 package fr.inria.zvtm.engine;
 
 import java.awt.Color;
-import java.awt.Container;
+import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -213,8 +213,8 @@ public abstract class View {
     /** Destroy this view. */
     public abstract void destroyView();
 
-    /** Get the java.awt.Container for this View. */
-    public abstract Container getFrame();
+    /** Get the java.awt.Component for this View. */
+    public abstract Component getFrame();
 
     /**Set the cursor for this View.
      * Either the ZVTM cursor or one of the default AWT cursors.
@@ -328,7 +328,7 @@ public abstract class View {
         if (cameras.contains(c)){
             //compute region seen from this view through camera
             double uncoef = (c.focal+c.altitude) / c.focal;
-            Dimension panelSize = panel.getSize();
+            Dimension panelSize = panel.getComponent().getSize();
             res[0] = c.vx-(panelSize.width/2-panel.visibilityPadding[0])*uncoef;
             res[1] = c.vy+(panelSize.height/2-panel.visibilityPadding[1])*uncoef;
             res[2] = c.vx+(panelSize.width/2-panel.visibilityPadding[2])*uncoef;
@@ -343,7 +343,7 @@ public abstract class View {
      *@return width in VirtualSpace coordinates (from west to east boundaries)
      */
     public double getVisibleRegionWidth(Camera c){
-	    return panel.getSize().width * ((c.focal+c.altitude) / c.focal);
+	    return panel.getComponent().getSize().width * ((c.focal+c.altitude) / c.focal);
     }
 
     /** Get height of rectangular region of the VirtualSpace seen through a camera.
@@ -351,7 +351,7 @@ public abstract class View {
      *@return width in VirtualSpace coordinates (from north to south boundaries)
      */
     public double getVisibleRegionHeight(Camera c){
-	    return panel.getSize().height * ((c.focal+c.altitude) / c.focal);
+	    return panel.getComponent().getSize().height * ((c.focal+c.altitude) / c.focal);
     }
 
     /** Set which layer (camera) is currently active (getting events).
@@ -637,7 +637,7 @@ public abstract class View {
      *@see #getImage()
      */
     public BufferedImage rasterize(int w, int h, Vector<Camera> layers){
-        Dimension panelSize = panel.getSize();
+        Dimension panelSize = panel.getComponent().getSize();
         float mFactor = 1/Math.min(w / ((float)panelSize.getWidth()),
             h / ((float)panelSize.getHeight()));
         Camera c, nc;
@@ -865,28 +865,28 @@ public abstract class View {
         if (z){			
             double newAlt = 0;
             // compute the new altitude to see glyph g entirely horizontally
-            if (panel.getSize().width!=0){
+            if (panel.getComponent().getSize().width!=0){
                 if (g instanceof VText){
-                    newAlt = ((VText)g).getBounds(c.getIndex()).x * c.focal / panel.getSize().width - c.focal;
+                    newAlt = ((VText)g).getBounds(c.getIndex()).x * c.focal / panel.getComponent().getSize().width - c.focal;
                 }
                 else if (g instanceof RectangularShape){
-                    newAlt = ((RectangularShape)g).getWidth() * c.focal / panel.getSize().width - c.focal;
+                    newAlt = ((RectangularShape)g).getWidth() * c.focal / panel.getComponent().getSize().width - c.focal;
                 }
                 else {
-                    newAlt = g.getSize() * c.focal / panel.getSize().width - c.focal;
+                    newAlt = g.getSize() * c.focal / panel.getComponent().getSize().width - c.focal;
                 }
             }
             // compute the new altitude to see glyph g entirely vertically, take max of vertical and horizontal
-            if (panel.getSize().height!=0){
+            if (panel.getComponent().getSize().height!=0){
                 double tmpAlt;
                 if (g instanceof VText){
-                    tmpAlt = ((VText)g).getBounds(c.getIndex()).y * c.focal / panel.getSize().height - c.focal;
+                    tmpAlt = ((VText)g).getBounds(c.getIndex()).y * c.focal / panel.getComponent().getSize().height - c.focal;
                 }
                 else if (g instanceof RectangularShape){
-                    tmpAlt = ((RectangularShape)g).getHeight() * c.focal / panel.getSize().height - c.focal;
+                    tmpAlt = ((RectangularShape)g).getHeight() * c.focal / panel.getComponent().getSize().height - c.focal;
                 }
                 else {
-                    tmpAlt = g.getSize() * c.focal / panel.getSize().height - c.focal;
+                    tmpAlt = g.getSize() * c.focal / panel.getComponent().getSize().height - c.focal;
                 }
                 if (tmpAlt > newAlt){newAlt = tmpAlt;}
             }
@@ -980,7 +980,7 @@ public abstract class View {
         double dx = (wnes[2]+wnes[0]) / 2d; 
         double dy = (wnes[1]+wnes[3]) / 2d;
         // new alt to fit horizontally
-		Dimension panelSize = this.getPanel().getSize();
+		Dimension panelSize = this.getPanel().getComponent().getSize();
         double nah = (wnes[2]-dx) * 2 * c.getFocal() / panelSize.width - c.getFocal();
         // new alt to fit vertically
         double nav = (wnes[1]-dy) * 2 * c.getFocal() / panelSize.height - c.getFocal();

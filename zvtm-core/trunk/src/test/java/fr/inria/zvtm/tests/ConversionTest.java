@@ -37,8 +37,8 @@ public class ConversionTest extends TestCase {
 
     //test that the center of the panel is aligned with the camera coordinates
     public void testVscBase(){
-        int xmid = view.getPanel().getWidth()/2;
-        int ymid = view.getPanel().getHeight()/2;
+        int xmid = view.getPanel().getComponent().getWidth()/2;
+        int ymid = view.getPanel().getComponent().getHeight()/2;
         final Point2D.Double spaceCoords = view.getPanel().viewToSpaceCoords(cam, xmid, ymid);
         vsm.repaint(view, new RepaintListener(){
             public void viewRepainted(View v){
@@ -58,8 +58,8 @@ public class ConversionTest extends TestCase {
     }
 
     public void testVscUnzoom(){
-        int xmid = view.getPanel().getWidth()/2;
-        int ymid = view.getPanel().getHeight()/2;
+        int xmid = view.getPanel().getComponent().getWidth()/2;
+        int ymid = view.getPanel().getComponent().getHeight()/2;
         cam.setFocal(100f);
         cam.setLocation(new Location(-100, 200, 100));
         final Point2D.Double spaceCoords = view.getPanel().viewToSpaceCoords(cam, xmid + 10, ymid + 20);

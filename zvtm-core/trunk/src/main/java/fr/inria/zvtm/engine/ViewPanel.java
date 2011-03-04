@@ -30,6 +30,7 @@ import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.lens.Lens;
 
 import javax.swing.JPanel;
+import java.awt.Component;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -57,7 +58,7 @@ import java.util.Vector;
  * JPanel used to paint the content of a view (all camera layers).
  * @author Emmanuel Pietriga
  **/
-public abstract class ViewPanel extends JPanel implements MouseListener, MouseMotionListener, MouseWheelListener, ComponentListener {
+public abstract class ViewPanel implements MouseListener, MouseMotionListener, MouseWheelListener, ComponentListener {
 
     /**draw no oval between point where we started dragging the mouse and current point*/
     public final static short NONE=0;
@@ -172,6 +173,8 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 	public ViewListener[] getListeners(){
 		return evHs;
 	}
+	
+	public abstract Component getComponent();
 
 	/* -------------------- PORTALS ------------------- */
 
@@ -235,7 +238,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
 		}
 	    }
 	}
-	this.setCursor(awtCursor);
+	this.getComponent().setCursor(awtCursor);
     }
     
     public void setDrawCursor(boolean b){
@@ -249,7 +252,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
     protected void setAWTCursor(Cursor c){
 	awtCursor = c;
 	drawVTMcursor = false;
-	this.setCursor(awtCursor);
+	this.getComponent().setCursor(awtCursor);
     }
 
     /**
@@ -263,7 +266,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
         Location camLoc = cam.getLocation();
         double focal = cam.getFocal();
         double altCoef = (focal + camLoc.alt) / focal;
-        Dimension viewSize = getSize();
+        Dimension viewSize = this.getComponent().getSize();
 
         //find coords of view origin in the virtual space
         double viewOrigX = camLoc.vx - 0.5*viewSize.width*altCoef;
@@ -490,7 +493,7 @@ public abstract class ViewPanel extends JPanel implements MouseListener, MouseMo
         cursor_inside = true;
         VirtualSpaceManager.INSTANCE.setActiveView(this.parent);
         if (autoRequestFocusOnMouseEnter){
-            requestFocus();
+            getComponent().requestFocus();
         }
         if (parent.mouse.sync){
             parent.mouse.setJPanelCoordinates(e.getX(),e.getY());

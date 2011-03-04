@@ -10,6 +10,7 @@
 package fr.inria.zvtm.engine;
 
 import java.awt.Cursor;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -19,7 +20,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.awt.image.BufferedImage;
+import javax.swing.JPanel;
 import javax.swing.Timer;
+
 import java.util.Vector;
 
 import fr.inria.zvtm.glyphs.VText;
@@ -34,20 +37,34 @@ import fr.inria.zvtm.event.ViewListener;
 
 public class GLViewPanel extends ViewPanel {
     
+    protected JPanel panel;
+    
+    public Component getComponent(){
+        return panel;
+    }
+    
     Dimension oldSize;
 	Timer edtTimer;
 
     GLViewPanel(Vector cameras,View v, boolean arfome) {
+        panel = new JPanel(){
+	        @Override
+        	public void paint(Graphics g) {
+                super.paint(g);
+        		GLViewPanel.this.paint(g);
+        	}
+	    };
+	    
         ActionListener taskPerformer = new ActionListener(){
             public void actionPerformed(ActionEvent evt){
-                repaint();
+                panel.repaint();
             }
         };
         edtTimer = new Timer(25, taskPerformer);
-        addHierarchyListener(
+        panel.addHierarchyListener(
         new HierarchyListener() {
             public void hierarchyChanged(HierarchyEvent e) {
-                if (isShowing()) {
+                if (panel.isShowing()) {
                     start();
                 } else {
                     stop();
@@ -63,20 +80,20 @@ public class GLViewPanel extends ViewPanel {
             cams[nbcam]=(Camera)(cameras.get(nbcam));
         }
         //init other stuff
-        setBackground(backColor);
-        this.addMouseListener(this);
-        this.addMouseMotionListener(this);
-        this.addMouseWheelListener(this);
-        this.addComponentListener(this);
+        panel.setBackground(backColor);
+        panel.addMouseListener(this);
+        panel.addMouseMotionListener(this);
+        panel.addMouseWheelListener(this);
+        panel.addComponentListener(this);
         setAutoRequestFocusOnMouseEnter(arfome);
         setAWTCursor(Cursor.CUSTOM_CURSOR);  //custom cursor means VTM cursor
-        this.size = this.getSize();
+        this.size = panel.getSize();
         if (VirtualSpaceManager.debugModeON()){System.out.println("View refresh time set to "+getRefreshRate()+"ms");}
         start();
     }
 
     private void start(){
-        size = getSize();
+        size = panel.getSize();
         oldSize = size;
         edtTimer.start();
     }
@@ -85,15 +102,13 @@ public class GLViewPanel extends ViewPanel {
         edtTimer.stop();
     }
 
-    @Override
     public void paint(Graphics g) {
-        super.paint(g);
         // stableRefToBackBufferGraphics is used here not as a Graphics from a back buffer image, but directly as the OpenGL graphics context
         // (simply reusing an already declared var instead of creating a new one for nothing)
         stableRefToBackBufferGraphics = (Graphics2D)g;
         try {
             updateCursorOnly = false;
-            size = this.getSize();
+            size = panel.getSize();
             if (size.width != oldSize.width || size.height != oldSize.height) {
                 if (VirtualSpaceManager.debugModeON()){System.out.println("Resizing JPanel: ("+oldSize.width+"x"+oldSize.height+") -> ("+size.width+"x"+size.height+")");}
                 oldSize=size;
@@ -107,7 +122,7 @@ public class GLViewPanel extends ViewPanel {
             if (notBlank){
                 stableRefToBackBufferGraphics.setPaintMode();
                 stableRefToBackBufferGraphics.setBackground(backColor);
-                stableRefToBackBufferGraphics.clearRect(0,0,getWidth(),getHeight());
+                stableRefToBackBufferGraphics.clearRect(0, 0, panel.getWidth(), panel.getHeight());
                 backgroundHook();
                 //begin actual drawing here
                 for (int nbcam=0;nbcam<cams.length;nbcam++){
@@ -174,7 +189,7 @@ public class GLViewPanel extends ViewPanel {
             else {
                 stableRefToBackBufferGraphics.setPaintMode();
                 stableRefToBackBufferGraphics.setColor(blankColor);
-                stableRefToBackBufferGraphics.fillRect(0, 0, getWidth(), getHeight());
+                stableRefToBackBufferGraphics.fillRect(0, 0, panel.getWidth(), panel.getHeight());
                 portalsHook();
             }
         }

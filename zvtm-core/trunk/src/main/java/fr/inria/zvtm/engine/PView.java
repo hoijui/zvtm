@@ -23,7 +23,7 @@
 
 package fr.inria.zvtm.engine;
 
-import java.awt.Container;
+import java.awt.Component;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Vector;
@@ -54,13 +54,13 @@ public class PView extends View implements KeyListener {
 		initCameras(v);   //vector -> cast elements as "Camera"
         //panel = (viewType.equals(View.OPENGL_VIEW)) ? new GLViewPanel(v, this, true) : new StdViewPanel(v, this, true);
         panel = View.getPanelType(viewType).getNewInstance(v, this, true);
-		panel.setSize(w, h);
-		panel.addKeyListener(this);
+		panel.getComponent().setSize(w, h);
+		panel.getComponent().addKeyListener(this);
 	}
 
     /** Get the java.awt.Container for this view*/
     @Override
-    public Container getFrame(){return panel;}
+    public Component getFrame(){return panel.getComponent();}
 
     /** Always returns false as this is not a window. */
     @Override
