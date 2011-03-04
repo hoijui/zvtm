@@ -65,10 +65,6 @@ public class Test {
         vsm.repaint();
     }
     
-	void doIt(){
-		testView.centerOnGlyph(g, vsm.getVirtualSpace("src").getCamera(0), 500, true, .5f);
-	}
-
     public static void main(String[] args){
         System.out.println("-----------------");
         System.out.println("General information");
@@ -100,9 +96,7 @@ class EventHandlerTest implements ViewListener {
         application=appli;
     }
     
-    public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-		application.doIt();
-	}
+    public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
