@@ -37,6 +37,10 @@ import agile2d.AgileState;
 /**
  * JPanel used to paint the content of a view (all camera layers).
  * Uses OpenGL acceletation provided by the Agile2D rendering pipeline (itself based upon JOGL 2.0).
+ * Before instantiating an Agile2D ZVTM View, one must register the new view type:<br>
+ * View.registerViewPanelType(AgilePanelType.AGILE_VIEW, new AgilePanelType());<br><br>
+ * Then the view gets created as any other view:<br>
+ * View v = VirtualSpaceManager.INSTANCE.addFrameView(cameras, View.ANONYMOUS, AgilePanelType.AGILE_VIEW, 800, 600, true);
  * @author Emmanuel Pietriga, Rodrigo A. B. de Almeida
  */
 
@@ -127,7 +131,6 @@ public class AgileViewPanel extends ViewPanel implements GLEventListener {
     public void display(GLAutoDrawable drawable){
         // Called by the drawable to initiate OpenGL rendering by the client.
         GL2 gl = drawable.getGL().getGL2();
-        AgileState glState = AgileState.get(gl);
         gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
         // Restore all the Java2D Graphics defaults
         jgraphics.resetAll(drawable);        
