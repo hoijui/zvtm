@@ -35,13 +35,13 @@ import java.awt.event.MouseWheelEvent;
 
 public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewListener {
 
-    ZGRApplet application;
-    GraphicsManager grMngr;
+    protected ZGRApplet application;
+    protected GraphicsManager grMngr;
 
-    ZgrAppletEvtHdlr(ZGRApplet app, GraphicsManager gm){
-	this.application=app;
-	this.grMngr = gm;
-    }
+    protected ZgrAppletEvtHdlr(ZGRApplet app, GraphicsManager gm){
+		this.application=app;
+		this.grMngr = gm;
+	}
 
     public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
         if (toolPaletteIsActive){return;}
@@ -406,7 +406,7 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewListener {
 
     public void viewClosing(View v){}
 
-    void attemptDisplayEdgeURL(VCursor mouse,Camera cam){
+    protected void attemptDisplayEdgeURL(VCursor mouse,Camera cam){
         Glyph g;
         Vector otherGlyphs = mouse.getPicker().getIntersectingGlyphs(cam);
         if (otherGlyphs!=null && otherGlyphs.size()>0){
@@ -415,7 +415,7 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewListener {
         }
     }
 
-    void getAndDisplayURL(LElem noa, Glyph g){
+    protected void getAndDisplayURL(LElem noa, Glyph g){
         String url = noa.getURL(g);
         if (url!=null && url.length()>0){
             application.displayURLinBrowser(url);
