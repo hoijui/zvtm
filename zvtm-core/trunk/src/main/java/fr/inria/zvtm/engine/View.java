@@ -537,7 +537,6 @@ public abstract class View {
      *@see ViewListener#viewDeactivated(View v)
      */
     public void deactivate(){
-        if (!panel.cursor_inside){panel.repaintable = false;}
         if (panel.evHs[panel.activeLayer]!=null){panel.evHs[panel.activeLayer].viewDeactivated(this);}
     }
 
