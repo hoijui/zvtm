@@ -67,6 +67,10 @@ public class SlaveApp {
 		updater.startOperation();
 	}
 
+    protected String getViewType(){
+        return options.openGl ? View.OPENGL_VIEW : View.STD_VIEW;
+    }
+
 	void createLocalView(ClusteredView cv){
 		if(!cv.ownsBlock(options.blockNumber)){
 			return;
@@ -80,7 +84,7 @@ public class SlaveApp {
 
 		view = vsm.addFrameView(cv.getCameras(), 
 				"slaveView " + options.blockNumber, 
-				options.openGl? View.OPENGL_VIEW : View.STD_VIEW,
+				getViewType(),
 				cv.getClusterGeometry().getBlockWidth(), 
 				cv.getClusterGeometry().getBlockHeight(), 
                 false, false, !options.undecorated, null);
