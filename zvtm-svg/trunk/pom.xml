@@ -135,12 +135,6 @@ $Id: pom.xml 2405 2009-09-25 09:07:33Z epietrig $
           </archive>
         </configuration>
       </plugin>
-    </plugins>
-  </build>
-  
-  <!-- Reporting -->
-  <reporting>
-    <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
@@ -157,6 +151,6 @@ $Id: pom.xml 2405 2009-09-25 09:07:33Z epietrig $
         </configuration>
       </plugin>
     </plugins>
-  </reporting>
-
+  </build>
+  
 </project>
