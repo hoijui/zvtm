@@ -224,13 +224,7 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
                   <downloadSources>true</downloadSources>
               </configuration>
           </plugin>
-      </plugins>
-  </build>
-
-  <!-- Reporting -->
-  <reporting>
-      <plugins>
-          <plugin>
+        <plugin>
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-javadoc-plugin</artifactId>
           	<version>2.7</version>
@@ -243,8 +237,8 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
                   <link>http://zvtm.sourceforge.net/apidocs</link>
               </links>
           </configuration>
-      </plugin>
-  </plugins>
-  </reporting>
+        </plugin>
+      </plugins>
+  </build>
 
 </project>
