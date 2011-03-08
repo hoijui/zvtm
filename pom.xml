@@ -58,7 +58,7 @@ $Id$
 
   <!-- mvn javadoc:aggregate -->
 
-  <reporting>
+  <build>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -69,13 +69,13 @@ $Id$
           <overview>${basedir}/overview.html</overview>
           <doctitle><![CDATA[<h1>ZVTM/ZUIST API documentation</h1>]]></doctitle>
           <bottom><![CDATA[<i>Copyright &#169; 2000-2002 Xerox Corporation. All Rights Reserved<br />Copyright &#169; 2003 World Wide Web Consortium. All Rights Reserved<br />Copyright &#169; 2004-2011 INRIA. All Rights Reserved<br />Licensed under the GNU LGPL. For full terms see the file COPYING.</i>]]></bottom>
+<excludePackageNames>fr.inria.zvtm.tests,fr.inria.zvtm.glyphs.projection,fr.inria.zvtm.animation.examples,fr.inria.zvtm.demo,fr.inria.zuist.viewer,fr.inria.zuist.viewer,fr.inria.zvtm.cluster.examples,fr.inria.zvtm.fits.example</excludePackageNames>          
           <links> 
             <link>http://download.oracle.com/javase/1.5.0/docs/api</link>
           </links>
-          <excludePackageNames>fr.inria.zvtm.tests,fr.inria.zvtm.glyphs.projection,fr.inria.zvtm.animation.examples,fr.inria.zvtm.demo,fr.inria.zuist.viewer,fr.inria.zuist.viewer,fr.inria.zvtm.cluster.examples,fr.inria.zvtm.fits.example</excludePackageNames>
         </configuration>
       </plugin>
     </plugins>
-  </reporting>
+  </build>
   
 </project>
