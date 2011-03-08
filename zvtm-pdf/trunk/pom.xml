@@ -79,8 +79,8 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
 		ICEpdf Pro is not available in any Maven repository for now.
 		Get icepdf-pro*.jar from http://www.icepdf.org/downloads.html
 		Install the JAR files in your local repository using the following command line:
-	        mvn install:install-file -Dfile=icepdf-pro.jar -DgroupId=org.icepdf -DartifactId=icepdf-pro -Dversion=4.1.0 -Dpackaging=jar	
-	        mvn install:install-file -Dfile=icepdf-pro-intl.jar -DgroupId=org.icepdf -DartifactId=icepdf-pro-intl -Dversion=4.1.0 -Dpackaging=jar	
+	        mvn install:install-file -Dfile=icepdf-pro.jar -DgroupId=org.icepdf -DartifactId=icepdf-pro -Dversion=4.1.1 -Dpackaging=jar	
+	        mvn install:install-file -Dfile=icepdf-pro-intl.jar -DgroupId=org.icepdf -DartifactId=icepdf-pro-intl -Dversion=4.1.1 -Dpackaging=jar	
 	-->
     
 	<!--
