@@ -85,12 +85,12 @@ public abstract class View {
          <li>View.OPENGL_VIEW: direct rendering on screen, works with Sun's OpenGL Java2D rendering pipeline </li>
      * </ul>
      *@param ptID unique ID identifying the new panel type. This is the ID passed to view creation methods (viewType) to specifiy the type of view.
-     *@param pt a class that can make new instances of the corresponding ViewPanel, to be included in the View.
+     *@param pf a class that can make new instances of the corresponding ViewPanel, to be included in the View.
      *@return true if the new view panel type was registered successfully
      */
-    public static boolean registerViewPanelType(String ptID, PanelType pt){
+    public static boolean registerViewPanelFactory(String ptID, PanelFactory pf){
         if (!VIEW_TYPES.containsKey(ptID)){
-            VIEW_TYPES.put(ptID, pt);
+            VIEW_TYPES.put(ptID, pf);
             return true;
         }
         else {
@@ -102,22 +102,22 @@ public abstract class View {
     }
     
     /**
-     * Two panel types are available in zvtm-core:
+     * Two panel types/factories are available in zvtm-core:
      * <ul>
          <li>View.STD_VIEW:double-buffered panel, drawing in an offscreen BufferedImage, supports lenses</li>
          <li>View.OPENGL_VIEW: direct rendering on screen, works with Sun's OpenGL Java2D rendering pipeline </li>
      * </ul>
      *@param ptID unique ID identifying the new panel type. This is the ID passed to view creation methods (viewType) to specifiy the type of view.
-     *@return pt an instance of PanelType that can make new instances of the corresponding ViewPanel, to be included in the View.
+     *@return an instance of PanelType that can make new instances of the corresponding ViewPanel, to be included in the View.
      */
-    public static PanelType getPanelType(String ptID){
+    public static PanelFactory getPanelFactory(String ptID){
         return VIEW_TYPES.get(ptID);
     }
 
-    static Hashtable<String,PanelType> VIEW_TYPES = new Hashtable(2);
+    static Hashtable<String,PanelFactory> VIEW_TYPES = new Hashtable(2);
     static {
-        registerViewPanelType(View.STD_VIEW, new StdViewPanelType());
-        registerViewPanelType(View.OPENGL_VIEW, new GLViewPanelType());
+        registerViewPanelFactory(View.STD_VIEW, new StdViewPanelFactory());
+        registerViewPanelFactory(View.OPENGL_VIEW, new GLViewPanelFactory());
     }
     
     /* ----------------- Cameras --------------------------*/    
@@ -1045,7 +1045,7 @@ public abstract class View {
 
 
 /** Instantiator for StdViewPanel */
-class StdViewPanelType implements PanelType {
+class StdViewPanelFactory implements PanelFactory {
     
     public ViewPanel getNewInstance(Vector<Camera> cameras, View v, boolean arfome){
         return new StdViewPanel(cameras, v, arfome);
@@ -1054,7 +1054,7 @@ class StdViewPanelType implements PanelType {
 }
 
 /** Instantiator for GLViewPanel */
-class GLViewPanelType implements PanelType {
+class GLViewPanelFactory implements PanelFactory {
     
     public ViewPanel getNewInstance(Vector<Camera> cameras, View v, boolean arfome){
         return new GLViewPanel(cameras, v, arfome);

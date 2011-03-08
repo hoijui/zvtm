@@ -103,7 +103,7 @@ public class EView extends View implements KeyListener{
             constraints.fill=GridBagConstraints.BOTH;
             constraints.anchor=GridBagConstraints.CENTER;
             //panel= (viewType.equals(View.OPENGL_VIEW)) ? new GLViewPanel(v, this, false) : new StdViewPanel(v, this, false);
-            panel = View.getPanelType(viewType).getNewInstance(v, this, false);
+            panel = View.getPanelFactory(viewType).getNewInstance(v, this, false);
             panel.getComponent().setSize(w, h);
             gridBag.setConstraints(panel.getComponent(), constraints);
             cpane.add(panel.getComponent());
@@ -117,7 +117,7 @@ public class EView extends View implements KeyListener{
             buildConstraints(constraints,0,0,1,1,100,90);
             constraints.fill=GridBagConstraints.BOTH;
             constraints.anchor=GridBagConstraints.CENTER;
-            panel = View.getPanelType(viewType).getNewInstance(v, this, false);
+            panel = View.getPanelFactory(viewType).getNewInstance(v, this, false);
             panel.getComponent().setSize(w, h);
             gridBag.setConstraints(panel.getComponent(), constraints);
             cpane.add(panel.getComponent());

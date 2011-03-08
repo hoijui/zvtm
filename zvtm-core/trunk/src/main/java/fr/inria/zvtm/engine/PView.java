@@ -53,7 +53,7 @@ public class PView extends View implements KeyListener {
 		detectMultipleFullFills = VirtualSpaceManager.INSTANCE.defaultMultiFill;
 		initCameras(v);   //vector -> cast elements as "Camera"
         //panel = (viewType.equals(View.OPENGL_VIEW)) ? new GLViewPanel(v, this, true) : new StdViewPanel(v, this, true);
-        panel = View.getPanelType(viewType).getNewInstance(v, this, true);
+        panel = View.getPanelFactory(viewType).getNewInstance(v, this, true);
 		panel.getComponent().setSize(w, h);
 		panel.getComponent().addKeyListener(this);
 	}
