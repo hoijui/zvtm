@@ -44,6 +44,7 @@ $Id$
   <!-- Modules -->
   <modules>
     <module>zvtm-core/trunk</module>
+    <module>zvtm-agile2d/trunk</module>
     <module>zvtm-svg/trunk</module>
     <module>zvtm-pdf/trunk</module>
     <module>zuist-engine/trunk</module>
