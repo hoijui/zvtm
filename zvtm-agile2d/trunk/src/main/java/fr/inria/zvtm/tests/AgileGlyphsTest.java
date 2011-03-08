@@ -40,14 +40,22 @@ public class AgileGlyphsTest {
     }
 
     public void initTest(String vt){
-        View.registerViewPanelFactory(AgileGLCanvasFactory.AGILE_GLC_VIEW, new AgileGLCanvasFactory());
         eh = new TestEventHandler(this);
         vs = vsm.addVirtualSpace("s1");
         mCam = vs.addCamera();
         Vector cameras = new Vector();
         cameras.add(mCam);
         vs.getCamera(0).setZoomFloor(-90f);
-        testView = vsm.addFrameView(cameras, View.ANONYMOUS, AgileGLCanvasFactory.AGILE_GLC_VIEW, 800, 600, true);
+        if (vt.equals(AgileGLJPanelFactory.AGILE_GLJ_VIEW)){
+            System.out.println("Instantiating a GLJPanel-backed view");
+            View.registerViewPanelFactory(AgileGLJPanelFactory.AGILE_GLJ_VIEW, new AgileGLJPanelFactory());
+            testView = vsm.addFrameView(cameras, View.ANONYMOUS, AgileGLJPanelFactory.AGILE_GLJ_VIEW, 800, 600, true);
+        }
+        else {
+            System.out.println("Instantiating a GLCanvas-backed view");
+            View.registerViewPanelFactory(AgileGLCanvasFactory.AGILE_GLC_VIEW, new AgileGLCanvasFactory());
+            testView = vsm.addFrameView(cameras, View.ANONYMOUS, AgileGLCanvasFactory.AGILE_GLC_VIEW, 800, 600, true);            
+        }
         testView.setBackgroundColor(Color.LIGHT_GRAY);
         testView.setListener(eh);
         vs.getCamera(0).setAltitude(0);

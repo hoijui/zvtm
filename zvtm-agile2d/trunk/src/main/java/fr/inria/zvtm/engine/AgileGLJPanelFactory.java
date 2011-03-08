@@ -15,7 +15,7 @@ import fr.inria.zvtm.engine.PanelFactory;
 
 public class AgileGLJPanelFactory implements PanelFactory {
 	
-	public static final String AGILE_GLC_VIEW = "a2dj";
+	public static final String AGILE_GLJ_VIEW = "a2dj";
     
     public ViewPanel getNewInstance(Vector<Camera> cameras, View v, boolean arfome){
         return new AgileGLJViewPanel(cameras, v, arfome);
