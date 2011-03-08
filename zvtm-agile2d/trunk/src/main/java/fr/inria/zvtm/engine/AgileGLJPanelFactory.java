@@ -11,9 +11,9 @@ package fr.inria.zvtm.engine;
 
 import java.util.Vector;
 
-import fr.inria.zvtm.engine.PanelType;
+import fr.inria.zvtm.engine.PanelFactory;
 
-public class AgileGLJPanelFactory implements PanelType {
+public class AgileGLJPanelFactory implements PanelFactory {
 	
 	public static final String AGILE_GLC_VIEW = "a2dj";
     

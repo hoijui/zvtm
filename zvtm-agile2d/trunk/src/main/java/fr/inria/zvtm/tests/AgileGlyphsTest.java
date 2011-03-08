@@ -40,7 +40,7 @@ public class AgileGlyphsTest {
     }
 
     public void initTest(String vt){
-        View.registerViewPanelType(AgileGLCanvasFactory.AGILE_GLC_VIEW, new AgileGLCanvasFactory());
+        View.registerViewPanelFactory(AgileGLCanvasFactory.AGILE_GLC_VIEW, new AgileGLCanvasFactory());
         eh = new TestEventHandler(this);
         vs = vsm.addVirtualSpace("s1");
         mCam = vs.addCamera();

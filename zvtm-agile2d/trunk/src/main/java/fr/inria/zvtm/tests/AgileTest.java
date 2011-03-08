@@ -31,13 +31,13 @@ public class AgileTest {
 	View mView;
 	Camera mCamera;
 	
-	public AgileTest(){
-		init();
+	public AgileTest(String vt){
+		init(vt);
 		populate();
 	}
 	
-	void init(){
-		View.registerViewPanelType(AgileGLCanvasFactory.AGILE_GLC_VIEW, new AgileGLCanvasFactory());
+	void init(String vt){
+		View.registerViewPanelFactory(AgileGLCanvasFactory.AGILE_GLC_VIEW, new AgileGLCanvasFactory());
 		mSpace = vsm.addVirtualSpace(VirtualSpace.ANONYMOUS);
 		mCamera = mSpace.addCamera();
 		Vector cameras = new Vector(1);
@@ -67,7 +67,7 @@ public class AgileTest {
         System.out.println("User name: "+System.getProperty("user.name"));
         System.out.println("User home directory: "+System.getProperty("user.home"));
         System.out.println("-----------------");
-        new AgileTest();
+        new AgileTest((args.length > 0) ? args[0] : AgileGLCanvasFactory.AGILE_GLC_VIEW);
     }
     	
 }
