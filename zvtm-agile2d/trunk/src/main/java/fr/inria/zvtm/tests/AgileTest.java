@@ -18,7 +18,7 @@ import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
-import fr.inria.zvtm.engine.AgilePanelType;
+import fr.inria.zvtm.engine.AgileGLCanvasFactory;
 import fr.inria.zvtm.event.ViewAdapter;
 
 import fr.inria.zvtm.glyphs.*;
@@ -37,12 +37,12 @@ public class AgileTest {
 	}
 	
 	void init(){
-		View.registerViewPanelType(AgilePanelType.AGILE_VIEW, new AgilePanelType());
+		View.registerViewPanelType(AgileGLCanvasFactory.AGILE_GLC_VIEW, new AgileGLCanvasFactory());
 		mSpace = vsm.addVirtualSpace(VirtualSpace.ANONYMOUS);
 		mCamera = mSpace.addCamera();
 		Vector cameras = new Vector(1);
 		cameras.add(mCamera);
-		mView = vsm.addFrameView(cameras, View.ANONYMOUS, AgilePanelType.AGILE_VIEW, 800, 600, true);
+		mView = vsm.addFrameView(cameras, View.ANONYMOUS, AgileGLCanvasFactory.AGILE_GLC_VIEW, 800, 600, true);
 		mView.setBackgroundColor(Color.LIGHT_GRAY);
 		mView.setListener(new MainListener(this), 0);
 	}

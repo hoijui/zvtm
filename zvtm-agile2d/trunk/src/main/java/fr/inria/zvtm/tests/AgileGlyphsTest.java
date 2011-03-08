@@ -40,14 +40,14 @@ public class AgileGlyphsTest {
     }
 
     public void initTest(String vt){
-        View.registerViewPanelType(AgilePanelType.AGILE_VIEW, new AgilePanelType());
+        View.registerViewPanelType(AgileGLCanvasFactory.AGILE_GLC_VIEW, new AgileGLCanvasFactory());
         eh = new TestEventHandler(this);
         vs = vsm.addVirtualSpace("s1");
         mCam = vs.addCamera();
         Vector cameras = new Vector();
         cameras.add(mCam);
         vs.getCamera(0).setZoomFloor(-90f);
-        testView = vsm.addFrameView(cameras, View.ANONYMOUS, AgilePanelType.AGILE_VIEW, 800, 600, true);
+        testView = vsm.addFrameView(cameras, View.ANONYMOUS, AgileGLCanvasFactory.AGILE_GLC_VIEW, 800, 600, true);
         testView.setBackgroundColor(Color.LIGHT_GRAY);
         testView.setListener(eh);
         vs.getCamera(0).setAltitude(0);
@@ -269,7 +269,7 @@ public class AgileGlyphsTest {
         System.out.println("User name: "+System.getProperty("user.name"));
         System.out.println("User home directory: "+System.getProperty("user.home"));
         System.out.println("-----------------");
-        new AgileGlyphsTest((args.length > 0) ? args[0] : AgilePanelType.AGILE_VIEW);
+        new AgileGlyphsTest((args.length > 0) ? args[0] : AgileGLCanvasFactory.AGILE_GLC_VIEW);
     }
     
 }

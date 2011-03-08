@@ -36,7 +36,9 @@ import agile2d.AgileState;
 
 /**
  * JPanel used to paint the content of a view (all camera layers).
- * Uses OpenGL acceletation provided by the Agile2D rendering pipeline (itself based upon JOGL 2.0).
+ * Uses OpenGL acceletation provided by the Agile2D rendering pipeline (itself based upon JOGL 2.0).<br>
+ * <a href="">Agile2D homepage</a><br>
+ * <a href="http://download.java.net/media/jogl/jogl-2.x-docs/">JOGL 2 javadoc</a><br>
  * Before instantiating an Agile2D ZVTM View, one must register the new view type:<br>
  * View.registerViewPanelType(AgilePanelType.AGILE_VIEW, new AgilePanelType());<br><br>
  * Then the view gets created as any other view:<br>
@@ -44,65 +46,12 @@ import agile2d.AgileState;
  * @author Emmanuel Pietriga, Rodrigo A. B. de Almeida
  */
 
-public class AgileViewPanel extends ViewPanel implements GLEventListener {
+public abstract class AgileViewPanel extends ViewPanel implements GLEventListener {
     
     private AgileGraphics2D jgraphics;
     private Component       root;
     
-    protected GLCanvas panel;
-    
-    public Component getComponent(){
-        return panel;
-    }
-    
 	Timer edtTimer;
-
-    AgileViewPanel(Vector cameras, View v, boolean arfome) {
-        
-        
-        panel = new GLCanvas();
-        
-        ActionListener taskPerformer = new ActionListener(){
-            public void actionPerformed(ActionEvent evt){
-                panel.display();
-            }
-        };
-        edtTimer = new Timer(20, taskPerformer);
-        panel.addHierarchyListener(
-            new HierarchyListener() {
-                public void hierarchyChanged(HierarchyEvent e) {
-                    if (panel.isShowing()) {
-                        start();
-                    } else {
-                        stop();
-                    }
-                }
-            }
-        );
-        parent=v;
-        //init of camera array
-        cams=new Camera[cameras.size()];  //array of Camera
-        evHs = new ViewListener[cams.length];
-        for (int nbcam=0;nbcam<cameras.size();nbcam++){
-            cams[nbcam]=(Camera)(cameras.get(nbcam));
-        }
-        //init other stuff
-        panel.addMouseListener(this);
-        panel.addMouseMotionListener(this);
-        panel.addMouseWheelListener(this);
-        panel.addComponentListener(this);
-        setAutoRequestFocusOnMouseEnter(arfome);
-        setAWTCursor(Cursor.CUSTOM_CURSOR);  //custom cursor means VTM cursor
-        //this.size = this.getSize();
-        if (VirtualSpaceManager.debugModeON()){System.out.println("View refresh time set to "+getRefreshRate()+"ms");}
-        start();
-    }
-
-    private void start(){
-        edtTimer.start();
-        panel.addGLEventListener(this);
-        //this.setRoot(canvas);
-    }
 
     void stop(){
         edtTimer.stop();
