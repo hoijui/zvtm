@@ -125,7 +125,7 @@ Special case of panel views:
 
 Integration within a Swing component hierarchy requires getting a reference on the underlying JPanel:
 
-\codebox{JPanel p = v.getPanel();}
+\codebox{JPanel p = (JPanel)v.getPanel().getComponent();}
 
 The \cd{View} instance itself can easily be retrieved by a call to:
 

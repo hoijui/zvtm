@@ -203,7 +203,7 @@ There is a single callback method, \cd{glyphSelected(Glyph g, boolean b)} which 
 \subsection{PDF Documents}
 \label{sec:pdf}
 
-PDF documents can be rendered as ZVTM glyphs. Each page of the document corresponds to a glyph. This feature is enabled by additional module \cd{zvtm-pdf}, available from the SVN repository only at the moment. Earlier versions used Sun's pdf-renderer library\fref{https://pdf-renderer.dev.java.net}. Since v0.2.0 this module uses ICEpdf\fref{http://www.icepdf.org/} to render PDF pages. ICepdf is not available through Maven for now and has to be installed manually in your local Maven repository before you can compile \cd{zvtm-pdf}. Instructions for doing this are available in the project's \cd{pom.xml} file.
+PDF documents can be rendered as ZVTM glyphs. Each page of the document corresponds to a glyph. This feature is enabled by additional module \cd{zvtm-pdf}, available from the SVN repository only at the moment. Earlier versions used Sun's pdf-renderer library\fref{https://pdf-renderer.dev.java.net}. Since v0.2.0 this module uses ICEpdf\fref{http://www.icepdf.org/} to render PDF pages. ICEpdf is not available through Maven for now and has to be installed manually in your local Maven repository before you can compile \cd{zvtm-pdf}. Instructions for doing this are available in the project's \cd{pom.xml} file.
 
 Dependency on \cd{zvtm-pdf} si declared as follows:
 
@@ -371,7 +371,7 @@ When fitting text within a treemap rectangle, using \texttt{AdaptiveText} (part 
 \subsection{OpenGL Java2D rendering with Agile2D}
 \label{sec:agile2d}
 
-\cd{zvtm-agile2d} provides a new type of ZVTM view that uses the OpenGL-backed Java2D renderer called Agile2D. Agile2D depends on JOGL 2.0 \footnote{\url{http://jogamp.org/jogl/www/}}.
+\cd{zvtm-agile2d} provides two new types of ZVTM views that use the OpenGL-backed Java2D renderer called Agile2D. Agile2D depends on JOGL 2.0 \footnote{\url{http://jogamp.org/jogl/www/}}.
 
 Dependency on \cd{zvtm-agile2d} is declared as follows:
 
@@ -384,26 +384,51 @@ Dependency on \cd{zvtm-agile2d} is declared as follows:
 \end{SaveVerbatim}
 \fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
 
+\begin{itemize}
+\item \cd{AgileGLJViewPanel} is backed by a JOGL \cd{GLJPanel}, that inherits from a Swing lightweight component (\cd{javax.swing.JPanel}).
+\item \cd{AgileGLCViewPanel} is backed by a JOGL \cd{GLCanvas}, that inherits from an AWT heavyweight component (\cd{java.awt.Canvas}).
+\end{itemize}
 
-The client application must register the new view type at initialization in ZVTM:
+The client application must register one (or both) new view type(s) at initialization in ZVTM:
 
 \begin{small}
 \begin{SaveVerbatim}{CodeVerb}
-import import fr.inria.zvtm.engine.AgilePanelType;
+import fr.inria.zvtm.engine.AgileGLJPanelFactory;
 
 ...
 
-View.registerViewPanelType(AgilePanelType.AGILE_VIEW, new AgilePanelType());
+View.registerViewPanelFactory(AgileGLJPanelFactory.AGILE_GLJ_VIEW,
+                              new AgileGLJPanelFactory());
 \end{SaveVerbatim}
 \fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
 \end{small}
 
-Then the view gets created the usual way, but using \cd{AgilePanelType.AGILE\_VIEW} as the view type:
+\begin{small}
+\begin{SaveVerbatim}{CodeVerb}
+import fr.inria.zvtm.engine.AgileGLCanvasFactory;
+
+...
+
+View.registerViewPanelFactory(AgileGLCanvasFactory.AGILE_GLC_VIEW,
+                              new AgileGLCanvasFactory());
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+\end{small}
+
+The views then get created the usual way, but using the appropriate constant for view type:
 
 \begin{small}
 \begin{SaveVerbatim}{CodeVerb}
-View v = VirtualSpaceManager.INSTANCE.addFrameView(cameras, View.ANONYMOUS,
-                                              AgilePanelType.AGILE_VIEW, 800, 600, true);
+View v = vsm.addFrameView(cameras, View.ANONYMOUS, AgileGLCanvasFactory.AGILE_GLC_VIEW,
+                          800, 600, true);
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+\end{small}
+
+\begin{small}
+\begin{SaveVerbatim}{CodeVerb}
+View v = vsm.addFrameView(cameras, View.ANONYMOUS, AgileGLCanvasFactory.AGILE_GLC_VIEW,
+                          800, 600, true);
 \end{SaveVerbatim}
 \fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
 \end{small}
