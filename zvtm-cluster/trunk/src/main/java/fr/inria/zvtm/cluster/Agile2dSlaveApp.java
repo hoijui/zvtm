@@ -1,6 +1,6 @@
 package fr.inria.zvtm.cluster;
 
-import fr.inria.zvtm.engine.AgilePanelType;
+import fr.inria.zvtm.engine.AgileGLCanvasFactory;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 
@@ -16,12 +16,12 @@ public class Agile2dSlaveApp extends SlaveApp {
     }
 
     static {
-        View.registerViewPanelType(AgilePanelType.AGILE_VIEW,
-                new AgilePanelType());
+        View.registerViewPanelFactory(AgileGLCanvasFactory.AGILE_GLC_VIEW,
+                new AgileGLCanvasFactory());
     }
 
     @Override protected String getViewType(){
-        return AgilePanelType.AGILE_VIEW;
+        return AgileGLCanvasFactory.AGILE_GLC_VIEW;
     }
 
     public static void main(String[] args){
