@@ -134,7 +134,7 @@ public class WildWorldExplorer extends WorldExplorer {
         console.setMargin(new java.awt.Insets(5,5,5,5));
         console.setVisible(false);
         mView.setActiveLayer(1);
-        mView.getPanel().addComponentListener(eh);
+        mView.getPanel().getComponent().addComponentListener(eh);
     }
     
     boolean isDynaspotEnabled(){
