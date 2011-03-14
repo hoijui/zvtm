@@ -66,8 +66,10 @@ class GeoToolsManager {
     
     GeoToolsManager(WorldExplorer app, boolean queryGN, short lad){
         this.application = app;
+        gnp = new GeoNamesParser(application);
         if (lad >= 0){
             loadShapes(new File("data/TM_WORLD_BORDERS-0.3.shp"), "Loading countries...", COUNTRY_COLOR, LAD0);
+            gnp.loadCountries();
         }
         if (lad >= 1){
             loadShapes(new File("data/shapefiles/ca_provinces/province.shp"), "Loading Canadian provinces...", ADMIN_DIV_1_COLOR, LAD1);
@@ -76,7 +78,6 @@ class GeoToolsManager {
             loadShapes(new File("data/shapefiles/russia/RUS1.shp"), "Loading Russian administrative divisions...", ADMIN_DIV_1_COLOR, LAD1);
             loadShapes(new File("data/shapefiles/china/CHN1.shp"), "Loading Chinese administrative divisions...", ADMIN_DIV_1_COLOR, LAD1);
         }
-        gnp = new GeoNamesParser(application);
         if (queryGN){
             loadEntities();            
         }

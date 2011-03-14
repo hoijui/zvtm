@@ -94,7 +94,6 @@ public class GeoNamesParser {
     
     GeoNamesParser(WorldExplorer app){
         this.application = app;
-        loadCountries();
     }
 
     private static final char INPUT_CSV_SEP_CHAR = ';';
