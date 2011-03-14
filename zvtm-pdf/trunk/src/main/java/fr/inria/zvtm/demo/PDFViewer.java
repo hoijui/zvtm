@@ -13,25 +13,34 @@ import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.GradientPaint;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.event.KeyAdapter;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+
 import javax.swing.JComponent;
 import javax.swing.JFrame;
-
+import javax.swing.JTextField;
+import javax.swing.JButton;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import java.util.ArrayList;
 import java.util.Vector;
 import java.util.Scanner;
 
@@ -43,12 +52,14 @@ import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.glyphs.IcePDFPageImg;
+import fr.inria.zvtm.glyphs.VRectangle;
 
 import org.icepdf.core.pobjects.Document;
 import org.icepdf.core.pobjects.Page;
 import org.icepdf.core.pobjects.PDimension;
 import org.icepdf.core.exceptions.PDFException;
 import org.icepdf.core.exceptions.PDFSecurityException;
+import org.icepdf.core.pobjects.graphics.text.*;
 
 public class PDFViewer {
 	
@@ -62,12 +73,22 @@ public class PDFViewer {
 	static final String spaceName = "pdfSpace";
 	ViewListener eh;
 	Camera mCamera;
-
+	
+	class RectFloat{
+		public float x , y , width , height;
+		RectFloat(float x, float y , float height , float width){
+			this.x = x; this.y= y; this.height = height; this.width = width;
+		}
+	}
+	
 	View pdfView;
 	VWGlassPane gp;
-
+	private Document document;
     int panelWidth, panelHeight;
-
+    private Vector<Glyph> lastAdded = new Vector<Glyph>();
+    String lastSearch = new String();
+    private int glphyIndex;
+    
 	PDFViewer(String pdfFilePath, float df, float sf){
 		VirtualSpaceManager.INSTANCE.setDebug(true);
 		initGUI();
@@ -103,6 +124,80 @@ public class PDFViewer {
         panelWidth = d.width;
         panelHeight = d.height;
     }
+    
+    RectFloat convertRect(RectFloat r, PDimension pageSize , int pageNumber ){
+    	r.x -=  pageSize.getWidth()/2 - r.width/2;
+    	r.x +=  pageNumber*(pageSize.getWidth() + 60); // TO:DO add the Difference between the pages 
+    	r.y -= pageSize.getHeight()/2 - r.height/2;
+    	return r;
+    }
+    
+    void highlightPage(ArrayList<RectFloat> rects){
+    	Color c = new Color(255,255,0,100);
+    	for( RectFloat r : rects){
+    		VRectangle v = new VRectangle(r.x , r.y ,0 , r.width , r.height ,c );
+    		v.setBorderColor(new Color(0,0,0,0));
+    		vs.addGlyph(v);
+    		lastAdded.add(v);
+    	}
+    	pdfView.centerOnGlyph(lastAdded.elementAt(0), mCamera, 800 , true , 0.9f);
+    }
+ 
+    void removeLastSearch(){
+    	 for(Glyph lastgly:lastAdded){
+    		 vs.removeGlyph(lastgly);
+    	 }
+    	 lastAdded.clear();
+    }
+    void previousWord(){
+    	if(lastAdded.size() ==0 )return ;
+    	glphyIndex--;
+    	if(glphyIndex == -1)
+    		glphyIndex = lastAdded.size() -1;
+       	pdfView.centerOnGlyph(lastAdded.elementAt(glphyIndex), mCamera, 800 , true , 0.9f);
+    	
+    }
+   
+    void nextWord(){
+    	if(lastAdded.size() ==0 )return ;
+    	glphyIndex++;
+    	if(glphyIndex == lastAdded.size())
+    		glphyIndex = 0 ;
+    	pdfView.centerOnGlyph(lastAdded.elementAt(glphyIndex), mCamera, 800 , true , 0.9f);
+    }
+    
+	void findWord(String search){
+		if(search.equals(lastSearch)) return;
+		lastSearch = search;
+		glphyIndex =0;
+    	 removeLastSearch();
+		 int wordsFound =0;
+    	 ArrayList<RectFloat> r = new ArrayList<RectFloat>();
+         int pages = document.getNumberOfPages();
+    	 PDimension pp = document.getPageDimension(0, 0);
+         for(int i = 0 ; i< pages ; i++){
+	    	 PageText pageText = document.getPageText(i);
+	    	 if(pageText==null) return ;
+	         // start iteration over words.
+	         ArrayList<LineText> pageLines = pageText.getPageLines();
+	         for (LineText pageLine : pageLines) {
+	             ArrayList<WordText> lineWords = pageLine.getWords();
+	             // compare words against search terms.
+	             for (WordText word : lineWords) {
+	            	 if(word.toString().toUpperCase().compareTo(search.toUpperCase())==0){
+	            		 wordsFound++;
+	            	     java.awt.geom.Rectangle2D.Float f=  word.getBounds();
+	            	     
+	            	     // convert it into the page dimension and then add.
+	            	     r.add(convertRect(new RectFloat(f.x,f.y,f.height,f.width) , pp , i));
+	            	 }
+	             }
+	         }
+	     }
+         if(wordsFound>0){
+        	 highlightPage(r);
+         }
+    }
 
     /*------------------ PDF loading ------------------ */
     
@@ -110,12 +205,12 @@ public class PDFViewer {
         gp.setLabel("Loading "+f.getName());
         gp.setValue(10);
         gp.setVisible(true);
-        Document document = new Document();
+        document = new Document();
         try {
             document.setFile(f.getAbsolutePath());
         } catch (PDFException ex) {
             System.out.println("Error parsing PDF document " + ex);
-        } catch (PDFSecurityException ex) {
+        } catch (PDFSecurityException ex) {	
             System.out.println("Error encryption not supported " + ex);
         } catch (FileNotFoundException ex) {
             System.out.println("Error file not found " + ex);
@@ -133,7 +228,7 @@ public class PDFViewer {
         // center on first page
         pdfView.centerOnGlyph(pages[0], mCamera, PDFViewer.NAV_ANIM_DURATION);
         // clean up resources
-        document.dispose();
+       // document.dispose();
         gp.setVisible(false);
     }
     
@@ -338,10 +433,15 @@ class PDFViewerEventHandler implements ViewListener {
 
 	public void exitGlyph(Glyph g){
 	}
+	public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){	}
 
-	public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
-
-	public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){}
+	public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
+		if(code == 70 && mod == 2){
+			JFrame searchBox = new SearchBox();
+			searchBox.setVisible(true);
+			
+		}
+	}
 
 	public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 
@@ -354,5 +454,56 @@ class PDFViewerEventHandler implements ViewListener {
 	public void viewDeiconified(View v){}
 
 	public void viewClosing(View v){System.exit(0);}
+	
+	class SearchBox extends JFrame {
+			
+		private JTextField textField;
+			
+			public SearchBox(){
+				setTitle("Search ");
+		        textField = new JTextField(10);
+		        add(textField,BorderLayout.NORTH);
+		        setSize(180,80);
+		        JButton previous = new JButton("Previous");
+		        add(previous,BorderLayout.WEST);
+		        JButton next = new JButton("Next");
+		        add(next,BorderLayout.EAST);
+		        previous.addActionListener(new ButtonListener());
+		        next.addActionListener(new ButtonListener());
+		        textField.addKeyListener(new TextFieldListner());
+		        this.addWindowListener(new Closer());
+			}
+	
+			class TextFieldListner implements KeyListener{
+				public void keyTyped(KeyEvent e) {}
 
+				    public void keyPressed(KeyEvent e) {
+				    	if(e.getKeyCode()==10){
+						String text = textField.getText();
+						application.findWord(text);
+				    	}
+				    }
+
+				    public void keyReleased(KeyEvent e) {}
+
+			}
+			class ButtonListener implements ActionListener{
+				public void actionPerformed(ActionEvent e) {
+					if(e.getActionCommand().equals("Next")){
+						application.nextWord();
+					}
+					else if (e.getActionCommand().equals("Previous")){
+						application.previousWord();
+					}
+						
+				}
+			}
+			class Closer extends WindowAdapter {
+			    public void windowClosing (WindowEvent event) {
+			    	application.removeLastSearch();
+			    	application.lastSearch ="";
+			    }
+			}
+	}
+	
 }
