@@ -140,7 +140,7 @@ public class PDFViewer {
     		vs.addGlyph(v);
     		lastAdded.add(v);
     	}
-    	pdfView.centerOnGlyph(lastAdded.elementAt(0), mCamera, 800 , true , 0.9f);
+    	pdfView.centerOnGlyph(lastAdded.elementAt(0), mCamera, 400 , true , 0.9f);
     }
  
     void removeLastSearch(){
@@ -154,7 +154,7 @@ public class PDFViewer {
     	glphyIndex--;
     	if(glphyIndex == -1)
     		glphyIndex = lastAdded.size() -1;
-       	pdfView.centerOnGlyph(lastAdded.elementAt(glphyIndex), mCamera, 800 , true , 0.9f);
+       	pdfView.centerOnGlyph(lastAdded.elementAt(glphyIndex), mCamera, 400 , true , 0.9f);
     	
     }
    
@@ -163,7 +163,7 @@ public class PDFViewer {
     	glphyIndex++;
     	if(glphyIndex == lastAdded.size())
     		glphyIndex = 0 ;
-    	pdfView.centerOnGlyph(lastAdded.elementAt(glphyIndex), mCamera, 800 , true , 0.9f);
+    	pdfView.centerOnGlyph(lastAdded.elementAt(glphyIndex), mCamera, 400 , true , 0.9f);
     }
     
 	void findWord(String search){
@@ -436,10 +436,9 @@ class PDFViewerEventHandler implements ViewListener {
 	public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){	}
 
 	public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
-		if(code == 70 && mod == 2){
+		if (code == KeyEvent.VK_F && (mod==CTRL_MOD || mod==META_MOD)){
 			JFrame searchBox = new SearchBox();
 			searchBox.setVisible(true);
-			
 		}
 	}
 
