@@ -83,7 +83,7 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
 	        mvn install:install-file -Dfile=icepdf-pro-intl.jar -DgroupId=org.icepdf -DartifactId=icepdf-pro-intl -Dversion=4.1.4 -Dpackaging=jar	
 	-->
     
-	
+	<!--
 	<dependency>
 		<groupId>org.icepdf</groupId>
 		<artifactId>icepdf-pro</artifactId>
@@ -94,7 +94,7 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
 		<artifactId>icepdf-pro-intl</artifactId>
 		<version>${icepdfVersion}</version>
 	</dependency>
-	
+	-->
 	
 	<!-- ICEpdf's dependency on Batik for SVG export is not used for now -->
 	<!-- <dependency>
