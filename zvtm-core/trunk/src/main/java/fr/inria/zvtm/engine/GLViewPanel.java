@@ -120,71 +120,76 @@ public class GLViewPanel extends ViewPanel {
             standardStroke=stableRefToBackBufferGraphics.getStroke();
             standardTransform=stableRefToBackBufferGraphics.getTransform();
             if (notBlank){
-                stableRefToBackBufferGraphics.setPaintMode();
-                stableRefToBackBufferGraphics.setBackground(backColor);
-                stableRefToBackBufferGraphics.clearRect(0, 0, panel.getWidth(), panel.getHeight());
-                backgroundHook();
-                //begin actual drawing here
-                for (int nbcam=0;nbcam<cams.length;nbcam++){
-                    if ((cams[nbcam]!=null) && (cams[nbcam].enabled) && ((cams[nbcam].eager) || (cams[nbcam].shouldRepaint()))){
-                        camIndex=cams[nbcam].getIndex();
-                        drawnGlyphs=cams[nbcam].parentSpace.getDrawnGlyphs(camIndex);
-                        drawnGlyphs.removeAllElements();
-                        double uncoef = (cams[nbcam].focal+cams[nbcam].altitude) / cams[nbcam].focal;
-                        //compute region seen from this view through camera
-                        double viewW = size.width;
-                        double viewH = size.height;
-                        double viewWC = cams[nbcam].vx - (viewW/2-visibilityPadding[0]) * uncoef;
-                        double viewNC = cams[nbcam].vy + (viewH/2-visibilityPadding[1]) * uncoef;
-                        double viewEC = cams[nbcam].vx + (viewW/2-visibilityPadding[2]) * uncoef;
-                        double viewSC = cams[nbcam].vy - (viewH/2-visibilityPadding[3]) * uncoef;
-                        gll = cams[nbcam].parentSpace.getDrawingList();
-                        for (int i=0;i<gll.length;i++){
-                            if (gll[i].visibleInViewport(viewWC, viewNC, viewEC, viewSC, cams[nbcam])){
-                                //if glyph is at least partially visible in the reg. seen from this view, display
-                                gll[i].project(cams[nbcam], size);
-                                if (gll[i].isVisible()){
-                                    gll[i].draw(stableRefToBackBufferGraphics,size.width,size.height,cams[nbcam].getIndex(),standardStroke,standardTransform, 0, 0);
+                if (repaintASAP || updateCursorOnly){
+                    repaintASAP=false; //do this first as the thread can be interrupted inside
+    				//this branch and we want to catch new requests for repaint
+    				updateCursorOnly=false;
+    				stableRefToBackBufferGraphics.setPaintMode();
+                    stableRefToBackBufferGraphics.setBackground(backColor);
+                    stableRefToBackBufferGraphics.clearRect(0, 0, panel.getWidth(), panel.getHeight());
+                    backgroundHook();
+                    //begin actual drawing here
+                    for (int nbcam=0;nbcam<cams.length;nbcam++){
+                        if ((cams[nbcam]!=null) && (cams[nbcam].enabled) && ((cams[nbcam].eager) || (cams[nbcam].shouldRepaint()))){
+                            camIndex=cams[nbcam].getIndex();
+                            drawnGlyphs=cams[nbcam].parentSpace.getDrawnGlyphs(camIndex);
+                            drawnGlyphs.removeAllElements();
+                            double uncoef = (cams[nbcam].focal+cams[nbcam].altitude) / cams[nbcam].focal;
+                            //compute region seen from this view through camera
+                            double viewW = size.width;
+                            double viewH = size.height;
+                            double viewWC = cams[nbcam].vx - (viewW/2-visibilityPadding[0]) * uncoef;
+                            double viewNC = cams[nbcam].vy + (viewH/2-visibilityPadding[1]) * uncoef;
+                            double viewEC = cams[nbcam].vx + (viewW/2-visibilityPadding[2]) * uncoef;
+                            double viewSC = cams[nbcam].vy - (viewH/2-visibilityPadding[3]) * uncoef;
+                            gll = cams[nbcam].parentSpace.getDrawingList();
+                            for (int i=0;i<gll.length;i++){
+                                if (gll[i].visibleInViewport(viewWC, viewNC, viewEC, viewSC, cams[nbcam])){
+                                    //if glyph is at least partially visible in the reg. seen from this view, display
+                                    gll[i].project(cams[nbcam], size);
+                                    if (gll[i].isVisible()){
+                                        gll[i].draw(stableRefToBackBufferGraphics,size.width,size.height,cams[nbcam].getIndex(),standardStroke,standardTransform, 0, 0);
+                                    }
+                                    // notifying outside if branch because glyph sensitivity is not
+                                    // affected by glyph visibility when managed through Glyph.setVisible()
+                                    cams[nbcam].parentSpace.drewGlyph(gll[i], camIndex);
                                 }
-                                // notifying outside if branch because glyph sensitivity is not
-                                // affected by glyph visibility when managed through Glyph.setVisible()
-                                cams[nbcam].parentSpace.drewGlyph(gll[i], camIndex);
                             }
                         }
                     }
-                }
-                foregroundHook();
-                afterLensHook();
-                drawPortals();
-                portalsHook();
-                if (cursor_inside){
-                    //deal with mouse glyph only if mouse cursor is inside this window
-                    try {
-                        //we project the mouse cursor wrt the appropriate coord sys
-                        parent.mouse.unProject(cams[activeLayer],this);
-                        if (parent.mouse.isSensitive()){
-                            parent.mouse.getPicker().computePickedGlyphList(evHs[activeLayer],cams[activeLayer]);
+                    foregroundHook();
+                    afterLensHook();
+                    drawPortals();
+                    portalsHook();
+                    if (cursor_inside){
+                        //deal with mouse glyph only if mouse cursor is inside this window
+                        try {
+                            //we project the mouse cursor wrt the appropriate coord sys
+                            parent.mouse.unProject(cams[activeLayer],this);
+                            if (parent.mouse.isSensitive()){
+                                parent.mouse.getPicker().computePickedGlyphList(evHs[activeLayer],cams[activeLayer]);
+                            }
+                        }
+                        catch (NullPointerException ex) {if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.drawdrag "+ex);}}
+                        stableRefToBackBufferGraphics.setColor(parent.mouse.hcolor);
+                        if (drawDrag){stableRefToBackBufferGraphics.drawLine(origDragx,origDragy,parent.mouse.jpx,parent.mouse.jpy);}
+                        if (drawRect){stableRefToBackBufferGraphics.drawRect(Math.min(origDragx,parent.mouse.jpx),Math.min(origDragy,parent.mouse.jpy),Math.max(origDragx,parent.mouse.jpx)-Math.min(origDragx,parent.mouse.jpx),Math.max(origDragy,parent.mouse.jpy)-Math.min(origDragy,parent.mouse.jpy));}
+                        if (drawOval){
+                            if (circleOnly){
+                                stableRefToBackBufferGraphics.drawOval(origDragx-Math.abs(origDragx-parent.mouse.jpx),origDragy-Math.abs(origDragx-parent.mouse.jpx),2*Math.abs(origDragx-parent.mouse.jpx),2*Math.abs(origDragx-parent.mouse.jpx));
+                            }
+                            else {
+                                stableRefToBackBufferGraphics.drawOval(origDragx-Math.abs(origDragx-parent.mouse.jpx),origDragy-Math.abs(origDragy-parent.mouse.jpy),2*Math.abs(origDragx-parent.mouse.jpx),2*Math.abs(origDragy-parent.mouse.jpy));
+                            }
+                        }
+                        if (drawVTMcursor){
+                            parent.mouse.draw(stableRefToBackBufferGraphics);
+                            oldX=parent.mouse.jpx;
+                            oldY=parent.mouse.jpy;
                         }
                     }
-                    catch (NullPointerException ex) {if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.drawdrag "+ex);}}
-                    stableRefToBackBufferGraphics.setColor(parent.mouse.hcolor);
-                    if (drawDrag){stableRefToBackBufferGraphics.drawLine(origDragx,origDragy,parent.mouse.jpx,parent.mouse.jpy);}
-                    if (drawRect){stableRefToBackBufferGraphics.drawRect(Math.min(origDragx,parent.mouse.jpx),Math.min(origDragy,parent.mouse.jpy),Math.max(origDragx,parent.mouse.jpx)-Math.min(origDragx,parent.mouse.jpx),Math.max(origDragy,parent.mouse.jpy)-Math.min(origDragy,parent.mouse.jpy));}
-                    if (drawOval){
-                        if (circleOnly){
-                            stableRefToBackBufferGraphics.drawOval(origDragx-Math.abs(origDragx-parent.mouse.jpx),origDragy-Math.abs(origDragx-parent.mouse.jpx),2*Math.abs(origDragx-parent.mouse.jpx),2*Math.abs(origDragx-parent.mouse.jpx));
-                        }
-                        else {
-                            stableRefToBackBufferGraphics.drawOval(origDragx-Math.abs(origDragx-parent.mouse.jpx),origDragy-Math.abs(origDragy-parent.mouse.jpy),2*Math.abs(origDragx-parent.mouse.jpx),2*Math.abs(origDragy-parent.mouse.jpy));
-                        }
-                    }
-                    if (drawVTMcursor){
-                        parent.mouse.draw(stableRefToBackBufferGraphics);
-                        oldX=parent.mouse.jpx;
-                        oldY=parent.mouse.jpy;
-                    }
-                }
-                //end drawing here
+                    //end drawing here
+    			}                
             }
             else {
                 stableRefToBackBufferGraphics.setPaintMode();
