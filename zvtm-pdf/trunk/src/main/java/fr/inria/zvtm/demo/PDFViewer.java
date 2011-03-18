@@ -492,7 +492,6 @@ class PDFViewerEventHandler implements ViewListener {
 		Camera c = VirtualSpaceManager.INSTANCE.getActiveCamera();
 		double a = (c.focal+Math.abs(c.altitude))/c.focal;
 		if (wheelDirection == WHEEL_UP){
-			System.out.println(c);
 			c.altitudeOffset(-a*5);
 			VirtualSpaceManager.INSTANCE.repaint();
 		}
