@@ -53,12 +53,14 @@ import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.glyphs.IcePDFPageImg;
 import fr.inria.zvtm.glyphs.VRectangle;
+import fr.inria.zvtm.glyphs.VText;
 
 import org.icepdf.core.pobjects.Document;
 import org.icepdf.core.pobjects.Page;
 import org.icepdf.core.pobjects.PDimension;
 import org.icepdf.core.exceptions.PDFException;
 import org.icepdf.core.exceptions.PDFSecurityException;
+import org.icepdf.core.pobjects.annotations.Annotation;
 import org.icepdf.core.pobjects.graphics.text.*;
 
 public class PDFViewer {
@@ -69,14 +71,14 @@ public class PDFViewer {
 	static final short OFFSCREEN_IMAGE_RENDERING = 1;
 	short rendering_technique = OFFSCREEN_IMAGE_RENDERING;
 
-	VirtualSpace vs;
+	VirtualSpace vs ;
 	static final String spaceName = "pdfSpace";
 	ViewListener eh;
 	Camera mCamera;
 	
 	class RectFloat{
-		public float x , y , width , height;
-		RectFloat(float x, float y , float height , float width){
+		public double x , y , width , height;
+		RectFloat(double x, double y , double height , double width){
 			this.x = x; this.y= y; this.height = height; this.width = width;
 		}
 	}
@@ -85,20 +87,25 @@ public class PDFViewer {
 	VWGlassPane gp;
 	private Document document;
     int panelWidth, panelHeight;
-    private Vector<Glyph> lastAdded = new Vector<Glyph>();
+    private Vector<Glyph> lastSearchAdded = new Vector<Glyph>();
+    private Vector<Glyph> AnnotationAdded = new Vector<Glyph>();
     String lastSearch = new String();
     private int glphyIndex;
+    private int pagesInDocument;
+    boolean showAnnotation = false;
+    float scaleFactor;
     
 	PDFViewer(String pdfFilePath, float df, float sf){
 		VirtualSpaceManager.INSTANCE.setDebug(true);
 		initGUI();
 		load(new File(pdfFilePath), df, sf);
+		scaleFactor = sf;
 	}
 
 	public void initGUI(){
 		vs = VirtualSpaceManager.INSTANCE.addVirtualSpace(spaceName);
 		mCamera = vs.addCamera();
-		Vector cameras = new Vector();
+		Vector<Camera> cameras= new Vector<Camera>();
 		cameras.add(mCamera);
 		pdfView = VirtualSpaceManager.INSTANCE.addFrameView(cameras, "ZVTM PDF Viewer", View.STD_VIEW, 1024, 768, false, true, true, null);
 		pdfView.setBackgroundColor(Color.WHITE);
@@ -126,9 +133,10 @@ public class PDFViewer {
     }
     
     RectFloat convertRect(RectFloat r, PDimension pageSize , int pageNumber ){
-    	r.x -=  pageSize.getWidth()/2 - r.width/2;
-    	r.x +=  pageNumber*(pageSize.getWidth() + 60); // TO:DO add the Difference between the pages 
-    	r.y -= pageSize.getHeight()/2 - r.height/2;
+    	r.x*=scaleFactor;r.y*=scaleFactor;r.width*=scaleFactor;r.height*=scaleFactor;
+    	r.x -=  scaleFactor*(pageSize.getWidth()/2) - r.width/2;
+    	r.x +=  pageNumber*(pageSize.getWidth() + 60)*scaleFactor; // TO:DO add the Difference between the pages 
+    	r.y -= scaleFactor*(pageSize.getHeight()/2) - r.height/2;
     	return r;
     }
     
@@ -138,68 +146,122 @@ public class PDFViewer {
     		VRectangle v = new VRectangle(r.x , r.y ,0 , r.width , r.height ,c );
     		v.setBorderColor(new Color(0,0,0,0));
     		vs.addGlyph(v);
-    		lastAdded.add(v);
+    		lastSearchAdded.add(v);
     	}
-    	pdfView.centerOnGlyph(lastAdded.elementAt(0), mCamera, 400 , true , 0.9f);
+    	pdfView.centerOnGlyph(lastSearchAdded.elementAt(0), mCamera, 400 , true , 0.9f);
     }
  
-    void removeLastSearch(){
-    	 for(Glyph lastgly:lastAdded){
-    		 vs.removeGlyph(lastgly);
-    	 }
-    	 lastAdded.clear();
-    }
+   void removeLastSearch(){
+   	 for(Glyph lastgly:lastSearchAdded){
+   		 vs.removeGlyph(lastgly);
+   	 }
+   	 lastSearchAdded.clear();
+   }
+   
+   void highlightAnnotation(){
+	   	 for(Glyph lastgly:AnnotationAdded){
+	   		 vs.addGlyph(lastgly);
+	   	 }
+	}
+
+    void removeAnnotation(){
+   	 for(Glyph lastgly:AnnotationAdded){
+   		 vs.removeGlyph(lastgly);
+   	 }
+   }
+   
     void previousWord(){
-    	if(lastAdded.size() ==0 )return ;
+    	if(lastSearchAdded.size() ==0 )return ;
     	glphyIndex--;
     	if(glphyIndex == -1)
-    		glphyIndex = lastAdded.size() -1;
-       	pdfView.centerOnGlyph(lastAdded.elementAt(glphyIndex), mCamera, 400 , true , 0.9f);
+    		glphyIndex = lastSearchAdded.size() -1;
+       	pdfView.centerOnGlyph(lastSearchAdded.elementAt(glphyIndex), mCamera, 400 , true , 0.9f);
     	
     }
    
     void nextWord(){
-    	if(lastAdded.size() ==0 )return ;
+    	if(lastSearchAdded.size() ==0 )return ;
     	glphyIndex++;
-    	if(glphyIndex == lastAdded.size())
+    	if(glphyIndex == lastSearchAdded.size())
     		glphyIndex = 0 ;
-    	pdfView.centerOnGlyph(lastAdded.elementAt(glphyIndex), mCamera, 400 , true , 0.9f);
+    	pdfView.centerOnGlyph(lastSearchAdded.elementAt(glphyIndex), mCamera, 400 , true , 0.9f);
     }
     
 	void findWord(String search){
 		if(search.equals(lastSearch)) return;
 		lastSearch = search;
 		glphyIndex =0;
-    	 removeLastSearch();
-		 int wordsFound =0;
-    	 ArrayList<RectFloat> r = new ArrayList<RectFloat>();
-         int pages = document.getNumberOfPages();
-    	 PDimension pp = document.getPageDimension(0, 0);
-         for(int i = 0 ; i< pages ; i++){
-	    	 PageText pageText = document.getPageText(i);
-	    	 if(pageText==null) return ;
+		removeLastSearch();
+		int wordsFound =0;
+    	ArrayList<RectFloat> r = new ArrayList<RectFloat>();
+    	PDimension pp = document.getPageDimension(0, 0);
+        for(int i = 0 ; i< pagesInDocument ; i++){
+	    	PageText pageText = document.getPageText(i);
+	    	if(pageText==null) return ;
 	         // start iteration over words.
-	         ArrayList<LineText> pageLines = pageText.getPageLines();
-	         for (LineText pageLine : pageLines) {
-	             ArrayList<WordText> lineWords = pageLine.getWords();
-	             // compare words against search terms.
-	             for (WordText word : lineWords) {
-	            	 if(word.toString().toUpperCase().compareTo(search.toUpperCase())==0){
-	            		 wordsFound++;
-	            	     java.awt.geom.Rectangle2D.Float f=  word.getBounds();
+	        ArrayList<LineText> pageLines = pageText.getPageLines();
+	        for (LineText pageLine : pageLines) {
+	            ArrayList<WordText> lineWords = pageLine.getWords();
+	            // compare words against search terms.
+	            for (WordText word : lineWords) {
+	            	if(word.toString().toUpperCase().compareTo(search.toUpperCase())==0){
+	            		wordsFound++;
+	            		java.awt.geom.Rectangle2D.Float f=  word.getBounds();
 	            	     
-	            	     // convert it into the page dimension and then add.
-	            	     r.add(convertRect(new RectFloat(f.x,f.y,f.height,f.width) , pp , i));
-	            	 }
+	            		// convert it into the page dimension and then add.
+	            		r.add(convertRect(new RectFloat(f.x,f.y,f.height,f.width) , pp , i));
+	            	}
 	             }
 	         }
 	     }
+        
          if(wordsFound>0){
         	 highlightPage(r);
          }
     }
 
+	void showAnnotations(){
+		if(AnnotationAdded.size()!=0)
+		{
+			highlightAnnotation();
+			return;
+		}
+		ArrayList < ArrayList <Annotation > > listAnnotations = new ArrayList < ArrayList <Annotation > > ();
+		boolean hasAnnotations = false;
+		for(int i = 0 ; i < pagesInDocument; i++){
+			Page page = document.getPageTree().getPage(i, pagesInDocument);
+			ArrayList<Annotation>	annotations = page.getAnnotations();
+			if(annotations != null){
+				hasAnnotations=true;
+				listAnnotations.add( annotations) ; 
+			}
+		}
+		if(hasAnnotations == false) 
+			return;
+		PDimension pp = document.getPageDimension(0, 0);
+		for(int i = 0 ; i < pagesInDocument; i++){
+			ArrayList<Annotation> pageAnnotations =  listAnnotations.get(i);
+			if(pageAnnotations != null){
+				for( int j =0 ;j<pageAnnotations.size() ; j+=2){
+					Annotation annotationP = pageAnnotations.get(j);
+					if(annotationP != null && annotationP.getObject("Contents") != null){
+						java.awt.geom.Rectangle2D.Float r = annotationP.getUserSpaceRectangle();
+						RectFloat f = convertRect(new RectFloat(r.x,r.y,r.height,r.width),pp,i);
+						VText v = new VText(f.x +10, f.y +10,0 ,Color.black,annotationP.getColor(), 
+								annotationP.getObject("Contents").toString(),VText.TEXT_ANCHOR_MIDDLE,1,1 );
+						v.setType(ANNOTATION);
+						v.setScale(scaleFactor);
+						AnnotationAdded.add(v);
+					}
+				}
+			}
+		}
+		highlightAnnotation();
+	}
     /*------------------ PDF loading ------------------ */
+    
+    static final String ANNOTATION = "a";
+    static final String PAGE = "p";
     
     void load(File f, float detailFactor, float scaleFactor){
         gp.setLabel("Loading "+f.getName());
@@ -218,11 +280,13 @@ public class PDFViewer {
             System.out.println("Error handling PDF document " + ex);
         }
         int page_width = (int)document.getPageDimension(0, 0).getWidth();
-        gp.setLabel("Loading "+f.getName()+ " (" + document.getNumberOfPages() + " pages)");
-        Glyph[] pages = new Glyph[document.getNumberOfPages()];
-        for (int i = 0; i < document.getNumberOfPages(); i++) {
+        pagesInDocument=document.getNumberOfPages();
+        gp.setLabel("Loading "+f.getName()+ " (" + pagesInDocument + " pages)");
+        Glyph[] pages = new Glyph[pagesInDocument];
+        for (int i = 0; i < pagesInDocument; i++) {
             pages[i] = new IcePDFPageImg(i*Math.round(page_width*1.1f*detailFactor*scaleFactor), 0, 0, document, i, detailFactor, scaleFactor);
-            gp.setValue(10+Math.round(i*90/(float)document.getNumberOfPages()));
+            gp.setValue(10+Math.round(i*90/(float)pagesInDocument));
+            pages[i].setType(PAGE);
         }
         vs.addGlyphs(pages, true);
         // center on first page
@@ -349,19 +413,29 @@ class PDFViewerEventHandler implements ViewListener {
 		application = appli;
 	}
 
-	boolean dragging = false;
+	boolean panning = false;
 
 	public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
 		lastJPX=jpx;
 		lastJPY=jpy;
-		v.setDrawDrag(true);
-		VirtualSpaceManager.INSTANCE.getActiveView().mouse.setSensitivity(false);
+		Glyph g = v.lastGlyphEntered();
+		if (g != null && g.getType().equals(PDFViewer.ANNOTATION)){
+		    v.getVCursor().stickGlyph(g);
+		}
+		else {
+		    panning = true;
+    		v.setDrawDrag(true);
+    		VirtualSpaceManager.INSTANCE.getActiveView().mouse.setSensitivity(false);		    
+		}
 	}
 
 	public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-		application.mCamera.setXspeed(0);
-        application.mCamera.setYspeed(0);
-        application.mCamera.setZspeed(0);
+	    panning = false;
+	    v.getVCursor().unstickLastGlyph();
+		Camera c = VirtualSpaceManager.INSTANCE.getActiveView().getActiveCamera();
+		c.setXspeed(0);
+        c.setYspeed(0);
+        c.setZspeed(0);
 		v.setDrawDrag(false);
 		VirtualSpaceManager.INSTANCE.getActiveView().mouse.setSensitivity(true);
 	}
@@ -397,19 +471,19 @@ class PDFViewerEventHandler implements ViewListener {
 	public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){}
 
 	public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
-		if (buttonNumber == 1){
+		if (panning){
 			Camera c = VirtualSpaceManager.INSTANCE.getActiveCamera();
 			double a = (c.focal+Math.abs(c.altitude))/c.focal;
 			if (mod == SHIFT_MOD) {
-			    application.mCamera.setXspeed(0);
-                application.mCamera.setYspeed(0);
-                application.mCamera.setZspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
+			    c.setXspeed(0);
+                c.setYspeed(0);
+                c.setZspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
 				//50 is just a speed factor (too fast otherwise)
 			}
 			else {
-			    application.mCamera.setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/50.0f)) : (long)((jpx-lastJPX)/(a*50)));
-                application.mCamera.setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
-                application.mCamera.setZspeed(0);
+			    c.setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/50.0f)) : (long)((jpx-lastJPX)/(a*50)));
+                c.setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
+                c.setZspeed(0);
 			}
 		}
 	}
@@ -418,6 +492,7 @@ class PDFViewerEventHandler implements ViewListener {
 		Camera c = VirtualSpaceManager.INSTANCE.getActiveCamera();
 		double a = (c.focal+Math.abs(c.altitude))/c.focal;
 		if (wheelDirection == WHEEL_UP){
+			System.out.println(c);
 			c.altitudeOffset(-a*5);
 			VirtualSpaceManager.INSTANCE.repaint();
 		}
@@ -439,6 +514,16 @@ class PDFViewerEventHandler implements ViewListener {
 		if (code == KeyEvent.VK_F && (mod==CTRL_MOD || mod==META_MOD)){
 			JFrame searchBox = new SearchBox();
 			searchBox.setVisible(true);
+		}
+		else if(code == KeyEvent.VK_A){
+			if(application.showAnnotation == false){
+				application.showAnnotations();
+				application.showAnnotation =true;
+			}
+			else{
+				application.removeAnnotation();
+				application.showAnnotation = false;
+			}
 		}
 	}
 
