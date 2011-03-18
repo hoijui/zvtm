@@ -26,7 +26,7 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	<icepdfVersion>4.1.4</icepdfVersion>
+	<icepdfVersion>4.2</icepdfVersion>
   </properties>
   
   <!-- Repositories -->
@@ -58,13 +58,13 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
       <version>[0.11.0-SNAPSHOT,)</version>
     </dependency>
 	
-    <!-- ICEpdf 4.1.x -->
+    <!-- ICEpdf 4.2 -->
 	<!--
 
 		ICEpdf is not available in any Maven repository for now.
 		Get icepdf-core.jar from http://www.icepdf.org/downloads.html
 		Install the JAR file in your local repository using the following command line:
-	        mvn install:install-file -Dfile=icepdf-core.jar -DgroupId=org.icepdf -DartifactId=icepdf-core -Dversion=4.1.4 -Dpackaging=jar	
+	        mvn install:install-file -Dfile=icepdf-core.jar -DgroupId=org.icepdf -DartifactId=icepdf-core -Dversion=4.2 -Dpackaging=jar	
 
 	-->
 	<dependency>
@@ -73,17 +73,15 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
 		<version>${icepdfVersion}</version>
 	</dependency>
     
-    <!-- ICEpdf Pro 4.1.x (if available) -->
+    <!-- ICEpdf Pro 4.2 (if available) -->
 	<!--
 
 		ICEpdf Pro is not available in any Maven repository for now.
 		Get icepdf-pro*.jar from http://www.icepdf.org/downloads.html
 		Install the JAR files in your local repository using the following command line:
-	        mvn install:install-file -Dfile=icepdf-pro.jar -DgroupId=org.icepdf -DartifactId=icepdf-pro -Dversion=4.1.4 -Dpackaging=jar	
-	        mvn install:install-file -Dfile=icepdf-pro-intl.jar -DgroupId=org.icepdf -DartifactId=icepdf-pro-intl -Dversion=4.1.4 -Dpackaging=jar	
+	        mvn install:install-file -Dfile=icepdf-pro.jar -DgroupId=org.icepdf -DartifactId=icepdf-pro -Dversion=4.2 -Dpackaging=jar	
+	        mvn install:install-file -Dfile=icepdf-pro-intl.jar -DgroupId=org.icepdf -DartifactId=icepdf-pro-intl -Dversion=4.2 -Dpackaging=jar	
 	-->
-    
-	<!--
 	<dependency>
 		<groupId>org.icepdf</groupId>
 		<artifactId>icepdf-pro</artifactId>
@@ -94,39 +92,7 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
 		<artifactId>icepdf-pro-intl</artifactId>
 		<version>${icepdfVersion}</version>
 	</dependency>
-	-->
-	
-	<!-- ICEpdf's dependency on Batik for SVG export is not used for now -->
-	<!-- <dependency>
-		<groupId>batik</groupId>
-		<artifactId>batik-awt-util</artifactId>
-		<version>1.6</version>
-	</dependency>
-	<dependency>
-		<groupId>batik</groupId>
-		<artifactId>batik-dom</artifactId>
-		<version>1.6</version>
-	</dependency>
-	<dependency>
-		<groupId>batik</groupId>
-		<artifactId>batik-svg-dom</artifactId>
-		<version>1.6</version>
-	</dependency>
-	<dependency>
-		<groupId>batik</groupId>
-		<artifactId>batik-svggen</artifactId>
-		<version>1.6</version>
-	</dependency>
-	<dependency>
-		<groupId>batik</groupId>
-		<artifactId>batik-util</artifactId>
-		<version>1.6</version>
-	</dependency>
-	<dependency>
-		<groupId>batik</groupId>
-		<artifactId>batik-xml</artifactId>
-		<version>1.6</version>
-	</dependency> -->
+
   </dependencies>
   
   <!-- Build -->
