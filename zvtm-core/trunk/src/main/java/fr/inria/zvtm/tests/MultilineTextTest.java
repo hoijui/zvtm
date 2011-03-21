@@ -19,6 +19,7 @@ import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VText;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
@@ -48,6 +49,11 @@ public class MultilineTextTest {
         adt.setColor(Color.RED);
         adt.setWidthConstraint(42);
         vs.addGlyph(adt);
+        MultilineText adt2 = new MultilineText("We apologize for the inconvenience");
+        adt2.setColor(Color.BLUE);
+        adt2.setFont(new Font("Monospaced", Font.PLAIN, 9));
+        adt2.move(50, 0);
+        vs.addGlyph(adt2);
         view.getGlobalView(cam, 500);
     }
 
