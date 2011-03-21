@@ -12,6 +12,11 @@ import java.awt.geom.Rectangle2D;
 import java.text.AttributedString;
 
 /**
+ * Multiline text.
+ * By default, text will be rendered on one line. Specifiy a width
+ * constraint to make the text overflow on multiple lines. Specify
+ * a height constraint to trim the text. A height constraint is only 
+ * meaningful if a width constraint has been defined.
  * 2011-03-17: in early development, do not use this yet!
  */
 public class MultilineText extends VText {
@@ -100,7 +105,7 @@ public class MultilineText extends VText {
                     if(layout == null){
                         pc[i].cw = 0;
                     } else {
-                        pc[i].cw = (int)(layout.getBounds().getX() * scaleFactor);
+                        pc[i].cw = (int)(layout.getBounds().getWidth() * scaleFactor);
                     } 
                 } else {
                     pc[i].cw = (int)(widthConstraint * scaleFactor);
