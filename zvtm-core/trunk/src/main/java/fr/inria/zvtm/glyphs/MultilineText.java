@@ -1,9 +1,11 @@
 package fr.inria.zvtm.glyphs;
 
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.font.FontRenderContext;
 import java.awt.font.LineBreakMeasurer;
+import java.awt.font.TextAttribute;
 import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
@@ -24,6 +26,8 @@ public class MultilineText extends VText {
     public MultilineText(String text){
         super(text);
         atText = new AttributedString(text);
+        atText.addAttribute(TextAttribute.FONT,
+                usesSpecificFont() ? getFont() : getMainFont());
         lbm = new LineBreakMeasurer(atText.getIterator(), DEFAULT_FRC);
     }
 
@@ -49,20 +53,27 @@ public class MultilineText extends VText {
         lbm = new LineBreakMeasurer(atText.getIterator(), DEFAULT_FRC);
     }
 
+    @Override public void setFont(Font f){
+        super.setFont(f);
+        atText.addAttribute(TextAttribute.FONT, 
+                usesSpecificFont() ? getFont() : getMainFont());
+    }
+
+    @Override public boolean visibleInRegion(double wb, double nb, double eb, double sb, int i){
+        if (!validBounds(i)){return true;}
+        if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
+            //if glyph hotspot is in the region, it is obviously visible
+            return true;
+        }
+        return (vx<=eb) && ((vx+pc[i].cw)>=wb) && (vy>=sb) && ((vy-pc[i].ch)<=nb);
+    }
+
     @Override public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
         float formatWidth = (float)widthConstraint;
 
-        if (!pc[i].valid){
-            g.setFont((font!=null) ? font : getMainFont());
-            Rectangle2D bounds = g.getFontMetrics().getStringBounds(text,g);
-            // cw and ch actually hold width and height of text *in virtual space*
-            pc[i].cw = (int)Math.round(bounds.getWidth() * scaleFactor);
-            pc[i].ch = (int)Math.round(bounds.getHeight() * scaleFactor);
-            pc[i].valid=true;
-        }
         if (alphaC != null && alphaC.getAlpha()==0){return;}
         double trueCoef = scaleFactor * coef;
-        if (trueCoef*fontSize > VText.TEXT_AS_LINE_PROJ_COEF || !zoomSensitive){
+        if (trueCoef*fontSize > VText.TEXT_AS_LINE_PROJ_COEF || !zoomSensitive || !pc[i].valid){
             //if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
             g.setFont((font!=null) ? font : getMainFont());	
             AffineTransform at = AffineTransform.getTranslateInstance(dx+pc[i].cx,dy+pc[i].cy);
@@ -71,19 +82,32 @@ public class MultilineText extends VText {
             int rectH = Math.round(pc[i].ch / scaleFactor);
             
             g.setColor(this.color);
-            //g.drawString(text, 0.0f, 0.0f);
             float drawPosY = 0;
             lbm.setPosition(atText.getIterator().getBeginIndex());
             int paragraphEnd = atText.getIterator().getEndIndex();
+            TextLayout layout = null;
             while(lbm.getPosition() < paragraphEnd &&
                     drawPosY <= heightConstraint){
-                TextLayout layout = lbm.nextLayout((float)widthConstraint);
+                layout = lbm.nextLayout((float)widthConstraint);
                 drawPosY += layout.getAscent();
                 layout.draw(g, 0, drawPosY);
                 
                 drawPosY += layout.getDescent() + layout.getLeading();
             }
             g.setTransform(stdT);
+            if(!pc[i].valid){
+                if(widthConstraint == Double.POSITIVE_INFINITY){
+                    if(layout == null){
+                        pc[i].cw = 0;
+                    } else {
+                        pc[i].cw = (int)(layout.getBounds().getX() * scaleFactor);
+                    } 
+                } else {
+                    pc[i].cw = (int)(widthConstraint * scaleFactor);
+                }
+                pc[i].ch = (int)(drawPosY * scaleFactor);
+                pc[i].valid = true;
+            }
         }
         else {
             g.setColor(this.color);

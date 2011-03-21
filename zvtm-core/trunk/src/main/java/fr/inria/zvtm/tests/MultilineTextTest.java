@@ -42,6 +42,7 @@ public class MultilineTextTest {
         View view = vsm.addFrameView(cameras, "MultilineText test",
                 View.STD_VIEW, 800, 600, false, true, true, null);	
         view.setListener(new MultilineTestEventHandler());
+        view.getCursor().setColor(Color.GREEN);
 
         MultilineText adt = new MultilineText("Forty-two is six multiplied by nine.");
         adt.setColor(Color.RED);
