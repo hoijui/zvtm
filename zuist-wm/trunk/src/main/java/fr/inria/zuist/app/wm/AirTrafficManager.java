@@ -7,6 +7,7 @@
 
 package fr.inria.zuist.app.wm;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.geom.Point2D;
 
@@ -216,7 +217,7 @@ class AirTrafficManager {
 				double cx = tail.getShape().vx + rho*Math.cos(alpha+QUAD_ANGLE);
 				double cy = tail.getShape().vy + rho*Math.sin(alpha+QUAD_ANGLE);
 				DPath p = new DPath(tail.getShape().vx, tail.getShape().vy, 5, AIRPORT_FILL_COLOR, DEFAULT_ARC_ALPHA);
-				p.setStrokeWidth(EDGE_STROKE_WIDTH);
+				p.setStroke(new BasicStroke(EDGE_STROKE_WIDTH));
 				p.addQdCurve(head.getShape().vx, head.getShape().vy, cx, cy, true);
 				application.bSpace.addGlyph(p);
 				res = new LEdge(weight, p);
@@ -313,7 +314,7 @@ class AirTrafficManager {
 				dimmedElements.remove(arcs[i].getSpline());
 				g2 = arcs[i].getSpline();
 				g2.setColor(HIGHLIGHT_COLOR);
-				g2.setStrokeWidth(EDGE_STROKE_WIDTH*2);
+				g2.setStroke(new BasicStroke(EDGE_STROKE_WIDTH*2));
 				g2.setTranslucencyValue(1f);
 				application.bSpace.onTop(g2, 5);
 				highlightedElements.add(g2);
@@ -344,7 +345,7 @@ class AirTrafficManager {
 		for (int i=0;i<highlightedElements.size();i++){
 			g2 = (Glyph)highlightedElements.elementAt(i);
 			g2.setColor(AIRPORT_FILL_COLOR);
-			g2.setStrokeWidth(EDGE_STROKE_WIDTH);
+			g2.setStroke(new BasicStroke(EDGE_STROKE_WIDTH));
 			if (g2 instanceof DPath){
     			g2.setTranslucencyValue(alpha_a*((LEdge)g2.getOwner()).weight + alpha_b);			    
 			}
