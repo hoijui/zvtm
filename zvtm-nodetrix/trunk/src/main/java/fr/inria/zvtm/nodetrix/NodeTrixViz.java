@@ -234,10 +234,29 @@ public class NodeTrixViz {
     public void createVisualisation(final VirtualSpace vs)
     {
     	this.vs = vs;
-        Map<Matrix,Map<Matrix,Double>> llg = new HashMap<Matrix,Map<Matrix,Double>>();
+
+    	layoutMatrices(matrices);
+        
+    	for(Matrix m : matrices)
+    	{
+    		m.createGraphics(0, 0, vs);
+    	}
+    }
+
+    
+    
+    /**
+     * Lays out a set of matrices.
+     * 
+     * @param matrices
+     * @author benjamin.bach@inria.fr
+     */
+    public void layoutMatrices(Vector<Matrix> matrices)
+    {
+    	Map<Matrix,Map<Matrix,Double>> llg = new HashMap<Matrix,Map<Matrix,Double>>();
         // keep trace of matrices tha are not part of the graph ; we still want to display them
         HashMap<Matrix,Object> orphanMatrices = new HashMap();
-        for (Matrix m:matrices){
+        for (Matrix m : matrices){
             orphanMatrices.put(m, null);
         }
         // building LLL graph to feed to the layout algorithm
@@ -254,6 +273,8 @@ public class NodeTrixViz {
                 }
             }
         }
+        
+        // LAYOUT MATRICES
         // for each orphan matrix, create an artifical link (that will not be displayed)
         // between orphan matrix and one random matrix that is part of the main graph
         // give it a weak weight (0.1) 
@@ -269,6 +290,7 @@ public class NodeTrixViz {
 		// see class MinimizerBarnesHut for a description of the parameters;
 		// for classical "nice" layout (uniformly distributed nodes), use
 		new MinimizerBarnesHut(llnodes, lledges, REPU_EXPONENT, ATTR_EXPONENT, GRAV_FACTOR).minimizeEnergy(nodeToPosition, LINLOG_ITERATIONS);
+		
 		// following might actually be useless, not sure yet...
 		//Map<Node,Integer> nodeToCluster = new OptimizerModularity().execute(llnodes, lledges, false);
 		// EOU		
@@ -278,12 +300,14 @@ public class NodeTrixViz {
   	   		{
 		        for (Node node : nodeToPosition.keySet()) {
 					double[] position = nodeToPosition.get(node);
-					node.getMatrix().createNodeGraphics(Math.round(position[0]*SCALE), Math.round(position[1]*SCALE), vs);
-				}
+				//	node.getMatrix().createNodeGraphics(Math.round(position[0]*SCALE), Math.round(position[1]*SCALE), vs);
+					node.getMatrix().move(position[0]*SCALE, position[1]*SCALE);
+		        }
   	   		}
 	    });
+		
     }
-
+    
 	/** Finish creating the visualization.
 	 *  Make sure the view has been painted once so that we have access to VText bounding boxes
 	 *  before instantiating the remaining graphical elements
@@ -590,7 +614,7 @@ public class NodeTrixViz {
 		           	
 		
 		           	//draw new matrix;    
-					newMatrix.createNodeGraphics(xCentre, yCentre, vs);
+					newMatrix.createGraphics(xCentre, yCentre, vs);
 					newMatrix.finishCreateNodeGraphics(vs);
 					// set node labels to old positions
 					// and put old matrices to front
@@ -617,7 +641,6 @@ public class NodeTrixViz {
 		    		newMatrix.adjustEdgeAppearance();
 		    		newMatrix.performEdgeAppearanceChange();
 		    		newMatrix.createEdgeGraphics(vs);
-//		    		newMatrix.createEdgeGraphics(vs);
 		    		newMatrix.onTop(vs);
 		    		matrices.add(newMatrix);
 		    	}
@@ -625,6 +648,8 @@ public class NodeTrixViz {
 		    	System.out.println("> Matrices left after merge: " + matrices.size());
   	   		}
   	    });
+	    
+	    
     		
     }
 

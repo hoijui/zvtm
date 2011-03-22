@@ -98,7 +98,7 @@ public class Matrix {
     
     /**
      * */
-    void createNodeGraphics(final double mx, final double my, final VirtualSpace vs)
+    void createGraphics(final double mx, final double my, final VirtualSpace vs)
     {
     	this.vs = vs;
 		bkg = new VRectangle(mx, my, 0,
@@ -499,7 +499,12 @@ public class Matrix {
         return false;
     }
     
-    
+    /**
+     * Moves the matrix relatively
+     * 
+     * @param x
+     * @param y
+     */
     public void move(double x, double y){
 
     	bkg.move(x, y);
@@ -732,7 +737,7 @@ public class Matrix {
 						//finish old matrix
 						mNew_width = mNew.getNodeAmount() * CELL_SIZE;
 						mNew.reorderCutHillMcKee();
-						mNew.createNodeGraphics(x + mNew_width, y - mNew_width, vs);
+						mNew.createGraphics(x + mNew_width, y - mNew_width, vs);
 						mNew.finishCreateNodeGraphics(vs);
 						x += mNew_width*2;
 						y -= mNew_width*2;
@@ -746,7 +751,7 @@ public class Matrix {
 				n.setMatrix(mNew);
 			}
 			mNew.reorderCutHillMcKee();
-			mNew.createNodeGraphics(x + mNew.getNodeAmount() * CELL_SIZE, y - mNew.getNodeAmount() * CELL_SIZE , vs);
+			mNew.createGraphics(x + mNew.getNodeAmount() * CELL_SIZE, y - mNew.getNodeAmount() * CELL_SIZE , vs);
 			mNew.finishCreateNodeGraphics(vs);
 			
 			cleanGraphics(am);
