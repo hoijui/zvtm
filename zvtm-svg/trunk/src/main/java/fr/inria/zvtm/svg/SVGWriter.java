@@ -3,7 +3,7 @@
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@xrce.xerox.com)
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2002. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2011. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -22,6 +22,7 @@
 
 package fr.inria.zvtm.svg;
 
+import java.awt.Stroke;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
@@ -253,11 +254,9 @@ public class SVGWriter {
 
     /*except for stroke color which is dealt with in shapeColors*/
     private void createStrokeInformation(Glyph g,Element e){
-        if (g.getStroke()!=null){
-            BasicStroke bs=g.getStroke();
-            if (bs.getLineWidth()!=Glyph.DEFAULT_STROKE_WIDTH){
-                e.setAttribute(SVGWriter._strokewidth,Float.toString(bs.getLineWidth()));
-            }
+        if (g.getStroke() != null && g.getStroke() instanceof BasicStroke){
+            BasicStroke bs = (BasicStroke)g.getStroke();
+            e.setAttribute(SVGWriter._strokewidth,Float.toString(bs.getLineWidth()));
             if (bs.getEndCap()!=BasicStroke.CAP_BUTT){
                 e.setAttribute(SVGWriter._strokelinecap,(bs.getEndCap()==BasicStroke.CAP_SQUARE) ? _strokecapsquare : _strokecapround);
             }
