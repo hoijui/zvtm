@@ -8,6 +8,7 @@
 package fr.inria.zvtm.tests;
 
 import fr.inria.zvtm.engine.Camera;
+import fr.inria.zvtm.event.RepaintListener;
 import fr.inria.zvtm.event.ViewAdapter;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewPanel;
@@ -40,7 +41,7 @@ public class MultilineTextTest {
         Vector<Camera> cameras = new Vector<Camera>();
         cameras.add(cam);	
 
-        View view = vsm.addFrameView(cameras, "MultilineText test",
+        final View view = vsm.addFrameView(cameras, "MultilineText test",
                 View.STD_VIEW, 800, 600, false, true, true, null);	
         view.setListener(new MultilineTestEventHandler());
         view.getCursor().setColor(Color.GREEN);
@@ -54,7 +55,13 @@ public class MultilineTextTest {
         adt2.setFont(new Font("Monospaced", Font.PLAIN, 6));
         adt2.move(50, 0);
         vs.addGlyph(adt2);
-        view.getGlobalView(cam, 500);
+
+        view.repaint(new RepaintListener(){
+            public void viewRepainted(View v){
+                view.getGlobalView(cam, 500);
+                view.removeRepaintListener();
+            }
+        });
     }
 
     public static void main(String[] args){
