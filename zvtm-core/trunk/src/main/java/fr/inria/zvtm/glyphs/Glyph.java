@@ -23,11 +23,10 @@
 
 package fr.inria.zvtm.glyphs;
 
-import java.awt.BasicStroke;
+import java.awt.Stroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
-import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.Shape;
@@ -433,76 +432,23 @@ public abstract class Glyph implements Cloneable, Translucent {
 
     /*------------Stroke-----------------------------------------*/
 
-    public static final float DEFAULT_STROKE_WIDTH = 1.0f;
-    
     /** For internal use. Dot not tamper with. */
-    protected BasicStroke stroke = null;  
+    protected Stroke stroke = null;  
     
-    private boolean dashedContour = false;
-    private float strokeWidth = DEFAULT_STROKE_WIDTH;
-
-    /** Convenience method for painting the glyph's border with an predefined dashed stroke.
-     *@param b true -&gt; draw a discontinuous contour for this glyph
-     */
-    public void setDashed(boolean b){
-	dashedContour=b;
-	strokeWidth=(stroke!=null) ? stroke.getLineWidth() : DEFAULT_STROKE_WIDTH;
-	int cap=(stroke!=null) ? stroke.getEndCap() : BasicStroke.CAP_BUTT;
-	int join=(stroke!=null) ? stroke.getLineJoin() : BasicStroke.JOIN_MITER;
-	float miterlimit=(stroke!=null) ? stroke.getMiterLimit() : 4.0f;
-	if (dashedContour){
-	    float[] dasharray={10.0f};
-	    float dashphase=(stroke!=null) ? stroke.getDashPhase() : 0.0f;
-	    stroke=new BasicStroke(strokeWidth,cap,join,miterlimit,dasharray,dashphase);
-	}
-	else {
-	    stroke=new BasicStroke(strokeWidth,cap,join,miterlimit);
-	}
-	VirtualSpaceManager.INSTANCE.repaint();
-    }
-
-    /** Set the width of the stroke used to paint ther glyph's border.
-     * Does not change the stroke dash settings.
-     *@param w stroke width
-     */
-    public void setStrokeWidth(float w){
-	strokeWidth=w;
-	int cap=(stroke!=null) ? stroke.getEndCap() : BasicStroke.CAP_BUTT;
-	int join=(stroke!=null) ? stroke.getLineJoin() : BasicStroke.JOIN_MITER;
-	float miterlimit=(stroke!=null) ? stroke.getMiterLimit() : 4.0f;
-	if (dashedContour){
-	    float[] dasharray={10.0f};
-	    float dashphase=(stroke!=null) ? stroke.getDashPhase() : 0.0f;
-	    stroke=new BasicStroke(strokeWidth,cap,join,miterlimit,dasharray,dashphase);
-	}
-	else {
-	    stroke=new BasicStroke(strokeWidth,cap,join,miterlimit);
-	}
-	VirtualSpaceManager.INSTANCE.repaint();
-    }
-
     /** Set a custom stroke to paint glyph's border.
      *@param b basic stroke (null to set standard 1px-thick stroke)
      */
-    public void setStroke(BasicStroke b){
-	if (b!=null){stroke=b;strokeWidth=stroke.getLineWidth();}
-	else {stroke=null;strokeWidth=1.0f;}
-	VirtualSpaceManager.INSTANCE.repaint();
-    }
+    public void setStroke(Stroke s){
+		if (s!=null){stroke=s;}
+		else {stroke=null;}
+		VirtualSpaceManager.INSTANCE.repaint();
+	}
 
     /** Get the stroke used to paint glyph's border.
      *@return null if default 1px-thick solid stroke
      */
-    public BasicStroke getStroke(){
-	return stroke;
-    }
-
-    /** Get the width of the stroke used to paint ther glyph's border.
-     *@return the stroke (default is 1.0)
-     */
-    public float getStrokeWidth(){
-	if (stroke!=null){return stroke.getLineWidth();}
-	else return strokeWidth;
+    public Stroke getStroke(){
+		return stroke;
     }
 
     /*---------Sticked glyphs----------------------------------*/
