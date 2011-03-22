@@ -82,6 +82,7 @@ public class MultilineTextTest {
             lastJPX = jpx;
             lastJPY = jpy;
             v.setDrawDrag(true);
+            System.out.println(v.getVCursor().getPicker().lastGlyphEntered());
         }
 
         public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){

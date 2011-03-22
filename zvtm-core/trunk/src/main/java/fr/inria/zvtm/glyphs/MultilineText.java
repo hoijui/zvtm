@@ -16,7 +16,7 @@ import java.text.AttributedString;
  * Multiline text.
  * By default, text will be rendered on one line. Specifiy a width
  * constraint to make the text overflow on multiple lines. Specify
- * a height constraint to trim the text. A height constraint is only 
+ * a height constraint to truncate the text. A height constraint is only 
  * meaningful if a width constraint has been defined.
  * The 'hot spot' of a MultilineText instance is its top-left corner.
  * This is unlike VText.
@@ -43,6 +43,7 @@ public class MultilineText extends VText {
      */
     public void setWidthConstraint(double constraint){
         widthConstraint = constraint;
+        invalidate();
     }
 
     /**
@@ -52,12 +53,14 @@ public class MultilineText extends VText {
      */
     public void setHeightConstraint(double constraint){
         heightConstraint = constraint;
+        invalidate();
     }
 
     @Override public void setText(String text){
         super.setText(text);
         atText = new AttributedString(text);
         lbm = new LineBreakMeasurer(atText.getIterator(), DEFAULT_FRC);
+        invalidate();
     }
 
     @Override public void setFont(Font f){
@@ -65,6 +68,7 @@ public class MultilineText extends VText {
         atText.addAttribute(TextAttribute.FONT, 
                 usesSpecificFont() ? getFont() : getMainFont());
         lbm = new LineBreakMeasurer(atText.getIterator(), DEFAULT_FRC); 
+        invalidate();
     }
 
     @Override public boolean visibleInRegion(double wb, double nb, double eb, double sb, int i){
@@ -74,6 +78,16 @@ public class MultilineText extends VText {
             return true;
         }
         return (vx<=eb) && ((vx+pc[i].cw)>=wb) && (vy>=sb) && ((vy-pc[i].ch)<=nb);
+    }
+
+    @Override public boolean containedInRegion(double wb, double nb, double eb, double sb, int i){
+        return (vx >= wb) && (vy <= nb) &&
+            (vx + pc[i].cw <= eb) && (vy - pc[i].ch >= sb);
+    }
+
+    @Override public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
+        return (cvx >= vx) && (cvy <= vy) && 
+            (cvx <= vx+pc[camIndex].cw) && (cvy >= vy-pc[camIndex].ch);
     }
 
     @Override public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
@@ -132,5 +146,9 @@ public class MultilineText extends VText {
 
     @Override public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
         draw(g, vW, vH, i, stdS, stdT, dx, dy);
+    }
+
+    @Override public Object clone(){
+        throw new UnsupportedOperationException("Cannot clone MultilineText");
     }
 }
