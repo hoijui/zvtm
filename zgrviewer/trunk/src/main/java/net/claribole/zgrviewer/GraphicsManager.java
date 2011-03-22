@@ -1528,14 +1528,14 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 		slidingLink.setColor(ConfigManager.HIGHLIGHT_COLOR);
 		// add cursor on link
 		slideCursor = new SICircle(press_vx, press_vy, 0, SLIDER_CURSOR_SIZE, SLIDER_CURSOR_FILL, ConfigManager.HIGHLIGHT_COLOR);
-		slideCursor.setStrokeWidth(2f);
+		slideCursor.setStroke(new BasicStroke(2f));
 		//slideCursor.setFilled(false);
 		mSpace.addGlyph(slideCursor);
 		// display selection radius, circular zone that allows for arc switching when starting from a node
 		if (closestNode != null){
     		selectionRadius = new SICircle(closestNode.getShape().vx, closestNode.getShape().vy, 0, SELECTION_RADIUS, Color.WHITE, SELECTION_RADIUS_COLOR);
     		selectionRadius.setFilled(false);
-    		selectionRadius.setStrokeWidth(2.0f);
+    		selectionRadius.setStroke(new BasicStroke(2f));
     		mSpace.addGlyph(selectionRadius);	    
 		}
 		// center camera on selection
