@@ -81,7 +81,7 @@ public class NodeTrixViz {
 	private HashSet<NTNode> highlightedNodes = new HashSet<NTNode>();
 	private HashSet<NTEdge> highlightedEdges = new HashSet<NTEdge>();
 
-	
+	private AnimationManager am;
     /**Vector that stores all edges considered by the linLog cluster algorithm*
      */
 
@@ -235,12 +235,13 @@ public class NodeTrixViz {
     {
     	this.vs = vs;
 
-    	layoutMatrices(matrices);
-        
     	for(Matrix m : matrices)
     	{
     		m.createGraphics(0, 0, vs);
     	}
+
+    	layoutMatrices(matrices);
+        
     }
 
     
@@ -300,8 +301,8 @@ public class NodeTrixViz {
   	   		{
 		        for (Node node : nodeToPosition.keySet()) {
 					double[] position = nodeToPosition.get(node);
-				//	node.getMatrix().createNodeGraphics(Math.round(position[0]*SCALE), Math.round(position[1]*SCALE), vs);
-					node.getMatrix().move(position[0]*SCALE, position[1]*SCALE);
+						node.getMatrix().move(position[0]*SCALE, position[1]*SCALE);
+					
 		        }
   	   		}
 	    });
@@ -532,6 +533,7 @@ public class NodeTrixViz {
 
     	matrices.addAll(newMatrices);
     	//reorderMatricesCMK();
+    	layoutMatrices(matrices);
     }
     
     
@@ -644,6 +646,8 @@ public class NodeTrixViz {
 		    		newMatrix.onTop(vs);
 		    		matrices.add(newMatrix);
 		    	}
+		    	
+		    	layoutMatrices(matrices);
 		    	
 		    	System.out.println("> Matrices left after merge: " + matrices.size());
   	   		}
