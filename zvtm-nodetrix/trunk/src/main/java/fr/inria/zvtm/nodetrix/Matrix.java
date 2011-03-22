@@ -82,10 +82,18 @@ public class Matrix {
     
     public void cleanNodeGraphics()
     {
-    	for (int i=0 ; i < nodes.size() ; i++ )
-	    {	
-    		nodes.get(i).cleanGraphics();
-	    }
+    	//wrap by thread
+    	//SwingUtilities.invokeLater(new Runnable()
+    	//{
+    	//	public void run()
+    	//	{    	
+	    		for (int i=0 ; i < nodes.size() ; i++ )
+			    {	
+		    		nodes.get(i).cleanGraphics();
+			    }
+    	//	}
+    	//});
+    	
     }
     
     /**
@@ -832,56 +840,61 @@ public class Matrix {
 	 * Removes all matrix relevant glyphs that do not belong to nodes nor relations.
 	 * */
 	public void cleanGraphics(final AnimationManager am){
-		final Animation a1, a2;
-		final int duration = 3000;
-	
-		if(vs.getAllGlyphs().contains(matrixLabel))
-		{
-			a1 = am.getAnimationFactory().createTranslucencyAnim(duration, matrixLabel, 0, false, SlowInSlowOutInterpolator2.getInstance(), 
-					new EndAction(){public void execute(Object o, Animation.Dimension dimension){
-						vs.removeGlyph((Glyph)o);}});
-			am.startAnimation(a1, true);
-		}
 		
-		if(nodes.size() < 2) return;
-		
-		cleanGroupLabels();
-
-		a2 = am.getAnimationFactory().createTranslucencyAnim(duration, bkg, 0, false, SlowInSlowOutInterpolator2.getInstance(), 
-				new EndAction(){
-			public void execute(Object o, Animation.Dimension dimension){
-				vs.removeGlyph((Glyph)o);}});
-		am.startAnimation(a2, true);
-			
-		
-		SwingUtilities.invokeLater(new Runnable()
-		{
-			public void run()
-			{
-				for(Glyph g : gridBarsH)
+    	SwingUtilities.invokeLater(new Runnable()
+    	{
+    		public void run()
+    		{
+    			final Animation a1, a2;
+    			final int duration = 3000;
+				if(vs.getAllGlyphs().contains(matrixLabel))
 				{
-					am.startAnimation(am.getAnimationFactory().createTranslucencyAnim(duration, g, 0, false, SlowInSlowOutInterpolator2.getInstance(), 
+					a1 = am.getAnimationFactory().createTranslucencyAnim(duration, matrixLabel, 0, false, SlowInSlowOutInterpolator2.getInstance(), 
 							new EndAction(){public void execute(Object o, Animation.Dimension dimension){
-								vs.removeGlyph((Glyph)o);}}), true);
+								vs.removeGlyph((Glyph)o);}});
+					am.startAnimation(a1, true);
 				}
-				for(Glyph g : gridBarsV){
-					am.startAnimation(am.getAnimationFactory().createTranslucencyAnim(duration, g, 0, false, SlowInSlowOutInterpolator2.getInstance(), 
-							new EndAction(){public void execute(Object o, Animation.Dimension dimension){
-								vs.removeGlyph((Glyph)o);}}), true);
-				}
-				for(Glyph g : groupLabelsN){
-					am.startAnimation(am.getAnimationFactory().createTranslucencyAnim(duration, g, 0, false, SlowInSlowOutInterpolator2.getInstance(), 
-							new EndAction(){public void execute(Object o, Animation.Dimension dimension){
-								vs.removeGlyph((Glyph)o);}}), true);
-				}
-				for(Glyph g : groupLabelsW){
-					am.startAnimation(am.getAnimationFactory().createTranslucencyAnim(duration, g, 0, false, SlowInSlowOutInterpolator2.getInstance(), 
-							new EndAction(){public void execute(Object o, Animation.Dimension dimension){
-								vs.removeGlyph((Glyph)o);}}), true);
-				}
-			}
+				
+				if(nodes.size() < 2) return;
+				
+				cleanGroupLabels();
+		
+				a2 = am.getAnimationFactory().createTranslucencyAnim(duration, bkg, 0, false, SlowInSlowOutInterpolator2.getInstance(), 
+						new EndAction(){
+					public void execute(Object o, Animation.Dimension dimension){
+						vs.removeGlyph((Glyph)o);}});
+				am.startAnimation(a2, true);
+					
+				
+				SwingUtilities.invokeLater(new Runnable()
+				{
+					public void run()
+					{
+						for(Glyph g : gridBarsH)
+						{
+							am.startAnimation(am.getAnimationFactory().createTranslucencyAnim(duration, g, 0, false, SlowInSlowOutInterpolator2.getInstance(), 
+									new EndAction(){public void execute(Object o, Animation.Dimension dimension){
+										vs.removeGlyph((Glyph)o);}}), true);
+						}
+						for(Glyph g : gridBarsV){
+							am.startAnimation(am.getAnimationFactory().createTranslucencyAnim(duration, g, 0, false, SlowInSlowOutInterpolator2.getInstance(), 
+									new EndAction(){public void execute(Object o, Animation.Dimension dimension){
+										vs.removeGlyph((Glyph)o);}}), true);
+						}
+						for(Glyph g : groupLabelsN){
+							am.startAnimation(am.getAnimationFactory().createTranslucencyAnim(duration, g, 0, false, SlowInSlowOutInterpolator2.getInstance(), 
+									new EndAction(){public void execute(Object o, Animation.Dimension dimension){
+										vs.removeGlyph((Glyph)o);}}), true);
+						}
+						for(Glyph g : groupLabelsW){
+							am.startAnimation(am.getAnimationFactory().createTranslucencyAnim(duration, g, 0, false, SlowInSlowOutInterpolator2.getInstance(), 
+									new EndAction(){public void execute(Object o, Animation.Dimension dimension){
+										vs.removeGlyph((Glyph)o);}}), true);
+						}
+					}
+				});
+    		}
 		});
-
 	}
 	
 	

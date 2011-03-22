@@ -122,8 +122,10 @@ public class Viewer {
         mView.setNotifyCursorMoved(true);
         mView.setAntialiasing(antialiased);
         mView.setBackgroundColor(ConfigManager.BACKGROUND_COLOR);
-		mView.getPanel().getComponent().addComponentListener(eh);
-		ComponentAdapter ca0 = new ComponentAdapter(){
+//bb		mView.getPanel().getComponent().addComponentListener(eh);
+    	mView.getPanel().addComponentListener(eh);
+		
+        ComponentAdapter ca0 = new ComponentAdapter(){
 			public void componentResized(ComponentEvent e){
 				updatePanelSize();
 			}
@@ -145,7 +147,8 @@ public class Viewer {
     }
     
     void updatePanelSize(){
-        Dimension d = mView.getPanel().getComponent().getSize();
+//bb        Dimension d = mView.getPanel().getComponent().getSize();
+    	Dimension d = mView.getPanel().getSize();
         panelWidth = d.width;
 		panelHeight = d.height;
 		nm.updateOverviewLocation();

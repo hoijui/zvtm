@@ -23,6 +23,7 @@ import java.util.Map.Entry;
 import javax.swing.SwingUtilities;
 
 import fr.inria.zvtm.animation.AnimationManager;
+import fr.inria.zvtm.engine.SwingWorker;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.nodetrix.lll.Edge;
 import fr.inria.zvtm.nodetrix.lll.LinLogEdge;
@@ -121,27 +122,28 @@ public class NodeTrixViz {
 	 **/
 	public Matrix[] createMatricesByClustering(Collection<NTNode> nodes, List<LinLogEdge> edges)
 	{ 
-		//Initialise
-		LinLogOptimizerModularity llalgo = new LinLogOptimizerModularity();
-		ArrayList<LinLogNode> llNodes = new ArrayList<LinLogNode>();
-		llNodes.addAll(nodes);
-		Map<LinLogNode, Integer> clusterMap = llalgo.execute(llNodes, edges , false);
-		
-		//Obtain clusters and create matrices	
-		HashMap<Integer, Matrix> newMatrices = new HashMap<Integer, Matrix>();
-		for(LinLogNode lln : clusterMap.keySet()){
-			NTNode n = (NTNode)lln;
-			int cluster = clusterMap.get(lln);
-			Matrix m = newMatrices.get(cluster);
-			if(m == null){
-				m = new Matrix("[" + cluster + "]", new Vector<NTNode>());
-				newMatrices.put(cluster, m);
-			}
-			//System.out.println("createMatricesByClustering");
-			m.addNode(n);
-			n.setMatrix(m);
-		}
-		return newMatrices.values().toArray(new Matrix[0]);
+				//Initialise
+				LinLogOptimizerModularity llalgo = new LinLogOptimizerModularity();
+				ArrayList<LinLogNode> llNodes = new ArrayList<LinLogNode>();
+				llNodes.addAll(nodes);
+				Map<LinLogNode, Integer> clusterMap = llalgo.execute(llNodes, edges , false);
+				
+				//Obtain clusters and create matrices	
+				HashMap<Integer, Matrix> newMatrices = new HashMap<Integer, Matrix>();
+				for(LinLogNode lln : clusterMap.keySet()){
+					NTNode n = (NTNode)lln;
+					int cluster = clusterMap.get(lln);
+					Matrix m = newMatrices.get(cluster);
+					if(m == null){
+						m = new Matrix("[" + cluster + "]", new Vector<NTNode>());
+						newMatrices.put(cluster, m);
+					}
+					//System.out.println("createMatricesByClustering");
+					m.addNode(n);
+					n.setMatrix(m);
+				}
+    		
+    	return newMatrices.values().toArray(new Matrix[0]);
 //		
 ////		System.out.println("[NODETRIXVIZ] " + i + " MATRICES CREATED");
 //		i = 0;
@@ -385,13 +387,17 @@ public class NodeTrixViz {
     	}
     }
     
-    public void cleanMatrices(AnimationManager am){
-    	for(Matrix m : matrices){
-    		m.cleanGraphics(am);
-    		m.cleanNodeGraphics();
-    	}
-    	matrices.clear();
-    }
+    public void cleanMatrices(AnimationManager am)
+    {
+		System.out.println("Matrices to be cleaned: " + matrices.size());
+
+ 		for(Matrix m : matrices){
+ 			System.out.println("Matrix cleaned!");
+ 			m.cleanGraphics(am);
+		    m.cleanNodeGraphics();
+ 		}
+		matrices.clear();
+	}
     
     public void highlightNodeContext(NTNode n, boolean context){
     	//care about node.
@@ -509,9 +515,7 @@ public class NodeTrixViz {
      * */
     public void mergeMatrices(final VirtualSpace vs, final AnimationManager am)
     {
-
-	   
-    	// GROUP MATRICES ACCORDING NAMES MATRIX
+	   // GROUP MATRICES ACCORDING NAMES MATRIX
 		final HashMap<String, Vector<Matrix>> mergeMap = new HashMap<String, Vector<Matrix>>();
     	for(Matrix m : matrices){
     		//m.cleanNodeGraphics();
@@ -546,22 +550,24 @@ public class NodeTrixViz {
     	
     	
     	//CREATE NEW MATRICES
-
+    	
+    	System.out.println("> Matrices before merge: " + matrices.size());
     	final Vector<Matrix> newMatrices = new Vector<Matrix>();
 	    SwingUtilities.invokeLater(new Runnable()
   	    {
   	   		public void run()
   	   		{
-
   	   			int clusterNumber = 0;
 		    	for(Entry<String, Vector<Matrix>> entry : mergeMap.entrySet())
 		    	{
 		    		Vector<Matrix> mergeMatrices = entry.getValue();
+		    		
 		    		//put nodes in new matrix
 		    		Matrix newMatrix = new Matrix(entry.getKey(), new Vector<NTNode>());
 		    		clusterNumber++;
-		    		
 		    		newMatrices.add(newMatrix);
+		    		
+		    		//put node into new matrics
 		    		for(Matrix m : mergeMatrices){
 		    			for(NTNode n : m.nodes){
 		    				newMatrix.addNode(n);
@@ -601,22 +607,25 @@ public class NodeTrixViz {
 					}
 		    				    		
 		    		//adjust edge appearance
+		    		System.out.println("> Remove all matrices");
+		    		matrices.removeAll(mergeMatrices);
+		    		System.out.println("> Matrices left after removal: " + matrices.size());
+		    	}
+
+		    	//create edge graphics
+		    	for(Matrix newMatrix : newMatrices){
 		    		newMatrix.adjustEdgeAppearance();
 		    		newMatrix.performEdgeAppearanceChange();
 		    		newMatrix.createEdgeGraphics(vs);
-
-		    		matrices.removeAll(mergeMatrices);
+//		    		newMatrix.createEdgeGraphics(vs);
+		    		newMatrix.onTop(vs);
+		    		matrices.add(newMatrix);
 		    	}
+		    	
+		    	System.out.println("> Matrices left after merge: " + matrices.size());
   	   		}
   	    });
     		
-    	//create edge graphics
-    	for(Matrix newMatrix : newMatrices){
-    		newMatrix.createEdgeGraphics(vs);
-    		newMatrix.onTop(vs);
-    		matrices.add(newMatrix);
-    		
-    	}
     }
 
     
@@ -648,5 +657,11 @@ public class NodeTrixViz {
     public HashSet<NTEdge> getEdges(){
     	return edges;
     }
+	public Vector<Matrix> getMatrices()
+	{
+		return this.matrices;
+		
+	}
+
     
 }
