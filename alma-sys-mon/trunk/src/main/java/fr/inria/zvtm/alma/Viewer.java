@@ -74,6 +74,7 @@ public class Viewer {
     VirtualSpaceManager vsm;
     VirtualSpace bgSpace, errorSpace;
     EView mView;
+	Camera bgCamera;
     
     MainEventHandler eh;
     Navigation nm;
@@ -108,7 +109,7 @@ public class Viewer {
         nm = new Navigation(this);
         bgSpace = vsm.addVirtualSpace(Messages.bgSpaceName);
         errorSpace = vsm.addVirtualSpace("errorSpace");
-        Camera bgCamera = bgSpace.addCamera();
+        bgCamera = bgSpace.addCamera();
         Camera errorCamera = errorSpace.addCamera();
         nm.ovCamera = errorSpace.addCamera(); 
         errorCamera.stick(bgCamera); //stick background camera to main (error) camera
@@ -132,7 +133,7 @@ public class Viewer {
         mView.setListener(eh, 1);
         mView.setAntialiasing(antialiased);
         mView.setBackgroundColor(Config.BACKGROUND_COLOR);
-		mView.getPanel().addComponentListener(eh);
+		mView.getPanel().getComponent().addComponentListener(eh);
 		ComponentAdapter ca0 = new ComponentAdapter(){
 			public void componentResized(ComponentEvent e){
 				updatePanelSize();
@@ -250,7 +251,7 @@ public class Viewer {
     }
     
     void updatePanelSize(){
-        Dimension d = mView.getPanel().getSize();
+        Dimension d = mView.getPanel().getComponent().getSize();
         panelWidth = d.width;
 		panelHeight = d.height;
 		nm.updateOverviewLocation();

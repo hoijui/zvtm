@@ -72,8 +72,8 @@ class MainEventHandler implements ViewListener, ComponentListener, PortalListene
 		}
 		else if (mod == ALT_MOD){
             selectingRegion = true;
-            x1 = v.getVCursor().vx;
-            y1 = v.getVCursor().vy;
+            x1 = v.getVCursor().getVSXCoordinate();
+            y1 = v.getVCursor().getVSYCoordinate();
             v.setDrawRect(true);
         }
     }
@@ -84,8 +84,8 @@ class MainEventHandler implements ViewListener, ComponentListener, PortalListene
 	    panning = false;
 	    if (selectingRegion){
 			v.setDrawRect(false);
-			x2 = v.getVCursor().vx;
-			y2 = v.getVCursor().vy;
+			x2 = v.getVCursor().getVSXCoordinate();
+			y2 = v.getVCursor().getVSYCoordinate();
 			if ((Math.abs(x2-x1)>=4) && (Math.abs(y2-y1)>=4)){
 				application.nm.mCamera.getOwningView().centerOnRegion(application.nm.mCamera, Config.ANIM_MOVE_LENGTH,
 				                                                      x1, y1, x2, y2);
@@ -96,8 +96,8 @@ class MainEventHandler implements ViewListener, ComponentListener, PortalListene
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
         if (mod == SHIFT_MOD){
-            lastVX = v.getVCursor().vx;
-            lastVY = v.getVCursor().vy;
+            lastVX = v.getVCursor().getVSXCoordinate();
+            lastVY = v.getVCursor().getVSXCoordinate();
             if (!inPortal){
                 if (application.nm.lensType != Navigation.NO_LENS){
                     application.nm.zoomInPhase2(lastVX, lastVY);
@@ -112,7 +112,7 @@ class MainEventHandler implements ViewListener, ComponentListener, PortalListene
             }
         }
         else {
-            Glyph[] pickList = v.getVCursor().getGlyphsUnderMouseList();
+            Glyph[] pickList = v.getVCursor().getPicker().getPickedGlyphList();
             if (pickList.length == 0){
                 return;
             }
@@ -135,17 +135,17 @@ class MainEventHandler implements ViewListener, ComponentListener, PortalListene
     }
 
 	public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	    application.vsm.getAnimationManager().setXspeed(0);
-        application.vsm.getAnimationManager().setYspeed(0);
-        application.vsm.getAnimationManager().setZspeed(0);
+	    application.bgCamera.setXspeed(0);
+        application.bgCamera.setYspeed(0);
+        application.bgCamera.setZspeed(0);
         v.setDrawDrag(false);
         panning = false;
 	}
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
         if (mod == SHIFT_MOD || mod == META_SHIFT_MOD){
-            lastVX = v.getVCursor().vx;
-            lastVY = v.getVCursor().vy;
+            lastVX = v.getVCursor().getVSXCoordinate();
+            lastVY = v.getVCursor().getVSYCoordinate();
             if (application.nm.lensType != Navigation.NO_LENS){
                 application.nm.zoomOutPhase2();
             }
@@ -207,14 +207,14 @@ class MainEventHandler implements ViewListener, ComponentListener, PortalListene
             Camera c = application.nm.mCamera;
             double a = (c.focal+Math.abs(c.altitude))/c.focal;
             if (mod == META_SHIFT_MOD) {
-                application.vsm.getAnimationManager().setXspeed(0);
-                application.vsm.getAnimationManager().setYspeed(0);
-                application.vsm.getAnimationManager().setZspeed(((lastJPY-jpy)*(ZOOM_SPEED_COEF)));
+                c.setXspeed(0);
+                c.setYspeed(0);
+                c.setZspeed(((lastJPY-jpy)*(ZOOM_SPEED_COEF)));
             }
             else {
-                application.vsm.getAnimationManager().setXspeed((long)((jpx-lastJPX)*(a/PAN_SPEED_COEF)));
-                application.vsm.getAnimationManager().setYspeed((long)((lastJPY-jpy)*(a/PAN_SPEED_COEF)));
-                application.vsm.getAnimationManager().setZspeed(0);
+                c.setXspeed((long)((jpx-lastJPX)*(a/PAN_SPEED_COEF)));
+                c.setYspeed((long)((lastJPY-jpy)*(a/PAN_SPEED_COEF)));
+                c.setZspeed(0);
             }		    
 		}
     }
