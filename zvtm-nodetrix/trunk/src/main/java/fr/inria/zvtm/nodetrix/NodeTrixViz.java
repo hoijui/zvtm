@@ -395,20 +395,15 @@ public class NodeTrixViz {
      * actually called the fade() or the show() method of the
      * NTEdgeAppearance class.
      * */
-    public void hideEdges(Set<NTEdge> non_visibleEdges){
-    	for(NTEdge n : non_visibleEdges){	
-//    		n.setInteractionState(IA_STATE_FADE);
-//    		n.performInteractionStateChange();
-    		n.setVisibility(false);
+    public void setEdgesFaded(ArrayList<LinLogEdge> fadedEdges){
+    	for(LinLogEdge lle : fadedEdges){	
+    		((NTEdge)lle).setFaded();
     	}
     }
     
-    public void showEdges(List<LinLogEdge> visibleEdges){
+    public void setEdgesVisible(ArrayList<LinLogEdge> visibleEdges){
     	for(LinLogEdge lle : visibleEdges){
-//    		((NTEdge)lle).setInteractionState(IA_STATE_DEFAULT);
-//    		((NTEdge)lle).performInteractionStateChange();
-    		((NTEdge)lle).setVisibility(true);
-
+    		((NTEdge)lle).setVisible();
     	}
     }
     
@@ -657,12 +652,11 @@ public class NodeTrixViz {
 		    	System.out.println("> Matrices left after merge: " + matrices.size());
   	   		}
   	    });
-	    
-	    
-    		
+	    	
     }
 
     
+     
     /**
      * Iterates over all matrices and group their nodes according to their assigned
      * groupname.
