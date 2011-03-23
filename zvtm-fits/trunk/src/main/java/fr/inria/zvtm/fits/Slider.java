@@ -10,6 +10,7 @@ import fr.inria.zvtm.glyphs.Composite;
 import fr.inria.zvtm.glyphs.VPolygon;
 import fr.inria.zvtm.glyphs.VRectangle;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.geom.Point2D;
 
@@ -77,7 +78,7 @@ public class Slider extends Composite {
         VPolygon retval = new VPolygon(getTickCoords(tickCoordsY), 0, 
                 new Color(200, 0, 0, 120),
                 Color.RED);
-        retval.setStrokeWidth(2);
+        retval.setStroke(new BasicStroke(2));
         return retval;
     }
 }

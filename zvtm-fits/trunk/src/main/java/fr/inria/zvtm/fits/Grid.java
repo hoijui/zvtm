@@ -6,6 +6,7 @@
  */
 package fr.inria.zvtm.fits;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
@@ -57,7 +58,7 @@ public class Grid extends Composite {
                            origWcs.y + j*decStep), null);
                VSegment segment = new VSegment(from.getX(), from.getY(), 
                            to.getX(), to.getY(), 0, DEFAULT_COLOR);
-                   segment.setStrokeWidth(2);
+                   segment.setStroke(new BasicStroke(2));
                addChild(segment);
            }
        }
@@ -71,7 +72,7 @@ public class Grid extends Composite {
                Point2D to = fits2vs.transform(image.wcs2pix(origWcs.x + j*raStep, dec), null);
                VSegment segment = new VSegment(from.getX(), from.getY(), 
                            to.getX(), to.getY(), 0, DEFAULT_COLOR);
-               segment.setStrokeWidth(2);
+               segment.setStroke(new BasicStroke(2));
                addChild(segment);
            }
        }
