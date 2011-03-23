@@ -428,7 +428,7 @@ public class NodeTrixViz {
     	//care about node.
     	Matrix m = n.getMatrix();
     	m.resetGrid();
-    	m.highlightGrid(n, n, ProjectColors.HIGHLIGHT[ProjectColors.COLOR_SCHEME]);
+    	m.highlightGrid(n, n, ProjectColors.HIGHLIGHT_GRID[ProjectColors.COLOR_SCHEME]);
     	highlightedNodes.add(n);
     	n.setNewInteractionState(IA_STATE_HIGHLIGHT, true, true);
     	n.perfomStateChange();
@@ -439,7 +439,7 @@ public class NodeTrixViz {
     		HashSet<NTNode> highlightedNodes = new HashSet<NTNode>();
     		HashSet<NTEdge> highlightedEdges = new HashSet<NTEdge>();
     		for(NTEdge e : n.getOutgoingEdges()){
-       		if(!e.isVisible()) continue;
+       		//if(!e.isVisible()) continue;
 	    		e.getHead().setNewInteractionState(NodeTrixViz.IA_STATE_RELATED, true, true);
 	    		e.performInteractionStateChange();
 				highlightedEdges.add(e);
@@ -448,7 +448,7 @@ public class NodeTrixViz {
     		
     		//highlight incomming relations and nodes.
     		for(NTEdge e : n.getIncomingEdges()){
-    			if(!e.isVisible()) continue;
+    		//	if(!e.isVisible()) continue;
     			e.getTail().setNewInteractionState(NodeTrixViz.IA_STATE_RELATED, true, true);
     			e.performInteractionStateChange();
     			highlightedEdges.add(e);
@@ -463,6 +463,11 @@ public class NodeTrixViz {
 //    				m.highlightGrid(n, nRel, NodeTrixViz.COLOR_MATRIX_NODE_RELATED_COLOR);
     			nRel.perfomStateChange();
     		}
+    		
+    		for(NTEdge e : highlightedEdges){
+        		e.setNewInteractionState(IA_STATE_HIGHLIGHT);
+        		e.performInteractionStateChange();
+        	}
     		
     		this.highlightedEdges.addAll(highlightedEdges);
     		this.highlightedNodes.addAll(highlightedNodes);
@@ -506,7 +511,7 @@ public class NodeTrixViz {
 
 		if(e.isIntraEdge()){
 		
-			tail.getMatrix().highlightGrid(tail, head, ProjectColors.HIGHLIGHT[ProjectColors.COLOR_SCHEME]);
+			tail.getMatrix().highlightGrid(tail, head, ProjectColors.HIGHLIGHT_GRID[ProjectColors.COLOR_SCHEME]);
 		}
     }
     

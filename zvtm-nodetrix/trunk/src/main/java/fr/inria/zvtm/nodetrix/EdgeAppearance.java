@@ -41,7 +41,7 @@ public abstract class EdgeAppearance {
 	
 	//INTERACTION
 	public abstract void reset();
-	public abstract void highlight(Color c);
+	public abstract void highlight();
 	public abstract void select();
 	public abstract void fade();
 	public abstract void show();

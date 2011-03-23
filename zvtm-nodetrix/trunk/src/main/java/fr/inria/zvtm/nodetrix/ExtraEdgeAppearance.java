@@ -18,7 +18,11 @@ import fr.inria.zvtm.glyphs.Glyph;
 
 public class ExtraEdgeAppearance extends EdgeAppearance {
 
+	/** Normal curve*/
 	private GPath edgePath;
+	/** Thicker curve for highlighting*/
+	private GPath edgePathLarge; 
+
 	// start and end point offsets w.r.t respective matrices
 	Point2D.Double[] offsets;
 	static double CONTROL_POINT_OFFSET = NodeTrixViz.CELL_SIZE * 3;
@@ -34,11 +38,11 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
 		super(edge);
 	}
 
-	public void updateColor(){
-	//	if(edgePath.getColor() != null && edgePath.getColor().equals(ProjectColors.EXTRA_EDGE_FADE_OUT[ProjectColors.COLOR_SCHEME])) 
-	//		return;
+	public void updateColor()
+	{
 		if(faded) return;
 		edgePath.setColor(edge.getColor());
+		edgePathLarge.setColor(edge.getColor());
 	}
 	
 	@Override
@@ -50,6 +54,7 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
     		public void run()
     		{
     			vs.removeGlyph(edgePath);
+    			vs.removeGlyph(edgePathLarge);
     		}
     	});
 	}
@@ -61,7 +66,6 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
 	}
 	
 	@Override
-//	public void createGraphics(double x1, double y1, double x2, double y2, VirtualSpace vs) {
 	public void createGraphics() {
 		if(vs == null) return;
 		double x1, y1, x2, y2;
@@ -85,6 +89,12 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
             edgePath.addCbCurve(hmp.x+offsets[1].x, hmp.y+offsets[1].y,
                                 tmp.x+offsets[0].x+CONTROL_POINT_OFFSET, tmp.y+offsets[0].y,
                                 hmp.x+offsets[1].x-CONTROL_POINT_OFFSET, hmp.y+offsets[1].y, true);
+            
+            edgePathLarge = new GPath(tmp.x+offsets[0].x, tmp.y+offsets[0].y, 0, edge.getColor());
+            edgePathLarge.addCbCurve(hmp.x+offsets[1].x, hmp.y+offsets[1].y,
+                                tmp.x+offsets[0].x+CONTROL_POINT_OFFSET, tmp.y+offsets[0].y,
+                                hmp.x+offsets[1].x-CONTROL_POINT_OFFSET, hmp.y+offsets[1].y, true);
+    
         }
         else if (angle > 5*Math.PI/4.0){
             // southward
@@ -98,6 +108,11 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
             edgePath.addCbCurve(hmp.x+offsets[1].x, hmp.y+offsets[1].y,
                                 tmp.x+offsets[0].x, tmp.y+offsets[0].y-CONTROL_POINT_OFFSET,
                                 hmp.x+offsets[1].x, hmp.y+offsets[1].y+CONTROL_POINT_OFFSET, true);
+            edgePathLarge = new GPath(tmp.x+offsets[0].x, tmp.y+offsets[0].y, 0, edge.getColor());
+            edgePathLarge.addCbCurve(hmp.x+offsets[1].x, hmp.y+offsets[1].y,
+                                tmp.x+offsets[0].x, tmp.y+offsets[0].y-CONTROL_POINT_OFFSET,
+                                hmp.x+offsets[1].x, hmp.y+offsets[1].y+CONTROL_POINT_OFFSET, true);
+            
         }
         else if (angle > 3*Math.PI/4.0){
             // westward
@@ -111,6 +126,11 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
             edgePath.addCbCurve(hmp.x+offsets[1].x, hmp.y+offsets[1].y,
                                 tmp.x+offsets[0].x-CONTROL_POINT_OFFSET, tmp.y+offsets[0].y,
                                 hmp.x+offsets[1].x+CONTROL_POINT_OFFSET, hmp.y+offsets[1].y, true);
+            edgePathLarge = new GPath(tmp.x+offsets[0].x, tmp.y+offsets[0].y, 0, edge.getColor());
+            edgePathLarge.addCbCurve(hmp.x+offsets[1].x, hmp.y+offsets[1].y,
+                                tmp.x+offsets[0].x-CONTROL_POINT_OFFSET, tmp.y+offsets[0].y,
+                                hmp.x+offsets[1].x+CONTROL_POINT_OFFSET, hmp.y+offsets[1].y, true);
+            
         }
         else {
             // angle >= Math.PI/4.0
@@ -125,12 +145,21 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
             edgePath.addCbCurve(hmp.x+offsets[1].x, hmp.y+offsets[1].y,
                                 tmp.x+offsets[0].x, tmp.y+offsets[0].y+CONTROL_POINT_OFFSET,
                                 hmp.x+offsets[1].x, hmp.y+offsets[1].y-CONTROL_POINT_OFFSET, true);
+            edgePathLarge = new GPath(tmp.x+offsets[0].x, tmp.y+offsets[0].y, 0, edge.getColor());
+            edgePathLarge.addCbCurve(hmp.x+offsets[1].x, hmp.y+offsets[1].y,
+                                tmp.x+offsets[0].x, tmp.y+offsets[0].y+CONTROL_POINT_OFFSET,
+                                hmp.x+offsets[1].x, hmp.y+offsets[1].y-CONTROL_POINT_OFFSET, true);
         }
-        
 
         edgePath.setColor(edge.getColor());
         edgePath.setStrokeWidth(2);
         edgePath.setOwner(edge);
+        edgePathLarge.setColor(edge.getColor());
+        edgePathLarge.setStrokeWidth(5);
+        edgePathLarge.setOwner(edge);
+        edgePathLarge.setVisible(false);
+        edgePath.stick(edgePathLarge);
+
         assignAlpha();
 
         SwingUtilities.invokeLater(new Runnable()
@@ -138,6 +167,7 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
         	public void run()
         	{
         		vs.addGlyph(edgePath);
+        		vs.addGlyph(edgePathLarge);
         	}
         });
         
@@ -149,7 +179,8 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
 		gradientColors[0] = ProjectColors.EXTRA_EDGE_FADE_OUT[ProjectColors.COLOR_SCHEME];
 		gradientColors[1] = ProjectColors.EXTRA_EDGE_FADE_OUT[ProjectColors.COLOR_SCHEME];	
 		edgePath.setGradientColors(gradientColors);
-		edgePath.setSensitivity(false);
+	//	edgePath.setSensitivity(false);
+	//	edgePathLarge.setVisible(false);
 		faded = true;
 	}
 	
@@ -160,18 +191,22 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
     	{
     		public void run()
     		{
+    		//	edgePathLarge.setVisible(false);
     			edgePath.setVisible(true);
     		}
     	});
 		edgePath.setColor(edge.getColor());
 		edgePath.setSensitivity(true);
+		edgePathLarge.setVisible(false);
 		assignAlpha();
 	}
 
 	@Override
-	public void highlight(Color c) {
-		edgePath.setColor(c);
-		edgePath.setTranslucencyValue(1);
+	public void highlight() {
+		//edgePath.setColor(c);
+		//edgePath.setTranslucencyValue(1);
+		edgePath.setVisible(false);
+		edgePathLarge.setVisible(true);
 	}
 
 	@Override
@@ -237,6 +272,7 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
             npos[3] = new Point2D.Double(hmp.x+offsets[1].x, hmp.y+offsets[1].y);
         }
         edgePath.edit(npos, true);
+        edgePathLarge.edit(npos, true);
         assignAlpha();
         
 	}
@@ -247,6 +283,7 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
     {
     	alpha = 1 - (float)Math.min(Math.max(edgePath.getSize(), NodeTrixViz.EXTRA_ALPHA_MIN_LENGHT), NodeTrixViz.EXTRA_ALPHA_MAX_LENGHT)/(NodeTrixViz.EXTRA_ALPHA_MAX_LENGHT * (1 + NodeTrixViz.EXTRA_ALPHA_MIN));
     	edgePath.setTranslucencyValue(alpha);
+      	edgePathLarge.setTranslucencyValue(alpha);
     }
     
     @Override
@@ -260,8 +297,16 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
 
 	@Override
 	public void reset() {
-		edgePath.setColor(edge.getColor());
+		if(faded){	
+			fade();
+		}
+		else{
+			edgePath.setColor(edge.getColor());
+			edgePath.setVisible(true);
+		}
+		edgePathLarge.setVisible(false);
 		edgePath.setTranslucencyValue(alpha);
+		edgePathLarge.setTranslucencyValue(alpha);
 	}
 
 	@Override

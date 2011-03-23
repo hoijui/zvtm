@@ -286,9 +286,9 @@ public class NTNode extends LinLogNode{
 //    	if(newInteractionState == interactionState) return;
 
     	if(newInteractionState == NodeTrixViz.IA_STATE_FADE) fade();
-	    else if(newInteractionState == NodeTrixViz.IA_STATE_HIGHLIGHT) highlight(ProjectColors.HIGHLIGHT[ProjectColors.COLOR_SCHEME]);
+	    else if(newInteractionState == NodeTrixViz.IA_STATE_HIGHLIGHT) highlight(ProjectColors.HIGHLIGHT_NODE[ProjectColors.COLOR_SCHEME]);
 	    else if(newInteractionState == NodeTrixViz.IA_STATE_SELECTED) select();
-	    else if(newInteractionState == NodeTrixViz.IA_STATE_RELATED) highlight(ProjectColors.HIGHLIGHT_RELATED[ProjectColors.COLOR_SCHEME]);
+	    else if(newInteractionState == NodeTrixViz.IA_STATE_RELATED) highlight(ProjectColors.HIGHLIGHT_NODE_RELATED[ProjectColors.COLOR_SCHEME]);
 	    else reset();
 	    
         interactionState = newInteractionState;
@@ -317,24 +317,14 @@ public class NTNode extends LinLogNode{
     
     private void highlight(Color c)
     {
-//    	System.out.println("[NTNODE] HIGHLIGHT " + this.name);
-
-//    	boolean oldNorth = this.permanentNorth;
-//    	boolean oldWest = this.permanentWest;
-		
     	if(affectNorth && !single){
     		this.gBackgroundN.setColor(c);
     		this.labelN.setColor(Color.black);
-//    		if(!matrix.isNodesVisibleNorth()) this.shiftNorth(p[1] - Math.min(widthHalf, NodeTrixViz.MATRIX_NODE_LABEL_OCCLUSION_WIDTH/2), true);
     	}
     	if(affectWest || single){
     		this.gBackgroundW.setColor(c);
     		this.labelW.setColor(Color.black);
-//    		if(!matrix.isNodesVisibleWest()) this.shiftWest(p[0] + Math.min(widthHalf, NodeTrixViz.MATRIX_NODE_LABEL_OCCLUSION_WIDTH/2), true);
     	}
-    	
-//    	this.permanentNorth = oldNorth;
-//    	this.permanentWest = oldWest;
     }
     
     private void select()
@@ -343,12 +333,6 @@ public class NTNode extends LinLogNode{
     
     private void fade()
     {
-//    	if(affectWest || single){
-//    		this.gBackgroundW.setTranslucencyValue(.6f);
-//    	}
-//    	if(affectNorth){
-//    		this.gBackgroundN.setTranslucencyValue(.6f);
-//    	}
     }
     
     public void onTop() {

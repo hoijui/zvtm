@@ -70,10 +70,10 @@ public class NTEdge extends LinLogEdge{
     
     public void performInteractionStateChange()
     {
-    	if(!visible || newInteractionState == interactionState) return;
-	    else if(newInteractionState == NodeTrixViz.IA_STATE_HIGHLIGHT) appearance.highlight(ProjectColors.HIGHLIGHT[ProjectColors.COLOR_SCHEME]);
-	    else if(newInteractionState == NodeTrixViz.IA_STATE_HIGHLIGHT_INCOMING) appearance.highlight(ProjectColors.HIGHLIGHT[ProjectColors.COLOR_SCHEME]);
-	    else if(newInteractionState == NodeTrixViz.IA_STATE_HIGHLIGHT_OUTGOING) appearance.highlight(ProjectColors.HIGHLIGHT[ProjectColors.COLOR_SCHEME]);
+    	if(newInteractionState == interactionState) return;
+	    else if(newInteractionState == NodeTrixViz.IA_STATE_HIGHLIGHT) appearance.highlight();
+	    else if(newInteractionState == NodeTrixViz.IA_STATE_HIGHLIGHT_INCOMING) appearance.highlight();
+	    else if(newInteractionState == NodeTrixViz.IA_STATE_HIGHLIGHT_OUTGOING) appearance.highlight();
 	    else if(newInteractionState == NodeTrixViz.IA_STATE_SELECTED) appearance.select();
 	    else{
 	    		appearance.reset();

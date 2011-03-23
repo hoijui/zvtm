@@ -337,7 +337,7 @@ public class Matrix {
 //    	n.setNewState(NodeTrixViz.IA_STATE_HIGHLIGHT, true, true);
 //    	
 //    	if(relations){
-//    		//highlight outgoing relations and nodes.
+//    		//hi outgoing relations and nodes.
 //    		highlightedNodes = new Vector<NTNode>();
 //    		highlightedEdges = new Vector<NTEdge>();
 //    		for(NTEdge e : n.getOutgoingEdges()){

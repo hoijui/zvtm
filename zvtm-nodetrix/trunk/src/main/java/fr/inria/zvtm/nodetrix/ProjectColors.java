@@ -18,11 +18,12 @@ public class ProjectColors {
 	public static int CS_SCREEN = 0;
     public static int CS_PRINT = 1;
     public static int COLOR_SCHEME = CS_SCREEN;
-    
-    public static final Color[] HIGHLIGHT = {Color.yellow, Color.yellow};
-    public static final Color[] HIGHLIGHT_RELATED = {Color.yellow.darker(), Color.orange.brighter()};
-    
+        
     //COLOR DEFINITIONS
+    public static final Color[] HIGHLIGHT_NODE = {Color.LIGHT_GRAY, Color.GRAY};
+    public static final Color[] HIGHLIGHT_NODE_RELATED = {Color.GRAY, Color.GRAY.brighter()};
+    public static final Color[] HIGHLIGHT_GRID = {Color.GRAY,Color.GRAY};
+    
     public static final Color[] MATRIX_BACKGROUND = {Color.WHITE, Color.WHITE};	
 	public static final Color[] MATRIX_SYMMETRY_FIELDS = {Color.LIGHT_GRAY, new Color(245,245,245)};	
 	public static final Color[] MATRIX_GROUP_LABEL_BACKGROUND = {Color.DARK_GRAY, Color.LIGHT_GRAY}	;	
@@ -32,7 +33,7 @@ public class ProjectColors {
 	
 	public static final Color[] EXTRA_COLOR_GRADIENT_END = {Color.gray, Color.gray};
 	public static final Color[] EXTRA_COLOR_GRADIENT_START = {new Color(70,70,70), new Color(220,220,220)};
-	public static final Color[] EXTRA_EDGE_FADE_OUT = {new Color(40,40,40), new Color(245,245,245)};
+	public static final Color[] EXTRA_EDGE_FADE_OUT = {new Color(70,70,70), new Color(222,222,222)};
 	
 	public static final float INTRA_TRANSLUCENCY = .7f;
 	public static final float INTRA_TRANSLUCENCY_DIMMFACTOR = .5f;
@@ -40,7 +41,7 @@ public class ProjectColors {
 	public static final Color INTRA_COLOR_DEFAULT = Color.BLUE;
 	
 	public static final Color[] NODE_TEXT = {Color.LIGHT_GRAY, Color.BLACK};
-	public static final Color[] NODE_BACKGROUND = {Color.DARK_GRAY.darker(), Color.LIGHT_GRAY};
+	public static final Color[] NODE_BACKGROUND = {Color.DARK_GRAY, Color.LIGHT_GRAY};
 	public static final float NODE_BACKGROUND_TRANSLUCENCY = .8f;
 		
 	

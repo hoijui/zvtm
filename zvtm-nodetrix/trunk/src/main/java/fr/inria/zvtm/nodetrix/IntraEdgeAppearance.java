@@ -287,10 +287,8 @@ public class IntraEdgeAppearance extends EdgeAppearance{
    }
 
 	@Override
-	public void highlight(Color c) 
+	public void highlight() 
 	{
-//		gHighlight.setVisible(true);
-//		gHighlight.setColor(c);
 	}
 	
 	@Override
