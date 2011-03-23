@@ -8,6 +8,9 @@ import java.io.Serializable;
 import fr.inria.zvtm.glyphs.Glyph;
 
 //a serializable vessel to move the main Glyph attributes
+//note about Strokes: setting a Stroke will only be propagated if the
+//Stroke instance is serializable; we augment BasicStroke to be 
+//seralizable
 class GlyphAttributes implements Serializable {
 	private final double x;
 	private final double y;

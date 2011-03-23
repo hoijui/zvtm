@@ -11,6 +11,7 @@ import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
+import fr.inria.zvtm.cluster.ClusteredStroke;
 import fr.inria.zvtm.cluster.ClusteredView;
 import fr.inria.zvtm.cluster.ClusterGeometry;
 import fr.inria.zvtm.engine.Camera;
@@ -23,6 +24,7 @@ import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.DPath;
 import fr.inria.zvtm.glyphs.VRectangle;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.util.Vector;
@@ -73,6 +75,12 @@ public class DPathExample {
         path.addSegment(200,0,true);
         path.addSegment(0,0,true);
         vs.addGlyph(path, false);	
+        path.setStroke(new ClusteredStroke(3,
+                BasicStroke.CAP_ROUND,
+                BasicStroke.JOIN_BEVEL,
+                1,
+                new float[]{10, 4},
+                0));
         path.moveTo(100,200);
         System.out.println("path position: (" + path.vx + ", " + path.vy + ")");
         path.moveTo(100,-200);

@@ -17,6 +17,7 @@ import fr.inria.zvtm.glyphs.VText;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Stroke;
 import java.awt.geom.Point2D;
 
 /**
@@ -54,6 +55,7 @@ public aspect AutoReplay extends AbstractAutoReplay {
          execution(public static void Glyph.stickToGlyph(Glyph, Glyph)) ||
          execution(public void Glyph.orientTo(float)) ||
          execution(public void Glyph.setSensitivity(boolean)) ||
+         execution(public void Glyph.setStroke(Stroke)) ||
          execution(public void VText.setFont(Font)) || 
          execution(public void VText.setText(String)) || 
          execution(public void VText.setScale(float)) || 
