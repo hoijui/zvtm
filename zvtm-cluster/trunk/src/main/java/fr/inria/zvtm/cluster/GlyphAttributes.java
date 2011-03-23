@@ -18,7 +18,6 @@ class GlyphAttributes implements Serializable {
 	private final Color mainColor;
 	private final boolean sensitive;
 	private final boolean visible;
-	private final float strokeWidth;
 	private final float translucency;
 
 	private GlyphAttributes(double x, double y, 
@@ -27,7 +26,6 @@ class GlyphAttributes implements Serializable {
 			Color borderColor, Color mainColor,
 			boolean sensitive,
 			boolean visible,
-			float strokeWidth,
 			float translucency){
 		this.x = x;
 		this.y = y;
@@ -37,7 +35,6 @@ class GlyphAttributes implements Serializable {
 		this.mainColor = mainColor;
 		this.sensitive = sensitive;
 		this.visible = visible;
-		this.strokeWidth = strokeWidth;
 		this.translucency = translucency;
 	}
 
@@ -49,7 +46,6 @@ class GlyphAttributes implements Serializable {
 				glyph.getBorderColor(), glyph.getDefaultColor(),
 				glyph.isSensitive(),
 				glyph.isVisible(),
-				glyph.getStrokeWidth(),
 				glyph.getTranslucencyValue());
 	}
 
@@ -61,7 +57,6 @@ class GlyphAttributes implements Serializable {
 		target.setColor(mainColor);
 		target.setSensitivity(sensitive);
 		target.setVisible(visible);
-		target.setStrokeWidth(strokeWidth);
 		target.setTranslucencyValue(translucency);
 	}
 }
