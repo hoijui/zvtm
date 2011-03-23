@@ -1,6 +1,7 @@
 package fr.inria.zvtm.cluster;
 
 import java.awt.Color;
+import java.awt.Stroke;
 import java.awt.geom.Point2D;
 import java.io.Serializable;
 
@@ -19,6 +20,7 @@ class GlyphAttributes implements Serializable {
 	private final boolean sensitive;
 	private final boolean visible;
 	private final float translucency;
+    private final Stroke stroke;
 
 	private GlyphAttributes(double x, double y, 
             int z,
@@ -26,7 +28,8 @@ class GlyphAttributes implements Serializable {
 			Color borderColor, Color mainColor,
 			boolean sensitive,
 			boolean visible,
-			float translucency){
+			float translucency,
+            Stroke stroke){
 		this.x = x;
 		this.y = y;
         this.z = z;
@@ -36,6 +39,11 @@ class GlyphAttributes implements Serializable {
 		this.sensitive = sensitive;
 		this.visible = visible;
 		this.translucency = translucency;
+        if(stroke != null && stroke instanceof Serializable){
+            this.stroke = stroke;
+        } else {
+            this.stroke = null;
+        }
 	}
 
 	static GlyphAttributes fromGlyph(Glyph glyph){
@@ -46,7 +54,8 @@ class GlyphAttributes implements Serializable {
 				glyph.getBorderColor(), glyph.getDefaultColor(),
 				glyph.isSensitive(),
 				glyph.isVisible(),
-				glyph.getTranslucencyValue());
+				glyph.getTranslucencyValue(),
+                glyph.getStroke());
 	}
 
 	void moveAttributesToGlyph(Glyph target){
@@ -58,6 +67,7 @@ class GlyphAttributes implements Serializable {
 		target.setSensitivity(sensitive);
 		target.setVisible(visible);
 		target.setTranslucencyValue(translucency);
+        target.setStroke(stroke);
 	}
 }
 
