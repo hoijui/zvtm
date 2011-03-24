@@ -50,10 +50,12 @@ import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.event.RepaintListener;
 import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.glyphs.IcePDFPageImg;
 import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VText;
+import fr.inria.zvtm.glyphs.MultilineText;
 
 import org.icepdf.core.pobjects.Document;
 import org.icepdf.core.pobjects.Page;
@@ -88,7 +90,8 @@ public class PDFViewer {
 	private Document document;
     int panelWidth, panelHeight;
     private Vector<Glyph> lastSearchAdded = new Vector<Glyph>();
-    private Vector<Glyph> AnnotationAdded = new Vector<Glyph>();
+    private Vector<Glyph> annotationAdded = new Vector<Glyph>();
+    private Vector<WordText> allWords = new Vector<WordText>();
     String lastSearch = new String();
     private int glphyIndex;
     private int pagesInDocument;
@@ -159,17 +162,17 @@ public class PDFViewer {
    }
    
    void highlightAnnotation(){
-	   	 for(Glyph lastgly:AnnotationAdded){
+	   	 for(Glyph lastgly:annotationAdded){
 	   		 vs.addGlyph(lastgly);
 	   	 }
 	}
 
     void removeAnnotation(){
-   	 for(Glyph lastgly:AnnotationAdded){
+   	 for(Glyph lastgly:annotationAdded){
    		 vs.removeGlyph(lastgly);
    	 }
    }
-   
+    
     void previousWord(){
     	if(lastSearchAdded.size() ==0 )return ;
     	glphyIndex--;
@@ -221,37 +224,52 @@ public class PDFViewer {
     }
 
 	void showAnnotations(){
-		if(AnnotationAdded.size()!=0)
+		if(annotationAdded.size()!=0)
 		{
 			highlightAnnotation();
 			return;
 		}
-		ArrayList < ArrayList <Annotation > > listAnnotations = new ArrayList < ArrayList <Annotation > > ();
-		boolean hasAnnotations = false;
+		final ArrayList<MultilineText> mi = new ArrayList<MultilineText>();
+		final ArrayList<VRectangle> vi = new ArrayList<VRectangle>();
+		PDimension pp = document.getPageDimension(0, 0);
 		for(int i = 0 ; i < pagesInDocument; i++){
 			Page page = document.getPageTree().getPage(i, pagesInDocument);
 			ArrayList<Annotation>	annotations = page.getAnnotations();
 			if(annotations != null){
-				hasAnnotations=true;
-				listAnnotations.add( annotations) ; 
-			}
-		}
-		if(hasAnnotations == false) 
-			return;
-		PDimension pp = document.getPageDimension(0, 0);
-		for(int i = 0 ; i < pagesInDocument; i++){
-			ArrayList<Annotation> pageAnnotations =  listAnnotations.get(i);
-			if(pageAnnotations != null){
-				for( int j =0 ;j<pageAnnotations.size() ; j+=2){
-					Annotation annotationP = pageAnnotations.get(j);
+				for( int j =0 ;j<annotations.size() ; j+=2){
+					Annotation annotationP = annotations.get(j);
 					if(annotationP != null && annotationP.getObject("Contents") != null){
 						java.awt.geom.Rectangle2D.Float r = annotationP.getUserSpaceRectangle();
 						RectFloat f = convertRect(new RectFloat(r.x,r.y,r.height,r.width),pp,i);
-						VText v = new VText(f.x +10, f.y +10,0 ,Color.black,annotationP.getColor(), 
-								annotationP.getObject("Contents").toString(),VText.TEXT_ANCHOR_MIDDLE,1,1 );
-						v.setType(ANNOTATION);
-						v.setScale(scaleFactor);
-						AnnotationAdded.add(v);
+						MultilineText m  = new MultilineText(annotationP.getObject("Contents").toString());
+						m.setWidthConstraint(100);
+						m.setScale(2);
+						VRectangle vr = new VRectangle(f.x , f.y,0, 100, 100 ,annotationP.getColor()   );
+						vi.add(vr);
+						mi.add(m);
+						
+						pdfView.repaint(new RepaintListener(){
+							public void viewRepainted(View v){
+								for(int i =0 ;i<vi.size() ;i++){
+									vi.get(i).setVisible(true);
+									double width =mi.get(i).getBounds(mCamera.getIndex()).getX(), height=mi.get(i).getBounds(mCamera.getIndex()).getY();
+									vi.get(i).setWidth(width);
+									vi.get(i).setHeight(height);
+									mi.get(i).moveTo(vi.get(i).vx -width/2, vi.get(i).vy +height/2);
+									vi.get(i).setDrawBorder(false);
+									mi.get(i).setType(ANNOTATION);
+									mi.get(i).setColor(Color.BLACK);
+									mi.get(i).stick(vi.get(i));
+								}
+								pdfView.removeRepaintListener();
+							}
+						});
+						
+						vr.setVisible(false);
+						Color c = new Color(255 , 255 , 255 , 0);
+						m.setColor(c);
+						annotationAdded.add(vr);
+						annotationAdded.add(m);
 					}
 				}
 			}
@@ -406,7 +424,7 @@ class VWGlassPane extends JComponent {
 class PDFViewerEventHandler implements ViewListener {
 
 	PDFViewer application;
-
+	
 	long lastJPX,lastJPY;
 
 	PDFViewerEventHandler(PDFViewer appli){
@@ -414,12 +432,14 @@ class PDFViewerEventHandler implements ViewListener {
 	}
 
 	boolean panning = false;
-
+	boolean rectDrag = false;
+	int initialX , initialY;
+	int finalY , finalX;
 	public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
 		lastJPX=jpx;
 		lastJPY=jpy;
 		Glyph g = v.lastGlyphEntered();
-		if (g != null && g.getType().equals(PDFViewer.ANNOTATION)){
+		if (g != null && g.getType()!=null &&g.getType().equals(PDFViewer.ANNOTATION)){
 		    v.getVCursor().stickGlyph(g);
 		}
 		else {
@@ -436,7 +456,7 @@ class PDFViewerEventHandler implements ViewListener {
 		c.setXspeed(0);
         c.setYspeed(0);
         c.setZspeed(0);
-		v.setDrawDrag(false);
+    	v.setDrawDrag(false);
 		VirtualSpaceManager.INSTANCE.getActiveView().mouse.setSensitivity(true);
 	}
 
@@ -450,28 +470,22 @@ class PDFViewerEventHandler implements ViewListener {
 		}
 	}
 
-	public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+	public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
-	}
+	public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
-	public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	}
+	public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
-	public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-	}
+	public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
-	public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	}
-
-	public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	}
+	public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
 	public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
 	public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){}
 
 	public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
-		if (panning){
+		if (panning == true){
 			Camera c = VirtualSpaceManager.INSTANCE.getActiveCamera();
 			double a = (c.focal+Math.abs(c.altitude))/c.focal;
 			if (mod == SHIFT_MOD) {
