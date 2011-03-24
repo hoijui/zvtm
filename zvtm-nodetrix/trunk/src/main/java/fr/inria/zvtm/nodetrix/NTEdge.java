@@ -47,15 +47,18 @@ public class NTEdge extends LinLogEdge{
         	newAppearance = new ExtraEdgeAppearance(this);
         }
     	
-    	if(visible)
-    		newAppearance.show();
-    	else
-    		newAppearance.fade();
     }
     
     public void performAppearanceStateChange(){
     	if(appearance != null) appearance.clearGraphics();
     	appearance = newAppearance;
+    	
+    	if (newAppearance != null) return;
+    	
+    	if(visible)
+    		newAppearance.show();
+    	else
+    		newAppearance.fade();
     }
 
     public void setNewInteractionState(int newState)
