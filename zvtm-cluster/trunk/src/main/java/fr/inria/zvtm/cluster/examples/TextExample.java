@@ -21,6 +21,7 @@ import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.glyphs.MultilineText;
 import fr.inria.zvtm.glyphs.VTextOr;
 
 import java.awt.Color;
@@ -72,6 +73,13 @@ public class TextExample {
         hi.orientTo((float)Math.PI / 4f);
         vs.addGlyph(hi, false);	
         hi.setFont(new Font("Serif", Font.PLAIN, 20));
+
+        MultilineText quote = new MultilineText("In many of the more relaxed civilizations on the Outer Eastern Rim of the Galaxy, the 'Hitchiker's Guide' has already supplanted the great 'Encyclopedia Galactica' as the standard repository of all knowledge and wisdom, for though it has many omissions and contains much that is apocryphal, or at least wildly inaccurate, it scores over the older, more pedestrian work in two important respects. First, it is slightly cheaper; and second, it has the words 'DON'T PANIC' inscribed in large friendly letters on its cover.");
+        quote.setFont(new Font("Serif", Font.PLAIN, 11));
+        quote.setColor(Color.RED);
+        quote.move(0, -15);
+        quote.setWidthConstraint(3*42);
+        vs.addGlyph(quote);
     }
 
 	public static void main(String[] args){

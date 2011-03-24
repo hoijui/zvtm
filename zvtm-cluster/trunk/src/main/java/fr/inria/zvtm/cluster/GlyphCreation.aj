@@ -22,6 +22,7 @@ import fr.inria.zvtm.glyphs.SICircle;
 import fr.inria.zvtm.glyphs.ClosedShape;
 import fr.inria.zvtm.glyphs.Composite;
 import fr.inria.zvtm.glyphs.DPath;
+import fr.inria.zvtm.glyphs.MultilineText;
 import fr.inria.zvtm.glyphs.SIRectangle;
 import fr.inria.zvtm.glyphs.VCircle;
 import fr.inria.zvtm.glyphs.VEllipse;
@@ -159,6 +160,10 @@ public aspect GlyphCreation {
         return new CompositeReplicator(this);
     }
 
+    @Override GlyphReplicator MultilineText.getReplicator(){
+        return new MultilineTextReplicator(this);
+    }
+
 	private static class NopReplicator implements GlyphReplicator {
         public Glyph createGlyph(){
             return null;
@@ -265,7 +270,6 @@ public aspect GlyphCreation {
 		}
 
 		public Glyph doCreateGlyph(){
-			//beware of z-index
 			return new VRectangle(0d,0d,0,width,height,Color.BLACK);
 		}
 
@@ -282,7 +286,6 @@ public aspect GlyphCreation {
 		}
 
 		public Glyph doCreateGlyph(){
-			//beware of z-index
 			return new VRectangleOr(0d,0d,0,width,height,Color.BLACK,0);
 		}
 
@@ -301,7 +304,6 @@ public aspect GlyphCreation {
 		}
 
 		public Glyph doCreateGlyph(){
-			//beware of z-index
 			return new VCircle(0d,0d,0,radius,Color.BLACK);
 		}
 
@@ -321,7 +323,6 @@ public aspect GlyphCreation {
 		}
 
 		public Glyph doCreateGlyph(){
-			//beware of z-index
 			return new VSegment(0d,0d,halfWidth,halfHeight,0,Color.BLACK);
 		}
 	}
@@ -339,10 +340,27 @@ public aspect GlyphCreation {
 		}
 
 		public Glyph doCreateGlyph(){
-			//beware of z-index
 			return new VText(0d,0d,0,Color.BLACK,text,textAnchor,scaleFactor);
 		}
 	}
+
+    private static class MultilineTextReplicator extends VTextReplicator {
+        protected final double widthConstraint;
+        protected final double heightConstraint;
+
+        MultilineTextReplicator(MultilineText source){
+            super(source);
+            this.widthConstraint = source.getWidthConstraint();
+            this.heightConstraint = source.getHeightConstraint();
+        }
+
+        public Glyph doCreateGlyph(){
+            MultilineText retval =  new MultilineText(text);
+            retval.setWidthConstraint(widthConstraint);
+            retval.setHeightConstraint(heightConstraint);
+            return retval;
+        }
+    }
 
     private static class VTextOrReplicator extends VTextReplicator{
         VTextOrReplicator(VTextOr source){
