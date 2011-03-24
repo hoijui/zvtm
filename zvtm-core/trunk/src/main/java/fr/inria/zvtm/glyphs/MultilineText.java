@@ -49,11 +49,24 @@ public class MultilineText extends VText {
     /**
      * Height constraint, in virtual space units.
      * Text will be truncated if it overflows the
-     * height constraint.
+     * height constraint. 
      */
     public void setHeightConstraint(double constraint){
         heightConstraint = constraint;
         invalidate();
+    }
+
+    /**
+     * Gets the width constraint for this MultilineText.
+     * A value of Double.POSITIVE_INFINITY means that the
+     * width is unconstrained.
+     */
+    public double getWidthConstraint(){
+        return widthConstraint;
+    }
+
+    public double getHeightConstraint(){
+        return heightConstraint;
     }
 
     @Override public void setText(String text){
