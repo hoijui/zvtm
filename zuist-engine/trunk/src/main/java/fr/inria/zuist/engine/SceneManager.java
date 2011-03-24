@@ -664,6 +664,10 @@ public class SceneManager implements CameraListener {
         return region;
     }
     
+	/** Destroy all regions at a given level.
+	 * Destroying a region destroys all object descriptions it contains.
+	 *@param l level index
+	 */
     public void destroyRegionsAtLevel(int l){
         Region[] ral = getRegionsAtLevel(l);
         for (int i=0;i<ral.length;i++){
@@ -671,6 +675,10 @@ public class SceneManager implements CameraListener {
         }
     }
     
+	/** Destroy a region.
+	 * Destroying a region destroys all object descriptions it contains.
+	 *@param r region to be destroyed
+	 */
     public void destroyRegion(Region r){
         r.forceHide(Region.DISAPPEAR, r.x, r.y);
         ObjectDescription[] ods = r.getObjectsInRegion();
