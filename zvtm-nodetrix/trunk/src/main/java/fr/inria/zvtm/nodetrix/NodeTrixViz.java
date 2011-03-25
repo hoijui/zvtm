@@ -60,7 +60,7 @@ public class NodeTrixViz {
     /* Links between matrices */
 	public static final float EXTRA_ALPHA_MAX_LENGHT = 1500;  
 	public static final float EXTRA_ALPHA_MIN_LENGHT = 100;  
-	public static final float EXTRA_ALPHA_MIN = .5f;
+	public static final float EXTRA_ALPHA_MIN = .1f;
 	
 	public static final double LINLOG_QUALITY = 100;
 	
@@ -532,8 +532,8 @@ public class NodeTrixViz {
     	}
 
     	matrices.addAll(newMatrices);
-    	//reorderMatricesCMK();
-    	layoutMatrices(matrices);
+    	reorderMatricesCMK();
+    	//layoutMatrices(matrices);
     }
     
     

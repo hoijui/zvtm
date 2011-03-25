@@ -33,7 +33,7 @@ public class ProjectColors {
 	
 	public static final Color[] EXTRA_COLOR_GRADIENT_END = {Color.gray, Color.gray};
 	public static final Color[] EXTRA_COLOR_GRADIENT_START = {new Color(70,70,70), new Color(220,220,220)};
-	public static final Color[] EXTRA_EDGE_FADE_OUT = {new Color(70,70,70), new Color(222,222,222)};
+	public static final Color[] EXTRA_EDGE_FADE_OUT = {new Color(70,70,70), new Color(200,200,200)};
 	
 	public static final float INTRA_TRANSLUCENCY = .7f;
 	public static final float INTRA_TRANSLUCENCY_DIMMFACTOR = .5f;
