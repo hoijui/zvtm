@@ -24,6 +24,7 @@ import java.awt.Font;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+import java.awt.geom.Point2D;
 import java.util.Vector;
 
 /**
@@ -35,7 +36,7 @@ public class MultilineTextTest {
     private Camera cam;
 
     MultilineTextTest(){
-        VirtualSpace vs = vsm.addVirtualSpace("testSpace");
+        final VirtualSpace vs = vsm.addVirtualSpace("testSpace");
         cam = vs.addCamera();
         cam.setZoomFloor(-90);
         Vector<Camera> cameras = new Vector<Camera>();
@@ -46,11 +47,12 @@ public class MultilineTextTest {
         view.setListener(new MultilineTestEventHandler());
         view.getCursor().setColor(Color.GREEN);
 
-        MultilineText adt = new MultilineText("Forty-two is six multiplied by nine.");
+        final MultilineText adt = new MultilineText("Forty-two is six multiplied by nine.");
         adt.setColor(Color.RED);
         adt.setWidthConstraint(42);
         vs.addGlyph(adt);
-        MultilineText adt2 = new MultilineText("We apologize for the inconvenience");
+    
+        final MultilineText adt2 = new MultilineText("We apologize for the inconvenience");
         adt2.setColor(Color.BLUE);
         adt2.setFont(new Font("Monospaced", Font.PLAIN, 6));
         adt2.move(50, 0);
@@ -59,10 +61,29 @@ public class MultilineTextTest {
         view.repaint(new RepaintListener(){
             public void viewRepainted(View v){
                 view.getGlobalView(cam, 500);
+                Point2D.Double adtB = adt.getBounds(cam.getIndex());
+                System.err.println("adt bounds: " + adtB.getX()
+                    + ", " + adtB.getY());
+                VRectangle adtBounds = new VRectangle(adt.vx, adt.vy, 0,
+                    adtB.getX(), adtB.getY(),
+                    new Color(0,0,0,0));
+                adtBounds.setBorderColor(Color.RED);
+                adtBounds.move(adtBounds.getWidth()/2, -adtBounds.getHeight()/2);
+                vs.addGlyph(adtBounds);
+
+                Point2D.Double adt2B = adt2.getBounds(cam.getIndex());
+                VRectangle adt2Bounds = new VRectangle(adt2.vx, adt2.vy, 0,
+                    adt2B.getX(), adt2B.getY(),
+                    new Color(0,0,0,0));
+                adt2Bounds.setBorderColor(Color.BLUE);
+                adt2Bounds.move(adt2Bounds.getWidth()/2, 
+                    -adt2Bounds.getHeight()/2);
+                vs.addGlyph(adt2Bounds);
+
                 view.removeRepaintListener();
             }
         });
-    }
+     }
 
     public static void main(String[] args){
         new MultilineTextTest();

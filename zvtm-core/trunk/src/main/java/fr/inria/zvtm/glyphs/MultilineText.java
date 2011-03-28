@@ -12,7 +12,6 @@ import java.awt.geom.Rectangle2D;
 import java.text.AttributedString;
 
 /**
- * 2011-03-17: in early development, do not use this yet!
  * Multiline text.
  * By default, text will be rendered on one line. Specifiy a width
  * constraint to make the text overflow on multiple lines. Specify
@@ -20,6 +19,7 @@ import java.text.AttributedString;
  * meaningful if a width constraint has been defined.
  * The 'hot spot' of a MultilineText instance is its top-left corner.
  * This is unlike VText.
+ * Note: setting a background color is unsupported.
  */
 public class MultilineText extends VText {
     // See http://java.sun.com/developer/onlineTraining/Media/2DText/style.html#multiple
