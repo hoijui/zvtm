@@ -133,7 +133,9 @@ public class Camera {
     }
 
     /**
-     * set a zoom-out limit/minimum magnification  (like a ceiling the camera cannot go through)<br>
+     * Set a zoom-out limit/minimum magnification  (like a ceiling the camera cannot go through)<br>. Note: if the ceiling is set below the current
+     * Camera altitude, the Camera will not be moved automatically. This
+     * is up to the application developer.
      *@param a the altitude of the ceiling - the default value is Double.MAX_VALUE
      */
     public void setZoomCeiling(double a){
