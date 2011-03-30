@@ -79,6 +79,7 @@ public class Camera {
 
     /**allow negative camera altitudes (this will zoom beyond the nominal scale).*/
     private double zoomFloor = 0;
+    private double zoomCeiling = Double.MAX_VALUE;
 
     //"listeners" is traversed a lot more often than it is mutated.
     private final List<CameraListener> listeners = new CopyOnWriteArrayList<CameraListener>();
@@ -116,7 +117,6 @@ public class Camera {
      * set a zoom-in limit/maximum magnification  (like a floor the camera cannot go through)<br>
      * value 0 means that, at maximum magnification, the size of observed glyphs corresponds to their <i>real</i> size (e.g. if a circle has a declared radius of 50 in the virtual space, then its radius at max magnification is 50)<br>
      * if the floor is set to a negative value, you will be able to zoom in further (meaning that you will be able to magnify objects beyond their declared size)<br>
-     * Note: there is no limit for zoom out (no so-called ceiling)
      *@param a the altitude of the floor - the default value is 0 (put a negative value if you want to be able to magnify objects beyond their normal size) 
      */
     public void setZoomFloor(double a){
@@ -127,10 +127,25 @@ public class Camera {
      * get the zoom-in limit/maximum magnification  (like a floor the camera cannot go through)<br>
      * default value 0 means that, at maximum magnification, the size of observed glyphs corresponds to their <i>real</i> size (e.g. if a circle has a declared radius of 50 in the virtual space, then its radius at max magnification is 50)<br>
      * if the floor is set to a negative value, you will be able to zoom in further (meaning that you will be able to magnify objects beyond their declared size)<br>
-     * Note: there is no limit for zoom out (no so-called ceiling)
      */
     public double getZoomFloor(){
-	return zoomFloor;
+        return zoomFloor;
+    }
+
+    /**
+     * set a zoom-out limit/minimum magnification  (like a ceiling the camera cannot go through)<br>
+     *@param a the altitude of the ceiling - the default value is Double.MAX_VALUE
+     */
+    public void setZoomCeiling(double a){
+        zoomCeiling=a;
+    }
+
+    /**
+     * Get the zoom-out limit/minimum magnification (like a ceiling the camera cannot go through).
+     * The default value is Double.MAX_VALUE.
+     */
+    public double getZoomCeiling(){
+        return zoomCeiling;
     }
 
     /**relative translation (offset) - will trigger a repaint, whereas directly assigning values to vx, vy will not*/
@@ -181,8 +196,9 @@ public class Camera {
      */
     public void setAltitude(double a, boolean repaint){
         double oldAlt = altitude;
-        if (a>=zoomFloor){altitude=a;}  //test prevents incorrect altitudes
-        else {altitude=zoomFloor;}
+        if (a<zoomFloor){altitude=zoomFloor;}  //test prevents incorrect altitudes
+        else if(a>zoomCeiling){altitude=zoomCeiling;}
+        else {altitude=a;}
         propagateAltitudeChange(altitude - oldAlt);
         if (repaint && view != null){
             VirtualSpaceManager.INSTANCE.repaint(view);
