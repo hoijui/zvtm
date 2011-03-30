@@ -265,8 +265,8 @@ public class Camera {
         if(clippedy < sb){ clippedy = sb; }
         if(clippedy > nb){ clippedy = nb; }
 
-        deltax = clippedx - vx;
-        deltay = clippedy - vy;
+        double deltax = clippedx - vx;
+        double deltay = clippedy - vy;
         vx = clippedx;
         vy = clippedy;
         propagateMove(deltax, deltay);
