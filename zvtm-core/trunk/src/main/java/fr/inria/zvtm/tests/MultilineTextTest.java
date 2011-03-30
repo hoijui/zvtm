@@ -62,8 +62,6 @@ public class MultilineTextTest {
             public void viewRepainted(View v){
                 view.getGlobalView(cam, 500);
                 Point2D.Double adtB = adt.getBounds(cam.getIndex());
-                System.err.println("adt bounds: " + adtB.getX()
-                    + ", " + adtB.getY());
                 VRectangle adtBounds = new VRectangle(adt.vx, adt.vy, 0,
                     adtB.getX(), adtB.getY(),
                     new Color(0,0,0,0));
