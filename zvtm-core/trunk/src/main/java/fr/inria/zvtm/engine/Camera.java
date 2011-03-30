@@ -47,6 +47,13 @@ public class Camera {
     /** Coordinates in virtual space.*/
 	public double vx,vy;
 
+    //borders (west, north, east, south), in 
+    //virtual space coordinates
+    private double wb = Double.MIN_VALUE;
+    private double nb = Double.MAX_VALUE;
+    private double eb = Double.MAX_VALUE;
+    private double sb = Double.MIN_VALUE;
+
     /** Altitude of observation (controls zoom factor).*/
     public double altitude;
 
@@ -150,19 +157,41 @@ public class Camera {
         return zoomCeiling;
     }
 
+    /**
+     * Sets the horizontal bounds for this Camera.
+     * Note: This does not move the Camera if it currently 
+     * lies outside the bounds.
+     */
+    public void setBounds(double[] wnes){
+        if(wnes[0] > wnes[2] || wnes[1] < wnes[3]){
+            throw new IllegalArgumentException("Invalid Camera bounds");
+        }
+        this.wb = wnes[0];
+        this.nb = wnes[1];
+        this.eb = wnes[2];
+        this.sb = wnes[3];
+    }
+
+    /**
+     * Gets the horizontal bounds for this Camera.
+     * @return a double array of size 4, containing the
+     * {west, north, east, south} borders.
+     */
+    public double[] getBounds(){
+        return new double[]{wb, nb, eb, sb};
+    }
+
     /**relative translation (offset) - will trigger a repaint, whereas directly assigning values to vx, vy will not*/
     public void move(double x, double y){
-        vx += x;
-        vy += y;
-        propagateMove(vx, vy);  //take care of sticked glyphs
-        if (view != null){
-            VirtualSpaceManager.INSTANCE.repaint(view);
-        }
-        notifyMoved();
+        moveTo(vx+x, vy+y);
     }
     
     /**absolute translation - will trigger a repaint, whereas directly assigning values to vx, vy will not*/
     public void moveTo(double x, double y){
+        if(x < wb){ x = wb; }
+        if(x > eb){ x = eb; }
+        if(y < sb){ y = sb; }
+        if(y > nb){ y = nb; }
         vx = x;
         vy = y;
         propagateMove(x-vx, y-vy);  //take care of sticked glyphs
@@ -229,11 +258,29 @@ public class Camera {
      * Set camera location
      */
     public void setLocation(Location l){
-        propagateMove(l.vx-vx, l.vy-vy);
-        propagateAltitudeChange(l.alt - altitude);
-        vx = l.vx;
-        vy = l.vy;
-        altitude = l.alt;
+        double clippedx = l.vx;
+        double clippedy = l.vy;
+        if(clippedx < wb){ clippedx = wb; }
+        if(clippedx > eb){ clippedx = eb; }
+        if(clippedy < sb){ clippedy = sb; }
+        if(clippedy > nb){ clippedy = nb; }
+
+        deltax = clippedx - vx;
+        deltay = clippedy - vy;
+        vx = clippedx;
+        vy = clippedy;
+        propagateMove(deltax, deltay);
+
+        double clippedAlt = l.alt;
+        if(clippedAlt < zoomFloor){
+            clippedAlt = zoomFloor;
+        }
+        if(clippedAlt > zoomCeiling){
+            clippedAlt = zoomCeiling;
+        }
+        double deltaAlt = clippedAlt - altitude;
+        propagateAltitudeChange(clippedAlt);
+        altitude = clippedAlt;
         if (view != null){
             VirtualSpaceManager.INSTANCE.repaint(view);
         }
