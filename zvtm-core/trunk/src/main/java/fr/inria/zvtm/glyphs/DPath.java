@@ -477,7 +477,7 @@ public class DPath extends Glyph implements RectangularShape {
     /** Iterate on the path's components (each line, quad curve, cubic curve) and draw them step by step.*/
     public static final short DRAW_SUBPATHS = 1;
     
-    short drawingMethod = DRAW_GENERAL_PATH;
+    short drawingMethod = DRAW_SUBPATHS;
 
     /** Specify what drawing method to use to paint this path.
      *@param m method to draw this glyph.
