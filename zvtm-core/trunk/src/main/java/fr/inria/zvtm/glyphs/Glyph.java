@@ -436,7 +436,7 @@ public abstract class Glyph implements Cloneable, Translucent {
     protected Stroke stroke = null;  
     
     /** Set a custom stroke to paint glyph's border.
-     *@param b basic stroke (null to set standard 1px-thick stroke)
+     *@param s stroke (null to set standard 1px-thick stroke)
      */
     public void setStroke(Stroke s){
 		if (s!=null){stroke=s;}
