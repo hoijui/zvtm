@@ -49,10 +49,10 @@ public class Camera {
 
     //borders (west, north, east, south), in 
     //virtual space coordinates
-    private double wb = Double.MIN_VALUE;
+    private double wb = -Double.MAX_VALUE;
     private double nb = Double.MAX_VALUE;
     private double eb = Double.MAX_VALUE;
-    private double sb = Double.MIN_VALUE;
+    private double sb = -Double.MAX_VALUE;
 
     /** Altitude of observation (controls zoom factor).*/
     public double altitude;
