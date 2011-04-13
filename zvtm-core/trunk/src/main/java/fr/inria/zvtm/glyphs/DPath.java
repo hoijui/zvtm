@@ -427,7 +427,7 @@ public class DPath extends Glyph implements RectangularShape {
 
     @Override
     public boolean fillsView(double w,double h,int camIndex){
-	return false;
+	    return false;
     }
 
     @Override
@@ -444,32 +444,32 @@ public class DPath extends Glyph implements RectangularShape {
 
     @Override
     public void project(Camera c, Dimension d){
-	int i = c.getIndex();
-	coef = c.focal / (c.focal+c.altitude);
-	hw = d.width/2;
-	hh = d.height/2;
-	pc[i].cx = hw + (int)Math.round((spx-c.vx)*coef);
-	pc[i].cy = hh - (int)Math.round((spy-c.vy)*coef);
-	if (elements.length == 0){return;}
-	elements[0].project(i, hw, hh, c, coef, pc[i].cx, pc[i].cy);
-	for (int j=1;j<elements.length;j++){
-	    elements[j].project(i, hw, hh, c, coef, elements[j-1].getX(i), elements[j-1].getY(i));
-	}
+        int i = c.getIndex();
+        coef = c.focal / (c.focal+c.altitude);
+        hw = d.width/2;
+        hh = d.height/2;
+        pc[i].cx = hw + (int)Math.round((spx-c.vx)*coef);
+        pc[i].cy = hh - (int)Math.round((spy-c.vy)*coef);
+        if (elements.length == 0){return;}
+        elements[0].project(i, hw, hh, c, coef, pc[i].cx, pc[i].cy);
+        for (int j=1;j<elements.length;j++){
+            elements[j].project(i, hw, hh, c, coef, elements[j-1].getX(i), elements[j-1].getY(i));
+        }
     }
 
     @Override
     public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, double lensx, double lensy){
-	int i = c.getIndex();
-	coef = c.focal / (c.focal+c.altitude) * lensMag;
-	lhw = lensWidth/2;
-	lhh = lensHeight/2;
-	pc[i].lcx = lhw + (int)Math.round((spx-(lensx))*coef);
-	pc[i].lcy = lhh - (int)Math.round((spy-(lensy))*coef);
-	if (elements.length == 0){return;}
-	elements[0].projectForLens(i, lhw, lhh, lensx, lensy, coef, pc[i].lcx, pc[i].lcy);
-	for (int j=1;j<elements.length;j++){
-	    elements[j].projectForLens(i, lhw, lhh, lensx, lensy, coef, elements[j-1].getlX(i), elements[j-1].getlY(i));
-	}
+        int i = c.getIndex();
+        coef = c.focal / (c.focal+c.altitude) * lensMag;
+        lhw = lensWidth/2;
+        lhh = lensHeight/2;
+        pc[i].lcx = lhw + (int)Math.round((spx-(lensx))*coef);
+        pc[i].lcy = lhh - (int)Math.round((spy-(lensy))*coef);
+        if (elements.length == 0){return;}
+        elements[0].projectForLens(i, lhw, lhh, lensx, lensy, coef, pc[i].lcx, pc[i].lcy);
+        for (int j=1;j<elements.length;j++){
+            elements[j].projectForLens(i, lhw, lhh, lensx, lensy, coef, elements[j-1].getlX(i), elements[j-1].getlY(i));
+        }
     }
 
     /** Draw the general path that gets compiled each time we make a change to the DPath (default). */
@@ -892,74 +892,74 @@ public class DPath extends Glyph implements RectangularShape {
      * Get total number of elements in the path
      */
     public int getElementsCount(){
-	if (elements != null)
-	    return elements.length;
-	else
-	    return 0;
+        if (elements != null)
+            return elements.length;
+        else
+            return 0;
     }
 
     /**
-     * Get element's type
-     * @param index index of the element in the DPath
-     * @return -1 in case of incorrect parameters, otherwise returns one of the constants DPath.CBC, DPath.QDC, DPath.SEG, DPath.MOV 
-     */
+    * Get element's type
+    * @param index index of the element in the DPath
+    * @return -1 in case of incorrect parameters, otherwise returns one of the constants DPath.CBC, DPath.QDC, DPath.SEG, DPath.MOV 
+    */
     public int getElementType(int index){
-	if (elements != null && index > -1 && index < elements.length && elements[index] != null){
-	    return elements[index].type;
-	}
-	else {
-	    return -1;
-	}
+        if (elements != null && index > -1 && index < elements.length && elements[index] != null){
+            return elements[index].type;
+        }
+        else {
+            return -1;
+        }
     }
-    
+
     /**
      * Get coordinates of the start, end and control points of the element
      * @param index index of the element in the DPath
      * @return List of element's points ordered as startPoint, controlPoint1, controlPoint2, endPoint
      */    
     public Point2D.Double[] getElementPointsCoordinates(int index){
-	Point2D.Double[] result = null;
-	if (elements != null && index > -1 && index < elements.length && elements[index] != null){
-	    switch (elements[index].type){
-	    case DPath.CBC:{
-		result = new Point2D.Double[4];
-		if (index == 0){
-		    result[0] = new Point2D.Double(this.spx, this.spy);
-		}
-		else{
-		    result[0] = new Point2D.Double(elements[index - 1].x, elements[index - 1].y);
-		}
-		result[3] = new Point2D.Double(elements[index].x, elements[index].y);
-		result[1] = new Point2D.Double(((CBCElement)elements[index]).ctrlx1, ((CBCElement)elements[index]).ctrly1);
-		result[2] = new Point2D.Double(((CBCElement)elements[index]).ctrlx2, ((CBCElement)elements[index]).ctrly2);
-		break;
-	    }
-	    case DPath.QDC:{
-		result = new Point2D.Double[3];
-		if (index == 0){
-		    result[0] = new Point2D.Double(this.spx, this.spy);
-		}
-		else{
-		    result[0] = new Point2D.Double(elements[index - 1].x, elements[index - 1].y);
-		}
-		result[2] = new Point2D.Double(elements[index].x, elements[index].y);
-		result[1] = new Point2D.Double(((QDCElement)elements[index]).ctrlx, ((QDCElement)elements[index]).ctrly);
-		break;
-	    }
-	    default:{
-		result = new Point2D.Double[2];
-		if (index == 0){
-		    result[0] = new Point2D.Double(this.spx, this.spy);
-		}
-		else{
-		    result[0] = new Point2D.Double(elements[index - 1].x, elements[index - 1].y);
-		}
-		result[1] = new Point2D.Double(elements[index].x, elements[index].y);
-		break;
-	    }
-	    }
-	}
-	return result;
+        Point2D.Double[] result = null;
+        if (elements != null && index > -1 && index < elements.length && elements[index] != null){
+            switch (elements[index].type){
+                case DPath.CBC:{
+                    result = new Point2D.Double[4];
+                    if (index == 0){
+                        result[0] = new Point2D.Double(this.spx, this.spy);
+                    }
+                    else{
+                        result[0] = new Point2D.Double(elements[index - 1].x, elements[index - 1].y);
+                    }
+                    result[3] = new Point2D.Double(elements[index].x, elements[index].y);
+                    result[1] = new Point2D.Double(((CBCElement)elements[index]).ctrlx1, ((CBCElement)elements[index]).ctrly1);
+                    result[2] = new Point2D.Double(((CBCElement)elements[index]).ctrlx2, ((CBCElement)elements[index]).ctrly2);
+                    break;
+                }
+                case DPath.QDC:{
+                    result = new Point2D.Double[3];
+                    if (index == 0){
+                        result[0] = new Point2D.Double(this.spx, this.spy);
+                    }
+                    else{
+                        result[0] = new Point2D.Double(elements[index - 1].x, elements[index - 1].y);
+                    }
+                    result[2] = new Point2D.Double(elements[index].x, elements[index].y);
+                    result[1] = new Point2D.Double(((QDCElement)elements[index]).ctrlx, ((QDCElement)elements[index]).ctrly);
+                    break;
+                }
+                default:{
+                    result = new Point2D.Double[2];
+                    if (index == 0){
+                        result[0] = new Point2D.Double(this.spx, this.spy);
+                    }
+                    else{
+                        result[0] = new Point2D.Double(elements[index - 1].x, elements[index - 1].y);
+                    }
+                    result[1] = new Point2D.Double(elements[index].x, elements[index].y);
+                    break;
+                }
+            }
+        }
+        return result;
     }
     
 	public int getNumberOfPoints(){
@@ -1018,21 +1018,21 @@ public class DPath extends Glyph implements RectangularShape {
      * @return List of LongPoint absolute coordinates that can be passed to the edit(LongPoint[], boolean) method or to the AnimManager
      */
     public static Point2D.Double[] getFlattenedCoordinates(DPath path, Point2D.Double startPoint, Point2D.Double endPoint, boolean abs){
-	Point2D.Double[] result = path.getAllPointsCoordinates();
-	if (!abs){
-	    startPoint = new Point2D.Double(result[0].x + startPoint.x, result[0].y + startPoint.y);
-	    endPoint = new Point2D.Double(result[result.length-1].x + endPoint.x, result[result.length-1].y + endPoint.y);            
-	}
-	double dx = (endPoint.x - startPoint.x) / (double)result.length;
-	double dy = (endPoint.y - startPoint.y) / (double)result.length;
-	
-	for (int i = 0; i < result.length - 1; i++){
+        Point2D.Double[] result = path.getAllPointsCoordinates();
+        if (!abs){
+            startPoint = new Point2D.Double(result[0].x + startPoint.x, result[0].y + startPoint.y);
+            endPoint = new Point2D.Double(result[result.length-1].x + endPoint.x, result[result.length-1].y + endPoint.y);            
+        }
+        double dx = (endPoint.x - startPoint.x) / (double)result.length;
+        double dy = (endPoint.y - startPoint.y) / (double)result.length;
+
+        for (int i = 0; i < result.length - 1; i++){
             result[i].x = startPoint.x + i * dx;
             result[i].y = startPoint.y + i * dy;                
         }
-	result[result.length - 1].x = endPoint.x;
-	result[result.length - 1].y = endPoint.y;
-	return result;
+        result[result.length - 1].x = endPoint.x;
+        result[result.length - 1].y = endPoint.y;
+        return result;
     }
     
 
@@ -1115,99 +1115,103 @@ public class DPath extends Glyph implements RectangularShape {
      */
     public double getStartTangentOrientation(){
 	    double res = 0;
-	if (elements.length > 0){
-	    PathElement el = elements[0];
-	    double sx = 0;
-	    double sy = 0;
-	    switch(el.type){
-	    case DPath.CBC:{
-		sx = ((CBCElement)el).ctrlx1;
-		sy = ((CBCElement)el).ctrly1;
-		break;
-	    }
-	    case DPath.QDC:{
-		sx = ((QDCElement)el).ctrlx;
-		sy = ((QDCElement)el).ctrly;
-		break;
-	    }
-	    default:{
-		sx = el.x;
-		sy = el.y;
-		break;
-	    }
-	    }
-	    if (spx == sx){ // x = 0, y = +-1
-		if (spy > sy) // y > 0
-		    res = (float)(Math.PI / 2);
-		else // y < 0
-		    res = (float)(Math.PI * 1.5);
-	    }
-	    else {
-		double tan = (double)(spy - sy) / (double)(spx - sx);
-		res = Math.atan(tan);
-		if (spx < sx) { // x < 0 
-		    res += Math.PI;
-		}
-		if (spx > sx && spy < sy){ // x > 0; y < 0
-		    res += 2*Math.PI;
-		}
-	    }
-	}
-	return res;
+        if (elements.length > 0){
+            PathElement el = elements[0];
+            double sx = 0;
+            double sy = 0;
+            switch(el.type){
+                case DPath.CBC:{
+                    sx = ((CBCElement)el).ctrlx1;
+                    sy = ((CBCElement)el).ctrly1;
+                    break;
+                }
+                case DPath.QDC:{
+                    sx = ((QDCElement)el).ctrlx;
+                    sy = ((QDCElement)el).ctrly;
+                    break;
+                }
+                default:{
+                    sx = el.x;
+                    sy = el.y;
+                    break;
+                }
+            }
+            if (spx == sx){ // x = 0, y = +-1
+                if (spy > sy) // y > 0
+                res = (float)(Math.PI / 2);
+            else // y < 0
+                res = (float)(Math.PI * 1.5);
+            }
+            else {
+                double tan = (double)(spy - sy) / (double)(spx - sx);
+                res = Math.atan(tan);
+                if (spx < sx) { // x < 0 
+                    res += Math.PI;
+                }
+                if (spx > sx && spy < sy){ // x > 0; y < 0
+                    res += 2*Math.PI;
+                }
+            }
+        }
+        return res;
     }
-    
+
     /**
      * Get orientation of the tangent to the end of the path.
      * @return radians between 0..2*Pi
      */
     public double getEndTangentOrientation(){
         double res = 0;
-	if (elements.length > 0){
-	    PathElement el = elements[elements.length-1];
-	    double sx = 0;
-	    double sy = 0;
-	    switch(el.type){
-	    case DPath.CBC:{
-		sx = ((CBCElement)el).ctrlx2;
-		sy = ((CBCElement)el).ctrly2;
-		break;
-	    }
-	    case DPath.QDC:{
-		sx = ((QDCElement)el).ctrlx;
-		sy = ((QDCElement)el).ctrly;
-		break;
-	    }
-	    default:{
-		if (elements.length > 1){
-		    sx = elements[elements.length - 2].x;
-		    sy = elements[elements.length - 2].y;
-		}
-		else {
-		    sx = spx;
-		    sy = spy;
-		}
-		break;
-	    }
-	    }
-	    if (el.x == sx){ // x = 0, y = +-1
-		if (el.y > sy) // y > 0
-		    res = (float)(Math.PI / 2);
-		else // y < 0
-		    res = (float)(Math.PI * 1.5);
-	    }
-	    else {
-		double tan = (double)(el.y - sy) / (double)(el.x - sx);
-		res = Math.atan(tan);
-		if (el.x < sx) { // x < 0 
-		    res += Math.PI;
-		}
-		if (el.x > sx && el.y < sy){ // x > 0; y < 0
-		    res += 2*Math.PI;
-		}
-	    }
-	}
-	return res;
+        if (elements.length > 0){
+            PathElement el = elements[elements.length-1];
+            double sx = 0;
+            double sy = 0;
+            switch(el.type){
+                case DPath.CBC:{
+                    sx = ((CBCElement)el).ctrlx2;
+                    sy = ((CBCElement)el).ctrly2;
+                    break;
+                }
+                case DPath.QDC:{
+                    sx = ((QDCElement)el).ctrlx;
+                    sy = ((QDCElement)el).ctrly;
+                    break;
+                }
+                default:{
+                    if (elements.length > 1){
+                        sx = elements[elements.length - 2].x;
+                        sy = elements[elements.length - 2].y;
+                    }
+                    else {
+                        sx = spx;
+                        sy = spy;
+                    }
+                    break;
+                }
+            }
+            if (el.x == sx){
+                // x = 0, y = +-1
+                if (el.y > sy) // y > 0
+                    res = (float)(Math.PI / 2);
+                else // y < 0
+                    res = (float)(Math.PI * 1.5);
+            }
+            else {
+                double tan = (double)(el.y - sy) / (double)(el.x - sx);
+                res = Math.atan(tan);
+                if (el.x < sx) { 
+                    // x < 0 
+                    res += Math.PI;
+                }
+                if (el.x > sx && el.y < sy){
+                    // x > 0; y < 0
+                    res += 2*Math.PI;
+                }
+            }
+        }
+        return res;
     }
+    
 }
 
 abstract class PathElement {
@@ -1260,84 +1264,84 @@ class MOVElement extends PathElement {
     
     @Override
     void initCams(int nbCam){
-	pc = new Point2D[nbCam];
-	lpc = new Point2D[nbCam];
-	for (int i=0;i<nbCam;i++){
-	    pc[i] = new Point2D.Double();
-	    lpc[i] = new Point2D.Double();
-	}
+        pc = new Point2D[nbCam];
+        lpc = new Point2D[nbCam];
+        for (int i=0;i<nbCam;i++){
+            pc[i] = new Point2D.Double();
+            lpc[i] = new Point2D.Double();
+        }
     }
 
     @Override
     void addCamera(int verifIndex){
-	if (pc != null){
-	    if (verifIndex == pc.length){
-		Point2D[] ta = pc;
-		pc = new Point2D[ta.length+1];
-		System.arraycopy(ta, 0, pc, 0, ta.length);
-		pc[pc.length-1] = new Point2D.Double();
-		ta = lpc;
-		lpc = new Point2D[ta.length+1];
-		System.arraycopy(ta, 0, lpc, 0, ta.length);
-		lpc[lpc.length-1] = new Point2D.Double();
-	    }
-	    else {System.err.println("DPath:Error while adding camera "+verifIndex);}
-	}
-	else {
-	    if (verifIndex == 0){
-		pc = new Point2D[1];
-		pc[0] = new Point2D.Double();
-		lpc = new Point2D[1];
-		lpc[0] = new Point2D.Double();
-	    }
-	    else {System.err.println("DPath:Error while adding camera "+verifIndex);}
-	}
+        if (pc != null){
+            if (verifIndex == pc.length){
+                Point2D[] ta = pc;
+                pc = new Point2D[ta.length+1];
+                System.arraycopy(ta, 0, pc, 0, ta.length);
+                pc[pc.length-1] = new Point2D.Double();
+                ta = lpc;
+                lpc = new Point2D[ta.length+1];
+                System.arraycopy(ta, 0, lpc, 0, ta.length);
+                lpc[lpc.length-1] = new Point2D.Double();
+            }
+            else {System.err.println("DPath:Error while adding camera "+verifIndex);}
+        }
+        else {
+            if (verifIndex == 0){
+                pc = new Point2D[1];
+                pc[0] = new Point2D.Double();
+                lpc = new Point2D[1];
+                lpc[0] = new Point2D.Double();
+            }
+            else {System.err.println("DPath:Error while adding camera "+verifIndex);}
+        }
     }
 
     @Override
     void removeCamera(int index){
- 	pc[index] = null;
- 	lpc[index] = null;
+        pc[index] = null;
+        lpc[index] = null;
     }
 
     @Override
     void project(int i, int hw, int hh, Camera c, double coef, double px, double py){
-	pc[i].setLocation(hw+(x-c.vx)*coef, hh-(y-c.vy)*coef);
+	    pc[i].setLocation(hw+(x-c.vx)*coef, hh-(y-c.vy)*coef);
     }
 
     @Override
     void projectForLens(int i, int hw, int hh, double lx, double ly, double coef, double px, double py){
-	lpc[i].setLocation(hw+(x-lx)*coef, hh-(y-ly)*coef);
+	    lpc[i].setLocation(hw+(x-lx)*coef, hh-(y-ly)*coef);
     }
 
     @Override
     double getX(int i){
-	return pc[i].getX();
+        return pc[i].getX();
     }
 
     @Override
     double getY(int i){
-	return pc[i].getY();
+        return pc[i].getY();
     }
 
     @Override
     double getlX(int i){
-	return lpc[i].getX();
+        return lpc[i].getX();
     }
 
     @Override
     double getlY(int i){
-	return lpc[i].getY();
+        return lpc[i].getY();
     }
 
     @Override
     Shape getShape(int i){
-	return null;
+        return null;
     }
 
     @Override
     Shape getlShape(int i){
-	return null;
+        return null;
     }
 
 }
@@ -1360,84 +1364,84 @@ class SEGElement extends PathElement {
 
     @Override
     void initCams(int nbCam){
-	pc = new Line2D[nbCam];
-	lpc = new Line2D[nbCam];
-	for (int i=0;i<nbCam;i++){
-	    pc[i] = new Line2D.Double();
-	    lpc[i] = new Line2D.Double();
-	}
+        pc = new Line2D[nbCam];
+        lpc = new Line2D[nbCam];
+        for (int i=0;i<nbCam;i++){
+            pc[i] = new Line2D.Double();
+            lpc[i] = new Line2D.Double();
+        }
     }
 
     @Override
     void addCamera(int verifIndex){
-	if (pc != null){
-	    if (verifIndex == pc.length){
-		Line2D[] ta = pc;
-		pc = new Line2D[ta.length+1];
-		System.arraycopy(ta, 0, pc, 0, ta.length);
-		pc[pc.length-1] = new Line2D.Double();
-		ta = lpc;
-		lpc = new Line2D[ta.length+1];
-		System.arraycopy(ta, 0, lpc, 0, ta.length);
-		lpc[lpc.length-1] = new Line2D.Double();
-	    }
-	    else {System.err.println("DPath:Error while adding camera "+verifIndex);}
-	}
-	else {
-	    if (verifIndex == 0){
-		pc = new Line2D[1];
-		pc[0] = new Line2D.Double();
-		lpc = new Line2D[1];
-		lpc[0] = new Line2D.Double();
-	    }
-	    else {System.err.println("DPath:Error while adding camera "+verifIndex);}
-	}
+        if (pc != null){
+            if (verifIndex == pc.length){
+                Line2D[] ta = pc;
+                pc = new Line2D[ta.length+1];
+                System.arraycopy(ta, 0, pc, 0, ta.length);
+                pc[pc.length-1] = new Line2D.Double();
+                ta = lpc;
+                lpc = new Line2D[ta.length+1];
+                System.arraycopy(ta, 0, lpc, 0, ta.length);
+                lpc[lpc.length-1] = new Line2D.Double();
+            }
+            else {System.err.println("DPath:Error while adding camera "+verifIndex);}
+        }
+        else {
+            if (verifIndex == 0){
+                pc = new Line2D[1];
+                pc[0] = new Line2D.Double();
+                lpc = new Line2D[1];
+                lpc[0] = new Line2D.Double();
+            }
+            else {System.err.println("DPath:Error while adding camera "+verifIndex);}
+        }
     }
 
     @Override
     void removeCamera(int index){
- 	pc[index] = null;
- 	lpc[index] = null;
+        pc[index] = null;
+        lpc[index] = null;
     }
 
     @Override
     void project(int i, int hw, int hh, Camera c, double coef, double px, double py){
-	pc[i].setLine(px, py, hw+(x-c.vx)*coef, hh-(y-c.vy)*coef);
+        pc[i].setLine(px, py, hw+(x-c.vx)*coef, hh-(y-c.vy)*coef);
     }
 
     @Override
     void projectForLens(int i, int hw, int hh, double lx, double ly, double coef, double px, double py){
-	lpc[i].setLine(px, py, hw+(x-lx)*coef, hh-(y-ly)*coef);
+        lpc[i].setLine(px, py, hw+(x-lx)*coef, hh-(y-ly)*coef);
     }
 
     @Override
     double getX(int i){
-	return pc[i].getX2();
+        return pc[i].getX2();
     }
 
     @Override
     double getY(int i){
-	return pc[i].getY2();
+        return pc[i].getY2();
     }
 
     @Override
     double getlX(int i){
-	return lpc[i].getX2();
+        return lpc[i].getX2();
     }
 
     @Override
     double getlY(int i){
-	return lpc[i].getY2();
+        return lpc[i].getY2();
     }
 
     @Override
     Shape getShape(int i){
-	return pc[i];
+        return pc[i];
     }
 
     @Override
     Shape getlShape(int i){
-	return lpc[i];
+        return lpc[i];
     }
 
 }
@@ -1466,84 +1470,84 @@ class QDCElement extends PathElement {
 
     @Override
     void initCams(int nbCam){
-	pc = new QuadCurve2D[nbCam];
-	lpc = new QuadCurve2D[nbCam];
-	for (int i=0;i<nbCam;i++){
-	    pc[i] = new QuadCurve2D.Double();
-	    lpc[i] = new QuadCurve2D.Double();
-	}
+        pc = new QuadCurve2D[nbCam];
+        lpc = new QuadCurve2D[nbCam];
+        for (int i=0;i<nbCam;i++){
+            pc[i] = new QuadCurve2D.Double();
+            lpc[i] = new QuadCurve2D.Double();
+        }
     }
 
     @Override
     void addCamera(int verifIndex){
-	if (pc != null){
-	    if (verifIndex == pc.length){
-		QuadCurve2D[] ta = pc;
-		pc = new QuadCurve2D[ta.length+1];
-		System.arraycopy(ta, 0, pc, 0, ta.length);
-		pc[pc.length-1] = new QuadCurve2D.Double();
-		ta = lpc;
-		lpc = new QuadCurve2D[ta.length+1];
-		System.arraycopy(ta, 0, lpc, 0, ta.length);
-		lpc[lpc.length-1] = new QuadCurve2D.Double();
-	    }
-	    else {System.err.println("DPath:Error while adding camera "+verifIndex);}
-	}
-	else {
-	    if (verifIndex == 0){
-		pc = new QuadCurve2D[1];
-		pc[0] = new QuadCurve2D.Double();
-		lpc = new QuadCurve2D[1];
-		lpc[0] = new QuadCurve2D.Double();
-	    }
-	    else {System.err.println("DPath:Error while adding camera "+verifIndex);}
-	}
+        if (pc != null){
+            if (verifIndex == pc.length){
+                QuadCurve2D[] ta = pc;
+                pc = new QuadCurve2D[ta.length+1];
+                System.arraycopy(ta, 0, pc, 0, ta.length);
+                pc[pc.length-1] = new QuadCurve2D.Double();
+                ta = lpc;
+                lpc = new QuadCurve2D[ta.length+1];
+                System.arraycopy(ta, 0, lpc, 0, ta.length);
+                lpc[lpc.length-1] = new QuadCurve2D.Double();
+            }
+            else {System.err.println("DPath:Error while adding camera "+verifIndex);}
+        }
+        else {
+            if (verifIndex == 0){
+                pc = new QuadCurve2D[1];
+                pc[0] = new QuadCurve2D.Double();
+                lpc = new QuadCurve2D[1];
+                lpc[0] = new QuadCurve2D.Double();
+            }
+            else {System.err.println("DPath:Error while adding camera "+verifIndex);}
+        }
     }
 
     @Override
     void removeCamera(int index){
- 	pc[index] = null;
- 	lpc[index] = null;
+        pc[index] = null;
+        lpc[index] = null;
     }
-    
+
     @Override
     void project(int i, int hw, int hh, Camera c, double coef, double px, double py){
-	pc[i].setCurve(px, py, hw+(ctrlx-c.vx)*coef, hh-(ctrly-c.vy)*coef, hw+(x-c.vx)*coef, hh-(y-c.vy)*coef);
+        pc[i].setCurve(px, py, hw+(ctrlx-c.vx)*coef, hh-(ctrly-c.vy)*coef, hw+(x-c.vx)*coef, hh-(y-c.vy)*coef);
     }
 
     @Override
     void projectForLens(int i, int hw, int hh, double lx, double ly, double coef, double px, double py){
-	lpc[i].setCurve(px, py, hw+(ctrlx-lx)*coef, hh-(ctrly-ly)*coef, hw+(x-lx)*coef, hh-(y-ly)*coef);
+        lpc[i].setCurve(px, py, hw+(ctrlx-lx)*coef, hh-(ctrly-ly)*coef, hw+(x-lx)*coef, hh-(y-ly)*coef);
     }
 
     @Override
     double getX(int i){
-	return pc[i].getX2();
+        return pc[i].getX2();
     }
 
     @Override
     double getY(int i){
-	return pc[i].getY2();
+        return pc[i].getY2();
     }
 
     @Override
     double getlX(int i){
-	return lpc[i].getX2();
+        return lpc[i].getX2();
     }
 
     @Override
     double getlY(int i){
-	return lpc[i].getY2();
+        return lpc[i].getY2();
     }
 
     @Override
     Shape getShape(int i){
-	return pc[i];
+        return pc[i];
     }
 
     @Override
     Shape getlShape(int i){
-	return lpc[i];
+        return lpc[i];
     }
 
 }
@@ -1576,90 +1580,90 @@ class CBCElement extends PathElement {
 
     @Override
     void initCams(int nbCam){
-	pc = new CubicCurve2D[nbCam];
-	lpc = new CubicCurve2D[nbCam];
-	for (int i=0;i<nbCam;i++){
-	    pc[i] = new CubicCurve2D.Double();
-	    lpc[i] = new CubicCurve2D.Double();
-	}
+        pc = new CubicCurve2D[nbCam];
+        lpc = new CubicCurve2D[nbCam];
+        for (int i=0;i<nbCam;i++){
+            pc[i] = new CubicCurve2D.Double();
+            lpc[i] = new CubicCurve2D.Double();
+        }
     }
 
     @Override
     void addCamera(int verifIndex){
-	if (pc != null){
-	    if (verifIndex == pc.length){
-		CubicCurve2D[] ta = pc;
-		pc = new CubicCurve2D[ta.length+1];
-		System.arraycopy(ta, 0, pc, 0, ta.length);
-		pc[pc.length-1] = new CubicCurve2D.Double();
-		ta = lpc;
-		lpc = new CubicCurve2D[ta.length+1];
-		System.arraycopy(ta, 0, lpc, 0, ta.length);
-		lpc[lpc.length-1] = new CubicCurve2D.Double();
-	    }
-	    else {System.err.println("DPath:Error while adding camera "+verifIndex);}
-	}
-	else {
-	    if (verifIndex == 0){
-		pc = new CubicCurve2D[1];
-		pc[0] = new CubicCurve2D.Double();
-		lpc = new CubicCurve2D[1];
-		lpc[0] = new CubicCurve2D.Double();
-	    }
-	    else {System.err.println("DPath:Error while adding camera "+verifIndex);}
-	}
+        if (pc != null){
+            if (verifIndex == pc.length){
+                CubicCurve2D[] ta = pc;
+                pc = new CubicCurve2D[ta.length+1];
+                System.arraycopy(ta, 0, pc, 0, ta.length);
+                pc[pc.length-1] = new CubicCurve2D.Double();
+                ta = lpc;
+                lpc = new CubicCurve2D[ta.length+1];
+                System.arraycopy(ta, 0, lpc, 0, ta.length);
+                lpc[lpc.length-1] = new CubicCurve2D.Double();
+            }
+            else {System.err.println("DPath:Error while adding camera "+verifIndex);}
+        }
+        else {
+            if (verifIndex == 0){
+                pc = new CubicCurve2D[1];
+                pc[0] = new CubicCurve2D.Double();
+                lpc = new CubicCurve2D[1];
+                lpc[0] = new CubicCurve2D.Double();
+            }
+            else {System.err.println("DPath:Error while adding camera "+verifIndex);}
+        }
     }
 
     @Override
     void removeCamera(int index){
- 	pc[index] = null;
- 	lpc[index] = null;
+        pc[index] = null;
+        lpc[index] = null;
     }
 
     @Override
     void project(int i, int hw, int hh, Camera c, double coef, double px, double py){
-	pc[i].setCurve(px, py,
-		       hw+(ctrlx1-c.vx)*coef, hh-(ctrly1-c.vy)*coef,
-		       hw+(ctrlx2-c.vx)*coef, hh-(ctrly2-c.vy)*coef,
-		       hw+(x-c.vx)*coef, hh-(y-c.vy)*coef);
+        pc[i].setCurve(px, py,
+            hw+(ctrlx1-c.vx)*coef, hh-(ctrly1-c.vy)*coef,
+            hw+(ctrlx2-c.vx)*coef, hh-(ctrly2-c.vy)*coef,
+            hw+(x-c.vx)*coef, hh-(y-c.vy)*coef);
     }
 
     @Override
     void projectForLens(int i, int hw, int hh, double lx, double ly, double coef, double px, double py){
-	lpc[i].setCurve(px, py,
-		       hw+(ctrlx1-lx)*coef, hh-(ctrly1-ly)*coef,
-		       hw+(ctrlx2-lx)*coef, hh-(ctrly2-ly)*coef,
-		       hw+(x-lx)*coef, hh-(y-ly)*coef);
+        lpc[i].setCurve(px, py,
+            hw+(ctrlx1-lx)*coef, hh-(ctrly1-ly)*coef,
+            hw+(ctrlx2-lx)*coef, hh-(ctrly2-ly)*coef,
+            hw+(x-lx)*coef, hh-(y-ly)*coef);
     }
 
     @Override
     double getX(int i){
-	return pc[i].getX2();
+        return pc[i].getX2();
     }
 
     @Override
     double getY(int i){
-	return pc[i].getY2();
+        return pc[i].getY2();
     }
 
     @Override
     double getlX(int i){
-	return lpc[i].getX2();
+        return lpc[i].getX2();
     }
 
     @Override
     double getlY(int i){
-	return lpc[i].getY2();
+        return lpc[i].getY2();
     }
 
     @Override
     Shape getShape(int i){
-	return pc[i];
+        return pc[i];
     }
 
     @Override
     Shape getlShape(int i){
-	return lpc[i];
+        return lpc[i];
     }
 
 }
