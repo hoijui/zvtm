@@ -1070,29 +1070,29 @@ public class DPath extends Glyph implements RectangularShape {
 	    gp = new GeneralPath();
         gp.moveTo((float)spx, (float)spy);
 	    dgp = new GeneralPath();
-        dgp.moveTo((float)spx, (float)-spy);
-		for (int i = 0; i < this.getElementsCount(); i++){
+        dgp.moveTo(0,0);
+        for (int i = 0; i < this.getElementsCount(); i++){
 			int elType = this.getElementType(i);
 			Point2D.Double[] pts = this.getElementPointsCoordinates(i);
 			switch(elType){
 				case DPath.CBC:{
 					gp.curveTo((float)pts[1].x, (float)pts[1].y, (float)pts[2].x, (float)pts[2].y, (float)pts[3].x, (float)pts[3].y);
-					dgp.curveTo((float)pts[1].x, (float)-pts[1].y, (float)pts[2].x, (float)-pts[2].y, (float)pts[3].x, (float)-pts[3].y);
+					dgp.curveTo((float)pts[1].x-spx, (float)-pts[1].y+spy, (float)pts[2].x-spx, (float)-pts[2].y+spy, (float)pts[3].x-spx, (float)-pts[3].y+spy);
 					break;
 				}
 				case DPath.QDC:{
 					gp.quadTo((float)pts[1].x, (float)pts[1].y, (float)pts[2].x, (float)pts[2].y);
-					dgp.quadTo((float)pts[1].x, (float)-pts[1].y, (float)pts[2].x, (float)-pts[2].y);
+					dgp.quadTo((float)pts[1].x-spx, (float)-pts[1].y+spy, (float)pts[2].x-spx, (float)-pts[2].y+spy);
 					break;
 				}
 				case DPath.SEG:{
 					gp.lineTo((float)pts[1].x, (float)pts[1].y);
-					dgp.lineTo((float)pts[1].x, (float)-pts[1].y);
+					dgp.lineTo((float)pts[1].x-spx, (float)-pts[1].y+spy);
 					break;
 				}
 				case DPath.MOV:{
 					gp.moveTo((float)pts[1].x, (float)pts[1].y);
-					dgp.moveTo((float)pts[1].x, (float)-pts[1].y);
+					dgp.moveTo((float)pts[1].x-spx, (float)-pts[1].y+spy);
 					break;
 				}
 			}
