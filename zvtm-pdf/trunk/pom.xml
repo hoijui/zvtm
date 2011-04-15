@@ -26,11 +26,15 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	<icepdfVersion>4.2</icepdfVersion>
+	<icepdfVersion>4.2.0</icepdfVersion>
   </properties>
   
   <!-- Repositories -->
   <repositories>
+	<repository>
+      <id>icefaces repository</id>
+      <url>http://anonsvn.icefaces.org/repo/maven2/releases</url>
+    </repository>
 	<repository>
       <id>zvtm repository</id>
       <url>http://zvtm.sourceforge.net/maven</url>
@@ -58,29 +62,19 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
       <version>[0.11.0-SNAPSHOT,)</version>
     </dependency>
 	
-    <!-- ICEpdf 4.2 -->
-	<!--
-
-		ICEpdf is not available in any Maven repository for now.
-		Get icepdf-core.jar from http://www.icepdf.org/downloads.html
-		Install the JAR file in your local repository using the following command line:
-	        mvn install:install-file -Dfile=icepdf-core.jar -DgroupId=org.icepdf -DartifactId=icepdf-core -Dversion=4.2 -Dpackaging=jar	
-
-	-->
 	<dependency>
 		<groupId>org.icepdf</groupId>
 		<artifactId>icepdf-core</artifactId>
 		<version>${icepdfVersion}</version>
 	</dependency>
-    
     <!-- ICEpdf Pro 4.2 (if available) -->
 	<!--
 
 		ICEpdf Pro is not available in any Maven repository for now.
 		Get icepdf-pro*.jar from http://www.icepdf.org/downloads.html
 		Install the JAR files in your local repository using the following command line:
-	        mvn install:install-file -Dfile=icepdf-pro.jar -DgroupId=org.icepdf -DartifactId=icepdf-pro -Dversion=4.2 -Dpackaging=jar	
-	        mvn install:install-file -Dfile=icepdf-pro-intl.jar -DgroupId=org.icepdf -DartifactId=icepdf-pro-intl -Dversion=4.2 -Dpackaging=jar	
+	        mvn install:install-file -Dfile=icepdf-pro.jar -DgroupId=org.icepdf -DartifactId=icepdf-pro -Dversion=4.2.0 -Dpackaging=jar	
+	        mvn install:install-file -Dfile=icepdf-pro-intl.jar -DgroupId=org.icepdf -DartifactId=icepdf-pro-intl -Dversion=4.2.0 -Dpackaging=jar	
 	-->
 	<!--
 	<dependency>
