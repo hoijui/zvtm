@@ -27,7 +27,7 @@ $Id: pom.xml 2427 2009-09-29 07:29:08Z epietrig $
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	<icepdfVersion>4.2</icepdfVersion>
+	<icepdfVersion>4.2.0</icepdfVersion>
   </properties>
   
   <!-- Repositories -->
@@ -70,8 +70,8 @@ $Id: pom.xml 2427 2009-09-29 07:29:08Z epietrig $
 		ICEpdf Pro is not available in any Maven repository for now.
 		Get icepdf-pro*.jar from http://www.icepdf.org/downloads.html
 		Install the JAR files in your local repository using the following command line:
-	        mvn install:install-file -Dfile=icepdf-pro.jar -DgroupId=org.icepdf -DartifactId=icepdf-pro -Dversion=4.2 -Dpackaging=jar	
-	        mvn install:install-file -Dfile=icepdf-pro-intl.jar -DgroupId=org.icepdf -DartifactId=icepdf-pro-intl -Dversion=4.2 -Dpackaging=jar	
+	        mvn install:install-file -Dfile=icepdf-pro.jar -DgroupId=org.icepdf -DartifactId=icepdf-pro -Dversion=4.2.0 -Dpackaging=jar	
+	        mvn install:install-file -Dfile=icepdf-pro-intl.jar -DgroupId=org.icepdf -DartifactId=icepdf-pro-intl -Dversion=4.2.0 -Dpackaging=jar	
 	-->
 	
 	<!--
@@ -90,12 +90,12 @@ $Id: pom.xml 2427 2009-09-29 07:29:08Z epietrig $
 	<dependency>
 	  <groupId>net.sf.ehcache</groupId>
 	  <artifactId>ehcache-core</artifactId>
-	  <version>2.3.2</version>
+	  <version>2.4.1</version>
 	</dependency>
 	<dependency>
 	  <groupId>org.slf4j</groupId>
 	  <artifactId>slf4j-simple</artifactId>
-	  <version>1.5.8</version>
+	  <version>1.6.1</version>
 	</dependency>
   
 </dependencies>
