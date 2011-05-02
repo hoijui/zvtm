@@ -110,7 +110,9 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     static final String mnSpaceName = "PieMenu Space";
     static final String ovSpaceName = "Overlay Space";
     VirtualSpace mSpace, ovSpace;
+    VirtualSpace cursorSpace;
     Camera mCamera;
+    Camera cursorCamera;
     String mCameraAltStr = Messages.ALTITUDE + "0";
     String levelStr = Messages.LEVEL + "0";
     static final String mViewName = "ZUIST Viewer";
@@ -123,6 +125,8 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 	OverlayManager ovm;
 	VWGlassPane gp;
 	PieMenu mainPieMenu;
+
+    private WallCursor zoomCenter;
     
     public Viewer(boolean fullscreen, boolean opengl, boolean antialiased, File xmlSceneFile){
 		ovm = new OverlayManager(this);
@@ -156,6 +160,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         VirtualSpace mnSpace = vsm.addVirtualSpace(mnSpaceName);
         mCamera = mSpace.addCamera();
 		mnSpace.addCamera().setAltitude(10);
+        cursorCamera = cursorSpace.addCamera();
         ovSpace = vsm.addVirtualSpace(ovSpaceName);
 		ovSpace.addCamera();
         Vector cameras = new Vector();
@@ -179,6 +184,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
                     sceneCam);
         clusteredView.setBackgroundColor(Color.GRAY);
         vsm.addClusteredView(clusteredView);
+        zoomCenter = new WallCursor(cursorSpace, 10, 160, Color.RED);
         if (fullscreen){
             GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow((JFrame)mView.getFrame());
         }
