@@ -27,6 +27,17 @@ public abstract class ObjectDescription {
 
     protected String takesTo;
     protected short takesToType;
+
+    //should we deprecate this ctor?
+    ObjectDescription(){}
+
+    protected ObjectDescription(String id, int z, Region pr, boolean sensitive){
+    this.id = id;
+    this.zindex = z;
+    this.parentRegion = pr;
+    this.setParentRegion(pr);
+    this.sensitive = sensitive;
+    }
     
     /** Called automatically by scene manager. Can be called by client application to force loading of objects not actually visible. */
     public abstract void createObject(SceneManager sm, final VirtualSpace vs, boolean fadeIn);

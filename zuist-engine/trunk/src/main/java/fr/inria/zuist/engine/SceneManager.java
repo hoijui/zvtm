@@ -836,6 +836,20 @@ public class SceneManager implements CameraListener {
         return gd;
     }
 
+    public GlyphDescription createGlyphDescription(Glyph g, String id, 
+            int zindex, Region region, boolean sensitivity){
+        GlyphDescription gd = new GlyphDescription(id, g, zindex, region, sensitivity);
+        region.addObject(gd);
+        if (!id2object.containsKey(id)){
+            id2object.put(id, gd);
+        } else {
+            if(DEBUG_MODE){
+                System.err.println("Warning: ID: "+id+" used to identify more than one object.");
+            }
+        }
+        return gd;
+    }
+
     /** Process XML description of a rectangle object. */
     ClosedShapeDescription processRectangle(Element rectEL, String id, int zindex, Region region){
         double x = Double.parseDouble(rectEL.getAttribute(_x));
