@@ -103,16 +103,17 @@ public class ZGRViewer implements ZGRApplication {
     }
 
     void initConfig(){
-	grMngr = new GraphicsManager(this);
-	cfgMngr = new ConfigManager(grMngr, false);
-	dotMngr=new DOTManager(grMngr, cfgMngr);
-	grMngr.setConfigManager(cfgMngr);
-	gvLdr = new GVLoader(this, grMngr, cfgMngr, dotMngr);
-	cfgMngr.loadConfig();  //have to test for existence of config file
-	cfgMngr.initPlugins(this);
+        grMngr = new GraphicsManager(this);
+        cfgMngr = new ConfigManager(grMngr, false);
+        dotMngr=new DOTManager(grMngr, cfgMngr);
+        grMngr.setConfigManager(cfgMngr);
+        gvLdr = new GVLoader(this, grMngr, cfgMngr, dotMngr);
+        cfgMngr.loadConfig();
+        cfgMngr.initPlugins(this);
     }
 
     void initGUI(boolean acc){
+        cfgMngr.notifyPlugins(Plugin.NOTIFY_PLUGIN_GUI_INITIALIZING);
 		Utils.initLookAndFeel();
 		JMenuBar jmb = initViewMenu(acc);
 		grMngr.createFrameView(grMngr.createZVTMelements(false), acc ? View.OPENGL_VIEW : View.STD_VIEW, jmb);
