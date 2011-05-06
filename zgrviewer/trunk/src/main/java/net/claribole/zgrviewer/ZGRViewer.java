@@ -117,6 +117,7 @@ public class ZGRViewer implements ZGRApplication {
 		Utils.initLookAndFeel();
 		JMenuBar jmb = initViewMenu(acc);
 		grMngr.createFrameView(grMngr.createZVTMelements(false), acc ? View.OPENGL_VIEW : View.STD_VIEW, jmb);
+        cfgMngr.notifyPlugins(Plugin.NOTIFY_PLUGIN_GUI_VIEW_CREATED);
 		grMngr.parameterizeView(new ZgrvEvtHdlr(this, this.grMngr));
 		cfgMngr.notifyPlugins(Plugin.NOTIFY_PLUGIN_GUI_INITIALIZED);
 	}
