@@ -61,13 +61,27 @@ Launching the slaves is usually done over ssh. There is an example launch script
 
 Important slave options:
 
+`-b` block id
+
+`-f` fullscreen
+
+`-d` device (screen name, when fullscreen is enabled)
+
+`-u` undecorated (to simulate full screen if needed)
+
+`-n` group name (should match the string given in the master application `setMaster()` call)
+
 ### Launching the master
 
-Launching the master is the easiest part. Wait until the slaves have initialized, then ...
+Launching the master is the easiest part. Wait until the slaves have initialized, then launch the application as for local development. The only change is the bind address if you specified a local one (see Gotchas). There is an example run script in `src/main/resources/scripts/master_run.sh`.
 
 ### Killing the slaves
 
 Normally, stopping the master should kill the slaves after a while. If it is not the case, you could write a kill script that would invoke e.g. `killall -9 java` on each wall machine (provided no important java-based daemon is running on the wall). On WILD, the `wildo` command can be used, e.g `wildo killall -9 java`.
+
+### Borders
+
+If you want to take the screen bezels into account, add the bezel width and height to your `blockWidth` and `blockHeight` dimensions.
 
 ## Gotchas - Troubleshooting
 
