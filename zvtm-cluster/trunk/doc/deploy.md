@@ -40,13 +40,24 @@ You should be able to access each wall machine through `ssh`. Two steps require 
 
 ## A simple deployment script
 
+Deploying zvtm-cluster can be done by copying the zvtm-cluster and dependencies binaries on each wall machine (that is, the content of the `zvtm-cluster/trunk` directory, with the exception of the `zvtm-core` jar -- more on this in the section "Gotchas - Troubleshooting").
+
+There is a simple deployment script example bundled with zvtm-cluster.
+It lives in `src/main/resources/scripts/deploy.sh`
+
+## zvtm-cluster screen layout
+
+When writing the slave startup script, you should give each slave a block id. Blocks are laid column-wise. Each slave application infers its position within the walls from its block id. Block id is passed to `SlaveApp` by the `-b` option. The following figure illustrates the zvtm-cluster screen layout.
+
+![Cluster screen layout](cv.png "Cluster screen layout")
+
 ## Running an application
 
 Running an application is done in two steps: launch the slave instances, then launch the master.
 
 ### Launching the slaves
 
-Launching the slaves is usually done over ssh.
+Launching the slaves is usually done over ssh. There is an example launch script in `src/main/resources/scripts/cluster_run.sh`. I usually copy it to the zvtm-cluster root on the master machine and modify it to suit the application/wall config.
 
 Important slave options:
 
@@ -58,8 +69,8 @@ Launching the master is the easiest part. Wait until the slaves have initialized
 
 Normally, stopping the master should kill the slaves after a while. If it is not the case, you could write a kill script that would invoke e.g. `killall -9 java` on each wall machine (provided no important java-based daemon is running on the wall). On WILD, the `wildo` command can be used, e.g `wildo killall -9 java`.
 
-## Gotchas
+## Gotchas - Troubleshooting
 
 Under Linux, it may be useful to give an explicit bind address to the master, e.g. use `-Djgroups.bind_addr="123.44.55.66"` when launching the master (replace the address by the IP of the interface that you wish to use).
 
-
+By default, some traces are not shown. You can get richer traces by putting a log4j configuration file on your classpath. There is an example configuration file in `src/main/resources/config/log4j.properties`.
