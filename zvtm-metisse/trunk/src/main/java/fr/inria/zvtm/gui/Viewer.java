@@ -18,8 +18,6 @@ import java.util.Vector;
 
 import javax.swing.JFrame;
 
-//import fr.inria.zvtm.cluster.ClusterGeometry;
-//import fr.inria.zvtm.cluster.ClusteredView;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.EView;
 import fr.inria.zvtm.engine.Utils;
@@ -38,12 +36,12 @@ public class Viewer implements ComponentListener{
 	private int VIEW_MAX_W = 1024;  // 1400
 	private int VIEW_MAX_H = 768;   // 1050
 	private int VIEW_W, VIEW_H;
- 	@SuppressWarnings("unused")
-	private int VIEW_X, VIEW_Y;
+	@SuppressWarnings("unused")
+		private int VIEW_X, VIEW_Y;
 	/* dimensions of zoomable panel */
 	protected int panelWidth, panelHeight;
 	private long lastRepaintTime ;
-	private VirtualSpaceManager vsm;
+	protected VirtualSpaceManager vsm;
 	public VirtualSpace mSpace;
 	protected EView mView;
 	public boolean isClient;
@@ -59,32 +57,28 @@ public class Viewer implements ComponentListener{
 	private VRectangle horizon;
 
 
-
-	/* --------------- init ------------------*/
-
-	public Viewer(boolean fullscreen, boolean opengl, boolean antialiased){
-		isClient = false;
-		initGUI(fullscreen, opengl, antialiased,null);
-	}
-	public Viewer(boolean fullscreen, boolean opengl, boolean antialiased, VirtualSpace vs) {
-		isClient = true;
+	public Viewer(boolean isClient){
+		this.isClient = isClient; 
 		clientId = getRandomColor();
-		initGUI(fullscreen, opengl, antialiased,vs);
-		setHorizon();
-		addCursor();
 	}
 
+	protected void preInitHook(){}
 
-	private void initGUI(boolean fullscreen, boolean opengl,
+	protected void viewCreatedHook(Vector<Camera> cameras){}
+
+	/**
+	 * @param vs VirtualSpace to provide if this Viewer is a client.
+	 */
+	public void init(boolean fullscreen, boolean opengl,
 			boolean antialiased, VirtualSpace vs) {
-		windowLayout();
 		vsm = VirtualSpaceManager.INSTANCE;
-		//if(vs == null)vsm.setMaster("intothewild");
+		preInitHook();
+		windowLayout();
 		nm = new Navigation(this);
 		if(!isClient)mSpace = vsm.addVirtualSpace(Messages.mSpaceName);
 		else{
 			mSpace = vs;
-		//	vsm.addVirtualSpace(vs.getName());//meme machine virtuelle donc vsm partagé ! il faudra gérer ça ...
+			//	vsm.addVirtualSpace(vs.getName());//meme machine virtuelle donc vsm partagé ! il faudra gérer ça ...
 		}
 		mCamera = mSpace.addCamera();
 		if (isClient){
@@ -116,29 +110,11 @@ public class Viewer implements ComponentListener{
 		};
 		mView.getFrame().addComponentListener(ca0);
 
-		if(!isClient){
-			if(!Main.CLUSTERMODE)return;
-		//	if(Main.SMALLMODE){
-		//		ClusterGeometry clGeom = new ClusterGeometry(600,400,2,2);
-		//		//                options.blockWidth,
-		//		//                options.blockHeight,
-		//		//                options.numCols,
-		//		//                options.numRows);
-		//		ClusteredView cv = new ClusteredView(clGeom,1,2,2,cameras);
-		//		cv.setBackgroundColor(Color.LIGHT_GRAY);
-		//		vsm.addClusteredView(cv);
-		//	}
-		//	else{
-		//		ClusterGeometry clGeom = new ClusterGeometry(2560,1600,8,4);
-		//		ClusteredView cv = new ClusteredView(clGeom,3,8,4,cameras);
-		//		//                    clGeom,3,8,4,cameras);
-		//		//                    options.numRows-1, //origin (block number)
-		//		//                    options.numCols, //use complete
-		//		//                    options.numRows, //cluster surface
-		//		//                    cameras);
-		//		cv.setBackgroundColor(Color.LIGHT_GRAY);
-		//		vsm.addClusteredView(cv);
-		//	}
+		viewCreatedHook(cameras);
+
+		if(isClient){
+			setHorizon();
+			addCursor();
 		}
 	}
 

@@ -12,8 +12,10 @@ public class Main {
 	private static int port = 5901;
 	public static ZVTMAdapter compositor;
 	public static Viewer viewer;
+	public static Viewer clientViewer;
+
 	public static boolean CLUSTERMODE = false;
-	public static boolean SMALLMODE = true;
+//	public static boolean SMALLMODE = true;
 
 	/**
 	 * @param args
@@ -22,8 +24,11 @@ public class Main {
 		handleArgs(args);
 		compositor = new ZVTMAdapter();
 		compositor.init();
-		viewer = new Viewer(false, false, true);
-		new Viewer(false,false,true,viewer.mSpace);	//	new Viewer(false,false,true,viewer.mSpace);
+		viewer = new Viewer(false);
+		viewer.init(false, false, true, null);
+
+		clientViewer = new Viewer(true);
+		clientViewer.init(false, false, true, viewer.mSpace);	
 		Connexion.init(ip,port);
 	}
 
@@ -40,8 +45,8 @@ public class Main {
 		}
 
 	
-		CLUSTERMODE = (args[0].equals("1"));
-		SMALLMODE = (args[1].equals("1"));
+//		CLUSTERMODE = (args[0].equals("1"));
+//		SMALLMODE = (args[1].equals("1"));
 		if(args.length == 2) return;
 		ip = args[2];
 		port = Integer.parseInt(args[3]);
