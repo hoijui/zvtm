@@ -93,6 +93,13 @@ public aspect GlyphCreation {
 			Delta delta = new GlyphRemoveDelta(glyph.getObjId(),
 					virtualSpace.getObjId());	
 			VirtualSpaceManager.INSTANCE.sendDelta(delta);
+			// We set the target glyph to non-replicated since
+			// we replicate glyphs when they are added to the virtual space
+			// (and *destroy* the slave glyphs when they are removed from the 
+			// virtual space).
+			// Hence, we should not propagate modifications to any glyph that has
+			// been removed from a space, because it does not have a slave counterpart.
+			glyph.setReplicated(false);
 		}
 	
 	//overrides for various Glyph subclasses
