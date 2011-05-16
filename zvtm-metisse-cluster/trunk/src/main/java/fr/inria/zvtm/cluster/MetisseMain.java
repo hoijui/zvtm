@@ -10,7 +10,7 @@ import fr.inria.zvtm.kernel.Main;
 
 public class MetisseMain extends Main{
 
-	public static boolean SMALLMODE = true;
+	public static boolean SMALLMODE = false;
 
 	/**
 	 * @param args
