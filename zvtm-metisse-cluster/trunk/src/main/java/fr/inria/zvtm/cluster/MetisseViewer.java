@@ -3,10 +3,10 @@ package fr.inria.zvtm.cluster;
 import java.awt.Color;
 import java.util.Vector;
 
-import fr.inria.zvtm.cluster.ClusterGeometry;
-import fr.inria.zvtm.cluster.ClusteredView;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.gui.Viewer;
+
+
 
 
 public class MetisseViewer extends Viewer {
