@@ -400,13 +400,13 @@ public aspect GlyphCreation {
 		}
 	}
 
-    private static class VImageReplicator extends ClosedShapeReplicator {
+    static class VImageReplicator extends ClosedShapeReplicator {
         //Note that serialized ImageIcon instances (as most AWT objects)
         //are not guaranteed to be portable across toolkits.
         //If this becomes a practical concern, then another serialization 
         //mechanism is to be used.
-        private final ImageIcon serImage; 
-        private final double scaleFactor;
+        protected final ImageIcon serImage; 
+        protected final double scaleFactor;
 
         VImageReplicator(VImage source){
             super(source);
