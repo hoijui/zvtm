@@ -27,6 +27,7 @@ public class Connexion {
 	}
 
 	private static void startListenning() {
+		System.out.println("start listening");
 		Thread listen = new Thread(){
 			@Override
 			public void run() {
@@ -58,7 +59,8 @@ public class Connexion {
 			RfbAgent.rfbSetPixelFormat(); // send
 			RfbAgent.rfbSetEncodings(); // sens
 			RfbAgent.rfbFramebufferUpdateRequest(true); // sens
-			fr.inria.zvtm.protocol.RfbAgent.addZVTMAdapter((GenericAdapter) Main.compositor);//connect the compositor to the rfb socket
+			System.out.println("addAdapter");
+			RfbAgent.addZVTMAdapter((GenericAdapter) Main.compositor);//connect the compositor to the rfb socket
 		} catch (Exception e) {
 			System.err.println("Connexion to the metisse server failed, system will exit...");
 			Main.end();

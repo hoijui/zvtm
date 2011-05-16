@@ -32,7 +32,7 @@ public class RfbAgent {
 	 * Functions for sending messages to the server (display => server)
 	 ****************************************************************************/
 
-	public static void addZVTMAdapter(fr.inria.zvtm.compositor.GenericAdapter a){
+	public static void addZVTMAdapter(GenericAdapter a){
 		listeners.add(a);
 	}
 

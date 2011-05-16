@@ -25,7 +25,6 @@ import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.VRectangle;
-import fr.inria.zvtm.kernel.Main;
 import fr.inria.zvtm.kernel.Temporizer;
 
 public class Viewer implements ComponentListener{
@@ -37,7 +36,7 @@ public class Viewer implements ComponentListener{
 	private int VIEW_MAX_H = 768;   // 1050
 	private int VIEW_W, VIEW_H;
 	@SuppressWarnings("unused")
-		private int VIEW_X, VIEW_Y;
+	private int VIEW_X, VIEW_Y;
 	/* dimensions of zoomable panel */
 	protected int panelWidth, panelHeight;
 	private long lastRepaintTime ;
