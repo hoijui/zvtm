@@ -2,7 +2,6 @@ package fr.inria.zvtm.cluster;
 
 
 import fr.inria.zvtm.compositor.ZVTMAdapter;
-import fr.inria.zvtm.gui.Viewer;
 import fr.inria.zvtm.kernel.Connexion;
 import fr.inria.zvtm.kernel.Main;
 
@@ -10,7 +9,6 @@ import fr.inria.zvtm.kernel.Main;
 
 public class MetisseMain extends Main{
 
-	public static boolean SMALLMODE = false;
 
 	/**
 	 * @param args
