@@ -15,6 +15,7 @@ public class Main {
 	public static Viewer clientViewer;
 
 	public static boolean CLUSTERMODE = false;
+	public static boolean SMALLMODE = false;
 
 	/**
 	 * @param args
@@ -48,7 +49,7 @@ public class Main {
 
 
 		CLUSTERMODE = (args[0].equals("1"));
-		//		SMALLMODE = (args[1].equals("1"));
+		SMALLMODE = (args[1].equals("1"));
 		if(args.length == 2) return;
 		ip = args[2];
 		port = Integer.parseInt(args[3]);
