@@ -15,6 +15,7 @@ import java.text.AttributedString;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
+import javax.swing.JCheckBox;
 import javax.swing.JList;
 import javax.swing.ListCellRenderer;
 
@@ -26,7 +27,7 @@ import javax.swing.ListCellRenderer;
  * 
  */
 
-public class TranslucentListCellRenderer extends JLabel implements
+public class TranslucentListCellRenderer extends JCheckBox implements
 		ListCellRenderer {
 
 	// This is the only method defined by ListCellRenderer.

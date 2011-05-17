@@ -68,7 +68,7 @@ public class TranslucentTextField extends JTextField implements TranslucentWidge
         setBackground(Color.BLACK);
         setSelectionColor(Color.WHITE);
         setSelectedTextColor(Color.BLACK);
-		setCaretColor(Color.WHITE);
+		//setCaretColor(Color.WHITE);
 	}
 	
 	/**Set the translucence value of this text area's background.
