@@ -629,7 +629,7 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
                 if (parent.mouse.isSensitive()){parent.mouse.getPicker().computePickedGlyphList(evHs[activeLayer],cams[activeLayer],this);}
             }
         }	
-        catch (NullPointerException ex) {if (VirtualSpaceManager.INSTANCE.debugModeON()){System.err.println("viewpanel.mousedragged "+ex);}}
+        catch (NullPointerException ex) {if (VirtualSpaceManager.INSTANCE.debugModeON()){System.err.println("viewpanel.mousedragged "+ex);ex.printStackTrace();}}
     }
 
     /**send event to application event handler*/
