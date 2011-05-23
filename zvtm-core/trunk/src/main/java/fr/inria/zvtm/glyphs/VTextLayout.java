@@ -27,8 +27,8 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.projection.ProjText;
 
 /**
- * Wrapper for an AWT TextLayout
- * Inspired by examples taken from http://java.sun.com/developer/onlineTraining/Media/2DText/more.html
+ * Wrapper for an AWT <a href="http://download.oracle.com/javase/1.5.0/docs/api/index.html?java/awt/font/TextLayout.html">TextLayout</a>
+ * Inspired by examples taken from <a href="http://java.sun.com/developer/onlineTraining/Media/2DText/more.html">http://java.sun.com/developer/onlineTraining/Media/2DText/more.html</a>
  * @author Emmanuel Pietriga
  *@see fr.inria.zvtm.glyphs.VText
  *@see fr.inria.zvtm.glyphs.VTextOr
