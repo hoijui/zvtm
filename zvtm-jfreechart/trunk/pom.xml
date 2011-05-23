@@ -15,11 +15,27 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <artifactId>zvtm-core</artifactId>
       <groupId>fr.inria.zvtm</groupId>
+      <artifactId>zvtm-core</artifactId>
       <version>0.11.0-SNAPSHOT</version>
     </dependency>
+    <dependency>
+      <groupId>jfree</groupId>
+      <artifactId>jfreechart</artifactId>
+      <version>1.0.9</version>
+    </dependency>
   </dependencies>
+    <repositories>
+	<repository>
+      <id>zvtm repository</id>
+      <url>http://zvtm.sourceforge.net/maven</url>
+    </repository>
+    <repository>
+      <id>central</id>
+      <name>Maven Repository</name>
+      <url>http://repo1.maven.org/maven2</url>
+    </repository>
+</repositories>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
