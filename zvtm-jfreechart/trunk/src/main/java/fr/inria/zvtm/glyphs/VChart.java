@@ -12,6 +12,7 @@ import fr.inria.zvtm.glyphs.projection.RProjectedCoordsP;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 
+import org.jfree.chart.ChartRenderingInfo;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.event.ChartChangeListener;
 import org.jfree.chart.event.ChartChangeEvent;
@@ -29,6 +30,8 @@ public class VChart extends ClosedShape implements RectangularShape {
     public double ar;
 
     private JFreeChart chart;
+    private transient ChartRenderingInfo chartRenderingInfo;
+    private volatile transient boolean updateRenderingInfo = true;
 
     /** For internal use. Made public for easier outside package subclassing. */
     public RProjectedCoordsP[] pc;
@@ -61,6 +64,7 @@ public class VChart extends ClosedShape implements RectangularShape {
         this.chart = chart;
         chart.addChangeListener(new ChartChangeListener(){
             public void chartChanged(ChartChangeEvent event){
+                updateRenderingInfo = true;
                 VirtualSpaceManager.INSTANCE.repaint();
             }
         });
@@ -259,7 +263,12 @@ public class VChart extends ClosedShape implements RectangularShape {
             if (alphaC != null && alphaC.getAlpha()==0){return;}
             g.setTransform(AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw, dy+pc[i].cy-pc[i].ch));
             g.transform(AffineTransform.getScaleInstance(coef, coef));
-            chart.draw(g, new Rectangle2D.Double(0,0,vw,vh));
+            if(updateRenderingInfo){
+                chart.draw(g, new Rectangle2D.Double(0,0,vw,vh), chartRenderingInfo);
+                updateRenderingInfo = false;
+            } else {
+                chart.draw(g, new Rectangle2D.Double(0,0,vw,vh));
+            }
             g.setTransform(stdT);
         }
 
