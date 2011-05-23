@@ -376,3 +376,76 @@ The following types of glyphs are available in \cd{zvtm-core}.
 \begin{itemize}
 \item{Composite:} 
 \end{itemize}
+
+%%%%%%%%%%
+\subsection{Text}
+
+Text is typically displayed using \cd{VText} or \cd{VTextOr}. The latter can be reoriented. These glyphs are instantiated and managed the same way the other glyphs. One big limitation at the moment is that they do not support text selection/editing. But they are very fast and consume little resources.
+
+If you really need character-aware text selection/highlighting/in-place editing, use \cd{VTextLayout}. This subclass of \cd{VText} lets you manage carets and logical highlighting in-place in the zoomable canvas. Basically, it provides all the features of AWT's \cd{TextLayout}.
+
+An example demonstrating how to highlight text by dragging the left mouse button and then copy the selected text into the system clipboard by hitting \cd{Ctrl+C}:
+
+\begin{small}
+\begin{SaveVerbatim}{CodeVerb}
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.StringSelection;
+
+class Demo implements ClipboardOwner {
+
+    VTextLayout vtl = new VTextLayout(x, y, z, Color.BLACK,
+                                      "A string to be displayed and copied");
+    Camera cam = ...;
+	
+    void copySelection(int start, int end){
+        if (start == -1 || end == -1 || start == end){
+            return;
+        }
+        setClipboardContents(vtl.getText().substring(start, end));
+    }
+	
+    public void setClipboardContents(String s){
+        StringSelection stringSelection = new StringSelection(s);
+        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        clipboard.setContents(stringSelection, this);
+    }
+	
+}
+
+class EventHandler implements ViewListener {
+
+    Demo demo;
+
+    int selectionStart = -1;
+    int selectionEnd = -1;
+    
+    public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+        selectionStart = demo.vtl.hitTestChar(e.getX(), e.getY(),
+                                              demo.cam).getInsertionIndex();
+    }
+	
+    public void mouseDragged(ViewPanel v,int mod,int buttonNumber,
+                             int jpx,int jpy, MouseEvent e){
+        if (buttonNumber == 1){
+            selectionEnd = demo.vtl.hitTestChar(e.getX(), e.getY(),
+                                                demo.cam).getInsertionIndex();
+            demo.vtl.setHighlightPosition(selectionStart, selectionEnd);
+        }		
+    }
+		
+    public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
+        if (mod == CTRL+MOD && code==KeyEvent.VK_C){
+            demo.copySelection(selectionStart, selectionEnd);
+        }
+    }
+	
+}
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+\end{small}
+
+
+
+
