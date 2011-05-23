@@ -1099,7 +1099,7 @@ public class DPath extends Glyph implements RectangularShape {
 		}
     }
     
-	/** Get the Java2D GeneralPath representing this DPath. */
+	/** Get the Java2D GeneralPath representing this DPath in virtual space coordinates. */
 	public GeneralPath getJava2DGeneralPath(){
         return gp;
 	}
