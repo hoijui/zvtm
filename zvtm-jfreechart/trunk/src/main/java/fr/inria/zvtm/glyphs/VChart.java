@@ -13,6 +13,8 @@ import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.event.ChartChangeListener;
+import org.jfree.chart.event.ChartChangeEvent;
 
 /**
  * A Glyph that embeds a JFreeChart instance.
@@ -57,6 +59,11 @@ public class VChart extends ClosedShape implements RectangularShape {
         else {ar = vw / vh;}
         orient=0;
         this.chart = chart;
+        chart.addChangeListener(new ChartChangeListener(){
+            public void chartChanged(ChartChangeEvent event){
+                VirtualSpaceManager.INSTANCE.repaint();
+            }
+        });
     }
 
     @Override
