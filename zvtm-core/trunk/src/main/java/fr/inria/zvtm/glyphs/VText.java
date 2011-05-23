@@ -43,6 +43,7 @@ import fr.inria.zvtm.glyphs.projection.ProjText;
  * Font properties are set globally in the view, but can be changed on a per-instance basis using setSpecialFont(Font f).<br>
  * (vx, vy) are the coordinates of the lower-left corner, or lower middle point, or lower-right corner depending on the text anchor (start, middle, end).
  * @author Emmanuel Pietriga
+ *@see fr.inria.zvtm.glyphs.VTextLayout
  *@see fr.inria.zvtm.glyphs.VTextOr
  */
 

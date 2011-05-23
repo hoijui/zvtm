@@ -37,6 +37,7 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
  * (vx, vy) are the coordinates of the lower-left corner, or lower middle point, or lower-right corner depending on the text anchor (start, middle, end).
  * @author Emmanuel Pietriga
  *@see fr.inria.zvtm.glyphs.VText
+ *@see fr.inria.zvtm.glyphs.VTextLayout
  */
 
 public class VTextOr extends VText {
