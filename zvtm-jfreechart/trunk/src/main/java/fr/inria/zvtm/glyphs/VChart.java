@@ -56,6 +56,7 @@ public class VChart extends ClosedShape implements RectangularShape {
         if (vw==0 && vh==0){ar=1.0f;}
         else {ar = vw / vh;}
         orient=0;
+        this.chart = chart;
     }
 
     @Override
@@ -249,18 +250,10 @@ public class VChart extends ClosedShape implements RectangularShape {
     @Override
         public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
             if (alphaC != null && alphaC.getAlpha()==0){return;}
-            //repaint only if object is visible
-            if (filled){
-                g.setColor(this.color);
-                g.fillRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw,2*pc[i].ch);
-            }
-            if (paintBorder){
-                g.setColor(borderColor);
-            }
-            chart.draw(g, new Rectangle2D.Double(dx+pc[i].cx-pc[i].cw,
-                        dy+pc[i].cy-pc[i].ch, 
-                        2*pc[i].cw,2*pc[i].ch));
-                //g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw,2*pc[i].ch);
+            g.setTransform(AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw, dy+pc[i].cy-pc[i].ch));
+            g.transform(AffineTransform.getScaleInstance(coef, coef));
+            chart.draw(g, new Rectangle2D.Double(0,0,vw,vh));
+            g.setTransform(stdT);
         }
 
     @Override
