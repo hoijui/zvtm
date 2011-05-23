@@ -65,7 +65,9 @@ public class ChartExample {
 		private int lastJPX;
 		private int lastJPY;
 
-		public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+		public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+            VChart.pickAndForward(v, e);
+        }
 
 		public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 

@@ -4,12 +4,15 @@ import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.Shape;
+import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
 import fr.inria.zvtm.glyphs.projection.RProjectedCoordsP;
 
 import fr.inria.zvtm.engine.Camera;
+import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 
 import org.jfree.chart.ChartRenderingInfo;
@@ -62,6 +65,7 @@ public class VChart extends ClosedShape implements RectangularShape {
         else {ar = vw / vh;}
         orient=0;
         this.chart = chart;
+        this.chartRenderingInfo = new ChartRenderingInfo();
         chart.addChangeListener(new ChartChangeListener(){
             public void chartChanged(ChartChangeEvent event){
                 updateRenderingInfo = true;
@@ -131,6 +135,10 @@ public class VChart extends ClosedShape implements RectangularShape {
     public double getWidth(){return vw;}
 
     public double getHeight(){return vh;}
+
+    public ChartRenderingInfo getRenderingInfo(){ 
+        return chartRenderingInfo; 
+    }
 
     void computeSize(){
         size = Math.sqrt(Math.pow(vw,2)+Math.pow(vh,2));
@@ -276,5 +284,33 @@ public class VChart extends ClosedShape implements RectangularShape {
         public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
             draw(g, vW, vH, i, stdS, stdT, dx, dy);
         }
+
+    /**
+     * Convenience mouse click redispatch method, to be called from
+     * e.g. a click1() handler.
+     */
+    public static void pickAndForward(ViewPanel v, MouseEvent e){
+        Glyph[] pickList = v.getVCursor().getPicker().getPickedGlyphList();
+        if(pickList.length == 0){
+            return;
+        }
+        Glyph pickedGlyph = pickList[pickList.length - 1];
+        if(pickedGlyph instanceof VChart){
+        Point2D vsCoords = v.viewToSpaceCoords(v.cams[v.activeLayer], e.getX(), e.getY()); //XXX replace v.cams[v.activeLayer] by v.getActiveCamera
+        VChart vchart = (VChart)pickedGlyph;
+        ChartRenderingInfo cri = vchart.getRenderingInfo();
+        Point2D pt = spaceToChart(vchart, vsCoords);
+        if(cri != null){
+            System.err.println("FOO!");
+            vchart.chart.handleClick((int)(pt.getX()), (int)(pt.getY()), cri);
+        }
+        }
+    }
+
+    private static Point2D spaceToChart(VChart chart, Point2D vsCoords){
+        return new Point2D.Double(vsCoords.getX() - (chart.vx - chart.getWidth()/2),
+                (chart.vy + chart.getHeight()/2) - vsCoords.getY());
+    }
+
 }
 
