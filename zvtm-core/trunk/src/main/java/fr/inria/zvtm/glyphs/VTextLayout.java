@@ -43,6 +43,8 @@ public class VTextLayout extends VText {
 	/* strong and weak carets, in that order */
 	Shape[] carets = new Shape[2];
 	
+	static Color HIGHLIGHT_COLOR = Color.YELLOW;
+	Shape highlighter = null;
     
     /**
      * @param t text string
@@ -170,8 +172,9 @@ public class VTextLayout extends VText {
 		int i = c.getIndex();
         double tcoef = c.focal/(c.focal+c.altitude) * scaleFactor;
 		switch(text_anchor){
-			case TEXT_ANCHOR_MIDDLE:{return tl.hitTestChar((float) ((jpx - pc[i].cx + pc[i].cw/2)/tcoef), (float)((jpy - pc[i].cy)/tcoef));}
-			case TEXT_ANCHOR_END:{return tl.hitTestChar((float) ((jpx - pc[i].cx + pc[i].cw)/tcoef), (float)((jpy - pc[i].cy)/tcoef));}
+			//XXX:FIXME the following does not take dx,dy portal offsets into account
+			case TEXT_ANCHOR_MIDDLE:{return tl.hitTestChar((float) ((jpx - pc[i].cx )/tcoef+ pc[i].cw/2), (float)((jpy - pc[i].cy)/tcoef));}
+			case TEXT_ANCHOR_END:{return tl.hitTestChar((float) ((jpx - pc[i].cx)/tcoef + pc[i].cw), (float)((jpy - pc[i].cy)/tcoef));}
 			default:{return tl.hitTestChar((float) ((jpx - pc[i].cx)/tcoef), (float)((jpy - pc[i].cy)/tcoef));}
 		}
 	}
@@ -183,6 +186,25 @@ public class VTextLayout extends VText {
 	 */
 	public void updateCaretPosition(int jpx, int jpy, Camera c){
 		setCaretPosition(hitTestChar(jpx, jpy, c).getInsertionIndex());
+	}
+	
+	public static void setHighlightColor(Color c){
+		HIGHLIGHT_COLOR = c;
+	}
+	
+	public static Color getHighlightColor(){
+		return HIGHLIGHT_COLOR;
+	}
+	
+	public void setHighlightPosition(int firstEndPoint, int secondEndPoint){
+		if (firstEndPoint < 0 || secondEndPoint < 0 || firstEndPoint == secondEndPoint){
+			highlighter = null;
+			return;
+		}
+		else {
+			highlighter = tl.getLogicalHighlightShape(firstEndPoint, secondEndPoint);			
+		}
+		VirtualSpaceManager.INSTANCE.repaint();
 	}
 
 	/** Force computation of text's bounding box at next call to draw().
@@ -209,7 +231,6 @@ public class VTextLayout extends VText {
      */
      @Override
     public double getSize(){
-		//XXX: maybe has to be updated to take into account the specificities of TextLayout
         for (int i=0;i<pc.length;i++){
             if (pc[i] != null & pc[i].valid){
                 return (float)Math.sqrt(Math.pow(pc[i].cw,2) + Math.pow(pc[i].ch,2));
@@ -377,8 +398,13 @@ public class VTextLayout extends VText {
 				    g.setColor(borderColor);
 	                g.fillRect(dx-paddingX, dy-rectH+1+2*paddingY, Math.round(pc[i].cw / scaleFactor+paddingX), rectH-1+2*paddingY);
 				}
-	    		g.setColor(this.color);
+				// background highlighting (text selection)
+				if (highlighter != null){
+					g.setColor(HIGHLIGHT_COLOR);
+					g.fill(highlighter);					
+				}
 				// text
+	    		g.setColor(this.color);
 				tl.draw(g, 0, 0);
 				// strong caret
 				if (carets[0] != null){
@@ -397,8 +423,13 @@ public class VTextLayout extends VText {
 				    g.setColor(borderColor);
 	                g.fillRect(dx-paddingX, dy-rectH+1+2*paddingY, Math.round(pc[i].cw / scaleFactor+paddingX), rectH-1+2*paddingY);
 				}
-	    		g.setColor(this.color);
+				// background highlighting (text selection)
+				if (highlighter != null){
+					g.setColor(HIGHLIGHT_COLOR);
+					g.fill(highlighter);					
+				}
 				// text
+	    		g.setColor(this.color);
 				tl.draw(g, 0, 0);
 				// strong caret
 				if (carets[0] != null){
@@ -450,6 +481,11 @@ public class VTextLayout extends VText {
 			g.setTransform(at);
 			if (alphaC != null){
 				g.setComposite(alphaC);
+				// background highlighting (text selection)
+				if (highlighter != null){
+					g.setColor(HIGHLIGHT_COLOR);
+					g.fill(highlighter);					
+				}
 				// text
 				tl.draw(g, 0, 0);
 				// strong caret
@@ -465,6 +501,11 @@ public class VTextLayout extends VText {
 				g.setComposite(acO);
 			}
 			else {
+				// background highlighting (text selection)
+				if (highlighter != null){
+					g.setColor(HIGHLIGHT_COLOR);
+					g.fill(highlighter);					
+				}
 				// text
 				tl.draw(g, 0, 0);
 				// strong caret
