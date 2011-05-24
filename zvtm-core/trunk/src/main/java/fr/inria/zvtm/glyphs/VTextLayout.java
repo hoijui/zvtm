@@ -161,7 +161,7 @@ public class VTextLayout extends VText {
 		}
 		VirtualSpaceManager.INSTANCE.repaint();
 	}
-	
+
 	/** Returns a TextHitInfo corresponding to the specified point.
 	 * This method is a convenience overload of hitTestChar that uses the natural bounds of this TextLayout.
 	 *@param jpx click coordinates, in JPanel coordinates.
@@ -169,13 +169,24 @@ public class VTextLayout extends VText {
 	 *@param c camera observing the TextLayout.
 	 */
 	public TextHitInfo hitTestChar(int jpx, int jpy, Camera c){
+		return hitTestChar(jpx, jpy, c, 0 , 0);
+	}
+	
+	/** Returns a TextHitInfo corresponding to the specified point.
+	 * This method is a convenience overload of hitTestChar that uses the natural bounds of this TextLayout.
+	 *@param jpx click coordinates, in JPanel coordinates.
+	 *@param jpy click coordinates, in JPanel coordinates.
+	 *@param c camera observing the TextLayout.
+	 *@param dx x-offest for hit test, typically used to give a Portal horizontal offset w.r.t the parent view's top left corner (JPanel coordinates).
+	 *@param dy y-offest for hit test, typically used to give a Portal horizontal offset w.r.t the parent view's top left corner (JPanel coordinates).
+	 */
+	public TextHitInfo hitTestChar(int jpx, int jpy, Camera c, int dx, int dy){
 		int i = c.getIndex();
         double tcoef = c.focal/(c.focal+c.altitude) * scaleFactor;
 		switch(text_anchor){
-			//XXX:FIXME the following does not take dx,dy portal offsets into account
-			case TEXT_ANCHOR_MIDDLE:{return tl.hitTestChar((float) ((jpx - pc[i].cx )/tcoef + pc[i].cw/2d/scaleFactor), (float)((jpy - pc[i].cy)/tcoef));}
-			case TEXT_ANCHOR_END:{return tl.hitTestChar((float) ((jpx - pc[i].cx)/tcoef + pc[i].cw/scaleFactor), (float)((jpy - pc[i].cy)/tcoef));}
-			default:{return tl.hitTestChar((float) ((jpx - pc[i].cx)/tcoef), (float)((jpy - pc[i].cy)/tcoef));}
+			case TEXT_ANCHOR_MIDDLE:{return tl.hitTestChar((float)((jpx - pc[i].cx)/tcoef + pc[i].cw/2d/scaleFactor - dx), (float)((jpy - pc[i].cy)/tcoef - dy));}
+			case TEXT_ANCHOR_END:{return tl.hitTestChar((float)((jpx - pc[i].cx)/tcoef + pc[i].cw/scaleFactor - dx), (float)((jpy - pc[i].cy)/tcoef - dy));}
+			default:{return tl.hitTestChar((float)((jpx - pc[i].cx)/tcoef - dx), (float)((jpy - pc[i].cy)/tcoef - dy));}
 		}
 	}
 	
