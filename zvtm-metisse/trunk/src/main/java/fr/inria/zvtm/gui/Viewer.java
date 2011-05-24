@@ -7,6 +7,7 @@
 
 package fr.inria.zvtm.gui;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GraphicsEnvironment;
@@ -14,8 +15,11 @@ import java.awt.Toolkit;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.util.Vector;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 
 import fr.inria.zvtm.engine.Camera;
@@ -24,10 +28,11 @@ import fr.inria.zvtm.engine.Utils;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
+import fr.inria.zvtm.glyphs.VImage;
 import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.kernel.Temporizer;
 
-public class Viewer implements ComponentListener{
+public class Viewer implements ComponentListener, MouseListener{
 
 	/* screen dimensions, actual dimensions of windows */
 	private int SCREEN_WIDTH =  Toolkit.getDefaultToolkit().getScreenSize().width;
@@ -51,10 +56,9 @@ public class Viewer implements ComponentListener{
 
 	protected Camera mCamera;
 	public boolean dragging = false;
-	private VRectangle cursorX;
-	private VRectangle cursorY;
 	private VRectangle horizon;
-
+	private CursorHandler cursorHandler;
+	private PCursor cursor;
 
 	public Viewer(boolean isClient){
 		this.isClient = isClient; 
@@ -89,12 +93,15 @@ public class Viewer implements ComponentListener{
 		nm.setCamera(mCamera);
 		mView = (EView)vsm.addFrameView(cameras, Messages.mViewName, (opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H,
 				false, false, !fullscreen, null);
+		mView.getCursor().setVisibility(false);
+		
 		if (fullscreen){
 			GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow((JFrame)mView.getFrame());
 		}
 		else {
 			mView.setVisible(true);
 		}
+		mView.mouse.setSensitivity(false);
 		updatePanelSize();
 		eh = new MainEventHandler(this);
 		mView.setListener(eh, 0);
@@ -108,44 +115,35 @@ public class Viewer implements ComponentListener{
 			}
 		};
 		mView.getFrame().addComponentListener(ca0);
-
 		viewCreatedHook(cameras);
 
 		if(isClient){
 			setHorizon();
-			addCursor();
+			cursor = new PCursor(mSpace, clientId,mCamera,eh);
 		}
+		
+		cursorHandler = new CursorHandler(cursor, this);
+		backgroundHook();
 	}
 
-	private void addCursor(){
-		cursorX = new VRectangle(0, 0, 1, 20, 1, this.clientId);
-		cursorX.setBorderColor(this.clientId);
-		cursorX.setVisible(true);
-		mSpace.addGlyph(cursorX);
-		cursorX.setSensitivity(false);
-		cursorY = new VRectangle(0, 0, 1, 1, 20, this.clientId);
-		cursorY.setBorderColor(this.clientId);
-		cursorY.setVisible(true);
-		mSpace.addGlyph(cursorY);
-		cursorY.setSensitivity(false);
 
-		refresh();
+	protected void backgroundHook() {
+		if(!isClient)addBackground();
+	}
+
+	protected void addBackground() {
+		ImageIcon img = (new ImageIcon("src/main/java/fr/inria/zvtm/resources/bg.jpg"));
+		mSpace.addGlyph(new VImage(img.getImage()));
 	}
 
 	public boolean hasCursor() {
-		return (cursorX!=null && cursorY!=null);
+		return (cursor!=null);
 	}
-	private void moveCursor(double x, double y){
-		cursorX.moveTo(x, y);
-		cursorY.moveTo(x, y);
-	}
-	
-	public void updateCursor() {
-		moveCursor(mView.getPanel().getVCursor().getVSXCoordinate(), mView.getPanel().getVCursor().getVSYCoordinate());
-	}
+
 	private void setHorizon() {
 		horizon = new VRectangle(mCamera.vx,mCamera.vy,1,200,200,this.clientId);
 		horizon.setBorderColor(this.clientId);
+		horizon.setStroke(new BasicStroke(10f));
 		horizon.setVisible(true);
 		horizon.setFilled(false);
 		horizon.setSensitivity(false);
@@ -162,6 +160,11 @@ public class Viewer implements ComponentListener{
 		horizon.moveTo(mCamera.vx, mCamera.vy);
 		
 	}
+	
+	public CursorHandler getCursorHandler(){
+		return cursorHandler;
+	}
+	
 	public void addFrame(fr.inria.zvtm.compositor.MetisseWindow f){
 		mSpace.addGlyph(f);
 		refresh();
@@ -172,7 +175,26 @@ public class Viewer implements ComponentListener{
 		refresh();
 	}
 
-
+	public void moveViewTo(double x,double y){
+		mCamera.moveTo(x, y);
+		updateHorizon();
+	}
+	
+	public void moveViewOf(double x,double y){
+		mCamera.move(x, y);
+		updateHorizon();
+	}
+	
+	public void zoomOf(double d){
+		mCamera.setAltitude(mCamera.getAltitude()+d);
+		updateHorizon();
+	}
+	
+	public void zoomViewTo(double z){
+		mCamera.setAltitude(z);
+		updateHorizon();
+	}
+	
 	void windowLayout(){
 		if (Utils.osIsWindows()){
 			VIEW_X = VIEW_Y = 0;
@@ -208,10 +230,7 @@ public class Viewer implements ComponentListener{
 	public void changeColor(){
 		if(!isClient)return;
 		clientId = getRandomColor();
-		cursorX.setBorderColor(clientId);
-		cursorX.setColor(clientId);
-		cursorY.setBorderColor(clientId);
-		cursorY.setColor(clientId);
+		cursor.setColor(clientId);
 		horizon.setBorderColor(clientId);
 	}
 	@Override
@@ -225,4 +244,37 @@ public class Viewer implements ComponentListener{
 	}
 	@Override
 	public void componentShown(ComponentEvent arg0) {}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+	//	cursorHandler.hasEntered();
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+	//	cursorHandler.hasExited();
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		
+	}
+	
+	public PCursor getCursor() {
+		return cursor;
+	}
+
+	public void resetCursorPosition() {
+		cursorHandler.resetCursorPos();
+	}
 }

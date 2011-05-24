@@ -12,15 +12,15 @@ import fr.inria.zvtm.protocol.Proto;
 import fr.inria.zvtm.protocol.RfbAgent;
 
 
-public class Connexion {
+public class Connection {
 	private static String ip;
 	private static int port;
 	private static Socket sock;
 	private static InputStream input;
 	private static OutputStream output;
 	public static void init(String ip, int port) {
-		Connexion.ip = ip;
-		Connexion.port = port;
+		Connection.ip = ip;
+		Connection.port = port;
 		connect();
 		InputForwarder.init();
 		startListenning();

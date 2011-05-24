@@ -549,4 +549,9 @@ public class MetisseWindow extends VImage{
 	public Point.Double getRootLocation() {
 		return rootLocation;
 	}
+	
+	@Override
+	public boolean coordInside(int jpx, int jpy, int camIndex, double cvx,double cvy) {
+ 		return((cvx-vx)*(cvx-vx)<=vw*vw/4		&&      (cvy-vy)*(cvy-vy)<=vh*vh/4);
+	}
 }

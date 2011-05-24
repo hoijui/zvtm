@@ -16,7 +16,6 @@ public class HorizonUpdater implements CameraListener{
 	@Override
 	public void cameraMoved(Camera arg0, Double arg1, double arg2) {
 		application.updateHorizon();
-		application.updateCursor();
 	}
 
 }

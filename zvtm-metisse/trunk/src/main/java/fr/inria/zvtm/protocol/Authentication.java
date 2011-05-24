@@ -88,9 +88,9 @@ package fr.inria.zvtm.protocol;
 // @see EncryptedOutputStream
 // @see EncryptedInputStream
 
-public class Authentification {
+public class Authentication {
   // Constructor, byte-array key.
-  public Authentification(byte[] key) {
+  public Authentication(byte[] key) {
     setKey(key);
   }
   

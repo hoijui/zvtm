@@ -25,7 +25,7 @@ public class Main {
 		compositor = new ZVTMAdapter();
 		compositor.init();
 		initViewers();
-		Connexion.init(ip,port);
+		Connection.init(ip,port);
 	}
 
 	private static void initViewers() {
@@ -62,7 +62,7 @@ public class Main {
 	}
 
 	public static void end() {
-		Connexion.end();
+		Connection.end();
 		System.exit(0);
 
 	}

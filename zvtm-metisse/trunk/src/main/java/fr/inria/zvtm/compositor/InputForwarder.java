@@ -67,8 +67,8 @@ public class InputForwarder {
 		if(cu==null)return null;
 		double[] cubounds = cu.getBounds();
 		sf = cu.getScaleFactor();
-		xx = (int) (cu.getX()+ (v.getVCursor().getVSXCoordinate()-cubounds[0])/sf);
-		yy = (int) (cu.getY()- (v.getVCursor().getVSYCoordinate()-cubounds[1])/sf);
+		xx = (int) (cu.getX()+ (Main.clientViewer.getCursor().getVSXCoordinate()-cubounds[0])/sf);
+		yy = (int) (cu.getY()- (Main.clientViewer.getCursor().getVSYCoordinate()-cubounds[1])/sf);
 		res[0] = xx;
 		res[1] = yy;
 		res[2] = currentWindow;
@@ -85,21 +85,28 @@ public class InputForwarder {
 				lastSentEventTime = System.currentTimeMillis();
 			}
 		}
-
 		currentWindow = detectWindow(v, jpx, jpy);
 		int[] p = unproject(v, jpx, jpy);
+
 		if(p == null)return;
 		RfbAgent.rfbPointerEvent(p[2],p[0],p[1], buttonState);
 	}
 
 
 	public static int detectWindow(ViewPanel v,double jpx,double jpy){
-		if(v==null)return -1;
-		if(v.getVCursor()==null)return -1;
-		if(v.getVCursor().getPicker()==null)return -1;
 		if(Main.viewer==null)return-1;
-		Glyph[] t = v.getVCursor().getPicker().getPickedGlyphList();
-
+		Glyph[] t = null;
+		try{
+			t = Main.clientViewer.getCursor().getPicker().getPickedGlyphList();
+	//		System.out.println(t.length);
+		}
+		catch (NullPointerException e)
+		{
+			if(v==null)return -1;
+			if(v.getVCursor()==null)return -1;
+			if(v.getVCursor().getPicker()==null)return -1;
+			t = v.getVCursor().getPicker().getPickedGlyphList();
+		}
 		if(t.length<=0)return -1;
 		Glyph up = t[t.length-1];
 		if(!up.getClass().equals(MetisseWindow.class))return -1;

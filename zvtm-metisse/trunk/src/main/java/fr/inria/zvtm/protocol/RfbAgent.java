@@ -107,7 +107,7 @@ public class RfbAgent {
 			readString(challenge, 16);
 
 			if (password.length() > 0){
-				Authentification auth = new Authentification(password.getBytes());
+				Authentication auth = new Authentication(password.getBytes());
 				auth.encrypt(challenge, 0, challenge, 0);
 				auth.encrypt(challenge, 8, challenge, 8);
 			}

@@ -66,24 +66,30 @@ class MainEventHandler implements ViewListener, ComponentListener, KeyListener{
 		this.application = app;
 	}
 
-	public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+	public void press1(ViewPanel v,int mod,int jpxx,int jpyy, MouseEvent e){
+		CursorHandler ch = application.getCursorHandler();
+		ch.move(jpxx,jpyy,e);
 
+		int jpx = ch.getX();
+		int jpy = ch.getY();
+		
+		
 		if(MOVE_MODE){
 
 			lastJPX = jpx;
 			lastJPY = jpy;
 			if (mod == ALT_MOD){
 				selectingRegion = true;
-				x1 = v.getVCursor().getVSXCoordinate();
-				y1 = v.getVCursor().getVSYCoordinate();
+				x1 = application.getCursor().getVSXCoordinate();
+				y1 = application.getCursor().getVSYCoordinate();
 				v.setDrawRect(true);
 			}
 			else{
 			
 				lastJPX = jpx;
 				lastJPY = jpy;
-				last_X = v.getVCursor().getVSXCoordinate();
-				last_Y = v.getVCursor().getVSYCoordinate();
+				last_X = application.getCursor().getVSXCoordinate();
+				last_Y = application.getCursor().getVSYCoordinate();
 				glyphMoving = true;
 				currentMovedWindow = FrameManager.get(InputForwarder.detectWindow(v, jpx, jpy));
 			}
@@ -93,8 +99,14 @@ class MainEventHandler implements ViewListener, ComponentListener, KeyListener{
 		}
 	}
 
-	public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+	public void release1(ViewPanel v,int mod,int jpxx,int jpyy, MouseEvent e){
+		CursorHandler ch = application.getCursorHandler();
+		ch.move(jpxx,jpyy, e);
 
+		int jpx = ch.getX();
+		int jpy = ch.getY();
+		
+		
 		if(MOVE_MODE){
 			regionStickedToMouse = false;
 			pcameraStickedToMouse = false;
@@ -121,12 +133,19 @@ class MainEventHandler implements ViewListener, ComponentListener, KeyListener{
 	public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
 	}
 
-	public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+	public void press2(ViewPanel v,int mod,int jpxx,int jpyy, MouseEvent e){
+		CursorHandler ch = application.getCursorHandler();
+		ch.move(jpxx,jpyy, e);
+
+		int jpx = ch.getX();
+		int jpy = ch.getY();
+		
 		if(MOVE_MODE){
 			lastJPX = jpx;
 			lastJPY = jpy;
 			scaling = true;
 			currentScaledWindow = FrameManager.get(InputForwarder.detectWindow(v, jpx, jpy));
+			if(currentScaledWindow==null)return;
 			currentScaledWindow.isRescaling = true;
 			lastScaleFactor = currentScaledWindow.scaleFactor;
 		}
@@ -135,9 +154,16 @@ class MainEventHandler implements ViewListener, ComponentListener, KeyListener{
 		}
 	}
 
-	public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+	public void release2(ViewPanel v,int mod,int jpxx,int jpyy, MouseEvent e){
 
+		CursorHandler ch = application.getCursorHandler();
+		ch.move(jpxx,jpyy, e);
+
+		int jpx = ch.getX();
+		int jpy = ch.getY();
+		
 		if(MOVE_MODE){
+			if(currentScaledWindow == null)return;
 			scaling = false;
 			lastScaleFactor = currentScaledWindow.scaleFactor;
 			currentScaledWindow.endRescale();
@@ -147,27 +173,47 @@ class MainEventHandler implements ViewListener, ComponentListener, KeyListener{
 		}
 	}
 
-	public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
+	public void click2(ViewPanel v,int mod,int jpxx,int jpyy,int clickNumber, MouseEvent e){
+		CursorHandler ch = application.getCursorHandler();
+		ch.move(jpxx,jpyy, e);
+
+		int jpx = ch.getX();
+		int jpy = ch.getY();
+		
 		if(MOVE_MODE){
 			if(currentScaledWindow!=null)currentScaledWindow.resetTransform();
+			else if(currentMovedWindow!=null)currentMovedWindow.resetTransform();
 		}
 		else
 		InputForwarder.click(mod,jpx,jpy,clickNumber,  e);
 	}
 
-	public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+	public void press3(ViewPanel v,int mod,int jpxx,int jpyy, MouseEvent e){
+		CursorHandler ch = application.getCursorHandler();
+		ch.move(jpxx,jpyy, e);
+
+		int jpx = ch.getX();
+		int jpy = ch.getY();
+		
+		
 		if(MOVE_MODE){
 			lastJPX = jpx;
 			lastJPY = jpy;
 			panning = true;
-			v.setDrawDrag(true);
+		//	v.setDrawDrag(true);
 		}
 		else{
 			InputForwarder.press(mod,v,jpx,jpy,e);
 		}
 	}
 
-	public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+	public void release3(ViewPanel v,int mod,int jpxx,int jpyy, MouseEvent e){
+		CursorHandler ch = application.getCursorHandler();
+		ch.move(jpxx,jpyy, e);
+
+		int jpx = ch.getX();
+		int jpy = ch.getY();
+		
 		if(MOVE_MODE){
 			application.nm.mCamera.setXspeed(0);
 			application.nm.mCamera.setYspeed(0);
@@ -180,7 +226,13 @@ class MainEventHandler implements ViewListener, ComponentListener, KeyListener{
 		}
 	}
 
-	public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
+	public void click3(ViewPanel v,int mod,int jpxx,int jpyy,int clickNumber, MouseEvent e){
+		CursorHandler ch = application.getCursorHandler();
+		ch.move(jpxx,jpyy, e);
+
+		int jpx = ch.getX();
+		int jpy = ch.getY();
+		
 		if(MOVE_MODE){
 			if (v.lastGlyphEntered() != null){
 				application.mView.centerOnGlyph(v.lastGlyphEntered(), v.cams[0], Config.ANIM_MOVE_LENGTH, true, 1.0f);				
@@ -192,18 +244,20 @@ class MainEventHandler implements ViewListener, ComponentListener, KeyListener{
 	}
 
 	public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
-		updateCursor(v);
-		InputForwarder.move(v,jpx,jpy,e);
+		CursorHandler ch = application.getCursorHandler();
+		if(ch==null)return;
+		ch.move(jpx,jpy, e);
+		InputForwarder.move(v,ch.getX(),ch.getY(),e);
 	}
 
-	private void updateCursor(ViewPanel v) {
-		if(application==null)return;
-		if(!application.hasCursor())return;
-		application.updateCursor();
-	}
 
-	public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
-		updateCursor(v);
+	public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpxx,int jpyy, MouseEvent e){
+		CursorHandler ch = application.getCursorHandler();
+		ch.move(jpxx,jpyy, e);
+
+		int jpx = ch.getX();
+		int jpy = ch.getY();
+		
 		if(MOVE_MODE){
 			if (regionStickedToMouse){
 				double a = (application.nm.ovCamera.focal+Math.abs(application.nm.ovCamera.altitude)) / application.nm.ovCamera.focal;
@@ -237,8 +291,8 @@ class MainEventHandler implements ViewListener, ComponentListener, KeyListener{
 				currentScaledWindow.setScaleFactor(lastScaleFactor+(jpx-lastJPX)*1./100);
 			}
 			else if(glyphMoving){
-				double x = v.getVCursor().getVSXCoordinate();
-				double y = v.getVCursor().getVSYCoordinate();
+				double x = application.getCursor().getVSXCoordinate();
+				double y = application.getCursor().getVSYCoordinate();
 				currentMovedWindow.moveGlyphOf(x-last_X,y-last_Y);
 				lastJPX = jpx;
 				lastJPY = jpy;
@@ -251,7 +305,8 @@ class MainEventHandler implements ViewListener, ComponentListener, KeyListener{
 		}
 	}
 
-	public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
+	public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpxx,int jpyy, MouseWheelEvent e){		
+		
 		if(MOVE_MODE){
 			double a = ((application.nm.mCamera.focal+Math.abs(application.nm.mCamera.altitude))/ application.nm.mCamera.focal);
 			double c = Math.pow(Math.min(1,(application.nm.mCamera.altitude+application.nm.mCamera.focal)/100),1.5);
@@ -285,6 +340,7 @@ class MainEventHandler implements ViewListener, ComponentListener, KeyListener{
 			else if (code==KeyEvent.VK_DOWN){application.nm.translateView(Navigation.MOVE_DOWN);}
 			else if (code==KeyEvent.VK_LEFT){application.nm.translateView(Navigation.MOVE_LEFT);}
 			else if (code==KeyEvent.VK_RIGHT){application.nm.translateView(Navigation.MOVE_RIGHT);}
+			else if (code==KeyEvent.VK_R){application.resetCursorPosition();}
 			else if (code==KeyEvent.VK_C){application.changeColor();};
 		}
 
