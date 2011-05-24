@@ -173,8 +173,8 @@ public class VTextLayout extends VText {
         double tcoef = c.focal/(c.focal+c.altitude) * scaleFactor;
 		switch(text_anchor){
 			//XXX:FIXME the following does not take dx,dy portal offsets into account
-			case TEXT_ANCHOR_MIDDLE:{return tl.hitTestChar((float) ((jpx - pc[i].cx )/tcoef+ pc[i].cw/2), (float)((jpy - pc[i].cy)/tcoef));}
-			case TEXT_ANCHOR_END:{return tl.hitTestChar((float) ((jpx - pc[i].cx)/tcoef + pc[i].cw), (float)((jpy - pc[i].cy)/tcoef));}
+			case TEXT_ANCHOR_MIDDLE:{return tl.hitTestChar((float) ((jpx - pc[i].cx )/tcoef + pc[i].cw/2d/scaleFactor), (float)((jpy - pc[i].cy)/tcoef));}
+			case TEXT_ANCHOR_END:{return tl.hitTestChar((float) ((jpx - pc[i].cx)/tcoef + pc[i].cw/scaleFactor), (float)((jpy - pc[i].cy)/tcoef));}
 			default:{return tl.hitTestChar((float) ((jpx - pc[i].cx)/tcoef), (float)((jpy - pc[i].cy)/tcoef));}
 		}
 	}
