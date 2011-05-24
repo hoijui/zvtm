@@ -2,7 +2,7 @@ package fr.inria.zvtm.cluster;
 
 
 import fr.inria.zvtm.compositor.ZVTMAdapter;
-import fr.inria.zvtm.kernel.Connexion;
+import fr.inria.zvtm.kernel.Connection;
 import fr.inria.zvtm.kernel.Main;
 
 
@@ -18,7 +18,9 @@ public class MetisseMain extends Main{
 		compositor = new ZVTMAdapter();
 		compositor.init();
 		initViewers();
-		Connexion.init(ip,port);
+		Connection.init(ip,port);
+		ViconInput vi = new ViconInput();
+		vi.initOSC(52511);
 	}
 
 

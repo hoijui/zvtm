@@ -10,6 +10,21 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+	<repositories>
+		<repository>
+			<id>zvtm repository</id>
+			<url>http://zvtm.sourceforge.net/maven</url>
+		</repository>
+		<repository>
+			<id>central</id>
+			<name>Maven Repository</name>
+			<url>http://repo1.maven.org/maven2</url>
+		</repository>
+		<repository>
+			<id>jboss</id>
+			<url>http://repository.jboss.com/maven2</url>
+		</repository>
+	</repositories>
     <build>
         <plugins>
             <plugin>
@@ -17,7 +32,7 @@
                 <artifactId>aspectj-maven-plugin</artifactId>
                 <version>1.2</version>
                 <configuration>
-                    <weaveDependencies>
+                    <weaveDependencies>	   
                         <weaveDependency>
                             <groupId>fr.inria.zvtm</groupId>
                             <artifactId>zvtm-metisse</artifactId>
@@ -76,6 +91,11 @@
         </plugins>
     </build>
     <dependencies>
+	<dependency>
+	    <groupId>com.illposed.osc</groupId>
+	    <artifactId>javaosc</artifactId>
+	    <version>1.0</version>
+	</dependency>	
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
