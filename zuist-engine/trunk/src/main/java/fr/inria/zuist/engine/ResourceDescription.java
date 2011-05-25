@@ -25,6 +25,7 @@ import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
 
 /** Description of external resource objects to be loaded/unloaded in the scene.
+ * Supports URL with the following protocols: file, http, jar (syntax jar:file:!/path/to/resource/in/jar)
  *@author Emmanuel Pietriga
  */
 
