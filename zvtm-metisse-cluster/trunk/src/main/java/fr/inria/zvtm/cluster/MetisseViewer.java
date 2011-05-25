@@ -55,7 +55,7 @@ public class MetisseViewer extends Viewer {
 
 	protected void addBackground() {
 		ImageIcon img = (new ImageIcon("src/main/java/fr/inria/zvtm/resources/bg.jpg"));
-		mSpace.addGlyph(new VImage(img.getImage()));
+		wallSpace.addGlyph(new VImage(img.getImage()));
 	}
 	
 	public double getVisibleRegionWidth(){

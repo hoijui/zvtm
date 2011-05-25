@@ -18,6 +18,7 @@ public class MetisseMain extends Main{
 		compositor = new ZVTMAdapter();
 		compositor.init();
 		initViewers();
+		compositor.setClient(clientViewer);
 		Connection.init(ip,port);
 		ViconInput vi = new ViconInput();
 		vi.initOSC(52511);
@@ -26,8 +27,8 @@ public class MetisseMain extends Main{
 
 	private static void initViewers() {
 		viewer = new MetisseViewer(false);
-		viewer.init(false, false, true, null);		
+		viewer.init(false, false, true, null,null);		
 		clientViewer = new MetisseViewer(true);
-		clientViewer.init(false, false, true, viewer.mSpace);	
+		clientViewer.init(false, false, true, viewer.wallSpace,viewer.cursorSpace);	
 	}
 }
