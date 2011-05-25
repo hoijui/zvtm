@@ -106,7 +106,12 @@ public class ImageDescription extends ResourceDescription {
                     }
                 }
                 else {
-                    finishCreatingObject(sm, vs, (new ImageIcon(src)).getImage(), null, fadeIn);                    
+                    if (src.toString().startsWith(JAR_HEADER)){
+                        finishCreatingObject(sm, vs, (new ImageIcon(this.getClass().getResource(src.toString().substring(JAR_HEADER.length())))).getImage(), null, fadeIn);
+                    }
+                    else {
+                        finishCreatingObject(sm, vs, (new ImageIcon(src)).getImage(), null, fadeIn);
+                    }
                 }
             }     
         }

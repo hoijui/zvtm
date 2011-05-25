@@ -31,6 +31,8 @@ import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
 public abstract class ResourceDescription extends ObjectDescription {
 	
 	static final String FILE_PROTOCOL = "file";
+	static final String JAR_PROTOCOL = "jar";
+	static final String JAR_HEADER = "jar:file:!";
 	
 	/** URL identifying this resource. */
 	protected URL src;
@@ -72,6 +74,10 @@ public abstract class ResourceDescription extends ObjectDescription {
 	/** Returns true if the resource is on the computer running this application. */
 	public boolean isLocal(){
 	    return src.getProtocol().equals(FILE_PROTOCOL);
+	}
+	
+	public boolean isInJAR(){
+	    return src.getProtocol().startsWith(JAR_PROTOCOL);
 	}
 	
 	/*------------------------- Visual feedback while fetching ----------------------- */

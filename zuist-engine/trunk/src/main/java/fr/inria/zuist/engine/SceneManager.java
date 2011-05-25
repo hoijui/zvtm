@@ -124,6 +124,7 @@ public class SceneManager implements CameraListener {
     
     
     static final String URL_PROTOCOL_SEQ = ":/";
+    static final String JAR_PROTOCOL_SEQ = ":!/";
     static final String FILE_PROTOCOL_HEAD = "file://";
 
     final GlyphLoader glyphLoader;
@@ -1167,7 +1168,7 @@ public class SceneManager implements CameraListener {
     }
 
     public static URL getAbsoluteURL(String src, File sceneFileDir){
-        if (src.indexOf(URL_PROTOCOL_SEQ) != -1){
+        if (src.indexOf(URL_PROTOCOL_SEQ) != -1 || src.indexOf(JAR_PROTOCOL_SEQ) != -1){
     		try {
     			return new URL(src);
     		}
