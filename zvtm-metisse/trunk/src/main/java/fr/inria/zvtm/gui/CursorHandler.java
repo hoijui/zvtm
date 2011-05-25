@@ -13,19 +13,20 @@ public class CursorHandler {
 	private double vx;
 	private double vy;
 	private Robot rbt;
-	private int refPosX = 400;
-	private int refPosY = 400;
+	private int refPosX;
+	private int refPosY;
 	private Viewer viewer;
 	private int frameLocOnScreenX;
 	private int frameLocOnScreenY;
 	private boolean exited;
 	private boolean beware;
+	private boolean active = true;
+	private boolean recalib = false;
 
 
 	public CursorHandler(PCursor out, Viewer v) {
 		this.pcursor = out;
 		this.viewer = v;
-		
 		try {
 			this.rbt = new Robot();
 
@@ -37,9 +38,11 @@ public class CursorHandler {
 
 
 	public void move(int jpx, int jpy, MouseEvent e) {
+		if(!active)return;
+		if((jpx+frameLocOnScreenX+1)==refPosX && (jpy+frameLocOnScreenY+27)==refPosY)return;
 		if(pcursor==null)return;
 		updateRefPos();		
-		if(exited){
+		if(exited||recalib){
 			this.jpx = e.getLocationOnScreen().x-frameLocOnScreenX;
 			this.jpy = e.getLocationOnScreen().y-frameLocOnScreenY;
 			Point.Double p = viewer.mView.getPanel().viewToSpaceCoords(viewer.mCamera, this.jpx, this.jpy);
@@ -49,6 +52,7 @@ public class CursorHandler {
 			pcursor.moveCursorTo(vx, vy, this.jpy, this.jpy);
 			exited = false;
 			beware = true;
+			recalib = false;
 			return;
 		}
 
@@ -66,16 +70,10 @@ public class CursorHandler {
 		vy = p.y;		
 		pcursor.moveCursorTo(vx, vy,this.jpx, this.jpy);
 
-		if(!exiting(e)&&!exited)rbt.mouseMove(refPosX, refPosY);
-		else {
-			rbt.mouseMove(frameLocOnScreenX, frameLocOnScreenY);	
-			exited = true;
-		}
+		rbt.mouseMove(refPosX, refPosY);
 	}
 
-	private boolean exiting(MouseEvent e) {
-		return ((jpx*jpx+jpy*jpy)<300);
-	}
+	
 
 	private void updateRefPos() {
 		Point locOnScreen = viewer.mView.getFrame().getLocationOnScreen();
@@ -107,6 +105,20 @@ public class CursorHandler {
 		vy = p.y;
 		pcursor.moveCursorTo(vx, vy,this.jpx,this.jpy);
 		rbt.mouseMove(refPosX, refPosY);
+	}
+
+
+
+	public void deactivate() {
+		recalib = true;
+		active = false;
+	}
+
+
+
+	public void activate() {
+		rbt.mouseMove(this.jpx, this.jpy);
+		active = true;
 	}
 
 

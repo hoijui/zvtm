@@ -45,6 +45,7 @@ public class MetisseWindow extends VImage{
 	private boolean isResizing= false;
 	public boolean isRescaling = false;
 	private HashMap<Integer, MetisseWindow> children;
+	private boolean onWall;
 	//	private boolean isMoving = false;
 
 
@@ -58,6 +59,7 @@ public class MetisseWindow extends VImage{
 		this.width = w;
 		this.height = h;
 		this.isroot = isroot;
+		this.onWall = false;
 		if (isroot){
 			rootDimension = new Point.Double(w, h);
 			rootPosition = new Point.Double(x, y);
@@ -553,5 +555,16 @@ public class MetisseWindow extends VImage{
 	@Override
 	public boolean coordInside(int jpx, int jpy, int camIndex, double cvx,double cvy) {
  		return((cvx-vx)*(cvx-vx)<=vw*vw/4		&&      (cvy-vy)*(cvy-vy)<=vh*vh/4);
+	}
+	
+	public void setOnWall(boolean b){
+		for (MetisseWindow c : children.values()) {
+			c.setOnWall(b);
+		}
+		onWall = b;
+	}
+	
+	public boolean isOnWall(){
+		return onWall;
 	}
 }

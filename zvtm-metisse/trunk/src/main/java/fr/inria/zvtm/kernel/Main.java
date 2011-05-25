@@ -25,14 +25,15 @@ public class Main {
 		compositor = new ZVTMAdapter();
 		compositor.init();
 		initViewers();
+		compositor.setClient(clientViewer);
 		Connection.init(ip,port);
 	}
 
 	private static void initViewers() {
 		viewer = new Viewer(false);
-		viewer.init(false, false, true, null);		
+		viewer.init(false, false, true, null,null);		
 		clientViewer = new Viewer(true);
-		clientViewer.init(false, false, true, viewer.mSpace);	
+		clientViewer.init(false, false, true, viewer.wallSpace, viewer.cursorSpace);	
 	}
 
 	protected static void handleArgs(String[] args) {

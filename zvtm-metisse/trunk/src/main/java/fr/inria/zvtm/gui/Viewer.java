@@ -45,8 +45,16 @@ public class Viewer implements ComponentListener, MouseListener{
 	/* dimensions of zoomable panel */
 	protected int panelWidth, panelHeight;
 	private long lastRepaintTime ;
+	public VirtualSpace cursorSpace;
 	protected VirtualSpaceManager vsm;
-	public VirtualSpace mSpace;
+	/**
+	 * The virtual space displayed on the wall and on client views. It is shared by all clients
+	 */
+	public VirtualSpace wallSpace;
+	/**
+	 * The space where the user operates it is not visible on the wall
+	 */
+	private VirtualSpace localSpace;
 	protected EView mView;
 	public boolean isClient;
 	private Color clientId;
@@ -59,6 +67,10 @@ public class Viewer implements ComponentListener, MouseListener{
 	private VRectangle horizon;
 	private CursorHandler cursorHandler;
 	private PCursor cursor;
+	private boolean mobileDesktop = true;
+	private Camera localCamera;
+	private Camera cursorCamera;
+	
 
 	public Viewer(boolean isClient){
 		this.isClient = isClient; 
@@ -73,28 +85,43 @@ public class Viewer implements ComponentListener, MouseListener{
 	 * @param vs VirtualSpace to provide if this Viewer is a client.
 	 */
 	public void init(boolean fullscreen, boolean opengl,
-			boolean antialiased, VirtualSpace vs) {
+			boolean antialiased, VirtualSpace vs, VirtualSpace cursorSpace) {
 		vsm = VirtualSpaceManager.INSTANCE;
 		preInitHook();
 		windowLayout();
 		nm = new Navigation(this);
-		if(!isClient)mSpace = vsm.addVirtualSpace(Messages.mSpaceName);
+		if(!isClient){
+			this.wallSpace = vsm.addVirtualSpace(Messages.WallSpaceName);
+			this.cursorSpace = vsm.addVirtualSpace(Messages.CursorSpaceName);
+		}
 		else{
-			mSpace = vs;
+			this.wallSpace = vs;
+			this.localSpace = vsm.addVirtualSpace(Messages.LocalSpaceName);
+			this.cursorSpace = cursorSpace;
 			//	vsm.addVirtualSpace(vs.getName());//meme machine virtuelle donc vsm partagé ! il faudra gérer ça ...
 		}
-		mCamera = mSpace.addCamera();
+		
+		mCamera = wallSpace.addCamera();
+		cursorCamera = this.cursorSpace.addCamera();
+		mCamera.stick(cursorCamera);
+		
 		if (isClient){
 			mCamera.addListener(new HorizonUpdater(this));
+			
+			localCamera = localSpace.addCamera();
+			localCamera.setZoomFloor(-99);
+			if(mobileDesktop)mCamera.stick(localCamera);
 		}
 		mCamera.setZoomFloor(-99);
+		cursorCamera.setZoomFloor(-99);
 		Vector<Camera> cameras = new Vector<Camera>();
 		cameras.add(mCamera);
+		if (isClient)cameras.add(localCamera);
+		cameras.add(cursorCamera);
 		nm.setCamera(mCamera);
 		mView = (EView)vsm.addFrameView(cameras, Messages.mViewName, (opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H,
 				false, false, !fullscreen, null);
 		mView.getCursor().setVisibility(false);
-		
 		if (fullscreen){
 			GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow((JFrame)mView.getFrame());
 		}
@@ -116,12 +143,12 @@ public class Viewer implements ComponentListener, MouseListener{
 		};
 		mView.getFrame().addComponentListener(ca0);
 		viewCreatedHook(cameras);
-
+		GraphicsEnvironment e =GraphicsEnvironment.getLocalGraphicsEnvironment();
 		if(isClient){
+			mView.getFrame().setLocation((int) (e.getCenterPoint().x-mView.getFrame().getWidth()*1./2), (int)(e.getCenterPoint().y-mView.getFrame().getHeight()*1./2));
 			setHorizon();
-			cursor = new PCursor(mSpace, clientId,mCamera,eh);
+			cursor = new PCursor(this.cursorSpace, clientId,mCamera,localCamera,eh);
 		}
-		
 		cursorHandler = new CursorHandler(cursor, this);
 		backgroundHook();
 	}
@@ -133,7 +160,7 @@ public class Viewer implements ComponentListener, MouseListener{
 
 	protected void addBackground() {
 		ImageIcon img = (new ImageIcon("src/main/java/fr/inria/zvtm/resources/bg.jpg"));
-		mSpace.addGlyph(new VImage(img.getImage()));
+		wallSpace.addGlyph(new VImage(img.getImage()));
 	}
 
 	public boolean hasCursor() {
@@ -147,7 +174,7 @@ public class Viewer implements ComponentListener, MouseListener{
 		horizon.setVisible(true);
 		horizon.setFilled(false);
 		horizon.setSensitivity(false);
-		mSpace.addGlyph(horizon);
+		wallSpace.addGlyph(horizon);
 		mView.getFrame().addComponentListener(this);
 		updateHorizon();
 	}
@@ -166,13 +193,47 @@ public class Viewer implements ComponentListener, MouseListener{
 	}
 	
 	public void addFrame(fr.inria.zvtm.compositor.MetisseWindow f){
-		mSpace.addGlyph(f);
+		if(isClient){
+			if(f.isOnWall())wallSpace.addGlyph(f);
+			else localSpace.addGlyph(f);
+		}
 		refresh();
 	}
 
-	public void remFrame(fr.inria.zvtm.compositor.MetisseWindow metisseWindow){
-		mSpace.removeGlyph(metisseWindow);
+	public void remFrame(fr.inria.zvtm.compositor.MetisseWindow f){
+		if(isClient){
+			if(f.isOnWall())wallSpace.removeGlyph(f);
+			else localSpace.removeGlyph(f);
+		}
 		refresh();
+	}
+	
+	/**
+	 * transfers the given MetisseWindow from the localSpace to the wallSpace
+	 * @param metisseWindow
+	 */
+	public void teleport(fr.inria.zvtm.compositor.MetisseWindow metisseWindow){
+		if(!isClient)return;
+		if(!localSpace.getAllGlyphs().contains(metisseWindow)){
+			return;
+		}
+		localSpace.removeGlyph(metisseWindow);
+		wallSpace.addGlyph(metisseWindow);
+		metisseWindow.setOnWall(true);
+	}
+	
+	/**
+	 * transfers the given MetisseWindow from the wallSpace to the localSpace
+	 * @param metisseWindow
+	 */
+	public void callBack(fr.inria.zvtm.compositor.MetisseWindow metisseWindow){
+		if(!isClient)return;
+		if(!wallSpace.getAllGlyphs().contains(metisseWindow)){
+			return;
+		}
+		wallSpace.removeGlyph(metisseWindow);
+		localSpace.addGlyph(metisseWindow);
+		metisseWindow.setOnWall(false);
 	}
 
 	public void moveViewTo(double x,double y){
@@ -276,5 +337,9 @@ public class Viewer implements ComponentListener, MouseListener{
 
 	public void resetCursorPosition() {
 		cursorHandler.resetCursorPos();
+	}
+	
+	public VirtualSpace getLocalSpace(){
+		return localSpace;
 	}
 }

@@ -84,7 +84,7 @@ public class Connection {
 
 		boolean something_read = false;
 		boolean ret = false;
-		while(input.available() > 0){
+	//	while(input.available() > 0){
 			something_read = true;
 			int type = RfbAgent.readCard8();
 
@@ -141,7 +141,7 @@ public class Connection {
 			default:
 				return false;
 			} 
-		}
+	//	}
 		return something_read;
 	}
 

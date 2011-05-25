@@ -1,28 +1,33 @@
 package fr.inria.zvtm.compositor;
 
-import fr.inria.zvtm.kernel.Main;
+import fr.inria.zvtm.gui.Viewer;
 
 
 
 public class ZVTMAdapter implements fr.inria.zvtm.compositor.GenericAdapter {
-
+	public Viewer application;
+	private FrameManager fm;
 
 	@Override
 	public void init() {
-		FrameManager.init();
 	}
 	
+	public void setClient(Viewer clientViewer) {		
+		this.application = clientViewer;
+		fm = new FrameManager(application);
+	}
+
 	@Override
 	public void addWindow(int window, boolean isroot, int x, int y, int w, int h) {
-		FrameManager.addWindow(window,isroot,x,y,w,h);		
+		fm.addWindow(window,isroot,x,y,w,h);		
 
 	}
 
 	@Override
 	public boolean handleConfigureWindow(int window, boolean isroot, int x,
 			int y, int w, int h) {
-		if(Main.viewer.dragging)return false;
-		FrameManager.configure(window,x,y,w,h);
+		if(application.dragging)return false;
+		fm.configure(window,x,y,w,h);
 		return false;
 	}
 
@@ -34,14 +39,14 @@ public class ZVTMAdapter implements fr.inria.zvtm.compositor.GenericAdapter {
 
 	@Override
 	public void handleDestroyWindow(int window) {
-		FrameManager.removeWindow(window);
+		fm.removeWindow(window);
 		refresh();
 	}
 
 	@Override
 	public void handleImageFramebufferUpdate(int window, boolean isroot,
 			byte[] img, int x, int y, int w, int h) {
-		FrameManager.frameBufferUpdate(window,isroot,img,x,y,w,h);
+		fm.frameBufferUpdate(window,isroot,img,x,y,w,h);
 		refresh();
 	}
 
@@ -49,7 +54,7 @@ public class ZVTMAdapter implements fr.inria.zvtm.compositor.GenericAdapter {
 	public void handleRestackWindow(int window, int nextWindow,
 			int transientFor, int unmanagedFor, int grabWindow,
 			int duplicateFor, int facadeReal, int flags) {
-		FrameManager.restackWindow(window, nextWindow,transientFor,unmanagedFor,grabWindow,duplicateFor,facadeReal,flags);
+		fm.restackWindow(window, nextWindow,transientFor,unmanagedFor,grabWindow,duplicateFor,facadeReal,flags);
 	}
 
 	@Override
@@ -60,13 +65,18 @@ public class ZVTMAdapter implements fr.inria.zvtm.compositor.GenericAdapter {
 
 	@Override
 	public void handleUnmapWindow(int window) {
-		FrameManager.UnmapWindow(window);
+		fm.UnmapWindow(window);
 		refresh();
 
 	}
 
 	private void refresh(){
-		Main.viewer.refresh();
+		application.refresh();
+	}
+
+	public MetisseWindow get(int currentWindow) {
+		if(fm==null)return null;
+		return fm.get(currentWindow);
 	}
 
 

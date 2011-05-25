@@ -14,17 +14,14 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
-
-import fr.inria.zvtm.compositor.FrameManager;
 import fr.inria.zvtm.compositor.InputForwarder;
 import fr.inria.zvtm.compositor.MetisseWindow;
-
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.glyphs.Glyph;
-import fr.inria.zvtm.gui.Viewer;
+import fr.inria.zvtm.kernel.Main;
 
 class MainEventHandler implements ViewListener, ComponentListener, KeyListener{
 
@@ -34,11 +31,13 @@ class MainEventHandler implements ViewListener, ComponentListener, KeyListener{
 	 final float WHEEL_ZOOMIN_COEF = 21.0f;
 	 final float WHEEL_ZOOMOUT_COEF = 22.0f;
 	 float WHEEL_MM_STEP = 1.0f;
-	
+	 long doubleclickdelay = 500;
+	 long lastClickTime;
 
 	//remember last mouse coords
 	private int lastJPX,lastJPY;
 	private Viewer application;
+
 
 	private boolean pcameraStickedToMouse = false;
 	private boolean regionStickedToMouse = false;
@@ -67,6 +66,7 @@ class MainEventHandler implements ViewListener, ComponentListener, KeyListener{
 	}
 
 	public void press1(ViewPanel v,int mod,int jpxx,int jpyy, MouseEvent e){
+		if(!application.hasCursor())return;
 		CursorHandler ch = application.getCursorHandler();
 		ch.move(jpxx,jpyy,e);
 
@@ -91,7 +91,7 @@ class MainEventHandler implements ViewListener, ComponentListener, KeyListener{
 				last_X = application.getCursor().getVSXCoordinate();
 				last_Y = application.getCursor().getVSYCoordinate();
 				glyphMoving = true;
-				currentMovedWindow = FrameManager.get(InputForwarder.detectWindow(v, jpx, jpy));
+				currentMovedWindow = Main.compositor.get(InputForwarder.detectWindow(v, jpx, jpy));
 			}
 		}
 		else{
@@ -100,6 +100,7 @@ class MainEventHandler implements ViewListener, ComponentListener, KeyListener{
 	}
 
 	public void release1(ViewPanel v,int mod,int jpxx,int jpyy, MouseEvent e){
+		if(!application.hasCursor())return;
 		CursorHandler ch = application.getCursorHandler();
 		ch.move(jpxx,jpyy, e);
 
@@ -113,8 +114,8 @@ class MainEventHandler implements ViewListener, ComponentListener, KeyListener{
 			panning = false;
 			if (selectingRegion){
 				v.setDrawRect(false);
-				x2 = v.getVCursor().getVSXCoordinate();
-				y2 = v.getVCursor().getVSYCoordinate();
+				x2 = application.getCursor().getVSXCoordinate();
+				y2 = application.getCursor().getVSYCoordinate();
 				if ((Math.abs(x2-x1)>=4) && (Math.abs(y2-y1)>=4)){
 					application.nm.mCamera.getOwningView().centerOnRegion(application.nm.mCamera, Config.ANIM_MOVE_LENGTH,
 							x1, y1, x2, y2);
@@ -130,10 +131,31 @@ class MainEventHandler implements ViewListener, ComponentListener, KeyListener{
 		}
 	}
 
-	public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
+	public void click1(ViewPanel v,int mod,int jpxx,int jpyy,int clickNumber, MouseEvent e){
+		
+		if(MOVE_MODE&& System.currentTimeMillis()-lastClickTime<doubleclickdelay){
+			if(!application.hasCursor())return;
+			CursorHandler ch = application.getCursorHandler();
+			ch.move(jpxx,jpyy,e);
+
+			int jpx = ch.getX();
+			int jpy = ch.getY();
+			MetisseWindow win = Main.compositor.get(InputForwarder.detectWindow(v, jpx, jpy));
+			if(win!=null)
+			if(win.isOnWall()){
+				application.callBack(win);
+			}
+			else{
+				application.teleport(win);
+			}		
+		}
+		
+		
+		lastClickTime = System.currentTimeMillis();
 	}
 
 	public void press2(ViewPanel v,int mod,int jpxx,int jpyy, MouseEvent e){
+		if(!application.hasCursor())return;
 		CursorHandler ch = application.getCursorHandler();
 		ch.move(jpxx,jpyy, e);
 
@@ -144,7 +166,7 @@ class MainEventHandler implements ViewListener, ComponentListener, KeyListener{
 			lastJPX = jpx;
 			lastJPY = jpy;
 			scaling = true;
-			currentScaledWindow = FrameManager.get(InputForwarder.detectWindow(v, jpx, jpy));
+			currentScaledWindow = Main.compositor.get(InputForwarder.detectWindow(v, jpx, jpy));
 			if(currentScaledWindow==null)return;
 			currentScaledWindow.isRescaling = true;
 			lastScaleFactor = currentScaledWindow.scaleFactor;
@@ -155,7 +177,7 @@ class MainEventHandler implements ViewListener, ComponentListener, KeyListener{
 	}
 
 	public void release2(ViewPanel v,int mod,int jpxx,int jpyy, MouseEvent e){
-
+		if(!application.hasCursor())return;
 		CursorHandler ch = application.getCursorHandler();
 		ch.move(jpxx,jpyy, e);
 
@@ -174,6 +196,7 @@ class MainEventHandler implements ViewListener, ComponentListener, KeyListener{
 	}
 
 	public void click2(ViewPanel v,int mod,int jpxx,int jpyy,int clickNumber, MouseEvent e){
+		if(!application.hasCursor())return;
 		CursorHandler ch = application.getCursorHandler();
 		ch.move(jpxx,jpyy, e);
 
@@ -189,6 +212,7 @@ class MainEventHandler implements ViewListener, ComponentListener, KeyListener{
 	}
 
 	public void press3(ViewPanel v,int mod,int jpxx,int jpyy, MouseEvent e){
+		if(!application.hasCursor())return;
 		CursorHandler ch = application.getCursorHandler();
 		ch.move(jpxx,jpyy, e);
 
@@ -208,6 +232,7 @@ class MainEventHandler implements ViewListener, ComponentListener, KeyListener{
 	}
 
 	public void release3(ViewPanel v,int mod,int jpxx,int jpyy, MouseEvent e){
+		if(!application.hasCursor())return;
 		CursorHandler ch = application.getCursorHandler();
 		ch.move(jpxx,jpyy, e);
 
@@ -227,6 +252,7 @@ class MainEventHandler implements ViewListener, ComponentListener, KeyListener{
 	}
 
 	public void click3(ViewPanel v,int mod,int jpxx,int jpyy,int clickNumber, MouseEvent e){
+		if(!application.hasCursor())return;
 		CursorHandler ch = application.getCursorHandler();
 		ch.move(jpxx,jpyy, e);
 
@@ -252,6 +278,7 @@ class MainEventHandler implements ViewListener, ComponentListener, KeyListener{
 
 
 	public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpxx,int jpyy, MouseEvent e){
+		if(!application.hasCursor())return;
 		CursorHandler ch = application.getCursorHandler();
 		ch.move(jpxx,jpyy, e);
 
@@ -341,7 +368,8 @@ class MainEventHandler implements ViewListener, ComponentListener, KeyListener{
 			else if (code==KeyEvent.VK_LEFT){application.nm.translateView(Navigation.MOVE_LEFT);}
 			else if (code==KeyEvent.VK_RIGHT){application.nm.translateView(Navigation.MOVE_RIGHT);}
 			else if (code==KeyEvent.VK_R){application.resetCursorPosition();}
-			else if (code==KeyEvent.VK_C){application.changeColor();};
+			else if (code==KeyEvent.VK_C){application.changeColor();}
+			else if (code==KeyEvent.VK_ALT){application.getCursorHandler().deactivate();};
 		}
 
 	}
@@ -353,10 +381,12 @@ class MainEventHandler implements ViewListener, ComponentListener, KeyListener{
 
 	public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){
 		
-		if (code==move_mode_key){MOVE_MODE = false;}
+		if (code==move_mode_key){
+			MOVE_MODE = false;
+			}
 		if(MOVE_MODE){
-		
 		}
+		if (code==KeyEvent.VK_ALT){application.getCursorHandler().activate();};
 	
 		
 	}

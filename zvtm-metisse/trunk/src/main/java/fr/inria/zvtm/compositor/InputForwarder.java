@@ -54,7 +54,7 @@ public class InputForwarder {
 		int[] p = unproject(v, jpx, jpy);
 		if(p == null)return;
 		RfbAgent.rfbPointerEvent(p[2],p[0],p[1], buttonState);
-		Main.viewer.dragging = false;
+		Main.clientViewer.dragging = false;
 	}
 
 
@@ -63,7 +63,7 @@ public class InputForwarder {
 		double sf = 1;//scale factor
 		int xx,yy;
 
-		MetisseWindow cu = FrameManager.get(currentWindow);
+		MetisseWindow cu = Main.compositor.get(currentWindow);
 		if(cu==null)return null;
 		double[] cubounds = cu.getBounds();
 		sf = cu.getScaleFactor();
@@ -94,7 +94,7 @@ public class InputForwarder {
 
 
 	public static int detectWindow(ViewPanel v,double jpx,double jpy){
-		if(Main.viewer==null)return-1;
+		if(Main.clientViewer==null)return-1;
 		Glyph[] t = null;
 		try{
 			t = Main.clientViewer.getCursor().getPicker().getPickedGlyphList();
