@@ -392,7 +392,7 @@ public class Picker {
      */
     public Glyph[] getDrawOrderedPickedGlyphList(VirtualSpace v){
     	Glyph[] tt = getPickedGlyphList();
-    	t  = new Glyph[tt.length]; 
+    	Glyph[] t  = new Glyph[tt.length]; 
 		int k=0;
 		Glyph[] list = v.getDrawingList();
 		for (int i = 0; i < list.length; i++) {
