@@ -387,4 +387,33 @@ public class Picker {
         System.err.println("]");
     }
     
+    /**
+     * The list of glyphs under the picker and ordered according to the drawing stack
+     */
+    public Glyph[] getDrawOrderedPickedGlyphList(VirtualSpace v){
+    	Glyph[] tt = getPickedGlyphList();
+    	t  = new Glyph[tt.length]; 
+		int k=0;
+		Glyph[] list = v.getDrawingList();
+		for (int i = 0; i < list.length; i++) {
+			if(contains(tt,list[i])&& !contains(t,list[i]))t[k++] = list[i];
+		}
+		return t;
+    }
+    
+    /**Returns the glyph under the picker (drawing order)*/
+    public Glyph pickOnTop(VirtualSpace v){
+    	Glyph[] list = getDrawOrderedPickedGlyphList(v);
+    	return list[list.length-1];
+    }
+    
+	private boolean contains(Glyph[] tab, Glyph g){		
+		for (int i = 0; i < tab.length; i++) {
+			if(tab[i]==g){
+				return true;
+			}
+		}
+		return false;
+	}
+    
 }
