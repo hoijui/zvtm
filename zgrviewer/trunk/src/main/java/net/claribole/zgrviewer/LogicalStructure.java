@@ -139,6 +139,12 @@ public class LogicalStructure {
 		}
 	}
 	
+	public void addEdge(LEdge e){
+	    LEdge[] nedges = new LEdge[edges.length+1];
+	    System.arraycopy(edges, 0, nedges, 0, nedges.length);
+	    edges = nedges;
+	}
+	
 	public LNode[] getAllNodes(){
 		return nodes;
 	}

@@ -29,6 +29,7 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JComponent;
 import javax.swing.JMenuBar;
+import javax.swing.SwingUtilities;
 import java.awt.event.ComponentListener;
 
 import java.util.Hashtable;
@@ -61,6 +62,7 @@ import fr.inria.zvtm.glyphs.SICircle;
 import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VRectangleOr;
 import fr.inria.zvtm.glyphs.DPath;
+import fr.inria.zvtm.glyphs.VShape;
 import fr.inria.zvtm.svg.Metadata;
 import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.event.PortalListener;
@@ -994,6 +996,45 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 		}
 		cfgMngr.notifyPlugins(Plugin.NOTIFY_PLUGIN_LOGICAL_STRUCTURE_CHANGED);
 	}
+
+    /* ------------- Graph editing ---------------- */
+    
+    static final float[] TRIANGLE_VERTICES = {1f, 1f, 1f};
+
+    public LEdge addEdge(Glyph sn, Glyph en, String title, boolean directed){
+        LNode s = LogicalStructure.getNode(sn);
+        LNode e = LogicalStructure.getNode(en);
+        if (s != null && e != null){
+            return addEdge(s, e, title, directed);
+        }
+        else {
+            return null;
+        }
+    }
+
+    public LEdge addEdge(LNode sn, LNode en, String title, boolean directed){
+        ClosedShape sns = sn.getShape();
+        ClosedShape ens = en.getShape();
+        final DPath spline = new DPath(sns.vx, sns.vy, 0, Color.BLACK);
+        spline.addSegment(ens.vx, ens.vy, true);
+        final VShape arrowHead = new VShape(ens.vx, ens.vy, 0, ens.getSize()/10.0, TRIANGLE_VERTICES, Color.BLACK, 0);
+        SwingUtilities.invokeLater(
+            new Runnable(){
+                public void run(){
+                    mSpace.addGlyph(spline);
+                    mSpace.addGlyph(arrowHead);
+                }
+            }
+        );
+        Vector<Glyph> glyphs = new Vector(2);
+        glyphs.add(spline);
+        glyphs.add(arrowHead);
+        LEdge res = new LEdge(glyphs);
+        res.setDirected(directed);
+        res.setTail(sn);
+        res.setHead(en);
+        return res;
+    }
 
     /* ------------- Highlighting ----------------- */
 
