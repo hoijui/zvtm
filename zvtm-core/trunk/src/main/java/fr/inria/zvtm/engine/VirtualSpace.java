@@ -313,11 +313,13 @@ public class VirtualSpace {
                     camera2drawnList[i].remove(g);
                 }
             }
-            View v;
             for (int i=0;i<cm.cameraList.length;i++){
                 if (cm.cameraList[i] != null && cm.cameraList[i].view != null){
                     cm.cameraList[i].view.mouse.getPicker().removeGlyphFromList(g);
                 }
+            }
+            for (Picker p:externalPickers){
+                p.removeGlyphFromList(g);
             }
             visualEnts.remove(g);
             removeGlyphFromDrawingList(g);
@@ -352,6 +354,9 @@ public class VirtualSpace {
             if (cm.cameraList[i] != null && cm.cameraList[i].view != null){
                 cm.cameraList[i].view.mouse.getPicker().removeGlyphFromList(g);
             }
+        }
+        for (Picker p:externalPickers){
+            p.removeGlyphFromList(g);
         }
         VirtualSpaceManager.INSTANCE.repaint();
     }
@@ -513,6 +518,30 @@ public class VirtualSpace {
 			Arrays.fill(res, 0);
 			return res;
 		}
+	}
+	
+	Vector<Picker> externalPickers = new Vector(0);
+
+	/** Register an external picker with this view.
+	 *  The picker is said to be <em>external</em> because it is not associated with a VCursor.
+	 *@return true if the picker was not already registered with this view, false if it was.
+	 */
+	public boolean registerPicker(Picker p){
+        if (!externalPickers.contains(p)){
+            externalPickers.add(p);
+            return true;
+        }
+        else {
+            return false;
+        }
+	}
+	
+	/** Unregister an external picker from this view.
+	 *  The picker is said to be <em>external</em> because it is not associated with a VCursor.
+	 *@return true if the picker was registered with this view and did get unregistered, false if it was not.
+	 */
+	public boolean unregisterPicker(Picker p){
+	    return externalPickers.remove(p);
 	}
 
     protected synchronized void addGlyphToDrawingList(Glyph g){
