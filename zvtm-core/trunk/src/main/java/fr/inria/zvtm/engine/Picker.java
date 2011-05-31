@@ -404,6 +404,7 @@ public class Picker {
     /**Returns the glyph under the picker (drawing order)*/
     public Glyph pickOnTop(VirtualSpace v){
     	Glyph[] list = getDrawOrderedPickedGlyphList(v);
+	if(list.length==0)return null;
     	return list[list.length-1];
     }
     
