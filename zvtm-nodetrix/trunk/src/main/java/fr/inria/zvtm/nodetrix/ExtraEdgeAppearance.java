@@ -8,6 +8,7 @@
 package fr.inria.zvtm.nodetrix;
 
 import java.awt.Color;
+import java.awt.BasicStroke;
 import java.awt.geom.Point2D;
 
 import javax.swing.SwingUtilities;
@@ -152,10 +153,10 @@ public class ExtraEdgeAppearance extends EdgeAppearance {
         }
 
         edgePath.setColor(edge.getColor());
-        edgePath.setStrokeWidth(2);
+        edgePath.setStroke(new BasicStroke(2));
         edgePath.setOwner(edge);
         edgePathLarge.setColor(edge.getColor());
-        edgePathLarge.setStrokeWidth(5);
+        edgePathLarge.setStroke(new BasicStroke(5));
         edgePathLarge.setOwner(edge);
         edgePathLarge.setVisible(false);
         edgePath.stick(edgePathLarge);
