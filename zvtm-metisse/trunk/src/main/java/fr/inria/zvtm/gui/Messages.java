@@ -24,11 +24,10 @@ public class Messages {
     
     static final String PROCESSING = "Processing ";
     
-    static final String WallSpaceName = "VS1";
-    static final String LocalSpaceName = "VSL";
-    static final String CursorSpaceName = "CSL";
+    public static final String mSpaceName = "VS1";
+    public static final String LocalSpaceName = "VSL";
     static final String aboutSpaceName = "About layer";
-    static final String mViewName = "Basic UI";
+    public static final String mViewName = "Basic UI";
     
     protected static void printCmdLineHelp(){
 		System.out.println("Usage:\n\tjava -jar target/zvtm-basicui-"+VERSION+".jar <path_to_file> [options]");

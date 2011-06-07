@@ -7,37 +7,36 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.LinkedList;
 
-import fr.inria.zvtm.compositor.GenericAdapter;
+import fr.inria.zvtm.compositor.RfbMessageHandler;
 
 
 
 public class RfbAgent {
 
-	private static InputStream in;
-	private static OutputStream out;
-	private static String password;
-	private static LinkedList<GenericAdapter> listeners;
-	private static int height;
-	private static int width;
+	private InputStream in;
+	private OutputStream out;
+	private String password;
+	private LinkedList<RfbMessageHandler> listeners;
+	private int height;
+	private int width;
 
-
-	public static void init(InputStream in, OutputStream out) {
-		RfbAgent.in = in;
-		RfbAgent.out = out;
-		RfbAgent.password = "insitu";
-		RfbAgent.listeners = new LinkedList<GenericAdapter>();
+	public RfbAgent(InputStream in, OutputStream out) {
+		this.in = in;
+		this.out = out;
+		password = "insitu";
+		listeners = new LinkedList<RfbMessageHandler>();
 	}
 
 	/*****************************************************************************
 	 * Functions for sending messages to the server (display => server)
 	 ****************************************************************************/
 
-	public static void addZVTMAdapter(GenericAdapter a){
+	public void addListener(RfbMessageHandler a){
 		listeners.add(a);
 	}
 
 
-	public static void rfbProtocalVersion() throws IOException{
+	public void rfbProtocalVersion() throws IOException{
 		byte[] pv = new byte[16]; // "METISSE 000.000\n"
 		readString(pv, 16);          //  0123456789012345
 
@@ -87,7 +86,7 @@ public class RfbAgent {
 
 
 
-	public static void rfbAuthentification() throws IOException{
+	public void rfbAuthentification() throws IOException{
 		int authScheme = readCard32();
 
 		switch (authScheme){
@@ -135,14 +134,14 @@ public class RfbAgent {
 	}
 
 
-	public static void rfbClientInit() throws IOException{
+	public void rfbClientInit() throws IOException{
 		byte shared[] = new byte[1];
 		shared[0] = 1;
 		out.write(shared, 0, 1);
 	}
 
 
-	public static void rfbServerInit() throws IOException{
+	public void rfbServerInit() throws IOException{
 		width = readCard16();
 		height = readCard16();
 
@@ -167,7 +166,7 @@ public class RfbAgent {
 	}
 
 
-	public static void rfbSetPixelFormat() throws IOException{
+	public void rfbSetPixelFormat() throws IOException{
 		writeUint8(Proto.rfbSetPixelFormat); // msg type
 		writeUint8(32); // bitsPerPixel
 		writeUint8(24); // depth
@@ -183,7 +182,7 @@ public class RfbAgent {
 	}
 
 
-	public static void rfbSetEncodings() throws IOException{
+	public void rfbSetEncodings() throws IOException{
 		writeUint8(Proto.rfbSetEncodings); // Msg type
 		writeUint16(4); // number of encodings
 		writeUint32(Proto.rfbEncodingRaw);
@@ -194,12 +193,12 @@ public class RfbAgent {
 	}
 
 
-	public static void rfbFramebufferUpdateRequest(boolean incremental) throws IOException {
+	public void rfbFramebufferUpdateRequest(boolean incremental) throws IOException {
 		rfbFramebufferUpdateRequest(0, 0, 10 * width, 10 * height, incremental) ;
 	}
 
 
-	public static void rfbFramebufferUpdateRequest(int x, int y, int w, int h, boolean incremental) throws IOException {
+	public void rfbFramebufferUpdateRequest(int x, int y, int w, int h, boolean incremental) throws IOException {
 		writeUint8(Proto.rfbFramebufferUpdateRequest);
 		writeUint8(incremental ? 1 : 0);
 		writeUint16(x);
@@ -210,7 +209,7 @@ public class RfbAgent {
 	}
 
 
-	public static void rfbKeyEvent(int keysym, boolean down) {
+	public void rfbKeyEvent(int keysym, boolean down) {
 		try{
 			writeUint8(Proto.rfbKeyEvent);
 			writeUint8(down ? 1 : 0);
@@ -222,8 +221,7 @@ public class RfbAgent {
 	}
 
 
-	public static void rfbPointerEvent(int window, int x, int y, int buttons) {
-	//	System.out.println("win:"+window+" x:"+x+" y:"+y);
+	public void rfbPointerEvent(int window, int x, int y, int buttons) {
 		try{
 			writeUint8(Proto.rfbPointerEvent);
 			writeUint32(buttons);
@@ -240,22 +238,20 @@ public class RfbAgent {
 		}
 	}
 
-	
-	
-	public static void rfbPointerEvent(int window, int jpx, int jpy, int[] buttonState) {
+
+
+	public void rfbPointerEvent(int window, int jpx, int jpy, int[] buttonState) {
 		int a = 0;
-		
-		a = ( ( (byte)buttonState[3] << 24 ) & 0xff000000 ) 
-		|  ( ( (byte)buttonState[2] << 16 ) & 0x00ff0000 ) 
-		|  ( ( (byte)buttonState[1]<< 8  ) & 0x0000ff00 ) 
-		|  (   (byte)buttonState[0]        & 0x000000ff );
+		for (int i = 0; i < 32; i++) {
+			a = a | (buttonState[i]<<i);
+		}
+
 		rfbPointerEvent(window,jpx,jpy,a);
-		
 	}
 
 
 
-	protected static void readString(byte data[], int length) throws IOException {
+	protected void readString(byte data[], int length) throws IOException {
 		int	read_total = 0;
 		int res = 0;
 
@@ -268,18 +264,22 @@ public class RfbAgent {
 	}
 
 
-	public static int readCard8() throws IOException{
+	protected void writeString(byte[] data, int length) throws IOException {
+		out.write(data, 0, length);	
+	}
+
+	public int readCard8() throws IOException{
 		return ( (byte)in.read() & 0xff );
 	}
 
 
-	private static int readCard16() throws IOException{
+	private int readCard16() throws IOException{
 		return ( ( (byte)in.read() << 8 ) & 0xff00 ) 
 		|  (   (byte)in.read()        & 0x00ff );
 	}
 
 
-	private static int readCard32() throws IOException {
+	private int readCard32() throws IOException {
 		return ( ( (byte)in.read() << 24 ) & 0xff000000 ) 
 		|  ( ( (byte)in.read() << 16 ) & 0x00ff0000 ) 
 		|  ( ( (byte)in.read() << 8  ) & 0x0000ff00 ) 
@@ -287,12 +287,12 @@ public class RfbAgent {
 	}
 
 
-	private static byte waiting_uint[] = new byte[1024];
-	private static int waiting_uint_size = 0; // TODO make sure waiting_uint_size < 1024
+	private   byte waiting_uint[] = new byte[1024];
+	private   int waiting_uint_size = 0; // TODO make sure waiting_uint_size < 1024
 
 
-	private static void writeUint32(int v) {
-		
+	private   void writeUint32(int v) {
+
 		waiting_uint[waiting_uint_size+0] = (byte)( ( v & 0xff000000 ) >>> 24 );
 		waiting_uint[waiting_uint_size+1] = (byte)( ( v & 0x00ff0000 ) >>> 16 );
 		waiting_uint[waiting_uint_size+2] = (byte)( ( v & 0x0000ff00 ) >>> 8  );
@@ -301,27 +301,23 @@ public class RfbAgent {
 	}
 
 
-	private static void writeUint16(int v) {
+	private   void writeUint16(int v) {
 		waiting_uint[waiting_uint_size+0] = (byte)( ( v & 0x0000ff00 ) >>> 8 );
 		waiting_uint[waiting_uint_size+1] = (byte)(   v & 0x000000ff );
 		waiting_uint_size += 2;
 	}
 
 
-	private static void writeUint8(int v) {
+	private   void writeUint8(int v) {
 		waiting_uint[waiting_uint_size+0] = (byte)( v & 0xff );
 		waiting_uint_size += 1;
 	}
 
 
-	private static void flushUint() throws IOException{
+	private void flushUint() throws IOException{
 		out.write(waiting_uint, 0, waiting_uint_size);
 		waiting_uint_size = 0;
 	}
-
-
-
-
 
 
 
@@ -335,22 +331,22 @@ public class RfbAgent {
 	 * Functions for reaction to the server => to display
 	 ****************************************************************************/
 
-	public static void handle(){
-		
+	public   void handle(){
+
 	}
 
-	private static boolean verbose = false;
+	private   boolean verbose = false;
 
 
-	public static void handleConfigureWindow(int window, boolean isroot, int x, int y, int w, int h){
+	public   void handleConfigureWindow(int window, boolean isroot, int x, int y, int w, int h){
 		boolean consumed = false;
 		if (verbose) System.out.println("configure "+window);
-		for(GenericAdapter l : listeners){
+		for(RfbMessageHandler l : listeners){
 			consumed = l.handleConfigureWindow(window, isroot, x, y, w, h) || consumed;
 		}
 
 		if(!consumed){
-			for(GenericAdapter l : listeners){
+			for(RfbMessageHandler l : listeners){
 				l.addWindow(window, isroot, x, y, w, h);
 			}
 			if (verbose) System.out.println("add "+window);
@@ -358,67 +354,67 @@ public class RfbAgent {
 	}
 
 
-	public static void handleCursorPosition(int x, int y) {
-		for(GenericAdapter l : listeners){
+	public   void handleCursorPosition(int x, int y) {
+		for(RfbMessageHandler l : listeners){
 			l.handleCursorPosition(x, y);
 		}
 	}
 
 
-	public static void handleImageFramebufferUpdate(int window, boolean isroot, byte img[], int x, int y, int w, int h){
+	public   void handleImageFramebufferUpdate(int window, boolean isroot, byte img[], int x, int y, int w, int h){
 
-		for(GenericAdapter l : listeners){
+		for(RfbMessageHandler l : listeners){
 			l.handleImageFramebufferUpdate(window, isroot, img, x, y, w, h);
 		}
 	}
 
 
-	public static void handleDestroyWindow(int window){
-		for(GenericAdapter l : listeners){
+	public   void handleDestroyWindow(int window){
+		for(RfbMessageHandler l : listeners){
 			l.handleDestroyWindow(window);
 		}
 		if (verbose) System.out.println("destroy "+window);
 	}
 
 
-	public static void handleUnmapWindow(int window){
-		for(GenericAdapter l : listeners){
+	public   void handleUnmapWindow(int window){
+		for(RfbMessageHandler l : listeners){
 			l.handleUnmapWindow(window); 
 		}
 		if (verbose) System.out.println("unmap "+window);
 	}
 
 
-	public static void handleServerCutText(String str){
-		for(GenericAdapter l : listeners){
+	public   void handleServerCutText(String str){
+		for(RfbMessageHandler l : listeners){
 			l.handleServerCutText(str);
 		}
 	}
 
 
-	public static void handleRestackWindow(int window, int nextWindow, int transientFor, int unmanagedFor, int grabWindow, int duplicateFor, int facadeReal, int flags){
-		for(GenericAdapter l : listeners){
+	public   void handleRestackWindow(int window, int nextWindow, int transientFor, int unmanagedFor, int grabWindow, int duplicateFor, int facadeReal, int flags){
+		for(RfbMessageHandler l : listeners){
 			l.handleRestackWindow(window, nextWindow, transientFor, unmanagedFor, grabWindow, duplicateFor, facadeReal, flags);
 		}
 		if (verbose) System.out.println("restack "+window);
 	}
 
 
-	public static void rootPointerEvent(int x, int y, int buttons){
+	public   void rootPointerEvent(int x, int y, int buttons){
 		rfbPointerEvent(0, x, y, buttons);
 	}
 
 
-	public static void rootKeyEvent(int key, boolean down_flag){
+	public   void rootKeyEvent(int key, boolean down_flag){
 		rfbKeyEvent(key, down_flag);
 	}
 
 	@SuppressWarnings("unused")
-	public static boolean framebufferUpdate() throws IOException {
+	public   boolean framebufferUpdate() throws IOException {
 		int nRects = readCard16();
 		int window = readCard32();
 		int topWindow = readCard32();
-		
+
 		int shmid = readCard32();
 
 		boolean isRoot = (topWindow == 0);
@@ -537,12 +533,12 @@ public class RfbAgent {
 	}
 
 
-	public static boolean rfbBell(){
+	public   boolean rfbBell(){
 		return false;
 	}
 
 
-	public static boolean rfbSetColourMapEntries() throws IOException {
+	public boolean rfbSetColourMapEntries() throws IOException {
 		readCard16(); // firstColour
 		int nColours = readCard16(); // nColours;
 		for(int i = 0; i < nColours; i++){
@@ -554,7 +550,7 @@ public class RfbAgent {
 	}
 
 
-	public static boolean rfbServerCutText() throws IOException {
+	public boolean rfbServerCutText() throws IOException {
 		int length = readCard32(); // length;
 		byte str[] = new byte[length];
 		readString(str, length);
@@ -563,7 +559,7 @@ public class RfbAgent {
 	}
 
 
-	public static boolean rfbConfigureWindow() throws IOException {
+	public boolean rfbConfigureWindow() throws IOException {
 		int window = readCard32(); // window id
 		int xsgn = readCard16(); // xsgn : 0: negative, 1: positive
 		int x = (xsgn == 0 ? -1 : 1) * readCard16(); // x
@@ -572,28 +568,28 @@ public class RfbAgent {
 		int width = readCard32(); // width
 		int height = readCard32(); // height
 		int isroot = readCard16(); // root window : 1, not root window : 0 
-//		System.out.println("<----------------win:"+window+" x:"+x+" y:"+y);
+		//		System.out.println("<----------------win:"+window+" x:"+x+" y:"+y);
 		handleConfigureWindow(window, isroot != 0, x, y, width, height);
 		rfbFramebufferUpdateRequest(true);
 		return true;
 	}
 
 
-	public static boolean rfbUnmapWindow() throws IOException {
+	public boolean rfbUnmapWindow() throws IOException {
 		int window = readCard32(); // window id
 		handleUnmapWindow(window);
 		return true;
 	}
 
 
-	public static boolean rfbDestroyWindow() throws IOException {
+	public boolean rfbDestroyWindow() throws IOException {
 		int window = readCard32(); // window id
 		handleDestroyWindow(window);
 		return true;
 	}
 
 
-	public static boolean rfbRestackWindow() throws IOException {
+	public   boolean rfbRestackWindow() throws IOException {
 		int window = readCard32(); // window id
 		int nextWindow = readCard32(); 
 		int transientFor = readCard32();
@@ -609,5 +605,195 @@ public class RfbAgent {
 
 
 
+
+	/*****************************************************************************
+	 * Functions for sending to a client
+	 ****************************************************************************/
+
+
+
+
+	public void orderConfigure(int window, boolean isroot, int x, int y, int w, int h) {
+		writeUint32(window);
+		if(x<0)writeUint16(0);
+		else writeUint16(1);
+		writeUint16(Math.abs(x));
+		if(y<0)writeUint16(0);
+		else writeUint16(1);
+		writeUint16(Math.abs(x));
+		writeUint32(w);
+		writeUint32(h);
+		if(isroot)writeUint16(1);
+		else writeUint16(0);
+	}
+
+	public void orderFrameBufferUpdate(int window, boolean isroot, byte[] img,int x, int y, int w, int h,int encoding) {
+		writeUint16(1);
+		writeUint32(window);
+		if(isroot)writeUint32(0);
+		else writeUint32(1);
+		writeUint32(0);//shmid
+		writeUint16(x);
+		writeUint16(y);
+		writeUint16(w);
+		writeUint16(h);
+		writeUint32(encoding);
+
+		switch(encoding){
+		case Proto.rfbEncodingPointerPos:
+			break;
+		case Proto.rfbEncodingRaw:
+			try {
+				writeString(img,4*w*h);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			break;
+		default:
+			break;
+		}
+	}
+
+	public void orderRestackWindow(int window, int nextWindow,int transientFor, int unmanagedFor, int grabWindow,int duplicateFor, int facadeReal, int flags) {
+		writeUint32(window);
+		writeUint32(nextWindow);
+		writeUint32(transientFor);
+		writeUint32(unmanagedFor);
+		writeUint32(grabWindow);
+		writeUint32(duplicateFor);
+		writeUint32(facadeReal);
+		writeUint32(flags);
+	}
+
+	public void orderUnmapWindow(int window) {
+		writeUint32(window);
+	}
+
+	public void orderAddWindow(int id, boolean root, int x, int y, int w, int h) {
+		orderConfigure(id,root,x, y, w, h);
+	}
+
+	public void orderRemoveWindow(int id) {
+		writeUint32(id);
+	}
+	
+	
+	
+	public boolean servrfbProtocalVersion() throws IOException{
+		byte[] pv = new byte[16]; 
+		
+		int major = (pv[ 8]-'0') * 100 + (pv[ 9]-'0') * 10 + (pv[10]-'0');
+		int minor = (pv[12]-'0') * 100 + (pv[13]-'0') * 10 + (pv[14]-'0');
+
+		major = Proto.rfbProtocolMajorVersion ;
+		minor = Proto.rfbProtocolMinorVersion ;
+		pv[0] = 'M';
+		pv[1] = 'E';
+		pv[2] = 'T';
+		pv[3] = 'I';
+		pv[4] = 'S';
+		pv[5] = 'S';
+		pv[6] = 'E';
+		pv[7] = ' ';
+		pv[11] = '.';
+		pv[14] = '\n';
+		pv[ 8] = (byte)((major/100) + '0');  pv[ 9] = (byte)(((major/10)%10) + '0'); pv[10] = (byte)(((major)%10) + '0');
+		pv[12] = (byte)((minor/100) + '0');  pv[13] = (byte)(((minor/10)%10) + '0'); pv[14] = (byte)(((minor)%10) + '0');
+
+		out.write(pv,0,16);
+									// "METISSE 000.000\n"
+		readString(pv, 16);          //  0123456789012345
+		if(pv[0] != 'M' ||
+				pv[1] != 'E' ||
+				pv[2] != 'T' ||
+				pv[3] != 'I' ||
+				pv[4] != 'S' ||
+				pv[5] != 'S' || 
+				pv[6] != 'E' ||
+				pv[7] != ' ' ||
+				pv[11] != '.' ||
+				pv[15] != '\n' ||
+				(pv[ 8] < '0' || pv[ 8] > '9') ||
+				(pv[ 9] < '0' || pv[ 9] > '9') ||
+				(pv[10] < '0' || pv[10] > '9') || 
+				(pv[12] < '0' || pv[12] > '9') || 
+				(pv[13] < '0' || pv[13] > '9') ||
+				(pv[14] < '0' || pv[14] > '9'))
+			{
+				writeUint32(Proto.rfbConnFailed);
+				String reason = "not a valid protocol version";
+				writeUint32(reason.length());
+				writeString(reason.getBytes(), reason.length());
+				flushUint();
+				return false;
+			}
+		return true;
+	}
+
+
+
+
+
+	public void servrfbAuthentication() throws IOException{
+		writeUint32(Proto.rfbNoAuth);
+		flushUint();
+	}
+
+
+	public void servrfbClientInit() throws IOException{
+		byte shared[] = new byte[1];
+		shared[0] = 1;
+		in.read(shared,0,1);
+	}
+
+
+	public void servrfbServerInit() throws IOException{
+		writeUint16(width);
+		writeUint16(height);
+		
+		writeUint8(0);
+		writeUint8(0);
+		writeUint8(0);
+		writeUint8(0);
+		writeUint16(0);
+		writeUint16(0);
+		writeUint16(0);
+		writeUint8(0);
+		writeUint8(0);
+		writeUint8(0);
+
+		
+		String s = "one client";
+		byte[] name = s.getBytes();
+		int namelen = name.length;
+		writeUint32(namelen);
+		writeString(name, namelen);
+	}
+
+
+	public void servrfbSetPixelFormat() throws IOException{
+		readCard8();// msg type
+		readCard8(); // bitsPerPixel
+		readCard8(); // depth
+		readCard8(); // bigEndian
+		readCard8(); // trueColour
+		readCard16(); // redMax
+		readCard16(); // greenMax
+		readCard16(); // blueMax
+		readCard8(); // redShift
+		readCard8(); // greenShift
+		readCard8(); // blueShift
+	}
+
+
+	public void servrfbSetEncodings() throws IOException{
+		readCard8();
+		readCard16();
+		readCard32();
+		readCard32();
+		readCard32();
+		readCard32();
+	}
+	
 
 }

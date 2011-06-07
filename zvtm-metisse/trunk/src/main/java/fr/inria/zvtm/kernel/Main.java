@@ -1,8 +1,7 @@
 package fr.inria.zvtm.kernel;
 
+import fr.inria.zvtm.compositor.ZvtmRfbHandler;
 import fr.inria.zvtm.gui.Viewer;
-
-import fr.inria.zvtm.compositor.ZVTMAdapter;
 
 
 
@@ -10,7 +9,7 @@ public class Main {
 
 	protected static String ip = "127.0.0.1";
 	protected static int port = 5901;
-	public static ZVTMAdapter compositor;
+	public static ZvtmRfbHandler rfbHandler;
 	public static Viewer viewer;
 	public static Viewer clientViewer;
 
@@ -20,20 +19,20 @@ public class Main {
 	/**
 	 * @param args
 	 */
-	public static void main(String[] args) {
-		handleArgs(args);
-		compositor = new ZVTMAdapter();
-		compositor.init();
-		initViewers();
-		compositor.setClient(clientViewer);
-		Connection.init(ip,port);
-	}
+//	public static void main(String[] args) {
+//		handleArgs(args);
+////		rfbHandler = new ZvtmRfbHandler();
+////		rfbHandler.init();
+////		initViewers();
+////		rfbHandler.setClient(clientViewer);
+////		RFBConnection.init(ip,port);
+//	}
 
 	private static void initViewers() {
-		viewer = new Viewer(false);
-		viewer.init(false, false, true, null,null);		
-		clientViewer = new Viewer(true);
-		clientViewer.init(false, false, true, viewer.wallSpace, viewer.cursorSpace);	
+//		viewer = new Viewer();
+//		viewer.init(false, false, true, null,null);		
+//		clientViewer = new Viewer();
+//		clientViewer.init(false, false, true, viewer._wallSpace, viewer._cursorSpace);	
 	}
 
 	protected static void handleArgs(String[] args) {
@@ -63,7 +62,7 @@ public class Main {
 	}
 
 	public static void end() {
-		Connection.end();
+	//	RFBConnection.end();
 		System.exit(0);
 
 	}

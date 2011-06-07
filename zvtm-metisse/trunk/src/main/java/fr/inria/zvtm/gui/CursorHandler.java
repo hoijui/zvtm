@@ -15,13 +15,14 @@ public class CursorHandler {
 	private Robot rbt;
 	private int refPosX;
 	private int refPosY;
-	private Viewer viewer;
+	Viewer viewer;
 	private int frameLocOnScreenX;
 	private int frameLocOnScreenY;
 	private boolean exited;
 	private boolean beware;
 	private boolean active = true;
 	private boolean recalib = false;
+	private boolean virtualMode;
 
 
 	public CursorHandler(PCursor out, Viewer v) {
@@ -33,6 +34,27 @@ public class CursorHandler {
 		} catch (AWTException e) {
 			e.printStackTrace();
 		}
+		updateRefPos();
+		resetCursorPos();
+		pcursor.setParent(this);
+	}
+
+
+
+	public PCursor getCursor() {
+		return pcursor;
+	}
+
+
+
+	public int getX() {
+		return jpx;
+	}
+
+
+
+	public int getY() {
+		return jpy;
 	}
 
 
@@ -45,7 +67,7 @@ public class CursorHandler {
 		if(exited||recalib){
 			this.jpx = e.getLocationOnScreen().x-frameLocOnScreenX;
 			this.jpy = e.getLocationOnScreen().y-frameLocOnScreenY;
-			Point.Double p = viewer.mView.getPanel().viewToSpaceCoords(viewer.mCamera, this.jpx, this.jpy);
+			Point.Double p = viewer.getView().getPanel().viewToSpaceCoords(viewer.mCamera, this.jpx, this.jpy);
 			vx = p.x;
 			vy = p.y;
 			pcursor.getPicker().setJPanelCoordinates(this.jpx, this.jpy);
@@ -62,34 +84,54 @@ public class CursorHandler {
 			beware = false;
 		}
 		else{
-			this.jpx += (e.getLocationOnScreen().x-refPosX);
-			this.jpy += (e.getLocationOnScreen().y-refPosY);
+			Point.Double p = viewer.getView().getPanel().viewToSpaceCoords(viewer.mCamera, this.jpx+(e.getLocationOnScreen().x-refPosX), this.jpy+(e.getLocationOnScreen().y-refPosY));
+			if((virtualMode&&(p.x>pcursor.wallBounds[0])&&(p.x<pcursor.wallBounds[2]) )||
+					(!virtualMode&&(this.jpx+e.getLocationOnScreen().x-refPosX)>=0 && (this.jpx+e.getLocationOnScreen().x-refPosX)<viewer.getView().getFrame().getWidth()))
+			
+				this.jpx += (e.getLocationOnScreen().x-refPosX);
+			
+			
+			if((virtualMode&&(p.y-pcursor.bounds[1]+pcursor.wallBounds[3]<pcursor.wallBounds[1])) ||
+					(!virtualMode&&(this.jpy+e.getLocationOnScreen().y-refPosY)<(viewer.getView().getFrame().getHeight()-27))){
+								
+				if((this.jpy+e.getLocationOnScreen().y-refPosY)<0){
+					virtualMode = true;
+					pcursor.enablePhantomMode();
+				}
+				else {
+					if((this.jpx+e.getLocationOnScreen().x-refPosX)<0)this.jpx=0;
+					if((this.jpx+e.getLocationOnScreen().x-refPosX)>=viewer.getView().getFrame().getWidth())this.jpx=viewer.getView().getFrame().getWidth()-1;
+					virtualMode = false;
+					pcursor.disablePhantomMode();
+				}
+				this.jpy += (e.getLocationOnScreen().y-refPosY);
+			}
 		}
-		Point.Double p = viewer.mView.getPanel().viewToSpaceCoords(viewer.mCamera, this.jpx, this.jpy);
+		Point.Double p = viewer.getView().getPanel().viewToSpaceCoords(viewer.mCamera, this.jpx, this.jpy);
 		vx = p.x;
 		vy = p.y;		
 		pcursor.moveCursorTo(vx, vy,this.jpx, this.jpy);
 
 		rbt.mouseMove(refPosX, refPosY);
+		if(virtualMode)dealWithVirtualMode(vx, vy,this.jpx, this.jpy);
 	}
 
-	
+
+
+	private void dealWithVirtualMode(double vx2, double vy2, int jpx2, int jpy2) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
 
 	private void updateRefPos() {
-		Point locOnScreen = viewer.mView.getFrame().getLocationOnScreen();
+		Point locOnScreen = viewer.getView().getFrame().getLocationOnScreen();
 		frameLocOnScreenX = locOnScreen.x;
 		frameLocOnScreenY = locOnScreen.y;
 
-		refPosX = frameLocOnScreenX + (viewer.mView.getFrame().getWidth() / 2);
-		refPosY = frameLocOnScreenY + (viewer.mView.getFrame().getHeight() / 2);
-	}
-
-	public int getX() {
-		return jpx;
-	}
-
-	public int getY() {
-		return jpy;
+		refPosX = frameLocOnScreenX + (viewer.getView().getFrame().getWidth() / 2);
+		refPosY = frameLocOnScreenY + (viewer.getView().getFrame().getHeight() / 2);
 	}
 
 	public boolean isRefPos(int jpx, int jpy) {
@@ -100,7 +142,7 @@ public class CursorHandler {
 	public void resetCursorPos(){
 		this.jpx = refPosX-frameLocOnScreenX;
 		this.jpy = refPosY-frameLocOnScreenY;
-		Point.Double p = viewer.mView.getPanel().viewToSpaceCoords(viewer.mCamera, this.jpx, this.jpy);
+		Point.Double p = viewer.getView().getPanel().viewToSpaceCoords(viewer.mCamera, this.jpx, this.jpy);
 		vx = p.x;
 		vy = p.y;
 		pcursor.moveCursorTo(vx, vy,this.jpx,this.jpy);
@@ -119,6 +161,32 @@ public class CursorHandler {
 	public void activate() {
 		rbt.mouseMove(this.jpx, this.jpy);
 		active = true;
+	}
+
+
+	public double getVX() {
+		return vx;
+	}
+
+
+
+	public double getVY() {
+		return vy;
+	}
+	
+	public void jumpTo(double vx, double vy,int jpx,int jpy){
+		this.vx = vx;
+		this.vy = vy;
+		this.jpx = jpx;
+		this.jpy = jpy;
+		rbt.mouseMove(jpx, jpy);
+		rbt.mouseMove(refPosX, refPosY);
+	}
+
+
+
+	public void refresh() {
+		pcursor.moveCursorTo(vx, vy,this.jpx,this.jpy);
 	}
 
 

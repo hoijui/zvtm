@@ -3,10 +3,11 @@ package fr.inria.zvtm.compositor;
 import java.util.HashMap;
 
 import fr.inria.zvtm.gui.Viewer;
+import fr.inria.zvtm.protocol.Proto;
 
 
 /**
- * this is the meeting point between the ZVTM viewer and the compositor (ZVTMAdapter)
+ * Keeps in memory the windows, accordingly with the rfb instructions
  * @author Julien Altieri
  *
  */
@@ -15,13 +16,13 @@ public class FrameManager {
 	private boolean verbose = false;
 	private HashMap<Integer, MetisseWindow> inSpace;
 	private HashMap<Integer, MetisseWindow> inWaitingRoom;
-	private Viewer application;
+	private Viewer viewer;
 	
 	
 	public FrameManager(Viewer application) {
 		inSpace = new HashMap<Integer, MetisseWindow>();
 		inWaitingRoom = new HashMap<Integer, MetisseWindow>();
-		this.application = application;
+		this.viewer = application;
 	}
 	
 
@@ -37,19 +38,13 @@ public class FrameManager {
 		if (verbose)System.out.println("try to remove "+window);
 		if (!inSpace.containsKey(window))return;
 	
-		application.remFrame(inSpace.get(window));
+		viewer.remFrame(inSpace.get(window));
 		inSpace.remove(window);
 		if (verbose)System.out.println("removed "+window);
 	}
 
-	@SuppressWarnings("unused")
-	private void printState() {
-		System.out.println("nombre de fenetres : "+inSpace.keySet().size());
-	}
-
 	public void frameBufferUpdate(int window, boolean isroot, byte[] img,
 			int x, int y, int w, int h) {
-
 		
 		if(inSpace.containsKey(window))inSpace.get(window).fbUpdate(img,x,y,w,h);
 		if(inWaitingRoom.containsKey(window))inWaitingRoom.get(window).fbUpdate(img,x,y,w,h);
@@ -59,16 +54,24 @@ public class FrameManager {
 			int unmanagedFor, int grabWindow, int duplicateFor, int facadeReal,
 			int flags) {
 
+		if((flags & Proto.rfbWindowFlagsNetChecking) != 0)return;
 		if (verbose)System.out.println("try to restack "+window);
-		
 		
 		if(inWaitingRoom.containsKey(window)){
 			inSpace.put(window,inWaitingRoom.get(window));
 			inWaitingRoom.remove(window);
-			application.addFrame(inSpace.get(window));
-			if(grabWindow!=0){
+			viewer.addFrame(inSpace.get(window));
+			if(transientFor!=0){
+				inSpace.get(window).refreshMaster(inSpace.get(transientFor));
+			}
+			else if(unmanagedFor!=0){
+				inSpace.get(window).refreshMaster(inSpace.get(unmanagedFor));
+			}
+			else if(grabWindow!=0){
 				inSpace.get(window).refreshMaster(inSpace.get(grabWindow));
-				if(inSpace.containsKey(grabWindow)&& inSpace.get(grabWindow).isOnWall()) application.teleport(inSpace.get(window));
+			}
+			else if((flags & Proto.rfbWindowFlagsUnmanaged) != 0){
+				if (verbose)System.out.println("restacking a window which as an a parent but whose identity is untransmitted");
 			}
 			
 			if (verbose)System.out.println("restacked "+window);
@@ -94,11 +97,5 @@ public class FrameManager {
 		if(inSpace.containsKey(number))return inSpace.get(number);
 		return null;
 	}
-	
-	
-	
-	/**
-	 * **********************************************************************************************************************
-	 */
 
 }

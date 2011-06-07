@@ -45,8 +45,9 @@ public class MetisseWindow extends VImage{
 	private boolean isResizing= false;
 	public boolean isRescaling = false;
 	private HashMap<Integer, MetisseWindow> children;
-	private boolean onWall;
-	//	private boolean isMoving = false;
+	private boolean published = false;//on wall
+	private boolean displayed = false;
+	
 
 
 
@@ -59,7 +60,6 @@ public class MetisseWindow extends VImage{
 		this.width = w;
 		this.height = h;
 		this.isroot = isroot;
-		this.onWall = false;
 		if (isroot){
 			rootDimension = new Point.Double(w, h);
 			rootPosition = new Point.Double(x, y);
@@ -73,7 +73,6 @@ public class MetisseWindow extends VImage{
 	}
 
 	public void fbUpdate(byte[] img, int x, int y, int w, int h) {
-		//	System.err.print("x");
 		if(isroot)return;
 		int[] imgint = new int[w*h];
 		for (int i = 0; i < img.length; i=i+4) {
@@ -81,10 +80,7 @@ public class MetisseWindow extends VImage{
 		}
 
 		if(!isResizing){
-			//	System.out.print("mcx:"+x+" "+y+" "+w+" "+h);
-
 			((BufferedImage)image).setRGB(x, y, w, h, imgint, 0, w);
-			//	System.out.print("AFTER");
 		}
 		else {
 			if((currentW==w)&&(currentH==h))
@@ -96,15 +92,13 @@ public class MetisseWindow extends VImage{
 				this.height = currentH;
 				this.vw = this.width*scaleFactor;
 				this.vh = this.height*scaleFactor;
-				this.vx = (this.x-rootSize.x*1./2+this.width*1./2);//*scaleFactor;
-				this.vy =(-this.y+rootSize.y*1./2-this.height*1./2);//*scaleFactor;
+				this.vx = (this.x-rootSize.x*1./2+this.width*1./2);
+				this.vy =(-this.y+rootSize.y*1./2-this.height*1./2);
 				this.image = new BufferedImage((int)currentW, (int)currentH, encoding);		
-		//		System.out.print("complet");
 				((BufferedImage)image).setRGB((int)0, (int)0,(int) width, (int)height, lastFrameBuffer, 0, (int)width);
 
 			}
 		}
-		//	System.out.println("Glyph id: " + getObjId());
 		VirtualSpaceManager.INSTANCE.repaint();
 	}
 
@@ -156,8 +150,8 @@ public class MetisseWindow extends VImage{
 		this.height = currentH;
 		this.vw = this.width*scaleFactor;
 		this.vh = this.height*scaleFactor;
-		this.vx = (x-rootSize.x*1./2+this.width*1./2);//*scaleFactor;
-		this.vy =(-y+rootSize.y*1./2-this.height*1./2);//*scaleFactor;
+		this.vx = (x-rootSize.x*1./2+this.width*1./2);
+		this.vy =(-y+rootSize.y*1./2-this.height*1./2);
 		this.image = new BufferedImage((int)currentW, (int)currentH,encoding);		
 		isResizing = false;
 		MetisseWindow.rezisingFrame= null;
@@ -198,9 +192,6 @@ public class MetisseWindow extends VImage{
 		}
 		scaleFactor = d;
 		VirtualSpaceManager.INSTANCE.repaint();
-		
-		
-		
 	}
 
 
@@ -360,12 +351,12 @@ public class MetisseWindow extends VImage{
 		return xParentOffset;
 	}
 
-	public double getX() {
-		return this.x;
+	public int getX() {
+		return (int)this.x;
 	}
 
-	public double getY() {
-		return this.y;
+	public int getY() {
+		return (int)this.y;
 	}
 
 	public void resetTransform(){
@@ -516,6 +507,14 @@ public class MetisseWindow extends VImage{
 		this.isRescaling = isRescaling;
 	}
 
+	public void setPublished(boolean published) {
+		this.published = published;
+	}
+
+	public boolean isPublished() {
+		return published;
+	}
+
 	public double getParentScaleFactor() {
 		return parentScaleFactor;
 	}
@@ -556,15 +555,20 @@ public class MetisseWindow extends VImage{
 	public boolean coordInside(int jpx, int jpy, int camIndex, double cvx,double cvy) {
  		return((cvx-vx)*(cvx-vx)<=vw*vw/4		&&      (cvy-vy)*(cvy-vy)<=vh*vh/4);
 	}
-	
-	public void setOnWall(boolean b){
-		for (MetisseWindow c : children.values()) {
-			c.setOnWall(b);
-		}
-		onWall = b;
+
+	public void setDisplayed(boolean displayed) {
+		this.displayed = displayed;
+	}
+
+	public boolean isDisplayed() {
+		return displayed;
+	}
+
+	public int getW() {
+		return (int) width;
 	}
 	
-	public boolean isOnWall(){
-		return onWall;
+	public int getH() {
+		return (int) height;
 	}
 }

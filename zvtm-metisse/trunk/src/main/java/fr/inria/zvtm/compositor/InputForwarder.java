@@ -2,80 +2,130 @@ package fr.inria.zvtm.compositor;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.glyphs.Glyph;
-import fr.inria.zvtm.kernel.Main;
+import fr.inria.zvtm.gui.client.ClientViewer;
 import fr.inria.zvtm.kernel.Temporizer;
 import fr.inria.zvtm.protocol.RfbAgent;
 
 public class InputForwarder {
 
-	private static int[]buttonState;
-	private static int currentWindow;
-	private static boolean dragging = false;
-	private static boolean pressed = false;
-	private static long lastSentEventTime;
+	private int[]buttonState = new int[32];
+	private int currentWindow;
+	private boolean dragging = false;
+	private boolean pressed = false;
+	private long lastSentEventTime = System.currentTimeMillis();
+	private ClientViewer viewer;
+	private RfbAgent rfbAgent;
 
-	public static void init() {
-		buttonState = new int[8];
-		lastSentEventTime = System.currentTimeMillis();
+	public InputForwarder(ClientViewer clientViewer) {
+		this.viewer = clientViewer;
+	}
+
+	public void setRfbAgent(RfbAgent a){
+		this.rfbAgent = a;
+	}
+	
+	public void Kpress(KeyEvent e) {
+		rfbAgent.rfbKeyEvent(getKeysym(e), true);
+
+	}
+
+	public void Kreles(KeyEvent e) {
+		rfbAgent.rfbKeyEvent(getKeysym(e), false);
 	}
 
 
-	public static void Kpress(KeyEvent e) {
-		RfbAgent.rfbKeyEvent(getKeysym(e), true);
-
+	public void click(int mod, int jpx, int jpy, int clickNumber, MouseEvent e) {	
 	}
 
-	public static void Kreles(KeyEvent e) {
-		RfbAgent.rfbKeyEvent(getKeysym(e), false);
-	}
-
-
-	public static void click(int mod, int jpx, int jpy, int clickNumber, MouseEvent e) {	
-	}
-
-	public static void press(int mod, ViewPanel v, int jpx, int jpy, MouseEvent e) {
+	public void press(int mod, ViewPanel v, int jpx, int jpy, MouseEvent e) {
 		pressed = true;
-		buttonState[e.getButton()-1] = 1;
-		currentWindow = detectWindow(v, jpx, jpy);
+		switch (e.getButton()) {
+		case MouseEvent.BUTTON1:
+			buttonState[0] = 1;
+			break;
+		case MouseEvent.BUTTON2:
+			buttonState[1] = 1;
+			break;
+		case MouseEvent.BUTTON3:
+			buttonState[2] = 1;
+			break;
+		default:
+			break;
+		}
+		currentWindow = detectWindow(jpx, jpy);
 		int[] p = unproject(v, jpx, jpy);
 		if(p == null)return;
-		RfbAgent.rfbPointerEvent(p[2],p[0],p[1], buttonState);
+		rfbAgent.rfbPointerEvent(p[2],p[0],p[1], buttonState);
 	}
 
-	public static void release(int mod, ViewPanel v, int jpx, int jpy, MouseEvent e) {
+	public void release(int mod, ViewPanel v, int jpx, int jpy, MouseEvent e) {
 		pressed = false;
 		dragging = false;
 		if(MetisseWindow.getRezisingFrame() !=null)
 			MetisseWindow.getRezisingFrame().endResize();
-		buttonState[e.getButton()-1] = 0;
+		switch (e.getButton()) {
+		case MouseEvent.BUTTON1:
+			buttonState[0] = 0;
+			break;
+		case MouseEvent.BUTTON2:
+			buttonState[1] = 0;
+			break;
+		case MouseEvent.BUTTON3:
+			buttonState[2] = 0;
+			break;
+		default:
+			break;
+		}
 		int[] p = unproject(v, jpx, jpy);
 		if(p == null)return;
-		RfbAgent.rfbPointerEvent(p[2],p[0],p[1], buttonState);
-		Main.clientViewer.dragging = false;
+		rfbAgent.rfbPointerEvent(p[2],p[0],p[1], buttonState);
+		//	viewer.dragging = false;
 	}
 
 
-	public static int[] unproject(ViewPanel v, double jpx,double jpy){
+	public void wheel(int mod, ViewPanel v, int jpx, int jpy,MouseWheelEvent e) {
+		
+		int[] p = unproject(v, jpx, jpy);
+		if(p == null)return;
+		
+		int i = e.getWheelRotation();
+		 if(i<0){
+			 buttonState[3] =1;
+			 rfbAgent.rfbPointerEvent(p[2],p[0],p[1], buttonState);
+			 buttonState[3] =0;
+			 rfbAgent.rfbPointerEvent(p[2],p[0],p[1], buttonState);
+		 }
+		 else{
+			 buttonState[4] =1;
+			 rfbAgent.rfbPointerEvent(p[2],p[0],p[1], buttonState);
+			 buttonState[4] =0;
+			 rfbAgent.rfbPointerEvent(p[2],p[0],p[1], buttonState);
+		 }
+	}
+
+	public int[] unproject(ViewPanel v, double jpx,double jpy){
+		if(viewer==null)return null;
+		if(viewer.getFrameManager()==null)return null;
 		int[] res = new int[3];
 		double sf = 1;//scale factor
 		int xx,yy;
-
-		MetisseWindow cu = Main.compositor.get(currentWindow);
+		MetisseWindow cu = viewer.getFrameManager().get(currentWindow);
 		if(cu==null)return null;
 		double[] cubounds = cu.getBounds();
 		sf = cu.getScaleFactor();
-		xx = (int) (cu.getX()+ (Main.clientViewer.getCursor().getVSXCoordinate()-cubounds[0])/sf);
-		yy = (int) (cu.getY()- (Main.clientViewer.getCursor().getVSYCoordinate()-cubounds[1])/sf);
+		xx = (int) (cu.getX()+ (viewer.getCursorHandler().getCursor().getVSXCoordinate()-cubounds[0])/sf);
+		yy = (int) (cu.getY()- (viewer.getCursorHandler().getCursor().getVSYCoordinate()-cubounds[1])/sf);
 		res[0] = xx;
 		res[1] = yy;
 		res[2] = currentWindow;
 		return res;
 	}
 
-	public static void move(ViewPanel v, int jpx, int jpy, MouseEvent e) {
+	public void move(ViewPanel v, int jpx, int jpy, MouseEvent e) {
 		if(pressed&& !dragging){
 			dragging = true;
 		}
@@ -85,37 +135,21 @@ public class InputForwarder {
 				lastSentEventTime = System.currentTimeMillis();
 			}
 		}
-		currentWindow = detectWindow(v, jpx, jpy);
+		currentWindow = detectWindow(jpx, jpy);
 		int[] p = unproject(v, jpx, jpy);
 
 		if(p == null)return;
-		RfbAgent.rfbPointerEvent(p[2],p[0],p[1], buttonState);
+		rfbAgent.rfbPointerEvent(p[2],p[0],p[1], buttonState);
 	}
 
-
-	public static int detectWindow(ViewPanel v,double jpx,double jpy){
-		if(Main.clientViewer==null)return-1;
-		Glyph[] t = null;
-		try{
-			t = Main.clientViewer.getCursor().getPicker().getPickedGlyphList();
-	//		System.out.println(t.length);
-		}
-		catch (NullPointerException e)
-		{
-			if(v==null)return -1;
-			if(v.getVCursor()==null)return -1;
-			if(v.getVCursor().getPicker()==null)return -1;
-			t = v.getVCursor().getPicker().getPickedGlyphList();
-		}
-		if(t.length<=0)return -1;
-		Glyph up = t[t.length-1];
-		if(!up.getClass().equals(MetisseWindow.class))return -1;
+	public int detectWindow(double jpx,double jpy){
+		if(viewer==null||viewer.getCursorHandler().getCursor().getPicker().getDrawOrderedPickedGlyphList(viewer.getVirtualSpace()).length==0)return -1;
+		Glyph up = viewer.getCursorHandler().getCursor().getPicker().pickOnTop(viewer.getVirtualSpace());
+		if(up==null || !up.getClass().equals(MetisseWindow.class))return -1;
 		return ((MetisseWindow)up).getId();
 	}
 
-
-	private static int getKeysym(KeyEvent e){
-
+	private int getKeysym(KeyEvent e){
 		switch (e.getKeyCode()) {
 		case KeyEvent.VK_LEFT:
 			return (0xff51);
@@ -139,9 +173,6 @@ public class InputForwarder {
 		default:
 			break;
 		}
-
-
-
 		return (e.getKeyChar());
 	}
 }
