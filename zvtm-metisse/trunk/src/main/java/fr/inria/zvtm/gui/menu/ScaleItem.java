@@ -61,8 +61,6 @@ public class ScaleItem extends DragableItem {
 			parent.move((vx-pvx),(vy-pvy));
 			parent.parentFrame.setScaleFactor(lastScaleFactor+(vx-psvx)*1./100);
 		}
-		System.out.println(parent.refVX);
-
 		pvx = vx;
 		pvy = vy;
 	}
