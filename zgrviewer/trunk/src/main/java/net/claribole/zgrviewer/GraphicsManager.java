@@ -409,13 +409,14 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     /*-------------     Window resizing     -----------------*/
 
     void updatePanelSize(){
-	tp.displayPalette(false);
-	try {
-	    panelWidth = mainViewPanel.getWidth();
-	    panelHeight = mainViewPanel.getHeight();
-	    paMngr.requestToolPaletteRelocation();
-	}
-	catch(NullPointerException ex){}
+        tp.displayPalette(false);
+        try {
+            panelWidth = mainViewPanel.getWidth();
+            panelHeight = mainViewPanel.getHeight();
+            paMngr.requestToolPaletteRelocation();
+    		cfgMngr.notifyPlugins(Plugin.NOTIFY_PLUGIN_GUI_VIEW_RESIZED);
+        }
+        catch(NullPointerException ex){}
     }
 
     /*----------  Reveal graph (after loading) --------------*/

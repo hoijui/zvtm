@@ -71,6 +71,8 @@ public interface Plugin {
 	public static final short NOTIFY_PLUGIN_GUI_INITIALIZING = 2;
 	/** Event triggered when ZGRViewer's UI has been instantiated but is not yet visible. */
 	public static final short NOTIFY_PLUGIN_GUI_VIEW_CREATED = 3;
+	/** Event triggered when ZGRViewer's window has been resized. */
+	public static final short NOTIFY_PLUGIN_GUI_VIEW_RESIZED = 4;
 
 	/** Event notification
 	 *@param event one of NOTIFY_* events
