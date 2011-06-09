@@ -7,6 +7,7 @@ import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.awt.image.Raster;
 import java.util.HashMap;
 
 import org.jdesktop.animation.timing.interpolation.Interpolator;
@@ -78,13 +79,14 @@ public class MetisseWindow extends VImage{
 		for (int i = 0; i < img.length; i=i+4) {
 			imgint[i/4] = byteToRGB(img[i],img[i+1],img[i+2],img[i+3]);
 		}
-
 		if(!isResizing){
 			((BufferedImage)image).setRGB(x, y, w, h, imgint, 0, w);
 		}
 		else {
-			if((currentW==w)&&(currentH==h))
+			if((currentW==w)&&(currentH==h)){
 				lastFrameBuffer = imgint;
+			}
+				
 		}
 		if(alwaysRefresh){
 			if (isResizing && lastFrameBuffer!= null && currentH*currentW== lastFrameBuffer.length) {
@@ -102,13 +104,23 @@ public class MetisseWindow extends VImage{
 		VirtualSpaceManager.INSTANCE.repaint();
 	}
 
-	private int byteToRGB(byte c,byte b,byte a,byte d) {
-		return ( ( d<< 24 ) & 0xff000000 ) 
-		|  ( ( c << 16 ) & 0x00ff0000 ) 
-		|  ( ( b<< 8  ) & 0x0000ff00 ) 
-		|  (   a        & 0x000000ff );
-
+	private int byteToRGB(byte r,byte g,byte b,byte a) {
+		return ( ( a<< 24 ) & 0xff000000 ) 
+		|  ( ( r << 16 ) & 0x00ff0000 ) 
+		|  ( ( g<< 8  ) & 0x0000ff00 ) 
+		|  (   b        & 0x000000ff );
 	}
+	
+	private byte[] RGBToByte(int col) {
+	
+		byte[] res = new byte[4];
+		res[0] = (byte) ((col>>16)&0x000000ff);//r
+		res[1] = (byte) ((col>>8)&0x000000ff);//g
+		res[2] = (byte) (col&0x000000ff);//b
+		res[3] = (byte) ((col>>24)&0x000000ff);//a
+		return res;
+	}
+	
 
 	public void configure(int x, int y, int w, int h) {
 		if(isroot)return;
@@ -336,6 +348,7 @@ public class MetisseWindow extends VImage{
 		xParentOffset = w.x_offset;
 		yParentOffset = w.y_offset;
 
+		published = master.published;
 		VirtualSpaceManager.INSTANCE.repaint();
 	}
 
@@ -508,6 +521,9 @@ public class MetisseWindow extends VImage{
 	}
 
 	public void setPublished(boolean published) {
+		for (MetisseWindow m : children.values()) {
+				m.setPublished(published);
+		}
 		this.published = published;
 	}
 
@@ -570,5 +586,16 @@ public class MetisseWindow extends VImage{
 	
 	public int getH() {
 		return (int) height;
+	}
+
+	public byte[] getRaster() {
+		BufferedImage img = (BufferedImage) image;
+		Raster r = img.getRaster();		
+		byte[] res = new byte[4*r.getHeight()*r.getWidth()];
+		for (int i = 0; i < r.getHeight()*r.getWidth(); i++) {
+			byte[] rbg = RGBToByte(img.getRGB(i%r.getWidth(), i/r.getWidth()));
+			System.arraycopy(rbg, 0, res, 4*i, 4);
+		}
+		return  res;
 	}
 }

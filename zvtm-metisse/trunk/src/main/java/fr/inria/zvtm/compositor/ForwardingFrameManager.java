@@ -11,6 +11,15 @@ public class ForwardingFrameManager extends FrameManager {
 		rfbfw = new RfbForwarder();
 	}
 
+
+	@Override
+	public void addWindow(int window, boolean isroot, int x, int y, int w, int h) {
+		super.addWindow(window, isroot, x, y, w, h);
+		if(isroot){
+			rfbfw.addWindow(window, isroot, x, y, w, h);
+		}
+	}
+
 	@Override
 	public void configure(int window, int x, int y, int w, int h) {
 		super.configure(window, x, y, w, h);
@@ -22,14 +31,21 @@ public class ForwardingFrameManager extends FrameManager {
 	public void frameBufferUpdate(int window, boolean isroot, byte[] img,int x, int y, int w, int h) {
 		super.frameBufferUpdate(window, isroot, img, x, y, w, h);
 		if(get(window)==null)return;
-		if(get(window).isPublished())rfbfw.frameBufferUpdate(window, isroot, img, x, y, w, h);
+		if(get(window).isPublished()){
+			rfbfw.frameBufferUpdate(window, isroot, img, x, y, w, h);
+		}
 	}
 
 	@Override
 	public void restackWindow(int window, int nextWindow, int transientFor,int unmanagedFor, int grabWindow, int duplicateFor, int facadeReal,int flags) {
 		super.restackWindow(window, nextWindow, transientFor, unmanagedFor, grabWindow,duplicateFor, facadeReal, flags);
-		if(get(window)==null)return;
-		if(get(window).isPublished())rfbfw.restackWindow(window, nextWindow, transientFor,unmanagedFor, grabWindow, duplicateFor, facadeReal,flags);
+		MetisseWindow win = get(window);
+		if(win==null)return;
+		if(win.isPublished()){
+			rfbfw.addWindow(window,false,win.getX(),win.getY(),win.getW(),win.getH());
+			rfbfw.restackWindow(window, nextWindow, transientFor,unmanagedFor, grabWindow, duplicateFor, facadeReal,flags);
+			rfbfw.frameBufferUpdate(win.getId(), win.isRoot(), win.getRaster(), 0, 0, win.getW(), win.getH());
+		}
 	}
 
 	@Override
@@ -41,16 +57,27 @@ public class ForwardingFrameManager extends FrameManager {
 
 	public void publish(MetisseWindow win) {
 		rfbfw.addWindow(win.getId(), win.isRoot(), win.getX(), win.getY(), win.getW(), win.getH());
-		rfbfw.restackWindow(win.getId(), 0, 0, 0, 0, 0, 0, 0);
+		if(inSpace.containsValue(win)){
+			rfbfw.restackWindow(win.getId(), 0, 0, 0, 0, 0, 0, 0);
+			rfbfw.frameBufferUpdate(win.getId(), win.isRoot(), win.getRaster(), 0, 0, win.getW(), win.getH());
+		}
+		for (MetisseWindow w : win.getChildren().values()) {
+			publish(w);
+		}
 	}
 
 	public void unpublish(MetisseWindow win) {
 		rfbfw.removeWindow(win.getId());
 	}
-	
+
 	@Override
 	public void removeWindow(int window) {
 		super.removeWindow(window);
 		rfbfw.removeWindow(window);
+	}
+
+	@Override
+	public void endResize(MetisseWindow mwr) {
+		rfbfw.configure(mwr.getId(), true, mwr.getX(), mwr.getY(), mwr.getW(), mwr.getH());
 	}
 }

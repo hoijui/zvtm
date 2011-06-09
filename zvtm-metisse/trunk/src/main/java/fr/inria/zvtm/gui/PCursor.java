@@ -121,8 +121,6 @@ public class PCursor {
 		phcursorX.moveTo(xx,yy);
 		phcursorY.moveTo(xx,yy);
 		circle.moveTo(xx,yy);
-		
-		System.out.println(wallX+" "+wallY);
 	}
 
 	public Picker getPicker() {

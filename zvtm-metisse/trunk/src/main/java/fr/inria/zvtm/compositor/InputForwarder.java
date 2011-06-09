@@ -65,8 +65,11 @@ public class InputForwarder {
 	public void release(int mod, ViewPanel v, int jpx, int jpy, MouseEvent e) {
 		pressed = false;
 		dragging = false;
-		if(MetisseWindow.getRezisingFrame() !=null)
-			MetisseWindow.getRezisingFrame().endResize();
+		MetisseWindow  mwr = MetisseWindow.getRezisingFrame();
+		if(mwr !=null){
+			mwr.endResize();
+			this.viewer.getFrameManager().endResize(mwr);			
+		}
 		switch (e.getButton()) {
 		case MouseEvent.BUTTON1:
 			buttonState[0] = 0;

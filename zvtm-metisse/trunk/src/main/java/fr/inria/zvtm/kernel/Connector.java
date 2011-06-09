@@ -1,0 +1,170 @@
+package fr.inria.zvtm.kernel;
+
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.HashMap;
+
+import fr.inria.zvtm.compositor.ZvtmRfbHandlerMultiplexer;
+import fr.inria.zvtm.compositor.master.MasterCompositor;
+import fr.inria.zvtm.protocol.Proto;
+import fr.inria.zvtm.protocol.RfbAgent;
+
+public class Connector {
+	private MasterCompositor compositor;
+	private int listeningPort;
+	private HashMap<Socket, RfbAgent> connections;
+	private ServerSocket server;
+	private ZvtmRfbHandlerMultiplexer rfbInputmultiplex;
+
+	public Connector(MasterCompositor compositor) {
+		this.compositor = compositor;
+		this.connections = new HashMap<Socket, RfbAgent>();
+		this.rfbInputmultiplex = new ZvtmRfbHandlerMultiplexer(this.compositor.getViewer().getFrameManager());
+	}
+
+	public void init(int listeningPort) {
+		this.listeningPort = listeningPort;
+		try {
+			server = new ServerSocket(this.listeningPort);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		listenIncomingConnections();
+	}
+
+	private void listenIncomingConnections() {
+		Thread listConn = new Thread(){
+			@Override
+			public void run() {
+				while(true){
+					try {
+						System.out.println("Server ready\nWaiting for incoming connection...");
+						Socket s = server.accept();
+						connections.put(s, new RfbAgent(s.getInputStream(), s.getOutputStream()));
+						System.out.println("Connection accepted from "+s.getInetAddress()+":"+s.getPort());
+						startListening(s).start();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		};
+
+		listConn.start();
+	}
+
+
+	private Thread startListening(final Socket s){
+		Thread listen = new Thread(){
+			RfbAgent rfbAgent;
+			Socket sock;
+
+			@Override
+			public void run() {
+				sock = s;
+				rfbAgent = connections.get(sock);
+
+				try {
+					rfbAgent.rfbProtocalVersion();
+					rfbAgent.rfbAuthentification(); // receive, send & receive
+					rfbAgent.rfbClientInit(); // send
+					rfbAgent.rfbServerInit(); // receive
+					rfbAgent.rfbSetPixelFormat(); // send
+					rfbAgent.rfbSetEncodings(); // sens
+					rfbAgent.rfbFramebufferUpdateRequest(true); // sens
+					rfbAgent.addListener(new RfbInput(sock,rfbInputmultiplex));//connect the compositor to the rfb socket
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				} 
+
+				while(true){
+					if(sock.isClosed())return;
+					try {
+						receive();
+					} catch (IOException e) {
+						System.out.println("connection "+sock.getInetAddress()+":"+sock.getPort()+" closed.");
+						end();
+					}
+				}
+			}
+
+			public void end() {
+
+				if (sock!=null) try {
+					rfbInputmultiplex.remove(sock);
+					sock.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+
+			protected boolean receive() throws IOException {
+				if(sock == null)
+					return false;
+
+				boolean something_read = false;
+				boolean ret = false;
+				something_read = true;
+				int type = rfbAgent.readCard8();
+				switch(type){
+				case Proto.rfbBell:
+					ret = rfbAgent.rfbBell();
+					if(ret)
+						return true;
+					break ;
+
+				case Proto.rfbSetColourMapEntries:
+					ret = rfbAgent.rfbSetColourMapEntries();
+					if(ret)
+						return true;
+					break ;
+
+				case Proto.rfbServerCutText:
+					ret = rfbAgent.rfbServerCutText();
+					if(ret)
+						return true;
+					break ;
+
+				case Proto.rfbConfigureWindow:
+					ret = rfbAgent.rfbConfigureWindow();
+					if(ret)
+						return true;
+					break;
+
+				case Proto.rfbUnmapWindow:
+					ret = rfbAgent.rfbUnmapWindow();
+					if(ret)
+						return true;
+					break;
+
+				case Proto.rfbDestroyWindow:
+					ret = rfbAgent.rfbDestroyWindow();
+					if(ret)
+						return true;
+					break;
+
+				case Proto.rfbRestackWindow:
+					ret = rfbAgent.rfbRestackWindow();
+					if(ret)
+						return true;
+					break;
+
+				case Proto.rfbFramebufferUpdate:
+					ret = rfbAgent.framebufferUpdate();
+					if (!ret){
+						return false;
+					}
+					return true;
+
+				default:
+					return false;
+				} 
+				return something_read;
+			}
+		};
+		return listen;
+	}
+
+
+}

@@ -7,9 +7,15 @@ public class MasterMain {
 	public static boolean CLUSTERMODE = false;
 	public static boolean SMALLMODE = false;
 	protected static MasterCompositor compositor;//wall compositor
+	protected static int listeningPort = 5700;
+	private static Connector connector;
+	
 	
 	public static void main(String[] args) {
 		handleArgs(args);
+		compositor = new MasterCompositor();
+		connector = new Connector(compositor);
+		connector.init(listeningPort);
 	}
 
 	

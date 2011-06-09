@@ -14,7 +14,7 @@ import fr.inria.zvtm.protocol.Proto;
 
 public class FrameManager {
 	private boolean verbose = false;
-	private HashMap<Integer, MetisseWindow> inSpace;
+	protected HashMap<Integer, MetisseWindow> inSpace;
 	private HashMap<Integer, MetisseWindow> inWaitingRoom;
 	private Viewer viewer;
 	
@@ -37,7 +37,6 @@ public class FrameManager {
 	public void removeWindow(int window) {
 		if (verbose)System.out.println("try to remove "+window);
 		if (!inSpace.containsKey(window))return;
-	
 		viewer.remFrame(inSpace.get(window));
 		inSpace.remove(window);
 		if (verbose)System.out.println("removed "+window);
@@ -45,7 +44,7 @@ public class FrameManager {
 
 	public void frameBufferUpdate(int window, boolean isroot, byte[] img,
 			int x, int y, int w, int h) {
-		
+		if (verbose)System.out.println("fbupdate "+window);
 		if(inSpace.containsKey(window))inSpace.get(window).fbUpdate(img,x,y,w,h);
 		if(inWaitingRoom.containsKey(window))inWaitingRoom.get(window).fbUpdate(img,x,y,w,h);
 	}
@@ -53,7 +52,6 @@ public class FrameManager {
 	public void restackWindow(int window, int nextWindow, int transientFor,
 			int unmanagedFor, int grabWindow, int duplicateFor, int facadeReal,
 			int flags) {
-
 		if((flags & Proto.rfbWindowFlagsNetChecking) != 0)return;
 		if (verbose)System.out.println("try to restack "+window);
 		
@@ -95,7 +93,11 @@ public class FrameManager {
 
 	public MetisseWindow get(int number) {
 		if(inSpace.containsKey(number))return inSpace.get(number);
+		if(inWaitingRoom.containsKey(number))return inWaitingRoom.get(number);
 		return null;
 	}
+
+
+	public void endResize(MetisseWindow mwr) {}
 
 }

@@ -39,7 +39,7 @@ public class RfbAgent {
 	public void rfbProtocalVersion() throws IOException{
 		byte[] pv = new byte[16]; // "METISSE 000.000\n"
 		readString(pv, 16);          //  0123456789012345
-
+		
 		if(pv[0] != 'M' ||
 				pv[1] != 'E' ||
 				pv[2] != 'T' ||
@@ -74,11 +74,14 @@ public class RfbAgent {
 		pv[5] = 'S';
 		pv[6] = 'E';
 		pv[7] = ' ';
+		pv[8] = (byte)((major/100) + '0');  
+		pv[9] = (byte)(((major/10)%10) + '0'); 
+		pv[10] = (byte)(((major)%10) + '0');
 		pv[11] = '.';
-		pv[14] = '\n';
-		pv[ 8] = (byte)((major/100) + '0');  pv[ 9] = (byte)(((major/10)%10) + '0'); pv[10] = (byte)(((major)%10) + '0');
-		pv[12] = (byte)((minor/100) + '0');  pv[13] = (byte)(((minor/10)%10) + '0'); pv[14] = (byte)(((minor)%10) + '0');
-
+		pv[12] = (byte)((minor/100) + '0');  
+		pv[13] = (byte)(((minor/10)%10) + '0'); 
+		pv[14] = (byte)(((minor)%10) + '0');
+		pv[15] = '\n';
 		out.write(pv,0,16);
 	}
 
@@ -144,7 +147,6 @@ public class RfbAgent {
 	public void rfbServerInit() throws IOException{
 		width = readCard16();
 		height = readCard16();
-
 		/* rfbPixelFormat */
 		readCard8(); // bpp
 		readCard8(); // depth
@@ -266,6 +268,7 @@ public class RfbAgent {
 
 	protected void writeString(byte[] data, int length) throws IOException {
 		out.write(data, 0, length);	
+		flushUint();
 	}
 
 	public int readCard8() throws IOException{
@@ -614,20 +617,27 @@ public class RfbAgent {
 
 
 	public void orderConfigure(int window, boolean isroot, int x, int y, int w, int h) {
+		writeUint8(Proto.rfbConfigureWindow);
 		writeUint32(window);
 		if(x<0)writeUint16(0);
 		else writeUint16(1);
 		writeUint16(Math.abs(x));
 		if(y<0)writeUint16(0);
 		else writeUint16(1);
-		writeUint16(Math.abs(x));
+		writeUint16(Math.abs(y));
 		writeUint32(w);
 		writeUint32(h);
 		if(isroot)writeUint16(1);
 		else writeUint16(0);
+		try {
+			flushUint();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void orderFrameBufferUpdate(int window, boolean isroot, byte[] img,int x, int y, int w, int h,int encoding) {
+		writeUint8(Proto.rfbFramebufferUpdate);
 		writeUint16(1);
 		writeUint32(window);
 		if(isroot)writeUint32(0);
@@ -638,7 +648,11 @@ public class RfbAgent {
 		writeUint16(w);
 		writeUint16(h);
 		writeUint32(encoding);
-
+		try {
+			flushUint();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		switch(encoding){
 		case Proto.rfbEncodingPointerPos:
 			break;
@@ -655,6 +669,7 @@ public class RfbAgent {
 	}
 
 	public void orderRestackWindow(int window, int nextWindow,int transientFor, int unmanagedFor, int grabWindow,int duplicateFor, int facadeReal, int flags) {
+		writeUint8(Proto.rfbRestackWindow);
 		writeUint32(window);
 		writeUint32(nextWindow);
 		writeUint32(transientFor);
@@ -663,10 +678,21 @@ public class RfbAgent {
 		writeUint32(duplicateFor);
 		writeUint32(facadeReal);
 		writeUint32(flags);
+		try {
+			flushUint();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void orderUnmapWindow(int window) {
+		writeUint8(Proto.rfbUnmapWindow);
 		writeUint32(window);
+		try {
+			flushUint();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 	public void orderAddWindow(int id, boolean root, int x, int y, int w, int h) {
@@ -674,7 +700,13 @@ public class RfbAgent {
 	}
 
 	public void orderRemoveWindow(int id) {
+		writeUint8(Proto.rfbDestroyWindow);
 		writeUint32(id);
+		try {
+			flushUint();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	
@@ -696,10 +728,10 @@ public class RfbAgent {
 		pv[6] = 'E';
 		pv[7] = ' ';
 		pv[11] = '.';
-		pv[14] = '\n';
+		pv[15] = '\n';
 		pv[ 8] = (byte)((major/100) + '0');  pv[ 9] = (byte)(((major/10)%10) + '0'); pv[10] = (byte)(((major)%10) + '0');
 		pv[12] = (byte)((minor/100) + '0');  pv[13] = (byte)(((minor/10)%10) + '0'); pv[14] = (byte)(((minor)%10) + '0');
-
+		
 		out.write(pv,0,16);
 									// "METISSE 000.000\n"
 		readString(pv, 16);          //  0123456789012345
@@ -761,12 +793,13 @@ public class RfbAgent {
 		writeUint8(0);
 		writeUint8(0);
 		writeUint8(0);
-
-		
+		flushUint();
 		String s = "one client";
 		byte[] name = s.getBytes();
 		int namelen = name.length;
 		writeUint32(namelen);
+		flushUint();
+
 		writeString(name, namelen);
 	}
 

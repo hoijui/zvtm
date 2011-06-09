@@ -4,7 +4,7 @@ package fr.inria.zvtm.compositor;
 
 
 public class ZvtmRfbHandler implements fr.inria.zvtm.compositor.RfbMessageHandler {
-	private FrameManager fm;
+	protected FrameManager fm;
 
 	public ZvtmRfbHandler(FrameManager fm) {		
 		this.fm = fm;
@@ -18,6 +18,9 @@ public class ZvtmRfbHandler implements fr.inria.zvtm.compositor.RfbMessageHandle
 
 	@Override
 	public boolean handleConfigureWindow(int window, boolean isroot, int x,int y, int w, int h) {
+		if(fm!=null)
+		if(fm.get(window)!=null)
+		if(isroot&&!fm.get(window).isRoot())fm.get(window).endResize();
 		fm.configure(window,x,y,w,h);
 		return false;
 	}
