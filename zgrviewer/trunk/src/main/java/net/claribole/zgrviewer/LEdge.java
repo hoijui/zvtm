@@ -45,6 +45,9 @@ public class LEdge extends LElem {
 		if (this.glyphs.length > 0){
 	        this.groupID = ((Metadata)this.glyphs[0].getOwner()).getClosestAncestorGroupID();			
 		}
+		else {
+		    this.groupID = Messages.EMPTY_STRING;
+		}
 		for (int i=0;i<this.glyphs.length;i++){
             this.glyphs[i].setOwner(this);
         }
@@ -61,12 +64,8 @@ public class LEdge extends LElem {
             this.URLs[i] = "";
             this.tooltips[i] = "";
         }
-        this.groupID = "";
+        this.groupID = Messages.EMPTY_STRING;
     }
-
-	public String getGroupID(){
-		return groupID;
-	}
 
     public String getURL(Glyph g){
         for (int i=0;i<glyphs.length;i++){

@@ -20,13 +20,13 @@ public class LNode extends LElem {
     LEdge[] edges;
     short[] edgeDirections;
 
-    LNode(String title, Vector glyphs){
+    LNode(String title, Vector<Glyph> gls){
         this.title = title;
-        this.glyphs = new Glyph[glyphs.size()];
-        this.URLs = new String[glyphs.size()];
-        this.tooltips = new String[glyphs.size()];
+        this.glyphs = new Glyph[gls.size()];
+        this.URLs = new String[gls.size()];
+        this.tooltips = new String[gls.size()];
         for (int i=0;i<this.glyphs.length;i++){
-            this.glyphs[i] = (Glyph)glyphs.elementAt(i);
+            this.glyphs[i] = gls.elementAt(i);
             // URL associated with each glyph (there might be different URLs associated with
             // the various glyphs constituting a node or edge)
             if (this.glyphs[i].getOwner() != null){
@@ -34,6 +34,12 @@ public class LNode extends LElem {
                 tooltips[i] = ((Metadata)this.glyphs[i].getOwner()).getURLTitle();
             }
         }
+        if (this.glyphs.length > 0){
+	        this.groupID = ((Metadata)this.glyphs[0].getOwner()).getClosestAncestorGroupID();			
+		}
+		else {
+		    this.groupID = Messages.EMPTY_STRING;
+		}
         for (int i=0;i<this.glyphs.length;i++){
             this.glyphs[i].setOwner(this);
         }

@@ -44,6 +44,10 @@ public class LElem {
 	public String getTooltip(Glyph g){
 		return tooltips[0];
 	}
+	
+	public String getGroupID(){
+		return groupID;
+	}
 
 	public Glyph[] getGlyphs(){
 		Glyph[] res = new Glyph[glyphs.length];
