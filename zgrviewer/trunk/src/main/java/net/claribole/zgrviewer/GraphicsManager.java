@@ -17,6 +17,10 @@ import java.awt.Rectangle;
 import java.awt.Point;
 import java.awt.GradientPaint;
 import java.awt.Font;
+import java.awt.Shape;
+import java.awt.geom.Area;
+import java.awt.geom.Line2D;
+import java.awt.geom.Rectangle2D;
 import java.awt.BasicStroke;
 import java.awt.Robot;
 import java.awt.event.ComponentEvent;
@@ -1016,9 +1020,33 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     public LEdge addEdge(LNode sn, LNode en, String title, boolean directed){
         ClosedShape sns = sn.getShape();
         ClosedShape ens = en.getShape();
-        final DPath spline = new DPath(sns.vx, sns.vy, 0, Color.BLACK);
-        spline.addSegment(ens.vx, ens.vy, true);
-        final VShape arrowHead = new VShape(ens.vx, ens.vy, 0, ens.getSize()/10.0, TRIANGLE_VERTICES, Color.BLACK, 0);
+		// find endpoints for the edge by computing intersections between segment
+		// linking both node shapes' center and each of those shape's boundary
+		BasicStroke st = new BasicStroke(.2f);
+		Shape snsh = st.createStrokedShape(sns.getJava2DShape());
+		Shape ensh = st.createStrokedShape(ens.getJava2DShape());
+		Area edgeseg = new Area(st.createStrokedShape(new Line2D.Double(sns.vx, sns.vy, ens.vx, ens.vy)));
+		Area intersectStart = new Area(snsh);
+		intersectStart.intersect(edgeseg);
+		Area intersectEnd = new Area(ensh);
+		intersectEnd.intersect(edgeseg);
+		Rectangle2D spc = intersectStart.getBounds2D();
+		Rectangle2D epc = intersectEnd.getBounds2D();
+		// compute control point coordinates for both quadratic curves
+		// control point of 1st quadratic curve
+		Point2D.Double cpqd1 = new Point2D.Double((3*spc.getCenterX()+epc.getCenterX())/4d, (3*spc.getCenterY()+epc.getCenterY())/4d);
+		// point of junction between both quadratic curves
+		Point2D.Double jp = new Point2D.Double((spc.getCenterX()+epc.getCenterX())/2d, (spc.getCenterY()+epc.getCenterY())/2d);
+		// control point of 2nd quadratic curve
+		Point2D.Double cpqd2 = new Point2D.Double((spc.getCenterX()+3*epc.getCenterX())/4d, (spc.getCenterY()+3*epc.getCenterY())/4d);
+		// instantiate all glyphs that form the edge
+        final DPath spline = new DPath(spc.getCenterX(), spc.getCenterY(), 0, Color.BLACK);
+		spline.addQdCurve(jp.x, jp.y, cpqd1.x, cpqd1.y, true);
+		spline.addQdCurve(epc.getCenterX(), epc.getCenterY(), cpqd2.x, cpqd2.y, true);
+		//XXX: adapt orientation
+		double theta = Math.atan2(epc.getCenterY()-spc.getCenterY(), epc.getCenterX()-spc.getCenterX());
+        final VShape arrowHead = new VShape(epc.getCenterX(), epc.getCenterY(), 0, ens.getSize()/10.0, TRIANGLE_VERTICES, Color.BLACK, theta);
+		// put them in virtual space
         SwingUtilities.invokeLater(
             new Runnable(){
                 public void run(){
@@ -1027,6 +1055,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
                 }
             }
         );
+		// create the LEdge
         Vector<Glyph> glyphs = new Vector(2);
         glyphs.add(spline);
         glyphs.add(arrowHead);
