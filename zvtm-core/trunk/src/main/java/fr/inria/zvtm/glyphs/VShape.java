@@ -511,6 +511,12 @@ public class VShape extends ClosedShape {
         return res;
     }
 
+	@Override
+	public Shape getJava2DShape(){
+		//XXX:TBW
+		return null;
+	}
+
     @Override
     public Object clone(){
         VShape res=new VShape(vx, vy, vz, size, (float[])vertices.clone(), color, borderColor, orient);

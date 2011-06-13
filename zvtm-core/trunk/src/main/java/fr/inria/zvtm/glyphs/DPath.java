@@ -1103,6 +1103,11 @@ public class DPath extends Glyph implements RectangularShape {
 	public GeneralPath getJava2DGeneralPath(){
         return gp;
 	}
+	
+	@Override
+	public Shape getJava2DShape(){
+		return getJava2DGeneralPath();
+	}
 
 	/** Get the Java2D path iterator representing this DPath. */
     public PathIterator getJava2DPathIterator(){

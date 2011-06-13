@@ -14,6 +14,7 @@ import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.Shape;
 import java.awt.Polygon;
+import java.awt.geom.Rectangle2D;
 import java.awt.geom.AffineTransform;
 import javax.swing.JComponent;
 
@@ -682,6 +683,11 @@ public class VSwingComponent extends ClosedShape implements RectangularShape {
         }
     }
     
+	@Override
+	public Shape getJava2DShape(){
+		return new Rectangle2D.Double(vx-vw/2.0, vy-vh/2.0, vw, vh);
+	}
+
     @Override
     public Object clone(){
         VSwingComponent res = new VSwingComponent(vx, vy, vz, sc, scaleFactor, orient,

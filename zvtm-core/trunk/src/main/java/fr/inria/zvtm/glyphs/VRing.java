@@ -565,6 +565,12 @@ public class VRing extends ClosedShape {
         }
     }
 
+	@Override
+	public Shape getJava2DShape(){
+		//XXX:TBW
+		return null;
+	}
+
     @Override
     public Object clone(){
 	    VRing res = new VRing(vx, vy, vz, size, angle, irr_p, orient, color, borderColor, (alphaC != null) ? alphaC.getAlpha() : 1);

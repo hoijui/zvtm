@@ -16,6 +16,7 @@ import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.Shape;
+import java.awt.geom.Rectangle2D;
 import java.awt.geom.AffineTransform;
 
 import fr.inria.zvtm.glyphs.projection.RProjectedCoords;
@@ -422,6 +423,11 @@ public class SIRectangle extends ClosedShape implements RectangularShape {
             }
         }
     }
+
+	@Override
+	public Shape getJava2DShape(){
+		return new Rectangle2D.Double(vx-vw/2.0, vy-vh/2.0, vw, vh);
+	}
 
     @Override
     public Object clone(){

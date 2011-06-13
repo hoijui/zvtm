@@ -27,6 +27,7 @@ import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
 
 import fr.inria.zvtm.glyphs.projection.ProjEllipse;
 
@@ -419,6 +420,11 @@ public class VEllipse extends ClosedShape implements RectangularShape {
             }
         }
     }
+
+	@Override
+	public Shape getJava2DShape(){
+		return new Ellipse2D.Double(vx-vw/2.0, vy-vh/2.0, vw, vh);
+	}
 
     @Override
     public Object clone(){

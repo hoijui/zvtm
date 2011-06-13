@@ -27,6 +27,7 @@ import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
 import java.awt.Shape;
 
 import fr.inria.zvtm.glyphs.projection.BProjectedCoords;
@@ -351,6 +352,11 @@ public class VCircle extends ClosedShape {
             }
         }
     }
+
+	@Override
+	public Shape getJava2DShape(){
+		return new Ellipse2D.Double(vx-size/2.0, vy-size/2.0, size, size);
+	}
 
     @Override
     public Object clone(){

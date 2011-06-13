@@ -390,6 +390,11 @@ public class VSegment extends Glyph implements RectangularShape {
         }
     }
 
+	@Override
+	public Shape getJava2DShape(){
+		return new Line2D.Double(vx+vw/2d, vy+vh/2d, vx-vw/2d, vy-vh/2d);
+	}
+
     @Override
     public Object clone(){
         Point2D.Double[] ep = getEndPoints();

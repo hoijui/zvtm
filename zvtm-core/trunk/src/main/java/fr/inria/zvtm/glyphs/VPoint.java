@@ -28,6 +28,7 @@ import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.Shape;
+import java.awt.geom.Rectangle2D;
 
 import fr.inria.zvtm.glyphs.projection.ProjectedCoords;
 
@@ -247,6 +248,12 @@ public class VPoint extends Glyph {
             g.fillRect(dx+pc[i].lcx, dy+pc[i].lcy, 1, 1);
         }
     }
+
+	@Override
+	public Shape getJava2DShape(){
+		// returning a Rectangle2D instead of a Point2D because Point2D does not implement Shape
+		return new Rectangle2D.Double(vx, vy, 1, 1);
+	}
 
     @Override
     public Object clone(){

@@ -30,6 +30,7 @@ import java.awt.Stroke;
 import java.awt.Shape;
 import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
 
 import fr.inria.zvtm.glyphs.projection.RProjectedCoordsP;
 
@@ -580,6 +581,11 @@ public class VImage extends ClosedShape implements RectangularShape {
     public Object getInterpolationMethod(){
         return interpolationMethod;
     }
+
+	@Override
+	public Shape getJava2DShape(){
+		return new Rectangle2D.Double(vx-vw/2.0, vy-vh/2.0, vw, vh);
+	}
 
     @Override
     public Object clone(){

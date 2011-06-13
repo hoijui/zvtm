@@ -565,6 +565,12 @@ public class VTextLayout extends VText {
 		invalidate();
 	}
 
+	@Override
+	public Shape getJava2DShape(){
+		//XXX:TBW
+		return null;
+	}
+
     public Object clone(){
         VTextLayout res = new VTextLayout(vx, vy, vz, color, borderColor, (new StringBuffer(text)).toString(),
             text_anchor, font, getScale(), (alphaC != null) ? alphaC.getAlpha() : 1.0f);

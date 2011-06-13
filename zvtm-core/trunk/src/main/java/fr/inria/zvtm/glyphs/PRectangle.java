@@ -16,7 +16,7 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.VRectangle;
 
 /**
- * Rectangle filled a customizable gradient paint. Cannot be reoriented.
+ * Rectangle filled using a customizable gradient paint. Cannot be reoriented.
  *@author Emmanuel Pietriga
  *@see fr.inria.zvtm.glyphs.VRectangle
  *@see fr.inria.zvtm.glyphs.VRectangleOr

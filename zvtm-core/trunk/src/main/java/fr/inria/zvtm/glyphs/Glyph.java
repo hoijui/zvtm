@@ -723,6 +723,12 @@ public abstract class Glyph implements Cloneable, Translucent {
     public static void unstickAllGlyphs(Glyph g){
 		g.unstickAllGlyphs();
 	}
+	
+    /*---------------------  Java 2D  --------------------------*/
+	
+	/** Get the Java2D Shape corresponding to this Glyph. Virtual Space coordinates. */
+	public abstract Shape getJava2DShape();
+	
 
     /*-------------Cloning--------------------------------------*/
 

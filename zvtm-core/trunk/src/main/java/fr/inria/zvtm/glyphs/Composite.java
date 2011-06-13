@@ -10,6 +10,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.List;
@@ -300,5 +301,12 @@ public class Composite extends Glyph {
             return (Math.sqrt((bbox[1] - bbox[3])*(bbox[1] - bbox[3]) + 
                         (bbox[2] - bbox[0])*(bbox[2] - bbox[0])));
         }
+
+	@Override
+	public Shape getJava2DShape(){
+		//XXX:TBW
+		return null;
+	}
+
 }
 

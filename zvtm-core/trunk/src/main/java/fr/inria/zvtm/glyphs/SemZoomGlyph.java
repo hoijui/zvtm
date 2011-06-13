@@ -10,6 +10,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.util.ArrayList;
 import java.util.List;
@@ -194,5 +195,12 @@ public class SemZoomGlyph extends Glyph {
     protected Glyph selectChild(int camIndex){
         return null;
     }
+
+	@Override
+	public Shape getJava2DShape(){
+		//XXX:TBW
+		return null;
+	}
+
 }
 

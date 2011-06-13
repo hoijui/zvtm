@@ -673,6 +673,12 @@ public class VText extends ClosedShape {
 	return text_anchor;
     }
 
+	@Override
+	public Shape getJava2DShape(){
+		//XXX:TBW
+		return null;
+	}
+
     public Object clone(){
         VText res = new VText(vx, vy, vz, color, borderColor, (new StringBuffer(text)).toString(),
             text_anchor, getScale(), (alphaC != null) ? alphaC.getAlpha() : 1.0f);
