@@ -312,5 +312,10 @@ public class VChart extends ClosedShape implements RectangularShape {
                 (chart.vy + chart.getHeight()/2) - vsCoords.getY());
     }
 
+	@Override
+	public Shape getJava2DShape(){
+		return new Rectangle2D.Double(vx-vw/2.0, vy-vh/2.0, vw, vh);
+	}
+
 }
 
