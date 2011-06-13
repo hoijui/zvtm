@@ -9,6 +9,7 @@ package fr.inria.zvtm.glyphs;
 
 import java.awt.Image;
 import java.awt.Rectangle;
+import java.awt.geom.Rectangle2D;
 
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.Camera;
@@ -241,5 +242,10 @@ public abstract class ZPDFPage extends ClosedShape implements RectangularShape {
 	
 	/** Flush any resource used. */
 	public abstract void flush();
+
+	@Override
+	public Shape getJava2DShape(){
+		return new Rectangle2D.Double(vx-vw/2.0, vy-vh/2.0, vw, vh);
+	}
 
 }
