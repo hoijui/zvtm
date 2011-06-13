@@ -11,6 +11,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
+import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
@@ -343,6 +344,11 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
         public double getSize(){
             return Math.sqrt(getWidth() * getWidth() + getHeight() * getHeight());
         }
+
+   	@Override
+   	public Shape getJava2DShape(){
+   		return new Rectangle2D.Double(vx-vw/2.0, vy-vh/2.0, vw, vh);
+   	}
 
     public enum ScaleAlgorithm {
         LINEAR{
