@@ -7,7 +7,8 @@ The steps to launch the local demo:
 
 To launch the wall-demo:
 
-- launch the metisse server (launch_metisse_server_fvwm.sh) (on the first execution)
+
 - launch "cluster_run.sh -n intothewild" (but you must check that the path in the file is the path where the slave app is installed on each machine of the cluster
 - execute launch_master.sh (runs the zvtm server and wait for incoming connections from zvtm-metisse clients)
+- launch the metisse server on the client laptop (launch_metisse_server_fvwm.sh) (on the first execution)
 - launch zvtm-metisse clients
