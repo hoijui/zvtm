@@ -141,8 +141,23 @@ public class LogicalStructure {
 	
 	public void addEdge(LEdge e){
 	    LEdge[] nedges = new LEdge[edges.length+1];
-	    System.arraycopy(edges, 0, nedges, 0, nedges.length);
+	    System.arraycopy(edges, 0, nedges, 0, edges.length);
 	    edges = nedges;
+	}
+	
+	public void removeEdge(LEdge e){
+		//int index = -1;
+		//// find edge index in array
+		//for (int i=0;i<edges.length;i++){
+		//	if (edges[i] == e){index = i;break;}
+		//}
+		//if (index != -1){
+		//	// then remove it (if found)
+		//	LEdge[] nedges = new LEdge[edges.length-1];
+		//	System.arraycopy(edges, 0, nedges, , index-1);
+		//	System.arraycopy(edges, index+1, nedges, index, edges.length);
+		//	edges = nedges;
+		//}
 	}
 	
 	public LNode[] getAllNodes(){

@@ -1043,7 +1043,6 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         final DPath spline = new DPath(spc.getCenterX(), spc.getCenterY(), 0, Color.BLACK);
 		spline.addQdCurve(jp.x, jp.y, cpqd1.x, cpqd1.y, true);
 		spline.addQdCurve(epc.getCenterX(), epc.getCenterY(), cpqd2.x, cpqd2.y, true);
-		//XXX: adapt orientation
 		double theta = Math.atan2(epc.getCenterY()-spc.getCenterY(), epc.getCenterX()-spc.getCenterX());
         final VShape arrowHead = new VShape(epc.getCenterX(), epc.getCenterY(), 0, ens.getSize()/10.0, TRIANGLE_VERTICES, Color.BLACK, theta);
 		// put them in virtual space
@@ -1063,8 +1062,23 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         res.setDirected(directed);
         res.setTail(sn);
         res.setHead(en);
+		lstruct.addEdge(res);
         return res;
     }
+
+	void removeEdge(final LEdge e){
+		lstruct.removeEdge(e);
+        SwingUtilities.invokeLater(
+            new Runnable(){
+                public void run(){
+					for (Glyph g:e.getGlyphs()){
+						mSpace.removeGlyph(g, false);
+					}
+					VirtualSpaceManager.INSTANCE.repaint();
+                }
+            }
+        );
+	}
 
     /* ------------- Highlighting ----------------- */
 
