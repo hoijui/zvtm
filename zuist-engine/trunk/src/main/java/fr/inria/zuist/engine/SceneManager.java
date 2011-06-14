@@ -1124,13 +1124,7 @@ public class SceneManager implements CameraListener {
 
     /* -------- Navigation ----------------- */
     
-    /** Get a global view of the scene.
-     *@param c camera that should show a global view
-     *@param d duration of animation from current location to global view
-     *@param ea action to be perfomed after camera has reached its new position (can be null)
-     @return bounds in virtual space, null if none
-     */
-    public double[] getGlobalView(Camera c, int d, EndAction ea){
+	public double[] findFarmostRegionCoords(){
 		int l = 0;
 		while (getRegionsAtLevel(l) == null){
 			l++;
@@ -1140,13 +1134,21 @@ public class SceneManager implements CameraListener {
 			}
 		}
 		if (l > -1){
-			double[] wnes = getLevel(l).getBounds();
-	        c.getOwningView().centerOnRegion(c, d, wnes[0], wnes[1], wnes[2], wnes[3], ea);
-	        return wnes;
+			return getLevel(l).getBounds();
 		}
-		else {
-		    return null;
-		}
+		else return new double[]{0,0,0,0};		
+	}
+
+    /** Get a global view of the scene.
+     *@param c camera that should show a global view
+     *@param d duration of animation from current location to global view
+     *@param ea action to be perfomed after camera has reached its new position (can be null)
+     @return bounds in virtual space
+     */
+    public double[] getGlobalView(Camera c, int d, EndAction ea){
+		double[] wnes = findFarmostRegionCoords();
+	    c.getOwningView().centerOnRegion(c, d, wnes[0], wnes[1], wnes[2], wnes[3], ea);
+	    return wnes;
     }
 
     /* -------------- Utils ------------------- */
