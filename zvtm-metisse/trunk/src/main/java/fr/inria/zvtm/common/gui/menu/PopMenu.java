@@ -1,5 +1,6 @@
 package fr.inria.zvtm.common.gui.menu;
 
+import java.awt.Image;
 import java.awt.geom.Point2D;
 import java.util.LinkedList;
 
@@ -43,8 +44,10 @@ public class PopMenu {
 		this.ged = ged;
 		this.viewer = viewer;
 		this.itemList = new LinkedList<Item>();
-		range = new VImage((new ImageIcon(ressourcePath+"range.png")).getImage());
+		Image img = (new ImageIcon(ressourcePath+"range.png")).getImage();
+		range = new VImage(img);
 		range.scaleFactor = factor;
+		range.setImage(img);
 		range.setSensitivity(false);
 		range.setTranslucencyValue(0.3f);
 		range.setDrawBorder(false);

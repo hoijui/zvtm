@@ -17,7 +17,7 @@ public class ResetItem extends Item {
 	protected String getState1ImageName() {
 		return "reset.png";
 	}
-
+	
 	@Override
 	protected String getState2ImageName() {
 		return "resetp.png";

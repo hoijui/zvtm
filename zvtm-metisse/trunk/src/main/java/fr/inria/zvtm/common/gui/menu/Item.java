@@ -51,6 +51,7 @@ public abstract class Item implements GlyphListener{
 		this.shape.setSensitivity(true);
 		this.shape.setTranslucencyValue(0);	
 		this.parent.ged.subscribe(this.shape, this);
+		drawUp();
 	}
 
 	protected abstract String getState1ImageName();
