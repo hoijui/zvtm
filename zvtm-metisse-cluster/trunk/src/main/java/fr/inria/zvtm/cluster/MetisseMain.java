@@ -1,13 +1,18 @@
 package fr.inria.zvtm.cluster;
 
+import fr.inria.zvtm.common.kernel.Connector;
+import fr.inria.zvtm.master.MasterMain;
+import fr.inria.zvtm.master.compositor.MasterCompositor;
+import fr.inria.zvtm.master.gui.MasterViewer;
 
-import fr.inria.zvtm.compositor.ZVTMAdapter;
-import fr.inria.zvtm.kernel.Connection;
-import fr.inria.zvtm.kernel.Main;
 
 
 
-public class MetisseMain extends Main{
+
+
+
+
+public class MetisseMain extends MasterMain {
 
 
 	/**
@@ -15,20 +20,15 @@ public class MetisseMain extends Main{
 	 */
 	public static void main(String[] args) {
 		handleArgs(args);
-		compositor = new ZVTMAdapter();
-		compositor.init();
+		compositor = new MasterCompositor(new MetisseViewer());
+		connector = new Connector(compositor);
 		initViewers();
-		compositor.setClient(clientViewer);
-		Connection.init(ip,port);
-		ViconInput vi = new ViconInput();
-		vi.initOSC(52511);
+		connector.init(listeningPort);
 	}
 
 
 	private static void initViewers() {
-		viewer = new MetisseViewer(false);
-		viewer.init(false, false, true, null,null);		
-		clientViewer = new MetisseViewer(true);
-		clientViewer.init(false, false, true, viewer.wallSpace,viewer.cursorSpace);	
+		((MasterViewer)compositor.getViewer()).getBoucer().setRFBInputMultiplexer(connector.getMultiplexer());
+
 	}
 }

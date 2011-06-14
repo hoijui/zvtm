@@ -5,7 +5,7 @@ import java.awt.image.BufferedImage;
 
 import fr.inria.zvtm.glyphs.Glyph;
 
-import fr.inria.zvtm.compositor.MetisseWindow;
+import fr.inria.zvtm.common.compositor.MetisseWindow;
 
 public aspect MetisseGlyphCreation {
 	@Override GlyphReplicator MetisseWindow.getReplicator(){

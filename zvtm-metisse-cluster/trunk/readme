@@ -2,10 +2,12 @@ The steps to launch the local demo:
 
 - launch the metisse server (launch_metisse_server_fvwm.sh) (on the first execution)
 - launch one or more slaves (local_slave.sh)
-- execute local_master.sh (will run the zvtm compositor communicating with the metisse server)
+- execute local_master.sh (runs the zvtm server and wait for incoming connections from zvtm-metisse clients)
+- launch a zvtm-metisse client to interact with the x server and to share windows on the wall
 
 To launch the wall-demo:
 
 - launch the metisse server (launch_metisse_server_fvwm.sh) (on the first execution)
-- launch the cluster_run.sh (but you must update the inner path where the slave app is installed
-- execute launch_master.sh (will run the zvtm compositor communicating with the metisse server)
+- launch "cluster_run.sh -n intothewild" (but you must check that the path in the file is the path where the slave app is installed on each machine of the cluster
+- execute launch_master.sh (runs the zvtm server and wait for incoming connections from zvtm-metisse clients)
+- launch zvtm-metisse clients

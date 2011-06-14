@@ -2,7 +2,7 @@ package fr.inria.zvtm.cluster;
 
 import fr.inria.zvtm.cluster.Identifiable;
 
-import fr.inria.zvtm.compositor.MetisseWindow;
+import fr.inria.zvtm.common.compositor.MetisseWindow;
 
 /**
  * Add methods that should be replay by the generic Delta here.

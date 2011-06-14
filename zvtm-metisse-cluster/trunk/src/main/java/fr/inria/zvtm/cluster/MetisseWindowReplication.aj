@@ -1,7 +1,7 @@
 package fr.inria.zvtm.cluster;
 
 import fr.inria.zvtm.engine.VirtualSpaceManager;
-import fr.inria.zvtm.compositor.MetisseWindow;
+import fr.inria.zvtm.common.compositor.MetisseWindow;
 
 public aspect MetisseWindowReplication {
 

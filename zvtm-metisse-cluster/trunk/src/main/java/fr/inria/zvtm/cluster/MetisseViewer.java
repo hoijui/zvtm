@@ -1,35 +1,27 @@
 package fr.inria.zvtm.cluster;
 
 import java.awt.Color;
-import java.util.Vector;
 
-import javax.swing.ImageIcon;
-
-import fr.inria.zvtm.engine.Camera;
-import fr.inria.zvtm.glyphs.VImage;
-import fr.inria.zvtm.gui.Viewer;
+import fr.inria.zvtm.master.gui.MasterViewer;
 
 
 
 
-public class MetisseViewer extends Viewer {
+
+public class MetisseViewer extends MasterViewer {
 	
 	private ClusteredView cv;
 	private ClusterGeometry clGeom;
-	
-	public MetisseViewer(boolean isClient){
-		super(isClient);
-	}
 
 	@Override protected void preInitHook(){
-		if(!isClient)vsm.setMaster("intothewild");
+		vsm.setMaster("intothewild");
 	}
 
-	@Override protected void viewCreatedHook(Vector<Camera> cameras){
-		if(!isClient){
+	@Override protected void viewCreatedHook(){
+		
 			if(!MetisseMain.CLUSTERMODE)return;
 			if(MetisseMain.SMALLMODE){
-				clGeom = new ClusterGeometry(600,400,2,2);
+				clGeom = new ClusterGeometry(400,300,2,2);
 				//                options.blockWidth,
 				//                options.blockHeight,
 				//                options.numCols,
@@ -48,14 +40,13 @@ public class MetisseViewer extends Viewer {
 				cv.setBackgroundColor(Color.LIGHT_GRAY);
 				vsm.addClusteredView(cv);
 			}
-		}
+		
 
 	}
 	
-
+	@Override
 	protected void addBackground() {
-		ImageIcon img = (new ImageIcon("src/main/java/fr/inria/zvtm/resources/bg.jpg"));
-		wallSpace.addGlyph(new VImage(img.getImage()));
+	
 	}
 	
 	public double getVisibleRegionWidth(){
@@ -63,11 +54,6 @@ public class MetisseViewer extends Viewer {
 	}
 	public double getVisibleRegionHeight(){
 		return clGeom.getHeight()*mCamera.focal/(mCamera.focal+mCamera.altitude);
-	}
-	
-	@Override
-	protected void backgroundHook(){
-		
 	}
 }
 
