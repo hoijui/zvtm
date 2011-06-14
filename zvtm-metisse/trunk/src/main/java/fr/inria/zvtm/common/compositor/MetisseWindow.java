@@ -220,6 +220,7 @@ public class MetisseWindow extends VImage{
 		//	One should remove this Line as soon as the file MetisseWindow.java is placed in the package glyphs
 		double wFactor = 1;
 		double hFactor = 1;
+		interpolationMethod = RenderingHints.VALUE_INTERPOLATION_BICUBIC;
 
 		if(isResizing){
 			wFactor = currentW/this.width;

@@ -45,6 +45,7 @@ public abstract class Item implements GlyphListener{
 		img = (new ImageIcon(imagePath));
 		img2 = (new ImageIcon(imagePath2));
 		shape = new VImage(img.getImage());
+		shape.scaleFactor = parent.factor;
 		shape.setDrawBorder(false);
 		shape.addCamera(0);
 		this.shape.setSensitivity(true);

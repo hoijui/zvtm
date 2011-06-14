@@ -34,14 +34,17 @@ public class PopMenu {
 	private VImage range;
 	protected GlyphEventDispatcher ged;
 	private DragItem drag;
+	double factor = 1;
 
 
-	public PopMenu(VirtualSpace v,Viewer viewer, GlyphEventDispatcherForMenu ged) {
+	public PopMenu(VirtualSpace v,Viewer viewer, GlyphEventDispatcherForMenu ged,double factor) {
+		this.factor  =factor;
 		this.virtualSpace = v;
 		this.ged = ged;
 		this.viewer = viewer;
 		this.itemList = new LinkedList<Item>();
 		range = new VImage((new ImageIcon(ressourcePath+"range.png")).getImage());
+		range.scaleFactor = factor;
 		range.setSensitivity(false);
 		range.setTranslucencyValue(0.3f);
 		range.setDrawBorder(false);
@@ -104,7 +107,7 @@ public class PopMenu {
 		if(itemList.size()<2)return;
 		double offset = 0.;
 		double a = offset ;
-		double r = 30;
+		double r = 30*factor;
 		double pi = 2*Math.PI;
 		range.moveTo(mx, my);
 		for (Item it : itemList) {
@@ -118,7 +121,7 @@ public class PopMenu {
 	}
 
 	public void toggle(double vx, double vy, MetisseWindow frame,double radius) {
-		this.activityRadius = radius;
+		this.activityRadius = radius*factor;
 		if(invoked)banish();
 		else {
 			invoke(vx, vy, frame,this.activityRadius);
@@ -128,7 +131,7 @@ public class PopMenu {
 
 	public void invoke(double vx, double vy, MetisseWindow frame,double radius) {
 		if(invoked)return;
-		this.activityRadius = radius;
+		this.activityRadius = radius*factor;
 		invoke(vx, vy, frame);
 	}
 

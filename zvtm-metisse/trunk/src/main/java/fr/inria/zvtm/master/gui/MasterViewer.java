@@ -66,6 +66,10 @@ public class MasterViewer extends Viewer{
 
 	public void sendViewUpgrade() {
 		PCursor.wallBounds = getView().getVisibleRegion(mCamera);
+		PCursor.wallBounds[0]*=8;
+		PCursor.wallBounds[2]*=8;
+		PCursor.wallBounds[1]*=4;
+		PCursor.wallBounds[3]*=4;
 		bouncer.sendViewUpgrade(PCursor.wallBounds);
 	}
 	

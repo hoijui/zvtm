@@ -37,7 +37,7 @@ public abstract class Viewer {
 	protected VirtualSpace cursorSpace;
 	protected Camera cursorCamera;
 	private VirtualSpace menuSpace;
-	private Camera menuCamera;
+	protected Camera menuCamera;
 	
 	private MainEventHandler eh;
 	protected NavigationManager nm;

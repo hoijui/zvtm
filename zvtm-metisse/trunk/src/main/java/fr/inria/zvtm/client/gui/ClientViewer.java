@@ -34,7 +34,7 @@ public class ClientViewer extends Viewer{
 		infw = new InputForwarder(this);
 		getMainEventListener().setViewer(this);
 		ged = new GlyphEventDispatcherForMenu(this.getCursor(), this.getMenuSpace(),this);
-		popmenu = new PopMenu(getMenuSpace(),this,ged);
+		popmenu = new PopMenu(getMenuSpace(),this,ged,1);
 		ged.setMenu(popmenu);
 		ged.setPriorityOn(getMainEventListener());
 		this.listenMultiplexer.addListerner(ged);
