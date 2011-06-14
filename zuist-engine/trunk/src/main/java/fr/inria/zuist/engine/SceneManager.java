@@ -1124,6 +1124,9 @@ public class SceneManager implements CameraListener {
 
     /* -------- Navigation ----------------- */
     
+    /** Get the bounding box of all regions in this scene.
+     *@return bounds in virtual space
+     */
 	public double[] findFarmostRegionCoords(){
 		int l = 0;
 		while (getRegionsAtLevel(l) == null){
