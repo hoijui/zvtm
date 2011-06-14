@@ -1066,7 +1066,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         return res;
     }
 
-	void removeEdge(final LEdge e){
+	public void removeEdge(final LEdge e){
 		lstruct.removeEdge(e);
         SwingUtilities.invokeLater(
             new Runnable(){
