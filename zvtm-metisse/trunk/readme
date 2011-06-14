@@ -1,4 +1,8 @@
 The steps to launch the local demo:
 
 - launch the metisse server (launch_metisse_server_fvwm.sh)
-- execute launch_master.sh (will run the zvtm compositor communicating with the metisse server)
+- execute launch_master.sh (will run a zvtm server on local host)
+- execute launch_client.sh (will connect a client compositer to the server)
+	note: the ip address in argument of ClientMain must be the server address 
+
+to make the zvtm menu on the client appear, scroll the wheel up, down and up or down, up and down
