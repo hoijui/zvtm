@@ -101,6 +101,7 @@ public class MasterMainEventHandler extends MainEventHandler{
 		owner.ged.mouseWheelMove(x,y,wheelDirection);
 		if(locked)return;
 		currentwindow = detectWindow();
+		System.out.println(currentwindow);
 		int[] p = unproject();
 		if(p!=null){
 			if(wheelDirection==1){//up
@@ -139,20 +140,7 @@ public class MasterMainEventHandler extends MainEventHandler{
 
 	public void Kpress(int keysym) {
 		if(locked)return;
-//		if(InputForwarder.getKeysym(' ',KeyEvent.VK_CONTROL)==Keysym.ControlL){
-//			if(controlHasBeenPressed){
-//				toggleMenu();
-//				controlHasBeenPressed =false;
-//				return;
-//			}
-//			else{
-//				controlHasBeenPressed = true;
-//			}
-//		}else{
-//			controlHasBeenPressed = false;
-//		}
-		
-		
+	
 		viewer.getBoucer().handleKey(keysym,true,detectWindow());
 	}
 	
