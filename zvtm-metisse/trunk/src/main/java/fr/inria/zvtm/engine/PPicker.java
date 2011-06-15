@@ -349,7 +349,9 @@ public class PPicker extends Picker{
 	/** Compute the list of glyphs currently picked. */
 	boolean computePickedGlyphList(ViewListener eh, Camera c, int x, int y){
 		boolean res=false;
-		Vector<Glyph> drawnGlyphs = c.getOwningSpace().getDrawnGlyphs(c.getIndex());
+		Vector<Glyph> drawnGlyphs= null;
+		if(!offScreenMode) drawnGlyphs= c.getOwningSpace().getDrawnGlyphs(c.getIndex());
+		else drawnGlyphs = c.getOwningSpace().getAllGlyphs();
 		try {
 			for (int i=0;i<drawnGlyphs.size();i++){
 				tmpGlyph = drawnGlyphs.elementAt(i);
