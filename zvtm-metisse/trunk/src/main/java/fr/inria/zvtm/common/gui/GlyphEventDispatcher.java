@@ -1,6 +1,7 @@
 package fr.inria.zvtm.common.gui;
 
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
@@ -13,6 +14,7 @@ import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.master.MasterMain;
 
 /**
  * This class must be added to a view as a ViewListener. It dispatches glyph events on the 
@@ -270,10 +272,15 @@ public class GlyphEventDispatcher implements ViewListener {
 	public int[] unproject(double vx,double vy){
 		int[] res = new int[2];
 		Camera c = virtualSpace.getCamera(0);
-		Dimension d = virtualSpace.getCamera(0).getOwningView().getPanelSize();
+		java.awt.geom.Point2D.Double d = null;
+		if(MasterMain.SMALLMODE){
+			Dimension q = virtualSpace.getCamera(0).getOwningView().getPanelSize();
+			d = new java.awt.geom.Point2D.Double(q.getWidth(),q.getHeight());
+		}
+		else d = new java.awt.geom.Point2D.Double(PCursor.wallBounds[2]-PCursor.wallBounds[0], PCursor.wallBounds[1]-PCursor.wallBounds[3]);
 		double coef = c.focal / (c.focal+c.altitude);
-		int cx = (int)Math.round((d.width/2)+(vx-c.vx)*coef);
-		int cy = (int)Math.round((d.height/2)-(vy-c.vy)*coef);
+		int cx = (int)Math.round((d.x/2)+(vx-c.vx)*coef);
+		int cy = (int)Math.round((d.y/2)-(vy-c.vy)*coef);
 		res[0] = cx;
 		res[1] = cy;
 		return res;

@@ -101,7 +101,6 @@ public class MasterMainEventHandler extends MainEventHandler{
 		owner.ged.mouseWheelMove(x,y,wheelDirection);
 		if(locked)return;
 		currentwindow = detectWindow();
-		System.out.println(currentwindow);
 		int[] p = unproject();
 		if(p!=null){
 			if(wheelDirection==1){//up
