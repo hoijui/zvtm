@@ -11,26 +11,27 @@ import fr.inria.zvtm.common.gui.Viewer;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VImage;
+import fr.inria.zvtm.master.MasterMain;
 
 public class MasterViewer extends Viewer{
-	
+
 	private CursorMultiplexer cursorMultiplexer;
 	private Bouncer bouncer;
 
 	public MasterViewer() {
 		init();
 		bouncer = new Bouncer();
-		
+
 		//centers the frame
 		GraphicsEnvironment e =GraphicsEnvironment.getLocalGraphicsEnvironment();
 		getView().getFrame().setLocation((int) (e.getCenterPoint().x-getView().getFrame().getWidth()*1./2), (int)(e.getCenterPoint().y-getView().getFrame().getHeight()*1./2));
-		
+
 		getMainEventListener().setViewer(this);
 		cursorMultiplexer = new CursorMultiplexer(this);
-		
+
 		ged = new GEDMultiplexer();
 		this.listenMultiplexer.addListerner(ged);
-		
+
 	}
 
 	@Override
@@ -62,15 +63,21 @@ public class MasterViewer extends Viewer{
 	public Bouncer getBoucer() {
 		return bouncer;
 	}
-	
+
 
 	public void sendViewUpgrade() {
-		PCursor.wallBounds = getView().getVisibleRegion(mCamera);
-		PCursor.wallBounds[0]*=8;
-		PCursor.wallBounds[2]*=8;
-		PCursor.wallBounds[1]*=4;
-		PCursor.wallBounds[3]*=4;
+		if(MasterMain.SMALLMODE){
+			PCursor.wallBounds = getView().getVisibleRegion(mCamera);			
+		}
+		else{
+			
+			PCursor.wallBounds[0]=-4*2760+cursorCamera.vx;
+			PCursor.wallBounds[2]=4*2760+cursorCamera.vx;
+			PCursor.wallBounds[1]=2*1840+cursorCamera.vy;
+			PCursor.wallBounds[3]=-2*1840+cursorCamera.vy;
+		}
+
 		bouncer.sendViewUpgrade(PCursor.wallBounds);
 	}
-	
+
 }
