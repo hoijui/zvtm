@@ -71,10 +71,10 @@ public class MasterViewer extends Viewer{
 		}
 		else{
 			double a = (mCamera.focal+mCamera.altitude)/mCamera.focal;
-			PCursor.wallBounds[0]=-a*4*2760+cursorCamera.vx;
-			PCursor.wallBounds[2]=a*4*2760+cursorCamera.vx;
-			PCursor.wallBounds[1]=a*2*1840+cursorCamera.vy;
-			PCursor.wallBounds[3]=-a*2*1840+cursorCamera.vy;
+			PCursor.wallBounds[0]=-a*(4*2760-100)+cursorCamera.vx;
+			PCursor.wallBounds[2]=a*(4*2760-100)+cursorCamera.vx;
+			PCursor.wallBounds[1]=a*(2*1840-120)+cursorCamera.vy;
+			PCursor.wallBounds[3]=-a*(2*1840-120)+cursorCamera.vy;
 		}
 
 		bouncer.sendViewUpgrade(PCursor.wallBounds);
