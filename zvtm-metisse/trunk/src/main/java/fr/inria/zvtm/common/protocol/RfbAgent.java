@@ -575,11 +575,13 @@ public class RfbAgent {
 //			}
 	//	System.out.println();
 		//	System.out.println(xx+" "+String.valueOf(xx)+" "+yy+" "+String.valueOf(yy));
+			double x = Float.intBitsToFloat(lx);
+			double y = Float.intBitsToFloat(ly);
 			for(RfbMessageHandler l : listeners){
 				if(l instanceof RfbInput){
 //					((RfbInput)l).handleDoublePointerEvent(Double.parseDouble(String.valueOf(xx)),Double.parseDouble(String.valueOf(yy)),buttons);
 
-					((RfbInput)l).handleDoublePointerEvent(lx,ly,buttons);
+					((RfbInput)l).handleDoublePointerEvent(x,y,buttons);
 				}
 			}
 			return true;
@@ -831,12 +833,13 @@ public class RfbAgent {
 		try{
 			writeUint8(Proto.rfbDoublePointerEvent);
 			writeUint32(buttonMask);//buttons
+	
 			
-			writeUint32((int) x);
+			writeUint32(Float.floatToIntBits((float) x));
 	//		writeUint32(sx.length());//length
 			flushUint();
 	//		writeString(sx.getBytes(), sx.length());
-			writeUint32((int) y);
+			writeUint32(Float.floatToIntBits((float) y));
 	//		writeUint32(sy.length());//length
 			flushUint();
 		//	writeString(sy.getBytes(), sy.length());
