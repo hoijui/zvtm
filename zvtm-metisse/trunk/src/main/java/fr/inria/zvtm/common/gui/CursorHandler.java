@@ -87,13 +87,13 @@ public class CursorHandler {
 			Point.Double p = viewer.getView().getPanel().viewToSpaceCoords(viewer.mCamera, this.jpx+(e.getLocationOnScreen().x-refPosX), this.jpy+(e.getLocationOnScreen().y-refPosY));
 			if((virtualMode&&(p.x>PCursor.wallBounds[0])&&(p.x<PCursor.wallBounds[2]) )||
 					(!virtualMode&&(this.jpx+e.getLocationOnScreen().x-refPosX)>=0 && (this.jpx+e.getLocationOnScreen().x-refPosX)<viewer.getView().getFrame().getWidth()))
-			
+
 				this.jpx += (e.getLocationOnScreen().x-refPosX);
-			
-			
+
+
 			if((virtualMode&&(p.y-pcursor.bounds[1]+PCursor.wallBounds[3]<PCursor.wallBounds[1])) ||
 					(!virtualMode&&(this.jpy+e.getLocationOnScreen().y-refPosY)<(viewer.getView().getFrame().getHeight()-27))){
-								
+
 				if((this.jpy+e.getLocationOnScreen().y-refPosY)<0){
 					virtualMode = true;
 					pcursor.enablePhantomMode();
@@ -109,7 +109,7 @@ public class CursorHandler {
 		}
 		Point.Double p = viewer.getView().getPanel().viewToSpaceCoords(viewer.mCamera, this.jpx, this.jpy);
 		vx = p.x;
-		vy = p.y;		
+		vy = p.y;
 		pcursor.moveCursorTo(vx, vy,this.jpx, this.jpy);
 
 		rbt.mouseMove(refPosX, refPosY);
@@ -171,7 +171,7 @@ public class CursorHandler {
 	public double getVY() {
 		return vy;
 	}
-	
+
 	public void jumpTo(double vx, double vy,int jpx,int jpy){
 		this.vx = vx;
 		this.vy = vy;

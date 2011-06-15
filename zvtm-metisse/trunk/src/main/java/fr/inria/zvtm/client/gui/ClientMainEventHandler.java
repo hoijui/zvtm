@@ -105,6 +105,10 @@ public class ClientMainEventHandler extends MainEventHandler {
 
 	public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
 		if(locked)return;
+
+		if(code==KeyEvent.VK_F12){
+			ch.resetCursorPos();
+		}
 		if(ch.VirtualMode()){
 			((ForwardingFrameManager)viewer.getFrameManager()).sendKeyEvent(InputForwarder.getKeysym(c,code),1);
 			return;
@@ -122,8 +126,7 @@ public class ClientMainEventHandler extends MainEventHandler {
 		}
 		if(code==move_mode_key)MOVE_MODE = true;
 		if(MOVE_MODE){
-			if (code==KeyEvent.VK_R){ch.resetCursorPos();}
-			else if (code==KeyEvent.VK_ALT)ch.deactivate();
+			if (code==KeyEvent.VK_ALT)ch.deactivate();
 		}
 		else{
 			infw.Kpress(e);
