@@ -595,14 +595,7 @@ public class RfbAgent {
 		double[] res =new double[4];
 		try{
 			for (int i = 0; i < 4; i++) {
-				int lx = readCard32();
-				byte[] sx = new byte[lx]; 
-				readString(sx, lx);
-				char[]xx = new char[lx];
-				for (int j = 0; j < xx.length; j++) {
-					xx[j]= (char)sx[j];
-				}
-				res[i] = Double.parseDouble(String.valueOf(xx));
+				res[i] = Float.intBitsToFloat(readCard32());
 			}
 			PCursor.wallBounds = res;
 			return true;
@@ -725,26 +718,19 @@ public class RfbAgent {
 	}
 
 	public void orderConfigureWall(double[] bounds) {
-		String e = Double.toString(bounds[0]);
-		String n = Double.toString(bounds[1]);
-		String w = Double.toString(bounds[2]);
-		String s = Double.toString(bounds[3]);
+		int e = Float.floatToIntBits((float) bounds[0]);
+		int n = Float.floatToIntBits((float) bounds[1]);
+		int w = Float.floatToIntBits((float) bounds[2]);
+		int s = Float.floatToIntBits((float) bounds[3]);
 
 		try{
 			writeUint8(Proto.rfbConfigureWall);
 
-			writeUint32(e.length());//east
+			writeUint32(e);//east
+			writeUint32(n);//north
+			writeUint32(w);//west
+			writeUint32(s);//south
 			flushUint();
-			writeString(e.getBytes(), e.length());
-			writeUint32(n.length());//north
-			flushUint();
-			writeString(n.getBytes(), n.length());
-			writeUint32(w.length());//west
-			flushUint();
-			writeString(w.getBytes(), w.length());
-			writeUint32(s.length());//south
-			flushUint();
-			writeString(s.getBytes(), s.length());
 
 		}catch(IOException ex){
 			ex.printStackTrace();

@@ -32,7 +32,6 @@ public class ResetItem extends Item {
 	@Override
 	public void release1(ViewPanel v, int mod, int jpxx, int jpyy, MouseEvent e) {
 		super.release1(v, mod, jpxx, jpyy, e);
-		if(parent.parentFrame==null)
 		drawUp();
 	}
 
