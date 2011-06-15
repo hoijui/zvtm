@@ -67,6 +67,7 @@ public class GlyphEventDispatcherForMenu extends GlyphEventDispatcher implements
 	
 	@Override
 	public void mouseMoved(double x, double y) {
+		System.out.println(x+" "+y);
 		super.mouseMoved(x, y);
 		menu.mouseMove(x,y);
 	}
