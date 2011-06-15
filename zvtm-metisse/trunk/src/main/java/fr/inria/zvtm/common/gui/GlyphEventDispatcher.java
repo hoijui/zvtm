@@ -1,15 +1,13 @@
 package fr.inria.zvtm.common.gui;
 
 import java.awt.Dimension;
-import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.util.HashMap;
-import java.util.Vector;
 
 import fr.inria.zvtm.engine.Camera;
-import fr.inria.zvtm.engine.Picker;
+import fr.inria.zvtm.engine.PPicker;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.VirtualSpace;
@@ -25,13 +23,13 @@ import fr.inria.zvtm.master.MasterMain;
  */
 public class GlyphEventDispatcher implements ViewListener {
 	protected HashMap<Glyph, GlyphListener> dispatchTable;
-	private Picker picker;
+	private PPicker picker;
 	private VirtualSpace virtualSpace;
 	private ViewPanel vp ;
 	private Glyph lastPicked;
 	private boolean alwaysRepick = true;
 
-	public GlyphEventDispatcher(Picker p,VirtualSpace vs) {
+	public GlyphEventDispatcher(PPicker p,VirtualSpace vs) {
 		dispatchTable = new HashMap<Glyph, GlyphListener>();
 		this.picker = p;
 		this.virtualSpace = vs;
@@ -46,41 +44,10 @@ public class GlyphEventDispatcher implements ViewListener {
 	}
 
 
-	//offscreen picking
-	private Glyph[] getDrawOrderedPickedGlyphList(VirtualSpace v){
-		Glyph[] tt = picker.getPickedGlyphList();
-		Glyph[] t  = new Glyph[tt.length]; 
-		int k=0;
-		Vector<Glyph> list = v.getAllGlyphs();//<<<<========== here is the difference with the Picker class method
-		for (int i = 0; i < list.size(); i++) {
-			if(contains(tt,list.get(i))&& !contains(t,list.get(i)))t[k++] = list.get(i);
-		}
-		return t;
-	}
-
-	private Glyph pickOnTop(VirtualSpace v){
-		Glyph[] list = getDrawOrderedPickedGlyphList(v);
-		if(list.length==0)return null;
-		return list[list.length-1];
-	}
-
-
-	private boolean contains(Glyph[] tab, Glyph g){		
-		for (int i = 0; i < tab.length; i++) {
-			if(tab[i]==g){
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	//offscreen picking
-
-
 	protected Glyph pick(){
 		if(alwaysRepick){	
 			picker.computePickedGlyphList(this, virtualSpace.getCamera(0));
-			Glyph pp = pickOnTop(virtualSpace);
+			Glyph pp = picker.pickOnTop(virtualSpace);
 			if(pp!=lastPicked){
 				if(lastPicked!=null)exitGlyph(lastPicked);
 				if(pp!=null)enterGlyph(pp);

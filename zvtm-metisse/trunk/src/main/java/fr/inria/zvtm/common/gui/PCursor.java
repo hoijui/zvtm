@@ -4,7 +4,7 @@ import java.awt.Color;
 import java.awt.Dimension;
 
 import fr.inria.zvtm.engine.Camera;
-import fr.inria.zvtm.engine.Picker;
+import fr.inria.zvtm.engine.PPicker;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.glyphs.SICircle;
@@ -21,8 +21,8 @@ public class PCursor {
 	private SICircle circle;
 	private double vx;
 	private double vy;
-	private Picker picker;
-	private Picker picker2;
+	private PPicker picker;
+	private PPicker picker2;
 	private Camera mCamera;
 	private Camera mCamera2;
 	private ViewListener viewListener;
@@ -74,8 +74,8 @@ public class PCursor {
 		phcursorY.setVisible(false);
 		circle.setVisible(false);
 
-		picker = new Picker();
-		picker2 = new Picker();
+		picker = new PPicker();
+		picker2 = new PPicker();
 		pickingSpace.registerPicker(picker);
 		menuSpace.registerPicker(picker2);
 		this.mCamera = locCam;
@@ -125,11 +125,11 @@ public class PCursor {
 		circle.moveTo(xx,yy);
 	}
 
-	public Picker getPicker() {
+	public PPicker getPicker() {
 		return picker;
 	}
 
-	public Picker getPicker2() {
+	public PPicker getPicker2() {
 		return picker2;
 	}
 
