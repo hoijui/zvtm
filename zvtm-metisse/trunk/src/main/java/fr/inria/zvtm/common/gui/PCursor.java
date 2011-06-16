@@ -96,7 +96,10 @@ public class PCursor {
 		movePhantom(x,y,jpx,jpy);
 		picker.setVSCoordinates(x, y);
 		picker.setJPanelCoordinates(jpx, jpy);
-		picker2.setVSCoordinates(x, y);
+		
+		Camera c = ownerSpace.getCamera(0);
+		double a = (c.focal+c.altitude)/c.focal;
+		picker2.setVSCoordinates((x-c.vx)/a, (y-c.vy)/a);
 		picker2.setJPanelCoordinates(jpx, jpy);
 		refreshPicker();
 	}

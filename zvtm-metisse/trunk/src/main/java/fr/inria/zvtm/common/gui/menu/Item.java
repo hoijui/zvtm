@@ -44,7 +44,12 @@ public abstract class Item implements GlyphListener{
 		this.parent = parent;
 		img = (new ImageIcon(imagePath));
 		img2 = (new ImageIcon(imagePath2));
-		shape = new VImage(img.getImage());
+		shape = new VImage(img.getImage()){
+			@Override
+			public boolean coordInside(int jpx, int jpy, int camIndex, double cvx,double cvy) {
+		 		return((cvx-vx)*(cvx-vx)<=vw*vw/4		&&      (cvy-vy)*(cvy-vy)<=vh*vh/4);
+			}
+		};
 		shape.scaleFactor = parent.factor;
 		shape.setDrawBorder(false);
 		shape.addCamera(0);
