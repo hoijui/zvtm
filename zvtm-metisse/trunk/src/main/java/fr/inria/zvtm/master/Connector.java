@@ -1,10 +1,14 @@
 package fr.inria.zvtm.master;
 
 import java.io.IOException;
+import java.net.Inet4Address;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import fr.inria.zvtm.common.kernel.RfbInput;
 import fr.inria.zvtm.common.protocol.Proto;
@@ -18,6 +22,7 @@ public class Connector {
 	private HashMap<Socket, RfbAgent> connections;
 	private ServerSocket server;
 	private ZvtmRfbHandlerMultiplexer rfbInputmultiplex;
+	private Timer monitor = new Timer();
 
 	public Connector(MasterCompositor compositor) {
 		this.compositor = compositor;
@@ -43,6 +48,7 @@ public class Connector {
 					try {
 						System.out.println("Server ready\nWaiting for incoming connection...");
 						Socket s = server.accept();
+						s.setKeepAlive(true);
 						connections.put(s, new RfbAgent(s.getInputStream(), s.getOutputStream()));
 						System.out.println("Connection accepted from "+s.getInetAddress()+":"+s.getPort());
 						startListening(s).start();
@@ -66,7 +72,6 @@ public class Connector {
 			public void run() {
 				sock = s;
 				rfbAgent = connections.get(sock);
-
 				try {
 					rfbAgent.rfbProtocalVersion();
 					rfbAgent.rfbAuthentification(); // receive, send & receive
@@ -76,6 +81,7 @@ public class Connector {
 					rfbAgent.rfbSetEncodings(); // sens
 					rfbAgent.rfbFramebufferUpdateRequest(true); // sens
 					rfbAgent.addListener(new RfbInput(sock,rfbInputmultiplex));//connect the compositor to the rfb socket
+					startMonitoring(rfbAgent);
 					rfbAgent.startSender();
 				} catch (IOException e1) {
 					e1.printStackTrace();
@@ -90,6 +96,26 @@ public class Connector {
 						end();
 					}
 				}
+			}
+
+			private void startMonitoring(final RfbAgent rfbAgent) {
+				TimerTask t = new TimerTask() {
+					RfbAgent rfb = rfbAgent;
+					@Override
+					public void run() {
+						rfb.ping();
+						try {
+							sleep(500);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+						if(!rfb.hasResponded()){
+							end();
+							this.cancel();
+						}
+					}
+				};
+				monitor.scheduleAtFixedRate(t, 2000, 2000);
 			}
 
 			public void end() {
@@ -178,6 +204,9 @@ public class Connector {
 					if (!ret){
 						return false;
 					}
+					return true;
+				case Proto.pong:
+					rfbAgent.ponged();
 					return true;
 
 				default:

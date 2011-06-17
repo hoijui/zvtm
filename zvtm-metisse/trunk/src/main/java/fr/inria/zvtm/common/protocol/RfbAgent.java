@@ -57,7 +57,6 @@ public class RfbAgent {
 						outstr.write(b);
 						outstr.flush();
 					} catch (IOException e) {
-						e.printStackTrace();
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
@@ -351,6 +350,7 @@ public class RfbAgent {
 	}
 
 	private  boolean verbose = false;
+
 
 
 	public  void handleConfigureWindow(int window, boolean isroot, int x, int y, int w, int h){
@@ -888,5 +888,31 @@ public class RfbAgent {
 		return false;
 	}
 
+	private boolean pinged = false;
+	
+	public void ping() {
+		try {
+			toSend.put(new RFBPing());
+			pinged = true;
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void pong() {
+		try {
+			toSend.put(new RFBPong());
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void ponged() {
+		pinged = false;
+	}
+	
+	public boolean hasResponded(){
+		return !pinged;
+	}
 
 }

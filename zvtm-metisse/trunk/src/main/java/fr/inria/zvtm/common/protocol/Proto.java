@@ -21,6 +21,7 @@ public class Proto {
 	public static final int   rfbServKeyEvent				= 8;
 	public static final int   rfbDoublePointerEvent         = 9;
 	public static final int   rfbConfigureWall              = 10;
+	public static final int   ping							= 11;
 
 	/* client -> server */
 	public static final int   rfbSetPixelFormat             = 0;
@@ -32,6 +33,8 @@ public class Proto {
 	public static final int   rfbClientCutText              = 6;
 	public static final int   rfbWindowUpdateRequest        = 7;
 	public static final int   rfbFacadesDescription         = 8;
+	public static final int   pong							= 12;
+
 
 
 

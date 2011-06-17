@@ -222,6 +222,18 @@ class ServKeyEvent extends RFBMessage{
 	}
 }
 
+class RFBPing extends RFBMessage{
+	public RFBPing(){
+		this.waiting_uint = new byte[1];
+		writeUint8(Proto.ping);
+	}
+}
 
+class RFBPong extends RFBMessage{
+	public RFBPong(){
+		this.waiting_uint = new byte[1];
+		writeUint8(Proto.pong);
+	}
+}
 
 

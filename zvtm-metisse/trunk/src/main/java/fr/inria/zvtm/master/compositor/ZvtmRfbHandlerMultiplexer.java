@@ -53,7 +53,14 @@ public class ZvtmRfbHandlerMultiplexer extends ZvtmRfbHandler {
 	}
 
 	public void remove(Socket sock) {
-		String client = sock.getInetAddress()+":"+sock.getPort();
+		String client = "";
+		for (String s : socks.keySet()) {
+			if(socks.get(s)==sock){
+				client = s;
+				break;
+			}
+		}
+		
 		((MasterViewer)fm.getViewer()).getCursorMultiplexer().unsubscribeClient(sock);
 		for (Integer win : translationTable.get(client).values()) {
 			fm.removeWindow(win);

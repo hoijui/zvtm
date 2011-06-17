@@ -89,6 +89,10 @@ public class RfbForwarder{
 					if(ret)
 						return true;
 					break;
+				
+				case Proto.ping:
+					rfbAgent.pong();
+					break;
 
 				default:
 					return false;
