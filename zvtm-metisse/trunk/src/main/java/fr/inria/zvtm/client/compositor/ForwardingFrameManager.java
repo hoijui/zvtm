@@ -1,7 +1,5 @@
 package fr.inria.zvtm.client.compositor;
 
-import java.awt.event.KeyEvent;
-
 import fr.inria.zvtm.client.gui.ClientViewer;
 import fr.inria.zvtm.common.compositor.FrameManager;
 import fr.inria.zvtm.common.compositor.MetisseWindow;

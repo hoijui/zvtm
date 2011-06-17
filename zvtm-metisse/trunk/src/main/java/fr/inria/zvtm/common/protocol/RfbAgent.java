@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.concurrent.LinkedBlockingQueue;
+
 import fr.inria.zvtm.common.compositor.RfbMessageHandler;
 import fr.inria.zvtm.common.gui.PCursor;
 import fr.inria.zvtm.common.kernel.RfbInput;
@@ -558,6 +559,7 @@ public class RfbAgent {
 				res[i] = Float.intBitsToFloat(readCard32());
 			}
 			PCursor.wallBounds = res;
+			
 			return true;
 		}catch(IOException e){
 			e.printStackTrace();

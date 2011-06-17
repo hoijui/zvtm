@@ -3,6 +3,7 @@ package fr.inria.zvtm.client;
 import fr.inria.zvtm.client.compositor.ClientCompositor;
 import fr.inria.zvtm.client.compositor.ForwardingFrameManager;
 import fr.inria.zvtm.client.gui.ClientViewer;
+import fr.inria.zvtm.common.gui.Viewer;
 
 public class ClientMain {
 	
@@ -43,5 +44,10 @@ public class ClientMain {
 	
 	protected static void diplayUse() {
 		System.out.println("Use: ClientMain [ZVTM server address] \nor   ClientMain [ZVTM server address] [X server address] [X server port]");
+	}
+
+
+	public static Viewer getViewer() {
+		return compositor.getViewer();
 	}
 }

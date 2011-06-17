@@ -200,21 +200,21 @@ public abstract class Item implements GlyphListener{
 	public void release1(ViewPanel v, int mod, int jpxx, int jpyy, MouseEvent e) {
 		parent.pressed = false;
 		parent.ged.setAlwaysRepick(true);
-		if(parent.viewer instanceof MasterViewer)((MasterViewer) parent.viewer).sendViewUpgrade();
+		if(parent.viewer instanceof MasterViewer && this instanceof ScaleItem && parent.parentFrame==null)((MasterViewer) parent.viewer).sendViewUpgrade();
 	}
 
 	@Override
 	public void release2(ViewPanel v, int mod, int jpxx, int jpyy, MouseEvent e) {
 		parent.pressed = false;
 		parent.ged.setAlwaysRepick(true);
-		if(parent.viewer instanceof MasterViewer)((MasterViewer) parent.viewer).sendViewUpgrade();
+		if(parent.viewer instanceof MasterViewer && this instanceof ScaleItem && parent.parentFrame==null)((MasterViewer) parent.viewer).sendViewUpgrade();
 	}
 
 	@Override
 	public void release3(ViewPanel v, int mod, int jpxx, int jpyy, MouseEvent e) {
 		parent.pressed = false;
 		parent.ged.setAlwaysRepick(true);
-		if(parent.viewer instanceof MasterViewer)((MasterViewer) parent.viewer).sendViewUpgrade();
+		if(parent.viewer instanceof MasterViewer && this instanceof ScaleItem && parent.parentFrame==null)((MasterViewer) parent.viewer).sendViewUpgrade();
 	}
 
 	public void setActive(boolean active) {

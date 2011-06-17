@@ -64,4 +64,8 @@ public class ClientViewer extends Viewer{
 		return infw;
 	}
 
+	public void handleResetCursor() {
+		if(getCursorHandler().VirtualMode())getCursorHandler().resetCursorPos();
+	}
+
 }

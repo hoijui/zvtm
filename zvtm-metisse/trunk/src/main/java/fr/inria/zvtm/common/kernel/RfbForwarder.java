@@ -7,6 +7,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 
 import fr.inria.zvtm.client.ClientMain;
+import fr.inria.zvtm.client.gui.ClientViewer;
 import fr.inria.zvtm.common.protocol.Proto;
 import fr.inria.zvtm.common.protocol.RfbAgent;
 
@@ -74,6 +75,7 @@ public class RfbForwarder{
 				switch(type){
 				case Proto.rfbConfigureWall:
 					ret = fwagent.handleConfigureWall();
+					((ClientViewer)ClientMain.getViewer()).handleResetCursor();
 					if(ret)
 						return true;
 					break ;
