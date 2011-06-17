@@ -72,6 +72,7 @@ public abstract class Viewer {
 		cameras.add(getMenuCamera());
 		cameras.add(cursorCamera);
 		mView = (EView)vsm.addFrameView(cameras, Messages.mViewName, View.STD_VIEW, VIEW_W, VIEW_H,false, false, true, null);
+		mView.getFrame().setFocusTraversalKeysEnabled(false);
 		mView.getCursor().setVisibility(false);
 		mView.mouse.setSensitivity(false);
 		mView.setVisible(true);	

@@ -105,7 +105,6 @@ public class ClientMainEventHandler extends MainEventHandler {
 
 	public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
 		if(locked)return;
-
 		if(code==KeyEvent.VK_F12){
 			ch.resetCursorPos();
 		}

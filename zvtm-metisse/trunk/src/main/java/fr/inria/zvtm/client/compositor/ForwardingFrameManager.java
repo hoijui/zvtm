@@ -1,9 +1,12 @@
 package fr.inria.zvtm.client.compositor;
 
+import java.awt.event.KeyEvent;
+
 import fr.inria.zvtm.client.gui.ClientViewer;
 import fr.inria.zvtm.common.compositor.FrameManager;
 import fr.inria.zvtm.common.compositor.MetisseWindow;
 import fr.inria.zvtm.common.kernel.RfbForwarder;
+import fr.inria.zvtm.common.protocol.Keysym;
 
 public class ForwardingFrameManager extends FrameManager {
 
@@ -90,6 +93,7 @@ public class ForwardingFrameManager extends FrameManager {
 
 
 	public void sendKeyEvent(int code, int i) {
+		if(i==Keysym.AltL)return;
 		rfbfw.sendKeyEvent(code,i);
 	}
 

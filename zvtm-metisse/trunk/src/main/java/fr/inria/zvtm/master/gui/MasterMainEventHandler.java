@@ -139,7 +139,17 @@ public class MasterMainEventHandler extends MainEventHandler{
 
 	public void Kpress(int keysym) {
 		if(locked)return;
-	
+		if(keysym==Keysym.ControlL){
+			if(controlHasBeenPressed){
+				toggleMenu();
+				controlHasBeenPressed =false;
+			}
+			else{
+				controlHasBeenPressed = true;
+			}
+		}else{
+			controlHasBeenPressed = false;
+		}
 		viewer.getBoucer().handleKey(keysym,true,detectWindow());
 	}
 	
@@ -170,11 +180,11 @@ public class MasterMainEventHandler extends MainEventHandler{
 	
 	
 	public void toggleMenu(){
-		owner.getMenu().toggle(owner.getCursor().getVSXCoordinate(), owner.getCursor().getVSYCoordinate(), viewer.getFrameManager().get(detectWindow()),PopMenu.DEFAULTACTIVERADIUS);
+		owner.getMenu().toggle(owner.getCursor().getVSXCoordinate(), owner.getCursor().getVSYCoordinate(), viewer.getFrameManager().get(currentwindow),PopMenu.DEFAULTACTIVERADIUS);
 	}
 
 	public void invokeMenu(){
-		owner.getMenu().invoke(owner.getCursor().getVSXCoordinate(), owner.getCursor().getVSYCoordinate(), viewer.getFrameManager().get(detectWindow()),PopMenu.DEFAULTACTIVERADIUS);
+		owner.getMenu().invoke(owner.getCursor().getVSXCoordinate(), owner.getCursor().getVSYCoordinate(), viewer.getFrameManager().get(currentwindow),PopMenu.DEFAULTACTIVERADIUS);
 	}
 
 	public void banishMenu(){

@@ -1,8 +1,6 @@
 package fr.inria.zvtm.master;
 
 import java.io.IOException;
-import java.net.Inet4Address;
-import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Collection;
@@ -119,7 +117,6 @@ public class Connector {
 			}
 
 			public void end() {
-
 				if (sock!=null) try {
 					rfbInputmultiplex.remove(sock);
 					sock.close();
