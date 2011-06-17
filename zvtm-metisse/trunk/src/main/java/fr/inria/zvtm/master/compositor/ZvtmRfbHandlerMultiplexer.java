@@ -7,9 +7,9 @@ import java.util.Random;
 
 import fr.inria.zvtm.common.compositor.FrameManager;
 import fr.inria.zvtm.common.compositor.ZvtmRfbHandler;
-import fr.inria.zvtm.common.kernel.Connector;
 import fr.inria.zvtm.common.kernel.Pair;
 import fr.inria.zvtm.common.protocol.RfbAgent;
+import fr.inria.zvtm.master.Connector;
 import fr.inria.zvtm.master.gui.MasterViewer;
 
 public class ZvtmRfbHandlerMultiplexer extends ZvtmRfbHandler {

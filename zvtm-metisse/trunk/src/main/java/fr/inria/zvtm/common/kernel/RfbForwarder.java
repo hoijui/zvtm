@@ -37,6 +37,8 @@ public class RfbForwarder{
 			rfbAgent.servrfbServerInit(); // send
 			rfbAgent.servrfbSetPixelFormat(); // receive
 			rfbAgent.servrfbSetEncodings(); // send
+			
+			rfbAgent.startSender();
 		} catch (Exception e) {
 			System.err.println("Connexion to the frontal server failed, system will run on local...");
 			dead = true;

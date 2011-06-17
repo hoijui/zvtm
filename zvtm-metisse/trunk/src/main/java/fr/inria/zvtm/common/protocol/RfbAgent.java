@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.LinkedList;
-
+import java.util.concurrent.LinkedBlockingQueue;
 import fr.inria.zvtm.common.compositor.RfbMessageHandler;
 import fr.inria.zvtm.common.gui.PCursor;
 import fr.inria.zvtm.common.kernel.RfbInput;
@@ -21,10 +21,12 @@ public class RfbAgent {
 	private LinkedList<RfbMessageHandler> listeners;
 	private int height;
 	private int width;
+	private LinkedBlockingQueue<RFBMessage> toSend;
 
 	public RfbAgent(InputStream in, OutputStream out) {
 		this.setIn(in);
 		this.out = out;
+		toSend = new LinkedBlockingQueue<RFBMessage>();
 		password = "insitu";
 		listeners = new LinkedList<RfbMessageHandler>();
 	}
@@ -37,6 +39,26 @@ public class RfbAgent {
 		listeners.add(a);
 	}
 
+	public void startSender(){
+		Thread t = new Thread(){
+			OutputStream outstr = out;
+			@Override
+			public void run() {
+				while(true){
+					try {
+						byte[] b = toSend.take().getBytes();
+						outstr.write(b);
+						outstr.flush();
+					} catch (IOException e) {
+						e.printStackTrace();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			};
+		};
+		t.start();
+	}
 
 	public void rfbProtocalVersion() throws IOException{
 		byte[] pv = new byte[16]; // "METISSE 000.000\n"
@@ -63,9 +85,6 @@ public class RfbAgent {
 		int major = (pv[ 8]-'0') * 100 + (pv[ 9]-'0') * 10 + (pv[10]-'0');
 		int minor = (pv[12]-'0') * 100 + (pv[13]-'0') * 10 + (pv[14]-'0');
 
-		//	  Debug.debug("Metisse server supports protocol version " + major + "." + minor +
-		//	        " (viewer " + Proto.rfbProtocolMajorVersion + "." + Proto.rfbProtocolMinorVersion + ")");
-
 		major = Proto.rfbProtocolMajorVersion ;
 		minor = Proto.rfbProtocolMinorVersion ;
 		pv[0] = 'M';
@@ -84,7 +103,8 @@ public class RfbAgent {
 		pv[13] = (byte)(((minor/10)%10) + '0'); 
 		pv[14] = (byte)(((minor)%10) + '0');
 		pv[15] = '\n';
-		out.write(pv,0,16);
+	
+	 	out.write(pv,0,16);
 	}
 
 
@@ -100,10 +120,8 @@ public class RfbAgent {
 			byte reason[] = new byte[reasonLen];
 			readString(reason, reasonLen);
 			throw new RuntimeException("Metisse connection failed (" + new String(reason) + ")");
-			//break;
-
+			
 		case Proto.rfbNoAuth:
-			//  Debug.debug("No authentication needed");
 			break;
 
 		case Proto.rfbMetisseAuth:
@@ -117,7 +135,7 @@ public class RfbAgent {
 			}
 
 			out.write(challenge, 0, 16);
-
+			out.flush();
 			int authResult = readCard32();
 
 			switch (authResult){
@@ -143,6 +161,7 @@ public class RfbAgent {
 		byte shared[] = new byte[1];
 		shared[0] = 1;
 		out.write(shared, 0, 1);
+		out.flush();
 	}
 
 
@@ -164,9 +183,6 @@ public class RfbAgent {
 		int namelen = readCard32();
 		byte[] name = new byte[namelen];
 		readString(name, namelen);
-
-
-		//	  Debug.debug("Desktop name \"" + new String(name) + "\" (" + width + "x" + height + ")");
 	}
 
 
@@ -203,23 +219,18 @@ public class RfbAgent {
 
 
 	public void rfbFramebufferUpdateRequest(int x, int y, int w, int h, boolean incremental) throws IOException {
-		writeUint8(Proto.rfbFramebufferUpdateRequest);
-		writeUint8(incremental ? 1 : 0);
-		writeUint16(x);
-		writeUint16(y);
-		writeUint16(w);
-		writeUint16(h);
-		flushUint();
+	try {
+		toSend.put(new FBURequest(x, y, w, h, incremental));
+	} catch (InterruptedException e) {
+		e.printStackTrace();
+	}
 	}
 
 
 	public void rfbKeyEvent(int keysym, boolean down) {
-		try{
-			writeUint8(Proto.rfbKeyEvent);
-			writeUint8(down ? 1 : 0);
-			writeUint32(keysym);
-			flushUint();
-		}catch(IOException e){
+		try {
+			toSend.put(new KeyEvent(keysym, down));
+		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 	}
@@ -227,20 +238,11 @@ public class RfbAgent {
 
 
 	public void rfbPointerEvent(int window, int x, int y, int buttons) {
-		try{
-			writeUint8(Proto.rfbPointerEvent);
-			writeUint32(buttons);
-			if(x<0)writeUint8(0);
-			else writeUint8(1); /* 0: negative, 1: positive */
-			writeUint16(x);
-			if(y<0)writeUint8(0);
-			else writeUint8(1); /* 0: negative, 1: positive */
-			writeUint16(y);
-			writeUint32(window);
-			flushUint();
-		}catch(IOException e){
-			e.printStackTrace();
-		}
+	try {
+		toSend.put(new PointerEvent(window, x, y, buttons));
+	} catch (InterruptedException e) {
+		e.printStackTrace();
+	}
 	}
 
 
@@ -294,7 +296,7 @@ public class RfbAgent {
 
 
 	private  byte waiting_uint[] = new byte[1024];
-	private  int waiting_uint_size = 0; // TODO make sure waiting_uint_size < 1024
+	private  int waiting_uint_size = 0; 
 
 
 	private  void writeUint32(int v) {
@@ -322,6 +324,7 @@ public class RfbAgent {
 	private void flushUint() throws IOException{
 		out.write(waiting_uint, 0, waiting_uint_size);
 		waiting_uint_size = 0;
+		out.flush();
 	}
 
 
@@ -454,8 +457,6 @@ public class RfbAgent {
 
 					readString(buf, bd * 2);
 				}
-				//desktop.handleXCursor(x, y, w, h, buf, foreRed, foreGreen, foreBlue, backRed, backGreen, backBlue);
-				//   Debug.warning("[rfbFramebufferUpdate]: HandleXCursor ignored...");
 				continue;
 			}
 
@@ -478,8 +479,6 @@ public class RfbAgent {
 						buf[j*4+3] = readCard16(); // h
 					}
 				}
-				//desktop.handleWindowShape(win, buf, nrects);
-				//  Debug.warning("[rfbFramebufferUpdate]: HandleWindowShape ignored...");
 				continue;
 			}
 
@@ -492,21 +491,6 @@ public class RfbAgent {
 
 			switch(encoding){
 			case Proto.rfbEncodingARGBCursor:
-				//   Debug.warning("[rfbFramebufferUpdate]: rfbEncodingARGBCursor ignored...");
-				/*#ifdef HAVE_XCURSOR
-		         char *buf = NULL;
-		     unsigned int bufSize = rect.r.w * rect.r.h * 4;
-
-		     if (bufSize){
-		      buf = (char *)malloc(bufSize);
-
-		      RECEIVE((char *)buf, bufSize);
-		     }
-		     desktop->HandleARGBCursor(
-		         (CARD32)rect.r.x, (CARD32)rect.r.y,
-		         (CARD32)rect.r.w, (CARD32)rect.r.h,
-		         (XcursorPixel *)buf);
-		     #else // HAVE_XCURSOR */
 				int buffer_size = w * h * 4;
 				byte buffer[] = new byte[buffer_size];
 				readString(buffer, buffer_size);
@@ -520,8 +504,6 @@ public class RfbAgent {
 				break;
 
 			case Proto.rfbEncodingCoRRE:
-				//    Debug.warning("Encoding rfbEncodingCoRRE ignored...");
-
 				int nSubrects = readCard32();
 				byte pixel[] = new byte[4];
 				readString(pixel, 4);
@@ -532,12 +514,9 @@ public class RfbAgent {
 					int rw = readCard8();
 					int rh = readCard8();
 				}
-
-				//handleImageFramebufferUpdate(win, isRoot, tmpImg, x, y, w, h);
 				break;
 
 			default:
-				//    Debug.warning("Unknown rect encoding: " + encoding);
 				return false;
 			}
 		}
@@ -550,37 +529,11 @@ public class RfbAgent {
 		try{
 			int buttons = readCard32();//buttons
 			int lx = readCard32();//length of x
-		//	byte[] sx = new byte[lx]; 
-		//	readString(sx, lx);
 			int ly = readCard32();//length of y
-		//	byte[] sy = new byte[ly]; 
-		//	readString(sy, ly);
-
-//			char[]xx = new char[lx];
-//			char[]yy = new char[ly];
-//			for (int i = 0; i < xx.length; i++) {
-//				xx[i]= (char)sx[i];
-//			}
-//			for (int i = 0; i < yy.length; i++) {
-//				yy[i]= (char)sy[i];
-//			}
-//			System.out.print(lx+" ");
-//			for (int i = 0; i < lx; i++) {
-//				System.out.print(":"+sx[i]);
-//			}
-//			
-//			System.out.print("   ||||||||   "+ly+" ");
-//			for (int i = 0; i < Math.min(ly,10); i++) {
-//				System.out.print(":"+sy[i]);
-//			}
-	//	System.out.println();
-		//	System.out.println(xx+" "+String.valueOf(xx)+" "+yy+" "+String.valueOf(yy));
 			double x = Float.intBitsToFloat(lx);
 			double y = Float.intBitsToFloat(ly);
 			for(RfbMessageHandler l : listeners){
 				if(l instanceof RfbInput){
-//					((RfbInput)l).handleDoublePointerEvent(Double.parseDouble(String.valueOf(xx)),Double.parseDouble(String.valueOf(yy)),buttons);
-
 					((RfbInput)l).handleDoublePointerEvent(x,y,buttons);
 				}
 			}
@@ -638,7 +591,6 @@ public class RfbAgent {
 		int length = readCard32(); // length;
 		byte str[] = new byte[length];
 		readString(str, length);
-//		handleServerCutText(new String(str));
 		return false;
 	}
 
@@ -652,7 +604,6 @@ public class RfbAgent {
 		int width = readCard32(); // width
 		int height = readCard32(); // height
 		int isroot = readCard16(); // root window : 1, not root window : 0 
-		//		System.out.println("<----------------win:"+window+" x:"+x+" y:"+y);
 		handleConfigureWindow(window, isroot != 0, x, y, width, height);
 		rfbFramebufferUpdateRequest(true);
 		return true;
@@ -686,10 +637,7 @@ public class RfbAgent {
 		rfbFramebufferUpdateRequest(true);
 		return true;  
 	}
-
-
-
-
+	
 	/*****************************************************************************
 	 * Functions for sending to a client
 	 ****************************************************************************/
@@ -698,101 +646,41 @@ public class RfbAgent {
 
 
 	public void orderConfigure(int window, boolean isroot, int x, int y, int w, int h) {
-		writeUint8(Proto.rfbConfigureWindow);
-		writeUint32(window);
-		if(x<0)writeUint16(0);
-		else writeUint16(1);
-		writeUint16(Math.abs(x));
-		if(y<0)writeUint16(0);
-		else writeUint16(1);
-		writeUint16(Math.abs(y));
-		writeUint32(w);
-		writeUint32(h);
-		if(isroot)writeUint16(1);
-		else writeUint16(0);
 		try {
-			flushUint();
-		} catch (IOException e) {
+			toSend.put(new ConfigureMsg(window, isroot, x, y, w, h));
+		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 	}
 
 	public void orderConfigureWall(double[] bounds) {
-		int e = Float.floatToIntBits((float) bounds[0]);
-		int n = Float.floatToIntBits((float) bounds[1]);
-		int w = Float.floatToIntBits((float) bounds[2]);
-		int s = Float.floatToIntBits((float) bounds[3]);
-
-		try{
-			writeUint8(Proto.rfbConfigureWall);
-
-			writeUint32(e);//east
-			writeUint32(n);//north
-			writeUint32(w);//west
-			writeUint32(s);//south
-			flushUint();
-
-		}catch(IOException ex){
-			ex.printStackTrace();
+		try {
+			toSend.put(new ConfigureWallMsg(bounds));
+		} catch (InterruptedException e) {
+			e.printStackTrace();
 		}
-
 	}
 
 	public void orderFrameBufferUpdate(int window, boolean isroot, byte[] img,int x, int y, int w, int h,int encoding) {
-		writeUint8(Proto.rfbFramebufferUpdate);
-		writeUint16(1);
-		writeUint32(window);
-		if(isroot)writeUint32(0);
-		else writeUint32(1);
-		writeUint32(0);//shmid
-		writeUint16(x);
-		writeUint16(y);
-		writeUint16(w);
-		writeUint16(h);
-		writeUint32(encoding);
 		try {
-			flushUint();
-		} catch (IOException e) {
+			toSend.put(new FBUMsg(window, isroot, img, x, y, w, h, encoding));
+		} catch (InterruptedException e) {
 			e.printStackTrace();
-		}
-		switch(encoding){
-		case Proto.rfbEncodingPointerPos:
-			break;
-		case Proto.rfbEncodingRaw:
-			try {
-				writeString(img,4*w*h);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			break;
-		default:
-			break;
 		}
 	}
 
 	public void orderRestackWindow(int window, int nextWindow,int transientFor, int unmanagedFor, int grabWindow,int duplicateFor, int facadeReal, int flags) {
-		writeUint8(Proto.rfbRestackWindow);
-		writeUint32(window);
-		writeUint32(nextWindow);
-		writeUint32(transientFor);
-		writeUint32(unmanagedFor);
-		writeUint32(grabWindow);
-		writeUint32(duplicateFor);
-		writeUint32(facadeReal);
-		writeUint32(flags);
 		try {
-			flushUint();
-		} catch (IOException e) {
+			toSend.put(new RestackMsg(window, nextWindow, transientFor, unmanagedFor, grabWindow, duplicateFor, facadeReal, flags));
+		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 	}
 
 	public void orderUnmapWindow(int window) {
-		writeUint8(Proto.rfbUnmapWindow);
-		writeUint32(window);
 		try {
-			flushUint();
-		} catch (IOException e) {
+			toSend.put(new UnmapMsg(window));
+		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 	}
@@ -801,47 +689,27 @@ public class RfbAgent {
 		orderConfigure(id,root,x, y, w, h);
 	}
 
-	public void orderRemoveWindow(int id) {
-		writeUint8(Proto.rfbDestroyWindow);
-		writeUint32(id);
+	public void orderRemoveWindow(int window) {
 		try {
-			flushUint();
-		} catch (IOException e) {
+			toSend.put(new RemoveMsg(window));
+		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 	}
 
 
 	public void orderPointerEvent(double x, double y, int buttonMask) {
-//		String sx = Double.toString(x);
-//		String sy = Double.toString(y);
-
-		try{
-			writeUint8(Proto.rfbDoublePointerEvent);
-			writeUint32(buttonMask);//buttons
-	
-			
-			writeUint32(Float.floatToIntBits((float) x));
-	//		writeUint32(sx.length());//length
-			flushUint();
-	//		writeString(sx.getBytes(), sx.length());
-			writeUint32(Float.floatToIntBits((float) y));
-	//		writeUint32(sy.length());//length
-			flushUint();
-		//	writeString(sy.getBytes(), sy.length());
-			
-		}catch(IOException e){
+		try {
+			toSend.put(new DoublePointerEventMsg(x, y, buttonMask));
+		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 	}
 
 	public void orderKeyEvent(int keysym, boolean down) {
-		try{
-			writeUint8(Proto.rfbServKeyEvent);
-			writeUint8(down ? 1 : 0);
-			writeUint32(keysym);
-			flushUint();
-		}catch(IOException e){
+		try {
+			toSend.put(new ServKeyEvent(keysym, down));
+		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 	}
@@ -939,7 +807,6 @@ public class RfbAgent {
 		writeString(name, namelen);
 	}
 
-
 	public void servrfbSetPixelFormat() throws IOException{
 		readCard8();// msg type
 		readCard8(); // bitsPerPixel
@@ -981,19 +848,16 @@ public class RfbAgent {
 		rfbConfigureWall();
 		return false;
 	}
-
-
+	
 	public boolean fwKeyEvent() {
 
 		try {
 			int down = readCard8();//down
 			int keysym = readCard32();
-
-			writeUint8(Proto.rfbKeyEvent);
-			writeUint8((down==1) ? 1 : 0);
-			writeUint32(keysym);
-			flushUint();
+			toSend.put(new KeyEvent(keysym, 1==down));
 		}catch(IOException e){
+			e.printStackTrace();
+		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 		return false;
@@ -1007,15 +871,11 @@ public class RfbAgent {
 			int ys = readCard8();
 			int y = readCard16();
 			int window = readCard32();
-			writeUint8(Proto.rfbPointerEvent);
-			writeUint32(buttons);
-			writeUint8(xs); /* 0: negative, 1: positive */
-			writeUint16(x);
-			writeUint8(ys); /* 0: negative, 1: positive */
-			writeUint16(y);
-			writeUint32(window);
-			flushUint();
+			toSend.put(new PointerEvent(window,(xs==1?1:-1)*x, (ys==1?1:-1)*y, buttons));
+			
 		}catch(IOException e){
+			e.printStackTrace();
+		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 		return false;

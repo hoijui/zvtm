@@ -1,6 +1,5 @@
 package fr.inria.zvtm.master;
 
-import fr.inria.zvtm.common.kernel.Connector;
 import fr.inria.zvtm.master.compositor.MasterCompositor;
 import fr.inria.zvtm.master.gui.MasterViewer;
 

@@ -69,8 +69,10 @@ public class RFBConnection {
 			rfbAgent.rfbSetPixelFormat(); // send
 			rfbAgent.rfbSetEncodings(); // sens
 			rfbAgent.rfbFramebufferUpdateRequest(true); // sens
-			rfbAgent.addListener(rfbInput);//connect the compositor to the rfb socket
+			rfbAgent.addListener(rfbInput);//connect the compositor to the rfb socket			
+			rfbAgent.startSender();
 		} catch (Exception e) {
+			System.out.println(e.getMessage());
 			System.err.println("Connexion to the metisse server failed, system will exit...");
 			System.exit(1);
 		} 

@@ -1,4 +1,4 @@
-package fr.inria.zvtm.common.kernel;
+package fr.inria.zvtm.master;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -6,6 +6,7 @@ import java.net.Socket;
 import java.util.Collection;
 import java.util.HashMap;
 
+import fr.inria.zvtm.common.kernel.RfbInput;
 import fr.inria.zvtm.common.protocol.Proto;
 import fr.inria.zvtm.common.protocol.RfbAgent;
 import fr.inria.zvtm.master.compositor.MasterCompositor;
@@ -75,6 +76,7 @@ public class Connector {
 					rfbAgent.rfbSetEncodings(); // sens
 					rfbAgent.rfbFramebufferUpdateRequest(true); // sens
 					rfbAgent.addListener(new RfbInput(sock,rfbInputmultiplex));//connect the compositor to the rfb socket
+					rfbAgent.startSender();
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				} 
