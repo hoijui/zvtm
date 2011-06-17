@@ -144,29 +144,24 @@ class ConfigureWallMsg extends RFBMessage{
 class FBUMsg extends RFBMessage{
 	public FBUMsg(int window, boolean isroot, byte[] img,int x, int y, int w, int h,int encoding){
 		switch(encoding){
-		case Proto.rfbEncodingPointerPos:
-			this.waiting_uint = new byte[27];
-			break;
 		case Proto.rfbEncodingRaw:
-			this.waiting_uint = new byte[img.length*4+27];		
+			this.waiting_uint = new byte[img.length+27];		
 			break;
 		default:
 			break;
 		}
 		writeUint8(Proto.rfbFramebufferUpdate);
-		writeUint16(1);
+		writeUint16(1);//nrects
 		writeUint32(window);
-		if(isroot)writeUint32(0);
-		else writeUint32(1);
+		writeUint32(isroot?0:1);
 		writeUint32(0);//shmid
 		writeUint16(x);
 		writeUint16(y);
 		writeUint16(w);
 		writeUint16(h);
 		writeUint32(encoding);
+		
 		switch(encoding){
-		case Proto.rfbEncodingPointerPos:
-			break;
 		case Proto.rfbEncodingRaw:
 			writeString(img);
 			break;

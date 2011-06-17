@@ -31,6 +31,13 @@ public class RfbAgent {
 		listeners = new LinkedList<RfbMessageHandler>();
 	}
 
+	public RfbAgent(InputStream input, LinkedBlockingQueue<RFBMessage> out) {
+		in  = input;
+		toSend = out;
+		password = "insitu";
+		listeners = new LinkedList<RfbMessageHandler>();
+	}
+
 	/*****************************************************************************
 	 * Functions for sending messages to the server (display => server)
 	 ****************************************************************************/
@@ -839,8 +846,8 @@ public class RfbAgent {
 		return in;
 	}
 
-	public OutputStream getOut() {
-		return out;
+	public LinkedBlockingQueue<RFBMessage> getOut() {
+		return toSend;
 	}
 
 
