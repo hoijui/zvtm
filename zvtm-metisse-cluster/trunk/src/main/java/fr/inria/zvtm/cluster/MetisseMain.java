@@ -1,10 +1,9 @@
 package fr.inria.zvtm.cluster;
 
-import fr.inria.zvtm.common.kernel.Connector;
+import fr.inria.zvtm.master.Connector;
 import fr.inria.zvtm.master.MasterMain;
 import fr.inria.zvtm.master.compositor.MasterCompositor;
 import fr.inria.zvtm.master.gui.MasterViewer;
-
 
 
 
