@@ -28,7 +28,7 @@ public class InputForwarder {
 	public void setRfbAgent(RfbAgent a){
 		this.rfbAgent = a;
 	}
-	
+
 	public void Kpress(KeyEvent e) {
 		rfbAgent.rfbKeyEvent(getKeysym(e), true);
 
@@ -87,28 +87,27 @@ public class InputForwarder {
 		int[] p = unproject(v, jpx, jpy);
 		if(p == null)return;
 		rfbAgent.rfbPointerEvent(p[2],p[0],p[1], buttonState);
-		//	viewer.dragging = false;
 	}
 
 
 	public void wheel(int mod, ViewPanel v, int jpx, int jpy,MouseWheelEvent e) {
-		
+
 		int[] p = unproject(v, jpx, jpy);
 		if(p == null)return;
-		
+
 		int i = e.getWheelRotation();
-		 if(i<0){
-			 buttonState[3] =1;
-			 rfbAgent.rfbPointerEvent(p[2],p[0],p[1], buttonState);
-			 buttonState[3] =0;
-			 rfbAgent.rfbPointerEvent(p[2],p[0],p[1], buttonState);
-		 }
-		 else{
-			 buttonState[4] =1;
-			 rfbAgent.rfbPointerEvent(p[2],p[0],p[1], buttonState);
-			 buttonState[4] =0;
-			 rfbAgent.rfbPointerEvent(p[2],p[0],p[1], buttonState);
-		 }
+		if(i<0){
+			buttonState[3] =1;
+			rfbAgent.rfbPointerEvent(p[2],p[0],p[1], buttonState);
+			buttonState[3] =0;
+			rfbAgent.rfbPointerEvent(p[2],p[0],p[1], buttonState);
+		}
+		else{
+			buttonState[4] =1;
+			rfbAgent.rfbPointerEvent(p[2],p[0],p[1], buttonState);
+			buttonState[4] =0;
+			rfbAgent.rfbPointerEvent(p[2],p[0],p[1], buttonState);
+		}
 	}
 
 	public int[] unproject(ViewPanel v, double jpx,double jpy){
@@ -156,9 +155,9 @@ public class InputForwarder {
 	private int getKeysym(KeyEvent e){
 		return getKeysym(e.getKeyChar(), e.getKeyCode());
 	}
-	
-	
-	
+
+
+
 	public static int getKeysym(char c, int code) {
 		switch (code) {
 		case KeyEvent.VK_LEFT:

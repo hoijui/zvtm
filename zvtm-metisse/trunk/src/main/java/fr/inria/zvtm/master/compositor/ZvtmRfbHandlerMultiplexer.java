@@ -62,10 +62,13 @@ public class ZvtmRfbHandlerMultiplexer extends ZvtmRfbHandler {
 		}
 		
 		((MasterViewer)fm.getViewer()).getCursorMultiplexer().unsubscribeClient(sock);
-		for (Integer win : translationTable.get(client).values()) {
-			fm.removeWindow(win);
+		try {
+			for (Integer win : translationTable.get(client).values()) {
+				fm.removeWindow(win);
+			}
+			socks.remove(client);			
+		} catch (Exception e) {
 		}
-		socks.remove(client);
 	}
 
 	public FrameManager getFrameManager() {

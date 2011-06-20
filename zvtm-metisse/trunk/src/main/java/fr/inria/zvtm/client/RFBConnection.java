@@ -89,7 +89,7 @@ public class RFBConnection {
 		}
 	}
 
-	protected boolean receive() throws IOException {
+	protected boolean receive() throws IOException, InterruptedException {
 		if(sock == null)
 			return false;
 

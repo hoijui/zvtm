@@ -109,8 +109,8 @@ public class MetisseWindow extends VImage{
 		|  ( ( r << 16 ) & 0x00ff0000 ) 
 		|  ( ( g<< 8  ) & 0x0000ff00 ) 
 		|  (   b        & 0x000000ff );
-	}
 	
+	}
 	private byte[] RGBToByte(int col) {
 	
 		byte[] res = new byte[4];

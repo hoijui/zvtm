@@ -82,15 +82,17 @@ public class Connector {
 					startMonitoring(rfbAgent);
 					rfbAgent.startSender();
 				} catch (IOException e1) {
-					e1.printStackTrace();
-				} 
+					System.err.println("Connection "+sock.getInetAddress()+":"+sock.getPort()+" closing...");
+					end();
+					return;
+				}
 
 				while(true){
 					if(sock.isClosed())return;
 					try {
 						receive();
 					} catch (IOException e) {
-						System.out.println("connection "+sock.getInetAddress()+":"+sock.getPort()+" closed.");
+						System.err.println("connection "+sock.getInetAddress()+":"+sock.getPort()+" closed.");
 						end();
 					}
 				}
@@ -125,7 +127,7 @@ public class Connector {
 				}
 			}
 
-			protected boolean receive() throws IOException {
+			protected boolean receive() throws IOException{
 				if(sock == null)
 					return false;
 

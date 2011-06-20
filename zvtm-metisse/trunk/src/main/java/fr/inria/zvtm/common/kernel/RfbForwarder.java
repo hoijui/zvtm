@@ -54,17 +54,19 @@ public class RfbForwarder{
 			@Override
 			public void run() {
 				fwagent  = new RfbAgent(input, ClientMain.connection.getRfbAgent().getOut());
-				while(true){
+				boolean flag = true;
+				while(flag){
 					try {
 						receive();
 					} catch (IOException e) {
 						System.out.println("connection "+sock.getInetAddress()+":"+sock.getPort()+" closed.");
+						flag = false;
 					}
 				}
 			}
 
 
-			protected boolean receive() throws IOException {
+			protected boolean receive() throws IOException{
 				if(sock == null)
 					return false;
 
@@ -105,43 +107,43 @@ public class RfbForwarder{
 		listen.start();
 	}
 
-	public void configure(int window,boolean isroot, int x, int y, int w, int h) {
+	public void configure(int window,boolean isroot, int x, int y, int w, int h){
 		if(dead)return;
 		rfbAgent.orderConfigure(window,isroot,x,y,w,h);
 	}
 
-	public void frameBufferUpdate(int window, boolean isroot, byte[] img,int x, int y, int w, int h) {
+	public void frameBufferUpdate(int window, boolean isroot, byte[] img,int x, int y, int w, int h){
 		if(dead)return;
 		rfbAgent.orderFrameBufferUpdate(window,isroot,img,x,y,w,h,Proto.rfbEncodingRaw);
 	}
 
-	public void restackWindow(int window, int nextWindow, int transientFor,int unmanagedFor, int grabWindow, int duplicateFor, int facadeReal,int flags) {
+	public void restackWindow(int window, int nextWindow, int transientFor,int unmanagedFor, int grabWindow, int duplicateFor, int facadeReal,int flags){
 		if(dead)return;
 		rfbAgent.orderRestackWindow(window,nextWindow,transientFor,unmanagedFor,grabWindow,duplicateFor,facadeReal,flags);
 	}
 
-	public void UnmapWindow(int window) {
+	public void UnmapWindow(int window){
 		if(dead)return;
 		rfbAgent.orderUnmapWindow(window);
 	}
 
-	public void addWindow(int id, boolean root, int x, int y, int w, int h) {
+	public void addWindow(int id, boolean root, int x, int y, int w, int h){
 		if(dead)return;
 		rfbAgent.orderAddWindow(id,root,x,y,w,h);
 	}
 
-	public void removeWindow(int id) {
+	public void removeWindow(int id){
 		if(dead)return;
 		rfbAgent.orderRemoveWindow(id);
 	}
 
 
-	public void sendPointerEvent(double x, double y, int buttonMask) {
+	public void sendPointerEvent(double x, double y, int buttonMask){
 		if(dead)return;
 		rfbAgent.orderPointerEvent(x,y,buttonMask);
 	}
 
-	public void sendKeyEvent(int code, int i) {
+	public void sendKeyEvent(int code, int i){
 		if(dead)return;
 		rfbAgent.orderKeyEvent(code, i==1);
 	}

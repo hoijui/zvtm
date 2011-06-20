@@ -28,7 +28,8 @@ public class ForwardingFrameManager extends FrameManager {
 	public void configure(int window, int x, int y, int w, int h) {
 		super.configure(window, x, y, w, h);
 		if(get(window)==null)return;
-		if(get(window).isPublished())rfbfw.configure(window,get(window).isRoot(), x, y, w, h);
+		if(get(window).isPublished())
+			rfbfw.configure(window,get(window).isRoot(), x, y, w, h);
 	}
 
 	@Override
@@ -56,7 +57,8 @@ public class ForwardingFrameManager extends FrameManager {
 	public void UnmapWindow(int window) {
 		super.UnmapWindow(window);
 		if(get(window)==null)return;
-		if(get(window).isPublished())rfbfw.UnmapWindow(window);
+		if(get(window).isPublished())
+			rfbfw.UnmapWindow(window);
 	}
 
 	public void publish(MetisseWindow win) {

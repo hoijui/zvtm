@@ -53,11 +53,15 @@ public class RfbAgent {
 			@Override
 			public void run() {
 				while(true){
+					byte[] b;
 					try {
-						byte[] b = toSend.take().getBytes();
+						b = toSend.take().getBytes();
+				//		System.out.println();
 						outstr.write(b);
 						outstr.flush();
 					} catch (IOException e) {
+						System.err.println("Error writing in the socket. No further packets will be sent.");
+						return;
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
@@ -110,8 +114,8 @@ public class RfbAgent {
 		pv[13] = (byte)(((minor/10)%10) + '0'); 
 		pv[14] = (byte)(((minor)%10) + '0');
 		pv[15] = '\n';
-	
-	 	out.write(pv,0,16);
+
+		out.write(pv,0,16);
 	}
 
 
@@ -127,7 +131,7 @@ public class RfbAgent {
 			byte reason[] = new byte[reasonLen];
 			readString(reason, reasonLen);
 			throw new RuntimeException("Metisse connection failed (" + new String(reason) + ")");
-			
+
 		case Proto.rfbNoAuth:
 			break;
 
@@ -196,7 +200,7 @@ public class RfbAgent {
 	public void rfbSetPixelFormat() throws IOException{
 		writeUint8(Proto.rfbSetPixelFormat); // msg type
 		writeUint8(32); // bitsPerPixel
-		writeUint8(24); // depth
+		writeUint8(16); // depth
 		writeUint8(0); // bigEndian
 		writeUint8(1); // trueColour
 		writeUint16(255); // redMax
@@ -220,41 +224,29 @@ public class RfbAgent {
 	}
 
 
-	public void rfbFramebufferUpdateRequest(boolean incremental) throws IOException {
+	public void rfbFramebufferUpdateRequest(boolean incremental) throws IOException{
 		rfbFramebufferUpdateRequest(0, 0, 10 * width, 10 * height, incremental) ;
 	}
 
 
-	public void rfbFramebufferUpdateRequest(int x, int y, int w, int h, boolean incremental) throws IOException {
-	try {
-		toSend.put(new FBURequest(x, y, w, h, incremental));
-	} catch (InterruptedException e) {
-		e.printStackTrace();
-	}
+	public void rfbFramebufferUpdateRequest(int x, int y, int w, int h, boolean incremental) throws IOException{
+		send(new FBURequest(x, y, w, h, incremental));
 	}
 
 
-	public void rfbKeyEvent(int keysym, boolean down) {
-		try {
-			toSend.put(new KeyEvent(keysym, down));
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+	public void rfbKeyEvent(int keysym, boolean down){
+		send(new KeyEvent(keysym, down));
 	}
 
 
 
-	public void rfbPointerEvent(int window, int x, int y, int buttons) {
-	try {
-		toSend.put(new PointerEvent(window, x, y, buttons));
-	} catch (InterruptedException e) {
-		e.printStackTrace();
-	}
+	public void rfbPointerEvent(int window, int x, int y, int buttons){
+		send(new PointerEvent(window, x, y, buttons));
 	}
 
 
 
-	public void rfbPointerEvent(int window, int jpx, int jpy, int[] buttonState) {
+	public void rfbPointerEvent(int window, int jpx, int jpy, int[] buttonState){
 		int a = 0;
 		for (int i = 0; i < 32; i++) {
 			a = a | (buttonState[i]<<i);
@@ -424,17 +416,17 @@ public class RfbAgent {
 		}
 	}
 
-	public void rootPointerEvent(int x, int y, int buttons){
+	public void rootPointerEvent(int x, int y, int buttons)  {
 		rfbPointerEvent(0, x, y, buttons);
 	}
 
 
-	public void rootKeyEvent(int key, boolean down_flag){
+	public void rootKeyEvent(int key, boolean down_flag)  {
 		rfbKeyEvent(key, down_flag);
 	}
 
 	@SuppressWarnings("unused")
-	public  boolean framebufferUpdate() throws IOException {
+	public  boolean framebufferUpdate() throws IOException{
 		int nRects = readCard16();
 		int window = readCard32();
 		int topWindow = readCard32();
@@ -533,49 +525,33 @@ public class RfbAgent {
 	}
 
 
-	public boolean rfbDoublePointerEvent() {
-		try{
-			int buttons = readCard32();//buttons
-			int lx = readCard32();//length of x
-			int ly = readCard32();//length of y
-			double x = Float.intBitsToFloat(lx);
-			double y = Float.intBitsToFloat(ly);
-			for(RfbMessageHandler l : listeners){
-				if(l instanceof RfbInput){
-					((RfbInput)l).handleDoublePointerEvent(x,y,buttons);
-				}
+	public boolean rfbDoublePointerEvent() throws IOException {
+		int buttons = readCard32();//buttons
+		int lx = readCard32();//length of x
+		int ly = readCard32();//length of y
+		double x = Float.intBitsToFloat(lx);
+		double y = Float.intBitsToFloat(ly);
+		for(RfbMessageHandler l : listeners){
+			if(l instanceof RfbInput){
+				((RfbInput)l).handleDoublePointerEvent(x,y,buttons);
 			}
-			return true;
-		}catch(IOException e){
-			e.printStackTrace();
 		}
-		return false;
+		return true;
 	}
 
-	public boolean rfbConfigureWall() {
+	public boolean rfbConfigureWall() throws IOException {
 		double[] res =new double[4];
-		try{
-			for (int i = 0; i < 4; i++) {
-				res[i] = Float.intBitsToFloat(readCard32());
-			}
-			PCursor.wallBounds = res;
-			
-			return true;
-		}catch(IOException e){
-			e.printStackTrace();
+		for (int i = 0; i < 4; i++) {
+			res[i] = Float.intBitsToFloat(readCard32());
 		}
-		return false;
+		PCursor.wallBounds = res;
+		return true;
 	}
 
-	public boolean rfbRemoteKeyEvent() {
-		try {
-			int i = readCard8();//down
-			int keysym = readCard32();
-			handleRemoteKeyEvent(keysym,i);
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	public boolean rfbRemoteKeyEvent() throws IOException {
+		int i = readCard8();//down
+		int keysym = readCard32();
+		handleRemoteKeyEvent(keysym,i);
 		return false;
 	}
 
@@ -604,7 +580,7 @@ public class RfbAgent {
 	}
 
 
-	public boolean rfbConfigureWindow() throws IOException {
+	public boolean rfbConfigureWindow() throws IOException{
 		int window = readCard32(); // window id
 		int xsgn = readCard16(); // xsgn : 0: negative, 1: positive
 		int x = (xsgn == 0 ? -1 : 1) * readCard16(); // x
@@ -633,7 +609,7 @@ public class RfbAgent {
 	}
 
 
-	public  boolean rfbRestackWindow() throws IOException {
+	public  boolean rfbRestackWindow() throws IOException{
 		int window = readCard32(); // window id
 		int nextWindow = readCard32(); 
 		int transientFor = readCard32();
@@ -646,7 +622,7 @@ public class RfbAgent {
 		rfbFramebufferUpdateRequest(true);
 		return true;  
 	}
-	
+
 	/*****************************************************************************
 	 * Functions for sending to a client
 	 ****************************************************************************/
@@ -654,73 +630,41 @@ public class RfbAgent {
 
 
 
-	public void orderConfigure(int window, boolean isroot, int x, int y, int w, int h) {
-		try {
-			toSend.put(new ConfigureMsg(window, isroot, x, y, w, h));
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+	public void orderConfigure(int window, boolean isroot, int x, int y, int w, int h)   {
+		send(new ConfigureMsg(window, isroot, x, y, w, h));
 	}
 
-	public void orderConfigureWall(double[] bounds) {
-		try {
-			toSend.put(new ConfigureWallMsg(bounds));
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+	public void orderConfigureWall(double[] bounds)   {
+		send(new ConfigureWallMsg(bounds));
 	}
 
-	public void orderFrameBufferUpdate(int window, boolean isroot, byte[] img,int x, int y, int w, int h,int encoding) {
-		try {
-			toSend.put(new FBUMsg(window, isroot, img, x, y, w, h, encoding));
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+	public void orderFrameBufferUpdate(int window, boolean isroot, byte[] img,int x, int y, int w, int h,int encoding)   {
+		send(new FBUMsg(window, isroot, img, x, y, w, h, encoding));
 	}
 
-	public void orderRestackWindow(int window, int nextWindow,int transientFor, int unmanagedFor, int grabWindow,int duplicateFor, int facadeReal, int flags) {
-		try {
-			toSend.put(new RestackMsg(window, nextWindow, transientFor, unmanagedFor, grabWindow, duplicateFor, facadeReal, flags));
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+	public void orderRestackWindow(int window, int nextWindow,int transientFor, int unmanagedFor, int grabWindow,int duplicateFor, int facadeReal, int flags)   {
+		send(new RestackMsg(window, nextWindow, transientFor, unmanagedFor, grabWindow, duplicateFor, facadeReal, flags));
 	}
 
-	public void orderUnmapWindow(int window) {
-		try {
-			toSend.put(new UnmapMsg(window));
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+	public void orderUnmapWindow(int window)   {
+		send(new UnmapMsg(window));
 	}
 
-	public void orderAddWindow(int id, boolean root, int x, int y, int w, int h) {
+	public void orderAddWindow(int id, boolean root, int x, int y, int w, int h)   {
 		orderConfigure(id,root,x, y, w, h);
 	}
 
-	public void orderRemoveWindow(int window) {
-		try {
-			toSend.put(new RemoveMsg(window));
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+	public void orderRemoveWindow(int window)   {
+		send(new RemoveMsg(window));
 	}
 
 
-	public void orderPointerEvent(double x, double y, int buttonMask) {
-		try {
-			toSend.put(new DoublePointerEventMsg(x, y, buttonMask));
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+	public void orderPointerEvent(double x, double y, int buttonMask)   {
+		send(new DoublePointerEventMsg(x, y, buttonMask));
 	}
 
-	public void orderKeyEvent(int keysym, boolean down) {
-		try {
-			toSend.put(new ServKeyEvent(keysym, down));
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+	public void orderKeyEvent(int keysym, boolean down)   {
+		send(new ServKeyEvent(keysym, down));
 	}
 
 
@@ -853,57 +797,43 @@ public class RfbAgent {
 	}
 
 
-	public boolean handleConfigureWall() {
+	public boolean handleConfigureWall() throws IOException {
 		rfbConfigureWall();
 		return false;
 	}
-	
-	public boolean fwKeyEvent() {
 
-		try {
-			int down = readCard8();//down
-			int keysym = readCard32();
-			toSend.put(new KeyEvent(keysym, 1==down));
-		}catch(IOException e){
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+	public boolean fwKeyEvent() throws IOException{
+		int down = readCard8();//down
+		int keysym = readCard32();
+		send(new KeyEvent(keysym, 1==down));
 		return false;
 	}
 
-	public boolean fwPointerEvent() {
-		try{
-			int buttons = readCard32();
-			int xs = readCard8();
-			int x = readCard16();
-			int ys = readCard8();
-			int y = readCard16();
-			int window = readCard32();
-			toSend.put(new PointerEvent(window,(xs==1?1:-1)*x, (ys==1?1:-1)*y, buttons));
-			
-		}catch(IOException e){
-			e.printStackTrace();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+	public boolean fwPointerEvent() throws IOException{
+		int buttons = readCard32();
+		int xs = readCard8();
+		int x = readCard16();
+		int ys = readCard8();
+		int y = readCard16();
+		int window = readCard32();
+		send(new PointerEvent(window,(xs==1?1:-1)*x, (ys==1?1:-1)*y, buttons));
 		return false;
 	}
 
 	private boolean pinged = false;
-	
+
 	public void ping() {
-		try {
-			toSend.put(new RFBPing());
-			pinged = true;
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+		send(new RFBPing());
+		pinged = true;
 	}
 
 	public void pong() {
+		send(new RFBPong());
+	}
+
+	private void send(RFBMessage msg) {
 		try {
-			toSend.put(new RFBPong());
+			toSend.put(msg);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -912,7 +842,7 @@ public class RfbAgent {
 	public void ponged() {
 		pinged = false;
 	}
-	
+
 	public boolean hasResponded(){
 		return !pinged;
 	}
