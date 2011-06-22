@@ -96,6 +96,7 @@ public class RFBConnection {
 		boolean something_read = false;
 		boolean ret = false;
 		something_read = true;
+		
 		int type = rfbAgent.readCard8();
 
 		switch(type){

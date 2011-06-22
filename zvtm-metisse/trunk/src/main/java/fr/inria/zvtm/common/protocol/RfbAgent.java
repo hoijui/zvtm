@@ -2,6 +2,8 @@ package fr.inria.zvtm.common.protocol;
 
 
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -17,23 +19,24 @@ import fr.inria.zvtm.common.kernel.RfbInput;
 public class RfbAgent {
 
 	private InputStream in;
-	private OutputStream out;
+	private BufferedOutputStream out;
 	private String password;
 	private LinkedList<RfbMessageHandler> listeners;
 	private int height;
 	private int width;
 	private LinkedBlockingQueue<RFBMessage> toSend;
 
-	public RfbAgent(InputStream in, OutputStream out) {
-		this.setIn(in);
-		this.out = out;
+	public RfbAgent(InputStream in, OutputStream outs) {
+		
+		this.out = new BufferedOutputStream(outs);
+		this.in = in;
 		toSend = new LinkedBlockingQueue<RFBMessage>();
 		password = "insitu";
 		listeners = new LinkedList<RfbMessageHandler>();
 	}
 
 	public RfbAgent(InputStream input, LinkedBlockingQueue<RFBMessage> out) {
-		in  = input;
+		in  = input;;
 		toSend = out;
 		password = "insitu";
 		listeners = new LinkedList<RfbMessageHandler>();
@@ -47,19 +50,23 @@ public class RfbAgent {
 		listeners.add(a);
 	}
 
+	static boolean lock = true;
 	public void startSender(){
 		Thread t = new Thread(){
-			OutputStream outstr = out;
+			BufferedOutputStream outstr = out;
 			@Override
 			public void run() {
 				while(true){
 					byte[] b;
 					try {
-						b = toSend.take().getBytes();
-				//		System.out.println();
+						RFBMessage msg = toSend.take();
+						b = msg.getBytes();
+		//				if (lock)System.out.println(this.getId()+" "+msg);
 						outstr.write(b);
 						outstr.flush();
+				//		socket overflow ???? => essayer d'utiliser des buffered writer etc...
 					} catch (IOException e) {
+						lock = false;
 						System.err.println("Error writing in the socket. No further packets will be sent.");
 						return;
 					} catch (InterruptedException e) {
@@ -106,7 +113,7 @@ public class RfbAgent {
 		pv[5] = 'S';
 		pv[6] = 'E';
 		pv[7] = ' ';
-		pv[8] = (byte)((major/100) + '0'); 
+		pv[8] = (byte) ((major/100) + '0'); 
 		pv[9] = (byte)(((major/10)%10) + '0'); 
 		pv[10] = (byte)(((major)%10) + '0');
 		pv[11] = '.';
@@ -116,6 +123,8 @@ public class RfbAgent {
 		pv[15] = '\n';
 
 		out.write(pv,0,16);
+		out.flush();
+		
 	}
 
 
@@ -144,7 +153,7 @@ public class RfbAgent {
 				auth.encrypt(challenge, 0, challenge, 0);
 				auth.encrypt(challenge, 8, challenge, 8);
 			}
-
+	
 			out.write(challenge, 0, 16);
 			out.flush();
 			int authResult = readCard32();
@@ -262,7 +271,7 @@ public class RfbAgent {
 		int res = 0;
 
 		while (read_total < length) {
-			res = getIn().read(data, read_total, length - read_total);
+			res = in.read(data, read_total, length - read_total);
 			if (res <= 0)
 				return;
 			read_total += res;
@@ -276,25 +285,25 @@ public class RfbAgent {
 	}
 
 	public int readCard8() throws IOException{
-		return ( (byte)getIn().read() & 0xff );
+		return ( (byte)in.read() & 0xff );
 	}
 
 
 	private int readCard16() throws IOException{
-		return ( ( (byte)getIn().read() << 8 ) & 0xff00 ) 
-		| (  (byte)getIn().read()    & 0x00ff );
+		return ( ( (byte)in.read() << 8 ) & 0xff00 ) 
+		| (  (byte)in.read()    & 0x00ff );
 	}
 
 
 	private int readCard32() throws IOException {
-		return ( ( (byte)getIn().read() << 24 ) & 0xff000000 ) 
-		| ( ( (byte)getIn().read() << 16 ) & 0x00ff0000 ) 
-		| ( ( (byte)getIn().read() << 8 ) & 0x0000ff00 ) 
-		| (  (byte)getIn().read()     & 0x000000ff );
+		return ( ( (byte)in.read() << 24 ) & 0xff000000 ) 
+		| ( ( (byte)in.read() << 16 ) & 0x00ff0000 ) 
+		| ( ( (byte)in.read() << 8 ) & 0x0000ff00 ) 
+		| (  (byte)in.read()     & 0x000000ff );
 	}
 
 
-	private  byte waiting_uint[] = new byte[1024];
+	private  byte[] waiting_uint = new byte[1024];
 	private  int waiting_uint_size = 0; 
 
 
@@ -713,7 +722,7 @@ public class RfbAgent {
 			String reason = "not a valid protocol version";
 			writeUint32(reason.length());
 			flushUint();			
-			writeString(reason.getBytes(), reason.length());
+			writeString(reason.getBytes(),reason.length());
 			return false;
 		}
 		return true;
@@ -732,7 +741,7 @@ public class RfbAgent {
 	public void servrfbClientInit() throws IOException{
 		byte shared[] = new byte[1];
 		shared[0] = 1;
-		getIn().read(shared,0,1);
+		in.read(shared,0,1);
 	}
 
 
@@ -752,12 +761,11 @@ public class RfbAgent {
 		writeUint8(0);
 		flushUint();
 		String s = "one client";
-		byte[] name = s.getBytes();
-		int namelen = name.length;
+		int namelen = s.length();
 		writeUint32(namelen);
 		flushUint();
 
-		writeString(name, namelen);
+		writeString(s.getBytes(),namelen);
 	}
 
 	public void servrfbSetPixelFormat() throws IOException{
@@ -784,13 +792,7 @@ public class RfbAgent {
 		readCard32();
 	}
 
-	public void setIn(InputStream in) {
-		this.in = in;
-	}
 
-	public InputStream getIn() {
-		return in;
-	}
 
 	public LinkedBlockingQueue<RFBMessage> getOut() {
 		return toSend;
