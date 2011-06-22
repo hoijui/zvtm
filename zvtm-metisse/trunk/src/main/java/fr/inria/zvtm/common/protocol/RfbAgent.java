@@ -2,7 +2,6 @@ package fr.inria.zvtm.common.protocol;
 
 
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
