@@ -698,6 +698,7 @@ public class RfbAgent {
 		pv[12] = (byte)((minor/100) + '0'); pv[13] = (byte)(((minor/10)%10) + '0'); pv[14] = (byte)(((minor)%10) + '0');
 
 		out.write(pv,0,16);
+		out.flush();
 		// "METISSE 000.000\n"
 		readString(pv, 16);     // 0123456789012345
 		if(pv[0] != 'M' ||
