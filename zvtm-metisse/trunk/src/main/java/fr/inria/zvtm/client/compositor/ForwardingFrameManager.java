@@ -83,7 +83,7 @@ public class ForwardingFrameManager extends FrameManager {
 	}
 
 	@Override
-	public void endResize(MetisseWindow mwr) {
+	public void endResize(MetisseWindow mwr) {//send a message to indicate the end of resizing 
 		rfbfw.configure(mwr.getId(), true, mwr.getX(), mwr.getY(), mwr.getW(), mwr.getH());
 	}
 

@@ -423,18 +423,12 @@ public class PPicker extends Picker{
 		Glyph[] tt = getPickedGlyphList();
 		Glyph[] t  = new Glyph[tt.length]; 
 		int k=0;
-		if(!offScreenMode){
+	
 			Glyph[] list = v.getDrawingList();
 			for (int i = 0; i < list.length; i++) {
 				if(contains(tt,list[i])&& !contains(t,list[i]))t[k++] = list[i];
 			}
-		}
-		else{
-			Vector<Glyph> list = v.getAllGlyphs();
-			for (int i = 0; i < list.size(); i++) {
-				if(contains(tt,list.get(i))&& !contains(t,list.get(i)))t[k++] = list.get(i);
-			}
-		}
+		
 		return t;
 	}
 

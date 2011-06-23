@@ -7,7 +7,7 @@ import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
-import java.awt.image.Raster;
+import java.awt.image.DataBufferByte;
 import java.util.HashMap;
 
 import org.jdesktop.animation.timing.interpolation.Interpolator;
@@ -27,8 +27,8 @@ public class MetisseWindow extends VImage{
 	private static MetisseWindow rezisingFrame;
 	private Point.Double rootSize;//size of the root frame
 	private Point.Double rootLocation;//pos of the root frame
-	private int[] lastFrameBuffer;
-	private boolean alwaysRefresh = true;
+	private byte[] lastFrameBuffer;
+	private boolean alwaysRefresh = true;//refresh during resizing
 	private double x_offset;//ZVTM position
 	private double y_offset;
 	private double xParentOffset;//ZVTM position
@@ -41,7 +41,7 @@ public class MetisseWindow extends VImage{
 	private boolean isroot = false;
 	private double currentW;
 	private double currentH;
-	private static int encoding = BufferedImage.TYPE_INT_ARGB_PRE;
+	private static int encoding = BufferedImage.TYPE_4BYTE_ABGR;
 	private MetisseWindow master;
 	private boolean isResizing= false;
 	public boolean isRescaling = false;
@@ -75,21 +75,16 @@ public class MetisseWindow extends VImage{
 
 	public void fbUpdate(byte[] img, int x, int y, int w, int h) {
 		if(isroot)return;
-		int[] imgint = new int[w*h];
-		for (int i = 0; i < img.length; i=i+4) {
-			imgint[i/4] = byteToRGB(img[i],img[i+1],img[i+2],img[i+3]);
-		}
 		if(!isResizing){
-			((BufferedImage)image).setRGB(x, y, w, h, imgint, 0, w);
+			patch(img, x, y, w, h);
 		}
 		else {
 			if((currentW==w)&&(currentH==h)){
-				lastFrameBuffer = imgint;
+				lastFrameBuffer = img;
 			}
-				
 		}
 		if(alwaysRefresh){
-			if (isResizing && lastFrameBuffer!= null && currentH*currentW== lastFrameBuffer.length) {
+			if (isResizing && lastFrameBuffer!= null && 4*currentH*currentW== lastFrameBuffer.length) {
 				this.width = currentW;
 				this.height = currentH;
 				this.vw = this.width*scaleFactor;
@@ -97,28 +92,18 @@ public class MetisseWindow extends VImage{
 				this.vx = (this.x-rootSize.x*1./2+this.width*1./2);
 				this.vy =(-this.y+rootSize.y*1./2-this.height*1./2);
 				this.image = new BufferedImage((int)currentW, (int)currentH, encoding);		
-				((BufferedImage)image).setRGB((int)0, (int)0,(int) width, (int)height, lastFrameBuffer, 0, (int)width);
-
+				patch(img, x, y, w, h);
 			}
 		}
 		VirtualSpaceManager.INSTANCE.repaint();
 	}
 
-	private int byteToRGB(byte r,byte g,byte b,byte a) {
-		return ( ( a<< 24 ) & 0xff000000 ) 
-		|  ( ( r << 16 ) & 0x00ff0000 ) 
-		|  ( ( g<< 8  ) & 0x0000ff00 ) 
-		|  (   b        & 0x000000ff );
-	
-	}
-	private byte[] RGBToByte(int col) {
-	
-		byte[] res = new byte[4];
-		res[0] = (byte) ((col>>16)&0x000000ff);//r
-		res[1] = (byte) ((col>>8)&0x000000ff);//g
-		res[2] = (byte) (col&0x000000ff);//b
-		res[3] = (byte) ((col>>24)&0x000000ff);//a
-		return res;
+	private void patch(byte[] img, int x, int y, int w, int h){
+		byte[] raster = ((DataBufferByte)((BufferedImage) image).getRaster().getDataBuffer()).getData();
+		int W = ((BufferedImage) image).getWidth();
+		for (int i = 0; i < img.length; i++) {
+			raster[4*(i/4)+(3-i%4)+4*(i/(4*w))*(W-w)+4*(W*y+x)] = img[i];
+		}
 	}
 	
 
@@ -167,7 +152,7 @@ public class MetisseWindow extends VImage{
 		this.image = new BufferedImage((int)currentW, (int)currentH,encoding);		
 		isResizing = false;
 		MetisseWindow.rezisingFrame= null;
-		if (width*height == lastFrameBuffer.length) ((BufferedImage)image).setRGB((int)0, (int)0,(int) width, (int)height, lastFrameBuffer, 0, (int)width);
+		if (4*width*height == lastFrameBuffer.length) patch(lastFrameBuffer, 0, 0, (int)width,(int)height);
 	}
 
 
@@ -590,13 +575,14 @@ public class MetisseWindow extends VImage{
 	}
 
 	public byte[] getRaster() {
-		BufferedImage img = (BufferedImage) image;
-		Raster r = img.getRaster();		
-		byte[] res = new byte[4*r.getHeight()*r.getWidth()];
-		for (int i = 0; i < r.getHeight()*r.getWidth(); i++) {
-			byte[] rbg = RGBToByte(img.getRGB(i%r.getWidth(), i/r.getWidth()));
-			System.arraycopy(rbg, 0, res, 4*i, 4);
+		byte[] ori =  ((DataBufferByte)((BufferedImage) image).getRaster().getDataBuffer()).getData();
+		byte[] res = new byte[ori.length];
+		for (int i = 0; i < res.length; i=i+4) {
+			res[i] = ori[i+3];
+			res[i+1] = ori[i+2];
+			res[i+2] = ori[i+1];
+			res[i+3] = ori[i+0];
 		}
-		return  res;
+		return res;
 	}
 }

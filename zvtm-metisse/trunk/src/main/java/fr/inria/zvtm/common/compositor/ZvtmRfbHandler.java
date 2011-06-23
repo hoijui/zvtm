@@ -21,7 +21,9 @@ public class ZvtmRfbHandler implements fr.inria.zvtm.common.compositor.RfbMessag
 	public boolean handleConfigureWindow(int window, boolean isroot, int x,int y, int w, int h) {
 		if(fm!=null)
 		if(fm.get(window)!=null)
-		if(isroot&&!fm.get(window).isRoot())fm.get(window).endResize();
+		if(isroot&&!fm.get(window).isRoot()){
+			fm.get(window).endResize();
+		}
 		fm.configure(window,x,y,w,h);
 		return false;
 	}
