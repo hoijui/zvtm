@@ -142,7 +142,13 @@ class ConfigureWallMsg extends RFBMessage{
 }
 
 class FBUMsg extends RFBMessage{
+	int w;
+	int h;
+	int size;
 	public FBUMsg(int window, boolean isroot, byte[] img,int x, int y, int w, int h,int encoding){
+		this.w = w;
+		this.h = h;
+		this.size = img.length;
 		switch(encoding){
 		case Proto.rfbEncodingRaw:
 			this.waiting_uint = new byte[img.length+27];		
@@ -168,6 +174,11 @@ class FBUMsg extends RFBMessage{
 		default:
 			break;
 		}
+	}
+	@Override
+	public String toString() {
+		return ("w: "+w+" h: "+h+" size: "+size);
+
 	}
 }
 

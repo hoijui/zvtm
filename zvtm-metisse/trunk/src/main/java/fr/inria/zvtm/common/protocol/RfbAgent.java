@@ -2,6 +2,7 @@ package fr.inria.zvtm.common.protocol;
 
 
 
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,25 +18,28 @@ import fr.inria.zvtm.common.kernel.RfbInput;
 
 public class RfbAgent {
 
-	private InputStream in;
+	private BufferedInputStream in;
 	private BufferedOutputStream out;
 	private String password;
 	private LinkedList<RfbMessageHandler> listeners;
 	private int height;
 	private int width;
 	private LinkedBlockingQueue<RFBMessage> toSend;
+	private boolean alive = true;
+	private Owner owner;
 
-	public RfbAgent(InputStream in, OutputStream outs) {
-		
+	public RfbAgent(InputStream input, OutputStream outs,Owner own) {
+		this.owner = own;
 		this.out = new BufferedOutputStream(outs);
-		this.in = in;
+		this.in = new BufferedInputStream(input);
 		toSend = new LinkedBlockingQueue<RFBMessage>();
 		password = "insitu";
 		listeners = new LinkedList<RfbMessageHandler>();
 	}
 
-	public RfbAgent(InputStream input, LinkedBlockingQueue<RFBMessage> out) {
-		in  = input;;
+	public RfbAgent(InputStream input, LinkedBlockingQueue<RFBMessage> out,Owner own) {
+		this.owner = own;
+		in  = new BufferedInputStream(input);
 		toSend = out;
 		password = "insitu";
 		listeners = new LinkedList<RfbMessageHandler>();
@@ -44,34 +48,32 @@ public class RfbAgent {
 	/*****************************************************************************
 	 * Functions for sending messages to the server (display => server)
 	 ****************************************************************************/
-
+	static int instance = 0;
 	public void addListener(RfbMessageHandler a){
 		listeners.add(a);
 	}
-
-	static boolean lock = true;
 	public void startSender(){
 		Thread t = new Thread(){
 			BufferedOutputStream outstr = out;
 			@Override
 			public void run() {
+				RFBMessage msg = null ;
 				while(true){
 					byte[] b;
 					try {
-						RFBMessage msg = toSend.take();
-						b = msg.getBytes();
-		//				if (lock)System.out.println(this.getId()+" "+msg);
+						msg = toSend.take();
+						b = msg.getBytes();		
 						outstr.write(b);
 						outstr.flush();
-				//		socket overflow ???? => essayer d'utiliser des buffered writer etc...
 					} catch (IOException e) {
-						lock = false;
-						System.err.println("Error writing in the socket. No further packets will be sent.");
-						return;
+						System.err.println("Connection closed");
+						alive = false;
+						break;
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
 				}
+				owner.end();
 			};
 		};
 		t.start();
@@ -123,7 +125,7 @@ public class RfbAgent {
 
 		out.write(pv,0,16);
 		out.flush();
-		
+
 	}
 
 
@@ -152,7 +154,7 @@ public class RfbAgent {
 				auth.encrypt(challenge, 0, challenge, 0);
 				auth.encrypt(challenge, 8, challenge, 8);
 			}
-	
+
 			out.write(challenge, 0, 16);
 			out.flush();
 			int authResult = readCard32();
@@ -434,7 +436,7 @@ public class RfbAgent {
 	}
 
 	@SuppressWarnings("unused")
-	public  boolean framebufferUpdate() throws IOException{
+	public  boolean framebufferUpdate(boolean slave) throws IOException{
 		int nRects = readCard16();
 		int window = readCard32();
 		int topWindow = readCard32();
@@ -528,7 +530,7 @@ public class RfbAgent {
 				return false;
 			}
 		}
-		rfbFramebufferUpdateRequest(true);
+		if(!slave)rfbFramebufferUpdateRequest(true);
 		return true;
 	}
 
@@ -835,6 +837,7 @@ public class RfbAgent {
 
 	private void send(RFBMessage msg) {
 		try {
+			if (alive)
 			toSend.put(msg);
 		} catch (InterruptedException e) {
 			e.printStackTrace();

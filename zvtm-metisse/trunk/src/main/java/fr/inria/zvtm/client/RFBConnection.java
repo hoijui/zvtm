@@ -7,11 +7,12 @@ import java.net.Socket;
 
 import fr.inria.zvtm.common.compositor.ZvtmRfbHandler;
 import fr.inria.zvtm.common.kernel.Temporizer;
+import fr.inria.zvtm.common.protocol.Owner;
 import fr.inria.zvtm.common.protocol.Proto;
 import fr.inria.zvtm.common.protocol.RfbAgent;
 
 
-public class RFBConnection {
+public class RFBConnection implements Owner{
 	private String ip;
 	private int port;
 	private Socket sock;
@@ -61,7 +62,7 @@ public class RFBConnection {
 			sock = new Socket(InetAddress.getByName(ip),port);
 			input = sock.getInputStream();
 			output = sock.getOutputStream();
-			rfbAgent = new RfbAgent(input, output);
+			rfbAgent = new RfbAgent(input, output,this);
 			rfbAgent.rfbProtocalVersion(); // receive, send
 			rfbAgent.rfbAuthentification(); // receive, send & receive
 			rfbAgent.rfbClientInit(); // send
@@ -143,7 +144,7 @@ public class RFBConnection {
 			break;
 
 		case Proto.rfbFramebufferUpdate:
-			ret = rfbAgent.framebufferUpdate();
+			ret = rfbAgent.framebufferUpdate(false);
 			if (!ret){
 				return false;
 			}

@@ -8,10 +8,11 @@ import java.net.Socket;
 
 import fr.inria.zvtm.client.ClientMain;
 import fr.inria.zvtm.client.gui.ClientViewer;
+import fr.inria.zvtm.common.protocol.Owner;
 import fr.inria.zvtm.common.protocol.Proto;
 import fr.inria.zvtm.common.protocol.RfbAgent;
 
-public class RfbForwarder{
+public class RfbForwarder implements Owner{
 
 	private Socket sock;
 	private InputStream input;
@@ -23,12 +24,16 @@ public class RfbForwarder{
 		connect();
 	}
 
+	/**
+	 * Connection beetween the client and the zvtm server.
+	 * Forwards FB events, window managing events for public windows, and input events when the cursor in virtual mode.
+	 */
 	private void connect() {
 		try {
 			sock = new Socket(InetAddress.getByName(ClientMain.Hostip),ClientMain.Hostport);
 			input = sock.getInputStream();
 			output = sock.getOutputStream();
-			rfbAgent = new RfbAgent(input, output);
+			rfbAgent = new RfbAgent(input, output,this);
 			if(!rfbAgent.servrfbProtocalVersion()){
 				System.err.println("the server is not valid, system will exit");
 				System.exit(0);
@@ -47,25 +52,44 @@ public class RfbForwarder{
 	}
 
 
+	@Override
+	public void end() {
+		System.out.println("RFB Forwarder Connection ended");
+		try {
+			sock.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	class ListeningThread extends Thread implements Owner{
+		@Override
+		public void end() {
+		}};
+	
 	private void startListening(){
-		Thread listen = new Thread(){
+		
+		Thread listen = new ListeningThread(){
 			RfbAgent fwagent;
 
 			@Override
 			public void run() {
-				fwagent  = new RfbAgent(input, ClientMain.connection.getRfbAgent().getOut());
-				boolean flag = true;
-				while(flag){
+				fwagent  = new RfbAgent(input, ClientMain.connection.getRfbAgent().getOut(),this);
+				while(true){
 					try {
 						receive();
 					} catch (IOException e) {
-						System.out.println("connection "+sock.getInetAddress()+":"+sock.getPort()+" closed.");
-						flag = false;
+						end();
+						break;
 					}
 				}
 			}
 
-
+			@Override
+			public void end() {
+				System.out.println("connection "+sock.getInetAddress()+":"+sock.getPort()+" closed.");
+			}
+			
 			protected boolean receive() throws IOException{
 				if(sock == null)
 					return false;
