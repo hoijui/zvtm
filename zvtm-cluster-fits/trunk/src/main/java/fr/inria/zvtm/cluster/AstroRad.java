@@ -139,7 +139,7 @@ public class AstroRad {
         imgCursor = new WallCursor(imageSpace, 20, 160, Color.GREEN);
         imgCursor.onTop(IMGCURSOR_ZINDEX);
 
-        pointSource = new MouseLaserPoint(masterView.getPanel());
+        pointSource = new MouseLaserPoint(masterView.getPanel().getComponent());
         pointSource.addListener(new PointListener(){
             boolean dragging = false;
 
@@ -335,7 +335,7 @@ public class AstroRad {
             imageSpace.atBottom(img, UNSEL_IMG_ZINDEX); 
         }
         focused.setBorderColor(Color.PINK); //XXX move to addImage
-        focused.setStrokeWidth(3); //XXX move to addImage
+        //focused.setStrokeWidth(3); //XXX move to addImage
         focused.setDrawBorder(true);
         imageSpace.onTop(focused, SEL_IMG_ZINDEX);
         if(hist != null){
