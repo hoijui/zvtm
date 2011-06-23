@@ -36,6 +36,8 @@ import fr.inria.zvtm.glyphs.projection.ProjText;
 
 public class VTextLayout extends VText {
 	
+	static final FontRenderContext FRC = new FontRenderContext(null, false, true);
+	
 	TextLayout tl;
 	
 	static Color STRONG_CARET_COLOR = Color.BLACK;
@@ -223,8 +225,7 @@ public class VTextLayout extends VText {
 	*@see #getBounds(int i)
 	*/
 	public void invalidate(){
-		tl = new TextLayout(text, (font!=null) ? font : getMainFont(),
-		 					new FontRenderContext(null, false, true));
+		tl = new TextLayout(text, (font!=null) ? font : getMainFont(), FRC);
 		try {
 			for (int i=0;i<pc.length;i++){
 				pc[i].valid=false;
