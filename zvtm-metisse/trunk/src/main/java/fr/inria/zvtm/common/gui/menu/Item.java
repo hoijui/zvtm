@@ -27,6 +27,7 @@ public abstract class Item implements GlyphListener{
 	private static final float MinTranslucency = 0.3f;
 	private static final float MaxTranslucency = 1f;
 	protected VImage shape;
+	protected VImage shape2;
 	protected PopMenu parent;
 	private ImageIcon img;	
 	private ImageIcon img2;	
@@ -47,15 +48,27 @@ public abstract class Item implements GlyphListener{
 		shape = new VImage(img.getImage()){
 			@Override
 			public boolean coordInside(int jpx, int jpy, int camIndex, double cvx,double cvy) {
-		 		return((cvx-vx)*(cvx-vx)<=vw*vw/4		&&      (cvy-vy)*(cvy-vy)<=vh*vh/4);
+				return((cvx-vx)*(cvx-vx)<=vw*vw/4		&&      (cvy-vy)*(cvy-vy)<=vh*vh/4);
+			}
+		};
+		shape2 = new VImage(img2.getImage()){
+			@Override
+			public boolean coordInside(int jpx, int jpy, int camIndex, double cvx,double cvy) {
+				return((cvx-vx)*(cvx-vx)<=vw*vw/4		&&      (cvy-vy)*(cvy-vy)<=vh*vh/4);
 			}
 		};
 		shape.scaleFactor = parent.factor;
 		shape.setDrawBorder(false);
 		shape.addCamera(0);
+		shape2.scaleFactor = parent.factor;
+		shape2.setDrawBorder(false);
+		shape2.addCamera(0);
 		this.shape.setSensitivity(true);
 		this.shape.setTranslucencyValue(0);	
 		this.parent.ged.subscribe(this.shape, this);
+		this.shape2.setSensitivity(true);
+		this.shape2.setTranslucencyValue(0);	
+		this.parent.ged.subscribe(this.shape2, this);
 		drawUp();
 	}
 
@@ -65,11 +78,18 @@ public abstract class Item implements GlyphListener{
 
 	public void appear() {
 		parent.getVirtualSpace().addGlyph(this.shape);
+		parent.getVirtualSpace().addGlyph(this.shape2);
 		Animation trans = 
 			VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().
 			createTranslucencyAnim(100, this.shape, MinTranslucency, false, SlowInSlowOutInterpolator.getInstance(), null);
 		if(this.shape.getTranslucencyValue()==0)
 			VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(trans, false);
+
+		Animation trans2 = 
+			VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().
+			createTranslucencyAnim(100, this.shape2, MinTranslucency, false, SlowInSlowOutInterpolator.getInstance(), null);
+		if(this.shape2.getTranslucencyValue()==0)
+			VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(trans2, false);
 
 	}
 
@@ -89,6 +109,21 @@ public abstract class Item implements GlyphListener{
 			});
 		VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(trans, false);
 
+
+		Animation trans2 = 
+			VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().
+			createTranslucencyAnim(100, this.shape2, 0, false, SlowInSlowOutInterpolator.getInstance(), new EndAction() {
+
+				@Override
+				public void execute(Object subject,
+						fr.inria.zvtm.animation.Animation.Dimension dimension) {
+					parent.getVirtualSpace().removeGlyph(shape2);
+					deactivate();
+
+				}
+			});
+		VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(trans2, false);
+
 	}
 
 	private void makeAppear(){
@@ -100,6 +135,12 @@ public abstract class Item implements GlyphListener{
 			createTranslucencyAnim(100, this.shape, MaxTranslucency, false, SlowInSlowOutInterpolator.getInstance(), null);
 		if(this.shape.getTranslucencyValue()==MinTranslucency)
 			VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(trans, false);
+
+		Animation trans2 = 
+			VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().
+			createTranslucencyAnim(100, this.shape2, MaxTranslucency, false, SlowInSlowOutInterpolator.getInstance(), null);
+		if(this.shape2.getTranslucencyValue()==MinTranslucency)
+			VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(trans2, false);
 	}
 
 	private void makeDisappear(){
@@ -110,6 +151,11 @@ public abstract class Item implements GlyphListener{
 			VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().
 			createTranslucencyAnim(100, this.shape, MinTranslucency, false, SlowInSlowOutInterpolator.getInstance(), null);
 		VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(trans, false);
+
+		Animation trans2 = 
+			VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().
+			createTranslucencyAnim(100, this.shape2, MinTranslucency, false, SlowInSlowOutInterpolator.getInstance(), null);
+		VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(trans2, false);
 	}
 
 	public void addListener(ItemActivationListener ial){
@@ -136,6 +182,7 @@ public abstract class Item implements GlyphListener{
 
 	public void position(double vx, double vy) {
 		shape.moveTo(vx, vy);
+		shape2.moveTo(vx, vy);
 	}
 
 	@Override
@@ -222,11 +269,13 @@ public abstract class Item implements GlyphListener{
 	}
 
 	public void drawUp(){
-		shape.setImage(img.getImage());
+		shape.setVisible(true);
+		shape2.setVisible(false);
 	}
 
 	public void drawDown(){
-		shape.setImage(img2.getImage());
+		shape2.setVisible(true);
+		shape.setVisible(false);
 	}
 
 	public void animatedMove(double offsetx,double offsety){
@@ -234,10 +283,16 @@ public abstract class Item implements GlyphListener{
 		Animation trans = 
 			VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().
 			createGlyphTranslation(200, (Glyph)shape, new Point2D.Double(offsetx, offsety), true, SlowInSlowOutInterpolator.getInstance(), null);
-			VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(trans, false);
-			
+		VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(trans, false);
+
+		Animation trans2 = 
+			VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().
+			createGlyphTranslation(200, (Glyph)shape2, new Point2D.Double(offsetx, offsety), true, SlowInSlowOutInterpolator.getInstance(), null);
+		VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(trans2, false);
+
+
 	}
-	
+
 	public PopMenu getParent(){
 		return parent;
 	}

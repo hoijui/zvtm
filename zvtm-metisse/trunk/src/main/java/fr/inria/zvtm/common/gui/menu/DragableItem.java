@@ -56,6 +56,7 @@ public abstract class DragableItem extends Item {
 			offsetx += (vx/parent.getAltFactor()-pvx/lastAltFactor);
 			offsety += (vy/parent.getAltFactor()-pvy/lastAltFactor);
 			shape.move((vx/parent.getAltFactor()-pvx/lastAltFactor),(vy/parent.getAltFactor()-pvy/lastAltFactor));
+			shape2.move((vx/parent.getAltFactor()-pvx/lastAltFactor),(vy/parent.getAltFactor()-pvy/lastAltFactor));
 		}
 		pvx = vx;
 		pvy = vy;
