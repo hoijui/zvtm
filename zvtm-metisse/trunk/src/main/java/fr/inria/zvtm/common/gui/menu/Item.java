@@ -217,10 +217,6 @@ public abstract class Item implements GlyphListener{
 		if(parent.viewer instanceof MasterViewer && this instanceof ScaleItem && parent.parentFrame==null)((MasterViewer) parent.viewer).sendViewUpgrade();
 	}
 
-	public void setActive(boolean active) {
-		this.active = active;
-	}
-
 	public boolean isActive() {
 		return active;
 	}

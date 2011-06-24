@@ -48,6 +48,7 @@ public class MetisseWindow extends VImage{
 	private HashMap<Integer, MetisseWindow> children;
 	private boolean published = false;//on wall
 	private boolean displayed = false;
+	private boolean shared = false;
 	
 
 
@@ -584,5 +585,13 @@ public class MetisseWindow extends VImage{
 			res[i+3] = ori[i+0];
 		}
 		return res;
+	}
+
+	public void setShared(boolean b) {
+		shared   = b;
+	}
+
+	public boolean isShared() {
+		return shared;
 	}
 }

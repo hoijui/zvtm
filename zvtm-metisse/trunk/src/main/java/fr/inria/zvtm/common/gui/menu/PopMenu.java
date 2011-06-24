@@ -34,8 +34,11 @@ public class PopMenu {
 	public TeleportItem teleport;
 	private VImage range;
 	protected GlyphEventDispatcher ged;
-	private DragItem drag;
+	private DragItem pan;
 	double factor = 1;
+	private ShareItem share;
+	private ScaleItem scale;
+	private ResetItem reset;
 
 
 	public PopMenu(VirtualSpace v,Viewer viewer, GlyphEventDispatcherForMenu ged,double factor) {
@@ -52,12 +55,10 @@ public class PopMenu {
 		range.setTranslucencyValue(0.3f);
 		range.setDrawBorder(false);
 		teleport = new TeleportItem(this);
-		drag = new DragItem(this);
-		if (viewer instanceof ClientViewer)itemList.add(drag);
-		itemList.add(new ScaleItem(this));
-		itemList.add(new ResetItem(this));
-		if (viewer instanceof ClientViewer)itemList.add(teleport);
-		
+		pan = new DragItem(this);
+		share = new ShareItem(this);
+		scale = new ScaleItem(this);
+		reset = new ResetItem(this);
 	}
 
 	private void invoke(double vxx, double vyy, MetisseWindow frame) {
@@ -72,13 +73,12 @@ public class PopMenu {
 		}
 		else parentFrame = null;
 		if(parentFrame==null){
-			if(viewer instanceof ClientViewer && !itemList.contains(drag))itemList.add(drag);
-			if(viewer instanceof MasterViewer && itemList.contains(drag))itemList.remove(drag);
-			if(itemList.contains(teleport))itemList.remove(teleport);
+			if(viewer instanceof ClientViewer)composeMenu1();
+			if(viewer instanceof MasterViewer)composeMenu2();
 		}
 		else {
-			if(!itemList.contains(drag))itemList.add(drag);
-			if(viewer instanceof ClientViewer)if(!itemList.contains(teleport))itemList.add(teleport);
+			if(viewer instanceof ClientViewer)composeMenu3();
+			if(viewer instanceof MasterViewer)composeMenu4();
 		}
 		virtualSpace.addGlyph(range);
 		for (Item it : itemList) {
@@ -93,12 +93,46 @@ public class PopMenu {
 		
 	}
 
-	
+	/**
+	 * Metisse frame / Master Version
+	 */
+	private void composeMenu4() {
+		itemList.add(pan);		
+		itemList.add(scale);	
+		itemList.add(reset);	
+		itemList.add(share);
+	}
+	/**
+	 * Metisse frame / Client Version
+	 */
+	private void composeMenu3() {
+		itemList.add(pan);		
+		itemList.add(scale);	
+		itemList.add(reset);	
+		itemList.add(teleport);
+	}
+	/**
+	 * Root frame / Master Version
+	 */
+	private void composeMenu2() {		
+		itemList.add(scale);	
+		itemList.add(reset);	
+	}
+	/**
+	 * Root frame / Client Version
+	 */
+	private void composeMenu1() {
+		itemList.add(pan);		
+		itemList.add(scale);	
+		itemList.add(reset);		
+	}
+
 	public void banish() {
 		virtualSpace.removeGlyph(range);
 		for (Item it : itemList) {
 			it.disappear();
 		}
+		itemList.removeAll(itemList);
 		invoked = false;
 	}
 

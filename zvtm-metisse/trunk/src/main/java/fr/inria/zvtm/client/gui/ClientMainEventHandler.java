@@ -35,7 +35,7 @@ public class ClientMainEventHandler extends MainEventHandler {
 	}
 
 	public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
-		if(ch==null)return;
+		if(ch==null||ch.getCursor()==null)return;
 		ch.move(jpx,jpy, e);
 		vxTrace = ch.getVX();
 		vyTrace = ch.getVY();
@@ -105,6 +105,7 @@ public class ClientMainEventHandler extends MainEventHandler {
 
 	public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
 		if(locked)return;
+		if(ch==null||ch.getCursor()==null)return;
 		if(code==KeyEvent.VK_F12){
 			ch.resetCursorPos();
 		}
@@ -134,6 +135,7 @@ public class ClientMainEventHandler extends MainEventHandler {
 
 	public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){
 		if(locked)return;
+		if(ch==null||ch.getCursor()==null)return;
 		if(ch.VirtualMode()){
 			((ForwardingFrameManager)viewer.getFrameManager()).sendKeyEvent(InputForwarder.getKeysym(c,code),0);
 			return;

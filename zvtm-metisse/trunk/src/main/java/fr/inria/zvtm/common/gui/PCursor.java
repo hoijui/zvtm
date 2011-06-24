@@ -161,7 +161,7 @@ public class PCursor {
 	}
 
 	private static Color getColor() {
-		return new Color(0,0,0);
+		return new Color(200,0,0);
 	}
 
 	private static Color getPhantomColor() {

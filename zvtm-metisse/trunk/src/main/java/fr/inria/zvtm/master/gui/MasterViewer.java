@@ -43,6 +43,7 @@ public class MasterViewer extends Viewer{
 	public void initNavigation() {
 		nm = new NavigationManager(this);
 		nm.setCamera(mCamera);
+		getNavigationManager().getCamera().setAltitude(-80);
 	}
 
 	@Override

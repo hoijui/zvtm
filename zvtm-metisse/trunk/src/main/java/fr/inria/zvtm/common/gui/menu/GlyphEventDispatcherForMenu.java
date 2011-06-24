@@ -103,26 +103,26 @@ public class GlyphEventDispatcherForMenu extends GlyphEventDispatcher implements
 	
 	@Override
 	public void mouseDragged(ViewPanel v, int mod, int buttonNumber, int jpxx,int jpyy, MouseEvent e) {
-		testActivity();
 		super.mouseDragged(v, mod, buttonNumber, jpxx, jpyy, e);
+		testActivity();
 	}
 	
 	@Override
 	public void mouseDragged(double x, double y) {
-		testActivity();
 		super.mouseDragged(x, y);
+		testActivity();
 	}
 	
 	@Override
 	public void enterGlyph(Glyph g) {
-		testActivity();
 		super.enterGlyph(g);
+		testActivity();
 	}
 
 	@Override
 	public void exitGlyph(Glyph g) {
-		testActivity();
 		super.exitGlyph(g);
+		testActivity();
 	}
 
 	@Override
