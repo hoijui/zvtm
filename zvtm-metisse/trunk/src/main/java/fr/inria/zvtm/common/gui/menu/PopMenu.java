@@ -17,6 +17,7 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VImage;
 import fr.inria.zvtm.master.gui.MasterViewer;
+import fr.inria.zvtm.master.gui.PCursorPack;
 
 public class PopMenu {
 	public static String ressourcePath = "src/main/java/fr/inria/zvtm/resources/";
@@ -39,6 +40,7 @@ public class PopMenu {
 	private ShareItem share;
 	private ScaleItem scale;
 	private ResetItem reset;
+	private PCursorPack owner;
 
 
 	public PopMenu(VirtualSpace v,Viewer viewer, GlyphEventDispatcherForMenu ged,double factor) {
@@ -49,7 +51,7 @@ public class PopMenu {
 		this.itemList = new LinkedList<Item>();
 		Image img = (new ImageIcon(ressourcePath+"range.png")).getImage();
 		range = new VImage(img);
-		range.scaleFactor = factor;
+		range.reSize(factor);
 		range.setImage(img);
 		range.setSensitivity(false);
 		range.setTranslucencyValue(0.3f);
@@ -100,6 +102,7 @@ public class PopMenu {
 		itemList.add(pan);		
 		itemList.add(scale);	
 		itemList.add(reset);	
+		if(((MasterViewer)viewer).getBoucer().testOwnership(owner, parentFrame.getId()))
 		itemList.add(share);
 	}
 	/**
@@ -188,7 +191,7 @@ public class PopMenu {
 	private boolean validCoord(double vxx, double vyy) {
 		double vx = vxx/getAltFactor();
 		double vy = vyy/getAltFactor();
-		return ((vx-range.vx)*(vx-range.vx)+(vy-range.vy)*(vy-range.vy))<=activityRadius*activityRadius;
+		return ((vx-range.vx)*(vx-range.vx)+(vy-range.vy)*(vy-range.vy))<=activityRadius*activityRadius/factor/factor;
 	}
 
 	public void tryToBanish(){
@@ -245,5 +248,9 @@ public class PopMenu {
 			VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().
 			createGlyphTranslation(200, (Glyph)range, new Point2D.Double(d, e), true, SlowInSlowOutInterpolator.getInstance(),null);
 		VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(trans, false);
+	}
+
+	public void setOwner(PCursorPack pCursorPack) {
+		owner = pCursorPack;
 	}
 }

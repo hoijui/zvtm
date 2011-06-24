@@ -28,6 +28,7 @@ public class PCursorPack {
 		cursor.setVisible(false);
 		ged = new GlyphEventDispatcherForMenu(cursor, viewer.getMenuSpace(), viewer);
 		menu = new PopMenu(viewer.getMenuSpace(), viewer,ged,4);
+		menu.setOwner(this);
 		ged.setMenu(menu);
 		ged.setPriorityOn(meh);
 		((GEDMultiplexer)viewer.getGlyphEventDispatcher()).subscribe(menu,ged);

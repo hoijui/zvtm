@@ -6,7 +6,7 @@ import fr.inria.zvtm.engine.ViewPanel;
 
 public class ShareItem extends Item {
 
-	private boolean enabled = false;
+	private boolean enabled = true;
 	
 	public ShareItem(PopMenu parent) {
 		super(parent);

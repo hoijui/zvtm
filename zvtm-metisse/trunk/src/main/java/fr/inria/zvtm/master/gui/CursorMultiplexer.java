@@ -30,5 +30,12 @@ public class CursorMultiplexer {
 	public void handleRemoteKeyEvent(Socket sock,int keysym, int i) {
 		cursors.get(sock).handleRemoteKeyEvent(keysym,i);
 	}
+	
+	public Socket find(PCursorPack p){
+		for (Socket s : cursors.keySet()) {
+			if (p==cursors.get(s))return s;
+		}
+		return null;
+	}
 
 }

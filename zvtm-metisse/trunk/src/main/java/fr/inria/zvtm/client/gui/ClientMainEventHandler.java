@@ -35,7 +35,7 @@ public class ClientMainEventHandler extends MainEventHandler {
 	}
 
 	public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
-		if(ch==null||ch.getCursor()==null)return;
+		if(ch==null||ch.getCursor()==null||viewer==null||viewer.getFrameManager()==null)return;
 		ch.move(jpx,jpy, e);
 		vxTrace = ch.getVX();
 		vyTrace = ch.getVY();
@@ -48,6 +48,7 @@ public class ClientMainEventHandler extends MainEventHandler {
 
 
 	public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpxx,int jpyy, MouseEvent e){
+		if(ch==null||ch.getCursor()==null||viewer==null||viewer.getFrameManager()==null)return;
 		menuinvocationmarker = 0;
 		ch.move(jpxx,jpyy, e);
 		int jpx = ch.getX();
@@ -64,6 +65,7 @@ public class ClientMainEventHandler extends MainEventHandler {
 
 	public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpxx,int jpyy, MouseWheelEvent e){		
 		if(locked)return;
+		if(ch==null||ch.getCursor()==null||viewer==null||viewer.getFrameManager()==null)return;
 		ch.move(jpxx,jpyy, e);
 		int jpx = ch.getX();
 		int jpy = ch.getY();
@@ -105,7 +107,7 @@ public class ClientMainEventHandler extends MainEventHandler {
 
 	public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
 		if(locked)return;
-		if(ch==null||ch.getCursor()==null)return;
+		if(ch==null||ch.getCursor()==null||viewer==null||viewer.getFrameManager()==null)return;
 		if(code==KeyEvent.VK_F12){
 			ch.resetCursorPos();
 		}
@@ -135,7 +137,7 @@ public class ClientMainEventHandler extends MainEventHandler {
 
 	public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){
 		if(locked)return;
-		if(ch==null||ch.getCursor()==null)return;
+		if(ch==null||ch.getCursor()==null||viewer==null||viewer.getFrameManager()==null)return;
 		if(ch.VirtualMode()){
 			((ForwardingFrameManager)viewer.getFrameManager()).sendKeyEvent(InputForwarder.getKeysym(c,code),0);
 			return;

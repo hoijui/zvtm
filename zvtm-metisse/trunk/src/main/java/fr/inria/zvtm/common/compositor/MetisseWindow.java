@@ -27,7 +27,7 @@ public class MetisseWindow extends VImage{
 	private static MetisseWindow rezisingFrame;
 	private Point.Double rootSize;//size of the root frame
 	private Point.Double rootLocation;//pos of the root frame
-	private byte[] lastFrameBuffer;
+	private byte[] lastFrameBuffer= new byte[1];
 	private boolean alwaysRefresh = true;//refresh during resizing
 	private double x_offset;//ZVTM position
 	private double y_offset;
@@ -48,8 +48,8 @@ public class MetisseWindow extends VImage{
 	private HashMap<Integer, MetisseWindow> children;
 	private boolean published = false;//on wall
 	private boolean displayed = false;
-	private boolean shared = false;
-	
+	private boolean shared = true;
+
 
 
 
@@ -83,9 +83,7 @@ public class MetisseWindow extends VImage{
 			if((currentW==w)&&(currentH==h)){
 				lastFrameBuffer = img;
 			}
-		}
-		if(alwaysRefresh){
-			if (isResizing && lastFrameBuffer!= null && 4*currentH*currentW== lastFrameBuffer.length) {
+			if(alwaysRefresh){
 				this.width = currentW;
 				this.height = currentH;
 				this.vw = this.width*scaleFactor;
@@ -96,6 +94,7 @@ public class MetisseWindow extends VImage{
 				patch(img, x, y, w, h);
 			}
 		}
+
 		VirtualSpaceManager.INSTANCE.repaint();
 	}
 
@@ -103,13 +102,17 @@ public class MetisseWindow extends VImage{
 		byte[] raster = ((DataBufferByte)((BufferedImage) image).getRaster().getDataBuffer()).getData();
 		int W = ((BufferedImage) image).getWidth();
 		for (int i = 0; i < img.length; i++) {
-			raster[4*(i/4)+(3-i%4)+4*(i/(4*w))*(W-w)+4*(W*y+x)] = img[i];
+			if(4*(i/4)+(3-i%4)+4*(i/(4*w))*(W-w)+4*(W*y+x)<raster.length)
+				raster[4*(i/4)+(3-i%4)+4*(i/(4*w))*(W-w)+4*(W*y+x)] = img[i];
+			//			if(lastFrameBuffer.length>i+4*(i/(4*w))*(W-w)+4*(W*y+x))
+			//			lastFrameBuffer[i+4*(i/(4*w))*(W-w)+4*(W*y+x)] = img[i];
 		}
 	}
-	
+
 
 	public void configure(int x, int y, int w, int h) {
 		if(isroot)return;
+		System.out.println(this.width+" "+ w);//il y a un problème ici
 		if(isResizing || this.width!= w|| this.height!=h){
 			isResizing = true;
 			MetisseWindow.rezisingFrame = this;
@@ -136,7 +139,7 @@ public class MetisseWindow extends VImage{
 		this.y = y;
 
 	}
-	
+
 	private void fatherOf(MetisseWindow m){
 		if(children.containsKey(m))return;
 		children.put(m.getId(), m);
@@ -153,7 +156,8 @@ public class MetisseWindow extends VImage{
 		this.image = new BufferedImage((int)currentW, (int)currentH,encoding);		
 		isResizing = false;
 		MetisseWindow.rezisingFrame= null;
-		if (4*width*height == lastFrameBuffer.length) patch(lastFrameBuffer, 0, 0, (int)width,(int)height);
+		if (4*width*height == lastFrameBuffer.length) 
+			patch(lastFrameBuffer, 0, 0, (int)width,(int)height);
 	}
 
 
@@ -177,8 +181,8 @@ public class MetisseWindow extends VImage{
 		if (d ==0)return;
 		vw = d*image.getWidth(null);
 		vh = d*image.getHeight(null);
-	
-		
+
+
 		if (master!=null){
 			this.vx = master.vx-master.width*parentScaleFactor/2+parentScaleFactor*(x- master.x)+width*scaleFactor/2 + x_offset;
 			this.vy = master.vy-(-master.height*parentScaleFactor/2+parentScaleFactor*(y- master.y)+height*scaleFactor/2)+y_offset;
@@ -186,7 +190,7 @@ public class MetisseWindow extends VImage{
 
 		for (MetisseWindow m : children.values()) {
 			m.setScaleFactor(m.getScaleFactor()*d/scaleFactor);
-		
+
 		}
 		scaleFactor = d;
 		VirtualSpaceManager.INSTANCE.repaint();
@@ -206,7 +210,7 @@ public class MetisseWindow extends VImage{
 		//	One should remove this Line as soon as the file MetisseWindow.java is placed in the package glyphs
 		double wFactor = 1;
 		double hFactor = 1;
-//		interpolationMethod = RenderingHints.VALUE_INTERPOLATION_BICUBIC;
+		//		interpolationMethod = RenderingHints.VALUE_INTERPOLATION_BICUBIC;
 
 		if(isResizing){
 			wFactor = currentW/this.width;
@@ -320,18 +324,18 @@ public class MetisseWindow extends VImage{
 		x_offset*= w.getScaleFactor()/parentScaleFactor;
 		y_offset*= w.getScaleFactor()/parentScaleFactor;
 		double d = (scaleFactor*w.getScaleFactor()/parentScaleFactor);
-		
+
 		if(isroot)return;
 		if (d ==0)return;
 		vw = d*image.getWidth(null);
 		vh = d*image.getHeight(null);
 		scaleFactor = d;
-		
+
 		parentScaleFactor = w.getScaleFactor();
-		
+
 		this.vx = w.vx-w.width*parentScaleFactor/2+parentScaleFactor*(x- w.x)+width*scaleFactor/2 + x_offset;
 		this.vy = w.vy-(-w.height*parentScaleFactor/2+parentScaleFactor*(y- w.y)+height*scaleFactor/2)+y_offset;
-		
+
 		xParentOffset = w.x_offset;
 		yParentOffset = w.y_offset;
 
@@ -368,23 +372,23 @@ public class MetisseWindow extends VImage{
 			dx = master.vx-master.width*parentScaleFactor/2+parentScaleFactor*(x- master.x)+width*parentScaleFactor/2;
 			dy = master.vy-(-master.height*parentScaleFactor/2+parentScaleFactor*(y- master.y)+height*parentScaleFactor/2);
 		}
-		
-		
+
+
 		Animation trans = 
 			VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().
 			createGlyphTranslation(200, this, new Point2D.Double(dx,dy), false, SlowInSlowOutInterpolator.getInstance(),null);
 		VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(trans, false);
-	
+
 
 		Animation scale = 
 			createGlyphScaleAnim(200, this, parentScaleFactor, false, SlowInSlowOutInterpolator.getInstance(), null);
 		VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(scale, false);
-		
+
 		for (MetisseWindow m : children.values()) {
 			m.resetTransform(dx,dy,1);
 		}
-		
-		
+
+
 		x_offset = 0;
 		y_offset = 0;
 
@@ -398,19 +402,19 @@ public class MetisseWindow extends VImage{
 			dx = masterX-master.width*sf/2+sf*(x- master.x)+width*sf/2;
 			dy = masterY-(-master.height*sf/2+sf*(y- master.y)+height*sf/2);
 		}
-		
+
 		Animation trans = 
 			VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().
 			createGlyphTranslation(200, this, new Point2D.Double(dx,dy), false, SlowInSlowOutInterpolator.getInstance(),null);
 		VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(trans, false);
-		
+
 		x_offset = 0;
 		y_offset = 0;
 
 		Animation scale = 
 			createGlyphScaleAnim(200, this, sf, false, SlowInSlowOutInterpolator.getInstance(), null);
 		VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(scale, false);
-		
+
 	}
 
 	private Animation createGlyphScaleAnim(final int duration, final MetisseWindow mw,
@@ -447,13 +451,13 @@ public class MetisseWindow extends VImage{
 			public void timingEvent(float fraction, 
 					Object subject, Animation.Dimension dim){
 				double d = (startScale + fraction*(endScale - startScale));
-				
+
 				if(mw.isroot)return;
 				if (d ==0)return;
 				mw.vw = d*mw.image.getWidth(null);
 				mw.vh = d*mw.image.getHeight(null);
 				mw.scaleFactor = d;
-				
+
 			}
 		},
 		interpolator);
@@ -499,17 +503,13 @@ public class MetisseWindow extends VImage{
 		this.isroot = isroot;
 	}
 
-	public void setResizing(boolean isResizing) {
-		this.isResizing = isResizing;
-	}
-
 	public void setRescaling(boolean isRescaling) {
 		this.isRescaling = isRescaling;
 	}
 
 	public void setPublished(boolean published) {
 		for (MetisseWindow m : children.values()) {
-				m.setPublished(published);
+			m.setPublished(published);
 		}
 		this.published = published;
 	}
@@ -553,10 +553,10 @@ public class MetisseWindow extends VImage{
 	public Point.Double getRootLocation() {
 		return rootLocation;
 	}
-	
+
 	@Override
 	public boolean coordInside(int jpx, int jpy, int camIndex, double cvx,double cvy) {
- 		return((cvx-vx)*(cvx-vx)<=vw*vw/4		&&      (cvy-vy)*(cvy-vy)<=vh*vh/4);
+		return((cvx-vx)*(cvx-vx)<=vw*vw/4		&&      (cvy-vy)*(cvy-vy)<=vh*vh/4);
 	}
 
 	public void setDisplayed(boolean displayed) {
@@ -570,7 +570,7 @@ public class MetisseWindow extends VImage{
 	public int getW() {
 		return (int) width;
 	}
-	
+
 	public int getH() {
 		return (int) height;
 	}

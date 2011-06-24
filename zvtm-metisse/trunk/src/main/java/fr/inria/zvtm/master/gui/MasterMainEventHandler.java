@@ -57,7 +57,7 @@ public class MasterMainEventHandler extends MainEventHandler{
 		currentwindow = detectWindow();
 		upStack(viewer.getFrameManager().get(currentwindow));//put on top the window
 		int[] p = unproject();
-		if(p!=null && viewer.getFrameManager().get(currentwindow).isShared())
+		if(p!=null && testRight())
 		((MasterViewer) viewer).getBoucer().handleMouse(p[0],p[1],buttonMask,p[2]);
 	}
 
@@ -65,7 +65,7 @@ public class MasterMainEventHandler extends MainEventHandler{
 		owner.ged.release(x,y,i);
 		if(locked)return;
 		int[] p = unproject();
-		if(p!=null&& viewer.getFrameManager().get(currentwindow).isShared())
+		if(p!=null&& testRight())
 		((MasterViewer) viewer).getBoucer().handleMouse(p[0],p[1],buttonMask,p[2]);
 	}
 
@@ -77,7 +77,7 @@ public class MasterMainEventHandler extends MainEventHandler{
 		owner.ged.mouseDragged(x,y);
 		if(locked)return;
 		int[] p = unproject();
-		if(p!=null&& viewer.getFrameManager().get(currentwindow).isShared())
+		if(p!=null&& testRight())
 		((MasterViewer) viewer).getBoucer().handleMouse(p[0],p[1],buttonMask,p[2]);
 	}
 
@@ -86,7 +86,7 @@ public class MasterMainEventHandler extends MainEventHandler{
 		if(locked)return;
 		currentwindow = detectWindow();
 		int[] p = unproject();
-		if(p!=null&& viewer.getFrameManager().get(currentwindow).isShared())
+		if(p!=null&& testRight())
 		((MasterViewer) viewer).getBoucer().handleMouse(p[0],p[1],buttonMask,p[2]);
 	}
 
@@ -95,7 +95,7 @@ public class MasterMainEventHandler extends MainEventHandler{
 		if(locked)return;
 		currentwindow = detectWindow();
 		int[] p = unproject();
-		if(p!=null&& viewer.getFrameManager().get(currentwindow).isShared()){
+		if(p!=null&& testRight()){
 			if(wheelDirection==1){//up
 				((MasterViewer) viewer).getBoucer().handleMouse(p[0],p[1],buttonMask|(1<<5),p[2]);
 				((MasterViewer) viewer).getBoucer().handleMouse(p[0],p[1],buttonMask,p[2]);
@@ -143,27 +143,29 @@ public class MasterMainEventHandler extends MainEventHandler{
 		}else{
 			controlHasBeenPressed = false;
 		}
-		int win = detectWindow();
-		if(viewer.getFrameManager().get(win)!=null && viewer.getFrameManager().get(win).isShared())
-		((MasterViewer) viewer).getBoucer().handleKey(keysym,true,win);
+		currentwindow = detectWindow();
+		if(testRight())
+		((MasterViewer) viewer).getBoucer().handleKey(keysym,true,currentwindow);
 	}
 	
 	public void Krelease(int keysym) {
-		
 		if(locked)return;
-		if(InputForwarder.getKeysym(' ',KeyEvent.VK_CONTROL)==Keysym.ControlL){
+		if(keysym==Keysym.ControlL){
 			if(controlHasBeenPressed){
 				toggleMenu();
 				controlHasBeenPressed =false;
-				return;
 			}
 
 		}else{
 			controlHasBeenPressed = false;
 		}
-		int win = detectWindow();
-		if(viewer.getFrameManager().get(win)!=null && viewer.getFrameManager().get(win).isShared())
-		((MasterViewer) viewer).getBoucer().handleKey(keysym,false,win);
+		currentwindow = detectWindow();
+		
+		if(((MasterViewer) viewer).getBoucer().testOwnership(owner, currentwindow)&&viewer.getFrameManager().get(currentwindow)!=null)
+		viewer.getFrameManager().get(currentwindow).endResize();
+		
+		if(testRight())
+		((MasterViewer) viewer).getBoucer().handleKey(keysym,false,currentwindow);
 		
 	}
 
@@ -196,7 +198,6 @@ public class MasterMainEventHandler extends MainEventHandler{
 		int[] res = new int[3];
 		double sf = 1;//scale factor
 		int xx,yy;
-//		int currentWindow = detectWindow();
 		MetisseWindow cu = viewer.getFrameManager().get(currentwindow);
 		if(cu==null)return null;
 		double[] cubounds = cu.getBounds();
@@ -207,5 +208,11 @@ public class MasterMainEventHandler extends MainEventHandler{
 		res[1] = yy;
 		res[2] = currentwindow;
 		return res;
+	}
+
+	
+	private boolean testRight() {
+	//	if(((MasterViewer) viewer).getBoucer().testOwnership(owner,currentwindow))return true;
+		return viewer.getFrameManager().get(currentwindow)!=null &&viewer.getFrameManager().get(currentwindow).isShared();
 	}
 }

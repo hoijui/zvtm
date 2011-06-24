@@ -48,27 +48,28 @@ public abstract class Item implements GlyphListener{
 		shape = new VImage(img.getImage()){
 			@Override
 			public boolean coordInside(int jpx, int jpy, int camIndex, double cvx,double cvy) {
-				return((cvx-vx)*(cvx-vx)<=vw*vw/4		&&      (cvy-vy)*(cvy-vy)<=vh*vh/4);
+				return((cvx-vx)*(cvx-vx)+(cvy-vy)*(cvy-vy)<=vh*vw/4);
 			}
 		};
 		shape2 = new VImage(img2.getImage()){
 			@Override
 			public boolean coordInside(int jpx, int jpy, int camIndex, double cvx,double cvy) {
-				return((cvx-vx)*(cvx-vx)<=vw*vw/4		&&      (cvy-vy)*(cvy-vy)<=vh*vh/4);
+				return((cvx-vx)*(cvx-vx)+(cvy-vy)*(cvy-vy)<=vh*vh/4);
 			}
 		};
-		shape.scaleFactor = parent.factor;
+		shape.reSize(parent.factor);
+		shape2.reSize(parent.factor);
 		shape.setDrawBorder(false);
-		shape.addCamera(0);
-		shape2.scaleFactor = parent.factor;
 		shape2.setDrawBorder(false);
+		shape.addCamera(0);
 		shape2.addCamera(0);
 		this.shape.setSensitivity(true);
-		this.shape.setTranslucencyValue(0);	
-		this.parent.ged.subscribe(this.shape, this);
 		this.shape2.setSensitivity(true);
+		this.shape.setTranslucencyValue(0);	
 		this.shape2.setTranslucencyValue(0);	
+		this.parent.ged.subscribe(this.shape, this);
 		this.parent.ged.subscribe(this.shape2, this);
+		
 		drawUp();
 	}
 

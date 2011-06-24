@@ -1,5 +1,7 @@
 package fr.inria.zvtm.master.gui;
 
+import java.net.Socket;
+
 import fr.inria.zvtm.common.kernel.Pair;
 import fr.inria.zvtm.common.protocol.RfbAgent;
 import fr.inria.zvtm.master.compositor.ZvtmRfbHandlerMultiplexer;
@@ -37,7 +39,17 @@ public class Bouncer {
 			rfb.orderConfigureWall(bounds);
 		}
 	}
-	
-	
+
+	/** Tests if the cursor's owner is also the owner of the window
+	 *@param cursor The potential owner of the window
+	 *@param window The window to test 
+	 */
+	public boolean testOwnership(PCursorPack cursor, int window) {
+		Socket s = ((MasterViewer)multiplexer.getFrameManager().getViewer()).getCursorMultiplexer().find(cursor);
+		Pair p = multiplexer.find(window);
+		return ((p!=null) && (p.dest==s));
+	}
+
+
 }
 
