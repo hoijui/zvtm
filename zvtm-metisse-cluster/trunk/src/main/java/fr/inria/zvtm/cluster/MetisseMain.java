@@ -27,7 +27,7 @@ public class MetisseMain extends MasterMain {
 
 
 	private static void initViewers() {
-		((MasterViewer)compositor.getViewer()).getBoucer().setRFBInputMultiplexer(connector.getMultiplexer());
+		((MasterViewer)compositor.getViewer()).getBouncer().setRFBInputMultiplexer(connector.getMultiplexer());
 
 	}
 }
