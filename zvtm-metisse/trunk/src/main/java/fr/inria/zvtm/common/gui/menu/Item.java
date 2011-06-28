@@ -10,6 +10,7 @@ import javax.swing.ImageIcon;
 
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.EndAction;
+import fr.inria.zvtm.animation.Animation.Dimension;
 import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 import fr.inria.zvtm.common.gui.GlyphListener;
 import fr.inria.zvtm.engine.ViewPanel;
@@ -24,8 +25,8 @@ public abstract class Item implements GlyphListener{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private static final float MinTranslucency = 0.3f;
-	private static final float MaxTranslucency = 1f;
+	protected static final float MinTranslucency = 0.3f;
+	protected static final float MaxTranslucency = 1f;
 	protected VImage shape;
 	protected VImage shape2;
 	protected PopMenu parent;
@@ -69,94 +70,93 @@ public abstract class Item implements GlyphListener{
 		this.shape2.setTranslucencyValue(0);	
 		this.parent.ged.subscribe(this.shape, this);
 		this.parent.ged.subscribe(this.shape2, this);
-		
-		drawUp();
+
+		this.drawUp();
 	}
 
 	protected abstract String getState1ImageName();
 	protected abstract String getState2ImageName();
 
+/**
+ * Handle translucency animation for the specified shape.
+ * Animation will occur only if the shape is visible. In the other case, it will be just be set to dest.
+ * @param shape
+ * @param start the modification will apply only if the current translucency value is start. Set to a negative value to bypass the test.
+ * @param dest the translucency value in the end
+ * @param e the end action
+ */
+	protected void appearAnim(VImage shape,float start, float dest,EndAction e){
+		if(shape.isVisible()){
+			if(start<0 || (shape.getTranslucencyValue()==start && shape.getTranslucencyValue()!=dest)){
+				Animation trans = 
+					VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().
+					createTranslucencyAnim(30, shape, dest, false, SlowInSlowOutInterpolator.getInstance(), e);
+				VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(trans, false);
+			}
+		}
+		else{
+				shape.setTranslucencyValue(dest);
+				if(e!=null)e.execute(null, null);
+		}
+	}
+	
+	/**
+	 * Handle translucency animation for the specified shape.
+	 * Animation will occur only if the shape is visible. In the other case, it will be just be set to dest.
+	 * @param shape
+	 * @param start the modification will apply only if the current translucency value is start. Set to a negative value to bypass the test.
+	 * @param dest the translucency value in the end
+	 */
+	protected void appearAnim(VImage shape,float start, float dest){
+		appearAnim(shape, start, dest,null);
+	}
+
 
 	public void appear() {
 		parent.getVirtualSpace().addGlyph(this.shape);
 		parent.getVirtualSpace().addGlyph(this.shape2);
-		Animation trans = 
-			VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().
-			createTranslucencyAnim(100, this.shape, MinTranslucency, false, SlowInSlowOutInterpolator.getInstance(), null);
-		if(this.shape.getTranslucencyValue()==0)
-			VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(trans, false);
 
-		Animation trans2 = 
-			VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().
-			createTranslucencyAnim(100, this.shape2, MinTranslucency, false, SlowInSlowOutInterpolator.getInstance(), null);
-		if(this.shape2.getTranslucencyValue()==0)
-			VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(trans2, false);
-
+		appearAnim(shape, 0, MinTranslucency);
+		appearAnim(shape2, 0, MinTranslucency);
 	}
 
 	public void disappear() {
 		deactivate();
-		Animation trans = 
-			VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().
-			createTranslucencyAnim(100, this.shape, 0, false, SlowInSlowOutInterpolator.getInstance(), new EndAction() {
-
-				@Override
-				public void execute(Object subject,
-						fr.inria.zvtm.animation.Animation.Dimension dimension) {
-					parent.getVirtualSpace().removeGlyph(shape);
-					deactivate();
-
-				}
-			});
-		VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(trans, false);
-
-
-		Animation trans2 = 
-			VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().
-			createTranslucencyAnim(100, this.shape2, 0, false, SlowInSlowOutInterpolator.getInstance(), new EndAction() {
-
-				@Override
-				public void execute(Object subject,
-						fr.inria.zvtm.animation.Animation.Dimension dimension) {
-					parent.getVirtualSpace().removeGlyph(shape2);
-					deactivate();
-
-				}
-			});
-		VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(trans2, false);
-
+		EndAction e1 = new EndAction() {
+			
+			@Override
+			public void execute(Object subject, Dimension dimension) {
+				parent.getVirtualSpace().removeGlyph(shape);
+				deactivate();
+			}
+		};
+		EndAction e2 = new EndAction() {
+			
+			@Override
+			public void execute(Object subject, Dimension dimension) {
+				parent.getVirtualSpace().removeGlyph(shape2);
+				deactivate();
+			}
+		};
+		appearAnim(shape,-1,0,e1);
+		appearAnim(shape2,-1,0,e2);
 	}
 
-	private void makeAppear(){
+	protected void makeAppear(){
 		if(parent.pressed)return;
 		activate();
 		appeared = true;
-		Animation trans = 
-			VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().
-			createTranslucencyAnim(100, this.shape, MaxTranslucency, false, SlowInSlowOutInterpolator.getInstance(), null);
-		if(this.shape.getTranslucencyValue()==MinTranslucency)
-			VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(trans, false);
-
-		Animation trans2 = 
-			VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().
-			createTranslucencyAnim(100, this.shape2, MaxTranslucency, false, SlowInSlowOutInterpolator.getInstance(), null);
-		if(this.shape2.getTranslucencyValue()==MinTranslucency)
-			VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(trans2, false);
+		appearAnim(shape, MinTranslucency, MaxTranslucency);
+		appearAnim(shape2, MinTranslucency, MaxTranslucency);
+		
 	}
 
-	private void makeDisappear(){
+	protected void makeDisappear(){
 		if(parent.pressed)return;
 		deactivate();
 		appeared = false;
-		Animation trans = 
-			VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().
-			createTranslucencyAnim(100, this.shape, MinTranslucency, false, SlowInSlowOutInterpolator.getInstance(), null);
-		VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(trans, false);
-
-		Animation trans2 = 
-			VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().
-			createTranslucencyAnim(100, this.shape2, MinTranslucency, false, SlowInSlowOutInterpolator.getInstance(), null);
-		VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(trans2, false);
+		appearAnim(shape, -1, MinTranslucency);
+		appearAnim(shape2, -1, MinTranslucency);
 	}
 
 	public void addListener(ItemActivationListener ial){
@@ -174,7 +174,7 @@ public abstract class Item implements GlyphListener{
 		}
 	}
 
-	private void deactivate() {
+	protected void deactivate() {
 		active = false;
 		for (ItemActivationListener ial : listeners) {
 			ial.deactivated();

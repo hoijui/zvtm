@@ -61,7 +61,7 @@ public class MasterViewer extends Viewer{
 		return cursorSpace;
 	}
 
-	public Bouncer getBoucer() {
+	public Bouncer getBouncer() {
 		return bouncer;
 	}
 

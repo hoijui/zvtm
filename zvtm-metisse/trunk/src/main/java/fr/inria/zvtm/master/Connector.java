@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import fr.inria.zvtm.common.gui.PCursor;
 import fr.inria.zvtm.common.kernel.RfbInput;
 import fr.inria.zvtm.common.protocol.Owner;
 import fr.inria.zvtm.common.protocol.Proto;
@@ -47,7 +48,6 @@ public class Connector {
 					try {
 						System.out.println("Server ready\nWaiting for incoming connection...");
 						Socket s = server.accept();
-						s.setKeepAlive(true);
 						System.out.println("Connection accepted from "+s.getInetAddress()+":"+s.getPort());
 						startListening(s).start();
 					} catch (IOException e) {
@@ -69,14 +69,15 @@ public class Connector {
 		private Thread startListening(final Socket s){
 
 			Thread listen = new ListeningThread(){
-				RfbAgent rfbAgent;
-				Socket sock;
+				private RfbAgent rfbAgent;
+				private Socket sock;
+				private boolean consumed = false;
 
 				@Override
 				public void run() {
 					sock = s;
 					try {
-						connections.put(s, new RfbAgent(s.getInputStream(), s.getOutputStream(),this));
+						connections.put(sock, new RfbAgent(sock.getInputStream(), sock.getOutputStream(),this));
 						rfbAgent = connections.get(sock);
 						rfbAgent.rfbProtocalVersion();
 						rfbAgent.rfbAuthentification(); // receive, send & receive
@@ -139,8 +140,11 @@ public class Connector {
 					boolean something_read = false;
 					boolean ret = false;
 					something_read = true;
-
 					int type = rfbAgent.readCard8();
+					if(!consumed){
+						rfbAgent.orderConfigureWall(PCursor.wallBounds);//we send it now because we are sure that the client is ready
+						consumed = true;
+					}
 					switch(type){
 					case Proto.rfbBell:
 						ret = rfbAgent.rfbBell();

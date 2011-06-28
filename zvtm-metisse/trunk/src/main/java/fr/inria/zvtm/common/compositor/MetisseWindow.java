@@ -63,6 +63,7 @@ public class MetisseWindow extends VImage{
 		this.height = h;
 		this.isroot = isroot;
 		if (isroot){
+			shared = false;
 			rootDimension = new Point.Double(w, h);
 			rootPosition = new Point.Double(x, y);
 		}
@@ -588,6 +589,7 @@ public class MetisseWindow extends VImage{
 	}
 
 	public void setShared(boolean b) {
+		if(isroot)return;
 		shared   = b;
 	}
 

@@ -4,10 +4,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
-import fr.inria.zvtm.common.compositor.InputForwarder;
 import fr.inria.zvtm.common.compositor.MetisseWindow;
 import fr.inria.zvtm.common.gui.MainEventHandler;
-import fr.inria.zvtm.common.gui.menu.PopMenu;
 import fr.inria.zvtm.common.protocol.Keysym;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.glyphs.Glyph;
@@ -58,7 +56,7 @@ public class MasterMainEventHandler extends MainEventHandler{
 		upStack(viewer.getFrameManager().get(currentwindow));//put on top the window
 		int[] p = unproject();
 		if(p!=null && testRight())
-		((MasterViewer) viewer).getBoucer().handleMouse(p[0],p[1],buttonMask,p[2]);
+		((MasterViewer) viewer).getBouncer().handleMouse(p[0],p[1],buttonMask,p[2]);
 	}
 
 	public void release(double x, double y, int i,int buttonMask) {
@@ -66,7 +64,7 @@ public class MasterMainEventHandler extends MainEventHandler{
 		if(locked)return;
 		int[] p = unproject();
 		if(p!=null&& testRight())
-		((MasterViewer) viewer).getBoucer().handleMouse(p[0],p[1],buttonMask,p[2]);
+		((MasterViewer) viewer).getBouncer().handleMouse(p[0],p[1],buttonMask,p[2]);
 	}
 
 	public void click(double x, double y, int i,int buttonMask) {
@@ -78,7 +76,7 @@ public class MasterMainEventHandler extends MainEventHandler{
 		if(locked)return;
 		int[] p = unproject();
 		if(p!=null&& testRight())
-		((MasterViewer) viewer).getBoucer().handleMouse(p[0],p[1],buttonMask,p[2]);
+		((MasterViewer) viewer).getBouncer().handleMouse(p[0],p[1],buttonMask,p[2]);
 	}
 
 	public void mouseMoved(double x, double y,int buttonMask) {
@@ -87,7 +85,7 @@ public class MasterMainEventHandler extends MainEventHandler{
 		currentwindow = detectWindow();
 		int[] p = unproject();
 		if(p!=null&& testRight())
-		((MasterViewer) viewer).getBoucer().handleMouse(p[0],p[1],buttonMask,p[2]);
+		((MasterViewer) viewer).getBouncer().handleMouse(p[0],p[1],buttonMask,p[2]);
 	}
 
 	public void mouseWheelMove(double x, double y, int wheelDirection,int buttonMask) {
@@ -97,12 +95,12 @@ public class MasterMainEventHandler extends MainEventHandler{
 		int[] p = unproject();
 		if(p!=null&& testRight()){
 			if(wheelDirection==1){//up
-				((MasterViewer) viewer).getBoucer().handleMouse(p[0],p[1],buttonMask|(1<<5),p[2]);
-				((MasterViewer) viewer).getBoucer().handleMouse(p[0],p[1],buttonMask,p[2]);
+				((MasterViewer) viewer).getBouncer().handleMouse(p[0],p[1],buttonMask|(1<<5),p[2]);
+				((MasterViewer) viewer).getBouncer().handleMouse(p[0],p[1],buttonMask,p[2]);
 			}
 			else{
-				((MasterViewer) viewer).getBoucer().handleMouse(p[0],p[1],buttonMask|(1<<4),p[2]);
-				((MasterViewer) viewer).getBoucer().handleMouse(p[0],p[1],buttonMask,p[2]);
+				((MasterViewer) viewer).getBouncer().handleMouse(p[0],p[1],buttonMask|(1<<4),p[2]);
+				((MasterViewer) viewer).getBouncer().handleMouse(p[0],p[1],buttonMask,p[2]);
 			}
 		}
 		if(wheelDirection!=lastwheeldirection){//process to invoke the menu
@@ -145,7 +143,7 @@ public class MasterMainEventHandler extends MainEventHandler{
 		}
 		currentwindow = detectWindow();
 		if(testRight())
-		((MasterViewer) viewer).getBoucer().handleKey(keysym,true,currentwindow);
+		((MasterViewer) viewer).getBouncer().handleKey(keysym,true,currentwindow);
 	}
 	
 	public void Krelease(int keysym) {
@@ -161,11 +159,11 @@ public class MasterMainEventHandler extends MainEventHandler{
 		}
 		currentwindow = detectWindow();
 		
-		if(((MasterViewer) viewer).getBoucer().testOwnership(owner, currentwindow)&&viewer.getFrameManager().get(currentwindow)!=null)
+		if(((MasterViewer) viewer).getBouncer().testOwnership(owner, currentwindow)&&viewer.getFrameManager().get(currentwindow)!=null)
 		viewer.getFrameManager().get(currentwindow).endResize();
 		
 		if(testRight())
-		((MasterViewer) viewer).getBoucer().handleKey(keysym,false,currentwindow);
+		((MasterViewer) viewer).getBouncer().handleKey(keysym,false,currentwindow);
 		
 	}
 
@@ -178,11 +176,11 @@ public class MasterMainEventHandler extends MainEventHandler{
 	
 	
 	public void toggleMenu(){
-		owner.getMenu().toggle(owner.getCursor().getVSXCoordinate(), owner.getCursor().getVSYCoordinate(), viewer.getFrameManager().get(currentwindow),PopMenu.DEFAULTACTIVERADIUS);
+		owner.getMenu().toggle(owner.getCursor().getVSXCoordinate(), owner.getCursor().getVSYCoordinate(), viewer.getFrameManager().get(currentwindow));
 	}
 
 	public void invokeMenu(){
-		owner.getMenu().invoke(owner.getCursor().getVSXCoordinate(), owner.getCursor().getVSYCoordinate(), viewer.getFrameManager().get(currentwindow),PopMenu.DEFAULTACTIVERADIUS);
+		owner.getMenu().invoke(owner.getCursor().getVSXCoordinate(), owner.getCursor().getVSYCoordinate(), viewer.getFrameManager().get(currentwindow));
 	}
 
 	public void banishMenu(){

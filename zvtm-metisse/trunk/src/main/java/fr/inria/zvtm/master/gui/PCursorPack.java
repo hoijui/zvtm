@@ -32,7 +32,7 @@ public class PCursorPack {
 		ged.setMenu(menu);
 		ged.setPriorityOn(meh);
 		((GEDMultiplexer)viewer.getGlyphEventDispatcher()).subscribe(menu,ged);
-		viewer.sendViewUpgrade();
+	//	viewer.sendViewUpgrade();
 	}
 
 	public void end() {

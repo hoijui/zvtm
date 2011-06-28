@@ -5,7 +5,7 @@ import java.awt.event.MouseEvent;
 import fr.inria.zvtm.client.compositor.ForwardingFrameManager;
 import fr.inria.zvtm.engine.ViewPanel;
 
-public class TeleportItem extends Item {
+public class TeleportItem extends ToggleItem {
 
 	private boolean enabled = false;
 	
@@ -24,18 +24,27 @@ public class TeleportItem extends Item {
 	
 	@Override
 	protected String getState1ImageName() {
-		return "wall.png";
+		return "towall.png";
 	}
 
 	@Override
 	protected String getState2ImageName() {
-		return "wallp.png";
+		return "towallp.png";
 	}
 	
+	@Override
+	protected String getState3ImageName() {
+		return "toscreen.png";
+	}
+
+	@Override
+	protected String getState4ImageName() {
+		return "toscreenp.png";
+	}
+
 	public void setStatus(boolean s){
 		enabled = s;
-		if (enabled) drawDown();
-		else drawUp();
+		setState(enabled?1:0);
 	}
 	
 	@Override

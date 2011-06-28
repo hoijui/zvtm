@@ -16,7 +16,7 @@ public class MasterMain {
 		handleArgs(args);
 		compositor = new MasterCompositor(new MasterViewer());
 		connector = new Connector(compositor);
-		((MasterViewer)compositor.getViewer()).getBoucer().setRFBInputMultiplexer(connector.getMultiplexer());
+		((MasterViewer)compositor.getViewer()).getBouncer().setRFBInputMultiplexer(connector.getMultiplexer());
 		connector.init(listeningPort);
 	}
 

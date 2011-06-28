@@ -25,7 +25,6 @@ public class PopMenu {
 	private VirtualSpace virtualSpace;
 	private LinkedList<Item> itemList;
 	protected MetisseWindow parentFrame;
-	private double activityRadius = DEFAULTACTIVERADIUS;
 	private boolean invoked = false;
 	double refVX;
 	private double refVY;
@@ -51,8 +50,8 @@ public class PopMenu {
 		this.itemList = new LinkedList<Item>();
 		Image img = (new ImageIcon(ressourcePath+"range.png")).getImage();
 		range = new VImage(img);
-		range.reSize(factor);
 		range.setImage(img);
+		range.reSize(factor);
 		range.setSensitivity(false);
 		range.setTranslucencyValue(0.3f);
 		range.setDrawBorder(false);
@@ -63,7 +62,7 @@ public class PopMenu {
 		reset = new ResetItem(this);
 	}
 
-	private void invoke(double vxx, double vyy, MetisseWindow frame) {
+	public void invoke(double vxx, double vyy, MetisseWindow frame) {
 		refreshAltFactor();
 		double vx = (vxx - viewer.getNavigationManager().getCamera().getLocation().vx)/getAltFactor();
 		double vy = (vyy - viewer.getNavigationManager().getCamera().getLocation().vy)/getAltFactor();
@@ -102,7 +101,7 @@ public class PopMenu {
 		itemList.add(pan);		
 		itemList.add(scale);	
 		itemList.add(reset);	
-		if(((MasterViewer)viewer).getBoucer().testOwnership(owner, parentFrame.getId()))
+		if(((MasterViewer)viewer).getBouncer().testOwnership(owner, parentFrame.getId()))
 		itemList.add(share);
 	}
 	/**
@@ -160,20 +159,14 @@ public class PopMenu {
 		return virtualSpace;
 	}
 
-	public void toggle(double vx, double vy, MetisseWindow frame,double radius) {
-		this.activityRadius = radius*factor;
+	public void toggle(double vx, double vy, MetisseWindow frame) {
 		if(invoked)banish();
 		else {
-			invoke(vx, vy, frame,this.activityRadius);
+			invoke(vx, vy, frame);
 		}
 
 	}
 
-	public void invoke(double vx, double vy, MetisseWindow frame,double radius) {
-		if(invoked)return;
-		this.activityRadius = radius*factor;
-		invoke(vx, vy, frame);
-	}
 
 	public boolean isInvoked(){
 		return invoked;
@@ -191,7 +184,7 @@ public class PopMenu {
 	private boolean validCoord(double vxx, double vyy) {
 		double vx = vxx/getAltFactor();
 		double vy = vyy/getAltFactor();
-		return ((vx-range.vx)*(vx-range.vx)+(vy-range.vy)*(vy-range.vy))<=activityRadius*activityRadius/factor/factor;
+		return ((vx-range.vx)*(vx-range.vx)+(vy-range.vy)*(vy-range.vy))<=0.25*range.vw*range.vw;
 	}
 
 	public void tryToBanish(){

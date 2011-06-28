@@ -4,7 +4,7 @@ import java.awt.event.MouseEvent;
 
 import fr.inria.zvtm.engine.ViewPanel;
 
-public class ShareItem extends Item {
+public class ShareItem extends ToggleItem {
 
 	private boolean enabled = true;
 	
@@ -23,18 +23,27 @@ public class ShareItem extends Item {
 	
 	@Override
 	protected String getState1ImageName() {
-		return "share.png";
+		return "unshare.png";
 	}
 
 	@Override
 	protected String getState2ImageName() {
-		return "sharep.png";
+		return "unsharep.png";
 	}
 	
+	@Override
+	protected String getState3ImageName() {
+		return "share.png";
+	}
+
+	@Override
+	protected String getState4ImageName() {
+		return "sharep.png";
+	}
+
 	public void setStatus(boolean s){
 		enabled = s;
-		if (enabled) drawDown();
-		else drawUp();
+		setState(enabled?1:0);
 	}
 	
 	@Override

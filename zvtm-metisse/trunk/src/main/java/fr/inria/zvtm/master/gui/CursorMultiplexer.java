@@ -7,20 +7,22 @@ public class CursorMultiplexer {
 
 	private HashMap<Socket, PCursorPack> cursors;
 	private MasterViewer viewer;
-	
-	
+
+
 	public CursorMultiplexer(MasterViewer v) {
 		this.viewer = v;
 		cursors = new HashMap<Socket, PCursorPack>();
 	}
-	
+
 	public void subscribeClient(Socket s){
 		cursors.put(s, new PCursorPack(viewer));
 	}
 
 	public void unsubscribeClient(Socket sock) {
-		cursors.get(sock).end();
-		cursors.remove(sock);
+		if(cursors.containsKey(sock)){
+			cursors.get(sock).end();
+			cursors.remove(sock);
+		}
 	}
 
 	public void handlePointerEvent(Socket sock, double x, double y,int buttons) {
@@ -30,7 +32,7 @@ public class CursorMultiplexer {
 	public void handleRemoteKeyEvent(Socket sock,int keysym, int i) {
 		cursors.get(sock).handleRemoteKeyEvent(keysym,i);
 	}
-	
+
 	public Socket find(PCursorPack p){
 		for (Socket s : cursors.keySet()) {
 			if (p==cursors.get(s))return s;

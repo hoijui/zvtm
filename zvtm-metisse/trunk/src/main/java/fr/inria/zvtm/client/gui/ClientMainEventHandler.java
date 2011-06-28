@@ -9,7 +9,6 @@ import fr.inria.zvtm.common.compositor.InputForwarder;
 import fr.inria.zvtm.common.gui.CursorHandler;
 import fr.inria.zvtm.common.gui.MainEventHandler;
 import fr.inria.zvtm.common.gui.Viewer;
-import fr.inria.zvtm.common.gui.menu.PopMenu;
 import fr.inria.zvtm.engine.ViewPanel;
 
 
@@ -163,7 +162,7 @@ public class ClientMainEventHandler extends MainEventHandler {
 	public void toggleMenu(){
 		int jpx = ch.getX();
 		int jpy = ch.getY();
-		((ClientViewer)viewer).popmenu.toggle(vxTrace, vyTrace, viewer.getFrameManager().get(infw.detectWindow(jpx, jpy)),PopMenu.DEFAULTACTIVERADIUS);
+		((ClientViewer)viewer).popmenu.toggle(vxTrace, vyTrace, viewer.getFrameManager().get(infw.detectWindow(jpx, jpy)));
 	}
 
 	public void invokeMenu(){
@@ -171,7 +170,7 @@ public class ClientMainEventHandler extends MainEventHandler {
 		int jpy = ch.getY();
 		vxTrace = ch.getVX();
 		vyTrace = ch.getVY();
-		((ClientViewer)viewer).popmenu.invoke(vxTrace, vyTrace, viewer.getFrameManager().get(infw.detectWindow(jpx, jpy)),PopMenu.DEFAULTACTIVERADIUS);
+		((ClientViewer)viewer).popmenu.invoke(vxTrace, vyTrace, viewer.getFrameManager().get(infw.detectWindow(jpx, jpy)));
 	}
 
 	public void banishMenu(){
