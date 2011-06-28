@@ -427,8 +427,10 @@ public class VRing extends ClosedShape {
 					2 * pr[i].innerRingRadius, 2 * pr[i].innerRingRadius);
 				// actually combine both to create the ring (subtraction)
 				pr[i].ring = new Area(outerSlice);
-				subring = new Area(innerSlice);
-				pr[i].ring.subtract(subring);
+				if (pr[i].innerRingRadius > 0){
+					subring = new Area(innerSlice);
+					pr[i].ring.subtract(subring);					
+				}
 				// draw that area
 				g.setColor(this.color);
 				if (alphaC != null){
@@ -503,8 +505,10 @@ public class VRing extends ClosedShape {
                     2 * pr[i].linnerRingRadius, 2 * pr[i].linnerRingRadius);
                 // actually combine both to create the ring (subtraction)
                 pr[i].lring = new Area(outerSlice);
-                subring = new Area(innerSlice);
-                pr[i].lring.subtract(subring);
+				if (pr[i].linnerRingRadius > 0){
+	                subring = new Area(innerSlice);
+	                pr[i].lring.subtract(subring);				
+				}
                 // draw that area
                 g.setColor(this.color);
                 if (alphaC != null){
