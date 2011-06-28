@@ -113,15 +113,14 @@ public class MetisseWindow extends VImage{
 
 	public void configure(int x, int y, int w, int h) {
 		if(isroot)return;
-		System.out.println(this.width+" "+ w);//il y a un problème ici
-		if(isResizing || this.width!= w|| this.height!=h){
+		if(this.width!= w|| this.height!=h){
 			isResizing = true;
 			MetisseWindow.rezisingFrame = this;
 			currentH = h;
 			currentW = w;
-
 		}
 		else{
+			if(isRescaling)endResize();
 			for (MetisseWindow m : children.values()) {
 				m.move((x-this.x)*scaleFactor, -(y-this.y)*scaleFactor);
 			}
@@ -133,7 +132,7 @@ public class MetisseWindow extends VImage{
 		else{
 			double dx = (x-this.x)*sf;
 			double dy = -(y-this.y)*sf;
-			this.move(dx,dy);//moves the glyph
+			this.move(dx,dy);
 		}
 
 		this.x = x;
