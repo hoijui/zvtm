@@ -1098,12 +1098,12 @@ public class SceneManager implements CameraListener {
         return -1;
     }
 
-    VirtualSpace getSpaceByIndex(int layerIndex){
-	if((layerIndex < 0) || (layerIndex > sceneLayers.length)){
-	    return null;
+	public VirtualSpace getSpaceByIndex(int layerIndex){
+		if ((layerIndex < 0) || (layerIndex > sceneLayers.length)){
+			return null;
+		}
+		return sceneLayers[layerIndex];
 	}
-        return sceneLayers[layerIndex];
-    } 
 
     // debug
 //     void printLevelInfo(){
