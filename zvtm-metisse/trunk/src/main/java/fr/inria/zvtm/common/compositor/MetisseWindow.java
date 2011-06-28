@@ -595,4 +595,8 @@ public class MetisseWindow extends VImage{
 	public boolean isShared() {
 		return shared;
 	}
+	
+	public void setResizing(boolean isResizing){
+		
+	}
 }
