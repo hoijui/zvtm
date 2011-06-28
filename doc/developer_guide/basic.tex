@@ -110,7 +110,7 @@ A view is instantiated through the VSM:
 
 \begin{small}
 \begin{SaveVerbatim}{CodeVerb}
-Vector<Camera> cameras = new Vector();
+Vector<Camera> cameras = new Vector<Camera>();
 cameras.add(cam);
 View v = vsm.addFrameView(cameras, "fooview", View.STD_VIEW, 800, 600, true);
 \end{SaveVerbatim}
@@ -152,7 +152,7 @@ gd.setFullScreenWindow((JFrame)v.getFrame());}
 %%%%%
 \subsubsection{Layers}
 
-You may have noticed in the previous section that we are not passing the camera directly to the view construction method. Instead, we are putting it in a \cd{Vector}. The reason is that a view can be made of several cameras. Each camera is associated with a {\em layer} within the view.Each layer is independent from the others. Each camera can be moved independently from the others (they can also be sticked to one another). Layers (and thus cameras) can be switched on and off. Each layer is by default transparent. Graphical objects seen through the different cameras associated with each layer simply get painted on top of each others. As we will see in Section \ref{sec:glyphs}, glyphs can be translucent or even transparent, in which case glyphs on lower-level layers will show through them.
+You may have noticed in the previous section that we are not passing the camera directly to the view construction method. Instead, we are putting it in a \cd{Vector}. The reason is that a view can be made of several cameras. Each camera is associated with a {\em layer} within the view. Each layer is independent from the others. Each camera can be moved independently from the others (they can also be sticked to one another). Layers (and thus cameras) can be switched on and off. Each layer is by default transparent. Graphical objects seen through the different cameras associated with each layer simply get painted on top of each others. As we will see in Section \ref{sec:glyphs}, glyphs can be translucent or even transparent, in which case glyphs on lower-level layers will show through them.
 
 \begin{small}
 \begin{SaveVerbatim}{CodeVerb}
