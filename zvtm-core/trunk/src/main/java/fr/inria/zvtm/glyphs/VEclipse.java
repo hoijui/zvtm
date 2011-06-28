@@ -71,6 +71,17 @@ public class VEclipse extends VCircle {
 	}
 	
 	@Override
+    public boolean fillsView(double w,double h,int camIndex){
+        return false;
+    }
+    
+    @Override
+    public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
+        if (((ProjEclipse)pc[camIndex]).eclipsed.contains(jpx, jpy) && ((ProjEclipse)pc[camIndex]).shadowSource.contains(jpx, jpy)){return true;}
+        else {return false;}
+    }
+	
+	@Override
     public void project(Camera c, Dimension d){
         int i = c.getIndex();
         coef = c.focal / (c.focal+c.altitude);
@@ -84,13 +95,30 @@ public class VEclipse extends VCircle {
 		pe.shadowSource.setFrame(pc[i].cx-pc[i].cr+2*pc[i].cr*fraction, pc[i].cy-pc[i].cr, 2*pc[i].cr, 2*pc[i].cr);
     }
 
+    @Override
+    public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, double lensx, double lensy){
+        int i=c.getIndex();
+        coef = c.focal/(c.focal+c.altitude) * lensMag;
+        //find coordinates of object's geom center wrt to camera center and project
+        //translate in JPanel coords
+        pc[i].lcx = (int)Math.round(lensWidth/2 + (vx-lensx)*coef);
+        pc[i].lcy = (int)Math.round(lensHeight/2 - (vy-lensy)*coef);
+ 		pc[i].lcr = (int)Math.round(size*coef/2d);
+		ProjEclipse pe = (ProjEclipse)pc[i];
+		pe.leclipsed.setFrame(pc[i].lcx-pc[i].lcr, pc[i].lcy-pc[i].lcr, 2*pc[i].lcr, 2*pc[i].lcr);
+		pe.lshadowSource.setFrame(pc[i].lcx-pc[i].lcr+2*pc[i].lcr*fraction, pc[i].lcy-pc[i].lcr, 2*pc[i].lcr, 2*pc[i].lcr);
+    }
+
 	@Override
 	public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
+		if (Math.abs(fraction) > 1){return;}
 		if (alphaC != null && alphaC.getAlpha()==0){return;}
 		ProjEclipse pe = (ProjEclipse)pc[i];
         if ((pe.eclipsed.getBounds().width>2) || (pe.eclipsed.getBounds().height>2)){
 			Area eclipsed = new Area(pe.eclipsed);
-			eclipsed.intersect(new Area(pe.shadowSource));
+			if (fraction != 0){
+				eclipsed.intersect(new Area(pe.shadowSource));
+			}
             if (alphaC != null){
                 g.setComposite(alphaC);
                 if (filled){
@@ -153,11 +181,86 @@ public class VEclipse extends VCircle {
         }
 	}
 	
+	@Override
+    public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
+		if (Math.abs(fraction) > 1){return;}
+        if (alphaC != null && alphaC.getAlpha()==0){return;}
+		ProjEclipse pe = (ProjEclipse)pc[i];
+        if ((pe.leclipsed.getBounds().width>2) || (pe.leclipsed.getBounds().height>2)){
+			Area eclipsed = new Area(pe.eclipsed);
+			if (fraction != 0){
+				eclipsed.intersect(new Area(pe.shadowSource));
+			}
+            if (alphaC != null){
+                g.setComposite(alphaC);
+                if (filled){
+                    g.setColor(this.color);
+                    g.translate(dx, dy);
+                    g.fill(eclipsed);
+                    g.translate(-dx, -dy);
+                }
+                if (paintBorder){
+                    g.setColor(borderColor);
+                    if (stroke!=null){
+                        g.setStroke(stroke);
+                        g.translate(dx, dy);
+                        g.draw(eclipsed);
+                        g.translate(-dx, -dy);
+                        g.setStroke(stdS);
+                    }
+                    else {
+                        g.translate(dx, dy);
+                        g.draw(eclipsed);
+                        g.translate(-dx, -dy);
+                    }
+                }
+                g.setComposite(acO);
+            }
+            else {
+                if (filled){
+                    g.setColor(this.color);
+                    g.translate(dx, dy);
+                    g.fill(eclipsed);
+                    g.translate(-dx, -dy);
+                }
+                if (paintBorder){
+                    g.setColor(borderColor);
+                    if (stroke!=null){
+                        g.setStroke(stroke);
+                        g.translate(dx, dy);
+                        g.draw(eclipsed);
+                        g.translate(-dx, -dy);
+                        g.setStroke(stdS);
+                    }
+                    else {
+                        g.translate(dx, dy);
+                        g.draw(eclipsed);
+                        g.translate(-dx, -dy);
+                    }
+                }
+            }
+        }
+        else {
+            g.setColor(this.color);
+            if (alphaC != null){
+                g.setComposite(alphaC);
+                g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
+                g.setComposite(acO);
+            }
+            else {
+                g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
+            }
+        }
+    }
+    
 }
 
 class ProjEclipse extends BProjectedCoords {
 
 	Ellipse2D eclipsed = new Ellipse2D.Float();
 	Ellipse2D shadowSource = new Ellipse2D.Float();
+
+	Ellipse2D leclipsed = new Ellipse2D.Float();
+	Ellipse2D lshadowSource = new Ellipse2D.Float();
 	
 }
