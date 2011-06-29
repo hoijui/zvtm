@@ -39,6 +39,23 @@ public class VEclipse extends VCircle {
 		super(x, y, z, d, c, bc, alpha);
 		this.fraction = f;
 	}
+
+	/**
+     *@param x coordinate in virtual space
+     *@param y coordinate in virtual space
+     *@param z z-index (pass 0 if you do not use z-ordering)
+     *@param d diameter in virtual space
+     *@param f fraction of full eclipse (-1 to 1, with 0 = full eclipse)
+     *@param c fill color
+     *@param bc border color
+     *@param or orientation
+     *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
+     */
+    public VEclipse(double x, double y, int z, double d, float f, Color c, Color bc, double or, float alpha){
+		super(x, y, z, d, c, bc, alpha);
+		this.fraction = f;
+		this.orient = or;
+	}
 	
 	@Override
 	public void initCams(int nbCam){
