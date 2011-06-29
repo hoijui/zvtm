@@ -70,6 +70,15 @@ public class VEclipse extends VCircle {
 		}
 	}
 	
+	/** Set the glyph's absolute orientation.
+     *@param angle in [0:2Pi[ 
+     */
+    @Override
+    public void orientTo(double angle){
+		orient = angle;
+		VirtualSpaceManager.INSTANCE.repaint();
+	}
+    
 	@Override
     public boolean fillsView(double w,double h,int camIndex){
         return false;
@@ -109,6 +118,8 @@ public class VEclipse extends VCircle {
 		pe.lshadowSource.setFrame(pc[i].lcx-pc[i].lcr+2*pc[i].lcr*fraction, pc[i].lcy-pc[i].lcr, 2*pc[i].lcr, 2*pc[i].lcr);
     }
 
+	AffineTransform at;
+
 	@Override
 	public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 		if (Math.abs(fraction) > 1){return;}
@@ -120,52 +131,50 @@ public class VEclipse extends VCircle {
 				eclipsed.intersect(new Area(pe.shadowSource));
 			}
             if (alphaC != null){
+				at = AffineTransform.getTranslateInstance(dx,dy);
+                // rotate
+                at.concatenate(AffineTransform.getRotateInstance(-orient, (float)pc[i].cx, (float)pc[i].cy));
+				g.setTransform(at);
                 g.setComposite(alphaC);
                 if (filled){
                     g.setColor(this.color);
-                    g.translate(dx, dy);
                     g.fill(eclipsed);
-                    g.translate(-dx, -dy);
                 }
                 if (paintBorder){
                     g.setColor(borderColor);
                     if (stroke!=null){
                         g.setStroke(stroke);
-                        g.translate(dx, dy);
                         g.draw(eclipsed);
-                        g.translate(-dx, -dy);
                         g.setStroke(stdS);
                     }
                     else {
-                        g.translate(dx, dy);
                         g.draw(eclipsed);
-                        g.translate(-dx, -dy);
                     }
                 }
                 g.setComposite(acO);
+				g.setTransform(stdT);
             }
             else {
+				at = AffineTransform.getTranslateInstance(dx,dy);
+                // rotate
+                at.concatenate(AffineTransform.getRotateInstance(-orient, (float)pc[i].cx, (float)pc[i].cy));
+				g.setTransform(at);
                 if (filled){
                     g.setColor(this.color);
-                    g.translate(dx, dy);
                     g.fill(eclipsed);
-                    g.translate(-dx, -dy);
                 }
                 if (paintBorder){
                     g.setColor(borderColor);
                     if (stroke!=null){
                         g.setStroke(stroke);
-                        g.translate(dx, dy);
                         g.draw(eclipsed);
-                        g.translate(-dx, -dy);
                         g.setStroke(stdS);
                     }
                     else {
-                        g.translate(dx, dy);
                         g.draw(eclipsed);
-                        g.translate(-dx, -dy);
                     }
                 }
+				g.setTransform(stdT);
             }
         }
         else {
@@ -192,52 +201,50 @@ public class VEclipse extends VCircle {
 				eclipsed.intersect(new Area(pe.shadowSource));
 			}
             if (alphaC != null){
+				at = AffineTransform.getTranslateInstance(dx,dy);
+                // rotate
+                at.concatenate(AffineTransform.getRotateInstance(-orient, (float)pc[i].cx, (float)pc[i].cy));
+				g.setTransform(at);
                 g.setComposite(alphaC);
                 if (filled){
                     g.setColor(this.color);
-                    g.translate(dx, dy);
                     g.fill(eclipsed);
-                    g.translate(-dx, -dy);
                 }
                 if (paintBorder){
                     g.setColor(borderColor);
                     if (stroke!=null){
                         g.setStroke(stroke);
-                        g.translate(dx, dy);
                         g.draw(eclipsed);
-                        g.translate(-dx, -dy);
                         g.setStroke(stdS);
                     }
                     else {
-                        g.translate(dx, dy);
                         g.draw(eclipsed);
-                        g.translate(-dx, -dy);
                     }
                 }
                 g.setComposite(acO);
+				g.setTransform(stdT);
             }
             else {
+				at = AffineTransform.getTranslateInstance(dx,dy);
+                // rotate
+                at.concatenate(AffineTransform.getRotateInstance(-orient, (float)pc[i].cx, (float)pc[i].cy));
+				g.setTransform(at);
                 if (filled){
                     g.setColor(this.color);
-                    g.translate(dx, dy);
                     g.fill(eclipsed);
-                    g.translate(-dx, -dy);
                 }
                 if (paintBorder){
                     g.setColor(borderColor);
                     if (stroke!=null){
                         g.setStroke(stroke);
-                        g.translate(dx, dy);
                         g.draw(eclipsed);
-                        g.translate(-dx, -dy);
                         g.setStroke(stdS);
                     }
                     else {
-                        g.translate(dx, dy);
                         g.draw(eclipsed);
-                        g.translate(-dx, -dy);
                     }
                 }
+				g.setTransform(stdT);
             }
         }
         else {
