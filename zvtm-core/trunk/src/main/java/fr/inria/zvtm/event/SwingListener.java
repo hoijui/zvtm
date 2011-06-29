@@ -38,6 +38,12 @@ public class SwingListener extends ViewAdapter {
     @Override public void click3(ViewPanel v, int mod, int jpx, int jpy, int clickNumber, MouseEvent e){
       pickAndForward(v, e); 
     }
+    @Override public void mouseMoved(ViewPanel v, int jpx, int jpy, MouseEvent e){
+        pickAndForward(v, e);
+    }
+    @Override public void mouseDragged(ViewPanel v, int mod, int buttonNumber, int jpx, int jpy, MouseEvent e){
+        pickAndForward(v, e);
+    }
 
     @Override public void Kpress(ViewPanel v, char c, int code, int mod, KeyEvent e){
         if(focusedComponent == null){
@@ -66,18 +72,20 @@ public class SwingListener extends ViewAdapter {
         VirtualSpaceManager.INSTANCE.repaint(); //XXX quick fix
     }
     
-	protected void pickAndForward(ViewPanel v, MouseEvent e) {
+	protected boolean pickAndForward(ViewPanel v, MouseEvent e) {
         focusedComponent = null;
 		//pick glyph under cursor, redispatch if it is an instance
         //of VSwingComponent
         Glyph[] pickList = v.getVCursor().getPicker().getPickedGlyphList();
         if(pickList.length == 0){
-            return;
+            return false;
         }
         Glyph pickedGlyph = pickList[pickList.length - 1];
         if(pickedGlyph instanceof VSwingComponent){
             redispatchMouse(v, e, (VSwingComponent)pickedGlyph);
+            return true;
         }
+        return false;
 	}
 
     private void redispatchMouse(ViewPanel v, final MouseEvent evt, VSwingComponent c){
