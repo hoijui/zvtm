@@ -63,6 +63,7 @@ public class PopMenu {
 	}
 
 	public void invoke(double vxx, double vyy, MetisseWindow frame) {
+		if(invoked)return;
 		refreshAltFactor();
 		double vx = (vxx - viewer.getNavigationManager().getCamera().getLocation().vx)/getAltFactor();
 		double vy = (vyy - viewer.getNavigationManager().getCamera().getLocation().vy)/getAltFactor();
