@@ -5,6 +5,8 @@
  * $Id: $
  */
 
+package fr.inria.zvtm.basicui;
+
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
