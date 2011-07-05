@@ -219,7 +219,7 @@ public class VTextLayout extends VText {
 		}
 		VirtualSpaceManager.INSTANCE.repaint();
 	}
-
+	
 	/** Force computation of text's bounding box at next call to draw().
 	*@see #validBounds(int i)
 	*@see #getBounds(int i)

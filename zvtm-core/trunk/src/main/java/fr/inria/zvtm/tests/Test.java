@@ -30,10 +30,19 @@ import java.awt.geom.*;
 import java.util.Vector;
 
 import fr.inria.zvtm.engine.*;
+import fr.inria.zvtm.animation.*;
+import fr.inria.zvtm.animation.interpolation.*;
 import fr.inria.zvtm.glyphs.*;
 import fr.inria.zvtm.event.*;
 
-public class Test {
+import java.awt.font.*;
+
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.ClipboardOwner;
+import java.awt.datatransfer.Transferable;
+import java.awt.datatransfer.StringSelection;
+
+public class Test implements Java2DPainter {
 
     VirtualSpaceManager vsm;
     VirtualSpace vs;
@@ -48,6 +57,9 @@ public class Test {
         initTest(vt);
     }
 
+	VCircle c = new VCircle(0, 100, 0, 20, Color.GREEN, Color.BLACK);
+	VEclipse e = new VEclipse(0, 100, 0, 20, -.5f, Color.BLACK, Color.BLACK, .5f);
+
     public void initTest(String vt){
         eh=new EventHandlerTest(this);
         vs = vsm.addVirtualSpace(VirtualSpace.ANONYMOUS);
@@ -55,23 +67,39 @@ public class Test {
         Vector cameras=new Vector();
         cameras.add(vs.getCamera(0));
         vs.getCamera(0).setZoomFloor(-90f);
-        testView = vsm.addFrameView(cameras, View.ANONYMOUS, vt, 800, 600, false, true, true, null);
+        testView = vsm.addFrameView(cameras, View.ANONYMOUS, View.OPENGL_VIEW, 800, 600, false, true, true, null);
         testView.setBackgroundColor(Color.LIGHT_GRAY);
         testView.setListener(eh);
         testView.setAntialiasing(true);
+		testView.setJava2DPainter(this, Java2DPainter.FOREGROUND);
 
-        rr = new VRoundRect(0, 0, 0, 200, 100, Color.WHITE, Color.BLACK, 20, 20);
-        rr.setStroke(new BasicStroke(3f));
-        vs.addGlyph(rr);
-		        
+		vs.addGlyph(c);
+		vs.addGlyph(e);
+		
+		
         vsm.repaint();
     }
-    
-    VRoundRect rr;
-    
-    void doIt(){
-        vs.removeGlyph(rr);
-    }
+
+	void animateS(){
+		Animation a1 = vsm.getAnimationManager().getAnimationFactory().createGlyphSizeAnim(
+			1000, c, 2*c.getSize(), false, SlowInSlowOutInterpolator.getInstance(), null);
+		vsm.getAnimationManager().startAnimation(a1, false);
+		Animation a2 = vsm.getAnimationManager().getAnimationFactory().createGlyphSizeAnim(
+			1000, e, 2*e.getSize(), false, SlowInSlowOutInterpolator.getInstance(), null);
+		vsm.getAnimationManager().startAnimation(a2, false);
+	}
+
+	void animateR(){
+		Animation a1 = vsm.getAnimationManager().getAnimationFactory().createGlyphOrientationAnim(
+			1000, c, Math.PI, true, SlowInSlowOutInterpolator.getInstance(), null);
+		vsm.getAnimationManager().startAnimation(a1, false);
+		Animation a2 = vsm.getAnimationManager().getAnimationFactory().createGlyphOrientationAnim(
+			1000, e, Math.PI, true, SlowInSlowOutInterpolator.getInstance(), null);
+		vsm.getAnimationManager().startAnimation(a2, false);
+	}
+
+	public void paint(Graphics2D g2d, int viewWidth, int viewHeight){}
+	
     
     public static void main(String[] args){
         System.out.println("-----------------");
@@ -104,13 +132,13 @@ class EventHandlerTest implements ViewListener {
         application=appli;
     }
     
-    public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){application.doIt();}
+    public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){application.animateR();}
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
-    public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+    public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){application.animateS();}
 
     public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
@@ -139,7 +167,7 @@ class EventHandlerTest implements ViewListener {
     static double PAN_SPEED_COEF = 50.0;
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
-        if (buttonNumber == 3 || ((mod == META_MOD || mod == META_SHIFT_MOD) && buttonNumber == 1)){
+		if (buttonNumber == 3){
             Camera c=application.vsm.getActiveCamera();
             double a=(c.focal+Math.abs(c.altitude))/c.focal;
             if (mod == META_SHIFT_MOD) {
@@ -180,7 +208,9 @@ class EventHandlerTest implements ViewListener {
 
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
     
-    public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){}
+    public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
+        if (code==KeyEvent.VK_C){}
+	}
     
     public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 
@@ -193,144 +223,5 @@ class EventHandlerTest implements ViewListener {
     public void viewDeiconified(View v){}
 
     public void viewClosing(View v){System.exit(0);}
-
-}
-
-class TextStroke implements Stroke {
-	private String text;
-	private Font font;
-	private boolean stretchToFit = false;
-	private boolean repeat = false;
-	private AffineTransform t = new AffineTransform();
-
-	private static final float FLATNESS = 1;
-
-	public TextStroke( String text, Font font ) {
-		this( text, font, true, false );
-	}
-
-	public TextStroke( String text, Font font, boolean stretchToFit, boolean repeat ) {
-		this.text = text;
-		this.font = font;
-		this.stretchToFit = stretchToFit;
-		this.repeat = repeat;
-	}
-
-	public Shape createStrokedShape( Shape shape ) {
-		FontRenderContext frc = new FontRenderContext(null, true, true);
-		GlyphVector glyphVector = font.createGlyphVector(frc, text);
-
-		GeneralPath result = new GeneralPath();
-		PathIterator it = new FlatteningPathIterator( shape.getPathIterator( null ), FLATNESS );
-		float points[] = new float[6];
-		float moveX = 0, moveY = 0;
-		float lastX = 0, lastY = 0;
-		float thisX = 0, thisY = 0;
-		int type = 0;
-		boolean first = false;
-		float next = 0;
-		int currentChar = 0;
-		int length = glyphVector.getNumGlyphs();
-
-		if ( length == 0 )
-            return result;
-
-        float factor = stretchToFit ? measurePathLength( shape )/(float)glyphVector.getLogicalBounds().getWidth() : 1.0f;
-        float nextAdvance = 0;
-
-		while ( currentChar < length && !it.isDone() ) {
-			type = it.currentSegment( points );
-			switch( type ){
-			case PathIterator.SEG_MOVETO:
-				moveX = lastX = points[0];
-				moveY = lastY = points[1];
-				result.moveTo( moveX, moveY );
-				first = true;
-                nextAdvance = glyphVector.getGlyphMetrics( currentChar ).getAdvance() * 0.5f;
-                next = nextAdvance;
-				break;
-
-			case PathIterator.SEG_CLOSE:
-				points[0] = moveX;
-				points[1] = moveY;
-				// Fall into....
-
-			case PathIterator.SEG_LINETO:
-				thisX = points[0];
-				thisY = points[1];
-				float dx = thisX-lastX;
-				float dy = thisY-lastY;
-				float distance = (float)Math.sqrt( dx*dx + dy*dy );
-				if ( distance >= next ) {
-					float r = 1.0f/distance;
-					float angle = (float)Math.atan2( dy, dx );
-					while ( currentChar < length && distance >= next ) {
-						Shape glyph = glyphVector.getGlyphOutline( currentChar );
-						Point2D p = glyphVector.getGlyphPosition(currentChar);
-						float px = (float)p.getX();
-						float py = (float)p.getY();
-						float x = lastX + next*dx*r;
-						float y = lastY + next*dy*r;
-                        float advance = nextAdvance;
-                        nextAdvance = currentChar < length-1 ? glyphVector.getGlyphMetrics(currentChar+1).getAdvance() * 0.5f : 0;
-						t.setToTranslation( x, y );
-						t.rotate( angle );
-						t.translate( -px-advance, -py );
-						result.append( t.createTransformedShape( glyph ), false );
-						next += (advance+nextAdvance) * factor;
-						currentChar++;
-						if ( repeat )
-							currentChar %= length;
-					}
-				}
-                next -= distance;
-				first = false;
-				lastX = thisX;
-				lastY = thisY;
-				break;
-			}
-			it.next();
-		}
-
-		return result;
-	}
-
-	public float measurePathLength( Shape shape ) {
-		PathIterator it = new FlatteningPathIterator( shape.getPathIterator( null ), FLATNESS );
-		float points[] = new float[6];
-		float moveX = 0, moveY = 0;
-		float lastX = 0, lastY = 0;
-		float thisX = 0, thisY = 0;
-		int type = 0;
-        float total = 0;
-
-		while ( !it.isDone() ) {
-			type = it.currentSegment( points );
-			switch( type ){
-			case PathIterator.SEG_MOVETO:
-				moveX = lastX = points[0];
-				moveY = lastY = points[1];
-				break;
-
-			case PathIterator.SEG_CLOSE:
-				points[0] = moveX;
-				points[1] = moveY;
-				// Fall into....
-
-			case PathIterator.SEG_LINETO:
-				thisX = points[0];
-				thisY = points[1];
-				float dx = thisX-lastX;
-				float dy = thisY-lastY;
-				total += (float)Math.sqrt( dx*dx + dy*dy );
-				lastX = thisX;
-				lastY = thisY;
-				break;
-			}
-			it.next();
-		}
-
-		return total;
-	}
 
 }

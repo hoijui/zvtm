@@ -176,12 +176,34 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 		}
 	}
 
-	public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+    Glyph startG, endG;
+	LEdge edge;
+
+	public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+		//XXXX
+	    if (mod == ALT_SHIFT_MOD){
+	        if (startG!=null){
+	            endG = v.lastGlyphEntered();
+	            edge = grMngr.addEdge(startG, endG, "test", true);
+	            startG = endG = null;
+	        }
+	        else {
+	            startG = v.lastGlyphEntered();
+	        }
+	    }
+	else if (mod == ALT_MOD){
+		grMngr.removeEdge(edge);
+	}
+		//XXXX
+	}
 
 	public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
 	public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
 		if (toolPaletteIsActive){return;}
+		//XXXX
+		if (mod == ALT_SHIFT_MOD){return;}
+		//XXXX
 		Glyph g=v.lastGlyphEntered();
 		if (g!=null && g != grMngr.boundingBox){
 			if (g.getOwner()!=null){
