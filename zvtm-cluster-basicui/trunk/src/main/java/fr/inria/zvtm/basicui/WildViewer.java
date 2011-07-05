@@ -39,15 +39,14 @@ public class WildViewer {
 	View mView;
 	ViewListener eh;
 
-	public WildViewer(){
+	public WildViewer(boolean single){
         vsm.setMaster("WildViewer");
         mSpace = vsm.addVirtualSpace("mainSpace");
         mCamera = mSpace.addCamera();
         Vector cameras = new Vector();
         cameras.add(mCamera);
 		// local view (on master)
-        mView = vsm.addFrameView(cameras, "zvtm-cluster-basicui", View.STD_VIEW, VIEW_W, VIEW_H, false, false, false, null);
-        mView.setVisible(true);
+        mView = vsm.addFrameView(cameras, "zvtm-cluster-basicui", View.STD_VIEW, VIEW_W, VIEW_H, true);
 		mView.setAntialiasing(true);
         eh = new WildViewerEvtHld(this);
         mView.setListener(eh, 0);
@@ -55,11 +54,20 @@ public class WildViewer {
 		mView.getCursor().setColor(Color.WHITE);
 		mView.getCursor().setHintColor(Color.WHITE);
         // clustered view (wall)
-        ClusterGeometry cg = new ClusterGeometry(2760, 1800, 8, 4);
-        Vector ccameras = new Vector();
-        ccameras.add(mCamera);
-        ClusteredView cv = new ClusteredView(cg, 3, 8, 4, ccameras);
-        vsm.addClusteredView(cv);
+		if (single){
+			ClusterGeometry cg = new ClusterGeometry(800, 600, 1, 1);
+	        Vector ccameras = new Vector();
+	        ccameras.add(mCamera);
+	        ClusteredView cv = new ClusteredView(cg, 0, 1, 1, ccameras);
+	        vsm.addClusteredView(cv);
+		}
+		else {
+	        ClusterGeometry cg = new ClusterGeometry(2760, 1800, 8, 4);
+	        Vector ccameras = new Vector();
+	        ccameras.add(mCamera);
+	        ClusteredView cv = new ClusteredView(cg, 3, 8, 4, ccameras);
+	        vsm.addClusteredView(cv);			
+		}
 	}
 	
 	void init(){
@@ -67,7 +75,11 @@ public class WildViewer {
 	}
 
 	public static void main(String[] args){
-		(new WildViewer()).init();
+		boolean single = false;
+		for (String arg:args){
+			if (arg.equals("-single")){single = true;}
+		}
+		(new WildViewer(single)).init();
 	}
 
 }

@@ -36,12 +36,6 @@
                     <target>1.5</target>
                     <showWeaveInfo>true</showWeaveInfo>
                     <verbose>true</verbose>
-                    <aspectLibraries>
-                        <aspectLibrary>
-                            <groupId>fr.inria.zvtm</groupId>
-                            <artifactId>zvtm-cluster</artifactId>
-                        </aspectLibrary>
-                    </aspectLibraries>
                 </configuration>
                 <executions>
                     <execution>
