@@ -5,12 +5,19 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
 import fr.inria.zvtm.client.gui.ClientViewer;
+import fr.inria.zvtm.common.gui.Viewer;
 import fr.inria.zvtm.common.kernel.Temporizer;
 import fr.inria.zvtm.common.protocol.Keysym;
 import fr.inria.zvtm.common.protocol.RfbAgent;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.glyphs.Glyph;
 
+/**
+ * This class redirects the Zvtm {@link Viewer}'s input to the real windows in the X server.
+ * Since a {@link MetisseWindow} has both a X server location / size and a Zvtm location / size (as {@link Glyph}), the {@link InputForwarder} calculates the inverse Zvtm transformation in order to transmit the correct coordinates of an event to the X server.
+ * @author Julien Altieri
+ *
+ */
 public class InputForwarder {
 
 	private int[]buttonState = new int[32];
@@ -21,10 +28,18 @@ public class InputForwarder {
 	private ClientViewer viewer;
 	private RfbAgent rfbAgent;
 
+	/**
+	 * Obviously, the {@link InputForwarder} is related to a Zvtm {@link Viewer}. However, We only need to redirect inputs from the client.
+	 * @param clientViewer The {@link ClientViewer} that needs to be handled
+	 */
 	public InputForwarder(ClientViewer clientViewer) {
 		this.viewer = clientViewer;
 	}
 
+	/**
+	 * In the overall architecture, the interesting {@link RfbAgent} is instantiated after the creation of the {@link InputForwarder}. We need to set it after.
+	 * @param a
+	 */
 	public void setRfbAgent(RfbAgent a){
 		this.rfbAgent = a;
 	}
@@ -39,9 +54,25 @@ public class InputForwarder {
 	}
 
 
+	/**
+	 * Forwards a click event
+	 * @param mod the modifier mask
+	 * @param jpx the x position in the X server
+	 * @param jpy the y position in the X server
+	 * @param clickNumber 
+	 * @param e
+	 */
 	public void click(int mod, int jpx, int jpy, int clickNumber, MouseEvent e) {	
 	}
 
+	/**
+	 * Forwards a MousePressed event
+	 * @param mod the modifier mask
+	 * @param v the origin ViewPanel of the event
+	 * @param jpx the x position in the X server
+	 * @param jpy the y position in the X server
+	 * @param e
+	 */
 	public void press(int mod, ViewPanel v, int jpx, int jpy, MouseEvent e) {
 		pressed = true;
 		switch (e.getButton()) {
@@ -63,6 +94,14 @@ public class InputForwarder {
 		rfbAgent.rfbPointerEvent(p[2],p[0],p[1], buttonState);
 	}
 
+	/**
+	 * Forwards a MouseReleased Event
+	 * @param mod the modifier mask
+	 * @param v the origin ViewPanel of the event
+	 * @param jpx the x position in the X server
+	 * @param jpy the y position in the X server
+	 * @param e
+	 */
 	public void release(int mod, ViewPanel v, int jpx, int jpy, MouseEvent e) {
 		pressed = false;
 		dragging = false;
@@ -89,7 +128,14 @@ public class InputForwarder {
 		rfbAgent.rfbPointerEvent(p[2],p[0],p[1], buttonState);
 	}
 
-
+	/**
+	 * Forwards a MouseWheel event
+	 * @param mod the modifier mask
+	 * @param v the origin ViewPanel of the event
+	 * @param jpx the x position in the X server
+	 * @param jpy the y position in the X server
+	 * @param e
+	 */
 	public void wheel(int mod, ViewPanel v, int jpx, int jpy,MouseWheelEvent e) {
 
 		int[] p = unproject(v, jpx, jpy);
@@ -110,6 +156,13 @@ public class InputForwarder {
 		}
 	}
 
+	/**
+	 * Transforms the coordinates from the Zvtm {@link Viewer} to the coordinates in X server.
+	 * @param v
+	 * @param jpx
+	 * @param jpy
+	 * @return a int[] according to the following format: {server x, server y, picked window id}
+	 */
 	public int[] unproject(ViewPanel v, double jpx,double jpy){
 		if(viewer==null)return null;
 		if(viewer.getFrameManager()==null)return null;
@@ -128,6 +181,13 @@ public class InputForwarder {
 		return res;
 	}
 
+	/**
+	 * Forwards a move event.
+	 * @param v the origin ViewPanel of the event
+	 * @param jpx the x position in the X server
+	 * @param jpy the y position in the X server
+	 * @param e
+	 */
 	public void move(ViewPanel v, int jpx, int jpy, MouseEvent e) {
 		if(pressed&& !dragging){
 			dragging = true;
@@ -145,6 +205,12 @@ public class InputForwarder {
 		rfbAgent.rfbPointerEvent(p[2],p[0],p[1], buttonState);
 	}
 
+	/**
+	 * Pick the window which is under the cursor at position jpx, jpy in the Zvtm {@link Viewer}.
+	 * @param jpx 
+	 * @param jpy
+	 * @return The picked window's id
+	 */
 	public int detectWindow(double jpx,double jpy){
 		if(viewer==null||viewer.getCursorHandler().getCursor().getPicker().getDrawOrderedPickedGlyphList(viewer.getVirtualSpace()).length==0)return -1;
 		Glyph up = viewer.getCursorHandler().getCursor().getPicker().pickOnTop(viewer.getVirtualSpace());
@@ -157,7 +223,12 @@ public class InputForwarder {
 	}
 
 
-
+	/**
+	 * Converts Swing virtual keys into keysyms
+	 * @param c the related character
+	 * @param code
+	 * @return the keysym
+	 */
 	public static int getKeysym(char c, int code) {
 		switch (code) {
 		case KeyEvent.VK_LEFT:

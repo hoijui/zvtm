@@ -6,15 +6,25 @@ import fr.inria.zvtm.common.compositor.MetisseWindow;
 import fr.inria.zvtm.common.kernel.RfbForwarder;
 import fr.inria.zvtm.common.protocol.Keysym;
 
+/**
+ * This is an extension of the basic FrameManager that forwards the rfbMessages (incoming from the Metisse server, to the Zvtm server) concerning public frames.
+ * @author Julien Altieri
+ * @see RfbForwarder
+ * @see FrameManager
+ */
 public class ForwardingFrameManager extends FrameManager {
 
 	private RfbForwarder rfbfw;
 
+	/**
+	 * Must provide the related ZVTM Viewer
+	 * @param viewer
+	 */
 	public ForwardingFrameManager(ClientViewer viewer) {
 		super(viewer);
 		rfbfw = new RfbForwarder();
-	}
 
+	}
 
 	@Override
 	public void addWindow(int window, boolean isroot, int x, int y, int w, int h) {
@@ -61,6 +71,11 @@ public class ForwardingFrameManager extends FrameManager {
 			rfbfw.UnmapWindow(window);
 	}
 
+
+	/**
+	 * By calling this method, the specified {@link MetisseWindow} will be visible on the wall
+	 * @param win the window to publish
+	 */
 	public void publish(MetisseWindow win) {
 		rfbfw.addWindow(win.getId(), win.isRoot(), win.getX(), win.getY(), win.getW(), win.getH());
 		if(inSpace.containsValue(win)){
@@ -72,6 +87,10 @@ public class ForwardingFrameManager extends FrameManager {
 		}
 	}
 
+	/**
+	 * Unpublishes the specified {@link MetisseWindow}
+	 * @param win the window to unpublish
+	 */
 	public void unpublish(MetisseWindow win) {
 		rfbfw.removeWindow(win.getId());
 	}
@@ -87,17 +106,29 @@ public class ForwardingFrameManager extends FrameManager {
 		rfbfw.configure(mwr.getId(), true, mwr.getX(), mwr.getY(), mwr.getW(), mwr.getH());
 	}
 
+	/**
+	 * Sends a pointer event in double coordinates to the zvtm server. Used for transmitting the zvtm virtual pointer events to the zvtm server.
+	 * @param x
+	 * @param y
+	 * @param buttonMask
+	 */
 	public void sendDoublePointerEvent(double x, double y,int buttonMask) {
 		rfbfw.sendPointerEvent(x,y,buttonMask);	
 	}
 
-
+	/**
+	 * Sends a key event to the zvtm server
+	 * @param code
+	 * @param i 1 for down, 0 for up
+	 */
 	public void sendKeyEvent(int code, int i) {
 		if(i==Keysym.AltL)return;
 		rfbfw.sendKeyEvent(code,i);
 	}
 
-
+	/**
+	 * Must be called to start listening the zvtm server messages (wall interaction)
+	 */
 	public void startListeningBounces() {
 		this.rfbfw.startListeningBounces();
 	}

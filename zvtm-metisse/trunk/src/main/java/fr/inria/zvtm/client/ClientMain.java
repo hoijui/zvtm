@@ -5,9 +5,16 @@ import fr.inria.zvtm.client.compositor.ForwardingFrameManager;
 import fr.inria.zvtm.client.gui.ClientViewer;
 import fr.inria.zvtm.common.gui.Viewer;
 
+/**
+ * The client pack 
+ * @author insitu
+ *
+ */
 public class ClientMain {
 	
 	public static boolean CLUSTERMODE = false;
+	/**influence the geometry of the simulated cluster: SMALLMODE is design to run on the local machine. 
+	*/
 	public static boolean SMALLMODE = false;
 	protected static String Xip = "127.0.0.1";
 	protected static int Xport = 5901;

@@ -15,6 +15,11 @@ import fr.inria.zvtm.common.gui.menu.PopMenu;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VImage;
 
+/**
+ * The Zvtm viewer's specialization for a client use
+ * @author Julien Altieri
+ *
+ */
 public class ClientViewer extends Viewer{
 
 	private InputForwarder infw;
@@ -60,10 +65,19 @@ public class ClientViewer extends Viewer{
 		mSpace.addGlyph(g);
 	}
 
+	/**
+	 * 
+	 * @return The {@link InputForwarder} attached to the viewer
+	 * @see InputForwarder
+	 */
 	public InputForwarder getInputForwarder() {
 		return infw;
 	}
 
+	/**
+	 * This handles a message sent by the zvtm server which forces the virtual cursor to be called back. It happens when the server's view is zoomed, since the cursor can exit the visible region and be lost.
+	 * The Cursor will be set to the center of the client's screen.
+	 */
 	public void handleResetCursor() {
 		if(getCursorHandler().VirtualMode())getCursorHandler().resetCursorPos();
 	}

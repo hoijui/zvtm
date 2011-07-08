@@ -11,7 +11,12 @@ import fr.inria.zvtm.common.gui.MainEventHandler;
 import fr.inria.zvtm.common.gui.Viewer;
 import fr.inria.zvtm.engine.ViewPanel;
 
-
+/**
+ * This is a specific inherited class from {@link MainEventHandler}, designed to handle a cursor's virtual mode (off screen) and to send events to the zvtm server
+ * 
+ * @author Julien Altieri
+ * 
+ */
 public class ClientMainEventHandler extends MainEventHandler {
 
 	private	boolean MOVE_MODE = false;
@@ -159,12 +164,19 @@ public class ClientMainEventHandler extends MainEventHandler {
 		if (code==KeyEvent.VK_ALT)ch.activate();
 	}
 
+	/**
+	 * Invokes the PopMenu if it is not already done,
+	 * Banish it if already invoked
+	 */
 	public void toggleMenu(){
 		int jpx = ch.getX();
 		int jpy = ch.getY();
 		((ClientViewer)viewer).popmenu.toggle(vxTrace, vyTrace, viewer.getFrameManager().get(infw.detectWindow(jpx, jpy)));
 	}
 
+	/**
+	 * Invokes the PopMenu at the current cursor's position
+	 */
 	public void invokeMenu(){
 		int jpx = ch.getX();
 		int jpy = ch.getY();
@@ -173,6 +185,9 @@ public class ClientMainEventHandler extends MainEventHandler {
 		((ClientViewer)viewer).popmenu.invoke(vxTrace, vyTrace, viewer.getFrameManager().get(infw.detectWindow(jpx, jpy)));
 	}
 
+	/**
+	 * Make the Menu Disappear
+	 */
 	public void banishMenu(){
 		lastwheeldirection = -1;
 		menuinvocationmarker = 0;

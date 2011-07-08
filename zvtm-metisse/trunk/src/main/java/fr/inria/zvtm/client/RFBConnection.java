@@ -11,7 +11,12 @@ import fr.inria.zvtm.common.protocol.Owner;
 import fr.inria.zvtm.common.protocol.Proto;
 import fr.inria.zvtm.common.protocol.RfbAgent;
 
-
+/**
+ * This class handles the Remote Frame Buffer based (RFB) connection between the Metisse server provided and the client.
+ * It handles the reception process but each action calls the handling methods of a ZvtmRfbHandler
+ * @author Julien Altieri
+ *
+ */
 public class RFBConnection implements Owner{
 	private String ip;
 	private int port;
@@ -21,7 +26,13 @@ public class RFBConnection implements Owner{
 	private ZvtmRfbHandler rfbInput;
 	private RfbAgent rfbAgent;
 	
-	
+	/**
+	 * 
+	 * @param ip the address of the Metisse server
+	 * @param port the port of the Metisse server
+	 * @param rfbInput the ZvtmRFBHandler who will handle the rfb actions
+	 * @see #ZvtmRfbHandler
+	 */
 	public RFBConnection(String ip,int port,ZvtmRfbHandler rfbInput) {
 		this.rfbInput = rfbInput;
 		this.init(ip, port);
@@ -34,6 +45,11 @@ public class RFBConnection implements Owner{
 		startListenning();
 	}
 	
+	/**
+	 * 
+	 * @return the RfbAgent related to the connection with the Metisse server
+	 * @see #RfbAgent
+	 */
 	public RfbAgent getRfbAgent(){
 		return rfbAgent;
 	}
@@ -81,6 +97,9 @@ public class RFBConnection implements Owner{
 		System.out.println("Connexion established.");
 	}
 
+	/**
+	 * to close the connection properly
+	 */
 	public void end() {
 
 		if (sock!=null) try {

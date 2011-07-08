@@ -3,7 +3,11 @@ package fr.inria.zvtm.common.compositor;
 
 
 
-
+/**
+ * 
+ * @author insitu
+ *
+ */
 public class ZvtmRfbHandler implements fr.inria.zvtm.common.compositor.RfbMessageHandler {
 	protected FrameManager fm;
 
