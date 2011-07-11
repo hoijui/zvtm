@@ -10,29 +10,28 @@ import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.LGRectangle;
 import fr.inria.zvtm.glyphs.VText;
 
-interface ComboStateObserver {
-    void onStateChange(ComboBox source, int activeIdx, String label);
+interface RadioStateObserver {
+    void onStateChange(RadioGroup source, int activeIdx, String label);
 }
 
-//A manager for a combo-box style interaction.
-//A Combo box is a number of horizontally aligned VRectangles, at most
+//A Radio Group is a number of horizontally aligned VRectangles, at most
 //one of which is selected at a given time
-class ComboBox {
+class RadioGroup {
     private final VirtualSpace parentSpace;
     private final ArrayList<LGRectangle> buttons = new ArrayList();
     private final ArrayList<VText> labels = new ArrayList();
 
-    private final ArrayList<ComboStateObserver> observers = new ArrayList();
+    private final ArrayList<RadioStateObserver> observers = new ArrayList();
 
     private static final double LABEL_OFFSET = 15;
 
     /**
      * @param parentSpace parent VirtualSpace (new glyphs will be added to parentSpace)
-     * @param labels combo box labels
+     * @param labels radio group labels
      * @param x origin x-coordinate (center of the leftmost button)
      * @param y origin y-coordinate (center of the leftmost button)
      */
-    ComboBox(VirtualSpace parentSpace, double x, double y, 
+    RadioGroup(VirtualSpace parentSpace, double x, double y, 
             String[] labels, LinearGradientPaint[] gradients, double itemSize){
         assert(labels.length == gradients.length);
         this.parentSpace = parentSpace;
@@ -58,14 +57,14 @@ class ComboBox {
         }
     }
 
-    void addObserver(ComboStateObserver obs){
+    void addObserver(RadioStateObserver obs){
         assert(obs != null);
         if(!observers.contains(obs)){
             observers.add(obs);
         }
     }
 
-    void removeObserver(ComboStateObserver obs){
+    void removeObserver(RadioStateObserver obs){
         observers.remove(obs);
     }
 
@@ -79,7 +78,7 @@ class ComboBox {
     }
 
     private void stateChanged(int activeIdx, String label){
-        for(ComboStateObserver obs: observers){
+        for(RadioStateObserver obs: observers){
             obs.onStateChange(this, activeIdx, label);
         }
     }
