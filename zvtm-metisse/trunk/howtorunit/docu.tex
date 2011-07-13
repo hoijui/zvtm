@@ -1,0 +1,310 @@
+\documentclass[12pt]{article}
+\usepackage{enumerate}
+\usepackage{listings}
+\usepackage{hyperref}
+\lstset{
+       basicstyle=\footnotesize\ttfamily, % Standardschrift
+         %numbers=left,               % Ort der Zeilennummern
+ %        numberstyle=\tiny,          % Stil der Zeilennummern
+         %stepnumber=2,               % Abstand zwischen den Zeilennummern
+   %      numbersep=5pt,              % Abstand der Nummern zum Text
+     %    tabsize=2,                  % Groesse von Tabs
+    %     extendedchars=true,         %
+   %      breaklines=false,            % Zeilen werden Umgebrochen
+   %      keywordstyle=\color{red},
+  %  		frame=b,         
+ %        keywordstyle=[1]\textbf,    % Stil der Keywords
+ %        keywordstyle=[2]\textbf,    %
+ %        keywordstyle=[3]\textbf,    %
+ %        keywordstyle=[4]\textbf,   \sqrt{\sqrt{}} %
+  %       stringstyle=\color{white}\ttfamily, % Farbe der String
+   %      showspaces=false,           % Leerzeichen anzeigen ?
+  %%       showtabs=false,             % Tabs anzeigen ?
+   %      xleftmargin=17pt,
+   %     framexleftmargin=17pt,
+   %      framexrightmargin=5pt,
+   %      framexbottommargin=4pt,
+         %backgroundcolor=\color{lightgray},
+   %      showstringspaces=false      % Leerzeichen in Strings anzeigen ?        
+ }
+ \lstloadlanguages{% Check Dokumentation for further languages ...
+         %[Visual]Basic
+         %Pascal
+         %C
+         %C++
+         %XML
+         %HTML
+         %Java
+         sh
+ }
+
+\begin{document}
+
+\begin{center}
+Run a ZVTM-Metisse demo
+\end{center}
+
+
+\section{Introduction}
+This tutorial will tell you how to run the ZVTM-Metisse demo, eigther on the wall or not. Note that this demo will allow you to install the different items (ZVTM server and clients) so you must check first that the thing you are trying to do has not already been done.
+
+\section{Architecture}
+The system is mainly composed of a ZVTM Server -it will host the shared virtual space- and ZVTM clients -they must run on each individual user's machine- communicating by network. \newline
+The ZVTM server can be run on the wall as well as on a single machine. The only difference between the two configuration is the part of the library required. In both cases, there will be at least one server application running on the host machine.\newline
+The ZVTM client must run on a user's machine, being the elementary interface for sharing on the ZVTM server. This client connects to a Metisse server, so the user must first have a running Metisse server on his computer.\newline
+At last, the project is Maven-based so be sure to have the Maven package installed on the computer first.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+\section{ZVTM Server}
+
+
+
+
+
+\subsection{Install}
+
+This section is only if you want to install the server on a new host machine (it must already be done on frontal1 and frontal2).
+The order of the following steps is really crucial.
+
+\begin{enumerate}
+\item \emph{Get the zvtm sources.} First, get the sources from the download page
+
+\begin{lstlisting}
+svn co https://zvtm.svn.sourceforge.net/svnroot/zvtm zvtm
+\end{lstlisting}
+
+\item \emph{Compile zvtm-core.} This is the core unit of zvtm
+
+\begin{lstlisting}
+cd zvtmDirectory/zvtm-core/trunk/
+mvn clean install
+\end{lstlisting}
+
+\item \emph{Compile zvtm-metisse.} The Metisse support and applications (will also be used for the clients)
+
+\begin{lstlisting}
+cd zvtmDirectory/zvtm-metisse/trunk/
+mvn clean install
+\end{lstlisting}
+
+\item \emph{Compile zvtm-cluster.} (only if you want to run it on the wall)
+
+\begin{lstlisting}
+cd zvtmDirectory/zvtm-cluster/trunk/
+mvn clean install
+\end{lstlisting}
+
+\item \emph{Compile zvtm-metisse-cluster.} (only if you want to run it on the wall)
+
+\begin{lstlisting}
+cd zvtmDirectory/zvtm-metisse-cluster/trunk/
+mvn clean install
+\end{lstlisting}
+
+\end{enumerate}
+
+The install part is now over. However, if you want to run it on the wall, you will need to deploy the slaves on each cluster's machine if not already done. These applications are the Metisse version of zvtm-cluster's slaveApps.
+
+\subparagraph{Deploying the slaveApps ont the wall}
+
+\begin{enumerate}
+
+\item \emph{Create directories on each machine of the cluster.} We need to put the slaveApp at the same place on each machine of the cluster.
+\begin{lstlisting}
+wildo mkdir myDirectory
+\end{lstlisting}
+
+\emph{myDirectory} is now created on each machine of the cluster.
+
+
+\item \emph{Deploy the applications on myDirectory.} 
+\begin{lstlisting}
+cd zvtmDirectory/zvtm-metisse-cluster/trunk/
+./deploy.sh zvtmDirectory/zvtm-metisse-cluster/trunk/target/ myDirectory 
+\end{lstlisting}
+The whole content of \emph{target/} must now be on each machine at \emph{myDirectory/target/}.
+
+
+\emph{note: wildo is a program that reproduce the specified action on each machine of the cluster. \newline Further documentation can be fould at http://insitu.lri.fr/WILD/WildoPy}
+
+\end{enumerate}
+
+
+
+
+
+
+
+
+
+
+
+
+\subsection{Configure the scripts}
+
+\begin{enumerate}
+\item  
+\emph{Configure zvtmDirectory/zvtm-metisse-cluster/trunk/launch\_master.sh}. Here we need to indicate the ip address of the host machine. For example, if the ZVTM server is going to run on frontal2, whose ip is "192.168.0.2", enshure the script has the following option:\newline
+\begin{lstlisting} 
+-Djgroups.bind_addr="192.168.0.2"
+\end{lstlisting}
+
+\item  
+\emph{Configure zvtmDirectory/zvtm-metisse-cluster/trunk/cluster\_run.sh}. The cluster\_run script launches the slaveApps on each machine of the cluster. Thus, we need to check the specified slaveApp path in the script. On the "ssh" lines 4 and 5 (out of 5), the remote instruction must start with:
+\begin{lstlisting} 
+"cd myDirectory/target/ && ...... 
+\end{lstlisting}
+
+There are 2 replacements to make (one for each line). Note that in the end, the specified path must be the directory containing the jar files (in other terms, the content of target/).
+
+\end{enumerate}
+
+
+
+
+
+
+
+
+
+
+\subsection{Running the ZVTM server}
+
+
+\subparagraph{Run the server on a machine without using the wall (used for tests)}
+
+In the zvtm/zvtm-metisse/trunk/ just run \emph{launch\_master.sh}
+\begin{lstlisting}
+cd zvtmDirectory/zvtm-metisse/trunk/
+./launch_master.sh
+\end{lstlisting}
+
+\subparagraph{Run the server on the wall}
+
+In the zvtm/zvtm-metisse-cluster/trunk/ execute the following commands (needs two terminals):
+\begin{lstlisting}
+cd zvtmDirectory/zvtm-metisse-cluster/trunk/
+./cluster_run.sh -n intothewild
+\end{lstlisting}
+
+then, when the 16 machines are ready,
+
+\begin{lstlisting}
+cd zvtmDirectory/zvtm-metisse-cluster/trunk/
+./launch_master.sh
+
+\end{lstlisting}
+
+
+
+
+
+
+
+
+
+
+
+
+\section{ZVTM Client}
+
+
+
+
+\subsection{Install}
+
+To Install the ZVTM Client, we will first install and compile Metisse and then zvtm-metisse.
+
+\begin{enumerate}
+\item \emph{Get and compile the Metisse sources.} Follow the explanations for Metisse from the download page http://insitu.lri.fr/metisse/docs/building.html Note that you need both Nucleo and Metisse.
+
+\item \emph{Get the zvtm sources} If not already done ...
+
+\begin{lstlisting}
+svn co https://zvtm.svn.sourceforge.net/svnroot/zvtm zvtm
+\end{lstlisting}
+
+\item \emph{Compile zvtm-core.} Note that Maven is required here.
+
+\begin{lstlisting}
+cd zvtmDirectory/zvtm-core/trunk/
+mvn clean install
+\end{lstlisting}
+
+\item \emph{Compile zvtm-metisse.} 
+
+\begin{lstlisting}
+cd zvtmDirectory/zvtm-metisse/trunk/
+mvn clean install
+\end{lstlisting}
+
+\end{enumerate}
+
+The install part is over. On the next section we will now configure the launch scripts.
+
+
+
+
+
+
+
+
+
+
+
+\subsection{Configure the scripts}
+
+
+\emph{Configure zvtmDirectory/zvtm-metisse/trunk/launch\_client.sh}. Here we need to indicate the ip address of the host machine. For example, if the ZVTM server is going to run on frontal2, whose ip is "192.168.0.2", enshure the script ends as follow:
+\begin{lstlisting} 
+fr.inria.zvtm.client.ClientMain "192.168.0.2"
+\end{lstlisting}
+
+Note: the last ip (argument of the main class) is the only one that must be changed (it differs from the configuration of the zvtm server).
+
+
+
+
+\subsection{Running the ZVTM Client}
+
+\begin{enumerate}
+
+
+\item
+In zvtmDirectory/zvtm-metisse/trunk/, launch the script for metisse:
+\begin{lstlisting}
+cd zvtmDirectory/zvtm-metisse/trunk/
+./launch_metisse_server_fvwm.sh
+\end{lstlisting}
+
+
+
+\item
+In zvtmDirectory/zvtm-metisse/trunk/ just run \emph{launch\_client.sh}
+\begin{lstlisting}
+cd zvtmDirectory/zvtm-metisse/trunk/
+./launch_client.sh
+\end{lstlisting}
+
+
+
+\end{enumerate}
+
+
+
+
+\end{document}
