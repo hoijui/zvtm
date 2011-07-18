@@ -3,8 +3,14 @@ package fr.inria.zvtm.common.gui.menu;
 import java.awt.event.MouseEvent;
 
 import fr.inria.zvtm.client.compositor.ForwardingFrameManager;
+import fr.inria.zvtm.common.compositor.MetisseWindow;
 import fr.inria.zvtm.engine.ViewPanel;
 
+/**
+ * Specification for {@link Item} to control the visibility of the {@link MetisseWindow} on which it is invoked on the wall.
+ * @author Julien Altieri
+ *
+ */
 public class TeleportItem extends ToggleItem {
 
 	private boolean enabled = false;
@@ -42,6 +48,10 @@ public class TeleportItem extends ToggleItem {
 		return "toscreenp.png";
 	}
 
+	/**
+	 * Set the status of the {@link Item} true for configuration 1 and 2 and false for 3 and 4
+	 * @param s
+	 */
 	public void setStatus(boolean s){
 		enabled = s;
 		setState(enabled?1:0);

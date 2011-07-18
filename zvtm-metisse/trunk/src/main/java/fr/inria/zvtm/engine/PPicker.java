@@ -417,7 +417,7 @@ public class PPicker extends Picker{
 	}
 
 	/**
-	 * The list of glyphs under the picker and ordered according to the drawing stack
+	 * @return The list of glyphs under the picker and ordered according to the drawing stack
 	 */
 	public Glyph[] getDrawOrderedPickedGlyphList(VirtualSpace v){
 		Glyph[] tt = getPickedGlyphList();
@@ -432,7 +432,10 @@ public class PPicker extends Picker{
 		return t;
 	}
 
-	/**Returns the glyph under the picker (drawing order)*/
+	/**
+	 * Returns the {@link Glyph} under the picker (drawing order).
+	 * @param v The {@link VirtualSpace} in which the glyphs are drawn.
+	 */
 	public Glyph pickOnTop(VirtualSpace v){
 		Glyph[] list = getDrawOrderedPickedGlyphList(v);
 		if(list.length==0)return null;

@@ -6,8 +6,10 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.util.HashMap;
 
+import fr.inria.zvtm.common.gui.menu.Item;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.PPicker;
+import fr.inria.zvtm.engine.Picker;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.VirtualSpace;
@@ -16,8 +18,8 @@ import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.master.MasterMain;
 
 /**
- * This class must be added to a view as a ViewListener. It dispatches glyph events on the 
- * subscribed glyph which is under the picker
+ * This class must be added to a {@link View} as a {@link ViewListener}. It dispatches mouse events on the subscribed {@link Glyph} which is under the {@link Picker}.
+ * With such a structure, when the {@link Glyph} g1 is above the {@link Glyph} g2, while the mouse is into g1, g2 will get no events (even g2 exited). This is crucial for focus issues.
  * @author Julien Altieri
  *
  */
@@ -29,6 +31,11 @@ public class GlyphEventDispatcher implements ViewListener {
 	private Glyph lastPicked;
 	private boolean alwaysRepick = true;
 
+	/**
+	 * 
+	 * @param p The {@link PPicker} which will determine the list of the concerned {@link Glyph}.
+	 * @param vs The {@link VirtualSpace} where the subscribed glyphs are
+	 */
 	public GlyphEventDispatcher(PPicker p,VirtualSpace vs) {
 		dispatchTable = new HashMap<Glyph, GlyphListener>();
 		this.picker = p;
@@ -37,13 +44,20 @@ public class GlyphEventDispatcher implements ViewListener {
 
 	}
 
-
+	/**
+	 * Register the given {@link Glyph} for dispaching. Must provide the {@link GlyphListener}. When an event is triggered, the {@link GlyphEventDispatcher} will call the same event on the {@link GlyphListener}.
+	 * @param g the {@link Glyph} to subscribe
+	 * @param gl the related {@link GlyphListener}.
+	 */
 	public void subscribe(Glyph g,GlyphListener gl){
 		if (vp == null)this.vp = virtualSpace.getCamera(0).getOwningView().getPanel();
 		dispatchTable.put(g, gl);
 	}
 
-
+	/**
+	 * 
+	 * @return the {@link Glyph} just under the cursor. (if not locked by alwaysRepick, otherwise it will return the last picked {@link Glyph})
+	 */
 	protected Glyph pick(){
 		if(alwaysRepick){	
 			picker.computePickedGlyphList(this, virtualSpace.getCamera(0));
@@ -186,20 +200,35 @@ public class GlyphEventDispatcher implements ViewListener {
 	public void viewIconified(View v) {}
 
 
+	/**
+	 * This alwaysRepick is a lock for picking. It is useful to drag on a {@link Glyph} even when exiting it.
+	 * Used in the PopMenu for draggable {@link Item}. 
+	 * @param alwaysRepick
+	 * @see GlyphEventDispatcher#isAlwaysRepick()
+	 */
 	public void setAlwaysRepick(boolean alwaysRepick) {
 		this.alwaysRepick = alwaysRepick;
 	}
 
-
+	/**
+	 * 
+	 * @return true if alwaysRepick is set to true
+	 * @see GlyphEventDispatcher#setAlwaysRepick(boolean)
+	 */
 	public boolean isAlwaysRepick() {
 		return alwaysRepick;
 	}
 
 
-
+	/**
+	 * This calls one of {@link GlyphListener#press1(ViewPanel, int, int, int, MouseEvent)}, {@link GlyphListener#press2(ViewPanel, int, int, int, MouseEvent)}, {@link GlyphListener#press3(ViewPanel, int, int, int, MouseEvent)}, depending on the value of i.
+	 * @param x location of the event
+	 * @param y location of the event
+	 * @param i number of the pressed button. (1 for left, 2 for middle and 3 for right)
+	 */
 	public void press(double x, double y, int i) {
 		lastPicked = pick();
-		int[] co = unproject(x, y);
+		int[] co = project(x, y);
 		int jpxx = co[0];
 		int jpyy = co[1];
 		if(dispatchTable.containsKey(lastPicked)){
@@ -209,10 +238,15 @@ public class GlyphEventDispatcher implements ViewListener {
 		}
 	}
 
-
+	/**
+	 * This calls one of {@link GlyphListener#release1(ViewPanel, int, int, int, MouseEvent)}, {@link GlyphListener#release2(ViewPanel, int, int, int, MouseEvent)}, {@link GlyphListener#release3(ViewPanel, int, int, int, MouseEvent)}, depending on the value of i.
+	 * @param x location of the event
+	 * @param y location of the event
+	 * @param i number of the pressed button. (1 for left, 2 for middle and 3 for right)
+	 */
 	public void release(double x, double y, int i) {
 		lastPicked = pick();
-		int[] co = unproject(x, y);
+		int[] co = project(x, y);
 		int jpxx = co[0];
 		int jpyy = co[1];
 		if(dispatchTable.containsKey(lastPicked)){
@@ -222,10 +256,15 @@ public class GlyphEventDispatcher implements ViewListener {
 		}
 	}
 
-
+	/**
+	 * This calls one of {@link GlyphListener#click1(ViewPanel, int, int, int, MouseEvent)}, {@link GlyphListener#click2(ViewPanel, int, int, int, MouseEvent)}, {@link GlyphListener#click3(ViewPanel, int, int, int, MouseEvent)}, depending on the value of i.
+	 * @param x location of the event
+	 * @param y location of the event
+	 * @param i number of the pressed button. (1 for left, 2 for middle and 3 for right)
+	 */
 	public void click(double x, double y, int i) {
 		lastPicked = pick();
-		int[] co = unproject(x, y);
+		int[] co = project(x, y);
 		int jpxx = co[0];
 		int jpyy = co[1];
 		if(dispatchTable.containsKey(lastPicked)){
@@ -235,10 +274,14 @@ public class GlyphEventDispatcher implements ViewListener {
 		}
 	}
 
-
+	/**
+	 * MouseMoved Callback
+	 * @param x the x virtual position 
+	 * @param y the y virtual position
+	 */
 	public void mouseMoved(double x, double y) {
 		lastPicked = pick();
-		int[] co = unproject(x, y);
+		int[] co = project(x, y);
 		int jpxx = co[0];
 		int jpyy = co[1];
 		if(dispatchTable.containsKey(lastPicked)){
@@ -246,10 +289,14 @@ public class GlyphEventDispatcher implements ViewListener {
 		}
 	}
 
-
+	/**
+	 * MouseDragged Callback
+	 * @param x the x virtual position 
+	 * @param y the y virtual position
+	 */
 	public void mouseDragged(double x, double y) {
 		lastPicked = pick();
-		int[] co = unproject(x, y);
+		int[] co = project(x, y);
 		int jpxx = co[0];
 		int jpyy = co[1];
 		if(dispatchTable.containsKey(lastPicked)){
@@ -257,10 +304,15 @@ public class GlyphEventDispatcher implements ViewListener {
 		}
 	}
 
-
+	/**
+	 * WheelMove Callback
+	 * @param x the x virtual position 
+	 * @param y the y virtual position
+	 * @param i the wheel direction (0 for down, 1 for up)
+	 */
 	public void mouseWheelMove(double x, double y, int i) {
 		lastPicked = pick();
-		int[] co = unproject(x, y);
+		int[] co = project(x, y);
 		int jpxx = co[0];
 		int jpyy = co[1];
 		if(dispatchTable.containsKey(lastPicked)){
@@ -268,8 +320,13 @@ public class GlyphEventDispatcher implements ViewListener {
 		}
 	}
 
-
-	public int[] unproject(double vx,double vy){
+	/**
+	 * Transforms virtual coordinates into panel coordinates
+	 * @param vx
+	 * @param vy
+	 * @return int[] as following: {x,y}
+	 */
+	private int[] project(double vx,double vy){
 		int[] res = new int[2];
 		Camera c = virtualSpace.getCamera(0);
 		java.awt.geom.Point2D.Double d = null;

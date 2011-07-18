@@ -8,6 +8,7 @@ import javax.swing.SwingUtilities;
 import fr.inria.zvtm.common.compositor.FrameManager;
 import fr.inria.zvtm.common.compositor.MetisseWindow;
 import fr.inria.zvtm.common.gui.menu.GlyphEventDispatcherForMenu;
+import fr.inria.zvtm.common.gui.menu.PopMenu;
 import fr.inria.zvtm.common.kernel.Temporizer;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.EView;
@@ -17,6 +18,11 @@ import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
 
+/**
+ * The minimal structure for building a zvtm {@link Viewer} related to this project.
+ * @author Julien Altieri
+ *
+ */
 public abstract class Viewer {
 
 	/* screen dimensions, actual dimensions of windows */
@@ -48,6 +54,9 @@ public abstract class Viewer {
 	protected GlyphEventDispatcherForMenu ged;
 	protected Vector<Camera> cameras;
 
+	/**
+	 * Need to be called right after instantiation.
+	 */
 	public void init() {
 		vsm = VirtualSpaceManager.INSTANCE;
 		
@@ -89,37 +98,62 @@ public abstract class Viewer {
 		addBackground();
 	}
 
+	/**
+	 * Hook called just at the beginning to initialization.
+	 */
 	protected void preInitHook(){}
 	
+	/**
+	 * Hook called at the end of initialization.
+	 */
 	protected void viewCreatedHook(){}
 
+	/**
+	 * Hook to add a background to the {@link VirtualSpace}.
+	 */
 	protected void addBackground() {}
 
+	/**
+	 * Must set a {@link NavigationManager}.
+	 */
 	public abstract void initNavigation();
 
+	/**
+	 * Must return the desired type of {@link MainEventHandler}
+	 * @return The {@link MainEventHandler} that will be attached to this {@link Viewer}
+	 */
 	public abstract MainEventHandler makeEventHandler();
 
+	/**
+	 * @return the drawing list of the main {@link VirtualSpace} (containing Metisse windows)
+	 */
 	public Glyph[] getDrawingStack(){
 		return mSpace.getDrawingList();
 	}
 	
+	/**
+	 * Adds a {@link MetisseWindow} to the main {@link VirtualSpace}.
+	 * @param f a {@link MetisseWindow} object
+	 */
 	public void addFrame(final MetisseWindow f){
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
 				mSpace.addGlyph(f);
-				f.setDisplayed(true);
 			}
 		});
 		refresh();
 	}
 
+	/**
+	 * Removes the specified {@link MetisseWindow} from the main {@link VirtualSpace}. Does not test weather or not this window already exists (must be done before). 
+	 * @param f a {@link MetisseWindow} object
+	 */
 	public void remFrame(final MetisseWindow f){
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
 				mSpace.removeGlyph(f);
-				f.setDisplayed(false);
 			}
 		});
 		refresh();
@@ -137,6 +171,9 @@ public abstract class Viewer {
 		VIEW_H = (SCREEN_HEIGHT <= VIEW_MAX_H) ? SCREEN_HEIGHT : VIEW_MAX_H;
 	}
 
+	/**
+	 * Forces refreshing the zvtm view.
+	 */
 	public void refresh() {
 		if(System.currentTimeMillis()-lastRepaintTime>Temporizer.repaintMinDelay){
 			mView.repaint();
@@ -145,55 +182,106 @@ public abstract class Viewer {
 		}
 	}
 
-	
+	/**
+	 * 
+	 * @return the {@link FrameManager} attached to this {@link Viewer}
+	 */
 	public FrameManager getFrameManager(){
 		return fm;
 	}
 
+	/**
+	 * 
+	 * @return the {@link NavigationManager} attached to this {@link Viewer}
+	 */
 	public NavigationManager getNavigationManager() {
 		return nm;
 	}
 
+	/**
+	 * Set the specified {@link FrameManager} as attached to this {@link Viewer}
+	 * @param framemanager
+	 */
 	public void setFrameManager(FrameManager framemanager) {
 		this.fm = framemanager;
 	}
 	
+	/**
+	 * 
+	 * @return the {@link VirtualSpace} where Metisse windows are drawn
+	 */
 	public VirtualSpace getVirtualSpace() {
 		return mSpace;
 	}
 
+	/**
+	 * Sets the {@link CursorHandler} attached to this {@link Viewer}.
+	 * @param cursorHandler
+	 */
 	public void setCursorHandler(CursorHandler cursorHandler) {
 		this.cursorHandler = cursorHandler;
 	}
 
+	/**
+	 * 
+	 * @return the {@link CursorHandler} which handles this {@link Viewer} main {@link PCursor}
+	 */
 	public CursorHandler getCursorHandler() {
 		return cursorHandler;
 	}
 
+	/**
+	 * Set the {@link PCursor} attached to this {@link Viewer}
+	 * @param cursor a {@link PCursor} object.
+	 */
 	public void setCursor(PCursor cursor) {
 		this.cursor = cursor;
 	}
 
+	/**
+	 * 
+	 * @return The {@link PCursor} attached to this {@link Viewer}
+	 */
 	public PCursor getCursor() {
 		return cursor;
 	}
 
+	/**
+	 * 
+	 * @return The {@link GlyphEventDispatcher} attached to this {@link Viewer}
+	 */
 	public GlyphEventDispatcher getGlyphEventDispatcher() {
 		return ged;
 	}
 
+	/**
+	 * 
+	 * @return The {@link EView} attached to this {@link Viewer}
+	 */
 	public EView getView() {
 		return mView;
 	}
 
+	/**
+	 * 
+	 * @return The {@link Camera} observing {@link PopMenu}'s {@link VirtualSpace}
+	 */
 	public Camera getMenuCamera() {
 		return menuCamera;
 	}
 
+	/**
+	 * 
+	 * @return The {@link VirtualSpace} which contains the {@link PopMenu}
+	 */
 	public VirtualSpace getMenuSpace() {
 		return menuSpace;
 	}
 	
+	/**
+	 * 
+	 * @return The {@link MainEventHandler} attached to this {@link Viewer}
+	 */
 	public MainEventHandler getMainEventListener() {
 		return eh;
 	}

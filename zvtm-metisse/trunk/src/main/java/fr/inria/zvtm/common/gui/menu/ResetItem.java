@@ -4,9 +4,16 @@ import java.awt.event.MouseEvent;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import fr.inria.zvtm.common.compositor.MetisseWindow;
+import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.master.gui.MasterViewer;
 
+/**
+ * Specification for {@link Item} used to reset the visible region (set the {@link Camera} to 0,0,0 or to reset the position of a {@link MetisseWindow} (scale and zvtm offset).
+ * @author Julien Altieri
+ *
+ */
 public class ResetItem extends Item {
 
 	public ResetItem(PopMenu parent) {

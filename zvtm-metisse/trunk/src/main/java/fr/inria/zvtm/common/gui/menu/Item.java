@@ -19,11 +19,14 @@ import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VImage;
 import fr.inria.zvtm.master.gui.MasterViewer;
 
+
+/**
+ * Basic structure for a component of the {@link PopMenu}.
+ * @author Julien Altieri
+ *
+ */
 public abstract class Item implements GlyphListener{
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	protected static final float MinTranslucency = 0.3f;
 	protected static final float MaxTranslucency = 1f;
@@ -39,6 +42,10 @@ public abstract class Item implements GlyphListener{
 
 
 
+	/**
+	 * Should provide the {@link PopMenu} to whom it belongs.
+	 * @param parent a {@link PopMenu} object
+	 */
 	public Item(PopMenu parent) {
 		listeners = new LinkedList<ItemActivationListener>();
 		String imagePath = PopMenu.ressourcePath+getState1ImageName();
@@ -74,17 +81,24 @@ public abstract class Item implements GlyphListener{
 		this.drawUp();
 	}
 
+	/**
+	 * @return The filename of the png image to draw when the button is up (state 1).
+	 */
 	protected abstract String getState1ImageName();
+
+	/**
+	 * @return The filename of the png image to draw when the button is down (state 2).
+	 */
 	protected abstract String getState2ImageName();
 
-/**
- * Handle translucency animation for the specified shape.
- * Animation will occur only if the shape is visible. In the other case, it will be just be set to dest.
- * @param shape
- * @param start the modification will apply only if the current translucency value is start. Set to a negative value to bypass the test.
- * @param dest the translucency value in the end
- * @param e the end action
- */
+	/**
+	 * Handle translucency animation for the specified shape.
+	 * Animation will occur only if the shape is visible. In the other case, it will be just be set to dest.
+	 * @param shape
+	 * @param start the modification will apply only if the current translucency value is start. Set to a negative value to bypass the test.
+	 * @param dest the translucency value in the end
+	 * @param e the end action
+	 */
 	protected void appearAnim(VImage shape,float start, float dest,EndAction e){
 		if(shape.isVisible()){
 			if(start<0 || (shape.getTranslucencyValue()==start && shape.getTranslucencyValue()!=dest)){
@@ -95,11 +109,11 @@ public abstract class Item implements GlyphListener{
 			}
 		}
 		else{
-				shape.setTranslucencyValue(dest);
-				if(e!=null)e.execute(null, null);
+			shape.setTranslucencyValue(dest);
+			if(e!=null)e.execute(null, null);
 		}
 	}
-	
+
 	/**
 	 * Handle translucency animation for the specified shape.
 	 * Animation will occur only if the shape is visible. In the other case, it will be just be set to dest.
@@ -112,6 +126,10 @@ public abstract class Item implements GlyphListener{
 	}
 
 
+	/**
+	 * Makes the {@link Item} appear as a shadow.
+	 * @see Item#makeAppear() 
+	 */
 	public void appear() {
 		parent.getVirtualSpace().addGlyph(this.shape);
 		parent.getVirtualSpace().addGlyph(this.shape2);
@@ -120,10 +138,13 @@ public abstract class Item implements GlyphListener{
 		appearAnim(shape2, 0, MinTranslucency);
 	}
 
+	/**
+	 * Makes the {@link Item} disappear.
+	 */
 	public void disappear() {
 		deactivate();
 		EndAction e1 = new EndAction() {
-			
+
 			@Override
 			public void execute(Object subject, Dimension dimension) {
 				parent.getVirtualSpace().removeGlyph(shape);
@@ -131,7 +152,7 @@ public abstract class Item implements GlyphListener{
 			}
 		};
 		EndAction e2 = new EndAction() {
-			
+
 			@Override
 			public void execute(Object subject, Dimension dimension) {
 				parent.getVirtualSpace().removeGlyph(shape2);
@@ -142,15 +163,21 @@ public abstract class Item implements GlyphListener{
 		appearAnim(shape2,-1,0,e2);
 	}
 
+	/**
+	 * Makes the {@link Item} completely appear (from shadow mode to fully visible mode).
+	 */
 	protected void makeAppear(){
 		if(parent.pressed)return;
 		activate();
 		appeared = true;
 		appearAnim(shape, MinTranslucency, MaxTranslucency);
 		appearAnim(shape2, MinTranslucency, MaxTranslucency);
-		
+
 	}
 
+	/**
+	 * Makes the {@link Item} partially disappear (from fully visible mode to shadow mode).
+	 */
 	protected void makeDisappear(){
 		if(parent.pressed)return;
 		deactivate();
@@ -159,14 +186,25 @@ public abstract class Item implements GlyphListener{
 		appearAnim(shape2, -1, MinTranslucency);
 	}
 
+	/**
+	 * Plugs an {@link ItemActivationListener}.
+	 * @param ial
+	 */
 	public void addListener(ItemActivationListener ial){
 		listeners.add(ial);
 	}
 
+	/**
+	 * Removes an {@link ItemActivationListener}.
+	 * @param ial
+	 */
 	public void removeListener(ItemActivationListener ial){
 		listeners.remove(ial);
 	}
 
+	/**
+	 * Activates the {@link Item}. It will have consequences on the {@link GlyphEventDispatcherForMenu}. When the {@link Item} is activated, interaction with under layers must be locked.
+	 */
 	private void activate() {
 		active = true;
 		for (ItemActivationListener ial : listeners) {
@@ -174,6 +212,10 @@ public abstract class Item implements GlyphListener{
 		}
 	}
 
+	/**
+	 * Deactivates the {@link Item}.
+	 * @see Item#activate()
+	 */
 	protected void deactivate() {
 		active = false;
 		for (ItemActivationListener ial : listeners) {
@@ -181,6 +223,11 @@ public abstract class Item implements GlyphListener{
 		}
 	}
 
+	/**
+	 * Moves the {@link Item} to the specified position.
+	 * @param vx virtual x coordinate
+	 * @param vy virtual y coordinate
+	 */
 	public void position(double vx, double vy) {
 		shape.moveTo(vx, vy);
 		shape2.moveTo(vx, vy);
@@ -265,20 +312,35 @@ public abstract class Item implements GlyphListener{
 		if(parent.viewer instanceof MasterViewer && this instanceof ScaleItem && parent.parentFrame==null)((MasterViewer) parent.viewer).sendViewUpgrade();
 	}
 
+	/**
+	 * 
+	 * @return whether or not the {@link Item} is active
+	 */
 	public boolean isActive() {
 		return active;
 	}
 
+	/**
+	 * Set the state 1 for drawing
+	 */
 	public void drawUp(){
 		shape.setVisible(true);
 		shape2.setVisible(false);
 	}
 
+	/**
+	 * Set the state 2 for drawing
+	 */
 	public void drawDown(){
 		shape2.setVisible(true);
 		shape.setVisible(false);
 	}
 
+	/**
+	 * Moves the {@link Item} with an animation.
+	 * @param offsetx the relative move within x
+	 * @param offsety the relative move within y
+	 */
 	public void animatedMove(double offsetx,double offsety){
 		parent.refreshAltFactor();
 		Animation trans = 
@@ -294,6 +356,10 @@ public abstract class Item implements GlyphListener{
 
 	}
 
+	/**
+	 * 
+	 * @return The owner {@link PopMenu}
+	 */
 	public PopMenu getParent(){
 		return parent;
 	}

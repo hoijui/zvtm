@@ -2,8 +2,14 @@ package fr.inria.zvtm.common.gui.menu;
 
 import java.awt.event.MouseEvent;
 
+import fr.inria.zvtm.common.compositor.MetisseWindow;
 import fr.inria.zvtm.engine.ViewPanel;
 
+/**
+ * Specification for {@link Item} used for setting the {@link MetisseWindow} on which it is invoked to status "shared" or "not shared".
+ * @author Julien Altieri
+ *
+ */
 public class ShareItem extends ToggleItem {
 
 	private boolean enabled = true;
@@ -41,6 +47,10 @@ public class ShareItem extends ToggleItem {
 		return "sharep.png";
 	}
 
+	/**
+	 * Set the status of the {@link Item} true for configuration 1 and 2 and false for 3 and 4
+	 * @param s
+	 */
 	public void setStatus(boolean s){
 		enabled = s;
 		setState(enabled?1:0);

@@ -4,12 +4,13 @@ import java.awt.event.MouseEvent;
 
 import fr.inria.zvtm.engine.ViewPanel;
 
-
+/**
+ * Used for move action (either in attached or free mode)
+ * @author Julien Altieri
+ *
+ */
 public class DragItem extends DragableItem {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private int lastJPX;
 	private int lastJPY;
@@ -43,7 +44,7 @@ public class DragItem extends DragableItem {
 		else setFreedom(true);
 		pvx = ((GlyphEventDispatcherForMenu)parent.ged).getCursor().getVSXCoordinate()-parent.viewer.getNavigationManager().getCamera().vx;
 		pvy = ((GlyphEventDispatcherForMenu)parent.ged).getCursor().getVSYCoordinate()-parent.viewer.getNavigationManager().getCamera().vy;
-		int[] co = unproject(pvx, pvy);
+		int[] co = project(pvx, pvy);
 		lastJPX = co[0];
 		lastJPY = co[1];
 	}
@@ -69,7 +70,7 @@ public class DragItem extends DragableItem {
 		if(buttonNumber!=1)return;		
 		vx = ((GlyphEventDispatcherForMenu)parent.ged).getCursor().getVSXCoordinate()-parent.viewer.getNavigationManager().getCamera().vx;
 		vy = ((GlyphEventDispatcherForMenu)parent.ged).getCursor().getVSYCoordinate()-parent.viewer.getNavigationManager().getCamera().vy;
-		int[] co = unproject(vx, vy);
+		int[] co = project(vx, vy);
 		double jpx = co[0];
 		double jpy = co[1];
 

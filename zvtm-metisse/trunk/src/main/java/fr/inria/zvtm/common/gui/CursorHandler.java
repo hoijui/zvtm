@@ -5,6 +5,14 @@ import java.awt.Point;
 import java.awt.Robot;
 import java.awt.event.MouseEvent;
 
+import fr.inria.zvtm.engine.VirtualSpace;
+
+/**
+ * This class emulates the behavior of a real cursor, but all in zvtm. It traps the system's cursor to impair it from going out the application's frame and loose focus, and listen to it's moves. The emulated cursor (the {@link PCursor}) is a zvtm glyph set and can go anywhere in the {@link VirtualSpace}, even outside the laptop's screen.
+ * The main purpose is to make it possible for the cursor to go "on the wall", by exiting by the top of the screen.
+ * @author Julien Altieri
+ *
+ */
 public class CursorHandler {
 
 	private PCursor pcursor;
@@ -24,7 +32,11 @@ public class CursorHandler {
 	private boolean recalib = false;
 	private boolean virtualMode;
 
-
+	/**
+	 * 
+	 * @param out the {@link PCursor} who will be used for the display.
+	 * @param v The viewer to which it is related.
+	 */
 	public CursorHandler(PCursor out, Viewer v) {
 		this.pcursor = out;
 		this.viewer = v;
@@ -40,7 +52,10 @@ public class CursorHandler {
 	}
 
 
-
+/**
+ * 
+ * @return the zvtm {@link PCursor}
+ */
 	public PCursor getCursor() {
 		return pcursor;
 	}
@@ -58,7 +73,12 @@ public class CursorHandler {
 	}
 
 
-
+/**
+ * Makes the virtual cursor move in the virtual space.
+ * @param jpx The position of the system's cursor
+ * @param jpy The position of the system's cursor
+ * @param e Event of the system's cursor
+ */
 	public void move(int jpx, int jpy, MouseEvent e) {
 		if(!active)return;
 		if((jpx+frameLocOnScreenX+1)==refPosX && (jpy+frameLocOnScreenY+27)==refPosY)return;
@@ -132,11 +152,19 @@ public class CursorHandler {
 		refPosY = frameLocOnScreenY + (viewer.getView().getFrame().getHeight() / 2);
 	}
 
+	/**
+	 * RefPos is the position where the system's cursor is replaced at each event. Here we test if the cursor is in his reference position.
+	 * @param jpx
+	 * @param jpy
+	 */
 	public boolean isRefPos(int jpx, int jpy) {
 		boolean res =  (((jpx+frameLocOnScreenX+1)==refPosX)&&((27+jpy+frameLocOnScreenY)==refPosY));
 		return res;
 	}
 
+	/**
+	 * Move the virtual cursor at the center of the client view.
+	 */
 	public void resetCursorPos(){
 		this.jpx = refPosX-frameLocOnScreenX;
 		this.jpy = refPosY-frameLocOnScreenY;
@@ -148,30 +176,47 @@ public class CursorHandler {
 	}
 
 
-
+	/**
+	 * Disable the robot, and the handling of the virtual cursor.
+	 */
 	public void deactivate() {
 		recalib = true;
 		active = false;
 	}
 
 
-
+	/**
+	 * Enables the robot, and the handling of the virtual cursor.
+	 */
 	public void activate() {
 		rbt.mouseMove(this.jpx, this.jpy);
 		active = true;
 	}
 
-
+	/**
+	 * 
+	 * @return the virtual x position of the emulated cursor.
+	 */
 	public double getVX() {
 		return vx;
 	}
 
 
-
+	/**
+	 * 
+	 * @return the virtual y position of the emulated cursor.
+	 */
 	public double getVY() {
 		return vy;
 	}
 
+	/**
+	 * Make the virtual cursor move to (vx+jpx-refPosX,vy+jpy-refPosY). Used for the mapping of the top of the laptop on the bottom of the wall.
+	 * @param vx
+	 * @param vy
+	 * @param jpx
+	 * @param jpy
+	 */
 	public void jumpTo(double vx, double vy,int jpx,int jpy){
 		this.vx = vx;
 		this.vy = vy;
@@ -181,14 +226,10 @@ public class CursorHandler {
 		rbt.mouseMove(refPosX, refPosY);
 	}
 
-
-
-	public void refresh() {
-		pcursor.moveCursorTo(vx, vy,this.jpx,this.jpy);
-	}
-
-
-
+	/**
+	 * Virtual mode is when the cursor is on the wall.
+	 * @return true if the cursor is on the wall
+	 */
 	public boolean VirtualMode() {
 		return virtualMode;
 	}

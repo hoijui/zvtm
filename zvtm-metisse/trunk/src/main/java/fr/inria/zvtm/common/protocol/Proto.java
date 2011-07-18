@@ -1,7 +1,11 @@
 package fr.inria.zvtm.common.protocol;
 
 
-
+/**
+ * Encoding constants for the Metisse protocol.
+ * @author Julien Altieri
+ *
+ */
 public class Proto {
 	/*****************************************************************************
 	 *

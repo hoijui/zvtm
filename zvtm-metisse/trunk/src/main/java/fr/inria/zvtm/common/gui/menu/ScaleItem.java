@@ -2,8 +2,15 @@ package fr.inria.zvtm.common.gui.menu;
 
 import java.awt.event.MouseEvent;
 
+import fr.inria.zvtm.common.compositor.MetisseWindow;
+import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.ViewPanel;
 
+/**
+ * Specification for {@link Item} for rescaling, either the main view (z-moving the {@link Camera}) or the selected {@link MetisseWindow} (applies a scalefactor)).
+ * @author Julien Altieri
+ *
+ */
 public class ScaleItem extends DragableItem {
 
 	private double lastScaleFactor;

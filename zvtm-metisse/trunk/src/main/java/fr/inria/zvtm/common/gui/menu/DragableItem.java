@@ -5,7 +5,13 @@ import java.awt.event.MouseEvent;
 
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.ViewPanel;
+import fr.inria.zvtm.engine.VirtualSpace;
 
+/**
+ * This king of {@link Item} can be grabbed and leaves the menu when doing so. When the mouse is released, the menu moves itself and catch the {@link Item} back.
+ * @author Julien Altieri
+ *
+ */
 public abstract class DragableItem extends Item {
 
 	private double lastAltFactor;
@@ -62,15 +68,29 @@ public abstract class DragableItem extends Item {
 		pvy = vy;
 	}
 
+	/**
+	 * When set to true, the {@link DragableItem} can leave the {@link PopMenu}. Otherwise, it is attached and the {@link PopMenu} follows.
+	 * @param freedom
+	 */
 	public void setFreedom(boolean freedom) {
 		this.freedom = freedom;
 	}
 
+	/**
+	 * @see DragableItem#setFreedom(boolean)
+	 * @return the freedom state
+	 */
 	public boolean isFree() {
 		return freedom;
 	}
 	
-	public int[] unproject(double vx,double vy){
+	/**
+	 * Transforms virtual coordinates into JPanel projected coordinates.
+	 * @param vx x coordinate in the {@link VirtualSpace}
+	 * @param vy y coordinate in the {@link VirtualSpace}
+	 * @return int[] as follow: {x,y}
+	 */
+	public int[] project(double vx,double vy){
 		int[] res = new int[2];
 		Camera c = parent.getVirtualSpace().getCamera(0);
 		Dimension d = parent.getVirtualSpace().getCamera(0).getOwningView().getPanelSize();

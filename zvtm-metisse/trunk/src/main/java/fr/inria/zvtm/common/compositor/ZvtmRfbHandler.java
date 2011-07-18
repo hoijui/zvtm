@@ -1,11 +1,13 @@
 package fr.inria.zvtm.common.compositor;
 
+import fr.inria.zvtm.common.protocol.RfbAgent;
+
 
 
 
 /**
- * 
- * @author insitu
+ * This class makes the junction point between the {@link RfbAgent} and the compositor, via his {@link FrameManager}.
+ * @author Julien Altieri
  *
  */
 public class ZvtmRfbHandler implements fr.inria.zvtm.common.compositor.RfbMessageHandler {

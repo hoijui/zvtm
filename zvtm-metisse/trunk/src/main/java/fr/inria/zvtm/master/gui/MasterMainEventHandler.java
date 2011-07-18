@@ -6,10 +6,16 @@ import java.awt.event.MouseWheelEvent;
 
 import fr.inria.zvtm.common.compositor.MetisseWindow;
 import fr.inria.zvtm.common.gui.MainEventHandler;
+import fr.inria.zvtm.common.gui.menu.PopMenu;
 import fr.inria.zvtm.common.protocol.Keysym;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.glyphs.Glyph;
 
+/**
+ * Main event handler (defines interaction) for the {@link MasterViewer}, related to a specific client ({@link PCursorPack}).
+ * @author Julien Altieri
+ *
+ */
 public class MasterMainEventHandler extends MainEventHandler{
 
 	private PCursorPack owner;
@@ -18,7 +24,10 @@ public class MasterMainEventHandler extends MainEventHandler{
 	private boolean controlHasBeenPressed = false;
 	private int currentwindow;
 
-
+	/**
+	 * There is one {@link MasterMainEventHandler} for each connection.
+	 * @param owner the client's {@link PCursorPack}
+	 */
 	public MasterMainEventHandler(PCursorPack owner) {
 		super();
 		this.owner = owner;
@@ -48,7 +57,13 @@ public class MasterMainEventHandler extends MainEventHandler{
 	 * 						          Events from the network                               *
 	 **************************************************************************************/
 	
-	
+	/**
+	 * Hub for all press events. 
+	 * @param jpxx x-coordinates of cursor in JPanel coordinates when event occurred
+	 * @param jpyy y-coordinates of cursor in JPanel coordinates when event occurred
+	 * @param clickNumber 
+	 * @param e The related original MouseEvent
+	 */
 	public void press(double x, double y, int i,int buttonMask) {
 		owner.ged.press(x,y,i);
 		if(locked)return;
@@ -59,6 +74,13 @@ public class MasterMainEventHandler extends MainEventHandler{
 		((MasterViewer) viewer).getBouncer().handleMouse(p[0],p[1],buttonMask,p[2]);
 	}
 
+	/**
+	 * Hub for all release events. 
+	 * @param jpxx x-coordinates of cursor in JPanel coordinates when event occurred
+	 * @param jpyy y-coordinates of cursor in JPanel coordinates when event occurred
+	 * @param clickNumber 
+	 * @param e The related original MouseEvent
+	 */
 	public void release(double x, double y, int i,int buttonMask) {
 		owner.ged.release(x,y,i);
 		if(locked)return;
@@ -67,10 +89,22 @@ public class MasterMainEventHandler extends MainEventHandler{
 		((MasterViewer) viewer).getBouncer().handleMouse(p[0],p[1],buttonMask,p[2]);
 	}
 
+	/**
+	 * Hub for all click events. 
+	 * @param jpxx x-coordinates of cursor in JPanel coordinates when event occurred
+	 * @param jpyy y-coordinates of cursor in JPanel coordinates when event occurred
+	 * @param clickNumber 
+	 * @param e The related original MouseEvent
+	 */
 	public void click(double x, double y, int i,int buttonMask) {
 		owner.ged.click(x,y,i);
 	}
 
+    /** Mouse dragged callback.
+     *@param jpx x-coordinate of cursor in JPanel coordinates when event occurred.
+     *@param jpy y-coordinate of cursor in JPanel coordinates when event occurred.
+     *@param e reference to original AWT mouse event.
+     */
 	public void mouseDragged(double x, double y,int buttonMask) {
 		owner.ged.mouseDragged(x,y);
 		if(locked)return;
@@ -79,6 +113,11 @@ public class MasterMainEventHandler extends MainEventHandler{
 		((MasterViewer) viewer).getBouncer().handleMouse(p[0],p[1],buttonMask,p[2]);
 	}
 
+    /** Mouse moved callback.
+     *@param x x-coordinate of cursor in JPanel coordinates when event occurred.
+     *@param y y-coordinate of cursor in JPanel coordinates when event occurred.
+     *@param buttonMask the button mask
+     */
 	public void mouseMoved(double x, double y,int buttonMask) {
 		owner.ged.mouseMoved(x,y);
 		if(locked)return;
@@ -88,6 +127,12 @@ public class MasterMainEventHandler extends MainEventHandler{
 		((MasterViewer) viewer).getBouncer().handleMouse(p[0],p[1],buttonMask,p[2]);
 	}
 
+    /** Mouse wheel moved callback.
+     *@param x x-coordinate of cursor in JPanel coordinates when event occurred.
+     *@param y y-coordinate of cursor in JPanel coordinates when event occurred.
+     *@param wheelDirection (1 for up, 0 for down)
+     *@param buttonMask the button mask
+     */
 	public void mouseWheelMove(double x, double y, int wheelDirection,int buttonMask) {
 		owner.ged.mouseWheelMove(x,y,wheelDirection);
 		if(locked)return;
@@ -128,6 +173,10 @@ public class MasterMainEventHandler extends MainEventHandler{
 		
 	}
 
+	/**
+	 * Callback for key pressed event.
+	 * @param keysym
+	 */
 	public void Kpress(int keysym) {
 		if(locked)return;
 		if(keysym==Keysym.ControlL){
@@ -146,6 +195,10 @@ public class MasterMainEventHandler extends MainEventHandler{
 		((MasterViewer) viewer).getBouncer().handleKey(keysym,true,currentwindow);
 	}
 	
+	/**
+	 * Callback for key released event.
+	 * @param keysym
+	 */
 	public void Krelease(int keysym) {
 		if(locked)return;
 		if(keysym==Keysym.ControlL){
@@ -167,6 +220,10 @@ public class MasterMainEventHandler extends MainEventHandler{
 		
 	}
 
+	/**
+	 * Picks the {@link MetisseWindow} under the cursor.
+	 * @return the found {@link MetisseWindow} under the cursor
+	 */
 	public int detectWindow(){
 		if(owner.getCursor().getPicker().getDrawOrderedPickedGlyphList(viewer.getVirtualSpace()).length==0)return -1;
 		Glyph up = owner.getCursor().getPicker().pickOnTop(viewer.getVirtualSpace());
@@ -174,22 +231,33 @@ public class MasterMainEventHandler extends MainEventHandler{
 		return ((MetisseWindow)up).getId();
 	}
 	
-	
+	/**
+	 * Makes the {@link PopMenu} appear or disappear, depending on it's state.
+	 */
 	public void toggleMenu(){
 		owner.getMenu().toggle(owner.getCursor().getVSXCoordinate(), owner.getCursor().getVSYCoordinate(), viewer.getFrameManager().get(currentwindow));
 	}
 
+	/**
+	 * Makes the {@link PopMenu} appear.
+	 */
 	public void invokeMenu(){
 		owner.getMenu().invoke(owner.getCursor().getVSXCoordinate(), owner.getCursor().getVSYCoordinate(), viewer.getFrameManager().get(currentwindow));
 	}
 
+	/**
+	 * Makes the {@link PopMenu} disappear.
+	 */
 	public void banishMenu(){
 		lastwheeldirection = -1;
 		menuinvocationmarker = 0;
 		owner.getMenu().banish();
 	}
 
-
+	/**
+	 * Gets the current position of the cursor (in zvtm), and picks the {@link MetisseWindow} which is under the cursor.
+	 * @return an int[] containing {Metisse x-coordinate, Metisse y-coordinate, id of the picked {@link MetisseWindow}}
+	 */
 	public int[] unproject(){
 		if(viewer==null)return null;
 		if(viewer.getFrameManager()==null)return null;
@@ -208,7 +276,9 @@ public class MasterMainEventHandler extends MainEventHandler{
 		return res;
 	}
 
-	
+	/**
+	 * Tests if the event should be transmitted or not (depending on whether or not the picked window is shared or if the event comes from it's owner).
+	 */
 	private boolean testRight() {
 	//	if(((MasterViewer) viewer).getBoucer().testOwnership(owner,currentwindow))return true;
 		return viewer.getFrameManager().get(currentwindow)!=null &&viewer.getFrameManager().get(currentwindow).isShared();

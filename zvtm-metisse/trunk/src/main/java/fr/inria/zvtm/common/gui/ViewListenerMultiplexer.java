@@ -10,14 +10,28 @@ import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.glyphs.Glyph;
 
+/**
+ * The purpose of {@link ViewListenerMultiplexer} is to attach more than one single {@link ViewListener} to a {@link Viewer}. It is plugged as a normal {@link ViewListener}, and will dispatch all events to subscribed ViewListeners.
+ * @author Julien Altieri
+ *
+ */
 public class ViewListenerMultiplexer implements ViewListener{
 	
 	private LinkedList<ViewListener> dispatchTable = new LinkedList<ViewListener>();
 	
+	/**
+	 * Registers the specified {@link ViewListener}. It will receive all events of the {@link ViewListenerMultiplexer}.
+	 * @param vl a {@link ViewListener} object
+	 */
 	public void addListerner(ViewListener vl){
 		dispatchTable.addLast(vl);
 	}
 	
+	/**
+	 * Unregister the specified {@link ViewListener}.
+	 * @see ViewListenerMultiplexer#addListerner(ViewListener)
+	 * @param vl a {@link ViewListener} object
+	 */
 	public void removeListener(ViewListener vl){
 		dispatchTable.remove(vl);
 	}

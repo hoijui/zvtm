@@ -12,6 +12,11 @@ import fr.inria.zvtm.common.protocol.Owner;
 import fr.inria.zvtm.common.protocol.Proto;
 import fr.inria.zvtm.common.protocol.RfbAgent;
 
+/**
+ * Redirects input events from the zvtm server to the X server.
+ * @author Julien Altieri
+ *
+ */
 public class RfbForwarder implements Owner{
 
 	private Socket sock;
@@ -131,47 +136,108 @@ public class RfbForwarder implements Owner{
 		listen.start();
 	}
 
+	/**
+	 * Sends a ConfigureWindow message to the zvtm server.
+	 * @param window the id of the configured window
+	 * @param isroot is the window the root frame?
+	 * @param x the new x coordinate in the X server
+	 * @param y the new y coordinate in the X server
+	 * @param w the new width in the X server
+	 * @param h the new height in the X server
+	 */
 	public void configure(int window,boolean isroot, int x, int y, int w, int h){
 		if(dead)return;
 		rfbAgent.orderConfigure(window,isroot,x,y,w,h);
 	}
 
+	/**
+	 * Sends a FrameBufferUpdate message to the zvtm server.
+	 * @param window the related window
+	 * @param isroot is this the root window
+	 * @param img the byte[] containing raster update information. Its maximum size is 4*w*h since each pixel's color is 4-bytes encoded.
+	 * @param x the x where the update rectangle starts
+	 * @param y the y where the update rectangle starts
+	 * @param w the width of the update rectangle
+	 * @param h the height of the update rectangle
+	 */
 	public void frameBufferUpdate(int window, boolean isroot, byte[] img,int x, int y, int w, int h){
 		if(dead)return;
 		rfbAgent.orderFrameBufferUpdate(window,isroot,img,x,y,w,h,Proto.rfbEncodingRaw);
 	}
 
+	/**
+	 * Sends a RestackWindow message to the zvtm server.
+	 * @param window the window to restack
+	 * @param nextWindow the next window in the stack 
+	 * @param transientFor potential parent of the frame
+	 * @param unmanagedFor potential parent of the frame
+	 * @param grabWindow potential parent of the frame
+	 * @param duplicateFor Facade flag
+	 * @param facadeReal Facade flag
+	 * @param flags Facade flag
+	 */
 	public void restackWindow(int window, int nextWindow, int transientFor,int unmanagedFor, int grabWindow, int duplicateFor, int facadeReal,int flags){
 		if(dead)return;
 		rfbAgent.orderRestackWindow(window,nextWindow,transientFor,unmanagedFor,grabWindow,duplicateFor,facadeReal,flags);
 	}
 
+	/**
+	 * Sends a UnmapWindow message to the zvtm server.
+	 * @param window
+	 */
 	public void UnmapWindow(int window){
 		if(dead)return;
 		rfbAgent.orderUnmapWindow(window);
 	}
 
+	/**
+	 * Sends a AddWindow message to the zvtm server.
+	 * @param window The id of the new window
+	 * @param isroot is it the root frame?
+	 * @param x The window's x position in the X server
+	 * @param y The window's y position in the X server
+	 * @param w The window's width in the X server
+	 * @param h The window's height in the X server
+	 */
 	public void addWindow(int id, boolean root, int x, int y, int w, int h){
 		if(dead)return;
 		rfbAgent.orderAddWindow(id,root,x,y,w,h);
 	}
 
+	
+	/**
+	 * Sends a RemoveWindow message to the zvtm server.
+	 * @param id
+	 */
 	public void removeWindow(int id){
 		if(dead)return;
 		rfbAgent.orderRemoveWindow(id);
 	}
 
-
+	/**
+	 * Sends a pointer event to the zvtm server, using double coordinates
+	 * @param x The virtual x coordinate of the event
+	 * @param y The virtual y coordinate of the event
+	 * @param buttonMask The mutton mask
+	 */
 	public void sendPointerEvent(double x, double y, int buttonMask){
 		if(dead)return;
 		rfbAgent.orderPointerEvent(x,y,buttonMask);
 	}
 
+	/**
+	 * Sends a key event to the zvtm server
+	 * @param code the virtual key code
+	 * @param i the press state of the key (1 for down, 0 for up)
+	 */
 	public void sendKeyEvent(int code, int i){
 		if(dead)return;
 		rfbAgent.orderKeyEvent(code, i==1);
 	}
 
+	/**
+	 * Starts the listening {@link Thread} from the zvtm server.
+	 */
 	public void startListeningBounces() {
 		startListening();
 	}

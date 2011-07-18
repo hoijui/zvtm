@@ -225,7 +225,7 @@ public class InputForwarder {
 
 	/**
 	 * Converts Swing virtual keys into keysyms
-	 * @param c the related character
+	 * @param c the related character. Works for all the regular characters, else the method will use the code for the convertion.
 	 * @param code
 	 * @return the keysym
 	 */

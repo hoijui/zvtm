@@ -3,15 +3,29 @@ package fr.inria.zvtm.master;
 import fr.inria.zvtm.master.compositor.MasterCompositor;
 import fr.inria.zvtm.master.gui.MasterViewer;
 
+/**
+ * The main class for the zvtm server.
+ * @author Julien Altieri
+ *
+ */
 public class MasterMain {
 	
+	/**
+	 * Set to true, the related {@link MasterViewer} will generate a clustered view. (Specified by the arguments of {@link MasterMain#main(String[])})
+	 */
 	public static boolean CLUSTERMODE = false;
 	public static boolean SMALLMODE = false;
 	protected static MasterCompositor compositor;//wall compositor
 	protected static int listeningPort = 5700;
 	protected static Connector connector;
 	
-	
+	/**
+	 * 
+	 * Use: MasterMain 1 1 <br>
+	 * <b>Clustermode on</b> (set to 0 to deactivate) <br>
+	 * <b>Cmallmode on</b> (idem)
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		handleArgs(args);
 		compositor = new MasterCompositor(new MasterViewer());

@@ -2,11 +2,17 @@ package fr.inria.zvtm.master.gui;
 
 import java.awt.Dimension;
 
+import fr.inria.zvtm.common.compositor.MetisseWindow;
 import fr.inria.zvtm.common.gui.PCursor;
 import fr.inria.zvtm.common.gui.menu.GlyphEventDispatcherForMenu;
 import fr.inria.zvtm.common.gui.menu.PopMenu;
 import fr.inria.zvtm.engine.Camera;
 
+/**
+ * This is a package for each client which includes a {@link PCursor} a {@link PopMenu} and the required stuff.
+ * @author Julien Altieri
+ *
+ */
 public class PCursorPack {
 	private PCursor cursor;
 	private PopMenu menu;
@@ -19,7 +25,10 @@ public class PCursorPack {
 	private boolean consumed = false;
 
 
-
+	/**
+	 * Must provide the owning {@link MasterViewer}.
+	 * @param v
+	 */
 	public PCursorPack(MasterViewer v) {
 		this.viewer = v;
 		meh = new MasterMainEventHandler(this);
@@ -35,12 +44,21 @@ public class PCursorPack {
 	//	viewer.sendViewUpgrade();
 	}
 
+	/**
+	 * Close it properly.
+	 */
 	public void end() {
 		((GEDMultiplexer)viewer.getGlyphEventDispatcher()).unsubscribe(menu);
 		menu.banish();
 		cursor.end();
 	}
 
+	/**
+	 * Handles a pointer event.
+	 * @param x virtual x coordinate
+	 * @param y virtual y coordinate
+	 * @param buttons button mask
+	 */
 	public void handlePointerEvent(double x, double y, int buttons) {
 		if(!consumed ){
 			cursor.setVisible(true);
@@ -95,19 +113,36 @@ public class PCursorPack {
 		lastMask = buttons;
 	}
 
+	/**
+	 * Handles a key event.
+	 * @param keysym
+	 * @param i (1 for down, 0 for up)
+	 */
 	public void handleRemoteKeyEvent(int keysym, int i) {
 		if(i==1)meh.Kpress(keysym);
 		if(i==0)meh.Krelease(keysym);
 	}
 	
+	/**
+	 * The associated {@link PCursor}.
+	 */
 	public PCursor getCursor(){
 		return cursor;
 	}
 
+	/**
+	 * The associated {@link PopMenu}.
+	 */
 	public PopMenu getMenu() {
 		return menu;
 	}
 	
+	/**
+	 * Transforms virtual coordinates into {@link MetisseWindow} server's coordinates.
+	 * @param vx virtual x coordinates
+	 * @param vy virtual y coordinates
+	 * @return an int[] {server's x coordinate,server's y coordinates}
+	 */
 	public int[] unproject(double vx,double vy){
 		int[] res = new int[2];
 		Camera c = viewer.getVirtualSpace().getCamera(0);

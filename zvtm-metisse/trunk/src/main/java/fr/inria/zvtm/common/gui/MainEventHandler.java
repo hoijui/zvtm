@@ -11,12 +11,20 @@ import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.glyphs.Glyph;
 
-
+/**
+ * This class is a hub for all possible input events from the zvtm {@link ViewListener}
+ * @author Julien Altieri
+ *
+ */
 public abstract class MainEventHandler implements ViewListener{
 
 	protected boolean locked = false;
 	protected Viewer viewer;
 
+	/**
+	 * The related {@link Viewer} must be set after instantiation.
+	 * @param v the related {@link Viewer}
+	 */
 	public void setViewer(Viewer v){
 		this.viewer = v;
 	}
@@ -98,6 +106,10 @@ public abstract class MainEventHandler implements ViewListener{
 		g.highlight(false, null);
 	}
 
+	/**
+	 * Put the specified {@link MetisseWindow} at the top of the drawing stack.
+	 * @param f the {@link MetisseWindow} to be put at the top.
+	 */
 	public void upStack(MetisseWindow f){
 		if(locked)return;
 		if(f==null)return;
@@ -106,20 +118,61 @@ public abstract class MainEventHandler implements ViewListener{
 		f.setZindex(0);
 	}
 
+	/**
+	 * Disable all the events. Used by the PopMenu to prevent buttons events from being transmitted to the Metisse server.
+	 */
 	public void lock(){
 		locked = true;
 	}
 
+	/**
+	 * Enable all the events.
+	 * @see MainEventHandler#lock()
+	 */
 	public void unlock(){
 		locked = false;
 	}
 
+	/**
+	 * @see MainEventHandler#lock()
+	 * @see MainEventHandler#unlock()
+	 * @return The lock state
+	 */
 	public boolean isLocked(){
 		return locked;
 	}
 
+	/**
+	 * Hub for all click events. 
+	 * @param v {@link ViewPanel} in which glyphs are drawn.
+	 * @param mod Modifier Mask
+	 * @param jpxx x-coordinates of cursor in JPanel coordinates when event occurred
+	 * @param jpyy y-coordinates of cursor in JPanel coordinates when event occurred
+	 * @param clickNumber 
+	 * @param e The related original MouseEvent
+	 */
 	public abstract void click(ViewPanel v,int mod,int jpxx,int jpyy,int clickNumber, MouseEvent e);
+	
+	/**
+	 * Hub for all press events. 
+	 * @param v {@link ViewPanel} in which glyphs are drawn.
+	 * @param mod Modifier Mask
+	 * @param jpxx x-coordinates of cursor in JPanel coordinates when event occurred
+	 * @param jpyy y-coordinates of cursor in JPanel coordinates when event occurred
+	 * @param clickNumber 
+	 * @param e The related original MouseEvent
+	 */
 	public abstract void press(ViewPanel v,int mod,int jpxx,int jpyy,MouseEvent e);
+	
+	/**
+	 * Hub for all release events. 
+	 * @param v {@link ViewPanel} in which glyphs are drawn.
+	 * @param mod Modifier Mask
+	 * @param jpxx x-coordinates of cursor in JPanel coordinates when event occurred
+	 * @param jpyy y-coordinates of cursor in JPanel coordinates when event occurred
+	 * @param clickNumber 
+	 * @param e The related original MouseEvent
+	 */
 	public abstract void release(ViewPanel v,int mod,int jpxx,int jpyy,MouseEvent e);
 
 }

@@ -14,6 +14,11 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VImage;
 
+/**
+ * A generic kind of {@link Item} which accepts 4 drawing states, useful for toggles, who require a "upstate" "downstate" for both their two states.
+ * @author Julien Altieri
+ *
+ */
 public abstract class ToggleItem extends Item {
 
 	protected VImage shape3;
@@ -57,7 +62,13 @@ public abstract class ToggleItem extends Item {
 
 	}
 
+	/**
+	 * @return The filename of the png image to draw in state 3.
+	 */
 	protected abstract String getState3ImageName();
+	/**
+	 * @return The filename of the png image to draw in state 4.
+	 */
 	protected abstract String getState4ImageName();
 
 
@@ -177,6 +188,10 @@ public abstract class ToggleItem extends Item {
 
 	}
 
+	/**
+	 * Set the drawing status of the {@link Item} (true for state 1 and 2, and false for state 3 and 4)
+	 * @param status
+	 */
 	public void setState(int status){
 		this.status = status;
 		refresh();

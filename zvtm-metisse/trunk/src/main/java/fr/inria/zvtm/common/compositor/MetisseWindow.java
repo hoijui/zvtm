@@ -6,6 +6,7 @@ import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.awt.geom.Point2D.Double;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferByte;
 import java.util.HashMap;
@@ -19,14 +20,24 @@ import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.VImage;
 
+/**
+ * This is the main structure for handling Metisse windows in ZVTM. 
+ * @author Julien Altieri
+ *
+ */
 public class MetisseWindow extends VImage{
 
 	private int id;
+	/**
+	 * This static field is used for calibration of resizing in Metisse relatively to the upper left corner of a window, because we need to know the dimensions of the root frame.
+	 */
 	public static Point.Double rootDimension;
+	/**
+	 * This static field is used for calibration of resizing in Metisse relatively to the upper left corner of a window, because we need to know the dimensions of the root frame.
+	 */
 	public static Point.Double rootPosition;
 	private static MetisseWindow rezisingFrame;
 	private Point.Double rootSize;//size of the root frame
-	private Point.Double rootLocation;//pos of the root frame
 	private byte[] lastFrameBuffer= new byte[1];
 	private boolean alwaysRefresh = true;//refresh during resizing
 	private double x_offset;//ZVTM position
@@ -44,15 +55,22 @@ public class MetisseWindow extends VImage{
 	private static int encoding = BufferedImage.TYPE_4BYTE_ABGR;
 	private MetisseWindow master;
 	private boolean isResizing= false;
-	public boolean isRescaling = false;
+	private boolean isRescaling = false;//used by the 
 	private HashMap<Integer, MetisseWindow> children;
 	private boolean published = false;//on wall
-	private boolean displayed = false;
-	private boolean shared = true;
+	private boolean shared = true;//should we transmit events from this window on the wall?
 
 
 
-
+	/**
+	 * 
+	 * @param isroot
+	 * @param window the id of the window
+	 * @param x x position in the Metisse server
+	 * @param y y position in the Metisse server
+	 * @param w width in the Metisse server (also the size of the raster)
+	 * @param h height in the Metisse server (also the size of the raster)
+	 */
 	public MetisseWindow(boolean isroot,int window, int x, int y, int w, int h) {
 		super(new BufferedImage(w, h, encoding));
 		this.children = new HashMap<Integer, MetisseWindow>();
@@ -69,12 +87,19 @@ public class MetisseWindow extends VImage{
 		}
 		else if (rootDimension!=null){
 			this.rootSize = rootDimension;
-			this.rootLocation = rootPosition;
 			this.vx = (x-rootSize.x*1./2+w*1./2);
 			this.vy =(-y+rootSize.y*1./2-h*1./2);
 		}
 	}
 
+	/**
+	 * Updates the raster of the window
+	 * @param img the byte array containing graphic instructions (4 bytes encoding)
+	 * @param x the x position where the update rectangle should start
+	 * @param y the y position where the update rectangle should start
+	 * @param w the width of the updated rectangle 
+	 * @param h the height of the updated rectangle 
+	 */
 	public void fbUpdate(byte[] img, int x, int y, int w, int h) {
 		if(isroot)return;
 		if(!isResizing){
@@ -105,12 +130,17 @@ public class MetisseWindow extends VImage{
 		for (int i = 0; i < img.length; i++) {
 			if(4*(i/4)+(3-i%4)+4*(i/(4*w))*(W-w)+4*(W*y+x)<raster.length)
 				raster[4*(i/4)+(3-i%4)+4*(i/(4*w))*(W-w)+4*(W*y+x)] = img[i];
-			//			if(lastFrameBuffer.length>i+4*(i/(4*w))*(W-w)+4*(W*y+x))
-			//			lastFrameBuffer[i+4*(i/(4*w))*(W-w)+4*(W*y+x)] = img[i];
 		}
 	}
 
 
+	/**
+	 * Updates the size and the position of the current frame (in metisse, but also acts on the zvtm object)
+	 * @param x the new window's x
+	 * @param y the new window's y
+	 * @param w the new width
+	 * @param h the new height
+	 */
 	public void configure(int x, int y, int w, int h) {
 		if(isroot)return;
 		if(this.width!= w|| this.height!=h){
@@ -145,6 +175,9 @@ public class MetisseWindow extends VImage{
 		children.put(m.getId(), m);
 	}
 
+	/**
+	 * This method should be called as soon as the resize process (in Metisse, so implies the raster) ends.
+	 */
 	public void endResize(){
 		if(!isResizing)return;
 		this.width = currentW;
@@ -160,7 +193,9 @@ public class MetisseWindow extends VImage{
 			patch(lastFrameBuffer, 0, 0, (int)width,(int)height);
 	}
 
-
+	/**
+	 * Only used for zvtm purposes 
+	 */
 	public void endRescale(){
 		if(isroot)return;
 		this.isRescaling = false;
@@ -176,6 +211,10 @@ public class MetisseWindow extends VImage{
 		g.drawImage(image,AffineTransform.getScaleInstance(trueCoef*wFactor,trueCoef*hFactor),null);
 	}
 
+	/**
+	 * Deals with the zvtm factor only. The size of raster of the {@link MetisseWindow} will not change, but the way it is drawn will.
+	 * @param d the new scale factor
+	 */
 	public void setScaleFactor(double d) {
 		if(isroot)return;
 		if (d ==0)return;
@@ -196,7 +235,11 @@ public class MetisseWindow extends VImage{
 		VirtualSpaceManager.INSTANCE.repaint();
 	}
 
-
+	/**
+	 * Relatively moves the {@link MetisseWindow} of (dx,dy) (zvtm position only) 
+	 * @param dx
+	 * @param dy
+	 */
 	public void moveGlyphOf(double dx, double dy) {
 		if(isroot)return;
 		x_offset+=dx;
@@ -292,17 +335,32 @@ public class MetisseWindow extends VImage{
 		return id;
 	}
 
+	/**
+	 * @return the difference between zvtm x position and metisse x position
+	 */
 	public double getX_offset(){
 		return x_offset;
 	}
-	public double getHeight() {
-		return height;
+	
+	/**
+	 * @return the Metisse height (height of the raster)
+	 */
+	public int getH() {
+		return (int) height;
 	}
 
-	public double getWidth() {
-		return width;
+
+	/**
+	 * @return the Metisse width (width of the raster)
+	 */
+	public int getW() {
+		return (int) width;
 	}
 
+
+	/**
+	 * @return the difference between zvtm x position and metisse x position
+	 */
 	public double getY_offset(){
 		return y_offset;
 	}
@@ -311,10 +369,17 @@ public class MetisseWindow extends VImage{
 		return scaleFactor;
 	}
 
+	/**
+	 * @return The last resized frame (or the current one if there is one)
+	 */
 	public static MetisseWindow getRezisingFrame() {
 		return rezisingFrame;
 	}
 
+	/**
+	 * This method handles the inheritance of the properties from the parent if there is one. For example, it includes the relative calculus of scale factor from the parent and the handling of relative positioning (menus). It must be called as soon as we get the information of who is the parent.
+	 * @param w the parent {@link MetisseWindow}
+	 */
 	public void refreshMaster(MetisseWindow w){
 		if(w== null)return;
 		if(isroot)return;
@@ -343,26 +408,46 @@ public class MetisseWindow extends VImage{
 		VirtualSpaceManager.INSTANCE.repaint();
 	}
 
+	/**
+	 * @return The parent frame of this window if it exists, null otherwise.
+	 */
 	public MetisseWindow getMaster(){
 		return master;
 	}
 
+	/**
+	 * @return the result of this.getMaster().getY_offset()
+	 * @see {@link MetisseWindow#getMaster()}, {@link MetisseWindow#getY_offset()}
+	 */
 	public double getYparentOffset() {
 		return yParentOffset;
 	}
 
+	/**
+	 * @return the result of this.getMaster().getX_offset()
+	 * @see {@link MetisseWindow#getMaster()}, {@link MetisseWindow#getX_offset()}
+	 */
 	public double getXparentOffset() {
 		return xParentOffset;
 	}
 
+	/**
+	 * @return The x position (in the Metisse server)
+	 */
 	public int getX() {
 		return (int)this.x;
 	}
 
+	/**
+	 * @return The y position (in the Metisse server)
+	 */
 	public int getY() {
 		return (int)this.y;
 	}
 
+	/**
+	 * This animates and reset all the zvtm offsets and scale factor. The result is exactly the replication of the Metisse server's rendered window. Resetting will also trigger the same for all the children.
+	 */
 	public void resetTransform(){
 		double dx = vx-x_offset;
 		double dy = vy-y_offset;
@@ -463,50 +548,11 @@ public class MetisseWindow extends VImage{
 		interpolator);
 	}
 
-	public void setX_offset(double xOffset) {
-		x_offset = xOffset;
-	}
-
-	public void setY_offset(double yOffset) {
-		y_offset = yOffset;
-	}
-
-	public void setXparentOffset(double xParentOffset) {
-		this.xParentOffset = xParentOffset;
-	}
-
-	public void setYparentOffset(double yParentOffset) {
-		this.yParentOffset = yParentOffset;
-	}
-
-	public void setParentScaleFactor(double parentScaleFactor) {
-		this.parentScaleFactor = parentScaleFactor;
-	}
-
-	public void setX(double x) {
-		this.x = x;
-	}
-
-	public void setY(double y) {
-		this.y = y;
-	}
-
-	public void setHeight(double height) {
-		this.height = height;
-	}
-
-	public void setWidth(double width) {
-		this.width = width;
-	}
-
-	public void setIsroot(boolean isroot) {
-		this.isroot = isroot;
-	}
-
-	public void setRescaling(boolean isRescaling) {
-		this.isRescaling = isRescaling;
-	}
-
+	
+	/**
+	 * Use this method to set whether or not this window should be on the wall (as well as it's children).
+	 * @param published
+	 */
 	public void setPublished(boolean published) {
 		for (MetisseWindow m : children.values()) {
 			m.setPublished(published);
@@ -514,14 +560,17 @@ public class MetisseWindow extends VImage{
 		this.published = published;
 	}
 
+	/**
+	 * @return True if the window is published on the wall, false in other case.
+	 */
 	public boolean isPublished() {
 		return published;
 	}
 
-	public double getParentScaleFactor() {
-		return parentScaleFactor;
-	}
-
+	/**
+	 * 
+	 * @return the list of the attached {@link MetisseWindow} (menus for example)
+	 */
 	public HashMap<Integer, MetisseWindow> getChildren() {
 		return children;
 	}
@@ -530,51 +579,33 @@ public class MetisseWindow extends VImage{
 		return isroot;
 	}
 
+	/**
+	 * If the resizing is true, not all the updates are taken into account.
+	 * @return the current resizing state
+	 */
 	public boolean isResizing() {
 		return isResizing;
 	}
 
-	public boolean isRescaling() {
-		return isRescaling;
-	}
-
+	/**
+	 * Used for calibration, not crucial.
+	 * @param rootSize
+	 */
 	public void setRootSize(Point.Double rootSize) {
 		this.rootSize = rootSize;
 	}
 
-	public void setRootLocation(Point.Double rootLocation) {
-		this.rootLocation = rootLocation;
-	}
 
-	public Point.Double getRootSize() {
-		return rootSize;
-	}
-
-	public Point.Double getRootLocation() {
-		return rootLocation;
-	}
-
+	//it is necessary we redefine it, since the test is usually made on projected coordinates whereas we need to make it on virtual coordinates here.
 	@Override
 	public boolean coordInside(int jpx, int jpy, int camIndex, double cvx,double cvy) {
 		return((cvx-vx)*(cvx-vx)<=vw*vw/4		&&      (cvy-vy)*(cvy-vy)<=vh*vh/4);
 	}
 
-	public void setDisplayed(boolean displayed) {
-		this.displayed = displayed;
-	}
-
-	public boolean isDisplayed() {
-		return displayed;
-	}
-
-	public int getW() {
-		return (int) width;
-	}
-
-	public int getH() {
-		return (int) height;
-	}
-
+	/**
+	 * 
+	 * @return The current complete raster of the {@link MetisseWindow}
+	 */
 	public byte[] getRaster() {
 		byte[] ori =  ((DataBufferByte)((BufferedImage) image).getRaster().getDataBuffer()).getData();
 		byte[] res = new byte[ori.length];
@@ -587,16 +618,86 @@ public class MetisseWindow extends VImage{
 		return res;
 	}
 
+	/**
+	 * Set this to true to allow external events to bounce to the owner of this frame.
+	 * @param b
+	 */
 	public void setShared(boolean b) {
 		if(isroot)return;
 		shared   = b;
 	}
 
+	/**
+	 * 
+	 * @return whether or not external events will bounce to the owner of this frame.
+	 */
 	public boolean isShared() {
 		return shared;
 	}
 	
+	/**
+	 * Does nothing :)
+	 * @param isResizing
+	 */
 	public void setResizing(boolean isResizing){
 		
 	}
+	
+	public boolean isRescaling(){
+		return this.isRescaling;
+	}
+	
+	public Double getRootLocation(){
+		return MetisseWindow.rootPosition;
+	}
+	
+	public Double getRootSize(){
+		return MetisseWindow.rootDimension;
+	}
+	
+	public void setX_offset(double x){
+		this.x_offset = x;
+	}
+	
+	public void setY_offset(double y){
+		this.y_offset = y;
+	}
+	
+	public void setXparentOffset(double x){
+		this.xParentOffset = x;
+	}
+	
+	public void setYparentOffset(double y){
+		this.yParentOffset = y;
+	}
+	
+	public void setParentScaleFactor(double sf){
+		this.parentScaleFactor = sf;
+	}
+	
+	public void setX(double x){
+		this.x = x;
+	}
+	
+	public void setY(double y){
+		this.y = y;
+	}
+	
+	public void setIsroot(boolean b){
+		this.isroot = b;
+	}
+	
+	public void setRescaling(boolean b){
+		this.isRescaling = b;
+	}
+	
+	public void setRootLocation(Point2D.Double p){
+		MetisseWindow.rootPosition = p;
+	}
+	
+	public double getParentScaleFactor(){
+		return parentScaleFactor;
+	}
+	
+	
 }

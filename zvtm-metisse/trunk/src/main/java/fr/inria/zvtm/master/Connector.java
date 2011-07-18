@@ -16,6 +16,11 @@ import fr.inria.zvtm.common.protocol.RfbAgent;
 import fr.inria.zvtm.master.compositor.MasterCompositor;
 import fr.inria.zvtm.master.compositor.ZvtmRfbHandlerMultiplexer;
 
+/**
+ * This is the hub class which accepts and handles all the connections from the clients.
+ * @author Julien Altieri
+ *
+ */
 public class Connector {
 	private MasterCompositor compositor;
 	private int listeningPort;
@@ -24,12 +29,20 @@ public class Connector {
 	private ZvtmRfbHandlerMultiplexer rfbInputmultiplex;
 	private Timer monitor = new Timer();
 
+	/**
+	 * You must provide the {@link MasterCompositor}.
+	 * @param compositor
+	 */
 	public Connector(MasterCompositor compositor) {
 		this.compositor = compositor;
 		this.connections = new HashMap<Socket, RfbAgent>();
 		this.rfbInputmultiplex = new ZvtmRfbHandlerMultiplexer(this.compositor.getViewer().getFrameManager(),this);
 	}
 
+	/**
+	 * Starts the connection accepter thread. It creates a {@link ServerSocket} on the specified port.
+	 * @param listeningPort the listening port of the {@link ServerSocket}.
+	 */
 	public void init(int listeningPort) {
 		this.listeningPort = listeningPort;
 		try {
@@ -60,7 +73,11 @@ public class Connector {
 		listConn.start();
 	}
 
-
+	/**
+	 * The basic listening {@link Thread} which sets up a rfb connection and waits for incoming messages.
+	 * @author Julien Altieri
+	 *
+	 */
 	class ListeningThread extends Thread implements Owner{
 		@Override
 		public void end() {
@@ -227,14 +244,25 @@ public class Connector {
 			return listen;
 		}
 
+		/**
+		 * 
+		 * @return The linked {@link ZvtmRfbHandlerMultiplexer}
+		 */
 		public ZvtmRfbHandlerMultiplexer getMultiplexer() {
 			return this.rfbInputmultiplex;
 		}
 
+		/**
+		 * Returns the {@link RfbAgent} linked to the specified {@link Socket}.
+		 * @param s a {@link Socket} object.
+		 */
 		public RfbAgent getRfbAgent(Socket s){
 			return connections.get(s);
 		}
 
+		/**
+		 * Returns the list of all connections' {@link RfbAgent}.
+		 */
 		public Collection<RfbAgent> getAllAgents() {
 			return connections.values();
 		}

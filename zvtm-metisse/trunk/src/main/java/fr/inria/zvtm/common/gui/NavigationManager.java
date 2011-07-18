@@ -8,7 +8,6 @@ package fr.inria.zvtm.common.gui;
  */
 
 
-
 import java.awt.geom.Point2D;
 
 import fr.inria.zvtm.animation.Animation;

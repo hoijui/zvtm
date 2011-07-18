@@ -13,6 +13,12 @@ import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VImage;
 import fr.inria.zvtm.master.MasterMain;
 
+/**
+ * The effective graphic part of the compositor.
+ * @see Viewer
+ * @author Julien Altieri
+ *
+ */
 public class MasterViewer extends Viewer{
 
 	private CursorMultiplexer cursorMultiplexer;
@@ -53,19 +59,32 @@ public class MasterViewer extends Viewer{
 		mSpace.addGlyph(g);
 	}
 
+	/**
+	 * 
+	 * @return The related {@link CursorMultiplexer}
+	 */
 	public CursorMultiplexer getCursorMultiplexer() {
 		return cursorMultiplexer;
 	}
 
+	/**
+	 * 
+	 * @return The {@link VirtualSpace} in which the cursors are moving
+	 */
 	public VirtualSpace getCursorSpace() {
 		return cursorSpace;
 	}
 
+	/**
+	 * @return The related {@link Bouncer}.
+	 */
 	public Bouncer getBouncer() {
 		return bouncer;
 	}
 
-
+	/**
+	 * Updates and broadcasts the wall's zvtm bounds.
+	 */
 	public void sendViewUpgrade() {
 		if(MasterMain.SMALLMODE){
 			PCursor.wallBounds = getView().getVisibleRegion(mCamera);			

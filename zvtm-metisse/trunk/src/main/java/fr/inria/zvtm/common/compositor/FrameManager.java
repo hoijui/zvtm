@@ -32,12 +32,12 @@ public class FrameManager {
 	/**
 	 * Called by the RFB listener. Creates a {@link MetisseWindow} object that represents the specified id (window) given by the Metisse server.
 	 * The new {@link MetisseWindow} is put in the "waiting room" until it is restacked
-	 * @param window
-	 * @param isroot
-	 * @param x
-	 * @param y
-	 * @param w
-	 * @param h
+	 * @param window The id of the new window
+	 * @param isroot is it the root frame?
+	 * @param x The window's x position in the X server
+	 * @param y The window's y position in the X server
+	 * @param w The window's width in the X server
+	 * @param h The window's height in the X server
 	 * @see FrameManager#restackWindow(int, int, int, int, int, int, int, int)
 	 */
 	public void addWindow(int window, boolean isroot, int x, int y, int w, int h) {
@@ -82,12 +82,12 @@ public class FrameManager {
 	 * The given window will now be visible (mapped) in the virtual space.
 	 * @param window the window to restack
 	 * @param nextWindow the next window in the stack 
-	 * @param transientFor Facade Parametter (dont mind)
-	 * @param unmanagedFor Facade Parametter (dont mind)
-	 * @param grabWindow Facade Parametter (dont mind)
-	 * @param duplicateFor Facade Parametter (dont mind)
-	 * @param facadeReal Facade Parametter (dont mind)
-	 * @param flags Facade Parametter (dont mind)
+	 * @param transientFor potential parent of the frame
+	 * @param unmanagedFor potential parent of the frame
+	 * @param grabWindow potential parent of the frame
+	 * @param duplicateFor Facade flag
+	 * @param facadeReal Facade flag
+	 * @param flags Facade flag
 	 */
 	public void restackWindow(int window, int nextWindow, int transientFor,
 			int unmanagedFor, int grabWindow, int duplicateFor, int facadeReal,
