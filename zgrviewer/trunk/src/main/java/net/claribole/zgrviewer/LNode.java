@@ -76,7 +76,7 @@ public class LNode extends LElem {
 		edgeDirections = nedgeDirections;
 	}
 	
-	void removeEdge(LEdge e){
+	void removeArc(LEdge e){
 		int index = -1;
 		// find edge index in array
 		for (int i=0;i<edges.length;i++){

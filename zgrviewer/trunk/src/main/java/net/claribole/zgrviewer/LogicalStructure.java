@@ -159,8 +159,8 @@ public class LogicalStructure {
 			System.arraycopy(edges, index+1, nedges, index, edges.length-index-1);
 			edges = nedges;
 		}
-		e.tail.removeEdge(e);
-		e.head.removeEdge(e);
+		e.tail.removeArc(e);
+		e.head.removeArc(e);
 	}
 	
 	public LNode[] getAllNodes(){
