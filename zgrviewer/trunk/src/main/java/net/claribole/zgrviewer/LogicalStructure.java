@@ -152,7 +152,6 @@ public class LogicalStructure {
 		for (int i=0;i<edges.length;i++){
 			if (edges[i] == e){index = i;break;}
 		}
-		System.out.println(index);
 		if (index != -1){
 			// then remove it (if found)
 			LEdge[] nedges = new LEdge[edges.length-1];
@@ -160,6 +159,8 @@ public class LogicalStructure {
 			System.arraycopy(edges, index+1, nedges, index, edges.length-index-1);
 			edges = nedges;
 		}
+		e.tail.removeEdge(e);
+		e.head.removeEdge(e);
 	}
 	
 	public LNode[] getAllNodes(){

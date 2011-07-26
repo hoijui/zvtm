@@ -66,15 +66,34 @@ public class LNode extends LElem {
     }
 
     void addArc(LEdge e, short direction){
-	LEdge[] nedges = new LEdge[edges.length+1];
-	short[] nedgeDirections = new short[nedges.length];
-	System.arraycopy(edges, 0, nedges, 0, edges.length);
-	System.arraycopy(edgeDirections, 0, nedgeDirections, 0, edgeDirections.length);
-	nedges[edges.length] = e;
-	nedgeDirections[edgeDirections.length] = direction;
-	edges = nedges;
-	edgeDirections = nedgeDirections;
-    }
+		LEdge[] nedges = new LEdge[edges.length+1];
+		short[] nedgeDirections = new short[edgeDirections.length+1];
+		System.arraycopy(edges, 0, nedges, 0, edges.length);
+		System.arraycopy(edgeDirections, 0, nedgeDirections, 0, edgeDirections.length);
+		nedges[edges.length] = e;
+		nedgeDirections[edgeDirections.length] = direction;
+		edges = nedges;
+		edgeDirections = nedgeDirections;
+	}
+	
+	void removeEdge(LEdge e){
+		int index = -1;
+		// find edge index in array
+		for (int i=0;i<edges.length;i++){
+			if (edges[i] == e){index = i;break;}
+		}
+		if (index != -1){
+			// then remove it (if found)
+			LEdge[] nedges = new LEdge[edges.length-1];
+			short[] nedgeDirections = new short[edgeDirections.length-1];
+			System.arraycopy(edges, 0, nedges, 0, index);
+			System.arraycopy(edges, index+1, nedges, index, edges.length-index-1);
+			System.arraycopy(edgeDirections, 0, nedgeDirections, 0, index);
+			System.arraycopy(edgeDirections, index+1, nedgeDirections, index, edgeDirections.length-index-1);
+			edges = nedges;
+			edgeDirections = nedgeDirections;
+		}
+	}
 
 	public LEdge[] getAllArcs(){
 		LEdge[] res = new LEdge[edges.length];
@@ -97,56 +116,56 @@ public class LNode extends LElem {
 	}
 
     public LEdge[] getOutgoingArcs(){
-	int oaCount = 0;
-	for (int i=0;i<edgeDirections.length;i++){
-	    if (edgeDirections[i] == LEdge.OUTGOING){oaCount++;}
+		int oaCount = 0;
+		for (int i=0;i<edgeDirections.length;i++){
+			if (edgeDirections[i] == LEdge.OUTGOING){oaCount++;}
+		}
+		LEdge[] res = new LEdge[oaCount];
+		int j = 0;
+		for (int i=0;i<edges.length;i++){
+			if (edgeDirections[i] == LEdge.OUTGOING){
+				res[j++] = edges[i];
+			}
+		}
+		return res;
 	}
-	LEdge[] res = new LEdge[oaCount];
-	int j = 0;
-	for (int i=0;i<edges.length;i++){
-	    if (edgeDirections[i] == LEdge.OUTGOING){
-		res[j++] = edges[i];
-	    }
-	}
-	return res;
-    }
 
-    public LEdge[] getIncomingArcs(){
-	int oaCount = 0;
-	for (int i=0;i<edgeDirections.length;i++){
-	    if (edgeDirections[i] == LEdge.INCOMING){oaCount++;}
+	public LEdge[] getIncomingArcs(){
+		int oaCount = 0;
+		for (int i=0;i<edgeDirections.length;i++){
+			if (edgeDirections[i] == LEdge.INCOMING){oaCount++;}
+		}
+		LEdge[] res = new LEdge[oaCount];
+		int j = 0;
+		for (int i=0;i<edges.length;i++){
+			if (edgeDirections[i] == LEdge.INCOMING){
+				res[j++] = edges[i];
+			}
+		}
+		return res;
 	}
-	LEdge[] res = new LEdge[oaCount];
-	int j = 0;
-	for (int i=0;i<edges.length;i++){
-	    if (edgeDirections[i] == LEdge.INCOMING){
-		res[j++] = edges[i];
-	    }
-	}
-	return res;
-    }
 
     public LEdge[] getUndirectedArcs(){
-	int oaCount = 0;
-	for (int i=0;i<edgeDirections.length;i++){
-	    if (edgeDirections[i] == LEdge.UNDIRECTED){oaCount++;}
+		int oaCount = 0;
+		for (int i=0;i<edgeDirections.length;i++){
+			if (edgeDirections[i] == LEdge.UNDIRECTED){oaCount++;}
+		}
+		LEdge[] res = new LEdge[oaCount];
+		int j = 0;
+		for (int i=0;i<edges.length;i++){
+			if (edgeDirections[i] == LEdge.UNDIRECTED){
+				res[j++] = edges[i];
+			}
+		}
+		return res;
 	}
-	LEdge[] res = new LEdge[oaCount];
-	int j = 0;
-	for (int i=0;i<edges.length;i++){
-	    if (edgeDirections[i] == LEdge.UNDIRECTED){
-		res[j++] = edges[i];
-	    }
-	}
-	return res;
-    }
 
-    public ClosedShape getShape(){
-        for (int i=0;i<glyphs.length;i++){
-            if (glyphs[i] instanceof ClosedShape){return (ClosedShape)glyphs[i];}
-        }
-        return null;
-    }
+	public ClosedShape getShape(){
+		for (int i=0;i<glyphs.length;i++){
+			if (glyphs[i] instanceof ClosedShape){return (ClosedShape)glyphs[i];}
+		}
+		return null;
+	}
 
     public VText getLabel(){
         for (int i=0;i<glyphs.length;i++){
@@ -155,13 +174,13 @@ public class LNode extends LElem {
         return null;
     }
 
-    public String toString(){
-	String res = title + "[";
-	for (int i=0;i<edges.length;i++){
-	    res += ((edges[i] != null) ? edges[i].title + "@" + edges[i].hashCode() : "NULL") + "(" + edgeDirections[i] + ") ";
+	public String toString(){
+		String res = title + "[";
+		for (int i=0;i<edges.length;i++){
+			res += ((edges[i] != null) ? edges[i].title + "@" + edges[i].hashCode() : "NULL") + "(" + edgeDirections[i] + ") ";
+		}
+		res += "]";
+		return res;
 	}
-	res += "]";
-	return res;
-    }
 
 }
