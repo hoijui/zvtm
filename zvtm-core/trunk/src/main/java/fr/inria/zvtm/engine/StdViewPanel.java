@@ -54,6 +54,9 @@ public class StdViewPanel extends ViewPanel {
 
     protected JPanel panel;
     
+    /**Get the underlying Swing component.
+     *@return the underlying JPanel
+     */
     public Component getComponent(){
         return panel;
     }

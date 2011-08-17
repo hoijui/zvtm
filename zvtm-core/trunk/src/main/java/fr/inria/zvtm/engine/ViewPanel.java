@@ -174,6 +174,8 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
 		return evHs;
 	}
 	
+	/**Get the underlying Swing component.
+     */
 	public abstract Component getComponent();
 
 	/* -------------------- PORTALS ------------------- */
