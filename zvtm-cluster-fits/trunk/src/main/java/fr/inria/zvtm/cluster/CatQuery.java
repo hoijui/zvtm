@@ -13,6 +13,9 @@ import java.util.List;
 
 import jsky.science.Coordinates;
 
+/**
+ * Performs queries on the Simbad catalog.
+ */
 class CatQuery {
 
     public static void main(String[] args) throws Exception{
@@ -32,22 +35,38 @@ class CatQuery {
     private static URL makeSimbadCoordQueryUrl(double ra, double dec, 
             int radMin){
         try{
-            // Query script example:
+            // Coordinates query script example:
             // format object "%IDLIST(1)|%COO(d;A)|%COO(d;D)"
             // query coo 12 30 +10 20 radius=6m
 
             Coordinates coords = new Coordinates(ra, dec);
+            //XXX the 'replace' operation is ugly, should be improved
+            String script = String.format(
+                    "output console=off script=off\n" +
+                    "format object \"%%IDLIST(1)|%%COO(d;A)|%%COO(d;D)\"\n" +
+                    "query coo %s %s radius=%dm", 
+                    coords.raToString().replace(',', '.'), 
+                    coords.decToString().replace(',','.'), 
+                    radMin);
 
-            String prefix = "http://simbad.u-strasbg.fr/simbad/sim-script?script=";
-            String argStr = String.format("output console=off script=off\nformat object \"%%IDLIST(1)|%%COO(d;A)|%%COO(d;D)\"\nquery coo %s %s radius=%dm", coords.raToString(), coords.decToString(), radMin);
-
-            return new URL(prefix + URLEncoder.encode(argStr, "UTF-8"));
+            return makeSimbadScriptQueryUrl(script);
         } catch (MalformedURLException ex){
             //we are supposed to create well-formed URLs here...
             throw new Error(ex);
+        } 
+    }
+
+    private static URL makeSimbadScriptQueryUrl(String script) throws MalformedURLException {
+        String prefix = "http://simbad.u-strasbg.fr/simbad/sim-script?script=";
+        try{
+            return new URL(prefix + URLEncoder.encode(script, "UTF-8"));
         } catch (UnsupportedEncodingException eex){
+            //Java implementations are required to offer UTF-8 encoding
+            //support, so we should not trigger this.
+            //See http://download.oracle.com/javase/1.3/docs/api/java/lang/package-summary.html#charenc
             throw new Error(eex);
         }
+
     }
 
     //A better version should deal with http errors
