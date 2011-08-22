@@ -1,9 +1,11 @@
 package fr.inria.zvtm.cluster;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
+import java.util.logging.Logger;
 
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
@@ -25,7 +27,6 @@ import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.fits.FitsHistogram;
-//import fr.inria.zvtm.fits.Grid;
 import fr.inria.zvtm.fits.RangeSelection;
 import fr.inria.zvtm.fits.filters.*;
 import fr.inria.zvtm.fits.ZScale;
@@ -44,6 +45,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
+import jsky.coords.WorldCoords;
+
 /**
  * A clustered viewer for FITS images.
  */
@@ -53,19 +56,23 @@ public class AstroRad {
     private static final double IMGVIEW_XOFFSET = 3*2840;
     private static final double VIEW_YOFFSET = 2*1800;
 
-    private static final int UNSEL_IMG_ZINDEX = 0;
-    private static final int SEL_IMG_ZINDEX = 1; //selected image z-index
+    static final int UNSEL_IMG_ZINDEX = 0;
+    static final int SEL_IMG_ZINDEX = 1; //selected image z-index
+    static final int IMG_OVERLAY_ZINDEX = 2; //e.g. for circle selection
     private static final int IMGCURSOR_ZINDEX = 2;
     private static final int CTRLCURSOR_ZINDEX = 2;
 
     private VirtualSpace imageSpace;
+    //the symbols layer sits atop the image layer (e.g. to display astronomical objects)
+    private VirtualSpace symbolSpace;
     private VirtualSpace controlSpace;
     private Camera imageCamera; 
+    private Camera symbolCamera;
     private Camera controlCamera; 
     private final List<JSkyFitsImage> images = new ArrayList<JSkyFitsImage>();
     private RangeManager range;
     private SliderManager slider;
-    private ComboBox combo;
+    private RadioGroup radio;
     private JSkyFitsImage selectedImage = null;
     private JSkyFitsImage draggedImage = null;
     private FitsHistogram hist;
@@ -89,15 +96,19 @@ public class AstroRad {
     private void setup(){
         vsm.setMaster("AstroRad");
         imageSpace = vsm.addVirtualSpace("imageSpace");
+        symbolSpace = vsm.addVirtualSpace("symbolSpace");
         controlSpace = vsm.addVirtualSpace("controlSpace");
         imageCamera = imageSpace.addCamera();
+        symbolCamera = symbolSpace.addCamera();
         controlCamera = controlSpace.addCamera();
         ArrayList<Camera> imgCamList = new ArrayList<Camera>();
         imgCamList.add(imageCamera);
+        imgCamList.add(symbolCamera);
         ArrayList<Camera> controlCamList = new ArrayList<Camera>();
         controlCamList.add(controlCamera);
         Vector<Camera> cameras = new Vector<Camera>();
         cameras.add(imageCamera);
+        cameras.add(symbolCamera);
         cameras.add(controlCamera);
         masterView = vsm.addFrameView(cameras, "Master View",
                 View.STD_VIEW, 800, 600, false, true, true, null);	
@@ -164,7 +175,7 @@ public class AstroRad {
                }
                public void pressed(boolean pressed){
                    //forward click events to RangeSel
-                   //forward click events to ComboBox 
+                   //forward click events to RadioGroup 
                    Point2D.Double pos = ctrlCursor.getPosition();
                    Point2D.Double imgCurPos = imgCursor.getPosition();
                    if(pressed){
@@ -175,7 +186,7 @@ public class AstroRad {
                    } else {
                        draggedImage = null;
                        dragging = false;
-                       combo.onClick1(pos.x, pos.y);
+                       radio.onClick1(pos.x, pos.y);
                        range.onRelease1();
                        slider.onRelease1();
                    }
@@ -199,7 +210,7 @@ public class AstroRad {
     private void setupControlZone(double x, double y, double width, double height){
         range = new RangeManager(controlSpace, 0, height/8, width);
 
-        combo = new ComboBox(controlSpace, -height/4, -height/5, 
+        radio = new RadioGroup(controlSpace, -height/4, -height/5, 
                 new String[]{"gray", "heat", "rainbow"}, 
                 new LinearGradientPaint[]{NopFilter.getGradientS((float)height/5f), HeatFilter.getGradientS((float)height/5f), RainbowFilter.getGradientS((float)height/5f)},
                 height/5
@@ -219,8 +230,8 @@ public class AstroRad {
         });
 
         //XXX maybe separate this step from construction to avoid escaping 'this'
-        combo.addObserver(new ComboStateObserver(){
-            public void onStateChange(ComboBox source, int activeIdx, String label){
+        radio.addObserver(new RadioStateObserver(){
+            public void onStateChange(RadioGroup source, int activeIdx, String label){
                 if(selectedImage == null){
                     return;
                 }
@@ -390,19 +401,48 @@ public class AstroRad {
     private class PanZoomEventHandler implements ViewListener{
         private int lastJPX;
         private int lastJPY;
+        private CircleSelectionManager selMan = new CircleSelectionManager(imageSpace);
 
         public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
             Point2D.Double spcCoords = masterView.getPanel().viewToSpaceCoords(controlCamera, jpx, jpy);
             range.onPress1(spcCoords.x, spcCoords.y);
+            Point2D.Double spcImgCoords = masterView.getPanel().viewToSpaceCoords(imageCamera, jpx, jpy);
+            selMan.onPress1(spcImgCoords.x, spcImgCoords.y);
         }
 
         public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
             range.onRelease1();
+            Point2D.Double spcImgCoords = masterView.getPanel().viewToSpaceCoords(imageCamera, jpx, jpy);
+            if(selMan.onRelease1(spcImgCoords.x, spcImgCoords.y)){
+                //get center
+                if(selectedImage == null){ return;}
+                Point2D.Double vsCenter = selMan.getVsCenter();
+                Point2D.Double wcsCenter = selectedImage.pix2wcs(vsCenter.x, vsCenter.y);
+                //compute radius in arcmin
+                double vsRadius = selMan.getVsRadius();
+                Point2D.Double wcsExt = selectedImage.pix2wcs(vsCenter.x + vsRadius, vsCenter.y);
+                WorldCoords wc = new WorldCoords(wcsCenter.getX(), wcsCenter.getY());
+                WorldCoords wcDummy = new WorldCoords(wcsExt.getX(), wcsExt.getY());
+                int distArcMin = (int)(wc.dist(wcDummy));
+                //perform catalog query
+                System.err.println("Querying Simbad at " + wc + " with a radius of " + distArcMin + "arcminutes");
+                symbolSpace.removeAllGlyphs();
+                //XXX do this asynchronously
+                try{
+                    List<AstroObject> objs = CatQuery.makeSimbadCoordQuery(wc.getRaDeg(), wc.getDecDeg(), distArcMin);
+                    for(AstroObject obj: objs){
+                        System.err.println(obj);
+                    }
+                }catch(IOException ioe){
+                    ioe.printStackTrace();
+                }
+            }
+
         }
 
         public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
             Point2D.Double spcCoords = masterView.getPanel().viewToSpaceCoords(controlCamera, jpx, jpy);
-            combo.onClick1(spcCoords.x, spcCoords.y);
+            radio.onClick1(spcCoords.x, spcCoords.y);
         }
 
         public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
@@ -442,6 +482,8 @@ public class AstroRad {
             if(buttonNumber == 1){
                 Point2D.Double spcCoords = masterView.getPanel().viewToSpaceCoords(controlCamera, jpx, jpy);
                 range.onDrag(spcCoords.x, spcCoords.y); 
+                Point2D.Double spcImgCoords = masterView.getPanel().viewToSpaceCoords(imageCamera, jpx, jpy);
+                selMan.onDrag(spcImgCoords.x, spcImgCoords.y);
             }
 
             if (buttonNumber == 3 || ((mod == META_MOD || mod == META_SHIFT_MOD) && buttonNumber == 1)){
@@ -468,7 +510,9 @@ public class AstroRad {
         public void exitGlyph(Glyph g){
         }
 
-        public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
+        public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){
+            selMan.onKeyType(c, e);
+        }
 
         public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
         }
