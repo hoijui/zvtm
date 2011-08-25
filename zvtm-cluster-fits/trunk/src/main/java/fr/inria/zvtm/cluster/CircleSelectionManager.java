@@ -57,6 +57,12 @@ class CircleSelectionManager {
         return new Point2D.Double(circle.vx, circle.vy);
     }
 
+    //get a point that lies on the circle
+    Point2D.Double getOuterPoint(){
+        return new Point2D.Double(circle.vx + circle.getSize()*0.5, 
+                circle.vy);
+    }
+
     /**
      * @param x x-coordinate, in virtual space units.
      * @param y y-coordinate, in virtual space units.

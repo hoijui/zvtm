@@ -32,6 +32,7 @@ import fr.inria.zvtm.fits.filters.*;
 import fr.inria.zvtm.fits.ZScale;
 import fr.inria.zvtm.glyphs.JSkyFitsImage;
 import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.glyphs.VCircle;
 import fr.inria.zvtm.glyphs.VImage;
 import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VText;
@@ -100,6 +101,7 @@ public class AstroRad {
         controlSpace = vsm.addVirtualSpace("controlSpace");
         imageCamera = imageSpace.addCamera();
         symbolCamera = symbolSpace.addCamera();
+        imageCamera.stick(symbolCamera);
         controlCamera = controlSpace.addCamera();
         ArrayList<Camera> imgCamList = new ArrayList<Camera>();
         imgCamList.add(imageCamera);
@@ -256,7 +258,7 @@ public class AstroRad {
             }
         });
 
-        wcsCoords = new VText(-width/4 + 100, height/3 - 100, 0, Color.YELLOW, "unknown coords", VText.TEXT_ANCHOR_MIDDLE, 15);
+        wcsCoords = new VText(-width/4 + 100, height/3 - 100, 0, Color.YELLOW, "unknown coords", VText.TEXT_ANCHOR_MIDDLE, options.debugView? 2: 15);
         controlSpace.addGlyph(wcsCoords);
         wcsCoords.setFont(new Font("Monospaced", Font.PLAIN, 12));
     }
@@ -395,7 +397,19 @@ public class AstroRad {
 
         AstroRad ar = new AstroRad(args[0], options);
         new AstroServer(ar, 8000);
+    }
 
+    private void drawSymbols(List<AstroObject> objs){
+        if(selectedImage == null){
+            return;
+        }
+        for(AstroObject obj: objs){
+            Point2D.Double vsCoords = selectedImage.wcs2pix(obj.getRa(), obj.getDec());
+            VCircle circle = new VCircle(vsCoords.getX(),vsCoords.getY(),0,3,Color.CYAN);
+            circle.setOwner(obj);
+            selectedImage.stick(circle);
+            symbolSpace.addGlyph(circle);
+        }
     }
 
     private class PanZoomEventHandler implements ViewListener{
@@ -419,17 +433,20 @@ public class AstroRad {
                 Point2D.Double vsCenter = selMan.getVsCenter();
                 Point2D.Double wcsCenter = selectedImage.pix2wcs(vsCenter.x, vsCenter.y);
                 //compute radius in arcmin
-                double vsRadius = selMan.getVsRadius();
-                Point2D.Double wcsExt = selectedImage.pix2wcs(vsCenter.x + vsRadius, vsCenter.y);
+                Point2D.Double vsExt = selMan.getOuterPoint();
+                Point2D.Double wcsExt = selectedImage.pix2wcs(vsExt.x, vsExt.y);
                 WorldCoords wc = new WorldCoords(wcsCenter.getX(), wcsCenter.getY());
                 WorldCoords wcDummy = new WorldCoords(wcsExt.getX(), wcsExt.getY());
-                int distArcMin = (int)(wc.dist(wcDummy));
+                int distArcMin = (int)(wc.dist(wcDummy)+1);//make sure the query radius is at least 1arcmin
                 //perform catalog query
                 System.err.println("Querying Simbad at " + wc + " with a radius of " + distArcMin + "arcminutes");
                 symbolSpace.removeAllGlyphs();
+                selectedImage.unstickAllGlyphs();
                 //XXX do this asynchronously
                 try{
                     List<AstroObject> objs = CatQuery.makeSimbadCoordQuery(wc.getRaDeg(), wc.getDecDeg(), distArcMin);
+                    System.err.println("Result size: " + objs.size());
+                    drawSymbols(objs);
                     for(AstroObject obj: objs){
                         System.err.println(obj);
                     }
@@ -437,7 +454,6 @@ public class AstroRad {
                     ioe.printStackTrace();
                 }
             }
-
         }
 
         public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){

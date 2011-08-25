@@ -47,7 +47,7 @@ class CatQuery {
                     "query coo %s %s radius=%dm", 
                     coords.raToString().replace(',', '.'), 
                     coords.decToString().replace(',','.'), 
-                    radMin);
+                    radMin); 
 
             return makeSimbadScriptQueryUrl(script);
         } catch (MalformedURLException ex){
@@ -57,7 +57,8 @@ class CatQuery {
     }
 
     private static URL makeSimbadScriptQueryUrl(String script) throws MalformedURLException {
-        String prefix = "http://simbad.u-strasbg.fr/simbad/sim-script?script=";
+        //String prefix = "http://simbad.u-strasbg.fr/simbad/sim-script?script=";
+        String prefix = "http://simbak.cfa.harvard.edu/simbad/sim-script?script=";
         try{
             return new URL(prefix + URLEncoder.encode(script, "UTF-8"));
         } catch (UnsupportedEncodingException eex){

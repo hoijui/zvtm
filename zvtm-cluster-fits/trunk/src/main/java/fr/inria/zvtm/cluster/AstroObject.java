@@ -7,6 +7,10 @@ class AstroObject {
     private Coordinates coords;
     private AstroObject(){}
 
+    /**
+     * @param simRowStr - simbad row formatted as per the CatQuery
+     * format.
+     */
     static AstroObject fromSimbadRow(String simRowStr){
         AstroObject retval = new AstroObject();
 
@@ -19,6 +23,28 @@ class AstroObject {
         retval.coords = new Coordinates(Double.parseDouble(elems[1]),
                 Double.parseDouble(elems[2]));
         return retval;
+    }
+
+    Coordinates getCoords(){
+        return coords;
+    }
+
+    /**
+     * Returns the right ascension of the object, in degrees.
+     */
+    double getRa(){
+        return coords.getRa();
+    }
+
+    /**
+     * Returns the declination of the object, in degrees.
+     */
+    double getDec(){
+        return coords.getDec();
+    }
+
+    String getIdentifier(){
+        return identifier;
     }
 
     public String toString(){
