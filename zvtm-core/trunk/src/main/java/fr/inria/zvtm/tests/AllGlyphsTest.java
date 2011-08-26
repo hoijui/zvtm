@@ -218,7 +218,7 @@ public class AllGlyphsTest {
         rg.moveTo(100, 380);
         vs.addGlyph(rg);
         // images
-        String path_to_img = "src/main/resources/test.jpg";
+        String path_to_img = "src/main/resources/images/test.jpg";
         VImage im = new VImage(0, 360, 0, (new ImageIcon(path_to_img)).getImage());
         vs.addGlyph(im);
         im = new VImage(0, 360, 0, (new ImageIcon(path_to_img)).getImage());
