@@ -75,7 +75,8 @@ $Id$
 	  <resource>
         <directory>src/main/resources</directory> 
           <excludes> 
-		    <exclude>test.jpg</exclude>
+		    <exclude>images/test.jpg</exclude>
+		    <exclude>images/1st-order.ai</exclude>
 		</excludes> 
       </resource>
 	</resources>
