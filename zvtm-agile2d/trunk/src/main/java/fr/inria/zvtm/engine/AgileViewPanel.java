@@ -152,6 +152,9 @@ public abstract class AgileViewPanel extends ViewPanel implements GLEventListene
                                 stableRefToBackBufferGraphics.drawOval(origDragx-Math.abs(origDragx-parent.mouse.jpx),origDragy-Math.abs(origDragy-parent.mouse.jpy),2*Math.abs(origDragx-parent.mouse.jpx),2*Math.abs(origDragy-parent.mouse.jpy));
                             }
                         }
+                        if (sfopw){
+                		    stableRefToBackBufferGraphics.drawImage(FIRST_ORDER_PAN_WIDGET, fopw_x, fopw_y, null);
+                		}
                         if (drawVTMcursor){
                             parent.mouse.draw(stableRefToBackBufferGraphics);
                             oldX=parent.mouse.jpx;
