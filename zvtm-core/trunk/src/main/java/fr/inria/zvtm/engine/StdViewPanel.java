@@ -314,6 +314,9 @@ public class StdViewPanel extends ViewPanel {
 						2*Math.abs(origDragy-parent.mouse.jpy));
 			}
 		}
+		if (sfopw){
+		    stableRefToBackBufferGraphics.drawImage(FIRST_ORDER_PAN_WIDGET, fopw_x, fopw_y, null);
+		}
 		if (drawVTMcursor){
 			stableRefToBackBufferGraphics.setXORMode(backColor);
 			parent.mouse.draw(stableRefToBackBufferGraphics);

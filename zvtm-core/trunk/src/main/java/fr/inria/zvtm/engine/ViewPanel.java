@@ -29,13 +29,13 @@ import fr.inria.zvtm.event.RepaintListener;
 import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.lens.Lens;
 
-import javax.swing.JPanel;
 import java.awt.Component;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
+import java.awt.Image;
 import java.awt.Point;
 import java.awt.Stroke;
 import java.awt.Toolkit;
@@ -50,6 +50,9 @@ import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import javax.swing.JPanel;
+import javax.swing.ImageIcon;
+
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
@@ -59,7 +62,7 @@ import java.util.Vector;
  * @author Emmanuel Pietriga
  **/
 public abstract class ViewPanel implements MouseListener, MouseMotionListener, MouseWheelListener, ComponentListener {
-
+    
     /**draw no oval between point where we started dragging the mouse and current point*/
     public final static short NONE=0;
     /**draw an oval between point where we started dragging the mouse and current point*/
@@ -148,6 +151,12 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
     boolean drawOval=false;
     /**should the oval be a circle or any oval*/
     boolean circleOnly=false;
+
+    protected static final Image FIRST_ORDER_PAN_WIDGET = (new ImageIcon(ViewPanel.class.getResource("/images/1st-order.png"))).getImage();
+    // show first order pan widget (or not)
+    boolean sfopw = false;
+    // first order pan widget coordinates in JPanel coordinates
+    int fopw_x, fopw_y = 0;
     
     /**VTM cursor is drawn only when AWT cursor is set to CUSTOM_CURSOR*/
     protected boolean drawVTMcursor=true;
@@ -311,6 +320,18 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
 	else if (s==CIRCLE){drawOval=true;circleOnly=true;}
 	else if (s==NONE){drawOval=false;}
 	parent.repaint();
+    }
+    
+    public void showFirstOrderPanWidget(int jpx, int jpy){
+        fopw_x = jpx - FIRST_ORDER_PAN_WIDGET.getWidth(null)/2;
+        fopw_y = jpy - FIRST_ORDER_PAN_WIDGET.getHeight(null)/2;
+        sfopw = true;
+    	parent.repaint();
+    }
+    
+    public void hideFirstOrderPanWidget(){
+        sfopw = false;
+    	parent.repaint();
     }
 
     /**send event to application event handler*/
