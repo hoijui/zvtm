@@ -66,14 +66,17 @@ public class AstroRad {
     private VirtualSpace imageSpace;
     //the symbols layer sits atop the image layer (e.g. to display astronomical objects)
     private VirtualSpace symbolSpace;
+    private VirtualSpace detailSpace;
     private VirtualSpace controlSpace;
     private Camera imageCamera; 
     private Camera symbolCamera;
+    private Camera detailCamera;
     private Camera controlCamera; 
     private final List<JSkyFitsImage> images = new ArrayList<JSkyFitsImage>();
     private RangeManager range;
     private SliderManager slider;
     private RadioGroup radio;
+    private AODetailBox detailBox;
     private JSkyFitsImage selectedImage = null;
     private JSkyFitsImage draggedImage = null;
     private FitsHistogram hist;
@@ -98,10 +101,13 @@ public class AstroRad {
         vsm.setMaster("AstroRad");
         imageSpace = vsm.addVirtualSpace("imageSpace");
         symbolSpace = vsm.addVirtualSpace("symbolSpace");
+        detailSpace = vsm.addVirtualSpace("detailSpace");
         controlSpace = vsm.addVirtualSpace("controlSpace");
         imageCamera = imageSpace.addCamera();
         symbolCamera = symbolSpace.addCamera();
+        detailCamera = detailSpace.addCamera();
         imageCamera.stick(symbolCamera);
+        imageCamera.stick(detailCamera);
         controlCamera = controlSpace.addCamera();
         ArrayList<Camera> imgCamList = new ArrayList<Camera>();
         imgCamList.add(imageCamera);
@@ -111,11 +117,13 @@ public class AstroRad {
         Vector<Camera> cameras = new Vector<Camera>();
         cameras.add(imageCamera);
         cameras.add(symbolCamera);
+        cameras.add(detailCamera);
         cameras.add(controlCamera);
         masterView = vsm.addFrameView(cameras, "Master View",
                 View.STD_VIEW, 800, 600, false, true, true, null);	
         masterView.setListener(new PanZoomEventHandler());
         masterView.getCursor().setColor(Color.GREEN);
+        masterView.setActiveLayer(symbolCamera);
 
         ClusterGeometry clGeom;
         ClusteredView imageView;
@@ -151,6 +159,7 @@ public class AstroRad {
         ctrlCursor.onTop(CTRLCURSOR_ZINDEX);
         imgCursor = new WallCursor(imageSpace, 20, 160, Color.GREEN);
         imgCursor.onTop(IMGCURSOR_ZINDEX);
+        detailBox = new AODetailBox(detailSpace);
 
         pointSource = new MouseLaserPoint(masterView.getPanel().getComponent());
         pointSource.addListener(new PointListener(){
@@ -280,7 +289,7 @@ public class AstroRad {
         if(draggedImage == null){
             return;
         }
-        //implement snapping here
+        //snapping 
         JSkyFitsImage snapTo = getSnapCandidate(draggedImage);
         double UNSNAP_DISTANCE = 200;
         if((snapTo != null) && (distance(x, y, draggedImage) < UNSNAP_DISTANCE)){
@@ -405,7 +414,7 @@ public class AstroRad {
         }
         for(AstroObject obj: objs){
             Point2D.Double vsCoords = selectedImage.wcs2pix(obj.getRa(), obj.getDec());
-            VCircle circle = new VCircle(vsCoords.getX(),vsCoords.getY(),0,3,Color.CYAN);
+            VCircle circle = new VCircle(vsCoords.getX(),vsCoords.getY(),0,5,Color.CYAN);
             circle.setOwner(obj);
             selectedImage.stick(circle);
             symbolSpace.addGlyph(circle);
@@ -476,7 +485,7 @@ public class AstroRad {
         }
 
         public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-            Camera c=vsm.getActiveCamera();
+            Camera c=imageCamera;
             c.setXspeed(0);
             c.setYspeed(0);
             c.setZspeed(0);
@@ -503,7 +512,7 @@ public class AstroRad {
             }
 
             if (buttonNumber == 3 || ((mod == META_MOD || mod == META_SHIFT_MOD) && buttonNumber == 1)){
-                Camera c=vsm.getActiveCamera();
+                Camera c=imageCamera;
                 double a=(c.focal+Math.abs(c.altitude))/c.focal;
                 if (mod == META_SHIFT_MOD) {
                     c.setXspeed(0);
@@ -521,9 +530,11 @@ public class AstroRad {
         public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){}
 
         public void enterGlyph(Glyph g){
+            detailBox.onEnterGlyph(g);
         }
 
         public void exitGlyph(Glyph g){
+            detailBox.onExitGlyph(g);
         }
 
         public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){
