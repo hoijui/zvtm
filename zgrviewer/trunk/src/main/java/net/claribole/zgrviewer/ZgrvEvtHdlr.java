@@ -80,7 +80,8 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 				lastJPX=jpx;
 				lastJPY=jpy;
 				//grMngr.vsm.setActiveCamera(v.cams[0]);
-				v.setDrawDrag(true);
+				v.showFirstOrderPanWidget(jpx, jpy);
+				//v.setDrawDrag(true);
 				// because we would not be consistent
 				// (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed,
 				// and if the mouse is not moving, this list is not computed
@@ -126,7 +127,8 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 			grMngr.mainCamera.setXspeed(0);
 			grMngr.mainCamera.setYspeed(0);
 			grMngr.mainCamera.setZspeed(0);
-			v.setDrawDrag(false);
+			v.hideFirstOrderPanWidget();
+			//v.setDrawDrag(false);
 			v.getVCursor().setSensitivity(true);
 			if (autoZooming){unzoom(v);}
 			manualLeftButtonMove=false;
@@ -181,19 +183,19 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 
 	public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
 		//XXXX
-	    if (mod == ALT_SHIFT_MOD){
-	        if (startG!=null){
-	            endG = v.lastGlyphEntered();
-	            edge = grMngr.addEdge(startG, endG, "test", true);
-	            startG = endG = null;
-	        }
-	        else {
-	            startG = v.lastGlyphEntered();
-	        }
-	    }
-	else if (mod == ALT_MOD){
-		grMngr.removeEdge(edge);
-	}
+		if (mod == ALT_SHIFT_MOD){
+			if (startG!=null){
+				endG = v.lastGlyphEntered();
+				edge = grMngr.addEdge(startG, endG, "test", true);
+				startG = endG = null;
+			}
+			else {
+				startG = v.lastGlyphEntered();
+			}
+		}
+		else if (mod == ALT_MOD){
+			grMngr.removeEdge(edge);
+		}
 		//XXXX
 	}
 
@@ -204,14 +206,14 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 		//XXXX
 		if (mod == ALT_SHIFT_MOD){return;}
 		//XXXX
-		Glyph g=v.lastGlyphEntered();
+		Glyph g = v.lastGlyphEntered();
 		if (g!=null && g != grMngr.boundingBox){
-			if (g.getOwner()!=null){
+			if (g.getOwner() != null){
 				getAndDisplayURL((LElem)g.getOwner(), g);
 			}
 		}
 		else {
-			attemptDisplayEdgeURL(v.getVCursor(),v.cams[0]);
+			attemptDisplayEdgeURL(v.getVCursor(), v.cams[0]);
 		}
 	}
 
@@ -492,6 +494,25 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 				attemptDisplayEdgeURL(v.getVCursor(),v.cams[0]);
 			}
 		}
+		
+		
+		//XXXX
+		else if (code==KeyEvent.VK_Y){
+			if (startG!=null){
+				endG = v.lastGlyphEntered();
+				edge = grMngr.addEdge(startG, endG, "test", true);
+				startG = endG = null;
+			}
+			else {
+				startG = v.lastGlyphEntered();
+			}
+		}
+		else if (code==KeyEvent.VK_U){
+			grMngr.removeEdge(edge);
+		}
+		//XXXX
+		
+		
 	}
 
 	public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
