@@ -444,7 +444,8 @@ class PDFViewerEventHandler implements ViewListener {
 		}
 		else {
 		    panning = true;
-    		v.setDrawDrag(true);
+    		//v.setDrawDrag(true);
+			v.showFirstOrderPanWidget(jpx, jpy);
     		VirtualSpaceManager.INSTANCE.getActiveView().mouse.setSensitivity(false);		    
 		}
 	}
@@ -456,7 +457,8 @@ class PDFViewerEventHandler implements ViewListener {
 		c.setXspeed(0);
         c.setYspeed(0);
         c.setZspeed(0);
-    	v.setDrawDrag(false);
+    	v.hideFirstOrderPanWidget();
+		//v.setDrawDrag(false);
 		VirtualSpaceManager.INSTANCE.getActiveView().mouse.setSensitivity(true);
 	}
 
