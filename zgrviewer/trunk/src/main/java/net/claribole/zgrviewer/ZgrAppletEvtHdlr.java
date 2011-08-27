@@ -78,7 +78,8 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewListener {
 				lastJPX=jpx;
 				lastJPY=jpy;
 				//grMngr.vsm.setActiveCamera(v.cams[0]);
-				v.setDrawDrag(true);
+				v.showFirstOrderPanWidget(jpx, jpy);
+				//v.setDrawDrag(true);
 				v.getVCursor().setSensitivity(false);  //because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
 				activeCam=grMngr.vsm.getActiveCamera();
 			}
@@ -119,7 +120,8 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewListener {
 			grMngr.mainCamera.setXspeed(0);
 			grMngr.mainCamera.setYspeed(0);
 			grMngr.mainCamera.setZspeed(0);
-			v.setDrawDrag(false);
+			v.hideFirstOrderPanWidget();
+			//v.setDrawDrag(false);
 			v.getVCursor().setSensitivity(true);
 			if (autoZooming){unzoom(v);}
 			manualLeftButtonMove=false;
