@@ -267,15 +267,17 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
     }
 
     /**
-     * Converts between view coordinates and virtualspace coordinates for
+     * Converts between view coordinates and virtual space coordinates for
      * a given camera.
-     * @param cam camera
-     * @param jpx x coordinate in the panel system
-     * @param jpy y coordinate in the panel system
+     * @param c camera
+     * @param jpx x coordinate in the panel system (JPanel coordinates)
+     * @param jpy y coordinate in the panel system (JPanel coordinates)
+     *@return (x,y) coordinates in virtual space
+     *@see #spaceToViewCoords(Camera cam, double vx, double vy)
      */
-    public Point2D.Double viewToSpaceCoords(Camera cam, int jpx, int jpy){
-        Location camLoc = cam.getLocation();
-        double focal = cam.getFocal();
+    public Point2D.Double viewToSpaceCoords(Camera c, int jpx, int jpy){
+        Location camLoc = c.getLocation();
+        double focal = c.getFocal();
         double altCoef = (focal + camLoc.alt) / focal;
         Dimension viewSize = this.getComponent().getSize();
 
@@ -286,6 +288,22 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
         return new Point2D.Double(
                 viewOrigX + altCoef*jpx,
                 viewOrigY - altCoef*jpy);
+    }
+    
+    /**
+     * Converts between virtual space coordinates and view coordinates for
+     * a given camera.
+     * @param c camera
+     * @param vx x coordinate in virtual space
+     * @param vy y coordinate in virtual space
+     *@return (x,y) coordinates in the view system (JPanel coordinates)
+     *@see #viewToSpaceCoords(Camera cam, int jpx, int jpy)
+     */
+    public Point spaceToViewCoords(Camera c, double vx, double vy){
+        double coef = c.focal / (c.focal+c.altitude);
+        Dimension d = this.getComponent().getSize();
+        return new Point((int)Math.round((d.width/2)+(vx-c.vx)*coef),
+                         (int)Math.round((d.height/2)-(vy-c.vy)*coef));
     }
     
     /**true will draw a segment between origin of drag and current cursor pos until drag is finished (still visible for backward compatibility reasons - should use setDrawSegment instead)*/
