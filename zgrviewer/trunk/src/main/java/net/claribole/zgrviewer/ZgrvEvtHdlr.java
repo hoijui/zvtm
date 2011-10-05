@@ -5,7 +5,7 @@
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  *   $Id$
- */ 
+ */
 
 package net.claribole.zgrviewer;
 
@@ -39,16 +39,16 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 
 	protected ZGRViewer application;
 	protected GraphicsManager grMngr;
-	
+
 	protected double mvx, mvy;
-	
+
 	boolean editingSpline = false;
 
 	protected ZgrvEvtHdlr(ZGRViewer app, GraphicsManager gm){
 		this.application = app;
 		this.grMngr = gm;
 	}
-		
+
 	public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
 		if (toolPaletteIsActive){return;}
 		lastJPX = jpx;
@@ -85,7 +85,7 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
                 }
                 else {
                     // moving something else (XXX:not implemented yet)
-        		    grMngr.geom.clearSplineEditingGlyphs();              
+        		    grMngr.geom.clearSplineEditingGlyphs();
                 }
 		    }
             else {
@@ -133,7 +133,7 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 		draggingZoomWindowContent = false;
 		if (editingSpline){
 		    v.getVCursor().unstickLastGlyph();
-    		editingSpline = false;		    
+    		editingSpline = false;
 		}
 		if (draggingMagWindow){
 			draggingMagWindow = false;
@@ -459,7 +459,7 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 		        grMngr.mainView.setCursorIcon(Cursor.MOVE_CURSOR);
 		    }
 		    else if (grMngr.tp.isHighlightMode()){
-				grMngr.highlightElement(g, null, null, true); 
+				grMngr.highlightElement(g, null, null, true);
 				// g is guaranteed to be != null, don't care about camera and cursor
 			}
 			else {
@@ -552,7 +552,7 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 			application.displayURLinBrowser(url);
 		}
 	}
-	
+
 	public void attemptEditEdge(ViewPanel v){
 	    Vector<Glyph> otherGlyphs = v.getVCursor().getPicker().getIntersectingGlyphs(v.cams[0]);
 		if (otherGlyphs != null && otherGlyphs.size() > 0){
