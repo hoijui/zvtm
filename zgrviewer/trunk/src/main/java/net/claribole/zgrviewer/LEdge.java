@@ -12,6 +12,9 @@ import java.util.Vector;
 
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.DPath;
+import fr.inria.zvtm.glyphs.VPolygon;
+import fr.inria.zvtm.glyphs.VShape;
+import fr.inria.zvtm.glyphs.ClosedShape;
 import fr.inria.zvtm.svg.Metadata;
 
 public class LEdge extends LElem {
@@ -128,6 +131,17 @@ public class LEdge extends LElem {
 			if (glyphs[i] instanceof DPath){return (DPath)glyphs[i];}
 		}
 		return null;
+	}
+	
+	/**
+	 *@return null if none or could not be identified.
+	 */
+	public ClosedShape getArrowHead(){
+		for (int i=0;i<glyphs.length;i++){
+		    if (glyphs[i] instanceof VShape){return (VShape)glyphs[i];}
+			else if (glyphs[i] instanceof VPolygon){return (VPolygon)glyphs[i];}
+		}
+		return null;	    
 	}
 
     public String toString(){

@@ -13,6 +13,7 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.SICircle;
 import fr.inria.zvtm.glyphs.VSegment;
 import fr.inria.zvtm.glyphs.DPath;
+import fr.inria.zvtm.glyphs.ClosedShape;
 
 public class GeometryEditor {
     
@@ -55,6 +56,11 @@ public class GeometryEditor {
             currentEditPoints[i].setLocation(currentEditPointGlyphs[i].vx, currentEditPointGlyphs[i].vy);
         }
         currentEditSpline.edit(currentEditPoints, true);
+        
+        double theta = Math.atan2(currentEditPoints[currentEditPoints.length-1].y-currentEditPoints[currentEditPoints.length-2].y,
+                                  currentEditPoints[currentEditPoints.length-1].x-currentEditPoints[currentEditPoints.length-2].x);
+        ((LEdge)currentEditSpline.getOwner()).getArrowHead().orientTo(theta);
+        
     }
     
     void clearSplineEditingGlyphs(){
