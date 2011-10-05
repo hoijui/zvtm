@@ -54,6 +54,9 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 		lastJPX = jpx;
 		lastJPY = jpy;
 		Glyph g = v.lastGlyphEntered();
+		if ((g == null || !GeometryEditor.SPLINE_GEOM_EDITOR.equals(g.getType()))){
+		    application.geom.clearSplineEditingGlyphs();
+	    }
 		if (inZoomWindow){
 			if (grMngr.dmPortal.coordInsideBar(jpx, jpy)){
 				draggingZoomWindow = true;
@@ -76,10 +79,10 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 			LS_SY = v.getVCursor().getVSYCoordinate();
 			grMngr.attemptLinkSliding(LS_SX, LS_SY, location.x, location.y);
 		}
-		else if (g != null && g.getType() != null && g.getType().equals(GeometryEditor.SPLINE_GEOM_EDITOR)){
-	        editingSpline = true;
-	        v.getVCursor().stickGlyph(g);
-	    }
+	    else if (g != null && g.getType() != null && g.getType().equals(GeometryEditor.SPLINE_GEOM_EDITOR)){
+            editingSpline = true;
+            v.getVCursor().stickGlyph(g);
+        }
 		else {
 			grMngr.rememberLocation(v.cams[0].getLocation());
 			if (mod == NO_MODIFIER || mod == SHIFT_MOD || mod == META_MOD || mod == META_SHIFT_MOD){
