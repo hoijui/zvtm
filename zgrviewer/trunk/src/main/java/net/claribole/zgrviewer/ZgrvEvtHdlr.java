@@ -54,9 +54,6 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 		lastJPX = jpx;
 		lastJPY = jpy;
 		Glyph g = v.lastGlyphEntered();
-		if ((g == null || !GeometryEditor.SPLINE_GEOM_EDITOR.equals(g.getType()))){
-		    application.geom.clearSplineEditingGlyphs();
-	    }
 		if (inZoomWindow){
 			if (grMngr.dmPortal.coordInsideBar(jpx, jpy)){
 				draggingZoomWindow = true;
@@ -79,10 +76,24 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 			LS_SY = v.getVCursor().getVSYCoordinate();
 			grMngr.attemptLinkSliding(LS_SX, LS_SY, location.x, location.y);
 		}
-	    else if (g != null && g.getType() != null && g.getType().equals(GeometryEditor.SPLINE_GEOM_EDITOR)){
-            editingSpline = true;
-            v.getVCursor().stickGlyph(g);
-        }
+		else if (grMngr.tp.isEditMode()){
+		    if (g != null){
+		        // moving edge control point
+        	    if (g.getType() != null && g.getType().equals(GeometryEditor.SPLINE_GEOM_EDITOR)){
+                    editingSpline = true;
+                    v.getVCursor().stickGlyph(g);
+                }
+                else {
+                    // moving something else (XXX:not implemented yet)
+        		    grMngr.geom.clearSplineEditingGlyphs();              
+                }
+		    }
+            else {
+                // might be attempting to edit an edge
+                grMngr.geom.clearSplineEditingGlyphs();
+                attemptEditEdge(v);
+            }
+		}
 		else {
 			grMngr.rememberLocation(v.cams[0].getLocation());
 			if (mod == NO_MODIFIER || mod == SHIFT_MOD || mod == META_MOD || mod == META_SHIFT_MOD){
@@ -196,8 +207,7 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 	LEdge edge;
 
 	public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-		//XXXX
-		if (mod == ALT_SHIFT_MOD){
+		if (grMngr.tp.isEditMode()){
 			if (startG!=null){
 				endG = v.lastGlyphEntered();
 				edge = grMngr.addEdge(startG, endG, "test", true);
@@ -207,19 +217,15 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 				startG = v.lastGlyphEntered();
 			}
 		}
-		else if (mod == ALT_MOD){
-			grMngr.removeEdge(edge);
-		}
-		//XXXX
+		//else if (mod == ALT_MOD){
+		//	grMngr.removeEdge(edge);
+		//}
 	}
 
 	public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
 	public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
 		if (toolPaletteIsActive){return;}
-		//XXXX
-		if (mod == ALT_SHIFT_MOD){return;}
-		//XXXX
 		Glyph g = v.lastGlyphEntered();
 		if (g!=null && g != grMngr.boundingBox){
 			if (g.getOwner() != null){
@@ -322,7 +328,7 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 		if (toolPaletteIsActive || grMngr.isBringingAndGoing){return;}
 		if (v.getVCursor().getDynaPicker().isDynaSpotActivated()){grMngr.activateDynaSpot(false, false);}
 		if (editingSpline){
-		    application.geom.updateEdgeSpline();
+		    grMngr.geom.updateEdgeSpline();
 		}
 		else if (grMngr.isLinkSliding){
 			// ignore events triggered by AWT robot
@@ -517,38 +523,6 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 				attemptDisplayEdgeURL(v.getVCursor(),v.cams[0]);
 			}
 		}
-		
-		
-		//XXXX
-		else if (code==KeyEvent.VK_Y){
-			if (startG!=null){
-				endG = v.lastGlyphEntered();
-				edge = grMngr.addEdge(startG, endG, "test", true);
-				startG = endG = null;
-			}
-			else {
-				startG = v.lastGlyphEntered();
-			}
-		}
-		else if (code==KeyEvent.VK_U){
-			grMngr.removeEdge(edge);
-		}
-		
-		else if (code==KeyEvent.VK_E){
-		    Glyph g;
-    		Vector<Glyph> otherGlyphs = v.getVCursor().getPicker().getIntersectingGlyphs(v.cams[0]);
-    		if (otherGlyphs != null && otherGlyphs.size() > 0){
-    		    for (Glyph eg:otherGlyphs){
-    		        if (eg.getOwner() != null && eg.getOwner() instanceof LEdge){
-    		            application.geom.editEdgeSpline((LEdge)eg.getOwner());
-    		        }
-    		    }
-    		}
-		}
-		
-		//XXXX
-		
-		
 	}
 
 	public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
@@ -576,6 +550,17 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 		String url = noa.getURL(g);
 		if (url!=null && url.length()>0){
 			application.displayURLinBrowser(url);
+		}
+	}
+	
+	public void attemptEditEdge(ViewPanel v){
+	    Vector<Glyph> otherGlyphs = v.getVCursor().getPicker().getIntersectingGlyphs(v.cams[0]);
+		if (otherGlyphs != null && otherGlyphs.size() > 0){
+		    for (Glyph eg:otherGlyphs){
+		        if (eg.getOwner() != null && eg.getOwner() instanceof LEdge){
+		            grMngr.geom.editEdgeSpline((LEdge)eg.getOwner());
+		        }
+		    }
 		}
 	}
 

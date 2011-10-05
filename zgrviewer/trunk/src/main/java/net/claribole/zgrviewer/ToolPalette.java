@@ -35,6 +35,7 @@ public class ToolPalette {
     static final short HIGHLIGHT_MODE = 4;
     static final short BRING_AND_GO_MODE = 5;
     static final short LINK_SLIDING_MODE = 6;
+    static final short EDIT_MODE = 7;
 
     static final String[] ICON_PATHS = {"/images/stdnav24b.png",
 					"/images/flnav24b.png",
@@ -42,7 +43,8 @@ public class ToolPalette {
 					"/images/plnav24b.png",
 					"/images/hl24b.png",
 					"/images/fl24b.png",
-					"/images/ls24b.png"};
+					"/images/ls24b.png",
+					"/images/edit24b.png"};
 
     static final String[] SELECTED_ICON_PATHS = {"/images/stdnav24g.png",
 						 "/images/flnav24g.png",
@@ -50,7 +52,8 @@ public class ToolPalette {
 						 "/images/plnav24g.png",
 						 "/images/hl24g.png",
 						 "/images/fl24g.png",
-						 "/images/ls24g.png"};
+						 "/images/ls24g.png",
+ 						 "/images/edit24g.png"};
 
     VImage[] buttons;
     VImage[] selectedButtons;
@@ -123,6 +126,10 @@ public class ToolPalette {
     public boolean isLinkSlidingMode(){
 		return selectedIconIndex == LINK_SLIDING_MODE;
     }
+    
+    public boolean isEditMode(){
+        return selectedIconIndex == EDIT_MODE;
+    }
 
     public void selectButton(VImage icon){
         boolean newIconSelected = false;
@@ -165,6 +172,9 @@ public class ToolPalette {
                     try {grMngr.activateDynaSpot(true, false);}
                     catch (NullPointerException ex){}                    
                 }
+            }
+            else if (oldSelectedIconIndex == EDIT_MODE){
+                grMngr.geom.clearSplineEditingGlyphs();
             }
         }
     }

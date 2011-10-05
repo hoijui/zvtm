@@ -47,7 +47,6 @@ public class ZGRViewer implements ZGRApplication {
 
     public GVLoader gvLdr;
     GraphicsManager grMngr;
-    GeometryEditor geom;
 
     static File cmdLineDOTFile=null;
     static String cmdLinePrg=null;
@@ -59,7 +58,6 @@ public class ZGRViewer implements ZGRApplication {
 		initConfig();
 		//init GUI after config as we load some GUI prefs from the config file
 		initGUI(acc);
-		geom = new GeometryEditor(grMngr);
 		if (cmdLineDOTFile!=null){loadCmdLineFile();}
 	}
 	

@@ -102,7 +102,9 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     JPanel mainViewPanel;
 
     PeriodicActionManager paMngr;
-
+    
+    GeometryEditor geom;
+    
     /*dimensions of zoomable panel*/
     int panelWidth, panelHeight;
 
@@ -190,7 +192,8 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     LogicalStructure lstruct = null;
 
     GraphicsManager(ZGRApplication za){
-	this.zapp = za;
+	    this.zapp = za;
+	    geom = new GeometryEditor(this);
     }
 
     Vector createZVTMelements(boolean applet){
