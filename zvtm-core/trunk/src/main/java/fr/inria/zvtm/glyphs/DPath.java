@@ -976,9 +976,9 @@ public class DPath extends Glyph implements RectangularShape {
 	}
 
 	/**
-		* Get coordinates of each point in the path including control points
-		* @return list of points in following format: startPoint, controlPoint1, controlPoint2, endPoint ...
-		*/
+	 * Get coordinates of each point in the path including control points.
+	 * @return a copy of the list of points in following format: startPoint, controlPoint1, controlPoint2, endPoint ...
+	 */
 	public Point2D.Double[] getAllPointsCoordinates(){
 		int totalNumberOfPoints = getNumberOfPoints();
 		Point2D.Double[] result = new Point2D.Double[totalNumberOfPoints];
