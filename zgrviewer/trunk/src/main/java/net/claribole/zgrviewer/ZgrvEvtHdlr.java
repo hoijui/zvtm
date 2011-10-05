@@ -11,6 +11,7 @@ package net.claribole.zgrviewer;
 
 import java.awt.Graphics2D;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Point;
 import java.util.Vector;
@@ -40,6 +41,8 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 	protected GraphicsManager grMngr;
 	
 	protected double mvx, mvy;
+	
+	boolean editingSpline = false;
 
 	protected ZgrvEvtHdlr(ZGRViewer app, GraphicsManager gm){
 		this.application = app;
@@ -73,6 +76,10 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 			LS_SY = v.getVCursor().getVSYCoordinate();
 			grMngr.attemptLinkSliding(LS_SX, LS_SY, location.x, location.y);
 		}
+		else if (g != null && g.getType() != null && g.getType().equals(GeometryEditor.SPLINE_GEOM_EDITOR)){
+	        editingSpline = true;
+	        v.getVCursor().stickGlyph(g);
+	    }
 		else {
 			grMngr.rememberLocation(v.cams[0].getLocation());
 			if (mod == NO_MODIFIER || mod == SHIFT_MOD || mod == META_MOD || mod == META_SHIFT_MOD){
@@ -110,6 +117,10 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 		if (toolPaletteIsActive){return;}
 		draggingZoomWindow = false;
 		draggingZoomWindowContent = false;
+		if (editingSpline){
+		    v.getVCursor().unstickLastGlyph();
+    		editingSpline = false;		    
+		}
 		if (draggingMagWindow){
 			draggingMagWindow = false;
 			v.getVCursor().unstickLastGlyph();
@@ -307,7 +318,10 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 	public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
 		if (toolPaletteIsActive || grMngr.isBringingAndGoing){return;}
 		if (v.getVCursor().getDynaPicker().isDynaSpotActivated()){grMngr.activateDynaSpot(false, false);}
-		if (grMngr.isLinkSliding){
+		if (editingSpline){
+		    application.geom.updateEdgeSpline();
+		}
+		else if (grMngr.isLinkSliding){
 			// ignore events triggered by AWT robot
 			grMngr.linkSlider(v.getVCursor().getVSXCoordinate(), v.getVCursor().getVSYCoordinate(), false);
 		}
@@ -432,7 +446,10 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 			}
 		}
 		else {
-			if (grMngr.tp.isHighlightMode()){
+		    if (g.getType() != null && g.getType().equals(GeometryEditor.SPLINE_GEOM_EDITOR)){
+		        grMngr.mainView.setCursorIcon(Cursor.MOVE_CURSOR);
+		    }
+		    else if (grMngr.tp.isHighlightMode()){
 				grMngr.highlightElement(g, null, null, true); 
 				// g is guaranteed to be != null, don't care about camera and cursor
 			}
@@ -465,7 +482,10 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 			}
 		}
 		else {
-			if (application.grMngr.tp.isHighlightMode()){
+		    if (g.getType() != null && g.getType().equals(GeometryEditor.SPLINE_GEOM_EDITOR)){
+		        grMngr.mainView.setCursorIcon(Cursor.CUSTOM_CURSOR);
+		    }
+			else if (application.grMngr.tp.isHighlightMode()){
 				grMngr.unhighlightAll();
 			}
 			else {
@@ -510,6 +530,19 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 		else if (code==KeyEvent.VK_U){
 			grMngr.removeEdge(edge);
 		}
+		
+		else if (code==KeyEvent.VK_E){
+		    Glyph g;
+    		Vector<Glyph> otherGlyphs = v.getVCursor().getPicker().getIntersectingGlyphs(v.cams[0]);
+    		if (otherGlyphs != null && otherGlyphs.size() > 0){
+    		    for (Glyph eg:otherGlyphs){
+    		        if (eg.getOwner() != null && eg.getOwner() instanceof LEdge){
+    		            application.geom.editEdgeSpline((LEdge)eg.getOwner());
+    		        }
+    		    }
+    		}
+		}
+		
 		//XXXX
 		
 		

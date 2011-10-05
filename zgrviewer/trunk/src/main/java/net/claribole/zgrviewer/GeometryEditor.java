@@ -1,0 +1,76 @@
+/*   Copyright (c) INRIA, 2011. All Rights Reserved
+ *   Licensed under the GNU LGPL. For full terms see the file COPYING.
+ *
+ * $Id$
+ */ 
+
+package net.claribole.zgrviewer;
+
+import java.awt.Color;
+import java.awt.geom.Point2D;
+
+import fr.inria.zvtm.engine.VirtualSpaceManager;
+import fr.inria.zvtm.glyphs.SICircle;
+import fr.inria.zvtm.glyphs.VSegment;
+import fr.inria.zvtm.glyphs.DPath;
+
+public class GeometryEditor {
+    
+    public static final String SPLINE_GEOM_EDITOR = "sge";
+
+    GraphicsManager grMngr;
+    Point2D.Double[] currentEditPoints;
+    SICircle[] currentEditPointGlyphs;
+    VSegment[] currentEditSegments;
+    DPath currentEditSpline;
+
+    GeometryEditor(GraphicsManager gm){
+        this.grMngr = gm;
+    }
+
+    void editEdgeSpline(LEdge e){
+        currentEditSpline = e.getSpline();
+        currentEditPoints = currentEditSpline.getAllPointsCoordinates();
+        currentEditPointGlyphs = new SICircle[currentEditPoints.length];
+        currentEditSegments = new VSegment[currentEditPointGlyphs.length-1];
+        currentEditPointGlyphs[0] = new SICircle(currentEditPoints[0].x, currentEditPoints[0].y, 100, 6, Color.DARK_GRAY, Color.DARK_GRAY, .8f);
+        currentEditPointGlyphs[0].setType(SPLINE_GEOM_EDITOR);
+        currentEditPointGlyphs[0].setDrawBorder(false);
+        for (int i=1;i<currentEditPoints.length;i++){
+            currentEditPointGlyphs[i] = new SICircle(currentEditPoints[i].x, currentEditPoints[i].y, 100, 6, Color.DARK_GRAY, Color.DARK_GRAY, .8f);
+            currentEditPointGlyphs[i].setType(SPLINE_GEOM_EDITOR);
+            currentEditPointGlyphs[i].setDrawBorder(false);
+            currentEditSegments[i-1] = new VSegment(currentEditPoints[i-1].x, currentEditPoints[i-1].y, currentEditPoints[i].x, currentEditPoints[i].y, 99, Color.RED, .6f);
+        }
+        grMngr.mSpace.addGlyphs(currentEditSegments, false);
+        grMngr.mSpace.addGlyphs(currentEditPointGlyphs, true);
+    }
+    
+    void updateEdgeSpline(){
+        for (int i=0;i<currentEditSegments.length;i++){
+            currentEditSegments[i].setEndPoints(currentEditPointGlyphs[i].vx, currentEditPointGlyphs[i].vy,
+                                                currentEditPointGlyphs[i+1].vx, currentEditPointGlyphs[i+1].vy);
+        }
+        for (int i=0;i<currentEditPointGlyphs.length;i++){
+            currentEditPoints[i].setLocation(currentEditPointGlyphs[i].vx, currentEditPointGlyphs[i].vy);
+        }
+        currentEditSpline.edit(currentEditPoints, true);
+    }
+    
+    void clearSplineEditingGlyphs(){
+        if (currentEditPoints != null){
+            for (VSegment s:currentEditSegments){
+                grMngr.mSpace.removeGlyph(s, false);                
+            }
+            for (SICircle c:currentEditPointGlyphs){
+                grMngr.mSpace.removeGlyph(c, false);
+            }
+            VirtualSpaceManager.INSTANCE.repaint();
+        }
+        currentEditSpline = null;
+        currentEditPointGlyphs = null;
+        currentEditSegments = null;
+        currentEditPoints = null;
+    }
+
+}
