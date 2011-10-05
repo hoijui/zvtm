@@ -26,6 +26,7 @@ import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.DPath;
 import fr.inria.zvtm.glyphs.VSegment;
 import fr.inria.zvtm.glyphs.VImage;
+import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.engine.portals.Portal;
 import fr.inria.zvtm.animation.Animation;
@@ -43,6 +44,7 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 	protected double mvx, mvy;
 
 	boolean editingSpline = false;
+	boolean movingGlyph = false;
 
 	protected ZgrvEvtHdlr(ZGRViewer app, GraphicsManager gm){
 		this.application = app;
@@ -86,6 +88,15 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
                 else {
                     // moving something else (XXX:not implemented yet)
         		    grMngr.geom.clearSplineEditingGlyphs();
+        		    if (g instanceof VText){
+        		        movingGlyph = true;
+                        v.getVCursor().stickGlyph(g);
+        		    }
+        		    else {
+        		        // might be attempting to edit an edge
+                        grMngr.geom.clearSplineEditingGlyphs();
+                        attemptEditEdge(v);
+        		    }
                 }
 		    }
             else {
@@ -131,9 +142,9 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 		if (toolPaletteIsActive){return;}
 		draggingZoomWindow = false;
 		draggingZoomWindowContent = false;
-		if (editingSpline){
+		if (editingSpline || movingGlyph){
 		    v.getVCursor().unstickLastGlyph();
-    		editingSpline = false;
+    		editingSpline = movingGlyph = false;
 		}
 		if (draggingMagWindow){
 			draggingMagWindow = false;
@@ -184,6 +195,9 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 			}
 			else if (grMngr.tp.isDragMagNavMode()){
 				grMngr.triggerDM(jpx, jpy, this);
+			}
+			else if (grMngr.tp.isEditMode()){
+			    return;
 			}
 			else {
 				if (clickNumber == 2){click2(v, mod, jpx, jpy, clickNumber, e);}
@@ -329,6 +343,10 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 		if (v.getVCursor().getDynaPicker().isDynaSpotActivated()){grMngr.activateDynaSpot(false, false);}
 		if (editingSpline){
 		    grMngr.geom.updateEdgeSpline();
+		}
+		else if (movingGlyph){
+		    // do nothing but prevent exec of else
+		    return;
 		}
 		else if (grMngr.isLinkSliding){
 			// ignore events triggered by AWT robot
