@@ -44,7 +44,8 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 	protected double mvx, mvy;
 
 	boolean editingSpline = false;
-	boolean movingGlyph = false;
+	boolean movingEdgeLabel = false;
+	boolean movingNode = false;
 
 	protected ZgrvEvtHdlr(ZGRViewer app, GraphicsManager gm){
 		this.application = app;
@@ -86,15 +87,20 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
                     v.getVCursor().stickGlyph(g);
                 }
                 else {
-                    // moving something else (XXX:not implemented yet)
-        		    grMngr.geom.clearSplineEditingGlyphs();
-        		    if (g instanceof VText){
-        		        movingGlyph = true;
+                    // moving something else
+                    grMngr.geom.clearSplineEditingGlyphs();
+                    if (g instanceof VText && g.getOwner() != null && g.getOwner() instanceof LEdge){
+                        // moving an edge label
+                        movingEdgeLabel = true;
                         v.getVCursor().stickGlyph(g);
-        		    }
+                    }
+                    else if (g.getOwner() != null && g.getOwner() instanceof LNode){
+                        // moving a node (label of shape)
+                        movingNode = true;
+                        v.getVCursor().stickGlyph(g);
+                    }
         		    else {
         		        // might be attempting to edit an edge
-                        grMngr.geom.clearSplineEditingGlyphs();
                         attemptEditEdge(v);
         		    }
                 }
@@ -142,9 +148,9 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 		if (toolPaletteIsActive){return;}
 		draggingZoomWindow = false;
 		draggingZoomWindowContent = false;
-		if (editingSpline || movingGlyph){
+		if (editingSpline || movingEdgeLabel || movingNode){
 		    v.getVCursor().unstickLastGlyph();
-    		editingSpline = movingGlyph = false;
+    		editingSpline = movingEdgeLabel = movingNode = false;
 		}
 		if (draggingMagWindow){
 			draggingMagWindow = false;
@@ -344,7 +350,7 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 		if (editingSpline){
 		    grMngr.geom.updateEdgeSpline();
 		}
-		else if (movingGlyph){
+		else if (movingEdgeLabel || movingNode){
 		    // do nothing but prevent exec of else
 		    return;
 		}
