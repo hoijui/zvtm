@@ -14,6 +14,7 @@ import fr.inria.zvtm.glyphs.SICircle;
 import fr.inria.zvtm.glyphs.VSegment;
 import fr.inria.zvtm.glyphs.DPath;
 import fr.inria.zvtm.glyphs.ClosedShape;
+import fr.inria.zvtm.glyphs.Glyph;
 
 public class GeometryEditor {
     
@@ -77,6 +78,22 @@ public class GeometryEditor {
         currentEditPointGlyphs = null;
         currentEditSegments = null;
         currentEditPoints = null;
+    }
+    
+    Glyph manipulatedNodeGlyph;
+    
+    void stickNodeComponents(Glyph mg, LNode n){
+        manipulatedNodeGlyph = mg;
+        for (Glyph g:n.getGlyphs()){
+            if (g != manipulatedNodeGlyph){
+                manipulatedNodeGlyph.stick(g);
+            }
+        }
+    }
+    
+    void unstickAll(){
+        manipulatedNodeGlyph.unstickAllGlyphs();
+        manipulatedNodeGlyph = null;
     }
 
 }

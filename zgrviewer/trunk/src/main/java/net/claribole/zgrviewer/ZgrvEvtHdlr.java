@@ -97,6 +97,7 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
                     else if (g.getOwner() != null && g.getOwner() instanceof LNode){
                         // moving a node (label of shape)
                         movingNode = true;
+                        grMngr.geom.stickNodeComponents(g, (LNode)g.getOwner());
                         v.getVCursor().stickGlyph(g);
                     }
         		    else {
@@ -148,9 +149,14 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 		if (toolPaletteIsActive){return;}
 		draggingZoomWindow = false;
 		draggingZoomWindowContent = false;
-		if (editingSpline || movingEdgeLabel || movingNode){
+		if (editingSpline || movingEdgeLabel){
 		    v.getVCursor().unstickLastGlyph();
-    		editingSpline = movingEdgeLabel = movingNode = false;
+    		editingSpline = movingEdgeLabel = false;
+		}
+		else if (movingNode){
+		    v.getVCursor().unstickLastGlyph();
+		    grMngr.geom.unstickAll();
+    		movingNode = false;
 		}
 		if (draggingMagWindow){
 			draggingMagWindow = false;
