@@ -32,22 +32,22 @@ public class GeometryEditor {
     }
 
     void editEdgeSpline(LEdge e){
-        
         currentEditSpline = e.getSpline();
         currentEditPoints = currentEditSpline.getAllPointsCoordinates();
-        
+        // replace original arrow head by a generic reorientable one
         if (e.isDirected() && !e.hasVShapeArrowHead()){
             double theta = Math.atan2(currentEditPoints[currentEditPoints.length-1].y-currentEditPoints[currentEditPoints.length-2].y,
                                       currentEditPoints[currentEditPoints.length-1].x-currentEditPoints[currentEditPoints.length-2].x);
             VShape newArrowHead = new VShape(currentEditPoints[currentEditPoints.length-1].x, currentEditPoints[currentEditPoints.length-1].y, 0,
-                                             e.getArrowHead().getSize(), GraphicsManager.TRIANGLE_VERTICES, Color.BLACK, theta);
+                                             e.getArrowHead().getSize(), GraphicsManager.TRIANGLE_VERTICES,
+                                             Color.BLACK, Color.BLACK, theta);
             ClosedShape oldArrowHead = e.replaceArrowHead(newArrowHead);
+            newArrowHead.setColor(oldArrowHead.getColor());
+            newArrowHead.setBorderColor(oldArrowHead.getBorderColor());
             grMngr.mSpace.removeGlyph(oldArrowHead, false);
             grMngr.mSpace.addGlyph(newArrowHead, true);
         }
-        
-        
-        
+        // show glyphs for editing control points
         currentEditPointGlyphs = new SICircle[currentEditPoints.length];
         currentEditSegments = new VSegment[currentEditPointGlyphs.length-1];
         currentEditPointGlyphs[0] = new SICircle(currentEditPoints[0].x, currentEditPoints[0].y, 100, 6, Color.DARK_GRAY, Color.DARK_GRAY, .8f);
