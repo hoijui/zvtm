@@ -31,6 +31,8 @@ public class GeometryEditor {
         this.grMngr = gm;
     }
 
+    /*-------------------- Editing edges -----------------*/
+
     void editEdgeSpline(LEdge e){
         currentEditSpline = e.getSpline();
         currentEditPoints = currentEditSpline.getAllPointsCoordinates();
@@ -94,6 +96,8 @@ public class GeometryEditor {
         currentEditSegments = null;
         currentEditPoints = null;
     }
+    
+    /*-------------------- Moving nodes -----------------*/
     
     Glyph manipulatedNodeGlyph;
     
