@@ -144,6 +144,27 @@ public class LEdge extends LElem {
 		return null;	    
 	}
 
+	public boolean hasVShapeArrowHead(){
+		for (int i=0;i<glyphs.length;i++){
+		    if (glyphs[i] instanceof VShape){return true;}
+        }
+        return false;
+    }
+    
+	/**
+	 *@return the old polygon if replace successful.
+	 */	
+	public ClosedShape replaceArrowHead(VShape s){
+		for (int i=0;i<glyphs.length;i++){
+		    if (glyphs[i] instanceof VPolygon || glyphs[i] instanceof VShape){
+                ClosedShape old = (ClosedShape)glyphs[i];
+                glyphs[i] = s;
+		        return old;
+		    }
+		}
+		return null;
+	}
+
     public String toString(){
 	return title + "@" + hashCode() + " [" + 
 	    ((tail != null) ? tail.getTitle() + "@" + tail.hashCode() : "NULL")+

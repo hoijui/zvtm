@@ -12,6 +12,7 @@ import java.awt.geom.Point2D;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.SICircle;
 import fr.inria.zvtm.glyphs.VSegment;
+import fr.inria.zvtm.glyphs.VShape;
 import fr.inria.zvtm.glyphs.DPath;
 import fr.inria.zvtm.glyphs.ClosedShape;
 import fr.inria.zvtm.glyphs.Glyph;
@@ -31,8 +32,22 @@ public class GeometryEditor {
     }
 
     void editEdgeSpline(LEdge e){
+        
         currentEditSpline = e.getSpline();
         currentEditPoints = currentEditSpline.getAllPointsCoordinates();
+        
+        if (e.isDirected() && !e.hasVShapeArrowHead()){
+            double theta = Math.atan2(currentEditPoints[currentEditPoints.length-1].y-currentEditPoints[currentEditPoints.length-2].y,
+                                      currentEditPoints[currentEditPoints.length-1].x-currentEditPoints[currentEditPoints.length-2].x);
+            VShape newArrowHead = new VShape(currentEditPoints[currentEditPoints.length-1].x, currentEditPoints[currentEditPoints.length-1].y, 0,
+                                             e.getArrowHead().getSize(), GraphicsManager.TRIANGLE_VERTICES, Color.BLACK, theta);
+            ClosedShape oldArrowHead = e.replaceArrowHead(newArrowHead);
+            grMngr.mSpace.removeGlyph(oldArrowHead, false);
+            grMngr.mSpace.addGlyph(newArrowHead, true);
+        }
+        
+        
+        
         currentEditPointGlyphs = new SICircle[currentEditPoints.length];
         currentEditSegments = new VSegment[currentEditPointGlyphs.length-1];
         currentEditPointGlyphs[0] = new SICircle(currentEditPoints[0].x, currentEditPoints[0].y, 100, 6, Color.DARK_GRAY, Color.DARK_GRAY, .8f);
