@@ -1,5 +1,4 @@
 /*   FILE: Plugin.java
- *   DATE OF CREATION:  Thu May 26 16:20:27 2005
  *   Copyright (c) INRIA, 2004-2011. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
@@ -8,8 +7,10 @@
 
 package net.claribole.zgrviewer;
 
-import java.util.Hashtable;
 import javax.swing.JFrame;
+import java.awt.Image;
+
+import java.util.Hashtable;
 
 /**
  * An interface for ZGRViewer plugins (such as the one based on ZVTM-MPD). See <a href="http://zvtm.sourceforge.net/doc/tutorials/zgrvplugins/index.html">http://zvtm.sourceforge.net/doc/tutorials/zgrvplugins/index.html</a> for more details.
@@ -62,6 +63,21 @@ public interface Plugin {
      * Gets a URL pointing to more information about this plug-in (e.g. Web site) - can be null
      **/
     public java.net.URL getURL();
+    
+    /** Does this plugin declare an interaction mode/tool in the toolpalette.
+     * @return true if it does
+     */
+    public boolean hasMode();
+    
+    /** Get the icon to be placed in the toolpalette to activate this mode.
+     * @return null if no mode associated with this plugin
+     */
+    public Image getModeIcon();
+    
+    public void enterMode();
+    
+    public void exitMode();
+    
 
 	/** Event triggered when the graph's logical structure has changed. */
 	public static final short NOTIFY_PLUGIN_LOGICAL_STRUCTURE_CHANGED = 0;

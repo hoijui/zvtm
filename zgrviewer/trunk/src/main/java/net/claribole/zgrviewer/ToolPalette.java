@@ -11,6 +11,8 @@ package net.claribole.zgrviewer;
 import java.awt.Cursor;
 import java.awt.geom.Point2D;
 import javax.swing.ImageIcon;
+import java.util.Vector;
+import java.util.HashMap;
 
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VirtualSpace;
@@ -58,7 +60,7 @@ public class ToolPalette {
     VImage[] buttons;
     VImage[] selectedButtons;
     static final int VERTICAL_STEP_BETWEEN_ICONS = 30;
-    int selectedIconIndex = -1; // -1 means no button selected
+    short selectedIconIndex = -1; // -1 means no button selected
 
     boolean visible = false;
     boolean paintPalette = true; // set to false temporarily during panel resizing operations ; used as an optimization indicator
@@ -66,11 +68,12 @@ public class ToolPalette {
 
     public static final int ANIM_TIME = 200;
     public static final int TRIGGER_ZONE_WIDTH = 48;
-    public static final int TRIGGER_ZONE_HEIGHT = ICON_PATHS.length * (VERTICAL_STEP_BETWEEN_ICONS) + 24;
+    public static int TRIGGER_ZONE_HEIGHT = ICON_PATHS.length * (VERTICAL_STEP_BETWEEN_ICONS) + 24;
 
 	ToolPalette(GraphicsManager gm){
 		this.grMngr = gm;
 		initZVTMelements();
+        loadPluginModes();		
 	}
     
     void initZVTMelements(){
@@ -130,11 +133,15 @@ public class ToolPalette {
     public boolean isEditMode(){
         return selectedIconIndex == EDIT_MODE;
     }
+    
+    public short getMode(){
+        return selectedIconIndex;
+    }
 
     public void selectButton(VImage icon){
         boolean newIconSelected = false;
-        int oldSelectedIconIndex = selectedIconIndex;
-        for (int i=0;i<buttons.length;i++){
+        short oldSelectedIconIndex = selectedIconIndex;
+        for (short i=0;i<buttons.length;i++){
             // only try to find it in the list of unselected buttons
             if (buttons[i] == icon){
                 // this way we are sure it is not the one already selected
@@ -155,6 +162,7 @@ public class ToolPalette {
                 paletteSpace.hide(selectedButtons[i]);
                 paletteSpace.show(buttons[i]);
             }
+            // and discard resources associated with old mode
             if (oldSelectedIconIndex == DM_NAV_MODE){
                 grMngr.killDM();
             }
@@ -175,6 +183,14 @@ public class ToolPalette {
             }
             else if (oldSelectedIconIndex == EDIT_MODE){
                 grMngr.geom.clearSplineEditingGlyphs();
+            }
+            else if (oldSelectedIconIndex > EDIT_MODE){
+                // a plugin mode, notify the plugin
+                getPlugin(oldSelectedIconIndex).exitMode();
+            }
+            if (selectedIconIndex > EDIT_MODE){
+                // a plugin mode, notify the plugin
+                getPlugin(selectedIconIndex).enterMode();
             }
         }
     }
@@ -224,9 +240,11 @@ public class ToolPalette {
         }
     }
 
+    /** 
+     * return false if palette is temporarily disabled
+     */
     public boolean insidePaletteTriggerZone(int jpx, int jpy){
-	// return false if palette is temporarily disabled
-	return (paintPalette && jpx < TRIGGER_ZONE_WIDTH && jpy < TRIGGER_ZONE_HEIGHT);
+	    return (paintPalette && jpx < TRIGGER_ZONE_WIDTH && jpy < TRIGGER_ZONE_HEIGHT);
     }
 
     public boolean isShowing(){
@@ -258,6 +276,41 @@ public class ToolPalette {
 			if (selectedButtons[i].isSensitive()){selectedButtons[i].setSensitivity(false);}
 			if (selectedButtons[i].isVisible()){selectedButtons[i].setVisible(false);}
 		}
+	}
+	
+	HashMap<Short,Plugin> pluginsWithMode;
+	
+	void loadPluginModes(){
+	    Plugin[] plugins = grMngr.cfgMngr.plugins;
+	    Vector<Plugin> pwm = new Vector<Plugin>(plugins.length);
+		for (int i=0;i<plugins.length;i++){
+		    if (plugins[i].hasMode()){
+		        pwm.add(plugins[i]);
+		    }
+		}
+	    if (pwm.isEmpty()){return;}
+	    pluginsWithMode = new HashMap<Short,Plugin>(pwm.size());
+	    
+	    VImage[] nbuttons = new VImage[buttons.length+pwm.size()];
+	    VImage[] nselectedButtons = new VImage[nbuttons.length];
+	    System.arraycopy(buttons, 0, nbuttons, 0, buttons.length);
+	    System.arraycopy(selectedButtons, 0, nselectedButtons, 0, selectedButtons.length);
+	    buttons = nbuttons;
+	    selectedButtons = nselectedButtons;
+	    for (int i=EDIT_MODE+1;i<EDIT_MODE+1+pwm.size();i++){
+	        Plugin p = pwm.elementAt(i-EDIT_MODE-1);
+	        pluginsWithMode.put(new Short((short)i), p);
+			buttons[i] = new VImage(0, -i*VERTICAL_STEP_BETWEEN_ICONS, 0, p.getModeIcon());
+			selectedButtons[i] = new VImage(0, -i*VERTICAL_STEP_BETWEEN_ICONS, 0, p.getModeIcon());
+			paletteSpace.addGlyph(buttons[i]);
+			paletteSpace.addGlyph(selectedButtons[i]);	        
+	    }
+	    // update original trigger zone height
+	    TRIGGER_ZONE_HEIGHT = buttons.length * (VERTICAL_STEP_BETWEEN_ICONS) + 24;
+	}
+	
+	Plugin getPlugin(short index){
+	    return pluginsWithMode.get(new Short(index));
 	}
     
 }
