@@ -74,10 +74,13 @@ public interface Plugin {
      */
     public Image getModeIcon();
     
+    /** Callback triggered when the corresponding icon gets selected in the tool palette.
+     */
     public void enterMode();
     
+    /** Callback triggered when the corresponding icon gets unselected in the tool palette.
+     */
     public void exitMode();
-    
 
 	/** Event triggered when the graph's logical structure has changed. */
 	public static final short NOTIFY_PLUGIN_LOGICAL_STRUCTURE_CHANGED = 0;
