@@ -493,15 +493,16 @@ public class ZGRViewer implements ZGRApplication {
 	static void printCmdLineHelp(){
 		System.out.println("\njava -jar zgrviewer-0.9.0-SNAPSHOT.jar [options] [file]\n");
         System.out.println("[options]");
-        System.out.println("   -opengl             ZVTM will run in OpenGL accelerated mode");
-        System.out.println("                       (requires JDK 1.5 or later)\n");
-        System.out.println("   -Pxxx               where xxx={dot, neato, svg} to specify what program");
-        System.out.println("                       to use to compute the [file]'s layout\n");
-		System.out.println("   -pluginDir=<path>   where <path> is the relative of full path to");
-		System.out.println("                       the directory where to look for plugins");
-		System.out.println("   -pluginList=<paths> where <path> is a list of comma-separated relative");
-		System.out.println("                       to the JAR files that contain plugins");
-		System.out.println("   -pluginList takes precedence over -pluginDir\n");
+        System.out.println("   -opengl                    ZVTM will run in OpenGL accelerated mode");
+        System.out.println("                              (requires JDK 1.5 or later)\n");
+        System.out.println("   -Pxxx                      where xxx={dot, neato, svg} to specify what program");
+        System.out.println("                              to use to compute the [file]'s layout\n");
+		System.out.println("   -pluginDir=<path>          where <path> is the relative of full path to");
+		System.out.println("                              the directory where to look for plugins");
+		System.out.println("   -pluginList=<paths>        where <path> is a list of comma-separated relative");
+		System.out.println("                              to the JAR files that contain plugins");
+		System.out.println("   -pluginList                takes precedence over -pluginDir\n");
+		System.out.println("   -pluginMode=<PluginClass>  plugin mode enabled by default in tool palette\n");
         System.out.println("[file]                 can be a relative or full path ; use the native OS path syntax\n\n");
 	}
 
@@ -527,6 +528,9 @@ public class ZGRViewer implements ZGRApplication {
 				}
 				else if (args[i].startsWith("-pluginList=")){
 					ConfigManager.setPlugInJARs(args[i].substring(12).split(","));
+				}
+				else if (args[i].startsWith("-pluginMode=")){
+					ToolPalette.setDefaultPluginMode(args[i].substring(12));
 				}
             }
             else {

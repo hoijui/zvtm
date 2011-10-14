@@ -73,7 +73,8 @@ public class ToolPalette {
 	ToolPalette(GraphicsManager gm){
 		this.grMngr = gm;
 		initZVTMelements();
-        loadPluginModes();		
+        loadPluginModes();
+        selectDefaultMode();
 	}
     
     void initZVTMelements(){
@@ -90,7 +91,19 @@ public class ToolPalette {
 			paletteSpace.addGlyph(buttons[i]);
 			paletteSpace.addGlyph(selectedButtons[i]);
 		}
-		selectButton(buttons[0]);
+	}
+	
+	void selectDefaultMode(){
+	    if (defaultPluginModeClassName != null && pluginsWithMode != null && pluginsWithMode.size() > 0){
+            for (Short index:pluginsWithMode.keySet()){
+                Plugin p = pluginsWithMode.get(index);
+                if (p.getClass().getName().equals(defaultPluginModeClassName)){
+                    selectButton(buttons[index.shortValue()]);
+                    return;
+                }
+            }
+	    }
+	    selectButton(buttons[0]);	        
 	}
     
     public void setEnabled(boolean b){
@@ -278,6 +291,11 @@ public class ToolPalette {
 		}
 	}
 	
+	static String defaultPluginModeClassName = null;
+	static void setDefaultPluginMode(String pluginClassName){
+	    defaultPluginModeClassName = pluginClassName;
+	}
+	
 	HashMap<Short,Plugin> pluginsWithMode;
 	
 	void loadPluginModes(){
@@ -290,7 +308,6 @@ public class ToolPalette {
 		}
 	    if (pwm.isEmpty()){return;}
 	    pluginsWithMode = new HashMap<Short,Plugin>(pwm.size());
-	    
 	    VImage[] nbuttons = new VImage[buttons.length+pwm.size()];
 	    VImage[] nselectedButtons = new VImage[nbuttons.length];
 	    System.arraycopy(buttons, 0, nbuttons, 0, buttons.length);
