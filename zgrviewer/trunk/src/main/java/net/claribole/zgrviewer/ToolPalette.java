@@ -185,6 +185,7 @@ public class ToolPalette {
             else if (oldSelectedIconIndex == STD_NAV_MODE){
                 grMngr.activateDynaSpot(false, false);
             }
+            // init new mode
             if (selectedIconIndex == BRING_AND_GO_MODE){
                 grMngr.enterBringAndGoMode();
             }
@@ -197,7 +198,7 @@ public class ToolPalette {
             else if (oldSelectedIconIndex == EDIT_MODE){
                 grMngr.geom.clearSplineEditingGlyphs();
             }
-            else if (oldSelectedIconIndex > EDIT_MODE){
+            if (oldSelectedIconIndex > EDIT_MODE){
                 // a plugin mode, notify the plugin
                 getPlugin(oldSelectedIconIndex).exitMode();
             }
