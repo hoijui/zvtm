@@ -9,8 +9,10 @@
 package net.claribole.zgrviewer;
 
 import java.awt.Cursor;
+import java.awt.BasicStroke;
 import java.awt.geom.Point2D;
 import javax.swing.ImageIcon;
+
 import java.util.Vector;
 import java.util.HashMap;
 
@@ -48,15 +50,6 @@ public class ToolPalette {
 					"/images/ls24b.png",
 					"/images/edit24b.png"};
 
-    static final String[] SELECTED_ICON_PATHS = {"/images/stdnav24g.png",
-						 "/images/flnav24g.png",
-						 "/images/dmnav24g.png",
-						 "/images/plnav24g.png",
-						 "/images/hl24g.png",
-						 "/images/fl24g.png",
-						 "/images/ls24g.png",
- 						 "/images/edit24g.png"};
-
     VImage[] buttons;
     VImage[] selectedButtons;
     static final int VERTICAL_STEP_BETWEEN_ICONS = 30;
@@ -82,14 +75,10 @@ public class ToolPalette {
 		paletteCamera = paletteSpace.addCamera();
 		paletteCamera.setAltitude(0);
 		buttons = new VImage[ICON_PATHS.length];
-		selectedButtons = new VImage[ICON_PATHS.length];
 		for (int i=0;i<buttons.length;i++){
 			buttons[i] = new VImage(0, -i*VERTICAL_STEP_BETWEEN_ICONS, 0,
 				(new ImageIcon(this.getClass().getResource(ICON_PATHS[i]))).getImage());
-			selectedButtons[i] = new VImage(0, -i*VERTICAL_STEP_BETWEEN_ICONS, 0,
-				(new ImageIcon(this.getClass().getResource(SELECTED_ICON_PATHS[i]))).getImage());
 			paletteSpace.addGlyph(buttons[i]);
-			paletteSpace.addGlyph(selectedButtons[i]);
 		}
 	}
 	
@@ -151,31 +140,24 @@ public class ToolPalette {
         return selectedIconIndex;
     }
 
+    static final BasicStroke SB_STROKE = new BasicStroke(2f);
+    static final BasicStroke DB_STROKE = new BasicStroke(1f);
+
     public void selectButton(VImage icon){
         boolean newIconSelected = false;
         short oldSelectedIconIndex = selectedIconIndex;
         for (short i=0;i<buttons.length;i++){
-            // only try to find it in the list of unselected buttons
-            if (buttons[i] == icon){
-                // this way we are sure it is not the one already selected
-                paletteSpace.show(selectedButtons[i]);
-                paletteSpace.hide(buttons[i]);
+            if (buttons[i] == icon && i != selectedIconIndex){
+                buttons[i].setStroke(SB_STROKE);
+                if (selectedIconIndex >= 0){buttons[selectedIconIndex].setStroke(DB_STROKE);}
                 selectedIconIndex = i;
                 newIconSelected = true;
+                break;
             }
         }
         if (newIconSelected){
             // if a new button has been selected,
-            for (int i=0;i<selectedIconIndex;i++){
-                // unselect other buttons
-                paletteSpace.hide(selectedButtons[i]);
-                paletteSpace.show(buttons[i]);
-            }
-            for (int i=selectedIconIndex+1;i<buttons.length;i++){
-                paletteSpace.hide(selectedButtons[i]);
-                paletteSpace.show(buttons[i]);
-            }
-            // and discard resources associated with old mode
+            // discard resources associated with old mode
             if (oldSelectedIconIndex == DM_NAV_MODE){
                 grMngr.killDM();
             }
@@ -216,7 +198,6 @@ public class ToolPalette {
 		if (paintPalette == b){return;}
 		for (int i=0;i<buttons.length;i++){
 			buttons[i].setVisible(b);
-			selectedButtons[i].setVisible(b);
 		}
 		paintPalette = b;
 	}
@@ -225,7 +206,6 @@ public class ToolPalette {
 		double[] wnes = grMngr.mainView.getVisibleRegion(paletteCamera);
 		for (int i=0;i<buttons.length;i++){
 			buttons[i].moveTo(wnes[0]-buttons[i].getWidth()/2+1, wnes[1]-(i+1)*VERTICAL_STEP_BETWEEN_ICONS);
-			selectedButtons[i].moveTo(wnes[0]-buttons[i].getWidth()/2+1, wnes[1]-(i+1)*VERTICAL_STEP_BETWEEN_ICONS);
 		}
 		displayPalette(true);
 	}
@@ -273,8 +253,6 @@ public class ToolPalette {
         for (int i=4;i<=6;i++){
             if (!buttons[i].isSensitive()){buttons[i].setSensitivity(true);}
             if (!buttons[i].isVisible()){buttons[i].setVisible(true);}
-            if (!selectedButtons[i].isSensitive()){selectedButtons[i].setSensitivity(true);}
-            if (!selectedButtons[i].isVisible()){selectedButtons[i].setVisible(true);}
         }
     }
 
@@ -287,8 +265,6 @@ public class ToolPalette {
 		for (int i=4;i<=6;i++){
 			if (buttons[i].isSensitive()){buttons[i].setSensitivity(false);}
 			if (buttons[i].isVisible()){buttons[i].setVisible(false);}
-			if (selectedButtons[i].isSensitive()){selectedButtons[i].setSensitivity(false);}
-			if (selectedButtons[i].isVisible()){selectedButtons[i].setVisible(false);}
 		}
 	}
 	
@@ -310,18 +286,13 @@ public class ToolPalette {
 	    if (pwm.isEmpty()){return;}
 	    pluginsWithMode = new HashMap<Short,Plugin>(pwm.size());
 	    VImage[] nbuttons = new VImage[buttons.length+pwm.size()];
-	    VImage[] nselectedButtons = new VImage[nbuttons.length];
 	    System.arraycopy(buttons, 0, nbuttons, 0, buttons.length);
-	    System.arraycopy(selectedButtons, 0, nselectedButtons, 0, selectedButtons.length);
 	    buttons = nbuttons;
-	    selectedButtons = nselectedButtons;
 	    for (int i=EDIT_MODE+1;i<EDIT_MODE+1+pwm.size();i++){
 	        Plugin p = pwm.elementAt(i-EDIT_MODE-1);
 	        pluginsWithMode.put(new Short((short)i), p);
 			buttons[i] = new VImage(0, -i*VERTICAL_STEP_BETWEEN_ICONS, 0, p.getModeIcon());
-			selectedButtons[i] = new VImage(0, -i*VERTICAL_STEP_BETWEEN_ICONS, 0, p.getModeIcon());
 			paletteSpace.addGlyph(buttons[i]);
-			paletteSpace.addGlyph(selectedButtons[i]);	        
 	    }
 	    // update original trigger zone height
 	    TRIGGER_ZONE_HEIGHT = buttons.length * (VERTICAL_STEP_BETWEEN_ICONS) + 24;
