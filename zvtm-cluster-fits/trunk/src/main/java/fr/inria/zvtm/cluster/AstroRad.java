@@ -21,6 +21,7 @@ import fr.inria.vit.point.PointListener;
 
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.Location;
+import fr.inria.zvtm.engine.SwingWorker;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.VirtualSpace;
@@ -112,6 +113,7 @@ public class AstroRad {
         ArrayList<Camera> imgCamList = new ArrayList<Camera>();
         imgCamList.add(imageCamera);
         imgCamList.add(symbolCamera);
+        imgCamList.add(detailCamera);
         ArrayList<Camera> controlCamList = new ArrayList<Camera>();
         controlCamList.add(controlCamera);
         Vector<Camera> cameras = new Vector<Camera>();
@@ -181,7 +183,6 @@ public class AstroRad {
                    if(selectedImage != null){
                        Point2D.Double coords = selectedImage.pix2wcs(imgCurPos.x - (selectedImage.vx - (selectedImage.getWidth()/2)), imgCurPos.y - (selectedImage.vy - (selectedImage.getHeight()/2)));
                        wcsCoords.setText(coords == null? "unknown coords" : String.format("%+09.4f %+09.4f", coords.x, coords.y)); 
-
                    }
                }
                public void pressed(boolean pressed){
@@ -444,24 +445,34 @@ public class AstroRad {
                 //compute radius in arcmin
                 Point2D.Double vsExt = selMan.getOuterPoint();
                 Point2D.Double wcsExt = selectedImage.pix2wcs(vsExt.x, vsExt.y);
-                WorldCoords wc = new WorldCoords(wcsCenter.getX(), wcsCenter.getY());
+                final WorldCoords wc = new WorldCoords(wcsCenter.getX(), wcsCenter.getY());
                 WorldCoords wcDummy = new WorldCoords(wcsExt.getX(), wcsExt.getY());
-                int distArcMin = (int)(wc.dist(wcDummy)+1);//make sure the query radius is at least 1arcmin
+                final int distArcMin = (int)(wc.dist(wcDummy)+1);//make sure the query radius is at least 1arcmin
                 //perform catalog query
                 System.err.println("Querying Simbad at " + wc + " with a radius of " + distArcMin + "arcminutes");
                 symbolSpace.removeAllGlyphs();
                 selectedImage.unstickAllGlyphs();
-                //XXX do this asynchronously
-                try{
-                    List<AstroObject> objs = CatQuery.makeSimbadCoordQuery(wc.getRaDeg(), wc.getDecDeg(), distArcMin);
-                    System.err.println("Result size: " + objs.size());
-                    drawSymbols(objs);
-                    for(AstroObject obj: objs){
-                        System.err.println(obj);
+                
+                new SwingWorker(){
+                    @Override public List<AstroObject> construct(){
+                        List<AstroObject> objs = null;
+                        try{
+                            objs = CatQuery.makeSimbadCoordQuery(wc.getRaDeg(), wc.getDecDeg(), distArcMin);
+                        } catch(IOException ioe){
+                            ioe.printStackTrace();
+                        } finally {
+                            return objs;
+                        } 
                     }
-                }catch(IOException ioe){
-                    ioe.printStackTrace();
-                }
+                    @Override public void finished(){
+                        List<AstroObject> objs = (List<AstroObject>)get();
+                        System.err.println("Result size: " + objs.size());
+                        drawSymbols(objs);
+                        for(AstroObject obj: objs){
+                            System.err.println(obj);
+                        }
+                    }
+                }.start();
             }
         }
 
