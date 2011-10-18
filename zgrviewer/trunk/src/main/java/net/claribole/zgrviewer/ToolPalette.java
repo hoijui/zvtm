@@ -277,6 +277,7 @@ public class ToolPalette {
 	
 	void loadPluginModes(){
 	    Plugin[] plugins = grMngr.cfgMngr.plugins;
+	    if (plugins == null){return;}
 	    Vector<Plugin> pwm = new Vector<Plugin>(plugins.length);
 		for (int i=0;i<plugins.length;i++){
 		    if (plugins[i].hasMode()){
