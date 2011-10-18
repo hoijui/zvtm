@@ -345,6 +345,7 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
      *@param jpy y-coordinate of icon's center in JPanel coordinate system
      *@see #hideFirstOrderPanWidget()
      *@see #setFirstOrderPanWidget(Image icon)
+     *@see #isShowingFirstOrderPanWidget()
      */
     public void showFirstOrderPanWidget(int jpx, int jpy){
         fopw_x = jpx - FIRST_ORDER_PAN_WIDGET.getWidth(null)/2;
@@ -356,6 +357,7 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
     /** Hide the icon representing first-order-of-control panning.
      *@see #showFirstOrderPanWidget(int jpx, int jpy)
      *@see #setFirstOrderPanWidget(Image icon)
+     *@see #isShowingFirstOrderPanWidget()
      */
     public void hideFirstOrderPanWidget(){
         sfopw = false;
@@ -365,9 +367,19 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
     /** Set the icon used to represent first-order-of-control panning.
      *@see #showFirstOrderPanWidget(int jpx, int jpy)
      *@see #hideFirstOrderPanWidget()
+     *@see #isShowingFirstOrderPanWidget()
      */
     public void setFirstOrderPanWidget(Image icon){
         FIRST_ORDER_PAN_WIDGET = icon;
+    }
+    
+    /** Is the icon used to represent first-order-of-control panning currently being shown.
+     *@see #showFirstOrderPanWidget(int jpx, int jpy)
+     *@see #hideFirstOrderPanWidget()
+     *@see #setFirstOrderPanWidget(Image icon)
+     */
+    public boolean isShowingFirstOrderPanWidget(){
+        return sfopw;
     }
 
     /**send event to application event handler*/
