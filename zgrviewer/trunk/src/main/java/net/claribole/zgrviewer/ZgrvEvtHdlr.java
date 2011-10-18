@@ -39,13 +39,8 @@ import java.awt.event.MouseWheelEvent;
 public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 
 	protected ZGRViewer application;
-	protected GraphicsManager grMngr;
 
 	protected double mvx, mvy;
-
-	boolean editingSpline = false;
-	boolean movingEdgeLabel = false;
-	boolean movingNode = false;
 
 	protected ZgrvEvtHdlr(ZGRViewer app, GraphicsManager gm){
 		this.application = app;
@@ -80,37 +75,7 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 			grMngr.attemptLinkSliding(LS_SX, LS_SY, location.x, location.y);
 		}
 		else if (grMngr.tp.isEditMode()){
-		    if (g != null){
-		        // moving edge control point
-        	    if (g.getType() != null && g.getType().equals(GeometryEditor.SPLINE_GEOM_EDITOR)){
-                    editingSpline = true;
-                    v.getVCursor().stickGlyph(g);
-                }
-                else {
-                    // moving something else
-                    grMngr.geom.clearSplineEditingGlyphs();
-                    if (g instanceof VText && g.getOwner() != null && g.getOwner() instanceof LEdge){
-                        // moving an edge label
-                        movingEdgeLabel = true;
-                        v.getVCursor().stickGlyph(g);
-                    }
-                    else if (g.getOwner() != null && g.getOwner() instanceof LNode){
-                        // moving a node (label of shape)
-                        movingNode = true;
-                        grMngr.geom.stickNodeComponents(g, (LNode)g.getOwner());
-                        v.getVCursor().stickGlyph(g);
-                    }
-        		    else {
-        		        // might be attempting to edit an edge
-                        attemptEditEdge(v);
-        		    }
-                }
-		    }
-            else {
-                // might be attempting to edit an edge
-                grMngr.geom.clearSplineEditingGlyphs();
-                attemptEditEdge(v);
-            }
+            pressInEditMode(g, v.getVCursor(), grMngr.mainCamera);
 		}
 		else {
 			grMngr.rememberLocation(v.cams[0].getLocation());
@@ -126,7 +91,6 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 				// and if the mouse is not moving, this list is not computed
 				// so here we choose to disable this computation when dragging the mouse with button 3 pressed)
 				v.getVCursor().setSensitivity(false);
-
 				activeCam=grMngr.vsm.getActiveCamera();
 			}
 			else if (mod == ALT_MOD){
@@ -233,6 +197,7 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 	LEdge edge;
 
 	public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+	    // XXXXXXXXXXXXXXX debug / test
 		if (grMngr.tp.isEditMode()){
 			if (startG!=null){
 				endG = v.lastGlyphEntered();
@@ -246,6 +211,7 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 		//else if (mod == ALT_MOD){
 		//	grMngr.removeEdge(edge);
 		//}
+	    // XXXXXXXXXXXXXXX debug / test
 	}
 
 	public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
@@ -581,26 +547,6 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 		if (url!=null && url.length()>0){
 			application.displayURLinBrowser(url);
 		}
-	}
-
-	public void attemptEditEdge(ViewPanel v){
-	    Vector<Glyph> otherGlyphs = v.getVCursor().getPicker().getIntersectingGlyphs(v.cams[0]);
-		if (otherGlyphs != null && otherGlyphs.size() > 0){
-		    for (Glyph eg:otherGlyphs){
-		        if (eg.getOwner() != null && eg.getOwner() instanceof LEdge){
-		            grMngr.geom.editEdgeSpline((LEdge)eg.getOwner());
-		        }
-		    }
-		}
-	}
-
-	/*cancel a speed-dependant autozoom*/
-	protected void unzoom(ViewPanel v){
-		Animation a = grMngr.vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(300, v.cams[0],
-            new Float(application.cfgMngr.autoUnzoomFactor*(v.cams[0].getAltitude()+v.cams[0].getFocal())), true,
-            IdentityInterpolator.getInstance(), null);
-        grMngr.vsm.getAnimationManager().startAnimation(a, false);
-		autoZooming = false;
 	}
 
 }

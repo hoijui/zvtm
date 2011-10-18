@@ -11,11 +11,11 @@ package net.claribole.zgrviewer;
 
 import java.awt.Graphics2D;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Point;
 import java.util.Vector;
 
-//import fr.inria.zvtm.engine.AnimManager;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VCursor;
 import fr.inria.zvtm.engine.View;
@@ -36,7 +36,6 @@ import java.awt.event.MouseWheelEvent;
 public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewListener {
 
     protected ZGRApplet application;
-    protected GraphicsManager grMngr;
 
     protected ZgrAppletEvtHdlr(ZGRApplet app, GraphicsManager gm){
 		this.application=app;
@@ -47,7 +46,7 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewListener {
         if (toolPaletteIsActive){return;}
 		lastJPX = jpx;
 		lastJPY = jpy;
-		Glyph g;
+		Glyph g = v.lastGlyphEntered();
 		if (inZoomWindow){
 			if (grMngr.dmPortal.coordInsideBar(jpx, jpy)){
 				draggingZoomWindow = true;
@@ -70,6 +69,9 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewListener {
 			//LS_SX = v.getVCursor().vx;
 			//LS_SY = v.getVCursor().vy;
 			//grMngr.attemptLinkSliding(LS_SX, LS_SY, location.x, location.y);
+		}
+		else if (grMngr.tp.isEditMode()){
+            pressInEditMode(g, v.getVCursor(), grMngr.mainCamera);
 		}
 		else {
 			grMngr.rememberLocation(v.cams[0].getLocation());
@@ -103,6 +105,15 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewListener {
         if (toolPaletteIsActive){return;}
 		draggingZoomWindow = false;
 		draggingZoomWindowContent = false;
+		if (editingSpline || movingEdgeLabel){
+		    v.getVCursor().unstickLastGlyph();
+    		editingSpline = movingEdgeLabel = false;
+		}
+		else if (movingNode){
+		    v.getVCursor().unstickLastGlyph();
+		    grMngr.geom.unstickAll();
+    		movingNode = false;
+		}
 		if (draggingMagWindow){
 			draggingMagWindow = false;
 			v.getVCursor().unstickLastGlyph();
@@ -153,6 +164,9 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewListener {
             else if (grMngr.tp.isDragMagNavMode()){
                 grMngr.triggerDM(jpx, jpy, this);
             }
+            else if (grMngr.tp.isEditMode()){
+			    return;
+			}
             else {
                 if (clickNumber == 2){click2(v, mod, jpx, jpy, clickNumber, e);}
                 else {
@@ -171,7 +185,7 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewListener {
     }
 
     public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	grMngr.paMngr.requestToolPaletteRelocation();
+	    grMngr.paMngr.requestToolPaletteRelocation();
     }
 
     public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
@@ -188,36 +202,37 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewListener {
     }
 
     public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	if (toolPaletteIsActive){return;}
-	else {
-	    if (grMngr.tp.isFadingLensNavMode() || grMngr.tp.isProbingLensNavMode()){
-		lastJPX = jpx;
-		lastJPY = jpy;
-	    }
-	}
+        if (toolPaletteIsActive){return;}
+        else {
+            if (grMngr.tp.isFadingLensNavMode() || grMngr.tp.isProbingLensNavMode()){
+                lastJPX = jpx;
+                lastJPY = jpy;
+            }
+        }
     }
 
     public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-	if (toolPaletteIsActive){return;}
-	else {
-	    if (grMngr.tp.isFadingLensNavMode() || grMngr.tp.isProbingLensNavMode()){
-		lastJPX = jpx;
-		lastJPY = jpy;
-		lastVX = v.getVCursor().getVSXCoordinate();
-		lastVY = v.getVCursor().getVSYCoordinate();
-		if (grMngr.lensType != GraphicsManager.NO_LENS){
-		    grMngr.zoomOutPhase2();
-		}
-		else {
-		    if (cursorNearBorder){// do not activate the lens when cursor is near the border
-			return;
-		    }
-		    grMngr.zoomOutPhase1(jpx, jpy, lastVX, lastVY);
-		}
-	    }
-	}
+        if (toolPaletteIsActive){return;}
+        else {
+            if (grMngr.tp.isFadingLensNavMode() || grMngr.tp.isProbingLensNavMode()){
+                lastJPX = jpx;
+                lastJPY = jpy;
+                lastVX = v.getVCursor().getVSXCoordinate();
+                lastVY = v.getVCursor().getVSYCoordinate();
+                if (grMngr.lensType != GraphicsManager.NO_LENS){
+                    grMngr.zoomOutPhase2();
+                }
+                else {
+                    if (cursorNearBorder){
+                        // do not activate the lens when cursor is near the border
+                        return;
+                    }
+                    grMngr.zoomOutPhase1(jpx, jpy, lastVX, lastVY);
+                }
+            }
+        }
     }
 
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
@@ -262,6 +277,13 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewListener {
 		//	// ignore events triggered by AWT robot
 		//	grMngr.linkSlider(v.getVCursor().vx, v.getVCursor().vy, false);
 		//}
+		if (editingSpline){
+		    grMngr.geom.updateEdgeSpline();
+		}
+		else if (movingEdgeLabel || movingNode){
+		    // do nothing but prevent exec of else
+		    return;
+		}
         else if (mod != ALT_MOD && buttonNumber == 1){
             if (draggingZoomWindow){
                 grMngr.dmPortal.move(jpx-lastJPX, jpy-lastJPY);
@@ -352,38 +374,41 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewListener {
     }
 
     public void enterGlyph(Glyph g){
-	grMngr.mainView.setStatusBarText(Messages.SPACE_STRING);
-	if (g == grMngr.magWindow){
-	    inMagWindow = true;
-	    return;
-	}
-	if (g == grMngr.boundingBox){return;} // do not highlight graph's bounding box
-	if (grMngr.tp.isHighlightMode()){
-	    grMngr.highlightElement(g, null, null, true); // g is guaranteed to be != null, don't care about camera and cursor
-	}
-//	else if (grMngr.tp.isFresnelMode()){
-//	    grMngr.fresnelizeNode(g);
-//	}
-	else {// node highlighting is taken care of above (in a slightly different manner)
-	    g.highlight(true, null);
-	}
+        grMngr.mainView.setStatusBarText(Messages.SPACE_STRING);
+        if (g == grMngr.magWindow){
+            inMagWindow = true;
+            return;
+        }
+        if (g == grMngr.boundingBox){return;} // do not highlight graph's bounding box
+        if (g.getType() != null && g.getType().equals(GeometryEditor.SPLINE_GEOM_EDITOR)){
+	        grMngr.mainView.setCursorIcon(Cursor.MOVE_CURSOR);
+	    }
+        else if (grMngr.tp.isHighlightMode()){
+            grMngr.highlightElement(g, null, null, true); // g is guaranteed to be != null, don't care about camera and cursor
+        }
+        else {
+            // node highlighting is taken care of above (in a slightly different manner)
+            g.highlight(true, null);
+        }
     }
 
     public void exitGlyph(Glyph g){
-	if (g == grMngr.magWindow){
-	    inMagWindow = false;
-	    return;
-	}
-	if (g == grMngr.boundingBox){return;} // do not highlight graph's bounding box
-	if (application.grMngr.tp.isHighlightMode()){
-	    grMngr.unhighlightAll();
-	}
-//	else if (grMngr.tp.isFresnelMode()){
-//	    grMngr.unfresnelizeNodes();
-//	}
-	else {// node highlighting is taken care of above (in a slightly different manner)
-	    g.highlight(false, null);
-	}
+        if (g == grMngr.magWindow){
+            inMagWindow = false;
+            return;
+        }
+        // do not highlight graph's bounding box
+        if (g == grMngr.boundingBox){return;}
+        if (g.getType() != null && g.getType().equals(GeometryEditor.SPLINE_GEOM_EDITOR)){
+	        grMngr.mainView.setCursorIcon(Cursor.CUSTOM_CURSOR);
+	    }
+        else if (application.grMngr.tp.isHighlightMode()){
+            grMngr.unhighlightAll();
+        }
+        else {
+            // node highlighting is taken care of above (in a slightly different manner)
+            g.highlight(false, null);
+        }
     }
 
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){
@@ -422,15 +447,6 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewListener {
         if (url!=null && url.length()>0){
             application.displayURLinBrowser(url);
         }
-    }
-
-    /*cancel a speed-dependant autozoom*/
-    protected void unzoom(ViewPanel v){
-        Animation a = grMngr.vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(300, v.cams[0],
-            new Float(application.cfgMngr.autoUnzoomFactor*(v.cams[0].getAltitude()+v.cams[0].getFocal())), true,
-            IdentityInterpolator.getInstance(), null);
-        grMngr.vsm.getAnimationManager().startAnimation(a, false);
-        autoZooming = false;
     }
 
 }
