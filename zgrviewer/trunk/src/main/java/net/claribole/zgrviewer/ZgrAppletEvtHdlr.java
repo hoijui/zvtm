@@ -304,15 +304,17 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewListener {
             else if (draggingMagWindow){
                 grMngr.updateZoomWindow();
             }
-            else {
-                tfactor=(activeCam.focal+Math.abs(activeCam.altitude))/activeCam.focal;
+			else if (manualLeftButtonMove){
+			    if (!v.isShowingFirstOrderPanWidget()){
+    			    v.showFirstOrderPanWidget(lastJPX, lastJPY);			        
+			    }
                 if (mod == SHIFT_MOD || mod == META_SHIFT_MOD){
                     grMngr.mainCamera.setXspeed(0);
                     grMngr.mainCamera.setYspeed(0);
                     grMngr.mainCamera.setZspeed((lastJPY-jpy)*ZOOM_SPEED_COEF);
-                    //50 is just a speed factor (too fast otherwise)
                 }
                 else {
+                    tfactor=(activeCam.focal+Math.abs(activeCam.altitude))/activeCam.focal;
                     jpxD = jpx-lastJPX;
                     jpyD = lastJPY-jpy;
                     grMngr.mainCamera.setXspeed((activeCam.altitude>0) ? jpxD*(tfactor/PAN_SPEED_FACTOR) : jpxD/(tfactor*PAN_SPEED_FACTOR));
