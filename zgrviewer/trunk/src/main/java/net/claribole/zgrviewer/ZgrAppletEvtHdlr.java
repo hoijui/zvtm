@@ -362,16 +362,24 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewListener {
         }
         else {
             tfactor = (grMngr.mainCamera.focal+Math.abs(grMngr.mainCamera.altitude))/grMngr.mainCamera.focal;
-            if (wheelDirection == WHEEL_UP){
-                // zooming out
-                grMngr.mainCamera.altitudeOffset(tfactor*WHEEL_ZOOMOUT_FACTOR);
-                grMngr.cameraMoved(null, null, 0);
-            }
-            else {
-                // wheelDirection == WHEEL_DOWN, zooming in
-                grMngr.mainCamera.altitudeOffset(-tfactor*WHEEL_ZOOMIN_FACTOR);
-                grMngr.cameraMoved(null, null, 0);
-            }
+			mvx = v.getVCursor().getVSXCoordinate();
+			mvy = v.getVCursor().getVSYCoordinate();
+			if (wheelDirection == WHEEL_UP){
+				// zooming out
+				grMngr.mainCamera.vx -= Math.round((mvx - grMngr.mainCamera.vx) * WHEEL_ZOOMOUT_FACTOR / grMngr.mainCamera.focal);
+				grMngr.mainCamera.vy -= Math.round((mvy - grMngr.mainCamera.vy) * WHEEL_ZOOMOUT_FACTOR / grMngr.mainCamera.focal);
+				grMngr.mainCamera.altitudeOffset(tfactor*WHEEL_ZOOMOUT_FACTOR);
+				grMngr.cameraMoved(null, null, 0);
+			}
+			else {
+				// wheelDirection == WHEEL_DOWN, zooming in
+				if (grMngr.mainCamera.getAltitude() > -90){
+					grMngr.mainCamera.vx += Math.round((mvx - grMngr.mainCamera.vx) * WHEEL_ZOOMIN_FACTOR / grMngr.mainCamera.focal);
+					grMngr.mainCamera.vy += Math.round((mvy - grMngr.mainCamera.vy) * WHEEL_ZOOMIN_FACTOR / grMngr.mainCamera.focal);
+				}
+				grMngr.mainCamera.altitudeOffset(-tfactor*WHEEL_ZOOMIN_FACTOR);
+				grMngr.cameraMoved(null, null, 0);
+			}
         }
     }
 

@@ -40,8 +40,6 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 
 	protected ZGRViewer application;
 
-	protected double mvx, mvy;
-
 	protected ZgrvEvtHdlr(ZGRViewer app, GraphicsManager gm){
 		this.application = app;
 		this.grMngr = gm;

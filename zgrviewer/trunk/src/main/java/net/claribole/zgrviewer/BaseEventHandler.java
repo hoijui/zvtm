@@ -45,6 +45,8 @@ public abstract class BaseEventHandler implements PortalListener {
     protected double tfactor;
     // remember last mouse coords to display selection rectangle (dragging)
     protected double x1,y1,x2,y2;
+
+	protected double mvx, mvy;
     
     // lens optimization
     protected int lx, ly;
