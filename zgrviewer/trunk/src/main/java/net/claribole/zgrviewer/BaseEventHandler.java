@@ -18,6 +18,7 @@ import fr.inria.zvtm.engine.VCursor;
 import fr.inria.zvtm.engine.portals.Portal;
 import fr.inria.zvtm.event.PortalListener;
 import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.glyphs.ClosedShape;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.glyphs.VSegment;
 import fr.inria.zvtm.animation.Animation;
@@ -74,7 +75,7 @@ public abstract class BaseEventHandler implements PortalListener {
 
     /* Edit mode */
 	boolean editingSpline = false;
-	boolean movingEdgeLabel = false;
+	boolean movingEdgeLabelOrBox = false;
 	boolean movingNode = false;
 
     /**cursor enters portal*/
@@ -106,7 +107,7 @@ public abstract class BaseEventHandler implements PortalListener {
                 grMngr.geom.clearSplineEditingGlyphs();
                 if (g instanceof VText && g.getOwner() != null && g.getOwner() instanceof LEdge){
                     // moving an edge label
-                    movingEdgeLabel = true;
+                    movingEdgeLabelOrBox = true;
                     c.stickGlyph(g);
                 }
                 else if (g.getOwner() != null && g.getOwner() instanceof LNode){
@@ -114,6 +115,10 @@ public abstract class BaseEventHandler implements PortalListener {
                     movingNode = true;
                     grMngr.geom.stickNodeComponents(g, (LNode)g.getOwner());
                     c.stickGlyph(g);
+                }
+                else if (g instanceof ClosedShape){
+                    movingEdgeLabelOrBox = true;
+                    c.stickGlyph(g);                    
                 }
     		    else {
     		        // might be attempting to edit an edge

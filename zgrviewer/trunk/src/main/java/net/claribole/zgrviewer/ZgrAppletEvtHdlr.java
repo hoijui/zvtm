@@ -105,9 +105,9 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewListener {
         if (toolPaletteIsActive){return;}
 		draggingZoomWindow = false;
 		draggingZoomWindowContent = false;
-		if (editingSpline || movingEdgeLabel){
+		if (editingSpline || movingEdgeLabelOrBox){
 		    v.getVCursor().unstickLastGlyph();
-    		editingSpline = movingEdgeLabel = false;
+    		editingSpline = movingEdgeLabelOrBox = false;
 		}
 		else if (movingNode){
 		    v.getVCursor().unstickLastGlyph();
@@ -280,7 +280,7 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewListener {
 		if (editingSpline){
 		    grMngr.geom.updateEdgeSpline();
 		}
-		else if (movingEdgeLabel || movingNode){
+		else if (movingEdgeLabelOrBox || movingNode){
 		    // do nothing but prevent exec of else
 		    return;
 		}
