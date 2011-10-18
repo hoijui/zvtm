@@ -108,7 +108,7 @@ public class ConfigManager {
     /*magnification factor when centering on a glyph - 1.0 (default) means that
       the glyph will occupy the whole screen. mFactor < 1 will make the glyph
       smaller (zoom out). mFactor > 1 will make the glyph appear bigger (zoom in)*/
-    public static float MAG_FACTOR = 2.0f;
+    public static float MAG_FACTOR = .5f;
 
     /*External (platform-dependant) browser*/
     //a class to access a platform-specific web browser (not initialized at startup, but only on demand)
