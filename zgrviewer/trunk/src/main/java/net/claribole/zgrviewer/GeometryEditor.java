@@ -52,13 +52,11 @@ public class GeometryEditor {
         // show glyphs for editing control points
         currentEditPointGlyphs = new SICircle[currentEditPoints.length];
         currentEditSegments = new VSegment[currentEditPointGlyphs.length-1];
-        currentEditPointGlyphs[0] = new SICircle(currentEditPoints[0].x, currentEditPoints[0].y, 100, 6, Color.DARK_GRAY, Color.DARK_GRAY, .8f);
+        currentEditPointGlyphs[0] = new SICircle(currentEditPoints[0].x, currentEditPoints[0].y, 100, 6, Color.DARK_GRAY, Color.LIGHT_GRAY, .8f);
         currentEditPointGlyphs[0].setType(SPLINE_GEOM_EDITOR);
-        currentEditPointGlyphs[0].setDrawBorder(false);
         for (int i=1;i<currentEditPoints.length;i++){
-            currentEditPointGlyphs[i] = new SICircle(currentEditPoints[i].x, currentEditPoints[i].y, 100, 6, Color.DARK_GRAY, Color.DARK_GRAY, .8f);
+            currentEditPointGlyphs[i] = new SICircle(currentEditPoints[i].x, currentEditPoints[i].y, 100, 6, Color.DARK_GRAY, Color.LIGHT_GRAY, .8f);
             currentEditPointGlyphs[i].setType(SPLINE_GEOM_EDITOR);
-            currentEditPointGlyphs[i].setDrawBorder(false);
             currentEditSegments[i-1] = new VSegment(currentEditPoints[i-1].x, currentEditPoints[i-1].y, currentEditPoints[i].x, currentEditPoints[i].y, 99, Color.RED, .6f);
         }
         grMngr.mSpace.addGlyphs(currentEditSegments, false);
@@ -77,8 +75,10 @@ public class GeometryEditor {
         
         double theta = Math.atan2(currentEditPoints[currentEditPoints.length-1].y-currentEditPoints[currentEditPoints.length-2].y,
                                   currentEditPoints[currentEditPoints.length-1].x-currentEditPoints[currentEditPoints.length-2].x);
-        ((LEdge)currentEditSpline.getOwner()).getArrowHead().orientTo(theta);
-        
+        ClosedShape arrowHead = ((LEdge)currentEditSpline.getOwner()).getArrowHead();
+        arrowHead.orientTo(theta);
+        // assuming that arrow head is associated with last control point of edge (won't work for arrows located at the tail of an edge)
+        arrowHead.moveTo(currentEditPoints[currentEditPoints.length-1].x, currentEditPoints[currentEditPoints.length-1].y);
     }
     
     void clearSplineEditingGlyphs(){
