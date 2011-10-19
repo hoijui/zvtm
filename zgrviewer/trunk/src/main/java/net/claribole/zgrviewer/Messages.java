@@ -11,6 +11,8 @@ package net.claribole.zgrviewer;
 
 import java.awt.geom.Point2D;
 
+import java.util.Scanner;
+
 public class Messages {
     
     /*warning, error, help and other messages*/
@@ -20,8 +22,17 @@ public class Messages {
     public static final String pngOnlyIn140FirstPart="This functionality is only available when running ZGRViewer using a JVM version 1.4.0 or later (it requires the ImageIO API).\nZGRViewer detected JVM version ";
     
     public static final String pngOnlyIn140SecondPart="\nDo you want to proceed anyway (this will probably cause an error)?";
-
-    public static final String VERSION = "0.9.0-SNAPSHOT";
+        
+    public static String VERSION;
+	static {
+	    Scanner sc = new Scanner(Messages.class.getResourceAsStream("/properties")).useDelimiter("\\s*=\\s*");
+        while (sc.hasNext()){
+            String token = sc.next();
+            if (token.equals("version")){
+                Messages.VERSION = sc.next();
+            }
+        }
+	}
 
     public static final String about = "ZGRViewer " + VERSION + "\n\nA Visualization Tool for GraphViz based on ZVTM\nhttp://zvtm.sourceforge.net/zgrviewer.html\n\nWritten by Emmanuel Pietriga\n(INRIA project In Situ)\nemmanuel.pietriga@inria.fr";
 
