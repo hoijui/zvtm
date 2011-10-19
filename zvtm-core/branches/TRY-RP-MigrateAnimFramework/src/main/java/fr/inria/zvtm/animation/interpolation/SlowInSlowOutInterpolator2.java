@@ -10,7 +10,7 @@ package fr.inria.zvtm.animation.interpolation;
 
 import net.jcip.annotations.*;
 
-import org.jdesktop.animation.timing.interpolation.Interpolator;
+import org.jdesktop.core.animation.timing.Interpolator;
 
 /**
  * A class that implements a more pronounced slow in, slow out interpolation, as was available in the old animation engine of 0.9.x.

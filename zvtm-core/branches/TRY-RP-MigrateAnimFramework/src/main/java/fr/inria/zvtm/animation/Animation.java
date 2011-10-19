@@ -9,10 +9,10 @@ package fr.inria.zvtm.animation;
 
 import net.jcip.annotations.*;
 
-import org.jdesktop.animation.timing.interpolation.Interpolator;
-import org.jdesktop.animation.timing.Animator;
-import org.jdesktop.animation.timing.TimingSource;
-import org.jdesktop.animation.timing.TimingTarget;
+import org.jdesktop.core.animation.timing.Interpolator;
+import org.jdesktop.core.animation.timing.Animator;
+import org.jdesktop.core.animation.timing.TimingSource;
+import org.jdesktop.core.animation.timing.TimingTarget;
 
 /**
  * This class represents an animation.

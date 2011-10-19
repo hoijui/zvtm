@@ -21,7 +21,7 @@ import fr.inria.zvtm.glyphs.*;
 import fr.inria.zvtm.event.*;
 import fr.inria.zvtm.animation.*;
 import fr.inria.zvtm.animation.interpolation.*;
-import org.jdesktop.animation.timing.interpolation.*;
+import org.jdesktop.core.animation.timing.interpolators.*;
 
 // Click handler that animates the Camera to a new position.
 // Left-click in the view to move the camera.

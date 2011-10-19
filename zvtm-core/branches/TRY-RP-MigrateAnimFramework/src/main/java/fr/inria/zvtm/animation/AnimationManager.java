@@ -21,9 +21,9 @@ import javax.swing.Timer;
 
 import net.jcip.annotations.*;
 
-import org.jdesktop.animation.timing.Animator;
-import org.jdesktop.animation.timing.interpolation.Interpolator;
-import org.jdesktop.animation.timing.TimingSource;
+import org.jdesktop.core.animation.timing.Animator;
+import org.jdesktop.core.animation.timing.Interpolator;
+import org.jdesktop.core.animation.timing.TimingSource;
 
 //for active Camera animation
 import fr.inria.zvtm.engine.VirtualSpaceManager;

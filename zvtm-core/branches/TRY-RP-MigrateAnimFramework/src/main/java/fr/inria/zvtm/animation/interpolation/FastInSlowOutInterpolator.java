@@ -9,8 +9,8 @@ package fr.inria.zvtm.animation.interpolation;
 
 import net.jcip.annotations.*;
 
-import org.jdesktop.animation.timing.interpolation.Interpolator;
-import org.jdesktop.animation.timing.interpolation.SplineInterpolator;
+import org.jdesktop.core.animation.timing.Interpolator;
+import org.jdesktop.core.animation.timing.interpolators.SplineInterpolator;
 
 /**
  * A class that implements fast in, slow out interpolation.

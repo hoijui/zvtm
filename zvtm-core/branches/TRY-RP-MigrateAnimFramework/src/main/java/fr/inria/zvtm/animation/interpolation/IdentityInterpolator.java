@@ -9,8 +9,8 @@ package fr.inria.zvtm.animation.interpolation;
 
 import net.jcip.annotations.*;
 
-import org.jdesktop.animation.timing.interpolation.Interpolator;
-import org.jdesktop.animation.timing.interpolation.LinearInterpolator;
+import org.jdesktop.core.animation.timing.Interpolator;
+import org.jdesktop.core.animation.timing.interpolators.LinearInterpolator;
 
 /**
  * A class that implements an identity ('no-op') interpolation.

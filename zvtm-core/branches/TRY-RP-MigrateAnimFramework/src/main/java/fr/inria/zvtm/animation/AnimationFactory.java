@@ -12,7 +12,7 @@ import java.awt.geom.Point2D;
 
 import net.jcip.annotations.*;
 
-import org.jdesktop.animation.timing.interpolation.Interpolator;
+import org.jdesktop.core.animation.timing.Interpolator;
 
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.glyphs.Glyph;
