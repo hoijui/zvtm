@@ -26,6 +26,7 @@ import javax.swing.BorderFactory;
 import java.util.Vector;
 
 import fr.inria.zvtm.engine.View;
+import fr.inria.zvtm.event.RepaintAdapter;
 
 /* Navigation Panel (directional arrows, plus zoom) */
 
@@ -98,14 +99,22 @@ class NavPanel extends JPanel implements ActionListener, ChangeListener {
             grMngr.rView.setListener(grMngr.reh, 1);
             grMngr.rView.setActiveLayer(1);
             grMngr.rView.setCursorIcon(java.awt.Cursor.MOVE_CURSOR);
-            grMngr.rView.getGlobalView(grMngr.mSpace.getCamera(1),100);
-            System.out.println("a");
             grMngr.cameraMoved(null, null, 0);
             borderPanel.add(ovPanel, BorderLayout.CENTER);
             buildConstraints(constraints, 0, gncl_i++, 1, 1, 100, 64);
             gridBag.setConstraints(borderPanel, constraints);
             this.add(borderPanel);
-            System.out.println("b"+grMngr.mSpace.getCamera(1).getLocation());
+            
+            grMngr.rView.repaint(new RepaintAdapter(){
+                                    public void	viewRepainted(View v){
+                                        v.getGlobalView(grMngr.mSpace.getCamera(1), 100);
+                                        v.removeRepaintListener();
+                                    }
+                                });
+            //grMngr.rView.getGlobalView(grMngr.mSpace.getCamera(1), 100);
+            
+            
+            
         }
         constraints.fill = GridBagConstraints.NONE;
         //translation buttons in a 3x3 grid
