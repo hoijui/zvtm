@@ -81,6 +81,11 @@ public interface Plugin {
     /** Callback triggered when the corresponding icon gets unselected in the tool palette.
      */
     public void exitMode();
+    
+    /** Get the list of built-in modes this plugin would like to disable.
+     *@return a list of modes to be disabled. null or an empty array if not disabling any mode.
+     */
+    public String[] getDisabledModes();
 
 	/** Event triggered when the graph's logical structure has changed. */
 	public static final short NOTIFY_PLUGIN_LOGICAL_STRUCTURE_CHANGED = 0;

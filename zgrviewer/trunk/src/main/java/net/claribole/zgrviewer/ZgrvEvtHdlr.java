@@ -140,7 +140,7 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 
 	public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
 		if (toolPaletteIsActive){
-			if (v.lastGlyphEntered() != null){grMngr.tp.selectButton((VImage)v.lastGlyphEntered());}
+			if (v.lastGlyphEntered() != null){grMngr.tp.selectMode((VImage)v.lastGlyphEntered());}
 		}
 		else {
 			if (grMngr.tp.isBringAndGoMode()){return;}
