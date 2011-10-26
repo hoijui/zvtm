@@ -14,7 +14,7 @@ import fr.inria.zvtm.glyphs.VText;
  * Implementation of a linear menu.
  */
 public class Menu {
-    protected static final double DEFAULT_WIDTH = 200;
+    protected double width = 200;
     protected static final double DEFAULT_ITEM_HEIGHT = 25;
     protected static final Color MENU_BGCOLOR=new Color(70, 70, 70);
     protected static final Color MENU_HCOLOR=new Color(120,120,120);
@@ -56,6 +56,25 @@ public class Menu {
     }
 
     /**
+     * Returns the width of the menu, in virtual space units.
+     */
+    public double getWidth(){
+        return width;
+    }
+
+    /**
+     * Sets the width of the menu.
+     * @param width new width of the menu, in virtualspace units
+     * @throws IllegalArgumentException if <code>width</code> is less than or equal to 0.
+     */
+    public void setWidth(double width){
+        if(width <= 0){
+            throw new IllegalArgumentException("setWidth: positive value expected");
+        }
+        this.width = width;
+    }
+
+    /**
      * Override this method if you need to customize menu labels
      * (e.g. set color...)
      */
@@ -75,11 +94,11 @@ public class Menu {
         double ypos = coords.getY();
         for(MenuItem item: items){
             PRectangle menuBox = new PRectangle(xpos, ypos, 0, 
-                    DEFAULT_WIDTH, DEFAULT_ITEM_HEIGHT, 
-                    Utils.makeDiagGradient((float)DEFAULT_WIDTH, 
+                    width, DEFAULT_ITEM_HEIGHT, 
+                    Utils.makeDiagGradient((float)width, 
                         (float)DEFAULT_ITEM_HEIGHT, MENU_BGCOLOR));
             menuBox.setCursorInsidePaint(Utils.makeDiagGradient(
-                        (float)DEFAULT_WIDTH, (float)DEFAULT_ITEM_HEIGHT,
+                        (float)width, (float)DEFAULT_ITEM_HEIGHT,
                         MENU_HCOLOR));
             menuBox.setType(MENU_BOX_TYPE);
             menuBox.setOwner(item);
