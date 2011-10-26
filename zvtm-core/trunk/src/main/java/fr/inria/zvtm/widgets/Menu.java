@@ -68,6 +68,7 @@ public class Menu {
 
     /**
      * Builds a menu from the given items.
+     * @param coords coordinates of the topmost menu item, in virtual space units.
      */
     public void populate(List<MenuItem> items, Point2D.Double coords){
         double xpos = coords.getX();
