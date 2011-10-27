@@ -55,7 +55,7 @@ public abstract class AgileViewPanel extends ViewPanel implements GLEventListene
     
     public void init(GLAutoDrawable drawable){
         // Called by the drawable immediately after the OpenGL context is initialized.
-        jgraphics = new AgileGraphics2D(drawable);
+        jgraphics = AgileGraphics2D.getInstance(drawable);
         GL2 gl = drawable.getGL().getGL2();
         if (VirtualSpaceManager.INSTANCE.debugModeON()){
             System.out.println("Agile2D:: INIT GL IS: " + gl.getClass().getName());
