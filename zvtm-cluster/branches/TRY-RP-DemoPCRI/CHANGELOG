@@ -1,0 +1,38 @@
+0.2.5
+
+Moved some common operations from AutoReplay to static Deltas in GlyphReplication.
+This is meant to increase performance, especially where animations are concerned.
+
+Added z-index replication at glyph construction (in addition to the already
+existing onTop... support)
+
+Notice: starting with 0.2.5-SNAPSHOT, zvtm-cluster requires zvtm-core 0.11.0
+
+0.2.4
+
+Changed coordinates system to match the new zvtm coordinate system (0.11.0+).
+The new system uses double precision floating point coordinates.
+Added Composite support (requires a recent zvtm trunk checkout). Adding support
+for Composite glyph required a fairly large rework of the GlyphCreation aspect.
+Some things may break.
+Added VSlice.setAngle to AutoReplay methods
+Added Glyph.stickToGlyph to AutoReplay methods
+
+0.2.3 
+
+Added VirtualSpace.show and VirtualSpace.hide to Autoreplay methods.
+Added DPath.edit to Autoreplay methods.
+Added local_slave and local_master example scripts
+Added serialization of raw images (i.e. VImage in complement to the already-existing
+ClusteredImage class)
+
+0.2.2
+
+Added graceful shutdown capabilities 
+Moved back to JGroups 2.7.0.GA due to a bug / puzzling behavior in JGroups 2.8.0.
+
+0.2.0
+
+Moved to JGroups 2.8.0GA, mainly because it figures out which network interface
+and protocol to use in a smarter way.
+
