@@ -84,6 +84,7 @@ public class SlaveApp {
 
 		clusteredView = cv;
 
+		View.registerViewPanelFactory(AgileGLJPanelFactory.AGILE_GLJ_VIEW, new AgileGLJPanelFactory());
 		view = vsm.addFrameView(cv.getCameras(), 
 				"slaveView " + options.blockNumber, 
 				getViewType(),
