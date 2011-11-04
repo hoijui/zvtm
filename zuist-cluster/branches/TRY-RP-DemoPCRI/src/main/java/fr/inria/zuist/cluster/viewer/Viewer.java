@@ -161,8 +161,9 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		ovSpace.addCamera();
         Vector cameras = new Vector();
         cameras.add(mCamera);
-		cameras.add(vsm.getVirtualSpace(mnSpaceName).getCamera(0));
-		cameras.add(vsm.getVirtualSpace(ovSpaceName).getCamera(0));
+	cameras.add(vsm.getVirtualSpace(mnSpaceName).getCamera(0));
+	cameras.add(vsm.getVirtualSpace(ovSpaceName).getCamera(0));
+	View.registerViewPanelFactory(AgileGLJPanelFactory.AGILE_GLJ_VIEW, new AgileGLJPanelFactory());	
         mView = vsm.addFrameView(cameras, mViewName, AgileGLJPanelFactory.AGILE_GLJ_VIEW, VIEW_W, VIEW_H, false, false, !fullscreen, initMenu());
         Vector<Camera> sceneCam = new Vector<Camera>();
         sceneCam.add(mCamera);
