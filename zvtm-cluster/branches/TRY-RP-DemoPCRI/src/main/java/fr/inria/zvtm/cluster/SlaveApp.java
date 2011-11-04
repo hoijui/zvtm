@@ -1,5 +1,6 @@
 package fr.inria.zvtm.cluster;
 
+import fr.inria.zvtm.engine.AgileGLJPanelFactory;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.engine.View;
@@ -68,7 +69,8 @@ public class SlaveApp {
 	}
 
     protected String getViewType(){
-        return options.openGl ? View.OPENGL_VIEW : View.STD_VIEW;
+        //return options.openGl ? View.OPENGL_VIEW : View.STD_VIEW;
+        return AgileGLJPanelFactory.AGILE_GLJ_VIEW;
     }
 
 	void createLocalView(ClusteredView cv){
