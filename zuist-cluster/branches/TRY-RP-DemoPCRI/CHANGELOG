@@ -1,0 +1,3 @@
+updated zvtm-cluster dependency to 0.2.4-SNAPSHOT
+added SceneManager.setOrigin to autoreplay methods
+
