@@ -48,6 +48,7 @@ import java.io.FilenameFilter;
 
 import fr.inria.zvtm.cluster.ClusterGeometry;
 import fr.inria.zvtm.cluster.ClusteredView;
+import fr.inria.zvtm.engine.AgileGLJPanelFactory;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.VirtualSpace;
@@ -162,7 +163,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         cameras.add(mCamera);
 		cameras.add(vsm.getVirtualSpace(mnSpaceName).getCamera(0));
 		cameras.add(vsm.getVirtualSpace(ovSpaceName).getCamera(0));
-        mView = vsm.addFrameView(cameras, mViewName, (opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, !fullscreen, initMenu());
+        mView = vsm.addFrameView(cameras, mViewName, AgileGLJPanelFactory.AGILE_GLJ_VIEW, VIEW_W, VIEW_H, false, false, !fullscreen, initMenu());
         Vector<Camera> sceneCam = new Vector<Camera>();
         sceneCam.add(mCamera);
         ClusterGeometry clGeom = new ClusterGeometry(

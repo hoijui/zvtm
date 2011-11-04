@@ -32,8 +32,13 @@
         </dependency>
         <dependency>
             <groupId>fr.inria.zvtm</groupId>
-            <artifactId>zvtm-cluster</artifactId>
+            <artifactId>zvtm-cluster-demoPCRI</artifactId>
             <version>0.2.6-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>fr.inria.zvtm</groupId>
+            <artifactId>zvtm-agile2d</artifactId>
+            <version>0.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.aspectj</groupId>
@@ -55,7 +60,7 @@
 						</weaveDependency>
                         <weaveDependency>
 							<groupId>fr.inria.zvtm</groupId>
-							<artifactId>zvtm-cluster</artifactId>
+							<artifactId>zvtm-cluster-demoPCRI</artifactId>
 						</weaveDependency>
                     </weaveDependencies>	
 					<source>1.5</source>
@@ -64,7 +69,7 @@
                     <aspectLibraries>
                         <aspectLibrary>
                             <groupId>fr.inria.zvtm</groupId>
-                            <artifactId>zvtm-cluster</artifactId>
+                            <artifactId>zvtm-cluster-demoPCRI</artifactId>
                         </aspectLibrary>
                     </aspectLibraries>
 				</configuration>				
