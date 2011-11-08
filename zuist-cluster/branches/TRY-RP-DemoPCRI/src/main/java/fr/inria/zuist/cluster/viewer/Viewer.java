@@ -9,10 +9,12 @@ package fr.inria.zuist.cluster.viewer;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GradientPaint;
 import java.awt.Font;
+import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.Dimension;
 import java.awt.Rectangle;
@@ -31,12 +33,12 @@ import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.ImageIcon;
-import java.awt.Container;
 import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
 import java.util.Vector;
@@ -45,6 +47,16 @@ import java.util.HashMap;
 import java.io.File;
 import java.io.IOException;
 import java.io.FilenameFilter;
+
+import techniques.AbstractTechnique;
+import techniques.pan.AbstractPanTechnique;
+import techniques.point.AbstractPointTechnique;
+import techniques.zoom.AbstractZoomTechnique;
+import utils.settings.TechniqueSettings;
+import utils.settings.TechniqueSettingsManager;
+import utils.settings.TechniqueSettingsManager.Dimensions;
+import utils.settings.TechniqueSettingsManager.GestureType;
+import utils.settings.TechniqueSettingsManager.Hands;
 
 import fr.inria.zvtm.cluster.ClusterGeometry;
 import fr.inria.zvtm.cluster.ClusteredView;
@@ -105,6 +117,24 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     static final short MOVE_LEFT = 2;
     static final short MOVE_RIGHT = 3;
     
+    public static final int DEFAULT_ZOOM_OSC_LISTENING_PORT = 52510 ;
+    public static final int DEFAULT_POINT_OSC_LISTENING_PORT = 52511;
+    public static final int DEFAULT_PAN_OSC_LISTENING_PORT = 52512;
+
+    public static final int IPOD_ZOOM_OSC_LISTENING_PORT = 52513 ;
+    public static final int IPOD_POINT_OSC_LISTENING_PORT = 52514;
+    public static final int IPOD_PAN_OSC_LISTENING_PORT = 52515;
+
+    public static final int IPOD_DEFAULT_OSC_LISTENING_PORT = 52516;
+
+    public static final String MOVE_CAMERA = "/moveMCam";
+    public static final String TILT_OBJECT = "/WILDPointing/inclinaison";
+    public static final String MOVE_OBJECT = "/WildPointing/moveTo";
+    static final String CMD_NOSIGNAL = "noSignal";
+    static final String IN_CMD_PAN1 = "pan";
+    static final String IN_CMD_PAN0 = "pan0";
+    static final String IN_CMD_NOSIGNAL = CMD_NOSIGNAL;
+
     /* ZVTM objects */
     VirtualSpaceManager vsm;
     static final String mSpaceName = "Scene Space";
@@ -112,6 +142,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     static final String ovSpaceName = "Overlay Space";
     VirtualSpace mSpace, ovSpace;
     Camera mCamera;
+    Camera cursorCamera;
     String mCameraAltStr = Messages.ALTITUDE + "0";
     String levelStr = Messages.LEVEL + "0";
     static final String mViewName = "ZUIST Viewer";
@@ -124,6 +155,18 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 	OverlayManager ovm;
 	VWGlassPane gp;
 	PieMenu mainPieMenu;
+
+    private AbstractPanTechnique currentPanTechnique;
+    private AbstractPointTechnique currentPointTechnique;
+    private AbstractZoomTechnique currentZoomTechnique;
+
+    private double zoX = 0;
+    private double zoY = 0;
+
+    private WallCursor zoomCenter;
+
+    //hack for the interaction techniques
+    static Viewer INSTANCE;
     
     public Viewer(boolean fullscreen, boolean opengl, boolean antialiased, File xmlSceneFile){
 		ovm = new OverlayManager(this);
@@ -147,6 +190,117 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 			getGlobalView(ea);
 		}
 		ovm.toggleConsole();
+        currentPanTechnique = AbstractPanTechnique.createTechnique("IPodPressLaserPan");
+        currentPointTechnique = AbstractPointTechnique.createTechnique("DefaultLaserPoint");
+        currentZoomTechnique = AbstractZoomTechnique.createTechnique("LinearIPod");
+        currentPanTechnique.initListeners();
+        currentPanTechnique.startListening();
+        currentPointTechnique.initListeners();
+        currentPointTechnique.startListening();
+        currentZoomTechnique.initListeners();
+        currentZoomTechnique.startListening();
+
+        //hack, this-escape, bad
+        INSTANCE = this;
+    }
+
+    public static Viewer getInstance(){
+        return INSTANCE;
+    }
+
+    public ClusteredView getClusteredView(){
+        return clusteredView;
+    }
+
+    public Camera getMCamera(){
+        return mCamera;
+    }
+
+    public Camera getCursorCamera(){
+        return cursorCamera;
+    }
+
+    public void setCursorPosition(double x, double y){
+        //pzwild stuff, not needed
+    }
+
+ 	public JComponent getZVTMPanel(){
+ 		return (JComponent)mView.getPanel().getComponent();
+ 	}
+
+    public void setZoomOrigin(double x, double y, boolean updateCursor) {
+        this.zoX = x;
+        this.zoY = y;
+        Point pointLocation;
+        pointLocation = clusteredView.spaceToViewCoords(mCamera, x, y);
+        Point2D.Double pl = clusteredView.viewToSpaceCoords(cursorCamera,pointLocation.x,pointLocation.y);
+
+        if (updateCursor) {
+            zoomCenter.moveTo(pl.x,pl.y);
+        }
+    }
+
+    public void setZoomOrigin(double x, double y) {
+        setZoomOrigin(x, y, true);
+    }
+
+    public static VirtualSpaceManager getVirtualSpaceManager(){
+         return VirtualSpaceManager.INSTANCE;
+     }
+
+    public View getView(){
+         return mView;
+    }
+
+    public void startPan(){}
+    public void stopPan(){}
+    public void startZoom(){}
+    public void stopZoom(){}
+
+    public void zeroOrderZoom(float z){
+
+        Location cgl = mCamera.getLocation();
+        double a = (mCamera.focal+Math.abs(mCamera.altitude))/mCamera.focal;
+        double zz = (double)z;
+
+        if (zz < 0)
+        {
+            if ((double)mCamera.getAltitude()+a*zz < 0)
+            {
+                zz = - ((double)mCamera.getAltitude()/a);
+            }
+
+            double newx = mCamera.vx + (mCamera.vx-zoX)*a*zz/(mCamera.getAltitude()+mCamera.focal);
+            double newy = mCamera.vy + (mCamera.vy-zoY)*a*zz/(mCamera.getAltitude()+mCamera.focal);
+            double newz = mCamera.getAltitude()+a*zz;
+            mCamera.setLocation(new Location(newx, newy, newz));
+        }
+        else
+        {
+            // zooming out
+            double newx = mCamera.vx+(mCamera.vx-zoX)*a*zz/(mCamera.getAltitude()+mCamera.focal);
+            double newy = mCamera.vy+(mCamera.vy-zoY)*a*zz/(mCamera.getAltitude()+mCamera.focal);
+            double newz = mCamera.getAltitude()+a*zz;
+            mCamera.setLocation(new Location(newx, newy, newz));
+        }
+    }
+
+    public void zeroOrderTranslate(double x, double y){
+
+        // Je laisse l'ancien code
+
+        double a = (mCamera.focal+Math.abs(mCamera.altitude)) / mCamera.focal;
+
+        Location l = mCamera.getLocation();
+        double newx = l.getX()+a*x;
+        double newy = l.getY()+a*y;
+
+        mCamera.setLocation(new Location(newx, newy, l.getAltitude()));
+       
+        if (currentPointTechnique == null)
+        {
+            setZoomOrigin(newx, newy);
+        }
     }
 
     void initGUI(boolean fullscreen, boolean opengl, boolean antialiased){
@@ -156,17 +310,21 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         mSpace = vsm.addVirtualSpace(mSpaceName);
         VirtualSpace mnSpace = vsm.addVirtualSpace(mnSpaceName);
         mCamera = mSpace.addCamera();
+        VirtualSpace cursorSpace = vsm.addVirtualSpace("cursorSpace");
+        cursorCamera = cursorSpace.addCamera();
+        zoomCenter = new WallCursor(cursorSpace,  10, 160, Color.RED);
 		mnSpace.addCamera().setAltitude(10);
         ovSpace = vsm.addVirtualSpace(ovSpaceName);
 		ovSpace.addCamera();
         Vector cameras = new Vector();
         cameras.add(mCamera);
-	cameras.add(vsm.getVirtualSpace(mnSpaceName).getCamera(0));
-	cameras.add(vsm.getVirtualSpace(ovSpaceName).getCamera(0));
-	View.registerViewPanelFactory(AgileGLJPanelFactory.AGILE_GLJ_VIEW, new AgileGLJPanelFactory());	
+        cameras.add(cursorCamera);
+		cameras.add(vsm.getVirtualSpace(mnSpaceName).getCamera(0));
+		cameras.add(vsm.getVirtualSpace(ovSpaceName).getCamera(0));
         mView = vsm.addFrameView(cameras, mViewName, AgileGLJPanelFactory.AGILE_GLJ_VIEW, VIEW_W, VIEW_H, false, false, !fullscreen, initMenu());
         Vector<Camera> sceneCam = new Vector<Camera>();
         sceneCam.add(mCamera);
+        sceneCam.add(cursorCamera);
         ClusterGeometry clGeom = new ClusterGeometry(
                 2680,
                 1700,
