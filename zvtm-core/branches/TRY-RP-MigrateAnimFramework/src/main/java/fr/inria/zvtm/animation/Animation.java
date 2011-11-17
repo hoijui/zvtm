@@ -7,6 +7,8 @@
  */ 
 package fr.inria.zvtm.animation;
 
+import java.util.concurrent.TimeUnit;
+
 import net.jcip.annotations.*;
 
 import org.jdesktop.core.animation.timing.Interpolator;
@@ -36,7 +38,7 @@ public class Animation {
 	/**
 	 * Used to specify unending duration or RepeatCount
 	 */
-	public static final int INFINITE = Animator.INFINITE;
+	public static final long INFINITE = Animator.INFINITE;
 
 	/**
 	 * RepeatBehavior determines how each successive cycle will flow.
@@ -68,9 +70,10 @@ public class Animation {
     //package-level ctor, to be used from AnimationManager
     //(not publicly visible)
     Animation(AnimationManager parent,
-	      int duration, 
-	      double repeatCount, 
+	      long duration, 
+	      long repeatCount, 
 	      RepeatBehavior repeatBehavior, 
+          Interpolator interpolator,
 	      Object subject,
 	      Dimension dimension,
 	      TimingHandler handler){
@@ -80,15 +83,21 @@ public class Animation {
 	this.handler = handler;
 
 	timingInterceptor = new TimingInterceptor();
-	animator = new Animator(duration, repeatCount, repeatBehavior.getAnimatorValue(), timingInterceptor);
+    Animator.Builder animatorBuilder = new Animator.Builder();
+    animatorBuilder.setDuration(duration, TimeUnit.MILLISECONDS)
+        .setRepeatCount(repeatCount)
+        .setRepeatBehavior(repeatBehavior.getAnimatorValue())
+        .setInterpolator(interpolator)
+        .addTarget(timingInterceptor);
+	animator = animatorBuilder.build(); // new Animator(duration, repeatCount, repeatBehavior.getAnimatorValue(), timingInterceptor);
     }
 
     /**
      * Sets the interpolator for this Animation.
      */
-    public void setInterpolator(Interpolator interpolator){
-	animator.setInterpolator(interpolator);
-    }
+  //  public void setInterpolator(Interpolator interpolator){
+  //  animator.setInterpolator(interpolator);
+  //  }
 
     /**
      * Sets the initial fraction at which the first animation cycle will begin. The default value is 0.
@@ -97,9 +106,10 @@ public class Animation {
      * @throws IllegalStateException if animation is already running; this parameter may only 
      * be changed prior to starting the animation or after the animation has ended
      */
-    public void setStartFraction(float startFraction){
-	animator.setStartFraction(startFraction);
-    }
+    //  XXX removed from the jdesktop animation framework
+    //  public void setStartFraction(double startFraction){
+    //      animator.setStartFraction(startFraction);
+    //  }
     
     /**
      * Two or more Animations can be run concurrently if and only if they
@@ -115,9 +125,9 @@ public class Animation {
     }   
 
     //called by parent AnimationManager (owns the tick source)
-    void setTimer(TimingSource timingSource){
-	animator.setTimer(timingSource);
-    }
+  // void setTimer(TimingSource timingSource){
+  //      animator.setTimer(timingSource);
+  //  }
 
     void start(){
 	animator.start();
@@ -174,11 +184,11 @@ public class Animation {
     private class TimingInterceptor implements TimingTarget {
 	TimingInterceptor(){}
 
-	public void begin(){
+	public void begin(Animator animator){
 	    handler.begin(subject, dimension);
 	}
 
-	public void end(){
+	public void end(Animator animator){
 	    handler.end(subject, dimension);
 
 	    //should do useful stuff like queue management
@@ -188,11 +198,15 @@ public class Animation {
 	    onAnimationEnded();
 	}
 
-	public void repeat(){
+	public void repeat(Animator animator){
 	    handler.repeat(subject, dimension);
 	}
 
-	public void timingEvent(float fraction){
+    public void reverse(Animator animator){
+        //handler.reverse();
+    }
+
+	public void timingEvent(Animator animator, double fraction){
 	    handler.timingEvent(fraction, subject, dimension);
 	}
     }

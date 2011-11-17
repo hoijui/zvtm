@@ -73,7 +73,7 @@ public class TestMultipleGlyphs {
 									  final double initX = circle.vx;
 									  final double initY = circle.vy;
 
-									  public void timingEvent(float fraction, 
+									  public void timingEvent(double fraction, 
 												  Object subject, Animation.Dimension dim){
 									      Glyph g = (Glyph)subject;
 							
@@ -82,7 +82,7 @@ public class TestMultipleGlyphs {
 									  }
 								      },
 								      new SplineInterpolator(0.1f,0.95f,0.2f,0.95f));
-	    anim.setStartFraction(rnd.nextFloat());
+	    //anim.setStartFraction(rnd.nextFloat());
 	    am.startAnimation(anim, false);
 	}
     }

@@ -70,7 +70,7 @@ public class TestCameraAnim {
 						final double initX = circle.vx;
 						final double initY = circle.vy;
 						
-						public void timingEvent(float fraction, 
+						public void timingEvent(double fraction, 
 									Object subject, Animation.Dimension dim){
 						    Glyph g = (Glyph)subject;
 						    g.moveTo(initX,
@@ -88,7 +88,7 @@ public class TestCameraAnim {
 						 final double initX = circle2.vx;
 						 final double initY = circle2.vy;
 						 
-						 public void timingEvent(float fraction, 
+						 public void timingEvent(double fraction, 
 									 Object subject, Animation.Dimension dim){
 						     Glyph g = (Glyph)subject;
 						     g.moveTo(initX,
@@ -98,13 +98,13 @@ public class TestCameraAnim {
 					     new SplineInterpolator(0.1f,0.95f,0.2f,0.95f));
 
 	Animation cameraPos = am.getAnimationFactory().createAnimation(4000, 
-						 2f,
+						 2,
 						 Animation.RepeatBehavior.LOOP,
 						 cam,
 						 Animation.Dimension.POSITION,
 						 new DefaultTimingHandler(){
 						     						     
-						     public void timingEvent(float fraction, 
+						     public void timingEvent(double fraction, 
 									     Object subject, Animation.Dimension dim){
 							   Camera c = (Camera)subject;
 							   
@@ -119,13 +119,13 @@ public class TestCameraAnim {
 						 SlowInSlowOutInterpolator.getInstance());
 	
 	Animation cameraAlt = am.getAnimationFactory().createAnimation(4000, 
-						 2f,
+						 2,
 						 Animation.RepeatBehavior.REVERSE,
 						 cam,
 						 Animation.Dimension.ALTITUDE,
 						 new DefaultTimingHandler(){
 					
-						     public void timingEvent(float fraction, 
+						     public void timingEvent(double fraction, 
 									     Object subject, Animation.Dimension dim){
 							 Camera c = (Camera)subject;
 							 c.setAltitude(25+Double.valueOf(fraction*50).doubleValue());

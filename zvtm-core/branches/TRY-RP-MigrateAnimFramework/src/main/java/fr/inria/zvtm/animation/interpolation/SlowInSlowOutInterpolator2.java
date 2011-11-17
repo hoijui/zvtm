@@ -51,8 +51,8 @@ class AtanInterpolator implements Interpolator {
         this.DEN = Math.atan(this.N);
     }
     
-    public float interpolate(float fraction){
-        return (float)((Math.atan(N*(2*fraction-1))/DEN + 1) / (2.0));
+    public double interpolate(double fraction){
+        return (Math.atan(N*(2*fraction-1))/DEN + 1) / (2.0);
     }
     
 }

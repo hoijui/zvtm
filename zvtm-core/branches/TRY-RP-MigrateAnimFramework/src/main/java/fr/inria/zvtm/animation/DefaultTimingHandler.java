@@ -25,6 +25,6 @@ public abstract class DefaultTimingHandler implements TimingHandler{
     public void begin(Object subject, Animation.Dimension dim){}
     public void end(Object subject, Animation.Dimension dim){}
     public void repeat(Object subject, Animation.Dimension dim){}
-    public abstract void timingEvent(float fraction, 
+    public abstract void timingEvent(double fraction, 
 				     Object subject, Animation.Dimension dim);
 }

@@ -19,6 +19,7 @@ import fr.inria.zvtm.engine.*;
 import fr.inria.zvtm.glyphs.*;
 import fr.inria.zvtm.event.*;
 import fr.inria.zvtm.animation.*;
+import fr.inria.zvtm.animation.interpolation.*;
 import org.jdesktop.core.animation.timing.interpolators.*;
 
 public class TestCircle {
@@ -56,7 +57,7 @@ public class TestCircle {
 	for(int i=0; i<4; ++i){
 	    Animation anim = 
 		am.getAnimationFactory().createAnimation(3000, //milliseconds
-							 1.0,
+							 1,
 							 Animation.RepeatBehavior.LOOP,
 							 circle,
 							 Animation.Dimension.POSITION,
@@ -64,7 +65,7 @@ public class TestCircle {
 							     public void begin(Object subject, Animation.Dimension dim){}
 							     public void end(Object subject, Animation.Dimension dim){}
 							     public void repeat(Object subject, Animation.Dimension dim){}
-							     public void timingEvent(float fraction, 
+							     public void timingEvent(double fraction, 
 										     Object subject, Animation.Dimension dim){
 								 Glyph g = (Glyph)subject;
 								 g.moveTo(100 - Double.valueOf(400*fraction).doubleValue(), 0);
@@ -76,7 +77,7 @@ public class TestCircle {
 
 	Animation anim = 
 	    am.getAnimationFactory().createAnimation(8000, 
-						     1.0,
+						     1,
 						     Animation.RepeatBehavior.LOOP,
 						     circle,
 						     Animation.Dimension.FILLCOLOR,
@@ -84,19 +85,20 @@ public class TestCircle {
 							 public void begin(Object subject, Animation.Dimension dim){}
 							 public void end(Object subject, Animation.Dimension dim){}
 							 public void repeat(Object subject, Animation.Dimension dim){}
-							 public void timingEvent(float fraction, 
+							 public void timingEvent(double fraction, 
 										 Object subject, Animation.Dimension dim){
 							     Glyph g = (Glyph)subject;
 							     g.setColor(new Color(0,
 										  0,
-										  Float.valueOf(255*fraction).intValue()));
+										  Float.valueOf(255*(float)fraction).intValue()));
 							 }
-						     });
+						     },
+                             IdentityInterpolator.getInstance());
 	am.startAnimation(anim, false);
 	 
 	Animation animSize = 
 	    am.getAnimationFactory().createAnimation(4000, 
-						     1.0,
+						     1,
 						     Animation.RepeatBehavior.LOOP,
 						     circle,
 						     Animation.Dimension.SIZE,
@@ -104,12 +106,13 @@ public class TestCircle {
 							 public void begin(Object subject, Animation.Dimension dim){}
 							 public void end(Object subject, Animation.Dimension dim){}
 							 public void repeat(Object subject, Animation.Dimension dim){}
-							 public void timingEvent(float fraction, 
+							 public void timingEvent(double fraction, 
 										 Object subject, Animation.Dimension dim){
 							     Glyph g = (Glyph)subject;
 							     g.sizeTo(40+60*fraction);
 							 }
-						     });
+						     },
+                             IdentityInterpolator.getInstance());
 	am.startAnimation(animSize, false);
 	 
     }

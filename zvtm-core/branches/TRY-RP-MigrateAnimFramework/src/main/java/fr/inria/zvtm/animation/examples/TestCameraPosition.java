@@ -73,7 +73,7 @@ public class TestCameraPosition {
 						    final double initX = circle.vx;
 						    final double initY = circle.vy;
 
-						    public void timingEvent(float fraction, 
+						    public void timingEvent(double fraction, 
 									    Object subject, Animation.Dimension dim){
 							Glyph g = (Glyph)subject;
 							
@@ -82,7 +82,7 @@ public class TestCameraPosition {
 						    }
 						},
 						new SplineInterpolator(0.1f,0.95f,0.2f,0.95f));
-	    anim.setStartFraction(rnd.nextFloat());
+	    //anim.setStartFraction(rnd.nextFloat());
 	    am.startAnimation(anim, false);
 	}
 
@@ -131,7 +131,7 @@ public class TestCameraPosition {
 	    final double ex = v.getVCursor().getVSXCoordinate();
 	    final double ey = v.getVCursor().getVSYCoordinate();
 
-	    Animation trans = am.getAnimationFactory().createAnimation(1000, 1f, Animation.RepeatBehavior.LOOP,
+	    Animation trans = am.getAnimationFactory().createAnimation(1000, 1, Animation.RepeatBehavior.LOOP,
 						 cam,
 						 Animation.Dimension.POSITION,
 						  new DefaultTimingHandler(){
@@ -140,7 +140,7 @@ public class TestCameraPosition {
 						      final double endX = ex;
 						      final double endY = ey;
 
-						      public void timingEvent(float fraction, 
+						      public void timingEvent(double fraction, 
 									      Object subject, Animation.Dimension dim){
 							  Camera c = (Camera)subject;
 							  
@@ -154,7 +154,7 @@ public class TestCameraPosition {
 						    Animation.Dimension.ALTITUDE,
 						    new DefaultTimingHandler(){
 							final double initZ = cam.getAltitude();
-							public void timingEvent(float fraction, 
+							public void timingEvent(double fraction, 
 										Object subject, Animation.Dimension dim){
 							    Camera c = (Camera)subject;
 							    

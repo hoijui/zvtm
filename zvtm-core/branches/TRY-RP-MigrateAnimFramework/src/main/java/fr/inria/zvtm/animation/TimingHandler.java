@@ -45,6 +45,6 @@ public interface TimingHandler {
      * @param subject the subject that will be animated. 
      * @param dim Dimension of the animation
      */
-    public void timingEvent(float fraction, 
+    public void timingEvent(double fraction, 
 			    Object subject, Animation.Dimension dim);
 }

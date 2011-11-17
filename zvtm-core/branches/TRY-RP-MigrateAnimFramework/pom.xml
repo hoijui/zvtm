@@ -59,7 +59,7 @@ $Id$
     </dependency>
     <dependency>
 		<groupId>net.java.timingframework</groupId>
-		<artifactId>timingframework-core</artifactId>
+		<artifactId>timingframework-swing</artifactId>
 		<version>4.1.0</version>
 	</dependency>
 	<dependency>

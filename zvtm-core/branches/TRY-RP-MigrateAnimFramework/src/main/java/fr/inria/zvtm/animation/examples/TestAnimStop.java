@@ -65,7 +65,7 @@ public class TestAnimStop {
 						final double initX = circle.vx;
 						final double initY = circle.vy;
 						
-						public void timingEvent(float fraction, 
+						public void timingEvent(double fraction, 
 									Object subject, Animation.Dimension dim){
 						    Glyph g = (Glyph)subject;
 						    
@@ -84,7 +84,7 @@ public class TestAnimStop {
 						 final double initX = circle2.vx;
 						 final double initY = circle2.vy;
 						 
-						 public void timingEvent(float fraction, 
+						 public void timingEvent(double fraction, 
 									 Object subject, Animation.Dimension dim){
 						     Glyph g = (Glyph)subject;
 						     

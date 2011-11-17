@@ -24,6 +24,9 @@ import net.jcip.annotations.*;
 import org.jdesktop.core.animation.timing.Animator;
 import org.jdesktop.core.animation.timing.Interpolator;
 import org.jdesktop.core.animation.timing.TimingSource;
+import org.jdesktop.swing.animation.timing.sources.SwingTimerTimingSource;
+
+import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
 
 //for active Camera animation
 import fr.inria.zvtm.engine.VirtualSpaceManager;
@@ -46,47 +49,49 @@ public class AnimationManager {
 	pendingAnims = new LinkedList<Animation>();
 	runningAnims = new LinkedList<Animation>();
 	listsLock = new ReentrantLock();
-	tickThread = new TickThread("tickThread");
+	//tickThread = new TickThread("tickThread");
+    timingSource = new SwingTimerTimingSource();
 	animationFactory = new AnimationFactory(this);
 	started = new AtomicBoolean(false);
 
 	//vsm is only useful for currentCamAnim
 	currentCamAnim = new InteractiveCameraAnimation(vsm);
-	Animation anim = createAnimation(Animator.INFINITE, 1d,
+	Animation anim = createAnimation(Animator.INFINITE, 1,
 					 Animation.RepeatBehavior.LOOP,
 					 currentCamAnim, //DUMMY subject: avoids conflicts
 					 Animation.Dimension.POSITION,
-					 currentCamAnim);
+					 currentCamAnim,
+                     IdentityInterpolator.getInstance());
 	startAnimation(anim, true);
     }
 
-    Animation createAnimation(int duration, 
-			      double repeatCount, 
+    Animation createAnimation(long duration, 
+			      long repeatCount, 
 			      Animation.RepeatBehavior repeatBehavior,
 			      Object subject,
 			      Animation.Dimension dimension,
 			      TimingHandler handler,
 			      Interpolator interpolator){
 	Animation retval = new Animation(this, duration, repeatCount,
-					 repeatBehavior, subject,
+					 repeatBehavior, interpolator, subject,
 					 dimension, handler);
-	retval.setTimer(new TickSource(tickThread));
-	retval.setInterpolator(interpolator);
+	//retval.setTimer(new TickSource(tickThread));
+	//retval.setInterpolator(interpolator);
 	return retval;
     }
 
-    Animation createAnimation(int duration, 
-			      double repeatCount, 
-			      Animation.RepeatBehavior repeatBehavior,
-			      Object subject,
-			      Animation.Dimension dimension,
-			      TimingHandler handler){
-	Animation retval =  new Animation(this, duration, repeatCount,
-					  repeatBehavior, subject,
-					  dimension, handler);
-	retval.setTimer(new TickSource(tickThread));
-	return retval;
-    }
+   // Animation createAnimation(int duration, 
+   // 		      double repeatCount, 
+   // 		      Animation.RepeatBehavior repeatBehavior,
+   // 		      Object subject,
+   // 		      Animation.Dimension dimension,
+   // 		      TimingHandler handler){
+   // Animation retval =  new Animation(this, duration, repeatCount,
+   // 				  repeatBehavior, subject,
+   // 				  dimension, handler);
+   // //retval.setTimer(new TickSource(tickThread));
+   // return retval;
+   // }
 
     /**
      * Starts this AnimationManager.
@@ -96,9 +101,9 @@ public class AnimationManager {
      * calls will have no effect.
      */
     public void start(){
-	if(started.compareAndSet(false, true)){
-	    tickThread.start();
-	}
+//	if(started.compareAndSet(false, true)){
+//	    tickThread.start();
+//	}
     }
 
     /**
@@ -111,7 +116,7 @@ public class AnimationManager {
      * @throws java.lang.IllegalStateException if called more than once
      */
     public void stop(){
-	tickThread.requestStop();
+	//tickThread.requestStop();
     }
 
     /**
@@ -241,40 +246,8 @@ public class AnimationManager {
      * resolution.
      */
     public void setResolution(int resolution){
-	tickThread.setResolution(resolution);
+	//tickThread.setResolution(resolution);
     }
-
-    ///**
-    // * Sets the active camera X speed.
-    // * @param dx active camera X speed
-    // */
-    //public void setXspeed(double dx){
-	//currentCamAnim.setXspeed(dx);
-    //}
-    //
-    ///**
-    // * Sets the active camera Y speed
-    // * @param dy active camera Y speed
-    // */
-    //public void setYspeed(double dy){
-	//currentCamAnim.setYspeed(dy);
-    //}
-    //
-    ///**
-    // * Sets the active camera Z speed
-    // * @param dz active camera Z speed
-    // */
-    //public void setZspeed(double dz){
-	//currentCamAnim.setZspeed(dz);
-    //}
-    //
-    //public void setZoomInvariantLocation(double x, double y){
-    //    currentCamAnim.setZoomInvariantLocation(x,y);
-    //}
-    //
-    //public void enableCustomZoomInvariantLocation(boolean b){
-    //    currentCamAnim.enableCustomZoomInvariantLocation(b);
-    //}
 
     void onAnimationEnded(Animation anim){
 	listsLock.lock();
@@ -364,7 +337,8 @@ public class AnimationManager {
 
     private final Lock listsLock;
 
-    private final TickThread tickThread;
+    //private final TickThread tickThread;
+    private final TimingSource timingSource; 
 
     private final AnimationFactory animationFactory;
 
@@ -384,7 +358,7 @@ public class AnimationManager {
 	    this.vsm = vsm;
 	}
 	
-	@Override public void timingEvent(float fraction, Object subject, Animation.Dimension dim){
+	@Override public void timingEvent(double fraction, Object subject, Animation.Dimension dim){
 	    for (VirtualSpace vs:vsm.getVirtualSpaces()){
 	        for (Camera cam:vs.getCameraListAsArray()){
     	        animateInteractiveCamera(cam);	            
@@ -431,80 +405,5 @@ public class AnimationManager {
 	
     }
 
-}
-
-
-//A custom tick source to replace the one provided by the Timing Framework.
-//NOTE: setResolution() has no effect (the resolution will always be the one supplied by the TickThread)
-//Every animation has its own TickSource (that way they can be started or stopped independently)
-//but all tick sources share the same TickThread (enforced by AnimationManager)
-//@ThreadSafe
-class TickSource extends TimingSource {
-    private TickThread tickThread;
-    
-    public TickSource(TickThread tickThread){
-	this.tickThread = tickThread;
-    }
-    
-    public void setResolution(int resolution){
-	//This has purposely no effect. Animation resolution is set globally,
-	//see AnimationManager#setResolution.
-    }
-
-    public void setStartDelay(int delay){
-	//This has purposely no effect. We do not currently provide a start
-	//delay for animations, altough this could be done.
-    }
-
-    public void start(){
-	tickThread.addSubscriber(this);
-    }
-
-    public void stop(){
-	tickThread.removeSubscriber(this);
-    }
-
-    //called by TickThread instance, which needs at least package acccess
-    void tick(){
-	timingEvent();
-    }
-}
-
-class TickThread {
-	private Timer edtTimer;
-
-    //receivers is traversed a *lot* more often than it is mutated
-    private final List<TickSource> receivers = new CopyOnWriteArrayList<TickSource>();
-
-    public TickThread(String name){
-		ActionListener taskPerformer = new ActionListener(){
-			public void actionPerformed(ActionEvent evt){
-				for(TickSource ts: receivers){
-					ts.tick();
-				}
-			}
-		};
-		edtTimer = new Timer(16, taskPerformer);
-    }
-
-	public void start(){
-		edtTimer.start();
-	}
-
-    public void setResolution(int res){
-		edtTimer.setDelay(res);
-    }
-
-    public void addSubscriber(TickSource ts){
-	receivers.add(ts);
-    }
-
-    public void removeSubscriber(TickSource ts){
-	receivers.remove(ts);
-    }
-	
-    public void requestStop(){
-		edtTimer.stop();
-    }
 }
 

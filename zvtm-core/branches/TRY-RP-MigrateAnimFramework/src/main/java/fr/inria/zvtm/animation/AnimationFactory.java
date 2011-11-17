@@ -14,6 +14,8 @@ import net.jcip.annotations.*;
 
 import org.jdesktop.core.animation.timing.Interpolator;
 
+import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
+
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.Translucent;
@@ -51,12 +53,12 @@ public class AnimationFactory {
      * implementing the animation code itself (e.g. move a Camera or
      * change the color of a Glyph).
      */
-    public Animation createAnimation(int duration, 
+    public Animation createAnimation(long duration, 
 				     Object subject,
 				     Animation.Dimension dimension,
 				     TimingHandler handler){
-	return createAnimation(duration, 1.0, Animation.RepeatBehavior.LOOP,
-			       subject, dimension, handler);
+	return createAnimation(duration, 1, Animation.RepeatBehavior.LOOP,
+			       IdentityInterpolator.getInstance(), subject, dimension, handler);
     }
 
     /**
@@ -64,9 +66,9 @@ public class AnimationFactory {
      * by the associated AnimationManager.
      * @param duration duration of the animation, in milliseconds
      * @param repeatCount the number of times this Animation will
-     * be repeated. This is not necessarily an integer, i.e. an animation may
-     * be repeated 2.5 times. repeatCount may be set to Animation.INFINITE,
-	 * in which case the animation will be repeated indefinitely.
+     * be repeated. <code>repeatCount</code> may 
+     * be set to Animation.INFINITE, in which case the animation 
+     * will be repeated indefinitely.
      * @param repeatBehavior controls whether an animation loops or reverse
      * when repeating
      * @param subject object that will be animated
@@ -76,17 +78,17 @@ public class AnimationFactory {
      * implementing the animation code itself (e.g. move a Camera or
      * change the color of a Glyph).
      */
-    public Animation createAnimation(int duration, 
-				     double repeatCount, 
+    public Animation createAnimation(long duration, 
+				     long repeatCount, 
 				     Animation.RepeatBehavior repeatBehavior,
+                     Interpolator interpolator,
 				     Object subject,
 				     Animation.Dimension dimension,
 				     TimingHandler handler){
 	Animation retval =  new Animation(animationManager, duration, repeatCount,
-					  repeatBehavior, subject,
+					  repeatBehavior, interpolator, subject,
 					  dimension, handler);
-	return animationManager.createAnimation(duration, repeatCount, repeatBehavior,
-						subject, dimension, handler);
+	return retval;
     }
 
     /**
@@ -94,8 +96,7 @@ public class AnimationFactory {
      * by this AnimationManager.
      * @param duration duration of the animation, in milliseconds
      * @param repeatCount the number of times this Animation will
-     * be repeated. This is not necessarily an integer, i.e. an animation may
-     * be repeated 2.5 times
+     * be repeated.
      * @param repeatBehavior controls whether an animation loops or reverse
      * when repeating
      * @param subject object that will be animated
@@ -104,14 +105,14 @@ public class AnimationFactory {
      * for each animation event. The handler is responsible for 
      * implementing the animation code itself (e.g. move a Camera or
      * change the color of a Glyph).
-     * @param interpolator an Interpolator, ie a functor that takes a float between 0 and 1
-     * and returns a float between 0 and 1. By default a linear Interpolator is
+     * @param interpolator an Interpolator, ie a functor that takes a double between 0 and 1
+     * and returns a double between 0 and 1. By default a linear Interpolator is
      * used, but spline interpolators may be used to provide different animation
      * behaviors: slow in/slow out, fast in/slow out et caetera. You may also
      * provide your own interpolator.
      */
-    public Animation createAnimation(int duration, 
-				     double repeatCount, 
+    public Animation createAnimation(long duration, 
+				     long repeatCount, 
 				     Animation.RepeatBehavior repeatBehavior,
 				     Object subject,
 				     Animation.Dimension dimension,
@@ -138,11 +139,12 @@ public class AnimationFactory {
      * ends. May be set to null, in which case it is ignored.
      * @see EndAction
      */
-    public Animation createCameraTranslation(final int duration, final Camera camera, 
+    public Animation createCameraTranslation(final long duration, final Camera camera, 
 					     final Point2D.Double data, final boolean relative,
 					     final Interpolator interpolator,
 					     final EndAction endAction){
-	return createAnimation(duration, 1f, Animation.RepeatBehavior.LOOP,
+	return createAnimation(duration, 1, Animation.RepeatBehavior.LOOP,
+                   interpolator,
 			       camera,
 			       Animation.Dimension.POSITION,
 			       new DefaultTimingHandler(){
@@ -167,13 +169,12 @@ public class AnimationFactory {
 				   }
 
 				   @Override
-				   public void timingEvent(float fraction, 
+				   public void timingEvent(double fraction, 
 							   Object subject, Animation.Dimension dim){
 				       camera.moveTo(startX + fraction*(endX - startX),
 						     startY + fraction*(endY - startY));
 				   }
-			       },
-			       interpolator);
+			       });
     }
     
     /**
@@ -191,12 +192,12 @@ public class AnimationFactory {
      * @param endAction a functor that will be executed when the animation
      * ends. May be set to null, in which case it is ignored.
      */
-    public Animation createCameraAltAnim(final int duration, final Camera camera, 
+    public Animation createCameraAltAnim(final long duration, final Camera camera, 
 					 final double data, final boolean relative,
 					 final Interpolator interpolator,
 					 final EndAction endAction){
 	
-	return createAnimation(duration, 1f, Animation.RepeatBehavior.LOOP,
+	return createAnimation(duration, 1, Animation.RepeatBehavior.LOOP,
 			       camera,
 			       Animation.Dimension.ALTITUDE,
 			       new DefaultTimingHandler(){
@@ -217,7 +218,7 @@ public class AnimationFactory {
 				   }
 
 				   @Override
-				   public void timingEvent(float fraction, 
+				   public void timingEvent(double fraction, 
 							   Object subject, Animation.Dimension dim){
 				       camera.setAltitude(startZ + fraction*(endZ - startZ));
 				   }
@@ -240,11 +241,11 @@ public class AnimationFactory {
      * @param endAction a functor that will be executed when the animation
      * ends. May be set to null, in which case it is ignored.
      */
-    public Animation createGlyphTranslation(final int duration, final Glyph glyph,
+    public Animation createGlyphTranslation(final long duration, final Glyph glyph,
 					    final Point2D.Double data, final boolean relative,
 					    final Interpolator interpolator,
 					    final EndAction endAction){
-	 return createAnimation(duration, 1f, Animation.RepeatBehavior.LOOP,
+	 return createAnimation(duration, 1, Animation.RepeatBehavior.LOOP,
 				glyph,
 				Animation.Dimension.POSITION,
 				new DefaultTimingHandler(){
@@ -269,7 +270,7 @@ public class AnimationFactory {
 				    }
 				    
 				    @Override
-				    public void timingEvent(float fraction, 
+				    public void timingEvent(double fraction, 
 							    Object subject, Animation.Dimension dim){
 					glyph.moveTo(startX + fraction*(endX - startX),
 						     startY + fraction*(endY - startY));
@@ -294,11 +295,11 @@ public class AnimationFactory {
      * @param endAction a functor that will be executed when the animation
      * ends. May be set to null, in which case it is ignored.
      */
-    public Animation createGlyphSizeAnim(final int duration, final Glyph glyph,
+    public Animation createGlyphSizeAnim(final long duration, final Glyph glyph,
 					 final double data, final boolean relative,
 					 final Interpolator interpolator,
 					 final EndAction endAction){
-	return createAnimation(duration, 1f, Animation.RepeatBehavior.LOOP,
+	return createAnimation(duration, 1, Animation.RepeatBehavior.LOOP,
 			       glyph,
 			       Animation.Dimension.SIZE,
 			       new DefaultTimingHandler(){
@@ -325,7 +326,7 @@ public class AnimationFactory {
 				   }
 
 				   @Override
-				   public void timingEvent(float fraction, 
+				   public void timingEvent(double fraction, 
 							   Object subject, Animation.Dimension dim){
 				       glyph.sizeTo(startSize + fraction*(endSize - startSize));
 				   }
@@ -349,11 +350,11 @@ public class AnimationFactory {
      * @param endAction a functor that will be executed when the animation
      * ends. May be set to null, in which case it is ignored.
      */
-    public Animation createGlyphOrientationAnim(final int duration, final Glyph glyph,
+    public Animation createGlyphOrientationAnim(final long duration, final Glyph glyph,
 						final double data, final boolean relative,
 						final Interpolator interpolator,
 						final EndAction endAction){
-	return createAnimation(duration, 1f, Animation.RepeatBehavior.LOOP,
+	return createAnimation(duration, 1, Animation.RepeatBehavior.LOOP,
 			       glyph,
 			       Animation.Dimension.ORIENTATION,
 			       new DefaultTimingHandler(){
@@ -374,7 +375,7 @@ public class AnimationFactory {
 				   }
 
 				   @Override
-				   public void timingEvent(float fraction, 
+				   public void timingEvent(double fraction, 
 							   Object subject, Animation.Dimension dim){
 				       glyph.orientTo(startAngle + fraction*(endAngle - startAngle));
 				   }
@@ -402,11 +403,11 @@ public class AnimationFactory {
      * @param endAction a functor that will be executed when the animation
      * ends. May be set to null, in which case it is ignored.
      */
-    public Animation createGlyphFillColorAnim(final int duration, final Glyph glyph,
+    public Animation createGlyphFillColorAnim(final long duration, final Glyph glyph,
 					      final float[] data, final boolean relative,
 					      final Interpolator interpolator,
 					      final EndAction endAction){
-	return createAnimation(duration, 1f, Animation.RepeatBehavior.LOOP,
+	return createAnimation(duration, 1, Animation.RepeatBehavior.LOOP,
 			       glyph,
 			       Animation.Dimension.FILLCOLOR,
 			       new DefaultTimingHandler(){
@@ -436,11 +437,11 @@ public class AnimationFactory {
 				   }
 
 				   @Override
-				   public void timingEvent(float fraction, 
+				   public void timingEvent(double fraction, 
 							   Object subject, Animation.Dimension dim){
-				       glyph.setHSVColor(startH + fraction*(endH - startH),
-							 startS + fraction*(endS - startS),
-							 startV + fraction*(endV - startV));
+				       glyph.setHSVColor(startH + (float)fraction*(endH - startH),
+							 startS + (float)fraction*(endS - startS),
+							 startV + (float)fraction*(endV - startV));
 				   }
 			       },
 			       interpolator);
@@ -465,11 +466,11 @@ public class AnimationFactory {
      * @param endAction a functor that will be executed when the animation
      * ends. May be set to null, in which case it is ignored.
      */
-    public Animation createGlyphBorderColorAnim(final int duration, final Glyph glyph,
+    public Animation createGlyphBorderColorAnim(final long duration, final Glyph glyph,
 						final float[] data, final boolean relative,
 						final Interpolator interpolator,
 						final EndAction endAction){
-	return createAnimation(duration, 1f, Animation.RepeatBehavior.LOOP,
+	return createAnimation(duration, 1, Animation.RepeatBehavior.LOOP,
 			       glyph,
 			       Animation.Dimension.BORDERCOLOR,
 			       new DefaultTimingHandler(){
@@ -499,11 +500,11 @@ public class AnimationFactory {
 				   }
 
 				   @Override
-				   public void timingEvent(float fraction, 
+				   public void timingEvent(double fraction, 
 							   Object subject, Animation.Dimension dim){
-				       glyph.setHSVbColor(startH + fraction*(endH - startH),
-							  startS + fraction*(endS - startS),
-							  startV + fraction*(endV - startV));
+				       glyph.setHSVbColor(startH + (float)fraction*(endH - startH),
+							  startS + (float)fraction*(endS - startS),
+							  startV + (float)fraction*(endV - startV));
 				   }
 			       },
 			       interpolator);
@@ -526,11 +527,11 @@ public class AnimationFactory {
      * @param endAction a functor that will be executed when the animation
      * ends. May be set to null, in which case it is ignored.
      */
-    public Animation createTranslucencyAnim(final int duration, final Translucent translucent,
+    public Animation createTranslucencyAnim(final long duration, final Translucent translucent,
 					    final float data, final boolean relative,
 					    final Interpolator interpolator,
 					    final EndAction endAction){
-	return createAnimation(duration, 1f, Animation.RepeatBehavior.LOOP,
+	return createAnimation(duration, 1, Animation.RepeatBehavior.LOOP,
 			       translucent,
 			       Animation.Dimension.TRANSLUCENCY,
 			       new DefaultTimingHandler(){
@@ -551,9 +552,9 @@ public class AnimationFactory {
 				   }
 
 				   @Override
-				   public void timingEvent(float fraction, 
+				   public void timingEvent(double fraction, 
 							   Object subject, Animation.Dimension dim){
-				       translucent.setTranslucencyValue(startA + fraction*(endA - startA));
+				       translucent.setTranslucencyValue(startA + (float)fraction*(endA - startA));
 				   }
 			       },
 			       interpolator);
@@ -574,11 +575,11 @@ public class AnimationFactory {
      * @param endAction a functor that will be executed when the animation
      * ends. May be set to null, in which case it is ignored.
      */
-    public Animation createPortalTranslation(final int duration, final Portal portal,
+    public Animation createPortalTranslation(final long duration, final Portal portal,
 					     final Point data, final boolean relative,
 					     final Interpolator interpolator,
 					     final EndAction endAction){
-	return createAnimation(duration, 1f, Animation.RepeatBehavior.LOOP,
+	return createAnimation(duration, 1, Animation.RepeatBehavior.LOOP,
 			       portal,
 			       Animation.Dimension.POSITION,
 			       new DefaultTimingHandler(){
@@ -603,7 +604,7 @@ public class AnimationFactory {
 				    }
 				    
 				    @Override
-				    public void timingEvent(float fraction, 
+				    public void timingEvent(double fraction, 
 							    Object subject, Animation.Dimension dim){
 					portal.moveTo(startX + (int)(fraction*(endX - startX)),
 						      startY + (int)(fraction*(endY - startY)));
@@ -632,12 +633,12 @@ public class AnimationFactory {
      * @param endAction a functor that will be executed when the animation
      * ends. May be set to null, in which case it is ignored.
      */
-    public Animation createPortalSizeAnim(final int duration, final Portal portal,
+    public Animation createPortalSizeAnim(final long duration, final Portal portal,
 					  final int wdata, final int hdata, 
 					  final boolean relative,
 					  final Interpolator interpolator,
 					  final EndAction endAction){
-	return createAnimation(duration, 1f, Animation.RepeatBehavior.LOOP,
+	return createAnimation(duration, 1, Animation.RepeatBehavior.LOOP,
 			       portal,
 			       Animation.Dimension.SIZE,
 			       new DefaultTimingHandler(){
@@ -662,7 +663,7 @@ public class AnimationFactory {
 				   }
 				   
 				   @Override
-				   public void timingEvent(float fraction, 
+				   public void timingEvent(double fraction, 
 							   Object subject, Animation.Dimension dim){
 				       portal.sizeTo(startW + (int)(fraction*(endW - startW)),
 						     startH + (int)(fraction*(endH - startH)));
@@ -687,7 +688,7 @@ public class AnimationFactory {
      * @param endAction a functor that will be executed when the animation
      * ends. May be set to null, in which case it is ignored.
      */
-    public Animation createLensMagAnim(final int duration, final FixedSizeLens lens,
+    public Animation createLensMagAnim(final long duration, final FixedSizeLens lens,
 				       final float data, final boolean relative,
 				       final Interpolator interpolator,
 				       final EndAction endAction){
@@ -695,7 +696,7 @@ public class AnimationFactory {
 	//XXX throw an exception if the animation causes the
 	//magnification factor to become < 0
 
-	return createAnimation(duration, 1f, Animation.RepeatBehavior.LOOP,
+	return createAnimation(duration, 1, Animation.RepeatBehavior.LOOP,
 			       lens,
 			       Animation.Dimension.LENS_MAG,
 			       new DefaultTimingHandler(){
@@ -726,10 +727,10 @@ public class AnimationFactory {
 				   }
 
 	@Override
-		public void timingEvent(float fraction, 
+		public void timingEvent(double fraction, 
 				Object subject, Animation.Dimension dim){
 			lens.setMaximumMagnification(startMag + 
-					fraction * (endMag - startMag), false);
+					(float)fraction * (endMag - startMag), false);
 		}
 		},
 				   interpolator);
@@ -754,7 +755,7 @@ public class AnimationFactory {
      * @param endAction a functor that will be executed when the animation
      * ends. May be set to null, in which case it is ignored.
      */
-    public Animation createLensMagRadiusAnim(final int duration, final FixedSizeLens lens,
+    public Animation createLensMagRadiusAnim(final long duration, final FixedSizeLens lens,
 					     final float magData, final int orData,
 					     final int irData,
 					     final boolean relative,
@@ -765,7 +766,7 @@ public class AnimationFactory {
 	//get bigger than the outer radius or if it causes the magnification
 	//factor to become < 0
 
-	return createAnimation(duration, 1f, Animation.RepeatBehavior.LOOP,
+	return createAnimation(duration, 1, Animation.RepeatBehavior.LOOP,
 			       lens,
 			       Animation.Dimension.LENS_MAG_RADIUS,
 			       new DefaultTimingHandler(){
@@ -808,9 +809,9 @@ public class AnimationFactory {
 				   }
 
 				   @Override
-				   public void timingEvent(float fraction, 
+				   public void timingEvent(double fraction, 
 							   Object subject, Animation.Dimension dim){
-					   lens.setMMandRadii(startMag + fraction * (endMag - startMag),
+					   lens.setMMandRadii(startMag + (float)fraction * (endMag - startMag),
 							      startOr + (int)(fraction*(endOr - startOr)),
 							      startIr + (int)(fraction*(endIr - startIr)), false);
 				   }
@@ -833,7 +834,7 @@ public class AnimationFactory {
      * @param endAction a functor that will be executed when the animation
      * ends. May be set to null, in which case it is ignored.
      */
-    public Animation createLensRadiusAnim(final int duration, final FixedSizeLens lens,
+    public Animation createLensRadiusAnim(final long duration, final FixedSizeLens lens,
 					  final int orData, final int irData,
 					  final boolean relative,
 					  final Interpolator interpolator,
@@ -841,7 +842,7 @@ public class AnimationFactory {
 	//XXX throw an exception if the animation causes the inner radius to 
 	//get bigger than the outer radius
 
- 	return createAnimation(duration, 1f, Animation.RepeatBehavior.LOOP,
+ 	return createAnimation(duration, 1, Animation.RepeatBehavior.LOOP,
 			       lens,
 			       Animation.Dimension.LENS_RADIUS,
 			       new DefaultTimingHandler(){
@@ -882,7 +883,7 @@ public class AnimationFactory {
 				   }
 
 				   @Override
-				   public void timingEvent(float fraction, 
+				   public void timingEvent(double fraction, 
 							   Object subject, Animation.Dimension dim){
 					   lens.setRadii(startOr + (int)(fraction*(endOr - startOr)),
 							 startIr + (int)(fraction*(endIr - startIr)), false);
@@ -903,12 +904,12 @@ public class AnimationFactory {
      * @param endAction a functor that will be executed when the animation
      * ends. May be set to null, in which case it is ignored.
      */
-    public Animation createPathAnim(final int duration, final DPath path,
+    public Animation createPathAnim(final long duration, final DPath path,
 				    final Point2D.Double[] data, final boolean relative,
 				    final Interpolator interpolator,
 				    final EndAction endAction){
 
-	return createAnimation(duration, 1f, Animation.RepeatBehavior.LOOP,
+	return createAnimation(duration, 1, Animation.RepeatBehavior.LOOP,
 			       path,
 			       Animation.Dimension.PATH,
 			       new DefaultTimingHandler(){
@@ -942,7 +943,7 @@ public class AnimationFactory {
 				   }
 
 				   @Override
-				   public void timingEvent(float fraction, 
+				   public void timingEvent(double fraction, 
 							   Object subject, Animation.Dimension dim){
 				       
 				       for(int i=0; i<tempPoints.length; ++i){
