@@ -211,7 +211,12 @@ public abstract class View {
     }
 
     /** Destroy this view. */
-    public abstract void destroyView();
+    public void destroyView(){
+        activeRepaintTimer.stop();
+        for(ActionListener listener: activeRepaintTimer.getActionListeners()){
+            activeRepaintTimer.removeActionListener(listener);
+        }
+    }
 
     /** Get the java.awt.Component for this View. */
     public abstract Component getFrame();

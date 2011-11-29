@@ -166,6 +166,7 @@ public class EView extends View implements KeyListener{
 
     @Override
     public void destroyView(){
+        super.destroyView();
         panel.stop();
         VirtualSpaceManager.INSTANCE.destroyView(this.name);
         frame.dispose();

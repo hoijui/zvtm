@@ -90,6 +90,7 @@ public class PView extends View implements KeyListener {
 
     @Override
     public void destroyView(){
+        super.destroyView();
         panel.stop();
         VirtualSpaceManager.INSTANCE.destroyView(this.name);
     }
