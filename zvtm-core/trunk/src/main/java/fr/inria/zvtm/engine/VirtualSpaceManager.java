@@ -159,7 +159,11 @@ public class VirtualSpaceManager implements AWTEventListener {
     /** Manually set what view is active. */
     public void setActiveView(View v){
         activeView=v;
-        activeViewIndex = getViewIndex(v.getName());
+        if(v != null){
+            activeViewIndex = getViewIndex(v.getName());
+        } else {
+            activeViewIndex = -1;
+        }
     }
 
     /** Get currently active view. */
