@@ -51,6 +51,8 @@ public class AnimationManager {
 	listsLock = new ReentrantLock();
 	//tickThread = new TickThread("tickThread");
     timingSource = new SwingTimerTimingSource();
+    timingSource.init();
+    Animator.setDefaultTimingSource(timingSource);
 	animationFactory = new AnimationFactory(this);
 	started = new AtomicBoolean(false);
 
