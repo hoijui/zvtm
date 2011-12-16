@@ -189,5 +189,9 @@ public abstract class AgileViewPanel extends ViewPanel implements GLEventListene
     public BufferedImage getImage(){
 	    return null;
     }
+    
+    public void setRenderingStrategy(int strategy){
+        jgraphics.setRenderingStrategy(strategy);
+    }
 
 }

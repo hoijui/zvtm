@@ -348,7 +348,9 @@ class TestEventHandler extends ViewAdapter {
     public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
         if (c == 't'){application.translate();}
         else if (c == 'r'){application.rotate();}
-        else if (c == 'd'){application.toggleDynaSpot();}        
+        else if (c == 'd'){application.toggleDynaSpot();}
+        else if (code == KeyEvent.VK_1){((AgileViewPanel)v).setRenderingStrategy(agile2d.AgileGraphics2D.BEST_TEXT_RENDERING_STRATEGY);}
+        else if (code == KeyEvent.VK_2){((AgileViewPanel)v).setRenderingStrategy(agile2d.AgileGraphics2D.ROUGH_TEXT_RENDERING_STRATEGY);}
     }
     
     public void viewClosing(View v){
