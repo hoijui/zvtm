@@ -7,6 +7,7 @@
 package fr.inria.zvtm.cluster;
 
 import java.awt.Color;
+import java.awt.Paint;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
@@ -23,6 +24,7 @@ import fr.inria.zvtm.glyphs.ClosedShape;
 import fr.inria.zvtm.glyphs.Composite;
 import fr.inria.zvtm.glyphs.DPath;
 import fr.inria.zvtm.glyphs.MultilineText;
+import fr.inria.zvtm.glyphs.PRectangle;
 import fr.inria.zvtm.glyphs.SIRectangle;
 import fr.inria.zvtm.glyphs.VCircle;
 import fr.inria.zvtm.glyphs.VEllipse;
@@ -106,6 +108,10 @@ public aspect GlyphCreation {
 	@Override GlyphReplicator VRectangle.getReplicator(){
 		return new VRectangleReplicator(this);
 	}
+
+    @Override GlyphReplicator PRectangle.getReplicator(){
+        return new PRectangleReplicator(this);
+    }
 	
 	@Override GlyphReplicator VRectangleOr.getReplicator(){
 		return new VRectangleOrReplicator(this);
@@ -285,6 +291,20 @@ public aspect GlyphCreation {
 				+ ", height=" + height;
 		}
 	}
+
+    private static class PRectangleReplicator extends VRectangleReplicator {
+        protected final Paint paint;
+
+        PRectangleReplicator(PRectangle source){
+            super(source);
+            paint = GlyphReplication.wrapPaint(source.getPaint());
+        }
+
+        public Glyph doCreateGlyph(){
+            PRectangle retval = new PRectangle(0d,0d,0,width,height,paint);
+            return retval;
+        }
+    }
 	
 	private static class VRectangleOrReplicator extends VRectangleReplicator {
 
