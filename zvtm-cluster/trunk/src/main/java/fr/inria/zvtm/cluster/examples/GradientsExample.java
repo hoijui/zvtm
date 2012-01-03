@@ -23,6 +23,7 @@ import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.PRectangle;
 
 import java.awt.Color;
+import java.awt.GradientPaint;
 import java.awt.LinearGradientPaint;
 import java.util.Vector;
 import java.awt.event.KeyEvent;
@@ -68,6 +69,8 @@ public class GradientsExample {
         PRectangle prect = new PRectangle(0,0,0,50,50,null);
         vs.addGlyph(prect, false);
         prect.setPaint(new LinearGradientPaint(0,0,50,50,new float[]{0, 1}, new Color[]{Color.WHITE, Color.BLACK}));
+        PRectangle prect2 = new PRectangle(-60,0,0,50,50, new GradientPaint(0,0,Color.BLUE,50,50,Color.BLACK,false));
+        vs.addGlyph(prect2, false);
 	}
 
 	public static void main(String[] args){

@@ -1,6 +1,7 @@
 package fr.inria.zvtm.cluster;
 
 import java.awt.Color;
+import java.awt.GradientPaint;
 import java.awt.LinearGradientPaint;
 import java.awt.MultipleGradientPaint;
 import java.awt.Paint;
@@ -93,7 +94,47 @@ aspect GlyphReplication {
         }
     }
 
+    // a serializable GradientPaint
+    private static class GradPaint implements Paint, Serializable {
+        private transient GradientPaint paint;
+        private final float x1;
+        private final float y1;
+        private final float x2;
+        private final float y2;
+        private final Color color1;
+        private final Color color2;
+        private final boolean cyclic;
+
+        GradPaint(GradientPaint paint){
+            this.paint = paint;
+            x1 = (float)paint.getPoint1().getX();
+            y1 = (float)paint.getPoint1().getY();
+            x2 = (float)paint.getPoint2().getX();
+            y2 = (float)paint.getPoint2().getY();
+            color1 = paint.getColor1();
+            color2 = paint.getColor2();
+            cyclic = paint.isCyclic();
+        }
+        public PaintContext createContext(ColorModel cm,
+                Rectangle deviceBounds,
+                Rectangle2D userBounds,
+                AffineTransform xform,
+                RenderingHints hints){
+            return paint.createContext(cm, deviceBounds, userBounds, xform, hints);
+        }
+
+        public int getTransparency(){
+            return paint.getTransparency();
+        }
+
+        private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException{
+            in.defaultReadObject();
+            paint = new GradientPaint(x1, y1, color1, x2, y2, color2, cyclic);
+        }
+    }
+
     // a serializable LinearGradientPaint
+    // XXX transparency
     private static class LinGradPaint implements Paint, Serializable {
         private transient LinearGradientPaint paint;
         private final float startX;
@@ -140,6 +181,8 @@ aspect GlyphReplication {
     static final Paint wrapPaint(Paint orig){
         if(orig instanceof Serializable){
             return orig;
+        } else if (orig instanceof GradientPaint){
+            return new GradPaint((GradientPaint)orig);
         } else if(orig instanceof LinearGradientPaint){
             return new LinGradPaint((LinearGradientPaint)orig);
         } else {
