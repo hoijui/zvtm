@@ -194,8 +194,8 @@ public abstract class AgileViewPanel extends ViewPanel implements GLEventListene
 	    return null;
     }
     
-    public void setRenderingStrategy(int strategy){
-        jgraphics.setRenderingStrategy(strategy);
+    public void setFontRenderingStrategy(int strategy){
+        jgraphics.setFontRenderingStrategy(strategy);
     }
 
 }
