@@ -30,6 +30,8 @@ import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.awt.GLJPanel;
 import javax.media.opengl.GLEventListener;
+import javax.media.opengl.GLCapabilities;
+import javax.media.opengl.GLProfile;
 
 import agile2d.AgileGraphics2D;
 import agile2d.AgileState;
@@ -47,7 +49,7 @@ import agile2d.AgileState;
  */
 
 public class AgileGLJViewPanel extends AgileViewPanel {
-        
+    
     protected GLJPanel panel;
     
     public Component getComponent(){
@@ -55,7 +57,12 @@ public class AgileGLJViewPanel extends AgileViewPanel {
     }
     
     AgileGLJViewPanel(Vector cameras, View v, boolean arfome) {
-        panel = new GLJPanel();
+        GLProfile myGLProfile = GLProfile.get(GLProfile.GL2);
+		GLCapabilities caps = new GLCapabilities(myGLProfile);
+		//caps.setDoubleBuffered(true);
+		//caps.setSampleBuffers(true);
+		//caps.setNumSamples(2);
+        panel = new GLJPanel(caps);
         
         ActionListener taskPerformer = new ActionListener(){
             public void actionPerformed(ActionEvent evt){

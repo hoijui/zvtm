@@ -43,16 +43,16 @@ import agile2d.AgileState;
  */
 
 public abstract class AgileViewPanel extends ViewPanel implements GLEventListener {
-    
+
     private AgileGraphics2D jgraphics;
     private Component       root;
-    
+
 	Timer edtTimer;
 
     void stop(){
         edtTimer.stop();
     }
-    
+
     public void init(GLAutoDrawable drawable){
         // Called by the drawable immediately after the OpenGL context is initialized.
         jgraphics = AgileGraphics2D.getInstance(drawable);
@@ -62,7 +62,7 @@ public abstract class AgileViewPanel extends ViewPanel implements GLEventListene
         }
         gl.setSwapInterval(1);
         if (drawable.getAutoSwapBufferMode()){
-            drawable.setAutoSwapBufferMode(false);            
+            drawable.setAutoSwapBufferMode(false);
         }
     }
 
@@ -80,7 +80,7 @@ public abstract class AgileViewPanel extends ViewPanel implements GLEventListene
         // Called by the drawable to initiate OpenGL rendering by the client.
         GL2 gl = drawable.getGL().getGL2();
         // Restore all the Java2D Graphics defaults
-        jgraphics.resetAll(drawable);        
+        jgraphics.resetAll(drawable);
     	this.paint(jgraphics, gl);
     }
 
@@ -164,8 +164,13 @@ public abstract class AgileViewPanel extends ViewPanel implements GLEventListene
                             oldY=parent.mouse.jpy;
                         }
                     }
-                    //end drawing here             
-                    gl.glSwapAPPLE();       
+                    //end drawing here
+                    gl.glSwapAPPLE();
+                    synchronized(this){
+            			lastButOneRepaint = lastRepaint;
+            			lastRepaint = System.currentTimeMillis();
+            			delay = lastRepaint - lastButOneRepaint;
+            		}
                 }
             }
             else {
@@ -193,7 +198,7 @@ public abstract class AgileViewPanel extends ViewPanel implements GLEventListene
     public BufferedImage getImage(){
 	    return null;
     }
-    
+
     public void setFontRenderingStrategy(int strategy){
         jgraphics.setFontRenderingStrategy(strategy);
     }
