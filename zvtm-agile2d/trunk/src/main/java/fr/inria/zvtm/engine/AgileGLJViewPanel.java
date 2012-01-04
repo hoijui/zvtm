@@ -1,8 +1,8 @@
 /*
- *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2011.
+ *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2011-2012.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: AgileViewPanel.java 4327 2011-03-04 14:34:59Z epietrig $
+ * $Id$
  */
 
 package fr.inria.zvtm.engine;

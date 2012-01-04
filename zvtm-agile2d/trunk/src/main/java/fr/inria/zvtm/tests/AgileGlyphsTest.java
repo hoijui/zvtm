@@ -1,7 +1,7 @@
 /*
  * AUTHOR : Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *
- *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2010-2011.
+ *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2010-2012.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -349,8 +349,8 @@ class TestEventHandler extends ViewAdapter {
         if (c == 't'){application.translate();}
         else if (c == 'r'){application.rotate();}
         else if (c == 'd'){application.toggleDynaSpot();}
-        else if (code == KeyEvent.VK_1){((AgileViewPanel)v).setRenderingStrategy(agile2d.AgileGraphics2D.BEST_TEXT_RENDERING_STRATEGY);}
-        else if (code == KeyEvent.VK_2){((AgileViewPanel)v).setRenderingStrategy(agile2d.AgileGraphics2D.ROUGH_TEXT_RENDERING_STRATEGY);}
+        else if (code == KeyEvent.VK_1){((AgileViewPanel)v).setFontRenderingStrategy(agile2d.AgileGraphics2D.BEST_TEXT_RENDERING_STRATEGY);}
+        else if (code == KeyEvent.VK_2){((AgileViewPanel)v).setFontRenderingStrategy(agile2d.AgileGraphics2D.ROUGH_TEXT_RENDERING_STRATEGY);}
     }
     
     public void viewClosing(View v){

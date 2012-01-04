@@ -1,5 +1,5 @@
 /*
- *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2011.
+ *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2011-2012.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -8,6 +8,7 @@
 package fr.inria.zvtm.tests;
 
 import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
@@ -18,14 +19,16 @@ import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
+import fr.inria.zvtm.engine.Java2DPainter;
 import fr.inria.zvtm.engine.AgileGLCanvasFactory;
+import fr.inria.zvtm.engine.AgileNewtCanvasFactory;
 import fr.inria.zvtm.engine.AgileGLJPanelFactory;
 import fr.inria.zvtm.event.ViewAdapter;
 
 import fr.inria.zvtm.glyphs.*;
 
 
-public class AgileTest {
+public class AgileTest implements Java2DPainter {
 	
 	VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE;
 	VirtualSpace mSpace;
@@ -35,6 +38,7 @@ public class AgileTest {
 	public AgileTest(String vt){
 		init(vt);
 		populate();
+		mView.getGlobalView(mCamera, 0);
 	}
 	
 	void init(String vt){
@@ -46,20 +50,36 @@ public class AgileTest {
         if (vt.equals(AgileGLJPanelFactory.AGILE_GLJ_VIEW)){
             System.out.println("Instantiating a GLJPanel-backed view");
             View.registerViewPanelFactory(AgileGLJPanelFactory.AGILE_GLJ_VIEW, new AgileGLJPanelFactory());
-    		mView = vsm.addFrameView(cameras, View.ANONYMOUS, AgileGLJPanelFactory.AGILE_GLJ_VIEW, 800, 600, true);
+    		mView = vsm.addFrameView(cameras, View.ANONYMOUS, AgileGLJPanelFactory.AGILE_GLJ_VIEW, 1600, 1200, true);
+        }
+        else if (vt.equals(AgileNewtCanvasFactory.AGILE_NEWT_VIEW)){
+            System.out.println("Instantiating a NewtCanvas-backed view");
+            View.registerViewPanelFactory(AgileNewtCanvasFactory.AGILE_NEWT_VIEW, new AgileNewtCanvasFactory());
+    		mView = vsm.addFrameView(cameras, View.ANONYMOUS, AgileNewtCanvasFactory.AGILE_NEWT_VIEW, 1600, 1200, true);
         }
         else {
             System.out.println("Instantiating a GLCanvas-backed view");
             View.registerViewPanelFactory(AgileGLCanvasFactory.AGILE_GLC_VIEW, new AgileGLCanvasFactory());
-    		mView = vsm.addFrameView(cameras, View.ANONYMOUS, AgileGLCanvasFactory.AGILE_GLC_VIEW, 800, 600, true);
+    		mView = vsm.addFrameView(cameras, View.ANONYMOUS, AgileGLCanvasFactory.AGILE_GLC_VIEW, 1600, 1200, true);
         }
 		mView.setBackgroundColor(Color.LIGHT_GRAY);
 		mView.setListener(new MainListener(this), 0);
+		mView.setRefreshRate(1);
+		mView.setJava2DPainter(this, Java2DPainter.FOREGROUND);
 	}
 	
 	void populate(){
-		mSpace.addGlyph(new VCircle(-200, 0, 0, 100, Color.WHITE));
-		mSpace.addGlyph(new VRectangle(200, 0, 0, 500, 100, Color.RED));
+		float MAX = 100;
+        for (int i=0;i<MAX;i++){
+            for (int j=0;j<MAX;j++){
+                mSpace.addGlyph(new VRectangle(i*20,j*20,0,18,18,Color.getHSBColor(i/MAX,j/MAX,1)));
+            }
+        }
+	}
+	
+	public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
+	    float rr = 1000 / (float)(mView.getPanel().getDelay());
+	    g2d.drawString(String.valueOf(rr), 10, 20);
 	}
 	
 	public static void main(String[] args){
