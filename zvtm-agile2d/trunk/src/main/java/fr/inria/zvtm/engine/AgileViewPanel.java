@@ -61,6 +61,9 @@ public abstract class AgileViewPanel extends ViewPanel implements GLEventListene
             System.out.println("Agile2D:: INIT GL IS: " + gl.getClass().getName());
         }
         gl.setSwapInterval(1);
+        if (drawable.getAutoSwapBufferMode()){
+            drawable.setAutoSwapBufferMode(false);            
+        }
     }
 
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height){
@@ -161,7 +164,8 @@ public abstract class AgileViewPanel extends ViewPanel implements GLEventListene
                             oldY=parent.mouse.jpy;
                         }
                     }
-                    //end drawing here                    
+                    //end drawing here             
+                    gl.glSwapAPPLE();       
                 }
             }
             else {
