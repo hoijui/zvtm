@@ -297,7 +297,7 @@ public aspect GlyphCreation {
 
         PRectangleReplicator(PRectangle source){
             super(source);
-            paint = GlyphReplication.wrapPaint(source.getPaint());
+            paint = Paints.wrapPaint(source.getPaint());
         }
 
         public Glyph doCreateGlyph(){
