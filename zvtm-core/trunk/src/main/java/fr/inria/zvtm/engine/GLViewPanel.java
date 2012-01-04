@@ -205,6 +205,11 @@ public class GLViewPanel extends ViewPanel {
             }
         }
         catch (NullPointerException ex0){if (VirtualSpaceManager.debugModeON()){System.err.println("GLViewPanel.paint "+ex0);}}
+        synchronized(this){
+			lastButOneRepaint = lastRepaint;
+			lastRepaint = System.currentTimeMillis();
+			delay = lastRepaint - lastButOneRepaint;
+		}
         if (repaintListener != null){repaintListener.viewRepainted(this.parent);}
     }
 

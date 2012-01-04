@@ -745,6 +745,17 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
      *@return positive integer in milliseconds
      */
     public abstract int getRefreshRate();
+    
+    long delay;
+    long lastRepaint = 0;
+    long lastButOneRepaint = 0;
+    
+    /**
+     * Get the actual instantaneous refresh rate. As the delay (in milliseconds) between the last two full view repaint calls performed.
+     */
+    public long getDelay(){
+        return delay;   
+    }
 
 	/**set a lens for this view ; set to null to remove an existing lens*/
 	protected Lens setLens(Lens l){

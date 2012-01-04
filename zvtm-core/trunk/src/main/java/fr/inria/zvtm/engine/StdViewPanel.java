@@ -367,6 +367,11 @@ public class StdViewPanel extends ViewPanel {
 						//end drawing here
 						if (stableRefToBackBufferGraphics == backBufferGraphics) {
 							panel.paintImmediately(0,0,size.width,size.height);
+							synchronized(this){    							
+    							lastButOneRepaint = lastRepaint;
+    							lastRepaint = System.currentTimeMillis();
+    							delay = lastRepaint - lastButOneRepaint;
+							}
 						}
 					}
 					catch (NullPointerException ex0){
