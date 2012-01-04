@@ -735,13 +735,13 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
     public abstract java.awt.image.BufferedImage getImage();
 
     /**
-     * Sets the maximum view refresh rate by giving the minimum refresh period (below which ZVTM won't go even if it can) 
+     * Sets the maximum view refresh rate. Beyond which ZVTM won't go even if it can.
      *@param r positive integer in milliseconds
      */
     public abstract void setRefreshRate(int r);
 
     /**
-     * Gets the maximum view refresh rate as the minimum refresh period (below which ZVTM won't go even if it can) 
+     * Gets the maximum view refresh rate. Beyond which ZVTM won't go even if it can.
      *@return positive integer in milliseconds
      */
     public abstract int getRefreshRate();

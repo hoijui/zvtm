@@ -433,5 +433,5 @@ public class StdViewPanel extends ViewPanel {
     public int getRefreshRate(){
         return edtTimer.getDelay();
     }
+    
 }
-

@@ -487,14 +487,14 @@ public abstract class View {
     /** Shows or hides this View depending on the value of parameter b. */
     public abstract void setVisible(boolean b);
 
-    /** Set this View's refresh rate - default is 20.
+    /** Set this View's refresh rate - default is 25.
      *@param rr positive integer (refresh rate in milliseconds)
      */
     public void setRefreshRate(int rr){
 	    panel.setRefreshRate(rr);
     }
 
-    /** Get this View's refresh rate - default is 20.*/
+    /** Get this View's refresh rate - default is 25.*/
     public int getRefreshRate(){
 	    return panel.getRefreshRate();
     }
