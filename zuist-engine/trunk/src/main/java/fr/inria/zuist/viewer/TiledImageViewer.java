@@ -66,6 +66,8 @@ import fr.inria.zvtm.animation.EndAction;
 import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 import fr.inria.zvtm.event.RepaintListener;
 
+import fr.inria.zvtm.engine.AgileGLCanvasFactory;
+
 import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zuist.engine.Region;
 import fr.inria.zuist.engine.ProgressListener;
@@ -151,7 +153,13 @@ public class TiledImageViewer {
         Vector cameras = new Vector();
         cameras.add(mCamera);
         cameras.add(aboutSpace.getCamera(0));
-        mView = vsm.addFrameView(cameras, mViewName, (opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, !fullscreen, (!fullscreen) ? initMenu() : null);
+        if (opengl){
+            View.registerViewPanelFactory(AgileGLCanvasFactory.AGILE_GLC_VIEW, new AgileGLCanvasFactory());
+            mView = vsm.addFrameView(cameras, mViewName, AgileGLCanvasFactory.AGILE_GLC_VIEW, VIEW_W, VIEW_H, false, false, !fullscreen, (!fullscreen) ? initMenu() : null);
+        }
+        else {
+            mView = vsm.addFrameView(cameras, mViewName, View.STD_VIEW, VIEW_W, VIEW_H, false, false, !fullscreen, (!fullscreen) ? initMenu() : null);
+        }
         if (fullscreen && GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().isFullScreenSupported()){
             GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow((JFrame)mView.getFrame());
         }
@@ -337,9 +345,9 @@ public class TiledImageViewer {
                 }
             }
 		}
-		if (ogl){
-		    System.setProperty("sun.java2d.opengl", "True");
-		}
+		//if (ogl){
+		//    System.setProperty("sun.java2d.opengl", "True");
+		//}
         if (!fs && Utils.osIsMacOS()){
             System.setProperty("apple.laf.useScreenMenuBar", "true");
         }

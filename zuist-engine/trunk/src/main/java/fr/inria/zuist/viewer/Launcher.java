@@ -55,9 +55,9 @@ public class Launcher {
                 }
             }
 		}
-		if (ogl){
-		    System.setProperty("sun.java2d.opengl", "True");
-		}
+		//if (ogl){
+		//    System.setProperty("sun.java2d.opengl", "True");
+		//}
         if (!fs && Utils.osIsMacOS()){
             System.setProperty("apple.laf.useScreenMenuBar", "true");
         }

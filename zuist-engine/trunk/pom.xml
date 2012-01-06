@@ -40,6 +40,13 @@ $Id$
       <name>Maven Repository</name>
       <url>http://repo1.maven.org/maven2</url>
     </repository>
+	<!-- This repository puts in a maven repository the JOGL and Gluegen jar files
+    available on http://jogamp.org/deployment/v2.0-rc4/jar/ -->
+	<repository>
+	  <id>internal</id>
+	  <name>Internal Third-party Repository for JOGL Libraries</name>
+	  <url>http://rodrigoalmeida.free.fr/maven2</url>
+	</repository>
   </repositories>
   
   <!-- Distribution - Deploy to FTP -->
@@ -50,12 +57,53 @@ $Id$
     </repository>
   </distributionManagement>
   
+  <profiles>
+    <profile>
+      <id>osx</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <build.type>macosx-universal</build.type>
+      </properties>
+    </profile>
+    <profile>
+      <id>lin32</id>
+      <properties>
+        <build.type>linux-i586</build.type>
+      </properties>
+    </profile>
+    <profile>
+      <id>lin64</id>
+      <properties>
+        <build.type>linux-amd64</build.type>
+      </properties>
+    </profile>
+    <profile>
+      <id>win32</id>
+      <properties>
+        <build.type>windows-i586</build.type>
+      </properties>
+    </profile>
+    <profile>
+      <id>win64</id>
+      <properties>
+        <build.type>windows-amd64</build.type>
+      </properties>
+    </profile>
+  </profiles>
+
   <!-- Dependencies -->
   <dependencies>
 	<dependency>
       <groupId>fr.inria.zvtm</groupId>
       <artifactId>zvtm-core</artifactId>
       <version>[0.11.0-SNAPSHOT,)</version>
+    </dependency>
+	<dependency>
+      <groupId>fr.inria.zvtm</groupId>
+      <artifactId>zvtm-agile2d</artifactId>
+      <version>[0.1.0-SNAPSHOT,)</version>
     </dependency>
 	<dependency>
       <groupId>fr.inria.zvtm</groupId>
@@ -80,6 +128,46 @@ $Id$
       </resource>
 	</resources>
     <plugins>
+		<plugin>
+		  <groupId>org.apache.maven.plugins</groupId>
+		  <artifactId>maven-dependency-plugin</artifactId>
+		  <executions>
+		    <execution>
+		      <id>unpack</id>
+		      <phase>compile</phase>
+		      <goals>
+		        <goal>unpack</goal>
+		      </goals>
+		      <configuration>
+		        <artifactItems>
+					<artifactItem>
+					  <groupId>org.jogamp.jogl</groupId>
+					  <artifactId>jogl-all-natives</artifactId>
+					  <version>v2.0-rc5</version>
+		 			  <classifier>${build.type}</classifier>
+					  <type>jar</type>
+					  <includes>*.jnilib,*.lib,*.so,*.dll</includes>
+					  <overWrite>true</overWrite>
+					  <outputDirectory>${project.build.directory}/lib</outputDirectory>
+					</artifactItem>
+					<artifactItem>
+					  <groupId>org.jogamp.gluegen</groupId>
+					  <artifactId>gluegen-rt-natives</artifactId>
+					  <version>v2.0-rc5</version>
+		 			  <classifier>${build.type}</classifier>
+					  <type>jar</type>
+		              <includes>*.jnilib,*.lib,*.so,*.dll</includes>
+					  <!-- Exclude native library files of jogl for mobile platforms -->
+		              <!-- <excludes>%ant[*mobile*]</excludes> -->
+					  <overWrite>true</overWrite>
+					  <outputDirectory>${project.build.directory}/lib</outputDirectory>
+					</artifactItem>
+		        </artifactItems>
+		      </configuration>
+		    </execution>
+		  </executions>
+		</plugin>
+	
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>dependency-maven-plugin</artifactId>
