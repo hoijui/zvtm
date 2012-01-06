@@ -1,5 +1,5 @@
 /*
- *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2011.
+ *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2011-2012.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -18,6 +18,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
+import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import javax.swing.Timer;
 import java.util.Vector;
@@ -62,7 +63,9 @@ public class AgileGLCViewPanel extends AgileViewPanel {
 		//caps.setDoubleBuffered(true);
         panel = new GLCanvas(caps);
         panel.addGLEventListener(this);
-        
+        if (parent instanceof KeyListener){
+            panel.addKeyListener((KeyListener)parent);
+        }
         ActionListener taskPerformer = new ActionListener(){
             public void actionPerformed(ActionEvent evt){
                 panel.display();

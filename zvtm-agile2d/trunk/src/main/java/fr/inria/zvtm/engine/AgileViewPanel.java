@@ -45,7 +45,6 @@ import agile2d.AgileState;
 public abstract class AgileViewPanel extends ViewPanel implements GLEventListener {
 
     private AgileGraphics2D jgraphics;
-    private Component       root;
 
 	Timer edtTimer;
 
