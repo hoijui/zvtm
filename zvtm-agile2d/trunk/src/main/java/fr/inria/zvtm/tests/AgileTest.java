@@ -8,6 +8,7 @@
 package fr.inria.zvtm.tests;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
@@ -23,6 +24,9 @@ import fr.inria.zvtm.engine.Java2DPainter;
 import fr.inria.zvtm.engine.AgileGLCanvasFactory;
 import fr.inria.zvtm.engine.AgileNewtCanvasFactory;
 import fr.inria.zvtm.engine.AgileGLJPanelFactory;
+import fr.inria.zvtm.animation.Animation;
+import fr.inria.zvtm.animation.DefaultTimingHandler;
+import fr.inria.zvtm.animation.interpolation.ConstantAccInterpolator;
 import fr.inria.zvtm.event.ViewAdapter;
 
 import fr.inria.zvtm.glyphs.*;
@@ -30,15 +34,29 @@ import fr.inria.zvtm.glyphs.*;
 
 public class AgileTest implements Java2DPainter {
 	
+	static final int FRAME_WIDTH = 1600;
+	static final int FRAME_HEIGHT = 1200;
+	
+	static final Font FPS_FONT = new Font("Arial", Font.PLAIN, 12);
+	
+	static final float DEFAULT_MAX = 100;
+	float MAX = DEFAULT_MAX;
+	
 	VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE;
 	VirtualSpace mSpace;
 	View mView;
 	Camera mCamera;
 	
-	public AgileTest(String vt){
+	public AgileTest(String vt, float nbObj){
 		init(vt);
+		MAX = nbObj;
 		populate();
+		double gvAlt = mView.getGlobalView(mCamera).getAltitude();
 		mView.getGlobalView(mCamera, 0);
+        animate(gvAlt);
+		while(true){
+            vsm.repaint();
+        }
 	}
 	
 	void init(String vt){
@@ -50,17 +68,21 @@ public class AgileTest implements Java2DPainter {
         if (vt.equals(AgileGLJPanelFactory.AGILE_GLJ_VIEW)){
             System.out.println("Instantiating a GLJPanel-backed view");
             View.registerViewPanelFactory(AgileGLJPanelFactory.AGILE_GLJ_VIEW, new AgileGLJPanelFactory());
-    		mView = vsm.addFrameView(cameras, View.ANONYMOUS, AgileGLJPanelFactory.AGILE_GLJ_VIEW, 1600, 1200, true);
+    		mView = vsm.addFrameView(cameras, View.ANONYMOUS, AgileGLJPanelFactory.AGILE_GLJ_VIEW, FRAME_WIDTH, FRAME_HEIGHT, true);
         }
         else if (vt.equals(AgileNewtCanvasFactory.AGILE_NEWT_VIEW)){
             System.out.println("Instantiating a NewtCanvas-backed view");
             View.registerViewPanelFactory(AgileNewtCanvasFactory.AGILE_NEWT_VIEW, new AgileNewtCanvasFactory());
-    		mView = vsm.addFrameView(cameras, View.ANONYMOUS, AgileNewtCanvasFactory.AGILE_NEWT_VIEW, 1600, 1200, true);
+    		mView = vsm.addFrameView(cameras, View.ANONYMOUS, AgileNewtCanvasFactory.AGILE_NEWT_VIEW, FRAME_WIDTH, FRAME_HEIGHT, true);
         }
-        else {
+        else if (vt.equals(AgileGLCanvasFactory.AGILE_GLC_VIEW)){
             System.out.println("Instantiating a GLCanvas-backed view");
             View.registerViewPanelFactory(AgileGLCanvasFactory.AGILE_GLC_VIEW, new AgileGLCanvasFactory());
-    		mView = vsm.addFrameView(cameras, View.ANONYMOUS, AgileGLCanvasFactory.AGILE_GLC_VIEW, 1600, 1200, true);
+    		mView = vsm.addFrameView(cameras, View.ANONYMOUS, AgileGLCanvasFactory.AGILE_GLC_VIEW, FRAME_WIDTH, FRAME_HEIGHT, true);
+        }
+        else {
+            System.out.println("Instantiating a regular Java2D view");
+            mView = vsm.addFrameView(cameras, View.ANONYMOUS, View.STD_VIEW, FRAME_WIDTH, FRAME_HEIGHT, true);
         }
 		mView.setBackgroundColor(Color.LIGHT_GRAY);
 		mView.setListener(new MainListener(this), 0);
@@ -69,16 +91,35 @@ public class AgileTest implements Java2DPainter {
 	}
 	
 	void populate(){
-		float MAX = 100;
+	    Glyph[] glyphs = new Glyph[(int)(MAX*MAX)];
         for (int i=0;i<MAX;i++){
             for (int j=0;j<MAX;j++){
-                mSpace.addGlyph(new VRectangle(i*20,j*20,0,18,18,Color.getHSBColor(i/MAX,j/MAX,1)));
+                VRectangle r = new VRectangle(i*20,j*20,0,20,20,Color.getHSBColor(i/MAX,j/MAX,1));
+                r.setDrawBorder(false);
+                glyphs[(int)(i*MAX+j)] = r;
             }
         }
+        mSpace.addGlyphs(glyphs);
 	}
+	
+	void animate(final double gvAlt){
+	    Animation cameraAlt = vsm.getAnimationManager().getAnimationFactory().createAnimation(
+           2000, Animation.INFINITE, Animation.RepeatBehavior.REVERSE, mCamera, Animation.Dimension.ALTITUDE,
+           new DefaultTimingHandler(){
+               public void timingEvent(float fraction, Object subject, Animation.Dimension dim){
+                   Camera c = (Camera)subject;
+                   c.setAltitude(2*Double.valueOf(fraction*gvAlt).doubleValue());
+               }
+           },
+           ConstantAccInterpolator.getInstance()
+        );
+        vsm.getAnimationManager().startAnimation(cameraAlt, false);
+    }
 	
 	public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
 	    float rr = 1000 / (float)(mView.getPanel().getDelay());
+	    g2d.setColor(Color.BLACK);
+	    g2d.setFont(FPS_FONT);
 	    g2d.drawString(String.valueOf(rr), 10, 20);
 	}
 	
@@ -97,7 +138,21 @@ public class AgileTest implements Java2DPainter {
         System.out.println("User name: "+System.getProperty("user.name"));
         System.out.println("User home directory: "+System.getProperty("user.home"));
         System.out.println("-----------------");
-        new AgileTest((args.length > 0) ? args[0] : AgileGLCanvasFactory.AGILE_GLC_VIEW);
+        String vt = "";
+        float nbObj = DEFAULT_MAX;
+        for (String arg:args){
+            if (arg.startsWith("a2d")){vt = arg;}
+            else {
+                try {
+                    nbObj = Integer.parseInt(arg);
+                }
+                catch (NumberFormatException ex){
+                    ex.printStackTrace();
+                    System.exit(1);
+                }
+            }
+        }
+        new AgileTest(vt, nbObj);
     }
     	
 }
@@ -166,6 +221,10 @@ class MainListener extends ViewAdapter {
 
     public void exitGlyph(Glyph g){
         g.highlight(false, null);
+    }
+    
+    public void viewClosing(View v){
+        System.exit(0);
     }
     
 }
