@@ -63,12 +63,11 @@ public class AgileNewtViewPanel extends AgileViewPanel {
         GLProfile myGLProfile = GLProfile.get(GLProfile.GL2);
 		GLCapabilities caps = new GLCapabilities(myGLProfile);
 		//caps.setDoubleBuffered(true);
-		//caps.setSampleBuffers(true);
-		//caps.setNumSamples(2);
 
         window = GLWindow.create(caps); 
 		panel = new NewtCanvasAWT(window);
-        
+        window.addGLEventListener(this);
+		
         ActionListener taskPerformer = new ActionListener(){
             public void actionPerformed(ActionEvent evt){
                 panel.repaint();
@@ -78,7 +77,7 @@ public class AgileNewtViewPanel extends AgileViewPanel {
         panel.addHierarchyListener(
             new HierarchyListener() {
                 public void hierarchyChanged(HierarchyEvent e) {
-                    if (panel.isShowing()) {
+                    if (panel.isShowing()){
                         start();
                     } else {
                         stop();
@@ -107,8 +106,6 @@ public class AgileNewtViewPanel extends AgileViewPanel {
 
     private void start(){
         edtTimer.start();
-		window.addGLEventListener(this);
-        //this.setRoot(canvas);
     }
 
 }

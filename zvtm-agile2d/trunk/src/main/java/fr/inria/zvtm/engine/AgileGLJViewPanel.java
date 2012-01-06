@@ -60,10 +60,8 @@ public class AgileGLJViewPanel extends AgileViewPanel {
         GLProfile myGLProfile = GLProfile.get(GLProfile.GL2);
 		GLCapabilities caps = new GLCapabilities(myGLProfile);
 		//caps.setDoubleBuffered(true);
-		//caps.setSampleBuffers(true);
-		//caps.setNumSamples(2);
         panel = new GLJPanel(caps);
-        
+        panel.addGLEventListener(this);
         ActionListener taskPerformer = new ActionListener(){
             public void actionPerformed(ActionEvent evt){
                 panel.display();
@@ -102,8 +100,6 @@ public class AgileGLJViewPanel extends AgileViewPanel {
 
     private void start(){
         edtTimer.start();
-        panel.addGLEventListener(this);
-        //this.setRoot(canvas);
     }
 
 }

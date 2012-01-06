@@ -30,6 +30,8 @@ import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.awt.GLCanvas;
 import javax.media.opengl.GLEventListener;
+import javax.media.opengl.GLCapabilities;
+import javax.media.opengl.GLProfile;
 
 import agile2d.AgileGraphics2D;
 import agile2d.AgileState;
@@ -55,7 +57,12 @@ public class AgileGLCViewPanel extends AgileViewPanel {
     }
     
     AgileGLCViewPanel(Vector cameras, View v, boolean arfome) {
-        panel = new GLCanvas();
+        GLProfile myGLProfile = GLProfile.get(GLProfile.GL2);
+		GLCapabilities caps = new GLCapabilities(myGLProfile);
+		//caps.setDoubleBuffered(true);
+        panel = new GLCanvas(caps);
+        panel.addGLEventListener(this);
+        
         ActionListener taskPerformer = new ActionListener(){
             public void actionPerformed(ActionEvent evt){
                 panel.display();
@@ -94,8 +101,6 @@ public class AgileGLCViewPanel extends AgileViewPanel {
     
     private void start(){
         edtTimer.start();
-        panel.addGLEventListener(this);
-        //this.setRoot(canvas);
     }
 
 }

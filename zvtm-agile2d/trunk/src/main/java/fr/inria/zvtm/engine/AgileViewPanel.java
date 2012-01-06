@@ -164,8 +164,8 @@ public abstract class AgileViewPanel extends ViewPanel implements GLEventListene
                             oldY=parent.mouse.jpy;
                         }
                     }
-                    //end drawing here
                     gl.glSwapAPPLE();
+                    //end drawing here
                     synchronized(this){
             			lastButOneRepaint = lastRepaint;
             			lastRepaint = System.currentTimeMillis();
