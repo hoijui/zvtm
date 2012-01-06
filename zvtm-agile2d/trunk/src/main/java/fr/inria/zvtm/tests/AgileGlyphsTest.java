@@ -51,6 +51,11 @@ public class AgileGlyphsTest {
             View.registerViewPanelFactory(AgileGLJPanelFactory.AGILE_GLJ_VIEW, new AgileGLJPanelFactory());
             testView = vsm.addFrameView(cameras, View.ANONYMOUS, AgileGLJPanelFactory.AGILE_GLJ_VIEW, 800, 600, true);
         }
+        else if (vt.equals(AgileNewtCanvasFactory.AGILE_NEWT_VIEW)){
+            System.out.println("Instantiating a NewtCanvas-backed view");
+            View.registerViewPanelFactory(AgileNewtCanvasFactory.AGILE_NEWT_VIEW, new AgileNewtCanvasFactory());
+    		testView = vsm.addFrameView(cameras, View.ANONYMOUS, AgileNewtCanvasFactory.AGILE_NEWT_VIEW, 800, 600, true);
+        }
         else {
             System.out.println("Instantiating a GLCanvas-backed view");
             View.registerViewPanelFactory(AgileGLCanvasFactory.AGILE_GLC_VIEW, new AgileGLCanvasFactory());
