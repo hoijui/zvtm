@@ -14,8 +14,10 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.ComponentEvent;
-import java.awt.geom.Point2D.Double;
+import java.awt.geom.Point2D;
 
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.Vector;
 
 import fr.inria.zvtm.engine.VirtualSpaceManager;
@@ -26,6 +28,7 @@ import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.event.ViewListener;
+import fr.inria.zvtm.event.CameraListener;
 import fr.inria.zvtm.engine.portals.Portal;
 import fr.inria.zvtm.engine.portals.OverviewPortal;
 import fr.inria.zvtm.event.PortalListener;
@@ -36,7 +39,7 @@ import fr.inria.zuist.engine.Region;
 import fr.inria.zuist.engine.ObjectDescription;
 import fr.inria.zuist.engine.TextDescription;
 
-class TIVExplorerEventHandler implements ViewListener, ComponentListener, PortalListener {
+class TIVEventHandler implements ViewListener, ComponentListener, PortalListener, CameraListener {
 
     static final float WHEEL_ZOOMIN_FACTOR = 21.0f;
     static final float WHEEL_ZOOMOUT_FACTOR = 22.0f;
@@ -61,6 +64,7 @@ class TIVExplorerEventHandler implements ViewListener, ComponentListener, Portal
     
     boolean zero_order_dragging = false;
     boolean first_order_dragging = false;
+    boolean translating = false;
 	static final short ZERO_ORDER = 0;
 	static final short FIRST_ORDER = 1;
 	short navMode = ZERO_ORDER;
@@ -69,9 +73,20 @@ class TIVExplorerEventHandler implements ViewListener, ComponentListener, Portal
 	boolean selectingRegion = false;
 	double x1, y1, x2, y2;
 
-    TIVExplorerEventHandler(TiledImageViewer app){
+	static final int DELAYED_UPDATE_FREQUENCY = 1000;
+	
+    DelayedUpdateTimer dut;
+
+    TIVEventHandler(TiledImageViewer app){
         this.application = app;
+        initDelayedUpdateTimer();
     }
+
+	void initDelayedUpdateTimer(){
+		Timer timer = new Timer();
+		dut = new DelayedUpdateTimer(this);
+		timer.scheduleAtFixedRate(dut, DELAYED_UPDATE_FREQUENCY, DELAYED_UPDATE_FREQUENCY);
+	}
 
     public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
         lastJPX = jpx;
@@ -107,11 +122,19 @@ class TIVExplorerEventHandler implements ViewListener, ComponentListener, Portal
                 zero_order_dragging = true;
             }
         }
+        translating = zero_order_dragging || first_order_dragging || regionStickedToMouse;
+        if (translating){
+            application.sm.enableRegionUpdater(false);
+        }
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
 		regionStickedToMouse = false;
 		zero_order_dragging = false;
+		if (translating){
+    		translating = false;
+    		application.sm.enableRegionUpdater(true);
+		}
         if (first_order_dragging){
             Camera c = application.mCamera;
             c.setXspeed(0);
@@ -335,4 +358,51 @@ class TIVExplorerEventHandler implements ViewListener, ComponentListener, Portal
         }
     }
     
+    public void cameraMoved(Camera cam, Point2D.Double coord, double a){
+        if (translating){
+            dut.requestUpdate();            
+        }
+    }
+    
+    void cameraMoved(){
+        application.sm.updateVisibleRegions();
+    }
+    
+}
+
+class DelayedUpdateTimer extends TimerTask {
+
+    private boolean enabled = true;
+	private boolean update = false;
+	
+	TIVEventHandler eh;
+
+	DelayedUpdateTimer(TIVEventHandler eh){
+		super();
+		this.eh = eh;
+	}
+
+	public void setEnabled(boolean b){
+		enabled = b;
+	}
+
+	public boolean isEnabled(){
+		return enabled;
+	}
+
+	public void run(){		
+		if (enabled && update){
+			eh.cameraMoved();
+			update = false;
+		}
+	}
+	
+	void requestUpdate(){
+		update = true;
+	}
+	
+	void cancelUpdate(){
+		update = false;
+	}
+
 }

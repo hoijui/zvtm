@@ -104,7 +104,7 @@ public class TiledImageViewer {
     Camera mCamera, ovCamera;
     static final String mViewName = "ZUIST Tiled Image Viewer";
     View mView;
-    TIVExplorerEventHandler eh;
+    TIVEventHandler eh;
 
     SceneManager sm;
     TIVNavigationManager nm;
@@ -166,12 +166,13 @@ public class TiledImageViewer {
         else {
             mView.setVisible(true);
         }
-        eh = new TIVExplorerEventHandler(this);
+        eh = new TIVEventHandler(this);
         mView.setListener(eh, 0);
         mView.setListener(ovm, 1);
         mView.setBackgroundColor(BACKGROUND_COLOR);
 		mView.setAntialiasing(antialiased);
         mView.getPanel().getComponent().addComponentListener(eh);
+        mCamera.addListener(eh);
         updatePanelSize();
         mView.setActiveLayer(0);
     }
