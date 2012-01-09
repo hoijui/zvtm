@@ -68,10 +68,11 @@ public class AgileNewtViewPanel extends AgileViewPanel {
         window = GLWindow.create(caps); 
 		panel = new NewtCanvasAWT(window);
         window.addGLEventListener(this);
-        if (parent instanceof KeyListener){
-            panel.addKeyListener((KeyListener)parent);
-        }
-		
+        
+        // made not focusable because otherwise key events are lost when the panel gets focus
+        // only true for Agile2D-based ViewPanel types, not for the default one.
+        panel.setFocusable(false);
+        		
         ActionListener taskPerformer = new ActionListener(){
             public void actionPerformed(ActionEvent evt){
                 panel.repaint();

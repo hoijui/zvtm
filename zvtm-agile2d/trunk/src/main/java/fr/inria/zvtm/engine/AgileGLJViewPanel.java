@@ -63,9 +63,9 @@ public class AgileGLJViewPanel extends AgileViewPanel {
 		//caps.setDoubleBuffered(true);
         panel = new GLJPanel(caps);
         panel.addGLEventListener(this);
-        if (parent instanceof KeyListener){
-            panel.addKeyListener((KeyListener)parent);
-        }
+        // made not focusable because otherwise key events are lost when the panel gets focus
+        // only true for Agile2D-based ViewPanel types, not for the default one.
+        panel.setFocusable(false);
         ActionListener taskPerformer = new ActionListener(){
             public void actionPerformed(ActionEvent evt){
                 panel.display();
