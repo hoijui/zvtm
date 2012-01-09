@@ -22,6 +22,7 @@ import java.awt.image.BufferedImage;
 import javax.swing.Timer;
 import java.util.Vector;
 
+import fr.inria.zvtm.engine.Utils;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.event.ViewListener;
 
@@ -60,7 +61,7 @@ public abstract class AgileViewPanel extends ViewPanel implements GLEventListene
             System.out.println("Agile2D:: INIT GL IS: " + gl.getClass().getName());
         }
         gl.setSwapInterval(1);
-        if (drawable.getAutoSwapBufferMode()){
+        if (Utils.osIsMacOS() && drawable.getAutoSwapBufferMode()){
             drawable.setAutoSwapBufferMode(false);
         }
     }
@@ -163,7 +164,9 @@ public abstract class AgileViewPanel extends ViewPanel implements GLEventListene
                             oldY=parent.mouse.jpy;
                         }
                     }
-                    gl.glSwapAPPLE();
+		    if (Utils.osIsMacOS()){
+			gl.glSwapAPPLE();
+		    }
                     //end drawing here
                     synchronized(this){
             			lastButOneRepaint = lastRepaint;
