@@ -25,13 +25,14 @@ import fr.inria.zvtm.glyphs.PRectangle;
 import java.awt.Color;
 import java.awt.GradientPaint;
 import java.awt.LinearGradientPaint;
+import java.awt.RadialGradientPaint;
 import java.util.Vector;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.net.MalformedURLException;
 import java.net.URL;
-import javax.swing.ImageIcon;
+import javax.swing.JButton;
 /**
  * Sample master application.
  */
@@ -71,6 +72,9 @@ public class GradientsExample {
         prect.setPaint(new LinearGradientPaint(0,0,50,50,new float[]{0, 1}, new Color[]{Color.WHITE, Color.BLACK}));
         PRectangle prect2 = new PRectangle(-60,0,0,50,50, new GradientPaint(0,0,Color.BLUE,50,50,Color.BLACK,false));
         vs.addGlyph(prect2, false);
+        PRectangle prect3 = new PRectangle(0,-60,0,50,50, new RadialGradientPaint(20,20,30,new float[]{0,1}, new Color[]{Color.WHITE, Color.BLUE}));
+        vs.addGlyph(prect3, false);
+
 	}
 
 	public static void main(String[] args){
