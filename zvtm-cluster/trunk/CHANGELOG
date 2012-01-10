@@ -1,3 +1,9 @@
+0.2.6
+
+Partial paint support for PRectangle (GradientPaint, LinearGradientPaint, RadialGradientPaint plus any serializable Paint)
+
+Add VSegment.setEndPoints to autoreplay proxy
+
 0.2.5
 
 Moved some common operations from AutoReplay to static Deltas in GlyphReplication.
