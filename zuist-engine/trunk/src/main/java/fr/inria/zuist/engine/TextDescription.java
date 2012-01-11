@@ -38,22 +38,23 @@ public class TextDescription extends ObjectDescription {
     Font font;
     
     Color fillColor;
+    float alpha;
     
     private volatile VText glyph;
 
-    /** Constructs the description of an image (VTextST).
-        *@param id ID of object in scene
-        *@param x x-coordinate in scene
-        *@param y y-coordinate in scene
-        *@param z z-index (layer). Feed 0 if you don't know.
-        *@param s scale factor
-        *@param tx text label
-        *@param c text color
-        *@param pr parent Region in scene
-        */
-    TextDescription(String id, double x, double y, int z, float s, String tx, Color c, Region pr){
-        this(id, x, y, z, s, tx, c, VText.TEXT_ANCHOR_MIDDLE, pr);
-    }
+    ///** Constructs the description of an image (VTextST).
+    //    *@param id ID of object in scene
+    //    *@param x x-coordinate in scene
+    //    *@param y y-coordinate in scene
+    //    *@param z z-index (layer). Feed 0 if you don't know.
+    //    *@param s scale factor
+    //    *@param tx text label
+    //    *@param c text color
+    //    *@param pr parent Region in scene
+    //    */
+    //TextDescription(String id, double x, double y, int z, float s, String tx, Color c, Region pr){
+    //    this(id, x, y, z, s, tx, c, VText.TEXT_ANCHOR_MIDDLE, pr);
+    //}
 
     /** Constructs the description of an image (VTextST).
         *@param id ID of object in scene
@@ -63,10 +64,11 @@ public class TextDescription extends ObjectDescription {
         *@param s scale factor
         *@param tx text label
         *@param c text color
+        *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
         *@param ta text alignment, one of VText.TEXT_ANCHOR_*
         *@param pr parent Region in scene
         */
-    TextDescription(String id, double x, double y, int z, float s, String tx, Color c, short ta, Region pr){
+    TextDescription(String id, double x, double y, int z, float s, String tx, Color c, float alpha, short ta, Region pr){
         this.id = id;
         this.vx = x;
         this.vy = y;
@@ -74,6 +76,7 @@ public class TextDescription extends ObjectDescription {
         this.scale = s;
         this.text = tx;
         this.fillColor = c;
+        this.alpha = alpha;
         this.parentRegion = pr;
         this.anchor = ta;
     }
@@ -86,11 +89,11 @@ public class TextDescription extends ObjectDescription {
                 if (font != null){((VText)glyph).setFont(font);}
                 if (!sensitive){glyph.setSensitivity(false);}
                 Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_IN_DURATION, glyph,
-                    1.0f, false, IdentityInterpolator.getInstance(), null);
+                    alpha, false, IdentityInterpolator.getInstance(), null);
                 VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
             }
             else {
-                glyph = new VText(vx, vy, zindex, fillColor, text, anchor, scale, 1.0f);
+                glyph = new VText(vx, vy, zindex, fillColor, text, anchor, scale, alpha);
                 if (font != null){((VText)glyph).setFont(font);}
                 if (!sensitive){glyph.setSensitivity(false);}
             }
@@ -188,6 +191,10 @@ public class TextDescription extends ObjectDescription {
         if (glyph != null){
             glyph.moveTo(vx, vy);
         }
+    }
+    
+    public float getTranslucencyValue(){
+        return alpha;
     }
     
 }

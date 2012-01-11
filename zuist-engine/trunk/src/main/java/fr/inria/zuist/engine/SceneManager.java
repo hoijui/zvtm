@@ -77,6 +77,7 @@ public class SceneManager implements CameraListener {
     public static final String _w = "w";
     public static final String _h = "h";
     public static final String _points = "points";
+    public static final String _alpha = "alpha";
     public static final String _fill = "fill";
     public static final String _stroke = "stroke";
     public static final String _background = "background";
@@ -737,11 +738,12 @@ public class SceneManager implements CameraListener {
         String params = resourceEL.getAttribute(_params);
         Color stroke = SVGReader.getColor(resourceEL.getAttribute(_stroke));
         boolean sensitivity = (resourceEL.hasAttribute(_sensitive)) ? Boolean.parseBoolean(resourceEL.getAttribute(_sensitive)) : true;
+        float alpha = (resourceEL.hasAttribute(_alpha)) ? Float.parseFloat(resourceEL.getAttribute(_alpha)) : 1f;
 		URL absoluteSrc = SceneManager.getAbsoluteURL(src, sceneFileDirectory);
         if (type.equals(ImageDescription.RESOURCE_TYPE_IMG)){
     		double w = Double.parseDouble(resourceEL.getAttribute(_w));
             double h = Double.parseDouble(resourceEL.getAttribute(_h));
-            return createImageDescription(x+origin.x, y+origin.y, w, h, id, zindex, region, absoluteSrc, sensitivity, stroke, params);
+            return createImageDescription(x+origin.x, y+origin.y, w, h, id, zindex, region, absoluteSrc, sensitivity, stroke, alpha, params);
         }
         else if (type.equals(SceneFragmentDescription.RESOURCE_TYPE_SCENE)){
             return createSceneFragmentDescription(x+origin.x, y+origin.y, id, region, absoluteSrc);
@@ -796,9 +798,9 @@ public class SceneManager implements CameraListener {
         *@param region parent Region in scene
      */
     public ImageDescription createImageDescription(double x, double y, double w, double h, String id, int zindex, Region region,
-                                                   URL imageURL, boolean sensitivity, Color stroke, String params){
+                                                   URL imageURL, boolean sensitivity, Color stroke, float alpha, String params){
         Object interpolation = (params != null && params.startsWith(_im)) ? parseInterpolation(params.substring(3)) : RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
-        ImageDescription imd = new ImageDescription(id, x, y, zindex, w, h, imageURL, stroke, interpolation, region);
+        ImageDescription imd = new ImageDescription(id, x, y, zindex, w, h, imageURL, stroke, alpha, interpolation, region);
         imd.setSensitive(sensitivity);
         region.addObject(imd);
         if (!id2object.containsKey(id)){
@@ -898,11 +900,12 @@ public class SceneManager implements CameraListener {
         Color fill = SVGReader.getColor(textEL.getAttribute(_fill));
         String ff = (textEL.hasAttribute(_fontFamily)) ? textEL.getAttribute(_fontFamily) : null;
         int fst = (textEL.hasAttribute(_fontStyle)) ? getFontStyle(textEL.getAttribute(_fontStyle)) : Font.PLAIN;
-        int fsz = (textEL.hasAttribute(_fontSize)) ? Integer.parseInt(textEL.getAttribute(_fontSize)) : 12;        
+        int fsz = (textEL.hasAttribute(_fontSize)) ? Integer.parseInt(textEL.getAttribute(_fontSize)) : 12;
+        float alpha = (textEL.hasAttribute(_alpha)) ? Float.parseFloat(textEL.getAttribute(_alpha)) : 1f;
         boolean sensitivity = (textEL.hasAttribute(_sensitive)) ? Boolean.parseBoolean(textEL.getAttribute(_sensitive)) : true;
         short anchor = (textEL.hasAttribute(_anchor)) ? TextDescription.getAnchor(textEL.getAttribute(_anchor)) : VText.TEXT_ANCHOR_MIDDLE;
         TextDescription od = createTextDescription(x+origin.x, y+origin.y, id, zindex, region, scale, text,
-                                                   anchor, fill,
+                                                   anchor, fill, alpha,
                                                    ff, fst, fsz,
                                                    sensitivity);
         return od;
@@ -927,11 +930,11 @@ public class SceneManager implements CameraListener {
      *
      */
     public TextDescription createTextDescription(double x, double y, String id, int zindex, Region region, float scale, String text,
-                                                 short anchor, Color fill, 
+                                                 short anchor, Color fill, float alpha,
                                                  String family, int style, int size,
                                                  boolean sensitivity){
         TextDescription td = new TextDescription(id, x, y, zindex, scale, text,
-                                                 (fill != null) ? fill : Color.BLACK,
+                                                 (fill != null) ? fill : Color.BLACK, alpha,
                                                  anchor, region);
         if (family != null){
             td.setFont(SVGReader.getFont(family, style, size));

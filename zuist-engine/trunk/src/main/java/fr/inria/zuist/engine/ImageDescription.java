@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2007-2011. All Rights Reserved
+ *   Copyright (c) INRIA, 2007-2012. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -45,6 +45,7 @@ public class ImageDescription extends ResourceDescription {
     /* necessary info about an image for instantiation */
     double vw, vh;
     Color strokeColor;
+    float alpha;
     Object interpolationMethod = RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
 
     private volatile VImage glyph;
@@ -160,20 +161,20 @@ public class ImageDescription extends ResourceDescription {
         }
     }
 
-    /** Constructs the description of an image (VImageST).
-        *@param id ID of object in scene
-        *@param x x-coordinate in scene
-        *@param y y-coordinate in scene
-        *@param z z-index (layer). Feed 0 if you don't know.
-        *@param w width in scene
-        *@param h height in scene
-        *@param p path to bitmap resource (any valid absolute URL)
-        *@param sc border color
-        *@param pr parent Region in scene
-        */
-    ImageDescription(String id, double x, double y, int z, double w, double h, URL p, Color sc, Region pr){
-        this(id,x,y,z,w,h,p,sc,null,pr);
-    }
+    ///** Constructs the description of an image (VImageST).
+    //    *@param id ID of object in scene
+    //    *@param x x-coordinate in scene
+    //    *@param y y-coordinate in scene
+    //    *@param z z-index (layer). Feed 0 if you don't know.
+    //    *@param w width in scene
+    //    *@param h height in scene
+    //    *@param p path to bitmap resource (any valid absolute URL)
+    //    *@param sc border color
+    //    *@param pr parent Region in scene
+    //    */
+    //ImageDescription(String id, double x, double y, int z, double w, double h, URL p, Color sc, Region pr){
+    //    this(id,x,y,z,w,h,p,sc,1f,null,pr);
+    //}
     
     /** Constructs the description of an image (VImageST).
         *@param id ID of object in scene
@@ -184,10 +185,11 @@ public class ImageDescription extends ResourceDescription {
         *@param h height in scene
         *@param p path to bitmap resource (any valid absolute URL)
         *@param sc border color
+        *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
         *@param im one of java.awt.RenderingHints.{VALUE_INTERPOLATION_NEAREST_NEIGHBOR,VALUE_INTERPOLATION_BILINEAR,VALUE_INTERPOLATION_BICUBIC} ; default is VALUE_INTERPOLATION_NEAREST_NEIGHBOR
         *@param pr parent Region in scene
         */
-    ImageDescription(String id, double x, double y, int z, double w, double h, URL p, Color sc, Object im, Region pr){
+    ImageDescription(String id, double x, double y, int z, double w, double h, URL p, Color sc, float alpha, Object im, Region pr){
         this.id = id;
         this.vx = x;
         this.vy = y;
@@ -196,6 +198,7 @@ public class ImageDescription extends ResourceDescription {
         this.vh = h;
 		this.setURL(p);
         this.strokeColor = sc;
+        this.alpha = alpha;
         this.interpolationMethod = (im != null) ? im : RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
         this.parentRegion = pr;
     }
@@ -230,19 +233,19 @@ public class ImageDescription extends ResourceDescription {
             if (showFeedbackWhenFetching){
                 // remove visual feedback about loading (smoothly)
                 Animation a2 = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, vrp,
-                    1.0f, false, IdentityInterpolator.getInstance(), new FeedbackHideAction(vs));
+                    alpha, false, IdentityInterpolator.getInstance(), new FeedbackHideAction(vs));
                 VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a2, false);                    
             }
             // smoothly fade glyph in
             Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_IN_DURATION, glyph,
-                1.0f, false, IdentityInterpolator.getInstance(), null);
+                alpha, false, IdentityInterpolator.getInstance(), null);
             VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
         }
         else {
             if (showFeedbackWhenFetching){
                 vs.removeGlyph(vrp);
             }
-            glyph = new VImage(vx, vy, zindex, i, sf, 1.0f);
+            glyph = new VImage(vx, vy, zindex, i, sf, alpha);
             if(!display){
                 glyph.setVisible(false);
             }
@@ -284,6 +287,10 @@ public class ImageDescription extends ResourceDescription {
         if (glyph != null){
             glyph.moveTo(vx, vy);
         }
+    }
+    
+    public float getTranslucencyValue(){
+        return alpha;
     }
     
 }
