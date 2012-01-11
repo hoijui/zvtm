@@ -59,10 +59,20 @@ class ViewerEventHandler implements ViewListener, ComponentListener, CameraListe
 
 	Glyph objectJustSelected = null;
 	
-	
-    ViewerEventHandler(Viewer app){
+	static final int DEFAULT_DELAYED_UPDATE_PERIOD = 500;
+    DelayedUpdateTimer dut;
+	boolean translating = false;
+    
+    ViewerEventHandler(Viewer app, int dutp){
         this.application = app;
+        initDelayedUpdateTimer(dutp);
     }
+
+	void initDelayedUpdateTimer(int dutp){
+		Timer timer = new Timer();
+		dut = new DelayedUpdateTimer(this);
+		timer.scheduleAtFixedRate(dut, dutp, dutp);
+	}
 
     public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
         lastJPX = jpx;
@@ -75,10 +85,18 @@ class ViewerEventHandler implements ViewListener, ComponentListener, CameraListe
             // ZERO_ORDER
             zero_order_dragging = true;
         }
+        translating = zero_order_dragging || first_order_dragging;
+        if (translating){
+            application.sm.enableRegionUpdater(false);
+        }
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
         zero_order_dragging = false;
+        if (translating){
+    		translating = false;
+    		application.sm.enableRegionUpdater(true);
+		}
         if (first_order_dragging){
             Camera c = application.mCamera;
             c.setXspeed(0);
@@ -148,7 +166,7 @@ class ViewerEventHandler implements ViewListener, ComponentListener, CameraListe
         Camera c = application.mCamera;
         double a = (c.focal+Math.abs(c.altitude)) / c.focal;
         if (zero_order_dragging){
-            c.move(a*(lastJPX-jpx),a*(jpy-lastJPY));
+            c.move(4*a*(lastJPX-jpx),4*a*(jpy-lastJPY));
             lastJPX = jpx;
             lastJPY = jpy;
         }
@@ -239,6 +257,13 @@ class ViewerEventHandler implements ViewListener, ComponentListener, CameraListe
     
     public void cameraMoved(Camera cam, Point2D.Double coord, double alt){
         application.altitudeChanged();
+        if (application.panning){
+            dut.requestUpdate();            
+        }
+    }
+    
+    void cameraMoved(){
+        application.sm.updateVisibleRegions();
     }
     
     void toggleNavMode(){
@@ -248,4 +273,41 @@ class ViewerEventHandler implements ViewListener, ComponentListener, CameraListe
         }
     }
     
+}
+
+class DelayedUpdateTimer extends TimerTask {
+
+    private boolean enabled = true;
+	private boolean update = false;
+	
+	ViewerEventHandler eh;
+
+	DelayedUpdateTimer(ViewerEventHandler eh){
+		super();
+		this.eh = eh;
+	}
+
+	public void setEnabled(boolean b){
+		enabled = b;
+	}
+
+	public boolean isEnabled(){
+		return enabled;
+	}
+
+	public void run(){		
+		if (enabled && update){
+			eh.cameraMoved();
+			update = false;
+		}
+	}
+	
+	void requestUpdate(){
+		update = true;
+	}
+	
+	void cancelUpdate(){
+		update = false;
+	}
+
 }

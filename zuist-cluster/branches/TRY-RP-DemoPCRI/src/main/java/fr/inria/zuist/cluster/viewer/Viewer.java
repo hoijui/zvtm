@@ -60,7 +60,6 @@ import utils.settings.TechniqueSettingsManager.Hands;
 
 import fr.inria.zvtm.cluster.ClusterGeometry;
 import fr.inria.zvtm.cluster.ClusteredView;
-import fr.inria.zvtm.engine.AgileGLJPanelFactory;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.VirtualSpace;
@@ -168,9 +167,9 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     //hack for the interaction techniques
     static Viewer INSTANCE;
     
-    public Viewer(boolean fullscreen, boolean opengl, boolean antialiased, File xmlSceneFile){
+    public Viewer(boolean fullscreen, boolean opengl, boolean antialiased, File xmlSceneFile, int dut){
 		ovm = new OverlayManager(this);
-		initGUI(fullscreen, opengl, antialiased);
+		initGUI(fullscreen, opengl, antialiased, dut);
         VirtualSpace[]  sceneSpaces = {mSpace};
         Camera[] sceneCameras = {mCamera};
         sm = new SceneManager(sceneSpaces, sceneCameras);
@@ -252,8 +251,15 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
          return mView;
     }
 
-    public void startPan(){}
-    public void stopPan(){}
+    boolean panning = false;
+    public void startPan(){
+        panning = true;
+        sm.enableRegionUpdater(false);
+    }
+    public void stopPan(){
+        panning = false;
+        sm.enableRegionUpdater(true);
+    }
     public void startZoom(){}
     public void stopZoom(){}
 
@@ -303,7 +309,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         }
     }
 
-    void initGUI(boolean fullscreen, boolean opengl, boolean antialiased){
+    void initGUI(boolean fullscreen, boolean opengl, boolean antialiased, int dut){
         windowLayout();
         vsm = VirtualSpaceManager.INSTANCE;
         vsm.setMaster("ZuistCluster");
@@ -321,7 +327,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         cameras.add(cursorCamera);
 		cameras.add(vsm.getVirtualSpace(mnSpaceName).getCamera(0));
 		cameras.add(vsm.getVirtualSpace(ovSpaceName).getCamera(0));
-        mView = vsm.addFrameView(cameras, mViewName, AgileGLJPanelFactory.AGILE_GLJ_VIEW, VIEW_W, VIEW_H, false, false, !fullscreen, initMenu());
+        mView = vsm.addFrameView(cameras, mViewName, View.STD_VIEW, VIEW_W, VIEW_H, false, false, !fullscreen, initMenu());
         Vector<Camera> sceneCam = new Vector<Camera>();
         sceneCam.add(mCamera);
         sceneCam.add(cursorCamera);
@@ -348,7 +354,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         updatePanelSize();
 		gp = new VWGlassPane(this);
 		((JFrame)mView.getFrame()).setGlassPane(gp);
-        eh = new ViewerEventHandler(this);
+        eh = new ViewerEventHandler(this, dut);
         mView.setListener(eh, 0);
         mView.setListener(eh, 1);
         mView.setListener(ovm, 2);
@@ -811,6 +817,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		boolean fs = false;
 		boolean ogl = false;
 		boolean aa = true;
+		int dut = ViewerEventHandler.DEFAULT_DELAYED_UPDATE_PERIOD;
 		for (int i=0;i<args.length;i++){
 			if (args[i].startsWith("-")){
 				if (args[i].substring(1).equals("fs")){fs = true;}
@@ -818,6 +825,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 				else if (args[i].substring(1).equals("smooth")){Region.setDefaultTransitions(Region.FADE_IN, Region.FADE_OUT);}
 				else if (args[i].substring(1).equals("noaa")){aa = false;}
 				else if (args[i].substring(1).equals("h") || args[i].substring(1).equals("--help")){Viewer.printCmdLineHelp();System.exit(0);}
+				else if (args[i].substring(1).startsWith("dut")){dut = Integer.parseInt(args[i].substring(4));}
 			}
             else {
                 // the only other thing allowed as a cmd line param is a scene file
@@ -842,7 +850,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
             System.setProperty("apple.laf.useScreenMenuBar", "true");
         }
         System.out.println("--help for command line options");
-        new Viewer(fs, ogl, aa, xmlSceneFile);
+        new Viewer(fs, ogl, aa, xmlSceneFile, dut);
     }
     
     private static void printCmdLineHelp(){
