@@ -41,7 +41,7 @@ $Id: pom.xml 2405 2009-09-25 09:07:33Z epietrig $
       <url>http://repo1.maven.org/maven2</url>
     </repository>
 	<!-- This repository puts in a maven repository the JOGL and Gluegen jar files
-    available on http://jogamp.org/deployment/v2.0-rc4/jar/ -->
+    available on http://jogamp.org/deployment/v2.0-rc5/jar/ -->
 	<repository>
 	  <id>internal</id>
 	  <name>Internal Third-party Repository for JOGL Libraries</name>
@@ -133,7 +133,7 @@ $Id: pom.xml 2405 2009-09-25 09:07:33Z epietrig $
 					<artifactItem>
 					  <groupId>org.jogamp.jogl</groupId>
 					  <artifactId>jogl-all-natives</artifactId>
-					  <version>v2.0-rc4</version>
+					  <version>v2.0-rc5</version>
 		 			  <classifier>${build.type}</classifier>
 					  <type>jar</type>
 					  <includes>*.jnilib,*.lib,*.so,*.dll</includes>
@@ -143,7 +143,7 @@ $Id: pom.xml 2405 2009-09-25 09:07:33Z epietrig $
 					<artifactItem>
 					  <groupId>org.jogamp.gluegen</groupId>
 					  <artifactId>gluegen-rt-natives</artifactId>
-					  <version>v2.0-rc4</version>
+					  <version>v2.0-rc5</version>
 		 			  <classifier>${build.type}</classifier>
 					  <type>jar</type>
 		              <includes>*.jnilib,*.lib,*.so,*.dll</includes>
