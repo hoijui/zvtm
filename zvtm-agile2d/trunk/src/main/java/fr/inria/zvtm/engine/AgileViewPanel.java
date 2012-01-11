@@ -60,10 +60,7 @@ public abstract class AgileViewPanel extends ViewPanel implements GLEventListene
         if (VirtualSpaceManager.INSTANCE.debugModeON()){
             System.out.println("Agile2D:: INIT GL IS: " + gl.getClass().getName());
         }
-        gl.setSwapInterval(1);
-        if (Utils.osIsMacOS() && drawable.getAutoSwapBufferMode()){
-            drawable.setAutoSwapBufferMode(false);
-        }
+		drawable.setAutoSwapBufferMode(false);
     }
 
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height){
@@ -81,10 +78,10 @@ public abstract class AgileViewPanel extends ViewPanel implements GLEventListene
         GL2 gl = drawable.getGL().getGL2();
         // Restore all the Java2D Graphics defaults
         jgraphics.resetAll(drawable);
-    	this.paint(jgraphics, gl);
+    	this.paint(jgraphics, gl, drawable);
     }
 
-    void paint(Graphics g, GL2 gl) {
+    void paint(Graphics g, GL2 gl, GLAutoDrawable drawable) {
         // stableRefToBackBufferGraphics is used here not as a Graphics from a back buffer image, but directly as the OpenGL graphics context
         // (simply reusing an already declared var instead of creating a new one for nothing)
         stableRefToBackBufferGraphics = (Graphics2D)g;
@@ -164,9 +161,7 @@ public abstract class AgileViewPanel extends ViewPanel implements GLEventListene
                             oldY=parent.mouse.jpy;
                         }
                     }
-		    if (Utils.osIsMacOS()){
-			gl.glSwapAPPLE();
-		    }
+                    drawable.swapBuffers();
                     //end drawing here
                     synchronized(this){
             			lastButOneRepaint = lastRepaint;
