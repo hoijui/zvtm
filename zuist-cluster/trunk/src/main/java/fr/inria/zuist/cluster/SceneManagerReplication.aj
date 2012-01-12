@@ -255,35 +255,35 @@ aspect SceneManagerReplication {
             double x, double y, double w, double h, 
             String id, int zindex, Region region,
             URL imageURL, boolean sensitivity, 
-            Color stroke, String params) : 
+            Color stroke, float alpha, String params) : 
         execution(public ImageDescription SceneManager.createImageDescription(
                     double, double, double, double, 
                     String, int, Region,
                     URL, boolean, 
-                    Color, String)) &&
+                    Color, float, String)) &&
         this(sceneManager) && 
         args(x, y, w, h, 
             id, zindex, region,
             imageURL, sensitivity, 
-            stroke, params);
+            stroke, alpha, params);
     
     after(SceneManager sceneManager,
             double x, double y, double w, double h, 
             String id, int zindex, Region region,
             URL imageURL, boolean sensitivity, 
-            Color stroke, String params
+            Color stroke, float alpha, String params
             ) returning(ObjectDescription imageDesc):
         createImageDescription(sceneManager,
                 x, y, w, h, 
                 id, zindex, region,
                 imageURL, sensitivity, 
-                stroke, params) &&
+                stroke, alpha, params) &&
         if(VirtualSpaceManager.INSTANCE.isMaster()) &&
         !cflowbelow(createImageDescription(SceneManager,
                 double, double, double, double, 
                 String, int, Region,
                 URL, boolean, 
-                Color, String)) {
+                Color, float, String)) {
             imageDesc.setReplicated(true);
 
             Delta delta = new ImageCreateDelta(sceneManager.getObjId(),
@@ -291,7 +291,7 @@ aspect SceneManagerReplication {
                     x, y, w, h,
                     id, zindex, region.getObjId(),
                     imageURL, sensitivity,
-                    stroke, params);
+                    stroke, alpha, params);
             VirtualSpaceManager.INSTANCE.sendDelta(delta);
         }
 
@@ -308,6 +308,7 @@ aspect SceneManagerReplication {
        private final URL imageURL;
        private final boolean sensitivity;
        private final Color stroke;
+       private final float alpha;
        private final String params;
 
        ImageCreateDelta(ObjId<SceneManager> smId,
@@ -315,7 +316,7 @@ aspect SceneManagerReplication {
                double x, double y, double w, double h, 
                String id, int zindex, ObjId<Region> regionId,
                URL imageURL, boolean sensitivity, 
-               Color stroke, String params){
+               Color stroke, float alpha, String params){
            this.smId = smId;
            this.descId = descId;
            this.x = x; 
@@ -327,7 +328,8 @@ aspect SceneManagerReplication {
            this.regionId = regionId;
            this.imageURL = imageURL; 
            this.sensitivity = sensitivity; 
-           this.stroke = stroke; 
+           this.stroke = stroke;
+           this.alpha = alpha;
            this.params = params;
        }
 
@@ -338,42 +340,42 @@ aspect SceneManagerReplication {
                    x, y, w, h,
                    id, zindex, region,
                    imageURL, sensitivity,
-                   stroke, params);
+                   stroke, alpha, params);
            su.putSlaveObject(descId, desc);
        }
     }
 
     pointcut createTextDescription(SceneManager sceneManager, 
             double x, double y, String id, int zindex, Region region, float scale, 
-            String text, short anchor, Color fill, String family, 
+            String text, short anchor, Color fill, float alpha, String family, 
             int style, int size, boolean sensitivity) :
         execution(public TextDescription SceneManager.createTextDescription(
                     double, double, String, int, Region, float, String,
-                    short, Color, String, int, int, boolean)) &&
+                    short, Color, float, String, int, int, boolean)) &&
         this(sceneManager) && 
         args(x, y, id, zindex, region, scale, 
-            text, anchor, fill, family, 
+            text, anchor, fill, alpha, family, 
             style, size, sensitivity);
 
     after(SceneManager sceneManager, 
             double x, double y, String id, int zindex, Region region, float scale, 
-            String text, short anchor, Color fill, String family, 
+            String text, short anchor, Color fill, float alpha, String family, 
             int style, int size, boolean sensitivity) 
         returning(ObjectDescription textDesc) :
             createTextDescription(sceneManager, x, y, id, 
                     zindex, region, scale, 
-                    text, anchor, fill, family, 
+                    text, anchor, fill, alpha, family, 
                     style, size, sensitivity) &&
             if(VirtualSpaceManager.INSTANCE.isMaster()) &&
             !cflowbelow(createTextDescription(SceneManager, double, double, 
                         String, int, Region, float, String,
-                        short, Color, String, int, int, boolean)) {
+                        short, Color, float, String, int, int, boolean)) {
                 textDesc.setReplicated(true);
 
                 Delta delta = new TextCreateDelta(sceneManager.getObjId(),
                         textDesc.getObjId(),
                         x, y, id, zindex, region.getObjId(), scale, 
-                        text, anchor, fill, family, 
+                        text, anchor, fill, alpha, family, 
                         style, size, sensitivity );
                 VirtualSpaceManager.INSTANCE.sendDelta(delta);
             }
@@ -390,6 +392,7 @@ aspect SceneManagerReplication {
         private final String text;
         private final short anchor;
         private final Color fill;
+        private final float alpha;
         private final String family;
         private final int style;
         private final int size;
@@ -399,7 +402,7 @@ aspect SceneManagerReplication {
                 ObjId<ObjectDescription> descId,
                 double x, double y, String id, int zindex, ObjId<Region> regionId, 
                 float scale, String text, short anchor, 
-                Color fill, String family, 
+                Color fill, float alpha, String family, 
                 int style, int size, boolean sensitivity){
             this.smId = smId;
             this.descId = descId;
@@ -412,6 +415,7 @@ aspect SceneManagerReplication {
             this.text = text;
             this.anchor = anchor;
             this.fill = fill;
+            this.alpha = alpha;
             this.family = family;
             this.style = style;
             this.size = size;
@@ -423,7 +427,7 @@ aspect SceneManagerReplication {
            Region region = su.getSlaveObject(regionId);
            TextDescription desc = sm.createTextDescription(
                    x, y, id, zindex, region, scale, 
-                   text, anchor, fill, family, 
+                   text, anchor, fill, alpha, family, 
                    style, size, sensitivity);
            su.putSlaveObject(descId, desc);
        }
