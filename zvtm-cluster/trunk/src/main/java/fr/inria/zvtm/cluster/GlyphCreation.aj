@@ -43,7 +43,7 @@ import fr.inria.zvtm.glyphs.VTextOr;
 //space to replicate them on slaves)
 public aspect GlyphCreation {
         //introduce Glyph.getReplicator
-	GlyphReplicator Glyph.getReplicator(){
+	public GlyphReplicator Glyph.getReplicator(){
 		String poison = System.getProperty("poisonNopReplicator");
 		if((poison != null) && (poison.toLowerCase().equals("true"))){
 			throw new Error("NopReplicator not allowed");
@@ -101,75 +101,75 @@ public aspect GlyphCreation {
 		}
 	
 	//overrides for various Glyph subclasses
-	@Override GlyphReplicator VRectangle.getReplicator(){
+	@Override public GlyphReplicator VRectangle.getReplicator(){
 		return new VRectangleReplicator(this);
 	}
 
-    @Override GlyphReplicator PRectangle.getReplicator(){
+    @Override public GlyphReplicator PRectangle.getReplicator(){
         return new PRectangleReplicator(this);
     }
 	
-	@Override GlyphReplicator VRectangleOr.getReplicator(){
+	@Override public GlyphReplicator VRectangleOr.getReplicator(){
 		return new VRectangleOrReplicator(this);
 	}
 
-	@Override GlyphReplicator VCircle.getReplicator(){
+	@Override public GlyphReplicator VCircle.getReplicator(){
 		return new VCircleReplicator(this);
 	}
 
-	@Override GlyphReplicator VSegment.getReplicator(){
+	@Override public GlyphReplicator VSegment.getReplicator(){
 		return new VSegmentReplicator(this);
 	}
 
-	@Override GlyphReplicator VText.getReplicator(){
+	@Override public GlyphReplicator VText.getReplicator(){
 		return new VTextReplicator(this);
 	}
 
-    @Override GlyphReplicator VTextOr.getReplicator(){
+    @Override public GlyphReplicator VTextOr.getReplicator(){
         return new VTextOrReplicator(this);
     }
 
-	@Override GlyphReplicator SIRectangle.getReplicator(){
+	@Override public GlyphReplicator SIRectangle.getReplicator(){
 		return new SIRectangleReplicator(this);
 	}
 
-	@Override GlyphReplicator SICircle.getReplicator(){
+	@Override public GlyphReplicator SICircle.getReplicator(){
 		return new SICircleReplicator(this);
 	}
 
-	@Override GlyphReplicator VImage.getReplicator(){
+	@Override public GlyphReplicator VImage.getReplicator(){
 		return new VImageReplicator(this);
 	}
 
-	@Override GlyphReplicator ClusteredImage.getReplicator(){
+	@Override public GlyphReplicator ClusteredImage.getReplicator(){
 		return new ClusteredImageReplicator(this);
 	}
 
-	@Override GlyphReplicator DPath.getReplicator(){
+	@Override public GlyphReplicator DPath.getReplicator(){
 		return new DPathReplicator(this);
 	}
 
-    @Override GlyphReplicator VEllipse.getReplicator(){
+    @Override public GlyphReplicator VEllipse.getReplicator(){
         return new VEllipseReplicator(this);
     }
 
-    @Override GlyphReplicator VPoint.getReplicator(){
+    @Override public GlyphReplicator VPoint.getReplicator(){
         return new VPointReplicator(this);
     }
 
-    @Override GlyphReplicator VRing.getReplicator(){
+    @Override public GlyphReplicator VRing.getReplicator(){
         return new VRingReplicator(this);
     }
 
-    @Override GlyphReplicator VPolygon.getReplicator(){
+    @Override public GlyphReplicator VPolygon.getReplicator(){
         return new VPolygonReplicator(this);
     }
 
-    @Override GlyphReplicator Composite.getReplicator(){
+    @Override public GlyphReplicator Composite.getReplicator(){
         return new CompositeReplicator(this);
     }
 
-    @Override GlyphReplicator MultilineText.getReplicator(){
+    @Override public GlyphReplicator MultilineText.getReplicator(){
         return new MultilineTextReplicator(this);
     }
 
