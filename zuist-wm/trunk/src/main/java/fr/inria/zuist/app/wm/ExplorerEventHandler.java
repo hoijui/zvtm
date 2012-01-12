@@ -390,8 +390,8 @@ class ExplorerEventHandler implements ViewListener, CameraListener, ComponentLis
     }
     
     void cameraMoved(){
+        //application.mView.getVisibleRegion(application.mCamera, wnes);
         // region seen through camera
-        application.mView.getVisibleRegion(application.mCamera, wnes);
         double alt = application.mCamera.getAltitude();
         if (alt != oldCameraAltitude){
             oldCameraAltitude = alt;
