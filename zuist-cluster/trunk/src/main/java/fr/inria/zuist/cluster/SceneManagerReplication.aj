@@ -11,10 +11,14 @@ import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.cluster.Delta;
 import fr.inria.zvtm.cluster.GlyphCreation;
+import fr.inria.zvtm.cluster.GlyphReplicator;
 import fr.inria.zvtm.cluster.Identifiables;
 import fr.inria.zvtm.cluster.ObjId;
 import fr.inria.zvtm.cluster.SlaveUpdater;
+import fr.inria.zvtm.glyphs.ClosedShape;
 import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.glyphs.VText;
+import fr.inria.zuist.engine.ClosedShapeDescription;
 import fr.inria.zuist.engine.ImageDescription;
 import fr.inria.zuist.engine.ObjectDescription;
 import fr.inria.zuist.engine.SceneFragmentDescription;
@@ -429,6 +433,57 @@ aspect SceneManagerReplication {
                    x, y, id, zindex, region, scale, 
                    text, anchor, fill, alpha, family, 
                    style, size, sensitivity);
+           su.putSlaveObject(descId, desc);
+       }
+    }
+
+    pointcut createClosedShapeDescription(SceneManager sceneManager, 
+            ClosedShape closedShape, String id, int zindex, Region region, boolean sensitivity) :
+        execution(public ClosedShapeDescription SceneManager.createClosedShapeDescription(ClosedShape, String, int, Region, boolean)) &&
+        this(sceneManager) && 
+        args(closedShape, id, zindex, region, sensitivity);
+
+    after(SceneManager sceneManager, 
+            ClosedShape closedShape, String id, int zindex, Region region, boolean sensitivity) 
+        returning(ClosedShapeDescription csDesc) :
+            createClosedShapeDescription(sceneManager, closedShape, id, zindex, region, sensitivity) &&
+            if(VirtualSpaceManager.INSTANCE.isMaster()) &&
+            !cflowbelow(createClosedShapeDescription(SceneManager, ClosedShape, String, int, Region, boolean)) {
+                csDesc.setReplicated(true);
+
+                Delta delta = new ClosedShapeCreateDelta(sceneManager.getObjId(),
+                        csDesc, id, zindex, region.getObjId(), sensitivity);
+                VirtualSpaceManager.INSTANCE.sendDelta(delta);
+            }
+
+    private static class ClosedShapeCreateDelta implements Delta {
+        private final ObjId<SceneManager> smId;
+        private final ObjId<ObjectDescription> descId;
+        private final GlyphReplicator csReplicator;
+        private final String id;
+        private final int zindex;
+        private final ObjId<Region> regionId;
+        private final boolean sensitivity;
+
+        ClosedShapeCreateDelta(ObjId<SceneManager> smId, 
+                ClosedShapeDescription csDesc,
+                String id, int zindex, ObjId<Region> regionId, 
+                boolean sensitivity){
+            this.smId = smId;
+            this.descId = csDesc.getObjId();
+            this.csReplicator = csDesc.getGlyph().getReplicator();
+            this.id = id;
+            this.zindex = zindex;
+            this.regionId = regionId;
+            this.sensitivity = sensitivity;
+        }
+
+       public void apply(SlaveUpdater su){
+           SceneManager sm = su.getSlaveObject(smId);
+           Region region = su.getSlaveObject(regionId);
+           ClosedShapeDescription desc = sm.createClosedShapeDescription(
+                   (ClosedShape)(csReplicator.createGlyph()), id, zindex, region, 
+                   sensitivity);
            su.putSlaveObject(descId, desc);
        }
     }
