@@ -98,10 +98,20 @@ public class AgileNewtViewPanel extends AgileViewPanel {
             cams[nbcam]=(Camera)(cameras.get(nbcam));
         }
         //init other stuff
+        /*
         panel.addMouseListener(this);
         panel.addMouseMotionListener(this);
         panel.addMouseWheelListener(this);
         panel.addComponentListener(this);
+        */
+        
+        //init other stuff
+        window.addMouseListener(this);
+        window.addMouseMotionListener(this);
+        window.addMouseWheelListener(this);
+        window.addComponentListener(this);
+        
+        
         setAutoRequestFocusOnMouseEnter(arfome);
         setAWTCursor(Cursor.CUSTOM_CURSOR);  //custom cursor means VTM cursor
         //this.size = this.getSize();
