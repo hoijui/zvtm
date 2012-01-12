@@ -38,10 +38,6 @@ import fr.inria.zvtm.glyphs.VSegment;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.glyphs.VTextOr;
 
-interface GlyphReplicator extends Serializable {
-   public Glyph createGlyph();
-}
-
 //Replicates Glyph subtypes creation on slaves
 //(in fact, waits for the glyphs to be added to a virtual
 //space to replicate them on slaves)
