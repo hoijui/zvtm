@@ -106,11 +106,12 @@ public class AgileNewtViewPanel extends AgileViewPanel {
         */
         
         //init other stuff
+	/*
         window.addMouseListener(this);
         window.addMouseMotionListener(this);
         window.addMouseWheelListener(this);
         window.addComponentListener(this);
-        
+        */
         
         setAutoRequestFocusOnMouseEnter(arfome);
         setAWTCursor(Cursor.CUSTOM_CURSOR);  //custom cursor means VTM cursor
