@@ -40,15 +40,12 @@ $Id: pom.xml 2405 2009-09-25 09:07:33Z epietrig $
       <name>Maven Repository</name>
       <url>http://repo1.maven.org/maven2</url>
     </repository>
-	<!-- This repository puts in a maven repository the JOGL and Gluegen jar files
-    available on http://jogamp.org/deployment/v2.0-rc5/jar/ -->
 	<repository>
-	  <id>internal</id>
-	  <name>Internal Third-party Repository for JOGL Libraries</name>
-	  <url>http://rodrigoalmeida.free.fr/maven2</url>
-	</repository>
+        <!-- JOGL and Gluegen jar files from http://jogamp.org/deployment/v2.0-rc5/jar/ are available in the (maven) repository below -->
+        <id>agile2d.sf.net</id>
+        <url>http://agile2d.sourceforge.net/maven</url>
+    </repository>
   </repositories>
-  
   <!-- Distribution -->
   <distributionManagement>
 	<repository>
@@ -103,7 +100,7 @@ $Id: pom.xml 2405 2009-09-25 09:07:33Z epietrig $
 	<dependency>
       <groupId>agile2d</groupId>
       <artifactId>agile2d</artifactId>
-      <version>[0.0.1-SNAPSHOT,)</version>
+      <version>[3.0,)</version>
   	</dependency>
   </dependencies>
 
