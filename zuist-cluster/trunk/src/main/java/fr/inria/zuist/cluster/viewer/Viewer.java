@@ -370,17 +370,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		if (returnVal == JFileChooser.APPROVE_OPTION){
 		    final SwingWorker worker = new SwingWorker(){
 			    public Object construct(){
-					reset();
-					sm.setUpdateLevel(false);
-					sm.enableRegionUpdater(false);
-					loadScene(fc.getSelectedFile());
-					EndAction ea  = new EndAction(){
-                           public void execute(Object subject, Animation.Dimension dimension){
-                               sm.setUpdateLevel(true);
-                               sm.enableRegionUpdater(true);
-                           }
-                       };
-					getGlobalView(ea);
+					openScene(fc.getSelectedFile());
 					return null; 
 			    }
 			};
@@ -400,6 +390,20 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 	    worker.start();
 	}
 
+	public void openScene(File xmlSceneFile) {
+		reset();
+		sm.setUpdateLevel(false);
+		sm.enableRegionUpdater(false);
+		loadScene(xmlSceneFile);
+		EndAction ea  = new EndAction(){
+               public void execute(Object subject, Animation.Dimension dimension){
+                   sm.setUpdateLevel(true);
+                   sm.enableRegionUpdater(true);
+               }
+           };
+		getGlobalView(ea);		
+	}
+	
 	void loadScene(File xmlSceneFile){
 		try {
 			ovm.sayInConsole("Loading "+xmlSceneFile.getCanonicalPath()+"\n");
