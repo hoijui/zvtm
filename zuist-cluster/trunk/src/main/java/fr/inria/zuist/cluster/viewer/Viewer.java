@@ -15,6 +15,7 @@ import java.awt.GradientPaint;
 import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.Dimension;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionListener;
@@ -109,8 +110,9 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     static final String mSpaceName = "Scene Space";
     static final String mnSpaceName = "PieMenu Space";
     static final String ovSpaceName = "Overlay Space";
-    VirtualSpace mSpace, ovSpace;
+    VirtualSpace mSpace, ovSpace, cursorSpace;
     Camera mCamera;
+    Camera cursorCamera;
     String mCameraAltStr = Messages.ALTITUDE + "0";
     String levelStr = Messages.LEVEL + "0";
     static final String mViewName = "ZUIST Viewer";
@@ -123,6 +125,8 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 	OverlayManager ovm;
 	VWGlassPane gp;
 	PieMenu mainPieMenu;
+
+    private WallCursor wallCursor; //cursor, and zoom center
     
     public Viewer(boolean fullscreen, boolean opengl, boolean antialiased, File xmlSceneFile){
 		ovm = new OverlayManager(this);
@@ -158,13 +162,17 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		mnSpace.addCamera().setAltitude(10);
         ovSpace = vsm.addVirtualSpace(ovSpaceName);
 		ovSpace.addCamera();
+        cursorSpace = vsm.addVirtualSpace("cursorSpace");
+        cursorCamera = cursorSpace.addCamera();
         Vector cameras = new Vector();
         cameras.add(mCamera);
+        cameras.add(cursorCamera);
 		cameras.add(vsm.getVirtualSpace(mnSpaceName).getCamera(0));
 		cameras.add(vsm.getVirtualSpace(ovSpaceName).getCamera(0));
         mView = vsm.addFrameView(cameras, mViewName, (opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, !fullscreen, initMenu());
         Vector<Camera> sceneCam = new Vector<Camera>();
         sceneCam.add(mCamera);
+        sceneCam.add(cursorCamera);
         ClusterGeometry clGeom = new ClusterGeometry(
                 2680,
                 1700,
@@ -179,6 +187,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
                     sceneCam);
         clusteredView.setBackgroundColor(Color.GRAY);
         vsm.addClusteredView(clusteredView);
+        wallCursor = new WallCursor(cursorSpace, 8, 120, Color.RED);
         if (fullscreen){
             GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow((JFrame)mView.getFrame());
         }
@@ -205,6 +214,46 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		};
 		mView.getFrame().addComponentListener(ca0);
     }
+
+    /* external input section */
+
+    /**
+     * @param xView
+     * @param yView
+     */
+    public void pan(int xView, int yView){
+        //find the main camera coodinates for the view coordinates (xview, yview) and move mCamera there
+        Point2D.Double camLoc = clusteredView.viewToSpaceCoords(mCamera, xView, yView);
+        mCamera.moveTo(camLoc.getX(), camLoc.getY());
+    }
+
+    /**
+     *
+     * @param xView
+     * @param yView
+     */
+    public void point(int xView, int yView){
+       //find the cursor coordinates for the view coordinates (xview, yview) and move the cursor there
+        Point2D.Double cursCoord = clusteredView.viewToSpaceCoords(cursorCamera, xView, yView);
+        wallCursor.moveTo(cursCoord.getX(), cursCoord.getY());
+    }
+
+    //XXX todo: add relative pan and point operations
+
+    /**
+     * Zoom (centered on the wall cursor)
+     */
+    public void zoom(float altitudeOffset){
+        Point2D mCursorCoords = cursorCoordsInMainSpace();
+        mCamera.setLocation(new Location(mCursorCoords.getX(), mCursorCoords.getY(), mCamera.getAltitude() + altitudeOffset));
+    }
+
+    private Point2D cursorCoordsInMainSpace(){
+        Point vCoords = clusteredView.spaceToViewCoords(cursorCamera, wallCursor.getX(), wallCursor.getY());
+        return clusteredView.viewToSpaceCoords(mCamera, (int)vCoords.getX(), (int)vCoords.getY());
+    }
+
+    //XXX todo: add zoom centered on any coordinate (in view coord system or mCamera system)
 
     JMenuItem infoMI, consoleMI;
 
@@ -486,14 +535,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		if (previousLocations.size()>0){
 			Vector animParams = Location.getDifference(mSpace.getCamera(0).getLocation(), (Location)previousLocations.lastElement());
 			sm.setUpdateLevel(false);
-//			vsm.animator.createCameraAnimation(Viewer.ANIM_MOVE_LENGTH, AnimManager.CA_ALT_TRANS_SIG,
-//				animParams, mSpace.getCamera(0).getID(),
-//				new PostAnimationAdapter(){
-//                    public void animationEnded(Object target, short type, String dimension){
-//                        sm.setUpdateLevel(true);
-//                        sm.updateLevel(mCamera.altitude);
-//                    }
-//                    });                    
+      
             class LevelUpdater implements EndAction {
                 public void execute(Object subject, Animation.Dimension dimension){
                     sm.setUpdateLevel(true);
