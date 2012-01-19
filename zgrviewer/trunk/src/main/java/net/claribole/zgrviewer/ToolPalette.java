@@ -89,13 +89,14 @@ public class ToolPalette {
 		paletteCamera.setAltitude(0);
 		// building list of built-in modes that plugins want to disable
 		Plugin[] plugins = grMngr.cfgMngr.plugins;
-	    if (plugins == null){return;}
-	    HashMap<String,Object> modesToDisable = new HashMap(2);
-        for (short i=0;i<plugins.length;i++){
-            String[] mtd = plugins[i].getDisabledModes();
-            if (mtd != null && mtd.length > 0){
-                for (String bimode:mtd){
-                    modesToDisable.put(bimode, null);
+        HashMap<String,Object> modesToDisable = new HashMap(2);
+	    if (plugins != null){
+            for (short i=0;i<plugins.length;i++){
+                String[] mtd = plugins[i].getDisabledModes();
+                if (mtd != null && mtd.length > 0){
+                    for (String bimode:mtd){
+                        modesToDisable.put(bimode, null);
+                    }
                 }
             }
         }
