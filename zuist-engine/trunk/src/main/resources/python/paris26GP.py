@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 # AUTHOR : Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
-# Copyright (c) INRIA, 2010. All Rights Reserved
+# Copyright (c) INRIA, 2010-2012. All Rights Reserved
 # Licensed under the GNU LGPL. For full terms see the file COPYING.
 
 # $Id$
