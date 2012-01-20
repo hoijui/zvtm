@@ -73,7 +73,7 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
 	boolean selectingRegion = false;
 	double x1, y1, x2, y2;
 
-	static final int DELAYED_UPDATE_FREQUENCY = 1000;
+	static final int DELAYED_UPDATE_FREQUENCY = 400;
 	
     DelayedUpdateTimer dut;
 
