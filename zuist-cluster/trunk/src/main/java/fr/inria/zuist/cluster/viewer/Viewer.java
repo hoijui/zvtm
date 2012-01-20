@@ -127,7 +127,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 	PieMenu mainPieMenu;
 
     private WallCursor wallCursor; //cursor, and zoom center
-    private Location panStart;
+    private Point panStart;
     
     public Viewer(boolean fullscreen, boolean opengl, boolean antialiased, File xmlSceneFile){
 		ovm = new OverlayManager(this);
@@ -174,17 +174,29 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         Vector<Camera> sceneCam = new Vector<Camera>();
         sceneCam.add(mCamera);
         sceneCam.add(cursorCamera);
+//        ClusterGeometry clGeom = new ClusterGeometry(
+//                2680,
+//                1700,
+//                8,
+//                4);
+//		clusteredView = 
+//            new ClusteredView(
+//                    clGeom,
+//                    3, //origin (block number)
+//                    8, //use complete
+//                    4, //cluster surface
+//                    sceneCam);
         ClusterGeometry clGeom = new ClusterGeometry(
-                2680,
-                1700,
-                8,
-                4);
+                600,
+                400,
+                1,
+                1);
 		clusteredView = 
             new ClusteredView(
                     clGeom,
-                    3, //origin (block number)
-                    8, //use complete
-                    4, //cluster surface
+                    0, //origin (block number)
+                    1, //use complete
+                    1, //cluster surface
                     sceneCam);
         clusteredView.setBackgroundColor(Color.GRAY);
         vsm.addClusteredView(clusteredView);
@@ -220,7 +232,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 
     public void startPan(){
         //set pan center
-        panStart = mCamera.getLocation();
+        panStart = clusteredView.spaceToViewCoords(mCamera, wallCursor.getX(), wallCursor.getY());
     }
 
     /**
@@ -228,8 +240,8 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
      * @param yView
      */
     public void pan(int xView, int yView){
-        Point2D.Double camLoc = clusteredView.viewToSpaceCoords(mCamera, xView, yView);
-        mCamera.moveTo(panStart.getX() - camLoc.getX(), panStart.getY() - camLoc.getY());
+        double a = (mCamera.focal + Math.abs(mCamera.altitude)) / mCamera.focal;
+        mCamera.moveTo(panStart.getX() + a*(panStart.getX() - xView), panStart.getY() + a*(yView - panStart.getY()));
     }
 
     public void stopPan(){
