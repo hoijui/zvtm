@@ -127,6 +127,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 	PieMenu mainPieMenu;
 
     private WallCursor wallCursor; //cursor, and zoom center
+    private Location panStart;
     
     public Viewer(boolean fullscreen, boolean opengl, boolean antialiased, File xmlSceneFile){
 		ovm = new OverlayManager(this);
@@ -217,14 +218,21 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 
     /* external input section */
 
+    public void startPan(){
+        //set pan center
+        panStart = mCamera.getLocation();
+    }
+
     /**
      * @param xView
      * @param yView
      */
     public void pan(int xView, int yView){
-        //find the main camera coodinates for the view coordinates (xview, yview) and move mCamera there
         Point2D.Double camLoc = clusteredView.viewToSpaceCoords(mCamera, xView, yView);
-        mCamera.moveTo(camLoc.getX(), camLoc.getY());
+        mCamera.moveTo(panStart.getX() - camLoc.getX(), panStart.getY() - camLoc.getY());
+    }
+
+    public void stopPan(){
     }
 
     /**
