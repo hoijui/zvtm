@@ -126,6 +126,7 @@ def generateTilesAtLevel(parentEL, leveldir, levelCount):
             objectEL.set("w", "%d" % vw)
             objectEL.set("h", "%d" % vh)
             objectEL.set("src", "%s/%s/%s" % (leveldir, colf, rowf))
+            objectEL.set("z-index", "%d" % (level*10))
             vy -= vh / 2
             log("%s %s %s" % (level, col, row), 3)
         vx += vw / 2
