@@ -143,19 +143,19 @@ examples is a good way to get started.
 
 \begin{itemize}
 \item
-  VirtualSpaceManager.setMaster()
+  \verb! VirtualSpaceManager.setMaster() !
 \item
-  VirtualSpaceManager.addClusteredView()
+  \verb! VirtualSpaceManager.addClusteredView() !
 \item
-  VirtualSpaceManager.stop()
+  \verb! VirtualSpaceManager.stop() !
 \item
-  ClusterGeometry class
+  \verb! ClusterGeometry ! class 
 \item
-  ClusteredView class
+  \verb! ClusteredView ! class 
 \item
-  ClusteredImage class
+  \verb! ClusteredImage ! class 
 \item
-  ClusteredStroke class
+  \verb! ClusteredStroke ! class 
 \end{itemize}
 \subsection{Exclusions}
 
@@ -218,15 +218,6 @@ It is possible to set an arbitrary \verb!Paint! to fill the inside of a
 \verb!GradientPaint!, \verb!RadialGradientPaint! and
 \verb!LinearGradientPaint!, plus any \verb!Paint! that is serializable.
 
-\subsection{Deploying on WILD}
-
-See the example script \verb! deploy.sh ! located in
-\verb! src/main/resources/scripts !. Deploying a pure-java build of
-zvtm-cluster (the default) is as simple as copying your build to the
-target machines; using native libraries, however, requires more effort
-(the correct objects for the wall machines should be deployed and
-referenced from the \verb! java.library.path ! variable).
-
 \subsection{Running Applications}
 
 zvtm-cluster applications are split in two parts:
@@ -252,7 +243,7 @@ command line, e.g. \verb! -Dzvtm.cluster.channel_conf="foo.xml" !
 \item
   \verb! zvtm.cluster.channel_conf !
 \end{itemize}
-\textbf{TODO: isolate properties in a package?}
+% \textbf{TODO: isolate properties in a package?}
 
 \subsection{Slave client options}
 
@@ -393,11 +384,6 @@ you will avoid deploying the wrong code by mistake. Of course, if the
 branch is a feature branch that you intend to merge back into the trunk,
 change back the artifact id when merging.
 
-\subsubsection{Version numbers}
-
-We are still at 0.something. When moving to 1.0 it may be useful to
-adopt \href{http://semver.org/}{semantic versioning}.
-
 \subsection{Instrumenting zvtm-cluster for performance measurement}
 
 \subsubsection{Running with YourKit Java Profiler}
@@ -436,85 +422,4 @@ remote profiling. This is described
 \subsection{Network monitoring with JMX and JGroups}
 
 \href{http://community.jboss.org/wiki/JMX}{JMX support for JGroups}
-
-\subsection{Resources}
-
-\href{http://zvtm.sf.net}{ZVTM website (sourceforge)}. Before using
-zvtm-cluster, you should have basic familiarity with ZVTM.
-
-\href{http://insitu.lri.fr/WILD/ZVTMCluster}{zvtm-cluster} presentation
-page on this wiki.
-
-\href{http://community.jboss.org/wiki/JGroups}{JGroups wiki}
-
-\subsection{ToDo List}
-
-\begin{itemize}
-\item
-  portal support
-\item
-  picking and VCursor support
-\item
-  better dependency handling (maven)
-\item
-  change cluster geometry dynamically
-\end{itemize}
-\subsection{Glossary}
-
-\subsubsection{Block}
-
-The part of a clustered view that can be displayed by a single machine
-(typically the area covered by one or two screens).
-
-\subsubsection{Camera}
-
-A Camera is a zvtm concept. A Camera has a position in 3d space, but
-always looks straight down. Camera creation and movements are propagated
-to slaves, but with an offset applied to match the slave's position
-within the wall.
-
-\subsubsection{Cluster Geometry}
-
-Describes a display wall. The most important pieces of information
-contained in a ClusterGeometry are the number of screens (rows and
-columns) and the size of each screen (in pixels).
-
-\subsubsection{Clustered View}
-
-A clustered view extends the concept of a ZVTM view (i.e. a window) to
-display wall. A clustered view is divided into blocks. A block is
-displayed by a single slave instance.
-
-\subsubsection{Delta}
-
-A Delta represents a change from an application value (state) to the
-next. Examples of Deltas are: creating a camera, creating a virtual
-space, adding a glyph to a virtual space, changing a glyph's border
-color\ldots{}
-
-\subsubsection{Glyph}
-
-Graphical object. Examples of glyphs are an image, a rectangle, a
-circle, a path. Glyphs can be manipulated in a homogeneous fashion (i.e.
-resize() resizes a Circle or an image, moveTo() moves any glyph\ldots{})
-
-\subsubsection{Identifiable}
-
-An Identifiable is an object that may be replicated across the cluster.
-
-\subsubsection{Master}
-
-A Master is a (bespoke) ZVTM application which declares itself as a
-master. By doing so, it broadcasts changes to its state to all machines
-on the cluster.
-
-\subsubsection{Slave}
-
-A Slave is a generic display application that displays part of a
-clustered view. A Slave is identified by its block id.
-
-\subsubsection{Virtual Space}
-
-An infinite plane on which Glyphs are laid. An arbitrary number of
-virtual spaces can be observed in a View (through the use of Cameras).
 
