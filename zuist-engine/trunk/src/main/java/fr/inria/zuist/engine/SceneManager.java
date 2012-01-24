@@ -246,6 +246,13 @@ public class SceneManager implements CameraListener {
     public void setRegionUpdatePeriod(int period){
         regUpdater.setPeriod(period);
     }
+
+    /**
+     * Shuts down this SceneManager. The SceneManager should not be used after invoking shutdown.
+     */
+    public void shutdown(){
+        glyphLoader.shutdown();
+    }
     
     /** Declare a ResourceHandler for a given type of resource.
      *@param rType type of resource to be handled, e.g., "pdf", "img", ...

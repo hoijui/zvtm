@@ -54,6 +54,13 @@ class GlyphLoader {
         loader.submit(new Request(this.sceneManager, target, od, transition));	
     }
 
+    /**
+     * Shuts down this GlyphLoader. The loader should not be used after this method has been invoked.
+     */
+    public void shutdown(){
+        loader.shutdownNow();
+    }
+
     /** Add a request to unload an object in the queue.
      *@param od description of object to be loaded.
      *@param transition one of Region.{DISAPPEAR,FADE_OUT}
