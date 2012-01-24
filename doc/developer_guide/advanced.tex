@@ -379,7 +379,7 @@ Dependency on \cd{zvtm-agile2d} is declared as follows:
 <dependency>
   <groupId>fr.inria.zvtm</groupId>
   <artifactId>zvtm-agile2d</artifactId>
-  <version>0.0.1-SNAPSHOT</version> <!-- or any newer version -->
+  <version>0.1.0</version> <!-- or any newer version -->
 </dependency>
 \end{SaveVerbatim}
 \fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
@@ -387,6 +387,7 @@ Dependency on \cd{zvtm-agile2d} is declared as follows:
 \begin{itemize}
 \item \cd{AgileGLJViewPanel} is backed by a JOGL \cd{GLJPanel}, that inherits from a Swing lightweight component (\cd{javax.swing.JPanel}).
 \item \cd{AgileGLCViewPanel} is backed by a JOGL \cd{GLCanvas}, that inherits from an AWT heavyweight component (\cd{java.awt.Canvas}).
+\item \cd{AgileNewtViewPanel} is backed by a JOGL \cd{NewtCanvasAWT}, that inherits from an AWT heavyweight component (\cd{java.awt.Canvas}) based on the NEWT Native Windowing Toolkit\footnote{\url{http://jogamp.org/jogl/doc/NEWT-Overview.html}}.
 \end{itemize}
 
 The client application must register one (or both) new view type(s) at initialization in ZVTM:
@@ -432,3 +433,6 @@ View v = vsm.addFrameView(cameras, View.ANONYMOUS, AgileGLCanvasFactory.AGILE_GL
 \end{SaveVerbatim}
 \fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
 \end{small}
+
+For the moment, it is recommended to use a GLCanvas rather than a GLJPanel, as the former features better drawing performance in ZVTM views. NewtCanvas offers drawing performance similar to GLCanvas, but right now ViewListener instances associated with a NewtCanvas-backed ZVTM view do not receive any event.
+
