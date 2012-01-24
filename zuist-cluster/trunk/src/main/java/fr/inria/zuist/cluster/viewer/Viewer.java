@@ -17,6 +17,7 @@ import java.awt.Toolkit;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.Window;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
@@ -91,8 +92,8 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     /* screen dimensions, actual dimensions of windows */
     static int SCREEN_WIDTH =  Toolkit.getDefaultToolkit().getScreenSize().width;
     static int SCREEN_HEIGHT =  Toolkit.getDefaultToolkit().getScreenSize().height;
-    static int VIEW_MAX_W = 1024;  // 1400
-    static int VIEW_MAX_H = 768;   // 1050
+    static int VIEW_MAX_W = 1024;
+    static int VIEW_MAX_H = 768;
     int VIEW_W, VIEW_H;
     int VIEW_X, VIEW_Y;
     /* dimensions of zoomable panel */
@@ -122,6 +123,8 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 
     SceneManager sm;
 
+    private final boolean standalone;
+
 	OverlayManager ovm;
 	VWGlassPane gp;
 	PieMenu mainPieMenu;
@@ -129,7 +132,8 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     private WallCursor wallCursor; //cursor, and zoom center
     private Point panStart;
     
-    public Viewer(boolean fullscreen, boolean opengl, boolean antialiased, File xmlSceneFile){
+    public Viewer(boolean standalone, boolean fullscreen, boolean opengl, boolean antialiased, File xmlSceneFile){
+        this.standalone = standalone;
 		ovm = new OverlayManager(this);
 		initGUI(fullscreen, opengl, antialiased);
         VirtualSpace[]  sceneSpaces = {mSpace};
@@ -174,29 +178,17 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         Vector<Camera> sceneCam = new Vector<Camera>();
         sceneCam.add(mCamera);
         sceneCam.add(cursorCamera);
-//        ClusterGeometry clGeom = new ClusterGeometry(
-//                2680,
-//                1700,
-//                8,
-//                4);
-//		clusteredView = 
-//            new ClusteredView(
-//                    clGeom,
-//                    3, //origin (block number)
-//                    8, //use complete
-//                    4, //cluster surface
-//                    sceneCam);
         ClusterGeometry clGeom = new ClusterGeometry(
-                600,
-                400,
-                1,
-                1);
+                2680,
+                1700,
+                8,
+                4);
 		clusteredView = 
             new ClusteredView(
                     clGeom,
-                    0, //origin (block number)
-                    1, //use complete
-                    1, //cluster surface
+                    3, //origin (block number)
+                    8, //use complete
+                    4, //cluster surface
                     sceneCam);
         clusteredView.setBackgroundColor(Color.GRAY);
         vsm.addClusteredView(clusteredView);
@@ -708,8 +700,17 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		}
     }
     
+    public void destroy(){
+        mView.destroyView();
+        sm.reset();
+        sm.shutdown();
+    }
+
     void exit(){
-        System.exit(0);
+        destroy();
+        if(standalone){
+            System.exit(0);
+        }
     }
 
     public static void main(String[] args){
@@ -748,7 +749,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
             System.setProperty("apple.laf.useScreenMenuBar", "true");
         }
         System.out.println("--help for command line options");
-        new Viewer(fs, ogl, aa, xmlSceneFile);
+        new Viewer(true, fs, ogl, aa, xmlSceneFile);
     }
     
     private static void printCmdLineHelp(){
