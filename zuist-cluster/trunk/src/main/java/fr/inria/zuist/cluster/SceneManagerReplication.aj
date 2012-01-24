@@ -30,7 +30,7 @@ import fr.inria.zuist.engine.SceneManager;
 aspect SceneManagerReplication {
     //instrument *createLevel, *createRegion, *destroyRegion,
     //*createImageDescription, *createTextDescription, 
-    //createClosedShapeDescription, createSceneFragmentDescription
+    //*createClosedShapeDescription, createSceneFragmentDescription
 
     before(Glyph glyph, VirtualSpace virtualSpace): 
         GlyphCreation.glyphAdd(glyph, virtualSpace) &&

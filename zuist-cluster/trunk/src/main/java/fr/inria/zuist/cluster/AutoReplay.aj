@@ -17,6 +17,7 @@ aspect AutoReplay extends AbstractAutoReplay {
         this(replayTarget) &&
         if(replayTarget.isReplicated()) &&
         (
+         execution(public void SceneManager.reset()) ||
          execution(public void SceneManager.setUpdateLevel(boolean)) ||
          execution(public void SceneManager.setOrigin(Point2D.Double)) ||
          execution(public void SceneManager.enableRegionUpdater(boolean)) ||
