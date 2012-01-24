@@ -280,7 +280,7 @@ executing
 
 This summary is reproduced here:
 
-\begin{verbatim}
+\begin{SaveVerbatim}{CodeVerb}
 Usage: SlaveApp [options] where options are:
  -b (--block) N         : view block number (slave index)
  -d (--device-name) VAL : use chosen device (fullscreen only)
@@ -292,13 +292,19 @@ Usage: SlaveApp [options] where options are:
  -u (--undecorated)     : remove window decorations (borders)
  -x (--x-offset) N      : window x offset (ignored if fullscreen set)
  -y (--y-offset) N      : window y offset (ignored if fullscreen set)
-\end{verbatim}
-\textbf{Note about OpenGL acceleration: } for the acceleration to be
-enabled, you must define sun.java2d.opengl in addition to passing the
-\verb! -o ! option to SlaveApp, i.e.,
-\verb! java -Dsun.java2d.opengl=True fr.inria.zvtm.cluster.SlaveApp -o (...)!.
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+
+\textbf{Note about OpenGL acceleration: } for OpenGL acceleration to be
+enabled through the Sun Java2D OGL rendering pipeline,
+you must define sun.java2d.opengl in addition to passing the
+\cd{o} option to \cd{SlaveApp}, i.e.,
+
+\codebox{java -Dsun.java2d.opengl=True fr.inria.zvtm.cluster.SlaveApp -o (...)}
+
 This only works under Linux and Windows (the OGL pipeline is not yet
-available for Mac OS X).
+available for Mac OS X). This is different from the OpenGL acceleration provided
+by the zvtm-agile2D (JOGL-based) views. The latter works on any platform, including Mac OS X, and does not require this property to be set to true.
 
 \subsection{OpenGL information and troubleshooting}
 
