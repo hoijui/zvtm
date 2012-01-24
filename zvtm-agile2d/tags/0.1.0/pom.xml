@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+$Id: pom.xml 2405 2009-09-25 09:07:33Z epietrig $
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>fr.inria.zvtm</groupId>
+  <artifactId>zvtm-agile2d</artifactId>
+  <packaging>jar</packaging>
+  <name>ZVTM-AGILE2D</name>
+  <version>0.1.0</version>
+  <description>The ZVTM is a Zoomable User Interface (ZUI) toolkit implemented in Java, designed to ease the task of creating complex visual editors in which large amounts of objects have to be displayed, or which contain complex geometrical shapes that need to be animated. It is based on the metaphor of universes that can be observed through smart movable/zoomable cameras, and offers features such as perceptual continuity in object animations and camera movements, which should make the end-user's overall experience more pleasing. This package contains a new type of view using Agile2D to perform OpenGL rendering.</description>
+  <url>http://zvtm.sourceforge.net</url>
+  <licenses>
+    <license>
+      <name>GNU Lesser General Public License (LGPL)</name>
+      <url>http://www.gnu.org/licenses/lgpl.html</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <scm>
+    <url>https://zvtm.svn.sourceforge.net/svnroot/zvtm</url>
+  </scm>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+  
+  <!-- Repositories -->
+  <repositories>
+	<repository>
+      <id>zvtm repository</id>
+      <url>http://zvtm.sourceforge.net/maven</url>
+    </repository>
+    <repository>
+      <id>central</id>
+      <name>Maven Repository</name>
+      <url>http://repo1.maven.org/maven2</url>
+    </repository>
+	<repository>
+        <!-- JOGL and Gluegen jar files from http://jogamp.org/deployment/v2.0-rc5/jar/ are available in the (maven) repository below -->
+        <id>agile2d.sf.net</id>
+        <url>http://agile2d.sourceforge.net/maven</url>
+    </repository>
+  </repositories>
+  <!-- Distribution -->
+  <distributionManagement>
+	<repository>
+      <id>zvtm.sf.net</id>
+      <url>scp://shell.sourceforge.net/home/project-web/zvtm/htdocs/maven</url>
+    </repository>
+  </distributionManagement>
+  
+  <profiles>
+    <profile>
+      <id>osx</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <build.type>macosx-universal</build.type>
+      </properties>
+    </profile>
+    <profile>
+      <id>lin32</id>
+      <properties>
+        <build.type>linux-i586</build.type>
+      </properties>
+    </profile>
+    <profile>
+      <id>lin64</id>
+      <properties>
+        <build.type>linux-amd64</build.type>
+      </properties>
+    </profile>
+    <profile>
+      <id>win32</id>
+      <properties>
+        <build.type>windows-i586</build.type>
+      </properties>
+    </profile>
+    <profile>
+      <id>win64</id>
+      <properties>
+        <build.type>windows-amd64</build.type>
+      </properties>
+    </profile>
+  </profiles>
+
+  <!-- Dependencies -->
+  <dependencies>
+	<dependency>
+      <groupId>fr.inria.zvtm</groupId>
+      <artifactId>zvtm-core</artifactId>
+      <version>[0.11.0-SNAPSHOT,)</version>
+    </dependency>
+	<dependency>
+      <groupId>agile2d</groupId>
+      <artifactId>agile2d</artifactId>
+      <version>[3.0,)</version>
+  	</dependency>
+  </dependencies>
+
+  <!-- Build -->
+  <build>
+      <extensions>
+        <extension>
+          <groupId>org.apache.maven.wagon</groupId>
+           <artifactId>wagon-ssh</artifactId>
+           <version>2.2</version>
+        </extension>
+      </extensions>
+    <resources> 
+  	  <resource>
+          <directory>src/main/resources</directory> 
+            <excludes> 
+  		    <exclude>test.jpg</exclude>
+  		</excludes> 
+        </resource>
+  	</resources>
+    <plugins>
+		<plugin>
+		  <groupId>org.apache.maven.plugins</groupId>
+		  <artifactId>maven-dependency-plugin</artifactId>
+		  <executions>
+		    <execution>
+		      <id>unpack</id>
+		      <phase>compile</phase>
+		      <goals>
+		        <goal>unpack</goal>
+		      </goals>
+		      <configuration>
+		        <artifactItems>
+					<artifactItem>
+					  <groupId>org.jogamp.jogl</groupId>
+					  <artifactId>jogl-all-natives</artifactId>
+					  <version>v2.0-rc5b623</version>
+		 			  <classifier>${build.type}</classifier>
+					  <type>jar</type>
+					  <includes>*.jnilib,*.lib,*.so,*.dll</includes>
+					  <overWrite>true</overWrite>
+					  <outputDirectory>${project.build.directory}/lib</outputDirectory>
+					</artifactItem>
+					<artifactItem>
+					  <groupId>org.jogamp.gluegen</groupId>
+					  <artifactId>gluegen-rt-natives</artifactId>
+					  <version>v2.0-rc5b623</version>
+		 			  <classifier>${build.type}</classifier>
+					  <type>jar</type>
+		              <includes>*.jnilib,*.lib,*.so,*.dll</includes>
+					  <!-- Exclude native library files of jogl for mobile platforms -->
+		              <!-- <excludes>%ant[*mobile*]</excludes> -->
+					  <overWrite>true</overWrite>
+					  <outputDirectory>${project.build.directory}/lib</outputDirectory>
+					</artifactItem>
+		        </artifactItems>
+		      </configuration>
+		    </execution>
+		  </executions>
+		</plugin>
+	
+    <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>dependency-maven-plugin</artifactId>
+        <version>1.0</version>
+        <executions>
+          <execution>
+            <id>copy-dependencies</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+    	<version>2.3.2</version>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+          <showDeprecation>true</showDeprecation>
+        </configuration>
+      </plugin>
+      <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-eclipse-plugin</artifactId>
+        	<version>2.8</version>
+          <configuration>
+              <downloadSources>true</downloadSources>
+          </configuration>
+      </plugin>
+ 	  <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+    	<version>2.3.1</version>
+        <configuration>
+          <excludes>
+              <exclude>**/tests</exclude>
+              <exclude>**/tests/*</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+    	<version>2.7</version>
+        <configuration>
+          <code>javadoc:aggregate</code>
+          <overview>${basedir}/overview.html</overview>
+          <doctitle><![CDATA[<h1>ZVTM-AGILE2D API documentation</h1>]]></doctitle>
+          <bottom><![CDATA[<i>Copyright &#169; 2011 INRIA. All Rights Reserved<br />Licensed under the GNU LGPL. For full terms see the file COPYING.</i>]]></bottom>
+          <links>
+            <link>http://download.oracle.com/javase/1.5.0/docs/api</link>
+            <link>http://zvtm.sourceforge.net/apidocs/</link>
+            <link>http://download.java.net/media/jogl/jogl-2.x-docs/</link>
+          </links>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  
+</project>
