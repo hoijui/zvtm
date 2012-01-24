@@ -44,6 +44,8 @@ import agile2d.AgileState;
  * Uses OpenGL acceletation provided by the Agile2D rendering pipeline (itself based upon JOGL 2.0).<br>
  * <a href="http://agile2d.sourceforge.net/">Agile2D homepage</a><br>
  * <a href="http://download.java.net/media/jogl/jogl-2.x-docs/">JOGL 2 javadoc</a><br>
+ * <a href="http://jogamp.org/deployment/jogamp-next/javadoc/jogl/javadoc">JogAmp javadoc</a><br>
+ * <a href="http://jogamp.org/jogl/doc/NEWT-Overview.html">NEWT</a><br>
  * Before instantiating an Agile2D ZVTM View, one must register the new view type:<br>
  * View.registerViewPanelType(AgileGLJPanelFactory.AGILE_NEWT_VIEW, new AgileNewtCanvasFactory());<br><br>
  * Then the view gets created as any other view:<br>

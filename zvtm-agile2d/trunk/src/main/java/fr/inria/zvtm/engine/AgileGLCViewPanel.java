@@ -38,7 +38,7 @@ import agile2d.AgileGraphics2D;
 import agile2d.AgileState;
 
 /**
- * JPanel used to paint the content of a view (all camera layers).
+ * AWT Canvas used to paint the content of a view (all camera layers).
  * Uses OpenGL acceletation provided by the Agile2D rendering pipeline (itself based upon JOGL 2.0).<br>
  * <a href="http://agile2d.sourceforge.net/">Agile2D homepage</a><br>
  * <a href="http://download.java.net/media/jogl/jogl-2.x-docs/">JOGL 2 javadoc</a><br>

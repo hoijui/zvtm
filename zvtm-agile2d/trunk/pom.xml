@@ -216,11 +216,12 @@ $Id: pom.xml 2405 2009-09-25 09:07:33Z epietrig $
           <code>javadoc:aggregate</code>
           <overview>${basedir}/overview.html</overview>
           <doctitle><![CDATA[<h1>ZVTM-AGILE2D API documentation</h1>]]></doctitle>
-          <bottom><![CDATA[<i>Copyright &#169; 2011 INRIA. All Rights Reserved<br />Licensed under the GNU LGPL. For full terms see the file COPYING.</i>]]></bottom>
+          <bottom><![CDATA[<i>Copyright &#169; 2011-2012 INRIA. All Rights Reserved<br />Licensed under the GNU LGPL. For full terms see the file COPYING.</i>]]></bottom>
           <links>
             <link>http://download.oracle.com/javase/1.5.0/docs/api</link>
             <link>http://zvtm.sourceforge.net/apidocs/</link>
             <link>http://download.java.net/media/jogl/jogl-2.x-docs/</link>
+			<link>http://jogamp.org/deployment/jogamp-next/javadoc/jogl/javadoc/</link>
           </links>
         </configuration>
       </plugin>
