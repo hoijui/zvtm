@@ -154,7 +154,7 @@ Porting an application is done in three steps:
 
 \begin{itemize}
 \item
-  At the very beginning of your program, call \cd{VirtualSpaceManager.INSTANCE.setMaster()}
+  At the very beginning of your program, call \cd{VirtualSpaceManager.INSTANCE.setMaster("AppName")} where String \cd{"AppName"} matches the name passed through the \cd{-n} argument to the rendering slaves (\cd{SlaveApp}).
 \item
   Create one or more \cd{ClusteredView} instances
 \end{itemize}
@@ -308,44 +308,76 @@ by the zvtm-agile2D (JOGL-based) views. The latter works on any platform, includ
 
 \subsection{OpenGL information and troubleshooting}
 
-1. The example \verb! OGLClusterExample.java ! is used to trace the
+\begin{enumerate}
+\item The example \verb! OGLClusterExample.java ! is used to trace the
 OpenGL rendering capabilities with zvtm-cluster under Linux. This
-example contains paths, simple polygons, text, and image samples and
-therefore we can check if opengl calls are made for the drawing
-operations associated to each of those graphical entities.
+example contains paths, simple polygons, text, and image samples.
+With it, one can check if OpenGL calls are made for the drawing
+operations associated with each of those graphical entities.
 
-2. On each slave machine, we launch two slave applications through the
-script :
-\verb!/local_slave_ogl.sh -n OGLClusterExample -u -d :0.0 -b 0!, where
-``d'' indicates the screen name id and ``u'' indicates undecorated
-windows (since we couldn't get fullscreen working simultaneously on two
+\item On each slave machine, we launch two slave applications through the
+following script:
+
+\codebox{./local\_slave\_ogl.sh -n OGLClusterExample -u -d :0.0 -b 0}
+
+where \cd{d} indicates the screen name id and \cd{u} indicates undecorated
+windows (when we cannot get fullscreen working simultaneously on two
 screens).
 
-3. In \verb!local_slave_ogl.sh!, when calling the java slaveapp, we must
-transmit the arguments \verb!-Dsun.java2d.opengl=True! (enabling trace
-of opengl operations) and \verb!-Dsun.java2d.opengl.fbobject=false!
-(desactivating the use of FrameBufferObject, otherwise the rendering is
-not effectuated)
+\item In \cd{local\_slave\_ogl.sh}, when calling the java SlaveApp, we must
+transmit the arguments
 
-4. On frontal--1, we launch the script
-\verb!./local_master_ogl.sh -bw 2560 -bh 1600 -r 1 -c 2!, where ``bw''
-and ``bh'' indicate the dimensions of the window of each slave view).
+\codebox{-Dsun.java2d.opengl=True}
 
-5. The configuration of the slave machine in which it has been tested:
+(enabling trace
+of OpenGL operations) and 
+
+\codebox{-Dsun.java2d.opengl.fbobject=false}
+
+(desactivating the use of FrameBufferObject, otherwise the view does not properly render).
+
+\item On the master computer, we launch the script
+
+\codebox{./local\_master\_ogl.sh -bw 2560 -bh 1600 -r 1 -c 2}
+
+where \cd{bw} and \cd{bh} indicate the dimensions of the window of each slave view.
+
+\item The configuration of the slave machine in which it has been tested:
 Ubuntu 9.10, NVIDIA GeForce 8800 GT/PCI/SSE2, OpenGL version 3.0.0,
 driver version NVIDIA 185.18.36, GLX version 1.4.
 
-6. Trace messages (we get the same output on both slaveapps):
-\\\verb!sun.java2d.loops.FillRect::FillRect(AnyColor, SrcNoEa, AnyInt)!\\\verb!sun.java2d.loops.Blit::Blit(IntRgb, SrcNoEa, IntRgb)!\\\verb!sun.java2d.loops.DrawRect::DrawRect(AnyColor, SrcNoEa, AnyInt)!\\\verb!sun.java2d.loops.FillRect::FillRect(AnyColor, SrcNoEa, AnyInt)!\\\verb!sun.java2d.loops.DrawRect::DrawRect(AnyColor, SrcNoEa, AnyInt)!\\\verb!sun.java2d.loops.FillPath::FillPath(AnyColor, SrcNoEa, AnyInt)!\\\verb!sun.java2d.loops.DrawPath::DrawPath(AnyColor, SrcNoEa, AnyInt)!\\\verb!sun.java2d.loops.DrawGlyphList::DrawGlyphList(AnyColor, SrcNoEa, AnyInt)!\\\verb!sun.java2d.opengl.OGLSwToSurfaceBlit::Blit(IntRgb, AnyAlpha, "OpenGL Surface")!\\\verb!sun.java2d.opengl.OGLSurfaceToSurfaceBlit::Blit("OpenGL Surface", AnyAlpha, "OpenGL Surface")!\\
+\item Example trace messages for this configuration (we get the same output on both slaveapps):
 
-7. On WILD slaves (as of Feb 2011), the argument
-\verb!-Dsun.java2d.opengl.fbobject=true! works and the last line of the
-above trace output
-becomes:\\\verb!sun.java2d.opengl.OGLRTTSurfaceToSurfaceBlit::Blit("OpenGL Surface (render-to-texture)", AnyAlpha, "OpenGL Surface")!\\
+\begin{SaveVerbatim}{CodeVerb}
+sun.java2d.loops.FillRect::FillRect(AnyColor, SrcNoEa, AnyInt)
+sun.java2d.loops.Blit::Blit(IntRgb, SrcNoEa, IntRgb)
+sun.java2d.loops.DrawRect::DrawRect(AnyColor, SrcNoEa, AnyInt)
+sun.java2d.loops.FillRect::FillRect(AnyColor, SrcNoEa, AnyInt)
+sun.java2d.loops.DrawRect::DrawRect(AnyColor, SrcNoEa, AnyInt)
+sun.java2d.loops.FillPath::FillPath(AnyColor, SrcNoEa, AnyInt)
+sun.java2d.loops.DrawPath::DrawPath(AnyColor, SrcNoEa, AnyInt)
+sun.java2d.loops.DrawGlyphList::DrawGlyphList(AnyColor, SrcNoEa, AnyInt)
+sun.java2d.opengl.OGLSwToSurfaceBlit::Blit(IntRgb, AnyAlpha, "OpenGL Surface")
+sun.java2d.opengl.OGLSurfaceToSurfaceBlit::Blit("OpenGL Surface", AnyAlpha,
+"OpenGL Surface")
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+
+
+\item On WILD slaves (as of Feb 2011), the argument \cd{-Dsun.java2d.opengl.fbobject=true} works and the last line of the
+above trace output becomes:\\
+\begin{SaveVerbatim}{CodeVerb}
+sun.java2d.opengl.OGLRTTSurfaceToSurfaceBlit::Blit("OpenGL Surface
+(render-to-texture)", AnyAlpha, "OpenGL Surface")}
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+
+\end{enumerate}
+
 
 \subsection{Graceful shutdown}
 
-The method \verb! VirtualSpaceManager.stop() ! has been added to try to
+The method \cd{VirtualSpaceManager.stop()} has been added to try to
 initiate an orderly shutdown of the whole cluster.
 
 \subsection{Logging: configuring log4j}
@@ -353,8 +385,8 @@ initiate an orderly shutdown of the whole cluster.
 Since we do not want to force a particular logging library on
 zvtm-cluster users, logging is done through
 \href{http://www.slf4j.org/}{slf4j}. At the moment, we use the log4j
-back-end to actually perform the work. A sample properties file
-\verb!log4j.properties! is provided with zvtm-cluster. Modify it to suit
+back-end to actually perform the work. A sample properties file,
+\cd{log4j.properties}, is provided with zvtm-cluster. Modify it to suit
 your purposes. \textbf{This properties file should be in your
 classpath.}
 
@@ -362,7 +394,7 @@ classpath.}
 
 \begin{itemize}
 \item
-  When launching an application, the slave views do not display anything
+  When launching an application, the slave views do not display anything.
 \end{itemize}
 Check the application name property: the cluster name for your
 application and the generic slaves should match. That is, if you called
@@ -377,9 +409,11 @@ in your application, you should start the generic slaves using
 
 \begin{itemize}
 \item
-  \verb!DPath! clustering is only available when using java 1.6+. This
-  is because \verb!GeneralPath! was not serializable before java 1.6.
+  \cd{DPath} clustering is only available when using Java 1.6+. This
+  is because \cd{java.awt.geom.GeneralPath} was not serializable before Java 1.6.
 \end{itemize}
+
+
 \subsection{Choosing the right garbage collector}
 
 It is advisable to use the concurrent mark and sweep garbage collector,
@@ -387,71 +421,65 @@ which will minimize pause times. To do so, pass the option
 \verb!-XX:+UseConcMarkSweepGC! when running both the master and slave
 apps.
 
-There is a
-\href{http://www.oracle.com/technetwork/java/gc-tuning-5-138395.html}{nice
-article} on tuning garbage collection using the Oracle JVM.
+There is a nice
+article\footnote{\url{http://www.oracle.com/technetwork/java/gc-tuning-5-138395.html}} on tuning garbage collection using the Oracle JVM.
 
 \subsection{Generic Java troubleshooting links and tips:}
 
-\href{http://java.sun.com/javase/6/webnotes/trouble/other/matrix6-Unix.html}{Java
-6 quick troubleshooting tips}
-
-\href{http://java.sun.com/developer/technicalArticles/Programming/HPROF.html}{hprof}
+Java 6 quick troubleshooting tips\footnote{\url{http://java.sun.com/javase/6/webnotes/trouble/other/matrix6-Unix.html}}
+hprof\footnote{\url{http://java.sun.com/developer/technicalArticles/Programming/HPROF.html}}
 
 Discover hprof options by running:
 
-\begin{verbatim}
-java -Xrunhprof:help
-\end{verbatim}
+\codebox{java -Xrunhprof:help}
+
 Start VM with \verb!-XX:+HeapDumpOnOutOfMemoryError!; if
 OutOfMemoryError is thrown, VM generates a heap dump.
 
-\subsection{Developer tips/best practices}
-
-\subsubsection{Branches}
-
-When creating a branch (for example a throwaway branch for a demo),
-rename it (change the artifact id in the maven project file). This way,
-you will avoid deploying the wrong code by mistake. Of course, if the
-branch is a feature branch that you intend to merge back into the trunk,
-change back the artifact id when merging.
+%\subsection{Developer tips/best practices}
+%
+%\subsubsection{Branches}
+%
+%When creating a branch (for example a throwaway branch for a demo),
+%rename it (change the artifact id in the maven project file). This way,
+%you will avoid deploying the wrong code by mistake. Of course, if the
+%branch is a feature branch that you intend to merge back into the trunk,
+%change back the artifact id when merging.
 
 \subsection{Instrumenting zvtm-cluster for performance measurement}
 
 \subsubsection{Running with YourKit Java Profiler}
 
-\href{http://www.yourkit.com}{YJP} is a commercial java profiler.
-In-Situ owns a licence for this software.
-\href{http://www.yourkit.com/docs/80/help/agent.jsp}{Here} are the
-instructions needed to run programs under YJP. It mostly boils down to
-running
+YJP\footnote{\url{http://www.yourkit.com}} is a commercial Java profiler.
+Instructions  needed to run programs under YJP are available\footnote{\url{http://www.yourkit.com/docs/80/help/agent.jsp}}. It mostly boils down to running
 
-\begin{verbatim}
-java -agentlib:yjpagent FooClass
-\end{verbatim}
-after the yjp agent library directory has been added to your
-\verb!LD_LIBRARY_PATH!. One interesting feature of YJP is that it allows
+\codebox{java -agentlib:yjpagent FooClass}
+
+after the YJP agent library directory has been added to your
+\cd{LD\_LIBRARY\_PATH}. One interesting feature of YJP is that it allows
 profiling of remote applications. Connecting to a remote application is
-described \href{http://www.yourkit.com/docs/80/help/connect.jsp}{here}.
+described\footnote{\url{http://www.yourkit.com/docs/80/help/connect.jsp}}.
 
 \subsubsection{Running with VisualVM}
 
 \href{https://visualvm.dev.java.net/}{VisualVM} allows monitoring of the
 Java virtual machine that runs an application (heap size, occupancy,
-thread states, \ldots{}) as well as basic CPU and memory profiling. To
-install VisualVM under Debian, run
+thread states, \ldots{}) as well as basic CPU and memory profiling.
 
-\verb!apt-get install visualvm !
+%To
+%install VisualVM under Debian, run
+%
+%\verb!apt-get install visualvm !
+%
 
-Then run VisualVM with
+Run VisualVM with
 
-\verb! jvisualvm !
+\codebox{jvisualvm}
 
 VisualVM allows monitoring remote applications using jstatd, but not
-remote profiling. This is described
-\href{https://visualvm.dev.java.net/gettingstarted.html}{here}.
+remote profiling\footnote{\url{https://visualvm.dev.java.net/gettingstarted.html}}.
 
 \subsection{Network monitoring with JMX and JGroups}
 
-\href{http://community.jboss.org/wiki/JMX}{JMX support for JGroups}
+JMX support for JGroups\footnote{\url{http://community.jboss.org/wiki/JMX}}.
 
