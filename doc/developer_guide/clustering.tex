@@ -1,8 +1,23 @@
 \section{Clustering}
 \label{sec:clustering}
 
+\begin{figure}[t]
+\centering
+  \begin{picture}(500,170)(0,0)
+    \put(0,0){\includegraphics[width=.71\columnwidth]{images/atf_wild.jpg}}
+    \put(375,87){\includegraphics[width=.23\columnwidth]{images/ssc2008.jpg}}
+    \put(375,0){\includegraphics[width=.23\columnwidth]{images/expe.png}}
+    \put(2,153){\wl{(a)}}
+    \put(377,153){\wl{(b)}}
+    \put(377, 64){\wl{(c)}}    
+  \end{picture}
+\caption{zvtm-cluster applications running on the WILD platform (32 tiles for a total resolution of 20 480 $\times$ 6 400 pixels). (a) Zoomed-in visualization of the North-American part of the world-wide air traffic network (1~200 airports, 5~700 connections) overlaid on NASA's Blue Marble Next Generation images (86 400 $\times$ 43 200 pixels) augmented with country borders ESRI shapefiles. (b) Panning and zooming in Spitzer's Infrared Milky Way (396~032 $\times$ 12~000 pixels). (c) Controlled laboratory experiment for the evaluation of mid-air multi-scale navigation techniques.}
+\vspace{-1em}
+\label{fig:atf}
+\end{figure}
+
 Besides desktop applications running on one host, ZVTM can be used to create applications whose 
-rendering tasks will be split among nodes on a display cluster.
+rendering tasks will be split among nodes on a display cluster, such as those driving ultra-high-resolution wall-sized displays (Figure~\ref{fig:atf}).
 
 Distributed rendering works by replicating the state of one or more VirtualSpace instances 
 on the cluster. In this chapter, we introduce clustered views, which are practically the only
@@ -14,7 +29,7 @@ Dependency on \cd{zvtm-cluster} is declared as follows:
 <dependency>
   <groupId>fr.inria.zvtm</groupId>
   <artifactId>zvtm-cluster</artifactId>
-  <version>0.2.6-SNAPSHOT</version> <!-- or any newer version -->
+  <version>0.2.6</version> <!-- or any newer version -->
 </dependency>
 \end{SaveVerbatim}
 \fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
@@ -23,7 +38,7 @@ Dependency on \cd{zvtm-cluster} is declared as follows:
 
 Clustered views describe the display cluster geometry, as well as a viewport within that cluster.
 Views are organized around blocks (the basic unit of views). Blocks are arranged in a matrix
-and numbered column-wise, starting from 0.
+and numbered column-wise, starting from 0, as illustrated in Figure~\ref{fig:clview}.
 
 \begin{figure}
 \centering
@@ -39,48 +54,54 @@ and numbered column-wise, starting from 0.
 The recommended way of obtaining zvtm-cluster is from the SVN trunk. To
 check out zvtm-cluster:
 
-\verb! svn co https://zvtm.svn.sourceforge.net/svnroot/zvtm/zvtm-cluster/trunk !
+\codebox{svn co https://zvtm.svn.sourceforge.net/svnroot/zvtm/zvtm-cluster/trunk}
 
 The build process is managed by \href{http://maven.apache.org/}{Maven}.
-Assuming a recent version of maven2 is installed on your machine,
+Assuming a recent version of Maven 2 or Maven 3 is installed on your machine,
 executing
 
-\verb! mvn clean package !
+\codebox{mvn clean package}
 
 at the project root will build the software and
 
-\verb! mvn install !
+\codebox{mvn install}
 
 will install it in your local repository.
 
 \subsubsection{Build options}
 
 It is possible to build a jar containing the library, plus every
-dependency. To do so, execute \verb! mvn assembly:assembly !
+dependency. To do so, execute
 
-This will generate \verb!zvtm-cluster-x.y.z-jar-with-dependencies.jar!
+\codebox{mvn assembly:assembly}
+
+This will generate \cd{zvtm-cluster-x.y.z-jar-with-dependencies.jar}
 
 \subsubsection{Agile2d pipeline}
 
-zvtm-cluster can use the Agile2d pipeline through zvtm-agile2d. To build
+zvtm-cluster can use the Agile2d OpenGL rendering pipeline through zvtm-agile2d. To build
 zvtm-cluster with Agile2d support, run
 
-\verb! mvn -Pagile2d package !
+\codebox{mvn -Pagile2d package}
 
-The generic slave \verb! Agile2dSlaveApp ! should be used instead of
-\verb! SlaveApp !
+The generic slave \cd{Agile2dSlaveApp} should be used instead of \cd{SlaveApp}.
 
-\subsection{Launching an executable with maven}
+\subsection{Launching an executable with Maven}
 
-\verb! mvn exec:java -Dexec.mainClass="com.example.Main" [-Dexec.args="argument1"] ... !
+\codebox{mvn exec:java -Dexec.mainClass="com.example.Main" [-Dexec.args="argument1"] ... }
 
 For instance, you may launch the generic slave with
 
-\verb! mvn exec:java -Dexec.mainClass="fr.inria.zvtm.cluster.SlaveApp" !
+\codebox{mvn exec:java -Dexec.mainClass="fr.inria.zvtm.cluster.SlaveApp"}
 
 You may also try with
 
-\verb! mvn exec:exec -Dexec.executable="java"  -Dexec.args="-Xmx2g -cp %classpath fr.inria.zvtm.cluster.SlaveApp" !
+\begin{SaveVerbatim}{CodeVerb}
+mvn exec:exec -Dexec.executable="java"  -Dexec.args="-Xmx2g \
+    -cp %classpath fr.inria.zvtm.cluster.SlaveApp"
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+
 
 \subsection{Features (supported/unsupported)}
 
@@ -105,10 +126,10 @@ You may also try with
   Portals (portal support is planned, for CameraPortal only at first)
 \item
   Lenses (due to their implementation, supporting lenses on large
-  display would be too memory-heavy)
+  display would be too memory-intensive)
 \item
   VCursor (we are investigating VCursor support, or a suitable
-  replacement)
+  replacement; the externalization of picking now enables testing what glyphs are under the cursor {\em for a given view/slave}, but we still have to offer a mechanism that would make this transparent cluster-wide)
 \end{itemize}
 \subsection{Porting an application to zvtm-cluster}
 
@@ -116,54 +137,55 @@ Porting an application is done in three steps:
 
 \begin{itemize}
 \item
-  If you use Maven, declare a dependency to ZVTM-cluster in your pom
+  If you use Maven, declare a dependency to ZVTM-cluster in your POM
   file
 \end{itemize}
-\begin{verbatim}
- 
+
+
+\begin{SaveVerbatim}{CodeVerb}
 <dependency>
   <groupId>fr.inria.zvtm</groupId>
   <artifactId>zvtm-cluster</artifactId>
-  <version>0.2.6-SNAPSHOT</version>
-
+  <version>0.2.6</version>
 </dependency>
-\end{verbatim}
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+
+
 \begin{itemize}
 \item
-  At the very beginning of your program, call
-  \verb! VirtualSpaceManager.INSTANCE.setMaster() !
+  At the very beginning of your program, call \cd{VirtualSpaceManager.INSTANCE.setMaster()}
 \item
-  Create one or more ClusteredView instances
+  Create one or more \cd{ClusteredView} instances
 \end{itemize}
-Examples are located in the directory
-\verb! src/main/java/fr/inria/zvtm/cluster/examples ! . Studying the
+
+Examples are located in the \cd{src/main/java/fr/inria/zvtm/cluster/examples}. Studying the
 examples is a good way to get started.
 
 \subsection{API additions to ZVTM}
 
 \begin{itemize}
 \item
-  \verb! VirtualSpaceManager.setMaster() !
+  \cd{VirtualSpaceManager.setMaster()}
 \item
-  \verb! VirtualSpaceManager.addClusteredView() !
+  \cd{VirtualSpaceManager.addClusteredView()}
 \item
-  \verb! VirtualSpaceManager.stop() !
+  \cd{VirtualSpaceManager.stop()}
 \item
-  \verb! ClusterGeometry ! class 
+  \cd{ClusterGeometry} class 
 \item
-  \verb! ClusteredView ! class 
+  \cd{ClusteredView} class 
 \item
-  \verb! ClusteredImage ! class 
+  \cd{ClusteredImage} class 
 \item
-  \verb! ClusteredStroke ! class 
+  \cd{ClusteredStroke} class 
 \end{itemize}
 \subsection{Exclusions}
 
 XXX not terribly elegant. It may be necessary to declare your dependency
 on zvtm-cluster in the following fashion:
 
-\begin{verbatim}
- 
+\begin{SaveVerbatim}{CodeVerb}
 <dependency>
    <groupId>fr.inria.zvtm</groupId>
 
@@ -177,7 +199,9 @@ on zvtm-cluster in the following fashion:
       </exclusion>
    </exclusions>
 </dependency>
-\end{verbatim}
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+
 This is because zvtm-cluster depends on zvtm, but is not an add-on.
 Rather, it replaces zvtm and augments it with clustering. Since you want
 to avoid linking to the non-clustered classes in a clustered project,
@@ -186,15 +210,15 @@ you may need to declare this exclusion.
 \subsection{About clustered views}
 
 A clustered view extends the concept of a ZVTM view (i.e. a window) to
-display wall. A clustered view is divided into blocks. A block is
+tiled display walls. A clustered view is divided into blocks. A block is
 displayed by a single slave instance.
 
-\subsection{About clustered images}
+\subsection{About displaying images with zvtm-cluster}
 
-There are two possibilities for using images: \verb!ClusteredImage! and
-the normal zvtm \verb!VImage!. \verb!ClusteredImage! is defined in the
-\verb!fr.inria.zvtm.cluster! package. These images are constructed by
-providing an URL. When transmitting these images to the slaves, only a
+There are two possibilities for using images: \cd{ClusteredImage} and
+the normal zvtm \cd{VImage}. \cd{ClusteredImage} is defined in the
+\cd{fr.inria.zvtm.cluster} package. These images are constructed by
+providing a URL. When transmitting these images to the slaves, only a
 pointer (URL) is passed, and the slave is given the task of obtaining
 the actual image (over an http connection, a shared drive, a common
 naming scheme\ldots{}).
@@ -202,21 +226,22 @@ naming scheme\ldots{}).
 \verb!VImage! instances are transmitted fully to the slaves (i.e. the
 bitmap is serialized). This is especially useful for resource images
 (icons) or images that cannot be put on a web server / shared drive etc.
+But it obviously consumes much more bandwidth.
 
 \subsection{About strokes}
 
-It is possible to set an arbitrary \verb!Stroke! to draw the borders of
-a \verb!Glyph!. \verb!Stroke! being an interface, it cannot be
-serialized, and several implementations, such as \verb!BasicStroke!, are
+It is possible to set an arbitrary \cd{Stroke} to draw the border of
+a \cd{Glyph}. \cd{Stroke} being an interface, it cannot be
+serialized, and several implementations, such as \cd{BasicStroke}, are
 not serializable. We provide a serializable wrapper around
-\verb!BasicStroke!: \verb!ClusteredStroke!.
+\cd{BasicStroke}, called \cd{ClusteredStroke}.
 
 \subsection{About paints}
 
-It is possible to set an arbitrary \verb!Paint! to fill the inside of a
-\verb!PRectangle! (and soon any \verb!ClosedShape!?). We support
-\verb!GradientPaint!, \verb!RadialGradientPaint! and
-\verb!LinearGradientPaint!, plus any \verb!Paint! that is serializable.
+It is possible to set an arbitrary \cd{Paint} to fill the inside of a
+\cd{PRectangle} (and soon any \cd{ClosedShape}?). We support
+\cd{GradientPaint}, \cd{RadialGradientPaint} and
+\cd{LinearGradientPaint}, plus any \cd{Paint} that is serializable.
 
 \subsection{Running Applications}
 
@@ -226,22 +251,23 @@ zvtm-cluster applications are split in two parts:
 \item
   a master application (the one that you write)
 \item
-  a generic slave application \verb!fr.inria.zvtm.cluster.SlaveApp!, one
+  a generic slave application \cd{fr.inria.zvtm.cluster.SlaveApp}, one
   instance of which is typically run for each screen of the display
   wall.
 \end{itemize}
+
 \textbf{All slave instances should be running before the master
 application is launched.}
 
 \subsection{Properties}
 
 These are the system properties currently understood by zvtm-cluster.
-Define them in the standard way, i.e. by using \verb! -D ! on the
-command line, e.g. \verb! -Dzvtm.cluster.channel_conf="foo.xml" !
+Define them in the standard way, i.e. by using \cd{-D} on the
+command line, e.g. \cd{-Dzvtm.cluster.channel\_conf="foo.xml"}
 
 \begin{itemize}
 \item
-  \verb! zvtm.cluster.channel_conf !
+  \cd{zvtm.cluster.channel\_conf}
 \end{itemize}
 % \textbf{TODO: isolate properties in a package?}
 
@@ -250,7 +276,7 @@ command line, e.g. \verb! -Dzvtm.cluster.channel_conf="foo.xml" !
 A summary of the options supported by SlaveApp can be displayed by
 executing
 
-\verb! java fr.inria.zvtm.cluster.SlaveApp --help !
+\codebox{java fr.inria.zvtm.cluster.SlaveApp --help}
 
 This summary is reproduced here:
 
