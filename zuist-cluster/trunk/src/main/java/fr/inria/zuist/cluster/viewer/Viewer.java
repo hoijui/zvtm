@@ -118,10 +118,15 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     String levelStr = Messages.LEVEL + "0";
     static final String mViewName = "ZUIST Viewer";
     View mView;
-    ClusteredView clusteredView;
     ViewerEventHandler eh;
 
     SceneManager sm;
+
+    private Vector<Camera> sceneCam;
+    private ClusteredView clusteredView;
+    private ClusterGeometry withoutBezels;
+    private ClusterGeometry withBezels;
+    private boolean sceneUnderBezels = true;
 
     private final boolean standalone;
 
@@ -131,6 +136,28 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 
     private WallCursor wallCursor; //cursor, and zoom center
     private Point panStart;
+
+    //Toggle view bezels on/off
+    private void toggleClusterView(){
+        VirtualSpaceManager.INSTANCE.destroyClusteredView(clusteredView);
+        if(sceneUnderBezels){
+            clusteredView = new ClusteredView(
+                    withBezels,
+                    3, //origin (block number)
+                    8, //use complete
+                    4, //cluster surface
+                    sceneCam);
+        } else {
+            clusteredView = new ClusteredView(
+                    withoutBezels,
+                    3, //origin (block number)
+                    8, //use complete
+                    4, //cluster surface
+                    sceneCam);
+        }
+        VirtualSpaceManager.INSTANCE.addClusteredView(clusteredView);
+        sceneUnderBezels = !sceneUnderBezels;
+    }
     
     public Viewer(boolean standalone, boolean fullscreen, boolean opengl, boolean antialiased, File xmlSceneFile){
         this.standalone = standalone;
@@ -175,17 +202,18 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		cameras.add(vsm.getVirtualSpace(mnSpaceName).getCamera(0));
 		cameras.add(vsm.getVirtualSpace(ovSpaceName).getCamera(0));
         mView = vsm.addFrameView(cameras, mViewName, (opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, !fullscreen, initMenu());
-        Vector<Camera> sceneCam = new Vector<Camera>();
+        sceneCam = new Vector<Camera>();
         sceneCam.add(mCamera);
         sceneCam.add(cursorCamera);
-        ClusterGeometry clGeom = new ClusterGeometry(
-                2680,
-                1700,
+        withoutBezels = new ClusterGeometry(
+                2560,
+                1600,
                 8,
                 4);
+        withBezels = withoutBezels.addBezels(200, 240);
 		clusteredView = 
             new ClusteredView(
-                    clGeom,
+                    withBezels,
                     3, //origin (block number)
                     8, //use complete
                     4, //cluster surface
@@ -278,6 +306,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		exitMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		infoMI = new JMenuItem(Messages.INFO_SHOW);
 		infoMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
+        final JMenuItem bezelsMI = new JMenuItem("Toggle bezels");
 		consoleMI = new JMenuItem(Messages.CONSOLE_HIDE);
 		consoleMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0));
 		final JMenuItem gcMI = new JMenuItem("Run Garbage Collector");
@@ -289,6 +318,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 				else if (e.getSource()==reloadMI){reload();}
 				else if (e.getSource()==exitMI){exit();}
 				else if (e.getSource()==infoMI){toggleMiscInfoDisplay();}
+				else if (e.getSource()==bezelsMI){toggleClusterView();}
 				else if (e.getSource()==gcMI){gc();}
 				else if (e.getSource()==consoleMI){ovm.toggleConsole();}
 				else if (e.getSource()==aboutMI){about();}
@@ -303,6 +333,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		fileM.addSeparator();
 		fileM.add(exitMI);
 		viewM.add(infoMI);
+        viewM.add(bezelsMI);
 		viewM.add(gcMI);
 		viewM.add(consoleMI);
 		helpM.add(aboutMI);
