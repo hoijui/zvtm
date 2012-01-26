@@ -120,6 +120,10 @@ public class SlaveUpdater {
         appDelegate.stop();
 	}
 
+    void destroyLocalView(ClusteredView cv){
+        appDelegate.destroyLocalView(cv);
+    }
+
 	void createLocalView(ClusteredView cv){
 		appDelegate.createLocalView(cv);
 	}

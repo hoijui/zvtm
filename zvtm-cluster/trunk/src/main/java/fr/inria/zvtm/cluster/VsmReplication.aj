@@ -6,6 +6,7 @@
  */ 
 package fr.inria.zvtm.cluster;
 
+import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 
@@ -77,6 +78,15 @@ aspect VsmReplication {
 	
 	public void VirtualSpaceManager.addClusteredView(ClusteredView cv){
 		sendDelta(new ClusteredViewCreateDelta(cv));
+
+        //make sure slave receive camera positions once
+        for(Camera cam: cv.peekCameras()){
+            cam.setLocation(cam.getLocation());
+        }
 	}
+
+    public void VirtualSpaceManager.destroyClusteredView(ClusteredView cv){
+        sendDelta(new ClusteredViewDestroyDelta(cv));
+    }
 }
 

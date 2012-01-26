@@ -13,7 +13,7 @@ import java.util.Vector;
 import fr.inria.zvtm.engine.Camera;
 
 class ClusteredViewCreateDelta implements Delta {
-	private final ObjId objId;
+	private final ObjId<ClusteredView> objId;
     private final ClusterGeometry clGeom;
 	private final int origin;
 	private final int viewCols;

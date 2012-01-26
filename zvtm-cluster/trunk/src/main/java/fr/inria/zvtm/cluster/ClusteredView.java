@@ -224,5 +224,9 @@ public class ClusteredView extends DefaultIdentifiable {
     boolean ownsCamera(Camera cam){
         return cameras.contains(cam);
     }
+
+    List<Camera> peekCameras(){
+        return Collections.unmodifiableList(cameras);
+    }
 }
 

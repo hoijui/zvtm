@@ -71,6 +71,16 @@ public class SlaveApp {
         return options.openGl ? View.OPENGL_VIEW : View.STD_VIEW;
     }
 
+    void destroyLocalView(ClusteredView cv){
+        if(!cv.ownsBlock(options.blockNumber)){
+            return;
+        }
+        if(view != null){
+            view.destroyView();
+            view = null;
+        }
+    }
+
 	void createLocalView(ClusteredView cv){
 		if(!cv.ownsBlock(options.blockNumber)){
 			return;
@@ -92,11 +102,6 @@ public class SlaveApp {
         view.setListener(new SlaveEventHandler());
         view.getPanel().setRefreshRate(options.refreshPeriod);
 
-        //move cameras to their 'proper' location
-        for(Camera cam: clusteredView.getCameras()){
-            setCameraLocation(cam.getLocation(), cam);
-        }
-        
         if (options.antialiasing){
             view.setAntialiasing(true);
         }
