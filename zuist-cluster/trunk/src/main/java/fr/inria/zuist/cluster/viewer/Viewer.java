@@ -140,6 +140,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     //Toggle view bezels on/off
     private void toggleClusterView(){
         VirtualSpaceManager.INSTANCE.destroyClusteredView(clusteredView);
+        sceneUnderBezels = !sceneUnderBezels;
         if(sceneUnderBezels){
             clusteredView = new ClusteredView(
                     withBezels,
@@ -156,7 +157,6 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
                     sceneCam);
         }
         VirtualSpaceManager.INSTANCE.addClusteredView(clusteredView);
-        sceneUnderBezels = !sceneUnderBezels;
     }
     
     public Viewer(boolean standalone, boolean fullscreen, boolean opengl, boolean antialiased, File xmlSceneFile){
@@ -344,6 +344,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		reloadMI.addActionListener(a0);
 		exitMI.addActionListener(a0);
 		infoMI.addActionListener(a0);
+		bezelsMI.addActionListener(a0);
 		consoleMI.addActionListener(a0);
 		gcMI.addActionListener(a0);
 		aboutMI.addActionListener(a0);
