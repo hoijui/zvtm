@@ -1,3 +1,4 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Clustering}
 \label{sec:clustering}
 
@@ -34,6 +35,7 @@ Dependency on \cd{zvtm-cluster} is declared as follows:
 \end{SaveVerbatim}
 \fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
 
+%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Clustered Views}
 
 Clustered views describe the display cluster geometry, as well as a viewport within that cluster.
@@ -47,6 +49,7 @@ and numbered column-wise, starting from 0, as illustrated in Figure~\ref{fig:clv
    \label{fig:clview}
 \end{figure}
 
+%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Building zvtm-cluster}
 
 \subsubsection{Basic build}
@@ -77,14 +80,6 @@ dependency. To do so, execute
 
 This will generate \cd{zvtm-cluster-x.y.z-jar-with-dependencies.jar}
 
-\subsubsection{Agile2d pipeline}
-
-zvtm-cluster can use the Agile2d OpenGL rendering pipeline through zvtm-agile2d. To build
-zvtm-cluster with Agile2d support, run
-
-\codebox{mvn -Pagile2d package}
-
-The generic slave \cd{Agile2dSlaveApp} should be used instead of \cd{SlaveApp}.
 
 \subsection{Launching an executable with Maven}
 
@@ -102,8 +97,8 @@ mvn exec:exec -Dexec.executable="java"  -Dexec.args="-Xmx2g \
 \end{SaveVerbatim}
 \fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
 
-
-\subsection{Features (supported/unsupported)}
+%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Features}
 
 \subsubsection{Supported}
 
@@ -119,6 +114,8 @@ mvn exec:exec -Dexec.executable="java"  -Dexec.args="-Xmx2g \
 \item
   Animation framework
 \end{itemize}
+
+
 \subsubsection{Unsupported}
 
 \begin{itemize}
@@ -162,6 +159,7 @@ Porting an application is done in three steps:
 Examples are located in the \cd{src/main/java/fr/inria/zvtm/cluster/examples}. Studying the
 examples is a good way to get started.
 
+%%%%%%%%%%%%%%%%%%%%%%
 \subsection{API additions to ZVTM}
 
 \begin{itemize}
@@ -182,6 +180,8 @@ examples is a good way to get started.
 \item
   \cd{ClusteredStroke} class 
 \end{itemize}
+
+%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Exclusions}
 
 XXX not terribly elegant. It may be necessary to declare your dependency
@@ -209,12 +209,14 @@ Rather, it replaces zvtm and augments it with clustering. Since you want
 to avoid linking to the non-clustered classes in a clustered project,
 you may need to declare this exclusion.
 
+%%%%%%%%%%%%%%%%%%%%%%
 \subsection{About clustered views}
 
 A clustered view extends the concept of a ZVTM view (i.e. a window) to
 tiled display walls. A clustered view is divided into blocks. A block is
 displayed by a single slave instance.
 
+%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Displaying images with zvtm-cluster}
 
 There are two possibilities for using images: \cd{ClusteredImage} and
@@ -230,6 +232,7 @@ bitmap is serialized). This is especially useful for resource images
 (icons) or images that cannot be put on a web server / shared drive etc.
 But it obviously consumes much more bandwidth.
 
+%%%%%%%%%%%%%%%%%%%%%%
 \subsection{About strokes}
 
 It is possible to set an arbitrary \cd{Stroke} to draw the border of
@@ -238,6 +241,7 @@ serialized, and several implementations, such as \cd{BasicStroke}, are
 not serializable. We provide a serializable wrapper around
 \cd{BasicStroke}, called \cd{ClusteredStroke}.
 
+%%%%%%%%%%%%%%%%%%%%%%
 \subsection{About paints}
 
 It is possible to set an arbitrary \cd{Paint} to fill the inside of a
@@ -245,6 +249,7 @@ It is possible to set an arbitrary \cd{Paint} to fill the inside of a
 \cd{GradientPaint}, \cd{RadialGradientPaint} and
 \cd{LinearGradientPaint}, plus any \cd{Paint} that is serializable.
 
+%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Running Applications}
 
 zvtm-cluster applications are split in two parts:
@@ -261,6 +266,7 @@ zvtm-cluster applications are split in two parts:
 \textbf{All slave instances should be running before the master
 application is launched.}
 
+%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Properties}
 
 These are the system properties currently understood by zvtm-cluster.
@@ -273,6 +279,8 @@ command line, e.g. \cd{-Dzvtm.cluster.channel\_conf="foo.xml"}
 \end{itemize}
 % \textbf{TODO: isolate properties in a package?}
 
+
+%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Slave client options}
 
 A summary of the options supported by SlaveApp can be displayed by
@@ -297,18 +305,39 @@ Usage: SlaveApp [options] where options are:
 \end{SaveVerbatim}
 \fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
 
-\textbf{Note about OpenGL acceleration: } for OpenGL acceleration to be
-enabled through the Sun Java2D OGL rendering pipeline,
-you must define sun.java2d.opengl in addition to passing the
+
+%%%%%%%%%%%%%%%%%%%%%%
+\subsection{OpenGL acceleration}
+
+There are two ways of enabling OpenGL acceleration:
+\begin{itemize}
+\item Using Sun's OpenGL-backed Java2D rendering pipeline\footnote{\url{http://docs.oracle.com/javase/1.5.0/docs/guide/2d/new_features.html\#ogl}}, included in every JVM starting with Java 5 (available only on Windows and Linux).
+\item Using Agile2D\footnote{\url{http://agile2d.sf.net}}, a Java2D rendering pipeline based on JOGL 2. This solution currently depends on JOGL 2rc5 and works on Windows, Linux and Mac OS X 10.6 or later.
+\end{itemize}
+
+The two pipelines are quite different and will provide different levels of improvement depending on the drawing primitive considered.
+
+\subsubsection{Agile2d pipeline}
+
+zvtm-cluster can use the Agile2d OpenGL rendering pipeline through the \cd{zvtm-agile2d} module.
+To build zvtm-cluster with Agile2d support, run
+
+\codebox{mvn -Pagile2d package}
+
+The generic slave \cd{Agile2dSlaveApp} should be used instead of \cd{SlaveApp}.
+
+\subsubsection{Sun OGL pipeline}
+
+For acceleration to be enabled through the Sun Java2D OGL rendering pipeline,
+you must define \cd{sun.java2d.opengl} in addition to passing the
 \cd{o} option to \cd{SlaveApp}, i.e.,
 
 \codebox{java -Dsun.java2d.opengl=True fr.inria.zvtm.cluster.SlaveApp -o (...)}
 
 This only works under Linux and Windows (the OGL pipeline is not yet
 available for Mac OS X). This is different from the OpenGL acceleration provided
-by the zvtm-agile2D (JOGL-based) views. The latter works on any platform, including Mac OS X, and does not require this property to be set to true.
-
-\subsection{OpenGL information and troubleshooting}
+by the zvtm-agile2D (JOGL-based) views. The latter works on any platform,
+including Mac OS X, and does not require this property to be set to true.
 
 \begin{enumerate}
 \item The example \verb! OGLClusterExample.java ! is used to trace the
@@ -377,6 +406,7 @@ sun.java2d.opengl.OGLRTTSurfaceToSurfaceBlit::Blit("OpenGL Surface
 \end{enumerate}
 
 
+%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Graceful shutdown}
 
 The method \cd{VirtualSpaceManager.stop()} has been added to try to
@@ -392,6 +422,8 @@ back-end to actually perform the work. A sample properties file,
 your purposes. \textbf{This properties file should be in your
 classpath.}
 
+
+%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Quirks and troubleshooting}
 
 \begin{itemize}
@@ -415,7 +447,7 @@ in your application, you should start the generic slaves using
   is because \cd{java.awt.geom.GeneralPath} was not serializable before Java 1.6.
 \end{itemize}
 
-
+%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Choosing the right garbage collector}
 
 It is advisable to use the concurrent mark and sweep garbage collector,
@@ -448,6 +480,8 @@ OutOfMemoryError is thrown, VM generates a heap dump.
 %branch is a feature branch that you intend to merge back into the trunk,
 %change back the artifact id when merging.
 
+
+%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Instrumenting zvtm-cluster for performance measurement}
 
 \subsubsection{Running with YourKit Java Profiler}
@@ -481,6 +515,7 @@ Run VisualVM with
 VisualVM allows monitoring remote applications using jstatd, but not
 remote profiling\footnote{\url{https://visualvm.dev.java.net/gettingstarted.html}}.
 
+%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Network monitoring with JMX and JGroups}
 
 JMX support for JGroups\footnote{\url{http://community.jboss.org/wiki/JMX}}.
