@@ -65,8 +65,8 @@ public class VEclipse extends VCircle {
 	    VirtualSpaceManager.INSTANCE.repaint();
 	}
 
-	/** Set fraction of eclipse.
-	 *@param f fraction of full eclipse (-1 to 1, with 0 = full eclipse)
+	/** Get fraction of eclipse.
+	 *@return fraction of full eclipse (-1 to 1, with 0 = full eclipse)
      */
 	public double getFraction(){
 	    return fraction;
