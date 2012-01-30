@@ -102,7 +102,11 @@ There are two main types of views \cl{fr.inria.zvtm.engine.View}: external views
 
 Views with the \cd{GL} prefix are OpenGL views (they use Java2D's OpenGL rendering pipeline). They require that pipeline to be enabled at runtime using the following flag:
 
-\codebox{-Dsun.java2d.opengl=true}
+\codebox{-Dsun.java2d.opengl=True}
+
+To find out what is being accelerated, add the following flag:
+
+\codebox{-Dsun.java2d.trace=log}
 
 Other views (without a prefix) use standard \cd{BufferedImage}s to draw their content offscreen and the copy it to the display. The latter are the only views that support magnification lenses (Section \ref{sec:lenses}).
 
