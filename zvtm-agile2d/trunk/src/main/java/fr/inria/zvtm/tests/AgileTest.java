@@ -80,6 +80,10 @@ public class AgileTest implements Java2DPainter {
             View.registerViewPanelFactory(AgileGLCanvasFactory.AGILE_GLC_VIEW, new AgileGLCanvasFactory());
     		mView = vsm.addFrameView(cameras, View.ANONYMOUS, AgileGLCanvasFactory.AGILE_GLC_VIEW, FRAME_WIDTH, FRAME_HEIGHT, true);
         }
+	else if (vt.equals("a2ds")){
+            System.out.println("Instantiating a regular Java2D view with Sun's OGL pipeline");
+	    mView = vsm.addFrameView(cameras, View.ANONYMOUS, View.OPENGL_VIEW, FRAME_WIDTH, FRAME_HEIGHT, true);
+        }
         else {
             System.out.println("Instantiating a regular Java2D view");
             mView = vsm.addFrameView(cameras, View.ANONYMOUS, View.STD_VIEW, FRAME_WIDTH, FRAME_HEIGHT, true);
@@ -138,6 +142,10 @@ public class AgileTest implements Java2DPainter {
         System.out.println("User name: "+System.getProperty("user.name"));
         System.out.println("User home directory: "+System.getProperty("user.home"));
         System.out.println("-----------------");
+
+
+	System.out.println("Available options: a2dc (GLCanvas), a2dj (GLJPanel), a2dn (NewtCanvas), a2ds (Sun's OpenGL rendering pipeline), nothing (Default Java2D rendering pipeline)");
+
         String vt = "";
         float nbObj = DEFAULT_MAX;
         for (String arg:args){
@@ -152,6 +160,9 @@ public class AgileTest implements Java2DPainter {
                 }
             }
         }
+	if (vt.equals("a2ds")){
+	   System.setProperty("sun.java2d.opengl", "True");
+	}
         new AgileTest(vt, nbObj);
     }
     	
