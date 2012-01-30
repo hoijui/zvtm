@@ -63,6 +63,8 @@ import java.util.Vector;
  **/
 public abstract class ViewPanel implements MouseListener, MouseMotionListener, MouseWheelListener, ComponentListener {
     
+    static final int DEFAULT_DELAY = 20;
+    
     /**draw no oval between point where we started dragging the mouse and current point*/
     public final static short NONE=0;
     /**draw an oval between point where we started dragging the mouse and current point*/

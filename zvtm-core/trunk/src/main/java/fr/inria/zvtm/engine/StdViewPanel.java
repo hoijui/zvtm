@@ -88,7 +88,7 @@ public class StdViewPanel extends ViewPanel {
 				drawOffscreen();
 			}
 		};
-		edtTimer = new Timer(25, taskPerformer);
+		edtTimer = new Timer(DEFAULT_DELAY, taskPerformer);
 
 		panel.addHierarchyListener(
 				new HierarchyListener() {
