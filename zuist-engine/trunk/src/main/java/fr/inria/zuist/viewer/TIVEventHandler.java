@@ -312,6 +312,7 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
         else if (code == KeyEvent.VK_S){application.nm.toggleScreenSaver();}
         else if (code == KeyEvent.VK_Q && Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() == e.getModifiers()){application.exit();}
         else if (c == '?'){application.ovm.showAbout();}
+        else if (code == KeyEvent.VK_A){application.toggleBenchAnim();}
     }
 
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}

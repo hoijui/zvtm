@@ -61,6 +61,7 @@ import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.animation.EndAction;
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
+import fr.inria.zvtm.animation.DefaultTimingHandler;
 
 import fr.inria.zvtm.engine.AgileGLCanvasFactory;
 
@@ -505,6 +506,34 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener, Obj
 			ovm.updateConsoleBounds();
 		}
 	}
+
+	/* ---- Benchmark animation ----*/
+	
+	Animation cameraAlt;
+	
+	void toggleBenchAnim(){
+	    if (cameraAlt == null){
+	        animate(20000);
+	    }
+	    else {
+	        vsm.getAnimationManager().stopAnimation(cameraAlt);
+	        cameraAlt = null;
+	    }
+	}
+	
+	void animate(final double gvAlt){
+	    cameraAlt = vsm.getAnimationManager().getAnimationFactory().createAnimation(
+           5000, Animation.INFINITE, Animation.RepeatBehavior.REVERSE, mCamera, Animation.Dimension.ALTITUDE,
+           new DefaultTimingHandler(){
+               public void timingEvent(float fraction, Object subject, Animation.Dimension dim){
+                   Camera c = (Camera)subject;
+                   c.setAltitude(2*Double.valueOf(fraction*gvAlt).doubleValue());
+               }
+           },
+           SlowInSlowOutInterpolator.getInstance()
+        );
+        vsm.getAnimationManager().startAnimation(cameraAlt, false);
+    }
 
 	/* ---- Debug information ----*/
 	

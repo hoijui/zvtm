@@ -214,6 +214,7 @@ class ViewerEventHandler implements ViewListener, ComponentListener, CameraListe
         else if (code == KeyEvent.VK_F7){application.gc();}
         else if (code == KeyEvent.VK_F2){application.ovm.toggleConsole();}
         else if (code == KeyEvent.VK_Q && Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() == e.getModifiers()){application.exit();}
+        else if (code == KeyEvent.VK_A){application.toggleBenchAnim();}
     }
 
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
