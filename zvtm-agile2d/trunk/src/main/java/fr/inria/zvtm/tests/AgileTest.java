@@ -71,7 +71,6 @@ public class AgileTest implements Java2DPainter {
         mCamera = mSpace.addCamera();
         Vector cameras = new Vector(1);
         cameras.add(mCamera);
-        System.out.println(vt);
         if (vt.equals(AgileGLJPanelFactory.AGILE_GLJ_VIEW)){
             System.out.println("Instantiating a GLJPanel-backed view");
             View.registerViewPanelFactory(AgileGLJPanelFactory.AGILE_GLJ_VIEW, new AgileGLJPanelFactory());

@@ -71,7 +71,7 @@ public class AgileGLJViewPanel extends AgileViewPanel {
                 panel.display();
             }
         };
-        edtTimer = new Timer(20, taskPerformer);
+        edtTimer = new Timer(DEFAULT_DELAY, taskPerformer);
         panel.addHierarchyListener(
             new HierarchyListener() {
                 public void hierarchyChanged(HierarchyEvent e) {

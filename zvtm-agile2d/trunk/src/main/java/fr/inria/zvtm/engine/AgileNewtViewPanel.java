@@ -80,7 +80,7 @@ public class AgileNewtViewPanel extends AgileViewPanel {
                 panel.repaint();
             }
         };
-        edtTimer = new Timer(20, taskPerformer);
+        edtTimer = new Timer(DEFAULT_DELAY, taskPerformer);
         panel.addHierarchyListener(
             new HierarchyListener() {
                 public void hierarchyChanged(HierarchyEvent e) {
