@@ -9,6 +9,7 @@ package fr.inria.zvtm.tests;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Toolkit;
 import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
@@ -24,6 +25,7 @@ import fr.inria.zvtm.engine.Java2DPainter;
 import fr.inria.zvtm.engine.AgileGLCanvasFactory;
 import fr.inria.zvtm.engine.AgileNewtCanvasFactory;
 import fr.inria.zvtm.engine.AgileGLJPanelFactory;
+import fr.inria.zvtm.engine.Utils;
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.DefaultTimingHandler;
 import fr.inria.zvtm.animation.interpolation.ConstantAccInterpolator;
@@ -33,20 +35,24 @@ import fr.inria.zvtm.glyphs.*;
 
 
 public class AgileTest implements Java2DPainter {
-	
-	static final int FRAME_WIDTH = 1600;
-	static final int FRAME_HEIGHT = 1200;
-	
+
+	/* screen dimensions, actual dimensions of windows */
+    static int SCREEN_WIDTH =  Toolkit.getDefaultToolkit().getScreenSize().width;
+    static int SCREEN_HEIGHT =  Toolkit.getDefaultToolkit().getScreenSize().height;
+    static int VIEW_MAX_W = 1600;
+    static int VIEW_MAX_H = 1200;
+    int VIEW_W, VIEW_H;
+
 	static final Font FPS_FONT = new Font("Arial", Font.PLAIN, 12);
-	
+
 	static final float DEFAULT_MAX = 100;
 	float MAX = DEFAULT_MAX;
-	
+
 	VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE;
 	VirtualSpace mSpace;
 	View mView;
 	Camera mCamera;
-	
+
 	public AgileTest(String vt, float nbObj){
 		init(vt);
 		MAX = nbObj;
@@ -58,42 +64,48 @@ public class AgileTest implements Java2DPainter {
             vsm.repaint();
         }
 	}
-	
-	void init(String vt){
-		mSpace = vsm.addVirtualSpace(VirtualSpace.ANONYMOUS);
-		mCamera = mSpace.addCamera();
-		Vector cameras = new Vector(1);
-		cameras.add(mCamera);
-		System.out.println(vt);
+
+    void init(String vt){
+        windowLayout();
+        mSpace = vsm.addVirtualSpace(VirtualSpace.ANONYMOUS);
+        mCamera = mSpace.addCamera();
+        Vector cameras = new Vector(1);
+        cameras.add(mCamera);
+        System.out.println(vt);
         if (vt.equals(AgileGLJPanelFactory.AGILE_GLJ_VIEW)){
             System.out.println("Instantiating a GLJPanel-backed view");
             View.registerViewPanelFactory(AgileGLJPanelFactory.AGILE_GLJ_VIEW, new AgileGLJPanelFactory());
-    		mView = vsm.addFrameView(cameras, View.ANONYMOUS, AgileGLJPanelFactory.AGILE_GLJ_VIEW, FRAME_WIDTH, FRAME_HEIGHT, true);
+            mView = vsm.addFrameView(cameras, View.ANONYMOUS, AgileGLJPanelFactory.AGILE_GLJ_VIEW, VIEW_W, VIEW_H, true);
         }
         else if (vt.equals(AgileNewtCanvasFactory.AGILE_NEWT_VIEW)){
             System.out.println("Instantiating a NewtCanvas-backed view");
             View.registerViewPanelFactory(AgileNewtCanvasFactory.AGILE_NEWT_VIEW, new AgileNewtCanvasFactory());
-    		mView = vsm.addFrameView(cameras, View.ANONYMOUS, AgileNewtCanvasFactory.AGILE_NEWT_VIEW, FRAME_WIDTH, FRAME_HEIGHT, true);
+            mView = vsm.addFrameView(cameras, View.ANONYMOUS, AgileNewtCanvasFactory.AGILE_NEWT_VIEW, VIEW_W, VIEW_H, true);
         }
         else if (vt.equals(AgileGLCanvasFactory.AGILE_GLC_VIEW)){
             System.out.println("Instantiating a GLCanvas-backed view");
             View.registerViewPanelFactory(AgileGLCanvasFactory.AGILE_GLC_VIEW, new AgileGLCanvasFactory());
-    		mView = vsm.addFrameView(cameras, View.ANONYMOUS, AgileGLCanvasFactory.AGILE_GLC_VIEW, FRAME_WIDTH, FRAME_HEIGHT, true);
+            mView = vsm.addFrameView(cameras, View.ANONYMOUS, AgileGLCanvasFactory.AGILE_GLC_VIEW, VIEW_W, VIEW_H, true);
         }
-	else if (vt.equals("a2ds")){
+        else if (vt.equals("a2ds")){
             System.out.println("Instantiating a regular Java2D view with Sun's OGL pipeline");
-	    mView = vsm.addFrameView(cameras, View.ANONYMOUS, View.OPENGL_VIEW, FRAME_WIDTH, FRAME_HEIGHT, true);
+            mView = vsm.addFrameView(cameras, View.ANONYMOUS, View.OPENGL_VIEW, VIEW_W, VIEW_H, true);
         }
         else {
             System.out.println("Instantiating a regular Java2D view");
-            mView = vsm.addFrameView(cameras, View.ANONYMOUS, View.STD_VIEW, FRAME_WIDTH, FRAME_HEIGHT, true);
+            mView = vsm.addFrameView(cameras, View.ANONYMOUS, View.STD_VIEW, VIEW_W, VIEW_H, true);
         }
-		mView.setBackgroundColor(Color.LIGHT_GRAY);
-		mView.setListener(new MainListener(this), 0);
-		mView.setRefreshRate(1);
-		mView.setJava2DPainter(this, Java2DPainter.FOREGROUND);
-	}
-	
+        mView.setBackgroundColor(Color.LIGHT_GRAY);
+        mView.setListener(new MainListener(this), 0);
+        mView.setRefreshRate(1);
+        mView.setJava2DPainter(this, Java2DPainter.FOREGROUND);
+    }
+
+	void windowLayout(){
+        VIEW_W = (SCREEN_WIDTH <= VIEW_MAX_W) ? SCREEN_WIDTH : VIEW_MAX_W;
+        VIEW_H = (SCREEN_HEIGHT <= VIEW_MAX_H) ? SCREEN_HEIGHT : VIEW_MAX_H;
+    }
+
 	void populate(){
 	    Glyph[] glyphs = new Glyph[(int)(MAX*MAX)];
         for (int i=0;i<MAX;i++){
@@ -105,7 +117,7 @@ public class AgileTest implements Java2DPainter {
         }
         mSpace.addGlyphs(glyphs);
 	}
-	
+
 	void animate(final double gvAlt){
 	    Animation cameraAlt = vsm.getAnimationManager().getAnimationFactory().createAnimation(
            2000, Animation.INFINITE, Animation.RepeatBehavior.REVERSE, mCamera, Animation.Dimension.ALTITUDE,
@@ -119,14 +131,14 @@ public class AgileTest implements Java2DPainter {
         );
         vsm.getAnimationManager().startAnimation(cameraAlt, false);
     }
-	
+
 	public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
 	    float rr = 1000 / (float)(mView.getPanel().getDelay());
 	    g2d.setColor(Color.BLACK);
 	    g2d.setFont(FPS_FONT);
 	    g2d.drawString(String.valueOf(rr), 10, 20);
 	}
-	
+
 	public static void main(String[] args){
         System.out.println("-----------------");
         System.out.println("General information");
@@ -134,7 +146,7 @@ public class AgileTest implements Java2DPainter {
         System.out.println("OS type: "+System.getProperty("os.name")+" "+System.getProperty("os.version")+"/"+System.getProperty("os.arch")+" "+System.getProperty("sun.cpu.isalist"));
         System.out.println("-----------------");
         System.out.println("Directory information");
-        System.out.println("Java Classpath: "+System.getProperty("java.class.path"));	
+        System.out.println("Java Classpath: "+System.getProperty("java.class.path"));
         System.out.println("Java directory: "+System.getProperty("java.home"));
         System.out.println("Launching from: "+System.getProperty("user.dir"));
         System.out.println("-----------------");
@@ -165,19 +177,19 @@ public class AgileTest implements Java2DPainter {
 	}
         new AgileTest(vt, nbObj);
     }
-    	
+
 }
 
 class MainListener extends ViewAdapter {
-	
+
 	AgileTest application;
-	
+
 	int lastJPX, lastJPY;
-	
+
 	MainListener(AgileTest app){
 		this.application = app;
 	}
-	
+
 	public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
         lastJPX = jpx;
         lastJPY = jpy;
@@ -190,7 +202,7 @@ class MainListener extends ViewAdapter {
         application.mCamera.setZspeed(0);
         v.setDrawDrag(false);
     }
-	
+
 	static float ZOOM_SPEED_COEF = 1.0f/50.0f;
     static double PAN_SPEED_COEF = 50.0;
 
@@ -233,9 +245,9 @@ class MainListener extends ViewAdapter {
     public void exitGlyph(Glyph g){
         g.highlight(false, null);
     }
-    
+
     public void viewClosing(View v){
         System.exit(0);
     }
-    
+
 }
