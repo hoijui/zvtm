@@ -304,9 +304,9 @@ public class GLViewPanel extends ViewPanel {
                 if (drawLens) {
                     drawLens(g);
                 }
-                afterLensHook();
-                drawPortals();
-                portalsHook();
+                //afterLensHook();
+                //drawPortals();
+                //portalsHook();
                 if (cursor_inside){
                     //deal with mouse glyph only if mouse cursor is inside this window
                     try {
