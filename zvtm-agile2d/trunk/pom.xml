@@ -137,7 +137,7 @@ $Id: pom.xml 2405 2009-09-25 09:07:33Z epietrig $
 					<artifactItem>
 					  <groupId>org.jogamp.jogl</groupId>
 					  <artifactId>jogl-all-natives</artifactId>
-					  <version>v2.0-rc5b623</version>
+					  <version>v2.0-rc5</version>
 		 			  <classifier>${build.type}</classifier>
 					  <type>jar</type>
 					  <includes>*.jnilib,*.lib,*.so,*.dll</includes>
@@ -147,7 +147,7 @@ $Id: pom.xml 2405 2009-09-25 09:07:33Z epietrig $
 					<artifactItem>
 					  <groupId>org.jogamp.gluegen</groupId>
 					  <artifactId>gluegen-rt-natives</artifactId>
-					  <version>v2.0-rc5b623</version>
+					  <version>v2.0-rc5</version>
 		 			  <classifier>${build.type}</classifier>
 					  <type>jar</type>
 		              <includes>*.jnilib,*.lib,*.so,*.dll</includes>
