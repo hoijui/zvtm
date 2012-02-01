@@ -153,6 +153,17 @@ $Id$
 		<!-- mvn -P wild ... -->
 		<id>wild</id>
 	    <dependencies>
+		    <dependency>
+	            <groupId>fr.inria.zvtm</groupId>
+	            <artifactId>zuist-engine</artifactId>
+	            <version>0.4.0-SNAPSHOT</version>
+	        </dependency>
+	        <dependency>
+	            <groupId>fr.inria.zvtm</groupId>
+	            <artifactId>zvtm-cluster</artifactId>
+	            <version>0.2.7-SNAPSHOT</version>
+	        </dependency>
+	    
 			<dependency>
 		      <groupId>fr.inria.zvtm</groupId>
 		      <artifactId>zuist-cluster</artifactId>
@@ -161,6 +172,31 @@ $Id$
 	    </dependencies>
 		<build>
 			<plugins>
+				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>aspectj-maven-plugin</artifactId>
+					<version>1.2</version>
+					<configuration>
+						<source>1.6</source>
+						<target>1.6</target>
+						<showWeaveInfo>true</showWeaveInfo>
+	<!--                    <aspectLibraries>
+	                        <aspectLibrary>
+	                            <groupId>fr.inria.zvtm</groupId>
+	                            <artifactId>zvtm-cluster</artifactId>
+	                        </aspectLibrary>
+	                    </aspectLibraries> -->
+					</configuration>				
+					<executions>
+						<execution>
+							<goals>
+								<goal>compile</goal>       
+								<goal>test-compile</goal>  
+							</goals>
+						</execution>
+					</executions>
+				</plugin>			
+				
 		      <plugin>
 		        <groupId>org.apache.maven.plugins</groupId>
 		        <artifactId>maven-compiler-plugin</artifactId>
@@ -236,20 +272,6 @@ $Id$
             <configuration>
               <outputDirectory>${project.build.directory}</outputDirectory>
             </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <inherited>true</inherited>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-source-plugin</artifactId>
-    	<version>2.1.2</version>
-        <executions>
-          <execution>
-            <id>attach-sources</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
           </execution>
         </executions>
       </plugin>
