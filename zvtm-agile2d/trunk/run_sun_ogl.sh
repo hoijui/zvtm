@@ -1,0 +1,2 @@
+#!/bin/sh
+java -Dsun.java2d.opengl=True -cp target/classes:target/agile2d-3.0.jar:target/ehcache-core-2.4.1.jar:target/gluegen-rt-v2.0-rc5.jar:target/jcip-annotations-1.0.jar:target/jogl.all-v2.0-rc5.jar:target/slf4j-api-1.6.1.jar:target/slf4j-simple-1.6.1.jar:target/timingframework-1.0.jar:target/zvtm-agile2d-0.1.0-SNAPSHOT.jar:target/zvtm-core-0.11.0-SNAPSHOT.jar fr.inria.zvtm.tests.AgileTest a2ds "$@"
