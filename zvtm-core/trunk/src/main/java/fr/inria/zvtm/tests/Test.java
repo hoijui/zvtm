@@ -119,7 +119,6 @@ public class Test implements Java2DPainter {
 	    g2d.setColor(Color.BLACK);
 	    g2d.setFont(FPS_FONT);
 	    g2d.drawString(String.valueOf(rr), 10, 20);
-	    g2d.fillRect(200,200,100,100);
 	}
 
 	public static void main(String[] args){
