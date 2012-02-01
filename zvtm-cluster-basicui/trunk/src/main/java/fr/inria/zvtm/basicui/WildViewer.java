@@ -62,6 +62,7 @@ public class WildViewer {
 	        vsm.addClusteredView(cv);
 		}
 		else {
+		    // wall made of 8 x 4 30" displays (2560x1600 each, with approx 100px bezels -- overlay mode)
 	        ClusterGeometry cg = new ClusterGeometry(2760, 1800, 8, 4);
 	        Vector ccameras = new Vector();
 	        ccameras.add(mCamera);
