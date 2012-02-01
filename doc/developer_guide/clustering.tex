@@ -22,7 +22,7 @@ rendering tasks will be split among nodes on a display cluster, such as those dr
 
 Distributed rendering works by replicating the state of one or more VirtualSpace instances 
 on the cluster. In this chapter, we introduce clustered views, which are practically the only
-deviation from a desktop ZVTM application.
+deviation from a ZVTM desktop application.
 
 Dependency on \cd{zvtm-cluster} is declared as follows:
 
@@ -80,22 +80,21 @@ dependency. To do so, execute
 
 This will generate \cd{zvtm-cluster-x.y.z-jar-with-dependencies.jar}
 
-
-\subsection{Launching an executable with Maven}
-
-\codebox{mvn exec:java -Dexec.mainClass="com.example.Main" [-Dexec.args="argument1"] ... }
-
-For instance, you may launch the generic slave with
-
-\codebox{mvn exec:java -Dexec.mainClass="fr.inria.zvtm.cluster.SlaveApp"}
-
-You may also try with
-
-\begin{SaveVerbatim}{CodeVerb}
-mvn exec:exec -Dexec.executable="java"  -Dexec.args="-Xmx2g \
-    -cp %classpath fr.inria.zvtm.cluster.SlaveApp"
-\end{SaveVerbatim}
-\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+%\subsection{Launching an executable with Maven}
+%
+%\codebox{mvn exec:java -Dexec.mainClass="com.example.Main" [-Dexec.args="argument1"] ... }
+%
+%For instance, you may launch the generic slave with
+%
+%\codebox{mvn exec:java -Dexec.mainClass="fr.inria.zvtm.cluster.SlaveApp"}
+%
+%You may also try with
+%
+%\begin{SaveVerbatim}{CodeVerb}
+%mvn exec:exec -Dexec.executable="java"  -Dexec.args="-Xmx2g \
+%    -cp %classpath fr.inria.zvtm.cluster.SlaveApp"
+%\end{SaveVerbatim}
+%\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
 
 %%%%%%%%%%%%%%%%%%%%%%
 \subsection{Features}
@@ -204,7 +203,7 @@ on zvtm-cluster in the following fashion:
 \end{SaveVerbatim}
 \fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
 
-This is because zvtm-cluster depends on zvtm, but is not an add-on.
+This is because zvtm-cluster depends on zvtm-core, but is not an add-on.
 Rather, it replaces zvtm and augments it with clustering. Since you want
 to avoid linking to the non-clustered classes in a clustered project,
 you may need to declare this exclusion.
@@ -265,6 +264,72 @@ zvtm-cluster applications are split in two parts:
 
 \textbf{All slave instances should be running before the master
 application is launched.}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=.9\columnwidth]{images/wild.jpg}
+\caption{Wall-sized display configuration used in the following examples: an 8x4 = 32 tiles setup, driven by16 computers, each equipped with 2 graphics cards. One machine drives two 30" tiles, each tile is driven by a dedicated graphics card. The 30" tiles feature a display resolution of 2560x1600. In the following scripts, the 16 computers are named \cd{a1.foo.bar.com} to \cd{d4.foo.bar.com} and accessed with login \cd{username}.}
+\vspace{-1em}
+\label{fig:wildnodes}
+\end{figure}
+
+Example scripts to launch an application on an 8x4 wall, whose configuration is detailed in Figure \ref{fig:wildnodes}.
+
+Script to launch SlaveApp on all cluster nodes:\\
+\begin{tiny}
+\begin{SaveVerbatim}{CodeVerb}
+#!/bin/bash
+
+function colNum {
+  case "$1" in 
+	  "a" ) return 0;;
+	  "b" ) return 1;;
+	  "c" ) return 2;;
+	  "d" ) return 3;;
+  esac
+}
+
+#start client nodes
+for col in {a..d}
+do
+    for row in {1..4}
+    do
+        colNum $col 
+        SLAVENUM1=`expr $? \* 8 + $row - 1`
+        SLAVENUM2=`expr $SLAVENUM1 + 4`
+        ssh username@$col$row.foo.bar.com -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "sudo sysctl -w kern.ipc.maxsockbuf=80000000"
+        ssh username@$col$row.foo.bar.com -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "sudo sysctl -w net.inet.tcp.recvspace=40000000"
+        ssh username@$col$row.foo.bar.com -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "sudo sysctl -w net.inet.tcp.sendspace=40000000"
+        ssh username@$col$row.foo.bar.com -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
+          "cd /Users/wild/sandboxes/epietrig/zuist-cluster/trunk && java -XX:+DoEscapeAnalysis -XX:+UseConcMarkSweepGC -Xmx4g -cp target/args4j-2.0.12.jar:\
+          target/aspectjrt-1.6.2.jar:target/commons-logging-1.1.jar:target/jgroups-2.7.0.GA.jar:target/log4j-1.2.14.jar:target/slf4j-api-1.5.9-RC0.jar:\
+          target/slf4j-log4j12-1.5.9-RC0.jar:target/timingframework-1.0.jar:target/zvtm-cluster-0.2.7-SNAPSHOT.jar:target/zvtm-cluster-basicui-0.2.7.jar\
+          fr.inria.zvtm.cluster.SlaveApp -b $SLAVENUM1 -f -d "'\\Display0' $* &
+
+        ssh wild@$col$row.wild.lri.fr -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no \
+          "cd /Users/wild/sandboxes/epietrig/zuist-cluster/trunk && java -XX:+DoEscapeAnalysis -XX:+UseConcMarkSweepGC -Xmx4g -cp target/args4j-2.0.12.jar:\
+          target/aspectjrt-1.6.2.jar:target/commons-logging-1.1.jar:target/jgroups-2.7.0.GA.jar:target/log4j-1.2.14.jar:target/slf4j-api-1.5.9-RC0.jar:\
+          target/slf4j-log4j12-1.5.9-RC0.jar:target/timingframework-1.0.jar:target/zvtm-cluster-0.2.7-SNAPSHOT.jar:target/zvtm-cluster-basicui-0.2.7.jar\
+          fr.inria.zvtm.cluster.SlaveApp -b $SLAVENUM2 -f -d "'\\Display1' $* &
+    done
+done
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+\end{tiny}
+
+Script to launch the main application, \cd{fr.inria.zvtm.basicui.WildViewer}, on the master node (whose IP is 192.168.0.1):\\
+\begin{tiny}
+\begin{SaveVerbatim}{CodeVerb}
+#!/bin/bash
+java -Xmx1g -Djava.net.preferIPv4Stack=true -Djgroups.bind_addr="192.168.0.1" -XX:+UseConcMarkSweepGC\
+   -cp target/args4j-2.0.12.jar:target/aspectjrt-1.6.2.jar:target/commons-logging-1.1.jar:target/jgroups-2.7.0.GA.jar:target/log4j-1.2.14.jar:\
+   target/slf4j-api-1.5.9-RC0.jar:target/slf4j-log4j12-1.5.9-RC0.jar:target/timingframework-1.0.jar:target/zvtm-cluster-0.2.7-SNAPSHOT.jar:\
+   target/zvtm-cluster-basicui-0.2.7.jar fr.inria.zvtm.basicui.WildViewer -bw 2760 -bh 1740 -r 4 -c 8 -w 28000 -n 50 "$@"
+
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+\end{tiny}
+
 
 %%%%%%%%%%%%%%%%%%%%%%
 \subsection{Properties}
