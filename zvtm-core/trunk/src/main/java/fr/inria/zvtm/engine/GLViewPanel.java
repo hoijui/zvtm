@@ -317,6 +317,11 @@ public class GLViewPanel extends ViewPanel {
                     catch (NullPointerException ex) {if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.drawdrag "+ex);}}
                 }
                 //end drawing here
+                synchronized(this){
+        			lastButOneRepaint = lastRepaint;
+        			lastRepaint = System.currentTimeMillis();
+        			delay = lastRepaint - lastButOneRepaint;
+        		}
             }
             else {
                 stableRefToBackBufferGraphics.setPaintMode();
