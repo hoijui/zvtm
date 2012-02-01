@@ -299,8 +299,8 @@ public class GLViewPanel extends ViewPanel {
                 } catch (NullPointerException ex) {
                     if (VirtualSpaceManager.debugModeON()){System.err.println("GLViewPanel.run.paint "+ex);}
                 }
-                drawBackBuffer(g);
                 foregroundHook();
+                drawBackBuffer(g);
                 if (drawLens) {
                     drawLens(g);
                 }
