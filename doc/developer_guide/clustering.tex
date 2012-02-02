@@ -12,7 +12,7 @@
     \put(377,153){\wl{(b)}}
     \put(377, 64){\wl{(c)}}    
   \end{picture}
-\caption{zvtm-cluster applications running on the WILD platform (32 tiles for a total resolution of 20 480 $\times$ 6 400 pixels). (a) Zoomed-in visualization of the North-American part of the world-wide air traffic network (1~200 airports, 5~700 connections) overlaid on NASA's Blue Marble Next Generation images (86 400 $\times$ 43 200 pixels) augmented with country borders ESRI shapefiles. (b) Panning and zooming in Spitzer's Infrared Milky Way (396~032 $\times$ 12~000 pixels). (c) Controlled laboratory experiment for the evaluation of mid-air multi-scale navigation techniques.}
+\caption{zvtm-cluster applications running on the WILD platform (32 tiles for a total resolution of 20 480 $\times$ 6 400 pixels). (a) Zoomed-in visualization of the North-American part of the world-wide air traffic network (1~200 airports, 5~700 connections) overlaid on NASA's Blue Marble Next Generation images (86 400 $\times$ 43 200 pixels) augmented with country borders ESRI shapefiles. (b) Panning and zooming in Spitzer's Infrared Milky Way (396~032 $\times$ 12~000 pixels). (c) Controlled laboratory experiment for the evaluation of mid-air multi-scale navigation techniques \cite{nancel11}.}
 \vspace{-1em}
 \label{fig:atf}
 \end{figure}
@@ -22,7 +22,8 @@ rendering tasks will be split among nodes on a display cluster, such as those dr
 
 Distributed rendering works by replicating the state of one or more VirtualSpace instances 
 on the cluster. In this chapter, we introduce clustered views, which are practically the only
-deviation from a ZVTM desktop application.
+deviation from a ZVTM desktop application. zvtm-cluster is the graphics toolkit used in jBricks \cite{pietriga11}
+for the rapid development of cluster-driven wall display user interfaces.
 
 Dependency on \cd{zvtm-cluster} is declared as follows:
 
@@ -115,7 +116,7 @@ This will generate \cd{zvtm-cluster-x.y.z-jar-with-dependencies.jar}
 \end{itemize}
 
 
-\subsubsection{Unsupported}
+\subsubsection{Unsupported (for now)}
 
 \begin{itemize}
 \item
@@ -129,7 +130,7 @@ This will generate \cd{zvtm-cluster-x.y.z-jar-with-dependencies.jar}
 \end{itemize}
 \subsection{Porting an application to zvtm-cluster}
 
-Porting an application is done in three steps:
+Porting an existing zvtm application is done in three steps:
 
 \begin{itemize}
 \item
@@ -152,11 +153,10 @@ Porting an application is done in three steps:
 \item
   At the very beginning of your program, call \cd{VirtualSpaceManager.INSTANCE.setMaster("AppName")} where String \cd{"AppName"} matches the name passed through the \cd{-n} argument to the rendering slaves (\cd{SlaveApp}).
 \item
-  Create one or more \cd{ClusteredView} instances
+  Create one or more \cd{ClusteredView} instances (section \ref{sec:clusterviews}).
 \end{itemize}
 
-Examples are located in the \cd{src/main/java/fr/inria/zvtm/cluster/examples}. Studying the
-examples is a good way to get started.
+Simple examples are located in the \cd{src/main/java/fr/inria/zvtm/cluster/examples} and are a good way to get started.
 
 %%%%%%%%%%%%%%%%%%%%%%
 \subsection{API additions to ZVTM}
@@ -180,23 +180,23 @@ examples is a good way to get started.
   \cd{ClusteredStroke} class 
 \end{itemize}
 
+Javadoc available at \url{http://zvtm.sourceforge.net/apidocs/index.html?fr/inria/zvtm/cluster/package-summary.html}
+
 %%%%%%%%%%%%%%%%%%%%%%
 \subsection{Exclusions}
 
-XXX not terribly elegant. It may be necessary to declare your dependency
-on zvtm-cluster in the following fashion:
+In some cases it might be necessary to declare your dependency
+on zvtm-cluster in the following manner (notice the \cd{exclusion}):
 
 \begin{SaveVerbatim}{CodeVerb}
 <dependency>
    <groupId>fr.inria.zvtm</groupId>
-
    <artifactId>zvtm-cluster</artifactId>
-   <version>0.2.0-SNAPSHOT</version>
+   <version>0.2.7-SNAPSHOT</version>
    <exclusions>
       <exclusion>
          <groupId>fr.inria.zvtm</groupId> 
-         <artifactId>zvtm</artifactId>
-
+         <artifactId>zvtm-core</artifactId>
       </exclusion>
    </exclusions>
 </dependency>
@@ -211,9 +211,43 @@ you may need to declare this exclusion.
 %%%%%%%%%%%%%%%%%%%%%%
 \subsection{About clustered views}
 
+\label{sec:clusterviews}
+
 A clustered view extends the concept of a ZVTM view (i.e. a window) to
 tiled display walls. A clustered view is divided into blocks. A block is
 displayed by a single slave instance.
+
+The following code shows how to create a \cd{ClusteredView} on the wall display
+described in Figure \ref{fig:wildnodes}.
+
+\begin{footnotesize}
+\begin{SaveVerbatim}{CodeVerb}
+vsm = VirtualSpaceManager.INSTANCE;
+// the -n argument passed to SlaveApp instances must match the string passed to setMaster()
+// in this example, the argument to SlaveApp would be -n WildViewer
+vsm.setMaster("WildViewer");
+mSpace = vsm.addVirtualSpace("fooSpace");
+mCamera = mSpace.addCamera();
+Vector cameras = new Vector();
+cameras.add(mCamera);
+
+// create a local view (on master computer)
+mView = vsm.addFrameView(cameras, "foo", View.STD_VIEW, VIEW_W, VIEW_H, true);
+
+// create the clustered view that will be displayed on the wall
+
+// this wall is made of 8 x 4 30" displays (2560x1600 each,
+// with approx 100px bezels -- overlay mode)
+ClusterGeometry cg = new ClusterGeometry(2760, 1800, 8, 4);
+Vector ccameras = new Vector();
+ccameras.add(mCamera);
+// the origin should be the bottom-left block of the wall
+// since we have 4 rows of screens on this wall, 2nd arg = 3
+ClusteredView cv = new ClusteredView(cg, 3, 8, 4, ccameras);
+vsm.addClusteredView(cv);			
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+\end{footnotesize}
 
 %%%%%%%%%%%%%%%%%%%%%%
 \subsection{Displaying images with zvtm-cluster}
