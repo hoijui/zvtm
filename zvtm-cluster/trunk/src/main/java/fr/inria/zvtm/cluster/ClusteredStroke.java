@@ -27,6 +27,11 @@ public class ClusteredStroke implements Stroke, Serializable {
         bs = new BasicStroke(width, cap, join, miterlimit, dash, dash_phase);
     }
 
+    public ClusteredStroke(BasicStroke bs){
+        this(bs.getLineWidth(), bs.getEndCap(), bs.getLineJoin(), bs.getMiterLimit(), bs.getDashArray(),
+                bs.getDashPhase());
+    }
+
     public Shape createStrokedShape(Shape s){
         return bs.createStrokedShape(s);
     }
