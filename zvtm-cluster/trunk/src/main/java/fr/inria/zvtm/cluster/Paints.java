@@ -24,6 +24,7 @@ class Paints {
     private Paints(){}
 
     // wraps well-known Paint types into corresponding serializable types
+    // returns a serializable Paint, or null
     static final Paint wrapPaint(Paint orig){
         if(orig instanceof Serializable){
             return orig;
