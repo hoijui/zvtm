@@ -69,15 +69,12 @@ public class GradientsExample {
 		view.setListener(new PanZoomEventHandler());
 
         PRectangle prect = new PRectangle(0,0,0,50,50,null);
-        vs.addGlyph(prect, false);
         prect.setPaint(new LinearGradientPaint(0,0,50,50,new float[]{0, 1}, new Color[]{Color.WHITE, Color.BLACK}));
         prect.setStroke(new BasicStroke(3, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 2f, new float[]{10, 12}, 0f));
         prect.setBorderColor(Color.YELLOW);
         PRectangle prect2 = new PRectangle(-60,0,0,50,50, new GradientPaint(0,0,Color.BLUE,50,50,Color.BLACK,false));
-        vs.addGlyph(prect2, false);
         PRectangle prect3 = new PRectangle(0,-60,0,50,50, new RadialGradientPaint(20,20,30,new float[]{0,1}, new Color[]{Color.WHITE, Color.BLUE}));
-        vs.addGlyph(prect3, false);
-
+        vs.addGlyphs(new Glyph[]{prect, prect2, prect3});
 	}
 
 	public static void main(String[] args){

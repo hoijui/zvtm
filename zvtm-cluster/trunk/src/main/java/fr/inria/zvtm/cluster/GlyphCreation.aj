@@ -56,6 +56,12 @@ public aspect GlyphCreation {
 		&& if(VirtualSpaceManager.INSTANCE.isMaster())
 		&& args(glyph, ..)
 		&& this(virtualSpace);
+
+    pointcut glyphsAdd(Glyph[] glyphs, boolean repaint, VirtualSpace virtualSpace):
+        execution(public void VirtualSpace.addGlyphs(Glyph[], boolean))
+        && if(VirtualSpaceManager.INSTANCE.isMaster())
+        && args(glyphs, repaint)
+        && this(virtualSpace);
         
 	pointcut glyphRemove(Glyph glyph, VirtualSpace virtualSpace): 
 		(execution(public * VirtualSpace.removeGlyph(Glyph, boolean)) ||
@@ -72,6 +78,16 @@ public aspect GlyphCreation {
 			glyph.setParentSpace(virtualSpace);
             glyph.setReplicated(true);
 		}
+
+    void around(Glyph[] glyphs, boolean repaint, VirtualSpace virtualSpace):
+        glyphsAdd(glyphs, repaint, virtualSpace){
+            if(glyphs == null){
+                return;
+            }
+            for(Glyph glyph: glyphs){
+                virtualSpace.addGlyph(glyph, repaint);
+            }
+        }
 
 	//advise VirtualSpace.addGlyph
 	after(Glyph glyph, VirtualSpace virtualSpace) returning: 
