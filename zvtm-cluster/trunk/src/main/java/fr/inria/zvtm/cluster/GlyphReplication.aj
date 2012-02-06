@@ -2,6 +2,7 @@ package fr.inria.zvtm.cluster;
 
 import java.awt.Color;
 import java.awt.Paint;
+import java.awt.Stroke;
 import java.awt.geom.Point2D;
 import java.io.Serializable;
 
@@ -30,6 +31,22 @@ aspect GlyphReplication {
         !cflowbelow(pRectPaint(PRectangle, Paint)) &&
         if(prect.isReplicated()){
             Delta delta = makePaintDelta(prect.getObjId(), paint);
+            if(delta != null){
+                VirtualSpaceManager.INSTANCE.sendDelta(delta);
+            }
+        }
+
+    pointcut setStroke(Glyph glyph, Stroke stroke):
+        execution(public void Glyph.setStroke(Stroke))
+        && this(glyph)
+        && args(stroke)
+        && if(VirtualSpaceManager.INSTANCE.isMaster());
+
+    after(Glyph glyph, Stroke stroke) returning:
+        setStroke(glyph, stroke) &&
+        !cflowbelow(setStroke(Glyph, Stroke)) &&
+        if(glyph.isReplicated()){
+            Delta delta = makeStrokeDelta(glyph.getObjId(), stroke);
             if(delta != null){
                 VirtualSpaceManager.INSTANCE.sendDelta(delta);
             }
@@ -94,6 +111,37 @@ aspect GlyphReplication {
             return null;
         }
         return new PaintDelta(targetId, wrapped);
+    }
+
+    private static class StrokeDelta implements Delta {
+        private final ObjId<Glyph> targetId;
+        private final Stroke stroke;
+
+        StrokeDelta(ObjId<Glyph> targetId, Stroke stroke){
+            if(! (stroke instanceof Serializable)){
+                throw new IllegalArgumentException("Expected serializable Stroke");
+            }
+            this.targetId = targetId;
+            this.stroke = stroke;
+        }
+
+        public void apply(SlaveUpdater updater){
+            Glyph target = updater.getSlaveObject(targetId);
+            target.setStroke(stroke);
+        }
+    }
+
+    /**
+     * Returns a StrokeDelta given a target Glyph and a Stroke if
+     * the Stroke is or can be made Serializable, <code>null</code>
+     * otherwise.
+     */
+    private static final StrokeDelta makeStrokeDelta(ObjId<Glyph> targetId, Stroke stroke){
+        Stroke wrapped = Strokes.wrapStroke(stroke);
+        if(wrapped == null){
+            return null;
+        }
+        return new StrokeDelta(targetId, wrapped);
     }
 
     private static class DPathEditDelta implements Delta {

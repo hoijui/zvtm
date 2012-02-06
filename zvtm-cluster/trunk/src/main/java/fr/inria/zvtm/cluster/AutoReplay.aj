@@ -48,7 +48,6 @@ public aspect AutoReplay extends AbstractAutoReplay {
          execution(public void Glyph.sizeTo(double))	||
          execution(public void Glyph.setBorderColor(Color))	||
          execution(public void Glyph.setColor(Color))	||
-         execution(public void Glyph.setStrokeWidth(float))	||
          execution(public void Glyph.setTranslucencyValue(float)) || 
          execution(public void Glyph.setMouseInsideHighlightColor(Color)) ||
          execution(public void Glyph.setVisible(boolean)) ||
@@ -56,7 +55,8 @@ public aspect AutoReplay extends AbstractAutoReplay {
          execution(public static void Glyph.stickToGlyph(Glyph, Glyph)) ||
          execution(public void Glyph.orientTo(float)) ||
          execution(public void Glyph.setSensitivity(boolean)) ||
-         execution(public void Glyph.setStroke(Stroke)) ||
+         //Glyph.setStroke moved to a static Delta that performs wrapping if possible
+         //execution(public void Glyph.setStroke(Stroke)) ||
          execution(public void VSegment.setEndPoints(double, double, double, double)) || 
          execution(public void VText.setFont(Font)) || 
          execution(public void VText.setText(String)) || 
