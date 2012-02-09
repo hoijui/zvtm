@@ -81,7 +81,7 @@ def generateTile(pdf_document, page, x, y, tgtPath):
         return
     log("Generating tile (%d,%d) (%d,%d)" % (x,y,x+TILE_SIZE,y+TILE_SIZE), 2)
     bitmap = CGBitmapContextCreateWithColor(TILE_SIZE, TILE_SIZE,\
-                                            COLOR_SPACE, (1,1,1,1))    
+                                            COLOR_SPACE, CGFloatArray(4))    
     rect = page.getBoxRect(kCGPDFMediaBox)
     rect = rect.offset(-x,-y)
     rect.size.width = int(rect.size.width * PDF_SCALE_FACTOR)
