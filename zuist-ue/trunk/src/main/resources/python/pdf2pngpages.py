@@ -5,8 +5,8 @@
 import os, sys
 from CoreGraphics import CGColorSpaceCreateWithName, kCGColorSpaceGenericRGB,\
     CGDataProviderCreateWithFilename, CGPDFDocumentCreateWithProvider,\
-    CGBitmapContextCreateWithColor, kCGImageFormatPNG, kCGPDFMediaBox
-
+    CGBitmapContextCreateWithColor, kCGImageFormatPNG, kCGPDFMediaBox, CGFloatArray
+    
 USAGE_MSG = """
 Usage: pdf2pngpages.py <src_dir> <dst_dir> [trace_level]
 
@@ -52,8 +52,8 @@ def processDocument(parent_dir_src, parent_dir_dst, document_name):
     if not os.path.exists(document_dir_abspath):
         log("Creating %s" % document_dir_abspath, 2)
         os.mkdir(document_dir_abspath)
-        # os.mkdir("%s/%s" % (document_dir_abspath, "L"))
-        os.mkdir("%s/%s" % (document_dir_abspath, "H"))
+        os.mkdir("%s/%s" % (document_dir_abspath, "L"))
+        #os.mkdir("%s/%s" % (document_dir_abspath, "H"))
     document_abspath = "%s/%s" % (parent_dir_src, document_name)
     # parse input PDF document
     pdf_document =\
@@ -65,8 +65,8 @@ def processDocument(parent_dir_src, parent_dir_dst, document_name):
     log("Processing %s [%s pages]" % (document_abspath, pageCount), 1)
     # page number index is 1-based
     for page_number in range(1, pageCount+1):
-        # writePage(pdf_document, page_number, DEFAULT_RES_SCALE_FACTOR, document_dir_basename, parent_dir_dst, "L")
-        writePage(pdf_document, page_number, HIGHER_RES_SCALE_FACTOR, document_dir_basename, parent_dir_dst, "H")
+        writePage(pdf_document, page_number, DEFAULT_RES_SCALE_FACTOR, document_dir_basename, parent_dir_dst, "L")
+        #writePage(pdf_document, page_number, HIGHER_RES_SCALE_FACTOR, document_dir_basename, parent_dir_dst, "H")
 
 def writePage(pdf_document, page_number, scaleFactor, document_dir_basename, parent_dir_dst, res_dir_name):
     # for each page, create a bitmap
@@ -75,8 +75,13 @@ def writePage(pdf_document, page_number, scaleFactor, document_dir_basename, par
     page_width = int(page_rect.getWidth() * scaleFactor)
     page_height = int(page_rect.getHeight() * scaleFactor)
     bitmap = CGBitmapContextCreateWithColor(page_width, page_height,\
-                                            COLOR_SPACE, (1,1,1,1))
-    bitmap.scaleCTM(scaleFactor, scaleFactor)
+                                            COLOR_SPACE, CGFloatArray(5))
+    
+    #XXX: FIXME following line no longer works, but means we cannot render at another res than the default one...
+    #bitmap.scaleCTM(scaleFactor, scaleFactor)	-- [mbl] does not work: "argument should be CGFloat"
+    # might be an alternative ?
+    #CGContextScaleCTM(bitmap,scaleFactor, scaleFactor) #-- [mbl] no error but seems to do nothing...
+    
     # draw the PDF page on it
     bitmap.drawPDFDocument(page_rect, pdf_document, page_number)
     # encode it in PNG and save it in a file
