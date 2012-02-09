@@ -194,7 +194,7 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
             log("Cropping at (%d,%d,%d,%d)" % (x, y, aw, ah), 3)
             cim = im.createWithImageInRect(CGRectMake(int(x), int(y), int(aw), int(ah)))
             log("Resizing to (%d, %d)" % (aw/scale, ah/scale), 3)
-            bitmap = CGBitmapContextCreateWithColor(int(aw/scale), int(ah/scale), COLOR_SPACE, (0,0,0,1))
+            bitmap = CGBitmapContextCreateWithColor(int(aw/scale), int(ah/scale), COLOR_SPACE, CGFloatArray(4))
             bitmap.setInterpolationQuality(kCGInterpolationHigh)
             rect = CGRectMake(0, 0, int(aw/scale), int(ah/scale))
             bitmap.drawImage(rect, cim)
