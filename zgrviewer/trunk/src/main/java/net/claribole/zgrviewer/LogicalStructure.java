@@ -1,10 +1,10 @@
 /*   FILE: LogicalStructure.java
  *   DATE OF CREATION:  Thu Mar 15 18:33:17 2007
- *   Copyright (c) INRIA, 2007-2011. All Rights Reserved
+ *   Copyright (c) INRIA, 2007-2012. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
- */ 
+ */
 
 package net.claribole.zgrviewer;
 
@@ -17,7 +17,8 @@ import fr.inria.zvtm.svg.Metadata;
 
 public class LogicalStructure {
 
-    static final String NODE_PREFIX = "node";    
+    static final String GRAPH_PREFIX = "graph";
+    static final String NODE_PREFIX = "node";
     static final String EDGE_PREFIX = "edge";
 
 	public static LogicalStructure build(Vector glyphs){
@@ -30,7 +31,9 @@ public class LogicalStructure {
 		//           value = vector of glyphs associated with the
 		//                   edge whose id is key
 		// this is necessary to avoid all glyphs of different edges linking the same nodes being associated with the same single LEdge
-		Hashtable title2edgeGroup = new Hashtable(); 
+		Hashtable title2edgeGroup = new Hashtable();
+		// key = graph title, value = vector of glyphs associated with this subgraph
+		Hashtable title2graph = new Hashtable();
 		String title;
 		Vector v;
 		Hashtable t;
@@ -79,23 +82,36 @@ public class LogicalStructure {
 						title2node.put(title, v);
 					}
 				}
+				else if (cagid.startsWith(GRAPH_PREFIX) || cgac.equals(GRAPH_PREFIX)){
+				    if (title2graph.containsKey(title)){
+				        v = (Vector)title2graph.get(title);
+						v.add(g);
+				    }
+				    else {
+				        v = new Vector();
+						v.add(g);
+						title2graph.put(title, v);
+				    }
+				}
 				// else, other stuff that is probably not part of the graph structure, like a graph's background
 				// do nothing
 			}
 			// remain silent if structural information could not be extracted
 		}
-		LogicalStructure res = new LogicalStructure(title2node, title2edgeGroup, edgeCount);
+		LogicalStructure res = new LogicalStructure(title2node, title2edgeGroup, edgeCount, title2graph);
 		title2edgeGroup.clear();
 		title2node.clear();
+		title2graph.clear();
 		return (res.isEmpty()) ? null : res;
 	}
 
     /* ----------------------------------- */
 
+    LGraph[] graphs;
 	LNode[] nodes;
 	LEdge[] edges;
 
-	LogicalStructure(Hashtable title2node, Hashtable title2edgeGroup, int edgeCount){
+	LogicalStructure(Hashtable title2node, Hashtable title2edgeGroup, int edgeCount, Hashtable title2graph){
 		String title;
 		// construct nodes
 		nodes= new LNode[title2node.size()];
@@ -137,15 +153,23 @@ public class LogicalStructure {
 				}
 			}
 		}
+		// construct subgraphs
+		graphs = new LGraph[title2graph.size()];
+		i = 0;
+		for (Enumeration e=title2graph.keys();e.hasMoreElements();){
+			title = (String)e.nextElement();
+			graphs[i] = new LGraph(title, (Vector)title2graph.get(title));
+			i++;
+		}
 	}
-	
+
 	public void addEdge(LEdge e){
 	    LEdge[] nedges = new LEdge[edges.length+1];
 	    System.arraycopy(edges, 0, nedges, 0, edges.length);
 		nedges[edges.length] = e;
 	    edges = nedges;
 	}
-	
+
 	public void removeEdge(LEdge e){
 		int index = -1;
 		// find edge index in array
@@ -162,11 +186,11 @@ public class LogicalStructure {
 		e.tail.removeArc(e);
 		e.head.removeArc(e);
 	}
-	
+
 	public LNode[] getAllNodes(){
 		return nodes;
 	}
-	
+
 	public LEdge[] getAllEdges(){
 		return edges;
 	}
@@ -183,7 +207,7 @@ public class LogicalStructure {
 			title = title.substring(0, title.indexOf(LElem.PORT_SEPARATOR));
 			for (int i=0;i<nodes.length;i++){
 				if (nodes[i].title.equals(title)){return nodes[i];}
-			}			
+			}
 		}
 		// if this also fails, don't return anything
 		return null;
