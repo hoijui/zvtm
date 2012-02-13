@@ -31,7 +31,7 @@ public class LGraph extends LElem {
     /** Get the type of box used to paint the boundaries of this subgraph.
      *@return one of BOX_TYPE_*
      */
-    short getBoxType(){
+    public short getBoxType(){
         if (glyphs.length == 1 && glyphs[0] instanceof VRectangle){
             return BOX_TYPE_RECT;
         }
