@@ -161,6 +161,8 @@ public class LogicalStructure {
 			graphs[i] = new LGraph(title, (Vector)title2graph.get(title));
 			i++;
 		}
+		// XXX: assign LNodes to LGraphs
+		
 	}
 
 	public void addEdge(LEdge e){
