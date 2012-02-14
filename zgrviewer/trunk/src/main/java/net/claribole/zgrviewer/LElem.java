@@ -38,10 +38,12 @@ public class LElem {
     }
 
     public String getURL(Glyph g){
+        if (URLs == null){return null;}
         return URLs[0];
     }
 
 	public String getTooltip(Glyph g){
+	    if (tooltips == null){return null;}
 		return tooltips[0];
 	}
 	

@@ -37,6 +37,7 @@ public class LGraph extends LElem {
             this.glyphs = new Glyph[]{aRoundedBoxIndeed};
             mSpace.addGlyph(aRoundedBoxIndeed);
             mSpace.above(aRoundedBoxIndeed, gls.lastElement());
+            aRoundedBoxIndeed.setOwner(this);
             for (Glyph g:gls){
                 mSpace.removeGlyph(g);
             }
@@ -48,6 +49,7 @@ public class LGraph extends LElem {
             this.glyphs = new Glyph[gls.size()];
             for (int i=0;i<this.glyphs.length;i++){
                 this.glyphs[i] = gls.elementAt(i);
+                this.glyphs[i].setOwner(this);
             }
         }
     }
