@@ -982,7 +982,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 		Vector glyphs = (Vector)mSpace.getAllGlyphs().clone();
 		glyphs.remove(magWindow);
 		glyphs.remove(boundingBox);
-		lstruct = LogicalStructure.build(glyphs);
+		lstruct = LogicalStructure.build(glyphs, mSpace);
 		if (lstruct == null){
 			// building the logical structure failed
 			mainView.setStatusBarText(Messages.FAILED_TO_BUILD_LOGICAL_STRUCT);
@@ -997,7 +997,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 			if (g.getOwner() != null && g.getOwner() instanceof Metadata){
 				g.setOwner(new LElem((Metadata)g.getOwner()));
 			}
-		}
+		}		
 		cfgMngr.notifyPlugins(Plugin.NOTIFY_PLUGIN_LOGICAL_STRUCTURE_CHANGED);
 	}
 

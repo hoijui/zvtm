@@ -10,9 +10,12 @@ package net.claribole.zgrviewer;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Vector;
 
+import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.glyphs.RectangularShape;
 import fr.inria.zvtm.svg.Metadata;
 
 public class LogicalStructure {
@@ -21,7 +24,7 @@ public class LogicalStructure {
     static final String NODE_PREFIX = "node";
     static final String EDGE_PREFIX = "edge";
 
-	public static LogicalStructure build(Vector glyphs){
+	public static LogicalStructure build(Vector glyphs, VirtualSpace mSpace){
 		Glyph g;
 		Metadata md;
 		// key = node title, value = vector of glyphs associated with this node
@@ -98,7 +101,7 @@ public class LogicalStructure {
 			}
 			// remain silent if structural information could not be extracted
 		}
-		LogicalStructure res = new LogicalStructure(title2node, title2edgeGroup, edgeCount, title2graph);
+		LogicalStructure res = new LogicalStructure(title2node, title2edgeGroup, edgeCount, title2graph, mSpace);
 		title2edgeGroup.clear();
 		title2node.clear();
 		title2graph.clear();
@@ -111,7 +114,7 @@ public class LogicalStructure {
 	LNode[] nodes;
 	LEdge[] edges;
 
-	LogicalStructure(Hashtable title2node, Hashtable title2edgeGroup, int edgeCount, Hashtable title2graph){
+	LogicalStructure(Hashtable title2node, Hashtable title2edgeGroup, int edgeCount, Hashtable title2graph, VirtualSpace mSpace){
 		String title;
 		// construct nodes
 		nodes= new LNode[title2node.size()];
@@ -158,13 +161,24 @@ public class LogicalStructure {
 		i = 0;
 		for (Enumeration e=title2graph.keys();e.hasMoreElements();){
 			title = (String)e.nextElement();
-			graphs[i] = new LGraph(title, (Vector)title2graph.get(title));
+			graphs[i] = new LGraph(title, (Vector)title2graph.get(title), mSpace);
 			i++;
 		}
-		// XXX: assign LNodes to LGraphs
-		
+		// assign LNodes to LGraphs
+		for (LNode node:nodes){
+		    for (LGraph graph:graphs){
+		        Glyph nodeShape = node.getShape();
+		        if (graph.getBoxType() != LGraph.BOX_TYPE_NONE){
+    		        RectangularShape graphBox = (RectangularShape)graph.getBox();
+    		        if (graphBox == null){continue;}
+    		        // XXX: test containment
+    		        //if (nodeShape.vx > ...){}
+		            graph.addChildNode(node);
+		        }
+		    }
+		}
 	}
-
+    
 	public void addEdge(LEdge e){
 	    LEdge[] nedges = new LEdge[edges.length+1];
 	    System.arraycopy(edges, 0, nedges, 0, edges.length);
@@ -195,6 +209,19 @@ public class LogicalStructure {
 
 	public LEdge[] getAllEdges(){
 		return edges;
+	}
+	
+	public LGraph[] getAllGraphs(){
+	    return graphs;
+	}
+	
+	/** Get a map of all subgraphs. key = subgraph title, value = instance of LGraph*/
+	public HashMap getGraphMap(){
+	    HashMap res = new HashMap(graphs.length);
+	    for (LGraph g:graphs){
+	        res.put(g.getTitle(), g);
+	    }
+	    return res;
 	}
 
 	public LNode getNode(String title){
