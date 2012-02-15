@@ -343,7 +343,7 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 			}
 			else if (manualLeftButtonMove){
 			    if (!v.isShowingFirstOrderPanWidget()){
-    			    v.showFirstOrderPanWidget(lastJPX, lastJPY);			        
+    			    v.showFirstOrderPanWidget(lastJPX, lastJPY);
 			    }
 				if (mod == SHIFT_MOD || mod == META_SHIFT_MOD){
 					grMngr.mainCamera.setXspeed(0);
@@ -454,7 +454,7 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 			}
 			else {
 				// node highlighting is taken care of above (in a slightly different manner)
-				g.highlight(true, null);				
+				g.highlight(true, null);
 			}
 		}
 	}
