@@ -180,6 +180,21 @@ public class LogicalStructure {
 		        }
 		    }
 		}
+		// assign LGraphs to LGraphs (subgraph relationships)
+		for (LGraph graphA:graphs){
+		    if (graphA.getBoxType() == LGraph.BOX_TYPE_NONE){continue;}
+		    RectangularShape graphABox = (RectangularShape)graphA.getBox();
+    		for (LGraph graphB:graphs){
+                if (graphA != graphB && graphB.getBoxType() != LGraph.BOX_TYPE_NONE){
+        		    RectangularShape graphBBox = (RectangularShape)graphB.getBox();
+                    // if graphA's box is fully contained within graphB's box
+                    // graphA is a subgraph of graphB
+                    if (false){//XXX: test TBW
+                        graphB.addSubgraph(graphA);
+                    }
+                }
+    		}		    
+		}
 	}
     
 	public void addEdge(LEdge e){
