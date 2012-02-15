@@ -6,21 +6,22 @@ import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
 import fr.inria.zvtm.cluster.ClusteredImage;
+import fr.inria.zvtm.cluster.ClusterGeometry;
 import fr.inria.zvtm.cluster.ClusteredView;
 import fr.inria.zvtm.engine.Camera;
-import fr.inria.zvtm.engine.LongPoint;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.View;
-import fr.inria.zvtm.engine.ViewEventHandler;
+import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.glyphs.Glyph;
-import fr.inria.zvtm.glyphs.CircleNR;
+import fr.inria.zvtm.glyphs.SICircle;
 
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+import java.awt.geom.Point2D;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -41,9 +42,9 @@ public class DazBoard {
     VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE; //shortcut
     private Camera cam;
     private ClusteredView clusteredView;
-    CircleNR pointer;
+    SICircle pointer;
     private boolean panning = false;
-    private LongPoint panOrigin = new LongPoint(0,0);
+    private Point2D.Double panOrigin = new Point2D.Double(0,0);
     private final long IMG_DIM_MAX_A4=842; //pixels
     private final long INCR = IMG_DIM_MAX_A4 + 60;
     private long currX = 0;
@@ -66,17 +67,18 @@ public class DazBoard {
         if(options.localView){
             View view = vsm.addFrameView(cams, "Dazibao view", 
                     View.STD_VIEW, 640, 480, false, true, true, null);
-            view.setEventHandler(new PanZoomEventHandler());
+            view.setListener(new PanZoomEventHandler());
         }
-        clusteredView = new ClusteredView(options.viewOrigin,
-                options.blockWidth,
-                options.blockHeight,
-                options.numRows, options.numCols,
-                options.viewRows, options.viewCols,
+        ClusterGeometry clGeom = new ClusterGeometry(options.blockWidth, options.blockHeight, options.numCols, options.numRows);
+        clusteredView = new ClusteredView(
+                clGeom,
+                options.viewOrigin,
+                options.viewCols,
+                options.viewRows,
                 cams);
         vsm.addClusteredView(clusteredView);
         cam.moveTo(0,0);
-        pointer = new CircleNR(0,0,0,100,Color.RED);
+        pointer = new SICircle(0,0,0,100,Color.RED);
         space.addGlyph(pointer);
     }
 
@@ -98,17 +100,17 @@ public class DazBoard {
 
     void onWheel(int wheel){
         int normWheel = (wheel>0)?1:-1;
-        float a = (cam.focal+Math.abs(cam.altitude)) / cam.focal;
+        double a = (cam.focal+Math.abs(cam.altitude)) / cam.focal;
         cam.altitudeOffset(a*normWheel*WHEEL_ZOOM_FACTOR);
     }
 
     //newX, newY in view coordinates (0,0 top left, x right, y bottom)
     void onLaserMove(int newX, int newY){
-        LongPoint spcCoords = clusteredView.viewToSpaceCoords(cam, newX, newY);
+        Point2D.Double spcCoords = clusteredView.viewToSpaceCoords(cam, newX, newY);
         pointer.moveTo(spcCoords.x, spcCoords.y);
         if(panning){
-            long oldX = cam.posx;
-            long oldY = cam.posy;
+            double oldX = cam.vx;
+            double oldY = cam.vy;
             cam.move((spcCoords.x - panOrigin.x)*0.01, (spcCoords.y - panOrigin.y)*0.01);
         }
     }
@@ -191,7 +193,7 @@ public class DazBoard {
             return new NanoHTTPD.Response(HTTP_OK, MIME_PLAINTEXT, "addpage successful\n");
         }
     }
-    private class PanZoomEventHandler implements ViewEventHandler{
+    private class PanZoomEventHandler implements ViewListener{
         private int lastJPX;
         private int lastJPY;
 
@@ -211,16 +213,17 @@ public class DazBoard {
             lastJPX=jpx;
             lastJPY=jpy;
             v.setDrawDrag(true);
-            vsm.activeView.mouse.setSensitivity(false);
+            vsm.getActiveView().mouse.setSensitivity(false);
             //because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
         }
 
         public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-            vsm.getAnimationManager().setXspeed(0);
-            vsm.getAnimationManager().setYspeed(0);
-            vsm.getAnimationManager().setZspeed(0);
+            Camera cam = vsm.getActiveCamera();
+            cam.setXspeed(0);
+            cam.setYspeed(0);
+            cam.setZspeed(0);
             v.setDrawDrag(false);
-            vsm.activeView.mouse.setSensitivity(true);
+            vsm.getActiveView().mouse.setSensitivity(true);
         }
 
         public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
@@ -230,16 +233,16 @@ public class DazBoard {
         public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
             if (buttonNumber == 3 || ((mod == META_MOD || mod == META_SHIFT_MOD) && buttonNumber == 1)){
                 Camera c=vsm.getActiveCamera();
-                float a=(c.focal+Math.abs(c.altitude))/c.focal;
+                double a=(c.focal+Math.abs(c.altitude))/c.focal;
                 if (mod == META_SHIFT_MOD) {
-                    vsm.getAnimationManager().setXspeed(0);
-                    vsm.getAnimationManager().setYspeed(0);
-                    vsm.getAnimationManager().setZspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/4.0f)) : (long)((lastJPY-jpy)/(a*4)));
+                    c.setXspeed(0);
+                    c.setYspeed(0);
+                    c.setZspeed((c.altitude>0) ? (lastJPY-jpy)*(a/4.0f) : (lastJPY-jpy)/(a*4));
 
                 }
                 else {
-                    vsm.getAnimationManager().setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/4.0f)) : (long)((jpx-lastJPX)/(a*4)));
-                    vsm.getAnimationManager().setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/4.0f)) : (long)((lastJPY-jpy)/(a*4)));
+                    c.setXspeed((c.altitude>0) ? (jpx-lastJPX)*(a/4.0f) : (jpx-lastJPX)/(a*4));
+                    c.setYspeed((c.altitude>0) ? (lastJPY-jpy)*(a/4.0f) : (lastJPY-jpy)/(a*4));
                 }
             }
         }
