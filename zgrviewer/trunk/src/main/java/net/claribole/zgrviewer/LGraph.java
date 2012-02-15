@@ -123,14 +123,15 @@ public class LGraph extends LElem {
     }
     
     public ClosedShape getBox(){
+        ClosedShape res = null;
         for (Glyph g:glyphs){
-            // return first instance of a closed shape
-            // XXX: should test for largest such shape, if more than one...
             if (g instanceof ClosedShape){
-                return (ClosedShape)g;
+                if (res == null || g.getSize() > res.getSize()){
+                    res = (ClosedShape)g;
+                }
             }
         }
-        return null;
+        return res;
     }
     
     public void addChildNode(LNode n){
@@ -144,7 +145,11 @@ public class LGraph extends LElem {
     }
     
     public String toString(){
-        String res = "subgraph "+title + " [";
+        String res = "subgraph "+title + " subgraphs[";
+        for (LGraph subgraph:subgraphs){
+            res += subgraph.getTitle() + ", ";
+        }
+        res += "] - nodes[";
         for (LNode node:nodes){
             res += node.getTitle() + ", ";
         }
@@ -153,12 +158,13 @@ public class LGraph extends LElem {
     }
     
     public void addSubgraph(LGraph g){
-        //XXX:TBW
+        if (!subgraphs.contains(g)){
+            subgraphs.add(g);
+        }
     }
     
     public LGraph[] getSubgraphs(){
-        //XXX:TBW
-        return null;
+        return subgraphs.toArray(new LGraph[subgraphs.size()]);
     }
 
 }
