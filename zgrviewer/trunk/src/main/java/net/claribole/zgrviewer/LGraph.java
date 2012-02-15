@@ -143,6 +143,15 @@ public class LGraph extends LElem {
         return nodes.toArray(new LNode[nodes.size()]);
     }
     
+    public String toString(){
+        String res = "subgraph "+title + " [";
+        for (LNode node:nodes){
+            res += node.getTitle() + ", ";
+        }
+        res += "]";
+        return res;
+    }
+    
     public void addSubgraph(LGraph g){
         //XXX:TBW
     }

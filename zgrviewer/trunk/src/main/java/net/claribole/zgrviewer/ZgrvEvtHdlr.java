@@ -451,12 +451,10 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 		    else if (grMngr.tp.isHighlightMode()){
 				grMngr.highlightElement(g, null, null, true);
 				// g is guaranteed to be != null, don't care about camera and cursor
-				
-				
 			}
 			else {
 				// node highlighting is taken care of above (in a slightly different manner)
-				g.highlight(true, null);
+				g.highlight(true, null);				
 			}
 		}
 	}

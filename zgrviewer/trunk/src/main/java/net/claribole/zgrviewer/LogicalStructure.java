@@ -170,10 +170,13 @@ public class LogicalStructure {
 		        Glyph nodeShape = node.getShape();
 		        if (graph.getBoxType() != LGraph.BOX_TYPE_NONE){
     		        RectangularShape graphBox = (RectangularShape)graph.getBox();
-    		        if (graphBox == null){continue;}
-    		        // XXX: test containment
-    		        //if (nodeShape.vx > ...){}
-		            graph.addChildNode(node);
+    		        if (graphBox != null
+    		            && nodeShape.vx > (graph.getBox().vx-graphBox.getWidth()/2d)
+    		            && nodeShape.vx < (graph.getBox().vx+graphBox.getWidth()/2d)
+    		            && nodeShape.vy > (graph.getBox().vy-graphBox.getHeight()/2d)
+    		            && nodeShape.vy < (graph.getBox().vy+graphBox.getHeight()/2d)){
+    		            graph.addChildNode(node);
+    		        }
 		        }
 		    }
 		}
