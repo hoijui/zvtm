@@ -206,14 +206,17 @@ public class LogicalStructure {
 		e.head.removeArc(e);
 	}
 
+    /**@return the actual list used internally, not a copy. Do not temper with (or clone beforehand).*/
 	public LNode[] getAllNodes(){
 		return nodes;
 	}
 
+    /**@return the actual list used internally, not a copy. Do not temper with (or clone beforehand).*/
 	public LEdge[] getAllEdges(){
 		return edges;
 	}
 	
+    /**@return the actual list used internally, not a copy. Do not temper with (or clone beforehand).*/
 	public LGraph[] getAllGraphs(){
 	    return graphs;
 	}
