@@ -142,7 +142,7 @@ public class LGraph extends LElem {
     }
     
     public String toString(){
-        String res = "subgraph "+title + " subgraphs[";
+        String res = "subgraph "+title + " - subgraphs[";
         for (LGraph subgraph:subgraphs){
             res += subgraph.getTitle() + ", ";
         }
