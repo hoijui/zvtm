@@ -165,8 +165,8 @@ public class LogicalStructure {
 			i++;
 		}
 		// assign LNodes to LGraphs
-		for (LNode node:nodes){
-		    for (LGraph graph:graphs){
+	    for (LGraph graph:graphs){
+		    for (LNode node:nodes){
 		        Glyph nodeShape = node.getShape();
 		        if (graph.getBoxType() != LGraph.BOX_TYPE_NONE){
     		        RectangularShape graphBox = (RectangularShape)graph.getBox();
