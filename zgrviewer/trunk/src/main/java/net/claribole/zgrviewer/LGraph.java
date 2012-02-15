@@ -103,15 +103,12 @@ public class LGraph extends LElem {
      *@return one of BOX_TYPE_*
      */
     public short getBoxType(){
-        if (glyphs.length == 1 && glyphs[0] instanceof VRectangle){
-            return BOX_TYPE_RECT;
+        for (Glyph g:glyphs){
+            if (g instanceof VRoundRect){return BOX_TYPE_ROUND_RECT;}
+            else if (g instanceof VRectangle){return BOX_TYPE_RECT;}
+            // else keep looking for one
         }
-        else if (glyphs.length == 1 && glyphs[0] instanceof VRoundRect){
-            return BOX_TYPE_ROUND_RECT;
-        }
-        else {
-            return BOX_TYPE_NONE;
-        }
+        return BOX_TYPE_NONE;
     }
     
     /** Get all glyphs representing this subgraph.
