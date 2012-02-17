@@ -206,7 +206,11 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         cameras.add(cursorCamera);
 		cameras.add(vsm.getVirtualSpace(mnSpaceName).getCamera(0));
 		cameras.add(vsm.getVirtualSpace(ovSpaceName).getCamera(0));
-        mView = vsm.addFrameView(cameras, mViewName, (options.opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, !options.fullscreen, initMenu());
+        if(options.standalone){
+            mView = vsm.addFrameView(cameras, mViewName, (options.opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, !options.fullscreen, initMenu());
+        } else {
+            mView = vsm.addPanelView(cameras, mViewName, (options.opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H);
+        }
         sceneCam = new Vector<Camera>();
         sceneCam.add(mCamera);
         sceneCam.add(cursorCamera);
@@ -501,6 +505,10 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(Viewer.ANIM_MOVE_LENGTH, mCamera,
             alt, true, SlowInSlowOutInterpolator.getInstance(), null);
         vsm.getAnimationManager().startAnimation(a, false);
+    }
+
+    public View getView(){
+        return mView;
     }
 
     /* Higher view */
