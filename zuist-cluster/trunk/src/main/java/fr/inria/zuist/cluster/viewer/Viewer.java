@@ -41,6 +41,8 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 import java.util.HashMap;
 
@@ -81,8 +83,11 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
+import org.kohsuke.args4j.CmdLineException;
+import org.kohsuke.args4j.CmdLineParser;
 /**
  * @author Emmanuel Pietriga
+ * @author Romain Primet
  */
 
 public class Viewer implements Java2DPainter, RegionListener, LevelListener {
@@ -158,11 +163,11 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         }
         VirtualSpaceManager.INSTANCE.addClusteredView(clusteredView);
     }
-    
-    public Viewer(boolean standalone, boolean fullscreen, boolean opengl, boolean antialiased, File xmlSceneFile){
-        this.standalone = standalone;
+
+    public Viewer(ViewerOptions options, File xmlSceneFile){
+        this.standalone = options.standalone;
 		ovm = new OverlayManager(this);
-		initGUI(fullscreen, opengl, antialiased);
+		initGUI(options);
         VirtualSpace[]  sceneSpaces = {mSpace};
         Camera[] sceneCameras = {mCamera};
         sm = new SceneManager(sceneSpaces, sceneCameras);
@@ -184,7 +189,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		ovm.toggleConsole();
     }
 
-    void initGUI(boolean fullscreen, boolean opengl, boolean antialiased){
+    private void initGUI(ViewerOptions options){
         windowLayout();
         vsm = VirtualSpaceManager.INSTANCE;
         vsm.setMaster("ZuistCluster");
@@ -201,27 +206,28 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         cameras.add(cursorCamera);
 		cameras.add(vsm.getVirtualSpace(mnSpaceName).getCamera(0));
 		cameras.add(vsm.getVirtualSpace(ovSpaceName).getCamera(0));
-        mView = vsm.addFrameView(cameras, mViewName, (opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, !fullscreen, initMenu());
+        mView = vsm.addFrameView(cameras, mViewName, (options.opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, !options.fullscreen, initMenu());
         sceneCam = new Vector<Camera>();
         sceneCam.add(mCamera);
         sceneCam.add(cursorCamera);
         withoutBezels = new ClusterGeometry(
-                2560,
-                1600,
-                8,
-                4);
-        withBezels = withoutBezels.addBezels(200, 240);
+                options.blockWidth,
+                options.blockHeight,
+                options.numCols,
+                options.numRows);
+        withBezels = withoutBezels.addBezels(options.mullionWidth, 
+               options.mullionHeight);
 		clusteredView = 
             new ClusteredView(
                     withBezels,
                     3, //origin (block number)
-                    8, //use complete
-                    4, //cluster surface
+                    options.numCols, //use complete
+                    options.numRows, //cluster surface
                     sceneCam);
         clusteredView.setBackgroundColor(Color.GRAY);
         vsm.addClusteredView(clusteredView);
         wallCursor = new WallCursor(cursorSpace, 8, 120, Color.RED);
-        if (fullscreen){
+        if (options.fullscreen){
             GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow((JFrame)mView.getFrame());
         }
         else {
@@ -237,7 +243,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		mCamera.addListener(eh);
         mView.setNotifyCursorMoved(true);
         mView.setBackgroundColor(Color.WHITE);
-		mView.setAntialiasing(antialiased);
+		mView.setAntialiasing(!options.noaa);
 		mView.setJava2DPainter(this, Java2DPainter.AFTER_PORTALS);
 		mView.getPanel().getComponent().addComponentListener(eh);
 		ComponentAdapter ca0 = new ComponentAdapter(){
@@ -492,7 +498,6 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     void getHigherView(){
 		rememberLocation(mCamera.getLocation());
         Float alt = new Float(mCamera.getAltitude() + mCamera.getFocal());
-//        vsm.animator.createCameraAnimation(Viewer.ANIM_MOVE_LENGTH, AnimManager.CA_ALT_SIG, alt, mCamera.getID());
         Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(Viewer.ANIM_MOVE_LENGTH, mCamera,
             alt, true, SlowInSlowOutInterpolator.getInstance(), null);
         vsm.getAnimationManager().startAnimation(a, false);
@@ -502,7 +507,6 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     void getLowerView(){
 		rememberLocation(mCamera.getLocation());
         Float alt=new Float(-(mCamera.getAltitude() + mCamera.getFocal())/2.0f);
-//        vsm.animator.createCameraAnimation(Viewer.ANIM_MOVE_LENGTH, AnimManager.CA_ALT_SIG, alt, mCamera.getID());
         Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(Viewer.ANIM_MOVE_LENGTH, mCamera,
             alt, true, SlowInSlowOutInterpolator.getInstance(), null);
         vsm.getAnimationManager().startAnimation(a, false);
@@ -529,7 +533,6 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
             double qt = (rb[0]-rb[2])/4.0;
             trans = new Point2D.Double(qt,0);
         }
-//        vsm.animator.createCameraAnimation(Viewer.ANIM_MOVE_LENGTH, AnimManager.CA_TRANS_SIG, trans, mCamera.getID());
         Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(Viewer.ANIM_MOVE_LENGTH, mCamera,
             trans, true, SlowInSlowOutInterpolator.getInstance(), null);
         vsm.getAnimationManager().startAnimation(a, false);
@@ -747,51 +750,24 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 
     public static void main(String[] args){
         File xmlSceneFile = null;
-		boolean fs = false;
-		boolean ogl = false;
-		boolean aa = true;
-		for (int i=0;i<args.length;i++){
-			if (args[i].startsWith("-")){
-				if (args[i].substring(1).equals("fs")){fs = true;}
-				else if (args[i].substring(1).equals("opengl")){ogl = true;}
-				else if (args[i].substring(1).equals("smooth")){Region.setDefaultTransitions(Region.FADE_IN, Region.FADE_OUT);}
-				else if (args[i].substring(1).equals("noaa")){aa = false;}
-				else if (args[i].substring(1).equals("h") || args[i].substring(1).equals("--help")){Viewer.printCmdLineHelp();System.exit(0);}
-			}
-            else {
-                // the only other thing allowed as a cmd line param is a scene file
-                File f = new File(args[i]);
-                if (f.exists()){
-                    if (f.isDirectory()){
-                        // if arg is a directory, take first xml file we find in that directory
-                        String[] xmlFiles = f.list(new FilenameFilter(){
-                                                public boolean accept(File dir, String name){return name.endsWith(".xml");}
-                                            });
-                        if (xmlFiles.length > 0){
-                            xmlSceneFile = new File(f, xmlFiles[0]);
-                        }
-                    }
-                    else {
-                        xmlSceneFile = f;                        
-                    }
-                }
-            }
-		}
-        if (!fs && Utils.osIsMacOS()){
-            System.setProperty("apple.laf.useScreenMenuBar", "true");
-        }
+	
         System.out.println("--help for command line options");
-        new Viewer(true, fs, ogl, aa, xmlSceneFile);
+
+        //new Viewer(true, fs, ogl, aa, xmlSceneFile);
+        ViewerOptions options = new ViewerOptions();
+        CmdLineParser parser = new CmdLineParser(options);
+        try {
+            parser.parseArgument(args);
+        } catch(CmdLineException ex){
+            System.err.println(ex.getMessage());
+            parser.printUsage(System.err);
+            return;
+        }
+        if(!(options.arguments.isEmpty())){
+            xmlSceneFile = new File(options.arguments.get(0));
+        }
+        new Viewer(options, xmlSceneFile);
     }
-    
-    private static void printCmdLineHelp(){
-        System.out.println("Usage:\n\tjava -Xmx1024M -Xms512M -cp target/timingframework-1.0.jar:zuist-engine-0.2.0-SNAPSHOT.jar:target/zvtm-0.10.0-SNAPSHOT.jar <path_to_scene_dir> [options]");
-        System.out.println("Options:\n\t-fs: fullscreen mode");
-        System.out.println("\t-noaa: no antialiasing");
-		System.out.println("\t-opengl: use Java2D OpenGL rendering pipeline (Java 6+Linux/Windows), requires that -Dsun.java2d.opengl=true be set on cmd line");
-        System.out.println("\t-smooth: default to smooth transitions between levels when none specified");
-    }
-    
 }
 
 class VWGlassPane extends JComponent implements ProgressListener {
@@ -872,3 +848,5 @@ class ConfigManager {
     static final Font GLASSPANE_FONT = new Font("Arial", Font.PLAIN, 12);
 
 }
+
+
