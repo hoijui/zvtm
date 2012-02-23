@@ -17,6 +17,7 @@ import fr.inria.zvtm.glyphs.DPath;
 import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VRoundRect;
 import fr.inria.zvtm.glyphs.VSegment;
+import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.svg.Metadata;
 
 public class LGraph extends LElem {
@@ -129,6 +130,16 @@ public class LGraph extends LElem {
             }
         }
         return res;
+    }
+    
+    public VText[] getLabels(){
+        Vector<VText> labels = new Vector(2);
+        for (Glyph g:glyphs){
+            if (g instanceof VText){
+                labels.add((VText)g);
+            }
+        }
+        return labels.toArray(new VText[labels.size()]);
     }
     
     public void addChildNode(LNode n){
