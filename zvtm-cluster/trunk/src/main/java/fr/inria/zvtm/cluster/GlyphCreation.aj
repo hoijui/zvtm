@@ -352,17 +352,17 @@ public aspect GlyphCreation {
 	}
 	
 	private static class VSegmentReplicator extends AbstractGlyphReplicator {
-		private final double halfWidth;
-		private final double halfHeight;
+		private final double width;
+		private final double height;
 
 		VSegmentReplicator(VSegment source){
 			super(source);
-			this.halfWidth = source.getWidth();
-			this.halfHeight = source.getHeight();
+			this.width = source.getWidth();
+			this.height = source.getHeight();
 		}
 
 		public Glyph doCreateGlyph(){
-			return new VSegment(0d,0d,halfWidth,halfHeight,0,Color.BLACK);
+			return new VSegment(0d,0d,width,height,0,Color.BLACK);
 		}
 	}
 
