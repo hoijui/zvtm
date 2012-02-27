@@ -175,12 +175,19 @@ public class LogicalStructure {
             if (graphBox_g == null){continue;}
 		    for (LNode node:nodes){
 		        Glyph nodeShape = node.getShape();
-    		    if (nodeShape.vx > (graphBox_g.vx-graphBox_rs.getWidth()/2d)
-    		        && nodeShape.vx < (graphBox_g.vx+graphBox_rs.getWidth()/2d)
-    		        && nodeShape.vy > (graphBox_g.vy-graphBox_rs.getHeight()/2d)
-    		        && nodeShape.vy < (graphBox_g.vy+graphBox_rs.getHeight()/2d)){
-    		        graph.addChildNode(node);
+		        // original test:
+		        // nodeShape.vx > (graphBox_g.vx-graphBox_rs.getWidth()/2d)
+                // && nodeShape.vx < (graphBox_g.vx+graphBox_rs.getWidth()/2d)
+                // && nodeShape.vy > (graphBox_g.vy-graphBox_rs.getHeight()/2d)
+                // && nodeShape.vy < (graphBox_g.vy+graphBox_rs.getHeight()/2d)
+		        // optimised as:
+    		    if (nodeShape.vx < (graphBox_g.vx-graphBox_rs.getWidth()/2d)
+    		        || nodeShape.vx > (graphBox_g.vx+graphBox_rs.getWidth()/2d)
+    		        || nodeShape.vy < (graphBox_g.vy-graphBox_rs.getHeight()/2d)
+    		        || nodeShape.vy > (graphBox_g.vy+graphBox_rs.getHeight()/2d)){
+    		        continue;
     		    }
+		        graph.addChildNode(node);
 		    }
 		}
 		// assign LGraphs to LGraphs (subgraph relationships)
@@ -194,12 +201,19 @@ public class LogicalStructure {
         		    RectangularShape graphBBox_rs = (RectangularShape)graphBBox_g;
                     // if graphA's box is fully contained within graphB's box
                     // graphA is a subgraph of graphB
-                    if ((graphABox_g.vx-graphABox_rs.getWidth()/2d) > (graphBBox_g.vx-graphBBox_rs.getWidth()/2d)
-        		        && (graphABox_g.vx+graphABox_rs.getWidth()/2d) < (graphBBox_g.vx+graphBBox_rs.getWidth()/2d)
-        		        && (graphABox_g.vy-graphABox_rs.getHeight()/2d) > (graphBBox_g.vy-graphBBox_rs.getHeight()/2d)
-        		        && (graphABox_g.vy+graphABox_rs.getHeight()/2d) < (graphBBox_g.vy+graphBBox_rs.getHeight()/2d)){
-                        graphB.addSubgraph(graphA);
+                    // original test:
+                    // (graphABox_g.vx-graphABox_rs.getWidth()/2d) > (graphBBox_g.vx-graphBBox_rs.getWidth()/2d)
+                    // && (graphABox_g.vx+graphABox_rs.getWidth()/2d) < (graphBBox_g.vx+graphBBox_rs.getWidth()/2d)
+                    // && (graphABox_g.vy-graphABox_rs.getHeight()/2d) > (graphBBox_g.vy-graphBBox_rs.getHeight()/2d)
+                    // && (graphABox_g.vy+graphABox_rs.getHeight()/2d) < (graphBBox_g.vy+graphBBox_rs.getHeight()/2d)
+                    // optimized as:
+                    if ((graphABox_g.vx-graphABox_rs.getWidth()/2d) < (graphBBox_g.vx-graphBBox_rs.getWidth()/2d)
+        		        || (graphABox_g.vx+graphABox_rs.getWidth()/2d) > (graphBBox_g.vx+graphBBox_rs.getWidth()/2d)
+        		        || (graphABox_g.vy-graphABox_rs.getHeight()/2d) < (graphBBox_g.vy-graphBBox_rs.getHeight()/2d)
+        		        || (graphABox_g.vy+graphABox_rs.getHeight()/2d) > (graphBBox_g.vy+graphBBox_rs.getHeight()/2d)){
+                        continue;
                     }
+                    graphB.addSubgraph(graphA);
                 }
     		}		    
 		}
