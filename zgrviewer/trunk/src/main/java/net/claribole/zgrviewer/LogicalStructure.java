@@ -166,30 +166,38 @@ public class LogicalStructure {
 		}
 		// assign LNodes to LGraphs
 	    for (LGraph graph:graphs){
+	        Glyph graphBox_g = null;
+	        RectangularShape graphBox_rs = null;
+	        if (graph.getBoxType() != LGraph.BOX_TYPE_NONE){
+	            graphBox_g = graph.getBox();
+	            graphBox_rs = (RectangularShape)graphBox_g;
+            }
+            if (graphBox_g == null){continue;}
 		    for (LNode node:nodes){
 		        Glyph nodeShape = node.getShape();
-		        if (graph.getBoxType() != LGraph.BOX_TYPE_NONE){
-    		        RectangularShape graphBox = (RectangularShape)graph.getBox();
-    		        if (graphBox != null
-    		            && nodeShape.vx > (graph.getBox().vx-graphBox.getWidth()/2d)
-    		            && nodeShape.vx < (graph.getBox().vx+graphBox.getWidth()/2d)
-    		            && nodeShape.vy > (graph.getBox().vy-graphBox.getHeight()/2d)
-    		            && nodeShape.vy < (graph.getBox().vy+graphBox.getHeight()/2d)){
-    		            graph.addChildNode(node);
-    		        }
-		        }
+    		    if (nodeShape.vx > (graphBox_g.vx-graphBox_rs.getWidth()/2d)
+    		        && nodeShape.vx < (graphBox_g.vx+graphBox_rs.getWidth()/2d)
+    		        && nodeShape.vy > (graphBox_g.vy-graphBox_rs.getHeight()/2d)
+    		        && nodeShape.vy < (graphBox_g.vy+graphBox_rs.getHeight()/2d)){
+    		        graph.addChildNode(node);
+    		    }
 		    }
 		}
 		// assign LGraphs to LGraphs (subgraph relationships)
 		for (LGraph graphA:graphs){
 		    if (graphA.getBoxType() == LGraph.BOX_TYPE_NONE){continue;}
-		    RectangularShape graphABox = (RectangularShape)graphA.getBox();
+		    Glyph graphABox_g = graphA.getBox();
+		    RectangularShape graphABox_rs = (RectangularShape)graphABox_g;
     		for (LGraph graphB:graphs){
                 if (graphA != graphB && graphB.getBoxType() != LGraph.BOX_TYPE_NONE){
-        		    RectangularShape graphBBox = (RectangularShape)graphB.getBox();
+        		    Glyph graphBBox_g = graphB.getBox();
+        		    RectangularShape graphBBox_rs = (RectangularShape)graphBBox_g;
                     // if graphA's box is fully contained within graphB's box
                     // graphA is a subgraph of graphB
-                    if (false){//XXX: test TBW
+                    if ((graphABox_g.vx-graphABox_rs.getWidth()/2d) > (graphBBox_g.vx-graphBBox_rs.getWidth()/2d)
+        		        && (graphABox_g.vx+graphABox_rs.getWidth()/2d) < (graphBBox_g.vx+graphBBox_rs.getWidth()/2d)
+        		        && (graphABox_g.vy-graphABox_rs.getHeight()/2d) > (graphBBox_g.vy-graphBBox_rs.getHeight()/2d)
+        		        && (graphABox_g.vy+graphABox_rs.getHeight()/2d) < (graphBBox_g.vy+graphBBox_rs.getHeight()/2d)){
                         graphB.addSubgraph(graphA);
                     }
                 }
