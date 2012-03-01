@@ -135,13 +135,34 @@ public class LEdge extends LElem {
 	
 	/**
 	 *@return null if none or could not be identified.
+     *@see #getHeadGlyph()
 	 */
 	public ClosedShape getArrowHead(){
+	    //XXX: FIXME: does not differentiate head and tail right now
+	    // Will return the first thing it finds, no matter whether
+	    // at tail or head
 		for (int i=0;i<glyphs.length;i++){
 		    if (glyphs[i] instanceof VShape){return (VShape)glyphs[i];}
 			else if (glyphs[i] instanceof VPolygon){return (VPolygon)glyphs[i];}
 		}
 		return null;	    
+	}
+
+    /** NOT IMPLEMENTED YET.
+	 *@return null if none or could not be identified.
+     *@see #getArrowHead()
+     *@see #getTailGlyph()
+	 */
+	public ClosedShape getHeadGlyph(){
+	    return null;
+	}
+	
+    /** NOT IMPLEMENTED YET.
+	 *@return null if none or could not be identified.
+     *@see #getHeadGlyph()
+	 */
+	public ClosedShape getTailGlyph(){
+	    return null;
 	}
 
 	public boolean hasVShapeArrowHead(){
@@ -151,8 +172,17 @@ public class LEdge extends LElem {
         return false;
     }
     
+    public boolean hasTailAndHeadGlyphs(){
+        int count = 0;
+        for (int i=0;i<glyphs.length;i++){
+		    if (glyphs[i] instanceof VShape){count++;}
+			else if (glyphs[i] instanceof VPolygon){count++;}
+		}
+		return (count > 1);
+    }
+    
 	/**
-	 *@return the old polygon if replace successful.
+	 *@return the old polygon if replace was successful.
 	 */	
 	public ClosedShape replaceArrowHead(VShape s){
 		for (int i=0;i<glyphs.length;i++){
