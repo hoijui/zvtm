@@ -96,23 +96,26 @@ class GVLoader {
 	new CallBox((ZGRViewer)application, grMngr);
     }
 
-    void loadFile(File f, short prg, boolean parser){//f is the DOT file to load, prg is the program to use DOTManager.*_PROGRAM
-	if (f.exists()){
-	    ConfigManager.m_LastDir=f.getParentFile();
-	    cfgMngr.lastFileOpened = f;
-	    dotMngr.lastProgramUsed = prg;
-	    if (grMngr.mainView.isBlank() == null){grMngr.mainView.setBlank(cfgMngr.backgroundColor);}
-	    dotMngr.load(f, prg, parser);
-	    //in case a font was defined in the SVG file, make it the font used here (to show in Prefs)
-	    ConfigManager.defaultFont = VText.getMainFont();
-	    grMngr.mainView.setTitle(ConfigManager.MAIN_TITLE+" - "+f.getAbsolutePath());
-	    grMngr.reveal();
-	    if (grMngr.previousLocations.size()==1){grMngr.previousLocations.removeElementAt(0);} //do not remember camera's initial location (before global view)
-	    if (grMngr.rView != null){
-		grMngr.rView.getGlobalView(grMngr.mSpace.getCamera(1),100);
-		grMngr.cameraMoved(null, null, 0);
-	    }
-	}
+    void loadFile(File f, short prg, boolean parser){
+        // f is the DOT file to load, prg is the program to use DOTManager.*_PROGRAM
+        if (f.exists()){
+            ConfigManager.m_LastDir=f.getParentFile();
+            cfgMngr.lastFileOpened = f;
+            dotMngr.lastProgramUsed = prg;
+            if (grMngr.mainView.isBlank() == null){grMngr.mainView.setBlank(cfgMngr.backgroundColor);}
+            dotMngr.load(f, prg, parser);
+            // in case a font was defined in the SVG file, make it the font used here (to show in Prefs)
+            ConfigManager.defaultFont = VText.getMainFont();
+            grMngr.mainView.setTitle(ConfigManager.MAIN_TITLE+" - "+f.getAbsolutePath());
+            grMngr.reveal();
+            // do not remember camera's initial location (before global view)
+            if (grMngr.previousLocations.size()==1){grMngr.previousLocations.removeElementAt(0);}
+            if (grMngr.rView != null){
+                grMngr.rView.getGlobalView(grMngr.mSpace.getCamera(1),100);
+                grMngr.cameraMoved(null, null, 0);
+            }
+            cfgMngr.notifyPlugins(Plugin.NOTIFY_PLUGIN_FILE_LOADED);
+        }
     }
 
     void loadSVG(File f){
@@ -144,6 +147,7 @@ class GVLoader {
                 grMngr.cameraMoved(null, null, 0);
             }
             grMngr.gp.setVisible(false);
+            cfgMngr.notifyPlugins(Plugin.NOTIFY_PLUGIN_FILE_LOADED);
         }
         catch (Exception ex){
             grMngr.reveal();
@@ -202,31 +206,33 @@ class GVLoader {
     }
     
     void load(String commandLine, String sourceFile){
-	grMngr.reset();
-	dotMngr.loadCustom(sourceFile, commandLine);
-	//in case a font was defined in the SVG file, make it the font used here (to show in Prefs)
-	ConfigManager.defaultFont = VText.getMainFont();
-	grMngr.mainView.setTitle(ConfigManager.MAIN_TITLE+" - "+sourceFile);
-// 	grMngr.getGlobalView();
-	grMngr.reveal();
-	if (grMngr.previousLocations.size()==1){grMngr.previousLocations.removeElementAt(0);} //do not remember camera's initial location (before global view)
-	if (grMngr.rView != null){
-	    grMngr.rView.getGlobalView(grMngr.mSpace.getCamera(1),100);
-	    grMngr.cameraMoved(null, null, 0);
-	}
+        grMngr.reset();
+        dotMngr.loadCustom(sourceFile, commandLine);
+        //in case a font was defined in the SVG file, make it the font used here (to show in Prefs)
+        ConfigManager.defaultFont = VText.getMainFont();
+        grMngr.mainView.setTitle(ConfigManager.MAIN_TITLE+" - "+sourceFile);
+        // 	grMngr.getGlobalView();
+        grMngr.reveal();
+        // do not remember camera's initial location (before global view)
+        if (grMngr.previousLocations.size()==1){grMngr.previousLocations.removeElementAt(0);}
+        if (grMngr.rView != null){
+            grMngr.rView.getGlobalView(grMngr.mSpace.getCamera(1),100);
+            grMngr.cameraMoved(null, null, 0);
+        }
+        cfgMngr.notifyPlugins(Plugin.NOTIFY_PLUGIN_FILE_LOADED);
     }
 
     void reloadFile(){
         //XXX: TODO: support integrated parser during reload
-	if (cfgMngr.lastFileOpened != null){
-	    grMngr.reset();
-	    if (dotMngr.lastProgramUsed == DOTManager.SVG_FILE){
-		this.loadSVG(cfgMngr.lastFileOpened);
-	    }
-	    else {
-		this.loadFile(cfgMngr.lastFileOpened, dotMngr.lastProgramUsed, false);
-	    }
-	}
+        if (cfgMngr.lastFileOpened != null){
+            grMngr.reset();
+            if (dotMngr.lastProgramUsed == DOTManager.SVG_FILE){
+                this.loadSVG(cfgMngr.lastFileOpened);
+            }
+            else {
+                this.loadFile(cfgMngr.lastFileOpened, dotMngr.lastProgramUsed, false);
+            }
+        }
     }
     
 }
