@@ -14,6 +14,7 @@ import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.DPath;
 import fr.inria.zvtm.glyphs.VPolygon;
 import fr.inria.zvtm.glyphs.VShape;
+import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.glyphs.ClosedShape;
 import fr.inria.zvtm.svg.Metadata;
 
@@ -25,6 +26,13 @@ public class LEdge extends LElem {
 
     static final String UNDIRECTED_STR = "--";
     static final String DIRECTED_STR = "->";
+    
+    static final short GLYPH_SPLINE = 0;
+    static final short GLYPH_LABEL = 1;
+    static final short GLYPH_HEAD = 2;
+    static final short GLYPH_TAIL = 3;
+
+    short[] glyphCat;
 
     boolean directed = false;
 
@@ -54,6 +62,7 @@ public class LEdge extends LElem {
 		for (int i=0;i<this.glyphs.length;i++){
             this.glyphs[i].setOwner(this);
         }
+        categorizeGlyphs();
     }
 
     LEdge(Vector<Glyph> glyphs){
@@ -68,6 +77,31 @@ public class LEdge extends LElem {
             this.tooltips[i] = "";
         }
         this.groupID = Messages.EMPTY_STRING;
+        categorizeGlyphs();
+    }
+    
+    void categorizeGlyphs(){
+        glyphCat = new short[glyphs.length];
+        for (int i=0;i<glyphs.length;i++){
+            if (glyphs[i] instanceof DPath){
+                // the spline itself
+                glyphCat[i] = GLYPH_SPLINE;
+            }
+            else if (glyphs[i] instanceof VText){
+                // probably a label
+                glyphCat[i] = GLYPH_LABEL;
+            }
+            else if (glyphs[i] instanceof ClosedShape){
+                if (true){//XXX: test TBW
+                    // probably a head glyph
+                    glyphCat[i] = GLYPH_HEAD;
+                }
+                else {
+                    // probably a tail glyph
+                    glyphCat[i] = GLYPH_TAIL;
+                }
+            }
+        }
     }
 
     public String getURL(Glyph g){
