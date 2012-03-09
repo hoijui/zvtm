@@ -96,37 +96,38 @@ public abstract class BaseEventHandler implements PortalListener {
 	}
 	
 	public void pressInEditMode(Glyph g, VCursor c, Camera cam){
+        if (g != null){
+    	    if (g.getType() != null && g.getType().equals(GeometryEditor.SPLINE_GEOM_EDITOR)){
+    	        // moving edge control point
+                editingSpline = true;
+                c.stickGlyph(g);
+                return;
+            }
+        }
         // might be attempting to edit an edge
         if (attemptEditEdge(c, cam)){}
         else {
-    	    if (g != null){
-        	    if (g.getType() != null && g.getType().equals(GeometryEditor.SPLINE_GEOM_EDITOR)){
-        	        // moving edge control point
-                    editingSpline = true;
+            if (g != null){
+                // moving something else
+                grMngr.geom.clearSplineEditingGlyphs();
+                if (g instanceof VText && g.getOwner() != null && g.getOwner() instanceof LEdge){
+                    // moving an edge label
+                    movingEdgeLabelOrBox = true;
                     c.stickGlyph(g);
                 }
+                else if (g.getOwner() != null && g.getOwner() instanceof LNode){
+                    // moving a node (label of shape)
+                    movingNode = true;
+                    grMngr.geom.stickNodeComponents(g, (LNode)g.getOwner());
+                    c.stickGlyph(g);
+                }
+                else if (g instanceof ClosedShape){
+                    movingEdgeLabelOrBox = true;
+                    c.stickGlyph(g);                    
+                }
                 else {
-                    // moving something else
-                    grMngr.geom.clearSplineEditingGlyphs();
-                    if (g instanceof VText && g.getOwner() != null && g.getOwner() instanceof LEdge){
-                        // moving an edge label
-                        movingEdgeLabelOrBox = true;
-                        c.stickGlyph(g);
-                    }
-                    else if (g.getOwner() != null && g.getOwner() instanceof LNode){
-                        // moving a node (label of shape)
-                        movingNode = true;
-                        grMngr.geom.stickNodeComponents(g, (LNode)g.getOwner());
-                        c.stickGlyph(g);
-                    }
-                    else if (g instanceof ClosedShape){
-                        movingEdgeLabelOrBox = true;
-                        c.stickGlyph(g);                    
-                    }
-        		    else {
-        		        // might be attempting to edit an edge
-                        attemptEditEdge(c, cam);
-        		    }
+                    // might be attempting to edit an edge
+                    attemptEditEdge(c, cam);
                 }
     	    }
             else {

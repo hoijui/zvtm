@@ -44,6 +44,7 @@ public class GeometryEditor {
                                              e.getArrowHead().getSize(), GraphicsManager.TRIANGLE_VERTICES,
                                              Color.BLACK, Color.BLACK, theta);
             ClosedShape oldArrowHead = e.replaceArrowHead(newArrowHead);
+            newArrowHead.setType(oldArrowHead.getType());
             newArrowHead.setColor(oldArrowHead.getColor());
             newArrowHead.setBorderColor(oldArrowHead.getBorderColor());
             grMngr.mSpace.removeGlyph(oldArrowHead, false);
