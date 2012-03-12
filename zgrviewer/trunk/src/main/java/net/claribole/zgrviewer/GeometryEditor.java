@@ -2,7 +2,7 @@
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
- */ 
+ */
 
 package net.claribole.zgrviewer;
 
@@ -18,7 +18,7 @@ import fr.inria.zvtm.glyphs.ClosedShape;
 import fr.inria.zvtm.glyphs.Glyph;
 
 public class GeometryEditor {
-    
+
     public static final String SPLINE_GEOM_EDITOR = "sge";
 
     GraphicsManager grMngr;
@@ -38,17 +38,19 @@ public class GeometryEditor {
         currentEditPoints = currentEditSpline.getAllPointsCoordinates();
         // replace original arrow head by a generic reorientable one
         if (e.isDirected() && !e.hasVShapeArrowHead()){
-            double theta = Math.atan2(currentEditPoints[currentEditPoints.length-1].y-currentEditPoints[currentEditPoints.length-2].y,
-                                      currentEditPoints[currentEditPoints.length-1].x-currentEditPoints[currentEditPoints.length-2].x);
-            VShape newArrowHead = new VShape(currentEditPoints[currentEditPoints.length-1].x, currentEditPoints[currentEditPoints.length-1].y, 0,
-                                             e.getArrowHead().getSize(), GraphicsManager.TRIANGLE_VERTICES,
-                                             Color.BLACK, Color.BLACK, theta);
-            ClosedShape oldArrowHead = e.replaceArrowHead(newArrowHead);
-            newArrowHead.setType(oldArrowHead.getType());
-            newArrowHead.setColor(oldArrowHead.getColor());
-            newArrowHead.setBorderColor(oldArrowHead.getBorderColor());
-            grMngr.mSpace.removeGlyph(oldArrowHead, false);
-            grMngr.mSpace.addGlyph(newArrowHead, true);
+            if (e.getHeadGlyph() != null){
+                double theta = Math.atan2(currentEditPoints[currentEditPoints.length-1].y-currentEditPoints[currentEditPoints.length-2].y,
+                                          currentEditPoints[currentEditPoints.length-1].x-currentEditPoints[currentEditPoints.length-2].x);
+                VShape newArrowHead = new VShape(currentEditPoints[currentEditPoints.length-1].x, currentEditPoints[currentEditPoints.length-1].y, 0,
+                                                 e.getHeadGlyph().getSize(), GraphicsManager.TRIANGLE_VERTICES,
+                                                 Color.BLACK, Color.BLACK, theta);
+                ClosedShape oldArrowHead = e.replaceArrowHead(newArrowHead);
+                newArrowHead.setType(oldArrowHead.getType());
+                newArrowHead.setColor(oldArrowHead.getColor());
+                newArrowHead.setBorderColor(oldArrowHead.getBorderColor());
+                grMngr.mSpace.removeGlyph(oldArrowHead, false);
+                grMngr.mSpace.addGlyph(newArrowHead, true);
+            }
         }
         // show glyphs for editing control points
         currentEditPointGlyphs = new SICircle[currentEditPoints.length];
@@ -63,7 +65,7 @@ public class GeometryEditor {
         grMngr.mSpace.addGlyphs(currentEditSegments, false);
         grMngr.mSpace.addGlyphs(currentEditPointGlyphs, true);
     }
-    
+
     void updateEdgeSpline(){
         for (int i=0;i<currentEditSegments.length;i++){
             currentEditSegments[i].setEndPoints(currentEditPointGlyphs[i].vx, currentEditPointGlyphs[i].vy,
@@ -73,19 +75,20 @@ public class GeometryEditor {
             currentEditPoints[i].setLocation(currentEditPointGlyphs[i].vx, currentEditPointGlyphs[i].vy);
         }
         currentEditSpline.edit(currentEditPoints, true);
-        
-        double theta = Math.atan2(currentEditPoints[currentEditPoints.length-1].y-currentEditPoints[currentEditPoints.length-2].y,
-                                  currentEditPoints[currentEditPoints.length-1].x-currentEditPoints[currentEditPoints.length-2].x);
-        ClosedShape arrowHead = ((LEdge)currentEditSpline.getOwner()).getArrowHead();
-        arrowHead.orientTo(theta);
-        // assuming that arrow head is associated with last control point of edge (won't work for arrows located at the tail of an edge)
-        arrowHead.moveTo(currentEditPoints[currentEditPoints.length-1].x, currentEditPoints[currentEditPoints.length-1].y);
+        ClosedShape arrowHead = ((LEdge)currentEditSpline.getOwner()).getHeadGlyph();
+        if (arrowHead != null){
+            double theta = Math.atan2(currentEditPoints[currentEditPoints.length-1].y-currentEditPoints[currentEditPoints.length-2].y,
+                                      currentEditPoints[currentEditPoints.length-1].x-currentEditPoints[currentEditPoints.length-2].x);
+            arrowHead.orientTo(theta);
+            // assuming that arrow head is associated with last control point of edge (won't work for arrows located at the tail of an edge)
+            arrowHead.moveTo(currentEditPoints[currentEditPoints.length-1].x, currentEditPoints[currentEditPoints.length-1].y);
+        }
     }
-    
+
     void clearSplineEditingGlyphs(){
         if (currentEditPoints != null){
             for (VSegment s:currentEditSegments){
-                grMngr.mSpace.removeGlyph(s, false);                
+                grMngr.mSpace.removeGlyph(s, false);
             }
             for (SICircle c:currentEditPointGlyphs){
                 grMngr.mSpace.removeGlyph(c, false);
@@ -97,11 +100,11 @@ public class GeometryEditor {
         currentEditSegments = null;
         currentEditPoints = null;
     }
-    
+
     /*-------------------- Moving nodes -----------------*/
-    
+
     Glyph manipulatedNodeGlyph;
-    
+
     void stickNodeComponents(Glyph mg, LNode n){
         manipulatedNodeGlyph = mg;
         for (Glyph g:n.getGlyphs()){
@@ -110,7 +113,7 @@ public class GeometryEditor {
             }
         }
     }
-    
+
     void unstickAll(){
         manipulatedNodeGlyph.unstickAllGlyphs();
         manipulatedNodeGlyph = null;

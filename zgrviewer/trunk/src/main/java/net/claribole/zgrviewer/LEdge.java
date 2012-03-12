@@ -8,6 +8,8 @@
 
 package net.claribole.zgrviewer;
 
+import java.awt.geom.Point2D;
+
 import java.util.Vector;
 
 import fr.inria.zvtm.glyphs.Glyph;
@@ -31,6 +33,7 @@ public class LEdge extends LElem {
     static final short GLYPH_LABEL = 1;
     static final short GLYPH_HEAD = 2;
     static final short GLYPH_TAIL = 3;
+    static final short GLYPH_UNKNOWN = 4;
 
     short[] glyphCat;
 
@@ -82,6 +85,8 @@ public class LEdge extends LElem {
     
     void categorizeGlyphs(){
         glyphCat = new short[glyphs.length];
+        Point2D.Double sp = getSpline().getStartPoint();
+        Point2D.Double ep = getSpline().getEndPoint();
         for (int i=0;i<glyphs.length;i++){
             if (glyphs[i] instanceof DPath){
                 // the spline itself
@@ -92,17 +97,27 @@ public class LEdge extends LElem {
                 glyphCat[i] = GLYPH_LABEL;
             }
             else if (glyphs[i] instanceof ClosedShape){
-                if (true){//XXX: test TBW
-                    // probably a head glyph
-                    glyphCat[i] = GLYPH_HEAD;
-                }
-                else {
+                if (Math.sqrt(Math.pow(glyphs[i].vx-sp.x,2)+Math.pow(glyphs[i].vy-sp.y,2)) < Math.sqrt(Math.pow(glyphs[i].vx-ep.x,2)+Math.pow(glyphs[i].vy-ep.y,2))){
                     // probably a tail glyph
                     glyphCat[i] = GLYPH_TAIL;
                 }
+                else {
+                    // probably a head glyph
+                    glyphCat[i] = GLYPH_HEAD;
+                }
+            }
+            else {
+                glyphCat[i] = GLYPH_UNKNOWN;                
             }
         }
     }
+    
+    //void printCats(){
+    //    for (int i=0;i<glyphs.length;i++){
+    //        System.out.println(glyphs[i]+"\t=\t"+glyphCat[i]);
+    //    }
+    //    System.out.println();
+    //}
 
     public String getURL(Glyph g){
         for (int i=0;i<glyphs.length;i++){
@@ -162,57 +177,48 @@ public class LEdge extends LElem {
 
     public DPath getSpline(){
 		for (int i=0;i<glyphs.length;i++){
-			if (glyphs[i] instanceof DPath){return (DPath)glyphs[i];}
+			if (glyphCat[i] == GLYPH_SPLINE){return (DPath)glyphs[i];}
 		}
 		return null;
 	}
 	
-	/**
+    /**
 	 *@return null if none or could not be identified.
-     *@see #getHeadGlyph()
-	 */
-	public ClosedShape getArrowHead(){
-	    //XXX: FIXME: does not differentiate head and tail right now
-	    // Will return the first thing it finds, no matter whether
-	    // at tail or head
-		for (int i=0;i<glyphs.length;i++){
-		    if (glyphs[i] instanceof VShape){return (VShape)glyphs[i];}
-			else if (glyphs[i] instanceof VPolygon){return (VPolygon)glyphs[i];}
-		}
-		return null;	    
-	}
-
-    /** NOT IMPLEMENTED YET.
-	 *@return null if none or could not be identified.
-     *@see #getArrowHead()
      *@see #getTailGlyph()
 	 */
 	public ClosedShape getHeadGlyph(){
-	    return null;
+		for (int i=0;i<glyphs.length;i++){
+		    if (glyphCat[i] == GLYPH_HEAD){return (ClosedShape)glyphs[i];}
+		}
+		return null;	    
 	}
 	
-    /** NOT IMPLEMENTED YET.
+    /**
 	 *@return null if none or could not be identified.
      *@see #getHeadGlyph()
 	 */
 	public ClosedShape getTailGlyph(){
-	    return null;
+		for (int i=0;i<glyphs.length;i++){
+		    if (glyphCat[i] == GLYPH_TAIL){return (ClosedShape)glyphs[i];}
+		}
+		return null;	    
 	}
 
 	public boolean hasVShapeArrowHead(){
 		for (int i=0;i<glyphs.length;i++){
-		    if (glyphs[i] instanceof VShape){return true;}
+		    if (glyphCat[i] == GLYPH_HEAD && glyphs[i] instanceof VShape){return true;}
         }
         return false;
     }
     
     public boolean hasTailAndHeadGlyphs(){
-        int count = 0;
+        int countH = 0;
+        int countT = 0;
         for (int i=0;i<glyphs.length;i++){
-		    if (glyphs[i] instanceof VShape){count++;}
-			else if (glyphs[i] instanceof VPolygon){count++;}
+		    if (glyphCat[i] == GLYPH_HEAD){countH++;}
+			else if (glyphCat[i] == GLYPH_TAIL){countT++;}
 		}
-		return (count > 1);
+		return (countH > 0 && countT > 0);
     }
     
 	/**
@@ -220,7 +226,7 @@ public class LEdge extends LElem {
 	 */	
 	public ClosedShape replaceArrowHead(VShape s){
 		for (int i=0;i<glyphs.length;i++){
-		    if (glyphs[i] instanceof VPolygon || glyphs[i] instanceof VShape){
+		    if (glyphCat[i] == GLYPH_HEAD){
                 ClosedShape old = (ClosedShape)glyphs[i];
                 glyphs[i] = s;
 		        return old;
