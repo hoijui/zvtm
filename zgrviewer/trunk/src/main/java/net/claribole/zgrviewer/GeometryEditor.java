@@ -80,8 +80,11 @@ public class GeometryEditor {
             double theta = Math.atan2(currentEditPoints[currentEditPoints.length-1].y-currentEditPoints[currentEditPoints.length-2].y,
                                       currentEditPoints[currentEditPoints.length-1].x-currentEditPoints[currentEditPoints.length-2].x);
             arrowHead.orientTo(theta);
-            // assuming that arrow head is associated with last control point of edge (won't work for arrows located at the tail of an edge)
             arrowHead.moveTo(currentEditPoints[currentEditPoints.length-1].x, currentEditPoints[currentEditPoints.length-1].y);
+        }
+        ClosedShape arrowTail = ((LEdge)currentEditSpline.getOwner()).getTailGlyph();
+        if (arrowTail != null){
+            arrowTail.moveTo(currentEditPoints[0].x, currentEditPoints[0].y);
         }
     }
 
