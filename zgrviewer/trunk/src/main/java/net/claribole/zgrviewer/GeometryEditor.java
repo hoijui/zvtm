@@ -48,6 +48,7 @@ public class GeometryEditor {
                 newArrowHead.setType(oldArrowHead.getType());
                 newArrowHead.setColor(oldArrowHead.getColor());
                 newArrowHead.setBorderColor(oldArrowHead.getBorderColor());
+                newArrowHead.setFilled(oldArrowHead.isFilled());
                 grMngr.mSpace.removeGlyph(oldArrowHead, false);
                 grMngr.mSpace.addGlyph(newArrowHead, true);
             }
