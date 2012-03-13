@@ -3,11 +3,11 @@
  *   AUTHOR :            Emmanuel Pietriga (emmanuel@w3.org)
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Emmanuel Pietriga, 2002. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2012. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
- */ 
+ */
 
 package fr.inria.zvtm.glyphs;
 
@@ -60,7 +60,7 @@ public class VPolygon extends ClosedShape {
     public VPolygon(Point2D.Double[] v, int z, Color c, Color bc){
         this(v, z, c, bc, 1.0f);
     }
-    
+
     /**
         *@param v list of x,y vertices ABSOLUTE coordinates i virtual space
         *@param z z-index (pass 0 if you do not use z-ordering)
@@ -99,61 +99,61 @@ public class VPolygon extends ClosedShape {
 
     @Override
     public void initCams(int nbCam){
-	pc=new ProjPolygon[nbCam];
-	for (int i=0;i<nbCam;i++){
-	    pc[i]=new ProjPolygon(xcoords.length);
-	}
+        pc=new ProjPolygon[nbCam];
+        for (int i=0;i<nbCam;i++){
+            pc[i]=new ProjPolygon(xcoords.length);
+        }
     }
 
     @Override
     public void addCamera(int verifIndex){
-	if (pc!=null){
-	    if (verifIndex==pc.length){
-		ProjPolygon[] ta=pc;
-		pc=new ProjPolygon[ta.length+1];
-		for (int i=0;i<ta.length;i++){
-		    pc[i]=ta[i];
-		}
-		pc[pc.length-1]=new ProjPolygon(xcoords.length);
-	    }
-	    else {System.err.println("VPolygon:Error while adding camera "+verifIndex);}
-	}
-	else {
-	    if (verifIndex==0){
-		pc=new ProjPolygon[1];
-		pc[0]=new ProjPolygon(xcoords.length);
-	    }
-	    else {System.err.println("VPolygon:Error while adding camera "+verifIndex);}
-	}
+        if (pc!=null){
+            if (verifIndex==pc.length){
+                ProjPolygon[] ta=pc;
+                pc=new ProjPolygon[ta.length+1];
+                for (int i=0;i<ta.length;i++){
+                    pc[i]=ta[i];
+                }
+                pc[pc.length-1]=new ProjPolygon(xcoords.length);
+            }
+            else {System.err.println("VPolygon:Error while adding camera "+verifIndex);}
+        }
+        else {
+            if (verifIndex==0){
+                pc=new ProjPolygon[1];
+                pc[0]=new ProjPolygon(xcoords.length);
+            }
+            else {System.err.println("VPolygon:Error while adding camera "+verifIndex);}
+        }
     }
 
     @Override
     public void removeCamera(int index){
-	pc[index]=null;
+        pc[index]=null;
     }
 
     @Override
     public void resetMouseIn(){
-	for (int i=0;i<pc.length;i++){
-	    resetMouseIn(i);
-	}
+        for (int i=0;i<pc.length;i++){
+            resetMouseIn(i);
+        }
     }
 
     @Override
     public void resetMouseIn(int i){
-	if (pc[i]!=null){pc[i].prevMouseIn=false;}
-	borderColor = bColor;
+        if (pc[i]!=null){pc[i].prevMouseIn=false;}
+        borderColor = bColor;
     }
 
     @Override
-    public double getOrient(){return orient;}
+        public double getOrient(){return orient;}
 
     /** Cannot be reoriented. */
     @Override
-    public void orientTo(double angle){}
+        public void orientTo(double angle){}
 
     @Override
-    public double getSize(){return size;}
+        public double getSize(){return size;}
 
     void computeSize(){
         size = 0;
@@ -224,7 +224,7 @@ public class VPolygon extends ClosedShape {
                 return Glyph.ENTERED_GLYPH;
             }
             //if it was inside last time, nothing has changed
-            else {return Glyph.NO_CURSOR_EVENT;}  
+            else {return Glyph.NO_CURSOR_EVENT;}
         }
         else{
             //if the mouse is not inside the glyph
@@ -241,30 +241,30 @@ public class VPolygon extends ClosedShape {
      *@return relative coordinates (w.r.t polygon's centroid)
      */
     public Point2D.Double[] getVertices(){
-	Point2D.Double[] res=new Point2D.Double[xcoords.length];
-	for (int i=0;i<xcoords.length;i++){
-	    res[i]=new Point2D.Double(Math.round(xcoords[i]),Math.round(ycoords[i]));
-	}
-	return res;
+        Point2D.Double[] res = new Point2D.Double[xcoords.length];
+        for (int i = 0;i < xcoords.length;i++){
+            res[i] = new Point2D.Double(Math.round(xcoords[i]), Math.round(ycoords[i]));
+        }
+        return res;
     }
 
     /** Get this polygon's list of vertices (absolute coordinates).
      *@return absolute coordinates
      */
     public Point2D.Double[] getAbsoluteVertices(){
-	Point2D.Double[] res=new Point2D.Double[xcoords.length];
-	for (int i=0;i<xcoords.length;i++){
-	    res[i]=new Point2D.Double(Math.round(xcoords[i]+vx),Math.round(ycoords[i]+vy));
-	}
-	return res;
+        Point2D.Double[] res = new Point2D.Double[xcoords.length];
+        for (int i = 0;i < xcoords.length;i++){
+            res[i] = new Point2D.Double(Math.round(xcoords[i]+vx), Math.round(ycoords[i]+vy));
+        }
+        return res;
     }
 
     /** Get a serialization of this polygon's list of vertices.
      *@return a semicolon-separated string representation of all vertex absolute coordinates (x and y coordinates seperated by commas, e.g. x1,y1;x2,y2;x3,y3 etc.)
      */
     public String getVerticesAsText(){
-        StringBuffer res=new StringBuffer();
-        for (int i=0;i<xcoords.length-1;i++){
+        StringBuffer res = new StringBuffer();
+        for (int i = 0;i < xcoords.length-1;i++){
             res.append(xcoords[i]+vx+","+ycoords[i]+vy+";");
         }
         res.append(xcoords[xcoords.length-1]+vx+","+ycoords[ycoords.length-1]+vy);
@@ -273,14 +273,14 @@ public class VPolygon extends ClosedShape {
 
     @Override
     public void project(Camera c, Dimension d){
-        int i=c.getIndex();
+        int i = c.getIndex();
         coef = c.focal / (c.focal+c.altitude);
         //find coordinates of object's geom center wrt to camera center and project
         //translate in JPanel coords
         pc[i].cx = (int)Math.round((d.width/2)+(vx-c.vx)*coef);
         pc[i].cy = (int)Math.round((d.height/2)-(vy-c.vy)*coef);
         //project height and construct polygon
-        pc[i].cr = (int)Math.round(size*coef);	
+        pc[i].cr = (int)Math.round(size*coef);
         for (int j=0;j<xcoords.length;j++){
             pc[i].xpcoords[j]=(int)Math.round(pc[i].cx+xcoords[j]*coef);
             pc[i].ypcoords[j]=(int)Math.round(pc[i].cy-ycoords[j]*coef);
@@ -300,14 +300,14 @@ public class VPolygon extends ClosedShape {
 
     @Override
     public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, double lensx, double lensy){
-        int i=c.getIndex();
+        int i = c.getIndex();
         coef = c.focal/(c.focal+c.altitude) * lensMag;
         //find coordinates of object's geom center wrt to camera center and project
         //translate in JPanel coords
         pc[i].lcx = (int)Math.round((lensWidth/2) + (vx-(lensx))*coef);
         pc[i].lcy = (int)Math.round((lensHeight/2) - (vy-(lensy))*coef);
         //project height and construct polygon
-        pc[i].lcr = (int)Math.round(size*coef);	
+        pc[i].lcr = (int)Math.round(size*coef);
         for (int j=0;j<xcoords.length;j++){
             pc[i].lxpcoords[j]=(int)Math.round(pc[i].lcx+xcoords[j]*coef);
             pc[i].lypcoords[j]=(int)Math.round(pc[i].lcy-ycoords[j]*coef);
@@ -330,10 +330,10 @@ public class VPolygon extends ClosedShape {
         if (alphaC != null && alphaC.getAlpha()==0){return;}
         if (pc[i].cr>1){
             //repaint only if object is visible
-            if (alphaC != null){ 
+            if (alphaC != null){
                 g.setComposite(alphaC);
                 if (filled){
-                    g.setColor(this.color); 
+                    g.setColor(this.color);
                     g.translate(dx, dy);
                     g.fillPolygon(pc[i].p);
                     g.translate(-dx, -dy);
@@ -357,7 +357,7 @@ public class VPolygon extends ClosedShape {
             }
             else {
                 if (filled){
-                    g.setColor(this.color); 
+                    g.setColor(this.color);
                     g.translate(dx, dy);
                     g.fillPolygon(pc[i].p);
                     g.translate(-dx, -dy);
@@ -468,12 +468,12 @@ public class VPolygon extends ClosedShape {
             ycoordsForArea[i]=vy+ycoords[i];
         }
         int j,k;
-        double res=0;
+        double res = 0;
         for (j=0;j<xcoords.length;j++){
-            k=(j+1) % xcoords.length;
-            res+=(xcoordsForArea[j]*ycoordsForArea[k]-ycoordsForArea[j]*xcoordsForArea[k]);
+            k = (j+1) % xcoords.length;
+            res += (xcoordsForArea[j]*ycoordsForArea[k]-ycoordsForArea[j]*xcoordsForArea[k]);
         }
-        res=res/2.0;
+        res = res / 2.0;
         return ((res<0) ? -res : res);
     }
 
@@ -495,24 +495,24 @@ public class VPolygon extends ClosedShape {
             k=(j+1) % xcoords.length;
             area+=(xcoordsForArea[j]*ycoordsForArea[k]-ycoordsForArea[j]*xcoordsForArea[k]);
         }
-        area=area/2.0;
+        area = area / 2.0;
         //area=((area<0) ? -area : area);  //do not do that!!! it can change the centroid's coordinates
         //(-x,-y instead of x,y) depending on the order in which the
         //sequence of vertex coords
         //compute centroid
-        double factor=0;
-        double cx=0;
-        double cy=0;
+        double factor = 0;
+        double cx = 0;
+        double cy = 0;
         for (j=0;j<xcoords.length;j++){
-            k=(j+1) % xcoords.length;
-            factor=xcoordsForArea[j]*ycoordsForArea[k]-xcoordsForArea[k]*ycoordsForArea[j];
-            cx+=(xcoordsForArea[j]+xcoordsForArea[k])*factor;
-            cy+=(ycoordsForArea[j]+ycoordsForArea[k])*factor;
+            k = (j+1) % xcoords.length;
+            factor = xcoordsForArea[j]*ycoordsForArea[k]-xcoordsForArea[k]*ycoordsForArea[j];
+            cx += (xcoordsForArea[j]+xcoordsForArea[k])*factor;
+            cy += (ycoordsForArea[j]+ycoordsForArea[k])*factor;
         }
-        area*=6.0;
-        factor=1/area;
-        cx*=factor;
-        cy*=factor;
+        area *= 6.0;
+        factor = 1 / area;
+        cx *= factor;
+        cy *= factor;
         return new Point2D.Double(cx,cy);
     }
 
