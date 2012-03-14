@@ -15,7 +15,7 @@ import java.util.Vector;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.DPath;
 import fr.inria.zvtm.glyphs.VPolygon;
-import fr.inria.zvtm.glyphs.VShape;
+import fr.inria.zvtm.glyphs.VPolygonOr;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.glyphs.ClosedShape;
 import fr.inria.zvtm.svg.Metadata;
@@ -204,9 +204,9 @@ public class LEdge extends LElem {
 		return null;	    
 	}
 
-	public boolean hasVShapeArrowHead(){
+	public boolean hasOrientableArrowHead(){
 		for (int i=0;i<glyphs.length;i++){
-		    if (glyphCat[i] == GLYPH_HEAD && glyphs[i] instanceof VShape){return true;}
+		    if (glyphCat[i] == GLYPH_HEAD && glyphs[i] instanceof VPolygonOr){return true;}
         }
         return false;
     }
@@ -224,7 +224,7 @@ public class LEdge extends LElem {
 	/**
 	 *@return the old polygon if replace was successful.
 	 */	
-	public ClosedShape replaceArrowHead(VShape s){
+	public ClosedShape replaceArrowHead(VPolygonOr s){
 		for (int i=0;i<glyphs.length;i++){
 		    if (glyphCat[i] == GLYPH_HEAD){
                 ClosedShape old = (ClosedShape)glyphs[i];

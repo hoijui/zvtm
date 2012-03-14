@@ -12,7 +12,7 @@ import java.awt.geom.Point2D;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.SICircle;
 import fr.inria.zvtm.glyphs.VSegment;
-import fr.inria.zvtm.glyphs.VShape;
+import fr.inria.zvtm.glyphs.VPolygonOr;
 import fr.inria.zvtm.glyphs.DPath;
 import fr.inria.zvtm.glyphs.ClosedShape;
 import fr.inria.zvtm.glyphs.Glyph;
@@ -37,18 +37,22 @@ public class GeometryEditor {
         currentEditSpline = e.getSpline();
         currentEditPoints = currentEditSpline.getAllPointsCoordinates();
         // replace original arrow head by a generic reorientable one
-        if (e.isDirected() && !e.hasVShapeArrowHead()){
+        if (e.isDirected() && !e.hasOrientableArrowHead()){
             if (e.getHeadGlyph() != null){
                 double theta = Math.atan2(currentEditPoints[currentEditPoints.length-1].y-currentEditPoints[currentEditPoints.length-2].y,
                                           currentEditPoints[currentEditPoints.length-1].x-currentEditPoints[currentEditPoints.length-2].x);
-                VShape newArrowHead = new VShape(currentEditPoints[currentEditPoints.length-1].x, currentEditPoints[currentEditPoints.length-1].y, 0,
-                                                 e.getHeadGlyph().getSize(), GraphicsManager.TRIANGLE_VERTICES,
-                                                 Color.BLACK, Color.BLACK, theta);
+                // 2.2d instead of 2d because the latter yields slightly too big heads
+                double cos = e.getHeadGlyph().getSize()/2.2d * Math.cos(3*Math.PI/4d);
+                double sin = e.getHeadGlyph().getSize()/2.2d * Math.sin(3*Math.PI/4d);
+                Point2D.Double[] headPts = {new Point2D.Double(e.getHeadGlyph().getSize()/2.2d, 0),
+                                            new Point2D.Double(cos, sin),
+                                            new Point2D.Double(cos, -sin)};
+                VPolygonOr newArrowHead = new VPolygonOr(headPts, 0, Color.BLACK, Color.BLACK, theta);
+                newArrowHead.moveTo(currentEditPoints[currentEditPoints.length-1].x, currentEditPoints[currentEditPoints.length-1].y);
                 ClosedShape oldArrowHead = e.replaceArrowHead(newArrowHead);
                 newArrowHead.setType(oldArrowHead.getType());
                 newArrowHead.setColor(oldArrowHead.getColor());
                 newArrowHead.setBorderColor(oldArrowHead.getBorderColor());
-                newArrowHead.setFilled(oldArrowHead.isFilled());
                 grMngr.mSpace.removeGlyph(oldArrowHead, false);
                 grMngr.mSpace.addGlyph(newArrowHead, true);
             }
