@@ -46,7 +46,8 @@ public class GeometryEditor {
                                  currentEditPoints[currentEditPoints.length-1].x-currentEditPoints[currentEditPoints.length-2].x);
         if (head != null){
             if ((head instanceof VPolygon) && !(head instanceof VPolygonOr)){
-                VPolygonOr newHead = new VPolygonOr(((VPolygon)head).getAbsoluteVertices(), 0, head.getColor(), head.getBorderColor(), 0);
+                VPolygon p = (VPolygon)head;
+                VPolygonOr newHead = new VPolygonOr(p.getAbsoluteVertices(), 0, p.getDefaultColor(), p.getDefaultBorderColor(), 0);
                 newHead.moveTo(currentEditPoints[currentEditPoints.length-1].x, currentEditPoints[currentEditPoints.length-1].y);
                 e.replaceHead(newHead);
                 newHead.setType(head.getType());
