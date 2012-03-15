@@ -97,14 +97,17 @@ public abstract class BaseEventHandler implements PortalListener {
 	}
 	
 	public void pressInEditMode(Glyph g, VCursor c, Camera cam, int mod){
-        if (g != null){
-    	    if (g.getType() != null && g.getType().equals(GeometryEditor.SPLINE_GEOM_EDITOR)){
-    	        // moving edge control point
-                editingSpline = true;
-                c.stickGlyph(g);
-                return;
+        Vector<Glyph> hoveredGlyphs = c.getPicker().getIntersectingGlyphs(cam);
+        if (hoveredGlyphs != null &&  hoveredGlyphs.size() > 0){
+            for (Glyph g2:hoveredGlyphs){
+                if (g2.getType() != null && g2.getType().equals(GeometryEditor.SPLINE_GEOM_EDITOR)){
+                    // moving edge control point
+                    editingSpline = true;
+                    c.stickGlyph(g2);
+                    return;
+                }
             }
-        }
+        }        
         // might be attempting to edit an edge
         if (attemptEditEdge(c, cam, mod)){}
         else {
