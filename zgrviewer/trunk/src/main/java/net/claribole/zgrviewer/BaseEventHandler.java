@@ -140,7 +140,8 @@ public abstract class BaseEventHandler implements PortalListener {
 	    Vector<Glyph> otherGlyphs = c.getPicker().getIntersectingGlyphs(cam);
 		if (otherGlyphs != null && otherGlyphs.size() > 0){
 		    for (Glyph eg:otherGlyphs){
-		        if (eg.getOwner() != null && eg.getOwner() instanceof LEdge){
+		        // if clicking on an edge glyph, except its label (clicking on label should move the label)
+		        if (eg.getOwner() != null && eg.getOwner() instanceof LEdge && !(eg instanceof VText)){
                     grMngr.geom.clearSplineEditingGlyphs();
 		            grMngr.geom.editEdgeSpline((LEdge)eg.getOwner());
 		            return true;
