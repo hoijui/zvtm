@@ -232,6 +232,7 @@ public class LEdge extends LElem {
 		    if (glyphCat[i] == GLYPH_HEAD){
                 ClosedShape old = (ClosedShape)glyphs[i];
                 glyphs[i] = s;
+                s.setOwner(this);
 		        return old;
 		    }
 		}
@@ -246,6 +247,7 @@ public class LEdge extends LElem {
 		    if (glyphCat[i] == GLYPH_TAIL){
                 ClosedShape old = (ClosedShape)glyphs[i];
                 glyphs[i] = s;
+                s.setOwner(this);
 		        return old;
 		    }
 		}
