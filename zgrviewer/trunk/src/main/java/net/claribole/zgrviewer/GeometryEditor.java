@@ -12,6 +12,7 @@ import java.awt.geom.Point2D;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.SICircle;
 import fr.inria.zvtm.glyphs.VSegment;
+import fr.inria.zvtm.glyphs.VPolygon;
 import fr.inria.zvtm.glyphs.VPolygonOr;
 import fr.inria.zvtm.glyphs.DPath;
 import fr.inria.zvtm.glyphs.ClosedShape;
@@ -33,29 +34,45 @@ public class GeometryEditor {
 
     /*-------------------- Editing edges -----------------*/
 
+    double headTangent, tailTangent = 0;
+    double headOrient, tailOrient = 0;
+
     void editEdgeSpline(LEdge e){
         currentEditSpline = e.getSpline();
         currentEditPoints = currentEditSpline.getAllPointsCoordinates();
-        // replace original arrow head by a generic reorientable one
-        if (e.isDirected() && !e.hasOrientableArrowHead()){
-            if (e.getHeadGlyph() != null){
-                double theta = Math.atan2(currentEditPoints[currentEditPoints.length-1].y-currentEditPoints[currentEditPoints.length-2].y,
-                                          currentEditPoints[currentEditPoints.length-1].x-currentEditPoints[currentEditPoints.length-2].x);
-                // 2.2d instead of 2d because the latter yields slightly too big heads
-                double cos = e.getHeadGlyph().getSize()/2.2d * Math.cos(3*Math.PI/4d);
-                double sin = e.getHeadGlyph().getSize()/2.2d * Math.sin(3*Math.PI/4d);
-                Point2D.Double[] headPts = {new Point2D.Double(e.getHeadGlyph().getSize()/2.2d, 0),
-                                            new Point2D.Double(cos, sin),
-                                            new Point2D.Double(cos, -sin)};
-                VPolygonOr newArrowHead = new VPolygonOr(headPts, 0, Color.BLACK, Color.BLACK, theta);
-                newArrowHead.moveTo(currentEditPoints[currentEditPoints.length-1].x, currentEditPoints[currentEditPoints.length-1].y);
-                ClosedShape oldArrowHead = e.replaceArrowHead(newArrowHead);
-                newArrowHead.setType(oldArrowHead.getType());
-                newArrowHead.setColor(oldArrowHead.getColor());
-                newArrowHead.setBorderColor(oldArrowHead.getBorderColor());
-                grMngr.mSpace.removeGlyph(oldArrowHead, false);
-                grMngr.mSpace.addGlyph(newArrowHead, true);
+        // take care of head glyph
+        Glyph head = e.getHeadGlyph();
+        headTangent = Math.atan2(currentEditPoints[currentEditPoints.length-1].y-currentEditPoints[currentEditPoints.length-2].y,
+                                 currentEditPoints[currentEditPoints.length-1].x-currentEditPoints[currentEditPoints.length-2].x);
+        if (head != null){
+            if ((head instanceof VPolygon) && !(head instanceof VPolygonOr)){
+                VPolygonOr newHead = new VPolygonOr(((VPolygon)head).getAbsoluteVertices(), 0, head.getColor(), head.getBorderColor(), 0);
+                newHead.moveTo(currentEditPoints[currentEditPoints.length-1].x, currentEditPoints[currentEditPoints.length-1].y);
+                e.replaceHead(newHead);
+                newHead.setType(head.getType());
+                grMngr.mSpace.removeGlyph(head, false);
+                grMngr.mSpace.addGlyph(newHead, true);
+                head = newHead;
             }
+            // else consider that the glyph is already reorientable (should work in most - if not all - cases)
+            headOrient = head.getOrient();
+        }
+        // take care of tail glyph
+        Glyph tail = e.getTailGlyph();
+        tailTangent = Math.atan2(currentEditPoints[0].y-currentEditPoints[1].y,
+                                 currentEditPoints[0].x-currentEditPoints[1].x);
+        if (tail != null){
+            if ((tail instanceof VPolygon) && !(tail instanceof VPolygonOr)){
+                VPolygonOr newTail = new VPolygonOr(((VPolygon)tail).getAbsoluteVertices(), 0, tail.getColor(), tail.getBorderColor(), 0);
+                newTail.moveTo(currentEditPoints[0].x, currentEditPoints[0].y);
+                e.replaceTail(newTail);
+                newTail.setType(tail.getType());
+                grMngr.mSpace.removeGlyph(tail, false);
+                grMngr.mSpace.addGlyph(newTail, true);
+                tail = newTail;
+            }
+            // else consider that the glyph is already reorientable (should work in most - if not all - cases)
+            tailOrient = tail.getOrient();
         }
         // show glyphs for editing control points
         currentEditPointGlyphs = new SICircle[currentEditPoints.length];
@@ -80,16 +97,19 @@ public class GeometryEditor {
             currentEditPoints[i].setLocation(currentEditPointGlyphs[i].vx, currentEditPointGlyphs[i].vy);
         }
         currentEditSpline.edit(currentEditPoints, true);
-        ClosedShape arrowHead = ((LEdge)currentEditSpline.getOwner()).getHeadGlyph();
-        if (arrowHead != null){
-            double theta = Math.atan2(currentEditPoints[currentEditPoints.length-1].y-currentEditPoints[currentEditPoints.length-2].y,
-                                      currentEditPoints[currentEditPoints.length-1].x-currentEditPoints[currentEditPoints.length-2].x);
-            arrowHead.orientTo(theta);
-            arrowHead.moveTo(currentEditPoints[currentEditPoints.length-1].x, currentEditPoints[currentEditPoints.length-1].y);
+        ClosedShape head = ((LEdge)currentEditSpline.getOwner()).getHeadGlyph();
+        if (head != null){
+            double newHeadTangent = Math.atan2(currentEditPoints[currentEditPoints.length-1].y-currentEditPoints[currentEditPoints.length-2].y,
+                                              currentEditPoints[currentEditPoints.length-1].x-currentEditPoints[currentEditPoints.length-2].x);
+            head.orientTo(headOrient+(newHeadTangent-headTangent));
+            head.moveTo(currentEditPoints[currentEditPoints.length-1].x, currentEditPoints[currentEditPoints.length-1].y);
         }
-        ClosedShape arrowTail = ((LEdge)currentEditSpline.getOwner()).getTailGlyph();
-        if (arrowTail != null){
-            arrowTail.moveTo(currentEditPoints[0].x, currentEditPoints[0].y);
+        ClosedShape tail = ((LEdge)currentEditSpline.getOwner()).getTailGlyph();
+        if (tail != null){
+            double newTailTangent = Math.atan2(currentEditPoints[0].y-currentEditPoints[1].y,
+                                               currentEditPoints[0].x-currentEditPoints[1].x);
+            tail.orientTo(tailOrient+(newTailTangent-tailTangent));
+            tail.moveTo(currentEditPoints[0].x, currentEditPoints[0].y);
         }
     }
 

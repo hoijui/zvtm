@@ -203,13 +203,6 @@ public class LEdge extends LElem {
 		}
 		return null;	    
 	}
-
-	public boolean hasOrientableArrowHead(){
-		for (int i=0;i<glyphs.length;i++){
-		    if (glyphCat[i] == GLYPH_HEAD && glyphs[i] instanceof VPolygonOr){return true;}
-        }
-        return false;
-    }
     
     public boolean hasTailAndHeadGlyphs(){
         int countH = 0;
@@ -224,9 +217,23 @@ public class LEdge extends LElem {
 	/**
 	 *@return the old polygon if replace was successful.
 	 */	
-	public ClosedShape replaceArrowHead(VPolygonOr s){
+	public ClosedShape replaceHead(VPolygonOr s){
 		for (int i=0;i<glyphs.length;i++){
 		    if (glyphCat[i] == GLYPH_HEAD){
+                ClosedShape old = (ClosedShape)glyphs[i];
+                glyphs[i] = s;
+		        return old;
+		    }
+		}
+		return null;
+	}
+
+	/**
+	 *@return the old polygon if replace was successful.
+	 */	
+	public ClosedShape replaceTail(VPolygonOr s){
+		for (int i=0;i<glyphs.length;i++){
+		    if (glyphCat[i] == GLYPH_TAIL){
                 ClosedShape old = (ClosedShape)glyphs[i];
                 glyphs[i] = s;
 		        return old;
