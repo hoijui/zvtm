@@ -17,6 +17,7 @@ import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.VCursor;
 import fr.inria.zvtm.engine.portals.Portal;
 import fr.inria.zvtm.event.PortalListener;
+import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.ClosedShape;
 import fr.inria.zvtm.glyphs.VText;
@@ -95,7 +96,7 @@ public abstract class BaseEventHandler implements PortalListener {
 		draggingZoomWindowContent = false;
 	}
 	
-	public void pressInEditMode(Glyph g, VCursor c, Camera cam){
+	public void pressInEditMode(Glyph g, VCursor c, Camera cam, int mod){
         if (g != null){
     	    if (g.getType() != null && g.getType().equals(GeometryEditor.SPLINE_GEOM_EDITOR)){
     	        // moving edge control point
@@ -105,7 +106,7 @@ public abstract class BaseEventHandler implements PortalListener {
             }
         }
         // might be attempting to edit an edge
-        if (attemptEditEdge(c, cam)){}
+        if (attemptEditEdge(c, cam, mod)){}
         else {
             if (g != null){
                 // moving something else
@@ -127,7 +128,7 @@ public abstract class BaseEventHandler implements PortalListener {
                 }
                 else {
                     // might be attempting to edit an edge
-                    attemptEditEdge(c, cam);
+                    attemptEditEdge(c, cam, mod);
                 }
     	    }
             else {
@@ -136,12 +137,12 @@ public abstract class BaseEventHandler implements PortalListener {
         }
 	}
 	
-	public boolean attemptEditEdge(VCursor c, Camera cam){
+	public boolean attemptEditEdge(VCursor c, Camera cam, int mod){
 	    Vector<Glyph> otherGlyphs = c.getPicker().getIntersectingGlyphs(cam);
 		if (otherGlyphs != null && otherGlyphs.size() > 0){
 		    for (Glyph eg:otherGlyphs){
 		        // if clicking on an edge glyph, except its label (clicking on label should move the label)
-		        if (eg.getOwner() != null && eg.getOwner() instanceof LEdge && !(eg instanceof VText)){
+		        if (eg.getOwner() != null && eg.getOwner() instanceof LEdge && (!(eg instanceof VText) || mod == ViewListener.SHIFT_MOD)){
                     grMngr.geom.clearSplineEditingGlyphs();
 		            grMngr.geom.editEdgeSpline((LEdge)eg.getOwner());
 		            return true;

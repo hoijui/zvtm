@@ -71,7 +71,7 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewListener {
 			//grMngr.attemptLinkSliding(LS_SX, LS_SY, location.x, location.y);
 		}
 		else if (grMngr.tp.isEditMode()){
-            pressInEditMode(g, v.getVCursor(), grMngr.mainCamera);
+            pressInEditMode(g, v.getVCursor(), grMngr.mainCamera, mod);
 		}
 		else {
 			grMngr.rememberLocation(v.cams[0].getLocation());
