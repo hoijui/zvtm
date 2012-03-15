@@ -364,7 +364,7 @@ public abstract class Glyph implements Cloneable, Translucent {
 	return this.color;
     }
 
-     /** Get the glyph's current main color.
+     /** Get the glyph's default main color.
      * This might be different from the current main color depending on the Glyph's current status.
      * This is the fill color for closed shapes, or stroke color for other glyphs (text, paths, segments, etc.).
      *@see #getColor()

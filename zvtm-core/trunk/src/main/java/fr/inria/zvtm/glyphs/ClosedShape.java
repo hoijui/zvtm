@@ -143,7 +143,7 @@ public abstract class ClosedShape extends Glyph {
     }
 
     /** Get the glyph's current border color (use getColor for text, paths, segments, etc.).
-     * This might be different from the default border color depending on the Glyph's current status.
+     * This might be different from the current border color depending on the Glyph's current status.
      *@see #getDefaultBorderColor()
      */
     public Color getBorderColor(){
