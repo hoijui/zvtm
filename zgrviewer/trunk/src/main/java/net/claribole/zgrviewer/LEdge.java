@@ -203,6 +203,16 @@ public class LEdge extends LElem {
 		}
 		return null;	    
 	}
+	
+	public Glyph[] getUnknownGlyphs(){
+	    Vector<Glyph> res = new Vector(1);
+	    for (int i=0;i<glyphs.length;i++){
+	        if (glyphCat[i] == GLYPH_UNKNOWN){
+	            res.add(glyphs[i]);
+	        }
+        }
+        return res.toArray(new Glyph[res.size()]);
+	}
     
     public boolean hasTailAndHeadGlyphs(){
         int countH = 0;

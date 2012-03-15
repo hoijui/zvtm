@@ -51,7 +51,7 @@ public class GeometryEditor {
                 e.replaceHead(newHead);
                 newHead.setType(head.getType());
                 grMngr.mSpace.removeGlyph(head, false);
-                grMngr.mSpace.addGlyph(newHead, true);
+                grMngr.mSpace.addGlyph(newHead, false);
                 head = newHead;
             }
             // else consider that the glyph is already reorientable (should work in most - if not all - cases)
@@ -68,11 +68,16 @@ public class GeometryEditor {
                 e.replaceTail(newTail);
                 newTail.setType(tail.getType());
                 grMngr.mSpace.removeGlyph(tail, false);
-                grMngr.mSpace.addGlyph(newTail, true);
+                grMngr.mSpace.addGlyph(newTail, false);
                 tail = newTail;
             }
             // else consider that the glyph is already reorientable (should work in most - if not all - cases)
             tailOrient = tail.getOrient();
+        }
+        if (tail != null || head != null){
+            for (Glyph g:e.getUnknownGlyphs()){
+                if (g instanceof VSegment){grMngr.mSpace.removeGlyph(g, false);}
+            }
         }
         // show glyphs for editing control points
         currentEditPointGlyphs = new SICircle[currentEditPoints.length];
