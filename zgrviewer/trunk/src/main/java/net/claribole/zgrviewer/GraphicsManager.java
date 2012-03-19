@@ -1085,6 +1085,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 
     Vector highlightedEdges = new Vector();
     Vector originalEdgeColor = new Vector();
+    Vector originalEdgeBorderColor = new Vector();
     Vector originalEdgeStroke = new Vector();
     
     Vector highlightedNodes = new Vector();
@@ -1226,6 +1227,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         originalEdgeColor.add(g.getDefaultColor());
         originalEdgeStroke.add(g.getStroke());
         if (g instanceof ClosedShape){
+            originalEdgeBorderColor.add(((ClosedShape)g).getDefaultBorderColor());
             if (g.isFilled()){
                 // use border color to fill arrow head shape
                 g.setColor(ConfigManager.HIGHLIGHT_COLOR);
@@ -1235,6 +1237,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
             }
         }
         else {
+            originalEdgeBorderColor.add(Color.BLACK);
             g.setColor(ConfigManager.HIGHLIGHT_COLOR);	    
         }
         g.setStroke(HIGHLIGHT_STROKE);
@@ -1274,7 +1277,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
                     g.setColor((Color)originalEdgeColor.elementAt(i));
                 }
                 if (g.isBorderDrawn()){
-                    g.setBorderColor((Color)originalEdgeColor.elementAt(i));
+                    g.setBorderColor((Color)originalEdgeBorderColor.elementAt(i));
                 }
             }
             else {
@@ -1284,6 +1287,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         }
         highlightedEdges.removeAllElements();
         originalEdgeColor.removeAllElements();
+        originalEdgeBorderColor.removeAllElements();
         originalEdgeStroke.removeAllElements();
     }
 
