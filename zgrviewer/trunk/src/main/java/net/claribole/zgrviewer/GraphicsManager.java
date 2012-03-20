@@ -1331,7 +1331,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 		// compute layout of brought nodes
 		double thisEndBoundingCircleRadius = thisEndShape.getSize();
 		// distance between two rings
-        double RING_STEP = 3 * thisEndBoundingCircleRadius;
+        double RING_STEP = 2 * thisEndBoundingCircleRadius;
         LEdge[] arcs = n.getAllArcs();
         // sort them according to distance from start node
         // (so as to try to keep the closest ones closer to the start node)
@@ -1379,6 +1379,10 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	
 	void endBringAndGo(Glyph g){
         isBringingAndGoing = false;
+        if (elementsToFade == null){
+            // there is nothing to end, actually
+            return;
+        }
         // new camera location (if g != null)
         Point2D.Double newCameraLocation = null;
         if (!broughtElements.isEmpty()){
