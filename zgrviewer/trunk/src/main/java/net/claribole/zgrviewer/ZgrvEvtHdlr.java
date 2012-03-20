@@ -143,7 +143,7 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
 			if (v.lastGlyphEntered() != null){grMngr.tp.selectMode((VImage)v.lastGlyphEntered());}
 		}
 		else {
-			if (grMngr.tp.isBringAndGoMode()){return;}
+			if (grMngr.tp.isBringAndGoMode() || grMngr.tp.isLinkSlidingMode()){return;}
 			if (grMngr.tp.isFadingLensNavMode() || grMngr.tp.isProbingLensNavMode()){
 				lastJPX = jpx;
 				lastJPY = jpy;

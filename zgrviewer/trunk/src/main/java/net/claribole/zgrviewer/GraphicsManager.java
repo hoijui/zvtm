@@ -1634,6 +1634,12 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	}
 	
 	public void linkSlider(double vx, double vy, boolean centerCursor){
+	    if (lscs == null){
+	        // endLinkSliding might have been called before the call to
+	        // linkSlider(...) gets fired by the animation at the end of startLinkSliding,
+	        // e.g., when clicking in LinkSliding mode
+	        return;
+	    }
         boolean withinSelectionRadius = mainView.getCursor().getPicker().isPicked(selectionRadius);
 		mPos.setLocation(vx, vy);
 		lscs[lsci].updateMousePosition(mPos);
