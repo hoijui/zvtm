@@ -53,7 +53,7 @@ CMD_LINE_HELP = "ZUIST Image Tiling Script\n\nUsage:\n\n" + \
     "Options:\n\n"+\
     "\t-cg\t\tprocessing pipeline: CoreGraphics (Mac only)\n"+\
     "\t-im\t\tprocessing pipeline: PIL and ImageMagick (default)\n"+\
-    "\t-gm\t\tprocessing pipeline: GraphcisMagick (default)\n"+\
+    "\t-gm\t\tprocessing pipeline: GraphcisMagick\n"+\
     "\t-ts=N\t\ttile size (N in pixels)\n"+\
     "\t-f\t\tforce tile generation\n"+\
     "\t-tl=N\t\ttrace level (N in [0:3])\n"+\
@@ -66,7 +66,6 @@ CMD_LINE_HELP = "ZUIST Image Tiling Script\n\nUsage:\n\n" + \
 TRACE_LEVEL = 1
 
 FORCE_GENERATE_TILES = False
-USE_CG = False
 
 TILE_SIZE = 500
 
@@ -95,6 +94,7 @@ PDF_SCALE_FACTOR = 5
 
 COLOR_SPACE = None
 
+USE_CG = False
 USE_GRAPHICSMAGICK = False
 
 ################################################################################
@@ -320,7 +320,6 @@ if len(sys.argv) > 2:
                 log("Force tile generation")
             elif arg == "-gm":
                 USE_GRAPHICSMAGICK = True
-                log("Use GraphicsMagick")
             elif arg.startswith("-tl="):
                 TRACE_LEVEL = int(arg[4:])
             elif arg == "-cg":
@@ -351,6 +350,8 @@ else:
 
 if USE_CG:
     log("--------------------\nUsing Core Graphics")
+elif USE_GRAPHICSMAGICK:
+    log("--------------------\nUsing GraphicsMagick")
 else:
     log("--------------------\nUsing PIL + ImageMagick")
 log("Tile Size: %dx%d" % (TILE_SIZE, TILE_SIZE), 1)
