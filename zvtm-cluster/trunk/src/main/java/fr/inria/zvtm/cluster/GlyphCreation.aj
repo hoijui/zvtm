@@ -397,6 +397,7 @@ public aspect GlyphCreation {
             MultilineText retval =  new MultilineText(text);
             retval.setWidthConstraint(widthConstraint);
             retval.setHeightConstraint(heightConstraint);
+            retval.setScale(scaleFactor);
             return retval;
         }
     }
