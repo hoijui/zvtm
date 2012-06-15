@@ -7,6 +7,7 @@
 package fr.inria.zvtm.cluster;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Paint;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
@@ -370,16 +371,20 @@ public aspect GlyphCreation {
 		protected final String text;
 		protected final float scaleFactor;
 		protected final short textAnchor;
+    protected final Font font;
 
 		VTextReplicator(VText source){
 			super(source);
 			this.text = source.getText();
 			this.scaleFactor = source.getScale();
 			this.textAnchor = source.getTextAnchor();
+      this.font = source.getFont();
 		}
 
 		public Glyph doCreateGlyph(){
-			return new VText(0d,0d,0,Color.BLACK,text,textAnchor,scaleFactor);
+			VText retval = new VText(0d,0d,0,Color.BLACK,text,textAnchor,scaleFactor);
+      retval.setFont(this.font);
+      return retval;
 		}
 	}
 
@@ -398,6 +403,9 @@ public aspect GlyphCreation {
             retval.setWidthConstraint(widthConstraint);
             retval.setHeightConstraint(heightConstraint);
             retval.setScale(scaleFactor);
+            //TODO having to call again setFont for VTextReplicator-derived
+            //classes is not advisable. Fix?
+            retval.setFont(font);
             return retval;
         }
     }
@@ -408,7 +416,9 @@ public aspect GlyphCreation {
         }
 
         @Override public Glyph doCreateGlyph(){
-            return new VTextOr(0d,0d,0,Color.BLACK,text,0f,textAnchor,scaleFactor);
+            VTextOr retval = new VTextOr(0d,0d,0,Color.BLACK,text,0f,textAnchor,scaleFactor);
+            retval.setFont(font);
+            return retval;
         }
     }
 

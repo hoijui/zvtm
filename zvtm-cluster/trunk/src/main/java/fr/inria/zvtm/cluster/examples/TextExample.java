@@ -70,9 +70,9 @@ public class TextExample {
         view.setListener(new PanZoomEventHandler());
 
         VTextOr hi = new VTextOr(0,0,0,Color.GREEN,"Hello Clustered ZVTM", 0f);
+        hi.setFont(new Font("Serif", Font.PLAIN, 20));
         hi.orientTo((float)Math.PI / 4f);
         vs.addGlyph(hi, false);	
-        hi.setFont(new Font("Serif", Font.PLAIN, 20));
 
         MultilineText quote = new MultilineText("In many of the more relaxed civilizations on the Outer Eastern Rim of the Galaxy, the 'Hitchiker's Guide' has already supplanted the great 'Encyclopedia Galactica' as the standard repository of all knowledge and wisdom, for though it has many omissions and contains much that is apocryphal, or at least wildly inaccurate, it scores over the older, more pedestrian work in two important respects. First, it is slightly cheaper; and second, it has the words 'DON'T PANIC' inscribed in large friendly letters on its cover.");
         quote.setFont(new Font("Serif", Font.PLAIN, 11));
