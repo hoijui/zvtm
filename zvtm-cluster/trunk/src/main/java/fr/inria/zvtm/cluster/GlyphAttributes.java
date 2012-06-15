@@ -23,7 +23,7 @@ class GlyphAttributes implements Serializable {
 	private final boolean sensitive;
 	private final boolean visible;
 	private final float translucency;
-    private final Stroke stroke;
+  private final Stroke stroke;
 
 	private GlyphAttributes(double x, double y, 
             int z,
@@ -42,11 +42,7 @@ class GlyphAttributes implements Serializable {
 		this.sensitive = sensitive;
 		this.visible = visible;
 		this.translucency = translucency;
-        if(stroke != null && stroke instanceof Serializable){
-            this.stroke = stroke;
-        } else {
-            this.stroke = null;
-        }
+    this.stroke = Strokes.wrapStroke(stroke);
 	}
 
 	static GlyphAttributes fromGlyph(Glyph glyph){
@@ -70,7 +66,7 @@ class GlyphAttributes implements Serializable {
 		target.setSensitivity(sensitive);
 		target.setVisible(visible);
 		target.setTranslucencyValue(translucency);
-        target.setStroke(stroke);
+    target.setStroke(stroke);
 	}
 }
 

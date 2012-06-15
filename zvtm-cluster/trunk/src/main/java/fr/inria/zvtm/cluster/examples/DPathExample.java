@@ -74,13 +74,13 @@ public class DPathExample {
         path.addSegment(100,200,true);
         path.addSegment(200,0,true);
         path.addSegment(0,0,true);
-        vs.addGlyph(path, false);	
-        path.setStroke(new ClusteredStroke(3,
+        path.setStroke(new BasicStroke(3,
                 BasicStroke.CAP_ROUND,
                 BasicStroke.JOIN_BEVEL,
                 1,
                 new float[]{10, 4},
                 0));
+        vs.addGlyph(path, false);	
         path.moveTo(100,200);
         System.out.println("path position: (" + path.vx + ", " + path.vy + ")");
         path.moveTo(100,-200);
