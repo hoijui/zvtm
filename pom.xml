@@ -49,7 +49,7 @@ $Id$
     <module>zvtm-pdf/trunk</module>
     <module>zuist-engine/trunk</module>
     <module>zuist-pdf/trunk</module>
-    <module>zvtm-fits/trunk</module>
+    <!-- <module>zvtm-fits/trunk</module> -->
     <module>zvtm-cluster/trunk</module>
     <module>zvtm-layout/trunk</module>
   </modules>
