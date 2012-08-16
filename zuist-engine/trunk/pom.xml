@@ -41,7 +41,6 @@ $Id$
       <url>http://repo1.maven.org/maven2</url>
     </repository>
 	<repository>
-        <!-- JOGL and Gluegen jar files from http://jogamp.org/deployment/v2.0-rc5/jar/ are available in the (maven) repository below -->
         <id>agile2d.sf.net</id>
         <url>http://agile2d.sourceforge.net/maven</url>
     </repository>
