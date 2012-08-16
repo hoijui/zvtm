@@ -103,7 +103,7 @@ $Id: pom.xml 2405 2009-09-25 09:07:33Z epietrig $
 	<dependency>
       <groupId>agile2d</groupId>
       <artifactId>agile2d</artifactId>
-      <version>[3.0.1,)</version>
+      <version>[3.0.2-SNAPSHOT,)</version>
   	</dependency>
   </dependencies>
 
