@@ -45,6 +45,10 @@ $Id$
         <id>agile2d.sf.net</id>
         <url>http://agile2d.sourceforge.net/maven</url>
     </repository>
+	<repository>
+        <id>jogamp.org</id>
+        <url>http://jogamp.org/deployment/maven</url>
+    </repository>
   </repositories>
   
   <!-- Distribution - Deploy to FTP -->
@@ -62,31 +66,31 @@ $Id$
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
-        <build.type>macosx-universal</build.type>
+        <build.type>natives-macosx-universal</build.type>
       </properties>
     </profile>
     <profile>
       <id>lin32</id>
       <properties>
-        <build.type>linux-i586</build.type>
+        <build.type>natives-linux-i586</build.type>
       </properties>
     </profile>
     <profile>
       <id>lin64</id>
       <properties>
-        <build.type>linux-amd64</build.type>
+        <build.type>natives-linux-amd64</build.type>
       </properties>
     </profile>
     <profile>
       <id>win32</id>
       <properties>
-        <build.type>windows-i586</build.type>
+        <build.type>natives-windows-i586</build.type>
       </properties>
     </profile>
     <profile>
       <id>win64</id>
       <properties>
-        <build.type>windows-amd64</build.type>
+        <build.type>natives-windows-amd64</build.type>
       </properties>
     </profile>
   </profiles>
@@ -147,8 +151,8 @@ $Id$
 		        <artifactItems>
 					<artifactItem>
 					  <groupId>org.jogamp.jogl</groupId>
-					  <artifactId>jogl-all-natives</artifactId>
-					  <version>v2.0-rc5b623</version>
+					  <artifactId>jogl-all</artifactId>
+					  <version>2.0-rc9</version>
 		 			  <classifier>${build.type}</classifier>
 					  <type>jar</type>
 					  <includes>*.jnilib,*.lib,*.so,*.dll</includes>
@@ -157,8 +161,8 @@ $Id$
 					</artifactItem>
 					<artifactItem>
 					  <groupId>org.jogamp.gluegen</groupId>
-					  <artifactId>gluegen-rt-natives</artifactId>
-					  <version>v2.0-rc5b623</version>
+					  <artifactId>gluegen-rt</artifactId>
+					  <version>2.0-rc9</version>
 		 			  <classifier>${build.type}</classifier>
 					  <type>jar</type>
 		              <includes>*.jnilib,*.lib,*.so,*.dll</includes>
