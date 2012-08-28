@@ -120,6 +120,13 @@ public class DPath extends Glyph implements RectangularShape {
      */
     public DPath(PathIterator pi, int z, Color c, float alpha){
 		vz = z;
+		setPath(pi);
+		sensit = true;
+		setColor(c);
+		setTranslucencyValue(alpha);
+    }
+
+	public void setPath(PathIterator pi){
 		double[] cds = new double[6];
 		// if first instruction is a jump, make it the start point
 		if (pi.currentSegment(cds) == PathIterator.SEG_MOVETO){
@@ -158,12 +165,8 @@ public class DPath extends Glyph implements RectangularShape {
 			}
 			pi.next();
 	    }
-		computeBounds();
-		updateJava2DGeneralPath();
-		sensit = true;
-		setColor(c);
-		setTranslucencyValue(alpha);
-    }
+	}
+
 
 	/** Add a new cubic curve to the path, from current point to point (x,y), controlled by (x1,y1)
 		*@param x x coordinate of end point in virtual space
