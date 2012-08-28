@@ -202,6 +202,10 @@ public class VirtualSpace {
 	    return visualEnts;
     }
 
+	public boolean containsGlyph(Glyph g){
+		return visualEnts.contains(g);
+	}
+
     /** Get all visible glyphs (not cloned).
      *@see #getVisibleGlyphsList()
      */
