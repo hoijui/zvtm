@@ -202,7 +202,9 @@ public class VirtualSpace {
 	    return visualEnts;
     }
 
-	public boolean containsGlyph(Glyph g){
+    /** Tests whether a glyph belongs to this virtual space or not.
+     */
+	public boolean contains(Glyph g){
 		return visualEnts.contains(g);
 	}
 
