@@ -143,6 +143,12 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewListener {
         if (toolPaletteIsActive){
             if (v.lastGlyphEntered() != null){grMngr.tp.selectMode((VImage)v.lastGlyphEntered());}
         }
+        else if (mod == META_MOD){
+            if (grMngr.tp.isHighlightMode() && v.getGlyphsUnderCursorList().length>0){
+                Glyph g = v.lastGlyphEntered();
+                grMngr.highlightElement(g, v.cams[0], v.getVCursor(), true, 0, true, -1);
+            }            
+        }
         else {
             if (grMngr.tp.isBringAndGoMode() || grMngr.tp.isLinkSlidingMode()){return;}
             if (grMngr.tp.isFadingLensNavMode() || grMngr.tp.isProbingLensNavMode()){
@@ -215,10 +221,6 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewListener {
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
         if (toolPaletteIsActive){return;}
-        else if (grMngr.tp.isHighlightMode() && v.getGlyphsUnderCursorList().length>0){
-            Glyph g = v.lastGlyphEntered();
-            grMngr.highlightElement(g, v.cams[0], v.getVCursor(), true, 0, true, -1);
-        }
         else {
             if (grMngr.tp.isFadingLensNavMode() || grMngr.tp.isProbingLensNavMode()){
                 lastJPX = jpx;
