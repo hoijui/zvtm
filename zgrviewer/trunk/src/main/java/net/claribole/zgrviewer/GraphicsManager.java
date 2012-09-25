@@ -849,18 +849,22 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 
     /*Java2DPainter interface*/
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
-	if (paintLinks){
-	    double coef = mainCamera.focal/(mainCamera.focal+mainCamera.altitude);
-	    int magWindowX = (int)Math.round((viewWidth/2) + (magWindow.vx-mainCamera.vx)*coef);
-	    int magWindowY = (int)Math.round((viewHeight/2) - (magWindow.vy-mainCamera.vy)*coef);
-	    int magWindowW = (int)Math.round(magWindow.getWidth()*coef/2);
-	    int magWindowH = (int)Math.round(magWindow.getHeight()*coef/2);
-	    g2d.setColor(GraphicsManager.DM_COLOR);
-	    g2d.drawLine(magWindowX-magWindowW, magWindowY-magWindowH, dmPortal.x, dmPortal.y);
-	    g2d.drawLine(magWindowX+magWindowW, magWindowY-magWindowH, dmPortal.x+dmPortal.w, dmPortal.y);
-	    g2d.drawLine(magWindowX-magWindowW, magWindowY+magWindowH, dmPortal.x, dmPortal.y+dmPortal.h);
-	    g2d.drawLine(magWindowX+magWindowW, magWindowY+magWindowH, dmPortal.x+dmPortal.w, dmPortal.y+dmPortal.h);
-	}
+    	if (paintLinks){
+    	    double coef = mainCamera.focal/(mainCamera.focal+mainCamera.altitude);
+    	    int magWindowX = (int)Math.round((viewWidth/2) + (magWindow.vx-mainCamera.vx)*coef);
+    	    int magWindowY = (int)Math.round((viewHeight/2) - (magWindow.vy-mainCamera.vy)*coef);
+    	    int magWindowW = (int)Math.round(magWindow.getWidth()*coef/2);
+    	    int magWindowH = (int)Math.round(magWindow.getHeight()*coef/2);
+    	    g2d.setColor(GraphicsManager.DM_COLOR);
+    	    g2d.drawLine(magWindowX-magWindowW, magWindowY-magWindowH, dmPortal.x, dmPortal.y);
+    	    g2d.drawLine(magWindowX+magWindowW, magWindowY-magWindowH, dmPortal.x+dmPortal.w, dmPortal.y);
+    	    g2d.drawLine(magWindowX-magWindowW, magWindowY+magWindowH, dmPortal.x, dmPortal.y+dmPortal.h);
+    	    g2d.drawLine(magWindowX+magWindowW, magWindowY+magWindowH, dmPortal.x+dmPortal.w, dmPortal.y+dmPortal.h);
+    	}
+        g2d.setFont(ConfigManager.SMALL_FONT);
+        if (tp.isHighlightMode()){
+            g2d.drawString("HL = " + highlightLevel, viewWidth-50, 20);
+        }
     }
 
     /* ---------- search -----------*/
@@ -1843,7 +1847,7 @@ class ZGRGlassPane extends JComponent {
         g2.setColor(MSG_COLOR);
         g2.drawRect(prX, prY, BAR_WIDTH, BAR_HEIGHT);
     }
-    
+
 }
 
 class ZP2LensAction implements EndAction {

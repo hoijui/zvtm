@@ -45,6 +45,7 @@ public class ConfigManager {
     static int rdH = 200;
 
     static Font defaultFont = new Font("Dialog", 0, 12);
+    static Font SMALL_FONT = new Font("Dialog", 0, 10);
 
     static final String _BLANK = "_blank";
     static final String _SELF = "_self";
