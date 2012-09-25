@@ -36,6 +36,9 @@ import javax.swing.JMenuBar;
 import javax.swing.SwingUtilities;
 import java.awt.event.ComponentListener;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Vector;
 import java.util.Arrays;
@@ -1093,7 +1096,24 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     Vector originalNodeFillColor = new Vector();
     Vector originalNodeStroke = new Vector();
 
-    public void highlightElement(Glyph g, Camera cam, VCursor cursor, boolean highlight){
+    // currently selected level of highlighting neighboring nodes
+    int highlightLevel;
+    // currently selected direction of highlighting neighboring -1/UNDIRECTED/INCOMING/OUTGOING
+    int highlightDir;
+    // keep already highlighted nodes. This is for performance
+    HashMap highlightNodesDone = new HashMap(1000);  
+     // timeout for overly deep highlighting in seconds
+    final int highlightTimeStampTimeout = 5; 
+    Calendar highlightTimeStamp = Calendar.getInstance();
+    // nodes fixated for highlighting 
+    Vector highlightNodes = new Vector();
+    // number of levels for the fixated node at according pos of highlightNodes
+    Vector highlightLevels = new Vector();
+    // direction of highlighting for the fixated node at according pos of highlightNodes
+    Vector highlightDirections = new Vector();
+
+    
+    public void highlightElement(Glyph g, Camera cam, VCursor cursor, boolean highlight, int moreLess, boolean fixNode, int dir){
         Object o = null;
         if (g != null && g != boundingBox){
             // clicked inside a node
@@ -1113,8 +1133,32 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
             }
         }
         if (o != null){
+            if (fixNode) {
+                int indexNode = highlightNodes.indexOf((LNode) o);
+                if (indexNode >= 0) {
+                        highlightNodes.remove(indexNode);
+                        highlightLevels.remove(indexNode);
+                        highlightDirections.remove(indexNode);
+                        unhighlightAll();
+                } else {
+                        highlightNodes.add((LNode) o);
+                        highlightLevels.add(new Integer(highlightLevel));
+                        highlightDirections.add(new Integer(highlightDir));
+                }
+                return;
+            } else {
+                if (moreLess == 0) {
+                        highlightLevel = 1;
+                        highlightDir = -1;
+                } else {
+                        highlightLevel = Math.max(highlightLevel + moreLess, 0);
+                        highlightDir = dir;
+                }
+            }
+            unhighlightAll();
+
             if (o instanceof LNode){
-                highlightNode((LNode)o, highlight);
+                highlightNodeInOut((LNode)o, highlight, highlightLevel, dir);
             }
             else if (o instanceof LEdge){
                 highlightEdge((LEdge)o, highlight);
@@ -1122,8 +1166,43 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         }
     }
 
-    synchronized void highlightNode(LNode n, boolean highlight){
-	if (highlight){
+    public void highlightPermanent() {
+        for (int indexNode = 0; indexNode < highlightNodes.size(); indexNode++) {
+            LNode n = (LNode) highlightNodes.get(indexNode);
+            Integer level = (Integer) highlightLevels.get(indexNode);
+            Integer dir = (Integer) highlightDirections.get(indexNode);
+            highlightNodeInOut(n, true, level.intValue(), dir.intValue());
+         }
+     }
+
+     synchronized void highlightNodeInOut(LNode n, boolean highlight, int highlightLevel, int dir) {
+         highlightNodesDone.clear();
+         highlightTimeStamp = Calendar.getInstance();
+         highlightTimeStamp.add(Calendar.SECOND, highlightTimeStampTimeout);
+         if (dir == LEdge.UNDIRECTED) { 
+        	 highlightNode(n, highlight, LEdge.UNDIRECTED, highlightLevel);
+         } else {
+             if (dir != LEdge.OUTGOING) highlightNode(n, highlight, LEdge.INCOMING, highlightLevel);
+                 highlightNodesDone.clear();
+                 highlightTimeStamp = Calendar.getInstance();
+                 highlightTimeStamp.add(Calendar.SECOND, highlightTimeStampTimeout);
+                 if (dir != LEdge.INCOMING) {
+                	 highlightNode(n, highlight, LEdge.OUTGOING, highlightLevel);
+                 }
+         }
+     }
+
+    synchronized void highlightNode(LNode n, boolean highlight, short dir, int levelCnt){
+    if (highlight){
+        if (Calendar.getInstance().after(highlightTimeStamp)) {
+            unhighlightAll();
+            return;
+        }
+        Integer nodeLevel = ((Integer) highlightNodesDone.get(n));
+        if (nodeLevel != null && nodeLevel.intValue()>=levelCnt) {
+              return;
+        }
+        highlightNodesDone.put(n, new Integer(levelCnt));
 	    Glyph g;
 	    Glyph[] gs;
 	    // highlight node itself
@@ -1133,9 +1212,13 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 		highlightedNodes.add(g);
 		highlightNodeGlyph(g);
 	    }
+	    if (levelCnt <=0) {return;}
 	    // for all edges linked to this node
 	    for (int i=0;i<n.edges.length;i++){
 		// highlight edge itself
+		if (dir != LEdge.UNDIRECTED && dir != n.edgeDirections[i] && n.edges[i].isDirected()) {
+			continue;
+		}
 		for (int j=0;j<n.edges[i].glyphs.length;j++){
 		    g = n.edges[i].glyphs[j];
 		    /* prevent elements from being processed more than once
@@ -1147,18 +1230,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 		    highlightEdgeGlyph(g);
 		}
 		// highlight node at other end of arc
-		// (can't rely on edge direction as edges might be undirected)
-		gs = (n.edges[i].tail == n) ? n.edges[i].head.glyphs : n.edges[i].tail.glyphs;
-		for (int j=0;j<gs.length;j++){
-		    g = gs[j];
-		    /* prevent elements from being processed more than once
-		       this can happen when a node links to itself, and
-		       this makes the highlighting mechanism think that
-		       the arc's original color is the selection color */
-		    if (highlightedNodes.contains(g)){continue;}
-		    highlightedNodes.add(g);
-		    highlightNodeGlyph(g);
-		}
+		highlightNode(n.edges[i].getOtherEnd(n), highlight, dir, levelCnt-1);
 	    }
 	}
 	else {
@@ -1246,6 +1318,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     public void unhighlightAll(){
         unhighlightAllEdges();
         unhighlightAllNodes();
+        highlightPermanent();
     }
 
     void unhighlightAllNodes(){

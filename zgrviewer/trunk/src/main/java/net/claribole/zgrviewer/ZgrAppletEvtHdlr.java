@@ -172,7 +172,7 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewListener {
                 else {
                     Glyph g = v.lastGlyphEntered();
                     if (mod == SHIFT_MOD){
-                        grMngr.highlightElement(g, v.cams[0], v.getVCursor(), true);
+                        grMngr.highlightElement(g, v.cams[0], v.getVCursor(), true, 0, true, -1);
                     }
                     else {
                         if (g != null && g != grMngr.boundingBox){
@@ -191,7 +191,7 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewListener {
     public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
     public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-        if (toolPaletteIsActive){return;}
+    	if (toolPaletteIsActive){return;}
         Glyph g=v.lastGlyphEntered();
         if (g!=null && g != grMngr.boundingBox){
             if (g.getOwner()!=null){getAndDisplayURL((LElem)g.getOwner(), g);}
@@ -215,6 +215,10 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewListener {
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
         if (toolPaletteIsActive){return;}
+        else if (grMngr.tp.isHighlightMode() && v.getGlyphsUnderCursorList().length>0){
+            Glyph g = v.lastGlyphEntered();
+            grMngr.highlightElement(g, v.cams[0], v.getVCursor(), true, 0, true, -1);
+        }
         else {
             if (grMngr.tp.isFadingLensNavMode() || grMngr.tp.isProbingLensNavMode()){
                 lastJPX = jpx;
@@ -346,6 +350,14 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewListener {
             else {
                 grMngr.magnifyFocus(-GraphicsManager.WHEEL_MM_STEP, grMngr.lensType, grMngr.mainCamera);
             }
+        } 
+        else if (grMngr.tp.isHighlightMode() && v.getGlyphsUnderCursorList().length>0){
+            Glyph g = v.lastGlyphEntered();
+            int dir = -1;
+            if (e.isShiftDown()) dir = LEdge.INCOMING;
+            if (e.isControlDown()) dir = LEdge.OUTGOING;
+            if (e.isShiftDown() && e.isControlDown()) dir = LEdge.UNDIRECTED;
+            grMngr.highlightElement(g, null, null, true, (wheelDirection  == ViewListener.WHEEL_UP)?-1:1, false, dir); // g is guaranteed to be != null, don't care about camera and cursor
         }
         else if (inZoomWindow){
             tfactor = (grMngr.dmCamera.focal+Math.abs(grMngr.dmCamera.altitude))/grMngr.dmCamera.focal;
@@ -394,7 +406,7 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewListener {
 	        grMngr.mainView.setCursorIcon(Cursor.MOVE_CURSOR);
 	    }
         else if (grMngr.tp.isHighlightMode()){
-            grMngr.highlightElement(g, null, null, true); // g is guaranteed to be != null, don't care about camera and cursor
+            grMngr.highlightElement(g, null, null, true, 0, false, -1); // g is guaranteed to be != null, don't care about camera and cursor
         }
         else {
             // node highlighting is taken care of above (in a slightly different manner)
