@@ -43,6 +43,10 @@ import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.ListSelectionEvent;
+
 
 import fr.inria.zvtm.engine.SwingWorker;
 import fr.inria.zvtm.engine.Location;
@@ -709,20 +713,21 @@ public class ConfigManager {
 
     HashMap<String,Location> bookmarks = new HashMap(1);
 
-    public void bookmarkCurrentLocation(){
-    	String bkLabel = JOptionPane.showInputDialog(grMngr.mainView.getFrame(),
+    public void bookmarkCurrentLocation(BookmarksList bl){
+    	String bkLabel = JOptionPane.showInputDialog(bl,
     	                                             "Bookmark Label:",
     	                                             "Add bookmark",
     	                                             JOptionPane.PLAIN_MESSAGE);
     	if (bkLabel != null && bkLabel.length() > 0){
-	        bookmarks.put(bkLabel, grMngr.mainCamera.getLocation());    		
+	        bookmarks.put(bkLabel, grMngr.mainCamera.getLocation());
+	        bl.updateList();
     	}
     }
 
-    public void saveBookmarks(){
+    public void saveBookmarks(BookmarksList bl){
 		final JFileChooser fc = new JFileChooser(ConfigManager.m_LastExportDir!=null ? ConfigManager.m_LastExportDir : ConfigManager.m_PrjDir);
 		fc.setDialogTitle("Export SVG");
-		int returnVal = fc.showSaveDialog(grMngr.mainView.getFrame());
+		int returnVal = fc.showSaveDialog(bl);
 		if (returnVal == JFileChooser.APPROVE_OPTION) {
 			final SwingWorker worker=new SwingWorker(){
 				public Object construct(){
@@ -734,15 +739,15 @@ public class ConfigManager {
 		}    	
     }
 
-    void loadBookmarks(){
+    void loadBookmarks(final BookmarksList bl){
         final JFileChooser fc = new JFileChooser(ConfigManager.m_LastDir!=null ? ConfigManager.m_LastDir : ConfigManager.m_PrjDir);
         fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
         fc.setDialogTitle("Find DOT File");
-        int returnVal = fc.showOpenDialog(grMngr.mainView.getFrame());
+        int returnVal = fc.showOpenDialog(bl);
         if (returnVal == JFileChooser.APPROVE_OPTION) {
             final SwingWorker worker=new SwingWorker(){
                 public Object construct(){
-                	parseBookmarks(fc.getSelectedFile());
+                	parseBookmarks(fc.getSelectedFile(), bl);
                 	return null; 
                 }
             };
@@ -752,7 +757,7 @@ public class ConfigManager {
 
     static final String BK_SEP = "\t";
 
-    public void parseBookmarks(File f){
+    public void parseBookmarks(File f, BookmarksList bl){
 		try {
 	        FileInputStream fis = new FileInputStream(f);
 		    BufferedReader br = new BufferedReader(new InputStreamReader(fis, "UTF-8"));
@@ -767,6 +772,7 @@ public class ConfigManager {
 				line = br.readLine();
 		    }
 		    fis.close();
+		    bl.updateList();
 		}
 		catch (Exception ex){System.err.println("Error while parsing bookmarks");ex.printStackTrace();}
     }
@@ -793,7 +799,7 @@ public class ConfigManager {
 
 }
 
-class BookmarksList extends JFrame {
+class BookmarksList extends JFrame implements ListSelectionListener {
 
 	ConfigManager cm;
 
@@ -809,7 +815,9 @@ class BookmarksList extends JFrame {
 		c.setLayout(new BorderLayout());
 
 		bkList = new JList(cm.bookmarks.keySet().toArray());
+		bkList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		c.add(bkList, BorderLayout.CENTER);
+		bkList.addListSelectionListener(this);
 
 		JPanel btp = new JPanel();
 		btp.setLayout(new GridLayout(1, 3));
@@ -821,11 +829,15 @@ class BookmarksList extends JFrame {
 		btp.add(saveBt);
 		c.add(btp, BorderLayout.SOUTH);
 
-		ActionListener a0=new ActionListener(){
+		ActionListener a0 = new ActionListener(){
 			public void actionPerformed(ActionEvent e){
-				if (e.getSource() == addBt){cm.bookmarkCurrentLocation();}
-				else if (e.getSource() == loadBt){cm.loadBookmarks();}
-				else if (e.getSource() == saveBt){cm.saveBookmarks();}
+				if (e.getSource() == addBt){
+					cm.bookmarkCurrentLocation(BookmarksList.this);
+				}
+				else if (e.getSource() == loadBt){
+					cm.loadBookmarks(BookmarksList.this);
+				}
+				else if (e.getSource() == saveBt){cm.saveBookmarks(BookmarksList.this);}
 			}
 		};
 		addBt.addActionListener(a0);
@@ -842,6 +854,17 @@ class BookmarksList extends JFrame {
 		setSize(400,300);
 		setVisible(true);
 
+	}
+
+	void updateList(){
+		bkList.setListData(cm.bookmarks.keySet().toArray());
+		repaint();
+	}
+
+	public void	valueChanged(ListSelectionEvent e){
+		if (!e.getValueIsAdjusting()){
+			cm.grMngr.goTo((Location)cm.bookmarks.get(bkList.getSelectedValue()));
+		}
 	}
 
 }

@@ -532,15 +532,18 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 
     public void moveBack(){
         if (previousLocations.size()>0){
-            Vector animParams = Location.getDifference(mSpace.getCamera(0).getLocation(), (Location)previousLocations.lastElement());
-            Animation at = animator.getAnimationFactory().createCameraTranslation(ConfigManager.ANIM_MOVE_LENGTH, mSpace.getCamera(0),
-                (Point2D.Double)animParams.elementAt(1), true, SlowInSlowOutInterpolator.getInstance(), null);
-            Animation aa = animator.getAnimationFactory().createCameraAltAnim(ConfigManager.ANIM_MOVE_LENGTH, mSpace.getCamera(0),
-                (Double)animParams.elementAt(0), true, SlowInSlowOutInterpolator.getInstance(), null);
-            animator.startAnimation(at, false);
-            animator.startAnimation(aa, false);
-            previousLocations.removeElementAt(previousLocations.size()-1);
+            goTo((Location)previousLocations.lastElement());
         }
+    }
+
+    public void goTo(Location l){
+        Vector animParams = Location.getDifference(mSpace.getCamera(0).getLocation(), l);
+        Animation at = animator.getAnimationFactory().createCameraTranslation(ConfigManager.ANIM_MOVE_LENGTH, mSpace.getCamera(0),
+                (Point2D.Double)animParams.elementAt(1), true, SlowInSlowOutInterpolator.getInstance(), null);
+        Animation aa = animator.getAnimationFactory().createCameraAltAnim(ConfigManager.ANIM_MOVE_LENGTH, mSpace.getCamera(0),
+                (Double)animParams.elementAt(0), true, SlowInSlowOutInterpolator.getInstance(), null);
+        animator.startAnimation(at, false);
+        animator.startAnimation(aa, false);
     }
 
     /*show/hide radar view*/
