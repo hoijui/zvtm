@@ -10,18 +10,42 @@
 package net.claribole.zgrviewer;
 
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.BorderLayout;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStreamReader;
 import java.io.IOException;
-import java.net.URL;
+import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
-import java.util.Vector;
-import java.util.Enumeration;
-import java.util.Hashtable;
+import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.jar.JarFile;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
+import java.util.Vector;
+import javax.swing.JButton;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+
+import fr.inria.zvtm.engine.SwingWorker;
+import fr.inria.zvtm.engine.Location;
 
 import org.apache.xerces.dom.DOMImplementationImpl;
 import org.w3c.dom.DOMImplementation;
@@ -679,6 +703,145 @@ public class ConfigManager {
 			info.append("\n");
 		}
 		new TextViewer(info, Messages.ABOUT_PLUGINS, 0, 0, 0, 400, 300, false);
+	}
+
+	/* --------------------- Bookmarks ---------------------- */
+
+    HashMap<String,Location> bookmarks = new HashMap(1);
+
+    public void bookmarkCurrentLocation(){
+    	String bkLabel = JOptionPane.showInputDialog(grMngr.mainView.getFrame(),
+    	                                             "Bookmark Label:",
+    	                                             "Add bookmark",
+    	                                             JOptionPane.PLAIN_MESSAGE);
+    	if (bkLabel != null && bkLabel.length() > 0){
+	        bookmarks.put(bkLabel, grMngr.mainCamera.getLocation());    		
+    	}
+    }
+
+    public void saveBookmarks(){
+		final JFileChooser fc = new JFileChooser(ConfigManager.m_LastExportDir!=null ? ConfigManager.m_LastExportDir : ConfigManager.m_PrjDir);
+		fc.setDialogTitle("Export SVG");
+		int returnVal = fc.showSaveDialog(grMngr.mainView.getFrame());
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
+			final SwingWorker worker=new SwingWorker(){
+				public Object construct(){
+					serializeBookmarks(fc.getSelectedFile());
+					return null;
+				}
+			};
+			worker.start();
+		}    	
+    }
+
+    void loadBookmarks(){
+        final JFileChooser fc = new JFileChooser(ConfigManager.m_LastDir!=null ? ConfigManager.m_LastDir : ConfigManager.m_PrjDir);
+        fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        fc.setDialogTitle("Find DOT File");
+        int returnVal = fc.showOpenDialog(grMngr.mainView.getFrame());
+        if (returnVal == JFileChooser.APPROVE_OPTION) {
+            final SwingWorker worker=new SwingWorker(){
+                public Object construct(){
+                	parseBookmarks(fc.getSelectedFile());
+                	return null; 
+                }
+            };
+            worker.start();
+        }
+    }
+
+    static final String BK_SEP = "\t";
+
+    public void parseBookmarks(File f){
+		try {
+	        FileInputStream fis = new FileInputStream(f);
+		    BufferedReader br = new BufferedReader(new InputStreamReader(fis, "UTF-8"));
+		    String line = br.readLine();
+		    while (line != null){
+				if (line.length() > 0){
+				    String[] bk = line.split(BK_SEP);
+				    bookmarks.put(bk[0], new Location(Double.parseDouble(bk[1]),
+				    	                              Double.parseDouble(bk[2]),
+				    	                              Double.parseDouble(bk[3])));					
+				}
+				line = br.readLine();
+		    }
+		    fis.close();
+		}
+		catch (Exception ex){System.err.println("Error while parsing bookmarks");ex.printStackTrace();}
+    }
+
+    public void serializeBookmarks(File f){
+		try {
+		   	BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(f), "UTF-8"));
+	    	for (String label:bookmarks.keySet()){
+				Location l = bookmarks.get(label);
+				bw.write(label + BK_SEP +
+					     String.valueOf(l.getX()) + BK_SEP +
+					     String.valueOf(l.getY()) + BK_SEP +
+					     String.valueOf(l.getAltitude()));
+			    bw.newLine();
+	    	}
+		    bw.flush();
+		}
+		catch (Exception ex){System.err.println("Error while saving bookmarks");ex.printStackTrace();}
+    }
+
+    public void showBookmarks(){
+    	new BookmarksList(this);
+    }
+
+}
+
+class BookmarksList extends JFrame {
+
+	ConfigManager cm;
+
+	JList bkList;
+	JButton loadBt, saveBt, addBt;
+
+	BookmarksList(ConfigManager cfm){
+		super("Bookmark List");
+		this.cm = cfm;
+
+		Container c = this.getContentPane();
+
+		c.setLayout(new BorderLayout());
+
+		bkList = new JList(cm.bookmarks.keySet().toArray());
+		c.add(bkList, BorderLayout.CENTER);
+
+		JPanel btp = new JPanel();
+		btp.setLayout(new GridLayout(1, 3));
+		addBt = new JButton("Add...");
+		btp.add(addBt);
+		loadBt = new JButton("Load...");
+		btp.add(loadBt);
+		saveBt = new JButton("Save...");
+		btp.add(saveBt);
+		c.add(btp, BorderLayout.SOUTH);
+
+		ActionListener a0=new ActionListener(){
+			public void actionPerformed(ActionEvent e){
+				if (e.getSource() == addBt){cm.bookmarkCurrentLocation();}
+				else if (e.getSource() == loadBt){cm.loadBookmarks();}
+				else if (e.getSource() == saveBt){cm.saveBookmarks();}
+			}
+		};
+		addBt.addActionListener(a0);
+		loadBt.addActionListener(a0);
+		saveBt.addActionListener(a0);
+
+		WindowListener w0 = new WindowAdapter(){
+			public void windowClosing(WindowEvent e){
+				dispose();
+			}
+	   	 };
+
+		addWindowListener(w0);
+		setSize(400,300);
+		setVisible(true);
+
 	}
 
 }

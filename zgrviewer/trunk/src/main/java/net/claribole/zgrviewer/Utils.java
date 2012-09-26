@@ -9,6 +9,7 @@
 package net.claribole.zgrviewer;
 
 import java.awt.Font;
+import java.awt.GridBagConstraints;
 import java.io.File;
 import java.io.OutputStreamWriter;
 import java.io.FileOutputStream;
@@ -251,6 +252,15 @@ public class Utils {
 	    in.close();
 	}
 	return text;
+    }
+
+    static void buildConstraints(GridBagConstraints gbc, int gx,int gy,int gw,int gh,int wx,int wy){
+		gbc.gridx=gx;
+		gbc.gridy=gy;
+		gbc.gridwidth=gw;
+		gbc.gridheight=gh;
+		gbc.weightx=wx;
+		gbc.weighty=wy;
     }
 
 }

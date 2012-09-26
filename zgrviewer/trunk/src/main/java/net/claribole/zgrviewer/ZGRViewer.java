@@ -154,6 +154,7 @@ public class ZGRViewer implements ZGRApplication {
 		globvI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_G,0));
 		final JMenuItem radarI=new JMenuItem("Overview");
 		radarI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+		final JMenuItem showBkI = new JMenuItem("Show Bookmarks...");
 		final JMenuItem searchI=new JMenuItem("Find...");
 		searchI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		final JMenuItem fontI=new JMenuItem("Set Font...");
@@ -178,6 +179,7 @@ public class ZGRViewer implements ZGRApplication {
 				else if (e.getSource()==reloadI){gvLdr.reloadFile();}
 				else if (e.getSource()==globvI){grMngr.getGlobalView();}
 				else if (e.getSource()==radarI){grMngr.showRadarView(true);}
+				else if (e.getSource()==showBkI){cfgMngr.showBookmarks();}
 				else if (e.getSource()==searchI){showSearchBox();}
 				else if (e.getSource()==backI){grMngr.moveBack();}
 				else if (e.getSource()==fontI){grMngr.assignFontToGraph();}
@@ -227,6 +229,8 @@ public class ZGRViewer implements ZGRApplication {
 		jm2.add(globvI);
 		jm2.add(radarI);
 		jm2.addSeparator();
+		jm2.add(showBkI);
+		jm2.addSeparator();
 		jm2.add(searchI);
 		jm2.addSeparator();
 		jm2.add(fontI);
@@ -253,6 +257,7 @@ public class ZGRViewer implements ZGRApplication {
 		exitI.addActionListener(a0);
 		globvI.addActionListener(a0);
 		radarI.addActionListener(a0);
+		showBkI.addActionListener(a0);
 		searchI.addActionListener(a0);
 		backI.addActionListener(a0);
 		fontI.addActionListener(a0);
