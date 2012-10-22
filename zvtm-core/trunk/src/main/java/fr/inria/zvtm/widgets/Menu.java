@@ -18,8 +18,11 @@ public class Menu {
     protected static final double DEFAULT_ITEM_HEIGHT = 25;
     protected static final Color DEFAULT_MENU_BGCOLOR = new Color(70, 70, 70);
     protected static final Color DEFAULT_MENU_HCOLOR = new Color(120,120,120);
+    protected static final Color DEFAULT_MENU_LBCOLOR = Color.WHITE;
     protected Color MENU_BGCOLOR = DEFAULT_MENU_BGCOLOR;
     protected Color MENU_HCOLOR = DEFAULT_MENU_HCOLOR;
+    protected Color MENU_LBCOLOR = DEFAULT_MENU_LBCOLOR;
+    protected short LABEL_ANCHOR = VText.TEXT_ANCHOR_MIDDLE;
     protected static final String MENU_BOX_TYPE = "MENU_BOX";
 
     protected final VirtualSpace space;
@@ -29,10 +32,20 @@ public class Menu {
         this.space = space;
     }
 
-    public Menu(VirtualSpace space, Color bgColor, Color hColor){
+
+    /**
+     *@param space VirtualSpace in which to instantiate the menu
+     *@param bgColor background color of menu item boxes
+     *@param highlight color of menu item boxes (when cursor inside)
+     *@param lColor menu item label color
+     *@param label alignment (one of VText.TEXT_ANCHOR_*)
+     */
+    public Menu(VirtualSpace space, Color bgColor, Color hColor, Color lColor, short labelAnchor){
         this.space = space;
         MENU_BGCOLOR = bgColor;
         MENU_HCOLOR = hColor;
+        MENU_LBCOLOR = lColor;
+        LABEL_ANCHOR = labelAnchor;
     }
 
     /**
@@ -87,9 +100,9 @@ public class Menu {
      * (e.g. set color...)
      */
     protected VText makeLabel(MenuItem item, double xpos, double ypos){
-        VText retval = new VText(xpos, ypos, 0, Color.WHITE, 
+        VText retval = new VText(xpos, ypos, 0, DEFAULT_MENU_LBCOLOR, 
                     item.getText());
-        retval.setTextAnchor(VText.TEXT_ANCHOR_MIDDLE);
+        retval.setTextAnchor(LABEL_ANCHOR);
         return retval;
     }
 
