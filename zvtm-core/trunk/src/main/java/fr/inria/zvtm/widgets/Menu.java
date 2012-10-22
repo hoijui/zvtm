@@ -16,8 +16,10 @@ import fr.inria.zvtm.glyphs.VText;
 public class Menu {
     protected double width = 200;
     protected static final double DEFAULT_ITEM_HEIGHT = 25;
-    protected static final Color MENU_BGCOLOR=new Color(70, 70, 70);
-    protected static final Color MENU_HCOLOR=new Color(120,120,120);
+    protected static final Color DEFAULT_MENU_BGCOLOR = new Color(70, 70, 70);
+    protected static final Color DEFAULT_MENU_HCOLOR = new Color(120,120,120);
+    protected Color MENU_BGCOLOR = DEFAULT_MENU_BGCOLOR;
+    protected Color MENU_HCOLOR = DEFAULT_MENU_HCOLOR;
     protected static final String MENU_BOX_TYPE = "MENU_BOX";
 
     protected final VirtualSpace space;
@@ -25,6 +27,12 @@ public class Menu {
 
     public Menu(VirtualSpace space){
         this.space = space;
+    }
+
+    public Menu(VirtualSpace space, Color bgColor, Color hColor){
+        this.space = space;
+        MENU_BGCOLOR = bgColor;
+        MENU_HCOLOR = hColor;
     }
 
     /**
