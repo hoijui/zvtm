@@ -1,3 +1,9 @@
+/*   Copyright (c) INRIA, 2011-2012. All Rights Reserved
+ *   Licensed under the GNU LGPL. For full terms see the file COPYING.
+ *
+ * $Id$
+ */
+
 package fr.inria.zvtm.widgets;
 
 import java.awt.Color;
@@ -12,7 +18,10 @@ import fr.inria.zvtm.glyphs.VText;
 
 /**
  * Implementation of a linear menu.
+ *@author R.Primet, INRIA
+ *@author E.Pietriga, INRIA Chile
  */
+
 public class Menu {
     protected double width = 200;
     protected static final double DEFAULT_ITEM_HEIGHT = 25;
