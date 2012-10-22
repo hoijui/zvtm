@@ -52,6 +52,7 @@ $Id$
     <!-- <module>zvtm-fits/trunk</module> -->
     <module>zvtm-cluster/trunk</module>
     <module>zvtm-layout/trunk</module>
+    <module>zvtm-treemap/trunk</module>
   </modules>
 
   <!-- Reporting -->
