@@ -696,7 +696,8 @@ public class DPath extends Glyph implements RectangularShape {
     /** Not implemented yet. */
     @Override
     public Object clone(){
-		return null;
+    	DPath res = new DPath(getJava2DPathIterator(), vz, color, (alphaC != null) ? alphaC.getAlpha() : 1);
+		return res;
     }
 
     /** Highlight this glyph to give visual feedback when the cursor is inside it. */
