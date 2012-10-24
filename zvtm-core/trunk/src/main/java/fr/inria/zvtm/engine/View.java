@@ -985,9 +985,9 @@ public abstract class View {
         double dy = (wnes[1]+wnes[3]) / 2d;
         // new alt to fit horizontally
 		Dimension panelSize = this.getPanel().getComponent().getSize();
-        double nah = (wnes[2]-dx) * 2 * c.getFocal() / panelSize.width - c.getFocal();
+        double nah = (wnes[2]-wnes[0]) * c.getFocal() / panelSize.width - c.getFocal();
         // new alt to fit vertically
-        double nav = (wnes[1]-dy) * 2 * c.getFocal() / panelSize.height - c.getFocal();
+        double nav = (wnes[1]-wnes[3]) * c.getFocal() / panelSize.height - c.getFocal();
         // take max of both
         double na = Math.max(nah, nav);
         if (d > 0){
