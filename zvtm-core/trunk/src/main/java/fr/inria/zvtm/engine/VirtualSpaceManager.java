@@ -4,13 +4,13 @@
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2000-2002. All Rights Reserved
  *   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2011. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2012. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -62,19 +62,19 @@ public class VirtualSpaceManager implements AWTEventListener {
     		for (Enumeration e2=e.nextElement().getAllGlyphs().elements();e2.hasMoreElements();){
     			g = e2.nextElement();
     			if (g instanceof VText){((VText)g).invalidate();}
-    		}		    
+    		}
 		}
 		repaint();
 	}
 
 	/** Select only glyphs that are visible and sensitive to the cursor. */
 	public static short VIS_AND_SENS_GLYPHS=0;
-	/** Select only glyphs that are visible. */ 
+	/** Select only glyphs that are visible. */
 	public static short VISIBLE_GLYPHS=1;
 	/** Select only glyphs that are sensitive to the cursor. */
     public static short SENSITIVE_GLYPHS=2;
     /** Select all glyphs in the region. */
-    public static short ALL_GLYPHS=3;     
+    public static short ALL_GLYPHS=3;
 
     /**print exceptions and warning*/
     static boolean debug = false;
@@ -82,7 +82,7 @@ public class VirtualSpaceManager implements AWTEventListener {
     /**key is space name (String)*/
     protected Hashtable<String,VirtualSpace> allVirtualSpaces;
     private List<VirtualSpace> virtualSpaceList;
-    
+
     /**All views managed by this VSM*/
     protected View[] allViews;
     /**used to quickly retrieve a view by its name (gives its index position in the list of views)*/
@@ -97,9 +97,9 @@ public class VirtualSpaceManager implements AWTEventListener {
 
     /**Animation Manager*/
     private final AnimationManager animationManager;
-    
+
     public static final VirtualSpaceManager INSTANCE = new VirtualSpaceManager();
- 
+
     /**
      * Automatic instantiation as a singleton. THere is always a single VSM per application.
      */
@@ -151,7 +151,7 @@ public class VirtualSpaceManager implements AWTEventListener {
     /* -------------- Active entities ------------------ */
 
     Object activeJFrame = null;
-    
+
     public void eventDispatched(AWTEvent e){
 	    if (e.getID() == WindowEvent.WINDOW_ACTIVATED){activeJFrame=e.getSource();}
     }
@@ -195,7 +195,7 @@ public class VirtualSpaceManager implements AWTEventListener {
 	}
 
     /* ----------------- VIEWS ---------------- */
-    
+
     /** Create a new External View.<br>
      *@param c vector of cameras making this view (if more than one camera, cameras will be superimposed on different layers)
      *@param name view name - pass View.ANONYMOUS to generate a unique, random name.
@@ -205,10 +205,10 @@ public class VirtualSpaceManager implements AWTEventListener {
      *@param visible should the view be made visible automatically or not
      *@see #addFrameView(List c, String name, String viewType, int w, int h, boolean bar, boolean visible, boolean decorated, JMenuBar mnb)
      */
-    public View addFrameView(List<Camera> c, String name, String viewType, int w, int h, boolean visible){
+    public EView addFrameView(List<Camera> c, String name, String viewType, int w, int h, boolean visible){
 	    return addFrameView(new Vector<Camera>(c), name, viewType, w, h, false, visible, true, null);
     }
-    
+
     /**Create a new external view.<br>
      * The use of OPENGL_VIEW requires the following Java property: -Dsun.java2d.opengl=true
      *@param c vector of cameras making this view (if more than one camera, cameras will be superimposed on different layers)
@@ -222,14 +222,14 @@ public class VirtualSpaceManager implements AWTEventListener {
      *@param mnb a menu bar (null if none), already configured with ActionListeners already attached to items (it is just added to the view)
      *@see #addFrameView(List c, String name, String viewType, int w, int h, boolean visible)
      */
-    public View addFrameView(List<Camera> c, String name, String viewType, int w, int h,
+    public EView addFrameView(List<Camera> c, String name, String viewType, int w, int h,
 				boolean bar, boolean visible, boolean decorated, JMenuBar mnb){
-        View v = null;
+        EView v = null;
         if (name == View.ANONYMOUS){
             name = UUID.randomUUID().toString();
     		while (name2viewIndex.containsKey(name)){
     			name = UUID.randomUUID().toString();
-    		}            
+    		}
         }
         v = (mnb != null) ? new EView(viewType, new Vector<Camera>(c), name, w, h, bar, visible, decorated, mnb) : new EView(viewType, new Vector<Camera>(c), name, w, h, visible, decorated);
         addView(v);
@@ -248,7 +248,7 @@ public class VirtualSpaceManager implements AWTEventListener {
             name = UUID.randomUUID().toString();
     		while (name2viewIndex.containsKey(name)){
     			name = UUID.randomUUID().toString();
-    		}            
+    		}
         }
         PView tvi = new PView(viewType, new Vector<Camera>(c), name, w, h);
         addView(tvi);
@@ -361,7 +361,7 @@ public class VirtualSpaceManager implements AWTEventListener {
     public void repaint(View v, RepaintListener rl){
 	    v.repaint(rl);
     }
-    
+
     /* ----------- VIRTUAL SPACE --------------- */
 
     /** Create a new virtual space.
@@ -373,7 +373,7 @@ public class VirtualSpaceManager implements AWTEventListener {
 			name = UUID.randomUUID().toString();
 			while (allVirtualSpaces.containsKey(name)){
 				name = UUID.randomUUID().toString();
-			}			
+			}
 		}
         VirtualSpace tvs = new VirtualSpace(name);
         allVirtualSpaces.put(name, tvs);
@@ -403,7 +403,7 @@ public class VirtualSpaceManager implements AWTEventListener {
             updateVirtualSpaceList();
         }
     }
-    
+
     void updateVirtualSpaceList(){
         virtualSpaceList = new ArrayList(allVirtualSpaces.values());
     }
@@ -424,7 +424,7 @@ public class VirtualSpaceManager implements AWTEventListener {
     public VirtualSpace getVirtualSpace(String n){
 	    return allVirtualSpaces.get(n);
     }
-    
+
     /** Get all virtual spaces.
      *@return an unmodifiable list of all virtual spaces managed by this VSM.
      */

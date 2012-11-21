@@ -20,6 +20,7 @@ import java.awt.image.BufferedImage;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
+import java.util.Arrays;
 import java.util.Vector;
 
 import fr.inria.zvtm.glyphs.VText;
@@ -87,6 +88,10 @@ public class GLViewPanel extends ViewPanel {
         evHs = new ViewListener[cams.length];
         for (int nbcam=0;nbcam<cameras.size();nbcam++){
             cams[nbcam]=(Camera)(cameras.get(nbcam));
+        }
+        visibilityPadding = new int[cams.length][4];
+        for (int i=0;i<visibilityPadding.length;i++){
+            Arrays.fill(visibilityPadding[i], 0);
         }
         //init other stuff
         panel.setBackground(backColor);
@@ -231,10 +236,10 @@ public class GLViewPanel extends ViewPanel {
             				//compute region seen from this view through camera
             				double viewW = size.width;
             				double viewH = size.height;
-            				double viewWC = cams[nbcam].vx - (viewW/2-visibilityPadding[0]) * uncoef;
-            				double viewNC = cams[nbcam].vy + (viewH/2-visibilityPadding[1]) * uncoef;
-            				double viewEC = cams[nbcam].vx + (viewW/2-visibilityPadding[2]) * uncoef;
-            				double viewSC = cams[nbcam].vy - (viewH/2-visibilityPadding[3]) * uncoef;
+            				double viewWC = cams[nbcam].vx - (viewW/2-visibilityPadding[nbcam][0]) * uncoef;
+            				double viewNC = cams[nbcam].vy + (viewH/2-visibilityPadding[nbcam][1]) * uncoef;
+            				double viewEC = cams[nbcam].vx + (viewW/2-visibilityPadding[nbcam][2]) * uncoef;
+            				double viewSC = cams[nbcam].vy - (viewH/2-visibilityPadding[nbcam][3]) * uncoef;
             				double lviewWC = 0;
             				double lviewNC = 0;
             				double lviewEC = 0;
@@ -249,7 +254,7 @@ public class GLViewPanel extends ViewPanel {
             					lensVx = (lviewWC+lviewEC) / 2d;
             					lensVy = (lviewSC+lviewNC) / 2d;
             				}
-            				gll = cams[nbcam].parentSpace.getDrawingList();                            
+            				gll = cams[nbcam].parentSpace.getDrawingList();
                             for (int i=0;i<gll.length;i++){
                                 if (gll[i].visibleInViewport(viewWC, viewNC, viewEC, viewSC, camera)){
                                     //if glyph is at least partially visible in the reg. seen from this view, display

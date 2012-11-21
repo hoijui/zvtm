@@ -7,7 +7,7 @@
  *
  * $Id$
  */
- 
+
 package fr.inria.zvtm.engine;
 
 import java.awt.Color;
@@ -18,6 +18,7 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import javax.swing.JPanel;
 
+import java.util.Arrays;
 import java.util.Vector;
 
 import fr.inria.zvtm.glyphs.VText;
@@ -30,7 +31,7 @@ import fr.inria.zvtm.glyphs.VText;
 public class OffscreenViewPanel extends ViewPanel {
 
     protected JPanel panel;
-    
+
     public Component getComponent(){
         return panel;
     }
@@ -49,11 +50,15 @@ public class OffscreenViewPanel extends ViewPanel {
         for (int nbcam=0;nbcam<cameras.size();nbcam++){
             cams[nbcam] = (Camera)(cameras.get(nbcam));
         }
+        visibilityPadding = new int[cams.length][4];
+        for (int i=0;i<visibilityPadding.length;i++){
+            Arrays.fill(visibilityPadding[i], 0);
+        }
         //init other stuff
         panel.setBackground(Color.white);
         this.size = panel.getSize();
     }
-    
+
     void stop(){}
 
     @Override

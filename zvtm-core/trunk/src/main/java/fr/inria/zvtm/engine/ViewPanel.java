@@ -10,7 +10,7 @@
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -62,9 +62,9 @@ import java.util.Vector;
  * @author Emmanuel Pietriga
  **/
 public abstract class ViewPanel implements MouseListener, MouseMotionListener, MouseWheelListener, ComponentListener {
-    
+
     static final int DEFAULT_DELAY = 20;
-    
+
     /**draw no oval between point where we started dragging the mouse and current point*/
     public final static short NONE=0;
     /**draw an oval between point where we started dragging the mouse and current point*/
@@ -114,7 +114,7 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
     /**graphics2d's original affine transform -passed to each glyph in case it needs to modifiy the affine transform when painting itself*/
     AffineTransform standardTransform;
 
-    int[] visibilityPadding = {0,0,0,0};
+    int[][] visibilityPadding;
 
     Dimension size;
 
@@ -159,12 +159,12 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
     boolean sfopw = false;
     // first order pan widget coordinates in JPanel coordinates
     int fopw_x, fopw_y = 0;
-    
+
     /**VTM cursor is drawn only when AWT cursor is set to CUSTOM_CURSOR*/
     protected boolean drawVTMcursor=true;
     /**the AWT cursor*/
     protected Cursor awtCursor;
-    
+
     /** Should the viewpanel automatically request focus when cursor enters it or not. */
     boolean autoRequestFocusOnMouseEnter = false;
 
@@ -173,7 +173,7 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
 
     /** Stop this view. */
     abstract void stop();
-    
+
     /** Set application class to which events are sent.
      *@param layer depth of layer to which the event handler should be associated.
      */
@@ -184,7 +184,7 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
 	public ViewListener[] getListeners(){
 		return evHs;
 	}
-	
+
 	/**Get the underlying Swing component.
      */
 	public abstract Component getComponent();
@@ -194,7 +194,7 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
     // if = 0, not inside any portal,
     // if = N > 0, inside N portals
     int cursorInsidePortals = 0;
-    
+
     void resetCursorInsidePortals(){
 	    cursorInsidePortals = 0;
 	    for (int i=0;i<parent.portals.length;i++){
@@ -211,7 +211,7 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
     }
 
     /* -------------------- CURSOR ------------------- */
-    
+
     /**Set the cursor.
      * Either the ZVTM cursor or one of the default AWT cursors.
      *@param cursorType any of the cursor type values declared in java.awt.Cursor, such as DEFAULT_CURSOR, CROSSHAIR_CURSOR HAND_CURSOR, etc. To get the ZVTM cursor, use Cursor.CUSTOM_CURSOR.
@@ -253,7 +253,7 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
 	}
 	this.getComponent().setCursor(awtCursor);
     }
-    
+
     public void setDrawCursor(boolean b){
         drawVTMcursor = b;
     }
@@ -291,7 +291,7 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
                 viewOrigX + altCoef*jpx,
                 viewOrigY - altCoef*jpy);
     }
-    
+
     /**
      * Converts between virtual space coordinates and view coordinates for
      * a given camera.
@@ -307,7 +307,7 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
         return new Point((int)Math.round((d.width/2)+(vx-c.vx)*coef),
                          (int)Math.round((d.height/2)-(vy-c.vy)*coef));
     }
-    
+
     /**true will draw a segment between origin of drag and current cursor pos until drag is finished (still visible for backward compatibility reasons - should use setDrawSegment instead)*/
     public void setDrawDrag(boolean b){
 	curDragx=origDragx;
@@ -341,7 +341,7 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
 	else if (s==NONE){drawOval=false;}
 	parent.repaint();
     }
-    
+
     /** Show the icon representing first-order-of-control panning.
      *@param jpx x-coordinate of icon's center in JPanel coordinate system
      *@param jpy y-coordinate of icon's center in JPanel coordinate system
@@ -355,7 +355,7 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
         sfopw = true;
     	parent.repaint();
     }
-    
+
     /** Hide the icon representing first-order-of-control panning.
      *@see #showFirstOrderPanWidget(int jpx, int jpy)
      *@see #setFirstOrderPanWidget(Image icon)
@@ -365,7 +365,7 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
         sfopw = false;
     	parent.repaint();
     }
-    
+
     /** Set the icon used to represent first-order-of-control panning.
      *@see #showFirstOrderPanWidget(int jpx, int jpy)
      *@see #hideFirstOrderPanWidget()
@@ -374,7 +374,7 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
     public void setFirstOrderPanWidget(Image icon){
         FIRST_ORDER_PAN_WIDGET = icon;
     }
-    
+
     /** Is the icon used to represent first-order-of-control panning currently being shown.
      *@see #showFirstOrderPanWidget(int jpx, int jpy)
      *@see #hideFirstOrderPanWidget()
@@ -581,7 +581,7 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
                     evHs[activeLayer].mouseMoved(this, e.getX(), e.getY(), e);
                 }
             }
-        }        
+        }
         repaintASAP = true;
     }
 
@@ -590,9 +590,9 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
         cursor_inside = false;
         eraseCursor();
     }
-    
+
     void eraseCursor(){}
-    
+
     /** Should the viewpanel automatically request focus when cursor enters it or not.
      *  Default is false for external views (EView).
      *  Default is true for panel views (PView) as keyboard events don't get sent otherwise.
@@ -607,13 +607,13 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
      */
     public boolean getAutoRequestFocusOnMouseEnter(){
         return autoRequestFocusOnMouseEnter;
-    }    
-    
+    }
+
     /** Value that specifies that there isn't any point for which no mouse move/drag event is sent. */
     public static final int NO_COORDS = -1;
-    
+
     int ix,iy = NO_COORDS;
-    
+
     /** Set a particular point in view panel coordinates for which mouse move/drag events should be ignored.
      * This is useful, e.g., to completely ignore mouse repositioning events triggered by an AWT Robot.
      *@param x x-coordinate in the JPanel's system ; set to ViewPanel.NO_COORDS to cancel any previsouly set point.
@@ -623,7 +623,7 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
         ix = x;
         iy = y;
     }
-    
+
     /** Get the coordinates of a particular point in view panel coordinates for which mouse move/drag events are ignored, if any.
      * Such a point is useful, e.g., to completely ignore mouse repositioning events triggered by an AWT Robot.
      *@return (x,y) coordinates of the point in the JPanel's system, null if no such point is set.
@@ -667,7 +667,7 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
                 int buttonNumber=0;
                     parent.mouse.setJPanelCoordinates(e.getX(), e.getY());
                     //we project the mouse cursor wrt the appropriate coord sys
-                    parent.mouse.unProject(cams[activeLayer], this);                    
+                    parent.mouse.unProject(cams[activeLayer], this);
                 //translate glyphs sticked to mouse
                 parent.mouse.propagateMove();
                 // find out is the cursor is inside one (or more) portals
@@ -697,11 +697,11 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
                     }
                 }
                 //assign anyway, even if the current drag command does not want to display a segment
-                curDragx=e.getX();curDragy=e.getY();  
+                curDragx=e.getX();curDragy=e.getY();
                 parent.repaint();
                 if (parent.mouse.isSensitive()){parent.mouse.getPicker().computePickedGlyphList(evHs[activeLayer],cams[activeLayer],this);}
             }
-        }	
+        }
         catch (NullPointerException ex) {if (VirtualSpaceManager.INSTANCE.debugModeON()){System.err.println("viewpanel.mousedragged "+ex);ex.printStackTrace();}}
     }
 
@@ -747,23 +747,23 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
      *@return positive integer in milliseconds
      */
     public abstract int getRefreshRate();
-    
+
     long delay;
     long lastRepaint = 0;
     long lastButOneRepaint = 0;
-    
+
     /**
      * Get the actual instantaneous refresh rate. As the delay (in milliseconds) between the last two full view repaint calls performed.
      */
     public long getDelay(){
-        return delay;   
+        return delay;
     }
 
 	/**set a lens for this view ; set to null to remove an existing lens*/
 	protected Lens setLens(Lens l){
 		if (l != null){
 			this.lens = l;
-			this.lens.setLensBuffer(this);	    
+			this.lens.setLensBuffer(this);
 			parent.repaint();
 			return this.lens;
 		}
@@ -782,50 +782,57 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
 	return this.lens;
     }
 
-    /** set a padding for customizing the region inside the view for which objects are actually visible
+    /** Get the padding values customizing the region inside the view in which objects are actually visible.
      *@param wnesPadding padding values in pixels for the west, north, east and south borders
-    */
-    protected void setVisibilityPadding(int[] wnesPadding){
-	visibilityPadding = wnesPadding;
+     */
+    protected void setVisibilityPadding(int[] wnesPadding, int layer){
+        if (layer < visibilityPadding.length){
+            visibilityPadding[layer] = wnesPadding;
+        }
     }
 
-    /** get the padding values customizing the region inside the view for which objects are actually visible
-     *@return padding values in pixels for the west, north, east and south borders
-    */
-    protected int[] getVisibilityPadding(){
-	return visibilityPadding;
+    /** Get the padding values customizing the region inside the view in which objects are actually visible.
+     *@return padding values in pixels for the west, north, east and south borders, null if layer is invalid
+     */
+    protected int[] getVisibilityPadding(int layer){
+        if (layer < visibilityPadding.length){
+        	return visibilityPadding[layer];
+        }
+        else {
+            return null;
+        }
     }
-    
+
     // ---------------- Resize handling -----------------
-    
+
     Timer timer = new Timer(true);
     int currentTaskID = 0;
     long resizeDelay = 200;
     private class ResizeTask extends TimerTask{
-	
-	private int id;	
+
+	private int id;
 	public ResizeTask(int id){
 	    this.id = id;
-	}	
+	}
 	public void run() {
 	    if (id == currentTaskID){ //if this is the last task that was scheduled
 		parent.repaint();
 		currentTaskID = 0;
 	    } // if it is not the last task, then we don't want to repaint view. That would be done by the last task only.
-	}	
+	}
     }
-    
+
     public void componentResized(ComponentEvent e){
 		ResizeTask task = new ResizeTask(++currentTaskID);
 		timer.schedule(task, resizeDelay);
     }
-    
+
     public void componentMoved(ComponentEvent e){}
 
     public void componentShown(ComponentEvent e){}
 
     public void componentHidden(ComponentEvent e){}
-    
+
     //---------------- End Resize handling -----------------
 
 	protected final void drawPortals(){

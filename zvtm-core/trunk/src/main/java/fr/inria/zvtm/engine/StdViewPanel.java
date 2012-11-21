@@ -34,10 +34,10 @@ import java.awt.event.ActionListener;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.awt.image.BufferedImage;
-
 import javax.swing.Timer;
 import javax.swing.JPanel;
 
+import java.util.Arrays;
 import java.util.Vector;
 
 import fr.inria.zvtm.glyphs.VText;
@@ -107,6 +107,10 @@ public class StdViewPanel extends ViewPanel {
 		evHs = new ViewListener[cams.length];
 		for (int nbcam=0;nbcam<cameras.size();nbcam++){
 			cams[nbcam] = cameras.get(nbcam);
+		}
+		visibilityPadding = new int[cams.length][4];
+		for (int i=0;i<visibilityPadding.length;i++){
+			Arrays.fill(visibilityPadding[i], 0);
 		}
 		//init other stuff
 		panel.setBackground(backColor);
@@ -227,10 +231,10 @@ public class StdViewPanel extends ViewPanel {
 				//compute region seen from this view through camera
 				double viewW = size.width;
 				double viewH = size.height;
-				double viewWC = cams[nbcam].vx - (viewW/2-visibilityPadding[0]) * uncoef;
-				double viewNC = cams[nbcam].vy + (viewH/2-visibilityPadding[1]) * uncoef;
-				double viewEC = cams[nbcam].vx + (viewW/2-visibilityPadding[2]) * uncoef;
-				double viewSC = cams[nbcam].vy - (viewH/2-visibilityPadding[3]) * uncoef;
+				double viewWC = cams[nbcam].vx - (viewW/2-visibilityPadding[nbcam][0]) * uncoef;
+				double viewNC = cams[nbcam].vy + (viewH/2-visibilityPadding[nbcam][1]) * uncoef;
+				double viewEC = cams[nbcam].vx + (viewW/2-visibilityPadding[nbcam][2]) * uncoef;
+				double viewSC = cams[nbcam].vy - (viewH/2-visibilityPadding[nbcam][3]) * uncoef;
 				double lviewWC = 0;
 				double lviewNC = 0;
 				double lviewEC = 0;
