@@ -4,13 +4,13 @@
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2000-2002. All Rights Reserved
  *   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2011. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2012. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -38,7 +38,7 @@ import java.util.Vector;
  */
 
 public class VirtualSpace {
-    
+
     /** Anonymous virtual space. Will generate a random name (guaranteed to be unique). */
     public static final String ANONYMOUS = "AnonVS";
 
@@ -70,7 +70,7 @@ public class VirtualSpace {
 
     /** Name of virtual space. */
     String spaceName;
-    
+
     /**camera manager for this virtual space*/
     CameraManager cm;
 
@@ -102,7 +102,7 @@ public class VirtualSpace {
     /** Get the i-th camera added to this virtual space. */
     public Camera getCamera(int i){return cm.getCamera(i);}
 
-    /** Get a list of all cameras in this virtual space. 
+    /** Get a list of all cameras in this virtual space.
      *@return the actual list, not a copy.
      */
     public Camera[] getCameraListAsArray(){return cm.cameraList;}
@@ -122,7 +122,7 @@ public class VirtualSpace {
         }
         return c;
     }
-    
+
     /** Rremove camera at index i from this virtual space.
      * When a camera is destroyed, its index is not reused for another one.
      * So if camera number #3 is removed and then a new camera is added it will be assigned number #4 even though there is no camera at index #3 any longer.
@@ -166,7 +166,7 @@ public class VirtualSpace {
     public void addGlyph(Glyph g){
         addGlyph(g, true, true);
     }
-    
+
     /** Add glyph g to this virtual space.
      *@param repaint pass false if views should not be repainted as a consequence of this addition (default is true).
      */
@@ -193,7 +193,7 @@ public class VirtualSpace {
 	public void addGlyphs(Glyph[] glyphs){
 		addGlyphs(glyphs, true);
 	}
-	
+
     /** Get all glyphs in this virtual space, visible or not, sensitive or not.
      * IMPORTANT: Read-only. Do not temper with this data structure unless you know what you are doing.
      * It is highly recommended to clone it if you want to add/remove elements from it for your own purposes.
@@ -284,7 +284,7 @@ public class VirtualSpace {
     public void removeAllGlyphs(){
         removeAllGlyphs(true);
     }
-        
+
     /** Remove all glyphs from this virtual space.
      * If the glyphs were sticked to other glyphs, cameras or cursors, removing them from virtual space unsticks them.
      *@param repaint true to repaint all views afterwards, false otherwise
@@ -295,7 +295,7 @@ public class VirtualSpace {
             removeGlyph((Glyph)entClone.elementAt(i), false);
         }
         if (repaint){
-            VirtualSpaceManager.INSTANCE.repaint();            
+            VirtualSpaceManager.INSTANCE.repaint();
         }
     }
 
@@ -404,7 +404,7 @@ public class VirtualSpace {
             removeGlyphFromDrawingList(g);
 	        // insert at bottom of list if no other glyph has a lower z-index
 	        int insertAt = 0;
-	            // insert glyph in the drawing list so that 
+	            // insert glyph in the drawing list so that
 	            // it is the last glyph to be drawn for a given z-index
 	            for (int i=drawingList.length-1;i>=0;i--){
 	                if (drawingList[i].getZindex() <= z){
@@ -416,7 +416,7 @@ public class VirtualSpace {
             g.setZindex(z);
         }
 	}
-	
+
     /** Put this glyph before the first glyph that has z-index z, but after any glyph that has a z-index lower than z (if any).
      * g will be drawn before every other glyph that has z-index z, but after any glyph that has a z-index lower than z (if any).
      *@param z the considered z-index
@@ -426,7 +426,7 @@ public class VirtualSpace {
             removeGlyphFromDrawingList(g);
 	        // insert at bottom of list if no other glyph has a lower z-index
 	        int insertAt = 0;
-	            // insert glyph in the drawing list so that 
+	            // insert glyph in the drawing list so that
 	            // it is the last glyph to be drawn for a given z-index
 	            for (int i=0;i<drawingList.length;i++){
 	                if (drawingList[i].getZindex() > z){
@@ -480,8 +480,8 @@ public class VirtualSpace {
 	public double[] findFarmostGlyphCoords(double[] res){
 		return findFarmostGlyphCoords(getVisibleGlyphsList(), res);
 	}
-	    
-    /** Get the bounding box of all glyphs visible in this virtual space.
+
+    /** Get the bounding box of a set of glyphs visible in this virtual space.
      *@param gl list of glyphs to iterate upon (will typically be a subset of all glyphs in the virtual space)
      *@param res array which will contain the result
      *@return boundaries in VirtualSpace coordinates {west,north,east,south}
@@ -496,7 +496,7 @@ public class VirtualSpace {
 				res[0] = gl[0].vx - rs.getWidth()/2d;
 				res[1] = gl[0].vy + rs.getHeight()/2d;
 				res[2] = gl[0].vx + rs.getWidth()/2d;
-				res[3] = gl[0].vy - rs.getHeight()/2d;				
+				res[3] = gl[0].vy - rs.getHeight()/2d;
 			}
 			else {
 				size = gl[0].getSize() / 2d;
@@ -529,7 +529,7 @@ public class VirtualSpace {
 			return res;
 		}
 	}
-	
+
 	Vector<Picker> externalPickers = new Vector(0);
 
 	/** Register an external picker with this view.
@@ -545,7 +545,7 @@ public class VirtualSpace {
             return false;
         }
 	}
-	
+
 	/** Unregister an external picker from this view.
 	 *  The picker is said to be <em>external</em> because it is not associated with a VCursor.
 	 *@return true if the picker was registered with this view and did get unregistered, false if it was not.
@@ -558,7 +558,7 @@ public class VirtualSpace {
         int zindex = g.getZindex();
         // insert at bottom of list if no other glyph has a lower z-index
         int insertAt = 0;
-        // insert glyph in the drawing list so that 
+        // insert glyph in the drawing list so that
         // it is the last glyph to be drawn for a given z-index
         for (int i=drawingList.length-1;i>=0;i--){
             if (drawingList[i].getZindex() <= zindex){
@@ -566,7 +566,7 @@ public class VirtualSpace {
                 break;
             }
         }
-        insertGlyphInDrawingList(g, insertAt);            
+        insertGlyphInDrawingList(g, insertAt);
     }
 
     protected synchronized void addGlyphsToDrawingList(Glyph[] glyphs){
