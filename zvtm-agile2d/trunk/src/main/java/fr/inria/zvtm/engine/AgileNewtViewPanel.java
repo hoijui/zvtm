@@ -22,6 +22,7 @@ import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import javax.swing.Timer;
 import java.util.Vector;
+import java.util.Arrays;
 
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.event.ViewListener;
@@ -54,27 +55,27 @@ import agile2d.AgileState;
  */
 
 public class AgileNewtViewPanel extends AgileViewPanel {
-    
+
     protected NewtCanvasAWT panel;
     protected GLWindow window;
-    
+
     public Component getComponent(){
         return panel;
     }
-    
+
     AgileNewtViewPanel(Vector cameras, View v, boolean arfome) {
         GLProfile myGLProfile = GLProfile.get(GLProfile.GL2);
 		GLCapabilities caps = new GLCapabilities(myGLProfile);
 		//caps.setDoubleBuffered(true);
 
-        window = GLWindow.create(caps); 
+        window = GLWindow.create(caps);
 		panel = new NewtCanvasAWT(window);
         window.addGLEventListener(this);
-        
+
         // made not focusable because otherwise key events are lost when the panel gets focus
         // only true for Agile2D-based ViewPanel types, not for the default one.
         panel.setFocusable(false);
-        		
+
         ActionListener taskPerformer = new ActionListener(){
             public void actionPerformed(ActionEvent evt){
                 panel.repaint();
@@ -99,6 +100,10 @@ public class AgileNewtViewPanel extends AgileViewPanel {
         for (int nbcam=0;nbcam<cameras.size();nbcam++){
             cams[nbcam]=(Camera)(cameras.get(nbcam));
         }
+        visibilityPadding = new int[cams.length][4];
+        for (int i=0;i<visibilityPadding.length;i++){
+            Arrays.fill(visibilityPadding[i], 0);
+        }
         //init other stuff
         /*
         panel.addMouseListener(this);
@@ -106,7 +111,7 @@ public class AgileNewtViewPanel extends AgileViewPanel {
         panel.addMouseWheelListener(this);
         panel.addComponentListener(this);
         */
-        
+
         //init other stuff
 	/*
         window.addMouseListener(this);
@@ -114,7 +119,7 @@ public class AgileNewtViewPanel extends AgileViewPanel {
         window.addMouseWheelListener(this);
         window.addComponentListener(this);
         */
-        
+
         setAutoRequestFocusOnMouseEnter(arfome);
         setAWTCursor(Cursor.CUSTOM_CURSOR);  //custom cursor means VTM cursor
         //this.size = this.getSize();

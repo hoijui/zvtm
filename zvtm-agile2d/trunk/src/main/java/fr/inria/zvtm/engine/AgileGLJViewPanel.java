@@ -22,6 +22,7 @@ import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 import javax.swing.Timer;
 import java.util.Vector;
+import java.util.Arrays;
 
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.event.ViewListener;
@@ -50,13 +51,13 @@ import agile2d.AgileState;
  */
 
 public class AgileGLJViewPanel extends AgileViewPanel {
-    
+
     protected GLJPanel panel;
-    
+
     public Component getComponent(){
         return panel;
     }
-    
+
     AgileGLJViewPanel(Vector cameras, View v, boolean arfome) {
         GLProfile myGLProfile = GLProfile.get(GLProfile.GL2);
 		GLCapabilities caps = new GLCapabilities(myGLProfile);
@@ -89,6 +90,10 @@ public class AgileGLJViewPanel extends AgileViewPanel {
         evHs = new ViewListener[cams.length];
         for (int nbcam=0;nbcam<cameras.size();nbcam++){
             cams[nbcam]=(Camera)(cameras.get(nbcam));
+        }
+        visibilityPadding = new int[cams.length][4];
+        for (int i=0;i<visibilityPadding.length;i++){
+            Arrays.fill(visibilityPadding[i], 0);
         }
         //init other stuff
         panel.addMouseListener(this);
