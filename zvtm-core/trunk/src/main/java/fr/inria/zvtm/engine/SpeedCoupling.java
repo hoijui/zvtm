@@ -20,12 +20,12 @@ public class SpeedCoupling
     private long reducTime = 500;
     private float coefIncStep = 0.05f;
     private float coefDecStep = 0.0f;
-    
+
     long[] _cursor_time = new long[NB_SPEED_POINTS];
     int[] _cursor_x = new int[NB_SPEED_POINTS];
     int[] _cursor_y = new int[NB_SPEED_POINTS];
     long _prev_time;
- 
+
     float[] _speeds = new float[NB_SPEED_POINTS-1];
     float _speed_coef = 0;
     float _mspeed = 0;
@@ -55,7 +55,7 @@ public class SpeedCoupling
 
     public void addPoint(int x, int y, long currentTime)
     {
-	// compute mean speed over the last points 
+	// compute mean speed over the last points
 	for (int i=1;i<NB_SPEED_POINTS;i++)
 	{
 	    _cursor_time[i-1] = _cursor_time[i];
@@ -71,8 +71,8 @@ public class SpeedCoupling
 	    if(_cursor_time[i+1] != _cursor_time[i])
 	    {
 		_speeds[i] = (float)Math.sqrt(
-		    Math.pow(_cursor_x[i+1]-_cursor_x[i],2) + 
-		    Math.pow(_cursor_y[i+1]-_cursor_y[i],2)) / 
+		    Math.pow(_cursor_x[i+1]-_cursor_x[i],2) +
+		    Math.pow(_cursor_y[i+1]-_cursor_y[i],2)) /
 		    (float)(_cursor_time[i+1]-_cursor_time[i]);
 	    }
 	    else
@@ -106,7 +106,7 @@ public class SpeedCoupling
 	    {
 		_mspeedX = (ms/norm)*_mspeedX;
 		_mspeedY = (ms/norm)*_mspeedY;
-	    }	
+	    }
 	}
 	if (ms > minSpeed)
 	{

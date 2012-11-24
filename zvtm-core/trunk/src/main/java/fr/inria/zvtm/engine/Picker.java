@@ -18,7 +18,7 @@ import fr.inria.zvtm.glyphs.DPath;
 import fr.inria.zvtm.glyphs.VSegment;
 
 public class Picker {
-    
+
     /**coords in JPanel*/
     protected int jpx, jpy;
     /**coord in virtual space*/
@@ -30,7 +30,7 @@ public class Picker {
     protected short tmpRes;
     //used in computeMouseOverGlyph
     protected int maxIndex = -1;
-    
+
     /** List of glyphs picked at the pickers coordinates.
         Last entry is last glyph entered.
         IMPORTANT: elements beyond maxIndex might not be up to date. Do not trust the value, especially if not null.
@@ -39,25 +39,25 @@ public class Picker {
 
     /** Last glyph picked. */
     Glyph lastGlyphEntered = null;
-    
+
     /** Picker constructor.
      * Instantiated with a default stack size of 50.
      */
     public Picker(){
         this(50);
     }
-    
+
     /** Picker constructor.
      *@param stackSize start picked glyph stack size. Will double capacity if overflows.
      */
     public Picker(int stackSize){
        pickedGlyphs = new Glyph[stackSize];
     }
-    
+
     public Glyph lastGlyphEntered(){
         return lastGlyphEntered;
     }
-    
+
     /** Set picker's coordinates  (JPanel coordinates system).
      *@param x x-coordinate, in JPanel coordinates system
      *@param y y-coordinate, in JPanel coordinates system
@@ -66,16 +66,16 @@ public class Picker {
         jpx = x;
         jpy = y;
     }
-    
+
     /** Set picker's coordinates  (virtual space coordinates system).
      *@param x x-coordinate, in virtual space coordinates system
      *@param y y-coordinate, in virtual space coordinates system
-     */    
+     */
     public void setVSCoordinates(double x, double y){
         vx = x;
         vy = y;
     }
-    
+
     /** Get a list of all DPaths picked at a given set of coordinates.
      *@param c should be the active camera (can be obtained by VirtualSpaceManager.getActiveCamera())
      *@param tolerance the rectangular area's half width/height considered as the cursor intersecting region, in virtual space units (default tolerance is 5)
@@ -94,7 +94,7 @@ public class Picker {
         }
         return res;
     }
-	
+
     /** Get a list of all DPaths picked at the picker's current coordinates.
      *@param c should be the active camera (can be obtained by VirtualSpaceManager.getActiveCamera())
   	 *@return an empty vector if none
@@ -204,7 +204,7 @@ public class Picker {
     public boolean intersectsSegment(VSegment s, int x, int y, int tolerance, int camIndex){
 	    return s.intersects(x, y, tolerance, camIndex);
     }
-    
+
     /** Get a list of all Glyphs (including segments and paths) picked.
 	 * This method is especially useful when the camera of interest is not the active camera for the associated view (i.e. another layer is active).
 	 * Beware of the fact that this method returns glyphs of any kind, not just ClosedShape instances.
@@ -273,7 +273,7 @@ public class Picker {
         }
         else return new Glyph[0];
     }
-    
+
     /** Tells whether a given glyph is under this picker or not. */
     public boolean isPicked(Glyph g){
         for (int i=0;i<=maxIndex;i++){
@@ -300,7 +300,7 @@ public class Picker {
         }
     }
 
-    /** Compute the list of glyphs currently picked. 
+    /** Compute the list of glyphs currently picked.
      *@param eh ViewListener associated with the cursor's owning View.
      *@param c camera observing the glyphs of potential interest in the View.
      */
@@ -318,7 +318,7 @@ public class Picker {
             return this.computePickedGlyphList(eh, c, jpx, jpy);
 //        }
     }
-    
+
     /** Compute the list of glyphs currently picked. */
     boolean computePickedGlyphList(ViewListener eh, Camera c, int x, int y){
         boolean res=false;
@@ -386,13 +386,13 @@ public class Picker {
         }
         System.err.println("]");
     }
-    
+
     /**
      * The list of glyphs under the picker and ordered according to the drawing stack
      */
     public Glyph[] getDrawOrderedPickedGlyphList(VirtualSpace v){
     	Glyph[] tt = getPickedGlyphList();
-    	Glyph[] t  = new Glyph[tt.length]; 
+    	Glyph[] t  = new Glyph[tt.length];
 		int k=0;
 		Glyph[] list = v.getDrawingList();
 		for (int i = 0; i < list.length; i++) {
@@ -400,15 +400,15 @@ public class Picker {
 		}
 		return t;
     }
-    
+
     /**Returns the glyph under the picker (drawing order)*/
     public Glyph pickOnTop(VirtualSpace v){
     	Glyph[] list = getDrawOrderedPickedGlyphList(v);
 	if(list.length==0)return null;
     	return list[list.length-1];
     }
-    
-	private boolean contains(Glyph[] tab, Glyph g){		
+
+	private boolean contains(Glyph[] tab, Glyph g){
 		for (int i = 0; i < tab.length; i++) {
 			if(tab[i]==g){
 				return true;
@@ -416,5 +416,5 @@ public class Picker {
 		}
 		return false;
 	}
-    
+
 }

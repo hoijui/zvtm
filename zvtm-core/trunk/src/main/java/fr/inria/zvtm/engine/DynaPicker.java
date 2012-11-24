@@ -36,7 +36,7 @@ import fr.inria.zvtm.glyphs.Glyph;
  * <h4>Using DynaSpot</h4>
  * <p>The DynaSpot behavior must be activated in VCursor, calling</p>
  * <ul><li>VCursor.getDynaPicker().activateDynaSpot(boolean b)</li></ul>
- * 
+ *
  * <p>In your ViewListener, simply call VCursor.dynaPick(Camera c) wherever this makes sense. Usually this will be mouseMoved(...):</p>
  * <ul>
  *  <li>v.getCursor().getDynaPicker().dynaPick(c); // where c is the active camera</li>
@@ -53,10 +53,10 @@ public class DynaPicker {
     HashMap gida = new HashMap(20);
 
     int DYNASPOT_MAX_RADIUS = 16;
-    
+
     int LAG_TIME = 120;
     int REDUC_TIME = 180;
-    
+
     Color DYNASPOT_COLOR = Color.LIGHT_GRAY;
     float DYNASPOT_MAX_TRANSLUCENCY = 0.3f;
     AlphaComposite dsST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float)DYNASPOT_MAX_TRANSLUCENCY);
@@ -100,100 +100,100 @@ public class DynaPicker {
 
     /** Set the color of the dynaspot area.
     *@param c color of dynaspot area
-    */	
+    */
     public void setDynaSpotColor(Color c){
         DYNASPOT_COLOR = c;
     }
-    
+
     /** Get the color of the dynaspot area.
-    */	
+    */
     public Color getDynaSpotColor(){
         return DYNASPOT_COLOR;
     }
-    
+
     /** Set the translucence level of the dynaspot area.
         *@param a alpha value in [0.0-1.0]
-        */	
+        */
     public void setDynaSpotTranslucence(float a){
         DYNASPOT_MAX_TRANSLUCENCY = a;
         dsST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float)DYNASPOT_MAX_TRANSLUCENCY);
     }
-    
+
     /** Get the translucence level of the dynaspot area.
         *@return an alpha value in [0.0-1.0]
-        */	
+        */
     public float getDynaSpotTranslucence(){
         return DYNASPOT_MAX_TRANSLUCENCY;
     }
-    
+
     /** Set DynaSpot lag parameter. See <a href="http://zvtm.sourceforge.net/doc/dynaspot.html">http://zvtm.sourceforge.net/doc/dynaspot.html</a> for more detail. */
     public void setDynaSpotLagTime(int t){
         LAG_TIME = t;
     }
-    
+
     /** Get DynaSpot lag parameter. See <a href="http://zvtm.sourceforge.net/doc/dynaspot.html">http://zvtm.sourceforge.net/doc/dynaspot.html</a> for more detail. */
     public int getDynaSpotLagTime(){
         return LAG_TIME;
     }
-    
+
     /** Set DynaSpot reduction time parameter. See <a href="http://zvtm.sourceforge.net/doc/dynaspot.html">http://zvtm.sourceforge.net/doc/dynaspot.html</a> for more detail. */
     public void setDynaSpotReducTime(int t){
         REDUC_TIME = t;
         computeParams();
     }
-    
+
     /** Get DynaSpot reduction time parameter. See <a href="http://zvtm.sourceforge.net/doc/dynaspot.html">http://zvtm.sourceforge.net/doc/dynaspot.html</a> for more detail. */
     public int getDynaSpotReducTime(){
         return REDUC_TIME;
     }
-    
+
     int MIN_SPEED = 100;
     int MAX_SPEED = 300;
-    
+
     /* dynaspot parameters */
     float ds_aa;
     float ds_ab;
     float ds_ra;
     float ds_rb;
-    
+
     int dynaSpotRadius = 0;
-    
+
     boolean dynaSpotActivated = false;
-    
+
     boolean showDynarea = true;
-    
+
     Timer dstimer;
     DynaSpotTimer dynaspotTimer;
-    
+
     double opacity = 1.0f;
-    
+
     double[] dynawnes = new double[4];
-    
+
     Ellipse2D dynaspotVSshape = new Ellipse2D.Double(0, 0, 1, 1);
-    
+
     void initDynaSpotTimer(){
     	dstimer = new Timer();
     	dynaspotTimer = new DynaSpotTimer(this);
     	dstimer.scheduleAtFixedRate(dynaspotTimer, 40, 20);
     }
-    
+
     static final int NB_SPEED_POINTS = 4;
-    
+
     long[] cursor_time = new long[NB_SPEED_POINTS];
     int[] cursor_x = new int[NB_SPEED_POINTS];
     int[] cursor_y = new int[NB_SPEED_POINTS];
-    
+
     float[] speeds = new float[NB_SPEED_POINTS-1];
-    
+
     float mean_speed = 0;
-    
+
     boolean dynaspot_triggered = false;
-    
+
     long lastTimeAboveMinSpeed = -1;
-    
+
     boolean reducing = false;
     long reducStartTime = 0;
-    
+
     /**
      * Update DynaSpot's parameters.
      *@param currentTime current absolute time, obtained from System.currentTimeMillis()
@@ -223,7 +223,7 @@ public class DynaPicker {
     			if (mean_speed > MAX_SPEED){
     				if (dynaSpotRadius < DYNASPOT_MAX_RADIUS){
     					updateDynaSpotArea(DYNASPOT_MAX_RADIUS);
-    				}				
+    				}
     			}
     		}
     		else {
@@ -233,7 +233,7 @@ public class DynaPicker {
     				reducStartTime = currentTime;
     				dynaspot_triggered = false;
     			}
-    		}		
+    		}
     	}
     	else {
     	 	if (mean_speed > MIN_SPEED){
@@ -242,7 +242,7 @@ public class DynaPicker {
     			if (mean_speed > MAX_SPEED){
     				if (dynaSpotRadius < DYNASPOT_MAX_RADIUS){
     					updateDynaSpotArea(DYNASPOT_MAX_RADIUS);
-    				}				
+    				}
     			}
     			else {
     				updateDynaSpotArea(Math.round(ds_aa*mean_speed+ds_ab));
@@ -263,7 +263,7 @@ public class DynaPicker {
     	}
     	cursor.owningView.repaint();
     }
-    
+
     void updateDynaSpotArea(int r){
     	dynaSpotRadius = r;
     	dynaPick();
@@ -271,24 +271,24 @@ public class DynaPicker {
     		dsl.spotSizeChanged(this.cursor, dynaSpotRadius);
     	}
     }
-    
+
     /** Get DynaSpot's current radius. See <a href="http://zvtm.sourceforge.net/doc/dynaspot.html">http://zvtm.sourceforge.net/doc/dynaspot.html</a> for more detail. */
     public int getDynaSpotRadius(){
         return dynaSpotRadius;
     }
-    
+
     DynaSpotListener dsl;
-    
+
     /** Listen for DynaSpot events. */
     public void setDynaSpotListener(DynaSpotListener dsl){
     	this.dsl = dsl;
     }
-    
-    /** Find out who is listening for DynaSpot events. */	
+
+    /** Find out who is listening for DynaSpot events. */
     public DynaSpotListener getDynaSpotListener(){
     	return dsl;
     }
-    
+
     /** Enable/disable DynaSpot cursor behavior. */
     public void activateDynaSpot(boolean b){
     	dynaSpotActivated = b;
@@ -306,25 +306,25 @@ public class DynaPicker {
     		catch (NullPointerException ex){}
     	}
     }
-    
+
     /** Tells whether DynaSpot cursor behavior is enabled or not. */
     public boolean isDynaSpotActivated(){
         return dynaSpotActivated;
     }
-    
+
     /** Set maximum size of DynaSpot selection region. See <a href="http://zvtm.sourceforge.net/doc/dynaspot.html">http://zvtm.sourceforge.net/doc/dynaspot.html</a> for more detail. */
     public void setDynaSpotMaxRadius(int r){
     	DYNASPOT_MAX_RADIUS = (r < 0) ? 0 : r;
     	computeParams();
     }
-    
+
     /** Get maximum size of DynaSpot selection region. See <a href="http://zvtm.sourceforge.net/doc/dynaspot.html">http://zvtm.sourceforge.net/doc/dynaspot.html</a> for more detail. */
     public int getDynaSpotMaxRadius(){
     	return DYNASPOT_MAX_RADIUS;
     }
-    
+
     Camera refToCam4DynaPick = null;
-    
+
     /** Compute the list of glyphs picked by the dynaspot cursor.
      * The best picked glyph is returned.
      *@see #dynaPick(Camera c)
@@ -332,28 +332,28 @@ public class DynaPicker {
     void dynaPick(){
         dynaPick(refToCam4DynaPick);
     }
-    
+
     Glyph lastDynaPicked = null;
-    
+
     SelectionListener sl;
-    
+
     /** Set a Selection Listener callback triggered when a glyph gets selected/unselected by DynaSpot.
         *@param sl set to null to remove
         */
     public void setSelectionListener(SelectionListener sl){
         this.sl = sl;
     }
-    
+
     /** Get the Selection Listener callback triggered when a glyph gets selected/unselected by DynaSpot.
         *@return null if none set.
         */
     public SelectionListener getSelectionListener(){
         return this.sl;
     }
-    
+
     /** Compute the list of glyphs picked by the DynaSpot cursor.
      * The best picked glyph is returned.
-     * See <a href="http://zvtm.sourceforge.net/doc/dynaspot.html">http://zvtm.sourceforge.net/doc/dynaspot.html</a> for more detail. 
+     * See <a href="http://zvtm.sourceforge.net/doc/dynaspot.html">http://zvtm.sourceforge.net/doc/dynaspot.html</a> for more detail.
      *@return null if the dynaspot cursor does not pick anything.
      *@see #dynaPick()
      */
@@ -399,7 +399,7 @@ public class DynaPicker {
     			// if they do intersect, peform a finer-grain chec with Areas
     			else if (g.visibleInRegion(dynawnes[0], dynawnes[1], dynawnes[2], dynawnes[3], c.getIndex()) &&
     			 	g.visibleInDisc(cursor.vx, cursor.vy, unprojectedDSRadius, dynaspotVSshape, c.getIndex(), cursor.jpx, cursor.jpy, dynaSpotRadius)){
-                    // glyph intersects dynaspot area    
+                    // glyph intersects dynaspot area
                     gida.put(g, null);
                     double d = Math.sqrt(Math.pow(g.vx-cursor.vx,2)+Math.pow(g.vy-cursor.vy,2));
                     if (distanceToSelectedGlyph == -1 || d < distanceToSelectedGlyph){
@@ -416,7 +416,7 @@ public class DynaPicker {
         		        }
     			    }
     			}
-    		}		    
+    		}
     	}
         if (selectedGlyph != null && sl != null){
             sl.glyphSelected(selectedGlyph, true);
@@ -427,16 +427,16 @@ public class DynaPicker {
         lastDynaPicked = selectedGlyph;
         return selectedGlyph;
     }
-    
+
     /** Get the set of glyphs intersected by the cursor's dynaspot region.
-     * See <a href="http://zvtm.sourceforge.net/doc/dynaspot.html">http://zvtm.sourceforge.net/doc/dynaspot.html</a> for more detail. 
+     * See <a href="http://zvtm.sourceforge.net/doc/dynaspot.html">http://zvtm.sourceforge.net/doc/dynaspot.html</a> for more detail.
      *@return a set of Glyph IDs
      *@see #dynaPick(Camera c)
      */
     public Set getGlyphsInDynaSpotRegion(Camera c){
     	return gida.keySet();
     }
-    
+
 }
 
 class DynaSpotTimer extends TimerTask {
@@ -455,9 +455,9 @@ class DynaSpotTimer extends TimerTask {
 }
 
 class DefaultSelectionAction implements SelectionListener {
-    
+
     public void glyphSelected(Glyph g, boolean b){
-        g.highlight(b, null);        
+        g.highlight(b, null);
     }
-    
+
 }

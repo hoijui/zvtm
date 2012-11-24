@@ -6,7 +6,7 @@
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
- */ 
+ */
 
 package fr.inria.zvtm.engine;
 
@@ -27,7 +27,7 @@ public interface Java2DPainter {
     public static final short AFTER_LENSES = 2;
     /** After glyphs, lenses and portals have been painted. Also painted when view is in blank mode. */
     public static final short AFTER_PORTALS = 3;
-    
+
     /**Painting instructions, called by the associated view at each repaint.
      * This method is called at one of the following four times depending on how this painter was registered with the View: before ZVTM glyphs are painted (BACKGROUND), after ZVTM glyphs have been painted (FOREGROUND), after a distortion lens has been applied (AFTER_DISTORTION), after portals have been painted (AFTER_PORTALS).
      *@param g2d the Graphics context on which to paint

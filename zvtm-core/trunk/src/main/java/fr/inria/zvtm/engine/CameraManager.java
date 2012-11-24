@@ -9,7 +9,7 @@
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -44,7 +44,7 @@ class CameraManager {
         cameraList=new Camera[0];
         nextcIndex=0;
     }
-    
+
     /**return i-th camera in this virtual space*/
     Camera getCamera(int i) {
         if (i<cameraList.length){return cameraList[i];}
@@ -60,7 +60,7 @@ class CameraManager {
         cameraList=newList;
         return c;
     }
-    
+
     /** remove a camera from owning virtual space
      *@param i index of camera in virtual space
      */

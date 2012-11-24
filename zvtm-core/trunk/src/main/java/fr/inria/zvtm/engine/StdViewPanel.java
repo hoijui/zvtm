@@ -10,7 +10,7 @@
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -53,7 +53,7 @@ import fr.inria.zvtm.event.ViewListener;
 public class StdViewPanel extends ViewPanel {
 
     protected JPanel panel;
-    
+
     /**Get the underlying Swing component.
      *@return the underlying JPanel
      */
@@ -82,7 +82,7 @@ public class StdViewPanel extends ViewPanel {
         		}
         	}
 	    };
-	    
+
 		ActionListener taskPerformer = new ActionListener(){
 			public void actionPerformed(ActionEvent evt){
 				drawOffscreen();
@@ -213,7 +213,7 @@ public class StdViewPanel extends ViewPanel {
 		standardTransform=stableRefToBackBufferGraphics.getTransform();
 	}
 
-	private void drawScene(boolean drawLens){	
+	private void drawScene(boolean drawLens){
 		if(drawLens){
 			if (lensG2D == null){
 				updateOffscreenBuffer();
@@ -261,7 +261,7 @@ public class StdViewPanel extends ViewPanel {
 								gll[i].draw(stableRefToBackBufferGraphics, size.width, size.height, cams[nbcam].getIndex(),
 										standardStroke, standardTransform, 0, 0);
 							}
-							if(drawLens){	
+							if(drawLens){
 								if (gll[i].visibleInViewport(lviewWC, lviewNC, lviewEC, lviewSC, cams[nbcam])){
 									/* partially within the region seen through the lens
 									   draw it in both buffers */
@@ -325,7 +325,7 @@ public class StdViewPanel extends ViewPanel {
 			stableRefToBackBufferGraphics.setXORMode(backColor);
 			parent.mouse.draw(stableRefToBackBufferGraphics);
 			oldX = parent.mouse.jpx;
-			oldY = parent.mouse.jpy;			    
+			oldY = parent.mouse.jpy;
 		}
 
 	}
@@ -355,10 +355,10 @@ public class StdViewPanel extends ViewPanel {
 						stableRefToBackBufferGraphics.clearRect(0, 0, size.width, size.height);
 						backgroundHook();
 						//begin actual drawing here
-						if(lens != null) { 
-							drawScene(true); 
+						if(lens != null) {
+							drawScene(true);
 						} else {
-							drawScene(false); 
+							drawScene(false);
 						}
 						afterLensHook();
 						drawPortals();
@@ -371,7 +371,7 @@ public class StdViewPanel extends ViewPanel {
 						//end drawing here
 						if (stableRefToBackBufferGraphics == backBufferGraphics) {
 							panel.paintImmediately(0,0,size.width,size.height);
-							synchronized(this){    							
+							synchronized(this){
     							lastButOneRepaint = lastRepaint;
     							lastRepaint = System.currentTimeMillis();
     							delay = lastRepaint - lastButOneRepaint;
@@ -397,11 +397,11 @@ public class StdViewPanel extends ViewPanel {
                             stableRefToBackBufferGraphics.drawLine(parent.mouse.jpx-parent.mouse.size,parent.mouse.jpy,parent.mouse.jpx+parent.mouse.size,parent.mouse.jpy);
                             stableRefToBackBufferGraphics.drawLine(parent.mouse.jpx,parent.mouse.jpy-parent.mouse.size,parent.mouse.jpx,parent.mouse.jpy+parent.mouse.size);
                             oldX = parent.mouse.jpx;
-                            oldY = parent.mouse.jpy;							        
+                            oldY = parent.mouse.jpy;
                         }
                         //XXX: a nullpointerex on stableRefToBackBufferGraphics seems to occur from time to time when going in or exiting from blank mode
                         //just catch it and wait for next loop until we find out what's causing this
-                        catch (NullPointerException ex47){if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.runview.drawVTMcursor "+ex47);}} 					        
+                        catch (NullPointerException ex47){if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.runview.drawVTMcursor "+ex47);}}
 					}
 					panel.paintImmediately(0,0,size.width,size.height);
 				}
@@ -409,22 +409,22 @@ public class StdViewPanel extends ViewPanel {
 		}
 		else {
 		    // blank screen
-			updateOffscreenBuffer();	
+			updateOffscreenBuffer();
 			stableRefToBackBufferGraphics.setPaintMode();
 			stableRefToBackBufferGraphics.setColor(blankColor);
 			stableRefToBackBufferGraphics.fillRect(0, 0, panel.getWidth(), panel.getHeight());
-			portalsHook();				
+			portalsHook();
 			panel.paintImmediately(0,0,size.width,size.height);
 		}
 	}
-	
+
     void eraseCursor(){
         if (drawVTMcursor){
             stableRefToBackBufferGraphics.setXORMode(backColor);
             stableRefToBackBufferGraphics.setColor(parent.mouse.color);
             stableRefToBackBufferGraphics.drawLine(parent.mouse.jpx-parent.mouse.size,parent.mouse.jpy,parent.mouse.jpx+parent.mouse.size,parent.mouse.jpy);
             stableRefToBackBufferGraphics.drawLine(parent.mouse.jpx,parent.mouse.jpy-parent.mouse.size,parent.mouse.jpx,parent.mouse.jpy+parent.mouse.size);
-            panel.paintImmediately(0,0,size.width,size.height);            
+            panel.paintImmediately(0,0,size.width,size.height);
         }
 	}
 
@@ -442,5 +442,5 @@ public class StdViewPanel extends ViewPanel {
     public int getRefreshRate(){
         return edtTimer.getDelay();
     }
-    
+
 }

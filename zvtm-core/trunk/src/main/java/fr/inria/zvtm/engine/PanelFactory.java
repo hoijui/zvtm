@@ -12,7 +12,7 @@ package fr.inria.zvtm.engine;
 import java.util.Vector;
 
 public interface PanelFactory {
-    
+
     public ViewPanel getNewInstance(Vector<Camera> cameras, View v, boolean arfome);
-    
+
 }

@@ -6,7 +6,7 @@
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
- */ 
+ */
 
 package fr.inria.zvtm.engine;
 
@@ -187,7 +187,7 @@ public class Utils {
         COLORS_BY_KW.put("yellowgreen", new Color(154,205,50));
     }
 
-    /** 
+    /**
      * Get the Java AWT color which corresponds to a color keyword as defined in <a href="http://www.w3.org/TR/SVG/types.html#ColorKeywords">http://www.w3.org/TR/SVG/types.html#ColorKeywords</a>.
      *@param keyword a color keyword name such as black, blue, lime, darkorchid, etc...
      */
@@ -276,7 +276,7 @@ public class Utils {
 	/** Checks whether Glyph array ga contains glyph g or not within its first N items.
 		*@param maxIndex look for g in items in range [0,maxIndex[
 		*/
-	public static boolean containsGlyph(Glyph[] ga, Glyph g, int maxIndex){	
+	public static boolean containsGlyph(Glyph[] ga, Glyph g, int maxIndex){
 		for (int i=0;i<maxIndex;i++){
 			if (ga[i] == g){return true;}
 		}
@@ -288,7 +288,7 @@ public class Utils {
 	public static int indexOfGlyph(Glyph[] ga, Glyph g){
 		return indexOfGlyph(ga, g, ga.length);
 	}
-	
+
 	/** Checks whether Glyph array ga contains glyph g or not within its first N items, and returns its index.
 		*@param maxIndex look for g in items in range [0,maxIndex[
 		*/
@@ -367,7 +367,7 @@ public class Utils {
     }
 
      /**
-     * Returns a diagonal gradient centered around a color (upper left 
+     * Returns a diagonal gradient centered around a color (upper left
      * corner is lighter, lower right corner is darker)
      * @param width gradient width
      * @param height gradient height

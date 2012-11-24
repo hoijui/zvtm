@@ -10,7 +10,7 @@
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -47,7 +47,7 @@ import fr.inria.zvtm.glyphs.Translucency;
  * <h4>Using DynaSpot</h4>
  * <p>The DynaSpot behavior must be activated in VCursor, calling</p>
  * <ul><li>VCursor.getDynaPicker().activateDynaSpot(boolean b)</li></ul>
- * 
+ *
  * <p>In your ViewListener, simply call VCursor.dynaPick(Camera c) wherever this makes sense. Usually this will be mouseMoved(...):</p>
  * <ul>
  *  <li>v.getCursor().getDynaPicker().dynaPick(c); // where c is the active camera</li>
@@ -134,7 +134,7 @@ public class VCursor {
     public void setSync(boolean b){
 	    sync = b;
     }
-    
+
     /** Tells whether this ZVTM cursor is synchronized with the system cursor or not. */
     public boolean getSync(){
         return sync;
@@ -149,7 +149,7 @@ public class VCursor {
     public void setHintColor(Color c){
 	    this.hcolor = c;
     }
-    
+
     /** Move mouse cursor (JPanel coordinates).
      *@param x x-coordinate, in JPanel coordinates system
      *@param y y-coordinate, in JPanel coordinates system
@@ -263,11 +263,11 @@ public class VCursor {
             picker.setVSCoordinates(vx, vy);
         }
     }
-    
+
     public Picker getPicker(){
         return picker;
     }
-    
+
     public DynaPicker getDynaPicker(){
         return dynaPicker;
     }
@@ -304,7 +304,7 @@ public class VCursor {
     public int getPanelYCoordinate(){
 	    return jpy;
     }
-    
+
     /** Get the cursor's x-coordinate in virtual space coordinates system. */
     public double getVSXCoordinate(){
 	    return vx;

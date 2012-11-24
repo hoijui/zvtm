@@ -9,7 +9,7 @@
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -42,12 +42,12 @@ public class Camera {
     public static final float DEFAULT_FOCAL = 100;
 
     /** Camera index (wrt the owning virtual space)*/
-    int index; 
+    int index;
 
     /** Coordinates in virtual space.*/
 	public double vx,vy;
 
-    //borders (west, north, east, south), in 
+    //borders (west, north, east, south), in
     //virtual space coordinates
     private double wb = -Double.MAX_VALUE;
     private double nb = Double.MAX_VALUE;
@@ -90,8 +90,8 @@ public class Camera {
 
     //"listeners" is traversed a lot more often than it is mutated.
     private final List<CameraListener> listeners = new CopyOnWriteArrayList<CameraListener>();
-    
-    /** 
+
+    /**
      * @param x initial X coordinate
      * @param y initial Y coordinate
      * @param alt initial altitude
@@ -102,13 +102,13 @@ public class Camera {
 	    this(x, y, alt, f, i, false);
     }
 
-    /** 
+    /**
      * @param x initial X coordinate
      * @param y initial Y coordinate
      * @param alt initial altitude
      * @param f initial focal distance
      * @param i camera index (wrt the owning virtual space)
-     * @param l lazy camera, will only repaint when explicitely told to do so (default is false) 
+     * @param l lazy camera, will only repaint when explicitely told to do so (default is false)
      */
     Camera(double x, double y, double alt, double f, int i, boolean l){
 	    vx=x;
@@ -124,7 +124,7 @@ public class Camera {
      * set a zoom-in limit/maximum magnification  (like a floor the camera cannot go through)<br>
      * value 0 means that, at maximum magnification, the size of observed glyphs corresponds to their <i>real</i> size (e.g. if a circle has a declared radius of 50 in the virtual space, then its radius at max magnification is 50)<br>
      * if the floor is set to a negative value, you will be able to zoom in further (meaning that you will be able to magnify objects beyond their declared size)<br>
-     *@param a the altitude of the floor - the default value is 0 (put a negative value if you want to be able to magnify objects beyond their normal size) 
+     *@param a the altitude of the floor - the default value is 0 (put a negative value if you want to be able to magnify objects beyond their normal size)
      */
     public void setZoomFloor(double a){
 	    zoomFloor=a;
@@ -159,7 +159,7 @@ public class Camera {
 
     /**
      * Sets the horizontal bounds for this Camera.
-     * Note: This does not move the Camera if it currently 
+     * Note: This does not move the Camera if it currently
      * lies outside the bounds.
      */
     public void setBounds(double[] wnes){
@@ -185,7 +185,7 @@ public class Camera {
     public void move(double x, double y){
         moveTo(vx+x, vy+y);
     }
-    
+
     /**absolute translation - will trigger a repaint, whereas directly assigning values to vx, vy will not*/
     public void moveTo(double x, double y){
         if(x < wb){ x = wb; }
@@ -293,13 +293,13 @@ public class Camera {
     public Location getLocation(){
 	return new Location(vx,vy,altitude);
     }
-    
+
     /*------------------ 1st order control ----------------------*/
-    
+
     protected volatile double dx, dy, dz;
     protected volatile boolean zile = false;
 	protected volatile double zilX, zilY;
-    
+
     /**
      * Sets the camera's horizontal speed
      * @param dx camera's x-axis speed
@@ -338,7 +338,7 @@ public class Camera {
     public void setZspeed(double dz){
         this.dz = dz;
     }
-    
+
     /** Set zoom-invariant point's coordinates in virtual space.
      *@see #enableCustomZoomInvariantLocation(boolean b)
      *@see #isCustomZoomInvariantLocationEnabled()
@@ -349,7 +349,7 @@ public class Camera {
         zilX = x;
         zilY = y;
     }
-    
+
     /** Use a specific zoom-invariant point or use the camera's (x,y) coords are used (default).
      *@see #setZoomInvariantLocation(double x, double y)
      *@see #isCustomZoomInvariantLocationEnabled()
@@ -359,7 +359,7 @@ public class Camera {
     public void enableCustomZoomInvariantLocation(boolean b){
         zile = b;
     }
-    
+
     /** Get zoom-invariant point's x-coordinate in virtual space.
      *@see #setZoomInvariantLocation(double x, double y)
      *@see #enableCustomZoomInvariantLocation(boolean b)
@@ -379,7 +379,7 @@ public class Camera {
     public double getZilY(){
         return zilY;
     }
-    
+
     /** Tells whether a specific zoom-invariant point is being used or if the camera's (x,y) coords are used (default).
      *@see #setZoomInvariantLocation(double x, double y)
      *@see #enableCustomZoomInvariantLocation(boolean b)
@@ -389,7 +389,7 @@ public class Camera {
     public boolean isCustomZoomInvariantLocationEnabled(){
         return zile;
     }
-    
+
     /**
      * Get the camera's horizontal speed
      *@see #setXspeed(double dx)
@@ -425,9 +425,9 @@ public class Camera {
 	public double getZspeed(){
 	    return dz;
 	}
-    
+
     /*------------------ Events --------------------*/
-    
+
     /**
      * Registers a CameraListener for this Camera
      */
@@ -720,7 +720,7 @@ public class Camera {
     public boolean isEnabled(){
         return enabled;
     }
-    
+
     /**
      * set eager or lazy mode
      * @param b true=lazy, false=eager
@@ -756,7 +756,7 @@ public class Camera {
     }
 
 	/*--------------------Sticking--------------------*/
-	
+
     /** Stick glyph g to camera c. Behaves like a one-way constraint. */
     public static void stickToCamera(Glyph g, Camera c){
 		c.stick(g);

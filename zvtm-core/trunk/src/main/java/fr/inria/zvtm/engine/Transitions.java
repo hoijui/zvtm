@@ -6,7 +6,7 @@
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
- */ 
+ */
 
 package fr.inria.zvtm.engine;
 
@@ -43,7 +43,7 @@ public class Transitions {
      *@param v the view whose content will fade out
      *@param duration duration of the fade out transition in milliseconds
      *@param fadeColor target color for the fade out
-     *@param action fade out action. 
+     *@param action fade out action.
      *@see #fadeOut(View v, int duration, Color fadeColor)
      */
     public static void fadeOut(final View v, int duration, final Color fadeColor, final EndAction action){
@@ -67,7 +67,7 @@ public class Transitions {
                 public void execute(Object subject, Animation.Dimension dimension){
                     v.setBlank(fadeColor);
                     c.getOwningSpace().removeGlyph(fadeRect);
-            
+
                     if(null != action){
                         action.execute(subject, dimension);
                     }
@@ -84,7 +84,7 @@ public class Transitions {
      */
     public static void fadeIn(View v, int duration){
 	    Transitions.fadeIn(v, duration, null);
-    }    
+    }
 
     /** Makes a view (originally blank) fade in.
      * The view must be blank for the fade in to work.
@@ -116,7 +116,7 @@ public class Transitions {
             new EndAction(){
                 public void execute(Object subject, Animation.Dimension dimension){
                     c.getOwningSpace().removeGlyph(fadeRect);
-            
+
                     if(null != action){
                         action.execute(subject, dimension);
                     }

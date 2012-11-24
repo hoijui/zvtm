@@ -65,7 +65,7 @@ public class ScrollLayer implements ComponentListener {
 
     int panelWidth;
     int panelHeight;
-    
+
     static final String SCROLLSPACE_NAME_PREFIX = "scrollspace";
 
     /** Create all elements that compose the scroll bars to control a camera.
@@ -138,10 +138,10 @@ public class ScrollLayer implements ComponentListener {
         slVS.addGlyph(leftBt);
         slVS.addGlyph(rightBt);
     }
-    
-    
+
+
     /** Set the view the controlled camera belongs to.
-     * 
+     *
      */
     public void setView(View v){
         controlledView = v;
@@ -197,7 +197,7 @@ public class ScrollLayer implements ComponentListener {
         updateHorizontalScrollBar();
     }
 
-    
+
     /** Call this method directly if scroll bars should be updated for reasons other than changes to glyphs in the controlled camera's virtual space or changes to that camera itself.
      *@see #cameraUpdated()
      *@see #virtualSpaceUpdated()
@@ -258,7 +258,7 @@ public class ScrollLayer implements ComponentListener {
         controlledCamera.moveTo(Math.round(hslider.vx * (populatedRegionBounds[2]-populatedRegionBounds[0]) / (2.0*hgutterRS.getWidth()) + (populatedRegionBounds[2] + populatedRegionBounds[0])/2.0), controlledCamera.vy);
     }
 
-    /** Tells whether the given point is inside the area containing the scroll bars or not. 
+    /** Tells whether the given point is inside the area containing the scroll bars or not.
      *@param cx provide projected JPanel coordinates of the associated view, not virtual space coordinates
      *@param cy provide projected JPanel coordinates of the associated view, not virtual space coordinates
      */
@@ -373,7 +373,7 @@ public class ScrollLayer implements ComponentListener {
     /** Get the glyph that represents the RIGHT button. */
     public Glyph getRightButton(){return rightBt;}
 
-    /** 
+    /**
      * Make scroll bars fade in/out (gradually appear/disappear).
      * Make sure glyphs used to represent scrollbar widgets implement the Translucent interface.
      */
@@ -390,7 +390,7 @@ public class ScrollLayer implements ComponentListener {
             am.startAnimation(anim, false);
         }
     }
-    
+
     /** For internal use. */
     public void componentHidden(ComponentEvent e){}
     /** For internal use. */
@@ -407,5 +407,5 @@ public class ScrollLayer implements ComponentListener {
         updateWidgetInvariants();
         cameraUpdated();
     }
-    
+
 }
