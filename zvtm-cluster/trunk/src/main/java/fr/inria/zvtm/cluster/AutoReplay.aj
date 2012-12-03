@@ -3,7 +3,7 @@
  *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009-2010.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- */ 
+ */
 package fr.inria.zvtm.cluster;
 
 import fr.inria.zvtm.engine.Camera;
@@ -33,11 +33,11 @@ public aspect AutoReplay extends AbstractAutoReplay {
     // - only add execution join points
     // - every parameter of every method join point must be
     // serializable (primitive types are okay)
-    // - exercise caution when adding non-public methods to the 
+    // - exercise caution when adding non-public methods to the
     // join points, because these methods will be invoked reflectively.
     public pointcut autoReplayMethods(Identifiable replayTarget) :
         this(replayTarget) &&
-        if(replayTarget.isReplicated()) && 
+        if(replayTarget.isReplicated()) &&
         (
          //Glyph methods
 
@@ -48,7 +48,7 @@ public aspect AutoReplay extends AbstractAutoReplay {
          execution(public void Glyph.sizeTo(double))	||
          execution(public void Glyph.setBorderColor(Color))	||
          execution(public void Glyph.setColor(Color))	||
-         execution(public void Glyph.setTranslucencyValue(float)) || 
+         execution(public void Glyph.setTranslucencyValue(float)) ||
          execution(public void Glyph.setMouseInsideHighlightColor(Color)) ||
          execution(public void Glyph.setVisible(boolean)) ||
          execution(public void Glyph.stick(Glyph)) ||
@@ -58,18 +58,18 @@ public aspect AutoReplay extends AbstractAutoReplay {
          execution(public void Glyph.setSensitivity(boolean)) ||
          //Glyph.setStroke moved to a static Delta that performs wrapping if possible
          //execution(public void Glyph.setStroke(Stroke)) ||
-         execution(public void VSegment.setEndPoints(double, double, double, double)) || 
-         execution(public void VText.setFont(Font)) || 
-         execution(public void VText.setText(String)) || 
-         execution(public void VText.setScale(float)) || 
-         execution(public void ClosedShape.setDrawBorder(boolean)) || 
-         execution(public void ClosedShape.setFilled(boolean)) || 
-         execution(public void DPath.addSegment(double, double, boolean)) ||  
-         execution(public void DPath.addCbCurve(double, double, double, double, double, double, boolean)) ||  
-         execution(public void DPath.addQdCurve(double, double, double, double, boolean)) ||  
+         execution(public void VSegment.setEndPoints(double, double, double, double)) ||
+         execution(public void VText.setFont(Font)) ||
+         execution(public void VText.setText(String)) ||
+         execution(public void VText.setScale(float)) ||
+         execution(public void ClosedShape.setDrawBorder(boolean)) ||
+         execution(public void ClosedShape.setFilled(boolean)) ||
+         execution(public void DPath.addSegment(double, double, boolean)) ||
+         execution(public void DPath.addCbCurve(double, double, double, double, double, double, boolean)) ||
+         execution(public void DPath.addQdCurve(double, double, double, double, boolean)) ||
          //DPath.edit moved to a static Delta (see GlyphReplication)
-         //execution(public void DPath.edit(Point2D.Double[], boolean)) ||  
-         execution(public void RectangularShape.setHeight(double)) ||  
+         //execution(public void DPath.edit(Point2D.Double[], boolean)) ||
+         execution(public void RectangularShape.setHeight(double)) ||
          execution(public void RectangularShape.setWidth(double)) ||
          execution(public void VirtualSpace.show(Glyph)) ||
          execution(public void VirtualSpace.hide(Glyph)) ||

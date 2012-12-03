@@ -3,7 +3,7 @@
  *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009-2010.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- */ 
+ */
 package fr.inria.zvtm.cluster;
 
 import java.lang.reflect.Method;
@@ -24,7 +24,7 @@ public abstract aspect AbstractAutoReplay {
     public abstract pointcut autoReplayMethods(Identifiable replayTarget);
 
     pointcut masterAutoReplay(Identifiable replayTarget) :
-        autoReplayMethods(replayTarget) && 
+        autoReplayMethods(replayTarget) &&
         if(VirtualSpaceManager.INSTANCE.isMaster());
 
     after(Identifiable replayTarget) :
@@ -33,7 +33,7 @@ public abstract aspect AbstractAutoReplay {
             sendGenericDelta(replayTarget, thisJoinPoint);
         }
 
-    private static void sendGenericDelta(Identifiable target, 
+    private static void sendGenericDelta(Identifiable target,
             JoinPoint joinPoint){
         Signature sig = joinPoint.getStaticPart().getSignature();
         //We want to create a generic, serializable proxy that

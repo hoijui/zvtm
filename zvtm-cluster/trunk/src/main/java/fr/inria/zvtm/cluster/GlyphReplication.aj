@@ -17,15 +17,15 @@ import fr.inria.zvtm.glyphs.PRectangle;
  */
 aspect GlyphReplication {
 
-    // Serializes the Paint of a PRectangle if it serializable 
-    // or if it is an instance of LinearGradientPaint (or a 
+    // Serializes the Paint of a PRectangle if it serializable
+    // or if it is an instance of LinearGradientPaint (or a
     // "well-known" paint), otherwise ignores it.
     pointcut pRectPaint(PRectangle prect, Paint paint):
         execution(public void PRectangle.setPaint(Paint))
         && this(prect)
         && args(paint)
         && if(VirtualSpaceManager.INSTANCE.isMaster());
-        
+
     after(PRectangle prect, Paint paint) returning:
         pRectPaint(prect, paint) &&
         !cflowbelow(pRectPaint(PRectangle, Paint)) &&
@@ -52,35 +52,35 @@ aspect GlyphReplication {
             }
         }
 
-    pointcut dPathEdit(DPath dPath, Point2D.Double[] coords, boolean absolute): 
+    pointcut dPathEdit(DPath dPath, Point2D.Double[] coords, boolean absolute):
         execution(public void DPath.edit(Point2D.Double[], boolean))
-		&& this(dPath)
+        && this(dPath)
         && args(coords, absolute)
-		&& if(VirtualSpaceManager.INSTANCE.isMaster());
+        && if(VirtualSpaceManager.INSTANCE.isMaster());
 
     after(DPath dPath, Point2D.Double[] coords, boolean absolute) returning:
-	   dPathEdit(dPath, coords, absolute) && 
+       dPathEdit(dPath, coords, absolute) &&
        !cflowbelow(dPathEdit(DPath, Point2D.Double[], boolean)) &&
        if(dPath.isReplicated()){
-		   Delta delta = new DPathEditDelta(dPath.getObjId(),
+           Delta delta = new DPathEditDelta(dPath.getObjId(),
                    coords, absolute);
-		   VirtualSpaceManager.INSTANCE.sendDelta(delta);
-	   }
+           VirtualSpaceManager.INSTANCE.sendDelta(delta);
+       }
 
     pointcut glyphMove(Glyph glyph):
         (execution(public void Glyph.moveTo(double, double)) ||
          execution(public void Glyph.move(double, double)))
-		&& this(glyph)
-		&& if(VirtualSpaceManager.INSTANCE.isMaster());
+        && this(glyph)
+        && if(VirtualSpaceManager.INSTANCE.isMaster());
 
     after(Glyph glyph) returning:
-        glyphMove(glyph) && 
+        glyphMove(glyph) &&
         !cflowbelow(glyphMove(Glyph)) &&
         if(glyph.isReplicated()){
             Delta delta = new GlyphMoveDelta(glyph.getObjId(),
                     glyph.getLocation().x, glyph.getLocation().y);
             VirtualSpaceManager.INSTANCE.sendDelta(delta);
-	   }
+       }
 
     private static class PaintDelta implements Delta {
         private final ObjId<PRectangle> targetId;

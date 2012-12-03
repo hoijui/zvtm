@@ -3,7 +3,7 @@
  *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- */ 
+ */
 package fr.inria.zvtm.cluster;
 
 import fr.inria.zvtm.engine.Camera;
@@ -33,46 +33,46 @@ import org.slf4j.LoggerFactory;
  * Examples of such objects are Glyphs and Cameras.
  */
 public class SlaveUpdater {
-	protected final Logger logger = 
-		LoggerFactory.getLogger(SlaveUpdater.class);
-	private final int slaveNumber;
-	private final String appId;
-	//examples of slave objects are glyphs and cameras
-	private final Map<ObjId, Object> slaveObjects =
-		new HashMap<ObjId, Object>();
-	private final NetworkDelegate networkDelegate;
-	//'SlaveApp' may be replaced by an interface containing 
-	//the essential operations. For now it's overkill.
-	private SlaveApp appDelegate = null;
+    protected final Logger logger =
+        LoggerFactory.getLogger(SlaveUpdater.class);
+    private final int slaveNumber;
+    private final String appId;
+    //examples of slave objects are glyphs and cameras
+    private final Map<ObjId, Object> slaveObjects =
+        new HashMap<ObjId, Object>();
+    private final NetworkDelegate networkDelegate;
+    //'SlaveApp' may be replaced by an interface containing
+    //the essential operations. For now it's overkill.
+    private SlaveApp appDelegate = null;
 
-	/**
-	 * Creates a new Slave updater.
-	 * SlaveUpdater maintains the state of a whole application,
-	 * not just a VirtualSpace
-	 */
-	public SlaveUpdater(String appId, int slaveNumber){
-		this.appId = appId;
-		this.slaveNumber = slaveNumber;
-		networkDelegate = new NetworkDelegate(appId);
-	}
+    /**
+     * Creates a new Slave updater.
+     * SlaveUpdater maintains the state of a whole application,
+     * not just a VirtualSpace
+     */
+    public SlaveUpdater(String appId, int slaveNumber){
+        this.appId = appId;
+        this.slaveNumber = slaveNumber;
+        networkDelegate = new NetworkDelegate(appId);
+    }
 
-	public SlaveUpdater(){
-		this("clusterApp", 0);
-	}
+    public SlaveUpdater(){
+        this("clusterApp", 0);
+    }
 
-	void setAppDelegate(SlaveApp appDelegate){
-		this.appDelegate = appDelegate;
-	}
+    void setAppDelegate(SlaveApp appDelegate){
+        this.appDelegate = appDelegate;
+    }
 
-	/**
-	 * Returns the object mapped to 'id', or 
-	 * null if not present.
-	 * @return the value to which this SlaveUpdater maps the specified key, 
-	 * or null if the SlaveUpdater contains no mapping for this key.
-	 */
-	public <T> T getSlaveObject(ObjId<T> id){
-		return (T)(slaveObjects.get(id));
-	}
+    /**
+     * Returns the object mapped to 'id', or
+     * null if not present.
+     * @return the value to which this SlaveUpdater maps the specified key,
+     * or null if the SlaveUpdater contains no mapping for this key.
+     */
+    public <T> T getSlaveObject(ObjId<T> id){
+        return (T)(slaveObjects.get(id));
+    }
 
     /**
      * Returns an array containing the matching slave object for each
@@ -86,99 +86,99 @@ public class SlaveUpdater {
         for(ObjId<T> id: idList){
             retval.add(getSlaveObject(id));
         }
-        return retval; 
+        return retval;
     }
 
-	/**
-	 * Associates 'id' with 'object' in this SlaveUpdater.
-	 * If a mapping for this key was present, the old value 
-	 * is replaced.
-	 * @return previous value associated with specified key, 
-	 * or null  if there was no mapping for key.
-	 */
-	public <T> T putSlaveObject(ObjId<T> id, T object){
-		return (T)slaveObjects.put(id, object);
-	}
+    /**
+     * Associates 'id' with 'object' in this SlaveUpdater.
+     * If a mapping for this key was present, the old value
+     * is replaced.
+     * @return previous value associated with specified key,
+     * or null  if there was no mapping for key.
+     */
+    public <T> T putSlaveObject(ObjId<T> id, T object){
+        return (T)slaveObjects.put(id, object);
+    }
 
-	/**
-	 * Removes the mapping for 'id' if it exists.
-	 */
-	public Object removeSlaveObject(ObjId id){
-		return slaveObjects.remove(id);
-	}
+    /**
+     * Removes the mapping for 'id' if it exists.
+     */
+    public Object removeSlaveObject(ObjId id){
+        return slaveObjects.remove(id);
+    }
 
-	void startOperation(){
-		try{
-			networkDelegate.startOperation();
-		} catch( ChannelException ce ){
-			logger.error("Could not join network channel: " + ce);
-		}
-	}
+    void startOperation(){
+        try{
+            networkDelegate.startOperation();
+        } catch( ChannelException ce ){
+            logger.error("Could not join network channel: " + ce);
+        }
+    }
 
-	void stop(){
-		networkDelegate.stop();
+    void stop(){
+        networkDelegate.stop();
         appDelegate.stop();
-	}
+    }
 
     void destroyLocalView(ClusteredView cv){
         appDelegate.destroyLocalView(cv);
     }
 
-	void createLocalView(ClusteredView cv){
-		appDelegate.createLocalView(cv);
-	}
+    void createLocalView(ClusteredView cv){
+        appDelegate.createLocalView(cv);
+    }
 
-	void setCameraLocation(Location masterLoc,
-			Camera slaveCamera){
-		appDelegate.setCameraLocation(masterLoc, slaveCamera);
-	}
+    void setCameraLocation(Location masterLoc,
+            Camera slaveCamera){
+        appDelegate.setCameraLocation(masterLoc, slaveCamera);
+    }
 
     void setBackgroundColor(ClusteredView cv, Color bgColor){
         appDelegate.setBackgroundColor(cv, bgColor);
     }
 
-	class NetworkDelegate {
-		private JChannel channel;
-		private final String appName;
-		NetworkDelegate(String appName){
-			this.appName = appName;
-		}
+    class NetworkDelegate {
+        private JChannel channel;
+        private final String appName;
+        NetworkDelegate(String appName){
+            this.appName = appName;
+        }
 
-		//start listening on the appropriate channel,
-		//handle incoming messages (optionnally post reply
-		//or error messages)
-		void startOperation() throws ChannelException {
-			channel = ChannelFactory.makeChannel();
-			channel.connect(appName);
-			channel.setReceiver(new ReceiverAdapter(){
-				@Override public void viewAccepted(View newView){
-					logger.info("new view: {}", newView);
-				}
+        //start listening on the appropriate channel,
+        //handle incoming messages (optionnally post reply
+        //or error messages)
+        void startOperation() throws ChannelException {
+            channel = ChannelFactory.makeChannel();
+            channel.connect(appName);
+            channel.setReceiver(new ReceiverAdapter(){
+                @Override public void viewAccepted(View newView){
+                    logger.info("new view: {}", newView);
+                }
 
-				@Override public void receive(Message msg){
-					if(!(msg.getObject() instanceof Delta)){
-						logger.warn("wrong message type (Delta expected)");
-						return;
-					}
-					final Delta delta = (Delta)msg.getObject();
+                @Override public void receive(Message msg){
+                    if(!(msg.getObject() instanceof Delta)){
+                        logger.warn("wrong message type (Delta expected)");
+                        return;
+                    }
+                    final Delta delta = (Delta)msg.getObject();
 
-					SwingUtilities.invokeLater(new Runnable(){
-						public void run(){
-							//Do whatever needs to be done to update the
-							//state of the slave VirtualSpace (e.g. move a 
-							//Camera, create a rectangle, ...)
-							//In other words, "apply the message"
+                    SwingUtilities.invokeLater(new Runnable(){
+                        public void run(){
+                            //Do whatever needs to be done to update the
+                            //state of the slave VirtualSpace (e.g. move a
+                            //Camera, create a rectangle, ...)
+                            //In other words, "apply the message"
 
-							delta.apply(SlaveUpdater.this);
-						}
-					});
-				}
-			});
-		}
+                            delta.apply(SlaveUpdater.this);
+                        }
+                    });
+                }
+            });
+        }
 
-		void stop(){
-			channel.close();
-		}
-	}
+        void stop(){
+            channel.close();
+        }
+    }
 }
 

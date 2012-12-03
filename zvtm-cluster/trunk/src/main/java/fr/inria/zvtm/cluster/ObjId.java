@@ -3,66 +3,66 @@
  *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- */ 
+ */
 package fr.inria.zvtm.cluster;
 
 import java.io.Serializable;
 
 /**
- * An object identifier. 
+ * An object identifier.
  * A master program can request new ObjectId instances
  * through an ObjIdFactory. Slaves, however, should never
  * create them except through deserialization.
  *
  * ObjId instances may be tested for equality and validity.
- * If two ObjectId instances are 
+ * If two ObjectId instances are
  * equal, then the owning objects are considered identical
  * (even though they are not in the Java sense, as they are
  * mirrored on different machines).
  */
 public class ObjId<T> implements Serializable {
-	public static final ObjId INVALID_ID = new ObjId(-1);
+    public static final ObjId INVALID_ID = new ObjId(-1);
 
-	private final long id;
-    
-	ObjId(long id){
-		this.id = id;
-	}
+    private final long id;
 
-	/** 
-	 * Equality comparison. If two ObjectId instances are 
-	 * equal, then the owning objects are considered identical
-	 * (even though they are not in the Java sense, as they are
-	 * mirrored on different machines). 
-	 * @inheritDoc
-	 */	
-	@Override public boolean equals(Object other){
-		if(null == other){
-			return false;
-		}
+    ObjId(long id){
+        this.id = id;
+    }
 
-		if(!(other instanceof ObjId)){
-			return false;
-		}
+    /**
+     * Equality comparison. If two ObjectId instances are
+     * equal, then the owning objects are considered identical
+     * (even though they are not in the Java sense, as they are
+     * mirrored on different machines).
+     * @inheritDoc
+     */
+    @Override public boolean equals(Object other){
+        if(null == other){
+            return false;
+        }
 
-		return (((ObjId)other).id == id);
-	}
+        if(!(other instanceof ObjId)){
+            return false;
+        }
 
-	/**
-	 * @inheritDoc
-	 */
-	@Override public int hashCode(){
-		return (int)(id % Integer.MAX_VALUE);
-	}
+        return (((ObjId)other).id == id);
+    }
 
-	/**
-	 * Tests this identifier for validity.
-	 */
-	public boolean isValid(){
-		return !this.equals(INVALID_ID);
-	}
+    /**
+     * @inheritDoc
+     */
+    @Override public int hashCode(){
+        return (int)(id % Integer.MAX_VALUE);
+    }
 
-	@Override public String toString(){
-		return "ObjId@" + id;
-	}
+    /**
+     * Tests this identifier for validity.
+     */
+    public boolean isValid(){
+        return !this.equals(INVALID_ID);
+    }
+
+    @Override public String toString(){
+        return "ObjId@" + id;
+    }
 }

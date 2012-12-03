@@ -4,13 +4,13 @@ import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.glyphs.Glyph;
 
 public aspect VirtualSpaceIntroduction {
-	//introduce parent space attribute to Glyph
-	private VirtualSpace Glyph.parentSpace = null;
+    //introduce parent space attribute to Glyph
+    private VirtualSpace Glyph.parentSpace = null;
 
-	VirtualSpace Glyph.getParentSpace(){ return parentSpace; }
+    VirtualSpace Glyph.getParentSpace(){ return parentSpace; }
 
-	void Glyph.setParentSpace(VirtualSpace parentSpace){ 
-		this.parentSpace = parentSpace; 
-	}
+    void Glyph.setParentSpace(VirtualSpace parentSpace){
+        this.parentSpace = parentSpace;
+    }
 }
 

@@ -3,7 +3,7 @@
  *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- */ 
+ */
 package fr.inria.zvtm.cluster;
 
 import fr.inria.zvtm.engine.VirtualSpaceManager;
@@ -12,12 +12,12 @@ import java.awt.Color;
 
 /**
  * Replicates changes made to a ClusteredView
- * (adding a ClusteredView to a VirtualSpaceManager is 
+ * (adding a ClusteredView to a VirtualSpaceManager is
  * handled by VsmReplication)
  */
-aspect ClusteredViewReplication {	
+aspect ClusteredViewReplication {
     pointcut colorChange(ClusteredView clusteredView):
-        execution(public void ClusteredView.setBackgroundColor(Color)) 
+        execution(public void ClusteredView.setBackgroundColor(Color))
         && this(clusteredView)
         && if(VirtualSpaceManager.INSTANCE.isMaster());
 
@@ -25,7 +25,7 @@ aspect ClusteredViewReplication {
         colorChange(cv) && !cflowbelow(colorChange(ClusteredView))
         && args(bgColor){
             Delta delta = new BgColorDelta(cv.getObjId(),
-                    bgColor); 
+                    bgColor);
             VirtualSpaceManager.INSTANCE.sendDelta(delta);
         }
 

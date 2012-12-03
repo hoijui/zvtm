@@ -9,10 +9,10 @@ package fr.inria.zvtm.cluster;
  * Makes precedence explicit.
  */
 public aspect Precedence {
-	declare precedence: 
-		MiscIntroduction,
-		ObjIdIntroduction, 
-		AutoReplay, 
-		*;
+    declare precedence:
+        MiscIntroduction,
+        ObjIdIntroduction,
+        AutoReplay,
+        *;
 }
 

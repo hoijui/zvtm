@@ -3,7 +3,7 @@
  *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- */ 
+ */
 package fr.inria.zvtm.cluster;
 
 import java.io.Serializable;
@@ -17,13 +17,13 @@ import java.io.Serializable;
  * serializable.
  * Important note: this interface is called 'Delta' because
  * a Delta enables us to move from one VirtualSpace state to
- * the next. 
+ * the next.
  * It does *not* imply a glyph- or camera-level delta, i.e.
  * GlyphPosDelta will probably store *absolute* coordinates and
  * internally use moveTo and not move. That said, it should not
  * make any difference for users. It is simply a design choice.
  */
 public interface Delta extends Serializable {
-	public void apply(SlaveUpdater updater);
+    public void apply(SlaveUpdater updater);
 }
 

@@ -3,7 +3,7 @@
  *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- */ 
+ */
 package fr.inria.zvtm.cluster;
 
 import java.awt.Color;
@@ -27,14 +27,14 @@ import fr.inria.zvtm.glyphs.VImage;
  * we do not want to serialize images and send them over the
  * wire using the same "delta" protocol. Rather, we will
  * share metadata and trust slaves to create a matching image
- * on the other side. We expect that images will be shared 
+ * on the other side. We expect that images will be shared
  * using a network drive or a similar solution.
  */
 public class ClusteredImage extends VImage {
     private final URL location;
     private static final Image DEFAULT_IMAGE;
 
-    static { 
+    static {
         DEFAULT_IMAGE = new BufferedImage(10,10,BufferedImage.TYPE_INT_ARGB);
     }
 

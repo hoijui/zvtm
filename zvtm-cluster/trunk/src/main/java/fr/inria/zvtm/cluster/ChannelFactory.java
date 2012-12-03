@@ -3,7 +3,7 @@
  *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2010.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- */ 
+ */
 package fr.inria.zvtm.cluster;
 
 import java.io.File;
@@ -24,7 +24,7 @@ class ChannelFactory {
     private static class Dummy{}
 
     /*
-     * Creates a new channel. 
+     * Creates a new channel.
      */
     static final JChannel makeChannel() throws ChannelException{
         final String propFile = System.getProperty("zvtm.cluster.channel_conf");
