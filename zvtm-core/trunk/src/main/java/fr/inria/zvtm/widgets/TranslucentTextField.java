@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2008-2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2008-2012. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -29,25 +29,27 @@ t.setBounds(x, y, w, h);
 */
 
 public class TranslucentTextField extends JTextField implements TranslucentWidget {
-		
+
 	AlphaComposite bgAC = AB_08;
 	AlphaComposite fgAC = AB_10;
-	
+
+	Color borderColor;
+
 	public TranslucentTextField(){
 		super();
         init();
 	}
-	
+
 	public TranslucentTextField(javax.swing.text.Document doc, String text, int columns){
 		super(doc, text, columns);
         init();
 	}
-	
+
 	public TranslucentTextField(int columns){
 		super(columns);
         init();
 	}
-	
+
 	public TranslucentTextField(String text){
 		super(text);
         init();
@@ -69,8 +71,9 @@ public class TranslucentTextField extends JTextField implements TranslucentWidge
         setSelectionColor(Color.WHITE);
         setSelectedTextColor(Color.BLACK);
 		//setCaretColor(Color.WHITE);
+		setBorderColor(Color.WHITE);
 	}
-	
+
 	/**Set the translucence value of this text area's background.
 	 *@param alpha blending value, in [0.0,1.0]. Default is 0.8
 	 */
@@ -84,7 +87,15 @@ public class TranslucentTextField extends JTextField implements TranslucentWidge
 	public void setForegroundTranslucence(float alpha){
 		this.fgAC = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
 	}
-	
+
+	public void setBorderColor(Color c){
+		borderColor = c;
+	}
+
+	public Color getBorderColor(){
+		return borderColor;
+	}
+
 	@Override
 	public void paint(Graphics g){
 		Graphics2D g2d = (Graphics2D)g;
@@ -92,9 +103,10 @@ public class TranslucentTextField extends JTextField implements TranslucentWidge
 		g2d.setColor(getBackground());
 		g2d.fillRect(0,0,getWidth(),getHeight());
 		g2d.setComposite(fgAC);
-		g2d.setColor(getForeground());
+		g2d.setColor(borderColor);
 		g2d.drawRect(0,0,getWidth()-1,getHeight()-1);
+		g2d.setColor(getForeground());
 		super.paint(g2d);
 	}
-	
+
 }

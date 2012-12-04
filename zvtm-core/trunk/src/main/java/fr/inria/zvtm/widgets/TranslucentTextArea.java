@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2008-2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2008-2012. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -29,30 +29,32 @@ t.setBounds(x, y, w, h);
 */
 
 public class TranslucentTextArea extends JTextArea implements TranslucentWidget {
-		
+
 	AlphaComposite bgAC = AB_08;
 	AlphaComposite fgAC = AB_10;
-	
+
+	Color borderColor;
+
 	public TranslucentTextArea(){
 		super();
 		init();
 	}
-	
+
 	public TranslucentTextArea(javax.swing.text.Document doc){
 		super(doc);
 		init();
 	}
-	
+
 	public TranslucentTextArea(javax.swing.text.Document doc, String text, int rows, int columns){
 		super(doc, text, rows, columns);
 		init();
 	}
-	
+
 	public TranslucentTextArea(int rows, int columns){
 		super(rows, columns);
 		init();
 	}
-	
+
 	public TranslucentTextArea(String text){
 		super(text);
 		init();
@@ -62,20 +64,21 @@ public class TranslucentTextArea extends JTextArea implements TranslucentWidget 
 		super(text, rows, columns);
 		init();
 	}
-	
+
 	void init(){
 		setOpaque(false);
-		initColors();	    
+		initColors();
 	}
-	
+
 	void initColors(){
         setForeground(Color.WHITE);
         setBackground(Color.BLACK);
         setSelectionColor(Color.WHITE);
         setSelectedTextColor(Color.BLACK);
 		setCaretColor(Color.WHITE);
+		setBorderColor(Color.WHITE);
 	}
-	
+
 	/**Set the translucence value of this text area's background.
 	 *@param alpha blending value, in [0.0,1.0]. Default is 0.8
 	 */
@@ -89,7 +92,15 @@ public class TranslucentTextArea extends JTextArea implements TranslucentWidget 
 	public void setForegroundTranslucence(float alpha){
 		this.fgAC = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
 	}
-	
+
+	public void setBorderColor(Color c){
+		borderColor = c;
+	}
+
+	public Color getBorderColor(){
+		return borderColor;
+	}
+
 	@Override
 	public void paint(Graphics g){
 		Graphics2D g2d = (Graphics2D)g;
@@ -97,9 +108,10 @@ public class TranslucentTextArea extends JTextArea implements TranslucentWidget 
 		g2d.setColor(getBackground());
 		g2d.fillRect(0,0,getWidth(),getHeight());
 		g2d.setComposite(fgAC);
-		g2d.setColor(getForeground());
+		g2d.setColor(borderColor);
 		g2d.drawRect(0,0,getWidth()-1,getHeight()-1);
+		g2d.setColor(getForeground());
 		super.paint(g2d);
 	}
-	
+
 }
