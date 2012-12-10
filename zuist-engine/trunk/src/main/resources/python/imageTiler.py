@@ -53,7 +53,7 @@ CMD_LINE_HELP = "ZUIST Image Tiling Script\n\nUsage:\n\n" + \
     "Options:\n\n"+\
     "\t-cg\t\tprocessing pipeline: CoreGraphics (Mac only)\n"+\
     "\t-im\t\tprocessing pipeline: PIL and ImageMagick (default)\n"+\
-    "\t-gm\t\tprocessing pipeline: GraphcisMagick\n"+\
+    "\t-gm\t\tprocessing pipeline: GraphicsMagick\n"+\
     "\t-ts=N\t\ttile size (N in pixels)\n"+\
     "\t-f\t\tforce tile generation\n"+\
     "\t-tl=N\t\ttrace level (N in [0:3])\n"+\
