@@ -128,6 +128,7 @@ public class RoundCameraPortal extends CameraPortal {
                             if (gll[i].isVisible()){      // as it can be sensitive
                                 gll[i].draw(g2d, w, h, camIndex, standardStroke, standardTransform, x, y);
                             }
+                            cameraSpace.drewGlyph(gll[i], camIndex);
                         }
                     }
                 }
