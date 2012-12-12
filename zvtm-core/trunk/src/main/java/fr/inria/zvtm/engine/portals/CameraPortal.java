@@ -123,6 +123,11 @@ public class CameraPortal extends Portal {
         return (alphaC != null) ? alphaC.getAlpha() : 1.0f;
     }
 
+    /** Get picker associated with this camera portal.*/
+    public Picker getPicker(){
+        return picker;
+    }
+
     /**CALLED INTERNALLY - NOT FOR PUBLIC USE*/
     public void setOwningView(View v){
         super.setOwningView(v);
