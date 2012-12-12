@@ -20,9 +20,11 @@ import java.util.Vector;
 
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.View;
+import fr.inria.zvtm.engine.Picker;
 import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
+import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.Translucent;
 
@@ -56,6 +58,9 @@ public class CameraPortal extends Portal {
     Glyph[] gll;
     // camera's index in parent virtual space
     int camIndex;
+
+    // picking in camera portal
+    Picker picker = new Picker();
 
     /*Graphics2d's original stroke. Passed to each glyph in case it needs to modifiy the stroke when painting itself*/
     Stroke standardStroke;
@@ -344,6 +349,7 @@ public class CameraPortal extends Portal {
                             if (gll[i].isVisible()){      // as it can be sensitive
                                 gll[i].draw(g2d, w, h, camIndex, standardStroke, standardTransform, x, y);
                             }
+                            cameraSpace.drewGlyph(gll[i], camIndex);
                         }
                     }
                 }
@@ -357,6 +363,15 @@ public class CameraPortal extends Portal {
         if (alphaC != null){
             g2d.setComposite(Translucent.acO);
         }
+    }
+
+    public void pick(int cx, int cy, ViewListener eh){
+        picker.setJPanelCoordinates(cx-x, cy-y);
+        double uncoef = (camera.focal+camera.altitude) / camera.focal;
+        double pvx = (camera.vx + (cx-x-w/2)*uncoef);
+        double pvy = (camera.vy - (cy-y-h/2)*uncoef);
+        picker.setVSCoordinates(pvx, pvy);
+        picker.computePickedGlyphList(eh, camera);
     }
 
 }

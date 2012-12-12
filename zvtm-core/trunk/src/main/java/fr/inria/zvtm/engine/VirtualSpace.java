@@ -228,14 +228,14 @@ public class VirtualSpace {
      * Get all glyphs actually drawn for a given camera in this virtual space.
      */
     public Vector<Glyph> getDrawnGlyphs(int cameraIndex){
-	if (cameraIndex<camera2drawnList.length){
-	    return camera2drawnList[cameraIndex];
-	}
-	else return null;
+        if (cameraIndex<camera2drawnList.length){
+            return camera2drawnList[cameraIndex];
+        }
+        else return null;
     }
 
     /* Put glyph gl in the list of glyphs actually drawn. This list is used to compute the list of glyphs under cursor. */
-    protected void drewGlyph(Glyph gl,int cameraIndex){
+    public void drewGlyph(Glyph gl,int cameraIndex){
         if (cameraIndex<camera2drawnList.length && camera2drawnList[cameraIndex]!=null){
             camera2drawnList[cameraIndex].add(gl);
         }
