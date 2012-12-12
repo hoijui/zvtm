@@ -123,6 +123,10 @@ public class CameraPortal extends Portal {
         return (alphaC != null) ? alphaC.getAlpha() : 1.0f;
     }
 
+    public Camera getCamera(){
+        return camera;
+    }
+
     /** Get picker associated with this camera portal.*/
     public Picker getPicker(){
         return picker;
