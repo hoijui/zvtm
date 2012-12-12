@@ -2,11 +2,11 @@
  *   DATE OF CREATION:  Sat Jun 17 07:19:59 2006
  *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2004-2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2012. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
- */ 
+ */
 
 package fr.inria.zvtm.engine.portals;
 
@@ -79,9 +79,9 @@ public class OverviewPortal extends CameraPortal {
 
     }
 
-    /** Is the given point inside the observed region rectangle depicting what is seen through the main camera (viewfinder). 
+    /** Is the given point inside the observed region rectangle depicting what is seen through the main camera (viewfinder).
      *@param cx cursor x-coordinate (JPanel coordinates system)
-     *@param cy cursor y-coordinate (JPanel coordinates system) 
+     *@param cy cursor y-coordinate (JPanel coordinates system)
      */
     public boolean coordInsideObservedRegion(int cx, int cy){
 	return (cx >= x+w/2 + Math.round((observedRegion[0]-camera.vx)*orcoef) &&
@@ -89,7 +89,7 @@ public class OverviewPortal extends CameraPortal {
 		cx <= x+w/2 + Math.round((observedRegion[2]-camera.vx)*orcoef) &&
 		cy <= y+h/2 + Math.round((camera.vy-observedRegion[3])*orcoef));
     }
-    
+
     /** Set color of rectangle depicting what is seen through the main camera. */
     public void setObservedRegionColor(Color c){
 	    observedRegionColor = c;
@@ -131,7 +131,7 @@ public class OverviewPortal extends CameraPortal {
     public double getObservedRegionCY() {
         return getObservedRegionY() + getObservedRegionH()/2.0;
     }
-    
+
     /**
      *@return null if translucency is 1.0f (opaque).
      */
@@ -155,12 +155,12 @@ public class OverviewPortal extends CameraPortal {
         drawnGlyphs = cameraSpace.getDrawnGlyphs(camIndex);
         synchronized(drawnGlyphs){
             drawnGlyphs.removeAllElements();
-            uncoef = (camera.focal+camera.altitude) / camera.focal;
+            duncoef = (camera.focal+camera.altitude) / camera.focal;
             //compute region seen from this view through camera
-            viewWC = camera.vx - (w/2)*uncoef;
-            viewNC = camera.vy + (h/2)*uncoef;
-            viewEC = camera.vx + (w/2)*uncoef;
-            viewSC = camera.vy - (h/2)*uncoef;
+            viewWC = camera.vx - (w/2)*duncoef;
+            viewNC = camera.vy + (h/2)*duncoef;
+            viewEC = camera.vx + (w/2)*duncoef;
+            viewSC = camera.vy - (h/2)*duncoef;
             gll = cameraSpace.getDrawingList();
             for (int i=0;i<gll.length;i++){
                 if (gll[i] != null){

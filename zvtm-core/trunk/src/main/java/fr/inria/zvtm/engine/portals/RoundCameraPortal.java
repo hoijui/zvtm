@@ -2,11 +2,11 @@
  *   DATE OF CREATION:  Sun Jun 18 16:44:59 2006
  *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2004-2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2012. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
- */ 
+ */
 
 package fr.inria.zvtm.engine.portals;
 
@@ -33,7 +33,7 @@ public class RoundCameraPortal extends CameraPortal {
     public RoundCameraPortal(int x, int y, int w, int h, Camera c){
         this(x, y, w, h, c, 1f);
     }
-    
+
     /** Builds a new portal displaying what is seen through a camera
      *@param x top-left horizontal coordinate of portal, in parent's JPanel coordinates
      *@param y top-left vertical coordinate of portal, in parent's JPanel coordinates
@@ -63,7 +63,7 @@ public class RoundCameraPortal extends CameraPortal {
 
     /** Move the portal inside the view (relative).
      *@param dx x-offset (JPanel coordinates system)
-     *@param dy y-offset (JPanel coordinates system) 
+     *@param dy y-offset (JPanel coordinates system)
      */
     @Override
     public void move(int dx, int dy){
@@ -73,7 +73,7 @@ public class RoundCameraPortal extends CameraPortal {
 
     /** Move the portal inside the view (absolute).
      *@param x new x-coordinate (JPanel coordinates system)
-     *@param y new y-coordinate (JPanel coordinates system) 
+     *@param y new y-coordinate (JPanel coordinates system)
      */
     @Override
     public void moveTo(int x, int y){
@@ -87,7 +87,7 @@ public class RoundCameraPortal extends CameraPortal {
         if (clippingShape != null){clippingShape.setFrame(x, y, w, h);}
         else {clippingShape = new Ellipse2D.Float(x, y, w, h);}
     }
-    
+
     @Override
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
 		if (!visible){return;}
@@ -112,12 +112,12 @@ public class RoundCameraPortal extends CameraPortal {
         drawnGlyphs = cameraSpace.getDrawnGlyphs(camIndex);
         synchronized(drawnGlyphs){
             drawnGlyphs.removeAllElements();
-            uncoef = (camera.focal+camera.altitude) / camera.focal;
+            duncoef = (camera.focal+camera.altitude) / camera.focal;
             //compute region seen from this view through camera
-            viewWC = camera.vx - (w/2)*uncoef;
-            viewNC = camera.vy + (h/2)*uncoef;
-            viewEC = camera.vx + (w/2)*uncoef;
-            viewSC = camera.vy - (h/2)*uncoef;
+            viewWC = camera.vx - (w/2)*duncoef;
+            viewNC = camera.vy + (h/2)*duncoef;
+            viewEC = camera.vx + (w/2)*duncoef;
+            viewSC = camera.vy - (h/2)*duncoef;
             gll = cameraSpace.getDrawingList();
             for (int i=0;i<gll.length;i++){
                 if (gll[i] != null){

@@ -2,7 +2,7 @@
  *   DATE OF CREATION:  Wed Jul 05 15:00:06 2006
  *   AUTHOR :           Caroline Appert (appert@lri.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2006-2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2006-2012. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$

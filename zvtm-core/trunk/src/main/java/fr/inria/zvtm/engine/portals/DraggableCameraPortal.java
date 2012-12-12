@@ -2,11 +2,11 @@
  *   DATE OF CREATION:  Sat Jun 17 07:19:59 2006
  *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2004-2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2012. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
- */ 
+ */
 
 package fr.inria.zvtm.engine.portals;
 
@@ -22,7 +22,7 @@ public class DraggableCameraPortal extends CameraPortal {
 
     /**Color of horizontal bar used to drag the portal.*/
     Color barColor = Color.RED;
-    
+
     /**Height of horizontal bar used to drag the portal.*/
     int barHeight = 10;
 
@@ -44,29 +44,29 @@ public class DraggableCameraPortal extends CameraPortal {
     }
 
     /**Get color of horizontal bar used to drag the portal.
-     *@return color of bar*/    
+     *@return color of bar*/
     public Color getDragBarColor(){
 	    return barColor;
     }
 
     /**Set height of horizontal bar used to drag the portal.
-     *@param bh height of the bar*/    
+     *@param bh height of the bar*/
     public void setDragBarHeight(int bh){
 	    this.barHeight = bh;
     }
 
     /**Get height of horizontal bar used to drag the portal.
-     *@return height of bar*/    
+     *@return height of bar*/
     public int getDragBarHeight(){
 	    return barHeight;
     }
 
-    /**detects whether the given point is inside this portal's horizontal bar or not 
+    /**detects whether the given point is inside this portal's horizontal bar or not
      *@param cx horizontal cursor coordinate (JPanel)
      *@param cy vertical cursor coordinate (JPanel)
      */
     public boolean coordInsideBar(int cx, int cy){
-        return ((cx >= x) && (cx <= x+w) && 
+        return ((cx >= x) && (cx <= x+w) &&
             (cy >= y) && (cy <= y+barHeight));
     }
 
@@ -86,12 +86,12 @@ public class DraggableCameraPortal extends CameraPortal {
         drawnGlyphs = cameraSpace.getDrawnGlyphs(camIndex);
         synchronized(drawnGlyphs){
             drawnGlyphs.removeAllElements();
-            uncoef = (camera.focal+camera.altitude) / camera.focal;
+            duncoef = (camera.focal+camera.altitude) / camera.focal;
             //compute region seen from this view through camera
-            viewWC = camera.vx - (w/2) * uncoef;
-            viewNC = camera.vy + (h/2) * uncoef;
-            viewEC = camera.vx + (w/2) * uncoef;
-            viewSC = camera.vy - (h/2) * uncoef;
+            viewWC = camera.vx - (w/2) * duncoef;
+            viewNC = camera.vy + (h/2) * duncoef;
+            viewEC = camera.vx + (w/2) * duncoef;
+            viewSC = camera.vy - (h/2) * duncoef;
             gll = cameraSpace.getDrawingList();
             for (int i=0;i<gll.length;i++){
                 if (gll[i] != null){
