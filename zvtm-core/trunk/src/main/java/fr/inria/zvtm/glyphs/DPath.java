@@ -37,18 +37,18 @@ import java.util.Arrays;
  *@see fr.inria.zvtm.glyphs.VSegment
  */
 
-public class DPath extends Glyph implements RectangularShape {
-    
+public class DPath<T> extends Glyph implements RectangularShape {
+
     static final short MOV = 0;
     static final short SEG = 1;
     static final short QDC = 2;
     static final short CBC = 3;
-    
+
     /** For internal use. Dot not tamper with. Made public for outside package subclassing. Stores projected start point only. */
     public ProjectedCoords[] pc;
 
     PathElement[] elements;
-	
+
     /* endPoint contains the coordinates of the last element's endpoint */
     Point2D.Double endPoint;
 
@@ -61,7 +61,7 @@ public class DPath extends Glyph implements RectangularShape {
     public double vw;
     /** Height in virtual space. For internal use. Made public for easier outside package subclassing. */
     public double vh;
-    
+
     /** Java2D general path that represents this DPath in virtual space. */
     GeneralPath gp;
     /** Java2D general path that represents a drawable version of this DPath. */
@@ -80,7 +80,7 @@ public class DPath extends Glyph implements RectangularShape {
 	public DPath(double x, double y, int z, Color c){
 	    this(x, y, z, c, 1.0f);
     }
-    
+
 	/**
 		*@param x start coordinate in virtual space
 		*@param y start coordinate in virtual space
@@ -111,7 +111,7 @@ public class DPath extends Glyph implements RectangularShape {
     public DPath(PathIterator pi, int z, Color c){
         this(pi, z, c, 1.0f);
     }
-    
+
     /**
 	 *@param pi PathIterator describing this path (virtual space coordinates)
      *@param z z-index (pass 0 if you do not use z-ordering)
@@ -264,7 +264,7 @@ public class DPath extends Glyph implements RectangularShape {
 		    // (pc!=null) ? pc.length : 0 initialize projected coordinates if the glyph has already been added to a virtual space
 			tmp[elements.length] = new MOVElement(endPoint.x, endPoint.y, (pc!=null) ? pc.length : 0);
 			Arrays.fill(elements, null);
-			elements = tmp;			
+			elements = tmp;
 		}
 		computeBounds();
 		updateJava2DGeneralPath();
@@ -339,7 +339,7 @@ public class DPath extends Glyph implements RectangularShape {
 
     @Override
     public void resetMouseIn(int i){}
-    
+
 	/** No effect. */
     @Override
     public void sizeTo(double s){}
@@ -419,7 +419,7 @@ public class DPath extends Glyph implements RectangularShape {
 		double[] res = {vx-vw/2d,vy+vh/2d,vx+vw/2d,vy-vh/2d};
 		return res;
 	}
-	
+
 	public boolean coordsInsideBoundingBox(double x, double y){
 		return (x >= vx-vw/2d) && (x <= vx+vw/2d) &&
 		       (y >= vy-vh/2d) && (y <= vy+vh/2d);
@@ -479,7 +479,7 @@ public class DPath extends Glyph implements RectangularShape {
     public static final short DRAW_GENERAL_PATH = 0;
     /** Iterate on the path's components (each line, quad curve, cubic curve) and draw them step by step.*/
     public static final short DRAW_SUBPATHS = 1;
-    
+
     short drawingMethod = DRAW_GENERAL_PATH;
 
     /** Specify what drawing method to use to paint this path.
@@ -506,12 +506,12 @@ public class DPath extends Glyph implements RectangularShape {
                 if (alphaC != null){
                     // translucent
                     g.setComposite(alphaC);
-                    g.draw(dgp);            
+                    g.draw(dgp);
                     g.setComposite(acO);
                 }
                 else {
                     // opaque
-                    g.draw(dgp);            
+                    g.draw(dgp);
                 }
                 g.setStroke(stdS);
             }
@@ -519,15 +519,15 @@ public class DPath extends Glyph implements RectangularShape {
                 if (alphaC != null){
                     // translucent
                     g.setComposite(alphaC);
-                    g.draw(dgp);            
+                    g.draw(dgp);
                     g.setComposite(acO);
                 }
                 else {
                     // opaque
-                    g.draw(dgp);            
+                    g.draw(dgp);
                 }
             }
-            g.setTransform(stdT);            
+            g.setTransform(stdT);
         }
         else {
             if (stroke!=null) {
@@ -538,7 +538,7 @@ public class DPath extends Glyph implements RectangularShape {
                     g.setComposite(alphaC);
                     for (int j=0;j<elements.length;j++){
                         if (elements[j].type == DPath.MOV){continue;}
-                        g.draw(elements[j].getShape(i));		
+                        g.draw(elements[j].getShape(i));
                     }
                     g.setComposite(acO);
                 }
@@ -546,7 +546,7 @@ public class DPath extends Glyph implements RectangularShape {
                     // opaque
                     for (int j=0;j<elements.length;j++){
                         if (elements[j].type == DPath.MOV){continue;}
-                        g.draw(elements[j].getShape(i));		
+                        g.draw(elements[j].getShape(i));
                     }
                 }
                 g.translate(-dx,-dy);
@@ -572,7 +572,7 @@ public class DPath extends Glyph implements RectangularShape {
                 }
                 g.translate(-dx,-dy);
             }
-        }        
+        }
     }
 
     @Override
@@ -588,12 +588,12 @@ public class DPath extends Glyph implements RectangularShape {
                 if (alphaC != null){
                     // translucent
                     g.setComposite(alphaC);
-                    g.draw(dgp);            
+                    g.draw(dgp);
                     g.setComposite(acO);
                 }
                 else {
                     // opaque
-                    g.draw(dgp);            
+                    g.draw(dgp);
                 }
                 g.setStroke(stdS);
             }
@@ -601,15 +601,15 @@ public class DPath extends Glyph implements RectangularShape {
                 if (alphaC != null){
                     // translucent
                     g.setComposite(alphaC);
-                    g.draw(dgp);            
+                    g.draw(dgp);
                     g.setComposite(acO);
                 }
                 else {
                     // opaque
-                    g.draw(dgp);            
+                    g.draw(dgp);
                 }
             }
-            g.setTransform(stdT);            
+            g.setTransform(stdT);
         }
         else {
             if (stroke!=null) {
@@ -620,7 +620,7 @@ public class DPath extends Glyph implements RectangularShape {
                     g.setComposite(alphaC);
                     for (int j=0;j<elements.length;j++){
                         if (elements[j].type == DPath.MOV){continue;}
-                        g.draw(elements[j].getlShape(i));		
+                        g.draw(elements[j].getlShape(i));
                     }
                     g.setComposite(acO);
                 }
@@ -628,7 +628,7 @@ public class DPath extends Glyph implements RectangularShape {
                     // opaque
                     for (int j=0;j<elements.length;j++){
                         if (elements[j].type == DPath.MOV){continue;}
-                        g.draw(elements[j].getlShape(i));		
+                        g.draw(elements[j].getlShape(i));
                     }
                 }
                 g.translate(-dx,-dy);
@@ -654,7 +654,7 @@ public class DPath extends Glyph implements RectangularShape {
                 }
                 g.translate(-dx,-dy);
             }
-        }        
+        }
     }
 
     @Override
@@ -692,7 +692,7 @@ public class DPath extends Glyph implements RectangularShape {
     public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
 		return gp.intersects(dvx-dvr, dvy-dvr, 2*dvr, 2*dvr) && !gp.contains(dvx-dvr, dvy-dvr, 2*dvr, 2*dvr);
 	}
-	
+
     /** Not implemented yet. */
     @Override
     public Object clone(){
@@ -720,7 +720,7 @@ public class DPath extends Glyph implements RectangularShape {
 		VirtualSpaceManager.INSTANCE.repaint();
         }
     }
-    
+
 	/**
 		* Edit coordinates of start, end and control points of the element in DPath
 		* @param index index of the element in the DPath
@@ -829,7 +829,7 @@ public class DPath extends Glyph implements RectangularShape {
 			}
 			else {
 				this.spx += points[0].x;
-				this.spy += points[0].y;				
+				this.spy += points[0].y;
 			}
 			int offset = 0;
 			for (int i=0; i < elements.length; i++) {
@@ -905,7 +905,7 @@ public class DPath extends Glyph implements RectangularShape {
     /**
     * Get element's type
     * @param index index of the element in the DPath
-    * @return -1 in case of incorrect parameters, otherwise returns one of the constants DPath.CBC, DPath.QDC, DPath.SEG, DPath.MOV 
+    * @return -1 in case of incorrect parameters, otherwise returns one of the constants DPath.CBC, DPath.QDC, DPath.SEG, DPath.MOV
     */
     public int getElementType(int index){
         if (elements != null && index > -1 && index < elements.length && elements[index] != null){
@@ -920,7 +920,7 @@ public class DPath extends Glyph implements RectangularShape {
      * Get coordinates of the start, end and control points of the element
      * @param index index of the element in the DPath
      * @return List of element's points ordered as startPoint, controlPoint1, controlPoint2, endPoint
-     */    
+     */
     public Point2D.Double[] getElementPointsCoordinates(int index){
         Point2D.Double[] result = null;
         if (elements != null && index > -1 && index < elements.length && elements[index] != null){
@@ -965,7 +965,7 @@ public class DPath extends Glyph implements RectangularShape {
         }
         return result;
     }
-    
+
 	public int getNumberOfPoints(){
 		int totalNumberOfPoints = 1;
 		for (int i=0; i < elements.length; i++){
@@ -1012,7 +1012,7 @@ public class DPath extends Glyph implements RectangularShape {
 		}
 		return result;
 	}
-    
+
     /**
      * Calculates coordinates of all DPath's points (including control points) to display the DPath as a line.
      * @param path DPath to be flatten
@@ -1025,20 +1025,20 @@ public class DPath extends Glyph implements RectangularShape {
         Point2D.Double[] result = path.getAllPointsCoordinates();
         if (!abs){
             startPoint = new Point2D.Double(result[0].x + startPoint.x, result[0].y + startPoint.y);
-            endPoint = new Point2D.Double(result[result.length-1].x + endPoint.x, result[result.length-1].y + endPoint.y);            
+            endPoint = new Point2D.Double(result[result.length-1].x + endPoint.x, result[result.length-1].y + endPoint.y);
         }
         double dx = (endPoint.x - startPoint.x) / (double)result.length;
         double dy = (endPoint.y - startPoint.y) / (double)result.length;
 
         for (int i = 0; i < result.length - 1; i++){
             result[i].x = startPoint.x + i * dx;
-            result[i].y = startPoint.y + i * dy;                
+            result[i].y = startPoint.y + i * dy;
         }
         result[result.length - 1].x = endPoint.x;
         result[result.length - 1].y = endPoint.y;
         return result;
     }
-    
+
 
 	/** Get an SVG-compatible path iterator for this DPath. */
     public PathIterator getSVGPathIterator(){
@@ -1068,7 +1068,7 @@ public class DPath extends Glyph implements RectangularShape {
 		}
 		return res.getPathIterator(null);
 	}
-	
+
 	/** Update the Java2D GeneralPath representing this DPath. */
 	public void updateJava2DGeneralPath(){
 	    gp = new GeneralPath();
@@ -1102,12 +1102,12 @@ public class DPath extends Glyph implements RectangularShape {
 			}
 		}
     }
-    
+
 	/** Get the Java2D GeneralPath representing this DPath in virtual space coordinates. */
 	public GeneralPath getJava2DGeneralPath(){
         return gp;
 	}
-	
+
 	@Override
 	public Shape getJava2DShape(){
 		return getJava2DGeneralPath();
@@ -1154,7 +1154,7 @@ public class DPath extends Glyph implements RectangularShape {
             else {
                 double tan = (double)(spy - sy) / (double)(spx - sx);
                 res = Math.atan(tan);
-                if (spx < sx) { // x < 0 
+                if (spx < sx) { // x < 0
                     res += Math.PI;
                 }
                 if (spx > sx && spy < sy){ // x > 0; y < 0
@@ -1208,8 +1208,8 @@ public class DPath extends Glyph implements RectangularShape {
             else {
                 double tan = (double)(el.y - sy) / (double)(el.x - sx);
                 res = Math.atan(tan);
-                if (el.x < sx) { 
-                    // x < 0 
+                if (el.x < sx) {
+                    // x < 0
                     res += Math.PI;
                 }
                 if (el.x > sx && el.y < sy){
@@ -1220,7 +1220,7 @@ public class DPath extends Glyph implements RectangularShape {
         }
         return res;
     }
-    
+
 }
 
 abstract class PathElement {
@@ -1235,7 +1235,7 @@ abstract class PathElement {
     abstract void addCamera(int verifIndex);
 
     abstract void removeCamera(int index);
-    
+
     abstract void project(int i, int hw, int hh, Camera c, double coef, double px, double py);
 
     abstract void projectForLens(int i, int hw, int hh, double lx, double ly, double coef, double px, double py);
@@ -1270,7 +1270,7 @@ class MOVElement extends PathElement {
             initCams(nbCam);
         }
     }
-    
+
     @Override
     void initCams(int nbCam){
         pc = new Point2D[nbCam];
@@ -1356,7 +1356,7 @@ class MOVElement extends PathElement {
 }
 
 class SEGElement extends PathElement {
-    
+
     /* Draw a segment from previous point to (x,y) in virtual space */
 
     Line2D[] pc;

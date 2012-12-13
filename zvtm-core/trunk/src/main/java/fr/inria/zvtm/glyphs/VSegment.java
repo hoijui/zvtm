@@ -3,13 +3,13 @@
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@xrce.xerox.com)
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2002. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2011. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2012. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -38,11 +38,11 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 
 
 /**
- * Segment (straight line). 
+ * Segment (straight line).
  * @author Emmanuel Pietriga
  */
 
-public class VSegment extends Glyph implements RectangularShape {
+public class VSegment<T> extends Glyph implements RectangularShape {
 
     /** Width in virtual space. For internal use. Made public for easier outside package subclassing. */
     public double vw;
@@ -63,7 +63,7 @@ public class VSegment extends Glyph implements RectangularShape {
     public VSegment(double x1, double y1, double x2, double y2, int z, Color c){
         this(x1, y1, x2, y2, z, c, 1f);
     }
-    
+
     /**
      *give the end points of segment
      *@param x1 coordinate of endpoint 1 in virtual space
@@ -97,7 +97,7 @@ public class VSegment extends Glyph implements RectangularShape {
     public VSegment(double x, double y, int z, Color c, double lgth, double angle){
         this(x, y, z, c, 1f, lgth, angle);
     }
-    
+
     /**
      *give the centre of segment and half its length and orient
      *@param x coordinate in virtual space
@@ -207,7 +207,7 @@ public class VSegment extends Glyph implements RectangularShape {
         res[1] = new Point2D.Double(vx-vw/2d, vy-vh/2d);
         return res;
     }
-    
+
     void computeSize(){
         size = Math.sqrt(Math.pow(vw,2)+Math.pow(vh,2));
         if (vw!=0){orient=Math.atan((vh/vw));}
@@ -215,14 +215,14 @@ public class VSegment extends Glyph implements RectangularShape {
             orient=(vh>0) ? Math.PI/2.0f : -Math.PI/2.0f ;
         }
         if (orient<0){
-            if (vh>0){orient=Math.PI-orient;} 
+            if (vh>0){orient=Math.PI-orient;}
             else {orient=-orient;}
         }
         else if(orient>0){
             if (vh>0){orient=2*Math.PI-orient;}
             else {orient=Math.PI-orient;}
         }
-        else if(orient==0 && vw<0){orient=Math.PI;}	    
+        else if(orient==0 && vw<0){orient=Math.PI;}
     }
 
     public double getWidth(){return vw;}
@@ -297,7 +297,7 @@ public class VSegment extends Glyph implements RectangularShape {
 	                            pc[camIndex].cx+pc[camIndex].cw, pc[camIndex].cy-pc[camIndex].ch,
 	                            x, y) <= tolerance;
     }
-    
+
     @Override
     public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
 		return Line2D.ptSegDist(vx-vw/2d, vy-vh/2d, vx+vw/2d, vy+vh/2d, dvx, dvy) <= dvr;
@@ -358,7 +358,7 @@ public class VSegment extends Glyph implements RectangularShape {
             g.setComposite(acO);
         }
         else {
-            g.drawLine(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy+pc[i].ch,dx+pc[i].cx+pc[i].cw,dy+pc[i].cy-pc[i].ch);	    
+            g.drawLine(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy+pc[i].ch,dx+pc[i].cx+pc[i].cw,dy+pc[i].cy-pc[i].ch);
         }
     }
 

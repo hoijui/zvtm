@@ -1,7 +1,7 @@
 /*   FILE: ClosedShape.java
  *   DATE OF CREATION:  Wed Mar 21 08:17:03 2007
  *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2004-2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2012. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -17,19 +17,19 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
  * @author Emmanuel Pietriga
  **/
 
-public abstract class ClosedShape extends Glyph {
-    
+public abstract class ClosedShape<T> extends Glyph {
+
     /*------------Color------------------------------------------*/
 
     /** Current border color (read only, use access methods for all modification purposes).
      * Border color for closed shapes.
      */
     public Color borderColor;
-    
-    
+
+
     /** Coordinates of border color in HSV color space. */
     protected float[] HSVb=new float[3];
-    
+
 
     /** Border color of this glyph when it is in its default state. */
     public Color bColor = Color.BLACK;
@@ -94,7 +94,7 @@ public abstract class ClosedShape extends Glyph {
         borderColor = c;
         bColor = borderColor;
         if (borderColor != null){
-            HSVb = Color.RGBtoHSB(borderColor.getRed(), borderColor.getGreen(), borderColor.getBlue(), (new float[3]));            
+            HSVb = Color.RGBtoHSB(borderColor.getRed(), borderColor.getGreen(), borderColor.getBlue(), (new float[3]));
         }
         VirtualSpaceManager.INSTANCE.repaint();
     }
@@ -117,7 +117,7 @@ public abstract class ClosedShape extends Glyph {
 	bColor = borderColor;
 	VirtualSpaceManager.INSTANCE.repaint();
     }
-    
+
     /** Set the glyph's border color (absolute value, HSV color space).
      * Use setColor for text, paths, segments, etc.
      *@param h hue so that the final hue is in [0.0, 1.0]

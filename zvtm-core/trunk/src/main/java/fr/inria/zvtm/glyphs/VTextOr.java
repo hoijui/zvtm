@@ -4,13 +4,13 @@
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2000-2002. All Rights Reserved
  *   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2012. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -40,7 +40,7 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
  *@see fr.inria.zvtm.glyphs.VTextLayout
  */
 
-public class VTextOr extends VText {
+public class VTextOr<T> extends VText {
 
     public VTextOr(String t,double or){
 	    this(0, 0, 0, Color.BLACK, t, or, TEXT_ANCHOR_START, 1f, 1f);
@@ -84,7 +84,7 @@ public class VTextOr extends VText {
     public VTextOr(double x, double y, int z, Color c, String t, double or, short ta, float scale){
         this(x, y, z, c, t, or, ta, scale, 1f);
     }
-    
+
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
@@ -104,7 +104,7 @@ public class VTextOr extends VText {
     }
 
     /** Set the glyph's absolute orientation.
-     *@param angle in [0:2Pi[ 
+     *@param angle in [0:2Pi[
      */
      @Override
     public void orientTo(double angle){

@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2011. All Rights Reserved
+ *   Copyright (c) INRIA, 2011-2012. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -34,20 +34,20 @@ import fr.inria.zvtm.glyphs.projection.ProjText;
  *@see fr.inria.zvtm.glyphs.VTextOr
  */
 
-public class VTextLayout extends VText {
-	
+public class VTextLayout<T> extends VText {
+
 	static final FontRenderContext FRC = new FontRenderContext(null, false, true);
-	
+
 	TextLayout tl;
-	
+
 	static Color STRONG_CARET_COLOR = Color.BLACK;
 	static Color WEAK_CARET_COLOR = Color.DARK_GRAY;
 	/* strong and weak carets, in that order */
 	Shape[] carets = new Shape[2];
-	
+
 	static Color HIGHLIGHT_COLOR = Color.YELLOW;
 	Shape highlighter = null;
-    
+
     /**
      * @param t text string
      */
@@ -92,7 +92,7 @@ public class VTextLayout extends VText {
         this(x, y, z, c, null, t, ta, f, scale, 1.0f);
     }
 
-    
+
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
@@ -107,7 +107,7 @@ public class VTextLayout extends VText {
     public VTextLayout(double x, double y, int z, Color c, String t, short ta, Font f, float scale, float alpha){
         this(x, y, z, c, null, t, ta, f, scale, alpha);
     }
-    
+
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
@@ -130,7 +130,7 @@ public class VTextLayout extends VText {
 	public TextLayout getTextLayout(){
 		return tl;
 	}
-	
+
 	/** Set the strong and weak caret colors.
 	 *@param sc strong caret color
 	 *@param wc weak caret color
@@ -139,7 +139,7 @@ public class VTextLayout extends VText {
 		STRONG_CARET_COLOR = sc;
 		WEAK_CARET_COLOR = wc;
 	}
-	
+
 	/** Get the color used to paint the strong caret. */
 	public static Color getStrongCaretColor(){
 		return STRONG_CARET_COLOR;
@@ -149,7 +149,7 @@ public class VTextLayout extends VText {
 	public static Color getWeakCaretColor(){
 		return WEAK_CARET_COLOR;
 	}
-	
+
 	/** Set the caret's position within the string.
 	 *@param insertionIndex offset in the TextLayout. Pass -1 to remove the caret.
 	 */
@@ -159,7 +159,7 @@ public class VTextLayout extends VText {
 			return;
 		}
 		else {
-			carets = tl.getCaretShapes(insertionIndex);			
+			carets = tl.getCaretShapes(insertionIndex);
 		}
 		VirtualSpaceManager.INSTANCE.repaint();
 	}
@@ -173,7 +173,7 @@ public class VTextLayout extends VText {
 	public TextHitInfo hitTestChar(int jpx, int jpy, Camera c){
 		return hitTestChar(jpx, jpy, c, 0 , 0);
 	}
-	
+
 	/** Returns a TextHitInfo corresponding to the specified point.
 	 * This method is a convenience overload of hitTestChar that uses the natural bounds of this TextLayout.
 	 *@param jpx click coordinates, in JPanel coordinates.
@@ -191,7 +191,7 @@ public class VTextLayout extends VText {
 			default:{return tl.hitTestChar((float)((jpx - pc[i].cx)/tcoef - dx), (float)((jpy - pc[i].cy)/tcoef - dy));}
 		}
 	}
-	
+
 	/** Update the caret position to the point corresponding to the provided coordinates.
 	 *@param jpx click coordinates, in JPanel coordinates.
 	 *@param jpy click coordinates, in JPanel coordinates.
@@ -200,26 +200,26 @@ public class VTextLayout extends VText {
 	public void updateCaretPosition(int jpx, int jpy, Camera c){
 		setCaretPosition(hitTestChar(jpx, jpy, c).getInsertionIndex());
 	}
-	
+
 	public static void setHighlightColor(Color c){
 		HIGHLIGHT_COLOR = c;
 	}
-	
+
 	public static Color getHighlightColor(){
 		return HIGHLIGHT_COLOR;
 	}
-	
+
 	public void setHighlightPosition(int firstEndPoint, int secondEndPoint){
 		if (firstEndPoint < 0 || secondEndPoint < 0 || firstEndPoint == secondEndPoint){
 			highlighter = null;
 			return;
 		}
 		else {
-			highlighter = tl.getLogicalHighlightShape(firstEndPoint, secondEndPoint);			
+			highlighter = tl.getLogicalHighlightShape(firstEndPoint, secondEndPoint);
 		}
 		VirtualSpaceManager.INSTANCE.repaint();
 	}
-	
+
 	/** Force computation of text's bounding box at next call to draw().
 	*@see #validBounds(int i)
 	*@see #getBounds(int i)
@@ -315,7 +315,7 @@ public class VTextLayout extends VText {
 				if ((vx+pc[i].cw<=eb) && (vx>=wb) && (vy<=nb) && ((vy-pc[i].ch)>=sb)){
 					//if glyph is at least partially in region  (we approximate using the glyph bounding circle, meaning that some
 					//glyphs not actually visible can be projected and drawn  (but they won't be displayed))
-					return true;  
+					return true;
 				}
 			}
 		}
@@ -352,7 +352,7 @@ public class VTextLayout extends VText {
         else {
             //TEXT_ANCHOR_END
     		return dvs.intersects(vx-pc[camIndex].cw, vy, pc[camIndex].cw, pc[camIndex].ch);
-        }	    
+        }
 	}
 
     @Override
@@ -390,7 +390,7 @@ public class VTextLayout extends VText {
 		double trueCoef = scaleFactor * coef;
 		if (trueCoef*fontSize > VText.TEXT_AS_LINE_PROJ_COEF || !zoomSensitive){
 			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
-			g.setFont((font!=null) ? font : getMainFont());	
+			g.setFont((font!=null) ? font : getMainFont());
 			AffineTransform at;
 			if (text_anchor==TEXT_ANCHOR_START){
 			    at = AffineTransform.getTranslateInstance(dx+pc[i].cx,dy+pc[i].cy);
@@ -413,7 +413,7 @@ public class VTextLayout extends VText {
 				// background highlighting (text selection)
 				if (highlighter != null){
 					g.setColor(HIGHLIGHT_COLOR);
-					g.fill(highlighter);					
+					g.fill(highlighter);
 				}
 				// text
 	    		g.setColor(this.color);
@@ -438,7 +438,7 @@ public class VTextLayout extends VText {
 				// background highlighting (text selection)
 				if (highlighter != null){
 					g.setColor(HIGHLIGHT_COLOR);
-					g.fill(highlighter);					
+					g.fill(highlighter);
 				}
 				// text
 	    		g.setColor(this.color);
@@ -496,7 +496,7 @@ public class VTextLayout extends VText {
 				// background highlighting (text selection)
 				if (highlighter != null){
 					g.setColor(HIGHLIGHT_COLOR);
-					g.fill(highlighter);					
+					g.fill(highlighter);
 				}
 				// text
 				tl.draw(g, 0, 0);
@@ -516,7 +516,7 @@ public class VTextLayout extends VText {
 				// background highlighting (text selection)
 				if (highlighter != null){
 					g.setColor(HIGHLIGHT_COLOR);
-					g.fill(highlighter);					
+					g.fill(highlighter);
 				}
 				// text
 				tl.draw(g, 0, 0);

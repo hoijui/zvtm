@@ -1,4 +1,4 @@
-/*   Copyright (c) INRIA, 2010-2011. All Rights Reserved
+/*   Copyright (c) INRIA, 2010-2012. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -25,7 +25,7 @@ import fr.inria.zvtm.glyphs.VRectangle;
  *@see fr.inria.zvtm.glyphs.SIRectangle
  */
 
-public class PRectangle extends VRectangle {
+public class PRectangle<T> extends VRectangle {
 
     Paint gp;
     Paint highlightPaint = null;
@@ -65,14 +65,14 @@ public class PRectangle extends VRectangle {
 		super(x, y, z, w, h, Color.WHITE, bc);
 		this.gp = p;
 	}
-	
+
     /** Set a gradient or texture paint to fill this glyph.
      *@param p gradient or texture paint
 	 */
 	public void setPaint(Paint p){
 	    this.gp = p;
 	}
-	
+
     /** Get the gradient or texture paint used to fill this glyph
      *@return gradient or texture paint used
 	 */

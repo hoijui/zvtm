@@ -31,7 +31,7 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
  *@see fr.inria.zvtm.glyphs.FPolygon
  **/
 
-public class VPolygon extends ClosedShape {
+public class VPolygon<T> extends ClosedShape {
 
     /*array of projected coordinates - index of camera in virtual space is equal to index of projected coords in this array*/
     ProjPolygon[] pc;

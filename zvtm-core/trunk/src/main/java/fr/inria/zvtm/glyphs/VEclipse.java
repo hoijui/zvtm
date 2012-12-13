@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2011. All Rights Reserved
+ *   Copyright (c) INRIA, 2011-2012. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -21,10 +21,10 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.glyphs.projection.BProjectedCoords;
 
-public class VEclipse extends VCircle {
-	
+public class VEclipse<T> extends VCircle {
+
 	float fraction = .5f;
-	
+
 	/**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
@@ -71,7 +71,7 @@ public class VEclipse extends VCircle {
 	public double getFraction(){
 	    return fraction;
 	}
-	
+
 	@Override
 	public void initCams(int nbCam){
 		pc = new ProjEclipse[nbCam];
@@ -101,27 +101,27 @@ public class VEclipse extends VCircle {
 			else {System.err.println("VEclipse:Error while adding camera "+verifIndex);}
 		}
 	}
-	
+
 	/** Set the glyph's absolute orientation.
-     *@param angle in [0:2Pi[ 
+     *@param angle in [0:2Pi[
      */
     @Override
     public void orientTo(double angle){
 		orient = angle;
 		VirtualSpaceManager.INSTANCE.repaint();
 	}
-    
+
 	@Override
     public boolean fillsView(double w,double h,int camIndex){
         return false;
     }
-    
+
     @Override
     public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
         if (((ProjEclipse)pc[camIndex]).eclipsed.contains(jpx, jpy) && ((ProjEclipse)pc[camIndex]).shadowSource.contains(jpx, jpy)){return true;}
         else {return false;}
     }
-	
+
 	@Override
     public void project(Camera c, Dimension d){
         int i = c.getIndex();
@@ -221,7 +221,7 @@ public class VEclipse extends VCircle {
             }
         }
 	}
-	
+
 	@Override
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 		if (Math.abs(fraction) > 1){return;}
@@ -291,7 +291,7 @@ public class VEclipse extends VCircle {
             }
         }
     }
-    
+
 }
 
 class ProjEclipse extends BProjectedCoords {
@@ -301,5 +301,5 @@ class ProjEclipse extends BProjectedCoords {
 
 	Ellipse2D leclipsed = new Ellipse2D.Float();
 	Ellipse2D lshadowSource = new Ellipse2D.Float();
-	
+
 }

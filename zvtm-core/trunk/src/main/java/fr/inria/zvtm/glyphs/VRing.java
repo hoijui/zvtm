@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2008-2011. All Rights Reserved
+ *   Copyright (c) INRIA, 2008-2012ˇ. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -27,7 +27,7 @@ import fr.inria.zvtm.glyphs.projection.ProjRing;
  * @author Emmanuel Pietriga
  */
 
-public class VRing extends ClosedShape {
+public class VRing<T> extends ClosedShape {
 
     /*vertex x coords*/
     public int[] xpcoords;

@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2010-2011. All Rights Reserved
+ *   Copyright (c) INRIA, 2010-2012. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -35,7 +35,7 @@ vs.addGlyph(new VSwingComponent(200, 0, 0, b));
  * @author Emmanuel Pietriga
  */
 
-public class VSwingComponent extends ClosedShape implements RectangularShape {
+public class VSwingComponent<T> extends ClosedShape implements RectangularShape {
 
     /** Width in virtual space (read-only). */
     public double vw;
@@ -106,7 +106,7 @@ public class VSwingComponent extends ClosedShape implements RectangularShape {
     public VSwingComponent(double x, double y, int z, JComponent c, double scale, float alpha){
         this(x, y, z, c, scale, 0, 1f);
     }
-    
+
     /** Instantiate a Swing component at (x, y) with a custom scale.
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
@@ -185,7 +185,7 @@ public class VSwingComponent extends ClosedShape implements RectangularShape {
     public double getOrient(){return orient;}
 
     /** Set the glyph's absolute orientation.
-    *@param angle in [0:2Pi[ 
+    *@param angle in [0:2Pi[
     */
     @Override
     public void orientTo(double angle){
@@ -294,7 +294,7 @@ public class VSwingComponent extends ClosedShape implements RectangularShape {
         if (pc[camIndex].p.contains(jpx, jpy)){return true;}
         else {return false;}
     }
-    
+
     @Override
     public boolean visibleInRegion(double wb, double nb, double eb, double sb, int i){
         if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
@@ -309,7 +309,7 @@ public class VSwingComponent extends ClosedShape implements RectangularShape {
         }
         return false;
     }
-    
+
     /** The disc is actually approximated to its bounding box here. Precise intersection computation would be too costly. */
 	@Override
     public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
@@ -326,7 +326,7 @@ public class VSwingComponent extends ClosedShape implements RectangularShape {
                 return Glyph.ENTERED_GLYPH;
             }
             //if it was inside last time, nothing has changed
-            else {return Glyph.NO_CURSOR_EVENT;}  
+            else {return Glyph.NO_CURSOR_EVENT;}
         }
         else{
             //if the mouse is not inside the glyph
@@ -451,7 +451,7 @@ public class VSwingComponent extends ClosedShape implements RectangularShape {
                     sc.paint(g);
                     g.setTransform(stdT);
                     if (paintBorder){
-                        g.setColor(borderColor);                        
+                        g.setColor(borderColor);
                         if (stroke != null) {
                             g.setStroke(stroke);
                             g.drawPolygon(pc[i].p);
@@ -582,7 +582,7 @@ public class VSwingComponent extends ClosedShape implements RectangularShape {
                     sc.paint(g);
                     g.setTransform(stdT);
                     if (paintBorder){
-                        g.setColor(borderColor);                        
+                        g.setColor(borderColor);
                         if (stroke != null) {
                             g.setStroke(stroke);
                             g.drawPolygon(pc[i].lp);
@@ -682,7 +682,7 @@ public class VSwingComponent extends ClosedShape implements RectangularShape {
             g.fillRect(pc[i].lcx, pc[i].lcy, 1, 1);
         }
     }
-    
+
 	@Override
 	public Shape getJava2DShape(){
 		return new Rectangle2D.Double(vx-vw/2.0, vy-vh/2.0, vw, vh);
@@ -703,7 +703,7 @@ public class VSwingComponent extends ClosedShape implements RectangularShape {
 
     /**
      * Utility function: to ensure proper display, it is necessary
-     * to set the size of 'standalone' Components, or to force the 
+     * to set the size of 'standalone' Components, or to force the
      * layout of Containers.
      * @see #forceLayout(Container container)
      */
@@ -713,7 +713,7 @@ public class VSwingComponent extends ClosedShape implements RectangularShape {
 
     /**
      * Utility function: to ensure proper display, it is necessary
-     * to set the size of 'standalone' Components, or to force the 
+     * to set the size of 'standalone' Components, or to force the
      * layout of Containers.
      * @see #setSizeToPreferred(Component cmp)
      */

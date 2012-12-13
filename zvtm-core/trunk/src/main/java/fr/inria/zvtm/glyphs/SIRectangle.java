@@ -3,7 +3,7 @@
  *   AUTHOR :            Emmanuel Pietriga (emmanuel@w3.org)
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Emmanuel Pietriga, 2002. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2012. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -30,7 +30,7 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
  * @author Emmanuel Pietriga
  **/
 
-public class SIRectangle extends ClosedShape implements RectangularShape {
+public class SIRectangle<T> extends ClosedShape implements RectangularShape {
 
     double vw,vh;
     double ar;
@@ -157,7 +157,7 @@ public class SIRectangle extends ClosedShape implements RectangularShape {
         VirtualSpaceManager.INSTANCE.repaint();
     }
 
-    public void setWidth(double w){ 
+    public void setWidth(double w){
         vw=w;
         computeSize();
         updateProjectedWH();
@@ -212,7 +212,7 @@ public class SIRectangle extends ClosedShape implements RectangularShape {
 		/* Glyph is at least partially in region.
 		   We approximate using the glyph bounding box, meaning that some glyphs not
 		   actually visible can be projected and drawn (but they won't be displayed)) */
-		return true;  
+		return true;
 	    }
 	}
 	return false;
@@ -236,7 +236,7 @@ public class SIRectangle extends ClosedShape implements RectangularShape {
 	if ((w<=pc[camIndex].cx+pc[camIndex].cw) && (0>=pc[camIndex].cx-pc[camIndex].cw) && (h<=pc[camIndex].cy+pc[camIndex].ch) && (0>=pc[camIndex].cy-pc[camIndex].ch)){return true;}
 	else {return false;}
     }
-    
+
     @Override
     public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
 		return dvs.intersects(vx-vw/2d, vy-vh/2d, vw, vh);
@@ -259,7 +259,7 @@ public class SIRectangle extends ClosedShape implements RectangularShape {
                 return Glyph.ENTERED_GLYPH;
             }
             //if it was inside last time, nothing has changed
-            else {return Glyph.NO_CURSOR_EVENT;}  
+            else {return Glyph.NO_CURSOR_EVENT;}
         }
         else{
             //if the mouse is not inside the glyph
@@ -271,7 +271,7 @@ public class SIRectangle extends ClosedShape implements RectangularShape {
             else {return Glyph.NO_CURSOR_EVENT;}
         }
     }
-    
+
     @Override
     public void project(Camera c, Dimension d){
         int i=c.getIndex();

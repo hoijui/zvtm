@@ -1,9 +1,9 @@
 /*   AUTHOR : Romain Primet (romain.primet@inria.fr)
  *
- *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2010.
+ *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2010-2012.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- */ 
+ */
 package fr.inria.zvtm.glyphs;
 
 import java.awt.Color;
@@ -20,7 +20,7 @@ import fr.inria.zvtm.engine.Camera;
 /**
  * Composite glyph.
  */
-public class Composite extends Glyph {
+public class Composite<T> extends Glyph {
     private ArrayList<Glyph> children;
 
     private transient double[] bbox; //wnes
@@ -45,7 +45,7 @@ public class Composite extends Glyph {
     /**
      * Removes a child Glyph from this Composite.
      * @param child Glyph to remove
-     * @return <code>true</code> if child has been removed, <code>false</code> 
+     * @return <code>true</code> if child has been removed, <code>false</code>
      * otherwise
      */
     public boolean removeChild(Glyph child){
@@ -75,11 +75,11 @@ public class Composite extends Glyph {
      */
     @Override
         public Composite clone(){
-            Composite retval = (Composite)super.clone();  
+            Composite retval = (Composite)super.clone();
             retval.children = new ArrayList<Glyph>();
             for(Glyph g: children){
                 retval.children.add((Glyph)g.clone());
-            } 
+            }
             return retval;
         }
 
@@ -111,7 +111,7 @@ public class Composite extends Glyph {
     /**
      * {@inheritDoc}
      */
-    @Override 
+    @Override
         public void resetMouseIn(int i){
             //XXX ?
         }
@@ -127,14 +127,14 @@ public class Composite extends Glyph {
 
     //XXX implement visibleInRegion (clipping)
 
-    @Override 
+    @Override
         public void removeCamera(int index){
             for(Glyph child: children){
                 child.removeCamera(index);
             }
         }
 
-    @Override 
+    @Override
         public void addCamera(int index){
             for(Glyph child: children){
                 child.addCamera(index);
@@ -145,7 +145,7 @@ public class Composite extends Glyph {
         public void initCams(int nbCam){
             for(Glyph child: children){
                 child.initCams(nbCam);
-            } 
+            }
         }
 
     @Override
@@ -215,12 +215,12 @@ public class Composite extends Glyph {
             return 0f;
         }
 
-    @Override 
+    @Override
         public void reSize(double factor){
             for(Glyph child: children){
                 child.reSize(factor);
 
-                child.move((vx - child.vx) * (1. - factor), 
+                child.move((vx - child.vx) * (1. - factor),
                         (vy - child.vy) * (1. - factor));
             }
             computeBounds();
@@ -228,16 +228,16 @@ public class Composite extends Glyph {
 
     @Override
         public void sizeTo(double newSize){
-            reSize(newSize/getSize()); 
+            reSize(newSize/getSize());
         }
 
-    @Override 
+    @Override
         public void move(double dx, double dy){
             vx += dx;
             vy += dy;
             for(Glyph child: children){
                 child.move(dx, dy);
-            } 
+            }
             translateBoundingBox(dx, dy);
         }
 
@@ -249,10 +249,10 @@ public class Composite extends Glyph {
     @Override
         public boolean visibleInRegion(double wb, double nb, double eb, double sb, int i){
             double vw = (bbox[2] - bbox[0])/2d;
-            double vh = (bbox[1] - bbox[3])/2d; 
+            double vh = (bbox[1] - bbox[3])/2d;
             double cx = bbox[0] + vw;
-            double cy = bbox[3] + vh; 
-            return ((cx-vw)<=eb) && ((cx+vw)>=wb) && 
+            double cy = bbox[3] + vh;
+            return ((cx-vw)<=eb) && ((cx+vw)>=wb) &&
                 ((cy-vh)<=nb) && ((cy+vh)>=sb);
         }
 
@@ -267,7 +267,7 @@ public class Composite extends Glyph {
      * Re-computes the bounds of this Composite.
      * This method is called automatically after external operations
      * affecting the Composite size (such as adding or deleting a child) but
-     * should be called manually after modifying a child's size or position. 
+     * should be called manually after modifying a child's size or position.
      */
     public void computeBounds(){
         bbox[0] = Double.MAX_VALUE;
@@ -296,9 +296,9 @@ public class Composite extends Glyph {
         }
     }
 
-    @Override 
+    @Override
         public double getSize(){
-            return (Math.sqrt((bbox[1] - bbox[3])*(bbox[1] - bbox[3]) + 
+            return (Math.sqrt((bbox[1] - bbox[3])*(bbox[1] - bbox[3]) +
                         (bbox[2] - bbox[0])*(bbox[2] - bbox[0])));
         }
 

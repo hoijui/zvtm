@@ -3,13 +3,13 @@
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@xrce.xerox.com)
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2002. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2011. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2012. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -36,17 +36,17 @@ import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 
 /**
- * Circle. 
+ * Circle.
  * @author Emmanuel Pietriga
  *@see fr.inria.zvtm.glyphs.VEllipse
  *@see fr.inria.zvtm.glyphs.SICircle
  */
 
-public class VCircle extends ClosedShape {
+public class VCircle<T> extends ClosedShape {
 
     /*array of projected coordinates - index of camera in virtual space is equal to index of projected coords in this array*/
     public BProjectedCoords[] pc;
-    
+
     public VCircle(){
         this(0, 0, 0, 10, Color.WHITE, Color.BLACK, 1);
     }
@@ -73,7 +73,7 @@ public class VCircle extends ClosedShape {
     public VCircle(double x, double y, int z, double d, Color c, Color bc){
         this(x, y, z, d, c, bc, 1);
     }
-    
+
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
@@ -166,13 +166,13 @@ public class VCircle extends ClosedShape {
 
     @Override
     public boolean fillsView(double w,double h,int camIndex){
-        if ((alphaC == null) && (Math.sqrt(Math.pow(w-pc[camIndex].cx,2)+Math.pow(h-pc[camIndex].cy,2))<=pc[camIndex].cr/2d) 
-            && (Math.sqrt(Math.pow(pc[camIndex].cx,2)+Math.pow(h-pc[camIndex].cy,2))<=pc[camIndex].cr/2d) 
-            && (Math.sqrt(Math.pow(w-pc[camIndex].cx,2)+Math.pow(pc[camIndex].cy,2))<=pc[camIndex].cr/2d) 
+        if ((alphaC == null) && (Math.sqrt(Math.pow(w-pc[camIndex].cx,2)+Math.pow(h-pc[camIndex].cy,2))<=pc[camIndex].cr/2d)
+            && (Math.sqrt(Math.pow(pc[camIndex].cx,2)+Math.pow(h-pc[camIndex].cy,2))<=pc[camIndex].cr/2d)
+            && (Math.sqrt(Math.pow(w-pc[camIndex].cx,2)+Math.pow(pc[camIndex].cy,2))<=pc[camIndex].cr/2d)
             && (Math.sqrt(Math.pow(pc[camIndex].cx,2)+Math.pow(pc[camIndex].cy,2))<=pc[camIndex].cr/2d)){return true;}
         else {return false;}
     }
-    
+
     @Override
     public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
         if (Math.sqrt(Math.pow(jpx-pc[camIndex].cx,2)+Math.pow(jpy-pc[camIndex].cy,2))<=pc[camIndex].cr/2d){return true;}
@@ -189,7 +189,7 @@ public class VCircle extends ClosedShape {
                 return Glyph.ENTERED_GLYPH;
             }
             //if it was inside last time, nothing has changed
-            else {return Glyph.NO_CURSOR_EVENT;}  
+            else {return Glyph.NO_CURSOR_EVENT;}
         }
         else{
             //if the mouse is not inside the glyph

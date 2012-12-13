@@ -1,4 +1,4 @@
-/*   Copyright (c) INRIA, 2011. All Rights Reserved
+/*   Copyright (c) INRIA, 2011-2012. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -20,14 +20,14 @@ import fr.inria.zvtm.text.TextShortener;
 /**
  * An adaptative version of VText
  */
-public class AdaptiveText extends VText {
+public class AdaptiveText<T> extends VText {
 
     private TextShortener shortener = PrefixTextShortener.INSTANCE;
     private double vsHeight;
     private double vsWidth; //virtual space width (max)
     private Rectangle2D textPxBounds = null;
     //note: we use the font size as the minimal pixel text height
-    
+
     public AdaptiveText(double x, double y, int z, Color c, String t, double vsWidth, double vsHeight){
         super(x,y,z,c,t);
         this.vsHeight = vsHeight;
@@ -35,7 +35,7 @@ public class AdaptiveText extends VText {
         super.setTextAnchor(VText.TEXT_ANCHOR_MIDDLE);
         invalidatePixelBounds();
     }
-    
+
     //computes approximate text bounds
     private void computePixelBounds(Graphics2D g2d){
        textPxBounds = new TextLayout(getText(), getFont(), g2d.getFontRenderContext()).getBounds();
@@ -47,7 +47,7 @@ public class AdaptiveText extends VText {
 
     private boolean validPixelBounds(){
        return (textPxBounds != null);
-    } 
+    }
 
     /**
      * Sets the shortener for this AdaptiveText.
@@ -69,12 +69,12 @@ public class AdaptiveText extends VText {
      * Ignored (setting the scale is not meaningful
      * in the case of AdaptiveText)
      */
-    @Override public void setScale(float ignored){} 
+    @Override public void setScale(float ignored){}
 
     /**
      * Ignored (AdaptiveText is zoom sensitive)
      */
-    @Override public void setZoomSensitive(boolean ignored){} 
+    @Override public void setZoomSensitive(boolean ignored){}
 
     /**
      * Ignored.
@@ -89,7 +89,7 @@ public class AdaptiveText extends VText {
         return (vx + (vsWidth/2) >= wb &&
                 vx - (vsWidth/2) <= eb &&
                 vy + (vsHeight/2) >= sb &&
-                vy - (vsHeight/2) <= nb); 
+                vy - (vsHeight/2) <= nb);
     }
 
     @Override public boolean containedInRegion(double wb, double nb, double eb, double sb, int i){
@@ -114,9 +114,9 @@ public class AdaptiveText extends VText {
             int txLen = (int)Math.floor(xscr/(textPxBounds.getWidth()*txtScale)*getText().length());
             finalTxt = shortener.shorten(finalTxt, txLen);
         }
-     
+
         if (alphaC != null && alphaC.getAlpha()==0){return;}
-        g.setFont((font!=null) ? font : getMainFont());	
+        g.setFont((font!=null) ? font : getMainFont());
         AffineTransform at = AffineTransform.getTranslateInstance(dx+pc[i].cx-(textPxBounds.getWidth()*txtScale*finalTxt.length()/getText().length()*0.5),dy+pc[i].cy+(textPxBounds.getHeight()*0.5*txtScale));
         at.concatenate(AffineTransform.getScaleInstance(txtScale, txtScale));
         g.setTransform(at);

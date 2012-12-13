@@ -4,13 +4,13 @@
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2000-2002. All Rights Reserved
  *   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2011. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2012. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -39,7 +39,7 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
  *@author Emmanuel Pietriga
  */
 
-public abstract class Glyph implements Cloneable, Translucent {
+public abstract class Glyph<T> implements Cloneable, Translucent {
 
     /*------------Misc. Info-------------------------------------*/
 
@@ -47,7 +47,7 @@ public abstract class Glyph implements Cloneable, Translucent {
      * The owner can be any arbitrary Java object set by the client application, that the programmer wants to be easily accessible through the Glyph (typically the owner will be an object that models a logical concept of which a visual depiction is given by the glyph). Multiple glyphs can have the same owner. A glyph can only have one owner.
      * Set by client application. Null if not set.
      */
-    private Object owner;
+    private T owner;
 
     /** Type of object.
      * Arbitrary String, set by client application. Null if not set.
@@ -58,16 +58,16 @@ public abstract class Glyph implements Cloneable, Translucent {
      * The owner can be any arbitrary Java object set by the client application, that the programmer wants to be easily accessible through the Glyph (typically the owner will be an object that models a logical concept of which a visual depiction is given by the glyph). Multiple glyphs can have the same owner. A glyph can only have one owner.
      *@return null if not associated with anything.
      */
-    public Object getOwner(){
-	return owner;
+    public T getOwner(){
+	   return owner;
     }
-   
+
      /** Set the object this glyph represents in the client application.
      * The owner can be any arbitrary Java object set by the client application, that the programmer wants to be easily accessible through the Glyph (typically the owner will be an object that models a logical concept of which a visual depiction is given by the glyph). Multiple glyphs can have the same owner. A glyph can only have one owner.
      *@param o provided by client application, null by default.
      */
-    public void setOwner(Object o){
-	this.owner = o;
+    public void setOwner(T t){
+	   this.owner = t;
     }
 
     /** Get the type of this glyph.
@@ -77,10 +77,10 @@ public abstract class Glyph implements Cloneable, Translucent {
     public String getType(){
 	return type;
     }
-   
+
     /** Set the type of this glyph.
      * This is somewhat equivalent to tagging an object, but it only one type can be associated with a glyph.
-     *@param t arbitrary string, set by client application. Null if not set. 
+     *@param t arbitrary string, set by client application. Null if not set.
      */
     public void setType(String t){
 	this.type = t;
@@ -158,7 +158,7 @@ public abstract class Glyph implements Cloneable, Translucent {
      */
     public abstract void sizeTo(double s);
 
-    /** Set glyph's size by multiplying its bounding circle diameter by a factor. 
+    /** Set glyph's size by multiplying its bounding circle diameter by a factor.
      *@see #sizeTo(double s)
      */
     public abstract void reSize(double factor);
@@ -167,10 +167,10 @@ public abstract class Glyph implements Cloneable, Translucent {
     public abstract double getOrient();
 
     /** Set the glyph's absolute orientation.
-     *@param angle in [0:2Pi[ 
+     *@param angle in [0:2Pi[
      */
     public abstract void orientTo(double angle);
-    
+
     /** Get this object's z-index.
      *@return the default value, 0 if a z-index was not specified
      */
@@ -231,27 +231,27 @@ public abstract class Glyph implements Cloneable, Translucent {
 
 
     /*------------Color------------------------------------------*/
-    
+
     static Color DEFAULT_MOUSE_INSIDE_COLOR = Color.WHITE;
 
     public static void setDefaultCursorInsideHighlightColor(Color c){
         DEFAULT_MOUSE_INSIDE_COLOR = c;
     }
-    
+
     public static Color getDefaultCursorInsideHighlightColor(){
         return DEFAULT_MOUSE_INSIDE_COLOR;
     }
-     
+
      // Fill color for closed shapes, stroke color for glyphs which use just one color, such as text, paths, segments.
     protected Color color;
-    
-    // Coordinates of main color in HSV color space. 
+
+    // Coordinates of main color in HSV color space.
     protected float[] HSV=new float[3];
-    
-    // Main or Fill color of this glyph when it is in its default state. 
+
+    // Main or Fill color of this glyph when it is in its default state.
 	protected Color fColor = Color.white;
 
-    // Highlight color of this glyph when cursor is inside it. Null if same as default border color. 
+    // Highlight color of this glyph when cursor is inside it. Null if same as default border color.
     protected Color cursorInsideColor = DEFAULT_MOUSE_INSIDE_COLOR;
 
     /** Indicates whether this glyph's interior is filled or not.
@@ -331,7 +331,7 @@ public abstract class Glyph implements Cloneable, Translucent {
      *@see #addHSVbColor(float h,float s,float v)
      */
     public void setHSVbColor(float h,float s,float v){}
-    
+
     /** Set the glyph's border color (absolute value, HSV color space).
      * Use setColor for text, paths, segments, etc.
      * This will have an effect only for Glyphs that have a border, such as instances of ClosedShape.
@@ -380,25 +380,25 @@ public abstract class Glyph implements Cloneable, Translucent {
     public Color getBorderColor(){
 	return Color.BLACK;
     }
-    
+
     /** Highlight this glyph to give visual feedback when the cursor is inside it. */
     public abstract void highlight(boolean b, Color selectedColor);
-    
+
     /* ---------------- Translucency ------------------- */
-    
+
     /** AlphaComposite used to paint glyph if not opaque. Set to null if glyph is opaque. Temporarily made public until all glyphs get into the same package.*/
     public AlphaComposite alphaC;
-    
+
     /**
      * Set alpha channel value (translucency).
      *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
-     */    
+     */
     public void setTranslucencyValue(float alpha){
         if (alpha == 1.0f){
             alphaC = null;
         }
         else {
-            alphaC = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);            
+            alphaC = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
         }
         VirtualSpaceManager.INSTANCE.repaint();
     }
@@ -423,7 +423,7 @@ public abstract class Glyph implements Cloneable, Translucent {
     }
 
     /** Get this glyph's selection status.
-     *@return true if selected. 
+     *@return true if selected.
      */
     public boolean isSelected(){
 	return selected;
@@ -433,8 +433,8 @@ public abstract class Glyph implements Cloneable, Translucent {
     /*------------Stroke-----------------------------------------*/
 
     /** For internal use. Dot not tamper with. */
-    protected Stroke stroke = null;  
-    
+    protected Stroke stroke = null;
+
     /** Set a custom stroke to paint glyph's border.
      *@param s stroke (null to set standard 1px-thick stroke)
      */
@@ -460,7 +460,7 @@ public abstract class Glyph implements Cloneable, Translucent {
     public Object stickedTo;
 
     /** Propagate this glyph's movement to all glyphs constrained by this one.
-     * Called automatically by ZVTM when translating this glyph. 
+     * Called automatically by ZVTM when translating this glyph.
      */
     public void propagateMove(double x, double y){
         if (stickedGlyphs != null){
@@ -548,7 +548,7 @@ public abstract class Glyph implements Cloneable, Translucent {
     /** Value sent to cursor when it neither enters nor exit this glyph. For internal use. */
     public static final short NO_CURSOR_EVENT = 0;
 
-    // Projection coefficient. Computed internally. Do not tamper with. 
+    // Projection coefficient. Computed internally. Do not tamper with.
     protected double coef=1.0f;
 
     /** Project glyph w.r.t a given camera's coordinate system, prior to actual painting. Called internally.
@@ -568,7 +568,7 @@ public abstract class Glyph implements Cloneable, Translucent {
     public abstract void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, double lensx, double lensy);
 
     /** Draw this glyph.
-     *@param g graphics context in which the glyph should be drawn 
+     *@param g graphics context in which the glyph should be drawn
      *@param vW associated View width (used by some closed shapes to determine if it is worth painting the glyph's border)
      *@param vH associated View height (used by some closed shapes to determine if it is worth painting the glyph's border)
      *@param i camera index in the virtual space containing the glyph
@@ -580,7 +580,7 @@ public abstract class Glyph implements Cloneable, Translucent {
     public abstract void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy);
 
     /** Draw this glyph through a lens.
-     *@param g graphics context in which the glyph should be drawn 
+     *@param g graphics context in which the glyph should be drawn
      *@param vW associated View width (used by some closed shapes to determine if it is worth painting the glyph's border)
      *@param vH associated View height (used by some closed shapes to determine if it is worth painting the glyph's border)
      *@param i camera index in the virtual space containing the glyph
@@ -627,12 +627,12 @@ public abstract class Glyph implements Cloneable, Translucent {
 
     /** Reset memory of cursor being inside the glyph for projected coordinates associated with camera at index i. */
     public abstract void resetMouseIn(int i);
-    
+
     /** Method used internally for firing picking-related events.
      *@param jpx provide projected JPanel coordinates of the associated view, not virtual space coordinates
      *@param jpy provide projected JPanel coordinates of the associated view, not virtual space coordinates
      *@param cvx virtual space coordinates
-     *@param cvy virtual space coordinates 
+     *@param cvy virtual space coordinates
      *@return VCursor.ENTERED_GLYPH if cursor has entered the glyph, VCursor.EXITED_GLYPH if it has exited the glyph, VCursor.NO_CURSOR_EVENT if nothing has changed (meaning the cursor was already inside or outside it)
      */
     public abstract short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy);
@@ -658,11 +658,11 @@ public abstract class Glyph implements Cloneable, Translucent {
         }
         return false;
     }
-    
+
     public boolean visibleInViewport(double wb, double nb, double eb, double sb, Camera c){
         return visibleInRegion(wb, nb, eb, sb, c.getIndex());
     }
-    
+
     /** Method used internally to find out if it is necessary to project and draw the glyph through a lens for a given camera.
      *@param wb west region boundary (virtual space coordinates)
      *@param nb north region boundary (virtual space coordinates)
@@ -687,7 +687,7 @@ public abstract class Glyph implements Cloneable, Translucent {
     /** Find out if this glyph completely fills a view. (In which case it is not necessary to repaint objects below it in the drawing stack).
      * If implemented, this method should be very efficient, as it is used by an optional top-down clipping algorithm.
      * Otherwise it might cost more time than it can potentially save.
-     * Until now it has only been implemented for non-reorientable rectangles and was activated only for 
+     * Until now it has only been implemented for non-reorientable rectangles and was activated only for
      * treemap-like representations in which a lot of rectangles can potentially overlap each other.
      */
     public abstract boolean fillsView(double w,double h,int camIndex);
@@ -698,7 +698,7 @@ public abstract class Glyph implements Cloneable, Translucent {
 	public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
 		return false;
 	}
-	
+
 	/** Get the bounding box of this Glyph in virtual space coordinates.
 	 *@return west, north, east and south bounds in virtual space.
 	 */
@@ -706,9 +706,9 @@ public abstract class Glyph implements Cloneable, Translucent {
 		double[] res = {vx-size, vy+size, vx+size,vy-size};
 		return res;
 	}
-	
+
 	/*------------------------Sticking--------------------------*/
-	
+
 	/** Stick glyph g1 to glyph g2. Behaves like a one-way constraint.*/
     public static void stickToGlyph(Glyph g1,Glyph g2){
 		g2.stick(g1);
@@ -718,17 +718,17 @@ public abstract class Glyph implements Cloneable, Translucent {
     public static void unstickFromGlyph(Glyph g1,Glyph g2){
 		g2.unstick(g1);
 	}
-    
+
     /** Unstick all glyphs sticked to Glyph g. */
     public static void unstickAllGlyphs(Glyph g){
 		g.unstickAllGlyphs();
 	}
-	
+
     /*---------------------  Java 2D  --------------------------*/
-	
+
 	/** Get the Java2D Shape corresponding to this Glyph. Virtual Space coordinates. */
 	public abstract Shape getJava2DShape();
-	
+
 
     /*-------------Cloning--------------------------------------*/
 

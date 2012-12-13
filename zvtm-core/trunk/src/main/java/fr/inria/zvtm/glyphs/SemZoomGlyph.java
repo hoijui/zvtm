@@ -1,4 +1,4 @@
-/*   Copyright (c) INRIA, 2010-2011. All Rights Reserved
+/*   Copyright (c) INRIA, 2010-2012. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -23,7 +23,8 @@ import fr.inria.zvtm.engine.Camera;
  * of transition altitudes. When painting itself, the SemZoomGlyph delegates
  * to the appropriate underlying Glyph.
  */
-public class SemZoomGlyph extends Glyph {
+public class SemZoomGlyph<T> extends Glyph {
+
     private final ArrayList<Glyph> glyphs;
     private final ArrayList<Double> transitions;
 

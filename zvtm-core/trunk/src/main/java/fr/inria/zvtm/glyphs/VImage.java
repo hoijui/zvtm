@@ -3,13 +3,13 @@
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@xrce.xerox.com)
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2002. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2012. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -43,7 +43,7 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
  *@see fr.inria.zvtm.glyphs.VImageOr
  */
 
-public class VImage extends ClosedShape implements RectangularShape {
+public class VImage<T> extends ClosedShape implements RectangularShape {
 
     /** Width in virtual space (read-only). */
     public double vw;
@@ -66,7 +66,7 @@ public class VImage extends ClosedShape implements RectangularShape {
 
     /** For internal use. Made public for easier outside package subclassing. */
     public double scaleFactor = 1.0f;
-    
+
     /** For internal use. Made public for easier outside package subclassing. */
     public double trueCoef = 1.0f;
 
@@ -97,7 +97,7 @@ public class VImage extends ClosedShape implements RectangularShape {
     public VImage(double x, double y, int z, Image img, double scale){
         this(x, y, z, img, scale, 1.0f);
     }
-    
+
     /** Construct an image at (x, y) with a custom scale.
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
@@ -291,7 +291,7 @@ public class VImage extends ClosedShape implements RectangularShape {
         }
         return false;
     }
-    
+
 	@Override
     public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
 		return dvs.intersects(vx-vw/2d, vy-vh/2d, vw, vh);
@@ -307,7 +307,7 @@ public class VImage extends ClosedShape implements RectangularShape {
                 return Glyph.ENTERED_GLYPH;
             }
             //if it was inside last time, nothing has changed
-            else {return Glyph.NO_CURSOR_EVENT;}  
+            else {return Glyph.NO_CURSOR_EVENT;}
         }
         else{
             //if the mouse is not inside the glyph
@@ -391,7 +391,7 @@ public class VImage extends ClosedShape implements RectangularShape {
                         g.setColor(borderColor);
                         if (stroke!=null) {
                             g.setStroke(stroke);
-                            g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);                            
+                            g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
                             g.setStroke(stdS);
                         }
                         else {
@@ -415,7 +415,7 @@ public class VImage extends ClosedShape implements RectangularShape {
                         g.setColor(borderColor);
                         if (stroke!=null) {
                             g.setStroke(stroke);
-                            g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);                            
+                            g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
                             g.setStroke(stdS);
                         }
                         else {
@@ -433,7 +433,7 @@ public class VImage extends ClosedShape implements RectangularShape {
                         g.setColor(borderColor);
                         if (stroke!=null) {
                             g.setStroke(stroke);
-                            g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);                            
+                            g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
                             g.setStroke(stdS);
                         }
                         else {
@@ -449,7 +449,7 @@ public class VImage extends ClosedShape implements RectangularShape {
                         g.setColor(borderColor);
                         if (stroke!=null) {
                             g.setStroke(stroke);
-                            g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);                            
+                            g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
                             g.setStroke(stdS);
                         }
                         else {
@@ -496,7 +496,7 @@ public class VImage extends ClosedShape implements RectangularShape {
                         }
                         else {
                             g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
-                        }                        
+                        }
                     }
                     g.setComposite(acO);
                 }
@@ -520,7 +520,7 @@ public class VImage extends ClosedShape implements RectangularShape {
                         }
                         else {
                             g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
-                        }                        
+                        }
                     }
                 }
             }
@@ -538,7 +538,7 @@ public class VImage extends ClosedShape implements RectangularShape {
                         }
                         else {
                             g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
-                        }                        
+                        }
                     }
                     g.setComposite(acO);
                 }
@@ -554,7 +554,7 @@ public class VImage extends ClosedShape implements RectangularShape {
                         }
                         else {
                             g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
-                        }                        
+                        }
                     }
                 }
             }
@@ -564,17 +564,17 @@ public class VImage extends ClosedShape implements RectangularShape {
             g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
         }
     }
-        
+
     /** For internal use. Made public for easier outside package subclassing. */
     public Object interpolationMethod = RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
-    
+
     /** Specify how image should be interpolated when drawn at a scale different from its original scale.
         *@param im one of java.awt.RenderingHints.{VALUE_INTERPOLATION_NEAREST_NEIGHBOR,VALUE_INTERPOLATION_BILINEAR,VALUE_INTERPOLATION_BICUBIC} ; default is VALUE_INTERPOLATION_NEAREST_NEIGHBOR
         */
     public void setInterpolationMethod(Object im){
         interpolationMethod = im;
     }
-    
+
     /** Get information about how image should be interpolated when drawn at a scale different from its original scale.
         *@return one of java.awt.RenderingHints.{VALUE_INTERPOLATION_NEAREST_NEIGHBOR,VALUE_INTERPOLATION_BILINEAR,VALUE_INTERPOLATION_BICUBIC} ; default is VALUE_INTERPOLATION_NEAREST_NEIGHBOR
         */

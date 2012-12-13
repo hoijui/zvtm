@@ -3,13 +3,13 @@
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@xrce.xerox.com)
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2002. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2012. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -41,7 +41,7 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
  * @author Emmanuel Pietriga
  **/
 
-public class VShape extends ClosedShape {
+public class VShape<T> extends ClosedShape {
 
     BProjectedCoordsP[] pc;
 
@@ -86,7 +86,7 @@ public class VShape extends ClosedShape {
     public VShape(double x, double y, int z, double s, float[] v, Color c, Color bc, double or){
         this(x, y, z, s, v, c, bc, or, 1.0f);
     }
-    
+
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
@@ -215,7 +215,7 @@ public class VShape extends ClosedShape {
                 return Glyph.ENTERED_GLYPH;
             }
             //if it was inside last time, nothing has changed
-            else {return Glyph.NO_CURSOR_EVENT;}  
+            else {return Glyph.NO_CURSOR_EVENT;}
         }
         else{
             //if the mouse is not inside the glyph
@@ -385,7 +385,7 @@ public class VShape extends ClosedShape {
                 // translucent
                 g.setComposite(alphaC);
                 if (filled){
-                    g.setColor(this.color); 
+                    g.setColor(this.color);
                     g.translate(dx, dy);
                     g.fillPolygon(pc[i].lp);
                     g.translate(-dx, -dy);
@@ -410,7 +410,7 @@ public class VShape extends ClosedShape {
             else {
                 // opaque
                 if (filled){
-                    g.setColor(this.color); 
+                    g.setColor(this.color);
                     g.translate(dx, dy);
                     g.fillPolygon(pc[i].lp);
                     g.translate(-dx, -dy);

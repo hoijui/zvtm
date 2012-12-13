@@ -3,13 +3,13 @@
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@xrce.xerox.com)
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2002. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2012. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -44,7 +44,7 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
  *@see fr.inria.zvtm.glyphs.SIRectangle
  */
 
-public class VRectangle extends ClosedShape implements RectangularShape {
+public class VRectangle<T> extends ClosedShape implements RectangularShape {
 
     /** Width in virtual space. For internal use. Made public for easier outside package subclassing. */
     public double vw;
@@ -185,7 +185,7 @@ public class VRectangle extends ClosedShape implements RectangularShape {
         VirtualSpaceManager.INSTANCE.repaint();
     }
 
-    public void setWidth(double w){ 
+    public void setWidth(double w){
         vw = w;
         ar = vw / vh;
         computeSize();
@@ -259,7 +259,7 @@ public class VRectangle extends ClosedShape implements RectangularShape {
                 return Glyph.ENTERED_GLYPH;
             }
             //if it was inside last time, nothing has changed
-            else {return Glyph.NO_CURSOR_EVENT;}  
+            else {return Glyph.NO_CURSOR_EVENT;}
         }
         else{
             //if the mouse is not inside the glyph

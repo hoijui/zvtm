@@ -17,7 +17,7 @@ public class Translucency {
      *  10 seems to be a minimum, while 100 is definitely too high for most needs.
      */
     public static final int ACS_ACCURACY = 20;
-    
+
     public static final AlphaComposite[] acs;
     static {
 	acs = new AlphaComposite[ACS_ACCURACY+1];

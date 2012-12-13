@@ -3,11 +3,11 @@
  *   AUTHOR :            Emmanuel Pietriga (emmanuel@w3.org)
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Emmanuel Pietriga, 2002-2010. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2009. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2012. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
- */ 
+ */
 
 package fr.inria.zvtm.glyphs;
 
@@ -30,7 +30,7 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
  *@see fr.inria.zvtm.glyphs.VRectangle
  */
 
-public class VRoundRect extends ClosedShape implements RectangularShape  {
+public class VRoundRect<T> extends ClosedShape implements RectangularShape  {
 
     /* Width in virtual space. MADE PUBLIC FOR OUTSIDE PACKAGE SUBCLASSING. */
     public double vw;
@@ -184,7 +184,7 @@ public class VRoundRect extends ClosedShape implements RectangularShape  {
         VirtualSpaceManager.INSTANCE.repaint();
     }
 
-    public void setWidth(double w){ 
+    public void setWidth(double w){
         vw = w;
         ar = vw / vh;
         computeSize();
@@ -272,7 +272,7 @@ public class VRoundRect extends ClosedShape implements RectangularShape  {
         }
         return false;
     }
-    
+
     @Override
     public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
 		return dvs.intersects(vx-vw/2d, vy-vh/2d, vw, vh);
@@ -288,7 +288,7 @@ public class VRoundRect extends ClosedShape implements RectangularShape  {
                 return Glyph.ENTERED_GLYPH;
             }
             //if it was inside last time, nothing has changed
-            else {return Glyph.NO_CURSOR_EVENT;}  
+            else {return Glyph.NO_CURSOR_EVENT;}
         }
         else{
             //if the mouse is not inside the glyph
@@ -300,7 +300,7 @@ public class VRoundRect extends ClosedShape implements RectangularShape  {
             else {return Glyph.NO_CURSOR_EVENT;}
         }
     }
-    
+
     @Override
     public void project(Camera c, Dimension d){
         int i=c.getIndex();

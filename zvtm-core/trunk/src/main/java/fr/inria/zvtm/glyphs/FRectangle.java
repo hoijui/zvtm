@@ -1,4 +1,4 @@
-/*   Copyright (c) INRIA, 2004-2011. All Rights Reserved
+/*   Copyright (c) INRIA, 2004-2012. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -24,7 +24,7 @@ import fr.inria.zvtm.glyphs.VRectangle;
  *@see fr.inria.zvtm.glyphs.SIRectangle
  */
 
-public class FRectangle extends VRectangle {
+public class FRectangle<T> extends VRectangle {
 
 	public FRectangle(){
         this(0, 0, 0, 10, 10, Color.WHITE, Color.BLACK, 0, 1f);
@@ -61,7 +61,7 @@ public class FRectangle extends VRectangle {
 		MASK_ALPHA_BOTTOM = ba;
 		createMask();
 	}
-	
+
 	float MASK_ALPHA_TOP = 0.0f;
 	float MASK_ALPHA_BOTTOM = 1.0f;
 
@@ -78,7 +78,7 @@ public class FRectangle extends VRectangle {
 	}
 
 	BufferedImage image;
-	
+
 	void createMask(){
 		GradientPaint mask = new GradientPaint(0, 0, new Color(1.0f, 1.0f, 1.0f, MASK_ALPHA_TOP),
 			0, (float)(vh), new Color(1.0f, 1.0f, 1.0f, MASK_ALPHA_BOTTOM));
@@ -100,9 +100,9 @@ public class FRectangle extends VRectangle {
     public boolean fillsView(double w,double h,int camIndex){
 		return false;
 	}
-	
+
 	AffineTransform at;
-	
+
 	@Override
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
 		if ((pc[i].cw>1) && (pc[i].ch>1)){

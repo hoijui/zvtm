@@ -3,11 +3,11 @@
  *   AUTHOR :            Emmanuel Pietriga (emmanuel@w3.org)
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Emmanuel Pietriga, 2002. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2012. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
- */ 
+ */
 
 package fr.inria.zvtm.glyphs;
 
@@ -28,12 +28,12 @@ import fr.inria.zvtm.engine.Camera;
  * Fast Polygon. Can neither be resized nor reoriented (for now).
  * This is the old implementation of VPolygon, as found in ZVTM 0.8.2.<br>
  * The new version of VPolygon can be resized, but at some cost from an efficiency point of view, so the old version is still provided here and can be used by people who do not intend to resize their Polygon instances.<br>
- * This implementation uses doubles instead of doubles for its internal representation of the vertices, see VPolygon for more details. 
+ * This implementation uses doubles instead of doubles for its internal representation of the vertices, see VPolygon for more details.
  *@author Emmanuel Pietriga
  *@see fr.inria.zvtm.glyphs.VPolygon
  **/
 
-public class FPolygon extends ClosedShape {
+public class FPolygon<T> extends ClosedShape {
 
     /*array of projected coordinates - index of camera in virtual space is equal to index of projected coords in this array*/
     ProjPolygon[] pc;
@@ -193,7 +193,7 @@ public class FPolygon extends ClosedShape {
                 return Glyph.ENTERED_GLYPH;
             }
             //if it was inside last time, nothing has changed
-            else {return Glyph.NO_CURSOR_EVENT;}  
+            else {return Glyph.NO_CURSOR_EVENT;}
         }
         else{
             //if the mouse is not inside the glyph
@@ -249,7 +249,7 @@ public class FPolygon extends ClosedShape {
         pc[i].cx = (int)Math.round((d.width/2)+(vx-c.vx)*coef);
         pc[i].cy = (int)Math.round((d.height/2)-(vy-c.vy)*coef);
         //project height and construct polygon
-        pc[i].cr = (int)Math.round(size*coef);	
+        pc[i].cr = (int)Math.round(size*coef);
         for (int j=0;j<xcoords.length;j++){
             pc[i].xpcoords[j]=(int)Math.round(pc[i].cx+xcoords[j]*coef);
             pc[i].ypcoords[j]=(int)Math.round(pc[i].cy-ycoords[j]*coef);
@@ -276,7 +276,7 @@ public class FPolygon extends ClosedShape {
         pc[i].lcx = (int)Math.round((lensWidth/2) + (vx-(lensx))*coef);
         pc[i].lcy = (int)Math.round((lensHeight/2) - (vy-(lensy))*coef);
         //project height and construct polygon
-        pc[i].lcr = (int)Math.round(size*coef);	
+        pc[i].lcr = (int)Math.round(size*coef);
         for (int j=0;j<xcoords.length;j++){
             pc[i].lxpcoords[j]=(int)Math.round(pc[i].lcx+xcoords[j]*coef);
             pc[i].lypcoords[j]=(int)Math.round(pc[i].lcy-ycoords[j]*coef);
@@ -326,7 +326,7 @@ public class FPolygon extends ClosedShape {
             }
             else {
                 if (filled){
-                    g.setColor(this.color); 
+                    g.setColor(this.color);
                     g.translate(dx, dy);
                     g.fillPolygon(pc[i].p);
                     g.translate(-dx, -dy);
@@ -427,7 +427,7 @@ public class FPolygon extends ClosedShape {
             }
         }
     }
-    
+
     /** Get the polygon's area. */
     public double getArea(){
         double[] xcoordsForArea=new double[xcoords.length];

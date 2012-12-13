@@ -2,13 +2,13 @@
  *   DATE OF CREATION:   Jan 09 2001
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@xrce.xerox.com)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2002. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2012. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -39,7 +39,7 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
  *@see fr.inria.zvtm.glyphs.VImage
  */
 
-public class VImageOr extends VImage {
+public class VImageOr<T> extends VImage {
 
     /*vertex x coords*/
     int[] xcoords = new int[4];
@@ -88,7 +88,7 @@ public class VImageOr extends VImage {
     }
 
     /** Set the glyph's absolute orientation.
-     *@param angle in [0:2Pi[ 
+     *@param angle in [0:2Pi[
      */
      @Override
     public void orientTo(double angle){
@@ -101,7 +101,7 @@ public class VImageOr extends VImage {
         if (pc[camIndex].p.contains(jpx, jpy)){return true;}
         else {return false;}
     }
-    
+
     @Override
     public boolean visibleInRegion(double wb, double nb, double eb, double sb, int i){
         if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
@@ -116,7 +116,7 @@ public class VImageOr extends VImage {
         }
         return false;
     }
-    
+
     /** The disc is actually approximated to its bounding box here. Precise intersection computation would be too costly. */
 	@Override
     public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
@@ -239,7 +239,7 @@ public class VImageOr extends VImage {
                         g.drawImage(image,at,null);
                     }
                     if (paintBorder){
-                        g.setColor(borderColor);                        
+                        g.setColor(borderColor);
                         if (stroke!=null) {
                             g.setStroke(stroke);
                             g.drawPolygon(pc[i].p);
@@ -348,7 +348,7 @@ public class VImageOr extends VImage {
                 trueCoef=scaleFactor;
             }
             //a threshold greater than 0.01 causes jolts when zooming-unzooming around the 1.0 scale region
-            if (Math.abs(trueCoef-1.0f)<0.01f){trueCoef=1.0f;} 
+            if (Math.abs(trueCoef-1.0f)<0.01f){trueCoef=1.0f;}
             if (trueCoef!=1.0f){
                 // translate
                 at=AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw,dy+pc[i].lcy-pc[i].lch);

@@ -1,4 +1,4 @@
-/*   Copyright (c) INRIA, 2004-2011. All Rights Reserved
+/*   Copyright (c) INRIA, 2004-2012. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -26,28 +26,28 @@ import fr.inria.zvtm.glyphs.VImage;
  *@see fr.inria.zvtm.glyphs.VImageOr
  */
 
-public class RImage extends VImage {
-    
+public class RImage<T> extends VImage {
+
     static float REFLECTION_HEIGHT_RATIO = 0.5f;
     static float REFLECTION_MASK_ALPHA_BASE = 0.2f;
     static float REFLECTION_MASK_ALPHA_EDGE = 0.0f;
-    
+
     public static void setReflectionHeight(float ratio){
         REFLECTION_HEIGHT_RATIO = ratio;
     }
-    
+
     /**
         *@param base alpha value between in [0.0,1.0] (default value: 0.2)
         *@param edge alpha value between in [0.0,1.0] (typically 0.0)
         */
     public static void setReflectionMaskEndPoints(float base, float edge){
         REFLECTION_MASK_ALPHA_BASE = base;
-        REFLECTION_MASK_ALPHA_EDGE = edge;        
+        REFLECTION_MASK_ALPHA_EDGE = edge;
     }
-    
+
     // include reflection in height computation
     boolean irihc = false;
-    
+
     /**
         *@param img image to be displayed
         *@param alpha alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
@@ -82,7 +82,7 @@ public class RImage extends VImage {
         super(x, y, z, img, scale, alpha);
         this.image = createReflection(img);
     }
-    
+
     /** Construct an image at (x, y) with a custom scale.
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
@@ -100,11 +100,11 @@ public class RImage extends VImage {
             ///XXX:TBW
         }
     }
-    
+
     public boolean includesReflectionInHeightComputation(){
         return irihc;
     }
-    
+
     /** Set bitmap image to be displayed. */
     @Override
     public void setImage(Image i){
@@ -115,12 +115,12 @@ public class RImage extends VImage {
         computeSize();
 	    VirtualSpaceManager.INSTANCE.repaint();
     }
-    
+
     @Override
     public double getHeight(){
         return (irihc) ? vh : vh/2;
     }
-    
+
     @Override
     public Object clone(){
     	RImage res = new RImage(vx, vy, vz, image, (alphaC != null) ? alphaC.getAlpha() : 1.0f);
@@ -142,13 +142,13 @@ public class RImage extends VImage {
             return null;
         }
     }
-    
+
     public static BufferedImage createReflection(Image src){
         return createReflection(src,
             new GradientPaint(0, 0, new Color(1.0f, 1.0f, 1.0f, REFLECTION_MASK_ALPHA_BASE),
                 0, Math.round(src.getHeight(null) * REFLECTION_HEIGHT_RATIO), new Color(1.0f, 1.0f, 1.0f, REFLECTION_MASK_ALPHA_EDGE)));
-    }    
-    
+    }
+
     public static BufferedImage createReflection(Image src, GradientPaint mask){
         // code strongly inspired by the book Filthy Rich Clients, by Chet Haase and Romain Guy
         int height = src.getHeight(null);

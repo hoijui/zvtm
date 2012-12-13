@@ -1,10 +1,10 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2008-2011. All Rights Reserved
+ *   Copyright (c) INRIA, 2008-2012. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
  */
- 
+
 package fr.inria.zvtm.glyphs;
 
 import java.awt.Color;
@@ -12,7 +12,7 @@ import java.awt.Dimension;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.glyphs.VCircle;
 
-public class SICircle extends VCircle {
+public class SICircle<T> extends VCircle {
 
 	public SICircle(){
 		super();
@@ -53,7 +53,7 @@ public class SICircle extends VCircle {
 	public SICircle(double x, double y, int z, double d, Color c, Color bc, float alpha){
 		super(x, y, z, d, c, bc, alpha);
 	}
-	
+
 	@Override
     public boolean visibleInViewport(double wb, double nb, double eb, double sb, Camera c){
         if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
@@ -67,7 +67,7 @@ public class SICircle extends VCircle {
         }
         return false;
     }
-    
+
 	@Override
     public void project(Camera c, Dimension d){
 		int i=c.getIndex();

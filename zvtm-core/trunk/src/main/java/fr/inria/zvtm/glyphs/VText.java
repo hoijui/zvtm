@@ -4,13 +4,13 @@
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2000-2002. All Rights Reserved
  *   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2011. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2012. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -47,7 +47,7 @@ import fr.inria.zvtm.glyphs.projection.ProjText;
  *@see fr.inria.zvtm.glyphs.VTextOr
  */
 
-public class VText extends ClosedShape {
+public class VText<T> extends ClosedShape {
 
     /** Text alignment (for text anchor) used to align a VText (vx,vy coordinates coincides with start of String). */
     public static final short TEXT_ANCHOR_START=0;
@@ -80,7 +80,7 @@ public class VText extends ClosedShape {
 	protected String text;
 
 	protected float scaleFactor = 1.0f;
-	
+
 	/**
 	 * Offset between text and vertical borders
 	 */
@@ -90,7 +90,7 @@ public class VText extends ClosedShape {
 	 * Offset betwenn text and horizontal borders
 	 */
 	public int paddingY = 1;
-    
+
     /**
      * @param t text string
      */
@@ -134,7 +134,7 @@ public class VText extends ClosedShape {
         this(x, y, z, c, null, t, ta, scale, 1.0f);
     }
 
-    
+
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
@@ -148,7 +148,7 @@ public class VText extends ClosedShape {
     public VText(double x, double y, int z, Color c, String t, short ta, float scale, float alpha){
         this(x, y, z, c, null, t, ta, scale, alpha);
     }
-    
+
     /**
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
@@ -169,14 +169,14 @@ public class VText extends ClosedShape {
         // store background color in borderColor attribute
         if (bkg != null){
             setDrawBorder(true);
-            setBorderColor(bkg);            
+            setBorderColor(bkg);
         }
         else {
             setDrawBorder(false);
         }
         text_anchor = ta;
         scaleFactor = scale;
-        setTranslucencyValue(alpha);        
+        setTranslucencyValue(alpha);
     }
 
     @Override
@@ -288,7 +288,7 @@ public class VText extends ClosedShape {
     public static void setTextDisplayedAsSegCoef(float f){
         TEXT_AS_LINE_PROJ_COEF = f;
     }
-    
+
     /** Get the value under which a VText is drawn as a point/segment instead of an actual text (considered too small to be read).
      *@return the value compared to the product of the font size by the projection value. Default is 0.5.
      * Raising this value implies that more text that was still displayed as a string will be displayed as a segment and conversely.
@@ -305,7 +305,7 @@ public class VText extends ClosedShape {
     public void setBorderColor(Color c){
         super.setBorderColor(c);
     }
-    
+
     /** Get the text's background color.
      *@return background fill color. null if background is not painted.
      */
@@ -417,7 +417,7 @@ public class VText extends ClosedShape {
         else {
             //TEXT_ANCHOR_END
     		return dvs.intersects(vx-pc[camIndex].cw, vy, pc[camIndex].cw, pc[camIndex].ch);
-        }	    
+        }
 	}
 
     @Override
@@ -430,7 +430,7 @@ public class VText extends ClosedShape {
                  return Glyph.ENTERED_GLYPH;
              }
              //if it was inside last time, nothing has changed
-             else {return Glyph.NO_CURSOR_EVENT;}  
+             else {return Glyph.NO_CURSOR_EVENT;}
          }
          else{
              //if the mouse is not inside the glyph
@@ -477,7 +477,7 @@ public class VText extends ClosedShape {
 		double trueCoef = scaleFactor * coef;
 		if (trueCoef*fontSize > VText.TEXT_AS_LINE_PROJ_COEF || !zoomSensitive){
 			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
-			g.setFont((font!=null) ? font : getMainFont());	
+			g.setFont((font!=null) ? font : getMainFont());
 			AffineTransform at;
 			if (text_anchor==TEXT_ANCHOR_START){
 			    at = AffineTransform.getTranslateInstance(dx+pc[i].cx,dy+pc[i].cy);
@@ -583,7 +583,7 @@ public class VText extends ClosedShape {
 	scaleFactor = s;
 	invalidate();
     }
-    
+
     /** Get the scale factor for this text.
      * The actual size of the text is that defined by the font size multiplied by the scale factor returned by this method.
      */
@@ -713,7 +713,7 @@ public class VText extends ClosedShape {
 		paddingX = x;
 		paddingY = y;
 	}
-	
+
 	public Point getPadding(){
 		return new Point(paddingX, paddingY);
 	}
