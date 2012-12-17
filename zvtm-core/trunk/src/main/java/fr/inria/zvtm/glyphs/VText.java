@@ -304,6 +304,12 @@ public class VText<T> extends ClosedShape {
      @Override
     public void setBorderColor(Color c){
         super.setBorderColor(c);
+        if (c != null){
+            setDrawBorder(true);
+        }
+        else {
+            setDrawBorder(false);
+        }
     }
 
     /** Get the text's background color.
