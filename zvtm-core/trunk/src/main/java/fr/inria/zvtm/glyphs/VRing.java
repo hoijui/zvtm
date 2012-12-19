@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2008-2012ˇ. All Rights Reserved
+ *   Copyright (c) INRIA, 2008-2012. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -70,7 +70,7 @@ public class VRing<T> extends ClosedShape {
     public VRing(double x, double y, int z, double vs, double ag, float irr, double or, Color c, Color bc){
         this(x, y, z, vs, ag, irr, or, c, bc, 1.0f);
     }
-    
+
     /** Construct a slice by giving its size, angle and orientation
         *@param x x-coordinate in virtual space of vertex that is not an arc endpoint
         *@param y y-coordinate in virtual space of vertex that is not an arc endpoint
@@ -83,7 +83,7 @@ public class VRing<T> extends ClosedShape {
         *@param alpha alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
         */
     public VRing(double x, double y, int z, double vs, double ag, float irr, double or, Color c, Color bc, float alpha){
-		initCoordArray(4);	
+		initCoordArray(4);
         vx = x;
         vy = y;
         vz = z;
@@ -100,7 +100,7 @@ public class VRing<T> extends ClosedShape {
 
     /** Construct a slice by giving its size, angle and orientation
         *@param x x-coordinate in virtual space of vertex that is not an arc endpoint
-        *@param y y-coordinate in virtual space of vertex that is not an arc endpoint 
+        *@param y y-coordinate in virtual space of vertex that is not an arc endpoint
         *@param z z-index (pass 0 if you do not use z-ordering)
         *@param vs arc radius in virtual space
         *@param ag arc angle in virtual space (in degrees)
@@ -111,10 +111,10 @@ public class VRing<T> extends ClosedShape {
     public VRing(double x, double y, int z, double vs, int ag, float irr, int or, Color c, Color bc){
         this(x, y, z, vs, ag, irr, or, c, bc, 1.0f);
     }
-    
+
     /** Construct a slice by giving its size, angle and orientation
         *@param x x-coordinate in virtual space of vertex that is not an arc endpoint
-        *@param y y-coordinate in virtual space of vertex that is not an arc endpoint 
+        *@param y y-coordinate in virtual space of vertex that is not an arc endpoint
         *@param z z-index (pass 0 if you do not use z-ordering)
         *@param vs arc radius in virtual space
         *@param ag arc angle in virtual space (in degrees)
@@ -125,7 +125,7 @@ public class VRing<T> extends ClosedShape {
         *@param alpha alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
         */
     public VRing(double x, double y, int z, double vs, int ag, float irr, int or, Color c, Color bc, float alpha){
-		initCoordArray(4);	
+		initCoordArray(4);
         vx = x;
         vy = y;
         vz = z;
@@ -163,12 +163,12 @@ public class VRing<T> extends ClosedShape {
     public float getInnerRatio(){
         return irr_p;
     }
-    
-    
+
+
     void computeSize(){
         size = Math.sqrt(Math.pow(p1.x-vx, 2) + Math.pow(p1.y-vy, 2));
     }
-    
+
     void computeOrient(){
         double c = Math.sqrt(Math.pow(p1.x-vx, 2) + Math.pow(p1.y-vy, 2));
         double a1 = (p1.y-vy >= 0) ? Math.acos((p1.x-vx)/c) : Utils.TWO_PI - Math.acos((p1.x-vx)/c);
@@ -177,7 +177,7 @@ public class VRing<T> extends ClosedShape {
         orient = (a1 + a2) / 2.0;
         orientDeg = (int)Math.round(orient * RAD2DEG_FACTOR);
     }
-    
+
     void computeAngle(){
         double c = Math.sqrt(Math.pow(p1.x-vx, 2) + Math.pow(p1.y-vy, 2));
         double a1 = (p1.y-vy >= 0) ? Math.acos((p1.x-vx)/c) : Utils.TWO_PI - Math.acos((p1.x-vx)/c);
@@ -185,14 +185,14 @@ public class VRing<T> extends ClosedShape {
         angle = a2 - a1;
         angleDeg = (int)Math.round(angle * RAD2DEG_FACTOR);
     }
-    
+
     void computeSliceEdges(){
         p1.x = Math.cos(orient-angle/2.0)*size + vx;
         p1.y = Math.sin(orient-angle/2.0)*size + vy;
         p2.x = Math.cos(orient+angle/2.0)*size + vx;
         p2.y = Math.sin(orient+angle/2.0)*size + vy;
     }
-    
+
     void computePolygonEdges(){
         if (angle < Math.PI){
             p3.x = vx + (p1.x-vx)/Math.cos(angle/2.0);
@@ -202,7 +202,7 @@ public class VRing<T> extends ClosedShape {
         }
         else if (angle > Math.PI){
             // if angle >= PI a triangle cannot be used to model the bounding polygon
-            p3.x = vx - (p1.x-vx)/Math.cos(angle/2.0); // compute coordInside by checking that 
+            p3.x = vx - (p1.x-vx)/Math.cos(angle/2.0); // compute coordInside by checking that
             p3.y = vy - (p1.y-vy)/Math.cos(angle/2.0); // point is in circle and *not* inside triangle
             p4.x = vx - (p2.x-vx)/Math.cos(angle/2.0); // (triangle modeling the part not covered by
             p4.y = vy - (p2.y-vy)/Math.cos(angle/2.0); // the slice)
@@ -226,7 +226,7 @@ public class VRing<T> extends ClosedShape {
     public boolean fillsView(double w,double h,int camIndex){
 	    //XXX: TBW (call coordInside() for the four view corners)
 	    return false;
-    }    
+    }
 
 	@Override
     public void addCamera(int verifIndex){
@@ -318,7 +318,7 @@ public class VRing<T> extends ClosedShape {
     public double getSize(){
 	return size;
     }
-    
+
     public boolean coordInsideHemisphere(int x, int y, int camIndex){
 	if (orient == 0){
 	    return (x >= pr[camIndex].cx) ? true : false;
@@ -348,7 +348,7 @@ public class VRing<T> extends ClosedShape {
 		}
 		return false;
 	}
-    
+
     /** The disc is actually approximated to its bounding box here. Precise intersection computation would be too costly. */
 	@Override
     public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
@@ -357,7 +357,7 @@ public class VRing<T> extends ClosedShape {
 		}
 	    return false;
 	}
-	
+
 	@Override
     public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
             if (coordInside(jpx, jpy, camIndex, cvx, cvy)){
@@ -368,7 +368,7 @@ public class VRing<T> extends ClosedShape {
                     return Glyph.ENTERED_GLYPH;
                 }
                 //if it was inside last time, nothing has changed
-                else {return Glyph.NO_CURSOR_EVENT;}  
+                else {return Glyph.NO_CURSOR_EVENT;}
             }
             else{
                 //if the mouse is not inside the glyph
@@ -380,7 +380,7 @@ public class VRing<T> extends ClosedShape {
                 else {return Glyph.NO_CURSOR_EVENT;}
             }
     }
-    
+
 	@Override
     public void project(Camera c, Dimension d){
 		int i = c.getIndex();
@@ -408,11 +408,11 @@ public class VRing<T> extends ClosedShape {
 		pr[i].louterCircleRadius = (int)Math.round(size * coef);
 		pr[i].linnerRingRadius = (int)Math.round(size * irr_p * coef);
 	}
-	
+
 	Arc2D outerSlice = new Arc2D.Double(Arc2D.PIE);
 	Ellipse2D innerSlice = new Ellipse2D.Double();
 	Area subring;
-	
+
 	@Override
     public void draw(Graphics2D g, int vW, int vH, int i, Stroke stdS, AffineTransform stdT, int dx, int dy){
 	    if (alphaC != null && alphaC.getAlpha() == 0){return;}
@@ -429,7 +429,7 @@ public class VRing<T> extends ClosedShape {
 				pr[i].ring = new Area(outerSlice);
 				if (pr[i].innerRingRadius > 0){
 					subring = new Area(innerSlice);
-					pr[i].ring.subtract(subring);					
+					pr[i].ring.subtract(subring);
 				}
 				// draw that area
 				g.setColor(this.color);
@@ -507,7 +507,7 @@ public class VRing<T> extends ClosedShape {
                 pr[i].lring = new Area(outerSlice);
 				if (pr[i].linnerRingRadius > 0){
 	                subring = new Area(innerSlice);
-	                pr[i].lring.subtract(subring);				
+	                pr[i].lring.subtract(subring);
 				}
                 // draw that area
                 g.setColor(this.color);
