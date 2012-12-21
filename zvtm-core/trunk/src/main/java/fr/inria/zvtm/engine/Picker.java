@@ -210,15 +210,19 @@ public class Picker {
 	 * Beware of the fact that this method returns glyphs of any kind, not just ClosedShape instances.
 	 * It can thus be much more computationaly expensive than getpickedGlyphList()
 	 *@param c a camera (the active camera can be obtained by VirtualSpaceManager.getActiveCamera())
+     *@param type the type of glyph to look for (pass null to look for any type of glyph). Type of glyph as specified with Glyph.setType().
 	 *@return a list of glyphs under the mouse cursor, sorted by drawing order; null if no object under the cursor.
+     *@see #getIntersectingGlyphs(Camera c)
 	 *@see #getPickedGlyphList()
 	 */
-	public Vector<Glyph> getIntersectingGlyphs(Camera c){
+	public Vector<Glyph> getIntersectingGlyphs(Camera c, String type){
         Vector res = new Vector();
         Vector glyphs = c.getOwningSpace().getDrawnGlyphs(c.getIndex());
         Glyph glyph;
         for (int i=0;i<glyphs.size();i++){
             glyph = (Glyph)glyphs.elementAt(i);
+            // ignore glyphs of other types than the one specified (if set)
+            if (type != null && !glyph.getType().equals(type)){continue;}
             if (glyph.coordInside(jpx, jpy, c.getIndex(), vx, vy)){
                 res.add(glyph);
             }
@@ -231,6 +235,19 @@ public class Picker {
         }
         if (res.isEmpty()){res = null;}
         return res;
+    }
+
+    /** Get a list of all Glyphs (including segments and paths) picked.
+     * This method is especially useful when the camera of interest is not the active camera for the associated view (i.e. another layer is active).
+     * Beware of the fact that this method returns glyphs of any kind, not just ClosedShape instances.
+     * It can thus be much more computationaly expensive than getpickedGlyphList()
+     *@param c a camera (the active camera can be obtained by VirtualSpaceManager.getActiveCamera())
+     *@return a list of glyphs under the mouse cursor, sorted by drawing order; null if no object under the cursor.
+     *@see #getIntersectingGlyphs(Camera c, String type)
+     *@see #getPickedGlyphList()
+     */
+    public Vector<Glyph> getIntersectingGlyphs(Camera c){
+        return getIntersectingGlyphs(c, null);
     }
 
     /** Double capacity of array containing glyphs under the cursor. Mechanism similar to what Vectors do, bu we want to avoid casting. */
@@ -264,6 +281,7 @@ public class Picker {
      * In other words, the array returned by this method is not synchronized with the actual list over time.
      *@return an empty array if the picker is not over any object.
 	 *@see #getIntersectingGlyphs(Camera c)
+     *@see #getIntersectingGlyphs(Camera c, String type)
      */
     public Glyph[] getPickedGlyphList(){
         if (maxIndex >= 0){
