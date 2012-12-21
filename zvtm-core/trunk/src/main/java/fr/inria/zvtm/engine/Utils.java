@@ -291,7 +291,7 @@ public class Utils {
         double distance = Math.sqrt(Math.pow(glyphs[res].vx-vp.x,2)+Math.pow(glyphs[res].vy-vp.y,2));
         for (int i=1;i<glyphs.length;i++){
             double distance2 = Math.sqrt(Math.pow(glyphs[i].vx-vp.x,2)+Math.pow(glyphs[i].vy-vp.y,2));
-            if (distance2 > distance){
+            if (distance2 < distance){
                 distance = distance2;
                 res = i;
             }
