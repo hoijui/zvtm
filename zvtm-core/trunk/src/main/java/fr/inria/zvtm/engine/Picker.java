@@ -211,7 +211,7 @@ public class Picker {
 	 * It can thus be much more computationaly expensive than getpickedGlyphList()
 	 *@param c a camera (the active camera can be obtained by VirtualSpaceManager.getActiveCamera())
      *@param type the type of glyph to look for (pass null to look for any type of glyph). Type of glyph as specified with Glyph.setType().
-	 *@return a list of glyphs under the mouse cursor, sorted by drawing order; null if no object under the cursor.
+	 *@return a list of glyphs under the mouse cursor, sorted by drawing order.
      *@see #getIntersectingGlyphs(Camera c)
 	 *@see #getPickedGlyphList()
 	 */
@@ -233,7 +233,6 @@ public class Picker {
                 res.add(glyph);
             }
         }
-        if (res.isEmpty()){res = null;}
         return res;
     }
 
@@ -280,6 +279,7 @@ public class Picker {
      * This returns a <em>copy</em> of the actual array managed by the picker at the time the method is called.
      * In other words, the array returned by this method is not synchronized with the actual list over time.
      *@return an empty array if the picker is not over any object.
+     *@see #getPickedGlyphList(String type)
 	 *@see #getIntersectingGlyphs(Camera c)
      *@see #getIntersectingGlyphs(Camera c, String type)
      */
@@ -288,6 +288,30 @@ public class Picker {
             Glyph[] res = new Glyph[maxIndex+1];
             System.arraycopy(pickedGlyphs, 0, res, 0, maxIndex+1);
             return res;
+        }
+        else return new Glyph[0];
+    }
+
+    /** Get the list of glyphs currently picked. Last entry is last glyph entered.
+     * This returns a <em>copy</em> of the actual array managed by the picker at the time the method is called.
+     * In other words, the array returned by this method is not synchronized with the actual list over time.
+     *@param type the type of glyph to look for. Type of glyph as specified with Glyph.setType().
+     *@return an empty array if the picker is not over any object.
+     *@see #getPickedGlyphList()
+     *@see #getIntersectingGlyphs(Camera c)
+     *@see #getIntersectingGlyphs(Camera c, String type)
+     */
+    public Glyph[] getPickedGlyphList(String type){
+        if (maxIndex >= 0){
+            Vector<Glyph> gV = new Vector(maxIndex+1);
+            synchronized(pickedGlyphs){
+                for (int i=0;i<=maxIndex;i++){
+                    if (pickedGlyphs[i].getType() != null && pickedGlyphs[i].getType().equals(type)){
+                        gV.add(pickedGlyphs[i]);
+                    }
+                }
+            }
+            return gV.toArray(new Glyph[gV.size()]);
         }
         else return new Glyph[0];
     }
