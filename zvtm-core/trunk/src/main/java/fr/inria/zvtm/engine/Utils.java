@@ -15,6 +15,7 @@ import java.awt.GradientPaint;
 import java.awt.Image;
 import java.awt.Paint;
 import java.awt.Rectangle;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 
 import java.io.File;
@@ -282,6 +283,21 @@ public class Utils {
 		}
 		return false;
 	}
+
+    /** Get glyph closest to a given point in virtual space. */
+    public static Glyph getClosestGlyph(Glyph[] glyphs, Point2D.Double vp){
+        if (glyphs.length == 0){return null;}
+        int res = 0;
+        double distance = Math.sqrt(Math.pow(glyphs[res].vx-vp.x,2)+Math.pow(glyphs[res].vy-vp.y,2));
+        for (int i=1;i<glyphs.length;i++){
+            double distance2 = Math.sqrt(Math.pow(glyphs[i].vx-vp.x,2)+Math.pow(glyphs[i].vy-vp.y,2));
+            if (distance2 > distance){
+                distance = distance2;
+                res = i;
+            }
+        }
+        return glyphs[res];
+    }
 
 	/** Checks whether Glyph array ga contains glyph g or not and returns its index.
 		*/
