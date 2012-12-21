@@ -45,9 +45,9 @@ public class Menu {
     /**
      *@param space VirtualSpace in which to instantiate the menu
      *@param bgColor background color of menu item boxes
-     *@param highlight color of menu item boxes (when cursor inside)
+     *@param hColor color of menu item boxes (when cursor inside)
      *@param lColor menu item label color
-     *@param label alignment (one of VText.TEXT_ANCHOR_*)
+     *@param labelAnchor alignment (one of VText.TEXT_ANCHOR_*)
      */
     public Menu(VirtualSpace space, Color bgColor, Color hColor, Color lColor, short labelAnchor){
         this.space = space;
