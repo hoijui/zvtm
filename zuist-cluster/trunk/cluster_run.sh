@@ -1,10 +1,10 @@
-#!/bin/bash                                                                    
+#!/bin/bash
 
 # usage example: ./cluster_run.sh -n AnimCircles will run slaves for
-# each cluster screen, joining the application named 'AnimCircles'  
+# each cluster screen, joining the application named 'AnimCircles'
 
 function colNum {
-  case "$1" in   
+  case "$1" in
           "a" ) return 0;;
           "b" ) return 1;;
           "c" ) return 2;;
