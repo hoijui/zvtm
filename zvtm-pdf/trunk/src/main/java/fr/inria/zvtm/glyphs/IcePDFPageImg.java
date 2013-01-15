@@ -48,7 +48,7 @@ public class IcePDFPageImg extends ZPDFPage {
 
     /** For internal use. Made public for easier outside package subclassing. */
     public AffineTransform at;
-    
+
     /** Instantiate a PDF page as a ZVTM glyph, rendered at a resolution that matches the default scale for that page.
 	 *@param pdfDoc the PDF document from ICEpdf
 	 *@param pageNumber page number starting from 0 (for page 1)
@@ -56,7 +56,7 @@ public class IcePDFPageImg extends ZPDFPage {
 	public IcePDFPageImg(Document pdfDoc, int pageNumber){
 		this(0, 0, 0, pdfDoc, pageNumber, 1f, 1f);
 	}
-	
+
     /** Instantiate a PDF page as a ZVTM glyph, rendered at a resolution that matches the default scale for that page.
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
@@ -67,7 +67,7 @@ public class IcePDFPageImg extends ZPDFPage {
 	public IcePDFPageImg(double x, double y, int z, Document pdfDoc, int pageNumber){
 		this(x, y, z, pdfDoc, pageNumber, 1f, 1f);
 	}
-	
+
 	/** Instantiate a PDF page as a ZVTM glyph, rendered at a resolution that matches the default scale for that page multiplied by detailFactor.
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
@@ -87,31 +87,31 @@ public class IcePDFPageImg extends ZPDFPage {
             setPageImage((BufferedImage)pdfDoc.getPageImage(pageNumber, GraphicsRenderingHints.SCREEN, Page.BOUNDARY_CROPBOX, 0f, detailFactor));
 		}
 	}
-	
+
 	IcePDFPageImg(double x, double y, int z, double scaleFactor){
 	    this.vx = x;
 		this.vy = y;
 		this.vz = z;
 		this.scaleFactor = scaleFactor;
 	}
-	
+
 	/** For internal use. Made public for easier outside package subclassing. */
     public Object interpolationMethod = RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
-    
+
     /** Specify how image should be interpolated when drawn at a scale different from its original scale.
         *@param im one of java.awt.RenderingHints.{VALUE_INTERPOLATION_NEAREST_NEIGHBOR,VALUE_INTERPOLATION_BILINEAR,VALUE_INTERPOLATION_BICUBIC} ; default is VALUE_INTERPOLATION_NEAREST_NEIGHBOR
         */
     public void setInterpolationMethod(Object im){
         interpolationMethod = im;
     }
-    
+
     /** Get information about how image should be interpolated when drawn at a scale different from its original scale.
         *@return one of java.awt.RenderingHints.{VALUE_INTERPOLATION_NEAREST_NEIGHBOR,VALUE_INTERPOLATION_BILINEAR,VALUE_INTERPOLATION_BICUBIC} ; default is VALUE_INTERPOLATION_NEAREST_NEIGHBOR
         */
     public Object getInterpolationMethod(){
         return interpolationMethod;
     }
-    
+
     void setPageImage(BufferedImage img){
         this.pageImage = img;
         this.vw = this.pageImage.getWidth() * scaleFactor;
@@ -140,7 +140,7 @@ public class IcePDFPageImg extends ZPDFPage {
 				if (alphaC != null){
                     // translucent
                     g.setComposite(alphaC);
-    				// rescale and draw				
+    				// rescale and draw
     				if (interpolationMethod != RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR){
                         g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, interpolationMethod);
                         g.drawImage(pageImage,AffineTransform.getScaleInstance(trueCoef,trueCoef),null);
@@ -165,7 +165,7 @@ public class IcePDFPageImg extends ZPDFPage {
                 }
                 else {
                     // opaque
-    				// rescale and draw				
+    				// rescale and draw
     				if (interpolationMethod != RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR){
                         g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, interpolationMethod);
                         g.drawImage(pageImage,AffineTransform.getScaleInstance(trueCoef,trueCoef),null);
@@ -254,7 +254,7 @@ public class IcePDFPageImg extends ZPDFPage {
 			}
 			if (trueCoef!=1.0f){
 				g.setTransform(AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch));
-				
+
 				if (alphaC != null){
                     // translucent
                     g.setComposite(alphaC);
@@ -301,7 +301,7 @@ public class IcePDFPageImg extends ZPDFPage {
         					g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw-1, 2*pc[i].lch-1);
                         }
                     }
-                }				
+                }
 			}
 			else {
 			    if (alphaC != null){
@@ -374,11 +374,11 @@ public class IcePDFPageImg extends ZPDFPage {
 	        pageImage = null;
 	    }
 	}
-	
+
     /** Get rasterized rendering of this page.
      */
 	public BufferedImage getPageImage() {
 		return pageImage;
 	}
-	
+
 }

@@ -41,11 +41,11 @@ public abstract class ZPDFPage extends ClosedShape implements RectangularShape {
     public double ar;
 
     public RProjectedCoordsP[] pc;
-	
+
     public boolean zoomSensitive = true;
 
     public double scaleFactor = 1.0f;
-    
+
 	@Override
 	public void initCams(int nbCam){
 		pc=new RProjectedCoordsP[nbCam];
@@ -131,7 +131,7 @@ public abstract class ZPDFPage extends ClosedShape implements RectangularShape {
 	@Override
 	public boolean fillsView(double w,double h,int camIndex){
 		//can contain transparent pixel (we have no way of knowing without analysing the image data -could be done when constructing the object or setting the image)
-		return false; 
+		return false;
 	}
 
 	@Override
@@ -140,7 +140,7 @@ public abstract class ZPDFPage extends ClosedShape implements RectangularShape {
 		    (jpy>=(pc[camIndex].cy-pc[camIndex].ch)) && (jpy<=(pc[camIndex].cy+pc[camIndex].ch))){return true;}
 		else {return false;}
 	}
-	
+
 	@Override
 	public boolean visibleInRegion(double wb, double nb, double eb, double sb, int i){
         if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
@@ -155,7 +155,7 @@ public abstract class ZPDFPage extends ClosedShape implements RectangularShape {
         }
         return false;
     }
-    
+
 	@Override
 	public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
 		return dvs.intersects(vx-vw/2d, vy-vh/2d, vw, vh);
@@ -201,7 +201,7 @@ public abstract class ZPDFPage extends ClosedShape implements RectangularShape {
 		if (pc[i]!=null){pc[i].prevMouseIn=false;}
 		borderColor = bColor;
 	}
-	
+
 	@Override
 	public void project(Camera c, Dimension d){
 		int i = c.getIndex();
@@ -239,7 +239,7 @@ public abstract class ZPDFPage extends ClosedShape implements RectangularShape {
 			pc[i].lch = (int)Math.round(vh/2d);
 		}
 	}
-	
+
 	/** Flush any resource used. */
 	public abstract void flush();
 
