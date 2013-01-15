@@ -87,6 +87,7 @@ public class BrowsableDocument extends IcePDFPageImg {
         synchronized(doc){
             setPageImage((BufferedImage)doc.getPageImage(this.currentPage, GraphicsRenderingHints.SCREEN, Page.BOUNDARY_CROPBOX, 0f, detailFactor));
         }
+        VirtualSpaceManager.INSTANCE.repaint();
     }
 
     /** Get the underlying IcePDF document. */
