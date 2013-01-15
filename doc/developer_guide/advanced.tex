@@ -263,6 +263,8 @@ document.dispose();
 \fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
 \end{small}
 
+\cd{BrowsableDocument} works the same as \cd{IcePDFPageImg}, except that it keeps a reference to the original IcePDF \cd{Document} instance and offers methods to change what page of the document is displayed in that specific glyph. Without having to destroy the current \cd{Glyph} and create another one. Make sure that you do not \cd{dispose()} of the \cd{Document} if you are later going to change what page the glyph displays. This would throw a \cd{NullPointerException} in IcePDF.
+
 \subsubsection{Advanced Functionalities}
 
 %%%%%
