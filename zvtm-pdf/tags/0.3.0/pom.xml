@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+$Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>fr.inria.zvtm</groupId>
+  <artifactId>zvtm-pdf</artifactId>
+  <packaging>jar</packaging>
+  <name>ZVTM-PDF</name>
+  <version>0.3.0</version>
+  <url>http://zvtm.sourceforge.net</url>
+  <licenses>
+    <license>
+      <name>GNU Lesser General Public License (LGPL)</name>
+      <url>http://www.gnu.org/licenses/lgpl.html</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <scm>
+    <url>https://zvtm.svn.sourceforge.net/svnroot/zvtm</url>
+  </scm>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	<icepdfVersion>4.2.0</icepdfVersion>
+  </properties>
+
+  <!-- Repositories -->
+  <repositories>
+	<repository>
+      <id>icefaces repository</id>
+      <url>http://anonsvn.icefaces.org/repo/maven2/releases</url>
+    </repository>
+	<repository>
+      <id>zvtm repository</id>
+      <url>http://zvtm.sourceforge.net/maven</url>
+    </repository>
+    <repository>
+      <id>central</id>
+      <name>Maven Repository</name>
+      <url>http://repo1.maven.org/maven2</url>
+    </repository>
+  </repositories>
+
+  <!-- Deployment -->
+  <distributionManagement>
+	<repository>
+      <id>zvtm.sf.net</id>
+      <url>scp://shell.sourceforge.net/home/project-web/zvtm/htdocs/maven</url>
+    </repository>
+  </distributionManagement>
+
+  <!-- Dependencies -->
+  <dependencies>
+	<dependency>
+      <groupId>fr.inria.zvtm</groupId>
+      <artifactId>zvtm-core</artifactId>
+      <version>[0.11.0,)</version>
+    </dependency>
+
+	<dependency>
+		<groupId>org.icepdf</groupId>
+		<artifactId>icepdf-core</artifactId>
+		<version>${icepdfVersion}</version>
+	</dependency>
+    <!-- ICEpdf Pro 4.2 (if available) -->
+	<!--
+
+		ICEpdf Pro is not available in any Maven repository for now.
+		Get icepdf-pro*.jar from http://www.icepdf.org/downloads.html
+		Install the JAR files in your local repository using the following command line:
+	        mvn install:install-file -Dfile=icepdf-pro.jar -DgroupId=org.icepdf -DartifactId=icepdf-pro -Dversion=4.2.0 -Dpackaging=jar
+	        mvn install:install-file -Dfile=icepdf-pro-intl.jar -DgroupId=org.icepdf -DartifactId=icepdf-pro-intl -Dversion=4.2.0 -Dpackaging=jar
+	-->
+	<!--
+	<dependency>
+		<groupId>org.icepdf</groupId>
+		<artifactId>icepdf-pro</artifactId>
+		<version>${icepdfVersion}</version>
+	</dependency>
+	<dependency>
+		<groupId>org.icepdf</groupId>
+		<artifactId>icepdf-pro-intl</artifactId>
+		<version>${icepdfVersion}</version>
+	</dependency>
+    -->
+
+  </dependencies>
+
+  <!-- Build -->
+  <build>
+      <extensions>
+        <extension>
+          <groupId>org.apache.maven.wagon</groupId>
+           <artifactId>wagon-ssh</artifactId>
+           <version>2.2</version>
+        </extension>
+      </extensions>
+	<resources>
+	  <resource>
+	    <directory>src/main/resources</directory>
+	    <filtering>true</filtering>
+	  </resource>
+	</resources>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>dependency-maven-plugin</artifactId>
+        <version>1.0</version>
+        <executions>
+          <execution>
+            <id>copy-dependencies</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+    	<version>2.3.2</version>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
+      </plugin>
+      <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-eclipse-plugin</artifactId>
+        	<version>2.8</version>
+          <configuration>
+              <downloadSources>true</downloadSources>
+          </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+    	<version>2.3.1</version>
+        <configuration>
+          <archive>
+            <manifest>
+              <useUniqueVersions>false</useUniqueVersions>
+              <mainClass>fr.inria.zvtm.demo.PDFViewer</mainClass>
+              <packageName>fr.inria.zvtm.demo</packageName>
+              <addClasspath>true</addClasspath>
+            </manifest>
+            <manifestEntries>
+              <mode>development</mode>
+              <url>${project.url}</url>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+    	<version>2.7</version>
+        <configuration>
+          <aggregate>true</aggregate>
+          <doctitle><![CDATA[<h1>ZVTM API documentation</h1>]]></doctitle>
+          <bottom><![CDATA[Copyright &#169; 2008-2011 INRIA. All Rights Reserved<br />Licensed under the GNU LGPL. For full terms see the file COPYING.</i>]]></bottom>
+          <links>
+            <link>http://java.sun.com/j2se/1.5.0/docs/api</link>
+            <link>http://zvtm.sourceforge.net/apidocs</link>
+			<link>http://www.icepdf.org/docs/v4_0_0/core/javadocs</link>
+          </links>
+          <excludePackageNames>fr.inria.zvtm.demo</excludePackageNames>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
