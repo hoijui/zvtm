@@ -82,6 +82,7 @@ public class BrowsableDocument extends IcePDFPageImg {
 	}
 
     public void setPage(int pageNumber){
+        if (pageNumber < 0 || pageNumber > doc.getNumberOfPages()-1){return;}
         flush();
         this.currentPage = pageNumber;
         synchronized(doc){
