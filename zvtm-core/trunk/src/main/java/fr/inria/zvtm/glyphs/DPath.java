@@ -292,6 +292,22 @@ public class DPath<T> extends Glyph implements RectangularShape {
 		return new Point2D.Double(endPoint.x, endPoint.y);
 	}
 
+	public double getStartPointX(){
+		return spx;
+	}
+
+	public double getStartPointY(){
+		return spy;
+	}
+
+	public double getEndPointX(){
+		return endPoint.x;
+	}
+
+	public double getEndPointY(){
+		return endPoint.y;
+	}
+
     @Override
     public void initCams(int nbCam){
 	pc = new ProjectedCoords[nbCam];

@@ -8,6 +8,7 @@
 package fr.inria.zvtm.engine;
 
 import java.awt.geom.GeneralPath;
+import java.awt.geom.Line2D;
 
 import java.util.Vector;
 import java.util.Arrays;
@@ -125,7 +126,17 @@ public class Picker {
 		if (!p.coordsInsideBoundingBox(x, y)){return false;}
 		int dtol = tolerance * 2;
 		GeneralPath gp = p.getJava2DGeneralPath();
-		return gp.intersects(x-dtol, y-dtol, dtol, dtol) && !p.getJava2DGeneralPath().contains(x-tolerance, y-tolerance, dtol, dtol);
+        if (Line2D.ptSegDist(p.getStartPointX(), p.getStartPointY(), p.getEndPointX(), p.getEndPointY(), x, y) > 10){
+            return gp.intersects(x-tolerance, y-tolerance, dtol, dtol)
+                   && !p.getJava2DGeneralPath().contains(x-tolerance, y-tolerance, dtol, dtol);
+        }
+        else {
+            // GeneralPath.interesects() returns true when coords lie on the segment between start and end points.
+            // we do not want the edge to get picked in that case, hence the Line2D test
+            // this is not a perfect solution, far from it, but that seems to be acceptable and not too
+            // computationally expensive in most cases
+            return false;
+        }
 	}
 
     /** Tells whether the picker is hovering a particular DPath or not.
