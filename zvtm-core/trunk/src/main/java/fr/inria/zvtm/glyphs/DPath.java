@@ -498,9 +498,13 @@ public class DPath<T> extends Glyph implements RectangularShape {
         }
     }
 
-    /** Draw the general path that gets compiled each time we make a change to the DPath (default). */
+    /** Draw the general path that gets compiled each time we make a change to the DPath (default).
+     * A side effect of this method is that the stroke set, if any, is sensitive to zooming.
+     */
     public static final short DRAW_GENERAL_PATH = 0;
-    /** Iterate on the path's components (each line, quad curve, cubic curve) and draw them step by step.*/
+    /** Iterate on the path's components (each line, quad curve, cubic curve) and draw them step by step.
+      * A side effect of this method is that the stroke set, if any, is not sensitive to zooming.
+      */
     public static final short DRAW_SUBPATHS = 1;
 
     short drawingMethod = DRAW_GENERAL_PATH;
@@ -508,8 +512,10 @@ public class DPath<T> extends Glyph implements RectangularShape {
     /** Specify what drawing method to use to paint this path.
      *@param m method to draw this glyph.
      *  <ul>
-     *    <li> DRAW_GENERAL_PATH will draw the general path that gets compiled each time we make a change to the DPath (default).</li>
-     *    <li> DRAW_SUBPATHS will iterate on the path's components (each line, quad curve, cubic curve) and draw them step by step.</li>
+     *    <li> DRAW_GENERAL_PATH will draw the general path that gets compiled each time we make a change to the DPath (default).
+               A side effect of this method is that the stroke set, if any, is sensitive to zooming.</li>
+     *    <li> DRAW_SUBPATHS will iterate on the path's components (each line, quad curve, cubic curve) and draw them step by step.
+               A side effect of this method is that the stroke set, if any, is not sensitive to zooming.</li>
      *  </ul>
      */
     public void setDrawingMethod(short m){
