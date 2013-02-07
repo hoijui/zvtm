@@ -3,7 +3,7 @@
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@xrce.xerox.com)
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2002. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2012. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2013. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -166,16 +166,16 @@ public class VCircle<T> extends ClosedShape {
 
     @Override
     public boolean fillsView(double w,double h,int camIndex){
-        if ((alphaC == null) && (Math.sqrt(Math.pow(w-pc[camIndex].cx,2)+Math.pow(h-pc[camIndex].cy,2))<=pc[camIndex].cr/2d)
-            && (Math.sqrt(Math.pow(pc[camIndex].cx,2)+Math.pow(h-pc[camIndex].cy,2))<=pc[camIndex].cr/2d)
-            && (Math.sqrt(Math.pow(w-pc[camIndex].cx,2)+Math.pow(pc[camIndex].cy,2))<=pc[camIndex].cr/2d)
-            && (Math.sqrt(Math.pow(pc[camIndex].cx,2)+Math.pow(pc[camIndex].cy,2))<=pc[camIndex].cr/2d)){return true;}
+        if ((alphaC == null) && (Math.sqrt((w-pc[camIndex].cx)*(w-pc[camIndex].cx) + (h-pc[camIndex].cy)*(h-pc[camIndex].cy)) <= pc[camIndex].cr/2d)
+            && (Math.sqrt(pc[camIndex].cx*pc[camIndex].cx + (h-pc[camIndex].cy)*(h-pc[camIndex].cy)) <= pc[camIndex].cr/2d)
+            && (Math.sqrt((w-pc[camIndex].cx)*(w-pc[camIndex].cx) + pc[camIndex].cy*pc[camIndex].cy) <= pc[camIndex].cr/2d)
+            && (Math.sqrt((pc[camIndex].cx)*(pc[camIndex].cx) + pc[camIndex].cy*pc[camIndex].cy) <= pc[camIndex].cr/2d)){return true;}
         else {return false;}
     }
 
     @Override
     public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
-        if (Math.sqrt(Math.pow(jpx-pc[camIndex].cx,2)+Math.pow(jpy-pc[camIndex].cy,2))<=pc[camIndex].cr/2d){return true;}
+        if (Math.sqrt((jpx-pc[camIndex].cx)*(jpx-pc[camIndex].cx) + (jpy-pc[camIndex].cy)*(jpy-pc[camIndex].cy)) <= pc[camIndex].cr/2d){return true;}
         else {return false;}
     }
 
@@ -204,7 +204,7 @@ public class VCircle<T> extends ClosedShape {
 
 	@Override
     public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
-		return Math.sqrt(Math.pow(vx-dvx, 2)+Math.pow(vy-dvy, 2)) <= (dvr + size/2d);
+		return Math.sqrt((vx-dvx)*(vx-dvx)+(vy-dvy)*(vy-dvy)) <= (dvr + size/2d);
 	}
 
     @Override

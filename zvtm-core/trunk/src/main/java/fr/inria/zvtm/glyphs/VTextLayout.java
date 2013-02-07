@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2011-2012. All Rights Reserved
+ *   Copyright (c) INRIA, 2011-2013. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -245,7 +245,7 @@ public class VTextLayout<T> extends VText {
     public double getSize(){
         for (int i=0;i<pc.length;i++){
             if (pc[i] != null & pc[i].valid){
-                return (float)Math.sqrt(Math.pow(pc[i].cw,2) + Math.pow(pc[i].ch,2));
+                return (float)Math.sqrt(pc[i].cw*pc[i].cw + pc[i].ch*pc[i].ch);
             }
         }
         // return 0 if could not find any valid bounds for any camera

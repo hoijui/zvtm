@@ -4,7 +4,7 @@
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2000-2002. All Rights Reserved
  *   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2012. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2013. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -252,7 +252,7 @@ public class VText<T> extends ClosedShape {
     public double getSize(){
         for (int i=0;i<pc.length;i++){
             if (pc[i] != null & pc[i].valid){
-                return (float)Math.sqrt(Math.pow(pc[i].cw,2) + Math.pow(pc[i].ch,2));
+                return (float)Math.sqrt(pc[i].cw*pc[i].cw + pc[i].ch*pc[i].ch);
             }
         }
         // return 0 if could not find any valid bounds for any camera

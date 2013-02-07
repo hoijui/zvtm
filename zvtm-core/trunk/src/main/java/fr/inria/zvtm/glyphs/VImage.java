@@ -3,7 +3,7 @@
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@xrce.xerox.com)
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2002. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2012. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2013. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -182,7 +182,7 @@ public class VImage<T> extends ClosedShape implements RectangularShape {
 
     /** For internal use. */
     void computeSize(){
-        size = Math.sqrt(Math.pow(vw,2)+Math.pow(vh,2));
+        size = Math.sqrt(vw*vw + vh*vh);
     }
 
     public void setWidth(double w){
@@ -208,8 +208,8 @@ public class VImage<T> extends ClosedShape implements RectangularShape {
     @Override
     public void sizeTo(double s){
         size = s;
-        vw = (size*ar) / (Math.sqrt(Math.pow(ar,2)+1));
-        vh = size / (Math.sqrt(Math.pow(ar,2)+1));
+        vw = (size*ar) / (Math.sqrt(ar*ar+1));
+        vh = size / (Math.sqrt(ar*ar+1));
         scaleFactor = size / Math.sqrt(Math.pow(image.getWidth(null),2)+Math.pow(image.getHeight(null),2));
         VirtualSpaceManager.INSTANCE.repaint();
     }
@@ -217,8 +217,8 @@ public class VImage<T> extends ClosedShape implements RectangularShape {
     @Override
     public void reSize(double factor){
         size *= factor;
-        vw = (size*ar) / (Math.sqrt(Math.pow(ar,2)+1));
-        vh = size / (Math.sqrt(Math.pow(ar,2)+1));
+        vw = (size*ar) / (Math.sqrt(ar*ar+1));
+        vh = size / (Math.sqrt(ar*ar+1));
         scaleFactor = size / Math.sqrt(Math.pow(image.getWidth(null),2)+Math.pow(image.getHeight(null),2));
         VirtualSpaceManager.INSTANCE.repaint();
     }

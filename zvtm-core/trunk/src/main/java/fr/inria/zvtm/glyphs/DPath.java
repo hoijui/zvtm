@@ -1,7 +1,7 @@
 /*   FILE: DPath.java
  *   DATE OF CREATION:   Thu Mar 29 19:33 2007
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2007-2012. All Rights Reserved
+ *   Copyright (c) INRIA, 2007-2013. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -405,7 +405,7 @@ public class DPath<T> extends Glyph implements RectangularShape {
     }
 
     void computeSize(){
-        size = Math.sqrt(Math.pow(vw,2)+Math.pow(vh,2));
+        size = Math.sqrt(vw*vw + vh*vh);
     }
 
     public void computeBounds(){

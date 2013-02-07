@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2008-2012. All Rights Reserved
+ *   Copyright (c) INRIA, 2008-2013. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -166,11 +166,11 @@ public class VRing<T> extends ClosedShape {
 
 
     void computeSize(){
-        size = Math.sqrt(Math.pow(p1.x-vx, 2) + Math.pow(p1.y-vy, 2));
+        size = Math.sqrt((p1.x-vx)*(p1.x-vx) + (p1.y-vy)*(p1.y-vy));
     }
 
     void computeOrient(){
-        double c = Math.sqrt(Math.pow(p1.x-vx, 2) + Math.pow(p1.y-vy, 2));
+        double c = Math.sqrt((p1.x-vx)*(p1.x-vx) + (p1.y-vy)*(p1.y-vy));
         double a1 = (p1.y-vy >= 0) ? Math.acos((p1.x-vx)/c) : Utils.TWO_PI - Math.acos((p1.x-vx)/c);
         double a2 = (p2.y-vy >= 0) ? Math.acos((p2.x-vx)/c) : Utils.TWO_PI - Math.acos((p2.x-vx)/c);
         // was initially (360/(4*Math.PI)) * (a1 + a2) / 2.0
@@ -179,7 +179,7 @@ public class VRing<T> extends ClosedShape {
     }
 
     void computeAngle(){
-        double c = Math.sqrt(Math.pow(p1.x-vx, 2) + Math.pow(p1.y-vy, 2));
+        double c = Math.sqrt((p1.x-vx)*(p1.x-vx) + (p1.y-vy)*(p1.y-vy));
         double a1 = (p1.y-vy >= 0) ? Math.acos((p1.x-vx)/c) : Utils.TWO_PI - Math.acos((p1.x-vx)/c);
         double a2 = (p2.y-vy >= 0) ? Math.acos((p2.x-vx)/c) : Utils.TWO_PI - Math.acos((p2.x-vx)/c);
         angle = a2 - a1;
@@ -341,7 +341,7 @@ public class VRing<T> extends ClosedShape {
 
 	@Override
     public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
-		if (Math.sqrt(Math.pow(jpx-pr[camIndex].cx, 2)+Math.pow(jpy-pr[camIndex].cy, 2)) <= pr[camIndex].outerCircleRadius){
+		if (Math.sqrt((jpx-pr[camIndex].cx)*(jpx-pr[camIndex].cx) + (jpy-pr[camIndex].cy)*(jpy-pr[camIndex].cy)) <= pr[camIndex].outerCircleRadius){
 			if (pr[camIndex].ring.contains(jpx, jpy)){
 				return true;
 			}
@@ -352,7 +352,7 @@ public class VRing<T> extends ClosedShape {
     /** The disc is actually approximated to its bounding box here. Precise intersection computation would be too costly. */
 	@Override
     public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
-		if (Math.sqrt(Math.pow(vx-dvx, 2)+Math.pow(vy-dvy, 2)) < (dvr + size)){
+		if (Math.sqrt((vx-dvx)*(vx-dvx) + (vy-dvy)*(vy-dvy)) < (dvr + size)){
 		    return pr[camIndex].ring.intersects(jpx-dpr, jpy-dpr, 2*dpr, 2*dpr);
 		}
 	    return false;

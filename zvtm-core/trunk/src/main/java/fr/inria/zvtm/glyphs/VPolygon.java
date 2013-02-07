@@ -3,7 +3,7 @@
  *   AUTHOR :            Emmanuel Pietriga (emmanuel@w3.org)
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Emmanuel Pietriga, 2002. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2012. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2013. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -160,7 +160,7 @@ public class VPolygon<T> extends ClosedShape {
         double f;
         for (int i=0;i<xcoords.length;i++){
             //at this point, the xcoords,ycoords should contain relative vertices coordinates (w.r.t vx/vy=centroid)
-            f = Math.sqrt(Math.pow(xcoords[i],2) + Math.pow(ycoords[i],2));
+            f = Math.sqrt(xcoords[i]*xcoords[i] + ycoords[i]*ycoords[i]);
             if (f > size){size = f;}
         }
         size *= 2;
@@ -174,7 +174,7 @@ public class VPolygon<T> extends ClosedShape {
         for (int i=0;i<xcoords.length;i++){
             xcoords[i] = xcoords[i] * ratio;
             ycoords[i] = ycoords[i] * ratio;
-            f = Math.sqrt(Math.pow(xcoords[i],2) + Math.pow(ycoords[i],2));
+            f = Math.sqrt(xcoords[i]*xcoords[i] + ycoords[i]*ycoords[i]);
             if (f > size){size = f;}
         }
         size *= 2;
@@ -188,7 +188,7 @@ public class VPolygon<T> extends ClosedShape {
         for (int i=0;i<xcoords.length;i++){
             xcoords[i] = xcoords[i] * factor;
             ycoords[i] = ycoords[i] * factor;
-            f = Math.sqrt(Math.pow(xcoords[i],2) + Math.pow(ycoords[i],2));
+            f = Math.sqrt(xcoords[i]*xcoords[i] + ycoords[i]*ycoords[i]);
             if (f > size){size = f;}
         }
         size *= 2;
