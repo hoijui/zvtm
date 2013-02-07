@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2011. All Rights Reserved
+ *   Copyright (c) INRIA, 2011-2013. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -86,7 +86,7 @@ public class DynaPicker {
     	// linear drop-off
       	ds_ra = -DYNASPOT_MAX_RADIUS / (float)REDUC_TIME;
         // co-exponential drop-off
-    	ds_ra = -DYNASPOT_MAX_RADIUS / (float)Math.pow(REDUC_TIME,2);
+    	ds_ra = -DYNASPOT_MAX_RADIUS / (float)(REDUC_TIME*REDUC_TIME);
     	ds_rb = DYNASPOT_MAX_RADIUS;
     }
 
@@ -209,7 +209,8 @@ public class DynaPicker {
     	cursor_x[NB_SPEED_POINTS-1] = this.cursor.jpx;
     	cursor_y[NB_SPEED_POINTS-1] = this.cursor.jpy;
     	for (int i=0;i<speeds.length;i++){
-    		speeds[i] = (float)Math.sqrt(Math.pow(cursor_x[i+1]-cursor_x[i],2)+Math.pow(cursor_y[i+1]-cursor_y[i],2)) / (float)(cursor_time[i+1]-cursor_time[i]);
+    		speeds[i] = (float)Math.sqrt((cursor_x[i+1]-cursor_x[i])*(cursor_x[i+1]-cursor_x[i])+(cursor_y[i+1]-cursor_y[i])*(cursor_y[i+1]-cursor_y[i]))
+             / (float)(cursor_time[i+1]-cursor_time[i]);
     	}
     	mean_speed = 0;
     	for (int i=0;i<speeds.length;i++){
@@ -257,7 +258,7 @@ public class DynaPicker {
     			    // linear drop-off
     				updateDynaSpotArea(Math.round(ds_ra*(currentTime-reducStartTime)+ds_rb));
                     // co-exponential drop-off
-    				updateDynaSpotArea(Math.round(ds_ra*(float)Math.pow(currentTime-reducStartTime,2)+ds_rb));
+    				updateDynaSpotArea(Math.round(ds_ra*(float)((currentTime-reducStartTime)*(currentTime-reducStartTime))+ds_rb));
     			}
     		}
     	}
@@ -401,7 +402,7 @@ public class DynaPicker {
     			 	g.visibleInDisc(cursor.vx, cursor.vy, unprojectedDSRadius, dynaspotVSshape, c.getIndex(), cursor.jpx, cursor.jpy, dynaSpotRadius)){
                     // glyph intersects dynaspot area
                     gida.put(g, null);
-                    double d = Math.sqrt(Math.pow(g.vx-cursor.vx,2)+Math.pow(g.vy-cursor.vy,2));
+                    double d = Math.sqrt((g.vx-cursor.vx)*(g.vx-cursor.vx) + (g.vy-cursor.vy)*(g.vy-cursor.vy));
                     if (distanceToSelectedGlyph == -1 || d < distanceToSelectedGlyph){
                         selectedGlyph = g;
                         distanceToSelectedGlyph = d;

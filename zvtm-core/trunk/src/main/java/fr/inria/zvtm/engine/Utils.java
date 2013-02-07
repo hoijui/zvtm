@@ -2,7 +2,7 @@
  *   DATE OF CREATION:  Fri Aug 26 09:31:59 2005
  *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2006-2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2006-2013. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -288,9 +288,9 @@ public class Utils {
     public static Glyph getClosestGlyph(Glyph[] glyphs, Point2D.Double vp){
         if (glyphs.length == 0){return null;}
         int res = 0;
-        double distance = Math.sqrt(Math.pow(glyphs[res].vx-vp.x,2)+Math.pow(glyphs[res].vy-vp.y,2));
+        double distance = Math.sqrt((glyphs[res].vx-vp.x)*(glyphs[res].vx-vp.x) + (glyphs[res].vy-vp.y)*(glyphs[res].vy-vp.y));
         for (int i=1;i<glyphs.length;i++){
-            double distance2 = Math.sqrt(Math.pow(glyphs[i].vx-vp.x,2)+Math.pow(glyphs[i].vy-vp.y,2));
+            double distance2 = Math.sqrt((glyphs[i].vx-vp.x)*(glyphs[i].vx-vp.x) + (glyphs[i].vy-vp.y)*(glyphs[i].vy-vp.y));
             if (distance2 < distance){
                 distance = distance2;
                 res = i;

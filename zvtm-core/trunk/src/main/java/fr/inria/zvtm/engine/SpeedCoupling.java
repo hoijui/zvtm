@@ -71,8 +71,8 @@ public class SpeedCoupling
 	    if(_cursor_time[i+1] != _cursor_time[i])
 	    {
 		_speeds[i] = (float)Math.sqrt(
-		    Math.pow(_cursor_x[i+1]-_cursor_x[i],2) +
-		    Math.pow(_cursor_y[i+1]-_cursor_y[i],2)) /
+		    (_cursor_x[i+1]-_cursor_x[i])*(_cursor_x[i+1]-_cursor_x[i]) +
+		    (_cursor_y[i+1]-_cursor_y[i])*(_cursor_y[i+1]-_cursor_y[i])) /
 		    (float)(_cursor_time[i+1]-_cursor_time[i]);
 	    }
 	    else
