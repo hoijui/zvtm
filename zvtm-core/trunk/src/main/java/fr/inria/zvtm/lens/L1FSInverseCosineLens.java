@@ -2,11 +2,11 @@
  *   DATE OF CREATION:  Mon Nov 08 17:04:06 2004
  *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2004-2009. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2013. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
- */ 
+ */
 
 package fr.inria.zvtm.lens;
 
@@ -61,11 +61,11 @@ public class L1FSInverseCosineLens extends FSInverseCosineLens {
 	if (d <= LR2)
 	    g[0] = g[1] = MM;
 	else if (d <= LR1)
-	    g[0] = g[1] = MM-c*(float)Math.acos(Math.pow(d*a+b-1,2));
+	    g[0] = g[1] = MM-c*(float)Math.acos((d*a+b-1)*(d*a+b-1));
 	else
 	    g[0] = g[1] = 1;
     }
-    
+
     /**for internal use*/
     public void drawBoundary(Graphics2D g2d){
         if (r1Color != null){
@@ -83,5 +83,5 @@ public class L1FSInverseCosineLens extends FSInverseCosineLens {
             g2d.drawLine(lx+w/2-LR2, ly+h/2, lx+w/2, ly+h/2-LR2);
         }
     }
-    
+
 }

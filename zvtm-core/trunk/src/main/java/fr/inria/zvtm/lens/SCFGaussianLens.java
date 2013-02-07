@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2007-2011. All Rights Reserved
+ *   Copyright (c) INRIA, 2007-2013. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -34,7 +34,7 @@ public class SCFGaussianLens extends FSGaussianLens implements TemporalLens {
     protected Timer timer;
     protected DGTrailingTimer mouseStillUpdater;
 
-    protected double cutoffParamA = 0.1;   // decrease to increase time before starts to go back to rest position 
+    protected double cutoffParamA = 0.1;   // decrease to increase time before starts to go back to rest position
     protected double cutoffParamB = 0.01;  // increase to lower time to go back to rest position
 
     protected SpeedCoupling speedCoupling = null;
@@ -46,7 +46,7 @@ public class SCFGaussianLens extends FSGaussianLens implements TemporalLens {
     protected float scRingRadius = LR2;
     protected boolean doRing = false;
     protected boolean doDrawRing = false;
-    
+
     TemporalParamListener tpl;
 
     /**
@@ -203,9 +203,9 @@ public class SCFGaussianLens extends FSGaussianLens implements TemporalLens {
 	super.dispose();
 	timer.cancel();
     }
-    
+
     public void gf(float x, float y, float[] g){
-	d = Math.sqrt(Math.pow(x-sw-lx,2) + Math.pow(y-sh-ly,2));
+	d = Math.sqrt((x-sw-lx)*(x-sw-lx) + (y-sh-ly)*(y-sh-ly));
 	if (d <= LR2)
 	    g[0] = g[1] = dMM;
 	else if (d <= LR1)

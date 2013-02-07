@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2007-2011. All Rights Reserved
+ *   Copyright (c) INRIA, 2007-2013. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -11,7 +11,7 @@ package fr.inria.zvtm.lens;
 /**Translucent lens. Profile: linear - Distance metric: L(2) (circular shape)<br>Size expressed as an absolute value in pixels*/
 
 public class HWaveLens extends BLinearLens {
-    
+
     float N = 5.0f;
 
     /**
@@ -60,12 +60,12 @@ public class HWaveLens extends BLinearLens {
         super(mm, tc, tf, outerRadius, innerRadius, x, y);
         this.N = n;
     }
-    
+
     public void setN(float n){
         this.N = n;
         bT = LR2 / N;
     }
-    
+
     public float getN(){
         return N;
     }
@@ -74,9 +74,9 @@ public class HWaveLens extends BLinearLens {
         aT = MMTf - MMTc;
         bT = LR2 / N;
     }
-    
+
     public void gf(float x, float y, float[] g){
-        d = Math.sqrt(Math.pow(x-sw-lx,2) + Math.pow(y-sh-ly,2));
+        d = Math.sqrt((x-sw-lx)*(x-sw-lx) + (y-sh-ly)*(y-sh-ly));
         if (d <= LR2){
             g[0] = g[1] = MM;
         }
@@ -92,7 +92,7 @@ public class HWaveLens extends BLinearLens {
     }
 
     public void gfT(float x, float y, float[] g){
-        d = Math.sqrt(Math.pow(x-sw-lx,2) + Math.pow(y-sh-ly,2));
+        d = Math.sqrt((x-sw-lx)*(x-sw-lx) + (y-sh-ly)*(y-sh-ly));
         if (d <= LR2)
             g[0] = MMTf;
         else if (d <= LR1){
@@ -105,5 +105,5 @@ public class HWaveLens extends BLinearLens {
         else
             g[0] = 0;
     }
-    
+
 }

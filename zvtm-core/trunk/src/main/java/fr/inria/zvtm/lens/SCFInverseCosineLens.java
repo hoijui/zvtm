@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2007-2011. All Rights Reserved
+ *   Copyright (c) INRIA, 2007-2013. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -41,7 +41,7 @@ public class SCFInverseCosineLens extends FSInverseCosineLens implements Tempora
 
     /** Dynamic magnification factor. */
     float dMM = MM;
-    
+
     TemporalParamListener tpl;
 
     /**
@@ -190,13 +190,13 @@ public class SCFInverseCosineLens extends FSInverseCosineLens implements Tempora
 	super.dispose();
 	timer.cancel();
     }
-    
+
     public void gf(float x, float y, float[] g){
-	d = Math.sqrt(Math.pow(x-sw-lx,2) + Math.pow(y-sh-ly,2));
+	d = Math.sqrt((x-sw-lx)*(x-sw-lx) + (y-sh-ly)*(y-sh-ly));
 	if (d <= LR2)
 	    g[0] = g[1] = dMM;
 	else if (d <= LR1)
-	    g[0] = g[1] = dMM-c*(float)Math.acos(Math.pow(d*a+b-1,2));
+	    g[0] = g[1] = dMM-c*(float)Math.acos((d*a+b-1)*(d*a+b-1));
 	else
 	    g[0] = g[1] = 1;
     }
@@ -266,7 +266,7 @@ public class SCFInverseCosineLens extends FSInverseCosineLens implements Tempora
     public float getActualMaximumMagnification(){
 	return dMM;
     }
-    
+
     /** To be notified about updates to MM due to speed-coupling. */
     public void setTemporalParamListener(TemporalParamListener tpl){
         this.tpl = tpl;

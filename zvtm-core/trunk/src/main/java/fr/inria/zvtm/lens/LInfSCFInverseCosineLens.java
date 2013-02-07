@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2007-2009. All Rights Reserved
+ *   Copyright (c) INRIA, 2007-2013. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -61,7 +61,7 @@ public class LInfSCFInverseCosineLens extends SCFInverseCosineLens {
 	if (d <= LR2)
 	    g[0] = g[1] = dMM;
 	else if (d <= LR1)
-	    g[0] = g[1] = dMM-c*(float)Math.acos(Math.pow(d*a+b-1,2));
+	    g[0] = g[1] = dMM-c*(float)Math.acos((d*a+b-1)*(d*a+b-1));
 	else
 	    g[0] = g[1] = 1;
     }

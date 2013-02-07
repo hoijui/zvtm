@@ -2,11 +2,11 @@
  *   DATE OF CREATION:  Fri Oct 06 08:41:04 2006
  *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2004-2011. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2013. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
- */ 
+ */
 
 
 package fr.inria.zvtm.lens;
@@ -50,7 +50,7 @@ public class SCBLens extends BlendingLens implements TemporalLens {
     /** pseudo Dynamic magnification factor. */
     protected float dMM = MM;
     protected float mindMM = 1.0f;
-    
+
     /**Lens boundary color (default is black, null if none)*/
     Color bColor = Color.BLACK;
 
@@ -64,7 +64,7 @@ public class SCBLens extends BlendingLens implements TemporalLens {
     // a and b are used to convert the filter's opacity to values in the [minT, maxT] range
     float a = 1;
     float b = 0;
-    
+
     TemporalParamListener tpl;
 
     /**
@@ -188,7 +188,7 @@ public class SCBLens extends BlendingLens implements TemporalLens {
     }
 
     public void gfT(float x, float y, float[] g){
-	d = Math.sqrt(Math.pow(x-sw-lx,2) + Math.pow(y-sh-ly,2));
+	d = Math.sqrt((x-sw-lx)*(x-sw-lx) + (y-sh-ly)*(y-sh-ly));
 	if (d <= LR2)
 	    g[0] = MMTf;
 	else
@@ -345,16 +345,16 @@ public class SCBLens extends BlendingLens implements TemporalLens {
     public float getActualMaximumMagnification(){
 	return dMM;
     }
-    
+
     /** To be notified about updates to MM due to speed-coupling. */
     public void setTemporalParamListener(TemporalParamListener tpl){
         this.tpl = tpl;
     }
-    
+
     public TemporalParamListener getTemporalParamListener(){
         return this.tpl;
     }
-    
+
 }
 
 class TTrailingTimer extends TimerTask {

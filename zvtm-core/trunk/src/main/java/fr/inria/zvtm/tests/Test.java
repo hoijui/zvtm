@@ -122,6 +122,37 @@ public class Test implements Java2DPainter {
 	}
 
 	public static void main(String[] args){
+        double x = 85678.678;
+        double y;
+
+        int N = 40000;
+
+        long t1;
+        long t2,t3;
+
+
+        t1 = System.currentTimeMillis();
+        
+        for (int i=0;i<N ; i++) {
+            for (int j=0;j<N ; j++) {
+                y = x * x;
+            }
+        }
+        t2 = System.currentTimeMillis();
+
+        for (int i=0;i<N ; i++) {
+            for (int j=0;j<N ; j++) {
+                y = Math.pow(x,2);
+            }
+        }
+
+        t3 = System.currentTimeMillis();
+
+
+        System.out.println(t2-t1);
+        System.out.println(t3-t2);
+        System.exit(0);
+
         System.out.println("-----------------");
         System.out.println("General information");
         System.out.println("JVM version: "+System.getProperty("java.vm.vendor")+" "+System.getProperty("java.vm.name")+" "+System.getProperty("java.vm.version"));

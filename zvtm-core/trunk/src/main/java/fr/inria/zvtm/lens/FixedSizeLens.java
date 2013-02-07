@@ -2,11 +2,11 @@
  *   DATE OF CREATION:  Tue Nov 09 11:51:28 2004
  *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2004-2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2013. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
- */ 
+ */
 
 package fr.inria.zvtm.lens;
 
@@ -52,7 +52,7 @@ public abstract class FixedSizeLens extends Lens {
 	LR1 = r;
 	updateMagBufferWorkingDimensions();
     }
-    
+
     /**
      * set the lens' inner radius (beyond which maximum magnification is applied - inward)
      *
@@ -289,7 +289,7 @@ public abstract class FixedSizeLens extends Lens {
 	SpeedFunction sf;
 	int lensX, lensY;
 	boolean first = true;
-	
+
 	short speedBehavior = SPEED_DEPENDENT_LINEAR;
 	public static short CONSTANT = 0;
 	public static short SPEED_DEPENDENT_LINEAR = 1;
@@ -303,7 +303,7 @@ public abstract class FixedSizeLens extends Lens {
 			g2d.drawLine(lensX, lensY - 10, lensX, lensY + 10);
 		}
 	};
-	
+
     public void setFocusControlled(boolean isFocusControlled, short speedBehavior) {
 		this.speedBehavior = speedBehavior;
         activateFocusControlled(isFocusControlled, speedBehavior);
@@ -312,7 +312,7 @@ public abstract class FixedSizeLens extends Lens {
 	public void setFocusControlled(boolean isFocusControlled) {
 		setFocusControlled(isFocusControlled, speedBehavior);
 	}
-	
+
 	void activateFocusControlled(boolean isFocusControlled, short speedBehavior){
 		if(isFocusControlled) {
 			if(robot == null) {
@@ -320,7 +320,7 @@ public abstract class FixedSizeLens extends Lens {
 				owningView.parent.setJava2DPainter(paintCursor, Java2DPainter.AFTER_PORTALS);
 				try {
 					robot = new Robot();
-				} catch(AWTException e) { 
+				} catch(AWTException e) {
 					e.printStackTrace();
 				}
 			}
@@ -335,7 +335,7 @@ public abstract class FixedSizeLens extends Lens {
 					};
 				}
 			}
-			
+
 		} else {
 			setXfocusOffset(0);
 			setYfocusOffset(0);
@@ -351,20 +351,20 @@ public abstract class FixedSizeLens extends Lens {
 
 	int lastX = Integer.MAX_VALUE;
 	int lastY = Integer.MAX_VALUE;
-	
+
     private void doFocusControledOffsets(int deltaX, int deltaY, double magFactor, long currentTime) {
 	if(robot != null) {
 	    ptRobot.setLocation(lensX, lensY);
 	    SwingUtilities.convertPointToScreen(ptRobot, owningView.getComponent());
 	    robot.mouseMove((int)ptRobot.getX(), (int)ptRobot.getY());
 	}
-	if( 
+	if(
 	    deltaX % (int)magFactor == getXfocusOffset()
 	    && deltaY % (int)magFactor == getYfocusOffset()
 	    && deltaX / (int)magFactor == 0
 	    && deltaY / (int)magFactor == 0)
 	    return;
-		
+
 	setXfocusOffset(deltaX % (int)magFactor);
 	setYfocusOffset(deltaY % (int)magFactor);
 	if (this instanceof TemporalLens)
@@ -394,7 +394,7 @@ public abstract class FixedSizeLens extends Lens {
 			//System.out.println("speed="+speed+", magFactor="+magFactor+", ActualMM="+getActualMaximumMagnification());
 			lensX = lensX + deltaX / (int)magFactor;
 			lensY = lensY + deltaY / (int)magFactor;
-		
+
 			if (magFactor  > 1.0) {
 				doFocusControledOffsets(deltaX, deltaY, magFactor, currentTime);
 			}
@@ -444,7 +444,7 @@ public abstract class FixedSizeLens extends Lens {
 			cursor_y[NB_SPEED_POINTS-1] = y;
 			for (int i=0;i<speeds.length;i++){
 				if(cursor_time[i+1] != cursor_time[i])
-					speeds[i] = (float)Math.sqrt(Math.pow(cursor_x[i+1]-cursor_x[i],2)+Math.pow(cursor_y[i+1]-cursor_y[i],2)) / (float)(cursor_time[i+1]-cursor_time[i]);
+					speeds[i] = (float)Math.sqrt((cursor_x[i+1]-cursor_x[i])*(cursor_x[i+1]-cursor_x[i])+((cursor_y[i+1]-cursor_y[i])*(cursor_y[i+1]-cursor_y[i]))) / (float)(cursor_time[i+1]-cursor_time[i]);
 				else
 					speeds[i] = 0;
 			}
@@ -463,10 +463,10 @@ public abstract class FixedSizeLens extends Lens {
 		}
 
 	}
-	
+
 	/*****************************/
-	
-	
+
+
     /** Set the color used to draw the lens' inner radius (default is black).
      *@param c color of the boundary (set to null if you do not want to draw that border)
      */

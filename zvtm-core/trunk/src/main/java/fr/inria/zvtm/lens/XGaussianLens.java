@@ -1,11 +1,11 @@
 /*   FILE: TLinearLens.java
  *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2007-2011. All Rights Reserved
+ *   Copyright (c) INRIA, 2007-2013. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
- */ 
+ */
 
 package fr.inria.zvtm.lens;
 
@@ -68,7 +68,7 @@ public class XGaussianLens extends XLinearLens {
     }
 
     public void gf(float x, float y, float[] g){
-	dd = Math.sqrt(Math.pow(x-sw-lx,2) + Math.pow(y-sh-ly,2));
+	dd = Math.sqrt((x-sw-lx)*(x-sw-lx) + (y-sh-ly)*(y-sh-ly));
 	if (dd <= LR2){
 	    g[0] = g[1] = MM;
 	}

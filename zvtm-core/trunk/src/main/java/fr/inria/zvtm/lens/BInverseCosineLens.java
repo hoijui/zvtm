@@ -2,11 +2,11 @@
  *   DATE OF CREATION:  Thu Oct 05 11:35:04 2006
  *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2004-2009. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2013. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
- */ 
+ */
 
 
 package fr.inria.zvtm.lens;
@@ -146,7 +146,7 @@ public class BInverseCosineLens extends BlendingLens {
 	super.setMaximumMagnification(mm, forceRaster);
 	computeDropoffFactors();
     }
-    
+
     void computeDropoffFactors(){
 	aT = 1/(float)(LR1-LR2);
 	bT = (float)LR2/(float)(LR2-LR1);
@@ -154,11 +154,11 @@ public class BInverseCosineLens extends BlendingLens {
     }
 
     public void gfT(float x, float y, float[] g){
-        d = Math.sqrt(Math.pow(x-sw-lx,2) + Math.pow(y-sh-ly,2));
+        d = Math.sqrt((x-sw-lx)*(x-sw-lx) + (y-sh-ly)*(y-sh-ly));
         if (d <= LR2)
             g[0] = MMTf;
         else if (d <= LR1)
-            g[0] = MMTf-cT*(float)Math.acos(Math.pow(d*aT+bT-1,2));
+            g[0] = MMTf-cT*(float)Math.acos((d*aT+bT-1)*(d*aT+bT-1));
         else
             g[0] = 0;
     }
