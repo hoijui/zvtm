@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2007-2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2007-2013. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -19,7 +19,7 @@ public class Level {
 
     double ceilingAlt;
     double floorAlt;
-    
+
     Region[] regions = new Region[0];
 
     /** Create a new level.
@@ -36,7 +36,7 @@ public class Level {
     public double getCeilingAltitude(){
 	    return ceilingAlt;
     }
-    
+
     /** Get floor altitude for this level.
      */
     public double getFloorAltitude(){
@@ -50,7 +50,8 @@ public class Level {
 		if (regions.length >= 1){
 			Region res = regions[0];
 			for (int i=1;i<regions.length;i++){
-				if (Math.pow(regions[i].x-lp.x, 2) + Math.pow(regions[i].y-lp.y, 2) < Math.pow(res.x-lp.x, 2) + Math.pow(res.y-lp.y, 2)){
+				if ((regions[i].x-lp.x)*(regions[i].x-lp.x) + (regions[i].y-lp.y)*(regions[i].y-lp.y)
+					< (res.x-lp.x)*(res.x-lp.x) + (res.y-lp.y)*(res.y-lp.y)){
 					res = regions[i];
 				}
 			}
@@ -60,7 +61,7 @@ public class Level {
 			return null;
 		}
 	}
-	
+
 	/** Does Region r belongs to this level. */
 	public boolean contains(Region r){
 	    for (int i=0;i<regions.length;i++){
@@ -70,21 +71,21 @@ public class Level {
 	    }
 	    return false;
 	}
-    
+
     void addRegion(Region r){
         Region[] tmpR = new Region[regions.length+1];
         System.arraycopy(regions, 0, tmpR, 0, regions.length);
         regions = tmpR;
         regions[regions.length-1] = r;
     }
-    
+
     void removeRegion(Region r){
         for (int i=0;i<regions.length;i++){
             if (regions[i] == r){
                 Region[] tmpR = new Region[regions.length-1];
                 System.arraycopy(regions, 0, tmpR, 0, i);
                 System.arraycopy(regions, i+1, tmpR, i, regions.length-i-1);
-                regions = tmpR;                
+                regions = tmpR;
                 return;
             }
         }
@@ -111,7 +112,7 @@ public class Level {
 				if (regions[i].wnes[2] > res[2]){res[2] = regions[i].wnes[2];}
 				if (regions[i].wnes[3] < res[3]){res[3] = regions[i].wnes[3];}
 			}
-			return res;			
+			return res;
 		}
 		else {
 			double[] res = {0,0,0,0};

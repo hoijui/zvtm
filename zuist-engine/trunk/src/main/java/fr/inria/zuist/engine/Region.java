@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2007-2011. All Rights Reserved
+ *   Copyright (c) INRIA, 2007-2013. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -48,12 +48,12 @@ public class Region {
     /** Entering/leaving region: already in level range (transition at same level).
      Not stored, always appear/disappear as this is always off screen. */
     public static final short TASL = 4;
-    
+
     /** Default transition when leaving region. */
     static short DEFAULT_T_TRANSITION = DISAPPEAR;
     /** Default transition when entering region. */
     static short DEFAULT_F_TRANSITION = APPEAR;
-    
+
     /* Set default transition when none specified.
      *@param from one of {APPEAR, FADE_IN}
      *@param to one of {DISAPPEAR, FADE_OUT}
@@ -62,7 +62,7 @@ public class Region {
         DEFAULT_F_TRANSITION = from;
         DEFAULT_T_TRANSITION = to;
     }
-    
+
     public static final short ORDERING_ARRAY = 0;
     public static final short ORDERING_DISTANCE = 1;
     public static final String ORDERING_ARRAY_STR = "decl";
@@ -80,7 +80,7 @@ public class Region {
             return -1;
         }
     }
-    
+
     static short parseTransition(String t){
         if (t.equals(FADE_IN_STR)){return FADE_IN;}
         else if (t.equals(FADE_OUT_STR)){return FADE_OUT;}
@@ -119,19 +119,19 @@ public class Region {
     boolean wviv = false;
 
     SceneManager sm;
-    
+
     boolean isSensitive = false;
 
     short[] transitions;
 
     short requestOrder = ORDERING_DISTANCE;
-    
+
     /** Create a new region.
      *@param x center of region
      *@param y center of region
      *@param w width of region
      *@param h height of region
-     *@param highestLevel index of highest level in level span for this region (highestLevel <= lowestLevel) 
+     *@param highestLevel index of highest level in level span for this region (highestLevel <= lowestLevel)
      *@param lowestLevel index of lowest level in level span for this region (highestLevel <= lowestLevel)
      *@param id region ID
      *@param li layer index (information layer/space in which objects will be put)
@@ -159,12 +159,12 @@ public class Region {
     public String getID(){
 	    return id;
     }
-    
+
     /** Set Region title. */
     public void setTitle(String t){
         this.title = t;
     }
-    
+
     /** Get Region title. */
     public String getTitle(){
         return title;
@@ -212,7 +212,7 @@ public class Region {
             return cr;
         }
     }
-    
+
     /** Get objects in this region.
      *@return the actual list, not a clone. Do not temper with.
      */
@@ -231,13 +231,13 @@ public class Region {
     public VRectangle getBounds(){
 	    return bounds;
     }
-	
+
 	/** Get this region's center x-coordinate.
 	 */
 	public double getX(){
 		return x;
 	}
-	
+
 	/** Get this region's center y-coordinate.
 	 */
 	public double getY(){
@@ -249,13 +249,13 @@ public class Region {
 	public double getWidth(){
 		return w;
 	}
-	
+
 	/** Get this region's height.
 	 */
 	public double getHeight(){
 		return h;
 	}
-	
+
 	/** Set this region's center (x,y)-coordinates.
 	 */
 	public void moveTo(double x, double y){
@@ -263,25 +263,25 @@ public class Region {
 	    this.y = y;
 	    updateGeometry();
 	}
-	
+
 	/** Set this region's width.
 	 */
 	public void setWidth(double w){
 	    this.w = w;
 	    updateGeometry();
 	}
-	
+
 	/** Set this region's height.
 	 */
 	public void setHeight(double h){
 	    this.h = h;
 	    updateGeometry();
 	}
-	
+
 	void updateGeometry(){
 	    setGeometry(this.x, this.y, this.w, this.h);
 	}
-	
+
 	/** Set this region's center (x,y)-coordinates, width and height.
 	 */
 	public void setGeometry(double x, double y, double w, double h){
@@ -301,7 +301,7 @@ public class Region {
         isSensitive = b;
         if (bounds != null){bounds.setSensitivity(b);}
     }
-    
+
     /** Is the rectangle representing the region's bounds sensitive to cursor entry/exit. */
     public boolean isSensitive(){
         return isSensitive;
@@ -459,10 +459,10 @@ public class Region {
         int res = 0;
         if (objects.length > 0){
             // do not take the square root to get the actual distance as we are just comparing values
-            double shortestDistance = Math.round(Math.pow(x-objects[0].getX(),2) + Math.pow(y-objects[0].getY(),2));
+            double shortestDistance = Math.round((x-objects[0].getX())*(x-objects[0].getX()) + (y-objects[0].getY())*(y-objects[0].getY()));
             double distance;
             for (int i=1;i<objects.length;i++){
-                distance = Math.round(Math.pow(x-objects[i].getX(),2) + Math.pow(y-objects[i].getY(),2));
+                distance = Math.round((x-objects[i].getX())*(x-objects[i].getX()) + (y-objects[i].getY())*(y-objects[i].getY()));
                 if (distance < shortestDistance){
                     shortestDistance = distance;
                     res = i;
@@ -491,10 +491,10 @@ class DistanceComparator implements Comparator<ObjectDescription> {
 	this.x = x;
 	this.y = y;
     }
-    
+
 	public int compare(ObjectDescription od1, ObjectDescription od2){
-		double d1 = Math.pow(x-od1.getX(), 2) + Math.pow(y-od1.getY(), 2);
-		double d2 = Math.pow(x-od2.getX(), 2) + Math.pow(y-od2.getY(), 2);
+		double d1 = (x-od1.getX())*(x-od1.getX()) + (y-od1.getY())*(y-od1.getY());
+		double d2 = (x-od2.getX())*(x-od2.getX()) + (y-od2.getY())*(y-od2.getY());
 		if (d1 < d2){
 			return -1;
 		}
