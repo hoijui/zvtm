@@ -1,7 +1,7 @@
 /*   FILE: ZgrvEvtHdlr.java
  *   DATE OF CREATION:   Thu Jan 09 15:18:48 2003
  *   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2011. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2013. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  *   $Id$
@@ -363,7 +363,7 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
                     grMngr.mainCamera.setYspeed((activeCam.altitude>0) ? jpyD*(tfactor/PAN_SPEED_FACTOR) : jpyD/(tfactor*PAN_SPEED_FACTOR));
                     grMngr.mainCamera.setZspeed(0);
 					if (application.cfgMngr.isSDZoomEnabled()){
-						dragValue = Math.sqrt(Math.pow(jpxD, 2) + Math.pow(jpyD, 2));
+						dragValue = Math.sqrt(jpxD*jpxD + jpyD*jpyD);
 						if (!autoZooming && dragValue > application.cfgMngr.SD_ZOOM_THRESHOLD){
 							autoZooming = true;
 						    Animation a = grMngr.vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(300, v.cams[0],

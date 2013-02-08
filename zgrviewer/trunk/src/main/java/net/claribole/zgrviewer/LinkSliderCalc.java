@@ -1,5 +1,5 @@
 /*   AUTHOR : Tomer Moscovich (tomer@moscovich.net)
- *   Copyright (c) INRIA, 2009. All Rights Reserved
+ *   Copyright (c) INRIA, 2009-2013. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -21,16 +21,16 @@ import fr.inria.zvtm.glyphs.DPath;
 
 /**
  * Given a GeneralPath and a mouse cursor position, calculate path cursor position and scale
- * 
+ *
  * Usage:
  *    lsc = new LinkSliderCalc(edge.getPathReference(), myViewportWidth));
  *    lsc.updateMousePosition(newMousePos);
  *    patPoint = lsc.getPositionAlongPath();
  *    scale = lsc.getScale();
  */
- 
+
 public class LinkSliderCalc {
-	
+
 	public PolyLine polyLine;
 
 	protected Point2D mousePos;
@@ -39,13 +39,13 @@ public class LinkSliderCalc {
 	protected double viewWidth;
 	protected double scale;
 	protected double fractionAlongPath;
-	
+
 	DPath path;
-	
+
 	public LinkSliderCalc(DPath p, double viewWidth){
 		this(p, 0.5, viewWidth);
 	}
-	
+
 	/**
 	 * @param p 		path to slide along
 	 * @param flatness	optional - min distance between curve control points and flattend polyline representation
@@ -68,26 +68,26 @@ public class LinkSliderCalc {
 	 */
 	public void updateMousePosition(Point2D mousePos) {
 		this.mousePos = new Point2D.Double(mousePos.getX(), mousePos.getX());
-		
+
 		// Nearest Point and tangent segment
 		nearestSeg = polyLine.nearestSegment(mousePos);
 		nearestPoint = polyLine.nearestPointOnSegment(mousePos, nearestSeg);
-	
+
 		// Scale
 		double partialDist = polyLine.cumLengthAt(nearestPoint);
 		double pathLen = polyLine.getLength();
-			
+
 		// connes function
 		// in 0..1 unit sqare: y = (1-(x*2-1)^6)^4
 		double x = partialDist/pathLen;
 		double y = Math.pow(1-Math.pow(x*2-1, 6), 4) * (1-viewWidth/pathLen);
 		scale = Math.min(1, Math.max(0.01, 1-y)); // clamp .01 to 1
-		
-		
+
+
 		// fraction along path
 		fractionAlongPath = x;
 	}
-	
+
 	/**
 	 * @return Closest point on curve to mouse position
 	 * (call updateMousePosition first)
@@ -95,7 +95,7 @@ public class LinkSliderCalc {
 	public Point2D getPositionAlongPath(){
 		return nearestPoint;
 	}
-	
+
 	/**
 	 * @return fraction [0..1] closest point is along path
 	 * (call updateMousePosition first)
@@ -105,25 +105,25 @@ public class LinkSliderCalc {
 	}
 
 	/**
-	 * @return scale [0.01 to 1] so that viewWidth == path length at midpoint. 
+	 * @return scale [0.01 to 1] so that viewWidth == path length at midpoint.
 	 * (call updateMousePosition first)
 	 */
 	public double getScale(){
 		return scale;
 	}
-	
+
 	/**
-	 * @return tangent segment to curve at position along path 
+	 * @return tangent segment to curve at position along path
 	 * (call updateMousePosition first)
 	 */
 	public Line2D getTangentSegmentAtPathPosition(){
 		return nearestSeg;
 	}
-	
+
 }
 
 class Vector2D {
-	
+
 	public double x;
 	public double y;
 
@@ -150,9 +150,9 @@ class Vector2D {
 		x = _x;
 		y = _y;
 	}
-    	
+
    	public Vector2D(Vector2D v) {
-	    x = v.x;	
+	    x = v.x;
 	    y = v.y;
     }
 
@@ -162,7 +162,7 @@ class Vector2D {
 	public Vector2D duplicate(){
 		return new Vector2D(x,y);
 	}
-	
+
     public static Vector2D normalize(Vector2D v){
 		double l = v.length();
 		return new Vector2D(v.x/l, v.y/l);
@@ -172,18 +172,18 @@ class Vector2D {
 		x /= l;
 		y /= l;
     }
-	
+
 	public void negate(){
 		x*=-1;y*=-1;
 	}
 	public static Vector2D negate(Vector2D v){
-		return new Vector2D(-v.x, -v.y);	
+		return new Vector2D(-v.x, -v.y);
 	}
-	
+
     public double length(){
 		return Math.sqrt(x * x + y * y);
     }
-	
+
 	static public Vector2D add(Vector2D u, Vector2D v){
 		return new Vector2D(u.x + v.x, u.y + v.y);
     }
@@ -191,7 +191,7 @@ class Vector2D {
 		return new Vector2D(u.x + v.x +w.x, u.y + v.y + w.y);
     }
     public void add(Vector2D v){
-		x += v.x;	y += v.y;	
+		x += v.x;	y += v.y;
     }
 
 	static public Vector2D subtract(Point u, Vector2D v){
@@ -203,18 +203,18 @@ class Vector2D {
     public void subtract(Vector2D v){
 		x -= v.x;	y -= v.y;
     }
-	
+
     static public Vector2D multiply(Vector2D v, double m){
 		return new Vector2D(v.x * m, v.y * m);
     }
     public void multiply(double m){
-		x *= m;	y *= m;	
+		x *= m;	y *= m;
     }
-	
+
     static public double dot_product(Vector2D u, Vector2D v){
 		return u.x * v.x + u.y * v.y;
     }
-    
+
     static public double cross_product(Vector2D u, Vector2D v){
 		return u.x * v.y - u.y * v.x;
     }
@@ -236,14 +236,14 @@ class Vector2D {
 	  else
 	    return 0;
     }
-    
+
 	// angle 0 to PI
     public static double get_angle0PI(Vector2D u, Vector2D v){
 		double cosine = cos(u, v);
 		if (cosine <= -1) return Math.PI;
 		else if (cosine >= 1) return 0;
 		else return Math.acos(cosine);
-    }	
+    }
 
 	// angle -PI to PI
 	public double get_anglePIPI(Vector2D v){
@@ -255,7 +255,7 @@ class Vector2D {
 		if (sin == 0)
 			if (cos > 0)	return 0;
 			else		return Math.PI;
-		
+
 		// -PI/2   ...   +PI/2
 		double angle = Math.atan(sin/cos);
 
@@ -266,28 +266,28 @@ class Vector2D {
 				angle +=Math.PI;
 		return angle;
 	}
-	
+
 	public static Vector2D rotate90(Vector2D vec){
 		return new Vector2D(vec.y, -vec.x);
 	}
 
 	public static Vector2D rotate(Vector2D v, double radians){
-	    
+
 	    double cos = Math.cos(radians);
 	    double sin = Math.sin(radians);
 
 	    return  new Vector2D(v.x * cos - v.y * sin,
 				v.x * sin + v.y * cos );
 	}
-	
+
 	public static Vector2D flip(Vector2D vec, Vector2D axis){
 		Vector2D x_vec = Vector2D.normalize(axis);
-		
+
 		Vector2D y_vec = Vector2D.rotate90(x_vec);
 		double x = Vector2D.dot_product(vec, x_vec);
 		double y = Vector2D.dot_product(vec, y_vec);
 		y = -y;
-		
+
 		return Vector2D.add(Vector2D.multiply(x_vec, x),
 							Vector2D.multiply(y_vec, y));
 	}
@@ -312,22 +312,22 @@ class Vector2D {
 }
 
 class PolyLine {
-    
+
 	ArrayList<Line2D> segments;		// polyline segments
 	ArrayList<Double> cumLengths;	// total length until seg i (exclusive)
 	double length;
-	
+
 	public PolyLine(PathIterator pi){
 		// get segments
 		segments = new ArrayList<Line2D>();
-		double[] coords = {0,0,0,0,0,0};		
+		double[] coords = {0,0,0,0,0,0};
 		Point2D lastPt = new Point2D.Double();
 		while(!pi.isDone()){
 			switch( pi.currentSegment(coords) ) {
-				case PathIterator.SEG_MOVETO: 
+				case PathIterator.SEG_MOVETO:
 					lastPt = new Point2D.Double(coords[0], coords[1]);
 					break;
-				case PathIterator.SEG_LINETO: 
+				case PathIterator.SEG_LINETO:
 					Point2D.Double newPt = new Point2D.Double(coords[0], coords[1]);
 					segments.add( new Line2D.Double(lastPt, newPt) );
 					lastPt = newPt;
@@ -338,7 +338,7 @@ class PolyLine {
 		// precalc lengths
 		calcCumLengths();
 	}
-	
+
 	// calculate and store length of each segment
 	public void calcCumLengths(){
 		length = 0;
@@ -363,11 +363,11 @@ class PolyLine {
 	public double getLengthAtSegmentIdx(int idx){
 		return cumLengths.get(idx);
 	}
-	
+
 	public Point2D nearestPoint(Point2D pt) {
 		return nearestPointOnSegment(pt, nearestSegment(pt));
 	}
-	
+
 	public Line2D nearestSegment(Point2D pt) {
 		return segments.get(nearestSegmentIdx(pt));
 	}
@@ -385,8 +385,8 @@ class PolyLine {
 		}
 		return nearestSegIdx;
 	}
-	
-	
+
+
 	// Calculate closest point on segment
 	public static Point2D nearestPointOnSegment(Point2D pt, Line2D seg){
 		Point2D p1 = seg.getP1();
@@ -410,7 +410,7 @@ class PolyLine {
 	/*
 	public ArrayList<Point2D> getIntersections(PolyLine poly){
 		ArrayList<Point2D> intersections = new ArrayList<Point2D>();
-	
+
 		for(int i = 0; i < this.segments.size(); ++i){
 			Line2D seg1 = this.segments.get(i);
 			for(int j = 0; j < poly.segments.size(); ++j){
@@ -418,11 +418,11 @@ class PolyLine {
 				if(seg1.intersectsLine(poly.segments.get(j))){
 					//TODO intersects?  intersections.add(seg1.);
 				}
-					
+
 			}
-					
+
 		}
-		
+
 		return intersections;
 	}*/
 	public static Point2D SegmentSegmentIntersection(Line2D l1, Line2D l2) {
@@ -443,15 +443,15 @@ class PolyLine {
 		a1 = yy1 - yy2;
 		b1 = xx2 - xx1;
 		c1 = yy2 * xx1 - xx2 * yy1;
-		
+
 		if (Math.abs(a0 * b1 - a1 * b0) < 0.00001){
 		     return null;
 		}
-		
+
 		double x = ((b0 * c1 - b1 * c0)/(a0 * b1 - a1 * b0)) ;
 		double y = ((a0 * c1 - a1 * c0)/(a1 * b0 - a0 * b1));
 		return new Point2D.Double(x,y);
-		
+
 	}
 
 	// Calculate the intersection of a ray and a circle
@@ -466,9 +466,9 @@ class PolyLine {
 	   double a,b,c;
 	   double bb4ac;
 	   Point2D.Double dp;
-	
+
 	   dp = new Point2D.Double( p2.getX() - p1.getX(), p2.getY() - p1.getY());
-	
+
 	   a = dp.getX() * dp.getX() + dp.getY() * dp.getY();
 	   b = 2 * (dp.getX() * (p1.getX() - cc.getX()) + dp.getY() * (p1.getY() - cc.getY()));
 	   c = cc.getX() * cc.getX() + cc.getY() * cc.getY();
@@ -481,7 +481,7 @@ class PolyLine {
 	      int2.setLocation(Double.NaN, Double.NaN);
 	      return false;
 	   }
-	   
+
 	   mu1 = (-b + Math.sqrt(bb4ac)) / (2 * a);
 	   mu2 = (-b - Math.sqrt(bb4ac)) / (2 * a);
 	   Vector2D v1 = new Vector2D(p1, p2);
@@ -518,15 +518,15 @@ class PolyLine {
 			}
 		}
 		return -1;
-		
+
 	}
-	
+
 	public static final double segmentLength(Line2D seg){
 		double dx = seg.getX2()-seg.getX1();
 		double dy = seg.getY2()-seg.getY1();
 		return Math.sqrt(dx*dx + dy*dy);
 	}
-	
+
 	public Point2D firstPoint() {
 		return segments.get(0).getP1();
 	}

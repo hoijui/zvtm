@@ -1,9 +1,9 @@
 /*   FILE: ZgrReader.java
  *   DATE OF CREATION:   Apr 4 2005
  *   AUTHOR :            Eric Mounhem (skbo@lri.fr)
- *   Copyright (c) INRIA, 2004-2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2013. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
- * 
+ *
  * $Id$
  */
 
@@ -257,8 +257,8 @@ public class ZgrReader {
                         //    }
                         //    ellipse.setBorderColor(border);
                         //    vs.addGlyph(ellipse);
-                            
-                            
+
+
                             //secondaries[j] = new SGlyph(ellipse, 0, 0);
                         //}
                         //nodeGlyph = new CGlyph(primary, secondaries);
@@ -556,7 +556,7 @@ public class ZgrReader {
                 break;
             case Shape.NORMAL:
                 float[] norm = { 1, (float) 0.5, (float) 0.5 };
-                double taille = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2)) / 6;
+                double taille = Math.sqrt(x*x + y*y) / 6;
 
                 Color c;
                 if (edge.color == null)

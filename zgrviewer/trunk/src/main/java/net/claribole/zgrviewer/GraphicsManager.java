@@ -1,10 +1,10 @@
 /*   FILE: GraphicsManager.java
  *   DATE OF CREATION:   Mon Nov 27 08:30:31 2006
- *   Copyright (c) INRIA, 2006-2011. All Rights Reserved
+ *   Copyright (c) INRIA, 2006-2013. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  *   $Id$
- */ 
+ */
 
 package net.claribole.zgrviewer;
 
@@ -105,9 +105,9 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     JPanel mainViewPanel;
 
     PeriodicActionManager paMngr;
-    
+
     GeometryEditor geom;
-    
+
     /*dimensions of zoomable panel*/
     int panelWidth, panelHeight;
 
@@ -118,7 +118,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	public int getPanelHeight(){
 		return panelHeight;
 	}
-    
+
     /* misc. lens settings */
     Lens lens;
     SCBLens fLens;
@@ -262,7 +262,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	public VirtualSpace getGraphSpace(){
 		return mSpace;
 	}
-	
+
 	public VirtualSpace getMenuSpace(){
 		return mnSpace;
 	}
@@ -270,7 +270,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	public View getView(){
 		return mainView;
 	}
-	
+
 	public Camera getGraphCamera(){
 		return mainCamera;
 	}
@@ -278,19 +278,19 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	public Camera getMenuCamera(){
 		return mnSpace.getCamera(0);
 	}
-	
+
 	public BaseEventHandler getViewListener(){
 		return meh;
 	}
-	
+
 	public ToolPalette getToolPalette(){
 		return tp;
 	}
-	
+
 	public VRectangle getMagWindow(){
 		return magWindow;
 	}
-	
+
 	public VRectangleOr getBoundingBox(){
 		return boundingBox;
 	}
@@ -300,7 +300,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	mainView.setBackgroundColor(cfgMngr.backgroundColor);
 	meh = eh;
 	// same event handler handling all layers for now
-	//XXX: TBD: refactor event handler code taking advantage of new one handler per layer functionality 
+	//XXX: TBD: refactor event handler code taking advantage of new one handler per layer functionality
 	mainView.setListener((ViewListener)eh, 0);
 	mainView.setListener((ViewListener)eh, 1);
 	mainView.setListener((ViewListener)eh, 2);
@@ -351,7 +351,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	magWindow.setFilled(false);
 	magWindow.setBorderColor(GraphicsManager.DM_COLOR);
 	mSpace.addGlyph(magWindow);
-	mSpace.hide(magWindow);	
+	mSpace.hide(magWindow);
     }
 
 	/* Starting at version ? (somewhere between 1.16 and 2.8), GraphViz programs generate a polygon that bounds the entire graph.
@@ -404,7 +404,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	if (g instanceof DPath || g instanceof VText){
 	    return true;// don't take edges and text into accout, would be too costly (and would require one repaint for text)
 	}
-	else {// just get geometrical center for other glyphs ; this is an approximation, but it should work 
+	else {// just get geometrical center for other glyphs ; this is an approximation, but it should work
 	    return g.vx > r.vx-r.getWidth() && g.vx < r.vx+r.getWidth()
 		&& g.vy > r.vy-r.getHeight() && g.vy < r.vy+r.getHeight();
 	}
@@ -559,14 +559,14 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
                 rView.getFrame().addComponentListener(this);
                 rView.setBackgroundColor(cfgMngr.backgroundColor);
                 // same event handler handling all layers for now
-                //XXX: TBD: refactor event handler code taking advantage of new one-handler-per-layer functionality 
+                //XXX: TBD: refactor event handler code taking advantage of new one-handler-per-layer functionality
                 rView.setListener(reh, 0);
                 rView.setListener(reh, 1);
                 rView.setResizable(true);
                 rView.setActiveLayer(1);
                 rView.setCursorIcon(java.awt.Cursor.MOVE_CURSOR);
                 mSpace.getCamera(1).setLocation(rView.getGlobalView(mSpace.getCamera(1)));
-                
+
                 //rView.getGlobalView(mSpace.getCamera(1),100);
                 // give null arguments because the method does not really care
                 cameraMoved(null, null, 0);
@@ -613,7 +613,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     public void setLens(int t){
 		lensType = t;
 	}
-	
+
 	public int getLensType(){
 		return lensType;
 	}
@@ -629,7 +629,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 		}
 		vsm.repaint();
 	}
-	
+
 	public Lens getLens(){
 		return lens;
 	}
@@ -645,7 +645,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         animator.startAnimation(a, false);
         setLens(GraphicsManager.ZOOMIN_LENS);
     }
-    
+
     public void zoomInPhase2(double mx, double my){
         // compute camera animation parameters
         double cameraAbsAlt = mainCamera.getAltitude()+mainCamera.getFocal();
@@ -777,13 +777,13 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         }
         return res;
     }
-    
+
     /*-------------        DragMag        -----------------*/
 
 	public Camera getDragMagCamera(){
 		return dmCamera;
 	}
-	
+
 	public DraggableCameraPortal getDragMagPortal(){
 		return dmPortal;
 	}
@@ -796,7 +796,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 		else {
 			// portal not active, create it
 			createDM(x, y, pl);
-		}	
+		}
 	}
 
     void createDM(int x, int y, PortalListener pl){
@@ -940,11 +940,11 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	originalHighlightedLabelColor = highlightedLabel.getColor();
 	highlightedLabel.setColor(ConfigManager.HIGHLIGHT_COLOR);
     }
-    
+
     /* -------- Progress bar on glass pane -----------*/
-    
-    
-    
+
+
+
 
     /* -------------- Font management ----------------*/
 
@@ -963,7 +963,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	    VText.setMainFont(ConfigManager.defaultFont);
 	}
     }
-    
+
     public void componentResized(ComponentEvent e){
         if (e.getSource() == mainView.getFrame()){
             updatePanelSize();
@@ -971,7 +971,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
             cameraMoved(null, null, 0);
             //update SD_ZOOM_THRESHOLD
             Dimension sz = mainView.getFrame().getSize();
-            cfgMngr.setSDZoomThreshold(0.3 * Math.sqrt(Math.pow(sz.width, 2) + Math.pow(sz.height, 2)));
+            cfgMngr.setSDZoomThreshold(0.3 * Math.sqrt(sz.width*sz.width + sz.height*sz.height));
         }
         else if (e.getSource() == rView.getFrame()){
     		mSpace.getCamera(1).setLocation(rView.getGlobalView(mSpace.getCamera(1)));
@@ -1007,12 +1007,12 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 			if (g.getOwner() != null && g.getOwner() instanceof Metadata){
 				g.setOwner(new LElem((Metadata)g.getOwner()));
 			}
-		}		
+		}
 		cfgMngr.notifyPlugins(Plugin.NOTIFY_PLUGIN_LOGICAL_STRUCTURE_CHANGED);
 	}
 
     /* ------------- Graph editing ---------------- */
-    
+
     static final float[] TRIANGLE_VERTICES = {1f, 1f, 1f};
 
     public LEdge addEdge(Glyph sn, Glyph en, String title, boolean directed){
@@ -1097,7 +1097,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     Vector originalEdgeColor = new Vector();
     Vector originalEdgeBorderColor = new Vector();
     Vector originalEdgeStroke = new Vector();
-    
+
     Vector highlightedNodes = new Vector();
     Vector originalNodeBorderColor = new Vector();
     Vector originalNodeFillColor = new Vector();
@@ -1108,18 +1108,18 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     // currently selected direction of highlighting neighboring -1/UNDIRECTED/INCOMING/OUTGOING
     int highlightDir;
     // keep already highlighted nodes. This is for performance
-    HashMap highlightNodesDone = new HashMap(1000);  
+    HashMap highlightNodesDone = new HashMap(1000);
      // timeout for overly deep highlighting in seconds
-    final int highlightTimeStampTimeout = 5; 
+    final int highlightTimeStampTimeout = 5;
     Calendar highlightTimeStamp = Calendar.getInstance();
-    // nodes fixated for highlighting 
+    // nodes fixated for highlighting
     Vector highlightNodes = new Vector();
     // number of levels for the fixated node at according pos of highlightNodes
     Vector highlightLevels = new Vector();
     // direction of highlighting for the fixated node at according pos of highlightNodes
     Vector highlightDirections = new Vector();
 
-    
+
     public void highlightElement(Glyph g, Camera cam, VCursor cursor, boolean highlight, int moreLess, boolean fixNode, int dir){
         Object o = null;
         if (g != null && g != boundingBox){
@@ -1127,7 +1127,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
             o = g.getOwner();
         }
         else {
-            // if cursor was not in a shape, try to detect a label or an edge           
+            // if cursor was not in a shape, try to detect a label or an edge
             Vector otherGlyphs = cursor.getPicker().getIntersectingGlyphs(cam);
             if (otherGlyphs != null && otherGlyphs.size() > 0){
                 g = (Glyph)otherGlyphs.firstElement();
@@ -1186,7 +1186,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
          highlightNodesDone.clear();
          highlightTimeStamp = Calendar.getInstance();
          highlightTimeStamp.add(Calendar.SECOND, highlightTimeStampTimeout);
-         if (dir == LEdge.UNDIRECTED) { 
+         if (dir == LEdge.UNDIRECTED) {
         	 highlightNode(n, highlight, LEdge.UNDIRECTED, highlightLevel);
          } else {
              if (dir != LEdge.OUTGOING) highlightNode(n, highlight, LEdge.INCOMING, highlightLevel);
@@ -1301,7 +1301,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         }
         g.setStroke(HIGHLIGHT_STROKE);
     }
-    
+
     void highlightEdgeGlyph(Glyph g){
         originalEdgeColor.add(g.getDefaultColor());
         originalEdgeStroke.add(g.getStroke());
@@ -1317,7 +1317,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
         }
         else {
             originalEdgeBorderColor.add(Color.BLACK);
-            g.setColor(ConfigManager.HIGHLIGHT_COLOR);	    
+            g.setColor(ConfigManager.HIGHLIGHT_COLOR);
         }
         g.setStroke(HIGHLIGHT_STROKE);
     }
@@ -1372,13 +1372,13 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     }
 
 	/* -------------- Bring and Go mode (previously called Fresnel mode) -------------------- */
-	
+
 	static final int BRING_ANIM_DURATION = 300;
 	static final double BRING_DISTANCE_FACTOR = 1.5;
-	
+
 	static final float FADED_ELEMENTS_TRANSLUCENCY = 0.1f;
 	static final float SECOND_STEP_TRANSLUCENCY = 0.3f;
-	
+
 	boolean isBringingAndGoing = false;
 
 	public boolean isBringingAndGoing(){
@@ -1386,14 +1386,14 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	}
 
 	Vector broughtElements = new Vector();
-	
+
 	Vector elementsToFade;
 	float[] alphaOfElementsToFade;
 
 	void enterBringAndGoMode(){}
-	
+
 	void exitBringAndGoMode(){}
-	
+
 	void startBringAndGo(Glyph g){
 		isBringingAndGoing = true;
 		LNode n = LogicalStructure.getNode(g);
@@ -1424,7 +1424,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
             // process all others
             LNode otherEnd = arcs[i].getOtherEnd(n);
             ClosedShape otherEndShape = otherEnd.getShape();
-            double d = Math.sqrt(Math.pow(otherEndShape.vx-thisEndShape.vx, 2) + Math.pow(otherEndShape.vy-thisEndShape.vy, 2));
+            double d = Math.sqrt((otherEndShape.vx-thisEndShape.vx)*(otherEndShape.vx-thisEndShape.vx) + (otherEndShape.vy-thisEndShape.vy)*(otherEndShape.vy-thisEndShape.vy));
             // use this end's shape size when getting ring because we're rescaling
             // brought nodes to match the size of the current node
             Ring ring = rm.getRing(Math.atan2(otherEndShape.vy-thisEndShape.vy, otherEndShape.vx-thisEndShape.vx), thisEndShape.getSize(), RING_STEP);
@@ -1456,7 +1456,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
             catch (ClassCastException e){e.printStackTrace();}
         }
 	}
-	
+
 	void endBringAndGo(Glyph g){
         isBringingAndGoing = false;
         if (elementsToFade == null){
@@ -1490,7 +1490,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
             animator.startAnimation(a, true);
         }
 	}
-	
+
 	void bring(LEdge arc, LNode node, double sx, double sy, double ex, double ey, double size, Hashtable node2broughtPosition){
 	    broughtElements.add(BroughtElement.rememberPreviousState(node));
 	    broughtElements.add(BroughtElement.rememberPreviousState(arc));
@@ -1530,7 +1530,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 		Point2D.Double asp = spline.getStartPoint();
 		Point2D.Double aep = spline.getEndPoint();
 		Point2D.Double sp, ep;
-		if (Math.sqrt(Math.pow(asp.x-ex,2) + Math.pow(asp.y-ey,2)) < Math.sqrt(Math.pow(asp.x-sx,2) + Math.pow(asp.y-sy,2))){
+		if (Math.sqrt((asp.x-ex)*(asp.x-ex) + (asp.y-ey)*(asp.y-ey)) < Math.sqrt((asp.x-sx)*(asp.x-sx) + (asp.y-sy)*(asp.y-sy))){
 			sp = new Point2D.Double(bposition.x, bposition.y);
 			ep = new Point2D.Double(sx, sy);
 		}
@@ -1576,7 +1576,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 			}
 			else {
 				oe = otherArcs[i].getOtherEnd(node).getShape();
-				if (Math.sqrt(Math.pow(asp.x-ex,2) + Math.pow(asp.y-ey,2)) <= Math.sqrt(Math.pow(aep.x-ex,2) + Math.pow(aep.y-ey,2))){
+				if (Math.sqrt((asp.x-ex)*(asp.x-ex) + (asp.y-ey)*(asp.y-ey)) <= Math.sqrt((aep.x-ex)*(aep.x-ex) + (aep.y-ey)*(aep.y-ey))){
 					sp = new Point2D.Double(bposition.x, bposition.y);
 					ep = oe.getLocation();
 				}
@@ -1591,35 +1591,35 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     		    false, SlowInSlowOutInterpolator.getInstance(), null);
     		animator.startAnimation(a, true);
 			spline.setTranslucencyValue(SECOND_STEP_TRANSLUCENCY);
-		}		
+		}
     }
-    
+
     Point2D.Double sendBack(BroughtElement be, Glyph g){
 		broughtElements.remove(be);
         return be.restorePreviousState(BRING_ANIM_DURATION, g);
     }
-	
+
 	/* ----------------------- Link sliding navigation ----------------------------------- */
-	
+
 	static final int SLIDER_CURSOR_SIZE = 6;
 	static final Color SLIDER_CURSOR_FILL = Color.WHITE;
-	
+
 	static final int SELECTION_RADIUS = 200;
 	static final Color SELECTION_RADIUS_COLOR = Color.RED;
-	
+
 	boolean isLinkSliding = false;
-	
+
 	public boolean isLinkSliding(){
 		return isLinkSliding;
 	}
-	
+
 	LinkSliderCalc[] lscs;
 	int lsci = -1;
-	
+
 	DPath slidingLink;
 	Color slidingLinkActualColor = null;
 	Point2D mPos = new Point2D.Double();
-	
+
 	SICircle slideCursor, selectionRadius;
 	Point2D cPos;
 
@@ -1627,20 +1627,20 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 
 	int screen_cursor_x,screen_cursor_y;
 	Robot awtRobot;
-	
+
 	Point2D mtPos = new Point2D.Double();
-	
+
 	public void attemptLinkSliding(double press_vx, double press_vy, int scr_x, int scr_y){
 		double vieww = mainView.getVisibleRegionWidth(mainCamera);
 		lsci = 0;
 	    if (lstruct != null){
     		closestNode = lstruct.nodes[0];
             ClosedShape nodeShape = closestNode.getShape();
-    		double shortestDistance = Math.sqrt(Math.pow(nodeShape.vx-press_vx,2)+Math.pow(nodeShape.vy-press_vy,2));
+    		double shortestDistance = Math.sqrt((nodeShape.vx-press_vx)*(nodeShape.vx-press_vx) + (nodeShape.vy-press_vy)*(nodeShape.vy-press_vy));
     		double distance;
     		for (int i=1;i<lstruct.nodes.length;i++){
     			nodeShape = lstruct.nodes[i].getShape();
-    			distance = Math.sqrt(Math.pow(nodeShape.vx-press_vx,2)+Math.pow(nodeShape.vy-press_vy,2));
+    			distance = Math.sqrt((nodeShape.vx-press_vx)*(nodeShape.vx-press_vx) + (nodeShape.vy-press_vy)*(nodeShape.vy-press_vy));
     			if (distance < shortestDistance){
     				closestNode = lstruct.nodes[i];
     				shortestDistance = distance;
@@ -1656,12 +1656,12 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     			mPos.setLocation(press_vx, press_vy);
     			lscs[0].updateMousePosition(mPos);
     			cPos = lscs[0].getPositionAlongPath();
-    			shortestDistance = Math.sqrt(Math.pow(cPos.getX()-mPos.getX(),2) + Math.pow(cPos.getY()-mPos.getY(),2));
+    			shortestDistance = Math.sqrt((cPos.getX()-mPos.getX())*(cPos.getX()-mPos.getX()) + (cPos.getY()-mPos.getY())*(cPos.getY()-mPos.getY()));
     			for (int i=1;i<arcs.length;i++){
     				lscs[i] = new LinkSliderCalc(arcs[i].getSpline(), vieww);
     				lscs[i].updateMousePosition(mPos);
     				cPos = lscs[i].getPositionAlongPath();
-    				distance = Math.sqrt(Math.pow(cPos.getX()-mPos.getX(),2) + Math.pow(cPos.getY()-mPos.getY(),2));
+    				distance = Math.sqrt((cPos.getX()-mPos.getX())*(cPos.getX()-mPos.getX()) + (cPos.getY()-mPos.getY())*(cPos.getY()-mPos.getY()));
     				if (distance < shortestDistance){
     					shortestDistance = distance;
     					slidingLink = arcs[i].getSpline();
@@ -1682,7 +1682,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
             startLinkSliding(press_vx, press_vy, scr_x, scr_y);
         }
 	}
-	
+
 	public void startLinkSliding(final double press_vx, final double press_vy, int px, int py){
 		mainView.getCursor().setVisibility(false);
 		isLinkSliding = true;
@@ -1692,7 +1692,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 		try {
 			awtRobot = new Robot();
 		}
-		catch (java.awt.AWTException e){ 
+		catch (java.awt.AWTException e){
 			e.printStackTrace();
 		}
 		// chosen link
@@ -1708,7 +1708,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     		selectionRadius = new SICircle(closestNode.getShape().vx, closestNode.getShape().vy, 0, SELECTION_RADIUS, Color.WHITE, SELECTION_RADIUS_COLOR);
     		selectionRadius.setFilled(false);
     		selectionRadius.setStroke(new BasicStroke(2f));
-    		mSpace.addGlyph(selectionRadius);	    
+    		mSpace.addGlyph(selectionRadius);
 		}
 		// center camera on selection
 	    Animation a = animator.getAnimationFactory().createCameraTranslation(200, mainCamera, new Point2D.Double(press_vx, press_vy), false,
@@ -1716,7 +1716,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 	                                                                                          new EndAction(){public void execute(Object subject, Animation.Dimension dimension){linkSlider(press_vx, press_vy, true);}});
 	    animator.startAnimation(a, false);
 	}
-	
+
 	public void linkSlider(double vx, double vy, boolean centerCursor){
 	    if (lscs == null){
 	        // endLinkSliding might have been called before the call to
@@ -1736,12 +1736,12 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
             mtPos.setLocation(vx, vy);
             int newlsci = lsci;
             Point2D tPos = lscs[lsci].getPositionAlongPath();
-            double shortestDistance = Math.sqrt(Math.pow(tPos.getX()-mtPos.getX(),2) + Math.pow(cPos.getY()-mtPos.getY(),2));
+            double shortestDistance = Math.sqrt((tPos.getX()-mtPos.getX())*(tPos.getX()-mtPos.getX()) + (cPos.getY()-mtPos.getY())*(cPos.getY()-mtPos.getY()));
             double distance;
             for (int i=0;i<lsci;i++){
                 lscs[i].updateMousePosition(mtPos);
                 tPos = lscs[i].getPositionAlongPath();
-                distance = Math.sqrt(Math.pow(tPos.getX()-mtPos.getX(),2) + Math.pow(cPos.getY()-mtPos.getY(),2));
+                distance = Math.sqrt((tPos.getX()-mtPos.getX())*(tPos.getX()-mtPos.getX()) + (cPos.getY()-mtPos.getY())*(cPos.getY()-mtPos.getY()));
                 if (distance < shortestDistance){
                     shortestDistance = distance;
                     newlsci = i;
@@ -1750,14 +1750,14 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
             for (int i=lsci+1;i<lscs.length;i++){
                 lscs[i].updateMousePosition(mtPos);
                 tPos = lscs[i].getPositionAlongPath();
-                distance = Math.sqrt(Math.pow(tPos.getX()-mtPos.getX(),2) + Math.pow(cPos.getY()-mtPos.getY(),2));
+                distance = Math.sqrt((tPos.getX()-mtPos.getX())*(tPos.getX()-mtPos.getX()) + (cPos.getY()-mtPos.getY())*(cPos.getY()-mtPos.getY()));
                 if (distance < shortestDistance){
                     shortestDistance = distance;
                     newlsci = i;
                 }
             }
             if (newlsci != lsci){
-                slidingLink.setColor(slidingLinkActualColor);                
+                slidingLink.setColor(slidingLinkActualColor);
                 lsci = newlsci;
                 slidingLink = lscs[lsci].getPath();
                 slidingLinkActualColor = slidingLink.getColor();
@@ -1769,7 +1769,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 		mainCamera.moveTo(Math.round(cPos.getX()), Math.round(cPos.getY()));
 		//mainCamera.setAltitude((float)(Camera.DEFAULT_FOCAL/lsc.getScale() - Camera.DEFAULT_FOCAL));
 	}
-	
+
 	public void endLinkSliding(){
 		mainView.getPanel().setNoEventCoordinates(ViewPanel.NO_COORDS, ViewPanel.NO_COORDS);
         mainView.getCursor().setVisibility(true);
@@ -1786,29 +1786,29 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
 		lsci = -1;
 		awtRobot = null;
 	}
-	
+
 }
 
 class ZGRGlassPane extends JComponent {
-    
+
     static final int BAR_WIDTH = 200;
     static final int BAR_HEIGHT = 10;
 
-    static final AlphaComposite GLASS_ALPHA = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.65f);    
+    static final AlphaComposite GLASS_ALPHA = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.65f);
     static final Color MSG_COLOR = Color.DARK_GRAY;
     GradientPaint PROGRESS_GRADIENT = new GradientPaint(0, 0, Color.ORANGE, 0, BAR_HEIGHT, Color.BLUE);
-    
+
     String msg = Messages.EMPTY_STRING;
     int msgX = 0;
     int msgY = 0;
-    
+
     int completion = 0;
     int prX = 0;
     int prY = 0;
     int prW = 0;
-    
+
     GraphicsManager grMngr;
-    
+
     ZGRGlassPane(GraphicsManager grMngr){
         super();
         this.grMngr = grMngr;
@@ -1816,7 +1816,7 @@ class ZGRGlassPane extends JComponent {
         addMouseMotionListener(new MouseMotionAdapter(){});
         addKeyListener(new KeyAdapter(){});
     }
-    
+
     void setProgress(int c){
         completion = c;
         prX = grMngr.panelWidth/2-BAR_WIDTH/2;
@@ -1825,14 +1825,14 @@ class ZGRGlassPane extends JComponent {
         PROGRESS_GRADIENT = new GradientPaint(0, prY, Color.LIGHT_GRAY, 0, prY+BAR_HEIGHT, Color.DARK_GRAY);
         repaint(prX, prY, BAR_WIDTH, BAR_HEIGHT);
     }
-    
+
     void setMessage(String m){
         msg = m;
         msgX = grMngr.panelWidth/2-BAR_WIDTH/2;
         msgY = grMngr.panelHeight/2-BAR_HEIGHT/2 - 10;
         repaint(msgX, msgY-50, 200, 70);
     }
-    
+
     protected void paintComponent(Graphics g){
         Graphics2D g2 = (Graphics2D)g;
         Rectangle clip = g.getClipBounds();
@@ -1856,11 +1856,11 @@ class ZGRGlassPane extends JComponent {
 class ZP2LensAction implements EndAction {
 
     GraphicsManager grMngr;
-    
+
     public ZP2LensAction(GraphicsManager gm){
 	    this.grMngr = gm;
     }
-    
+
     public void	execute(Object subject, Animation.Dimension dimension){
         ((Lens)subject).getOwningView().setLens(null);
         ((Lens)subject).dispose();
@@ -1869,13 +1869,13 @@ class ZP2LensAction implements EndAction {
         grMngr.lens = null;
         grMngr.setLens(GraphicsManager.NO_LENS);
     }
-    
+
 }
 
 class RingManager {
-	
+
 	Ring[] rings = new Ring[0];
-	
+
 	Ring getRing(double direction, double size, double ringStep){
 		// normalize direction in [0,2Pi[
 		if (direction < 0){direction = 2 * Math.PI + direction;}
@@ -1893,7 +1893,7 @@ class RingManager {
 		r.addNode(direction-a, direction+a);
 		return r;
 	}
-	
+
 	private Ring createNewRing(){
 		Ring[] tr = new Ring[rings.length+1];
 		System.arraycopy(rings, 0, tr, 0, rings.length);
@@ -1901,7 +1901,7 @@ class RingManager {
 		rings = tr;
 		return rings[rings.length-1];
 	}
-	
+
 }
 
 class Ring {
@@ -1914,11 +1914,11 @@ class Ring {
 //  Point2D.Double[] broughtPositions = new Point2D.Double[0];
 //  /* cones of influence, for each item, first element is the smallest angle in [0, 2Pi[, second the largest angle in [0, 2Pi[ */
 	double[][] cones = new double[0][2];
-	
+
 	Ring(int r){
 		this.rank = r;
 	}
-	
+
 //	void addNode(/*LNode n, Point2D.Double p,*/ double a1, double a2){
 	void addNode(double a1, double a2){
 //		// add node
@@ -1941,14 +1941,14 @@ class Ring {
 		tc[cones.length][1] = Math.max(a1, a2);
 		cones = tc;
 	}
-	
+
 	boolean intersectsConeOfInfluence(double a1, double a2){
 		for (int i=0;i<cones.length;i++){
 			if (a2 > cones[i][0] && a1 < cones[i][1]){return true;}
 		}
 		return false;
 	}
-	
+
 }
 
 class DistanceComparator implements java.util.Comparator {
@@ -1960,12 +1960,12 @@ class DistanceComparator implements java.util.Comparator {
 		this.centerNode = cn;
 		this.centerShape = cn.getShape();
 	}
-    
+
 	public int compare(Object o1, Object o2){
 		Glyph n1 = ((LEdge)o1).getOtherEnd(centerNode).getShape();
 		Glyph n2 = ((LEdge)o2).getOtherEnd(centerNode).getShape();
-		double d1 = Math.pow(centerShape.vx-n1.vx, 2) + Math.pow(centerShape.vy-n1.vy, 2);
-		double d2 = Math.pow(centerShape.vx-n2.vx, 2) + Math.pow(centerShape.vy-n2.vy, 2);
+		double d1 = (centerShape.vx-n1.vx)*(centerShape.vx-n1.vx) + (centerShape.vy-n1.vy)*(centerShape.vy-n1.vy);
+		double d2 = (centerShape.vx-n2.vx)*(centerShape.vx-n2.vx) + (centerShape.vy-n2.vy)*(centerShape.vy-n2.vy);
 		if (d1 < d2){
 			return -1;
 		}
@@ -1976,5 +1976,5 @@ class DistanceComparator implements java.util.Comparator {
 			return 0;
 		}
 	}
-        
+
 }

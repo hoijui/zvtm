@@ -1,10 +1,10 @@
 /*   FILE: LEdge.java
  *   DATE OF CREATION:  Thu Mar 15 19:18:17 2007
- *   Copyright (c) INRIA, 2007-2011. All Rights Reserved
+ *   Copyright (c) INRIA, 2007-2013. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
- */ 
+ */
 
 package net.claribole.zgrviewer;
 
@@ -28,7 +28,7 @@ public class LEdge extends LElem {
 
     static final String UNDIRECTED_STR = "--";
     static final String DIRECTED_STR = "->";
-    
+
     static final short GLYPH_SPLINE = 0;
     static final short GLYPH_LABEL = 1;
     static final short GLYPH_HEAD = 2;
@@ -57,7 +57,7 @@ public class LEdge extends LElem {
             }
         }
 		if (this.glyphs.length > 0){
-	        this.groupID = ((Metadata)this.glyphs[0].getOwner()).getClosestAncestorGroupID();			
+	        this.groupID = ((Metadata)this.glyphs[0].getOwner()).getClosestAncestorGroupID();
 		}
 		else {
 		    this.groupID = Messages.EMPTY_STRING;
@@ -82,7 +82,7 @@ public class LEdge extends LElem {
         this.groupID = Messages.EMPTY_STRING;
         categorizeGlyphs();
     }
-    
+
     void categorizeGlyphs(){
         glyphCat = new short[glyphs.length];
         Point2D.Double sp = getSpline().getStartPoint();
@@ -97,7 +97,8 @@ public class LEdge extends LElem {
                 glyphCat[i] = GLYPH_LABEL;
             }
             else if (glyphs[i] instanceof ClosedShape){
-                if (Math.sqrt(Math.pow(glyphs[i].vx-sp.x,2)+Math.pow(glyphs[i].vy-sp.y,2)) < Math.sqrt(Math.pow(glyphs[i].vx-ep.x,2)+Math.pow(glyphs[i].vy-ep.y,2))){
+                if (Math.sqrt((glyphs[i].vx-sp.x)*(glyphs[i].vx-sp.x) + (glyphs[i].vy-sp.y)*(glyphs[i].vy-sp.y))
+                    < Math.sqrt((glyphs[i].vx-ep.x)*(glyphs[i].vx-ep.x) + (glyphs[i].vy-ep.y)*(glyphs[i].vy-ep.y))){
                     // probably a tail glyph
                     glyphCat[i] = GLYPH_TAIL;
                 }
@@ -107,11 +108,11 @@ public class LEdge extends LElem {
                 }
             }
             else {
-                glyphCat[i] = GLYPH_UNKNOWN;                
+                glyphCat[i] = GLYPH_UNKNOWN;
             }
         }
     }
-    
+
     //void printCats(){
     //    for (int i=0;i<glyphs.length;i++){
     //        System.out.println(glyphs[i]+"\t=\t"+glyphCat[i]);
@@ -181,7 +182,7 @@ public class LEdge extends LElem {
 		}
 		return null;
 	}
-	
+
     /**
 	 *@return null if none or could not be identified.
      *@see #getTailGlyph()
@@ -190,9 +191,9 @@ public class LEdge extends LElem {
 		for (int i=0;i<glyphs.length;i++){
 		    if (glyphCat[i] == GLYPH_HEAD){return (ClosedShape)glyphs[i];}
 		}
-		return null;	    
+		return null;
 	}
-	
+
     /**
 	 *@return null if none or could not be identified.
      *@see #getHeadGlyph()
@@ -201,9 +202,9 @@ public class LEdge extends LElem {
 		for (int i=0;i<glyphs.length;i++){
 		    if (glyphCat[i] == GLYPH_TAIL){return (ClosedShape)glyphs[i];}
 		}
-		return null;	    
+		return null;
 	}
-	
+
 	public Glyph[] getUnknownGlyphs(){
 	    Vector<Glyph> res = new Vector(1);
 	    for (int i=0;i<glyphs.length;i++){
@@ -213,7 +214,7 @@ public class LEdge extends LElem {
         }
         return res.toArray(new Glyph[res.size()]);
 	}
-    
+
     public boolean hasTailAndHeadGlyphs(){
         int countH = 0;
         int countT = 0;
@@ -223,10 +224,10 @@ public class LEdge extends LElem {
 		}
 		return (countH > 0 && countT > 0);
     }
-    
+
 	/**
 	 *@return the old polygon if replace was successful.
-	 */	
+	 */
 	public ClosedShape replaceHead(VPolygonOr s){
 		for (int i=0;i<glyphs.length;i++){
 		    if (glyphCat[i] == GLYPH_HEAD){
@@ -241,7 +242,7 @@ public class LEdge extends LElem {
 
 	/**
 	 *@return the old polygon if replace was successful.
-	 */	
+	 */
 	public ClosedShape replaceTail(VPolygonOr s){
 		for (int i=0;i<glyphs.length;i++){
 		    if (glyphCat[i] == GLYPH_TAIL){
@@ -255,7 +256,7 @@ public class LEdge extends LElem {
 	}
 
     public String toString(){
-	return title + "@" + hashCode() + " [" + 
+	return title + "@" + hashCode() + " [" +
 	    ((tail != null) ? tail.getTitle() + "@" + tail.hashCode() : "NULL")+
 	    ((directed) ? LEdge.DIRECTED_STR : LEdge.UNDIRECTED_STR) +
 	    ((head != null) ? head.getTitle() + "@" + head.hashCode() : "NULL") +
