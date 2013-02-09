@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2010-2013. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -43,34 +43,34 @@ import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.CommonTree;
 
 class AirTrafficManager {
-    
+
 	static int MIN_WEIGHT = 500000;
-	
+
 	static final int AIRPORT_NODE_SIZE = 25;
-	
+
 	static final float DEFAULT_ARC_ALPHA = 1f;
 	static float EDGE_STROKE_WIDTH = 1f;
 	static final double QUAD_ANGLE = Math.PI / 6.0;
-	
+
 	static final Color AIRPORT_FILL_COLOR = Color.YELLOW;
 	static final Color AIRPORT_STROKE_COLOR = Color.BLACK;
 	static final Color AIRPORT_LABEL_STROKE_COLOR = Color.BLACK;
-	    
+
     static final String GML_FILE_PATH = "data/airports/airtraffic_2004.gml";
 	static final String GEO_FILE_PATH = "data/airports/airports.csv";
 	static final String INPUT_CSV_SEP = ";";
-	
+
 	static final String AIRP = "AIR";
-	
+
     LNode[] allNodes;
 	LEdge[] allArcs;
-	
+
     WorldExplorer application;
-    
+
     boolean isShowing = false;
-    
+
     AnimationManager AM;
-    
+
     AirTrafficManager(WorldExplorer app, boolean show){
         this.application = app;
         AM = VirtualSpaceManager.INSTANCE.getAnimationManager();
@@ -79,7 +79,7 @@ class AirTrafficManager {
             loadTraffic(loadAirports());
         }
     }
-    
+
     HashMap<String,Airport> loadAirports(){
         HashMap<String,Airport> iata2airport = new HashMap();
 		try {
@@ -107,14 +107,14 @@ class AirTrafficManager {
 		System.out.println("Loaded " + iata2airport.size() + " airport localizations");
 		return iata2airport;
     }
-    
+
     void loadTraffic(HashMap<String,Airport> iata2airport){
         try {
             GMLLexer lex = new GMLLexer(new ANTLRFileStream(GML_FILE_PATH));
            	CommonTokenStream tokens = new CommonTokenStream(lex);
             GMLParser parser = new GMLParser(tokens);
             GMLParser.gmlgr_return parserResult = parser.gmlgr();
-            CommonTree ast = (CommonTree) parserResult.getTree();            
+            CommonTree ast = (CommonTree) parserResult.getTree();
             List<CommonTree> nodes = ast.getChildren();
             HashMap<String,LNode> id2node = new HashMap();
             for (CommonTree node:nodes){
@@ -140,7 +140,7 @@ class AirTrafficManager {
             //}
     		System.out.println("Constructing " + allNodes.length + " airports");
     		System.out.println("Constructing " + allArcs.length + " connections");
-            id2node.clear();    		
+            id2node.clear();
         } catch (RecognitionException e){
             e.printStackTrace();
         }
@@ -150,13 +150,13 @@ class AirTrafficManager {
         iata2airport.clear();
         isShowing = true;
     }
-    
+
     static final String _id = "id";
     static final String _airport_code = "airport_code";
     static final String _weight = "weight";
     static final String _source = "source";
     static final String _target = "target";
-    
+
     void createAirportNode(CommonTree node, HashMap<String,LNode> id2node, HashMap<String,Airport> iata2airport){
         String iataCode = null;
         String id = null;
@@ -185,7 +185,7 @@ class AirTrafficManager {
 		Glyph.stickToGlyph(label, shape);
 		id2node.put(id, new LNode(iataCode, ap.name, ap.lat, ap.lng, shape, label));
     }
-    
+
     LEdge createFlightEdge(CommonTree node, HashMap<String,LNode> id2node){
 		LEdge res = null;
 		int weight = 0;
@@ -211,9 +211,9 @@ class AirTrafficManager {
 			LNode head = id2node.get(tgt);
 			if (tail != null && head != null){
 				double alpha = Math.atan2(head.getShape().vy-tail.getShape().vy,
-				                          head.getShape().vx-tail.getShape().vx);					
-				double ds = Math.sqrt(Math.pow((head.getShape().vx-tail.getShape().vx),2)+Math.pow((head.getShape().vy-tail.getShape().vy),2)) / 2.0;
-				double rho = ds / Math.cos(QUAD_ANGLE);					
+				                          head.getShape().vx-tail.getShape().vx);
+				double ds = Math.sqrt((head.getShape().vx-tail.getShape().vx)*(head.getShape().vx-tail.getShape().vx) + (head.getShape().vy-tail.getShape().vy)*(head.getShape().vy-tail.getShape().vy)) / 2.0;
+				double rho = ds / Math.cos(QUAD_ANGLE);
 				double cx = tail.getShape().vx + rho*Math.cos(alpha+QUAD_ANGLE);
 				double cy = tail.getShape().vy + rho*Math.sin(alpha+QUAD_ANGLE);
 				DPath p = new DPath(tail.getShape().vx, tail.getShape().vy, 5, AIRPORT_FILL_COLOR, DEFAULT_ARC_ALPHA);
@@ -228,7 +228,7 @@ class AirTrafficManager {
 		}
 		return res;
     }
-    
+
     static float MIN_ALPHA = .2f;
     static float MAX_ALPHA = 1f;
     float alpha_a = 0;
@@ -249,13 +249,13 @@ class AirTrafficManager {
             e.getSpline().setTranslucencyValue(alpha_a*e.weight + alpha_b);
         }
     }
-    
+
     /* ------------------ network visibility ---------------------------- */
-    
+
     void toggleTraffic(){
         showNetwork(!isShowing);
     }
-    
+
     void showNetwork(boolean b){
         if (allArcs == null){return;}
         for (final LEdge e:allArcs){
@@ -290,23 +290,23 @@ class AirTrafficManager {
     }
 
     /* ------------------ highlighting ---------------------------- */
-    
+
     static final Color HIGHLIGHT_COLOR = Color.RED;
 	static final float DIMMED_ARC_ALPHA = 0.2f;
-	
+
     Vector highlightedElements = new Vector();
 	Vector dimmedElements = new Vector();
-	
+
 	Glyph[] airportInfo = new Glyph[5];
-	
+
 	boolean isHighlighting = false;
-	
+
 	void highlight(Glyph g){
 		g.setColor(HIGHLIGHT_COLOR);
 		LNode n = (LNode)g.getOwner();
 		if (n != null){
 			for (int i=0;i<allArcs.length;i++){
-				dimmedElements.add(allArcs[i].getSpline());			
+				dimmedElements.add(allArcs[i].getSpline());
 			}
 			LEdge[] arcs = n.getAllArcs();
 			Glyph g2;
@@ -328,7 +328,7 @@ class AirTrafficManager {
 		//	airportInfo[3] = new VText(airportInfo[0].vx-190, airportInfo[0].vy-10, 20, Color.WHITE, "Lat: "+n.getLatitude());
 		//	airportInfo[4] = new VText(airportInfo[0].vx-190, airportInfo[0].vy-30, 20, Color.WHITE, "Lon: "+n.getLongitude());
 		//	for (Glyph g3:airportInfo){
-    	//		application.bSpace.addGlyph(g3);			    
+    	//		application.bSpace.addGlyph(g3);
 		//	}
 			isHighlighting = true;
 		}
@@ -347,7 +347,7 @@ class AirTrafficManager {
 			g2.setColor(AIRPORT_FILL_COLOR);
 			//g2.setStroke(new BasicStroke(EDGE_STROKE_WIDTH));
 			if (g2 instanceof DPath){
-    			g2.setTranslucencyValue(alpha_a*((LEdge)g2.getOwner()).weight + alpha_b);			    
+    			g2.setTranslucencyValue(alpha_a*((LEdge)g2.getOwner()).weight + alpha_b);
 			}
 			application.bSpace.atBottom(g2, 0);
 		}
@@ -355,30 +355,30 @@ class AirTrafficManager {
 		dimmedElements.clear();
 	    isHighlighting = false;
 	}
-    
+
     /* ---------------------- Bring and go -----------------------------*/
-    
+
     static final int BRING_ANIM_DURATION = 1000;
     static final int FOLLOW_ANIM_DURATION = 3000;
     static final double BRING_DISTANCE_FACTOR = 1.5;
-    
+
     static final float SECOND_BNG_STEP_TRANSLUCENCY = 0.2f;
     static final float OUTSIDE_BNG_SCOPE_TRANSLUCENCY = 0.05f;
     static final float[] FADE_IN_ANIM = {0,0,0,0,0,0,1-OUTSIDE_BNG_SCOPE_TRANSLUCENCY};
     static final float[] FADE_OUT_ANIM = {0,0,0,0,0,0,OUTSIDE_BNG_SCOPE_TRANSLUCENCY-1};
-    
+
     static final Color BNG_SHAPE_FILL_COLOR = Color.RED;
-    
+
     boolean isBringingAndGoing = false;
-    
+
     Vector<LNode> broughtStack = new Vector();
-    
+
     HashMap<LElem,BroughtElement> brought2location = new HashMap();
     HashMap<LNode,LNode> broughtnode2broughtby = new HashMap();
-    
+
     Vector<LNode> nodesOutsideScope;
     Vector<LEdge> arcsOutsideScope;
-    
+
     void attemptToBring(Glyph g){
     	LNode n = (LNode)g.getOwner();
     	if (n == null){return;}
@@ -403,13 +403,13 @@ class AirTrafficManager {
     		}
     	}
     }
-    
+
     void bringFor(Glyph g){
     	nodesOutsideScope = new Vector(Arrays.asList(allNodes));
     	arcsOutsideScope = new Vector(Arrays.asList(allArcs));
     	bringFor((LNode)g.getOwner());
     }
-    
+
     void bringFor(LNode n){
     	if (n == null){return;}
     	isBringingAndGoing = true;
@@ -435,9 +435,9 @@ class AirTrafficManager {
     		// otherwise it would be a mess (they would move when entering one of the nodes brought by them)
     		if (broughtStack.contains(otherEnd)){continue;}
     		ClosedShape otherEndShape = otherEnd.getShape();
-    		double d = Math.sqrt(Math.pow(otherEndShape.vx-thisEndShape.vx, 2) + Math.pow(otherEndShape.vy-thisEndShape.vy, 2));
+    		double d = Math.sqrt((otherEndShape.vx-thisEndShape.vx)*(otherEndShape.vx-thisEndShape.vx) + (otherEndShape.vy-thisEndShape.vy)*(otherEndShape.vy-thisEndShape.vy));
     		Ring ring = rm.getRing(Math.atan2(otherEndShape.vy-thisEndShape.vy, otherEndShape.vx-thisEndShape.vx), otherEndShape.getSize(), RING_STEP);
-    		double bd = ring.rank * RING_STEP;			
+    		double bd = ring.rank * RING_STEP;
     		double ratio = bd / d;
     		double bx = thisEndShape.vx + ratio * (otherEndShape.vx-thisEndShape.vx);
     		double by = thisEndShape.vy + ratio * (otherEndShape.vy-thisEndShape.vy);
@@ -452,7 +452,7 @@ class AirTrafficManager {
     		bring(e, otherEnd, n, thisEndShape.vx, thisEndShape.vy, otherEndShape.vx, otherEndShape.vy, node2bposition);
     	}
     }
-    
+
     // n1 is the node for which we attempt to send back connected nodes
     // n2 is the new center of the bring and go, so we do not send back nodes connected to n1 that are also connected to n2
     void sendBackFor(LNode n1, LNode n2, boolean nodeItself){
@@ -476,7 +476,7 @@ class AirTrafficManager {
     				LNode n = nodesToSendBack.elementAt(i);
     				sendBack(n);
     				sendBack(n.getArcLeadingTo(n1));
-    				broughtnode2broughtby.remove(n);				
+    				broughtnode2broughtby.remove(n);
     			}
     		}
     	}
@@ -490,7 +490,7 @@ class AirTrafficManager {
     		}
     	}
     }
-    
+
     void updateEdges(LNode n, Point2D.Double p){
     	LEdge[] arcs = n.getAllArcs();
     	for (int i=0;i<arcs.length;i++){
@@ -499,13 +499,13 @@ class AirTrafficManager {
     		Point2D.Double asp = spline.getStartPoint();
     		Point2D.Double aep = spline.getEndPoint();
     		Point2D.Double sp, ep;
-    		if (Math.sqrt(Math.pow(p.x-aep.x,2) + Math.pow(p.y-aep.y,2)) < Math.sqrt(Math.pow(p.x-asp.x,2) + Math.pow(p.y-asp.y,2))){
+    		if (Math.sqrt((p.x-aep.x)*(p.x-aep.x) + (p.y-aep.y)*(p.y-aep.y)) < Math.sqrt((p.x-asp.x)*(p.x-asp.x) + (p.y-asp.y)*(p.y-asp.y))){
     			sp = oe.getShape().getLocation();
     			ep = p;
     		}
     		else {
     			sp = p;
-    			ep = oe.getShape().getLocation();				
+    			ep = oe.getShape().getLocation();
     		}
     		Point2D.Double[] splineCoords = DPath.getFlattenedCoordinates(spline, sp, ep, true);
     		Animation a = AM.getAnimationFactory().createPathAnim(NavigationManager.ANIM_MOVE_DURATION, spline,
@@ -513,7 +513,7 @@ class AirTrafficManager {
             AM.startAnimation(a, true);
     	}
     }
-    
+
     void endBringAndGo(Glyph g){
     	//XXX:TBW if g is null, or not the latest node in the bring and go stack, go back to initial state
     	//        else send all nodes and edges to their initial position, but also move camera to g
@@ -539,9 +539,9 @@ class AirTrafficManager {
     			application.sm.setUpdateLevel(false);
     			if (application.isAAEnabled()){
     			    // temporarily disable antialiasing for perf reasons
-        			application.mView.setAntialiasing(false);    			    
+        			application.mView.setAntialiasing(false);
     			}
-    			
+
     			Animation a1 = AM.getAnimationFactory().createCameraAltAnim(FOLLOW_ANIM_DURATION/2, application.mCamera,
                     zoomout, true, IdentityInterpolator.getInstance(), null);
     			Animation a2 = AM.getAnimationFactory().createCameraTranslation(FOLLOW_ANIM_DURATION/2, application.mCamera,
@@ -556,7 +556,7 @@ class AirTrafficManager {
                         public void execute(Object subject, Animation.Dimension dimension){
                             application.sm.setUpdateLevel(true);
                             if (application.isAAEnabled()){
-                    		    application.mView.setAntialiasing(true);                                
+                    		    application.mView.setAntialiasing(true);
                             }
                         }
                     });
@@ -585,7 +585,7 @@ class AirTrafficManager {
     	nodesOutsideScope.clear();
     	arcsOutsideScope.clear();
     }
-    
+
     void bring(LEdge arc, LNode node, LNode broughtby, double sx, double sy, double ex, double ey, HashMap<LNode,Point2D.Double> node2bposition){
     	synchronized(broughtnode2broughtby){
     		if (brought2location.containsKey(node)){
@@ -615,7 +615,7 @@ class AirTrafficManager {
     	Point2D.Double asp = spline.getStartPoint();
     	Point2D.Double aep = spline.getEndPoint();
     	Point2D.Double sp, ep;
-    	if (Math.sqrt(Math.pow(asp.x-ex,2) + Math.pow(asp.y-ey,2)) < Math.sqrt(Math.pow(asp.x-sx,2) + Math.pow(asp.y-sy,2))){
+    	if (Math.sqrt((asp.x-ex)*(asp.x-ex) + (asp.y-ey)*(asp.y-ey)) < Math.sqrt((asp.x-sx)*(asp.x-sx) + (asp.y-sy)*(asp.y-sy))){
     		sp = new Point2D.Double(bposition.x, bposition.y);
     		ep = new Point2D.Double(sx, sy);
     	}
@@ -646,7 +646,7 @@ class AirTrafficManager {
     		}
     		else {
     			oe = otherArcs[i].getOtherEnd(node).getShape();
-    			if (Math.sqrt(Math.pow(asp.x-ex,2) + Math.pow(asp.y-ey,2)) <= Math.sqrt(Math.pow(aep.x-ex,2) + Math.pow(aep.y-ey,2))){
+    			if (Math.sqrt((asp.x-ex)*(asp.x-ex) + (asp.y-ey)*(asp.y-ey)) <= Math.sqrt((aep.x-ex)*(aep.x-ex) + (aep.y-ey)*(aep.y-ey))){
     				sp = new Point2D.Double(bposition.x, bposition.y);
     				ep = oe.getLocation();
     			}
@@ -661,31 +661,31 @@ class AirTrafficManager {
             AM.startAnimation(a, true);
     		// 2nd step brought elements should not be faded
     		arcsOutsideScope.remove(otherArcs[i]);
-    	}		
+    	}
     }
-    
+
     void sendBackNTU(Object k, LNode followedNode){
     	BroughtElement be = brought2location.get(k);
     	//if (k == followedNode ||
     	//    (k instanceof LEdge && ((LEdge)k).isConnectedTo(followedNode))){
     	if (k == followedNode){
-    		be.restorePreviousState(FOLLOW_ANIM_DURATION);			
+    		be.restorePreviousState(FOLLOW_ANIM_DURATION);
     	}
     	else {
-    		be.restorePreviousState(BRING_ANIM_DURATION);						
+    		be.restorePreviousState(BRING_ANIM_DURATION);
     	}
     }
-    
+
     void sendBack(LNode n){
     	BroughtElement be = brought2location.get(n);
     	be.restorePreviousState(BRING_ANIM_DURATION);
     }
-    
+
     void sendBack(LEdge e){
     	BroughtElement be = brought2location.get(e);
     	be.restorePreviousState(BRING_ANIM_DURATION);
     }
-    
+
     // n1 is the node for which we attempt to send back connected nodes
     // n2 is the new center of the bring and go, so we do not send back nodes connected to n1 that are also connected to n2
     void fadeStack(LNode n1, LNode n2){
@@ -701,27 +701,27 @@ class AirTrafficManager {
     		}
     	}
     }
-    
+
 }
 
 class Airport {
-	
+
 	String iataCode;
 	String name;
 	double lat;
 	double lng;
-	
+
 	Airport(String[] data){
 		iataCode = data[0];
 		name = data[1];
 		lat = Double.parseDouble(data[2]);
 		lng = Double.parseDouble(data[3]);
 	}
-	
+
 }
 
 abstract class LElem {
-	
+
 }
 
 class LNode extends LElem {
@@ -746,7 +746,7 @@ class LNode extends LElem {
         edges = new LEdge[0];
         edgeDirections = new short[0];
     }
-    
+
     String getCode(){
         return code;
     }
@@ -754,11 +754,11 @@ class LNode extends LElem {
     String getName(){
         return name;
     }
-    
+
     String getLatitude(){
         return lat;
     }
-    
+
     String getLongitude(){
         return lon;
     }
@@ -779,7 +779,7 @@ class LNode extends LElem {
 		System.arraycopy(edges, 0, res, 0, edges.length);
 		return res;
 	}
-	
+
 	/** Get all arcs incoming or outgoing from this node, except for the specified one. */
 	LEdge[] getOtherArcs(LEdge arc){
 		int count = 0;
@@ -838,7 +838,7 @@ class LNode extends LElem {
 		}
 		return res;
 	}
-	
+
 	LEdge getArcLeadingTo(LNode n){
 		for (int i=0;i<edges.length;i++){
 			if (edges[i].getOtherEnd(this) == n){
@@ -851,11 +851,11 @@ class LNode extends LElem {
 	VCircle getShape(){
 		return nodeShape;
 	}
-	
+
 	VText getLabel(){
 		return nodeLabel;
 	}
-	
+
 	public String toString(){
 		String res = code + " " + name + "[";
 		for (int i=0;i<edges.length;i++){
@@ -882,7 +882,7 @@ class LEdge extends LElem {
 
 	LNode tail;
 	LNode head;
-	
+
 	DPath edgeSpline;
 
 	LEdge(int weight, DPath edgeSpline){
@@ -916,7 +916,7 @@ class LEdge extends LElem {
 			head.addArc(this, (directed) ? LEdge.INCOMING : LEdge.UNDIRECTED);
 		}
 	}
-	
+
 	boolean isConnectedTo(LNode n){
 		return (n == head) || (n == tail);
 	}
@@ -938,7 +938,7 @@ class LEdge extends LElem {
 	}
 
 	public String toString(){
-		return weight + "@" + hashCode() + " [" + 
+		return weight + "@" + hashCode() + " [" +
 			((tail != null) ? tail.getCode() + "@" + tail.hashCode() : "NULL")+
 			((directed) ? LEdge.DIRECTED_STR : LEdge.UNDIRECTED_STR) +
 			((head != null) ? head.getCode() + "@" + head.hashCode() : "NULL") +
@@ -948,9 +948,9 @@ class LEdge extends LElem {
 }
 
 abstract class BroughtElement {
-	
+
 	Object owner;
-	
+
 	static BroughtElement rememberPreviousState(LNode el){
 		return new BroughtNode(el);
 	}
@@ -960,14 +960,14 @@ abstract class BroughtElement {
 	}
 
 	abstract void restorePreviousState(int duration);
-		
+
 }
 
 class BroughtNode extends BroughtElement {
-	
+
 	Glyph glyph;
 	Point2D.Double previousLocation;
-	
+
 	BroughtNode(LNode n){
 		owner = n;
 		glyph = n.getShape();
@@ -979,7 +979,7 @@ class BroughtNode extends BroughtElement {
             new Point2D.Double(previousLocation.x, previousLocation.y), false, IdentityInterpolator.getInstance(), null);
         VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
 	}
-	
+
 }
 
 class BroughtEdge extends BroughtElement {
@@ -987,7 +987,7 @@ class BroughtEdge extends BroughtElement {
 	DPath spline;
 	float splineAlpha;
 	Point2D.Double[] splineCoords;
-	
+
 	BroughtEdge(LEdge e){
 		owner = e;
 		spline = e.getSpline();
@@ -996,19 +996,19 @@ class BroughtEdge extends BroughtElement {
 			splineAlpha = spline.getTranslucencyValue();
 		}
 	}
-	
+
 	void restorePreviousState(int duration){
 	    Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createPathAnim(duration, spline,
             splineCoords, false, SlowInSlowOutInterpolator.getInstance(), null);
         VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, true);
 	}
-	
+
 }
 
 class RingManager {
-	
+
 	Ring[] rings = new Ring[0];
-	
+
 	Ring getRing(double direction, double size, double ringStep){
 		// normalize direction in [0,2Pi[
 		if (direction < 0){direction = 2 * Math.PI + direction;}
@@ -1026,7 +1026,7 @@ class RingManager {
 		r.addNode(direction-a, direction+a);
 		return r;
 	}
-	
+
 	private Ring createNewRing(){
 		Ring[] tr = new Ring[rings.length+1];
 		System.arraycopy(rings, 0, tr, 0, rings.length);
@@ -1034,7 +1034,7 @@ class RingManager {
 		rings = tr;
 		return rings[rings.length-1];
 	}
-	
+
 }
 
 class Ring {
@@ -1042,11 +1042,11 @@ class Ring {
 	/* rank of this ring (starts at 1) */
 	int rank;
 	double[][] cones = new double[0][2];
-	
+
 	Ring(int r){
 		this.rank = r;
 	}
-	
+
 	void addNode(double a1, double a2){
 		// compute its cone of influence
 		double[][] tc = new double[cones.length+1][2];
@@ -1058,14 +1058,14 @@ class Ring {
 		tc[cones.length][1] = Math.max(a1, a2);
 		cones = tc;
 	}
-	
+
 	boolean intersectsConeOfInfluence(double a1, double a2){
 		for (int i=0;i<cones.length;i++){
 			if (a2 > cones[i][0] && a1 < cones[i][1]){return true;}
 		}
 		return false;
 	}
-	
+
 }
 
 class DistanceComparator implements java.util.Comparator {
@@ -1077,12 +1077,12 @@ class DistanceComparator implements java.util.Comparator {
 		this.centerNode = cn;
 		this.centerShape = cn.getShape();
 	}
-    
+
 	public int compare(Object o1, Object o2){
 		Glyph n1 = ((LEdge)o1).getOtherEnd(centerNode).getShape();
 		Glyph n2 = ((LEdge)o2).getOtherEnd(centerNode).getShape();
-		double d1 = Math.pow(centerShape.vx-n1.vx, 2) + Math.pow(centerShape.vy-n1.vy, 2);
-		double d2 = Math.pow(centerShape.vx-n2.vx, 2) + Math.pow(centerShape.vy-n2.vy, 2);
+		double d1 = (centerShape.vx-n1.vx)*(centerShape.vx-n1.vx) + (centerShape.vy-n1.vy)*(centerShape.vy-n1.vy);
+		double d2 = (centerShape.vx-n2.vx)*(centerShape.vx-n2.vx) + (centerShape.vy-n2.vy)*(centerShape.vy-n2.vy);
 		if (d1 < d2){
 			return -1;
 		}
@@ -1093,5 +1093,5 @@ class DistanceComparator implements java.util.Comparator {
 			return 0;
 		}
 	}
-        
+
 }
