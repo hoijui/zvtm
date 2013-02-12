@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2009-2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2009-2013. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -43,12 +43,12 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
 
     static final float WHEEL_ZOOMIN_FACTOR = 21.0f;
     static final float WHEEL_ZOOMOUT_FACTOR = 22.0f;
-    
+
     static float ZOOM_SPEED_COEF = 1.0f/50.0f;
     static double PAN_SPEED_COEF = 50.0;
-    
+
     static float WHEEL_MM_STEP = 1.0f;
-    
+
     int lastJPX,lastJPY;    //remember last mouse coords to compute translation  (dragging)
     double lastVX, lastVY;
     int currentJPX, currentJPY;
@@ -59,22 +59,22 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
 
     TiledImageViewer application;
     TIVNavigationManager nm;
-    
+
     boolean cursorNearBorder = false;
-    
+
     boolean zero_order_dragging = false;
     boolean first_order_dragging = false;
     boolean translating = false;
 	static final short ZERO_ORDER = 0;
 	static final short FIRST_ORDER = 1;
 	short navMode = ZERO_ORDER;
-    
+
 	// region selection
 	boolean selectingRegion = false;
 	double x1, y1, x2, y2;
 
 	static final int DELAYED_UPDATE_FREQUENCY = 400;
-	
+
     DelayedUpdateTimer dut;
 
     TIVEventHandler(TiledImageViewer app){
@@ -170,7 +170,7 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
                     return;
                 }
                 nm.zoomInPhase1(jpx, jpy);
-            }            
+            }
         }
     }
 
@@ -201,7 +201,7 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
             nm.zoomOutPhase1(jpx, jpy, lastVX, lastVY);
         }
     }
-        
+
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
 //        System.err.println(v.getVCursor().vx+" "+v.getVCursor().vy);
     	if ((jpx-TIVNavigationManager.LENS_R1) < 0){
@@ -274,15 +274,24 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
         }
         else {
             double a = (application.mCamera.focal+Math.abs(application.mCamera.altitude)) / application.mCamera.focal;
+            double mvx = v.getVCursor().getVSXCoordinate();
+            double mvy = v.getVCursor().getVSYCoordinate();
             if (wheelDirection  == WHEEL_UP){
-                // zooming in
+                // zooming out
+                application.mCamera.move(-((mvx - application.mCamera.vx) * WHEEL_ZOOMOUT_FACTOR / application.mCamera.focal),
+                                         -((mvy - application.mCamera.vy) * WHEEL_ZOOMOUT_FACTOR / application.mCamera.focal));
                 application.mCamera.altitudeOffset(a*WHEEL_ZOOMOUT_FACTOR);
-                VirtualSpaceManager.INSTANCE.repaint();
+                application.vsm.repaint();
             }
             else {
-                //wheelDirection == WHEEL_DOWN, zooming out
+                //wheelDirection == WHEEL_DOWN, zooming in
+                if (application.mCamera.getAltitude()-a*WHEEL_ZOOMIN_FACTOR >= application.mCamera.getZoomFloor()){
+                    // this test to prevent translation when camera is not actually zoming in
+                    application.mCamera.move((mvx - application.mCamera.vx) * WHEEL_ZOOMIN_FACTOR / application.mCamera.focal,
+                                             ((mvy - application.mCamera.vy) * WHEEL_ZOOMIN_FACTOR / application.mCamera.focal));
+                }
                 application.mCamera.altitudeOffset(-a*WHEEL_ZOOMIN_FACTOR);
-                VirtualSpaceManager.INSTANCE.repaint();
+                application.vsm.repaint();
             }
     	}
     }
@@ -320,7 +329,7 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
     public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 
     public void viewActivated(View v){}
-    
+
     public void viewDeactivated(View v){}
 
     public void viewIconified(View v){}
@@ -351,31 +360,31 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
 		((OverviewPortal)p).setBorder(TIVNavigationManager.OV_BORDER_COLOR);
 		VirtualSpaceManager.INSTANCE.repaint();
 	}
-	
+
 	void toggleNavMode(){
         switch(navMode){
             case FIRST_ORDER:{navMode = ZERO_ORDER;application.ovm.say(Messages.ZON);break;}
             case ZERO_ORDER:{navMode = FIRST_ORDER;application.ovm.say(Messages.FON);break;}
         }
     }
-    
+
     public void cameraMoved(Camera cam, Point2D.Double coord, double a){
         if (translating){
-            dut.requestUpdate();            
+            dut.requestUpdate();
         }
     }
-    
+
     void cameraMoved(){
         application.sm.updateVisibleRegions();
     }
-    
+
 }
 
 class DelayedUpdateTimer extends TimerTask {
 
     private boolean enabled = true;
 	private boolean update = false;
-	
+
 	TIVEventHandler eh;
 
 	DelayedUpdateTimer(TIVEventHandler eh){
@@ -391,17 +400,17 @@ class DelayedUpdateTimer extends TimerTask {
 		return enabled;
 	}
 
-	public void run(){		
+	public void run(){
 		if (enabled && update){
 			eh.cameraMoved();
 			update = false;
 		}
 	}
-	
+
 	void requestUpdate(){
 		update = true;
 	}
-	
+
 	void cancelUpdate(){
 		update = false;
 	}

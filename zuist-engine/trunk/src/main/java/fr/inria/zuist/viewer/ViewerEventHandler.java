@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2007-2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2007-2013. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -41,16 +41,16 @@ class ViewerEventHandler implements ViewListener, ComponentListener, CameraListe
 
     static final float WHEEL_ZOOMIN_FACTOR = 21.0f;
     static final float WHEEL_ZOOMOUT_FACTOR = 22.0f;
-    
+
     static float WHEEL_MM_STEP = 1.0f;
-    
+
     int lastJPX,lastJPY;    //remember last mouse coords to compute translation  (dragging)
     long lastVX, lastVY;
 
     Viewer application;
-    
+
     Glyph g;
-    
+
     boolean zero_order_dragging = false;
     boolean first_order_dragging = false;
 	static final short ZERO_ORDER = 0;
@@ -58,7 +58,7 @@ class ViewerEventHandler implements ViewListener, ComponentListener, CameraListe
 	short navMode = ZERO_ORDER;
 
 	Glyph objectJustSelected = null;
-	
+
     ViewerEventHandler(Viewer app){
         this.application = app;
     }
@@ -107,12 +107,12 @@ class ViewerEventHandler implements ViewListener, ComponentListener, CameraListe
 						case SceneManager.TAKES_TO_REGION:{application.centerOnRegion(takesToID);break;}
 					}
 				}
-			}				
+			}
 		}
 		else {
 			// last click was not on this object, center on it
 			application.rememberLocation(application.mCamera.getLocation());
-			v.cams[0].getOwningView().centerOnGlyph(g, v.cams[0], Viewer.ANIM_MOVE_LENGTH, true, 1.2f);				
+			v.cams[0].getOwningView().centerOnGlyph(g, v.cams[0], Viewer.ANIM_MOVE_LENGTH, true, 1.2f);
 			objectJustSelected = g;
 		}
     }
@@ -140,7 +140,7 @@ class ViewerEventHandler implements ViewListener, ComponentListener, CameraListe
 	}
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
-        
+
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
         application.setCursorCoords(v.getVCursor().getVSXCoordinate(), v.getVCursor().getVSYCoordinate());
         VirtualSpaceManager.INSTANCE.repaint();
@@ -169,17 +169,26 @@ class ViewerEventHandler implements ViewListener, ComponentListener, CameraListe
     }
 
 	public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
-		double a = (application.mCamera.focal+Math.abs(application.mCamera.altitude)) / application.mCamera.focal;
-		if (wheelDirection  == WHEEL_UP){
-			// zooming in
-			application.mCamera.altitudeOffset(a*WHEEL_ZOOMOUT_FACTOR);
-			application.vsm.repaint();
-		}
-		else {
-			//wheelDirection == WHEEL_DOWN, zooming out
-			application.mCamera.altitudeOffset(-a*WHEEL_ZOOMIN_FACTOR);
-			application.vsm.repaint();
-		}
+        double a = (application.mCamera.focal+Math.abs(application.mCamera.altitude)) / application.mCamera.focal;
+        double mvx = v.getVCursor().getVSXCoordinate();
+        double mvy = v.getVCursor().getVSYCoordinate();
+        if (wheelDirection  == WHEEL_UP){
+            // zooming out
+            application.mCamera.move(-((mvx - application.mCamera.vx) * WHEEL_ZOOMOUT_FACTOR / application.mCamera.focal),
+                                     -((mvy - application.mCamera.vy) * WHEEL_ZOOMOUT_FACTOR / application.mCamera.focal));
+            application.mCamera.altitudeOffset(a*WHEEL_ZOOMOUT_FACTOR);
+            application.vsm.repaint();
+        }
+        else {
+            //wheelDirection == WHEEL_DOWN, zooming in
+            if (application.mCamera.getAltitude()-a*WHEEL_ZOOMIN_FACTOR >= application.mCamera.getZoomFloor()){
+                // this test to prevent translation when camera is not actually zoming in
+                application.mCamera.move((mvx - application.mCamera.vx) * WHEEL_ZOOMIN_FACTOR / application.mCamera.focal,
+                                         ((mvy - application.mCamera.vy) * WHEEL_ZOOMIN_FACTOR / application.mCamera.focal));
+            }
+            application.mCamera.altitudeOffset(-a*WHEEL_ZOOMIN_FACTOR);
+            application.vsm.repaint();
+        }
 	}
 
 	public void enterGlyph(Glyph g){
@@ -222,7 +231,7 @@ class ViewerEventHandler implements ViewListener, ComponentListener, CameraListe
     public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 
     public void viewActivated(View v){}
-    
+
     public void viewDeactivated(View v){}
 
     public void viewIconified(View v){}
@@ -240,16 +249,16 @@ class ViewerEventHandler implements ViewListener, ComponentListener, CameraListe
         application.updatePanelSize();
     }
     public void componentShown(ComponentEvent e){}
-    
+
     public void cameraMoved(Camera cam, Point2D.Double coord, double alt){
         application.altitudeChanged();
     }
-    
+
     void toggleNavMode(){
         switch(navMode){
             case FIRST_ORDER:{navMode = ZERO_ORDER;break;}
             case ZERO_ORDER:{navMode = FIRST_ORDER;break;}
         }
     }
-    
+
 }
