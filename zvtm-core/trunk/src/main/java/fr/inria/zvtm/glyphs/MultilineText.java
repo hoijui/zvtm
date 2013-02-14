@@ -148,24 +148,50 @@ public class MultilineText<T> extends VText {
             int paragraphEnd = atText.getIterator().getEndIndex();
             TextLayout layout = null;
             Rectangle2D lbounds;
-            while(lbm.getPosition() < paragraphEnd &&
-                  drawPosY <= heightConstraint){
-                layout = lbm.nextLayout((float)widthConstraint);
-                drawPosY += layout.getAscent();
-                if (text_anchor==TEXT_ANCHOR_START){
-                    layout.draw(g, 0, drawPosY);
-                }
-                else if (text_anchor==TEXT_ANCHOR_MIDDLE){
-                    lbounds = layout.getBounds();
-                    layout.draw(g, (float)(widthConstraint/2f-lbounds.getWidth()/2f), drawPosY);
-                }
-                else {
-                    // text_anchor == TEXT_ANCHOR_END
-                    lbounds = layout.getBounds();
-                    layout.draw(g, (int)Math.round(widthConstraint-lbounds.getWidth()), drawPosY);
-                }
-                drawPosY += layout.getDescent() + layout.getLeading();
+
+            if (alphaC != null){
+                g.setComposite(alphaC);
+                while(lbm.getPosition() < paragraphEnd &&
+                      drawPosY <= heightConstraint){
+                    layout = lbm.nextLayout((float)widthConstraint);
+                    drawPosY += layout.getAscent();
+                    if (text_anchor==TEXT_ANCHOR_START){
+                        layout.draw(g, 0, drawPosY);
+                    }
+                    else if (text_anchor==TEXT_ANCHOR_MIDDLE){
+                        lbounds = layout.getBounds();
+                        layout.draw(g, (float)(-lbounds.getWidth()/2f), drawPosY);
+                    }
+                    else {
+                        // text_anchor == TEXT_ANCHOR_END
+                        lbounds = layout.getBounds();
+                        layout.draw(g, (float)-lbounds.getWidth(), drawPosY);
+                    }
+                    drawPosY += layout.getDescent() + layout.getLeading();
+                }                g.setComposite(acO);
             }
+            else {
+                while(lbm.getPosition() < paragraphEnd &&
+                      drawPosY <= heightConstraint){
+                    layout = lbm.nextLayout((float)widthConstraint);
+                    drawPosY += layout.getAscent();
+                    if (text_anchor==TEXT_ANCHOR_START){
+                        layout.draw(g, 0, drawPosY);
+                    }
+                    else if (text_anchor==TEXT_ANCHOR_MIDDLE){
+                        lbounds = layout.getBounds();
+                        layout.draw(g, (float)(-lbounds.getWidth()/2f), drawPosY);
+                    }
+                    else {
+                        // text_anchor == TEXT_ANCHOR_END
+                        lbounds = layout.getBounds();
+                        layout.draw(g, (float)-lbounds.getWidth(), drawPosY);
+                    }
+                    drawPosY += layout.getDescent() + layout.getLeading();
+                }
+
+            }
+
             g.setTransform(stdT);
             if(!pc[i].valid){
                 if(widthConstraint == Double.POSITIVE_INFINITY){
