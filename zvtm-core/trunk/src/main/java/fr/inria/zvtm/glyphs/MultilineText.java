@@ -54,8 +54,8 @@ public class MultilineText<T> extends VText {
      *@param scale scaleFactor w.r.t original image size
       *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
      */
-    public MultilineText(double x, double y, int z, Color c, String t, float scale, float alpha){
-        super(x, y, z, c, null, t, VText.TEXT_ANCHOR_START, scale, alpha);
+    public MultilineText(double x, double y, int z, Color c, String t, short ta, float scale, float alpha){
+        super(x, y, z, c, t, ta, scale, alpha);
         initLbm();
     }
 
@@ -147,11 +147,23 @@ public class MultilineText<T> extends VText {
             lbm.setPosition(atText.getIterator().getBeginIndex());
             int paragraphEnd = atText.getIterator().getEndIndex();
             TextLayout layout = null;
+            Rectangle2D lbounds;
             while(lbm.getPosition() < paragraphEnd &&
                   drawPosY <= heightConstraint){
                 layout = lbm.nextLayout((float)widthConstraint);
                 drawPosY += layout.getAscent();
-                layout.draw(g, 0, drawPosY);
+                if (text_anchor==TEXT_ANCHOR_START){
+                    layout.draw(g, 0, drawPosY);
+                }
+                else if (text_anchor==TEXT_ANCHOR_MIDDLE){
+                    lbounds = layout.getBounds();
+                    layout.draw(g, (float)(widthConstraint/2f-lbounds.getWidth()/2f), drawPosY);
+                }
+                else {
+                    // text_anchor == TEXT_ANCHOR_END
+                    lbounds = layout.getBounds();
+                    layout.draw(g, (int)Math.round(widthConstraint-lbounds.getWidth()), drawPosY);
+                }
                 drawPosY += layout.getDescent() + layout.getLeading();
             }
             g.setTransform(stdT);
