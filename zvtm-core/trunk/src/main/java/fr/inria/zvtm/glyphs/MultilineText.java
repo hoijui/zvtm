@@ -155,6 +155,13 @@ public class MultilineText<T> extends VText {
         lines = lineV.toArray(new TextLayout[lineV.size()]);
     }
 
+    /** Get number of lines in this MultilineText.
+     * This may vary depending on constraintWidth's value.
+     */
+    public int getLineCount(){
+        return lines.length;
+    }
+
     @Override public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
         if (alphaC != null && alphaC.getAlpha()==0){return;}
         double trueCoef = scaleFactor * coef;
