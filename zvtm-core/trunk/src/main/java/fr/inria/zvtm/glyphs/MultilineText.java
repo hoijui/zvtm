@@ -18,6 +18,8 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import java.text.AttributedString;
 
+import java.util.Vector;
+
 /**
  * Multiline text.
  * By default, text will be rendered on one line. Specifiy a width
@@ -38,6 +40,8 @@ public class MultilineText<T> extends VText {
     private static final FontRenderContext DEFAULT_FRC =
         new FontRenderContext(null, false, false);
 
+    TextLayout[] lines;
+
     public MultilineText(String text){
         super(text);
         initLbm();
@@ -57,6 +61,7 @@ public class MultilineText<T> extends VText {
     public MultilineText(double x, double y, int z, Color c, String t, short ta, float scale, float alpha){
         super(x, y, z, c, t, ta, scale, alpha);
         initLbm();
+        processText();
     }
 
     void initLbm(){
@@ -64,6 +69,7 @@ public class MultilineText<T> extends VText {
         atText.addAttribute(TextAttribute.FONT,
                 usesSpecificFont() ? getFont() : getMainFont());
         lbm = new LineBreakMeasurer(atText.getIterator(), DEFAULT_FRC);
+        processText();
     }
 
     /**
@@ -71,6 +77,7 @@ public class MultilineText<T> extends VText {
      */
     public void setWidthConstraint(double constraint){
         widthConstraint = constraint;
+        processText();
         invalidate();
     }
 
@@ -101,6 +108,7 @@ public class MultilineText<T> extends VText {
         super.setText(text);
         atText = new AttributedString(text);
         lbm = new LineBreakMeasurer(atText.getIterator(), DEFAULT_FRC);
+        processText();
         invalidate();
     }
 
@@ -109,6 +117,7 @@ public class MultilineText<T> extends VText {
         atText.addAttribute(TextAttribute.FONT,
                 usesSpecificFont() ? getFont() : getMainFont());
         lbm = new LineBreakMeasurer(atText.getIterator(), DEFAULT_FRC);
+        processText();
         invalidate();
     }
 
@@ -131,8 +140,22 @@ public class MultilineText<T> extends VText {
             (cvx <= vx+pc[camIndex].cw) && (cvy >= vy-pc[camIndex].ch);
     }
 
+    void processText(){
+        lbm.setPosition(atText.getIterator().getBeginIndex());
+        int paragraphEnd = atText.getIterator().getEndIndex();
+        float drawPosY = 0;
+        TextLayout line = null;
+        Vector<TextLayout> lineV = new Vector(5);
+        while(lbm.getPosition() < paragraphEnd &&
+                      drawPosY <= heightConstraint){
+            line = lbm.nextLayout((float)widthConstraint);
+            lineV.add(line);
+            drawPosY += line.getAscent() + line.getDescent() + line.getLeading();
+        }
+        lines = lineV.toArray(new TextLayout[lineV.size()]);
+    }
+
     @Override public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-        // float formatWidth = (float)widthConstraint;
         if (alphaC != null && alphaC.getAlpha()==0){return;}
         double trueCoef = scaleFactor * coef;
         if (trueCoef*fontSize > VText.TEXT_AS_LINE_PROJ_COEF || !zoomSensitive || !pc[i].valid){
@@ -141,65 +164,55 @@ public class MultilineText<T> extends VText {
             AffineTransform at = AffineTransform.getTranslateInstance(dx+pc[i].cx,dy+pc[i].cy);
             if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(trueCoef, trueCoef));}
             g.setTransform(at);
-            // int rectH = Math.round(pc[i].ch / scaleFactor);
             g.setColor(this.color);
             float drawPosY = 0;
-            lbm.setPosition(atText.getIterator().getBeginIndex());
-            int paragraphEnd = atText.getIterator().getEndIndex();
-            TextLayout layout = null;
             Rectangle2D lbounds;
-
             if (alphaC != null){
                 g.setComposite(alphaC);
-                while(lbm.getPosition() < paragraphEnd &&
-                      drawPosY <= heightConstraint){
-                    layout = lbm.nextLayout((float)widthConstraint);
-                    drawPosY += layout.getAscent();
+                for (TextLayout line:lines){
+                    drawPosY += line.getAscent();
                     if (text_anchor==TEXT_ANCHOR_START){
-                        layout.draw(g, 0, drawPosY);
+                        line.draw(g, 0, drawPosY);
                     }
                     else if (text_anchor==TEXT_ANCHOR_MIDDLE){
-                        lbounds = layout.getBounds();
-                        layout.draw(g, (float)(-lbounds.getWidth()/2f), drawPosY);
+                        lbounds = line.getBounds();
+                        line.draw(g, (float)(-lbounds.getWidth()/2f), drawPosY);
                     }
                     else {
                         // text_anchor == TEXT_ANCHOR_END
-                        lbounds = layout.getBounds();
-                        layout.draw(g, (float)-lbounds.getWidth(), drawPosY);
+                        lbounds = line.getBounds();
+                        line.draw(g, (float)-lbounds.getWidth(), drawPosY);
                     }
-                    drawPosY += layout.getDescent() + layout.getLeading();
-                }                g.setComposite(acO);
+                    drawPosY += line.getDescent() + line.getLeading();
+                }
+                g.setComposite(acO);
             }
             else {
-                while(lbm.getPosition() < paragraphEnd &&
-                      drawPosY <= heightConstraint){
-                    layout = lbm.nextLayout((float)widthConstraint);
-                    drawPosY += layout.getAscent();
+                for (TextLayout line:lines){
+                    drawPosY += line.getAscent();
                     if (text_anchor==TEXT_ANCHOR_START){
-                        layout.draw(g, 0, drawPosY);
+                        line.draw(g, 0, drawPosY);
                     }
                     else if (text_anchor==TEXT_ANCHOR_MIDDLE){
-                        lbounds = layout.getBounds();
-                        layout.draw(g, (float)(-lbounds.getWidth()/2f), drawPosY);
+                        lbounds = line.getBounds();
+                        line.draw(g, (float)(-lbounds.getWidth()/2f), drawPosY);
                     }
                     else {
                         // text_anchor == TEXT_ANCHOR_END
-                        lbounds = layout.getBounds();
-                        layout.draw(g, (float)-lbounds.getWidth(), drawPosY);
+                        lbounds = line.getBounds();
+                        line.draw(g, (float)-lbounds.getWidth(), drawPosY);
                     }
-                    drawPosY += layout.getDescent() + layout.getLeading();
+                    drawPosY += line.getDescent() + line.getLeading();
                 }
-
             }
-
             g.setTransform(stdT);
             if(!pc[i].valid){
                 if(widthConstraint == Double.POSITIVE_INFINITY){
-                    if(layout == null){
-                        pc[i].cw = 0;
-                    } else {
-                        pc[i].cw = (int)(layout.getBounds().getWidth() * scaleFactor);
+                    double max = lines[0].getBounds().getWidth();
+                    for (int j=1;j<lines.length;j++){
+                        if (lines[j].getBounds().getWidth() > max){max = lines[j].getBounds().getWidth();}
                     }
+                    pc[i].cw = (int)(max * scaleFactor);
                 } else {
                     pc[i].cw = (int)(widthConstraint * scaleFactor);
                 }
@@ -221,7 +234,7 @@ public class MultilineText<T> extends VText {
     }
 
     @Override public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-        draw(g, vW, vH, i, stdS, stdT, dx, dy);
+        //XXX
     }
 
     @Override public Object clone(){
