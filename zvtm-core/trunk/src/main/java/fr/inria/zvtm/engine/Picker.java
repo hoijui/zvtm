@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2011. All Rights Reserved
+ *   Copyright (c) INRIA, 2011-2013. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -7,6 +7,8 @@
 
 package fr.inria.zvtm.engine;
 
+import java.awt.Rectangle;
+import java.awt.Graphics2D;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
 
@@ -89,9 +91,10 @@ public class Picker {
         Vector res = new Vector();
         Vector glyphs = c.getOwningSpace().getDrawnGlyphs(c.getIndex());
         Object glyph;
+        Graphics2D g2d = c.getOwningView().getGraphicsContext();
         for (int i=0;i<glyphs.size();i++){
             glyph = glyphs.elementAt(i);
-            if ((glyph instanceof DPath) && intersectsPath((DPath)glyph, tolerance, x, y)){res.add(glyph);}
+            if ((glyph instanceof DPath) && intersectsPath((DPath)glyph, tolerance, x, y, g2d)){res.add(glyph);}
         }
         return res;
     }
@@ -115,6 +118,8 @@ public class Picker {
 		return getIntersectingPaths(c, tolerance, vx, vy);
     }
 
+    Rectangle pickingWindow = new Rectangle(0,0,1,1);
+
     /** Tells whether the picker is hovering a particular DPath or not.
      *@param p DPath instance to be tested
      *@param tolerance the rectangular area's half width/height considered as the cursor intersecting region, in virtual space units (default tolerance is 5)
@@ -122,21 +127,10 @@ public class Picker {
      *@param y picker y-coordinate, in virtual space coordinates system
      *@see #intersectsPath(DPath p)
      */
-	public boolean intersectsPath(DPath p, int tolerance, double x, double y){
+	public boolean intersectsPath(DPath p, int tolerance, double x, double y, Graphics2D g2d){
 		if (!p.coordsInsideBoundingBox(x, y)){return false;}
-		int dtol = tolerance * 2;
-		GeneralPath gp = p.getJava2DGeneralPath();
-        if (Line2D.ptSegDist(p.getStartPointX(), p.getStartPointY(), p.getEndPointX(), p.getEndPointY(), x, y) > 10){
-            return gp.intersects(x-tolerance, y-tolerance, dtol, dtol)
-                   && !p.getJava2DGeneralPath().contains(x-tolerance, y-tolerance, dtol, dtol);
-        }
-        else {
-            // GeneralPath.interesects() returns true when coords lie on the segment between start and end points.
-            // we do not want the edge to get picked in that case, hence the Line2D test
-            // this is not a perfect solution, far from it, but that seems to be acceptable and not too
-            // computationally expensive in most cases
-            return false;
-        }
+        pickingWindow.setRect(x-tolerance, y-tolerance, 2*tolerance, 2*tolerance);
+        return g2d.hit(pickingWindow, p.getJava2DGeneralPath(), true);
 	}
 
     /** Tells whether the picker is hovering a particular DPath or not.
@@ -144,16 +138,8 @@ public class Picker {
      *@param tolerance the rectangular area's half width/height considered as the cursor intersecting region, in virtual space units (default tolerance is 5)
      *@see #intersectsPath(DPath p, int tolerance, double cursorX, double cursorY)
      */
-    public boolean intersectsPath(DPath p, int tolerance){
-		return intersectsPath(p, tolerance, vx, vy);
-    }
-
-    /** Tells whether the picker is hovering a particular DPath or not.
-     *@param p DPath instance to be tested
-     *@see #intersectsPath(DPath p, int tolerance, double cursorX, double cursorY)
-     */
-    public boolean intersectsPath(DPath p){
-		return intersectsPath(p, 5, vx, vy);
+    public boolean intersectsPath(DPath p, int tolerance, Graphics2D g2d){
+		return intersectsPath(p, tolerance, vx, vy, g2d);
     }
 
     /** Get a list of all VSegments picked at the picker's current coordinates.
@@ -240,7 +226,7 @@ public class Picker {
             else if (glyph instanceof VSegment && intersectsSegment((VSegment)glyph, 2, c.getIndex())){
                 res.add(glyph);
             }
-            else if (glyph instanceof DPath && intersectsPath((DPath)glyph)){
+            else if (glyph instanceof DPath && intersectsPath((DPath)glyph, 2, c.getOwningView().getGraphicsContext())){
                 res.add(glyph);
             }
         }
