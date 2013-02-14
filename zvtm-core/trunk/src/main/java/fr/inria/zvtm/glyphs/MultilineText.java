@@ -40,10 +40,7 @@ public class MultilineText<T> extends VText {
 
     public MultilineText(String text){
         super(text);
-        atText = new AttributedString(text);
-        atText.addAttribute(TextAttribute.FONT,
-                usesSpecificFont() ? getFont() : getMainFont());
-        lbm = new LineBreakMeasurer(atText.getIterator(), DEFAULT_FRC);
+        initLbm();
     }
 
     /**
@@ -59,6 +56,10 @@ public class MultilineText<T> extends VText {
      */
     public MultilineText(double x, double y, int z, Color c, String t, float scale, float alpha){
         super(x, y, z, c, null, t, VText.TEXT_ANCHOR_START, scale, alpha);
+        initLbm();
+    }
+
+    void initLbm(){
         atText = new AttributedString(text);
         atText.addAttribute(TextAttribute.FONT,
                 usesSpecificFont() ? getFont() : getMainFont());
