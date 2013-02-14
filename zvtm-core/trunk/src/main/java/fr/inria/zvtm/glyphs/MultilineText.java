@@ -225,6 +225,9 @@ public class MultilineText<T> extends VText {
     }
 
     @Override public Object clone(){
-        throw new UnsupportedOperationException("Cannot clone MultilineText");
+        MultilineText res = new MultilineText(vx, vy, vz, color, (new StringBuffer(text)).toString(),
+            text_anchor, getScale(), (alphaC != null) ? alphaC.getAlpha() : 1.0f);
+        res.cursorInsideColor = this.cursorInsideColor;
+        return res;
     }
 }
