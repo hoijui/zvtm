@@ -1,5 +1,12 @@
+/*   Copyright (c) INRIA, 2010-2013. All Rights Reserved
+ *   Licensed under the GNU LGPL. For full terms see the file COPYING.
+ *
+ * $Id:  $
+ */
+
 package fr.inria.zvtm.glyphs;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
@@ -33,6 +40,25 @@ public class MultilineText<T> extends VText {
 
     public MultilineText(String text){
         super(text);
+        atText = new AttributedString(text);
+        atText.addAttribute(TextAttribute.FONT,
+                usesSpecificFont() ? getFont() : getMainFont());
+        lbm = new LineBreakMeasurer(atText.getIterator(), DEFAULT_FRC);
+    }
+
+    /**
+     *@param x coordinate in virtual space
+     *@param y coordinate in virtual space
+     *@param z z-index (pass 0 if you do not use z-ordering)
+     *@param c fill color
+     *@param bkg background color (null if not painted)
+     *@param t text string
+     *@param ta text-anchor (for alignment: one of TEXT_ANCHOR_*)
+     *@param scale scaleFactor w.r.t original image size
+      *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
+     */
+    public MultilineText(double x, double y, int z, Color c, String t, float scale, float alpha){
+        super(x, y, z, c, null, t, VText.TEXT_ANCHOR_START, scale, alpha);
         atText = new AttributedString(text);
         atText.addAttribute(TextAttribute.FONT,
                 usesSpecificFont() ? getFont() : getMainFont());
@@ -105,8 +131,7 @@ public class MultilineText<T> extends VText {
     }
 
     @Override public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-        float formatWidth = (float)widthConstraint;
-
+        // float formatWidth = (float)widthConstraint;
         if (alphaC != null && alphaC.getAlpha()==0){return;}
         double trueCoef = scaleFactor * coef;
         if (trueCoef*fontSize > VText.TEXT_AS_LINE_PROJ_COEF || !zoomSensitive || !pc[i].valid){
@@ -115,19 +140,17 @@ public class MultilineText<T> extends VText {
             AffineTransform at = AffineTransform.getTranslateInstance(dx+pc[i].cx,dy+pc[i].cy);
             if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(trueCoef, trueCoef));}
             g.setTransform(at);
-            int rectH = Math.round(pc[i].ch / scaleFactor);
-
+            // int rectH = Math.round(pc[i].ch / scaleFactor);
             g.setColor(this.color);
             float drawPosY = 0;
             lbm.setPosition(atText.getIterator().getBeginIndex());
             int paragraphEnd = atText.getIterator().getEndIndex();
             TextLayout layout = null;
             while(lbm.getPosition() < paragraphEnd &&
-                    drawPosY <= heightConstraint){
+                  drawPosY <= heightConstraint){
                 layout = lbm.nextLayout((float)widthConstraint);
                 drawPosY += layout.getAscent();
                 layout.draw(g, 0, drawPosY);
-
                 drawPosY += layout.getDescent() + layout.getLeading();
             }
             g.setTransform(stdT);
