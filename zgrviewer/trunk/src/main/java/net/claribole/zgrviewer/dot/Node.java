@@ -117,6 +117,14 @@ abstract public class Node {
         return this.out;
     }
 
+    public String getId(){
+        return this.id;
+    }
+
+    public String getLabel(){
+        return this.label;
+    }
+
     /**
      * Add an incoming edge to the node
      * 

@@ -454,6 +454,14 @@ public class Edge {
         this.end.addOutEdge(this);
     }
 
+    public Node getStart(){
+        return this.start;
+    }
+
+    public Node getEnd(){
+        return this.end;
+    }
+
 
     public void changeOption(String name, String value) /*throws Exception*/{
         String v;
