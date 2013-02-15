@@ -330,67 +330,52 @@ public class VText<T> extends ClosedShape {
         else {
             // cw and ch actually hold width and height of text *in virtual space*
             if (text_anchor==TEXT_ANCHOR_START){
-                if ((vx<=eb) && ((vx+pc[i].cw)>=wb) && (vy<=nb) && ((vy+pc[i].ch)>=sb)){
-                    //if glyph is at least partially in region  (we approximate using the glyph bounding circle, meaning that some
-                    //glyphs not actually visible can be projected and drawn  (but they won't be displayed))
-                    return true;
-                }
-                //otherwise the glyph is not visible
-                else return false;
+                //if glyph is at least partially in region  (we approximate using the glyph bounding circle, meaning that some
+                //glyphs not actually visible can be projected and drawn  (but they won't be displayed))
+                return ((vx<=eb) && ((vx+pc[i].cw)>=wb) && (vy<=nb) && ((vy+pc[i].ch)>=sb));
             }
             else if (text_anchor==TEXT_ANCHOR_MIDDLE){
-                if ((vx-pc[i].cw/2<=eb) && ((vx+pc[i].cw/2)>=wb) && (vy<=nb) && ((vy+pc[i].ch)>=sb)){
-                    //if glyph is at least partially in region  (we approximate using the glyph bounding circle, meaning that some
-                    //glyphs not actually visible can be projected and drawn  (but they won't be displayed))
-                    return true;
-                }
-                //otherwise the glyph is not visible
-                else return false;
+                //if glyph is at least partially in region  (we approximate using the glyph bounding circle, meaning that some
+                //glyphs not actually visible can be projected and drawn  (but they won't be displayed))
+                return ((vx-pc[i].cw/2<=eb) && ((vx+pc[i].cw/2)>=wb) && (vy<=nb) && ((vy+pc[i].ch)>=sb));
             }
             else {
                 //TEXT_ANCHOR_END
-                if ((vx-pc[i].cw<=eb) && (vx>=wb) && (vy<=nb) && ((vy+pc[i].ch)>=sb)){
-                    //if glyph is at least partially in region  (we approximate using the glyph bounding circle, meaning that some
-                    //glyphs not actually visible can be projected and drawn  (but they won't be displayed))
-                    return true;
-                }
-                //otherwise the glyph is not visible
-                else return false;
+                //if glyph is at least partially in region  (we approximate using the glyph bounding circle, meaning that some
+                //glyphs not actually visible can be projected and drawn  (but they won't be displayed))
+                return ((vx-pc[i].cw<=eb) && (vx>=wb) && (vy<=nb) && ((vy+pc[i].ch)>=sb));
             }
         }
     }
 
     @Override
     public boolean containedInRegion(double wb, double nb, double eb, double sb, int i){
-    if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
-        /* Glyph hotspot is in the region.
-           There is a good chance the glyph is contained in the region, but this is not sufficient. */
-        // cw and ch actually hold width and height of text *in virtual space*
-        if (text_anchor==TEXT_ANCHOR_START){
-        if ((vx<=eb) && ((vx+pc[i].cw)>=wb) && (vy<=nb) && ((vy-pc[i].ch)>=sb)){
-            //if glyph is at least partially in region  (we approximate using the glyph bounding circle, meaning that some
-            return true;  //glyphs not actually visible can be projected and drawn  (but they won't be displayed))
+        if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
+            /* Glyph hotspot is in the region.
+               There is a good chance the glyph is contained in the region, but this is not sufficient. */
+            // cw and ch actually hold width and height of text *in virtual space*
+            if (text_anchor==TEXT_ANCHOR_START){
+                //if glyph is at least partially in region  (we approximate using the glyph bounding circle, meaning that some
+                return ((vx<=eb) && ((vx+pc[i].cw)>=wb) && (vy<=nb) && ((vy-pc[i].ch)>=sb));
+                //glyphs not actually visible can be projected and drawn  (but they won't be displayed))
+            }
+            else if (text_anchor==TEXT_ANCHOR_MIDDLE){
+                return ((vx+pc[i].cw/2<=eb) && ((vx-pc[i].cw/2)>=wb) && (vy<=nb) && ((vy-pc[i].ch)>=sb));
+                //if glyph is at least partially in region  (we approximate using the glyph bounding circle, meaning that some
+                //glyphs not actually visible can be projected and drawn  (but they won't be displayed))
+            }
+            else {//TEXT_ANCHOR_END
+                return ((vx+pc[i].cw<=eb) && (vx>=wb) && (vy<=nb) && ((vy-pc[i].ch)>=sb));
+                //if glyph is at least partially in region  (we approximate using the glyph bounding circle, meaning that some
+                //glyphs not actually visible can be projected and drawn  (but they won't be displayed))
+            }
         }
-        }
-        else if (text_anchor==TEXT_ANCHOR_MIDDLE){
-        if ((vx+pc[i].cw/2<=eb) && ((vx-pc[i].cw/2)>=wb) && (vy<=nb) && ((vy-pc[i].ch)>=sb)){
-            //if glyph is at least partially in region  (we approximate using the glyph bounding circle, meaning that some
-            return true;  //glyphs not actually visible can be projected and drawn  (but they won't be displayed))
-        }
-        }
-        else {//TEXT_ANCHOR_END
-        if ((vx+pc[i].cw<=eb) && (vx>=wb) && (vy<=nb) && ((vy-pc[i].ch)>=sb)){
-            //if glyph is at least partially in region  (we approximate using the glyph bounding circle, meaning that some
-            return true;  //glyphs not actually visible can be projected and drawn  (but they won't be displayed))
-        }
-        }
-    }
-    return false;
+        return false;
     }
 
     @Override
     public boolean fillsView(double w,double h,int camIndex){
-    return false;
+        return false;
     }
 
     @Override
