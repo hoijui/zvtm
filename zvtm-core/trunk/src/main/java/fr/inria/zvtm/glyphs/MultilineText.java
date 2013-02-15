@@ -121,23 +121,76 @@ public class MultilineText<T> extends VText {
         invalidate();
     }
 
-    @Override public boolean visibleInRegion(double wb, double nb, double eb, double sb, int i){
+    @Override
+    public boolean visibleInRegion(double wb, double nb, double eb, double sb, int i){
         if (!validBounds(i)){return true;}
         if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
             //if glyph hotspot is in the region, it is obviously visible
             return true;
         }
-        return (vx<=eb) && ((vx+pc[i].cw)>=wb) && (vy>=sb) && ((vy-pc[i].ch)<=nb);
+        else {
+            // cw and ch actually hold width and height of text *in virtual space*
+            if (text_anchor==TEXT_ANCHOR_START){
+                //if glyph is at least partially in region  (we approximate using the glyph bounding circle, meaning that some
+                //glyphs not actually visible can be projected and drawn  (but they won't be displayed))
+                return (vx<=eb) && ((vx+pc[i].cw)>=wb) && (vy>=sb) && ((vy-pc[i].ch)<=nb);
+            }
+            else if (text_anchor==TEXT_ANCHOR_MIDDLE){
+                return ((vx-pc[i].cw/2<=eb) && ((vx+pc[i].cw/2)>=wb) && (vy>=sb) && ((vy-pc[i].ch)<=nb));
+                //if glyph is at least partially in region  (we approximate using the glyph bounding circle, meaning that some
+                //glyphs not actually visible can be projected and drawn  (but they won't be displayed))
+            }
+            else {
+                //TEXT_ANCHOR_END
+                return ((vx-pc[i].cw<=eb) && (vx>=wb) && (vy>=sb) && ((vy-pc[i].ch)<=nb));
+                //if glyph is at least partially in region  (we approximate using the glyph bounding circle, meaning that some
+                //glyphs not actually visible can be projected and drawn  (but they won't be displayed))
+            }
+        }
     }
 
-    @Override public boolean containedInRegion(double wb, double nb, double eb, double sb, int i){
-        return (vx >= wb) && (vy <= nb) &&
-            (vx + pc[i].cw <= eb) && (vy - pc[i].ch >= sb);
+    @Override
+    public boolean containedInRegion(double wb, double nb, double eb, double sb, int i){
+        if ((vx>=wb) && (vx<=eb) && (vy <= nb) && (vy >= sb)){
+            /* Glyph hotspot is in the region.
+               There is a good chance the glyph is contained in the region, but this is not sufficient. */
+            // cw and ch actually hold width and height of text *in virtual space*
+            if (text_anchor==TEXT_ANCHOR_START){
+                //if glyph is at least partially in region  (we approximate using the glyph bounding circle, meaning that some
+                return ((vx<=eb) && ((vx+pc[i].cw)>=wb) && (vy <= nb) && (vy - pc[i].ch >= sb));
+                //glyphs not actually visible can be projected and drawn  (but they won't be displayed))
+            }
+            else if (text_anchor==TEXT_ANCHOR_MIDDLE){
+                return ((vx+pc[i].cw/2<=eb) && ((vx-pc[i].cw/2)>=wb) && (vy <= nb) && (vy - pc[i].ch >= sb));
+                //if glyph is at least partially in region  (we approximate using the glyph bounding circle, meaning that some
+                //glyphs not actually visible can be projected and drawn  (but they won't be displayed))
+            }
+            else {//TEXT_ANCHOR_END
+                return ((vx+pc[i].cw<=eb) && (vx>=wb) && (vy <= nb) && (vy - pc[i].ch >= sb));
+                //if glyph is at least partially in region  (we approximate using the glyph bounding circle, meaning that some
+                //glyphs not actually visible can be projected and drawn  (but they won't be displayed))
+            }
+        }
+        return false;
     }
 
-    @Override public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
-        return (cvx >= vx) && (cvy <= vy) &&
-            (cvx <= vx+pc[camIndex].cw) && (cvy >= vy-pc[camIndex].ch);
+    @Override
+    public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
+        boolean res=false;
+        switch (text_anchor){
+            case VText.TEXT_ANCHOR_START:{
+                if ((cvx>=vx) && (cvy<=vy) && (cvx<=(vx+pc[camIndex].cw)) && (cvy >= vy-pc[camIndex].ch)){res=true;}
+                break;
+            }
+            case VText.TEXT_ANCHOR_MIDDLE:{
+                if ((cvx>=vx-pc[camIndex].cw/2) && (cvy<=vy) && (cvx<=(vx+pc[camIndex].cw/2)) && (cvy >= vy-pc[camIndex].ch)){res=true;}
+                break;
+            }
+            default:{
+                if ((cvx<=vx) && (cvy<=vy) && (cvx>=(vx-pc[camIndex].cw)) && (cvy >= vy-pc[camIndex].ch)){res=true;}
+            }
+        }
+        return res;
     }
 
     void processText(){
