@@ -63,39 +63,39 @@ public class VText<T> extends ClosedShape {
 
     protected boolean zoomSensitive=true;
 
-	protected static Font mainFont = new Font("Dialog",0,10);
-	/** Font size in pixels (read-only). */
-	protected float fontSize=mainFont.getSize2D();
+    protected static Font mainFont = new Font("Dialog",0,10);
+    /** Font size in pixels (read-only). */
+    protected float fontSize=mainFont.getSize2D();
 
-	/**returns default font used by glyphs*/
-	public static Font getMainFont(){return mainFont;}
-	/**set default font used by glyphs*/
-	public static void setMainFont(Font f){
-		mainFont=f;
-		VirtualSpaceManager.INSTANCE.onMainFontUpdated();
-	}
+    /**returns default font used by glyphs*/
+    public static Font getMainFont(){return mainFont;}
+    /**set default font used by glyphs*/
+    public static void setMainFont(Font f){
+        mainFont=f;
+        VirtualSpaceManager.INSTANCE.onMainFontUpdated();
+    }
 
-	protected Font font;
+    protected Font font;
 
-	protected String text;
+    protected String text;
 
-	protected float scaleFactor = 1.0f;
+    protected float scaleFactor = 1.0f;
 
-	/**
-	 * Offset between text and vertical borders
-	 */
-	public int paddingX = 1;
+    /**
+     * Offset between text and vertical borders
+     */
+    public int paddingX = 1;
 
-	/**
-	 * Offset betwenn text and horizontal borders
-	 */
-	public int paddingY = 1;
+    /**
+     * Offset betwenn text and horizontal borders
+     */
+    public int paddingY = 1;
 
     /**
      * @param t text string
      */
     public VText(String t){
-		this(0, 0, 0, Color.BLACK, null, t, TEXT_ANCHOR_START, 1f, 1f);
+        this(0, 0, 0, Color.BLACK, null, t, TEXT_ANCHOR_START, 1f, 1f);
     }
 
     /**
@@ -106,7 +106,7 @@ public class VText<T> extends ClosedShape {
      *@param t text string
      */
     public VText(double x, double y, int z, Color c, String t){
-		this(x, y, z, c, null, t, TEXT_ANCHOR_START, 1f, 1f);
+        this(x, y, z, c, null, t, TEXT_ANCHOR_START, 1f, 1f);
     }
 
     /**
@@ -118,7 +118,7 @@ public class VText<T> extends ClosedShape {
      *@param ta text-anchor (for alignment: one of TEXT_ANCHOR_*)
      */
     public VText(double x,double y, int z,Color c,String t,short ta){
-		this(x, y, z, c, null, t, ta, 1f, 1f);
+        this(x, y, z, c, null, t, ta, 1f, 1f);
     }
 
     /**
@@ -181,49 +181,49 @@ public class VText<T> extends ClosedShape {
 
     @Override
     public void initCams(int nbCam){
-	pc=new ProjText[nbCam];
-	for (int i=0;i<nbCam;i++){
-	    pc[i]=new ProjText();
-	}
+    pc=new ProjText[nbCam];
+    for (int i=0;i<nbCam;i++){
+        pc[i]=new ProjText();
+    }
     }
 
     @Override
     public void addCamera(int verifIndex){
-	if (pc!=null){
-	    if (verifIndex==pc.length){
-		ProjText[] ta=pc;
-		pc=new ProjText[ta.length+1];
-		for (int i=0;i<ta.length;i++){
-		    pc[i]=ta[i];
-		}
-		pc[pc.length-1]=new ProjText();
-	    }
-	    else {System.err.println("VText:Error while adding camera "+verifIndex);}
-	}
-	else {
-	    if (verifIndex==0){
-		pc=new ProjText[1];
-		pc[0]=new ProjText();
-	    }
-	    else {System.err.println("VText:Error while adding camera "+verifIndex);}
-	}
+    if (pc!=null){
+        if (verifIndex==pc.length){
+        ProjText[] ta=pc;
+        pc=new ProjText[ta.length+1];
+        for (int i=0;i<ta.length;i++){
+            pc[i]=ta[i];
+        }
+        pc[pc.length-1]=new ProjText();
+        }
+        else {System.err.println("VText:Error while adding camera "+verifIndex);}
+    }
+    else {
+        if (verifIndex==0){
+        pc=new ProjText[1];
+        pc[0]=new ProjText();
+        }
+        else {System.err.println("VText:Error while adding camera "+verifIndex);}
+    }
     }
 
     @Override
     public void removeCamera(int index){
-	pc[index]=null;
+    pc[index]=null;
     }
 
     @Override
     public void resetMouseIn(){
-	for (int i=0;i<pc.length;i++){
-	    resetMouseIn(i);
-	}
+    for (int i=0;i<pc.length;i++){
+        resetMouseIn(i);
+    }
     }
 
     @Override
     public void resetMouseIn(int i){
-	if (pc[i]!=null){pc[i].prevMouseIn=false;}
+    if (pc[i]!=null){pc[i].prevMouseIn=false;}
     }
 
     /** No effect. Use the glyph's scale factor.
@@ -266,17 +266,17 @@ public class VText<T> extends ClosedShape {
      *@see #isZoomSensitive()
      */
     public void setZoomSensitive(boolean b){
-	if (zoomSensitive!=b){
-	    zoomSensitive=b;
-	    VirtualSpaceManager.INSTANCE.repaint();
-	}
+    if (zoomSensitive!=b){
+        zoomSensitive=b;
+        VirtualSpaceManager.INSTANCE.repaint();
+    }
     }
 
     /** Indicates whether the text is scaled according to camera's altitude.
      *@see #setZoomSensitive(boolean b)
      */
     public boolean isZoomSensitive(){
-	return zoomSensitive;
+    return zoomSensitive;
     }
 
     static float TEXT_AS_LINE_PROJ_COEF = .5f;
@@ -362,35 +362,35 @@ public class VText<T> extends ClosedShape {
 
     @Override
     public boolean containedInRegion(double wb, double nb, double eb, double sb, int i){
-	if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
-	    /* Glyph hotspot is in the region.
-	       There is a good chance the glyph is contained in the region, but this is not sufficient. */
-	    // cw and ch actually hold width and height of text *in virtual space*
-	    if (text_anchor==TEXT_ANCHOR_START){
-		if ((vx<=eb) && ((vx+pc[i].cw)>=wb) && (vy<=nb) && ((vy-pc[i].ch)>=sb)){
-		    //if glyph is at least partially in region  (we approximate using the glyph bounding circle, meaning that some
-		    return true;  //glyphs not actually visible can be projected and drawn  (but they won't be displayed))
-		}
-	    }
-	    else if (text_anchor==TEXT_ANCHOR_MIDDLE){
-		if ((vx+pc[i].cw/2<=eb) && ((vx-pc[i].cw/2)>=wb) && (vy<=nb) && ((vy-pc[i].ch)>=sb)){
-		    //if glyph is at least partially in region  (we approximate using the glyph bounding circle, meaning that some
-		    return true;  //glyphs not actually visible can be projected and drawn  (but they won't be displayed))
-		}
-	    }
-	    else {//TEXT_ANCHOR_END
-		if ((vx+pc[i].cw<=eb) && (vx>=wb) && (vy<=nb) && ((vy-pc[i].ch)>=sb)){
-		    //if glyph is at least partially in region  (we approximate using the glyph bounding circle, meaning that some
-		    return true;  //glyphs not actually visible can be projected and drawn  (but they won't be displayed))
-		}
-	    }
-	}
-	return false;
+    if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
+        /* Glyph hotspot is in the region.
+           There is a good chance the glyph is contained in the region, but this is not sufficient. */
+        // cw and ch actually hold width and height of text *in virtual space*
+        if (text_anchor==TEXT_ANCHOR_START){
+        if ((vx<=eb) && ((vx+pc[i].cw)>=wb) && (vy<=nb) && ((vy-pc[i].ch)>=sb)){
+            //if glyph is at least partially in region  (we approximate using the glyph bounding circle, meaning that some
+            return true;  //glyphs not actually visible can be projected and drawn  (but they won't be displayed))
+        }
+        }
+        else if (text_anchor==TEXT_ANCHOR_MIDDLE){
+        if ((vx+pc[i].cw/2<=eb) && ((vx-pc[i].cw/2)>=wb) && (vy<=nb) && ((vy-pc[i].ch)>=sb)){
+            //if glyph is at least partially in region  (we approximate using the glyph bounding circle, meaning that some
+            return true;  //glyphs not actually visible can be projected and drawn  (but they won't be displayed))
+        }
+        }
+        else {//TEXT_ANCHOR_END
+        if ((vx+pc[i].cw<=eb) && (vx>=wb) && (vy<=nb) && ((vy-pc[i].ch)>=sb)){
+            //if glyph is at least partially in region  (we approximate using the glyph bounding circle, meaning that some
+            return true;  //glyphs not actually visible can be projected and drawn  (but they won't be displayed))
+        }
+        }
+    }
+    return false;
     }
 
     @Override
     public boolean fillsView(double w,double h,int camIndex){
-	return false;
+    return false;
     }
 
     @Override
@@ -413,22 +413,22 @@ public class VText<T> extends ClosedShape {
     }
 
     @Override
-	public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
-	    if (text_anchor==TEXT_ANCHOR_START){
-    		return dvs.intersects(vx, vy, pc[camIndex].cw, pc[camIndex].ch);
+    public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
+        if (text_anchor==TEXT_ANCHOR_START){
+            return dvs.intersects(vx, vy, pc[camIndex].cw, pc[camIndex].ch);
         }
         else if (text_anchor==TEXT_ANCHOR_MIDDLE){
-    		return dvs.intersects(vx-pc[camIndex].cw/2, vy, pc[camIndex].cw, pc[camIndex].ch);
+            return dvs.intersects(vx-pc[camIndex].cw/2, vy, pc[camIndex].cw, pc[camIndex].ch);
         }
         else {
             //TEXT_ANCHOR_END
-    		return dvs.intersects(vx-pc[camIndex].cw, vy, pc[camIndex].cw, pc[camIndex].ch);
+            return dvs.intersects(vx-pc[camIndex].cw, vy, pc[camIndex].cw, pc[camIndex].ch);
         }
-	}
+    }
 
     @Override
     public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
-	    if (coordInside(jpx, jpy, camIndex, cvx, cvy)){
+        if (coordInside(jpx, jpy, camIndex, cvx, cvy)){
              //if the mouse is inside the glyph
              if (!pc[camIndex].prevMouseIn){
                  //if it was not inside it last time, mouse has entered the glyph
@@ -470,115 +470,115 @@ public class VText<T> extends ClosedShape {
     }
 
     @Override
-	public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-		if (!pc[i].valid){
-			g.setFont((font!=null) ? font : getMainFont());
-			Rectangle2D bounds = g.getFontMetrics().getStringBounds(text,g);
-			// cw and ch actually hold width and height of text *in virtual space*
-			pc[i].cw = (int)Math.round(bounds.getWidth() * scaleFactor);
-			pc[i].ch = (int)Math.round(bounds.getHeight() * scaleFactor);
-			pc[i].valid=true;
-		}
+    public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
+        if (!pc[i].valid){
+            g.setFont((font!=null) ? font : getMainFont());
+            Rectangle2D bounds = g.getFontMetrics().getStringBounds(text,g);
+            // cw and ch actually hold width and height of text *in virtual space*
+            pc[i].cw = (int)Math.round(bounds.getWidth() * scaleFactor);
+            pc[i].ch = (int)Math.round(bounds.getHeight() * scaleFactor);
+            pc[i].valid=true;
+        }
         if (alphaC != null && alphaC.getAlpha()==0){return;}
-		double trueCoef = scaleFactor * coef;
-		if (trueCoef*fontSize > VText.TEXT_AS_LINE_PROJ_COEF || !zoomSensitive){
-			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
-			g.setFont((font!=null) ? font : getMainFont());
-			AffineTransform at;
-			if (text_anchor==TEXT_ANCHOR_START){
-			    at = AffineTransform.getTranslateInstance(dx+pc[i].cx,dy+pc[i].cy);
-			}
-			else if (text_anchor==TEXT_ANCHOR_MIDDLE){
-			    at = AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw*coef/2.0f,dy+pc[i].cy);
-			    }
-			else {
-			    at = AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw*coef,dy+pc[i].cy);
-			}
-			if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(trueCoef, trueCoef));}
-			g.setTransform(at);
-			int rectH = Math.round(pc[i].ch / scaleFactor);
-			if (alphaC != null){
-				g.setComposite(alphaC);
-				if (isBorderDrawn()){
-				    g.setColor(borderColor);
-	                g.fillRect(dx-paddingX, dy-rectH+1+2*paddingY, Math.round(pc[i].cw / scaleFactor+paddingX), rectH-1+2*paddingY);
-				}
-	    		g.setColor(this.color);
-				g.drawString(text, 0.0f, 0.0f);
-				g.setComposite(acO);
-			}
-			else {
-				if (isBorderDrawn()){
-				    g.setColor(borderColor);
-	                g.fillRect(dx-paddingX, dy-rectH+1+2*paddingY, Math.round(pc[i].cw / scaleFactor+paddingX), rectH-1+2*paddingY);
-				}
-	    		g.setColor(this.color);
-				g.drawString(text, 0.0f, 0.0f);
-			}
-			g.setTransform(stdT);
-		}
-		else {
-    		g.setColor(this.color);
-			if (alphaC != null){
-				g.setComposite(alphaC);
-				g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
-				g.setComposite(acO);
-			}
-			else {
-				g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
-			}
-		}
-	}
+        double trueCoef = scaleFactor * coef;
+        if (trueCoef*fontSize > VText.TEXT_AS_LINE_PROJ_COEF || !zoomSensitive){
+            //if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
+            g.setFont((font!=null) ? font : getMainFont());
+            AffineTransform at;
+            if (text_anchor==TEXT_ANCHOR_START){
+                at = AffineTransform.getTranslateInstance(dx+pc[i].cx,dy+pc[i].cy);
+            }
+            else if (text_anchor==TEXT_ANCHOR_MIDDLE){
+                at = AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw*coef/2.0f,dy+pc[i].cy);
+                }
+            else {
+                at = AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw*coef,dy+pc[i].cy);
+            }
+            if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(trueCoef, trueCoef));}
+            g.setTransform(at);
+            int rectH = Math.round(pc[i].ch / scaleFactor);
+            if (alphaC != null){
+                g.setComposite(alphaC);
+                if (isBorderDrawn()){
+                    g.setColor(borderColor);
+                    g.fillRect(dx-paddingX, dy-rectH+1+2*paddingY, Math.round(pc[i].cw / scaleFactor+paddingX), rectH-1+2*paddingY);
+                }
+                g.setColor(this.color);
+                g.drawString(text, 0.0f, 0.0f);
+                g.setComposite(acO);
+            }
+            else {
+                if (isBorderDrawn()){
+                    g.setColor(borderColor);
+                    g.fillRect(dx-paddingX, dy-rectH+1+2*paddingY, Math.round(pc[i].cw / scaleFactor+paddingX), rectH-1+2*paddingY);
+                }
+                g.setColor(this.color);
+                g.drawString(text, 0.0f, 0.0f);
+            }
+            g.setTransform(stdT);
+        }
+        else {
+            g.setColor(this.color);
+            if (alphaC != null){
+                g.setComposite(alphaC);
+                g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
+                g.setComposite(acO);
+            }
+            else {
+                g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
+            }
+        }
+    }
 
     @Override
-	public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-		if (!pc[i].lvalid){
-			g.setFont((font!=null) ? font : getMainFont());
-			Rectangle2D bounds = g.getFontMetrics().getStringBounds(text,g);
-			// lcw and lch actually hold width and height of text *in virtual space*
-			pc[i].lcw = (int)Math.round(bounds.getWidth() * scaleFactor);
-			pc[i].lch = (int)Math.round(bounds.getHeight() * scaleFactor);
-			pc[i].lvalid=true;
-		}
+    public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
+        if (!pc[i].lvalid){
+            g.setFont((font!=null) ? font : getMainFont());
+            Rectangle2D bounds = g.getFontMetrics().getStringBounds(text,g);
+            // lcw and lch actually hold width and height of text *in virtual space*
+            pc[i].lcw = (int)Math.round(bounds.getWidth() * scaleFactor);
+            pc[i].lch = (int)Math.round(bounds.getHeight() * scaleFactor);
+            pc[i].lvalid=true;
+        }
         if (alphaC != null && alphaC.getAlpha()==0){return;}
-		double trueCoef = scaleFactor * coef;
-		g.setColor(this.color);
-		if (trueCoef*fontSize > VText.TEXT_AS_LINE_PROJ_COEF || !zoomSensitive){
-			g.setFont((font!=null) ? font : getMainFont());
-			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
-			AffineTransform at;
-			if (text_anchor==TEXT_ANCHOR_START){at=AffineTransform.getTranslateInstance(dx+pc[i].lcx,dy+pc[i].lcy);}
-			else if (text_anchor==TEXT_ANCHOR_MIDDLE){at=AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw*coef/2.0f,dy+pc[i].lcy);}
-			else {at=AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw*coef,dy+pc[i].lcy);}
-			if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(trueCoef, trueCoef));}
-			g.setTransform(at);
-			if (alphaC != null){
-				g.setComposite(alphaC);
-				g.drawString(text, 0.0f, 0.0f);
-				g.setComposite(acO);
-			}
-			else {
-				g.drawString(text, 0.0f, 0.0f);
-			}
-			g.setTransform(stdT);
-		}
-		else {
-			if (alphaC != null){
-				g.setComposite(alphaC);
-				g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
-				g.setComposite(acO);
-			}
-			else {
-				g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
-			}
-		}
-	}
+        double trueCoef = scaleFactor * coef;
+        g.setColor(this.color);
+        if (trueCoef*fontSize > VText.TEXT_AS_LINE_PROJ_COEF || !zoomSensitive){
+            g.setFont((font!=null) ? font : getMainFont());
+            //if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
+            AffineTransform at;
+            if (text_anchor==TEXT_ANCHOR_START){at=AffineTransform.getTranslateInstance(dx+pc[i].lcx,dy+pc[i].lcy);}
+            else if (text_anchor==TEXT_ANCHOR_MIDDLE){at=AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw*coef/2.0f,dy+pc[i].lcy);}
+            else {at=AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw*coef,dy+pc[i].lcy);}
+            if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(trueCoef, trueCoef));}
+            g.setTransform(at);
+            if (alphaC != null){
+                g.setComposite(alphaC);
+                g.drawString(text, 0.0f, 0.0f);
+                g.setComposite(acO);
+            }
+            else {
+                g.drawString(text, 0.0f, 0.0f);
+            }
+            g.setTransform(stdT);
+        }
+        else {
+            if (alphaC != null){
+                g.setComposite(alphaC);
+                g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
+                g.setComposite(acO);
+            }
+            else {
+                g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
+            }
+        }
+    }
 
     /** Set text that should be painted. */
     public void setText(String t){
-	text=t;
-	VirtualSpaceManager.INSTANCE.repaint();
-	invalidate();
+    text=t;
+    VirtualSpaceManager.INSTANCE.repaint();
+    invalidate();
     }
 
     /** Set the scale factor for this text.
@@ -586,15 +586,15 @@ public class VText<T> extends ClosedShape {
      *@param s scale factor
      */
     public void setScale(float s){
-	scaleFactor = s;
-	invalidate();
+    scaleFactor = s;
+    invalidate();
     }
 
     /** Get the scale factor for this text.
      * The actual size of the text is that defined by the font size multiplied by the scale factor returned by this method.
      */
     public float getScale(){
-	return scaleFactor;
+    return scaleFactor;
     }
 
     /** Force computation of text's bounding box at next call to draw().
@@ -602,13 +602,13 @@ public class VText<T> extends ClosedShape {
      *@see #getBounds(int i)
      */
     public void invalidate(){
-	try {
-	    for (int i=0;i<pc.length;i++){
-		pc[i].valid=false;
-		pc[i].lvalid=false;
-	    }
-	}
-	catch (NullPointerException ex){}
+    try {
+        for (int i=0;i<pc.length;i++){
+        pc[i].valid=false;
+        pc[i].lvalid=false;
+        }
+    }
+    catch (NullPointerException ex){}
     }
 
     /** Get the width and height of the bounding box in virtual space.
@@ -618,7 +618,7 @@ public class VText<T> extends ClosedShape {
      *@return the width and height of the text's bounding box, as a LongPoint
      */
     public Point2D.Double getBounds(int i){
-	    return new Point2D.Double(pc[i].cw, pc[i].ch);
+        return new Point2D.Double(pc[i].cw, pc[i].ch);
     }
 
     /** Indicates whether the bounds of the text are valid at this time or not.
@@ -628,7 +628,7 @@ public class VText<T> extends ClosedShape {
      *@see #invalidate()
      */
     public boolean validBounds(int i){
-	return pc[i].valid;
+    return pc[i].valid;
     }
 
     /** Change the Font used to display this specific text object.
@@ -637,9 +637,9 @@ public class VText<T> extends ClosedShape {
      *@see #getFont()
      */
     public void setFont(Font f){
-	if (f!=null){font=f;fontSize=font.getSize2D();}else{font=null;fontSize=getMainFont().getSize2D();}
-	VirtualSpaceManager.INSTANCE.repaint();
-	invalidate();
+    if (f!=null){font=f;fontSize=font.getSize2D();}else{font=null;fontSize=getMainFont().getSize2D();}
+    VirtualSpaceManager.INSTANCE.repaint();
+    invalidate();
     }
 
     /** Get the Font used to display this specific text object.
@@ -648,8 +648,8 @@ public class VText<T> extends ClosedShape {
      *@return the main ZVTM font if no specific Font is used to draw this text
      */
     public Font getFont(){
-	if (font!=null){return font;}
-	else return getMainFont();
+    if (font!=null){return font;}
+    else return getMainFont();
     }
 
     /** Indicates whether this glyph is using a special font.
@@ -658,8 +658,8 @@ public class VText<T> extends ClosedShape {
      *@see #getFont()
      */
     public boolean usesSpecificFont(){
-	if (font==null){return false;}
-	else {return true;}
+    if (font==null){return false;}
+    else {return true;}
     }
 
     /** Get text painted by this glyph. */
@@ -669,21 +669,21 @@ public class VText<T> extends ClosedShape {
      *@param ta one of TEXT_ANCHOR_START, TEXT_ANCHOR_MIDDLE, TEXT_ANCHOR_END
      */
     public void setTextAnchor(short ta){
-	text_anchor=ta;
+    text_anchor=ta;
     }
 
     /** Get text anchor.
      *@return one of TEXT_ANCHOR_START, TEXT_ANCHOR_MIDDLE, TEXT_ANCHOR_END
      */
     public short getTextAnchor(){
-	return text_anchor;
+    return text_anchor;
     }
 
-	@Override
-	public Shape getJava2DShape(){
-		//XXX:TBW
-		return null;
-	}
+    @Override
+    public Shape getJava2DShape(){
+        //XXX:TBW
+        return null;
+    }
 
     public Object clone(){
         VText res = new VText(vx, vy, vz, color, borderColor, (new StringBuffer(text)).toString(),
@@ -715,13 +715,13 @@ public class VText<T> extends ClosedShape {
         }
     }
 
-	public void setPadding(int x, int y){
-		paddingX = x;
-		paddingY = y;
-	}
+    public void setPadding(int x, int y){
+        paddingX = x;
+        paddingY = y;
+    }
 
-	public Point getPadding(){
-		return new Point(paddingX, paddingY);
-	}
+    public Point getPadding(){
+        return new Point(paddingX, paddingY);
+    }
 
 }
