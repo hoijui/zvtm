@@ -1,11 +1,11 @@
 /*   FILE: ZgrAppletEvtHdlr.java
  *   DATE OF CREATION:   Fri May 09 09:54:03 2003
  *   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2011. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2013. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  *$Id$
- */ 
+ */
 
 package net.claribole.zgrviewer;
 
@@ -318,7 +318,7 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewListener {
             }
 			else if (manualLeftButtonMove){
 			    if (!v.isShowingFirstOrderPanWidget()){
-    			    v.showFirstOrderPanWidget(lastJPX, lastJPY);			        
+    			    v.showFirstOrderPanWidget(lastJPX, lastJPY);
 			    }
                 if (mod == SHIFT_MOD || mod == META_SHIFT_MOD){
                     grMngr.mainCamera.setXspeed(0);
@@ -358,7 +358,7 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewListener {
             else {
                 grMngr.magnifyFocus(-GraphicsManager.WHEEL_MM_STEP, grMngr.lensType, grMngr.mainCamera);
             }
-        } 
+        }
         else if (grMngr.tp.isHighlightMode() && v.getGlyphsUnderCursorList().length>0){
             Glyph g = v.lastGlyphEntered();
             int dir = -1;
@@ -454,7 +454,7 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewListener {
     }
 
     public void viewActivated(View v){}
-    
+
     public void viewDeactivated(View v){}
 
     public void viewIconified(View v){}
