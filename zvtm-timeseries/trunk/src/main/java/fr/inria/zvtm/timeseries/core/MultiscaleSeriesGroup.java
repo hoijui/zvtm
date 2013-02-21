@@ -49,6 +49,10 @@ public class MultiscaleSeriesGroup {
 		return seriesList[index];
 	}
 	
+	public int getSize() {
+		return seriesList.length;
+	}
+	
 	private class Cache implements IChunkCache {
 		private final MappedDiskCache cache;
 
