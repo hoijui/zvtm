@@ -5,7 +5,7 @@
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
- */ 
+ */
 
 package net.claribole.zgrviewer;
 
@@ -263,7 +263,7 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
                 }
                 grMngr.vsm.repaint();
                 gp.setVisible(false);
-                return null; 
+                return null;
             }
 
             public void finished(){
@@ -295,7 +295,7 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
         }
         // make sure we have a target if not previously set
         if (target == null) target = ConfigManager._BLANK;
-        try {	
+        try {
             URL displayUrl;
             if (!(uri.startsWith(JAVASCRIPT_PROTOCOL) ||
                 uri.startsWith(HTTP_PROTOCOL) || uri.startsWith(HTTPS_PROTOCOL) ||
@@ -316,7 +316,7 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
     }
 
     /* Key listener (keyboard events are not sent to ViewEventHandler when View is a JPanel...) */
-    
+
     public void keyPressed(KeyEvent e){
         int code = e.getKeyCode();
         char c = e.getKeyChar();
@@ -389,15 +389,15 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
 
 class ZGRAGlassPane extends JComponent {
 
-    static final AlphaComposite GLASS_ALPHA = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.65f);    
+    static final AlphaComposite GLASS_ALPHA = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.65f);
     static final Color MSG_COLOR = Color.DARK_GRAY;
-    
+
     String msg = Messages.EMPTY_STRING;
     int msgX = 0;
     int msgY = 0;
-    
+
     int w,h;
-    
+
     ZGRAGlassPane(int w, int h){
         super();
         this.w = w;
@@ -406,14 +406,14 @@ class ZGRAGlassPane extends JComponent {
         addMouseMotionListener(new MouseMotionAdapter(){});
         addKeyListener(new KeyAdapter(){});
     }
-    
+
     void setMessage(String m){
         msg = m;
         msgX = w/2-100;
         msgY = h/2;
         repaint(msgX, msgY-50, 200, 70);
     }
-    
+
     protected void paintComponent(Graphics g){
         Graphics2D g2 = (Graphics2D)g;
         Rectangle clip = g.getClipBounds();
@@ -427,5 +427,5 @@ class ZGRAGlassPane extends JComponent {
             g2.drawString(msg, msgX, msgY);
         }
     }
-    
+
 }

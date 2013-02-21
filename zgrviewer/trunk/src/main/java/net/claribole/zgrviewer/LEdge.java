@@ -43,7 +43,7 @@ public class LEdge extends LElem {
     LNode head;
 
     LEdge(String title, Vector<Glyph> glyphs){
-		this.title = title;
+        this.title = title;
         this.glyphs = new Glyph[glyphs.size()];
         this.URLs = new String[glyphs.size()];
         this.tooltips = new String[glyphs.size()];
@@ -56,25 +56,25 @@ public class LEdge extends LElem {
                 tooltips[i] = ((Metadata)this.glyphs[i].getOwner()).getURLTitle();
             }
         }
-		if (this.glyphs.length > 0){
-	        this.groupID = ((Metadata)this.glyphs[0].getOwner()).getClosestAncestorGroupID();
-		}
-		else {
-		    this.groupID = Messages.EMPTY_STRING;
-		}
-		for (int i=0;i<this.glyphs.length;i++){
+        if (this.glyphs.length > 0){
+            this.groupID = ((Metadata)this.glyphs[0].getOwner()).getClosestAncestorGroupID();
+        }
+        else {
+            this.groupID = Messages.EMPTY_STRING;
+        }
+        for (int i=0;i<this.glyphs.length;i++){
             this.glyphs[i].setOwner(this);
         }
         categorizeGlyphs();
     }
 
     LEdge(Vector<Glyph> glyphs){
-		this.title = "";
+        this.title = "";
         this.glyphs = new Glyph[glyphs.size()];
         this.URLs = new String[glyphs.size()];
         this.tooltips = new String[glyphs.size()];
-		for (int i=0;i<this.glyphs.length;i++){
-		    this.glyphs[i] = glyphs.elementAt(i);
+        for (int i=0;i<this.glyphs.length;i++){
+            this.glyphs[i] = glyphs.elementAt(i);
             this.glyphs[i].setOwner(this);
             this.URLs[i] = "";
             this.tooltips[i] = "";
@@ -139,128 +139,128 @@ public class LEdge extends LElem {
     }
 
     void setDirected(boolean b){
-	directed = b;
+    directed = b;
     }
 
     boolean isDirected(){
-	return directed;
+    return directed;
     }
 
-	public boolean isLoop(){
-		return tail == head;
-	}
+    public boolean isLoop(){
+        return tail == head;
+    }
 
     void setTail(LNode n){
-	tail = n;
-	if (tail != null){
-	    tail.addArc(this, (directed) ? LEdge.OUTGOING : LEdge.UNDIRECTED);
-	}
+    tail = n;
+    if (tail != null){
+        tail.addArc(this, (directed) ? LEdge.OUTGOING : LEdge.UNDIRECTED);
+    }
     }
 
     void setHead(LNode n){
-	head = n;
-	if (head != null){
-	    head.addArc(this, (directed) ? LEdge.INCOMING : LEdge.UNDIRECTED);
-	}
+    head = n;
+    if (head != null){
+        head.addArc(this, (directed) ? LEdge.INCOMING : LEdge.UNDIRECTED);
+    }
     }
 
     public LNode getTail(){
-		return tail;
+        return tail;
     }
 
     public LNode getHead(){
-		return head;
+        return head;
     }
 
     public LNode getOtherEnd(LNode n){
-		return (n == tail) ? head : tail;
+        return (n == tail) ? head : tail;
     }
 
     public DPath getSpline(){
-		for (int i=0;i<glyphs.length;i++){
-			if (glyphCat[i] == GLYPH_SPLINE){return (DPath)glyphs[i];}
-		}
-		return null;
-	}
+        for (int i=0;i<glyphs.length;i++){
+            if (glyphCat[i] == GLYPH_SPLINE){return (DPath)glyphs[i];}
+        }
+        return null;
+    }
 
     /**
-	 *@return null if none or could not be identified.
+     *@return null if none or could not be identified.
      *@see #getTailGlyph()
-	 */
-	public ClosedShape getHeadGlyph(){
-		for (int i=0;i<glyphs.length;i++){
-		    if (glyphCat[i] == GLYPH_HEAD){return (ClosedShape)glyphs[i];}
-		}
-		return null;
-	}
+     */
+    public ClosedShape getHeadGlyph(){
+        for (int i=0;i<glyphs.length;i++){
+            if (glyphCat[i] == GLYPH_HEAD){return (ClosedShape)glyphs[i];}
+        }
+        return null;
+    }
 
     /**
-	 *@return null if none or could not be identified.
+     *@return null if none or could not be identified.
      *@see #getHeadGlyph()
-	 */
-	public ClosedShape getTailGlyph(){
-		for (int i=0;i<glyphs.length;i++){
-		    if (glyphCat[i] == GLYPH_TAIL){return (ClosedShape)glyphs[i];}
-		}
-		return null;
-	}
+     */
+    public ClosedShape getTailGlyph(){
+        for (int i=0;i<glyphs.length;i++){
+            if (glyphCat[i] == GLYPH_TAIL){return (ClosedShape)glyphs[i];}
+        }
+        return null;
+    }
 
-	public Glyph[] getUnknownGlyphs(){
-	    Vector<Glyph> res = new Vector(1);
-	    for (int i=0;i<glyphs.length;i++){
-	        if (glyphCat[i] == GLYPH_UNKNOWN){
-	            res.add(glyphs[i]);
-	        }
+    public Glyph[] getUnknownGlyphs(){
+        Vector<Glyph> res = new Vector(1);
+        for (int i=0;i<glyphs.length;i++){
+            if (glyphCat[i] == GLYPH_UNKNOWN){
+                res.add(glyphs[i]);
+            }
         }
         return res.toArray(new Glyph[res.size()]);
-	}
+    }
 
     public boolean hasTailAndHeadGlyphs(){
         int countH = 0;
         int countT = 0;
         for (int i=0;i<glyphs.length;i++){
-		    if (glyphCat[i] == GLYPH_HEAD){countH++;}
-			else if (glyphCat[i] == GLYPH_TAIL){countT++;}
-		}
-		return (countH > 0 && countT > 0);
+            if (glyphCat[i] == GLYPH_HEAD){countH++;}
+            else if (glyphCat[i] == GLYPH_TAIL){countT++;}
+        }
+        return (countH > 0 && countT > 0);
     }
 
-	/**
-	 *@return the old polygon if replace was successful.
-	 */
-	public ClosedShape replaceHead(VPolygonOr s){
-		for (int i=0;i<glyphs.length;i++){
-		    if (glyphCat[i] == GLYPH_HEAD){
+    /**
+     *@return the old polygon if replace was successful.
+     */
+    public ClosedShape replaceHead(VPolygonOr s){
+        for (int i=0;i<glyphs.length;i++){
+            if (glyphCat[i] == GLYPH_HEAD){
                 ClosedShape old = (ClosedShape)glyphs[i];
                 glyphs[i] = s;
                 s.setOwner(this);
-		        return old;
-		    }
-		}
-		return null;
-	}
+                return old;
+            }
+        }
+        return null;
+    }
 
-	/**
-	 *@return the old polygon if replace was successful.
-	 */
-	public ClosedShape replaceTail(VPolygonOr s){
-		for (int i=0;i<glyphs.length;i++){
-		    if (glyphCat[i] == GLYPH_TAIL){
+    /**
+     *@return the old polygon if replace was successful.
+     */
+    public ClosedShape replaceTail(VPolygonOr s){
+        for (int i=0;i<glyphs.length;i++){
+            if (glyphCat[i] == GLYPH_TAIL){
                 ClosedShape old = (ClosedShape)glyphs[i];
                 glyphs[i] = s;
                 s.setOwner(this);
-		        return old;
-		    }
-		}
-		return null;
-	}
+                return old;
+            }
+        }
+        return null;
+    }
 
     public String toString(){
-	return title + "@" + hashCode() + " [" +
-	    ((tail != null) ? tail.getTitle() + "@" + tail.hashCode() : "NULL")+
-	    ((directed) ? LEdge.DIRECTED_STR : LEdge.UNDIRECTED_STR) +
-	    ((head != null) ? head.getTitle() + "@" + head.hashCode() : "NULL") +
-	    "]";
+    return title + "@" + hashCode() + " [" +
+        ((tail != null) ? tail.getTitle() + "@" + tail.hashCode() : "NULL")+
+        ((directed) ? LEdge.DIRECTED_STR : LEdge.UNDIRECTED_STR) +
+        ((head != null) ? head.getTitle() + "@" + head.hashCode() : "NULL") +
+        "]";
     }
 
 }

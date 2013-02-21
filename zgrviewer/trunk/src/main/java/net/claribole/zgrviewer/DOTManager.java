@@ -5,7 +5,7 @@
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
- */ 
+ */
 
 package net.claribole.zgrviewer;
 
@@ -46,12 +46,12 @@ class DOTManager {
 
     File dotF;
     File svgF;
-    
+
     Graph graph;
 
     DOTManager(GraphicsManager gm, ConfigManager cm){
-	this.grMngr = gm;
-	this.cfgMngr = cm;
+    this.grMngr = gm;
+    this.cfgMngr = cm;
     }
 
     void load(File f, short prg, boolean parser){
@@ -72,7 +72,7 @@ class DOTManager {
             javax.swing.JOptionPane.showMessageDialog(grMngr.mainView.getFrame(),Messages.loadError+f.toString());
         }
     }
-    
+
     private void callGraphViz(short prg, boolean parser) throws Exception {
         // prg is the program to use DOTManager.*_PROGRAM
         try {
@@ -107,20 +107,20 @@ class DOTManager {
     }
 
     void deleteTempFiles(){
-	if (svgF!=null){svgF.delete();}	
+    if (svgF!=null){svgF.delete();}
     }
 
     protected String getProgram(short prg){
-	// prg is the program to use DOTManager.*_PROGRAM
-	switch (prg){
-	case DOT_PROGRAM:{return ConfigManager.m_DotPath.toString();}
-	case NEATO_PROGRAM:{return ConfigManager.m_NeatoPath.toString();}
-	case TWOPI_PROGRAM:{return ConfigManager.m_TwopiPath.toString();}
-	case CIRCO_PROGRAM:{return ConfigManager.m_CircoPath.toString();}
-	default:{return ConfigManager.m_DotPath.toString();}
-	}
+    // prg is the program to use DOTManager.*_PROGRAM
+    switch (prg){
+    case DOT_PROGRAM:{return ConfigManager.m_DotPath.toString();}
+    case NEATO_PROGRAM:{return ConfigManager.m_NeatoPath.toString();}
+    case TWOPI_PROGRAM:{return ConfigManager.m_TwopiPath.toString();}
+    case CIRCO_PROGRAM:{return ConfigManager.m_CircoPath.toString();}
+    default:{return ConfigManager.m_DotPath.toString();}
     }
-    
+    }
+
     private boolean generateDOTFile(String dotFilePath, String tmpFilePath, short prg){
         String[] cmdArray = new String[(cfgMngr.FORCE_SILENT) ? 7 : 6];
         cmdArray[0] = getProgram(prg);
@@ -198,7 +198,7 @@ class DOTManager {
         catch (Exception e) {System.err.println("Error: generating OutputFile.\n");return false;}
         return true;
     }
-    
+
     protected void executeProcess(Process p) throws InterruptedException, IOException {
         Thread consumer = new ProcessOutputConsumer(p);
         consumer.start();
@@ -231,41 +231,41 @@ class DOTManager {
             javax.swing.JOptionPane.showMessageDialog(grMngr.mainView.getFrame(),Messages.loadError+srcFile);
         }
     }
-    
+
 
     /**
      * Invokes a program to create an SVG image from a source file using a program other than dot/neato for computing the layout (e.g. twopi)
      *@return true if success; false if any failure occurs
      */
     private boolean generateSVGFileFOP(String srcFilePath, String svgFilePath, String commandLine){
-	StringTokenizer st = new StringTokenizer(commandLine, " ");
-	int nbTokens = st.countTokens();
-	String[] cmdArray = new String[nbTokens];
-	for (int i=0;i<nbTokens;i++){
-	    cmdArray[i] = st.nextToken();
-	    if (cmdArray[i].equals("%s")){cmdArray[i] = srcFilePath;}
-	    else if (cmdArray[i].equals("%t")){cmdArray[i] = svgFilePath;}
-	}
-	Runtime rt=Runtime.getRuntime();
- 	grMngr.gp.setMessage("Computing layout...");
- 	grMngr.gp.setProgress(40);
-	try {
-	    try {
-		File execDir = (new File(srcFilePath)).getParentFile();
-		Process p = rt.exec(cmdArray, null, execDir);
-		p.waitFor();
-	    }
-	    catch (IOException ex){
-		Process p = rt.exec(cmdArray);
-		p.waitFor();
-	    }
-	}
- 	catch (Exception e){
-	    JOptionPane.showMessageDialog(grMngr.mainView.getFrame(), Messages.customCallExprError2 + Utils.join(cmdArray, " "),
-					  "Command line call error", JOptionPane.ERROR_MESSAGE);
-	    System.err.println("Error generating output SVG file.\n");
-	    return false;
-	}
+    StringTokenizer st = new StringTokenizer(commandLine, " ");
+    int nbTokens = st.countTokens();
+    String[] cmdArray = new String[nbTokens];
+    for (int i=0;i<nbTokens;i++){
+        cmdArray[i] = st.nextToken();
+        if (cmdArray[i].equals("%s")){cmdArray[i] = srcFilePath;}
+        else if (cmdArray[i].equals("%t")){cmdArray[i] = svgFilePath;}
+    }
+    Runtime rt=Runtime.getRuntime();
+    grMngr.gp.setMessage("Computing layout...");
+    grMngr.gp.setProgress(40);
+    try {
+        try {
+        File execDir = (new File(srcFilePath)).getParentFile();
+        Process p = rt.exec(cmdArray, null, execDir);
+        p.waitFor();
+        }
+        catch (IOException ex){
+        Process p = rt.exec(cmdArray);
+        p.waitFor();
+        }
+    }
+    catch (Exception e){
+        JOptionPane.showMessageDialog(grMngr.mainView.getFrame(), Messages.customCallExprError2 + Utils.join(cmdArray, " "),
+                      "Command line call error", JOptionPane.ERROR_MESSAGE);
+        System.err.println("Error generating output SVG file.\n");
+        return false;
+    }
         return true;
     }
 
@@ -312,72 +312,72 @@ class DOTManager {
 
     /*checks that the command line options do not contain a -Txxx */
     static String checkOptions(String options){
-	int i = options.indexOf("-T");
-	if (i!=-1){
-	    String res=options.substring(0,i);
-	    while (i<options.length() && options.charAt(i)!=' '){i++;}
-	    res+=options.substring(i);
-	    return res;
-	}
-	else return options;
+    int i = options.indexOf("-T");
+    if (i!=-1){
+        String res=options.substring(0,i);
+        while (i<options.length() && options.charAt(i)!=' '){i++;}
+        res+=options.substring(i);
+        return res;
+    }
+    else return options;
     }
 
 }
 
 /**
  * A simple thread that will consume the stdout and stderr streams of a process, to prevent deadlocks.
- * 
+ *
  * @author David J. Hamilton <hamilton37@llnl.gov>
  */
 
 class ProcessOutputConsumer extends Thread {
 
-	// Wrapping the inpustreams in readers because on my system
-	// FileInputStream#skip would not actually consume any of the available
-	// input
-	private BufferedReader pout, perr;
-	
-	private long waitTime = 200;
-	
+    // Wrapping the inpustreams in readers because on my system
+    // FileInputStream#skip would not actually consume any of the available
+    // input
+    private BufferedReader pout, perr;
 
-	/**
-	 * @param p The process whose stdout and stderr streams are to be consumed.
-	 * @throws IOException 
-	 */
-	public ProcessOutputConsumer(Process p) throws IOException {
-		p.getOutputStream().close();
-		
-		pout = new BufferedReader( new InputStreamReader( p.getInputStream()));
-		perr = new BufferedReader( new InputStreamReader( p.getErrorStream()));
-		
-		setDaemon( true);
-	}
-	
-	/**
-	 * @param p The process whose stdout and stderr streams are to be consumed.
-	 * @param waitTime How long to wait (in ms) between checks for output to consume.
-	 * @throws IOException 
-	 */
-	public ProcessOutputConsumer(Process p, long waitTime) throws IOException {
-		this(p);
-		this.waitTime = waitTime;
-	}
-	
+    private long waitTime = 200;
 
-	@Override
-	public void run() {
-		try {
-			while (true) {		
-				while( pout.ready())
-					pout.readLine();
-				while( perr.ready())
-					perr.readLine();
-				
-				if( waitTime > 0)
-					sleep( waitTime);
-			}
-		} 
-		catch (IOException e) { /* do nothing */ }
-		catch (InterruptedException e) { /* do nothing */}
-	}
+
+    /**
+     * @param p The process whose stdout and stderr streams are to be consumed.
+     * @throws IOException
+     */
+    public ProcessOutputConsumer(Process p) throws IOException {
+        p.getOutputStream().close();
+
+        pout = new BufferedReader( new InputStreamReader( p.getInputStream()));
+        perr = new BufferedReader( new InputStreamReader( p.getErrorStream()));
+
+        setDaemon( true);
+    }
+
+    /**
+     * @param p The process whose stdout and stderr streams are to be consumed.
+     * @param waitTime How long to wait (in ms) between checks for output to consume.
+     * @throws IOException
+     */
+    public ProcessOutputConsumer(Process p, long waitTime) throws IOException {
+        this(p);
+        this.waitTime = waitTime;
+    }
+
+
+    @Override
+    public void run() {
+        try {
+            while (true) {
+                while( pout.ready())
+                    pout.readLine();
+                while( perr.ready())
+                    perr.readLine();
+
+                if( waitTime > 0)
+                    sleep( waitTime);
+            }
+        }
+        catch (IOException e) { /* do nothing */ }
+        catch (InterruptedException e) { /* do nothing */}
+    }
 }

@@ -48,7 +48,7 @@ public interface Plugin {
      * Gets author information about this plug-in - return an empty String if none
      **/
     public String getAuthor();
-    
+
     /**
      * Gets information about this plug-in - return an empty String if none
      **/
@@ -63,47 +63,47 @@ public interface Plugin {
      * Gets a URL pointing to more information about this plug-in (e.g. Web site) - can be null
      **/
     public java.net.URL getURL();
-    
+
     /** Does this plugin declare an interaction mode/tool in the toolpalette.
      * @return true if it does
      */
     public boolean hasMode();
-    
+
     /** Get the icon to be placed in the toolpalette to activate this mode.
      * @return null if no mode associated with this plugin
      */
     public Image getModeIcon();
-    
+
     /** Callback triggered when the corresponding icon gets selected in the tool palette.
      */
     public void enterMode();
-    
+
     /** Callback triggered when the corresponding icon gets unselected in the tool palette.
      */
     public void exitMode();
-    
+
     /** Get the list of built-in modes this plugin would like to disable.
      *@return a list of modes to be disabled. null or an empty array if not disabling any mode.
      */
     public String[] getDisabledModes();
 
-	/** Event triggered when the graph's logical structure has changed. */
-	public static final short NOTIFY_PLUGIN_LOGICAL_STRUCTURE_CHANGED = 0;
-	/** Event triggered when ZGRViewer's UI has been instantiated and has finished initializing. */
-	public static final short NOTIFY_PLUGIN_GUI_INITIALIZED = 1;
-	/** Event triggered when ZGRViewer's UI is about to be instantiated. */
-	public static final short NOTIFY_PLUGIN_GUI_INITIALIZING = 2;
-	/** Event triggered when ZGRViewer's UI has been instantiated but is not yet visible. */
-	public static final short NOTIFY_PLUGIN_GUI_VIEW_CREATED = 3;
-	/** Event triggered when ZGRViewer's window has been resized. */
-	public static final short NOTIFY_PLUGIN_GUI_VIEW_RESIZED = 4;
-	/** Event triggered when ZGRViewer has finished loading a file. */
-	public static final short NOTIFY_PLUGIN_FILE_LOADED = 5;
+    /** Event triggered when the graph's logical structure has changed. */
+    public static final short NOTIFY_PLUGIN_LOGICAL_STRUCTURE_CHANGED = 0;
+    /** Event triggered when ZGRViewer's UI has been instantiated and has finished initializing. */
+    public static final short NOTIFY_PLUGIN_GUI_INITIALIZED = 1;
+    /** Event triggered when ZGRViewer's UI is about to be instantiated. */
+    public static final short NOTIFY_PLUGIN_GUI_INITIALIZING = 2;
+    /** Event triggered when ZGRViewer's UI has been instantiated but is not yet visible. */
+    public static final short NOTIFY_PLUGIN_GUI_VIEW_CREATED = 3;
+    /** Event triggered when ZGRViewer's window has been resized. */
+    public static final short NOTIFY_PLUGIN_GUI_VIEW_RESIZED = 4;
+    /** Event triggered when ZGRViewer has finished loading a file. */
+    public static final short NOTIFY_PLUGIN_FILE_LOADED = 5;
 
-	/** Event notification
-	 *@param event one of NOTIFY_* events
-	 */
-	public void eventOccured(short event);
+    /** Event notification
+     *@param event one of NOTIFY_* events
+     */
+    public void eventOccured(short event);
 
 }
 

@@ -4,7 +4,7 @@
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  *$Id$
- */ 
+ */
 
 package net.claribole.zgrviewer;
 
@@ -34,39 +34,39 @@ class NavPanel extends JPanel implements ActionListener, ChangeListener {
 
     GraphicsManager grMngr;
 
-	View overview = null;
+    View overview = null;
 
     // pan buttons: NW, N, NE, W, H, E, SW, S, SE
     JButton[] panBts = new JButton[9];
     // icons for these buttons
     final static ImageIcon[] icons = {new ImageIcon(NavPanel.class.getResource("/images/m_nw.png")),
-			       new ImageIcon(NavPanel.class.getResource("/images/m_n.png")),
-			       new ImageIcon(NavPanel.class.getResource("/images/m_ne.png")),
-			       new ImageIcon(NavPanel.class.getResource("/images/m_w.png")),
-			       new ImageIcon(NavPanel.class.getResource("/images/m_home.png")),
-			       new ImageIcon(NavPanel.class.getResource("/images/m_e.png")),
-			       new ImageIcon(NavPanel.class.getResource("/images/m_sw.png")),
-			       new ImageIcon(NavPanel.class.getResource("/images/m_s.png")),
-			       new ImageIcon(NavPanel.class.getResource("/images/m_se.png")),
-			       new ImageIcon(NavPanel.class.getResource("/images/zm_i.png")),
-			       new ImageIcon(NavPanel.class.getResource("/images/zm_o.png"))};
+                   new ImageIcon(NavPanel.class.getResource("/images/m_n.png")),
+                   new ImageIcon(NavPanel.class.getResource("/images/m_ne.png")),
+                   new ImageIcon(NavPanel.class.getResource("/images/m_w.png")),
+                   new ImageIcon(NavPanel.class.getResource("/images/m_home.png")),
+                   new ImageIcon(NavPanel.class.getResource("/images/m_e.png")),
+                   new ImageIcon(NavPanel.class.getResource("/images/m_sw.png")),
+                   new ImageIcon(NavPanel.class.getResource("/images/m_s.png")),
+                   new ImageIcon(NavPanel.class.getResource("/images/m_se.png")),
+                   new ImageIcon(NavPanel.class.getResource("/images/zm_i.png")),
+                   new ImageIcon(NavPanel.class.getResource("/images/zm_o.png"))};
     // rollover icons for these buttons
     final static ImageIcon[] r_icons = {new ImageIcon(NavPanel.class.getResource("/images/m_nw_h.png")),
-				 new ImageIcon(NavPanel.class.getResource("/images/m_n_h.png")),
-				 new ImageIcon(NavPanel.class.getResource("/images/m_ne_h.png")),
-				 new ImageIcon(NavPanel.class.getResource("/images/m_w_h.png")),
-				 new ImageIcon(NavPanel.class.getResource("/images/m_home_h.png")),
-				 new ImageIcon(NavPanel.class.getResource("/images/m_e_h.png")),
-				 new ImageIcon(NavPanel.class.getResource("/images/m_sw_h.png")),
-				 new ImageIcon(NavPanel.class.getResource("/images/m_s_h.png")),
-				 new ImageIcon(NavPanel.class.getResource("/images/m_se_h.png")),
-				 new ImageIcon(NavPanel.class.getResource("/images/zm_i_h.png")),
-				 new ImageIcon(NavPanel.class.getResource("/images/zm_o_h.png"))};
+                 new ImageIcon(NavPanel.class.getResource("/images/m_n_h.png")),
+                 new ImageIcon(NavPanel.class.getResource("/images/m_ne_h.png")),
+                 new ImageIcon(NavPanel.class.getResource("/images/m_w_h.png")),
+                 new ImageIcon(NavPanel.class.getResource("/images/m_home_h.png")),
+                 new ImageIcon(NavPanel.class.getResource("/images/m_e_h.png")),
+                 new ImageIcon(NavPanel.class.getResource("/images/m_sw_h.png")),
+                 new ImageIcon(NavPanel.class.getResource("/images/m_s_h.png")),
+                 new ImageIcon(NavPanel.class.getResource("/images/m_se_h.png")),
+                 new ImageIcon(NavPanel.class.getResource("/images/zm_i_h.png")),
+                 new ImageIcon(NavPanel.class.getResource("/images/zm_o_h.png"))};
     // zoom buttons: zoom in, zoom out
     JButton[] zoomBts = new JButton[2];
-    
+
     JCheckBox aaCb;
-    
+
     JButton aboutBt;
 
     NavPanel(GraphicsManager gm, String initialSearchString, boolean displayOverview){
@@ -85,7 +85,7 @@ class NavPanel extends JPanel implements ActionListener, ChangeListener {
             borderPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.black, 1), "Overview"));
             borderPanel.setOpaque(false);
             borderPanel.setLayout(new BorderLayout());
-            Vector cameras = new Vector();	
+            Vector cameras = new Vector();
             cameras.add(grMngr.mSpace.getCamera(1));
             cameras.add(grMngr.rSpace.getCamera(0));
             View pv = grMngr.vsm.addPanelView(cameras, GraphicsManager.RADAR_VIEW_NAME, View.STD_VIEW, 100, 100);
@@ -94,7 +94,7 @@ class NavPanel extends JPanel implements ActionListener, ChangeListener {
             grMngr.rView = grMngr.vsm.getView(GraphicsManager.RADAR_VIEW_NAME);
             grMngr.rView.setBackgroundColor(grMngr.cfgMngr.backgroundColor);
             // same event handler handling all layers for now
-            //XXX: TBD: refactor event handler code taking advantage of new one handler per layer functionality 
+            //XXX: TBD: refactor event handler code taking advantage of new one handler per layer functionality
             grMngr.rView.setListener(grMngr.reh, 0);
             grMngr.rView.setListener(grMngr.reh, 1);
             grMngr.rView.setActiveLayer(1);
@@ -104,17 +104,17 @@ class NavPanel extends JPanel implements ActionListener, ChangeListener {
             buildConstraints(constraints, 0, gncl_i++, 1, 1, 100, 64);
             gridBag.setConstraints(borderPanel, constraints);
             this.add(borderPanel);
-            
+
             grMngr.rView.repaint(new RepaintAdapter(){
-                                    public void	viewRepainted(View v){
+                                    public void viewRepainted(View v){
                                         v.getGlobalView(grMngr.mSpace.getCamera(1), 100);
                                         v.removeRepaintListener();
                                     }
                                 });
             //grMngr.rView.getGlobalView(grMngr.mSpace.getCamera(1), 100);
-            
-            
-            
+
+
+
         }
         constraints.fill = GridBagConstraints.NONE;
         //translation buttons in a 3x3 grid
@@ -214,7 +214,7 @@ class SearchPanel extends JPanel implements ActionListener, KeyListener {
     GraphicsManager grMngr;
     JTextField findTf;
     JButton prevBt, nextBt;
-    
+
     SearchPanel(GraphicsManager gm, String initialSearchString){
         this.setOpaque(false);
         this.grMngr = gm;
@@ -245,7 +245,7 @@ class SearchPanel extends JPanel implements ActionListener, KeyListener {
         this.add(nextBt);
         nextBt.addActionListener(this);
     }
-    
+
     public void actionPerformed(ActionEvent e){
         if (e.getSource() == prevBt){grMngr.search(findTf.getText(), -1);}
         else {grMngr.search(findTf.getText(), 1);}

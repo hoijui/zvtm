@@ -4,7 +4,7 @@
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  *   $Id$
- */ 
+ */
 
 package net.claribole.zgrviewer;
 
@@ -13,5 +13,5 @@ public interface ZGRApplication {
     public void about();
 
     public void setStatusBarText(String s);
-    
+
 }

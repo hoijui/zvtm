@@ -41,50 +41,50 @@ class SearchBox extends JFrame implements ActionListener, KeyListener {
     static int FRAME_HEIGHT = 110;
 
     GraphicsManager grMngr;
-    
+
     JButton prevBt, nextBt;
     JTextField searchText;
 
     SearchBox(GraphicsManager gm){
-	super();
-	this.grMngr = gm;
-	Container cp = this.getContentPane();
-	cp.setLayout(new GridLayout(2,1));
-	JPanel p1 = new JPanel();
-	JPanel p2 = new JPanel();
-	cp.add(p1);
-	cp.add(p2);
-	p1.add(new JLabel("Find:"));
-	searchText = new JTextField(32);
-	p1.add(searchText);
-	searchText.addKeyListener(this);
-	prevBt = new JButton("Previous");
-	p2.add(prevBt);
-	prevBt.addActionListener(this);
-	nextBt = new JButton("Next");
-	p2.add(nextBt);
-	nextBt.addActionListener(this);
-	//window
-	WindowListener w0=new WindowAdapter(){
-		public void windowClosing(WindowEvent e){
-		    dispose();
-		}
-	    };
-	this.addWindowListener(w0);
-	this.setTitle("Find");
-	this.pack();
-	this.setResizable(false);
+    super();
+    this.grMngr = gm;
+    Container cp = this.getContentPane();
+    cp.setLayout(new GridLayout(2,1));
+    JPanel p1 = new JPanel();
+    JPanel p2 = new JPanel();
+    cp.add(p1);
+    cp.add(p2);
+    p1.add(new JLabel("Find:"));
+    searchText = new JTextField(32);
+    p1.add(searchText);
+    searchText.addKeyListener(this);
+    prevBt = new JButton("Previous");
+    p2.add(prevBt);
+    prevBt.addActionListener(this);
+    nextBt = new JButton("Next");
+    p2.add(nextBt);
+    nextBt.addActionListener(this);
+    //window
+    WindowListener w0=new WindowAdapter(){
+        public void windowClosing(WindowEvent e){
+            dispose();
+        }
+        };
+    this.addWindowListener(w0);
+    this.setTitle("Find");
+    this.pack();
+    this.setResizable(false);
     }
 
     public void actionPerformed(ActionEvent e){
-	if (e.getSource() == prevBt){grMngr.search(searchText.getText(), -1);}
-	else {grMngr.search(searchText.getText(), 1);}
+    if (e.getSource() == prevBt){grMngr.search(searchText.getText(), -1);}
+    else {grMngr.search(searchText.getText(), 1);}
    }
 
     public void keyPressed(KeyEvent e){
-	if (e.getKeyCode()==KeyEvent.VK_ENTER){
-	    grMngr.search(searchText.getText(), 1);
-	}
+    if (e.getKeyCode()==KeyEvent.VK_ENTER){
+        grMngr.search(searchText.getText(), 1);
+    }
     }
 
     public void keyReleased(KeyEvent e){}

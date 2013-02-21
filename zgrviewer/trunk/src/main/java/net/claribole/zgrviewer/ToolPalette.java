@@ -30,7 +30,7 @@ public class ToolPalette {
     static final String PALETTE_SPACE_NAME = "tps";
     VirtualSpace paletteSpace;
     Camera paletteCamera;
-    
+
     public static final String PLUGIN_MODE_PREFIX = "plugin";
 
     public static final String STD_NAV_MODE = "st";
@@ -48,14 +48,14 @@ public class ToolPalette {
     static final HashMap<String,String> BUILTIN_MODE_ICON_PATHS = new HashMap(8);
     static {
         BUILTIN_MODE_ICON_PATHS.put(STD_NAV_MODE,"/images/stdnav24b.png");
-		BUILTIN_MODE_ICON_PATHS.put(FL_NAV_MODE,"/images/flnav24b.png");
-		BUILTIN_MODE_ICON_PATHS.put(DM_NAV_MODE,"/images/dmnav24b.png");
-		BUILTIN_MODE_ICON_PATHS.put(PL_NAV_MODE,"/images/plnav24b.png");
-		BUILTIN_MODE_ICON_PATHS.put(HIGHLIGHT_MODE,"/images/hl24b.png");
-		BUILTIN_MODE_ICON_PATHS.put(BRING_AND_GO_MODE,"/images/fl24b.png");
-		BUILTIN_MODE_ICON_PATHS.put(LINK_SLIDING_MODE,"/images/ls24b.png");
-		BUILTIN_MODE_ICON_PATHS.put(EDIT_MODE,"/images/edit24b.png");
-	};
+        BUILTIN_MODE_ICON_PATHS.put(FL_NAV_MODE,"/images/flnav24b.png");
+        BUILTIN_MODE_ICON_PATHS.put(DM_NAV_MODE,"/images/dmnav24b.png");
+        BUILTIN_MODE_ICON_PATHS.put(PL_NAV_MODE,"/images/plnav24b.png");
+        BUILTIN_MODE_ICON_PATHS.put(HIGHLIGHT_MODE,"/images/hl24b.png");
+        BUILTIN_MODE_ICON_PATHS.put(BRING_AND_GO_MODE,"/images/fl24b.png");
+        BUILTIN_MODE_ICON_PATHS.put(LINK_SLIDING_MODE,"/images/ls24b.png");
+        BUILTIN_MODE_ICON_PATHS.put(EDIT_MODE,"/images/edit24b.png");
+    };
 
     VImage[] buttons;
     VImage[] selectedButtons;
@@ -74,23 +74,23 @@ public class ToolPalette {
 
     short firstPluginModeIndex = -1;
 
-	ToolPalette(GraphicsManager gm){
-		this.grMngr = gm;
-		loadBuiltinModes();
+    ToolPalette(GraphicsManager gm){
+        this.grMngr = gm;
+        loadBuiltinModes();
         loadPluginModes();
-	    // update original trigger zone height
-	    TRIGGER_ZONE_HEIGHT = buttons.length * (VERTICAL_STEP_BETWEEN_ICONS) + 24;
+        // update original trigger zone height
+        TRIGGER_ZONE_HEIGHT = buttons.length * (VERTICAL_STEP_BETWEEN_ICONS) + 24;
         selectDefaultMode();
-	}
+    }
 
     void loadBuiltinModes(){
-		paletteSpace = grMngr.vsm.addVirtualSpace(PALETTE_SPACE_NAME);
-		paletteCamera = paletteSpace.addCamera();
-		paletteCamera.setAltitude(0);
-		// building list of built-in modes that plugins want to disable
-		Plugin[] plugins = grMngr.cfgMngr.plugins;
+        paletteSpace = grMngr.vsm.addVirtualSpace(PALETTE_SPACE_NAME);
+        paletteCamera = paletteSpace.addCamera();
+        paletteCamera.setAltitude(0);
+        // building list of built-in modes that plugins want to disable
+        Plugin[] plugins = grMngr.cfgMngr.plugins;
         HashMap<String,Object> modesToDisable = new HashMap(2);
-	    if (plugins != null){
+        if (plugins != null){
             for (short i=0;i<plugins.length;i++){
                 String[] mtd = plugins[i].getDisabledModes();
                 if (mtd != null && mtd.length > 0){
@@ -100,26 +100,26 @@ public class ToolPalette {
                 }
             }
         }
-	    // instantiating remaining built-in modes
-		buttons = new VImage[BUILTIN_MODES.length-modesToDisable.size()];
-		short i = 0;
+        // instantiating remaining built-in modes
+        buttons = new VImage[BUILTIN_MODES.length-modesToDisable.size()];
+        short i = 0;
         short j = 0;
-		while (i < BUILTIN_MODES.length){
-		    if (modesToDisable.containsKey(BUILTIN_MODES[i])){}
-		    else {
-    			buttons[j] = new VImage(0, -j*VERTICAL_STEP_BETWEEN_ICONS, 0,
-    				(new ImageIcon(this.getClass().getResource(BUILTIN_MODE_ICON_PATHS.get(BUILTIN_MODES[i])))).getImage());
-    			paletteSpace.addGlyph(buttons[j]);
-    			buttons[j].setOwner(BUILTIN_MODES[i]);
-    			j++;
-		    }
-	        i++;
-		}
-		firstPluginModeIndex = j;
-	}
+        while (i < BUILTIN_MODES.length){
+            if (modesToDisable.containsKey(BUILTIN_MODES[i])){}
+            else {
+                buttons[j] = new VImage(0, -j*VERTICAL_STEP_BETWEEN_ICONS, 0,
+                    (new ImageIcon(this.getClass().getResource(BUILTIN_MODE_ICON_PATHS.get(BUILTIN_MODES[i])))).getImage());
+                paletteSpace.addGlyph(buttons[j]);
+                buttons[j].setOwner(BUILTIN_MODES[i]);
+                j++;
+            }
+            i++;
+        }
+        firstPluginModeIndex = j;
+    }
 
-	void selectDefaultMode(){
-	    if (defaultPluginModeClassName != null && pluginsWithMode != null && pluginsWithMode.size() > 0){
+    void selectDefaultMode(){
+        if (defaultPluginModeClassName != null && pluginsWithMode != null && pluginsWithMode.size() > 0){
             for (Short index:pluginsWithMode.keySet()){
                 Plugin p = pluginsWithMode.get(index);
                 if (p.getClass().getName().equals(defaultPluginModeClassName)){
@@ -127,13 +127,13 @@ public class ToolPalette {
                     return;
                 }
             }
-	    }
-	    selectMode(buttons[0]);
-	}
+        }
+        selectMode(buttons[0]);
+    }
 
     public void setEnabled(boolean b){
         enabled = b;
-		paletteCamera.setEnabled(b);
+        paletteCamera.setEnabled(b);
     }
 
     public boolean isEnabled(){
@@ -234,20 +234,20 @@ public class ToolPalette {
        until it actually gets relocated to the top-left corner of that window.
        It is then called with true.*/
     public void displayPalette(boolean b){
-		if (paintPalette == b){return;}
-		for (int i=0;i<buttons.length;i++){
-			buttons[i].setVisible(b);
-		}
-		paintPalette = b;
-	}
+        if (paintPalette == b){return;}
+        for (int i=0;i<buttons.length;i++){
+            buttons[i].setVisible(b);
+        }
+        paintPalette = b;
+    }
 
     public void updateHiddenPosition(){
-		double[] wnes = grMngr.mainView.getVisibleRegion(paletteCamera);
-		for (int i=0;i<buttons.length;i++){
-			buttons[i].moveTo(wnes[0]-buttons[i].getWidth()/2+1, wnes[1]-(i+1)*VERTICAL_STEP_BETWEEN_ICONS);
-		}
-		displayPalette(true);
-	}
+        double[] wnes = grMngr.mainView.getVisibleRegion(paletteCamera);
+        for (int i=0;i<buttons.length;i++){
+            buttons[i].moveTo(wnes[0]-buttons[i].getWidth()/2+1, wnes[1]-(i+1)*VERTICAL_STEP_BETWEEN_ICONS);
+        }
+        displayPalette(true);
+    }
 
     public void show(){
         if (!visible){
@@ -277,15 +277,15 @@ public class ToolPalette {
      * return false if palette is temporarily disabled
      */
     public boolean insidePaletteTriggerZone(int jpx, int jpy){
-	    return (paintPalette && jpx < TRIGGER_ZONE_WIDTH && jpy < TRIGGER_ZONE_HEIGHT);
+        return (paintPalette && jpx < TRIGGER_ZONE_WIDTH && jpy < TRIGGER_ZONE_HEIGHT);
     }
 
     public boolean isShowing(){
-	return visible;
+    return visible;
     }
 
     public Camera getPaletteCamera(){
-	return paletteCamera;
+    return paletteCamera;
     }
 
     //public void showLogicalTools(){
@@ -295,52 +295,52 @@ public class ToolPalette {
     //    }
     //}
     //
-	//public void hideLogicalTools(){
-	//	if (isHighlightMode() || isBringAndGoMode() || isLinkSlidingMode()){
-	//		// if a tool that makes needs to know about the logical structure is selected,
-	//		// select something else as they are about to be disabled
-	//		selectButton(buttons[0]);
-	//	}
-	//	for (int i=4;i<=6;i++){
-	//		if (buttons[i].isSensitive()){buttons[i].setSensitivity(false);}
-	//		if (buttons[i].isVisible()){buttons[i].setVisible(false);}
-	//	}
-	//}
+    //public void hideLogicalTools(){
+    //  if (isHighlightMode() || isBringAndGoMode() || isLinkSlidingMode()){
+    //      // if a tool that makes needs to know about the logical structure is selected,
+    //      // select something else as they are about to be disabled
+    //      selectButton(buttons[0]);
+    //  }
+    //  for (int i=4;i<=6;i++){
+    //      if (buttons[i].isSensitive()){buttons[i].setSensitivity(false);}
+    //      if (buttons[i].isVisible()){buttons[i].setVisible(false);}
+    //  }
+    //}
 
-	/* ---------------- plugin modes ------------------*/
+    /* ---------------- plugin modes ------------------*/
 
-	static String defaultPluginModeClassName = null;
-	static void setDefaultPluginMode(String pluginClassName){
-	    defaultPluginModeClassName = pluginClassName;
-	}
+    static String defaultPluginModeClassName = null;
+    static void setDefaultPluginMode(String pluginClassName){
+        defaultPluginModeClassName = pluginClassName;
+    }
 
-	HashMap<Short,Plugin> pluginsWithMode;
+    HashMap<Short,Plugin> pluginsWithMode;
 
     void loadPluginModes(){
-	    Plugin[] plugins = grMngr.cfgMngr.plugins;
-	    if (plugins == null){return;}
-	    Vector<Plugin> pwm = new Vector<Plugin>(plugins.length);
-		for (int i=0;i<plugins.length;i++){
-		    if (plugins[i].hasMode()){
-		        pwm.add(plugins[i]);
-		    }
-		}
-	    if (pwm.isEmpty()){return;}
-	    pluginsWithMode = new HashMap<Short,Plugin>(pwm.size());
-	    VImage[] nbuttons = new VImage[buttons.length+pwm.size()];
-	    System.arraycopy(buttons, 0, nbuttons, 0, buttons.length);
-	    buttons = nbuttons;
-	    for (int i=firstPluginModeIndex;i<firstPluginModeIndex+pwm.size();i++){
-	        Plugin p = pwm.elementAt(i-firstPluginModeIndex);
-	        pluginsWithMode.put(new Short((short)i), p);
-			buttons[i] = new VImage(0, -i*VERTICAL_STEP_BETWEEN_ICONS, 0, p.getModeIcon());
-			buttons[i].setOwner(PLUGIN_MODE_PREFIX+String.valueOf(i));
-			paletteSpace.addGlyph(buttons[i]);
-	    }
-	}
+        Plugin[] plugins = grMngr.cfgMngr.plugins;
+        if (plugins == null){return;}
+        Vector<Plugin> pwm = new Vector<Plugin>(plugins.length);
+        for (int i=0;i<plugins.length;i++){
+            if (plugins[i].hasMode()){
+                pwm.add(plugins[i]);
+            }
+        }
+        if (pwm.isEmpty()){return;}
+        pluginsWithMode = new HashMap<Short,Plugin>(pwm.size());
+        VImage[] nbuttons = new VImage[buttons.length+pwm.size()];
+        System.arraycopy(buttons, 0, nbuttons, 0, buttons.length);
+        buttons = nbuttons;
+        for (int i=firstPluginModeIndex;i<firstPluginModeIndex+pwm.size();i++){
+            Plugin p = pwm.elementAt(i-firstPluginModeIndex);
+            pluginsWithMode.put(new Short((short)i), p);
+            buttons[i] = new VImage(0, -i*VERTICAL_STEP_BETWEEN_ICONS, 0, p.getModeIcon());
+            buttons[i].setOwner(PLUGIN_MODE_PREFIX+String.valueOf(i));
+            paletteSpace.addGlyph(buttons[i]);
+        }
+    }
 
-	Plugin getPlugin(short index){
-	    return pluginsWithMode.get(new Short(index));
-	}
+    Plugin getPlugin(short index){
+        return pluginsWithMode.get(new Short(index));
+    }
 
 }

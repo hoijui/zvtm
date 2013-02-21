@@ -25,7 +25,7 @@ public class LGraph extends LElem {
     public static final short BOX_TYPE_NONE = 0;
     public static final short BOX_TYPE_RECT = 1;
     public static final short BOX_TYPE_ROUND_RECT = 2;
-    
+
     Vector<LNode> nodes = new Vector(1);
     Vector<LGraph> subgraphs = new Vector(1);
 
@@ -86,7 +86,7 @@ public class LGraph extends LElem {
                                                Color.WHITE, westSide.getColor(), 1f, cornerRadius, cornerRadius);
                 ng.setFilled(false);
                 ng.setStroke(westSide.getStroke());
-                return ng;                
+                return ng;
             }
             catch (Exception ex){
                 System.err.println("ZGRViewer: WARNING: attempt at constructing rounded subgraph box failed for " + this.title);
@@ -111,15 +111,15 @@ public class LGraph extends LElem {
         }
         return BOX_TYPE_NONE;
     }
-    
+
     /** Get all glyphs representing this subgraph.
      * This can include the boundary box (a VRectangle or VRoundRect), some VText (subgraph title).
-     *@see #getBoxType() 
+     *@see #getBoxType()
      */
     public Glyph[] getGlyphs(){
         return glyphs;
     }
-    
+
     public ClosedShape getBox(){
         ClosedShape res = null;
         for (Glyph g:glyphs){
@@ -131,7 +131,7 @@ public class LGraph extends LElem {
         }
         return res;
     }
-    
+
     public VText[] getLabels(){
         Vector<VText> labels = new Vector(2);
         for (Glyph g:glyphs){
@@ -141,17 +141,17 @@ public class LGraph extends LElem {
         }
         return labels.toArray(new VText[labels.size()]);
     }
-    
+
     public void addChildNode(LNode n){
         if (!nodes.contains(n)){
-            nodes.add(n);            
+            nodes.add(n);
         }
     }
-    
+
     public LNode[] getChildNodes(){
         return nodes.toArray(new LNode[nodes.size()]);
     }
-    
+
     public String toString(){
         String res = "subgraph "+title + " - subgraphs[";
         for (LGraph subgraph:subgraphs){
@@ -164,13 +164,13 @@ public class LGraph extends LElem {
         res += "]";
         return res;
     }
-    
+
     public void addSubgraph(LGraph g){
         if (!subgraphs.contains(g)){
             subgraphs.add(g);
         }
     }
-    
+
     public LGraph[] getSubgraphs(){
         return subgraphs.toArray(new LGraph[subgraphs.size()]);
     }

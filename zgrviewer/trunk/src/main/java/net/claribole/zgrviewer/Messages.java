@@ -3,9 +3,9 @@
  *   Copyright (c) Emmanuel Pietriga, 2002. All Rights Reserved
  *   Copyright (c) INRIA, 2004-2011. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
- * 
+ *
  *   $Id$
- */ 
+ */
 
 package net.claribole.zgrviewer;
 
@@ -14,52 +14,52 @@ import java.awt.geom.Point2D;
 import java.util.Scanner;
 
 public class Messages {
-    
+
     /*warning, error, help and other messages*/
 
     public static final String antialiasingWarning="Antialiasing requires additional computing resources.\nSetting it ON will noticeably reduce the refresh rate.";
-    
+
     public static final String pngOnlyIn140FirstPart="This functionality is only available when running ZGRViewer using a JVM version 1.4.0 or later (it requires the ImageIO API).\nZGRViewer detected JVM version ";
-    
+
     public static final String pngOnlyIn140SecondPart="\nDo you want to proceed anyway (this will probably cause an error)?";
-        
+
     public static String VERSION;
-	static {
-	    Scanner sc = new Scanner(Messages.class.getResourceAsStream("/properties")).useDelimiter("\\s*=\\s*");
+    static {
+        Scanner sc = new Scanner(Messages.class.getResourceAsStream("/properties")).useDelimiter("\\s*=\\s*");
         while (sc.hasNext()){
             String token = sc.next();
             if (token.equals("version")){
                 Messages.VERSION = sc.next();
             }
         }
-	}
+    }
 
     public static final String about = "ZGRViewer " + VERSION + "\n\nA Visualization Tool for GraphViz based on ZVTM\nhttp://zvtm.sourceforge.net/zgrviewer.html\n\nWritten by Emmanuel Pietriga\n(INRIA project In Situ)\nemmanuel.pietriga@inria.fr";
 
     public static final String commands="Under Mac OS X, replace Ctrl by the Command key\n\nMisc. Commands\n"
-	+"* Press right mouse button to display the pie menu\n\n"
-	+"* Ctrl+D = open a file with dot (SVG pipeline)\n"
-	+"* Ctrl+N = open a file with neato (SVG pipeline)\n"
-	+"* Ctrl+Z = open a file with another program (SVG pipeline)\n"
-	+"* Ctrl+R = Reload current file (SVG pipeline)\n"
-	+"* Ctrl+P = Print current view\n"
-	+"* Ctrl+Q = Exit ZGRViewer\n\n"
+    +"* Press right mouse button to display the pie menu\n\n"
+    +"* Ctrl+D = open a file with dot (SVG pipeline)\n"
+    +"* Ctrl+N = open a file with neato (SVG pipeline)\n"
+    +"* Ctrl+Z = open a file with another program (SVG pipeline)\n"
+    +"* Ctrl+R = Reload current file (SVG pipeline)\n"
+    +"* Ctrl+P = Print current view\n"
+    +"* Ctrl+Q = Exit ZGRViewer\n\n"
 
-	+"Navigation (left mouse button corresponds to the single button for Mac users)\n"
-	+"* Press left mouse button and drag to move in the graph\n"
-	+"* Hold Shift, press left mouse button and drag vertically to zoom-in/zoom-out\n"
-	+"* Click left mouse button on a node or arc to center on it\n"
-	+"* Hold Alt, press left mouse button and drag to select a region of interest\n"
-	+"* Home (or G) = get a global view of the graph\n"
-	+"* Ctrl+L = (de)activate distortion lens\n"
-	+"* Ctrl+F = pop up search window\n"
-	+"* Page Down = Zoom In\n"
-	+"* Page Up = Zoom Out\n"
-	+"* Mouse wheel =  zoom in/out"
-	+"* Arrow Keys = Translation\n"
-	+"* B = Back to previous location\n"
-	+"* L or Space bar or Middle mouse button = load associated URL in a Web browser\n"
-	;
+    +"Navigation (left mouse button corresponds to the single button for Mac users)\n"
+    +"* Press left mouse button and drag to move in the graph\n"
+    +"* Hold Shift, press left mouse button and drag vertically to zoom-in/zoom-out\n"
+    +"* Click left mouse button on a node or arc to center on it\n"
+    +"* Hold Alt, press left mouse button and drag to select a region of interest\n"
+    +"* Home (or G) = get a global view of the graph\n"
+    +"* Ctrl+L = (de)activate distortion lens\n"
+    +"* Ctrl+F = pop up search window\n"
+    +"* Page Down = Zoom In\n"
+    +"* Page Up = Zoom Out\n"
+    +"* Mouse wheel =  zoom in/out"
+    +"* Arrow Keys = Translation\n"
+    +"* B = Back to previous location\n"
+    +"* L or Space bar or Middle mouse button = load associated URL in a Web browser\n"
+    ;
 
     public static final String customCallHelp = "Use %s for source and %t for target:\ne.g. twopi -Tsvg -o %t %s";
 
@@ -91,7 +91,7 @@ public class Messages {
 
     public static final String[] mainMenuLabels = {PM_GLOBALVIEW, PM_FILE, PM_BACK, PM_EXPORT};
     public static final Point2D.Double[] mainMenuLabelOffsets = {new Point2D.Double(5, -4), new Point2D.Double(0, 4),
-						     new Point2D.Double(-5, -4), new Point2D.Double(0, -15)};
+                             new Point2D.Double(-5, -4), new Point2D.Double(0, -15)};
 
     public static final String PM_OPENDOTSVG = "Dot (SVG)";
     public static final String PM_OPENCIRCOSVG = "Circo (SVG)";
@@ -101,10 +101,10 @@ public class Messages {
     public static final String PM_OPENOTHER = "Other (SVG)";
 
     public static final String[] fileMenuLabels = {PM_OPENSVG, PM_OPENCIRCOSVG, PM_OPENDOTSVG,
-					    PM_OPENNEATOSVG, PM_OPENTWOPISVG, PM_OPENOTHER};
+                        PM_OPENNEATOSVG, PM_OPENTWOPISVG, PM_OPENOTHER};
     public static final Point2D.Double[] fileMenuLabelOffsets = {new Point2D.Double(16, 6), new Point2D.Double(16, -10),
-						     new Point2D.Double(0, 20), new Point2D.Double(-10, -10),
-						     new Point2D.Double(-10, 6), new Point2D.Double(0, -32)};
+                             new Point2D.Double(0, 20), new Point2D.Double(-10, -10),
+                             new Point2D.Double(-10, 6), new Point2D.Double(0, -32)};
 
     public static final String PM_EXPSVG = "Export (SVG)";
     public static final String PM_EXPPNG = "Export (PNG)";
@@ -120,10 +120,10 @@ public class Messages {
     public static final String SPACE_STRING = " ";
 
     public static final String YOU_HAVE_THE_MOST_RECENT_VERSION = "You have the most recent version of ZGRViewer (" + VERSION + ")";
-    
+
     public static final String NEW_VERSION_AVAILABLE = "A new version of ZGRViewer is available: ";
 
-	public static final String DOWNLOAD_URL = "http://zvtm.sourceforge.net/zgrviewer.html#download";
+    public static final String DOWNLOAD_URL = "http://zvtm.sourceforge.net/zgrviewer.html#download";
 
     public static final String COULD_NOT_GET_VERSION_INFO = "Failed to get version information";
 
@@ -132,11 +132,11 @@ public class Messages {
     public static final String PATH_NOT_SET = "NOT SET";
 
     public static final String FAILED_TO_BUILD_LOGICAL_STRUCT = "Failed to build logical structure. Some tools are disabled.";
-    
+
     public static final String ERROR_LOADING_DOT_FILE = "An error occured while parsing this DOT file.";
 
     public static final String SVG_PARSING_ERROR = "SVG parsing error";
 
-	public static final String ABOUT_PLUGINS = "Installed ZGRViewer Plugins";
+    public static final String ABOUT_PLUGINS = "Installed ZGRViewer Plugins";
 
 }

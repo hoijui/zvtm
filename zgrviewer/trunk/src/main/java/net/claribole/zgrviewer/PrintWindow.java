@@ -51,44 +51,44 @@ public class PrintWindow
 
     private final static double CM_PER_INCH = 2.54;
     private final static double MM_PER_INCH = 25.4;
-    
+
     private int last_dpi = 72;
     private int last_width_unit = PIXEL;
     private int last_height_unit = PIXEL;
-    
+
     private JFrame frame;
-    
+
     private JPanel content;
     private JPanel options;
     private JPanel buttons;
-    
+
     private JButton cancel;
     private JButton export;
-    
+
     private TitledBorder optionsBorder;
-    
+
     private SpinnerNumberModel width;
     private SpinnerNumberModel height;
-    
+
     private JComboBox widthUnit;
     private JComboBox heightUnit;
-    
+
     private SpinnerNumberModel dpiSpinner;
-    
+
     private FlowLayout layout;
-    
+
     private double realWidth;
     private double realHeight;
-    
-    /* since using setValue causes a stateChange event, we need to 
+
+    /* since using setValue causes a stateChange event, we need to
      * stop recursion by locking the state so subsequent functions
      * called by the changeStated handlers quietly exists
      */
-    
+
     boolean stateLock = false;
-    
+
     private int dpi = last_dpi;
-    
+
     GraphicsManager grMngr;
 
     /**
@@ -98,147 +98,147 @@ public class PrintWindow
      *@param gm GraphicsManager instantiated by the parent ZGRViewer/ZGRApplet
      */
     public PrintWindow(double w, double h, GraphicsManager gm){
-	this.grMngr = gm;
-	if ( w < 1 || h < 1){
-	    JOptionPane.showMessageDialog(grMngr.mainView.getFrame(), "Can not export visible region of size 0.", "Export to PNG error", JOptionPane.ERROR_MESSAGE);
-	    return;
-	}
-	
-	realWidth = w;
+    this.grMngr = gm;
+    if ( w < 1 || h < 1){
+        JOptionPane.showMessageDialog(grMngr.mainView.getFrame(), "Can not export visible region of size 0.", "Export to PNG error", JOptionPane.ERROR_MESSAGE);
+        return;
+    }
+
+    realWidth = w;
         realHeight = h;
-        
-	// generate the window, but don't show it
+
+    // generate the window, but don't show it
         frame = new JFrame("Print Options");
         frame.setResizable(false);
-        
-	
-        
+
+
+
         // construct the content pane
         content = new JPanel(new BorderLayout());
         frame.setContentPane(content);
-        
+
         // create the options panel
         options = new JPanel(new GridLayout(3, 3));
         optionsBorder = BorderFactory.createTitledBorder("Print options");
         options.setBorder(optionsBorder);
-        
+
         // define some helper classes
         class UnitActionListener implements ActionListener{
             public void actionPerformed(ActionEvent e){
                 updateTextFields(false);
             }
         }
-        
+
         class DPIChangeListener implements ChangeListener{
             public void stateChanged(ChangeEvent e){
                 dpi = dpiSpinner.getNumber().intValue();
                 updateTextFields(false);
-		last_dpi = dpi;
+        last_dpi = dpi;
             }
         }
-        
+
         class TextChangeListener implements ChangeListener{
             public void stateChanged(ChangeEvent e){
                 updateTextFields(true);
             }
         }
-        
+
         UnitActionListener unitListener = new UnitActionListener();
         TextChangeListener textListener = new TextChangeListener();
-        
+
         width = new SpinnerNumberModel(realWidth,1,Double.MAX_VALUE,1.0);
         width.addChangeListener(textListener);
         widthUnit = new JComboBox(units);
-        widthUnit.addActionListener(unitListener);                                    
-        
+        widthUnit.addActionListener(unitListener);
+
         options.add(new JLabel("Image width: ", SwingConstants.RIGHT));
         options.add(new JSpinner(width));
         options.add(widthUnit);
-        
+
         height = new SpinnerNumberModel(realHeight,1,Double.MAX_VALUE,1.0);
         height.addChangeListener(textListener);
         heightUnit = new JComboBox(units);
         heightUnit.addActionListener(unitListener);
-        
+
         options.add(new JLabel("Image height: ", SwingConstants.RIGHT));
         options.add(new JSpinner(height));
         options.add(heightUnit);
-        
+
         dpiSpinner = new SpinnerNumberModel(last_dpi,72,9999,1);
         dpiSpinner.addChangeListener(new DPIChangeListener());
-        
+
         options.add(new JLabel("Dots per inch: ", SwingConstants.RIGHT));
         options.add(new JSpinner(dpiSpinner));
-        
+
         content.add(options, BorderLayout.CENTER);
-        
+
         // create the buttons panel
         buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        
+
         class CancelActionListener implements ActionListener{
             public void actionPerformed(ActionEvent e)
             {
                 hide();
             }
         }
-        
+
         class ExportActionListener implements ActionListener{
-	    public void actionPerformed(ActionEvent e){
-		hide();
-		grMngr.mainView.setStatusBarText("Sending image to printer ... (This operation can take some time)");
-		
-		realWidth = unitToPixel(realWidth, widthUnit.getSelectedIndex());
-		realHeight = unitToPixel(realHeight, heightUnit.getSelectedIndex());
+        public void actionPerformed(ActionEvent e){
+        hide();
+        grMngr.mainView.setStatusBarText("Sending image to printer ... (This operation can take some time)");
 
-		Vector layers = new Vector();
-		layers.add(grMngr.mainCamera);
+        realWidth = unitToPixel(realWidth, widthUnit.getSelectedIndex());
+        realHeight = unitToPixel(realHeight, heightUnit.getSelectedIndex());
 
-		java.awt.image.BufferedImage bi = grMngr.mainView.rasterize((int)realWidth, (int)realHeight, layers);
+        Vector layers = new Vector();
+        layers.add(grMngr.mainCamera);
 
-		if (bi!=null){
-		    PrintUtilities pu=new PrintUtilities(bi);
-		    pu.print();
-		}
+        java.awt.image.BufferedImage bi = grMngr.mainView.rasterize((int)realWidth, (int)realHeight, layers);
 
-		grMngr.mainView.setStatusBarText("Sending image to printer ...done");
-	    }
+        if (bi!=null){
+            PrintUtilities pu=new PrintUtilities(bi);
+            pu.print();
         }
-        
+
+        grMngr.mainView.setStatusBarText("Sending image to printer ...done");
+        }
+        }
+
         export = new JButton("Export");
         export.addActionListener(new ExportActionListener());
-        
+
         cancel = new JButton("Cancel");
         cancel.addActionListener(new CancelActionListener());
-        
+
         buttons.add(cancel);
         buttons.add(export);
-        
+
         content.add(buttons, BorderLayout.SOUTH);
-        
+
         updateTextFields(false);
-        
+
         // prepare it for display
         frame.getRootPane().setDefaultButton(export);
         content.setPreferredSize(new Dimension(400,200));
         frame.pack();
-	frame.setLocationRelativeTo(grMngr.mainView.getFrame());
+    frame.setLocationRelativeTo(grMngr.mainView.getFrame());
         frame.setVisible(true);
     }
-    
+
     /**
-     * Displays the window 
+     * Displays the window
      */
     public void show(){
         frame.setVisible(true);
     }
-    
-    /** 
+
+    /**
      * Hides the window
      */
     public void hide(){
         frame.setVisible(false);
     }
-    
+
     /**
      * updates all the text fields according to new selected unit and dpi informaion
      * @param   textChange  whether or not the text fields have changed
@@ -247,133 +247,133 @@ public class PrintWindow
         // only one instance of this method, ever
         if ( stateLock)
             return;
-            
+
         stateLock = true;
-        
+
         String text = "";
-        
+
         if ( textChange ){
             realWidth = width.getNumber().doubleValue();
             realHeight = height.getNumber().doubleValue();
         }
-        
+
         // calculate what to display for width
         double pixels = realWidth;
-        
+
         // found out how many pixels we had before
         pixels = unitToPixel(realWidth, last_width_unit);
-	pixels = pixelToUnit(pixels, widthUnit.getSelectedIndex());        
-        
+    pixels = pixelToUnit(pixels, widthUnit.getSelectedIndex());
+
         if (widthUnit.getSelectedIndex() == PIXEL){
             text = "" + (int)pixels;
         }
         else{
             text = "" + pixels;
         }
-        
-        if ( text.indexOf(".")>=0){   
+
+        if ( text.indexOf(".")>=0){
             text = text.substring(0,text.indexOf(".")+2);
         }
         width.setValue(new Double(text));
-        
+
         // record the real value to avoid loss of precision during unit conversion
         realWidth = pixels;
-        
+
         // now do height
         pixels = realHeight;
-        
+
         // found out how many pixels we had before
         pixels = unitToPixel(realHeight, last_height_unit);
-	pixels = pixelToUnit(pixels, heightUnit.getSelectedIndex());        
-        
+    pixels = pixelToUnit(pixels, heightUnit.getSelectedIndex());
+
         if (heightUnit.getSelectedIndex() == PIXEL){
             text = "" + (int)pixels;
         }
         else{
             text = "" + pixels;
         }
-        
-        if ( text.indexOf(".") >=0){   
+
+        if ( text.indexOf(".") >=0){
             text = text.substring(0,text.indexOf(".")+2);
         }
         height.setValue(new Double(text));
-        
+
         // record the real value to avoid loss of precision during unit conversion
         realHeight = pixels;
-        
+
         // set the last unit information
         last_width_unit = widthUnit.getSelectedIndex();
         last_height_unit = heightUnit.getSelectedIndex();
 
         stateLock = false;
     }
-	
-	
+
+
     /** Converts the given unit into pixels
-     *	@param	number	number to convert
-     *	@param	unit	unit to convert from
-     *	@return			number of pixels 
+     *  @param  number  number to convert
+     *  @param  unit    unit to convert from
+     *  @return         number of pixels
      */
     private double unitToPixel(double number, int unit){
-	//System.out.print("converting " + number + " " + units[unit] + " to " );
-	switch(unit){
-	case INCH:
-	    number *= last_dpi;
-	    break;
-			
-	case PIXEL:
-	    break;
-				
-	case CM:
-	    number = number / CM_PER_INCH * last_dpi;
-	    break;
-			
-	case MM:
-	    number = number / MM_PER_INCH * last_dpi;
-	    break;
-	}
-	//System.out.println(number + " pixels");
-	return number;
+    //System.out.print("converting " + number + " " + units[unit] + " to " );
+    switch(unit){
+    case INCH:
+        number *= last_dpi;
+        break;
+
+    case PIXEL:
+        break;
+
+    case CM:
+        number = number / CM_PER_INCH * last_dpi;
+        break;
+
+    case MM:
+        number = number / MM_PER_INCH * last_dpi;
+        break;
     }
-	
+    //System.out.println(number + " pixels");
+    return number;
+    }
+
     /** Converts pixels to the given unit
-     *	@param	pixels	number of pixels to convert
-     *	@param	unit	unit to conver to
-     *	@return			number of units the given number of pixels represent
+     *  @param  pixels  number of pixels to convert
+     *  @param  unit    unit to conver to
+     *  @return         number of units the given number of pixels represent
      */
     private double pixelToUnit(double pixels, int unit){
-	//System.out.print("converting " + pixels + " pixels to ");
-	switch(unit){
-	case INCH:
-	    pixels = pixels / last_dpi;
-	    break;
-				
-	case PIXEL:
-	    pixels = pixels * dpi/last_dpi;
-	    break;
-			
-	case CM:
-	    pixels = pixels / last_dpi * CM_PER_INCH;
-	    break;
-			
-	case MM:
-	    pixels  = pixels / last_dpi * MM_PER_INCH;
-	    break;
-	}
-	//System.out.println(pixels +" " + units[unit]);
-	return pixels;
+    //System.out.print("converting " + pixels + " pixels to ");
+    switch(unit){
+    case INCH:
+        pixels = pixels / last_dpi;
+        break;
+
+    case PIXEL:
+        pixels = pixels * dpi/last_dpi;
+        break;
+
+    case CM:
+        pixels = pixels / last_dpi * CM_PER_INCH;
+        break;
+
+    case MM:
+        pixels  = pixels / last_dpi * MM_PER_INCH;
+        break;
+    }
+    //System.out.println(pixels +" " + units[unit]);
+    return pixels;
     }
 }
 
 class PrintUtilities extends JPanel implements Printable {
 
     private BufferedImage bufferedImage;
-    
+
     /**
      *@param bufferedImage image to be printed
      */
     public PrintUtilities( BufferedImage bufferedImage ){
-	this.bufferedImage = bufferedImage;
+    this.bufferedImage = bufferedImage;
     }
 
 
@@ -381,44 +381,44 @@ class PrintUtilities extends JPanel implements Printable {
      * Launchs the printer job and call the method {@link #print(Graphics, PageFormat, int)} method
      */
     public void print(){
-	PrinterJob printJob = PrinterJob.getPrinterJob(); 
-	PageFormat pf = new PageFormat();
-	pf.setOrientation(PageFormat.LANDSCAPE);
-	printJob.setPrintable(this, pf);
-// 	pf = printJob.validatePage(pf);
-	if (printJob.printDialog()){
+    PrinterJob printJob = PrinterJob.getPrinterJob();
+    PageFormat pf = new PageFormat();
+    pf.setOrientation(PageFormat.LANDSCAPE);
+    printJob.setPrintable(this, pf);
+//  pf = printJob.validatePage(pf);
+    if (printJob.printDialog()){
             try {
-		printJob.print();
-	    } 
+        printJob.print();
+        }
             catch(PrinterException pe) {
-		JOptionPane.showMessageDialog(null, "Error while printing", "Error", JOptionPane.ERROR_MESSAGE);
-		System.err.println("** Error printing: " + pe);
-		pe.printStackTrace();
-	    }
-	}
+        JOptionPane.showMessageDialog(null, "Error while printing", "Error", JOptionPane.ERROR_MESSAGE);
+        System.err.println("** Error printing: " + pe);
+        pe.printStackTrace();
+        }
     }
-       
+    }
+
     public int print(Graphics g, PageFormat pf, int pageIndex){
-	Graphics2D g2d=(Graphics2D)g;
-	int panelWidth=bufferedImage.getWidth(); //width in pixels
-	int panelHeight=bufferedImage.getHeight(); //height in pixels
-	double pageHeight=pf.getImageableHeight(); //height of printer page
-	double pageWidth=pf.getImageableWidth(); //width of printer page
-	if (pageIndex >= 1){
-	    return Printable.NO_SUCH_PAGE;
-	}
-	// To place the top right corner at the center of the shit page :
-	setSize(new Dimension(panelWidth, panelHeight));
+    Graphics2D g2d=(Graphics2D)g;
+    int panelWidth=bufferedImage.getWidth(); //width in pixels
+    int panelHeight=bufferedImage.getHeight(); //height in pixels
+    double pageHeight=pf.getImageableHeight(); //height of printer page
+    double pageWidth=pf.getImageableWidth(); //width of printer page
+    if (pageIndex >= 1){
+        return Printable.NO_SUCH_PAGE;
+    }
+    // To place the top right corner at the center of the shit page :
+    setSize(new Dimension(panelWidth, panelHeight));
         g2d.translate(pf.getImageableX(),pf.getImageableY());
         g2d.translate(pf.getImageableWidth()/2, pf.getImageableHeight()/2);
         // To place at the center of the page :
-	Dimension d=getSize();
+    Dimension d=getSize();
         double scale=Math.min(pf.getImageableWidth()/d.width,pf.getImageableHeight()/d.height);
         if (scale < 1.0){g2d.scale(scale, scale);}
         g2d.translate(-d.width / 2.0, -d.height / 2.0);
         setOpaque(true);
-	this.paint(g2d);
-	return Printable.PAGE_EXISTS;
+    this.paint(g2d);
+    return Printable.PAGE_EXISTS;
     }
 
     public void paint(Graphics g){

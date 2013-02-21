@@ -4,7 +4,7 @@
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
- */ 
+ */
 
 package net.claribole.zgrviewer;
 
@@ -12,10 +12,10 @@ import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.svg.Metadata;
 
 public class LElem {
-	
-	static final String PORT_SEPARATOR = ":";
 
-	String groupID;
+    static final String PORT_SEPARATOR = ":";
+
+    String groupID;
     String title;
     // URLs associated with each glyph (there might be different URLs associated with
     // the various glyphs constituting a node or edge)
@@ -27,7 +27,7 @@ public class LElem {
     LElem(){}
 
     LElem(Metadata md){
-		this.groupID = md.getClosestAncestorGroupID();
+        this.groupID = md.getClosestAncestorGroupID();
         this.title = md.getTitle();
         this.URLs = new String[]{md.getURL()};
         this.tooltips = new String[]{md.getURLTitle()};
@@ -42,19 +42,19 @@ public class LElem {
         return URLs[0];
     }
 
-	public String getTooltip(Glyph g){
-	    if (tooltips == null){return null;}
-		return tooltips[0];
-	}
-	
-	public String getGroupID(){
-		return groupID;
-	}
+    public String getTooltip(Glyph g){
+        if (tooltips == null){return null;}
+        return tooltips[0];
+    }
 
-	public Glyph[] getGlyphs(){
-		Glyph[] res = new Glyph[glyphs.length];
-		System.arraycopy(glyphs, 0, res, 0, glyphs.length);
-		return res;
-	}
+    public String getGroupID(){
+        return groupID;
+    }
+
+    public Glyph[] getGlyphs(){
+        Glyph[] res = new Glyph[glyphs.length];
+        System.arraycopy(glyphs, 0, res, 0, glyphs.length);
+        return res;
+    }
 
 }
