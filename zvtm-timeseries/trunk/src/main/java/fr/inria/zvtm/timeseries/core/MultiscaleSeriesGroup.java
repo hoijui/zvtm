@@ -17,14 +17,16 @@ public class MultiscaleSeriesGroup {
 	private final Cache cache = new Cache();
 	private MultiscaleSeries[] seriesList;
 	private final TLongIntHashMap clustersMap = new TLongIntHashMap();
-	private final int chunkSize = 1024;
+	private final int chunkSize;
 	
 	private int nextClusterIndex = 1;
 	
-	public MultiscaleSeriesGroup() {
+	public MultiscaleSeriesGroup(int chunkSize) {
+		this.chunkSize = chunkSize;
 	}
 
-	public MultiscaleSeriesGroup(int size) {
+	public MultiscaleSeriesGroup(int chunkSize, int size) {
+		this.chunkSize = chunkSize;
 		seriesList = new MultiscaleSeries[size];
 		for(int i=0;i<size;i++) {
 			MultiscaleSeries series = new MultiscaleSeries(cache, chunkSize);
@@ -95,6 +97,7 @@ public class MultiscaleSeriesGroup {
 	private static long getClusterKey(int scale, int offset) {
 		long l1 = scale;
 		long l2 = offset;
-		return (l1 << 32) | (l2 & 0xffffffff);
+		long key = (l1 << 32) | (l2 & 0xffffffffL);
+		return key;
 	}
 }

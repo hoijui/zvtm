@@ -85,7 +85,7 @@ public class MultiscaleSeries {
 	/**
 	 * Adds raw data to this series.
 	 */
-	public void addData(double x1, double x2, IDataStream stream) {
+	public synchronized void addData(double x1, double x2, IDataStream stream) {
 		assert x2 > x1;
 		long size = stream.getSize();
 		assert size > 0;
@@ -113,9 +113,10 @@ public class MultiscaleSeries {
 		for (int i=0;i<chunks.length;i++) {
 			double ss = Math.pow(2, scale+i);
 			
-			int j1 = (int)(x1/ss);
-			int offset1 = j1/chunkSize;
+			int j1 = (int) Math.floor(x1/ss);
+			int offset1 = (int) Math.floor(1.0*j1/chunkSize);
 			indexes[i] = j1-(offset1*chunkSize);
+			assert indexes[i] >= 0;
 
 			chunks[i] = getChunk(scale+i, offset1, true);
 			chunks[i].setSynthetic(false);
@@ -126,6 +127,7 @@ public class MultiscaleSeries {
 		long k = 0; // sample index in original data
 		while(k < size) {
 			int len = Math.min(chunkSize, (int) (size-k));
+			len = Math.min(len, chunkSize-indexes[0]);
 			int l = stream.fillBuffer(buffer, indexes[0], len);
 			chunks[0].set(buffer);
 			if (LOG) System.out.println("adding: scale "+scale+", offset "+chunks[0].offset);
@@ -294,7 +296,7 @@ public class MultiscaleSeries {
 	 * span contains the missing chunk at the specified scale and offset.  
 	 */
 	protected DataChunk getLowestChunk(int scale, int offset) {
-		while(true) {
+		while(scale <= maxScale) {
 			SparseData sd = dataMap.get(scale);
 			if (sd == null) {
 				scale++;
@@ -311,6 +313,7 @@ public class MultiscaleSeries {
 			
 			return chunk;
 		}
+		return null;
 	}
 	
 	/**
@@ -327,7 +330,7 @@ public class MultiscaleSeries {
 		public final FloatBuffer buffer;
 		public final int bufferOffset;
 		
-		private boolean synthetic = false;
+		private boolean synthetic = true;
 
 		private DataChunk(int scale, int offset) {
 			this.scale = scale;
@@ -405,7 +408,7 @@ public class MultiscaleSeries {
 			double dj2 = x2/ss;
 			long j2 = (long) Math.floor(dj2);
 			
-			assert j1/chunkSize == offset: "j1: "+j1+" chunkSize: "+chunkSize+", offset: "+offset;
+			assert Math.floor(1.0*j1/chunkSize) == offset: "j1: "+j1+" chunkSize: "+chunkSize+", offset: "+offset+" vs. "+Math.floor(1.0*j1/chunkSize);
 					
 			int i = (int) (j1-(1L*offset*chunkSize));
 			int i2 = (int) (j2-(1L*offset*chunkSize));
@@ -433,6 +436,16 @@ public class MultiscaleSeries {
 				result[0] = sum;
 				result[1] = dj2-dj1;
 			}
+		}
+		
+		@Override
+		public String toString() {
+			StringBuilder b = new StringBuilder("Chunk (id: "+id+", scale: "+scale+", offset: "+offset+") = ");
+			for(int i=0;i<chunkSize;i++) {
+				b.append(get(i));
+				b.append(' ');
+			}
+			return b.toString();
 		}
 	}
 	
@@ -470,7 +483,7 @@ public class MultiscaleSeries {
 		 * using data of the current scale
 		 */
 		public double getAverageValue(double x1, double x2) {
-			int offset = (int) (x1/(ss*chunkSize));
+			int offset = (int) Math.floor(x1/(ss*chunkSize));
 			
 			double sum = 0;
 			double count = 0;

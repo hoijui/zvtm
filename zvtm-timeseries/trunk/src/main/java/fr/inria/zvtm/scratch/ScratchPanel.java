@@ -6,6 +6,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseWheelEvent;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Callable;
@@ -24,9 +26,9 @@ import fr.inria.zvtm.timeseries.core.MultiscaleSeriesGroup;
 
 public class ScratchPanel extends JPanel {
 	private static final int CHUNK_SIZE = 1024;
-	private static final int DATA_SIZE = 256*1024;
-	private static final int COUNT = 500;
-	private static final int VERTICAL_ZOOM = 1;
+	private static final int DATA_SIZE = 64*1024;
+	private static final int COUNT = 1;
+	private static final int VERTICAL_ZOOM = 10;
 	
 	private double zoom = 1;
 	private double x1 = 0;
@@ -44,15 +46,23 @@ public class ScratchPanel extends JPanel {
 	private AtomicInteger created = new AtomicInteger();
 	
 	public ScratchPanel() {
-		group = new MultiscaleSeriesGroup();
+		group = new MultiscaleSeriesGroup(1024);
 		for(int i=0;i<COUNT;i++) series[i] = new MySeries(group.getCache());
 		group.setSeries(series);
 		
 		imageHandler = new ImageMSGHandler(group);
 		
 		try {
+			x1 = 0;
+			double x2 = x1+365*24*60*60;
+			
+			double ss = (x2-x1)/DATA_SIZE;
+			double dScale = Math.log(ss)/Math.log(2);
+			x2 = Math.pow(2, Math.ceil(dScale))*DATA_SIZE+x1;
+			zoom = 1.0/(x2-x1);
+			
 			List<CreateDataTask> tasks = new ArrayList<CreateDataTask>(THREADS);
-			for(int i=0;i<THREADS;i++) tasks.add(new CreateDataTask(i));
+			for(int i=0;i<THREADS;i++) tasks.add(new CreateDataTask(i, x1, x2));
 			executor.invokeAll(tasks);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
@@ -70,7 +80,7 @@ public class ScratchPanel extends JPanel {
 					int w = getWidth();
 					double z0 = zoom;
 					zoom = z0 * Math.pow(1.2, -e.getWheelRotation());
-					if (zoom < 1) zoom = 1;
+					if (zoom < 0.000000001) zoom = 0.000000001;
 					if (zoom > 1000000) zoom = 1000000;
 					
 					x1 = x1 + i/(z0*w) - i/(zoom*w); 
@@ -101,9 +111,13 @@ public class ScratchPanel extends JPanel {
 	 */
 	private class CreateDataTask implements Runnable, Callable<Void> {
 		private int rank;
+		private double x1;
+		private double x2;
 		
-		public CreateDataTask(int rank) {
+		public CreateDataTask(int rank, double x1, double x2) {
 			this.rank = rank;
+			this.x1 = x1;
+			this.x2 = x2;
 		}
 
 		@Override
@@ -125,7 +139,7 @@ public class ScratchPanel extends JPanel {
 				data[data.length-1] = r.nextFloat();
 				plasma(r, data, 0, data.length-1);
 				
-				series[id].addData(0, 1, data);
+				series[id].addData(x1, x2, data);
 				
 				for(int j=0;j<data.length;j++) {
 					float v = data[j];
@@ -162,6 +176,9 @@ public class ScratchPanel extends JPanel {
 		int mid = (i1+i2)/2;
 		float avg = (data[i1] + data[i2])/2f;
 		data[mid] = avg + (r.nextFloat()-0.5f);
+		if (Float.isNaN(data[mid])) {
+			System.out.println("ScratchPanel.plasma()");
+		}
 		plasma(r, data, i1, mid);
 		plasma(r, data, mid, i2);
 	}
@@ -177,6 +194,11 @@ public class ScratchPanel extends JPanel {
 			super(cache, CHUNK_SIZE);
 		}
 
+		private boolean isValidLowestChunk(DataChunk chunk) {
+			for(int i=0;i<CHUNK_SIZE;i++) if (Float.isNaN(chunk.get(0))) return false;
+			return true;
+		}
+		
 		@Override
 		protected IDataStream fetch(int scale, double x1, double x2) {
 			double ss = Math.pow(2, scale);
@@ -189,10 +211,17 @@ public class ScratchPanel extends JPanel {
 			double x = x1;
 			while(x<x2) {
 				int o = (int) (x/(ss*chunkSize));
-				System.out.println("  gen: offset "+o+", x: "+x);
-				DataChunk lowestChunk = getLowestChunk(scale, o);
-				// Copy higher chunk data into new buffer
-				assert lowestChunk.scale > scale;
+				System.out.println("  gen ["+getId()+"]: offset "+o+", x: "+x);
+				DataChunk lowestChunk;
+				int lowestScale = scale;
+				while(true) {
+					lowestChunk = getLowestChunk(lowestScale, o);
+					if (lowestChunk == null) return null;
+					// Copy higher chunk data into new buffer
+					assert lowestChunk.scale > scale: "chunk offset "+lowestChunk.offset+", scale "+lowestChunk.scale;
+					if (isValidLowestChunk(lowestChunk)) break;
+					lowestScale++;
+				}
 				int n = 1 << (lowestChunk.scale - scale);
 				int d = (int) (1.0*chunkSize*(1.0*o/n - lowestChunk.offset));
 				
@@ -201,6 +230,9 @@ public class ScratchPanel extends JPanel {
 					int j = (i-d)*n;
 					if (j >= 0 && j < data.length) {
 						data[j] = lowestChunk.get(i);
+						if (Float.isNaN(data[j])) {
+							System.out.println(lowestChunk);
+						}
 						if (lastJ >= 0) plasma(r, data, lastJ, j);
 						lastJ = j;
 					}

@@ -17,7 +17,7 @@ public class MultiscaleSeriesGroupTest {
 	@Test 
 	public void testLongAddSimple() {
 		MultiscaleSeries[] series = new MultiscaleSeries[1000];
-		MultiscaleSeriesGroup group = new MultiscaleSeriesGroup();
+		MultiscaleSeriesGroup group = new MultiscaleSeriesGroup(1024);
 		for(int i=0;i<series.length;i++) series[i] = new MultiscaleSeries(group.getCache(), CHUNK_SIZE);
 		group.setSeries(series);
 		

@@ -107,7 +107,7 @@ public abstract class DynamicMultiscaleSeries extends MultiscaleSeries {
 		public void run() {
 			try {
 				IDataStream stream = fetch(scale, x1, x2);
-				addData(x1, x2, stream);
+				if (stream != null) addData(x1, x2, stream);
 			} catch (Throwable e) {
 				e.printStackTrace();
 			}

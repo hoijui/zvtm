@@ -15,7 +15,7 @@ import fr.inria.zvtm.timeseries.core.MultiscaleSeries.IDataStream;
 public class MultiscaleSeriesTest {
 
 	private static final int DATA_SIZE = 16*1024*1024;
-	private static final int CHUNK_SIZE = 1024;
+	private static final int CHUNK_SIZE = 2048;
 	
 	private DummyData dummyData = new DummyData();
 	
@@ -32,7 +32,7 @@ public class MultiscaleSeriesTest {
 	}
 	
 	private void checkFullChunkAverage(float[] buffer, int scale, int offset) {
-		MultiscaleSeriesGroup group = new MultiscaleSeriesGroup(1);
+		MultiscaleSeriesGroup group = new MultiscaleSeriesGroup(CHUNK_SIZE, 1);
 		DataChunk chunk = group.get(0)._createChunk(scale, offset, buffer);
 		
 		double ss = Math.pow(2, scale);
@@ -52,7 +52,7 @@ public class MultiscaleSeriesTest {
 		float[] buffer = new float[CHUNK_SIZE];
 		for(int i=0;i<CHUNK_SIZE;i++) buffer[i] = i;
 		
-		MultiscaleSeriesGroup group = new MultiscaleSeriesGroup(1);
+		MultiscaleSeriesGroup group = new MultiscaleSeriesGroup(CHUNK_SIZE, 1);
 		DataChunk chunk = group.get(0)._createChunk(0, 0, buffer);
 		
 		Random random = new Random(123);
@@ -79,7 +79,7 @@ public class MultiscaleSeriesTest {
 		float[] buffer = new float[CHUNK_SIZE];
 		for(int i=0;i<CHUNK_SIZE;i++) buffer[i] = i;
 		
-		MultiscaleSeriesGroup group = new MultiscaleSeriesGroup(1);
+		MultiscaleSeriesGroup group = new MultiscaleSeriesGroup(CHUNK_SIZE, 1);
 		DataChunk chunk = group.get(0)._createChunk(0, 0, buffer);
 		
 		Random random = new Random(123);
@@ -105,13 +105,19 @@ public class MultiscaleSeriesTest {
 	 */
 	@Test 
 	public void testLongAddSimple() {
-		MultiscaleSeriesGroup group = new MultiscaleSeriesGroup(1);
+		testLongAddSimple(0);
+		testLongAddSimple(1);
+		testLongAddSimple(-1);
+	}
+
+	private void testLongAddSimple(double x1) {
+		MultiscaleSeriesGroup group = new MultiscaleSeriesGroup(CHUNK_SIZE, 1);
 		MultiscaleSeries series = group.get(0);
-		series.addData(0, dummyData.data.length, dummyData.getStream(0, dummyData.data.length));
+		series.addData(x1, dummyData.data.length, dummyData.getStream(0, dummyData.data.length));
 	
 		float[] buffer = new float[CHUNK_SIZE];
 		for(int j=0;j<dummyData.data.length;j+=CHUNK_SIZE) {
-			int scale = series.getData(j, j+CHUNK_SIZE, buffer);
+			int scale = series.getData(x1+j, x1+j+CHUNK_SIZE, buffer);
 			assertEquals(0, scale);
 			
 			for(int i=0;i<CHUNK_SIZE;i++) {
@@ -122,7 +128,7 @@ public class MultiscaleSeriesTest {
 	
 	@Test
 	public void testSparseAverage() {
-		MultiscaleSeriesGroup group = new MultiscaleSeriesGroup(1);
+		MultiscaleSeriesGroup group = new MultiscaleSeriesGroup(CHUNK_SIZE, 1);
 		MultiscaleSeries series = group.get(0);
 		series.addData(0, dummyData.data.length, dummyData.getStream(0, dummyData.data.length));
 		
@@ -158,7 +164,7 @@ public class MultiscaleSeriesTest {
 	
 	@Test
 	public void testShortAddAtScale0() {
-		MultiscaleSeriesGroup group = new MultiscaleSeriesGroup(1);
+		MultiscaleSeriesGroup group = new MultiscaleSeriesGroup(CHUNK_SIZE, 1);
 		MultiscaleSeries series = group.get(0);
 		series.addData(0, CHUNK_SIZE, dummyData.getStream(0, CHUNK_SIZE));
 		
@@ -211,7 +217,7 @@ public class MultiscaleSeriesTest {
 	 */
 	@Test
 	public void testAIOOB() {
-		MultiscaleSeriesGroup group = new MultiscaleSeriesGroup(1);
+		MultiscaleSeriesGroup group = new MultiscaleSeriesGroup(CHUNK_SIZE, 1);
 		MultiscaleSeries series = group.get(0);
 		series.addData(0, 1, dummyData.getStream(0, 64*1024));
 		
