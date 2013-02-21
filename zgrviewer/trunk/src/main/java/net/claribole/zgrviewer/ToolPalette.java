@@ -33,6 +33,8 @@ public class ToolPalette {
 
     public static final String PLUGIN_MODE_PREFIX = "plugin";
 
+    static final String TOOLPALETTE_BUTTON = "tpb";
+
     public static final String STD_NAV_MODE = "st";
     public static final String FL_NAV_MODE = "fl";
     public static final String DM_NAV_MODE = "dm";
@@ -111,6 +113,7 @@ public class ToolPalette {
                     (new ImageIcon(this.getClass().getResource(BUILTIN_MODE_ICON_PATHS.get(BUILTIN_MODES[i])))).getImage());
                 paletteSpace.addGlyph(buttons[j]);
                 buttons[j].setOwner(BUILTIN_MODES[i]);
+                buttons[j].setType(TOOLPALETTE_BUTTON);
                 j++;
             }
             i++;
@@ -335,6 +338,7 @@ public class ToolPalette {
             pluginsWithMode.put(new Short((short)i), p);
             buttons[i] = new VImage(0, -i*VERTICAL_STEP_BETWEEN_ICONS, 0, p.getModeIcon());
             buttons[i].setOwner(PLUGIN_MODE_PREFIX+String.valueOf(i));
+            buttons[i].setType(TOOLPALETTE_BUTTON);
             paletteSpace.addGlyph(buttons[i]);
         }
     }

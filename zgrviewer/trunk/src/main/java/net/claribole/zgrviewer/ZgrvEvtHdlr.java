@@ -464,17 +464,24 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
             }
         }
         else {
-            if (g.getType() != null && g.getType().equals(GeometryEditor.SPLINE_GEOM_EDITOR)){
-                grMngr.mainView.setCursorIcon(Cursor.MOVE_CURSOR);
+            if (g.getType() != null){
+                if (g.getType().equals(GeometryEditor.SPLINE_GEOM_EDITOR)){
+                    grMngr.mainView.setCursorIcon(Cursor.MOVE_CURSOR);
+                }
+                else if (g.getType().equals(ToolPalette.TOOLPALETTE_BUTTON)){
+                    g.highlight(true, null);
+                }
             }
             else if (grMngr.tp.isHighlightMode()){
-                grMngr.highlightElement(g, null, null, true, 0, false, -1);
+                // node & neighbors highlighting in higlight mode
                 // g is guaranteed to be != null, don't care about camera and cursor
+                grMngr.highlightElement(g, null, null, true, 0, false, -1);
             }
             else {
-                // node highlighting is taken care of above (in a slightly different manner)
+                // regular node highlighting
                 g.highlight(true, null);
             }
+
         }
     }
 
@@ -500,14 +507,20 @@ public class ZgrvEvtHdlr extends BaseEventHandler implements ViewListener {
             }
         }
         else {
-            if (g.getType() != null && g.getType().equals(GeometryEditor.SPLINE_GEOM_EDITOR)){
-                grMngr.mainView.setCursorIcon(Cursor.CUSTOM_CURSOR);
+            if (g.getType() != null){
+                if (g.getType().equals(GeometryEditor.SPLINE_GEOM_EDITOR)){
+                    grMngr.mainView.setCursorIcon(Cursor.CUSTOM_CURSOR);
+                }
+                else if (g.getType().equals(ToolPalette.TOOLPALETTE_BUTTON)){
+                    g.highlight(false, null);
+                }
             }
             else if (application.grMngr.tp.isHighlightMode()){
+                // node & neighbors highlighting in higlight mode
                 grMngr.unhighlightAll();
             }
             else {
-                // node highlighting is taken care of above (in a slightly different manner)
+                // regular node highlighting
                 g.highlight(false, null);
             }
         }
