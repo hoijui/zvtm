@@ -1,6 +1,6 @@
-package fr.inria.zvtm.scratch;
+package fr.inria.zvtm.timeseries.core;
 
-import fr.inria.zvtm.scratch.MappedDiskCache.Block;
+import fr.inria.zvtm.timeseries.core.MappedDiskCache.Block;
 import gnu.trove.map.hash.TLongIntHashMap;
 
 import java.io.File;

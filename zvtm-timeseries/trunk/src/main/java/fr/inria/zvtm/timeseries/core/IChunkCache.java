@@ -1,4 +1,4 @@
-package fr.inria.zvtm.scratch;
+package fr.inria.zvtm.timeseries.core;
 
 import java.nio.FloatBuffer;
 

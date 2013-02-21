@@ -7,8 +7,10 @@ import java.util.Random;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import fr.inria.zvtm.scratch.MultiscaleSeries.DataChunk;
-import fr.inria.zvtm.scratch.MultiscaleSeries.IDataStream;
+import fr.inria.zvtm.timeseries.core.MultiscaleSeries;
+import fr.inria.zvtm.timeseries.core.MultiscaleSeriesGroup;
+import fr.inria.zvtm.timeseries.core.MultiscaleSeries.DataChunk;
+import fr.inria.zvtm.timeseries.core.MultiscaleSeries.IDataStream;
 
 public class MultiscaleSeriesTest {
 

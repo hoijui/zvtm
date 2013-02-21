@@ -18,6 +18,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import fr.inria.zvtm.timeseries.core.DynamicMultiscaleSeries;
+import fr.inria.zvtm.timeseries.core.IChunkCache;
+import fr.inria.zvtm.timeseries.core.MultiscaleSeries;
+import fr.inria.zvtm.timeseries.core.MultiscaleSeriesGroup;
+
 public class ScratchPanel extends JPanel {
 	private static final int CHUNK_SIZE = 1024;
 	private static final int DATA_SIZE = 256*1024;

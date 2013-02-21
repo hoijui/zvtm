@@ -4,6 +4,9 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
+import fr.inria.zvtm.timeseries.core.MultiscaleSeries;
+import fr.inria.zvtm.timeseries.core.MultiscaleSeriesGroup;
+
 public class MultiscaleSeriesGroupTest {
 	private static final int CHUNK_SIZE = 1024;
 	

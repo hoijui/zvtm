@@ -1,10 +1,7 @@
-package fr.inria.zvtm.scratch;
+package fr.inria.zvtm.timeseries.core;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
-import zz.utils.notification.IEvent;
-import zz.utils.notification.SimpleEvent;
 
 /**
  * En extension of {@link MultiscaleSeries} that fetches missing data when needed

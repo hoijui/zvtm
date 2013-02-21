@@ -1,17 +1,14 @@
-package fr.inria.zvtm.scratch;
-
-import fr.inria.zvtm.scratch.DynamicMultiscaleSeries.Range;
-import fr.inria.zvtm.scratch.IChunkCache.ChunkData;
-import gnu.trove.map.hash.TIntObjectHashMap;
+package fr.inria.zvtm.timeseries.core;
 
 import java.nio.FloatBuffer;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import zz.utils.notification.IEvent;
 import zz.utils.notification.SimpleEvent;
-import zz.utils.properties.SimpleRWProperty;
+import fr.inria.zvtm.timeseries.core.DynamicMultiscaleSeries.Range;
+import fr.inria.zvtm.timeseries.core.IChunkCache.ChunkData;
+import gnu.trove.map.hash.TIntObjectHashMap;
 
 
 /**
