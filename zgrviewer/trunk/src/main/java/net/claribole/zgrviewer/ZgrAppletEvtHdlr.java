@@ -141,17 +141,20 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewListener {
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
         if (toolPaletteIsActive){
+            if (clickNumber == 2){return;}
             if (v.lastGlyphEntered() != null){grMngr.tp.selectMode((VImage)v.lastGlyphEntered());}
         }
         else if (mod == META_MOD){
+            if (clickNumber == 2){return;}
             if (grMngr.tp.isHighlightMode() && v.getGlyphsUnderCursorList().length>0){
                 Glyph g = v.lastGlyphEntered();
                 grMngr.highlightElement(g, v.cams[0], v.getVCursor(), true, 0, true, -1);
-            }            
+            }
         }
         else {
             if (grMngr.tp.isBringAndGoMode() || grMngr.tp.isLinkSlidingMode()){return;}
             if (grMngr.tp.isFadingLensNavMode() || grMngr.tp.isProbingLensNavMode()){
+                if (clickNumber == 2){return;}
                 lastJPX = jpx;
                 lastJPY = jpy;
                 lastVX = v.getVCursor().getVSXCoordinate();
@@ -168,6 +171,7 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewListener {
                 }
             }
             else if (grMngr.tp.isDragMagNavMode()){
+                if (clickNumber == 2){return;}
                 grMngr.triggerDM(jpx, jpy, this);
             }
             else if (grMngr.tp.isEditMode()){
@@ -198,6 +202,7 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewListener {
 
     public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
     	if (toolPaletteIsActive){return;}
+        if (clickNumber == 2){return;}
         Glyph g=v.lastGlyphEntered();
         if (g!=null && g != grMngr.boundingBox){
             if (g.getOwner()!=null){getAndDisplayURL((LElem)g.getOwner(), g);}
@@ -223,6 +228,7 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewListener {
         if (toolPaletteIsActive){return;}
         else {
             if (grMngr.tp.isFadingLensNavMode() || grMngr.tp.isProbingLensNavMode()){
+                if (clickNumber == 2){return;}
                 lastJPX = jpx;
                 lastJPY = jpy;
                 lastVX = v.getVCursor().getVSXCoordinate();
