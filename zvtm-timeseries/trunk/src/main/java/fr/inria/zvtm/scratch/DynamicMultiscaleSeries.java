@@ -3,92 +3,131 @@ package fr.inria.zvtm.scratch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import zz.utils.properties.IProperty;
-import zz.utils.properties.SimpleRWProperty;
-import fr.inria.zvtm.scratch.MultiscaleSeries.DataStream;
+import zz.utils.notification.IEvent;
+import zz.utils.notification.SimpleEvent;
 
 /**
- * Similar to {@link MultiscaleSeries}, but:
- * - Provides view buffers that can emit change events
- * - Automatically requests data to providers as needed 
+ * En extension of {@link MultiscaleSeries} that fetches missing data when needed
+ * 
  * @author gpothier
  */
-public class DynamicMultiscaleSeries {
-	private Provider provider;
-	private MultiscaleSeries source;
+public abstract class DynamicMultiscaleSeries extends MultiscaleSeries {
+	/**
+	 * When data is missing at a given scale S, fetch actual data
+	 * at scale S-scaleDelta
+	 */
+	private int scaleDelta = 2;
+	
+	/**
+	 * When data is missing for a given range, fetch data for a range
+	 * rangeMultiplier times larger (adjusted to chunk boundaries)
+	 */
+	private int rangeMultiplier = 0;
 	
 	private ExecutorService executor = Executors.newFixedThreadPool(1);
 	
-	public ViewBuffer getData(float rangeStart, float rangeEnd, int bufferSize) {
-		float sampleSize = (rangeEnd-rangeStart)/bufferSize;
-		int logScale = (int) Math.floor(Math.log(sampleSize)/Math.log(2));
-
-		float[] buffer = new float[bufferSize];
-		int srcLogScale = source.getData(rangeStart, rangeEnd, buffer);
-		
-		ViewBuffer vb = new ViewBuffer(buffer);
-		if (Math.abs(logScale-srcLogScale) > 2) {
-			executor.execute(new FetchTask(vb, rangeStart, rangeEnd, logScale));
-		}
-		
-		return vb;
+	public DynamicMultiscaleSeries(IChunkCache cache, int chunkSize) {
+		super(cache, chunkSize);
 	}
 
-	public interface Provider {
-		public int getMinLogScale();
-		public int getMaxLogScale();
-		public float getRangeStart();
-		public float getRangeEnd();
-		public DataStream get(float rangeStart, float rangeEnd, int bufferSize);
-	}
-	
-	public class ViewBuffer {
-		private float[] data;
-		private final SimpleRWProperty<Boolean> pFetching = new SimpleRWProperty<Boolean>(false);
+	@Override
+	protected DataChunk chunkMissing(int scale, int offset) {
+		if (LOG) System.out.println("chunkMissing: "+scale+", "+offset);
 		
-		public ViewBuffer(float[] data) {
-			this.data = data;
+		// Immediately create a chunk with extrapolated data
+		DataChunk lowestChunk = getLowestChunk(scale, offset);
+		DataChunk chunk = createChunk(scale, offset);
+		chunk.setSynthetic(true);
+		
+		if (lowestChunk != null) {
+			assert lowestChunk.scale > scale;
+			int n = 1 << (lowestChunk.scale - scale);
+			int d = (int) (1.0*chunkSize*(1.0*offset/n - lowestChunk.offset));
+			for(int i=0;i<chunkSize;i++) {
+				chunk.set(i, lowestChunk.get(d+i/n));
+			}
 		}
 		
-		/**
-		 * This property is true whenever data for this buffer is currently being fetched.
-		 * When it becomes false, updated data is available.
-		 */
-		public IProperty<Boolean> pFetching() {
-			return pFetching;
-		}
+		// Schedule a fetch of actual data at a lower scale
+		scheduleFetch(scale-scaleDelta, (offset << scaleDelta)-rangeMultiplier/2, ((offset+1) << scaleDelta)-1+rangeMultiplier/2);
 		
-		public float[] getData() {
-			return data;
-		}
+		return chunk;
 	}
 	
-	private class FetchTask implements Runnable {
-		private final ViewBuffer viewBuffer;
-		private final float rangeStart;
-		private final float rangeEnd;
-		private final int logScale;
+	/**
+	 * Schedules the fetching of actual data at a given scale for a range of chunk offsets
+	 * (both inclusive)
+	 */
+	private void scheduleFetch(int scale, int o1, int o2) {
+		if (LOG) System.out.println("scheduleFetch "+scale+", range: "+o1+", "+o2);
+		SparseData sparseData = getScaleData(scale);
 		
-		public FetchTask(ViewBuffer buffer, float rangeStart, float rangeEnd, int logScale) {
-			this.viewBuffer = buffer;
-			this.rangeStart = rangeStart;
-			this.rangeEnd = rangeEnd;
-			this.logScale = logScale;
+		// Schedule a fetch for each missing range
+		int lastO = o1;
+		for(int o=o1;o<=o2;o++) {
+			if (sparseData.hasChunk(o)) {
+				int ro1 = lastO;
+				int ro2 = o-1;
+				if (ro1 <= ro2) submitFetch(scale, ro1, ro2);
+				lastO = o+1;
+			}
 		}
+		int ro1 = lastO;
+		int ro2 = o2;
+		if (ro1 <= ro2) submitFetch(scale, ro1, ro2);
+	}
+	
+	private void submitFetch(int scale, int o1, int o2) {
+		if (LOG) System.out.println("submitFetch "+scale+", range: "+o1+", "+o2);
+		executor.submit(new FetchAction(scale, o1, o2));
+	}
+	
+	/**
+	 * Subclasses should implement this method to retrieve the data for
+	 * a given scale and range. This method might be called concurrently
+	 * from multiple threads.
+	 */
+	protected abstract IDataStream fetch(int scale, double x1, double x2);
 
+	/**
+	 * The action that calls the fetch method 
+	 * @author gpothier
+	 */
+	private class FetchAction implements Runnable {
+		private final int scale;
+		private final double x1;
+		private final double x2;
+		
+		public FetchAction(int scale, int o1, int o2) {
+			this.scale = scale;
+			double ss = Math.pow(2, scale);
+			
+			this.x1 = ss*o1*chunkSize;
+			this.x2 = ss*(o2+1)*chunkSize;
+		}
+		
+		@Override
 		public void run() {
 			try {
-				viewBuffer.pFetching.set(true);
-				DataStream dataStream = provider.get(rangeStart, rangeEnd, logScale);
-				source.addData(rangeStart, rangeEnd, dataStream);
-				float[] buffer = new float[viewBuffer.data.length];
-				source.getData(rangeStart, rangeEnd, buffer);
-				viewBuffer.data = buffer;
-				viewBuffer.pFetching.set(false);
-			} catch (Exception e) {
-				throw new RuntimeException(e);
+				IDataStream stream = fetch(scale, x1, x2);
+				addData(x1, x2, stream);
+			} catch (Throwable e) {
+				e.printStackTrace();
 			}
 		}
 	}
-
+	
+	/**
+	 * A generic range with double values
+	 * @author gpothier
+	 */
+	public static class Range {
+		public final double x1;
+		public final double x2;
+		
+		public Range(double x1, double x2) {
+			this.x1 = x1;
+			this.x2 = x2;
+		}
+	}
 }
