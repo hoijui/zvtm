@@ -74,7 +74,7 @@ public class VImage<T> extends ClosedShape implements RectangularShape {
      *@param img image to be displayed
      */
     public VImage(Image img){
-	    this(0, 0, 0, img, 1.0, 1.0f);
+        this(0, 0, 0, img, 1.0, 1.0f);
     }
 
     /** Construct an image at (x, y) with original scale.
@@ -124,50 +124,50 @@ public class VImage<T> extends ClosedShape implements RectangularShape {
 
     @Override
     public void initCams(int nbCam){
-	pc=new RProjectedCoordsP[nbCam];
-	for (int i=0;i<nbCam;i++){
-	    pc[i]=new RProjectedCoordsP();
-	}
+    pc=new RProjectedCoordsP[nbCam];
+    for (int i=0;i<nbCam;i++){
+        pc[i]=new RProjectedCoordsP();
+    }
     }
 
     @Override
     public void addCamera(int verifIndex){
-	if (pc!=null){
-	    if (verifIndex==pc.length){
-		RProjectedCoordsP[] ta=pc;
-		pc=new RProjectedCoordsP[ta.length+1];
-		for (int i=0;i<ta.length;i++){
-		    pc[i]=ta[i];
-		}
-		pc[pc.length-1]=new RProjectedCoordsP();
-	    }
-	    else {System.err.println("VImage:Error while adding camera "+verifIndex);}
-	}
-	else {
-	    if (verifIndex==0){
-		pc=new RProjectedCoordsP[1];
-		pc[0]=new RProjectedCoordsP();
-	    }
-	    else {System.err.println("VImage:Error while adding camera "+verifIndex);}
-	}
+    if (pc!=null){
+        if (verifIndex==pc.length){
+        RProjectedCoordsP[] ta=pc;
+        pc=new RProjectedCoordsP[ta.length+1];
+        for (int i=0;i<ta.length;i++){
+            pc[i]=ta[i];
+        }
+        pc[pc.length-1]=new RProjectedCoordsP();
+        }
+        else {System.err.println("VImage:Error while adding camera "+verifIndex);}
+    }
+    else {
+        if (verifIndex==0){
+        pc=new RProjectedCoordsP[1];
+        pc[0]=new RProjectedCoordsP();
+        }
+        else {System.err.println("VImage:Error while adding camera "+verifIndex);}
+    }
     }
 
     @Override
     public void removeCamera(int index){
-	pc[index]=null;
+    pc[index]=null;
     }
 
     @Override
     public void resetMouseIn(){
-	for (int i=0;i<pc.length;i++){
-	    resetMouseIn(i);
-	}
+    for (int i=0;i<pc.length;i++){
+        resetMouseIn(i);
+    }
     }
 
     @Override
     public void resetMouseIn(int i){
-	if (pc[i]!=null){pc[i].prevMouseIn=false;}
-	borderColor = bColor;
+    if (pc[i]!=null){pc[i].prevMouseIn=false;}
+    borderColor = bColor;
     }
 
     @Override
@@ -223,14 +223,14 @@ public class VImage<T> extends ClosedShape implements RectangularShape {
         VirtualSpaceManager.INSTANCE.repaint();
     }
 
-	/** Get the bounding box of this Glyph in virtual space coordinates.
-	 *@return west, north, east and south bounds in virtual space.
-	 */
-	@Override
+    /** Get the bounding box of this Glyph in virtual space coordinates.
+     *@return west, north, east and south bounds in virtual space.
+     */
+    @Override
     public double[] getBounds(){
-		double[] res = {vx-vw/2d,vy+vh/2d,vx+vw/2d,vy-vh/2d};
-		return res;
-	}
+        double[] res = {vx-vw/2d,vy+vh/2d,vx+vw/2d,vy-vh/2d};
+        return res;
+    }
 
     /** Set bitmap image to be displayed. */
     public void setImage(Image i){
@@ -244,30 +244,30 @@ public class VImage<T> extends ClosedShape implements RectangularShape {
 
     /** Get the bitmap image displayed. */
     public Image getImage(){
-	    return image;
+        return image;
     }
 
     /** Set to false if the image should not be scaled according to camera's altitude. Its size can still be changed, but its apparent size will always be the same, no matter the camera's altitude.
      *@see #isZoomSensitive()
      */
     public void setZoomSensitive(boolean b){
-	if (zoomSensitive!=b){
-	    zoomSensitive=b;
-	    VirtualSpaceManager.INSTANCE.repaint();
-	}
+    if (zoomSensitive!=b){
+        zoomSensitive=b;
+        VirtualSpaceManager.INSTANCE.repaint();
+    }
     }
 
     /** Indicates whether the image is scaled according to camera's altitude.
      *@see #setZoomSensitive(boolean b)
      */
     public boolean isZoomSensitive(){
-	    return zoomSensitive;
+        return zoomSensitive;
     }
 
     @Override
     public boolean fillsView(double w,double h,int camIndex){
         //can contain transparent pixel (we have no way of knowing without analysing the image data -could be done when constructing the object or setting the image)
-	    return false;
+        return false;
     }
 
     @Override
@@ -292,10 +292,10 @@ public class VImage<T> extends ClosedShape implements RectangularShape {
         return false;
     }
 
-	@Override
+    @Override
     public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
-		return dvs.intersects(vx-vw/2d, vy-vh/2d, vw, vh);
-	}
+        return dvs.intersects(vx-vw/2d, vy-vh/2d, vw, vh);
+    }
 
     @Override
     public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
@@ -582,10 +582,10 @@ public class VImage<T> extends ClosedShape implements RectangularShape {
         return interpolationMethod;
     }
 
-	@Override
-	public Shape getJava2DShape(){
-		return new Rectangle2D.Double(vx-vw/2.0, vy-vh/2.0, vw, vh);
-	}
+    @Override
+    public Shape getJava2DShape(){
+        return new Rectangle2D.Double(vx-vw/2.0, vy-vh/2.0, vw, vh);
+    }
 
     @Override
     public Object clone(){

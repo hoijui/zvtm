@@ -209,10 +209,10 @@ public class VPolygon<T> extends ClosedShape {
     }
 
     /** The disc is actually approximated to its bounding box here. Precise intersection computation would be too costly. */
-	@Override
+    @Override
     public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
-		return pc[camIndex].p.intersects(jpx-dpr, jpy-dpr, 2*dpr, 2*dpr);
-	}
+        return pc[camIndex].p.intersects(jpx-dpr, jpy-dpr, 2*dpr, 2*dpr);
+    }
 
     @Override
     public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
@@ -516,19 +516,19 @@ public class VPolygon<T> extends ClosedShape {
         return new Point2D.Double(cx,cy);
     }
 
-	/** Get the Java2D Shape corresponding to this Glyph. Virtual Space coordinates.
-	 * <strong>Warning:</strong> the polygon's coordinates are converted to 32-bit integers for now (we use a java.awt.Polygon)
-	 */
-	@Override
-	public Shape getJava2DShape(){
-		int[] xc = new int[xcoords.length];
-		int[] yc = new int[xcoords.length];
-		for (int i=0;i<xcoords.length;i++){
+    /** Get the Java2D Shape corresponding to this Glyph. Virtual Space coordinates.
+     * <strong>Warning:</strong> the polygon's coordinates are converted to 32-bit integers for now (we use a java.awt.Polygon)
+     */
+    @Override
+    public Shape getJava2DShape(){
+        int[] xc = new int[xcoords.length];
+        int[] yc = new int[xcoords.length];
+        for (int i=0;i<xcoords.length;i++){
             xc[i] = (int)Math.round(xcoords[i] + vx);
             yc[i] = (int)Math.round(ycoords[i] + vy);
         }
-		return new Polygon(xc, yc, xc.length);
-	}
+        return new Polygon(xc, yc, xc.length);
+    }
 
     @Override
     public Object clone(){

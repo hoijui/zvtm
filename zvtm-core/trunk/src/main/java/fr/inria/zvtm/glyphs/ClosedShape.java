@@ -52,10 +52,10 @@ public abstract class ClosedShape<T> extends Glyph {
      * Relevant for closed shapes only. Does not make sense for glyphs such as text, paths and segments.
      */
     public void setFilled(boolean b){
-	if (b!=filled){
-	    filled=b;
-	    VirtualSpaceManager.INSTANCE.repaint();
-	}
+    if (b!=filled){
+        filled=b;
+        VirtualSpaceManager.INSTANCE.repaint();
+    }
     }
 
     /** Indicates whether this glyph's interior is filled or not.
@@ -67,10 +67,10 @@ public abstract class ClosedShape<T> extends Glyph {
      * Relevant for closed shapes only. Does not make sense for glyphs such as text, paths and segments.
      */
     public void setDrawBorder(boolean b){
-	if (b!=paintBorder){
-	    paintBorder=b;
-	    VirtualSpaceManager.INSTANCE.repaint();
-	}
+    if (b!=paintBorder){
+        paintBorder=b;
+        VirtualSpaceManager.INSTANCE.repaint();
+    }
     }
 
     /** Indicates whether the glyph's border is drawn or not.
@@ -84,7 +84,7 @@ public abstract class ClosedShape<T> extends Glyph {
      *@param c set to null to keep the original color.
      */
     public void setCursorInsideFillColor(Color c){
-	this.cursorInsideFColor = c;
+    this.cursorInsideFColor = c;
     }
 
     /** Set the glyph's border color (use setColor for text, paths, segments, etc.).
@@ -107,15 +107,15 @@ public abstract class ClosedShape<T> extends Glyph {
      *@see #addHSVbColor(float h,float s,float v)
      */
     public void setHSVbColor(float h, float s, float v){
-	HSVb[0] = h;
-	if (HSVb[0]>1) {HSVb[0] = 1.0f;} else {if (HSVb[0]<0) {HSVb[0] = 0;}}
-	HSVb[1] = s;
-	if (HSVb[1]>1) {HSVb[1] = 1.0f;} else {if (HSVb[1]<0) {HSVb[1] = 0;}}
-	HSVb[2] = v;
-	if (HSVb[2]>1) {HSVb[2] = 1.0f;} else {if (HSVb[2]<0) {HSVb[2] = 0;}}
-	borderColor = Color.getHSBColor(HSVb[0],HSVb[1],HSVb[2]);
-	bColor = borderColor;
-	VirtualSpaceManager.INSTANCE.repaint();
+    HSVb[0] = h;
+    if (HSVb[0]>1) {HSVb[0] = 1.0f;} else {if (HSVb[0]<0) {HSVb[0] = 0;}}
+    HSVb[1] = s;
+    if (HSVb[1]>1) {HSVb[1] = 1.0f;} else {if (HSVb[1]<0) {HSVb[1] = 0;}}
+    HSVb[2] = v;
+    if (HSVb[2]>1) {HSVb[2] = 1.0f;} else {if (HSVb[2]<0) {HSVb[2] = 0;}}
+    borderColor = Color.getHSBColor(HSVb[0],HSVb[1],HSVb[2]);
+    bColor = borderColor;
+    VirtualSpaceManager.INSTANCE.repaint();
     }
 
     /** Set the glyph's border color (absolute value, HSV color space).
@@ -126,20 +126,20 @@ public abstract class ClosedShape<T> extends Glyph {
      *@see #setHSVbColor(float h,float s,float v)
      */
     public void addHSVbColor(float h, float s, float v){
-	HSVb[0] = HSVb[0]+h;
-	if (HSVb[0]>1) {HSVb[0] = 1.0f;} else {if (HSVb[0]<0) {HSVb[0] = 0;}}
-	HSVb[1] = HSVb[1]+s;
-	if (HSVb[1]>1) {HSVb[1] = 1.0f;} else {if (HSVb[1]<0) {HSVb[1] = 0;}}
-	HSVb[2] = HSVb[2]+v;
-	if (HSVb[2]>1) {HSVb[2] = 1.0f;} else {if (HSVb[2]<0) {HSVb[2] = 0;}}
-	this.borderColor = Color.getHSBColor(HSVb[0], HSVb[1], HSVb[2]);
-	bColor = borderColor;
-	VirtualSpaceManager.INSTANCE.repaint();
+    HSVb[0] = HSVb[0]+h;
+    if (HSVb[0]>1) {HSVb[0] = 1.0f;} else {if (HSVb[0]<0) {HSVb[0] = 0;}}
+    HSVb[1] = HSVb[1]+s;
+    if (HSVb[1]>1) {HSVb[1] = 1.0f;} else {if (HSVb[1]<0) {HSVb[1] = 0;}}
+    HSVb[2] = HSVb[2]+v;
+    if (HSVb[2]>1) {HSVb[2] = 1.0f;} else {if (HSVb[2]<0) {HSVb[2] = 0;}}
+    this.borderColor = Color.getHSBColor(HSVb[0], HSVb[1], HSVb[2]);
+    bColor = borderColor;
+    VirtualSpaceManager.INSTANCE.repaint();
     }
 
     /** Get border color's HSV components. */
     public float[] getHSVbColor(){
-	return this.HSVb;
+    return this.HSVb;
     }
 
     /** Get the glyph's current border color (use getColor for text, paths, segments, etc.).
@@ -147,7 +147,7 @@ public abstract class ClosedShape<T> extends Glyph {
      *@see #getDefaultBorderColor()
      */
     public Color getBorderColor(){
-	return this.borderColor;
+    return this.borderColor;
     }
 
     /** Get the glyph's default border color (use getColor for text, paths, segments, etc.).
@@ -155,30 +155,30 @@ public abstract class ClosedShape<T> extends Glyph {
      *@see #getBorderColor()
      */
     public Color getDefaultBorderColor(){
-	return this.bColor;
+    return this.bColor;
     }
 
     /** Highlight this glyph to give visual feedback when the cursor is inside it. */
     @Override
     public void highlight(boolean b, Color selectedColor){
-	boolean update = false;
-	if (b){
-	    if (cursorInsideFColor != null){color = cursorInsideFColor;update = true;}
-	    if (cursorInsideColor != null){borderColor = cursorInsideColor;update = true;}
-	}
-	else {
-	    if (isSelected() && selectedColor != null){
-		borderColor = selectedColor;
-		update = true;
-	    }
-	    else {
-		if (cursorInsideFColor != null){color = fColor;update = true;}
-		if (cursorInsideColor != null){borderColor = bColor;update = true;}
-	    }
-	}
-	if (update){
-		VirtualSpaceManager.INSTANCE.repaint();
-	}
+    boolean update = false;
+    if (b){
+        if (cursorInsideFColor != null){color = cursorInsideFColor;update = true;}
+        if (cursorInsideColor != null){borderColor = cursorInsideColor;update = true;}
+    }
+    else {
+        if (isSelected() && selectedColor != null){
+        borderColor = selectedColor;
+        update = true;
+        }
+        else {
+        if (cursorInsideFColor != null){color = fColor;update = true;}
+        if (cursorInsideColor != null){borderColor = bColor;update = true;}
+        }
+    }
+    if (update){
+        VirtualSpaceManager.INSTANCE.repaint();
+    }
     }
 
 }

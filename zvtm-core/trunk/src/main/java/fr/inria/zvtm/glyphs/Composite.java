@@ -302,11 +302,11 @@ public class Composite<T> extends Glyph {
                         (bbox[2] - bbox[0])*(bbox[2] - bbox[0])));
         }
 
-	@Override
-	public Shape getJava2DShape(){
-		//XXX:TBW
-		return null;
-	}
+    @Override
+    public Shape getJava2DShape(){
+        //XXX:TBW
+        return null;
+    }
 
 }
 

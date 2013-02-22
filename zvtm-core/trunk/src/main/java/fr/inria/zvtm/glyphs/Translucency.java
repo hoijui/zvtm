@@ -20,10 +20,10 @@ public class Translucency {
 
     public static final AlphaComposite[] acs;
     static {
-	acs = new AlphaComposite[ACS_ACCURACY+1];
-	for (int i=0;i<acs.length;i++){
-	    acs[i] = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, i/((float)ACS_ACCURACY));
-	}
+    acs = new AlphaComposite[ACS_ACCURACY+1];
+    for (int i=0;i<acs.length;i++){
+        acs[i] = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, i/((float)ACS_ACCURACY));
+    }
     }
 
 }

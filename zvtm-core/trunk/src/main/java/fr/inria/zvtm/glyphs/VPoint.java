@@ -45,7 +45,7 @@ public class VPoint<T> extends Glyph {
     ProjectedCoords[] pc;
 
     public VPoint(){
-	    this(0, 0, 0, Color.BLACK, 1.0f);
+        this(0, 0, 0, Color.BLACK, 1.0f);
     }
 
     /**
@@ -85,49 +85,49 @@ public class VPoint<T> extends Glyph {
 
     @Override
     public void initCams(int nbCam){
-	pc=new ProjectedCoords[nbCam];
-	for (int i=0;i<nbCam;i++){
-	    pc[i]=new ProjectedCoords();
-	}
+    pc=new ProjectedCoords[nbCam];
+    for (int i=0;i<nbCam;i++){
+        pc[i]=new ProjectedCoords();
+    }
     }
 
     @Override
     public void addCamera(int verifIndex){
-	if (pc!=null){
-	    if (verifIndex==pc.length){
-		ProjectedCoords[] ta=pc;
-		pc=new ProjectedCoords[ta.length+1];
-		for (int i=0;i<ta.length;i++){
-		    pc[i]=ta[i];
-		}
-		pc[pc.length-1]=new ProjectedCoords();
-	    }
-	    else {System.err.println("VPoint:Error while adding camera "+verifIndex);}
-	}
-	else {
-	    if (verifIndex==0){
-		pc=new ProjectedCoords[1];
-		pc[0]=new ProjectedCoords();
-	    }
-	    else {System.err.println("VPoint:Error while adding camera "+verifIndex);}
-	}
+    if (pc!=null){
+        if (verifIndex==pc.length){
+        ProjectedCoords[] ta=pc;
+        pc=new ProjectedCoords[ta.length+1];
+        for (int i=0;i<ta.length;i++){
+            pc[i]=ta[i];
+        }
+        pc[pc.length-1]=new ProjectedCoords();
+        }
+        else {System.err.println("VPoint:Error while adding camera "+verifIndex);}
+    }
+    else {
+        if (verifIndex==0){
+        pc=new ProjectedCoords[1];
+        pc[0]=new ProjectedCoords();
+        }
+        else {System.err.println("VPoint:Error while adding camera "+verifIndex);}
+    }
     }
 
     @Override
     public void removeCamera(int index){
-	pc[index]=null;
+    pc[index]=null;
     }
 
     @Override
     public void resetMouseIn(){
-	for (int i=0;i<pc.length;i++){
-	    resetMouseIn(i);
-	}
+    for (int i=0;i<pc.length;i++){
+        resetMouseIn(i);
+    }
     }
 
     @Override
     public void resetMouseIn(int i){
-	if (pc[i]!=null){pc[i].prevMouseIn=false;}
+    if (pc[i]!=null){pc[i].prevMouseIn=false;}
     }
 
     /** Cannot be resized (it makes on sense). */
@@ -150,7 +150,7 @@ public class VPoint<T> extends Glyph {
 
     @Override
     public boolean fillsView(double w,double h,int camIndex){
-	    return false;
+        return false;
     }
 
     @Override
@@ -159,10 +159,10 @@ public class VPoint<T> extends Glyph {
         else {return false;}
     }
 
-	@Override
+    @Override
     public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
-		return Math.sqrt((vx-dvx)*(vx-dvx) + (vy-dvy)*(vy-dvy)) <= dvr;
-	}
+        return Math.sqrt((vx-dvx)*(vx-dvx) + (vy-dvy)*(vy-dvy)) <= dvr;
+    }
 
     @Override
     public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
@@ -249,11 +249,11 @@ public class VPoint<T> extends Glyph {
         }
     }
 
-	@Override
-	public Shape getJava2DShape(){
-		// returning a Rectangle2D instead of a Point2D because Point2D does not implement Shape
-		return new Rectangle2D.Double(vx, vy, 1, 1);
-	}
+    @Override
+    public Shape getJava2DShape(){
+        // returning a Rectangle2D instead of a Point2D because Point2D does not implement Shape
+        return new Rectangle2D.Double(vx, vy, 1, 1);
+    }
 
     @Override
     public Object clone(){
@@ -279,7 +279,7 @@ public class VPoint<T> extends Glyph {
             }
         }
         if (update){
-		VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint();
         }
     }
 

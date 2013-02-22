@@ -38,7 +38,7 @@ public class SIRectangle<T> extends ClosedShape implements RectangularShape {
     RProjectedCoords[] pc;
 
     public SIRectangle(){
-	    this(0, 0, 0, 5, 5, Color.WHITE, Color.BLACK);
+        this(0, 0, 0, 5, 5, Color.WHITE, Color.BLACK);
     }
 
     /**
@@ -50,7 +50,7 @@ public class SIRectangle<T> extends ClosedShape implements RectangularShape {
      *@param c fill color
      */
     public SIRectangle(double x,double y, int z,double w,double h,Color c){
-	    this(x, y, z, w, h, c, Color.BLACK);
+        this(x, y, z, w, h, c, Color.BLACK);
     }
 
     /**
@@ -114,20 +114,20 @@ public class SIRectangle<T> extends ClosedShape implements RectangularShape {
 
     @Override
     public void removeCamera(int index){
-	pc[index]=null;
+    pc[index]=null;
     }
 
     @Override
     public void resetMouseIn(){
-	for (int i=0;i<pc.length;i++){
-	    resetMouseIn(i);
-	}
+    for (int i=0;i<pc.length;i++){
+        resetMouseIn(i);
+    }
     }
 
     @Override
     public void resetMouseIn(int i){
-	if (pc[i]!=null){pc[i].prevMouseIn=false;}
-	borderColor = bColor;
+    if (pc[i]!=null){pc[i].prevMouseIn=false;}
+    borderColor = bColor;
     }
 
     @Override
@@ -145,7 +145,7 @@ public class SIRectangle<T> extends ClosedShape implements RectangularShape {
     public double getHeight(){return vh;}
 
     void computeSize(){
-	    size = Math.sqrt(vw*vw + vh*vh);
+        size = Math.sqrt(vw*vw + vh*vh);
     }
 
     @Override
@@ -180,67 +180,67 @@ public class SIRectangle<T> extends ClosedShape implements RectangularShape {
         VirtualSpaceManager.INSTANCE.repaint();
     }
 
-	/** Get the bounding box of this Glyph in virtual space coordinates.
-	 *@return west, north, east and south bounds in virtual space.
-	 */
-	 @Override
+    /** Get the bounding box of this Glyph in virtual space coordinates.
+     *@return west, north, east and south bounds in virtual space.
+     */
+     @Override
     public double[] getBounds(){
-		double[] res = {vx-vw/2d,vy+vh/2d,vx+vw/2d,vy-vh/2d};
-		return res;
-	}
+        double[] res = {vx-vw/2d,vy+vh/2d,vx+vw/2d,vy-vh/2d};
+        return res;
+    }
 
     private void updateProjectedWH(){
-	if (pc!=null){
-	    for (int i=0;i<pc.length;i++){
-		try {
-		    pc[i].cw=(int)(vw/2d);
-		    pc[i].ch=(int)(vh/2d);
-		}//some pc[i] might be null (if cameras were deleted from the virtual space)
-		catch (NullPointerException e){}
-	    }
-	}
+    if (pc!=null){
+        for (int i=0;i<pc.length;i++){
+        try {
+            pc[i].cw=(int)(vw/2d);
+            pc[i].ch=(int)(vh/2d);
+        }//some pc[i] might be null (if cameras were deleted from the virtual space)
+        catch (NullPointerException e){}
+        }
+    }
     }
 
     @Override
     public boolean visibleInRegion(double wb, double nb, double eb, double sb, int i){
-	if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
-	    /* Glyph hotspot is in the region. The glyph is obviously visible */
-	    return true;
-	}
-	else {
-	    if (((vx-pc[i].cw)<=eb) && ((vx+pc[i].cw)>=wb) && ((vy-pc[i].ch)<=nb) && ((vy+pc[i].ch)>=sb)){
-		/* Glyph is at least partially in region.
-		   We approximate using the glyph bounding box, meaning that some glyphs not
-		   actually visible can be projected and drawn (but they won't be displayed)) */
-		return true;
-	    }
-	}
-	return false;
+    if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
+        /* Glyph hotspot is in the region. The glyph is obviously visible */
+        return true;
+    }
+    else {
+        if (((vx-pc[i].cw)<=eb) && ((vx+pc[i].cw)>=wb) && ((vy-pc[i].ch)<=nb) && ((vy+pc[i].ch)>=sb)){
+        /* Glyph is at least partially in region.
+           We approximate using the glyph bounding box, meaning that some glyphs not
+           actually visible can be projected and drawn (but they won't be displayed)) */
+        return true;
+        }
+    }
+    return false;
     }
 
     @Override
     public boolean containedInRegion(double wb, double nb, double eb, double sb, int i){
-	if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
-	    /* Glyph hotspot is in the region.
-	       There is a good chance the glyph is contained in the region, but this is not sufficient. */
-	    if (((vx+pc[i].cw)<=eb) && ((vx-pc[i].cw)>=wb) && ((vy+pc[i].ch)<=nb) && ((vy-pc[i].ch)>=sb)){
-		return true;
-	    }
-	    else return false;   //otherwise the glyph is not visible
-	}
-	return false;
+    if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
+        /* Glyph hotspot is in the region.
+           There is a good chance the glyph is contained in the region, but this is not sufficient. */
+        if (((vx+pc[i].cw)<=eb) && ((vx-pc[i].cw)>=wb) && ((vy+pc[i].ch)<=nb) && ((vy-pc[i].ch)>=sb)){
+        return true;
+        }
+        else return false;   //otherwise the glyph is not visible
+    }
+    return false;
     }
 
     @Override
     public boolean fillsView(double w,double h,int camIndex){//width and height of view - pc[i].c? are JPanel coords
-	if ((w<=pc[camIndex].cx+pc[camIndex].cw) && (0>=pc[camIndex].cx-pc[camIndex].cw) && (h<=pc[camIndex].cy+pc[camIndex].ch) && (0>=pc[camIndex].cy-pc[camIndex].ch)){return true;}
-	else {return false;}
+    if ((w<=pc[camIndex].cx+pc[camIndex].cw) && (0>=pc[camIndex].cx-pc[camIndex].cw) && (h<=pc[camIndex].cy+pc[camIndex].ch) && (0>=pc[camIndex].cy-pc[camIndex].ch)){return true;}
+    else {return false;}
     }
 
     @Override
     public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
-		return dvs.intersects(vx-vw/2d, vy-vh/2d, vw, vh);
-	}
+        return dvs.intersects(vx-vw/2d, vy-vh/2d, vw, vh);
+    }
 
     @Override
     public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
@@ -424,10 +424,10 @@ public class SIRectangle<T> extends ClosedShape implements RectangularShape {
         }
     }
 
-	@Override
-	public Shape getJava2DShape(){
-		return new Rectangle2D.Double(vx-vw/2.0, vy-vh/2.0, vw, vh);
-	}
+    @Override
+    public Shape getJava2DShape(){
+        return new Rectangle2D.Double(vx-vw/2.0, vy-vh/2.0, vw, vh);
+    }
 
     @Override
     public Object clone(){

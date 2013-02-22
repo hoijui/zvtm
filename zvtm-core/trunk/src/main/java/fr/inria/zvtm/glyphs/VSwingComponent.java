@@ -71,7 +71,7 @@ public class VSwingComponent<T> extends ClosedShape implements RectangularShape 
      *@param c Swing component to be displayed
      */
     public VSwingComponent(JComponent c){
-	    this(0, 0, 0, c, 1.0, 0, 1.0f);
+        this(0, 0, 0, c, 1.0, 0, 1.0f);
     }
 
     /** Instantiate a Swing component at (x, y) with original scale.
@@ -121,7 +121,7 @@ public class VSwingComponent<T> extends ClosedShape implements RectangularShape 
         vy = y;
         vz = z;
         this.sc = c;
-		this.sc.setDoubleBuffered(false);
+        this.sc.setDoubleBuffered(false);
         vw = sc.getWidth() * scale;
         vh = sc.getHeight() * scale;
         if (vw==0 && vh==0){ar = 1.0f;}
@@ -239,19 +239,19 @@ public class VSwingComponent<T> extends ClosedShape implements RectangularShape 
         VirtualSpaceManager.INSTANCE.repaint();
     }
 
-	/** Get the bounding box of this Glyph in virtual space coordinates.
-	 *@return west, north, east and south bounds in virtual space.
-	 */
-	@Override
+    /** Get the bounding box of this Glyph in virtual space coordinates.
+     *@return west, north, east and south bounds in virtual space.
+     */
+    @Override
     public double[] getBounds(){
-		double[] res = {vx-vw/2d,vy+vh/2d,vx+vw/2d,vy-vh/2d};
-		return res;
-	}
+        double[] res = {vx-vw/2d,vy+vh/2d,vx+vw/2d,vy-vh/2d};
+        return res;
+    }
 
     /** Set Swing component to be displayed. */
     public void setComponent(JComponent c){
         sc = c;
-		sc.setDoubleBuffered(false);
+        sc.setDoubleBuffered(false);
         vw = sc.getWidth() * scaleFactor;
         vh = sc.getHeight() * scaleFactor;
         ar = vw / vh;
@@ -261,7 +261,7 @@ public class VSwingComponent<T> extends ClosedShape implements RectangularShape 
 
     /** Get the Swing component displayed. */
     public JComponent getComponent(){
-	    return sc;
+        return sc;
     }
 
     /** Set to false if the Swing component should not be scaled according to camera's altitude.
@@ -279,14 +279,14 @@ public class VSwingComponent<T> extends ClosedShape implements RectangularShape 
      *@see #setZoomSensitive(boolean b)
      */
     public boolean isZoomSensitive(){
-	    return zoomSensitive;
+        return zoomSensitive;
     }
 
     @Override
     public boolean fillsView(double w,double h,int camIndex){
         //can contain transparent pixel (we have no way of knowing without analysing the component
         // -could be done when constructing the object / setting the it)
-	    return false;
+        return false;
     }
 
     @Override
@@ -311,10 +311,10 @@ public class VSwingComponent<T> extends ClosedShape implements RectangularShape 
     }
 
     /** The disc is actually approximated to its bounding box here. Precise intersection computation would be too costly. */
-	@Override
+    @Override
     public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
-		return pc[camIndex].p.intersects(jpx-dpr, jpy-dpr, 2*dpr, 2*dpr);
-	}
+        return pc[camIndex].p.intersects(jpx-dpr, jpy-dpr, 2*dpr, 2*dpr);
+    }
 
     @Override
     public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
@@ -683,10 +683,10 @@ public class VSwingComponent<T> extends ClosedShape implements RectangularShape 
         }
     }
 
-	@Override
-	public Shape getJava2DShape(){
-		return new Rectangle2D.Double(vx-vw/2.0, vy-vh/2.0, vw, vh);
-	}
+    @Override
+    public Shape getJava2DShape(){
+        return new Rectangle2D.Double(vx-vw/2.0, vy-vh/2.0, vw, vh);
+    }
 
     @Override
     public Object clone(){

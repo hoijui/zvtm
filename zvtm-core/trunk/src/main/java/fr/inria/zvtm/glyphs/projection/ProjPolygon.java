@@ -9,7 +9,7 @@
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -40,10 +40,10 @@ public class ProjPolygon extends BProjectedCoordsP {
     public int[] lypcoords;
 
     public ProjPolygon(int nbVertices){
-	xpcoords = new int[nbVertices];
-	ypcoords = new int[nbVertices];
-	lxpcoords = new int[nbVertices];
-	lypcoords = new int[nbVertices];
+    xpcoords = new int[nbVertices];
+    ypcoords = new int[nbVertices];
+    lxpcoords = new int[nbVertices];
+    lypcoords = new int[nbVertices];
     }
 
 }

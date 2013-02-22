@@ -47,11 +47,11 @@ public class FPolygon<T> extends ClosedShape {
      *@param c fill color
      */
     public FPolygon(Point2D.Double[] v, int z, Color c){
-	    this(v, z, c, Color.BLACK, 1.0f);
+        this(v, z, c, Color.BLACK, 1.0f);
     }
 
     public FPolygon(Point2D.Double[] v, int z, Color c, Color bc){
-	    this(v, z, c, Color.BLACK, 1.0f);
+        this(v, z, c, Color.BLACK, 1.0f);
     }
 
     /**
@@ -96,42 +96,42 @@ public class FPolygon<T> extends ClosedShape {
 
     @Override
     public void addCamera(int verifIndex){
-	if (pc!=null){
-	    if (verifIndex==pc.length){
-		ProjPolygon[] ta=pc;
-		pc=new ProjPolygon[ta.length+1];
-		for (int i=0;i<ta.length;i++){
-		    pc[i]=ta[i];
-		}
-		pc[pc.length-1]=new ProjPolygon(xcoords.length);
-	    }
-	    else {System.err.println("FPolygon:Error while adding camera "+verifIndex);}
-	}
-	else {
-	    if (verifIndex==0){
-		pc=new ProjPolygon[1];
-		pc[0]=new ProjPolygon(xcoords.length);
-	    }
-	    else {System.err.println("FPolygon:Error while adding camera "+verifIndex);}
-	}
+    if (pc!=null){
+        if (verifIndex==pc.length){
+        ProjPolygon[] ta=pc;
+        pc=new ProjPolygon[ta.length+1];
+        for (int i=0;i<ta.length;i++){
+            pc[i]=ta[i];
+        }
+        pc[pc.length-1]=new ProjPolygon(xcoords.length);
+        }
+        else {System.err.println("FPolygon:Error while adding camera "+verifIndex);}
+    }
+    else {
+        if (verifIndex==0){
+        pc=new ProjPolygon[1];
+        pc[0]=new ProjPolygon(xcoords.length);
+        }
+        else {System.err.println("FPolygon:Error while adding camera "+verifIndex);}
+    }
     }
 
     @Override
     public void removeCamera(int index){
-	pc[index]=null;
+    pc[index]=null;
     }
 
     @Override
     public void resetMouseIn(){
-	for (int i=0;i<pc.length;i++){
-	    resetMouseIn(i);
-	}
+    for (int i=0;i<pc.length;i++){
+        resetMouseIn(i);
+    }
     }
 
     @Override
     public void resetMouseIn(int i){
-	if (pc[i]!=null){pc[i].prevMouseIn=false;}
-	borderColor = bColor;
+    if (pc[i]!=null){pc[i].prevMouseIn=false;}
+    borderColor = bColor;
     }
 
     @Override
@@ -178,10 +178,10 @@ public class FPolygon<T> extends ClosedShape {
     }
 
     /** The disc is actually approximated to its bounding box here. Precise intersection computation would be too costly. */
-	@Override
+    @Override
     public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
-		return pc[camIndex].p.intersects(jpx-dpr, jpy-dpr, 2*dpr, 2*dpr);
-	}
+        return pc[camIndex].p.intersects(jpx-dpr, jpy-dpr, 2*dpr, 2*dpr);
+    }
 
     @Override
     public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
@@ -485,19 +485,19 @@ public class FPolygon<T> extends ClosedShape {
         return new Point2D.Double(cx,cy);
     }
 
-	/** Get the Java2D Shape corresponding to this Glyph. Virtual Space coordinates.
-	 * <strong>Warning:</strong> the polygon's coordinates are converted to 32-bit integers for now (we use a java.awt.Polygon)
-	 */
-	@Override
-	public Shape getJava2DShape(){
-		int[] xc = new int[xcoords.length];
-		int[] yc = new int[xcoords.length];
-		for (int i=0;i<xcoords.length;i++){
+    /** Get the Java2D Shape corresponding to this Glyph. Virtual Space coordinates.
+     * <strong>Warning:</strong> the polygon's coordinates are converted to 32-bit integers for now (we use a java.awt.Polygon)
+     */
+    @Override
+    public Shape getJava2DShape(){
+        int[] xc = new int[xcoords.length];
+        int[] yc = new int[xcoords.length];
+        for (int i=0;i<xcoords.length;i++){
             xc[i] = (int)Math.round(xcoords[i] + vx);
             yc[i] = (int)Math.round(ycoords[i] + vy);
         }
-		return new Polygon(xc, yc, xc.length);
-	}
+        return new Polygon(xc, yc, xc.length);
+    }
 
     @Override
     public Object clone(){

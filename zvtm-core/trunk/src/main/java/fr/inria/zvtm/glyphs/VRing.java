@@ -51,10 +51,10 @@ public class VRing<T> extends ClosedShape {
     public int angleDeg;
     public int orientDeg;
 
-	ProjRing[] pr;
+    ProjRing[] pr;
 
-	/** Radius of inner ring, as a percentage of outer radius (from center of ring).*/
-	float irr_p;
+    /** Radius of inner ring, as a percentage of outer radius (from center of ring).*/
+    float irr_p;
 
     /** Construct a slice by giving its size, angle and orientation
         *@param x x-coordinate in virtual space of vertex that is not an arc endpoint
@@ -83,12 +83,12 @@ public class VRing<T> extends ClosedShape {
         *@param alpha alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
         */
     public VRing(double x, double y, int z, double vs, double ag, float irr, double or, Color c, Color bc, float alpha){
-		initCoordArray(4);
+        initCoordArray(4);
         vx = x;
         vy = y;
         vz = z;
         size = vs;
-		irr_p = irr;
+        irr_p = irr;
         orient = or;
         orientDeg = (int)Math.round(orient * RAD2DEG_FACTOR);
         angle = ag;
@@ -125,7 +125,7 @@ public class VRing<T> extends ClosedShape {
         *@param alpha alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
         */
     public VRing(double x, double y, int z, double vs, int ag, float irr, int or, Color c, Color bc, float alpha){
-		initCoordArray(4);
+        initCoordArray(4);
         vx = x;
         vy = y;
         vz = z;
@@ -141,19 +141,19 @@ public class VRing<T> extends ClosedShape {
     }
 
 
-	/** FOR INTERNAL USE ONLY */
-	public void initCoordArray(int n){
-		xpcoords = new int[n];
-	    ypcoords = new int[n];
-	}
+    /** FOR INTERNAL USE ONLY */
+    public void initCoordArray(int n){
+        xpcoords = new int[n];
+        ypcoords = new int[n];
+    }
 
-	@Override
+    @Override
     public void initCams(int nbCam){
-		pr = new ProjRing[nbCam];
-		for (int i=0;i<nbCam;i++){
-			pr[i] = new ProjRing();
-		}
-	}
+        pr = new ProjRing[nbCam];
+        for (int i=0;i<nbCam;i++){
+            pr[i] = new ProjRing();
+        }
+    }
 
     /**
      * Returns the inner radius ratio, as a percentage
@@ -224,48 +224,48 @@ public class VRing<T> extends ClosedShape {
 
     @Override
     public boolean fillsView(double w,double h,int camIndex){
-	    //XXX: TBW (call coordInside() for the four view corners)
-	    return false;
+        //XXX: TBW (call coordInside() for the four view corners)
+        return false;
     }
 
-	@Override
+    @Override
     public void addCamera(int verifIndex){
-		if (pr != null){
-			if (verifIndex == pr.length){
-				ProjRing[] ta = (ProjRing[])pr;
-				pr = new ProjRing[ta.length+1];
-				for (int i=0;i<ta.length;i++){
-					pr[i] = ta[i];
-				}
-				pr[pr.length-1] = new ProjRing();
-			}
-			else {System.err.println("VRing:Error while adding camera "+verifIndex);}
-		}
-		else {
-			if (verifIndex == 0){
-				pr = new ProjRing[1];
-				pr[0] = new ProjRing();
-			}
-			else {System.err.println("VRing:Error while adding camera "+verifIndex);}
-		}
-	}
+        if (pr != null){
+            if (verifIndex == pr.length){
+                ProjRing[] ta = (ProjRing[])pr;
+                pr = new ProjRing[ta.length+1];
+                for (int i=0;i<ta.length;i++){
+                    pr[i] = ta[i];
+                }
+                pr[pr.length-1] = new ProjRing();
+            }
+            else {System.err.println("VRing:Error while adding camera "+verifIndex);}
+        }
+        else {
+            if (verifIndex == 0){
+                pr = new ProjRing[1];
+                pr[0] = new ProjRing();
+            }
+            else {System.err.println("VRing:Error while adding camera "+verifIndex);}
+        }
+    }
 
     @Override
     public void removeCamera(int index){
-	pr[index] = null;
+    pr[index] = null;
     }
 
     @Override
     public void resetMouseIn(){
-	for (int i=0;i<pr.length;i++){
-	    resetMouseIn(i);
-	}
+    for (int i=0;i<pr.length;i++){
+        resetMouseIn(i);
+    }
     }
 
     @Override
     public void resetMouseIn(int i){
-	if (pr[i] != null){pr[i].prevMouseIn = false;}
-	borderColor = bColor;
+    if (pr[i] != null){pr[i].prevMouseIn = false;}
+    borderColor = bColor;
     }
 
     @Override
@@ -311,54 +311,54 @@ public class VRing<T> extends ClosedShape {
      *@return the angle in [0:2Pi[
      */
     public double getAngle(){
-	return angle;
+    return angle;
     }
 
     @Override
     public double getSize(){
-	return size;
+    return size;
     }
 
     public boolean coordInsideHemisphere(int x, int y, int camIndex){
-	if (orient == 0){
-	    return (x >= pr[camIndex].cx) ? true : false;
-	}
-	else if (orient == Math.PI){
-	    return (x <= pr[camIndex].cx) ? true : false;
-	}
-	else {
-	    double a = (pr[camIndex].p2y-pr[camIndex].p1y) / (pr[camIndex].p2x-pr[camIndex].p1x);
-	    double b = (pr[camIndex].p1y*pr[camIndex].p2x - pr[camIndex].p2y*pr[camIndex].p1x) / (pr[camIndex].p2x-pr[camIndex].p1x);
-	    if (orient < Math.PI && y <= a*x+b ||
-		orient > Math.PI && y >= a*x+b){
-		return true;
-	    }
-	    else {
-		return false;
-	    }
-	}
+    if (orient == 0){
+        return (x >= pr[camIndex].cx) ? true : false;
+    }
+    else if (orient == Math.PI){
+        return (x <= pr[camIndex].cx) ? true : false;
+    }
+    else {
+        double a = (pr[camIndex].p2y-pr[camIndex].p1y) / (pr[camIndex].p2x-pr[camIndex].p1x);
+        double b = (pr[camIndex].p1y*pr[camIndex].p2x - pr[camIndex].p2y*pr[camIndex].p1x) / (pr[camIndex].p2x-pr[camIndex].p1x);
+        if (orient < Math.PI && y <= a*x+b ||
+        orient > Math.PI && y >= a*x+b){
+        return true;
+        }
+        else {
+        return false;
+        }
+    }
     }
 
-	@Override
+    @Override
     public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
-		if (Math.sqrt((jpx-pr[camIndex].cx)*(jpx-pr[camIndex].cx) + (jpy-pr[camIndex].cy)*(jpy-pr[camIndex].cy)) <= pr[camIndex].outerCircleRadius){
-			if (pr[camIndex].ring.contains(jpx, jpy)){
-				return true;
-			}
-		}
-		return false;
-	}
+        if (Math.sqrt((jpx-pr[camIndex].cx)*(jpx-pr[camIndex].cx) + (jpy-pr[camIndex].cy)*(jpy-pr[camIndex].cy)) <= pr[camIndex].outerCircleRadius){
+            if (pr[camIndex].ring.contains(jpx, jpy)){
+                return true;
+            }
+        }
+        return false;
+    }
 
     /** The disc is actually approximated to its bounding box here. Precise intersection computation would be too costly. */
-	@Override
+    @Override
     public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
-		if (Math.sqrt((vx-dvx)*(vx-dvx) + (vy-dvy)*(vy-dvy)) < (dvr + size)){
-		    return pr[camIndex].ring.intersects(jpx-dpr, jpy-dpr, 2*dpr, 2*dpr);
-		}
-	    return false;
-	}
+        if (Math.sqrt((vx-dvx)*(vx-dvx) + (vy-dvy)*(vy-dvy)) < (dvr + size)){
+            return pr[camIndex].ring.intersects(jpx-dpr, jpy-dpr, 2*dpr, 2*dpr);
+        }
+        return false;
+    }
 
-	@Override
+    @Override
     public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
             if (coordInside(jpx, jpy, camIndex, cvx, cvy)){
                 //if the mouse is inside the glyph
@@ -381,115 +381,115 @@ public class VRing<T> extends ClosedShape {
             }
     }
 
-	@Override
+    @Override
     public void project(Camera c, Dimension d){
-		int i = c.getIndex();
-		coef = c.focal / (c.focal+c.altitude);
-		//find coordinates of object's geom center wrt to camera center and project
-		//translate in JPanel coords
-		int hw = d.width/2;
-		int hh = d.height/2;
-		pr[i].cx = hw + (int)Math.round((vx-c.vx) * coef);
-		pr[i].cy = hh - (int)Math.round((vy-c.vy) * coef);
-		pr[i].outerCircleRadius = (int)Math.round(size * coef);
-		pr[i].innerRingRadius = (int)Math.round(size * irr_p * coef);
-	}
+        int i = c.getIndex();
+        coef = c.focal / (c.focal+c.altitude);
+        //find coordinates of object's geom center wrt to camera center and project
+        //translate in JPanel coords
+        int hw = d.width/2;
+        int hh = d.height/2;
+        pr[i].cx = hw + (int)Math.round((vx-c.vx) * coef);
+        pr[i].cy = hh - (int)Math.round((vy-c.vy) * coef);
+        pr[i].outerCircleRadius = (int)Math.round(size * coef);
+        pr[i].innerRingRadius = (int)Math.round(size * irr_p * coef);
+    }
 
-	@Override
+    @Override
     public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, double lensx, double lensy){
-		int i = c.getIndex();
-		coef = c.focal/(c.focal+c.altitude) * lensMag;
-		//find coordinates of object's geom center wrt to camera center and project
-		//translate in JPanel coords
-		int hw = (int)lensWidth/2;
-		int hh = (int)lensHeight/2;
-		pr[i].lcx = hw + (int)Math.round((vx-lensx) * coef);
-		pr[i].lcy = hh - (int)Math.round((vy-lensy) * coef);
-		pr[i].louterCircleRadius = (int)Math.round(size * coef);
-		pr[i].linnerRingRadius = (int)Math.round(size * irr_p * coef);
-	}
+        int i = c.getIndex();
+        coef = c.focal/(c.focal+c.altitude) * lensMag;
+        //find coordinates of object's geom center wrt to camera center and project
+        //translate in JPanel coords
+        int hw = (int)lensWidth/2;
+        int hh = (int)lensHeight/2;
+        pr[i].lcx = hw + (int)Math.round((vx-lensx) * coef);
+        pr[i].lcy = hh - (int)Math.round((vy-lensy) * coef);
+        pr[i].louterCircleRadius = (int)Math.round(size * coef);
+        pr[i].linnerRingRadius = (int)Math.round(size * irr_p * coef);
+    }
 
-	Arc2D outerSlice = new Arc2D.Double(Arc2D.PIE);
-	Ellipse2D innerSlice = new Ellipse2D.Double();
-	Area subring;
+    Arc2D outerSlice = new Arc2D.Double(Arc2D.PIE);
+    Ellipse2D innerSlice = new Ellipse2D.Double();
+    Area subring;
 
-	@Override
+    @Override
     public void draw(Graphics2D g, int vW, int vH, int i, Stroke stdS, AffineTransform stdT, int dx, int dy){
-	    if (alphaC != null && alphaC.getAlpha() == 0){return;}
-		if (pr[i].outerCircleRadius > 2){
-			if (isFilled()){
-				// larger pie slice
-				outerSlice.setArc(dx+pr[i].cx - pr[i].outerCircleRadius, dy+pr[i].cy - pr[i].outerCircleRadius,
-					2 * pr[i].outerCircleRadius, 2 * pr[i].outerCircleRadius,
-					(int)Math.round(orientDeg-angleDeg/2.0), angleDeg, Arc2D.PIE);
-				// smaller pie slice to remove to create the ring
-				innerSlice.setFrame(dx+pr[i].cx - pr[i].innerRingRadius, dy+pr[i].cy - pr[i].innerRingRadius,
-					2 * pr[i].innerRingRadius, 2 * pr[i].innerRingRadius);
-				// actually combine both to create the ring (subtraction)
-				pr[i].ring = new Area(outerSlice);
-				if (pr[i].innerRingRadius > 0){
-					subring = new Area(innerSlice);
-					pr[i].ring.subtract(subring);
-				}
-				// draw that area
-				g.setColor(this.color);
-				if (alphaC != null){
-				    // translucent
-					g.setComposite(alphaC);
-					g.fill(pr[i].ring);
-					g.setComposite(acO);
-				}
-				else {
-				    // opaque
-				    g.fill(pr[i].ring);
-				}
-			}
-			if (isBorderDrawn()){
-				g.setColor(borderColor);
-				if (stroke != null){
-					g.setStroke(stroke);
-					if (alphaC != null){
-					    // translucwent
-						g.setComposite(alphaC);
-						g.draw(pr[i].ring);
-						g.setComposite(acO);
-					}
-					else {
-					    // opaque
-					    g.draw(pr[i].ring);
-					}
-					g.setStroke(stdS);
-				}
-				else {
-					if (alphaC != null){
-					    // translucent
-						g.setComposite(alphaC);
-						g.draw(pr[i].ring);
-						g.setComposite(acO);
-					}
-					else {
-					    // opaque
-					    g.draw(pr[i].ring);
-					}
-				}
-			}
-		}
-		else {
-			//paint a dot if too small
-			if (alphaC != null){
-			    // translucent
-				g.setComposite(alphaC);
-				g.setColor(this.color);
-				g.fillRect(dx+pr[i].cx, dy+pr[i].cy, 1, 1);
-				g.setComposite(acO);
-			}
-			else {
-			    // opaque
-				g.setColor(this.color);
-				g.fillRect(dx+pr[i].cx, dy+pr[i].cy, 1, 1);
-			}
-		}
-	}
+        if (alphaC != null && alphaC.getAlpha() == 0){return;}
+        if (pr[i].outerCircleRadius > 2){
+            if (isFilled()){
+                // larger pie slice
+                outerSlice.setArc(dx+pr[i].cx - pr[i].outerCircleRadius, dy+pr[i].cy - pr[i].outerCircleRadius,
+                    2 * pr[i].outerCircleRadius, 2 * pr[i].outerCircleRadius,
+                    (int)Math.round(orientDeg-angleDeg/2.0), angleDeg, Arc2D.PIE);
+                // smaller pie slice to remove to create the ring
+                innerSlice.setFrame(dx+pr[i].cx - pr[i].innerRingRadius, dy+pr[i].cy - pr[i].innerRingRadius,
+                    2 * pr[i].innerRingRadius, 2 * pr[i].innerRingRadius);
+                // actually combine both to create the ring (subtraction)
+                pr[i].ring = new Area(outerSlice);
+                if (pr[i].innerRingRadius > 0){
+                    subring = new Area(innerSlice);
+                    pr[i].ring.subtract(subring);
+                }
+                // draw that area
+                g.setColor(this.color);
+                if (alphaC != null){
+                    // translucent
+                    g.setComposite(alphaC);
+                    g.fill(pr[i].ring);
+                    g.setComposite(acO);
+                }
+                else {
+                    // opaque
+                    g.fill(pr[i].ring);
+                }
+            }
+            if (isBorderDrawn()){
+                g.setColor(borderColor);
+                if (stroke != null){
+                    g.setStroke(stroke);
+                    if (alphaC != null){
+                        // translucwent
+                        g.setComposite(alphaC);
+                        g.draw(pr[i].ring);
+                        g.setComposite(acO);
+                    }
+                    else {
+                        // opaque
+                        g.draw(pr[i].ring);
+                    }
+                    g.setStroke(stdS);
+                }
+                else {
+                    if (alphaC != null){
+                        // translucent
+                        g.setComposite(alphaC);
+                        g.draw(pr[i].ring);
+                        g.setComposite(acO);
+                    }
+                    else {
+                        // opaque
+                        g.draw(pr[i].ring);
+                    }
+                }
+            }
+        }
+        else {
+            //paint a dot if too small
+            if (alphaC != null){
+                // translucent
+                g.setComposite(alphaC);
+                g.setColor(this.color);
+                g.fillRect(dx+pr[i].cx, dy+pr[i].cy, 1, 1);
+                g.setComposite(acO);
+            }
+            else {
+                // opaque
+                g.setColor(this.color);
+                g.fillRect(dx+pr[i].cx, dy+pr[i].cy, 1, 1);
+            }
+        }
+    }
 
     @Override
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
@@ -505,10 +505,10 @@ public class VRing<T> extends ClosedShape {
                     2 * pr[i].linnerRingRadius, 2 * pr[i].linnerRingRadius);
                 // actually combine both to create the ring (subtraction)
                 pr[i].lring = new Area(outerSlice);
-				if (pr[i].linnerRingRadius > 0){
-	                subring = new Area(innerSlice);
-	                pr[i].lring.subtract(subring);
-				}
+                if (pr[i].linnerRingRadius > 0){
+                    subring = new Area(innerSlice);
+                    pr[i].lring.subtract(subring);
+                }
                 // draw that area
                 g.setColor(this.color);
                 if (alphaC != null){
@@ -569,15 +569,15 @@ public class VRing<T> extends ClosedShape {
         }
     }
 
-	@Override
-	public Shape getJava2DShape(){
-		//XXX:TBW
-		return null;
-	}
+    @Override
+    public Shape getJava2DShape(){
+        //XXX:TBW
+        return null;
+    }
 
     @Override
     public Object clone(){
-	    VRing res = new VRing(vx, vy, vz, size, angle, irr_p, orient, color, borderColor, (alphaC != null) ? alphaC.getAlpha() : 1);
+        VRing res = new VRing(vx, vy, vz, size, angle, irr_p, orient, color, borderColor, (alphaC != null) ? alphaC.getAlpha() : 1);
         res.cursorInsideColor = this.cursorInsideColor;
         return res;
     }

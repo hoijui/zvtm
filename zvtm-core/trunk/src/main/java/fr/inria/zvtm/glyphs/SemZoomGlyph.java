@@ -197,11 +197,11 @@ public class SemZoomGlyph<T> extends Glyph {
         return null;
     }
 
-	@Override
-	public Shape getJava2DShape(){
-		//XXX:TBW
-		return null;
-	}
+    @Override
+    public Shape getJava2DShape(){
+        //XXX:TBW
+        return null;
+    }
 
 }
 

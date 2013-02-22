@@ -113,7 +113,7 @@ public class RImage<T> extends VImage {
         vh = Math.round(image.getHeight(null)/2.0);
         ar = vw / vh;
         computeSize();
-	    VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint();
     }
 
     @Override
@@ -123,14 +123,14 @@ public class RImage<T> extends VImage {
 
     @Override
     public Object clone(){
-    	RImage res = new RImage(vx, vy, vz, image, (alphaC != null) ? alphaC.getAlpha() : 1.0f);
-    	res.setWidth(vw);
-    	res.setHeight(vh);
-    	res.borderColor = this.borderColor;
-    	res.cursorInsideColor = this.cursorInsideColor;
-    	res.bColor = this.bColor;
-    	res.setZoomSensitive(zoomSensitive);
-    	return res;
+        RImage res = new RImage(vx, vy, vz, image, (alphaC != null) ? alphaC.getAlpha() : 1.0f);
+        res.setWidth(vw);
+        res.setHeight(vh);
+        res.borderColor = this.borderColor;
+        res.cursorInsideColor = this.cursorInsideColor;
+        res.bColor = this.bColor;
+        res.setZoomSensitive(zoomSensitive);
+        return res;
     }
 
     public static BufferedImage getBufferedImageFromFile(File f){

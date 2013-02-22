@@ -109,50 +109,50 @@ public class VEllipse<T> extends ClosedShape implements RectangularShape {
 
     @Override
     public void initCams(int nbCam){
-	pc=new ProjEllipse[nbCam];
-	for (int i=0;i<nbCam;i++){
-	    pc[i]=new ProjEllipse();
-	}
+    pc=new ProjEllipse[nbCam];
+    for (int i=0;i<nbCam;i++){
+        pc[i]=new ProjEllipse();
+    }
     }
 
     @Override
     public void addCamera(int verifIndex){
-	if (pc!=null){
-	    if (verifIndex==pc.length){
-		ProjEllipse[] ta=pc;
-		pc=new ProjEllipse[ta.length+1];
-		for (int i=0;i<ta.length;i++){
-		    pc[i]=ta[i];
-		}
-		pc[pc.length-1]=new ProjEllipse();
-	    }
-	    else {System.err.println("VEllipse:Error while adding camera "+verifIndex);}
-	}
-	else {
-	    if (verifIndex==0){
-		pc=new ProjEllipse[1];
-		pc[0]=new ProjEllipse();
-	    }
-	    else {System.err.println("VEllipse:Error while adding camera "+verifIndex);}
-	}
+    if (pc!=null){
+        if (verifIndex==pc.length){
+        ProjEllipse[] ta=pc;
+        pc=new ProjEllipse[ta.length+1];
+        for (int i=0;i<ta.length;i++){
+            pc[i]=ta[i];
+        }
+        pc[pc.length-1]=new ProjEllipse();
+        }
+        else {System.err.println("VEllipse:Error while adding camera "+verifIndex);}
+    }
+    else {
+        if (verifIndex==0){
+        pc=new ProjEllipse[1];
+        pc[0]=new ProjEllipse();
+        }
+        else {System.err.println("VEllipse:Error while adding camera "+verifIndex);}
+    }
     }
 
     @Override
     public void removeCamera(int index){
-	pc[index]=null;
+    pc[index]=null;
     }
 
     @Override
     public void resetMouseIn(){
-	for (int i=0;i<pc.length;i++){
-	    resetMouseIn(i);
-	}
+    for (int i=0;i<pc.length;i++){
+        resetMouseIn(i);
+    }
     }
 
     @Override
     public void resetMouseIn(int i){
-	if (pc[i]!=null){pc[i].prevMouseIn=false;}
-	borderColor = bColor;
+    if (pc[i]!=null){pc[i].prevMouseIn=false;}
+    borderColor = bColor;
     }
 
     /** Cannot be reoriented. */
@@ -214,18 +214,18 @@ public class VEllipse<T> extends ClosedShape implements RectangularShape {
         VirtualSpaceManager.INSTANCE.repaint();
     }
 
-	/** Get the bounding box of this Glyph in virtual space coordinates.
-	 *@return west, north, east and south bounds in virtual space.
-	 */
-	 @Override
+    /** Get the bounding box of this Glyph in virtual space coordinates.
+     *@return west, north, east and south bounds in virtual space.
+     */
+     @Override
     public double[] getBounds(){
-		double[] res = {vx-vw/2d,vy+vh/2d,vx+vw/2d,vy-vh/2d};
-		return res;
-	}
+        double[] res = {vx-vw/2d,vy+vh/2d,vx+vw/2d,vy-vh/2d};
+        return res;
+    }
 
     @Override
     public boolean fillsView(double w,double h,int camIndex){//would be too complex: just say no
-	return false;
+    return false;
     }
 
     @Override
@@ -235,10 +235,10 @@ public class VEllipse<T> extends ClosedShape implements RectangularShape {
     }
 
     /** The disc is actually approximated to its bounding box here. Precise intersection computation would be too costly. */
-	@Override
+    @Override
     public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
-		return pc[camIndex].ellipse.intersects(jpx-dpr, jpy-dpr, 2*dpr, 2*dpr);
-	}
+        return pc[camIndex].ellipse.intersects(jpx-dpr, jpy-dpr, 2*dpr, 2*dpr);
+    }
 
     @Override
     public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
@@ -421,10 +421,10 @@ public class VEllipse<T> extends ClosedShape implements RectangularShape {
         }
     }
 
-	@Override
-	public Shape getJava2DShape(){
-		return new Ellipse2D.Double(vx-vw/2.0, vy-vh/2.0, vw, vh);
-	}
+    @Override
+    public Shape getJava2DShape(){
+        return new Ellipse2D.Double(vx-vw/2.0, vy-vh/2.0, vw, vh);
+    }
 
     @Override
     public Object clone(){

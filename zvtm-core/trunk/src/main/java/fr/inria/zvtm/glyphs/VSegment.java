@@ -121,49 +121,49 @@ public class VSegment<T> extends Glyph implements RectangularShape {
 
     @Override
     public void initCams(int nbCam){
-	pc=new RProjectedCoords[nbCam];
-	for (int i=0;i<nbCam;i++){
-	    pc[i]=new RProjectedCoords();
-	}
+    pc=new RProjectedCoords[nbCam];
+    for (int i=0;i<nbCam;i++){
+        pc[i]=new RProjectedCoords();
+    }
     }
 
     @Override
     public void addCamera(int verifIndex){
-	if (pc!=null){
-	    if (verifIndex==pc.length){
-		RProjectedCoords[] ta=pc;
-		pc=new RProjectedCoords[ta.length+1];
-		for (int i=0;i<ta.length;i++){
-		    pc[i]=ta[i];
-		}
-		pc[pc.length-1]=new RProjectedCoords();
-	    }
-	    else {System.err.println("VSegment:Error while adding camera "+verifIndex);}
-	}
-	else {
-	    if (verifIndex==0){
-		pc=new RProjectedCoords[1];
-		pc[0]=new RProjectedCoords();
-	    }
-	    else {System.err.println("VSegment:Error while adding camera "+verifIndex);}
-	}
+    if (pc!=null){
+        if (verifIndex==pc.length){
+        RProjectedCoords[] ta=pc;
+        pc=new RProjectedCoords[ta.length+1];
+        for (int i=0;i<ta.length;i++){
+            pc[i]=ta[i];
+        }
+        pc[pc.length-1]=new RProjectedCoords();
+        }
+        else {System.err.println("VSegment:Error while adding camera "+verifIndex);}
+    }
+    else {
+        if (verifIndex==0){
+        pc=new RProjectedCoords[1];
+        pc[0]=new RProjectedCoords();
+        }
+        else {System.err.println("VSegment:Error while adding camera "+verifIndex);}
+    }
     }
 
     @Override
     public void removeCamera(int index){
-	pc[index]=null;
+    pc[index]=null;
     }
 
     @Override
     public void resetMouseIn(){
-	for (int i=0;i<pc.length;i++){
-	    resetMouseIn(i);
-	}
+    for (int i=0;i<pc.length;i++){
+        resetMouseIn(i);
+    }
     }
 
     @Override
     public void resetMouseIn(int i){
-	if (pc[i]!=null){pc[i].prevMouseIn=false;}
+    if (pc[i]!=null){pc[i].prevMouseIn=false;}
     }
 
     @Override
@@ -179,14 +179,14 @@ public class VSegment<T> extends Glyph implements RectangularShape {
     @Override
     public double getSize(){return size;}
 
-	/** Get the bounding box of this Glyph in virtual space coordinates.
-	 *@return west, north, east and south bounds in virtual space.
-	 */
-	@Override
+    /** Get the bounding box of this Glyph in virtual space coordinates.
+     *@return west, north, east and south bounds in virtual space.
+     */
+    @Override
     public double[] getBounds(){
-		double[] res = {vx-vw/2d,vy+vh/2d,vx+vw/2d,vy-vh/2d};
-		return res;
-	}
+        double[] res = {vx-vw/2d,vy+vh/2d,vx+vw/2d,vy-vh/2d};
+        return res;
+    }
 
     /** Change the segment's location, size and orientation by giving its two endpoints (absolute coordinates). */
     public void setEndPoints(double x1, double y1, double x2, double y2){
@@ -274,7 +274,7 @@ public class VSegment<T> extends Glyph implements RectangularShape {
 
     @Override
     public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
-	    return false;
+        return false;
     }
 
     /** Detects whether the point (x,y) lies on the segment or not. Default tolerance of 2 pixels.
@@ -283,7 +283,7 @@ public class VSegment<T> extends Glyph implements RectangularShape {
      *@param camIndex camera index (obtained through Camera.getIndex())
      */
     public boolean intersects(int x, int y, int camIndex){
-	return intersects(x, y, 2, camIndex);
+    return intersects(x, y, 2, camIndex);
     }
 
     /** Detects whether the point (x,y) lies on the segment or not.
@@ -293,19 +293,19 @@ public class VSegment<T> extends Glyph implements RectangularShape {
      *@param camIndex camera index (obtained through Camera.getIndex())
      */
     public boolean intersects(int x, int y, int tolerance, int camIndex){
-	    return Line2D.ptSegDist(pc[camIndex].cx-pc[camIndex].cw, pc[camIndex].cy+pc[camIndex].ch,
-	                            pc[camIndex].cx+pc[camIndex].cw, pc[camIndex].cy-pc[camIndex].ch,
-	                            x, y) <= tolerance;
+        return Line2D.ptSegDist(pc[camIndex].cx-pc[camIndex].cw, pc[camIndex].cy+pc[camIndex].ch,
+                                pc[camIndex].cx+pc[camIndex].cw, pc[camIndex].cy-pc[camIndex].ch,
+                                x, y) <= tolerance;
     }
 
     @Override
     public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
-		return Line2D.ptSegDist(vx-vw/2d, vy-vh/2d, vx+vw/2d, vy+vh/2d, dvx, dvy) <= dvr;
-	}
+        return Line2D.ptSegDist(vx-vw/2d, vy-vh/2d, vx+vw/2d, vy+vh/2d, dvx, dvy) <= dvr;
+    }
 
     @Override
     public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
-	    return Glyph.NO_CURSOR_EVENT;
+        return Glyph.NO_CURSOR_EVENT;
     }
 
     @Override
@@ -390,10 +390,10 @@ public class VSegment<T> extends Glyph implements RectangularShape {
         }
     }
 
-	@Override
-	public Shape getJava2DShape(){
-		return new Line2D.Double(vx+vw/2d, vy+vh/2d, vx-vw/2d, vy-vh/2d);
-	}
+    @Override
+    public Shape getJava2DShape(){
+        return new Line2D.Double(vx+vw/2d, vy+vh/2d, vx-vw/2d, vy-vh/2d);
+    }
 
     @Override
     public Object clone(){
@@ -420,7 +420,7 @@ public class VSegment<T> extends Glyph implements RectangularShape {
             }
         }
         if (update){
-		VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint();
         }
     }
 

@@ -59,7 +59,7 @@ public abstract class Glyph<T> implements Cloneable, Translucent {
      *@return null if not associated with anything.
      */
     public T getOwner(){
-	   return owner;
+       return owner;
     }
 
      /** Set the object this glyph represents in the client application.
@@ -67,7 +67,7 @@ public abstract class Glyph<T> implements Cloneable, Translucent {
      *@param t provided by client application, null by default.
      */
     public void setOwner(T t){
-	   this.owner = t;
+       this.owner = t;
     }
 
     /** Get the type of this glyph.
@@ -75,7 +75,7 @@ public abstract class Glyph<T> implements Cloneable, Translucent {
      *@return null if not set
      */
     public String getType(){
-	return type;
+    return type;
     }
 
     /** Set the type of this glyph.
@@ -83,13 +83,13 @@ public abstract class Glyph<T> implements Cloneable, Translucent {
      *@param t arbitrary string, set by client application. Null if not set.
      */
     public void setType(String t){
-	this.type = t;
+    this.type = t;
     }
 
     /** Get a string representation of this glyph.
      */
     public String toString(){
-	return new String(super.toString()+" Glyph ID "+hashCode()+" pos ("+vx+","+vy+","+vz+") type="+type);
+    return new String(super.toString()+" Glyph ID "+hashCode()+" pos ("+vx+","+vy+","+vz+") type="+type);
     }
 
 
@@ -195,7 +195,7 @@ public abstract class Glyph<T> implements Cloneable, Translucent {
 
     /** Make this glyph sensitive (or not). */
     public void setSensitivity(boolean b){
-	sensit=b;
+    sensit=b;
     }
 
     /** Indicates whether ZVTM sends events related to cursor entry/exit in/from this glyph or not. */
@@ -208,17 +208,17 @@ public abstract class Glyph<T> implements Cloneable, Translucent {
      *@see fr.inria.zvtm.engine.VirtualSpace#hide(Glyph g)
      */
     public void setVisible(boolean b){
-	if (b!=visible){
-	    visible=b;
-	    VirtualSpaceManager.INSTANCE.repaint();
-	}
+    if (b!=visible){
+        visible=b;
+        VirtualSpaceManager.INSTANCE.repaint();
+    }
     }
 
     /** Get this glyph's visibility status.
      *@return true if visible
      */
     public boolean isVisible(){
-	return visible;
+    return visible;
     }
 
     /** Get this glyph's visibility status when seen through a lens.
@@ -226,7 +226,7 @@ public abstract class Glyph<T> implements Cloneable, Translucent {
      *@return true if visible
      */
     public boolean isVisibleThroughLens(){
-	return visible;
+    return visible;
     }
 
 
@@ -249,7 +249,7 @@ public abstract class Glyph<T> implements Cloneable, Translucent {
     protected float[] HSV=new float[3];
 
     // Main or Fill color of this glyph when it is in its default state.
-	protected Color fColor = Color.white;
+    protected Color fColor = Color.white;
 
     // Highlight color of this glyph when cursor is inside it. Null if same as default border color.
     protected Color cursorInsideColor = DEFAULT_MOUSE_INSIDE_COLOR;
@@ -269,15 +269,15 @@ public abstract class Glyph<T> implements Cloneable, Translucent {
      *@param c set to null to keep the original color.
      */
     public void setCursorInsideHighlightColor(Color c){
-		this.cursorInsideColor = c;
+        this.cursorInsideColor = c;
     }
 
     /** Set the glyph's main color. This is the fill color for closed shapes, or stroke color for other glyphs (text, paths, segments, etc.). */
     public void setColor(Color c){
-	color = c;
-	fColor = color;
-	HSV = Color.RGBtoHSB(c.getRed(),c.getGreen(),c.getBlue(),(new float[3]));
-	VirtualSpaceManager.INSTANCE.repaint();
+    color = c;
+    fColor = color;
+    HSV = Color.RGBtoHSB(c.getRed(),c.getGreen(),c.getBlue(),(new float[3]));
+    VirtualSpaceManager.INSTANCE.repaint();
     }
 
     /** Set the glyph's border color (use setColor for text, paths, segments, etc.).
@@ -293,15 +293,15 @@ public abstract class Glyph<T> implements Cloneable, Translucent {
      *@see #addHSVColor(float h,float s,float v)
      */
     public void setHSVColor(float h,float s,float v){
-	HSV[0]=h;
-	if (HSV[0]>1) {HSV[0]=1.0f;} else {if (HSV[0]<0) {HSV[0]=0;}}
-	HSV[1]=s;
-	if (HSV[1]>1) {HSV[1]=1.0f;} else {if (HSV[1]<0) {HSV[1]=0;}}
-	HSV[2]=v;
-	if (HSV[2]>1) {HSV[2]=1.0f;} else {if (HSV[2]<0) {HSV[2]=0;}}
-	color = Color.getHSBColor(HSV[0],HSV[1],HSV[2]);
-	fColor = color;
-	VirtualSpaceManager.INSTANCE.repaint();
+    HSV[0]=h;
+    if (HSV[0]>1) {HSV[0]=1.0f;} else {if (HSV[0]<0) {HSV[0]=0;}}
+    HSV[1]=s;
+    if (HSV[1]>1) {HSV[1]=1.0f;} else {if (HSV[1]<0) {HSV[1]=0;}}
+    HSV[2]=v;
+    if (HSV[2]>1) {HSV[2]=1.0f;} else {if (HSV[2]<0) {HSV[2]=0;}}
+    color = Color.getHSBColor(HSV[0],HSV[1],HSV[2]);
+    fColor = color;
+    VirtualSpaceManager.INSTANCE.repaint();
     }
 
     /** Set the glyph's main color (absolute value, HSV color space).
@@ -311,15 +311,15 @@ public abstract class Glyph<T> implements Cloneable, Translucent {
      *@see #setHSVColor(float h,float s,float v)
      */
     public void addHSVColor(float h,float s,float v){
-	HSV[0]=HSV[0]+h;
-	if (HSV[0]>1) {HSV[0]=1.0f;} else {if (HSV[0]<0) {HSV[0]=0;}}
-	HSV[1]=HSV[1]+s;
-	if (HSV[1]>1) {HSV[1]=1.0f;} else {if (HSV[1]<0) {HSV[1]=0;}}
-	HSV[2]=HSV[2]+v;
-	if (HSV[2]>1) {HSV[2]=1.0f;} else {if (HSV[2]<0) {HSV[2]=0;}}
-	this.color=Color.getHSBColor(HSV[0],HSV[1],HSV[2]);
-	fColor = color;
-	VirtualSpaceManager.INSTANCE.repaint();
+    HSV[0]=HSV[0]+h;
+    if (HSV[0]>1) {HSV[0]=1.0f;} else {if (HSV[0]<0) {HSV[0]=0;}}
+    HSV[1]=HSV[1]+s;
+    if (HSV[1]>1) {HSV[1]=1.0f;} else {if (HSV[1]<0) {HSV[1]=0;}}
+    HSV[2]=HSV[2]+v;
+    if (HSV[2]>1) {HSV[2]=1.0f;} else {if (HSV[2]<0) {HSV[2]=0;}}
+    this.color=Color.getHSBColor(HSV[0],HSV[1],HSV[2]);
+    fColor = color;
+    VirtualSpaceManager.INSTANCE.repaint();
     }
 
     /** Set the glyph's border color (absolute value, HSV color space).
@@ -344,15 +344,15 @@ public abstract class Glyph<T> implements Cloneable, Translucent {
 
     /** Get main color's HSV components. This is the original array, not a copy. */
     public float[] getHSVColor(){
-	return this.HSV;
+    return this.HSV;
     }
 
     /** Get border color's HSV components. This is the original array, not a copy.
      *@return {0, 0, 0} if the glyph does not have a border (e.g., is not an instanceof ClosedShape)
      */
     public float[] getHSVbColor(){
-	float[] res = {0.0f, 0.0f, 0.0f};
-	return res;
+    float[] res = {0.0f, 0.0f, 0.0f};
+    return res;
     }
 
     /** Get the glyph's current main color.
@@ -361,7 +361,7 @@ public abstract class Glyph<T> implements Cloneable, Translucent {
      *@see #getDefaultColor()
      */
     public Color getColor(){
-	return this.color;
+    return this.color;
     }
 
      /** Get the glyph's default main color.
@@ -370,7 +370,7 @@ public abstract class Glyph<T> implements Cloneable, Translucent {
      *@see #getColor()
      */
     public Color getDefaultColor(){
-	return this.fColor;
+    return this.fColor;
     }
 
     /** Get the glyph's border color (use getColor for text, paths, segments, etc.).
@@ -378,7 +378,7 @@ public abstract class Glyph<T> implements Cloneable, Translucent {
      *@see #getColor()
      */
     public Color getBorderColor(){
-	return Color.BLACK;
+    return Color.BLACK;
     }
 
     /** Highlight this glyph to give visual feedback when the cursor is inside it. */
@@ -419,14 +419,14 @@ public abstract class Glyph<T> implements Cloneable, Translucent {
      *@param b true to select glyph, false to unselect it
      */
     public void select(boolean b){
-	selected=b;
+    selected=b;
     }
 
     /** Get this glyph's selection status.
      *@return true if selected.
      */
     public boolean isSelected(){
-	return selected;
+    return selected;
     }
 
 
@@ -439,16 +439,16 @@ public abstract class Glyph<T> implements Cloneable, Translucent {
      *@param s stroke (null to set standard 1px-thick stroke)
      */
     public void setStroke(Stroke s){
-		if (s!=null){stroke=s;}
-		else {stroke=null;}
-		VirtualSpaceManager.INSTANCE.repaint();
-	}
+        if (s!=null){stroke=s;}
+        else {stroke=null;}
+        VirtualSpaceManager.INSTANCE.repaint();
+    }
 
     /** Get the stroke used to paint glyph's border.
      *@return null if default 1px-thick solid stroke
      */
     public Stroke getStroke(){
-		return stroke;
+        return stroke;
     }
 
     /*---------Sticked glyphs----------------------------------*/
@@ -474,69 +474,69 @@ public abstract class Glyph<T> implements Cloneable, Translucent {
      *@param g glyph to be attached to this one
      */
     public void stick(Glyph g){
-	if (stickedGlyphs == null){
-	    stickedGlyphs = new Glyph[1];
-	    stickedGlyphs[0] = g;
-	    g.stickedTo = this;
-	}
-	else {
-	    boolean alreadySticked = false;
-	    for (int i=0;i<stickedGlyphs.length;i++){
-		if (stickedGlyphs[i] == g){
-		    alreadySticked = true;
-		    break;
-		}
-	    }
-	    if (!alreadySticked){
-		Glyph[] newStickList = new Glyph[stickedGlyphs.length + 1];
-		System.arraycopy(stickedGlyphs, 0, newStickList, 0, stickedGlyphs.length);
-		newStickList[stickedGlyphs.length] = g;
-		stickedGlyphs = newStickList;
-		g.stickedTo = this;
-	    }
-	    else {
-		if (VirtualSpaceManager.debugModeON()){System.err.println("Warning: trying to stick Glyph "+g+" to Glyph "+this+" while they are already sticked.");}
-	    }
-	}
+    if (stickedGlyphs == null){
+        stickedGlyphs = new Glyph[1];
+        stickedGlyphs[0] = g;
+        g.stickedTo = this;
+    }
+    else {
+        boolean alreadySticked = false;
+        for (int i=0;i<stickedGlyphs.length;i++){
+        if (stickedGlyphs[i] == g){
+            alreadySticked = true;
+            break;
+        }
+        }
+        if (!alreadySticked){
+        Glyph[] newStickList = new Glyph[stickedGlyphs.length + 1];
+        System.arraycopy(stickedGlyphs, 0, newStickList, 0, stickedGlyphs.length);
+        newStickList[stickedGlyphs.length] = g;
+        stickedGlyphs = newStickList;
+        g.stickedTo = this;
+        }
+        else {
+        if (VirtualSpaceManager.debugModeON()){System.err.println("Warning: trying to stick Glyph "+g+" to Glyph "+this+" while they are already sticked.");}
+        }
+    }
     }
 
     /** Unattach a glyph from this one. Translations of this glyph will no longer be propagated to g.
      *@param g glyph to be unattached from this one
      */
     public void unstick(Glyph g){
-	if (stickedGlyphs != null){
-	    for (int i=0;i<stickedGlyphs.length;i++){
-		if (stickedGlyphs[i] == g){
-		    g.stickedTo = null;
-		    Glyph[] newStickList = new Glyph[stickedGlyphs.length - 1];
-		    System.arraycopy(stickedGlyphs, 0, newStickList, 0, i);
-		    System.arraycopy(stickedGlyphs, i+1, newStickList, i, stickedGlyphs.length-i-1);
-		    stickedGlyphs = newStickList;
-		    break;
-		}
-	    }
-	    if (stickedGlyphs.length == 0){stickedGlyphs = null;}
-	    g.stickedTo = null;
-	}
+    if (stickedGlyphs != null){
+        for (int i=0;i<stickedGlyphs.length;i++){
+        if (stickedGlyphs[i] == g){
+            g.stickedTo = null;
+            Glyph[] newStickList = new Glyph[stickedGlyphs.length - 1];
+            System.arraycopy(stickedGlyphs, 0, newStickList, 0, i);
+            System.arraycopy(stickedGlyphs, i+1, newStickList, i, stickedGlyphs.length-i-1);
+            stickedGlyphs = newStickList;
+            break;
+        }
+        }
+        if (stickedGlyphs.length == 0){stickedGlyphs = null;}
+        g.stickedTo = null;
+    }
     }
 
    /** Unattach all glyphs attached to this one. Translations of this glyph will no longer be propagated to them.
     */
     public void unstickAllGlyphs(){
-	if (stickedGlyphs != null){
-	    for (int i=0;i<stickedGlyphs.length;i++){
-		stickedGlyphs[i].stickedTo = null;
-		stickedGlyphs[i] = null;
-	    }
-	    stickedGlyphs = null;
-	}
+    if (stickedGlyphs != null){
+        for (int i=0;i<stickedGlyphs.length;i++){
+        stickedGlyphs[i].stickedTo = null;
+        stickedGlyphs[i] = null;
+        }
+        stickedGlyphs = null;
+    }
     }
 
     /** Get the list of glyphs sticked to this one.
      *@return null if no glyph is attached to this one
      */
     public Glyph[] getStickedGlyphArray(){
-	return stickedGlyphs;
+    return stickedGlyphs;
     }
 
     /*----Projecting and Drawing--------------------------------*/
@@ -592,7 +592,7 @@ public abstract class Glyph<T> implements Cloneable, Translucent {
     public abstract void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy);
 
     /** Initialize projected coordinates.
-	Called internally when glyph is created in order to create the initial set of projected coordinates w.r.t the number of cameras in the virtual space.
+    Called internally when glyph is created in order to create the initial set of projected coordinates w.r.t the number of cameras in the virtual space.
      *@param nbCam current number of cameras in the virtual space
      *@see #addCamera(int verifIndex)
      *@see #removeCamera(int index)
@@ -672,16 +672,16 @@ public abstract class Glyph<T> implements Cloneable, Translucent {
      *@return true if the glyph intersects the region delimited by wb, nb, eb, sb
      */
     public boolean containedInRegion(double wb, double nb, double eb, double sb, int i){
-	if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
-	    /* Glyph hotspot is in the region.
-	       There is a good chance the glyph is
-	       contained in the region, but this is not sufficient. */
-	    if (((vx+size)<=eb) && ((vx-size)>=wb) && ((vy+size)<=nb) && ((vy-size)>=sb)){
-		return true;
-	    }
-	    else return false;   //otherwise the glyph is not visible
-	}
-	return false;
+    if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
+        /* Glyph hotspot is in the region.
+           There is a good chance the glyph is
+           contained in the region, but this is not sufficient. */
+        if (((vx+size)<=eb) && ((vx-size)>=wb) && ((vy+size)<=nb) && ((vy-size)>=sb)){
+        return true;
+        }
+        else return false;   //otherwise the glyph is not visible
+    }
+    return false;
     }
 
     /** Find out if this glyph completely fills a view. (In which case it is not necessary to repaint objects below it in the drawing stack).
@@ -692,42 +692,42 @@ public abstract class Glyph<T> implements Cloneable, Translucent {
      */
     public abstract boolean fillsView(double w,double h,int camIndex);
 
-	/** Find out if a glyph is visible in a circular area. Not implemented yet for most glyph classes.
-	 * Used for instance to implement DynaSpot picking.
-	 */
-	public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
-		return false;
-	}
+    /** Find out if a glyph is visible in a circular area. Not implemented yet for most glyph classes.
+     * Used for instance to implement DynaSpot picking.
+     */
+    public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
+        return false;
+    }
 
-	/** Get the bounding box of this Glyph in virtual space coordinates.
-	 *@return west, north, east and south bounds in virtual space.
-	 */
-	public double[] getBounds(){
-		double[] res = {vx-size, vy+size, vx+size,vy-size};
-		return res;
-	}
+    /** Get the bounding box of this Glyph in virtual space coordinates.
+     *@return west, north, east and south bounds in virtual space.
+     */
+    public double[] getBounds(){
+        double[] res = {vx-size, vy+size, vx+size,vy-size};
+        return res;
+    }
 
-	/*------------------------Sticking--------------------------*/
+    /*------------------------Sticking--------------------------*/
 
-	/** Stick glyph g1 to glyph g2. Behaves like a one-way constraint.*/
+    /** Stick glyph g1 to glyph g2. Behaves like a one-way constraint.*/
     public static void stickToGlyph(Glyph g1,Glyph g2){
-		g2.stick(g1);
-	}
+        g2.stick(g1);
+    }
 
     /** Unstick glyph g1 from glyph g2. */
     public static void unstickFromGlyph(Glyph g1,Glyph g2){
-		g2.unstick(g1);
-	}
+        g2.unstick(g1);
+    }
 
     /** Unstick all glyphs sticked to Glyph g. */
     public static void unstickAllGlyphs(Glyph g){
-		g.unstickAllGlyphs();
-	}
+        g.unstickAllGlyphs();
+    }
 
     /*---------------------  Java 2D  --------------------------*/
 
-	/** Get the Java2D Shape corresponding to this Glyph. Virtual Space coordinates. */
-	public abstract Shape getJava2DShape();
+    /** Get the Java2D Shape corresponding to this Glyph. Virtual Space coordinates. */
+    public abstract Shape getJava2DShape();
 
 
     /*-------------Cloning--------------------------------------*/

@@ -105,32 +105,32 @@ public class VRectangleOr<T> extends VRectangle {
      */
      @Override
     public void orientTo(double angle){
-	orient=angle;
-	VirtualSpaceManager.INSTANCE.repaint();
+    orient=angle;
+    VirtualSpaceManager.INSTANCE.repaint();
     }
 
     @Override
     public boolean fillsView(double w,double h,int camIndex){
-	if (orient==0){
-	    if ((w<=pc[camIndex].cx+pc[camIndex].cw) && (0>=pc[camIndex].cx-pc[camIndex].cw) && (h<=pc[camIndex].cy+pc[camIndex].ch) && (0>=pc[camIndex].cy-pc[camIndex].ch)){return true;}
-	    else {return false;}
-	}
-	else {
-	    if ((pc[camIndex].p.contains(0,0)) && (pc[camIndex].p.contains(w,0)) && (pc[camIndex].p.contains(0,h)) && (pc[camIndex].p.contains(w,h))){return true;}
-	    else {return false;}
-	}
+    if (orient==0){
+        if ((w<=pc[camIndex].cx+pc[camIndex].cw) && (0>=pc[camIndex].cx-pc[camIndex].cw) && (h<=pc[camIndex].cy+pc[camIndex].ch) && (0>=pc[camIndex].cy-pc[camIndex].ch)){return true;}
+        else {return false;}
+    }
+    else {
+        if ((pc[camIndex].p.contains(0,0)) && (pc[camIndex].p.contains(w,0)) && (pc[camIndex].p.contains(0,h)) && (pc[camIndex].p.contains(w,h))){return true;}
+        else {return false;}
+    }
     }
 
     /** The disc is actually approximated to its bounding box here. Precise intersection computation would be too costly. */
-	@Override
+    @Override
     public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
-		if (orient == 0){
-    		return dvs.intersects(vx-vw/2d, vy-vh/2d, vw, vh);
-		}
-		else {
-    		return pc[camIndex].p.intersects(jpx-dpr, jpy-dpr, 2*dpr, 2*dpr);
-		}
-	}
+        if (orient == 0){
+            return dvs.intersects(vx-vw/2d, vy-vh/2d, vw, vh);
+        }
+        else {
+            return pc[camIndex].p.intersects(jpx-dpr, jpy-dpr, 2*dpr, 2*dpr);
+        }
+    }
 
     @Override
     public boolean visibleInRegion(double wb, double nb, double eb, double sb, int i){

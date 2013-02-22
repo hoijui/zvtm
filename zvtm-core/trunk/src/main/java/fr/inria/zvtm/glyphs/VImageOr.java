@@ -92,8 +92,8 @@ public class VImageOr<T> extends VImage {
      */
      @Override
     public void orientTo(double angle){
-	orient=angle;
-	VirtualSpaceManager.INSTANCE.repaint();
+    orient=angle;
+    VirtualSpaceManager.INSTANCE.repaint();
     }
 
     @Override
@@ -118,10 +118,10 @@ public class VImageOr<T> extends VImage {
     }
 
     /** The disc is actually approximated to its bounding box here. Precise intersection computation would be too costly. */
-	@Override
+    @Override
     public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
-		return pc[camIndex].p.intersects(jpx-dpr, jpy-dpr, 2*dpr, 2*dpr);
-	}
+        return pc[camIndex].p.intersects(jpx-dpr, jpy-dpr, 2*dpr, 2*dpr);
+    }
 
     @Override
     public void project(Camera c, Dimension d){

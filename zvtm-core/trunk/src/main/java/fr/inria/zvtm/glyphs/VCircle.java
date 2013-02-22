@@ -59,7 +59,7 @@ public class VCircle<T> extends ClosedShape {
      *@param c fill color
      */
     public VCircle(double x, double y, int z, double d, Color c){
-	    this(x, y, z, d, c, Color.BLACK, 1);
+        this(x, y, z, d, c, Color.BLACK, 1);
     }
 
     /**
@@ -96,50 +96,50 @@ public class VCircle<T> extends ClosedShape {
 
     @Override
     public void initCams(int nbCam){
-	pc = new BProjectedCoords[nbCam];
-	for (int i=0;i<nbCam;i++){
-	    pc[i] = new BProjectedCoords();
-	}
+    pc = new BProjectedCoords[nbCam];
+    for (int i=0;i<nbCam;i++){
+        pc[i] = new BProjectedCoords();
+    }
     }
 
     @Override
     public void addCamera(int verifIndex){
-	if (pc!=null){
-	    if (verifIndex==pc.length){
-		BProjectedCoords[] ta=pc;
-		pc = new BProjectedCoords[ta.length+1];
-		for (int i=0;i<ta.length;i++){
-		    pc[i]=ta[i];
-		}
-		pc[pc.length-1]=new BProjectedCoords();
-	    }
-	    else {System.err.println("VCircle:Error while adding camera "+verifIndex);}
-	}
-	else {
-	    if (verifIndex==0){
-		pc=new BProjectedCoords[1];
-		pc[0]=new BProjectedCoords();
-	    }
-	    else {System.err.println("VCircle:Error while adding camera "+verifIndex);}
-	}
+    if (pc!=null){
+        if (verifIndex==pc.length){
+        BProjectedCoords[] ta=pc;
+        pc = new BProjectedCoords[ta.length+1];
+        for (int i=0;i<ta.length;i++){
+            pc[i]=ta[i];
+        }
+        pc[pc.length-1]=new BProjectedCoords();
+        }
+        else {System.err.println("VCircle:Error while adding camera "+verifIndex);}
+    }
+    else {
+        if (verifIndex==0){
+        pc=new BProjectedCoords[1];
+        pc[0]=new BProjectedCoords();
+        }
+        else {System.err.println("VCircle:Error while adding camera "+verifIndex);}
+    }
     }
 
     @Override
     public void removeCamera(int index){
-	pc[index]=null;
+    pc[index]=null;
     }
 
     @Override
     public void resetMouseIn(){
-	for (int i=0;i<pc.length;i++){
-	    resetMouseIn(i);
-	}
+    for (int i=0;i<pc.length;i++){
+        resetMouseIn(i);
+    }
     }
 
     @Override
     public void resetMouseIn(int i){
-	if (pc[i]!=null){pc[i].prevMouseIn=false;}
-	borderColor = bColor;
+    if (pc[i]!=null){pc[i].prevMouseIn=false;}
+    borderColor = bColor;
     }
 
     @Override
@@ -202,10 +202,10 @@ public class VCircle<T> extends ClosedShape {
         }
     }
 
-	@Override
+    @Override
     public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
-		return Math.sqrt((vx-dvx)*(vx-dvx)+(vy-dvy)*(vy-dvy)) <= (dvr + size/2d);
-	}
+        return Math.sqrt((vx-dvx)*(vx-dvx)+(vy-dvy)*(vy-dvy)) <= (dvr + size/2d);
+    }
 
     @Override
     public void project(Camera c, Dimension d){
@@ -353,10 +353,10 @@ public class VCircle<T> extends ClosedShape {
         }
     }
 
-	@Override
-	public Shape getJava2DShape(){
-		return new Ellipse2D.Double(vx-size/2.0, vy-size/2.0, size, size);
-	}
+    @Override
+    public Shape getJava2DShape(){
+        return new Ellipse2D.Double(vx-size/2.0, vy-size/2.0, size, size);
+    }
 
     @Override
     public Object clone(){

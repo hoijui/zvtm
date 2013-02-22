@@ -113,50 +113,50 @@ public class VRoundRect<T> extends ClosedShape implements RectangularShape  {
 
     @Override
     public void initCams(int nbCam){
-	pc=new ProjRoundRect[nbCam];
-	for (int i=0;i<nbCam;i++){
-	    pc[i]=new ProjRoundRect();
-	}
+    pc=new ProjRoundRect[nbCam];
+    for (int i=0;i<nbCam;i++){
+        pc[i]=new ProjRoundRect();
+    }
     }
 
     @Override
     public void addCamera(int verifIndex){
-	if (pc!=null){
-	    if (verifIndex==pc.length){
-		ProjRoundRect[] ta=pc;
-		pc=new ProjRoundRect[ta.length+1];
-		for (int i=0;i<ta.length;i++){
-		    pc[i]=ta[i];
-		}
-		pc[pc.length-1]=new ProjRoundRect();
-	    }
-	    else {System.err.println("VRoundRect:Error while adding camera "+verifIndex);}
-	}
-	else {
-	    if (verifIndex==0){
-		pc=new ProjRoundRect[1];
-		pc[0]=new ProjRoundRect();
-	    }
-	    else {System.err.println("VRoundRect:Error while adding camera "+verifIndex);}
-	}
+    if (pc!=null){
+        if (verifIndex==pc.length){
+        ProjRoundRect[] ta=pc;
+        pc=new ProjRoundRect[ta.length+1];
+        for (int i=0;i<ta.length;i++){
+            pc[i]=ta[i];
+        }
+        pc[pc.length-1]=new ProjRoundRect();
+        }
+        else {System.err.println("VRoundRect:Error while adding camera "+verifIndex);}
+    }
+    else {
+        if (verifIndex==0){
+        pc=new ProjRoundRect[1];
+        pc[0]=new ProjRoundRect();
+        }
+        else {System.err.println("VRoundRect:Error while adding camera "+verifIndex);}
+    }
     }
 
     @Override
     public void removeCamera(int index){
-	pc[index]=null;
+    pc[index]=null;
     }
 
     @Override
     public void resetMouseIn(){
-	for (int i=0;i<pc.length;i++){
-	    resetMouseIn(i);
-	}
+    for (int i=0;i<pc.length;i++){
+        resetMouseIn(i);
+    }
     }
 
     @Override
     public void resetMouseIn(int i){
-	if (pc[i]!=null){pc[i].prevMouseIn=false;}
-	borderColor = bColor;
+    if (pc[i]!=null){pc[i].prevMouseIn=false;}
+    borderColor = bColor;
     }
 
     @Override
@@ -174,7 +174,7 @@ public class VRoundRect<T> extends ClosedShape implements RectangularShape  {
     public double getHeight(){return vh;}
 
     void computeSize(){
-	    size = Math.sqrt(vw*vw + vh*vh);
+        size = Math.sqrt(vw*vw + vh*vh);
     }
 
     public void sizeTo(double s){
@@ -209,38 +209,38 @@ public class VRoundRect<T> extends ClosedShape implements RectangularShape  {
     /** Get the bounding box of this Glyph in virtual space coordinates.
     *@return west, north, east and south bounds in virtual space.
     */
-	@Override
+    @Override
     public double[] getBounds(){
-		double[] res = {vx-vw/2d, vy+vh/2d, vx+vw/2d, vy-vh/2d};
-		return res;
-	}
+        double[] res = {vx-vw/2d, vy+vh/2d, vx+vw/2d, vy-vh/2d};
+        return res;
+    }
 
     /**
      * set horizontal diameter of the arc at the four corners
      */
     public void setArcWidth(double w){
-	    arcWidth=(w>=0) ? w : 0;
+        arcWidth=(w>=0) ? w : 0;
     }
 
     /**
      * set vertical diameter of the arc at the four corners
      */
     public void setArcHeight(double h){
-	    arcHeight=(h>=0) ? h : 0;
+        arcHeight=(h>=0) ? h : 0;
     }
 
     /**
      * get horizontal diameter of the arc at the four corners
      */
     public double getArcWidth(){
-	    return arcWidth;
+        return arcWidth;
     }
 
     /**
      * get vertical diameter of the arc at the four corners
      */
     public double getArcHeight(){
-	    return arcHeight;
+        return arcHeight;
     }
 
     @Override
@@ -275,8 +275,8 @@ public class VRoundRect<T> extends ClosedShape implements RectangularShape  {
 
     @Override
     public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
-		return dvs.intersects(vx-vw/2d, vy-vh/2d, vw, vh);
-	}
+        return dvs.intersects(vx-vw/2d, vy-vh/2d, vw, vh);
+    }
 
     @Override
     public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
@@ -441,10 +441,10 @@ public class VRoundRect<T> extends ClosedShape implements RectangularShape  {
         }
     }
 
-	@Override
-	public Shape getJava2DShape(){
-		return new RoundRectangle2D.Double(vx-vw/2.0, vy-vh/2.0, vw, vh, arcWidth, arcHeight);
-	}
+    @Override
+    public Shape getJava2DShape(){
+        return new RoundRectangle2D.Double(vx-vw/2.0, vy-vh/2.0, vw, vh, arcWidth, arcHeight);
+    }
 
     @Override
     public Object clone(){

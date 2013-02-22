@@ -57,7 +57,7 @@ public class VShape<T> extends ClosedShape {
      *@param v Vertex distances to the shape's center in the [0-1.0] range (relative to bounding circle). Vertices are laid out counter clockwise, with the first vertex placed at the same X coordinate as the shape's center (provided orient=0).
      */
     public VShape(float[] v){
-	    this(0, 0, 0, 10, v, Color.WHITE, Color.BLACK, 0, 1.0f);
+        this(0, 0, 0, 10, v, Color.WHITE, Color.BLACK, 0, 1.0f);
     }
 
     /**
@@ -70,7 +70,7 @@ public class VShape<T> extends ClosedShape {
      *@param or shape's orientation in [0, 2Pi[
      */
     public VShape(double x,double y, int z,double s,float[] v,Color c,double or){
-	    this(x, y, z, s, v, c, Color.BLACK, or, 1.0f);
+        this(x, y, z, s, v, c, Color.BLACK, or, 1.0f);
     }
 
     /**
@@ -116,50 +116,50 @@ public class VShape<T> extends ClosedShape {
 
     @Override
     public void initCams(int nbCam){
-	pc=new BProjectedCoordsP[nbCam];
-	for (int i=0;i<nbCam;i++){
-	    pc[i]=new BProjectedCoordsP();
-	}
+    pc=new BProjectedCoordsP[nbCam];
+    for (int i=0;i<nbCam;i++){
+        pc[i]=new BProjectedCoordsP();
+    }
     }
 
     @Override
     public void addCamera(int verifIndex){
-	if (pc!=null){
-	    if (verifIndex==pc.length){
-		BProjectedCoordsP[] ta=pc;
-		pc=new BProjectedCoordsP[ta.length+1];
-		for (int i=0;i<ta.length;i++){
-		    pc[i]=ta[i];
-		}
-		pc[pc.length-1]=new BProjectedCoordsP();
-	    }
-	    else {System.err.println("VShape:Error while adding camera "+verifIndex);}
-	}
-	else {
-	    if (verifIndex==0){
-		pc=new BProjectedCoordsP[1];
-		pc[0]=new BProjectedCoordsP();
-	    }
-	    else {System.err.println("VShape:Error while adding camera "+verifIndex);}
-	}
+    if (pc!=null){
+        if (verifIndex==pc.length){
+        BProjectedCoordsP[] ta=pc;
+        pc=new BProjectedCoordsP[ta.length+1];
+        for (int i=0;i<ta.length;i++){
+            pc[i]=ta[i];
+        }
+        pc[pc.length-1]=new BProjectedCoordsP();
+        }
+        else {System.err.println("VShape:Error while adding camera "+verifIndex);}
+    }
+    else {
+        if (verifIndex==0){
+        pc=new BProjectedCoordsP[1];
+        pc[0]=new BProjectedCoordsP();
+        }
+        else {System.err.println("VShape:Error while adding camera "+verifIndex);}
+    }
     }
 
     @Override
     public void removeCamera(int index){
-	pc[index]=null;
+    pc[index]=null;
     }
 
     @Override
     public void resetMouseIn(){
-	for (int i=0;i<pc.length;i++){
-	    resetMouseIn(i);
-	}
+    for (int i=0;i<pc.length;i++){
+        resetMouseIn(i);
+    }
     }
 
     @Override
     public void resetMouseIn(int i){
-	if (pc[i]!=null){pc[i].prevMouseIn=false;}
-	borderColor = bColor;
+    if (pc[i]!=null){pc[i].prevMouseIn=false;}
+    borderColor = bColor;
     }
 
     @Override
@@ -200,10 +200,10 @@ public class VShape<T> extends ClosedShape {
     }
 
     /** The disc is actually approximated to its bounding box here. Precise intersection computation would be too costly. */
-	@Override
+    @Override
     public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
-		return pc[camIndex].p.intersects(jpx-dpr, jpy-dpr, 2*dpr, 2*dpr);
-	}
+        return pc[camIndex].p.intersects(jpx-dpr, jpy-dpr, 2*dpr, 2*dpr);
+    }
 
     @Override
     public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
@@ -230,7 +230,7 @@ public class VShape<T> extends ClosedShape {
 
     /** Get the list of vertex distances to the shape's center in the [0-1.0] range (relative to bounding circle). Vertices are laid out counter clockwise, with the first vertex placed at the same X coordinate as the shape's center (provided orient=0). */
     public float[] getVertices(){
-	    return vertices;
+        return vertices;
     }
 
     /** Get a serialization of the list of vertex distances to the shape's center in the [0-1.0] range.
@@ -511,11 +511,11 @@ public class VShape<T> extends ClosedShape {
         return res;
     }
 
-	@Override
-	public Shape getJava2DShape(){
-		//XXX:TBW
-		return null;
-	}
+    @Override
+    public Shape getJava2DShape(){
+        //XXX:TBW
+        return null;
+    }
 
     @Override
     public Object clone(){

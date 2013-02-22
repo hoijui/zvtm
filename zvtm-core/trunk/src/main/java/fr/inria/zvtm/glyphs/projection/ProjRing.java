@@ -23,11 +23,11 @@ public class ProjRing extends ProjectedCoords {
     public Polygon lboundingPolygon;
     public int louterCircleRadius;
     public int lp1x,lp1y,lp2x,lp2y;
-    
+
     public int innerRingRadius;
 
     public int linnerRingRadius;
-    
+
     public Area ring, lring;
-    
+
 }
