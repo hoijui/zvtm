@@ -266,17 +266,32 @@ public class MultilineText<T> extends VText {
                 }
             }
             g.setTransform(stdT);
-            if(!pc[i].valid){
+            if (!pc[i].valid || (!zoomSensitive && coef != oldcoef)){
                 if(widthConstraint == Double.POSITIVE_INFINITY){
                     double max = lines[0].getBounds().getWidth();
                     for (int j=1;j<lines.length;j++){
                         if (lines[j].getBounds().getWidth() > max){max = lines[j].getBounds().getWidth();}
                     }
-                    pc[i].cw = (int)(max * scaleFactor);
-                } else {
-                    pc[i].cw = (int)(widthConstraint * scaleFactor);
+                    if (zoomSensitive){
+                        pc[i].cw = max * scaleFactor;
+                        pc[i].ch = drawPosY * scaleFactor;
+                    }
+                    else {
+                        pc[i].cw = max * scaleFactor / coef;
+                        pc[i].ch = drawPosY * scaleFactor / coef;
+                        oldcoef = coef;
+                    }
                 }
-                pc[i].ch = (int)(drawPosY * scaleFactor);
+                else {
+                    if (zoomSensitive){
+                        pc[i].cw = widthConstraint * scaleFactor;
+                        pc[i].ch = drawPosY * scaleFactor;
+                    }
+                    else {
+                        pc[i].cw = widthConstraint * scaleFactor / coef;
+                        pc[i].ch = drawPosY * scaleFactor / coef;
+                    }
+                }
                 pc[i].valid = true;
             }
         }
