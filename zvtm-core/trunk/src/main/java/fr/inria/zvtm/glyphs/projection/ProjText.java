@@ -26,7 +26,11 @@ package fr.inria.zvtm.glyphs.projection;
  * @author Emmanuel Pietriga
  */
 
-public class ProjText extends RProjectedCoords {
+public class ProjText extends ProjectedCoords {
+
+    public double cw,ch;
+
+    public double lcw,lch;
 
     /**tells whether the bounding rectangle needs to be computed at next paint call or not (in main space)*/
     public boolean valid=false;

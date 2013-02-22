@@ -460,9 +460,9 @@ public class VText<T> extends ClosedShape {
             g.setFont((font!=null) ? font : getMainFont());
             Rectangle2D bounds = g.getFontMetrics().getStringBounds(text,g);
             // cw and ch actually hold width and height of text *in virtual space*
-            pc[i].cw = (int)Math.round(bounds.getWidth() * scaleFactor);
-            pc[i].ch = (int)Math.round(bounds.getHeight() * scaleFactor);
-            pc[i].valid=true;
+            pc[i].cw = bounds.getWidth() * scaleFactor;
+            pc[i].ch = bounds.getHeight() * scaleFactor;
+            pc[i].valid = true;
         }
         if (alphaC != null && alphaC.getAlpha()==0){return;}
         double trueCoef = scaleFactor * coef;
@@ -481,12 +481,12 @@ public class VText<T> extends ClosedShape {
             }
             if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(trueCoef, trueCoef));}
             g.setTransform(at);
-            int rectH = Math.round(pc[i].ch / scaleFactor);
+            int rectH = (int)Math.round(pc[i].ch / scaleFactor);
             if (alphaC != null){
                 g.setComposite(alphaC);
                 if (isBorderDrawn()){
                     g.setColor(borderColor);
-                    g.fillRect(dx-paddingX, dy-rectH+1+2*paddingY, Math.round(pc[i].cw / scaleFactor+paddingX), rectH-1+2*paddingY);
+                    g.fillRect(dx-paddingX, dy-rectH+1+2*paddingY, (int)Math.round(pc[i].cw / scaleFactor+paddingX), rectH-1+2*paddingY);
                 }
                 g.setColor(this.color);
                 g.drawString(text, 0.0f, 0.0f);
@@ -495,7 +495,7 @@ public class VText<T> extends ClosedShape {
             else {
                 if (isBorderDrawn()){
                     g.setColor(borderColor);
-                    g.fillRect(dx-paddingX, dy-rectH+1+2*paddingY, Math.round(pc[i].cw / scaleFactor+paddingX), rectH-1+2*paddingY);
+                    g.fillRect(dx-paddingX, dy-rectH+1+2*paddingY, (int)Math.round(pc[i].cw / scaleFactor+paddingX), rectH-1+2*paddingY);
                 }
                 g.setColor(this.color);
                 g.drawString(text, 0.0f, 0.0f);

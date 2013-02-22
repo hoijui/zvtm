@@ -403,12 +403,12 @@ public class VTextLayout<T> extends VText {
 			}
 			if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(trueCoef, trueCoef));}
 			g.setTransform(at);
-			int rectH = Math.round(pc[i].ch / scaleFactor);
+			int rectH = (int)Math.round(pc[i].ch / scaleFactor);
 			if (alphaC != null){
 				g.setComposite(alphaC);
 				if (isBorderDrawn()){
 				    g.setColor(borderColor);
-	                g.fillRect(dx-paddingX, dy-rectH+1+2*paddingY, Math.round(pc[i].cw / scaleFactor+paddingX), rectH-1+2*paddingY);
+	                g.fillRect(dx-paddingX, dy-rectH+1+2*paddingY, (int)Math.round(pc[i].cw / scaleFactor+paddingX), rectH-1+2*paddingY);
 				}
 				// background highlighting (text selection)
 				if (highlighter != null){
@@ -433,7 +433,7 @@ public class VTextLayout<T> extends VText {
 			else {
 				if (isBorderDrawn()){
 				    g.setColor(borderColor);
-	                g.fillRect(dx-paddingX, dy-rectH+1+2*paddingY, Math.round(pc[i].cw / scaleFactor+paddingX), rectH-1+2*paddingY);
+	                g.fillRect(dx-paddingX, dy-rectH+1+2*paddingY, (int)Math.round(pc[i].cw / scaleFactor+paddingX), rectH-1+2*paddingY);
 				}
 				// background highlighting (text selection)
 				if (highlighter != null){
