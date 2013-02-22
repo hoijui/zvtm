@@ -368,11 +368,11 @@ public class VTextLayout<T> extends VText {
     @Override
     public void projectForLens(Camera c, int lensWidth, int lensHeight, float lensMag, double lensx, double lensy){
         int i=c.getIndex();
-        coef = c.focal/(c.focal+c.altitude) * lensMag;
+        lcoef = c.focal/(c.focal+c.altitude) * lensMag;
         //find coordinates of object's geom center wrt to camera center and project
         //translate in JPanel coords
-        pc[i].lcx = lensWidth/2 + (int)Math.round((vx-lensx)*coef);
-        pc[i].lcy = lensHeight/2 - (int)Math.round((vy-lensy)*coef);
+        pc[i].lcx = lensWidth/2 + (int)Math.round((vx-lensx)*lcoef);
+        pc[i].lcy = lensHeight/2 - (int)Math.round((vy-lensy)*lcoef);
     }
 
     @Override
@@ -480,15 +480,15 @@ public class VTextLayout<T> extends VText {
 			pc[i].lvalid=true;
 		}
         if (alphaC != null && alphaC.getAlpha()==0){return;}
-		double trueCoef = scaleFactor * coef;
+		double trueCoef = scaleFactor * lcoef;
 		g.setColor(this.color);
 		if (trueCoef*fontSize > VText.TEXT_AS_LINE_PROJ_COEF || !zoomSensitive){
 			g.setFont((font!=null) ? font : getMainFont());
 			//if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
 			AffineTransform at;
 			if (text_anchor==TEXT_ANCHOR_START){at=AffineTransform.getTranslateInstance(dx+pc[i].lcx,dy+pc[i].lcy);}
-			else if (text_anchor==TEXT_ANCHOR_MIDDLE){at=AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw*coef/2.0f,dy+pc[i].lcy);}
-			else {at=AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw*coef,dy+pc[i].lcy);}
+			else if (text_anchor==TEXT_ANCHOR_MIDDLE){at=AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw*lcoef/2.0f,dy+pc[i].lcy);}
+			else {at=AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw*lcoef,dy+pc[i].lcy);}
 			if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(trueCoef, trueCoef));}
 			g.setTransform(at);
 			if (alphaC != null){
