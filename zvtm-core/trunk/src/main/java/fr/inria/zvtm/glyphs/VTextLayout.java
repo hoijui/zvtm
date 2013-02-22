@@ -377,14 +377,21 @@ public class VTextLayout<T> extends VText {
 
     @Override
 	public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-		if (!pc[i].valid){
+		if (!pc[i].valid || (!zoomSensitive && (coef != oldcoef))){
 			g.setFont((font!=null) ? font : getMainFont());
 			tl = new TextLayout(text, (font!=null) ? font : getMainFont(), g.getFontRenderContext());
 			Rectangle2D bounds = g.getFontMetrics().getStringBounds(text,g);
 			// cw and ch actually hold width and height of text *in virtual space*
-			pc[i].cw = (int)Math.round(bounds.getWidth() * scaleFactor);
-			pc[i].ch = (int)Math.round(bounds.getHeight() * scaleFactor);
-			pc[i].valid=true;
+		    if (zoomSensitive){
+		        pc[i].cw = bounds.getWidth() * scaleFactor;
+		        pc[i].ch = bounds.getHeight() * scaleFactor;
+		    }
+		    else {
+		        pc[i].cw = bounds.getWidth() * scaleFactor / coef;
+		        pc[i].ch = bounds.getHeight() * scaleFactor / coef;
+		        oldcoef = coef;
+		    }
+			pc[i].valid = true;
 		}
         if (alphaC != null && alphaC.getAlpha()==0){return;}
 		double trueCoef = scaleFactor * coef;
@@ -471,13 +478,21 @@ public class VTextLayout<T> extends VText {
 
     @Override
 	public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-		if (!pc[i].lvalid){
+		if (!pc[i].lvalid || (!zoomSensitive && (lcoef != oldlcoef))){
 			g.setFont((font!=null) ? font : getMainFont());
+			tl = new TextLayout(text, (font!=null) ? font : getMainFont(), g.getFontRenderContext());
 			Rectangle2D bounds = g.getFontMetrics().getStringBounds(text,g);
-			// lcw and lch actually hold width and height of text *in virtual space*
-			pc[i].lcw = (int)Math.round(bounds.getWidth() * scaleFactor);
-			pc[i].lch = (int)Math.round(bounds.getHeight() * scaleFactor);
-			pc[i].lvalid=true;
+			// cw and ch actually hold width and height of text *in virtual space*
+		    if (zoomSensitive){
+		        pc[i].lcw = bounds.getWidth() * scaleFactor;
+		        pc[i].lch = bounds.getHeight() * scaleFactor;
+		    }
+		    else {
+		        pc[i].lcw = bounds.getWidth() * scaleFactor / lcoef;
+		        pc[i].lch = bounds.getHeight() * scaleFactor / lcoef;
+		        oldlcoef = lcoef;
+		    }
+			pc[i].lvalid = true;
 		}
         if (alphaC != null && alphaC.getAlpha()==0){return;}
 		double trueCoef = scaleFactor * lcoef;

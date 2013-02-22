@@ -82,7 +82,9 @@ public class VText<T> extends ClosedShape {
     protected float scaleFactor = 1.0f;
 
     // Projection coefficient. Computed internally. Do not tamper with.
-    protected double lcoef=1.0f;
+    protected double lcoef = 1.0f;
+    protected double oldcoef = 1.0f;
+    protected double oldlcoef = 1.0f;
 
     /**
      * Offset between text and vertical borders
@@ -459,12 +461,19 @@ public class VText<T> extends ClosedShape {
 
     @Override
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-        if (!pc[i].valid){
+        if (!pc[i].valid || (!zoomSensitive && (coef != oldcoef))){
             g.setFont((font!=null) ? font : getMainFont());
             Rectangle2D bounds = g.getFontMetrics().getStringBounds(text,g);
             // cw and ch actually hold width and height of text *in virtual space*
-            pc[i].cw = bounds.getWidth() * scaleFactor;
-            pc[i].ch = bounds.getHeight() * scaleFactor;
+            if (zoomSensitive){
+                pc[i].cw = bounds.getWidth() * scaleFactor;
+                pc[i].ch = bounds.getHeight() * scaleFactor;
+            }
+            else {
+                pc[i].cw = bounds.getWidth() * scaleFactor / coef;
+                pc[i].ch = bounds.getHeight() * scaleFactor / coef;
+                oldcoef = coef;
+            }
             pc[i].valid = true;
         }
         if (alphaC != null && alphaC.getAlpha()==0){return;}
@@ -520,13 +529,20 @@ public class VText<T> extends ClosedShape {
 
     @Override
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-        if (!pc[i].lvalid){
+        if (!pc[i].lvalid || (!zoomSensitive && (lcoef != oldlcoef))){
             g.setFont((font!=null) ? font : getMainFont());
             Rectangle2D bounds = g.getFontMetrics().getStringBounds(text,g);
             // lcw and lch actually hold width and height of text *in virtual space*
-            pc[i].lcw = (int)Math.round(bounds.getWidth() * scaleFactor);
-            pc[i].lch = (int)Math.round(bounds.getHeight() * scaleFactor);
-            pc[i].lvalid=true;
+            if (zoomSensitive){
+                pc[i].lcw = bounds.getWidth() * scaleFactor;
+                pc[i].lch = bounds.getHeight() * scaleFactor;
+            }
+            else {
+                pc[i].lcw = bounds.getWidth() * scaleFactor / coef;
+                pc[i].lch = bounds.getHeight() * scaleFactor / coef;
+                oldlcoef = lcoef;
+            }
+            pc[i].lvalid = true;
         }
         if (alphaC != null && alphaC.getAlpha()==0){return;}
         double trueCoef = scaleFactor * lcoef;
