@@ -301,14 +301,14 @@ public class MultiscaleSeries {
 			SparseData sd = dataMap.get(scale);
 			if (sd == null) {
 				scale++;
-				offset /= 2;
+				offset = (long) Math.floor(1.0*offset/2);
 				continue;
 			}
 			
 			DataChunk chunk = sd.getChunk(offset);
 			if (chunk == null || chunk.isSynthetic()) {
 				scale++;
-				offset /= 2;
+				offset = (long) Math.floor(1.0*offset/2);
 				continue;
 			}
 			
