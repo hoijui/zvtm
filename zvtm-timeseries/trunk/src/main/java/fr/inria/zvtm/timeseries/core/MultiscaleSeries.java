@@ -8,7 +8,8 @@ import zz.utils.notification.IEvent;
 import zz.utils.notification.SimpleEvent;
 import fr.inria.zvtm.timeseries.core.DynamicMultiscaleSeries.Range;
 import fr.inria.zvtm.timeseries.core.IChunkCache.ChunkData;
-import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.map.hash.TLongObjectHashMap;
+import gnu.trove.procedure.TLongProcedure;
 
 
 /**
@@ -113,9 +114,9 @@ public class MultiscaleSeries {
 		for (int i=0;i<chunks.length;i++) {
 			double ss = Math.pow(2, scale+i);
 			
-			int j1 = (int) Math.floor(x1/ss);
-			int offset1 = (int) Math.floor(1.0*j1/chunkSize);
-			indexes[i] = j1-(offset1*chunkSize);
+			long j1 = (long) Math.floor(x1/ss);
+			long offset1 = (long) Math.floor(1.0*j1/chunkSize);
+			indexes[i] = (int) (j1-(offset1*chunkSize));
 			assert indexes[i] >= 0;
 
 			chunks[i] = getChunk(scale+i, offset1, true);
@@ -130,7 +131,7 @@ public class MultiscaleSeries {
 			len = Math.min(len, chunkSize-indexes[0]);
 			int l = stream.fillBuffer(buffer, indexes[0], len);
 			chunks[0].set(buffer);
-			if (LOG) System.out.println("adding: scale "+scale+", offset "+chunks[0].offset);
+			if (LOG) System.out.println("["+Thread.currentThread().getId()+"]\tadding: id "+id+", scale "+scale+", offset "+chunks[0].offset);
 			assert len == l;
 			
 			for(int i=indexes[0];i<indexes[0]+len;i++) {
@@ -143,7 +144,7 @@ public class MultiscaleSeries {
 						chunks[j].set(indexes[j], (float) (sums[j] / counts[j]));
 						indexes[j] += 1;
 						if (indexes[j] >= chunkSize) {
-							if (k < size) {
+							if (k+len < size) {
 								chunks[j] = getChunk(scale+j, chunks[j].offset+1, true);
 								chunks[j].setSynthetic(false);
 							}
@@ -181,7 +182,7 @@ public class MultiscaleSeries {
 	 * @return The logScale that was used to render the buffer
 	 */
 	public int getData(double x1, double x2, float[] buffer) {
-		assert x2 > x1;
+		assert x2 > x1: "x1: "+x1+", x2: "+x2;
 		assert buffer.length > 0;
 		
 		// Find data series closest to requested range and scale
@@ -219,7 +220,7 @@ public class MultiscaleSeries {
 	 * If there is no such chunk and create is true, then returns a newly
 	 * created chunk.
 	 */
-	private DataChunk getChunk(int scale, int offset, boolean create) {
+	private DataChunk getChunk(int scale, long offset, boolean create) {
 		SparseData sd = dataMap.get(scale);
 		if (sd == null && !create) return null;
 		if (sd == null) {
@@ -239,7 +240,7 @@ public class MultiscaleSeries {
 		return chunk;
 	}
 	
-	protected DataChunk createChunk(int scale, int offset) {
+	protected DataChunk createChunk(int scale, long offset) {
 		DataChunk chunk = new DataChunk(scale, offset);
 		addChunk(chunk);
 		return chunk;
@@ -252,7 +253,7 @@ public class MultiscaleSeries {
 		return new DataChunk(scale, offset, values);
 	}
 	
-	private void addChunk(DataChunk chunk) {
+	private synchronized void addChunk(DataChunk chunk) {
 		SparseData sd = dataMap.get(chunk.scale);
 		if (sd == null) {
 			sd = new SparseData(chunk.scale);
@@ -287,7 +288,7 @@ public class MultiscaleSeries {
 	 * that is not available. 
 	 * @return A chunk or null if can't be obtained. 
 	 */
-	protected DataChunk chunkMissing(int scale, int offset) {
+	protected DataChunk chunkMissing(int scale, long offset) {
 		return null;
 	}
 
@@ -295,7 +296,7 @@ public class MultiscaleSeries {
 	 * Returns the chunk which has the smallest scale whose
 	 * span contains the missing chunk at the specified scale and offset.  
 	 */
-	protected DataChunk getLowestChunk(int scale, int offset) {
+	protected DataChunk getLowestChunk(int scale, long offset) {
 		while(scale <= maxScale) {
 			SparseData sd = dataMap.get(scale);
 			if (sd == null) {
@@ -324,7 +325,7 @@ public class MultiscaleSeries {
 	 */
 	public class DataChunk {
 		public final int scale;
-		public final int offset;
+		public final long offset;
 		private final double ss;
 
 		public final FloatBuffer buffer;
@@ -332,7 +333,7 @@ public class MultiscaleSeries {
 		
 		private boolean synthetic = true;
 
-		private DataChunk(int scale, int offset) {
+		private DataChunk(int scale, long offset) {
 			this.scale = scale;
 			this.offset = offset;
 			ChunkData chunkData = chunkCache.getChunkData(id, scale, offset);
@@ -342,7 +343,7 @@ public class MultiscaleSeries {
 			ss = Math.pow(2, scale);
 		}
 		
-		private DataChunk(int scale, int offset, float[] data) {
+		private DataChunk(int scale, long offset, float[] data) {
 			this.scale = scale;
 			this.offset = offset;
 			ChunkData chunkData = chunkCache.getChunkData(id, scale, offset);
@@ -353,6 +354,7 @@ public class MultiscaleSeries {
 		}
 		
 		public float get(int i) {
+			assert i >= 0 && i < chunkSize: ""+i;
 			return buffer.get(bufferOffset+i);
 		}
 		
@@ -366,6 +368,11 @@ public class MultiscaleSeries {
 				buffer.position(bufferOffset);
 				buffer.put(values);
 			}
+		}
+		
+		public boolean hasNaN() {
+			for(int i=0;i<chunkSize;i++) if (Float.isNaN(get(i))) return true;
+			return false;
 		}
 		
 		public boolean contains(double x) {
@@ -399,7 +406,7 @@ public class MultiscaleSeries {
 		 * @param result a array to store the result: [sum, count]
 		 */
 		public void getAverageValue(double[] result, double x1, double x2) {
-			assert x1 < x2;
+			assert x1 < x2: "x1: "+x1+", x2: "+x2;
 			assert contains(x1);
 			assert contains(x2);
 			
@@ -459,7 +466,7 @@ public class MultiscaleSeries {
 		/**
 		 * Offset to chunk map
 		 */
-		private TIntObjectHashMap<DataChunk> chunks = new TIntObjectHashMap<DataChunk>();
+		private TLongObjectHashMap<DataChunk> chunks = new TLongObjectHashMap<DataChunk>();
 
 		public SparseData(int scale) {
 			this.scale = scale;
@@ -470,12 +477,13 @@ public class MultiscaleSeries {
 			chunks.put(chunk.offset, chunk);
 		}
 		
-		public DataChunk getChunk(int offset) {
+		public DataChunk getChunk(long offset) {
 			return chunks.get(offset);
 		}
 		
-		public boolean hasChunk(int offset) {
-			return chunks.containsKey(offset);
+		public boolean hasChunk(long offset) {
+			DataChunk chunk = chunks.get(offset);
+			return chunk != null && ! chunk.isSynthetic();
 		}
 		
 		/**
@@ -483,7 +491,7 @@ public class MultiscaleSeries {
 		 * using data of the current scale
 		 */
 		public double getAverageValue(double x1, double x2) {
-			int offset = (int) Math.floor(x1/(ss*chunkSize));
+			long offset = (long) Math.floor(x1/(ss*chunkSize));
 			
 			double sum = 0;
 			double count = 0;
@@ -504,7 +512,9 @@ public class MultiscaleSeries {
 					// If no data, assume all zeros
 					count += (cx2-cx1)/ss;
 				} else {
-					chunk.getAverageValue(buffer, Math.max(cx1, x1), Math.min(cx2,  x2));
+					double lx1 = Math.max(cx1, x1);
+					double lx2 = Math.min(cx2,  x2);
+					if (lx1 != lx2) chunk.getAverageValue(buffer, lx1, lx2);
 					sum += buffer[0];
 					count += buffer[1];
 				}
@@ -514,6 +524,20 @@ public class MultiscaleSeries {
 			return sum/count;
 		}
 		
+		@Override
+		public String toString() {
+			final StringBuilder sb = new StringBuilder("SparseData ("+scale+") - ");
+			chunks.forEach(new TLongProcedure() {
+				@Override
+				public boolean execute(long value) {
+					sb.append(value);
+					sb.append(' ');
+					return true;
+				}
+			});
+			
+			return sb.toString();
+		}
 	}
 	
 	/**

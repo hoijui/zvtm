@@ -16,7 +16,7 @@ import java.util.concurrent.Executors;
  *
  */
 public class ImageMSGHandler {
-	private static final int THREADS = 16;
+	private static final int THREADS = 4;
 	
 	private final MultiscaleSeriesGroup group;
 	private final float[][] buffers;
@@ -25,7 +25,7 @@ public class ImageMSGHandler {
 
 	public ImageMSGHandler(MultiscaleSeriesGroup group) {
 		this.group = group;
-		buffers = new float[group.getSize()][];
+		buffers = new float[THREADS][];
 	}
 
 	/**
@@ -49,7 +49,7 @@ public class ImageMSGHandler {
 			IndexColorModel cm = new IndexColorModel(8, 256, red, green, blue);
 			image = new BufferedImage(width, group.getSize(), BufferedImage.TYPE_BYTE_INDEXED, cm);
 			
-			for(int i=0;i<group.getSize();i++) {
+			for(int i=0;i<THREADS;i++) {
 				buffers[i] = new float[width];
 			}			
 		}
@@ -57,28 +57,16 @@ public class ImageMSGHandler {
 		long t0 = System.currentTimeMillis();
 		
 		try {
+			WritableRaster raster = image.getRaster();
 			List<GetDataTask> tasks = new ArrayList<GetDataTask>(THREADS);
-			for(int i=0;i<THREADS;i++) tasks.add(new GetDataTask(group, i, buffers, x1, x2));
+			for(int i=0;i<THREADS;i++) tasks.add(new GetDataTask(group, i, buffers[i], raster, x1, x2, minValue, maxValue));
 			executor.invokeAll(tasks);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 		
 		long t1 = System.currentTimeMillis();
-
-		WritableRaster raster = image.getRaster();
-		for(int i=0;i<group.getSize();i++) {
-			for(int j=0;j<width;j++) {
-				float v = buffers[i][j];
-				int c;
-				if (Float.isNaN(v)) c = 255;
-				else c = (int) (254f*(v-minValue)/(maxValue-minValue));
-				raster.setSample(j, i, 0, c);
-			}
-		}
-		
-		long t2 = System.currentTimeMillis();
-		System.out.println("getData: "+(t1-t0)+"ms, update image: "+(t2-t1)+"ms");
+		System.out.println("getData: "+(t1-t0)+"ms");
 		
 		return image;
 	}
@@ -90,16 +78,28 @@ public class ImageMSGHandler {
 	private class GetDataTask implements Runnable, Callable<Void> {
 		private MultiscaleSeriesGroup group;
 		private int rank;
-		private float[][] buffers;
+		private float[] buffer;
+		private WritableRaster raster;
 		private double x1;
 		private double x2;
+		private double minValue;
+		private double maxValue;
 		
-		public GetDataTask(MultiscaleSeriesGroup group, int rank, float[][] buffers, double x1, double x2) {
+		public GetDataTask(
+				MultiscaleSeriesGroup group, 
+				int rank, 
+				float[] buffer,
+				WritableRaster raster,
+				double x1, double x2,
+				double minValue, double maxValue) {
 			this.group = group;
 			this.rank = rank;
-			this.buffers = buffers;
+			this.buffer = buffer;
+			this.raster = raster;
 			this.x1 = x1;
 			this.x2 = x2;
+			this.minValue = minValue;
+			this.maxValue = maxValue;
 		}
 		
 		@Override
@@ -108,7 +108,16 @@ public class ImageMSGHandler {
 			for(int i=0;i<groups;i++) {
 				int id = rank*groups+i;
 				if (id >= group.getSize()) continue;
-				group.get(id).getData(x1, x2, buffers[id]);
+				
+				group.get(id).getData(x1, x2, buffer);
+				
+				for(int j=0;j<buffer.length;j++) {
+					float v = buffer[j];
+					int c;
+					if (Float.isNaN(v)) c = 255;
+					else c = (int) (254f*(v-minValue)/(maxValue-minValue));
+					raster.setSample(j, id, 0, c);
+				}
 			}
 		}
 

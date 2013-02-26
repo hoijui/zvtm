@@ -1,10 +1,10 @@
 package fr.inria.zvtm.timeseries.core;
 
-import fr.inria.zvtm.timeseries.core.MappedDiskCache.Block;
-import gnu.trove.map.hash.TLongIntHashMap;
-
 import java.io.File;
 import java.io.IOException;
+
+import fr.inria.zvtm.timeseries.core.MappedDiskCache.Block;
+import gnu.trove.map.hash.TObjectIntHashMap;
 
 /**
  * A group of series that are intended to be displayed together.
@@ -16,7 +16,7 @@ import java.io.IOException;
 public class MultiscaleSeriesGroup {
 	private final Cache cache = new Cache();
 	private MultiscaleSeries[] seriesList;
-	private final TLongIntHashMap clustersMap = new TLongIntHashMap();
+	private final TObjectIntHashMap<ClusterKey> clustersMap = new TObjectIntHashMap<ClusterKey>();
 	private final int chunkSize;
 	
 	private int nextClusterIndex = 1;
@@ -69,7 +69,7 @@ public class MultiscaleSeriesGroup {
 		}
 
 		@Override
-		public ChunkData getChunkData(int seriesId, int scale, int offset) {
+		public ChunkData getChunkData(int seriesId, int scale, long offset) {
 			int index = getClusterIndex(scale, offset);
 			long cacheOffset = (1L*index*seriesList.length + seriesId)*chunkSize*(Float.SIZE/8);
 			Block block = cache.getBlock(cacheOffset);
@@ -83,21 +83,53 @@ public class MultiscaleSeriesGroup {
 		/**
 		 * Returns the storage index for the given cluster.
 		 */
-		private synchronized int getClusterIndex(int scale, int offset) {
-			long key = getClusterKey(scale, offset);
+		private synchronized int getClusterIndex(int scale, long offset) {
+			ClusterKey key = getClusterKey(scale, offset);
 			int index = clustersMap.putIfAbsent(key, nextClusterIndex);
 			if (index == clustersMap.getNoEntryValue()) index = nextClusterIndex++;
 			return index;
 		}
 	}
 
+	
+	private static class ClusterKey {
+		private final int scale;
+		private final long offset;
+		
+		public ClusterKey(int scale, long offset) {
+			this.scale = scale;
+			this.offset = offset;
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + (int) (offset ^ (offset >>> 32));
+			result = prime * result + scale;
+			return result;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			ClusterKey other = (ClusterKey) obj;
+			if (offset != other.offset)
+				return false;
+			if (scale != other.scale)
+				return false;
+			return true;
+		}
+	}
 	/**
 	 * Returns the mapping key for a given cluster
 	 */
-	private static long getClusterKey(int scale, int offset) {
-		long l1 = scale;
-		long l2 = offset;
-		long key = (l1 << 32) | (l2 & 0xffffffffL);
-		return key;
+	private static ClusterKey getClusterKey(int scale, long offset) {
+		return new ClusterKey(scale, offset);
 	}
 }

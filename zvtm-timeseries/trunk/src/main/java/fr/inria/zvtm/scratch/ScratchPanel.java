@@ -27,8 +27,8 @@ import fr.inria.zvtm.timeseries.core.MultiscaleSeriesGroup;
 public class ScratchPanel extends JPanel {
 	private static final int CHUNK_SIZE = 1024;
 	private static final int DATA_SIZE = 64*1024;
-	private static final int COUNT = 1;
-	private static final int VERTICAL_ZOOM = 10;
+	private static final int COUNT = 500;
+	private static final int VERTICAL_ZOOM = 1;
 	
 	private double zoom = 1;
 	private double x1 = 0;
@@ -40,7 +40,7 @@ public class ScratchPanel extends JPanel {
 	private MultiscaleSeries[] series = new MultiscaleSeries[COUNT];
 	private MultiscaleSeriesGroup group;
 	
-	private static final int THREADS = 16;
+	private static final int THREADS = 8;
 	private ExecutorService executor = Executors.newFixedThreadPool(THREADS);
 	
 	private AtomicInteger created = new AtomicInteger();
@@ -76,19 +76,36 @@ public class ScratchPanel extends JPanel {
 				if ((e.getModifiersEx() & InputEvent.SHIFT_DOWN_MASK) != 0) {
 					x1 += 1.0*e.getWheelRotation() / (10.0*zoom);
 				} else {
-					int i = e.getX();
-					int w = getWidth();
-					double z0 = zoom;
-					zoom = z0 * Math.pow(1.2, -e.getWheelRotation());
-					if (zoom < 0.000000001) zoom = 0.000000001;
-					if (zoom > 1000000) zoom = 1000000;
-					
-					x1 = x1 + i/(z0*w) - i/(zoom*w); 
+					zoom(-e.getWheelRotation(), e.getX());
 				}
 				
 				repaint();
 			}
 		});
+		
+		new Thread() {
+			public void run() {
+				while (zoom < 8.489238517276154E-6) {
+					zoom(4, 250);
+					try {
+						Thread.sleep(100);
+					} catch (InterruptedException e) {
+					}
+					repaint();
+				}
+			};
+		}.start();
+	}
+	
+	private void zoom(int n, int x) {
+		int w = getWidth();
+		if (w == 0) return;
+		double z0 = zoom;
+		zoom = z0 * Math.pow(1.2, n);
+		if (zoom < 0.000000001) zoom = 0.000000001;
+		if (zoom > 1000000) zoom = 1000000;
+		
+		x1 = x1 + 1.0*x/(z0*w) - 1.0*x/(zoom*w); 
 	}
 	
 	@Override
@@ -125,7 +142,7 @@ public class ScratchPanel extends JPanel {
 			System.out.println("Thread "+rank+" started");
 			int createdHere = 0;
 			float[] data = new float[DATA_SIZE];
-			Random r = new Random();
+			Random r = new Random((long) (rank ^ Double.doubleToLongBits(x1) ^ Double.doubleToLongBits(x2)));
 
 			int groups = (COUNT + (THREADS-1))/THREADS;
 			for(int i=0;i<groups;i++) {
@@ -176,9 +193,6 @@ public class ScratchPanel extends JPanel {
 		int mid = (i1+i2)/2;
 		float avg = (data[i1] + data[i2])/2f;
 		data[mid] = avg + (r.nextFloat()-0.5f);
-		if (Float.isNaN(data[mid])) {
-			System.out.println("ScratchPanel.plasma()");
-		}
 		plasma(r, data, i1, mid);
 		plasma(r, data, mid, i2);
 	}
@@ -195,28 +209,31 @@ public class ScratchPanel extends JPanel {
 		}
 
 		private boolean isValidLowestChunk(DataChunk chunk) {
-			for(int i=0;i<CHUNK_SIZE;i++) if (Float.isNaN(chunk.get(0))) return false;
-			return true;
+			return ! chunk.hasNaN();
 		}
 		
 		@Override
 		protected IDataStream fetch(int scale, double x1, double x2) {
+			long t0 = System.currentTimeMillis();
 			double ss = Math.pow(2, scale);
 			
 			float[] data = new float[(int)((x2-x1)/ss)];
-			System.out.println("Fetching ["+getId()+"]: "+scale+", l: "+data.length+" - "+x1+", "+x2);
+			if (MultiscaleSeries.LOG) System.out.println("["+Thread.currentThread().getId()+"]\t Fetching ["+getId()+"]: "+scale+", l: "+data.length+" - "+x1+", "+x2+" "+Thread.currentThread());
 			
-			Random r = new Random();
+			Random r = new Random((long) (getId() ^ scale ^ Double.doubleToLongBits(x1) ^ Double.doubleToLongBits(x2)));
 			
 			double x = x1;
 			while(x<x2) {
-				int o = (int) (x/(ss*chunkSize));
-				System.out.println("  gen ["+getId()+"]: offset "+o+", x: "+x);
+				long o = (long) (x/(ss*chunkSize));
+				if (MultiscaleSeries.LOG) System.out.println("["+Thread.currentThread().getId()+"]\t  gen ["+getId()+"]: offset "+o+", x: "+x);
 				DataChunk lowestChunk;
 				int lowestScale = scale;
 				while(true) {
 					lowestChunk = getLowestChunk(lowestScale, o);
-					if (lowestChunk == null) return null;
+					if (lowestChunk == null) {
+						if (MultiscaleSeries.LOG) System.out.println("["+Thread.currentThread().getId()+"]\tFetching aborted");
+						return null;
+					}
 					// Copy higher chunk data into new buffer
 					assert lowestChunk.scale > scale: "chunk offset "+lowestChunk.offset+", scale "+lowestChunk.scale;
 					if (isValidLowestChunk(lowestChunk)) break;
@@ -230,16 +247,13 @@ public class ScratchPanel extends JPanel {
 					int j = (i-d)*n;
 					if (j >= 0 && j < data.length) {
 						data[j] = lowestChunk.get(i);
-						if (Float.isNaN(data[j])) {
-							System.out.println(lowestChunk);
-						}
 						if (lastJ >= 0) plasma(r, data, lastJ, j);
 						lastJ = j;
 					}
 				}
 				x = Math.pow(2, lowestChunk.scale)*(lowestChunk.offset+1)*chunkSize;
 			}
-			System.out.println("Done fetching");
+			if (MultiscaleSeries.LOG) System.out.println("["+Thread.currentThread().getId()+"]\tDone fetching");
 
 			return new ArrayDataStream(data);
 		}	

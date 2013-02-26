@@ -28,7 +28,7 @@ public abstract class DynamicMultiscaleSeries extends MultiscaleSeries {
 	}
 
 	@Override
-	protected DataChunk chunkMissing(int scale, int offset) {
+	protected DataChunk chunkMissing(int scale, long offset) {
 		if (LOG) System.out.println("chunkMissing: "+scale+", "+offset);
 		
 		// Immediately create a chunk with extrapolated data
@@ -55,26 +55,26 @@ public abstract class DynamicMultiscaleSeries extends MultiscaleSeries {
 	 * Schedules the fetching of actual data at a given scale for a range of chunk offsets
 	 * (both inclusive)
 	 */
-	private void scheduleFetch(int scale, int o1, int o2) {
+	private void scheduleFetch(int scale, long o1, long o2) {
 		if (LOG) System.out.println("scheduleFetch "+scale+", range: "+o1+", "+o2);
 		SparseData sparseData = getScaleData(scale);
 		
 		// Schedule a fetch for each missing range
-		int lastO = o1;
-		for(int o=o1;o<=o2;o++) {
+		long lastO = o1;
+		for(long o=o1;o<=o2;o++) {
 			if (sparseData.hasChunk(o)) {
-				int ro1 = lastO;
-				int ro2 = o-1;
+				long ro1 = lastO;
+				long ro2 = o-1;
 				if (ro1 <= ro2) submitFetch(scale, ro1, ro2);
 				lastO = o+1;
 			}
 		}
-		int ro1 = lastO;
-		int ro2 = o2;
+		long ro1 = lastO;
+		long ro2 = o2;
 		if (ro1 <= ro2) submitFetch(scale, ro1, ro2);
 	}
 	
-	private void submitFetch(int scale, int o1, int o2) {
+	private void submitFetch(int scale, long o1, long o2) {
 		if (LOG) System.out.println("submitFetch "+scale+", range: "+o1+", "+o2);
 		executor.submit(new FetchAction(scale, o1, o2));
 	}
@@ -95,7 +95,7 @@ public abstract class DynamicMultiscaleSeries extends MultiscaleSeries {
 		private final double x1;
 		private final double x2;
 		
-		public FetchAction(int scale, int o1, int o2) {
+		public FetchAction(int scale, long o1, long o2) {
 			this.scale = scale;
 			double ss = Math.pow(2, scale);
 			

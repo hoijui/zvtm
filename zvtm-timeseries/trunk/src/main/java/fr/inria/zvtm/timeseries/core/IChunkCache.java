@@ -11,7 +11,7 @@ public interface IChunkCache {
 	/**
 	 * Returns the {@link ChunkData} object for the specified chunk
 	 */
-	public ChunkData getChunkData(int seriesId, int scale, int offset);
+	public ChunkData getChunkData(int seriesId, int scale, long offset);
 
 	/**
 	 * Represents the data for a given chunk.
