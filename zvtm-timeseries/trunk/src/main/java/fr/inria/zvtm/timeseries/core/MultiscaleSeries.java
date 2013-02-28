@@ -375,7 +375,7 @@ public class MultiscaleSeries {
 	}
 	
 	private SparseData getOptimalDataL(long x1, long x2, int size) {
-		int scale = log2(x2-x1);
+		int scale = log2((x2-x1)/size);
 		if (scale > maxScale) scale = maxScale;
 
 		return getScaleData(scale);
