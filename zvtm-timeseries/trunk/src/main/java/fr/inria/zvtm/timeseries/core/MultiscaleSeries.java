@@ -6,7 +6,6 @@ import java.util.Map;
 
 import zz.utils.notification.IEvent;
 import zz.utils.notification.SimpleEvent;
-import fr.inria.zvtm.timeseries.core.DynamicMultiscaleSeries.Range;
 import fr.inria.zvtm.timeseries.core.IChunkCache.ChunkData;
 import gnu.trove.map.hash.TLongObjectHashMap;
 import gnu.trove.procedure.TLongProcedure;
@@ -54,7 +53,7 @@ public class MultiscaleSeries {
 	private int id;
 	protected final int chunkSize;
 	
-	public final IEvent<Range> eRangeUpdated = new SimpleEvent<Range>();
+	public final IEvent<DoubleRange> eRangeUpdated = new SimpleEvent<DoubleRange>();
 	
 	private Map<Integer, SparseData> dataMap = new HashMap<Integer, SparseData>();
 	private int minScale = Integer.MAX_VALUE;
@@ -79,14 +78,14 @@ public class MultiscaleSeries {
 		this.id = id;
 	}
 	
-	public void addData(double x1, double x2, float[] values) {
-		addData(x1, x2, new ArrayDataStream(values));
+	public void addDataD(double x1, double x2, float[] values) {
+		addDataD(x1, x2, new ArrayDataStream(values));
 	}
 		
 	/**
 	 * Adds raw data to this series.
 	 */
-	public synchronized void addData(double x1, double x2, IDataStream stream) {
+	public synchronized void addDataD(double x1, double x2, IDataStream stream) {
 		assert x2 > x1;
 		long size = stream.getSize();
 		assert size > 0;
@@ -124,6 +123,76 @@ public class MultiscaleSeries {
 			assert chunks[i].offset == offset1;
 		}
 		
+		createScaledData(stream, scale, chunks, sums, counts, indexes);
+		
+		((SimpleEvent<DoubleRange>)eRangeUpdated).fire(new DoubleRange(x1, x2));
+		rangeUpdated(x1, x2);
+	}
+	
+	public void addDataL(long x1, long x2, float[] values) {
+		addDataL(x1, x2, new ArrayDataStream(values));
+	}
+		
+	private static int log2(long v) {
+		int r = 0;
+		while ((v >>= 1) != 0) r++;
+		return r;
+	}
+	
+	/**
+	 * Same as {@link #addData(double, double, IDataStream)}, but with
+	 * long coordinates
+	 */
+	public synchronized void addDataL(long x1, long x2, IDataStream stream) {
+		assert x2 > x1;
+		long size = stream.getSize();
+		assert size > 0;
+		
+		int scale = log2(x2-x1);
+
+		// We only accept power of 2 scales (TODO: resample when needed instead)
+		assert x2-x1 == (1L << scale);
+		
+		// Determine to range of scales to fill (we take the original scale an zoom out 
+		// until we reach SIZE_THRESHOLD samples
+		int maxScale = size > SIZE_THRESHOLD ? scale + (int) Math.ceil(Math.log(size/SIZE_THRESHOLD)/log2d) : scale;
+		
+		DataChunk[] chunks = new DataChunk[maxScale+1-scale];
+		double[] sums = new double[chunks.length];
+		int[] counts = new int[chunks.length];
+		int[] indexes = new int[chunks.length];
+		
+		// d[i] = avg(f, [(i+o·n)·2^s, (i+1+o·n)·2^s[)
+		
+		// Setup chunk & index stack
+		// the Js are sample indexes in the coordinate space of each scale
+		for (int i=0;i<chunks.length;i++) {
+			long lss = 1 << (scale+i);
+			
+			long j1 = x1 >> (scale+i);
+			long offset1 = j1/chunkSize;
+			indexes[i] = (int) (j1-(offset1*chunkSize));
+			assert indexes[i] >= 0;
+			
+			chunks[i] = getChunk(scale+i, offset1, true);
+			chunks[i].setSynthetic(false);
+			assert chunks[i].offset == offset1;
+		}
+		
+		createScaledData(stream, scale, chunks, sums, counts, indexes);
+		
+		((SimpleEvent<DoubleRange>)eRangeUpdated).fire(new DoubleRange(x1, x2));
+		rangeUpdated(x1, x2);
+	}
+	
+	private void createScaledData(
+			IDataStream stream, 
+			int scale,
+			DataChunk[] chunks,
+			double[] sums,
+			int[] counts,
+			int[] indexes) {
+		long size = stream.getSize();
 		float[] buffer = new float[chunkSize];
 		long k = 0; // sample index in original data
 		while(k < size) {
@@ -163,8 +232,6 @@ public class MultiscaleSeries {
 			k += len;
 		}
 		
-		((SimpleEvent<Range>)eRangeUpdated).fire(new Range(x1, x2));
-		rangeUpdated(x1, x2);
 	}
 	
 	/**
@@ -181,19 +248,44 @@ public class MultiscaleSeries {
 	 * if data is not available at some position, it is filled with 0 instead.
 	 * @return The logScale that was used to render the buffer
 	 */
-	public int getData(double x1, double x2, float[] buffer) {
+	public int getDataD(double x1, double x2, float[] buffer) {
 		assert x2 > x1: "x1: "+x1+", x2: "+x2;
 		assert buffer.length > 0;
 		
 		// Find data series closest to requested range and scale
-		SparseData src = getOptimalData(x1, x2, buffer.length);
+		SparseData src = getOptimalDataD(x1, x2, buffer.length);
 		
 		// Resample data
 		// The is a very slow algorithm, should be replaced by an incremental version
 		for(int dK=0;dK<buffer.length;dK++) {
 			double sx1 = (dK*(x2-x1)/buffer.length)+x1;
 			double sx2 = ((dK+1)*(x2-x1)/buffer.length)+x1;
-			buffer[dK] = (float) src.getAverageValue(sx1, sx2);
+			buffer[dK] = (float) src.getAverageValueD(sx1, sx2);
+		}
+		
+		return src.scale;
+	}
+	
+	/**
+	 * Fills the given buffer with data from the indicated range.
+	 * The number of samples to fill is determined by the size of the buffer.
+	 * The buffer is always completely filled; 
+	 * if data is not available at some position, it is filled with 0 instead.
+	 * @return The logScale that was used to render the buffer
+	 */
+	public int getDataL(long x1, long x2, float[] buffer) {
+		assert x2 > x1: "x1: "+x1+", x2: "+x2;
+		assert buffer.length > 0;
+		
+		// Find data series closest to requested range and scale
+		SparseData src = getOptimalDataL(x1, x2, buffer.length);
+		
+		// Resample data
+		// The is a very slow algorithm, should be replaced by an incremental version
+		for(int dK=0;dK<buffer.length;dK++) {
+			long sx1 = (dK*(x2-x1)/buffer.length)+x1;
+			long sx2 = ((dK+1)*(x2-x1)/buffer.length)+x1;
+			buffer[dK] = (float) src.getAverageValueL(sx1, sx2);
 		}
 		
 		return src.scale;
@@ -202,9 +294,17 @@ public class MultiscaleSeries {
 	/**
 	 * Only for tests
 	 */
-	public double _getAverage(double x1, double x2, int scale) {
+	public double _getAverageD(double x1, double x2, int scale) {
 		SparseData src = dataMap.get(scale);
-		return src.getAverageValue(x1, x2);
+		return src.getAverageValueD(x1, x2);
+	}
+	
+	/**
+	 * Only for tests
+	 */
+	public double _getAverageL(long x1, long x2, int scale) {
+		SparseData src = dataMap.get(scale);
+		return src.getAverageValueL(x1, x2);
 	}
 	
 	public int getMaxScale() {
@@ -266,9 +366,16 @@ public class MultiscaleSeries {
 		return d == Math.round(d);
 	}
 	
-	private SparseData getOptimalData(double x1, double x2, int size) {
+	private SparseData getOptimalDataD(double x1, double x2, int size) {
 		double sampleSize = (x2-x1)/size;
 		int scale = (int) Math.floor(Math.log(sampleSize)/Math.log(2));
+		if (scale > maxScale) scale = maxScale;
+
+		return getScaleData(scale);
+	}
+	
+	private SparseData getOptimalDataL(long x1, long x2, int size) {
+		int scale = log2(x2-x1);
 		if (scale > maxScale) scale = maxScale;
 
 		return getScaleData(scale);
@@ -375,9 +482,16 @@ public class MultiscaleSeries {
 			return false;
 		}
 		
-		public boolean contains(double x) {
+		public boolean containsD(double x) {
 			double start = ss*offset*chunkSize;
 			double end = ss*(offset+1)*chunkSize;
+			return x >= start && x <= end;
+		}
+		
+		public boolean containsL(long x) {
+			long lss = 1L << scale;
+			long start = lss*offset*chunkSize;
+			long end = lss*(offset+1)*chunkSize;
 			return x >= start && x <= end;
 		}
 		
@@ -393,9 +507,15 @@ public class MultiscaleSeries {
 		 * Computes the average value of the chunk over the interval [x1, x2[.
 		 * (absolute coordinates)
 		 */
-		public double getAverageValue(double x1, double x2) {
+		public double getAverageValueD(double x1, double x2) {
 			double[] result = new double[2];
-			getAverageValue(result, x1, x2);
+			getAverageValueD(result, x1, x2);
+			return result[0]/result[1];
+		}
+			
+		public double getAverageValueL(long x1, long x2) {
+			double[] result = new double[2];
+			getAverageValueL(result, x1, x2);
 			return result[0]/result[1];
 		}
 			
@@ -405,10 +525,10 @@ public class MultiscaleSeries {
 		 * (absolute coordinates).
 		 * @param result a array to store the result: [sum, count]
 		 */
-		public void getAverageValue(double[] result, double x1, double x2) {
+		public void getAverageValueD(double[] result, double x1, double x2) {
 			assert x1 < x2: "x1: "+x1+", x2: "+x2;
-			assert contains(x1);
-			assert contains(x2);
+			assert containsD(x1);
+			assert containsD(x2);
 			
 			double dj1 = x1/ss;
 			long j1 = (long) Math.floor(dj1);
@@ -417,12 +537,12 @@ public class MultiscaleSeries {
 			
 			assert Math.floor(1.0*j1/chunkSize) == offset: "j1: "+j1+" chunkSize: "+chunkSize+", offset: "+offset+" vs. "+Math.floor(1.0*j1/chunkSize);
 					
-			int i = (int) (j1-(1L*offset*chunkSize));
-			int i2 = (int) (j2-(1L*offset*chunkSize));
+			int i = (int) (j1-(offset*chunkSize));
+			int i2 = (int) (j2-(offset*chunkSize));
 			double sum = 0;
 			
 			if (i == i2) {
-				double w = dj2-dj1;
+				double w = (x2-x1)/ss;
 				result[0] = get(i)*w;
 				result[1] = w;
 			} else {
@@ -442,6 +562,52 @@ public class MultiscaleSeries {
 				
 				result[0] = sum;
 				result[1] = dj2-dj1;
+			}
+		}
+		
+		/**
+		 * Computes the average value of the chunk over the interval [x1, x2[.
+		 * (absolute coordinates).
+		 * @param result a array to store the result: [sum, count]
+		 */
+		public void getAverageValueL(double[] result, long x1, long x2) {
+			assert x1 < x2: "x1: "+x1+", x2: "+x2;
+			assert containsL(x1);
+			assert containsL(x2);
+
+			long lss = 1L << scale;
+			long j1 = x1 >> scale;
+			long rj1 = x1 & (lss-1);
+			long j2 = x2 >> scale;
+			long rj2 = x2 & (lss-1);
+			
+			assert Math.floor(1.0*j1/chunkSize) == offset: "j1: "+j1+" chunkSize: "+chunkSize+", offset: "+offset+" vs. "+Math.floor(1.0*j1/chunkSize);
+			
+			int i = (int) (j1-(offset*chunkSize));
+			int i2 = (int) (j2-(offset*chunkSize));
+			double sum = 0;
+			
+			if (i == i2) {
+				double w = 1.0*(x2-x1)/ss;
+				result[0] = get(i)*w;
+				result[1] = w;
+			} else {
+				// Compute the contribution of the first sample
+				double w = 1.0-(1.0*rj1/ss);
+				sum += get(i)*w;
+				i++;
+				
+				// Include the middle samples
+				while(i < i2) {
+					sum += get(i++);
+				}
+				
+				// Include the last sample
+				w = 1.0*rj2/ss;
+				if (w > 0) sum += get(i)*w;
+				
+				result[0] = sum;
+				result[1] = 1.0*(x2-x1)/ss;
 			}
 		}
 		
@@ -490,7 +656,7 @@ public class MultiscaleSeries {
 		 * Computes the average value of the serie over the interval [x1, x2[
 		 * using data of the current scale
 		 */
-		public double getAverageValue(double x1, double x2) {
+		public double getAverageValueD(double x1, double x2) {
 			long offset = (long) Math.floor(x1/(ss*chunkSize));
 			
 			double sum = 0;
@@ -514,7 +680,46 @@ public class MultiscaleSeries {
 				} else {
 					double lx1 = Math.max(cx1, x1);
 					double lx2 = Math.min(cx2,  x2);
-					if (lx1 != lx2) chunk.getAverageValue(buffer, lx1, lx2);
+					if (lx1 != lx2) chunk.getAverageValueD(buffer, lx1, lx2);
+					sum += buffer[0];
+					count += buffer[1];
+				}
+				offset++;
+			}
+			
+			return sum/count;
+		}
+		
+		/**
+		 * Same as {@link #getAverageValueD(double, double)}, but with
+		 * long coordinates
+		 */
+		public double getAverageValueL(long x1, long x2) {
+			long offset = (x1 >> scale)/chunkSize;
+			
+			long lss = 1L << scale;
+			double sum = 0;
+			double count = 0;
+			double[] buffer = new double[2];
+			while(true) {
+				long cx1 = lss*offset*chunkSize;
+				long cx2 = lss*(offset+1)*chunkSize;
+				if (cx1 >= x2) break;
+				DataChunk chunk = chunks.get(offset);
+				
+				if (chunk == null) {
+					// Attempt to obtain the missing data
+					chunk = chunkMissing(scale, offset);
+					if (chunk != null) add(chunk);
+				}
+				
+				if (chunk == null) {
+					// If no data, assume all zeros
+					count += (cx2-cx1)/ss;
+				} else {
+					long lx1 = Math.max(cx1, x1);
+					long lx2 = Math.min(cx2,  x2);
+					if (lx1 != lx2) chunk.getAverageValueL(buffer, lx1, lx2);
 					sum += buffer[0];
 					count += buffer[1];
 				}
@@ -582,4 +787,33 @@ public class MultiscaleSeries {
 		}
 		
 	}
+	
+	/**
+	 * A generic range with double values
+	 * @author gpothier
+	 */
+	public static class DoubleRange {
+		public final double x1;
+		public final double x2;
+		
+		public DoubleRange(double x1, double x2) {
+			this.x1 = x1;
+			this.x2 = x2;
+		}
+	}
+	
+	/**
+	 * A generic range with long values
+	 * @author gpothier
+	 */
+	public static class LongRange {
+		public final long x1;
+		public final long x2;
+		
+		public LongRange(long x1, long x2) {
+			this.x1 = x1;
+			this.x2 = x2;
+		}
+	}
+	
 }

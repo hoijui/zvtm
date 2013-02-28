@@ -37,7 +37,51 @@ public class ImageMSGHandler {
 	 * @param minValue Minimum value in the dataset
 	 * @param maxValue Maximum value in the dataset
 	 */
-	public BufferedImage generateImage(int width, double x1, double x2, double minValue, double maxValue) {
+	public BufferedImage generateImageD(int width, double x1, double x2, float minValue, float maxValue) {
+		checkImage(width);
+		
+		long t0 = System.currentTimeMillis();
+		
+		try {
+			WritableRaster raster = image.getRaster();
+			List<GetDataTask> tasks = new ArrayList<GetDataTask>(THREADS);
+			for(int i=0;i<THREADS;i++) tasks.add(new GetDataTaskDouble(group, i, buffers[i], raster, x1, x2, minValue, maxValue));
+			executor.invokeAll(tasks);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		long t1 = System.currentTimeMillis();
+		System.out.println("getData: "+(t1-t0)+"ms");
+		
+		return image;
+	}
+	
+	/**
+	 * Same as {@link #generateImage(int, double, double, float, float)} but
+	 * with long coordinates
+	 */
+	public BufferedImage generateImageL(int width, long x1, long x2, float minValue, float maxValue) {
+		checkImage(width);
+		
+		long t0 = System.currentTimeMillis();
+		
+		try {
+			WritableRaster raster = image.getRaster();
+			List<GetDataTask> tasks = new ArrayList<GetDataTask>(THREADS);
+			for(int i=0;i<THREADS;i++) tasks.add(new GetDataTaskLong(group, i, buffers[i], raster, x1, x2, minValue, maxValue));
+			executor.invokeAll(tasks);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		long t1 = System.currentTimeMillis();
+		System.out.println("getData: "+(t1-t0)+"ms");
+		
+		return image;
+	}
+	
+	private void checkImage(int width) {
 		if (image == null || width != image.getWidth()) {
 			byte[] red = new byte[256];
 			byte[] green = new byte[256];
@@ -53,51 +97,30 @@ public class ImageMSGHandler {
 				buffers[i] = new float[width];
 			}			
 		}
-		
-		long t0 = System.currentTimeMillis();
-		
-		try {
-			WritableRaster raster = image.getRaster();
-			List<GetDataTask> tasks = new ArrayList<GetDataTask>(THREADS);
-			for(int i=0;i<THREADS;i++) tasks.add(new GetDataTask(group, i, buffers[i], raster, x1, x2, minValue, maxValue));
-			executor.invokeAll(tasks);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		
-		long t1 = System.currentTimeMillis();
-		System.out.println("getData: "+(t1-t0)+"ms");
-		
-		return image;
 	}
 	
 	/**
 	 * This task obtains the scaled data from a subset of the series group.
 	 * @author gpothier
 	 */
-	private class GetDataTask implements Runnable, Callable<Void> {
+	private static abstract class GetDataTask implements Runnable, Callable<Void> {
 		private MultiscaleSeriesGroup group;
 		private int rank;
 		private float[] buffer;
 		private WritableRaster raster;
-		private double x1;
-		private double x2;
-		private double minValue;
-		private double maxValue;
+		private float minValue;
+		private float maxValue;
 		
 		public GetDataTask(
 				MultiscaleSeriesGroup group, 
 				int rank, 
 				float[] buffer,
 				WritableRaster raster,
-				double x1, double x2,
-				double minValue, double maxValue) {
+				float minValue, float maxValue) {
 			this.group = group;
 			this.rank = rank;
 			this.buffer = buffer;
 			this.raster = raster;
-			this.x1 = x1;
-			this.x2 = x2;
 			this.minValue = minValue;
 			this.maxValue = maxValue;
 		}
@@ -109,7 +132,7 @@ public class ImageMSGHandler {
 				int id = rank*groups+i;
 				if (id >= group.getSize()) continue;
 				
-				group.get(id).getData(x1, x2, buffer);
+				getData(group.get(id), buffer);
 				
 				for(int j=0;j<buffer.length;j++) {
 					float v = buffer[j];
@@ -120,6 +143,8 @@ public class ImageMSGHandler {
 				}
 			}
 		}
+		
+		protected abstract void getData(MultiscaleSeries series, float[] buffer);
 
 		@Override
 		public Void call() throws Exception {
@@ -132,5 +157,56 @@ public class ImageMSGHandler {
 		}
 	}
 	
+	/**
+	 * This task obtains the scaled data from a subset of the series group.
+	 * @author gpothier
+	 */
+	private static class GetDataTaskDouble extends GetDataTask {
+		private double x1;
+		private double x2;
+		
+		public GetDataTaskDouble(
+				MultiscaleSeriesGroup group, 
+				int rank, 
+				float[] buffer,
+				WritableRaster raster,
+				double x1, double x2,
+				float minValue, float maxValue) {
+			super(group, rank, buffer, raster, minValue, maxValue);
+			this.x1 = x1;
+			this.x2 = x2;
+		}
+		
+		@Override
+		protected void getData(MultiscaleSeries series, float[] buffer) {
+			series.getDataD(x1, x2, buffer);
+		}
+	}
 	
+	
+	/**
+	 * This task obtains the scaled data from a subset of the series group.
+	 * @author gpothier
+	 */
+	private static class GetDataTaskLong extends GetDataTask {
+		private long x1;
+		private long x2;
+		
+		public GetDataTaskLong(
+				MultiscaleSeriesGroup group, 
+				int rank, 
+				float[] buffer,
+				WritableRaster raster,
+				long x1, long x2,
+				float minValue, float maxValue) {
+			super(group, rank, buffer, raster, minValue, maxValue);
+			this.x1 = x1;
+			this.x2 = x2;
+		}
+		
+		@Override
+		protected void getData(MultiscaleSeries series, float[] buffer) {
+			series.getDataL(x1, x2, buffer);
+		}
+	}
 }

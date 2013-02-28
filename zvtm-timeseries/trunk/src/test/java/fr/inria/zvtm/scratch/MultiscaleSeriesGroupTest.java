@@ -24,12 +24,12 @@ public class MultiscaleSeriesGroupTest {
 		float[] data = new float[64*1024];
 		for(int i=0;i<series.length;i++) {
 			for(int j=0;j<data.length;j++) data[j] = i;
-			series[i].addData(0, 1, data);
+			series[i].addDataD(0, 1, data);
 		}
 
 		float[] buffer = new float[1];
 		for(int i=0;i<series.length;i++) {
-			series[i].getData(0, 1, buffer);
+			series[i].getDataD(0, 1, buffer);
 			assertEquals(i, (int) buffer[0]); 
 		}		
 	}

@@ -24,7 +24,7 @@ import fr.inria.zvtm.timeseries.core.ImageMSGHandler;
 import fr.inria.zvtm.timeseries.core.MultiscaleSeries;
 import fr.inria.zvtm.timeseries.core.MultiscaleSeriesGroup;
 
-public class ScratchPanel extends JPanel {
+public class ScratchPanelD extends JPanel {
 	private static final int CHUNK_SIZE = 1024;
 	private static final int DATA_SIZE = 64*1024;
 	private static final int COUNT = 500;
@@ -45,7 +45,7 @@ public class ScratchPanel extends JPanel {
 	
 	private AtomicInteger created = new AtomicInteger();
 	
-	public ScratchPanel() {
+	public ScratchPanelD() {
 		group = new MultiscaleSeriesGroup(1024);
 		for(int i=0;i<COUNT;i++) series[i] = new MySeries(group.getCache());
 		group.setSeries(series);
@@ -82,19 +82,6 @@ public class ScratchPanel extends JPanel {
 				repaint();
 			}
 		});
-		
-		new Thread() {
-			public void run() {
-				while (zoom < 8.489238517276154E-6) {
-					zoom(4, 250);
-					try {
-						Thread.sleep(100);
-					} catch (InterruptedException e) {
-					}
-					repaint();
-				}
-			};
-		}.start();
 	}
 	
 	private void zoom(int n, int x) {
@@ -114,7 +101,7 @@ public class ScratchPanel extends JPanel {
 		
 		double x2 = x1 + 1.0/zoom;
 		System.out.println("x1: "+x1+", x2: "+x2+", dx: "+(x2-x1)+", zoom: "+zoom);
-		BufferedImage image = imageHandler.generateImage(getWidth(), x1, x2, minValue, maxValue);
+		BufferedImage image = imageHandler.generateImageD(getWidth(), x1, x2, minValue, maxValue);
 		
 		g.drawImage(image, 
 				0, 0, getWidth(), getHeight(),
@@ -156,7 +143,7 @@ public class ScratchPanel extends JPanel {
 				data[data.length-1] = r.nextFloat();
 				plasma(r, data, 0, data.length-1);
 				
-				series[id].addData(x1, x2, data);
+				series[id].addDataD(x1, x2, data);
 				
 				for(int j=0;j<data.length;j++) {
 					float v = data[j];
@@ -203,7 +190,7 @@ public class ScratchPanel extends JPanel {
 	 * at higher scales.
 	 * @author gpothier
 	 */
-	private class MySeries extends DynamicMultiscaleSeries {
+	private class MySeries extends DynamicMultiscaleSeries.Double {
 		public MySeries(IChunkCache cache) {
 			super(cache, CHUNK_SIZE);
 		}
@@ -220,7 +207,7 @@ public class ScratchPanel extends JPanel {
 			float[] data = new float[(int)((x2-x1)/ss)];
 			if (MultiscaleSeries.LOG) System.out.println("["+Thread.currentThread().getId()+"]\t Fetching ["+getId()+"]: "+scale+", l: "+data.length+" - "+x1+", "+x2+" "+Thread.currentThread());
 			
-			Random r = new Random((long) (getId() ^ scale ^ Double.doubleToLongBits(x1) ^ Double.doubleToLongBits(x2)));
+			Random r = new Random((long) (getId() ^ scale ^ java.lang.Double.doubleToLongBits(x1) ^ java.lang.Double.doubleToLongBits(x2)));
 			
 			double x = x1;
 			while(x<x2) {
@@ -267,7 +254,7 @@ public class ScratchPanel extends JPanel {
 	public static void main(String[] args) {
 		JFrame frame = new JFrame("Timescale");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setContentPane(new ScratchPanel());
+		frame.setContentPane(new ScratchPanelD());
 		frame.setSize(500, 500);
 		frame.setVisible(true);
 	}
