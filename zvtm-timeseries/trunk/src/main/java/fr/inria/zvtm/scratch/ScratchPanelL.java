@@ -89,7 +89,7 @@ public class ScratchPanelL extends JPanel {
 		double z0 = zoom;
 		zoom = z0 * Math.pow(1.2, n);
 //		if (zoom < 0.000000001) zoom = 0.000000001;
-//		if (zoom > 1000000) zoom = 1000000;
+		if (zoom > 1.0/w) zoom = 1.0/w;
 		
 		x1 = x1 + (long) (1.0*x/(z0*w) - 1.0*x/(zoom*w)); 
 	}
@@ -203,7 +203,9 @@ public class ScratchPanelL extends JPanel {
 			long t0 = System.currentTimeMillis();
 			long lss = 1L << scale;
 			
-			float[] data = new float[(int)((x2-x1)/lss)];
+			int size = (int)((x2-x1)/lss);
+			if (size == 0) return null;
+			float[] data = new float[size];
 			if (MultiscaleSeries.LOG) System.out.println("["+Thread.currentThread().getId()+"]\t Fetching ["+getId()+"]: "+scale+", l: "+data.length+" - "+x1+", "+x2+" "+Thread.currentThread());
 			
 			Random r = new Random((long) (getId() ^ scale ^ x1 ^ x2));

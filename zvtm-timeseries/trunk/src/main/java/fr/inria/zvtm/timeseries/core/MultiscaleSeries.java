@@ -148,7 +148,7 @@ public class MultiscaleSeries {
 		long size = stream.getSize();
 		assert size > 0;
 		
-		int scale = log2(x2-x1);
+		int scale = log2((x2-x1)/size);
 
 		// We only accept power of 2 scales (TODO: resample when needed instead)
 		assert x2-x1 == (1L << scale);
