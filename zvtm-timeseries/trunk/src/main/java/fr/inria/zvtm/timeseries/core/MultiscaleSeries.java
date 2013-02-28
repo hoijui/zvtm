@@ -267,11 +267,8 @@ public class MultiscaleSeries {
 	}
 	
 	/**
-	 * Fills the given buffer with data from the indicated range.
-	 * The number of samples to fill is determined by the size of the buffer.
-	 * The buffer is always completely filled; 
-	 * if data is not available at some position, it is filled with 0 instead.
-	 * @return The logScale that was used to render the buffer
+	 * Same as {@link #getDataD(double, double, float[])} but with long
+	 * coordinates.
 	 */
 	public int getDataL(long x1, long x2, float[] buffer) {
 		assert x2 > x1: "x1: "+x1+", x2: "+x2;
