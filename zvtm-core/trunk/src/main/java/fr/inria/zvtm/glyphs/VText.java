@@ -619,7 +619,7 @@ public class VText<T> extends ClosedShape {
      *@param i index of camera (Camera.getIndex())
      *@see #validBounds(int i)
      *@see #invalidate()
-     *@return the width and height of the text's bounding box, as a LongPoint
+     *@return the width and height of the text's bounding box, as a Point2D
      */
     public Point2D.Double getBounds(int i){
         return new Point2D.Double(pc[i].cw, pc[i].ch);
