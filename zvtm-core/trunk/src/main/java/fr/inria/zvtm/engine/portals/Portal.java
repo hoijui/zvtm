@@ -2,11 +2,11 @@
  *   DATE OF CREATION:  Sat Jun 17 07:19:59 2006
  *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2004-2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2013. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
- */ 
+ */
 
 package fr.inria.zvtm.engine.portals;
 
@@ -17,25 +17,25 @@ import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.event.PortalListener;
 
 public abstract class Portal {
-    
+
     /** Top-left x-coordinate of this portal (JPanel coordinates system). */
     public int x;
     /** Top-left y-coordinate of this portal (JPanel coordinates system). */
     public int y;
-    
+
     /** Portal dimensions (width). */
     public int w;
     /** Portal dimensions (height). */
     public int h;
-    
+
     Dimension size = new Dimension(0,0);
-    
+
     /** View embedding this portal. */
     View owningView;
 
     /** Handles events occuring inside the portal. */
     PortalListener pevH;
-    
+
     /** Was the cursor inside the portal or not last time it moved. */
     public boolean cursorInside = false;
 
@@ -43,7 +43,7 @@ public abstract class Portal {
 
     /** Move the portal inside the view (relative).
      *@param dx x-offset (JPanel coordinates system)
-     *@param dy y-offset (JPanel coordinates system) 
+     *@param dy y-offset (JPanel coordinates system)
      */
     public void move(int dx, int dy){
         x += dx;
@@ -52,13 +52,13 @@ public abstract class Portal {
 
     /** Move the portal inside the view (absolute).
      *@param x new x-coordinate (JPanel coordinates system)
-     *@param y new y-coordinate (JPanel coordinates system) 
+     *@param y new y-coordinate (JPanel coordinates system)
      */
     public void moveTo(int x, int y){
         this.x = x;
         this.y = y;
-    }    
-    
+    }
+
     /** Set the portal's size (multiplication factor). */
     public void resize(int dw, int dh){
         w += dw;
@@ -72,7 +72,7 @@ public abstract class Portal {
         this.h = h;
         updateDimensions();
     }
-    
+
     public Dimension getDimensions(){
         return new Dimension(w, h);
     }
@@ -80,12 +80,12 @@ public abstract class Portal {
     public void updateDimensions(){
 	    size.setSize(w, h);
     }
-    
+
     /**CALLED INTERNALLY - NOT FOR PUBLIC USE*/
     public void setOwningView(View v){
 	    this.owningView = v;
     }
-    
+
     /** Get the view embedding this portal. */
     public View getOwningView(){
 	    return owningView;
@@ -101,19 +101,20 @@ public abstract class Portal {
 	    return this.pevH;
     }
 
-    /**detects whether the given point is inside this portal or not 
+    /**detects whether the given point is inside this portal or not
      *@param cx cursor x-coordinate (JPanel coordinates system)
-     *@param cy cursor y-coordinate (JPanel coordinates system) 
+     *@param cy cursor y-coordinate (JPanel coordinates system)
      */
     public abstract boolean coordInside(int cx, int cy);
 
 
     /** Detects cursor entry/exit in/from the portal.
      *@param cx cursor x-coordinate (JPanel coordinates system)
-     *@param cy cursor y-coordinate (JPanel coordinates system) 
+     *@param cy cursor y-coordinate (JPanel coordinates system)
      *@return 1 if cursor has entered the portal, -1 if it has exited the portal, 0 if nothing has changed (meaning it was already inside or outside it)
      */
     public int cursorInOut(int cx,int cy){
+        if (!visible){return 0;}
         if (coordInside(cx, cy)){
             // if the cursor is inside the portal
             if (!cursorInside){
@@ -157,7 +158,7 @@ public abstract class Portal {
         res[0] = cx - x;
         res[1] = cy - y;
         res[2] = x + w - cx;
-        res[3] = y + h - cy;	
+        res[3] = y + h - cy;
         return res;
     }
 
@@ -165,7 +166,7 @@ public abstract class Portal {
 	public void setVisible(boolean b){
 		visible = b;
 	}
-	
+
 	/** Tells wether this portal is currently visible or not. */
 	public boolean isVisible(){
 		return visible;
