@@ -40,6 +40,8 @@ public class OverviewPortal extends CameraPortal {
 
     Timer borderTimer;
 
+    boolean drawObservedRegionLocator = false;
+
     /** Builds a new portal displaying what is seen through a camera and the region seen through another camera.
      *@param x top-left horizontal coordinate of portal, in parent's JPanel coordinates
      *@param y top-left vertical coordinate of portal, in parent's JPanel coordinates
@@ -77,6 +79,14 @@ public class OverviewPortal extends CameraPortal {
             portal.observedRegionIntersects(intersection);
         }
 
+    }
+
+    public void drawObservedRegionLocator(boolean b){
+        drawObservedRegionLocator = b;
+    }
+
+    public boolean isDrawObservedRegionLocator(){
+        return drawObservedRegionLocator;
     }
 
     /** Is the given point inside the observed region rectangle depicting what is seen through the main camera (viewfinder).
@@ -181,18 +191,27 @@ public class OverviewPortal extends CameraPortal {
         observedRegion = observedRegionView.getVisibleRegion(observedRegionCamera, observedRegion);
         g2d.setColor(observedRegionColor);
         orcoef = (float)(camera.focal/(camera.focal+camera.altitude));
+        int nwx = (int)(x+w/2 + Math.round((observedRegion[0]-camera.vx)*orcoef));
+        int nwy = (int)(y+h/2 - Math.round((observedRegion[1]-camera.vy)*orcoef));
+        int orw = (int)Math.round((observedRegion[2]-observedRegion[0])*orcoef);
+        int orh = (int)Math.round((observedRegion[1]-observedRegion[3])*orcoef);
         if (acST != null){
             g2d.setComposite(acST);
-            g2d.fillRect((int)(x+w/2 + Math.round((observedRegion[0]-camera.vx)*orcoef)),
-                (int)(y+h/2 - Math.round((observedRegion[1]-camera.vy)*orcoef)),
-                (int)Math.round((observedRegion[2]-observedRegion[0])*orcoef),
-                (int)Math.round((observedRegion[1]-observedRegion[3])*orcoef));
+            g2d.fillRect(nwx, nwy, orw, orh);
             g2d.setComposite(Translucent.acO);
         }
-        g2d.drawRect((int)(x+w/2 + Math.round((observedRegion[0]-camera.vx)*orcoef)),
-            (int)(y+h/2 - Math.round((observedRegion[1]-camera.vy)*orcoef)),
-            (int)Math.round((observedRegion[2]-observedRegion[0])*orcoef),
-            (int)Math.round((observedRegion[1]-observedRegion[3])*orcoef));
+        g2d.setStroke(standardStroke);
+        g2d.drawRect(nwx, nwy, orw, orh);
+        if (drawObservedRegionLocator){
+            // west
+            g2d.drawRect(x, nwy+orh/2, nwx-x, 1);
+            // // north
+            g2d.drawRect(nwx+orw/2, y, 1, nwy-y);
+            // east
+            g2d.drawRect(nwx+orw, nwy+orh/2, x+w-(nwx+orw), 1);
+            // south
+            g2d.drawRect(nwx+orw/2, nwy+orh, 1, y+h-(nwy+orh));
+        }
         // reset Graphics2D
         g2d.setClip(0, 0, viewWidth, viewHeight);
         if (borderColor != null){
