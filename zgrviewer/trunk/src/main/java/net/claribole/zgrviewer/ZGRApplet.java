@@ -95,6 +95,10 @@ public class ZGRApplet extends JApplet implements MouseListener, KeyListener, ZG
         getRootPane().putClientProperty("defeatSystemEventQueueCheck", Boolean.TRUE);
     }
 
+    public boolean exitVMonClose(){
+        return false;
+    }
+
     public void init(){
         initConfig();
         initGUI();

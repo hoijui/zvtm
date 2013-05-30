@@ -14,4 +14,6 @@ public interface ZGRApplication {
 
     public void setStatusBarText(String s);
 
+    public boolean exitVMonClose();
+
 }

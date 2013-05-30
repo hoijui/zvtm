@@ -56,6 +56,7 @@ public class ZGRViewer implements ZGRApplication {
     private JPanel _panelView;
 	private ZGRGlassPane _gp;
 
+    boolean exitVMonClose = true;
 
     public ZGRViewer(boolean acc){
         initConfig();
@@ -87,7 +88,9 @@ public class ZGRViewer implements ZGRApplication {
         return grMngr.lstruct;
     }
 
-
+    public boolean exitVMonClose(){
+        return exitVMonClose;
+    }
 
     void loadCmdLineFile(){
     if (cmdLinePrg!=null){
@@ -138,6 +141,7 @@ public class ZGRViewer implements ZGRApplication {
 	}
 
     void initGUI(boolean acc, boolean viewOnJPanel){
+        exitVMonClose = !viewOnJPanel;
         cfgMngr.notifyPlugins(Plugin.NOTIFY_PLUGIN_GUI_INITIALIZING);
         Utils.initLookAndFeel();
         JMenuBar jmb = initViewMenu(acc);
@@ -541,7 +545,9 @@ public class ZGRViewer implements ZGRApplication {
         cfgMngr.saveCommandLines();
         grMngr.paMngr.stop();
         cfgMngr.terminatePlugins();
-        System.exit(0);
+        if (exitVMonClose()){
+            System.exit(0);
+        }
     }
 
     static void printCmdLineHelp(){
