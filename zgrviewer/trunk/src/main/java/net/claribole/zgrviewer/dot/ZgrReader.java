@@ -126,8 +126,8 @@ public class ZgrReader {
                     subgraph.fontcolor, subgraph.fontname, vsm, vs, subgraph);
         }
 
-        createNodesGlyphs(subgraph.nodes, vsm, vs);
-        createEdgesGlyphs(subgraph.edges, vsm, vs);
+        createNodesGlyphs(subgraph.getNodes(), vsm, vs);
+        createEdgesGlyphs(subgraph.getEdges(), vsm, vs);
     }
 
     private static void createRecord(Record record, VirtualSpaceManager vsm,

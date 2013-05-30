@@ -26,6 +26,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
 import fr.inria.zvtm.engine.SwingWorker;
@@ -52,13 +53,30 @@ public class ZGRViewer implements ZGRApplication {
     static String cmdLinePrg=null;
 
     PieMenu mainPieMenu, subPieMenu;
+    private JPanel _panelView;
+	private ZGRGlassPane _gp;
 
 
-    ZGRViewer(boolean acc){
+    public ZGRViewer(boolean acc){
         initConfig();
         //init GUI after config as we load some GUI prefs from the config file
-        initGUI(acc);
+        initGUI(acc, false);
         if (cmdLineDOTFile!=null){loadCmdLineFile();}
+    }
+    
+    public ZGRViewer() 
+    {
+    	initConfig();
+        //init GUI after config as we load some GUI prefs from the config file
+        initGUI(false, true);
+    	
+	}
+        
+    public void setFile(File dotFile)
+    {
+    	cmdLineDOTFile = dotFile;
+    	
+         if (cmdLineDOTFile!=null){loadCmdLineFile();}
     }
 
     public GraphicsManager getGraphicsManager(){
@@ -68,6 +86,8 @@ public class ZGRViewer implements ZGRApplication {
     public LogicalStructure getLogicalStructure(){
         return grMngr.lstruct;
     }
+    
+    
 
     void loadCmdLineFile(){
     if (cmdLinePrg!=null){
@@ -112,15 +132,43 @@ public class ZGRViewer implements ZGRApplication {
         cfgMngr.initPlugins(this);
     }
 
-    void initGUI(boolean acc){
+    public ZGRGlassPane getGlassPane() 
+    {
+    	return _gp;
+	}
+    
+    void initGUI(boolean acc, boolean viewOnJPanel){
         cfgMngr.notifyPlugins(Plugin.NOTIFY_PLUGIN_GUI_INITIALIZING);
         Utils.initLookAndFeel();
         JMenuBar jmb = initViewMenu(acc);
-        grMngr.createFrameView(grMngr.createZVTMelements(false), acc ? View.OPENGL_VIEW : View.STD_VIEW, jmb);
+        if (viewOnJPanel)
+        {
+        	_panelView = grMngr.createPanelView(grMngr.createZVTMelements(true), 100, 100);
+        	
+        	//_panelView.setLocation(ConfigManager.mainViewX,ConfigManager.mainViewY);
+        	_panelView.addComponentListener(grMngr);
+        	_gp = new ZGRGlassPane(grMngr);
+        	
+        	grMngr.gp = _gp;
+        	        	
+            //((JFrame)_panelView.getFrame()).setGlassPane(gp);
+        	
+        }
+        else
+        {
+        	grMngr.createFrameView(grMngr.createZVTMelements(false), acc ? View.OPENGL_VIEW : View.STD_VIEW, jmb);
+        }
+        
         cfgMngr.notifyPlugins(Plugin.NOTIFY_PLUGIN_GUI_VIEW_CREATED);
         grMngr.parameterizeView(new ZgrvEvtHdlr(this, this.grMngr));
         cfgMngr.notifyPlugins(Plugin.NOTIFY_PLUGIN_GUI_INITIALIZED);
     }
+    
+    public JPanel getPanelView() 
+    {
+    	return _panelView;
+	}
+    
 
     JMenuBar initViewMenu(boolean accelerationMode){
         JMenu open=new JMenu("Open");
@@ -464,6 +512,7 @@ public class ZGRViewer implements ZGRApplication {
     }
 
     static final String CURRENT_VERSION_URL = "http://zvtm.sourceforge.net/zgrviewer/currentVersion";
+	
 
     public void checkVersion(){
         try {

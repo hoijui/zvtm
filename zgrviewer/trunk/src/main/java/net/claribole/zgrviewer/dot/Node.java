@@ -73,7 +73,7 @@ abstract public class Node {
     /**
      * Node style
      */
-    Style          style       = new Style();
+    protected Style          style       = new Style();
 
     /**
      * Create a new Node instance
@@ -313,7 +313,7 @@ abstract public class Node {
      * @param value
      * @return A GraphViz color value
      */
-    private String printOption(String attribute, Color value) {
+    protected String printOption(String attribute, Color value) {
         if (value != null) {
             String r = Integer.toHexString(value.getRed()), g = Integer
                     .toHexString(value.getGreen()), b = Integer

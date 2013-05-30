@@ -108,6 +108,12 @@ public class Edge {
      * Groupe tails in the sametail group
      */
     String                 sametail       = "";
+    
+    /**
+    * width of an edge
+    */
+   String                 penwidth       = "";
+    
     /**
      * The root graph object that this edge belongs
      */
@@ -186,11 +192,11 @@ public class Edge {
     /**
      * Cluster where the arrow must stop
      */
-    Cluster                lhead;
+    protected SubGraph                lhead;
     /**
      * Cluster where the arrow must start
      */
-    Cluster                ltail;
+    protected SubGraph                ltail;
     /**
      * Position of the control nodes of the edge
      */
@@ -389,6 +395,9 @@ public class Edge {
         if (this.samehead != null)
             if (!this.samehead.equals(edge.samehead))
                 this.samehead = edge.samehead;
+        if (this.penwidth != null)
+            if (!this.penwidth.equals(edge.penwidth))
+                this.penwidth = edge.penwidth;
         if (this.sametail != null)
             if (!this.sametail.equals(edge.sametail))
                 this.sametail = edge.sametail;
@@ -526,6 +535,8 @@ public class Edge {
             this.samehead = v;
         else if (name.equals("sametail"))
             this.sametail = v;
+        else if (name.equals("penwidth"))
+            this.penwidth = v;
         else if (name.equals("showboxes"))
             this.showboxes = DotUtils.readInteger(v);
         else if (name.equals("style"))
@@ -639,6 +650,8 @@ public class Edge {
             o += printOption("pos", this.pos);
         if (!this.samehead.equals(""))
             o += printOption("samehead", this.samehead);
+        if (!this.penwidth.equals(""))
+            o += printOption("penwidth", this.penwidth);
         if (!this.sametail.equals(""))
             o += printOption("sametail", this.sametail);
         if (this.showboxes != 0)
@@ -720,7 +733,7 @@ public class Edge {
         return o + "\"" + (value.change ? "" : "!") + " ";
     }
 
-    private String printOption(String attribute, Cluster value) {
+    private String printOption(String attribute, SubGraph value) {
         return attribute + "=\"" + value.id + "\" ";
     }
 

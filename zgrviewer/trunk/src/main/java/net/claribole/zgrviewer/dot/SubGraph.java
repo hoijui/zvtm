@@ -84,9 +84,9 @@ public class SubGraph extends Node {
             ((SubGraph) root).addNode(this);
     }
 
-    /*private*/Node[] nodes;
+    /*private*/private Node[] nodes;
 
-    /*private*/Edge[] edges;
+    /*private*/private Edge[] edges;
 
     /**
      * Drawing bounding box
@@ -176,7 +176,7 @@ public class SubGraph extends Node {
     /**
      * Label of the graph
      */
-    //String label = "";
+    String label = "";
     /**
      * Label justification (CENTER, LEFT or RIGHT)
      */
@@ -474,14 +474,17 @@ public class SubGraph extends Node {
      * @see net.claribole.zgrviewer.dot.Node#toString()
      */
     public String toString() {
-        // TODO: print all SubGraph and Cluster options
+        // TODO: print all SubGraph and Cluster options - partly done node options and bg
+    	
         String g;
         if (this.id == null) {
             g = "{\n";
+                      
         } else {
             g = "subgraph " + ((this instanceof Cluster) ? "cluster" : "")
                     + this.id + " {\n";
         }
+        
         if (this.nodes != null)
             for (int i = 0; i < this.nodes.length; i++) {
                 g += this.nodes[i];
@@ -491,10 +494,63 @@ public class SubGraph extends Node {
                 g += this.edges[i];
             }
         }
+        
+        String o = nodeOptions();
+        if (!o.equals(" "))
+            g += " " + o + "";
+        
+//        if (getLabel() != null)
+//        {
+//        	if (getLabel().length() > 0)
+//        	{
+//        		g += "\nlabel=" + "\"" + getLabel() + "\"\n";
+//        	}
+//        }
+//        if (getBgColor() != null)
+//        {
+//        	g += printOption("bgcolor", getBgColor());
+//        	//g += "\nbgcolor=" + "\"" + getBgColor() + "\"\n";
+//        }
+                
         return g + "}\n";
     }
 
-    public void changeOption(String name, String value) throws Exception {
+    @Override
+    protected String nodeOptions() 
+    {
+    		String o = "";
+    		
+    		//not sure even if a subGraph is a node maybe not all options are applicable for subGraph
+    		// o += super.nodeOptions();
+    		
+            if (getLabel() != null)
+            {
+                if (!getLabel().equals(""))
+                {
+                    o += printOption("label", getLabel());
+                }
+            }
+            
+            if (this.color != null)
+            {
+                o += printOption("color", this.color);
+            }
+    		if (getBgColor() != null) 
+    		{
+    			o += printOption("bgcolor", getBgColor());
+    		}
+
+    		return o;
+    }
+    
+    private Color getBgColor() 
+    {
+    	Color retVal = this.bgcolor;
+    	
+		return retVal;
+	}
+
+	public void changeOption(String name, String value) throws Exception {
         try {
             super.changeOption(name, value);
         } catch (Exception e) {
@@ -661,4 +717,20 @@ public class SubGraph extends Node {
             return value;
         return -1;
     }
+
+	public Node[] getNodes() {
+		return nodes;
+	}
+
+	public void setNodes(Node[] nodes) {
+		this.nodes = nodes;
+	}
+
+	public Edge[] getEdges() {
+		return edges;
+	}
+
+	public void setEdges(Edge[] edges) {
+		this.edges = edges;
+	}
 }
