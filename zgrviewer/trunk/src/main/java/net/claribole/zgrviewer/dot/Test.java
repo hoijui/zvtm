@@ -1,7 +1,7 @@
 /*   AUTHOR :            Eric Mounhem (skbo@lri.fr)
  *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
- * 
+ *
  * $Id$
  */
 
@@ -41,15 +41,15 @@ public class Test {
 
             CommonAST ast = (CommonAST) parser.getAST();
             //System.out.println(ast.toStringTree());
-            
+
             DOTTreeTransformer trans = new DOTTreeTransformer();
             trans.graph(ast);
 
             CommonAST astTrans = (CommonAST) trans.getAST();
             //System.out.println(astTrans.toStringTree());
-            
+
             //ASTFrame frame1 = new ASTFrame(file.getName(), ast);
-            
+
             //ASTFrame frame2 = new ASTFrame(file.getName(), astTrans);
             //frame1.setVisible(true);
             //frame2.setVisible(true);
@@ -69,8 +69,8 @@ public class Test {
 
         /*try {
             System.out.println("TEST");
-            
-            
+
+
             StringReader sr = new StringReader("\"{ \\<seek-diagram\\> | {" +
                     " Ivars | Protected | Public } | { { <t> descriptor |" +
                     " diagram | dotgraph | dotoutput | graph | origdescriptor" +

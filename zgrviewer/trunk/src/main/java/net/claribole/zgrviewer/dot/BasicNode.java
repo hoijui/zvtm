@@ -3,7 +3,7 @@
  *   AUTHOR :            Eric Mounhem (skbo@lri.fr)
  *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
- * 
+ *
  * $Id$
  */
 
@@ -21,7 +21,7 @@ public class BasicNode extends CommonNode {
      * CIRCLE = ELLIPSE + regular
      * PARALLELOGRAM = POLYGON + sides=4 + skew=0.6
      * TRIANGLE = POLYGON + sides=3
-     * [HEX|OCT|SEPT|...]AGON = POLYGON + sides=[6|8|7|...] 
+     * [HEX|OCT|SEPT|...]AGON = POLYGON + sides=[6|8|7|...]
      * [DOUBLE|TRIPLE]x = x + peripheries=[3|4]
      * DIAMOND = POLYGON + regular + orientation=45
      */
@@ -126,7 +126,7 @@ public class BasicNode extends CommonNode {
 
     /**
      * Create a default node type in GraphViz
-     * 
+     *
      * @param root
      *            parent graph
      * @param id

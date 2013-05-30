@@ -3,7 +3,7 @@
  *   AUTHOR :            Eric Mounhem (skbo@lri.fr)
  *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
- * 
+ *
  * $Id$
  */
 
@@ -633,7 +633,7 @@ public class Graph {
 
     /**
      * Create a new empty graph
-     * @throws Exception 
+     * @throws Exception
      */
     public Graph() throws Exception {
         this.genericNode = new BasicNode(this, "node");
@@ -644,7 +644,7 @@ public class Graph {
     /**
      * Create a new empty graph
      *@param id a unique ID for this graph
-     *@throws Exception 
+     *@throws Exception
      */
     public Graph(String id) throws Exception {
         this.genericNode = new BasicNode(this, "node");
@@ -655,7 +655,7 @@ public class Graph {
 
     /**
      * Add a node to the nodes list
-     * 
+     *
      * @param node
      *            New node to add
      */
@@ -711,7 +711,7 @@ public class Graph {
 
     /**
      * Add an edge to the edges list
-     * 
+     *
      * @param edge
      *            New edge to add
      */
@@ -811,7 +811,7 @@ public class Graph {
 
     /**
      * Remove a node to the nodes list
-     * 
+     *
      * @param node
      *            Node to remove (if it's in the list)
      */
@@ -843,7 +843,7 @@ public class Graph {
 
     /**
      * Remove an edge to the edges list
-     * 
+     *
      * @param edge
      *            Edge to remove (if it's in the list)
      */
@@ -1326,7 +1326,7 @@ public class Graph {
 
     /**
      * Calling method in order to test
-     * 
+     *
      * @param args
      */
     public static void main(String[] args) {

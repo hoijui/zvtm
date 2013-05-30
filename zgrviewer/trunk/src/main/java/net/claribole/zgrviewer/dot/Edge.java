@@ -3,7 +3,7 @@
  *   AUTHOR :            Eric Mounhem (skbo@lri.fr)
  *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
- * 
+ *
  * $Id$
  */
 
@@ -108,12 +108,12 @@ public class Edge {
      * Groupe tails in the sametail group
      */
     String                 sametail       = "";
-    
+
     /**
     * width of an edge
     */
    String                 penwidth       = "";
-    
+
     /**
      * The root graph object that this edge belongs
      */
@@ -281,7 +281,7 @@ public class Edge {
 
     /**
      * Create an Edge object going from a node to another
-     * 
+     *
      * @param rootGraph
      *            Root of the graph
      * @param start
@@ -441,7 +441,7 @@ public class Edge {
 
     /**
      * Define the starting node
-     * 
+     *
      * @param start
      */
     public void setStart(Node start) {
@@ -453,7 +453,7 @@ public class Edge {
 
     /**
      * Define the ending node
-     * 
+     *
      * @param end
      */
     public void setEnd(Node end) {
@@ -549,12 +549,12 @@ public class Edge {
             this.URL = v;
         else if (name.equals("weight"))
             this.weight = DotUtils.readDouble(v);
-       
+
         else if(name.equals("headport"))
             this.head.port = readAttributeNumber(v);
         else if(name.equals("tailport"))
             this.tail.port = readAttributeNumber(v);
-       
+
         /* else if (name.equals("id")) {
          // XXX: don't know this attribute
          }*/
@@ -566,7 +566,7 @@ public class Edge {
                     .println("Edge attribute \"" + name + "\" does not exist");
         }
     }
-    
+
     private int readAttributeNumber(String v) {
         for (int i = 0; i < this.attributeNames.length; i++) {
             if (this.attributeNames[i].equalsIgnoreCase(v))

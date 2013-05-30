@@ -3,7 +3,7 @@
  *   AUTHOR :            Eric Mounhem (skbo@lri.fr)
  *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
- * 
+ *
  * $Id$
  */
 
@@ -20,7 +20,7 @@ abstract class CommonNode extends Node {
 
     /**
      * Common denominator between BasicNodes and Records
-     * 
+     *
      * @param root
      *            parent Graph
      * @param id

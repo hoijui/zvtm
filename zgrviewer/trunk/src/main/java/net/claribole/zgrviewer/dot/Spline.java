@@ -3,7 +3,7 @@
  *   AUTHOR :            Eric Mounhem (skbo@lri.fr)
  *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
- * 
+ *
  * $Id$
  */
 
@@ -39,7 +39,7 @@ public class Spline {
 
     /**
      * Getter for the controls attribute
-     * 
+     *
      * @return the list of control points
      */
     public Point[] getControls() {

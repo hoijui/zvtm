@@ -15,7 +15,7 @@ import javax.swing.JComponent;
 public class ZGRGlassPane extends JComponent {
 
     /**
-	 * 
+	 *
 	 */
 	private static final long serialVersionUID = 1L;
 	static final int BAR_WIDTH = 200;

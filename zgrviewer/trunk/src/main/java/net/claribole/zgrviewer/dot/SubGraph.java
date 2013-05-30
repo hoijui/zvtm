@@ -3,7 +3,7 @@
  *   AUTHOR :            Eric Mounhem (skbo@lri.fr)
  *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
- * 
+ *
  * $Id$
  */
 
@@ -353,7 +353,7 @@ public class SubGraph extends Node {
 
     /**
      * Add a node to the nodes list
-     * 
+     *
      * @param node
      *            New node to add
      */
@@ -388,7 +388,7 @@ public class SubGraph extends Node {
 
     /**
      * Add an edge to the edges list
-     * 
+     *
      * @param edge
      *            New edge to add
      */
@@ -416,7 +416,7 @@ public class SubGraph extends Node {
 
     /**
      * Remove a node to the nodes list
-     * 
+     *
      * @param node
      *            Node to remove (if it's in the list)
      */
@@ -448,7 +448,7 @@ public class SubGraph extends Node {
 
     /**
      * Remove an edge to the edges list
-     * 
+     *
      * @param edge
      *            Edge to remove (if it's in the list)
      */
@@ -475,16 +475,16 @@ public class SubGraph extends Node {
      */
     public String toString() {
         // TODO: print all SubGraph and Cluster options - partly done node options and bg
-    	
+
         String g;
         if (this.id == null) {
             g = "{\n";
-                      
+
         } else {
             g = "subgraph " + ((this instanceof Cluster) ? "cluster" : "")
                     + this.id + " {\n";
         }
-        
+
         if (this.nodes != null)
             for (int i = 0; i < this.nodes.length; i++) {
                 g += this.nodes[i];
@@ -494,11 +494,11 @@ public class SubGraph extends Node {
                 g += this.edges[i];
             }
         }
-        
+
         String o = nodeOptions();
         if (!o.equals(" "))
             g += " " + o + "";
-        
+
 //        if (getLabel() != null)
 //        {
 //        	if (getLabel().length() > 0)
@@ -511,18 +511,18 @@ public class SubGraph extends Node {
 //        	g += printOption("bgcolor", getBgColor());
 //        	//g += "\nbgcolor=" + "\"" + getBgColor() + "\"\n";
 //        }
-                
+
         return g + "}\n";
     }
 
     @Override
-    protected String nodeOptions() 
+    protected String nodeOptions()
     {
     		String o = "";
-    		
+
     		//not sure even if a subGraph is a node maybe not all options are applicable for subGraph
     		// o += super.nodeOptions();
-    		
+
             if (getLabel() != null)
             {
                 if (!getLabel().equals(""))
@@ -530,23 +530,23 @@ public class SubGraph extends Node {
                     o += printOption("label", getLabel());
                 }
             }
-            
+
             if (this.color != null)
             {
                 o += printOption("color", this.color);
             }
-    		if (getBgColor() != null) 
+    		if (getBgColor() != null)
     		{
     			o += printOption("bgcolor", getBgColor());
     		}
 
     		return o;
     }
-    
-    private Color getBgColor() 
+
+    private Color getBgColor()
     {
     	Color retVal = this.bgcolor;
-    	
+
 		return retVal;
 	}
 

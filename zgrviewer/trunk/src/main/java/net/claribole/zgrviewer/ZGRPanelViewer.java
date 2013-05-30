@@ -5,30 +5,30 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 
 
-public class ZGRPanelViewer  
+public class ZGRPanelViewer
 {
 
 	private ZGRViewer _zgrViewer;
 	private JPanel _panelView;
 
-	public ZGRPanelViewer() 
+	public ZGRPanelViewer()
 	{
 		_zgrViewer = new ZGRViewer();
 
 		_panelView = _zgrViewer.getPanelView();
 	}
-	
-	public JPanel getPanel() 
+
+	public JPanel getPanel()
 	{
 		return _panelView;
 	}
-	
-	public void loadFile(File dotFile) 
+
+	public void loadFile(File dotFile)
 	{
 		_zgrViewer.setFile(dotFile);
 	}
-	
-	public JComponent getGlassPane() 
+
+	public JComponent getGlassPane()
 	{
 		return _zgrViewer.getGlassPane();
 	}

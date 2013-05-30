@@ -3,7 +3,7 @@
  *   AUTHOR :            Eric Mounhem (skbo@lri.fr)
  *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
- * 
+ *
  * $Id$
  */
 
@@ -27,7 +27,7 @@ public class Point {
     /**
      * Create a new point. Depending on dimension used, you must fill coords
      * with the right number of elements.
-     * 
+     *
      * @param change
      */
     public Point(boolean change) {

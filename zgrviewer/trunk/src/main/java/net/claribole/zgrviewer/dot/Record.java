@@ -3,7 +3,7 @@
  *   AUTHOR :            Eric Mounhem (skbo@lri.fr)
  *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
- * 
+ *
  * $Id$
  */
 
@@ -37,7 +37,7 @@ class Record extends CommonNode {
 
     /**
      * Create a new Record object
-     * 
+     *
      * @param root
      *            root of the graph
      * @param id
@@ -149,7 +149,7 @@ class Record extends CommonNode {
 
     /**
      * Add a new SubRecord to the subRecord's list
-     * 
+     *
      * @param subRecord
      *            SubRecord to add
      */
@@ -169,7 +169,7 @@ class Record extends CommonNode {
 
     /**
      * Add a new Rectangle to the rects' list
-     * 
+     *
      * @param rect
      *            Rectangle to add
      */
@@ -187,7 +187,7 @@ class Record extends CommonNode {
 
     /**
      * Remove a SubRecord from the subRecord's list
-     * 
+     *
      * @param subRecord
      *            SubRecord to remove
      */
@@ -211,7 +211,7 @@ class Record extends CommonNode {
 
     /**
      * Remove a Rectangle from the rects' list
-     * 
+     *
      * @param rect
      *            Rectangle to remove
      */

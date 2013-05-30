@@ -3,7 +3,7 @@
  *   AUTHOR :            Eric Mounhem (skbo@lri.fr)
  *   Copyright (c) INRIA, 2004-2007. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
- * 
+ *
  * $Id$
  */
 
@@ -77,7 +77,7 @@ abstract public class Node {
 
     /**
      * Create a new Node instance
-     * 
+     *
      * @param root
      *            root of the Node
      * @param id
@@ -91,7 +91,7 @@ abstract public class Node {
         this.id = id;
         this.root = root;
     }
-    
+
     protected Node(Object root) throws Exception {
         /*if (id.equals("") && !(this instanceof SubRecord))
             throw new Exception("No ID");
@@ -101,7 +101,7 @@ abstract public class Node {
 
     /**
      * Get the edges entering this node
-     * 
+     *
      * @return list of entering edges
      */
     public Edge[] getIn() {
@@ -110,7 +110,7 @@ abstract public class Node {
 
     /**
      * Get the edges exiting this node
-     * 
+     *
      * @return list of exiting edges
      */
     public Edge[] getOut() {
@@ -127,7 +127,7 @@ abstract public class Node {
 
     /**
      * Add an incoming edge to the node
-     * 
+     *
      * @param edge
      */
     protected void addInEdge(Edge edge) {
@@ -144,7 +144,7 @@ abstract public class Node {
 
     /**
      * Add an outcoming edge to the node
-     * 
+     *
      * @param edge
      */
     protected void addOutEdge(Edge edge) {
@@ -161,7 +161,7 @@ abstract public class Node {
 
     /**
      * Remove an incoming edge to the node
-     * 
+     *
      * @param edge
      */
     protected void removeInEdge(Edge edge) {
@@ -184,7 +184,7 @@ abstract public class Node {
 
     /**
      * Remove an outcoming edge to the node
-     * 
+     *
      * @param edge
      */
     protected void removeOutEdge(Edge edge) {
@@ -367,5 +367,5 @@ abstract public class Node {
         return ((SubGraph) this.root).getRootGraph();
         //return null;
     }
-    
+
 }
