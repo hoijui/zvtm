@@ -419,13 +419,16 @@ public class StdViewPanel extends ViewPanel {
 	}
 
     void eraseCursor(){
-        if (drawVTMcursor){
-            stableRefToBackBufferGraphics.setXORMode(backColor);
-            stableRefToBackBufferGraphics.setColor(parent.mouse.color);
-            stableRefToBackBufferGraphics.drawLine(parent.mouse.jpx-parent.mouse.size,parent.mouse.jpy,parent.mouse.jpx+parent.mouse.size,parent.mouse.jpy);
-            stableRefToBackBufferGraphics.drawLine(parent.mouse.jpx,parent.mouse.jpy-parent.mouse.size,parent.mouse.jpx,parent.mouse.jpy+parent.mouse.size);
-            panel.paintImmediately(0,0,size.width,size.height);
-        }
+    	try {
+    		if (drawVTMcursor){
+    		    stableRefToBackBufferGraphics.setXORMode(backColor);
+    		    stableRefToBackBufferGraphics.setColor(parent.mouse.color);
+    		    stableRefToBackBufferGraphics.drawLine(parent.mouse.jpx-parent.mouse.size,parent.mouse.jpy,parent.mouse.jpx+parent.mouse.size,parent.mouse.jpy);
+    		    stableRefToBackBufferGraphics.drawLine(parent.mouse.jpx,parent.mouse.jpy-parent.mouse.size,parent.mouse.jpx,parent.mouse.jpy+parent.mouse.size);
+    		    panel.paintImmediately(0,0,size.width,size.height);
+    		}
+    	}
+    	catch (NullPointerException ex47){if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.runview.drawVTMcursor "+ex47);}}
 	}
 
     @Override
