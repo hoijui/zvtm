@@ -155,6 +155,12 @@ public class VirtualSpace {
     /** Add glyph g to this virtual space. */
     public void addGlyph(Glyph g, boolean initColors, boolean repaint){
         if (g == null){return;}
+        if (this.contains(g)){
+            if (VirtualSpaceManager.INSTANCE.debugModeON()){
+                System.err.println("VirtualSpace @"+hashCode()+" already contains Glyph @"+g.hashCode());
+            }
+            return;
+        }
         if (initColors){g.setCursorInsideHighlightColor(Glyph.getDefaultCursorInsideHighlightColor());}
         g.initCams(cm.cameraList.length);
         visualEnts.add(g);
