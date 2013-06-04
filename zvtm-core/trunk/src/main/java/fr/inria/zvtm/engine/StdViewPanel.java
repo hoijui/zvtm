@@ -78,7 +78,6 @@ public class StdViewPanel extends ViewPanel {
         	public void paint(Graphics g) {
         		if (backBuffer != null){
         			g.drawImage(backBuffer, 0, 0, panel);
-        			if (repaintListener != null){repaintListener.viewRepainted(StdViewPanel.this.parent);}
         		}
         	}
 	    };
@@ -371,6 +370,7 @@ public class StdViewPanel extends ViewPanel {
 						//end drawing here
 						if (stableRefToBackBufferGraphics == backBufferGraphics) {
 							panel.paintImmediately(0,0,size.width,size.height);
+							if (repaintListener != null){repaintListener.viewRepainted(StdViewPanel.this.parent);}
 							synchronized(this){
     							lastButOneRepaint = lastRepaint;
     							lastRepaint = System.currentTimeMillis();
@@ -415,6 +415,7 @@ public class StdViewPanel extends ViewPanel {
 			stableRefToBackBufferGraphics.fillRect(0, 0, panel.getWidth(), panel.getHeight());
 			portalsHook();
 			panel.paintImmediately(0,0,size.width,size.height);
+			if (repaintListener != null){repaintListener.viewRepainted(StdViewPanel.this.parent);}
 		}
 	}
 

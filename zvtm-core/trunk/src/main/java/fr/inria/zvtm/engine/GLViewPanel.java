@@ -329,6 +329,7 @@ public class GLViewPanel extends ViewPanel {
         		}
             }
             else {
+                // blank
                 stableRefToBackBufferGraphics.setPaintMode();
                 stableRefToBackBufferGraphics.setColor(blankColor);
                 stableRefToBackBufferGraphics.fillRect(0, 0, panel.getWidth(), panel.getHeight());
