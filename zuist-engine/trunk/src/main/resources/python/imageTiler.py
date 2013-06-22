@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
 # AUTHOR : Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
