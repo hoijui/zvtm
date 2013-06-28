@@ -21,6 +21,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.font.TextLayout;
 import java.awt.font.FontRenderContext;
 import java.awt.font.TextHitInfo;
+import java.awt.event.KeyEvent;
 
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
@@ -44,6 +45,8 @@ public class VTextLayout<T> extends VText {
     static Color WEAK_CARET_COLOR = Color.DARK_GRAY;
     /* strong and weak carets, in that order */
     Shape[] carets = new Shape[2];
+    public static final int INSERTION_INDEX_UNDEFINED = -1;
+    int insertionIndex = INSERTION_INDEX_UNDEFINED;
 
     static Color HIGHLIGHT_COLOR = Color.YELLOW;
     Shape highlighter = null;
@@ -152,19 +155,28 @@ public class VTextLayout<T> extends VText {
     }
 
     /** Set the caret's position within the string.
-     *@param insertionIndex offset in the TextLayout. Pass -1 to remove the caret.
+     *@param ii insertion index (offset) in the TextLayout. Pass INSERTION_INDEX_UNDEFINED to remove the caret.
      */
-    public void setCaretPosition(int insertionIndex){
-        if (insertionIndex < 0){
+    public void setCaretPosition(int ii){
+        if (ii < 0){
+            insertionIndex = INSERTION_INDEX_UNDEFINED;
             carets = new Shape[]{null, null};
             return;
         }
         else {
+            insertionIndex = ii;
             if (tl != null){
                 carets = tl.getCaretShapes(insertionIndex);
             }
         }
         VirtualSpaceManager.INSTANCE.repaint();
+    }
+
+    /** Get the caret's position within the string.
+     *@return INSERTION_INDEX_UNDEFINED when caret is not set
+     */
+    public int getCaretPosition(){
+        return insertionIndex;
     }
 
     /** Returns a TextHitInfo corresponding to the specified point.
@@ -389,20 +401,24 @@ public class VTextLayout<T> extends VText {
 
     @Override
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-        if (text.length() == 0){return;}
         if (!pc[i].valid || (!zoomSensitive && (coef != oldcoef))){
-            g.setFont((font!=null) ? font : getMainFont());
-            tl = new TextLayout(text, (font!=null) ? font : getMainFont(), g.getFontRenderContext());
-            Rectangle2D bounds = g.getFontMetrics().getStringBounds(text,g);
-            // cw and ch actually hold width and height of text *in virtual space*
-            if (zoomSensitive){
-                pc[i].cw = bounds.getWidth() * scaleFactor;
-                pc[i].ch = bounds.getHeight() * scaleFactor;
+            if (text.length() > 0){
+                g.setFont((font!=null) ? font : getMainFont());
+                tl = new TextLayout(text, (font!=null) ? font : getMainFont(), g.getFontRenderContext());
+                Rectangle2D bounds = g.getFontMetrics().getStringBounds(text,g);
+                // cw and ch actually hold width and height of text *in virtual space*
+                if (zoomSensitive){
+                    pc[i].cw = bounds.getWidth() * scaleFactor;
+                    pc[i].ch = bounds.getHeight() * scaleFactor;
+                }
+                else {
+                    pc[i].cw = bounds.getWidth() * scaleFactor / coef;
+                    pc[i].ch = bounds.getHeight() * scaleFactor / coef;
+                    oldcoef = coef;
+                }
             }
             else {
-                pc[i].cw = bounds.getWidth() * scaleFactor / coef;
-                pc[i].ch = bounds.getHeight() * scaleFactor / coef;
-                oldcoef = coef;
+                pc[i].cw = pc[i].ch = 1;
             }
             pc[i].valid = true;
         }
@@ -437,7 +453,9 @@ public class VTextLayout<T> extends VText {
                 }
                 // text
                 g.setColor(this.color);
-                tl.draw(g, 0, 0);
+                if (tl != null){
+                    tl.draw(g, 0, 0);
+                }
                 // strong caret
                 if (carets[0] != null){
                     g.setColor(STRONG_CARET_COLOR);
@@ -462,7 +480,9 @@ public class VTextLayout<T> extends VText {
                 }
                 // text
                 g.setColor(this.color);
-                tl.draw(g, 0, 0);
+                if (tl != null){
+                    tl.draw(g, 0, 0);
+                }
                 // strong caret
                 if (carets[0] != null){
                     g.setColor(STRONG_CARET_COLOR);
@@ -491,20 +511,24 @@ public class VTextLayout<T> extends VText {
 
     @Override
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-        if (text.length() == 0){return;}
         if (!pc[i].lvalid || (!zoomSensitive && (lcoef != oldlcoef))){
-            g.setFont((font!=null) ? font : getMainFont());
-            tl = new TextLayout(text, (font!=null) ? font : getMainFont(), g.getFontRenderContext());
-            Rectangle2D bounds = g.getFontMetrics().getStringBounds(text,g);
-            // cw and ch actually hold width and height of text *in virtual space*
-            if (zoomSensitive){
-                pc[i].lcw = bounds.getWidth() * scaleFactor;
-                pc[i].lch = bounds.getHeight() * scaleFactor;
+            if (text.length() > 0){
+                g.setFont((font!=null) ? font : getMainFont());
+                tl = new TextLayout(text, (font!=null) ? font : getMainFont(), g.getFontRenderContext());
+                Rectangle2D bounds = g.getFontMetrics().getStringBounds(text,g);
+                // cw and ch actually hold width and height of text *in virtual space*
+                if (zoomSensitive){
+                    pc[i].lcw = bounds.getWidth() * scaleFactor;
+                    pc[i].lch = bounds.getHeight() * scaleFactor;
+                }
+                else {
+                    pc[i].lcw = bounds.getWidth() * scaleFactor / lcoef;
+                    pc[i].lch = bounds.getHeight() * scaleFactor / lcoef;
+                    oldlcoef = lcoef;
+                }
             }
             else {
-                pc[i].lcw = bounds.getWidth() * scaleFactor / lcoef;
-                pc[i].lch = bounds.getHeight() * scaleFactor / lcoef;
-                oldlcoef = lcoef;
+                pc[i].lcw = pc[i].lch = 0;
             }
             pc[i].lvalid = true;
         }
@@ -528,7 +552,9 @@ public class VTextLayout<T> extends VText {
                     g.fill(highlighter);
                 }
                 // text
-                tl.draw(g, 0, 0);
+                if (tl != null){
+                    tl.draw(g, 0, 0);
+                }
                 // strong caret
                 if (carets[0] != null){
                     g.setColor(STRONG_CARET_COLOR);
@@ -548,7 +574,9 @@ public class VTextLayout<T> extends VText {
                     g.fill(highlighter);
                 }
                 // text
-                tl.draw(g, 0, 0);
+                if (tl != null){
+                    tl.draw(g, 0, 0);
+                }
                 // strong caret
                 if (carets[0] != null){
                     g.setColor(STRONG_CARET_COLOR);
@@ -606,6 +634,57 @@ public class VTextLayout<T> extends VText {
             text_anchor, font, getScale(), (alphaC != null) ? alphaC.getAlpha() : 1.0f);
         res.cursorInsideColor = this.cursorInsideColor;
         return res;
+    }
+
+    /** Default implementation of common edit key events.
+     * Supports letters, digits, backspace, delete, non-keypad arrows
+     */
+    public static void editEvent(VTextLayout tl, KeyEvent e){
+        char c = e.getKeyChar();
+        if (Character.isLetterOrDigit(c) || Character.isWhitespace(c)){
+            String res = tl.getText().substring(0, tl.getCaretPosition()) +
+                         String.valueOf(c) +
+                         tl.getText().substring(tl.getCaretPosition());
+            tl.setText(res);
+            tl.setCaretPosition(tl.getCaretPosition()+1);
+        }
+        else if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE){
+            if (tl.getText().length() == 0){return;}
+            else {
+                String res = tl.getText().substring(0, tl.getCaretPosition()-1) +
+                             tl.getText().substring(tl.getCaretPosition());
+                tl.setText(res);
+                tl.setCaretPosition(tl.getCaretPosition()-1);
+            }
+        }
+        else if (e.getKeyCode() == KeyEvent.VK_DELETE){
+            if (tl.getText().length() == 0 ||
+                tl.getCaretPosition() >= tl.getText().length()){return;}
+            else {
+                String res = tl.getText().substring(0, tl.getCaretPosition()) +
+                             tl.getText().substring(tl.getCaretPosition()+1);
+                tl.setText(res);
+                if (tl.getCaretPosition() > tl.getText().length()){
+                    tl.setCaretPosition(tl.getText().length());
+                }
+            }
+        }
+        else if (e.getKeyCode() == KeyEvent.VK_LEFT){
+            if (tl.getCaretPosition() > 0){
+                tl.setCaretPosition(tl.getCaretPosition()-1);
+            }
+        }
+        else if (e.getKeyCode() == KeyEvent.VK_RIGHT){
+            if (tl.getCaretPosition() < tl.getText().length()){
+                tl.setCaretPosition(tl.getCaretPosition()+1);
+            }
+        }
+        else if (e.getKeyCode() == KeyEvent.VK_UP){
+            tl.setCaretPosition(0);
+        }
+        else if (e.getKeyCode() == KeyEvent.VK_DOWN){
+            tl.setCaretPosition(tl.getText().length());
+        }
     }
 
 }
