@@ -126,6 +126,7 @@ public class VTextLayout<T> extends VText {
     }
 
     /** Get the underlyoing AWT TextLayout instance.
+     *@return null if length of string is 0
      */
     public TextLayout getTextLayout(){
         return tl;
@@ -159,7 +160,9 @@ public class VTextLayout<T> extends VText {
             return;
         }
         else {
-            carets = tl.getCaretShapes(insertionIndex);
+            if (tl != null){
+                carets = tl.getCaretShapes(insertionIndex);
+            }
         }
         VirtualSpaceManager.INSTANCE.repaint();
     }
@@ -181,8 +184,10 @@ public class VTextLayout<T> extends VText {
      *@param c camera observing the TextLayout.
      *@param dx x-offest for hit test, typically used to give a Portal horizontal offset w.r.t the parent view's top left corner (JPanel coordinates).
      *@param dy y-offest for hit test, typically used to give a Portal horizontal offset w.r.t the parent view's top left corner (JPanel coordinates).
+     *@return null if length of string is null
      */
     public TextHitInfo hitTestChar(int jpx, int jpy, Camera c, int dx, int dy){
+        if (tl == null){return null;}
         int i = c.getIndex();
         double tcoef = c.focal/(c.focal+c.altitude) * scaleFactor;
         switch(text_anchor){
@@ -215,7 +220,9 @@ public class VTextLayout<T> extends VText {
             return;
         }
         else {
-            highlighter = tl.getLogicalHighlightShape(firstEndPoint, secondEndPoint);
+            if (tl != null){
+                highlighter = tl.getLogicalHighlightShape(firstEndPoint, secondEndPoint);
+            }
         }
         VirtualSpaceManager.INSTANCE.repaint();
     }
@@ -225,7 +232,12 @@ public class VTextLayout<T> extends VText {
     *@see #getBounds(int i)
     */
     public void invalidate(){
-        tl = new TextLayout(text, (font!=null) ? font : getMainFont(), FRC);
+        if (text == null || text.length() == 0){
+            tl = null;
+        }
+        else {
+            tl = new TextLayout(text, (font!=null) ? font : getMainFont(), FRC);
+        }
         try {
             for (int i=0;i<pc.length;i++){
                 pc[i].valid=false;
@@ -377,6 +389,7 @@ public class VTextLayout<T> extends VText {
 
     @Override
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
+        if (text.length() == 0){return;}
         if (!pc[i].valid || (!zoomSensitive && (coef != oldcoef))){
             g.setFont((font!=null) ? font : getMainFont());
             tl = new TextLayout(text, (font!=null) ? font : getMainFont(), g.getFontRenderContext());
@@ -478,6 +491,7 @@ public class VTextLayout<T> extends VText {
 
     @Override
     public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
+        if (text.length() == 0){return;}
         if (!pc[i].lvalid || (!zoomSensitive && (lcoef != oldlcoef))){
             g.setFont((font!=null) ? font : getMainFont());
             tl = new TextLayout(text, (font!=null) ? font : getMainFont(), g.getFontRenderContext());
