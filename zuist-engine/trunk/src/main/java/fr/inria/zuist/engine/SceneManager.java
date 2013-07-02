@@ -698,6 +698,9 @@ public class SceneManager implements CameraListener {
         for (int i=r.getLowestLevel();i<=r.getHighestLevel();i++){
             levels[i].removeRegion(r);
         }
+        if (r.getBounds() != null){
+            sceneLayers[r.li].removeGlyph(r.getBounds());
+        }
     }
 
     ObjectDescription processObject(Element e, Region region, File sceneFileDirectory){
