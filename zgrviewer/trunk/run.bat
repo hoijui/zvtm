@@ -6,4 +6,4 @@ REM e.g. SET ZGRV=C:\tools\zgrviewer
 
 SET ZGRV=%~p0
 
-start java -jar "%ZGRV%\target\zgrviewer-0.9.0.jar" %1 %2 %3 %4
+start java -jar "%ZGRV%\target\zgrviewer-0.9.1-SNAPSHOT.jar" %1 %2 %3 %4
