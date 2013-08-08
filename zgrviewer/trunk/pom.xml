@@ -3,15 +3,15 @@
 $Id$
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>fr.inria.zvtm</groupId>
   <artifactId>zgrviewer</artifactId>
   <packaging>jar</packaging>
   <name>ZGRViewer</name>
-  <version>0.9.0-SNAPSHOT</version>
+  <version>0.9.0</version>
   <description>ZGRViewer is a graph visualizer implemented in Java and based upon the Zoomable Visual Transformation Machine. It is specifically aimed at displaying graphs expressed using the DOT language from AT&amp;T GraphViz and processed by programs dot, neato or others such as twopi. ZGRViewer is designed to handle large graphs, and offers a zoomable user interface (ZUI), which enables smooth zooming and easy navigation in the visualized structure. ZGRViewer should be able to load any file that uses the DOT language to describe the graph.</description>
   <url>http://zvtm.sourceforge.net/zgrviewer.html</url>
   <licenses>
@@ -54,13 +54,13 @@ $Id$
       <url>scp://shell.sourceforge.net/home/project-web/zvtm/htdocs/maven</url>
     </repository>
   </distributionManagement>
-  
+
   <!-- Dependencies -->
   <dependencies>
 	<dependency>
       <groupId>fr.inria.zvtm</groupId>
       <artifactId>zvtm-core</artifactId>
-      <version>[0.11.1-SNAPSHOT,)</version>
+      <version>[0.11.1,)</version>
     </dependency>
 	<dependency>
       <groupId>fr.inria.zvtm</groupId>
@@ -84,7 +84,7 @@ $Id$
       <scope>compile</scope>
     </dependency>
   </dependencies>
-  
+
   <!-- Build -->
   <build>
       <extensions>
@@ -100,11 +100,11 @@ $Id$
 	    <filtering>true</filtering>
 	  </resource>
 	  <resource>
-        <directory>src/main/resources</directory> 
-          <excludes> 
-		    <exclude>images/*.psd</exclude> 
-		    <exclude>antlr/**</exclude> 
-		</excludes> 
+        <directory>src/main/resources</directory>
+          <excludes>
+		    <exclude>images/*.psd</exclude>
+		    <exclude>antlr/**</exclude>
+		</excludes>
       </resource>
 	</resources>
     <plugins>
@@ -193,7 +193,7 @@ $Id$
        </plugin>
     </plugins>
   </build>
-  
+
   <!-- Reporting -->
   <reporting>
     <plugins>
@@ -206,7 +206,7 @@ $Id$
           <overview>${basedir}/overview.html</overview>
           <doctitle><![CDATA[<h1>ZVTM API documentation</h1>]]></doctitle>
           <bottom><![CDATA[Copyright &#169; 2003 World Wide Web Consortium. All Rights Reserved<br />Copyright &#169; 2004-2011 INRIA. All Rights Reserved<br />Licensed under the GNU LGPL. For full terms see the file COPYING.</i>]]></bottom>
-          <links> 
+          <links>
             <link>http://java.sun.com/j2se/1.5.0/docs/api</link>
           </links>
         </configuration>

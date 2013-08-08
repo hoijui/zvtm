@@ -6,5 +6,5 @@
 
 ZGRV_HOME=.
 
-java -Xmx1024M -Xms512M -jar $ZGRV_HOME/target/zgrviewer-0.9.0-SNAPSHOT.jar "$@"
+java -Xmx1024M -Xms512M -jar $ZGRV_HOME/target/zgrviewer-0.9.0.jar "$@"
 
