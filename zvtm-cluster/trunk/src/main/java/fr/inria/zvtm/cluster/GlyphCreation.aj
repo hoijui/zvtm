@@ -1,9 +1,10 @@
 /*   AUTHOR : Romain Primet (romain.primet@inria.fr)
  *
- *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009-2010.
+ *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009-2013.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  */
+
 package fr.inria.zvtm.cluster;
 
 import java.awt.Color;
@@ -16,6 +17,7 @@ import java.io.Serializable;
 import java.net.URL;
 import javax.swing.ImageIcon;
 import java.util.ArrayList;
+import java.util.List;
 
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
@@ -567,7 +569,8 @@ public aspect GlyphCreation {
             super(source);
             baseAttr = GlyphAttributes.fromGlyph(source);
             replicators = new ArrayList<GlyphReplicator>();
-            for(Glyph glyph: source.peekAtChildren()){
+            List<Glyph> glyphs = source.peekAtChildren();
+            for(Glyph glyph: glyphs){
                 replicators.add(glyph.getReplicator());
             }
         }
