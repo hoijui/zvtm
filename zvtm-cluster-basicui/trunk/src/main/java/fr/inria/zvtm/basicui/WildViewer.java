@@ -39,7 +39,11 @@ public class WildViewer {
 	View mView;
 	ViewListener eh;
 
-	public WildViewer(boolean single){
+	static final short CONFIG_WALL = 0;
+	static final short CONFIG_SIMULATOR = 1;
+	static final short CONFIG_SINGLE = 2;
+
+	public WildViewer(short config){
         vsm.setMaster("WildViewer");
         mSpace = vsm.addVirtualSpace("mainSpace");
         mCamera = mSpace.addCamera();
@@ -54,34 +58,44 @@ public class WildViewer {
 		mView.getCursor().setColor(Color.WHITE);
 		mView.getCursor().setHintColor(Color.WHITE);
         // clustered view (wall)
-		if (single){
-			// single view (for test purposes, likely on local computer)
-			ClusterGeometry cg = new ClusterGeometry(800, 600, 1, 1);
+		if (config == CONFIG_WALL){
+		    // wall made of 6 x 4 32" displays (1920x1080 each, with approx 100px bezels -- overlay mode)
+			ClusterGeometry cg = new ClusterGeometry(2120, 1280, 6, 4);
+	        Vector ccameras = new Vector();
+	        ccameras.add(mCamera);
+	        ClusteredView cv = new ClusteredView(cg, 3, 6, 4, ccameras);
+	        vsm.addClusteredView(cv);
+		}
+		if (config == CONFIG_SIMULATOR){
+			// simulator on a single machine, with 6x4 small windows pretending to be different tiles
+			ClusterGeometry cg = new ClusterGeometry(200, 112, 6, 4);
+	        Vector ccameras = new Vector();
+	        ccameras.add(mCamera);
+	        ClusteredView cv = new ClusteredView(cg, 3, 6, 4, ccameras);
+	        vsm.addClusteredView(cv);
+		}
+		else if (config == CONFIG_SINGLE){
+		    // wall made of 8 x 4 30" displays (2560x1600 each, with approx 100px bezels -- overlay mode)
+	        ClusterGeometry cg = new ClusterGeometry(800, 600, 1, 1);
 	        Vector ccameras = new Vector();
 	        ccameras.add(mCamera);
 	        ClusteredView cv = new ClusteredView(cg, 0, 1, 1, ccameras);
 	        vsm.addClusteredView(cv);
 		}
-		else {
-		    // wall made of 8 x 4 30" displays (2560x1600 each, with approx 100px bezels -- overlay mode)
-	        ClusterGeometry cg = new ClusterGeometry(2760, 1800, 8, 4);
-	        Vector ccameras = new Vector();
-	        ccameras.add(mCamera);
-	        ClusteredView cv = new ClusteredView(cg, 3, 8, 4, ccameras);
-	        vsm.addClusteredView(cv);			
-		}
 	}
-	
+
 	void init(){
 		mSpace.addGlyph(new VCircle(0, 0 , 0, 400, Color.RED));
 	}
 
 	public static void main(String[] args){
-		boolean single = false;
+		short cfg = CONFIG_WALL;
 		for (String arg:args){
-			if (arg.equals("-single")){single = true;}
+			if (arg.equals("-single")){cfg = CONFIG_SINGLE;}
+			else if (arg.equals("-simulator")){cfg = CONFIG_SIMULATOR;}
+			else if (arg.equals("-wall")){cfg = CONFIG_WALL;}
 		}
-		(new WildViewer(single)).init();
+		(new WildViewer(cfg)).init();
 	}
 
 }
@@ -93,14 +107,14 @@ class WildViewerEvtHld extends ViewAdapter {
     static final float WHEEL_ZOOMIN_COEF = 21.0f;
     static final float WHEEL_ZOOMOUT_COEF = 22.0f;
     static float WHEEL_MM_STEP = 1.0f;
-    
+
     //remember last mouse coords
     int lastJPX,lastJPY;
-    
+
     WildViewer application;
-        
+
     boolean panning = false;
-    
+
     WildViewerEvtHld(WildViewer app){
         this.application = app;
     }
@@ -141,7 +155,7 @@ class WildViewerEvtHld extends ViewAdapter {
             //wheelDirection == WHEEL_DOWN, zooming out
             application.mCamera.altitudeOffset(-a*WHEEL_ZOOMIN_COEF);
             VirtualSpaceManager.INSTANCE.repaint();
-        }            
+        }
     }
 
 	public void enterGlyph(Glyph g){
