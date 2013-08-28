@@ -40,8 +40,8 @@
                 <executions>
                     <execution>
                         <goals>
-                            <goal>compile</goal>       
-                            <goal>test-compile</goal>  
+                            <goal>compile</goal>
+                            <goal>test-compile</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -84,10 +84,10 @@
         <dependency>
             <groupId>fr.inria.zvtm</groupId>
             <artifactId>zvtm-cluster</artifactId>
-            <version>0.2.7-SNAPSHOT</version>
+            <version>[0.2.7,)</version>
             <exclusions>
                 <exclusion>
-                    <groupId>fr.inria.zvtm</groupId> 
+                    <groupId>fr.inria.zvtm</groupId>
                     <artifactId>zvtm-core</artifactId>
                 </exclusion>
             </exclusions>
