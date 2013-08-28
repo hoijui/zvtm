@@ -55,6 +55,7 @@ public class WildViewer {
 		mView.getCursor().setHintColor(Color.WHITE);
         // clustered view (wall)
 		if (single){
+			// single view (for test purposes, likely on local computer)
 			ClusterGeometry cg = new ClusterGeometry(800, 600, 1, 1);
 	        Vector ccameras = new Vector();
 	        ccameras.add(mCamera);
