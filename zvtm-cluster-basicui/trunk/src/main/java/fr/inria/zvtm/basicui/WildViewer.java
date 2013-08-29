@@ -27,6 +27,7 @@ import fr.inria.zvtm.cluster.ClusteredView;
 
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VCircle;
+import fr.inria.zvtm.glyphs.VRectangle;
 
 public class WildViewer {
 
@@ -66,7 +67,7 @@ public class WildViewer {
 	        ClusteredView cv = new ClusteredView(cg, 3, 6, 4, ccameras);
 	        vsm.addClusteredView(cv);
 		}
-		if (config == CONFIG_SIMULATOR){
+		else if (config == CONFIG_SIMULATOR){
 			// simulator on a single machine, with 6x4 small windows pretending to be different tiles
 			ClusterGeometry cg = new ClusterGeometry(200, 112, 6, 4);
 	        Vector ccameras = new Vector();
@@ -75,7 +76,6 @@ public class WildViewer {
 	        vsm.addClusteredView(cv);
 		}
 		else if (config == CONFIG_SINGLE){
-		    // wall made of 8 x 4 30" displays (2560x1600 each, with approx 100px bezels -- overlay mode)
 	        ClusterGeometry cg = new ClusterGeometry(800, 600, 1, 1);
 	        Vector ccameras = new Vector();
 	        ccameras.add(mCamera);
@@ -86,6 +86,10 @@ public class WildViewer {
 
 	void init(){
 		mSpace.addGlyph(new VCircle(0, 0 , 0, 400, Color.RED));
+		for (float angle=0;angle<2*Math.PI;){
+			mSpace.addGlyph(new VRectangle(400*Math.cos(angle), 400*Math.sin(angle), 10, 20, 20, Color.WHITE));
+			angle += Math.PI/12d;
+		}
 	}
 
 	public static void main(String[] args){
