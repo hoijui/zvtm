@@ -1,3 +1,10 @@
+/*
+ *   Copyright (c) INRIA, 2010-2013. All Rights Reserved
+ *   Licensed under the GNU LGPL. For full terms see the file COPYING.
+ *
+ * $Id:  $
+ */
+
 package fr.inria.zuist.cluster;
 
 import java.awt.Color;
@@ -29,27 +36,27 @@ import fr.inria.zuist.engine.SceneManager;
 
 aspect SceneManagerReplication {
     //instrument *createLevel, *createRegion, *destroyRegion,
-    //*createImageDescription, *createTextDescription, 
+    //*createImageDescription, *createTextDescription,
     //*createClosedShapeDescription, createSceneFragmentDescription
 
-    before(Glyph glyph, VirtualSpace virtualSpace): 
+    before(Glyph glyph, VirtualSpace virtualSpace):
         GlyphCreation.glyphAdd(glyph, virtualSpace) &&
         if(virtualSpace.isZuistOwned()) &&
         !cflowbelow(GlyphCreation.glyphAdd(Glyph, VirtualSpace)){
             glyph.setReplicated(false);
         }
 
-    pointcut sceneManagerCreation(SceneManager sceneManager, 
-            VirtualSpace[] spaces, Camera[] cameras) : 
-        execution(public SceneManager.new(VirtualSpace[], Camera[])) && 
+    pointcut sceneManagerCreation(SceneManager sceneManager,
+            VirtualSpace[] spaces, Camera[] cameras) :
+        execution(public SceneManager.new(VirtualSpace[], Camera[])) &&
         if(VirtualSpaceManager.INSTANCE.isMaster()) &&
         this(sceneManager) &&
         args(spaces, cameras);
 
-    after(SceneManager sceneManager, 
-            VirtualSpace[] spaces, 
-            Camera cameras[]) 
-        returning() : 
+    after(SceneManager sceneManager,
+            VirtualSpace[] spaces,
+            Camera cameras[])
+        returning() :
         sceneManagerCreation(sceneManager, spaces, cameras) &&
         !cflowbelow(sceneManagerCreation(SceneManager, VirtualSpace[], Camera[])){
             for(VirtualSpace vs: spaces){
@@ -57,8 +64,8 @@ aspect SceneManagerReplication {
             }
 
             sceneManager.setReplicated(true);
-            
-            SceneManagerCreateDelta delta = 
+
+            SceneManagerCreateDelta delta =
                 new SceneManagerCreateDelta(sceneManager.getObjId(),
                         Arrays.asList(spaces), Arrays.asList(cameras));
             VirtualSpaceManager.INSTANCE.sendDelta(delta);
@@ -76,7 +83,7 @@ aspect SceneManagerReplication {
         }
 
         public void apply(SlaveUpdater su){
-            SceneManager sm = 
+            SceneManager sm =
                 new SceneManager(su.getSlaveObjectArrayList(spaceRefs).toArray(new VirtualSpace[0]),
                         su.getSlaveObjectArrayList(cameraRefs).toArray(new Camera[0]));
             su.putSlaveObject(smId, sm);
@@ -91,8 +98,8 @@ aspect SceneManagerReplication {
         args(depth, ceilingAlt, floorAlt);
 
     after(SceneManager sceneManager, int depth,
-            double ceilingAlt, double floorAlt) 
-        returning(Level level) : 
+            double ceilingAlt, double floorAlt)
+        returning(Level level) :
         createLevel(sceneManager, depth, ceilingAlt, floorAlt) &&
         !cflowbelow(createLevel(SceneManager, int, double, double)){
             level.setReplicated(true);
@@ -127,44 +134,44 @@ aspect SceneManagerReplication {
         }
     }
 
-    pointcut createRegion(SceneManager sceneManager, 
+    pointcut createRegion(SceneManager sceneManager,
             double x, double y, double w, double h,
-            int highestLevel, int lowestLevel, 
-            String id, String title, int li, short[] transitions, 
-            short requestOrdering, boolean sensitivity, Color fill, 
-            Color stroke) : 
+            int highestLevel, int lowestLevel,
+            String id, String title, int li, short[] transitions,
+            short requestOrdering, boolean sensitivity, Color fill,
+            Color stroke) :
         execution(public Region SceneManager.createRegion(double, double, double, double,
-                    int, int, String, String, int, short[], short, boolean, 
+                    int, int, String, String, int, short[], short, boolean,
                     Color, Color)) &&
         if(VirtualSpaceManager.INSTANCE.isMaster()) &&
-        this(sceneManager) && 
-        args(x, y, w, h, 
-            highestLevel, lowestLevel, 
-            id, title, li, transitions, 
-            requestOrdering, sensitivity, fill, 
+        this(sceneManager) &&
+        args(x, y, w, h,
+            highestLevel, lowestLevel,
+            id, title, li, transitions,
+            requestOrdering, sensitivity, fill,
             stroke);
 
-    after(SceneManager sceneManager, double x, double y, double w, double h, 
-            int highestLevel, int lowestLevel, 
-            String id, String title, int li, short[] transitions, 
-            short requestOrdering, boolean sensitivity, Color fill, 
-            Color stroke) returning(Region region): 
-        createRegion(sceneManager, x, y, w, h, highestLevel, lowestLevel, 
-                id, title, li, transitions, 
-                requestOrdering, sensitivity, fill, 
+    after(SceneManager sceneManager, double x, double y, double w, double h,
+            int highestLevel, int lowestLevel,
+            String id, String title, int li, short[] transitions,
+            short requestOrdering, boolean sensitivity, Color fill,
+            Color stroke) returning(Region region):
+        createRegion(sceneManager, x, y, w, h, highestLevel, lowestLevel,
+                id, title, li, transitions,
+                requestOrdering, sensitivity, fill,
                 stroke) &&
         if(VirtualSpaceManager.INSTANCE.isMaster()) &&
-        !cflowbelow(createRegion(SceneManager, double, double, double, double, int, int, 
+        !cflowbelow(createRegion(SceneManager, double, double, double, double, int, int,
                 String, String, int, short[], short, boolean, Color, Color)){
             region.setReplicated(true);
 
             RegionCreateDelta delta = new RegionCreateDelta(
                     sceneManager.getObjId(),
                     region.getObjId(),
-                    x, y, w, h, 
-                    highestLevel, lowestLevel, 
-                    id, title, li, transitions, 
-                    requestOrdering, sensitivity, fill, 
+                    x, y, w, h,
+                    highestLevel, lowestLevel,
+                    id, title, li, transitions,
+                    requestOrdering, sensitivity, fill,
                     stroke);
             VirtualSpaceManager.INSTANCE.sendDelta(delta);
         }
@@ -188,14 +195,14 @@ aspect SceneManagerReplication {
         private final Color stroke;
 
         RegionCreateDelta(ObjId<SceneManager> smId, ObjId<Region> regionId,
-                double x, double y, double w, double h, 
-                int highestLevel, int lowestLevel, 
-                String id, String title, int li, short[] transitions, 
-                short requestOrdering, boolean sensitivity, Color fill, 
+                double x, double y, double w, double h,
+                int highestLevel, int lowestLevel,
+                String id, String title, int li, short[] transitions,
+                short requestOrdering, boolean sensitivity, Color fill,
                 Color stroke){
             this.smId = smId;
             this.regionId = regionId;
-            this.x = x; 
+            this.x = x;
             this.y = y;
             this.w = w;
             this.h = h;
@@ -213,21 +220,21 @@ aspect SceneManagerReplication {
 
         public void apply(SlaveUpdater su){
             SceneManager sm = su.getSlaveObject(smId);
-            Region region = sm.createRegion(x, y, w, h, 
-                    highestLevel, lowestLevel, 
-                    id, title, li, transitions, 
-                    requestOrdering, sensitivity, fill, 
+            Region region = sm.createRegion(x, y, w, h,
+                    highestLevel, lowestLevel,
+                    id, title, li, transitions,
+                    requestOrdering, sensitivity, fill,
                     stroke);
             su.putSlaveObject(regionId, region);
         }
     }
 
-    pointcut destroyRegion(SceneManager sceneManager, Region region) : 
+    pointcut destroyRegion(SceneManager sceneManager, Region region) :
         execution(public void SceneManager.destroyRegion(Region)) &&
         this(sceneManager) &&
         args(region);
 
-    after(SceneManager sceneManager, Region region) returning() : 
+    after(SceneManager sceneManager, Region region) returning() :
         destroyRegion(sceneManager, region) &&
         if(VirtualSpaceManager.INSTANCE.isMaster()) &&
         !cflowbelow(destroyRegion(SceneManager, Region)) {
@@ -256,37 +263,37 @@ aspect SceneManagerReplication {
 
     pointcut createImageDescription(
             SceneManager sceneManager,
-            double x, double y, double w, double h, 
+            double x, double y, double w, double h,
             String id, int zindex, Region region,
-            URL imageURL, boolean sensitivity, 
-            Color stroke, float alpha, String params) : 
+            URL imageURL, boolean sensitivity,
+            Color stroke, float alpha, String params) :
         execution(public ImageDescription SceneManager.createImageDescription(
-                    double, double, double, double, 
+                    double, double, double, double,
                     String, int, Region,
-                    URL, boolean, 
+                    URL, boolean,
                     Color, float, String)) &&
-        this(sceneManager) && 
-        args(x, y, w, h, 
+        this(sceneManager) &&
+        args(x, y, w, h,
             id, zindex, region,
-            imageURL, sensitivity, 
+            imageURL, sensitivity,
             stroke, alpha, params);
-    
+
     after(SceneManager sceneManager,
-            double x, double y, double w, double h, 
+            double x, double y, double w, double h,
             String id, int zindex, Region region,
-            URL imageURL, boolean sensitivity, 
+            URL imageURL, boolean sensitivity,
             Color stroke, float alpha, String params
             ) returning(ObjectDescription imageDesc):
         createImageDescription(sceneManager,
-                x, y, w, h, 
+                x, y, w, h,
                 id, zindex, region,
-                imageURL, sensitivity, 
+                imageURL, sensitivity,
                 stroke, alpha, params) &&
         if(VirtualSpaceManager.INSTANCE.isMaster()) &&
         !cflowbelow(createImageDescription(SceneManager,
-                double, double, double, double, 
+                double, double, double, double,
                 String, int, Region,
-                URL, boolean, 
+                URL, boolean,
                 Color, float, String)) {
             imageDesc.setReplicated(true);
 
@@ -317,21 +324,21 @@ aspect SceneManagerReplication {
 
        ImageCreateDelta(ObjId<SceneManager> smId,
                ObjId<ObjectDescription> descId,
-               double x, double y, double w, double h, 
+               double x, double y, double w, double h,
                String id, int zindex, ObjId<Region> regionId,
-               URL imageURL, boolean sensitivity, 
+               URL imageURL, boolean sensitivity,
                Color stroke, float alpha, String params){
            this.smId = smId;
            this.descId = descId;
-           this.x = x; 
-           this.y = y; 
-           this.w = w; 
-           this.h = h; 
-           this.id = id; 
-           this.zindex = zindex; 
+           this.x = x;
+           this.y = y;
+           this.w = w;
+           this.h = h;
+           this.id = id;
+           this.zindex = zindex;
            this.regionId = regionId;
-           this.imageURL = imageURL; 
-           this.sensitivity = sensitivity; 
+           this.imageURL = imageURL;
+           this.sensitivity = sensitivity;
            this.stroke = stroke;
            this.alpha = alpha;
            this.params = params;
@@ -349,37 +356,37 @@ aspect SceneManagerReplication {
        }
     }
 
-    pointcut createTextDescription(SceneManager sceneManager, 
-            double x, double y, String id, int zindex, Region region, float scale, 
-            String text, short anchor, Color fill, float alpha, String family, 
+    pointcut createTextDescription(SceneManager sceneManager,
+            double x, double y, String id, int zindex, Region region, float scale,
+            String text, short anchor, Color fill, float alpha, String family,
             int style, int size, boolean sensitivity) :
         execution(public TextDescription SceneManager.createTextDescription(
                     double, double, String, int, Region, float, String,
                     short, Color, float, String, int, int, boolean)) &&
-        this(sceneManager) && 
-        args(x, y, id, zindex, region, scale, 
-            text, anchor, fill, alpha, family, 
+        this(sceneManager) &&
+        args(x, y, id, zindex, region, scale,
+            text, anchor, fill, alpha, family,
             style, size, sensitivity);
 
-    after(SceneManager sceneManager, 
-            double x, double y, String id, int zindex, Region region, float scale, 
-            String text, short anchor, Color fill, float alpha, String family, 
-            int style, int size, boolean sensitivity) 
+    after(SceneManager sceneManager,
+            double x, double y, String id, int zindex, Region region, float scale,
+            String text, short anchor, Color fill, float alpha, String family,
+            int style, int size, boolean sensitivity)
         returning(ObjectDescription textDesc) :
-            createTextDescription(sceneManager, x, y, id, 
-                    zindex, region, scale, 
-                    text, anchor, fill, alpha, family, 
+            createTextDescription(sceneManager, x, y, id,
+                    zindex, region, scale,
+                    text, anchor, fill, alpha, family,
                     style, size, sensitivity) &&
             if(VirtualSpaceManager.INSTANCE.isMaster()) &&
-            !cflowbelow(createTextDescription(SceneManager, double, double, 
+            !cflowbelow(createTextDescription(SceneManager, double, double,
                         String, int, Region, float, String,
                         short, Color, float, String, int, int, boolean)) {
                 textDesc.setReplicated(true);
 
                 Delta delta = new TextCreateDelta(sceneManager.getObjId(),
                         textDesc.getObjId(),
-                        x, y, id, zindex, region.getObjId(), scale, 
-                        text, anchor, fill, alpha, family, 
+                        x, y, id, zindex, region.getObjId(), scale,
+                        text, anchor, fill, alpha, family,
                         style, size, sensitivity );
                 VirtualSpaceManager.INSTANCE.sendDelta(delta);
             }
@@ -387,7 +394,7 @@ aspect SceneManagerReplication {
     private static class TextCreateDelta implements Delta {
         private final ObjId<SceneManager> smId;
         private final ObjId<ObjectDescription> descId;
-        private final double x; 
+        private final double x;
         private final double y;
         private final String id;
         private final int zindex;
@@ -402,11 +409,11 @@ aspect SceneManagerReplication {
         private final int size;
         private final boolean sensitivity;
 
-        TextCreateDelta(ObjId<SceneManager> smId, 
+        TextCreateDelta(ObjId<SceneManager> smId,
                 ObjId<ObjectDescription> descId,
-                double x, double y, String id, int zindex, ObjId<Region> regionId, 
-                float scale, String text, short anchor, 
-                Color fill, float alpha, String family, 
+                double x, double y, String id, int zindex, ObjId<Region> regionId,
+                float scale, String text, short anchor,
+                Color fill, float alpha, String family,
                 int style, int size, boolean sensitivity){
             this.smId = smId;
             this.descId = descId;
@@ -430,21 +437,21 @@ aspect SceneManagerReplication {
            SceneManager sm = su.getSlaveObject(smId);
            Region region = su.getSlaveObject(regionId);
            TextDescription desc = sm.createTextDescription(
-                   x, y, id, zindex, region, scale, 
-                   text, anchor, fill, alpha, family, 
+                   x, y, id, zindex, region, scale,
+                   text, anchor, fill, alpha, family,
                    style, size, sensitivity);
            su.putSlaveObject(descId, desc);
        }
     }
 
-    pointcut createClosedShapeDescription(SceneManager sceneManager, 
+    pointcut createClosedShapeDescription(SceneManager sceneManager,
             ClosedShape closedShape, String id, int zindex, Region region, boolean sensitivity) :
         execution(public ClosedShapeDescription SceneManager.createClosedShapeDescription(ClosedShape, String, int, Region, boolean)) &&
-        this(sceneManager) && 
+        this(sceneManager) &&
         args(closedShape, id, zindex, region, sensitivity);
 
-    after(SceneManager sceneManager, 
-            ClosedShape closedShape, String id, int zindex, Region region, boolean sensitivity) 
+    after(SceneManager sceneManager,
+            ClosedShape closedShape, String id, int zindex, Region region, boolean sensitivity)
         returning(ClosedShapeDescription csDesc) :
             createClosedShapeDescription(sceneManager, closedShape, id, zindex, region, sensitivity) &&
             if(VirtualSpaceManager.INSTANCE.isMaster()) &&
@@ -465,9 +472,9 @@ aspect SceneManagerReplication {
         private final ObjId<Region> regionId;
         private final boolean sensitivity;
 
-        ClosedShapeCreateDelta(ObjId<SceneManager> smId, 
+        ClosedShapeCreateDelta(ObjId<SceneManager> smId,
                 ClosedShapeDescription csDesc,
-                String id, int zindex, ObjId<Region> regionId, 
+                String id, int zindex, ObjId<Region> regionId,
                 boolean sensitivity){
             this.smId = smId;
             this.descId = csDesc.getObjId();
@@ -482,23 +489,23 @@ aspect SceneManagerReplication {
            SceneManager sm = su.getSlaveObject(smId);
            Region region = su.getSlaveObject(regionId);
            ClosedShapeDescription desc = sm.createClosedShapeDescription(
-                   (ClosedShape)(csReplicator.createGlyph()), id, zindex, region, 
+                   (ClosedShape)(csReplicator.createGlyph()), id, zindex, region,
                    sensitivity);
            su.putSlaveObject(descId, desc);
        }
     }
 
     pointcut createSceneFragmentDescription(SceneManager sceneManager,
-            double x, double y, String id, Region region, URL resourceURL) : 
-        execution(public SceneFragmentDescription 
+            double x, double y, String id, Region region, URL resourceURL) :
+        execution(public SceneFragmentDescription
                 SceneManager.createSceneFragmentDescription(double, double, String, Region, URL)) &&
         this(sceneManager) &&
         args(x, y, id, region, resourceURL);
 
-    after(SceneManager sceneManager, double x, double y, 
-            String id, Region region, URL resourceURL) 
-        returning(SceneFragmentDescription fragDesc) : 
-            createSceneFragmentDescription(sceneManager, x, y, id, 
+    after(SceneManager sceneManager, double x, double y,
+            String id, Region region, URL resourceURL)
+        returning(SceneFragmentDescription fragDesc) :
+            createSceneFragmentDescription(sceneManager, x, y, id,
                     region, resourceURL)  &&
             if(VirtualSpaceManager.INSTANCE.isMaster()) &&
             !cflowbelow(createSceneFragmentDescription(SceneManager, double, double, String, Region, URL)){
@@ -523,7 +530,7 @@ aspect SceneManagerReplication {
 
         SceneFragmentCreateDelta(ObjId<SceneManager> smId,
                 ObjId<SceneFragmentDescription> descId,
-                double x, double y, String id, 
+                double x, double y, String id,
                 ObjId<Region> regionId, URL resourceURL){
             this.smId = smId;
             this.descId = descId;

@@ -1,9 +1,10 @@
-/*   AUTHOR : Romain Primet (romain.primet@inria.fr)
+/*
+ *   Copyright (c) INRIA, 2010-2013. All Rights Reserved
+ *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2010.
- *  Licensed under the GNU LGPL. For full terms see the file COPYING.
- *
- */ 
+ * $Id:  $
+ */
+
 package fr.inria.zuist.cluster;
 
 import fr.inria.zvtm.cluster.DefaultIdentifiable;

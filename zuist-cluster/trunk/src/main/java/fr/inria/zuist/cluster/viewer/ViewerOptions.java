@@ -10,7 +10,7 @@ public class ViewerOptions {
     @Option(name = "-bw", aliases = {"--block-width"}, usage = "clustered view block width")
     public int blockWidth = 400;
 
-	@Option(name = "-bh", aliases = {"--block-height"}, usage = "clustered view block height")
+    @Option(name = "-bh", aliases = {"--block-height"}, usage = "clustered view block height")
     public int blockHeight = 300;
 
     @Option(name = "-r", aliases = {"--num-rows"}, usage = "number of rows in the clustered view")

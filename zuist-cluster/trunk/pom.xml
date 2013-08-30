@@ -4,7 +4,7 @@
     <groupId>fr.inria.zvtm</groupId>
     <artifactId>zuist-cluster</artifactId>
     <packaging>jar</packaging>
-    <version>0.2.0</version>
+    <version>0.2.1-SNAPSHOT</version>
     <name>zuist-cluster</name>
     <description>Clustering extension to ZUIST</description>
     <url>http://zvtm.sourceforge.net</url>
@@ -43,7 +43,7 @@
         <dependency>
             <groupId>fr.inria.zvtm</groupId>
             <artifactId>zvtm-cluster</artifactId>
-            <version>0.2.7</version>
+            <version>0.2.8-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.aspectj</groupId>
