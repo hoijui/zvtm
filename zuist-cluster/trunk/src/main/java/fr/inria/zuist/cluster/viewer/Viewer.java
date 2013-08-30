@@ -224,7 +224,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         clusteredView =
             new ClusteredView(
                     withBezels,
-                    3, //origin (block number)
+                    options.numRows-1, //origin (block number)
                     options.numCols, //use complete
                     options.numRows, //cluster surface
                     sceneCam);
