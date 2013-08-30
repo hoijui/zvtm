@@ -1,7 +1,7 @@
 #!/bin/bash
 
 function colNum {
-  case "$1" in 
+  case "$1" in
 	  "a" ) return 0;;
 	  "b" ) return 1;;
 	  "c" ) return 2;;
@@ -14,7 +14,7 @@ for col in {a..d}
 do
 	for row in {1..4}
       do
-		  colNum $col 
+		  colNum $col
 		  SLAVENUM1=`expr $? \* 8 + $row - 1`
 		  SLAVENUM2=`expr $SLAVENUM1 + 4`
 		  ssh wild@$col$row.wild.lri.fr -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "sudo sysctl -w kern.ipc.maxsockbuf=80000000"
