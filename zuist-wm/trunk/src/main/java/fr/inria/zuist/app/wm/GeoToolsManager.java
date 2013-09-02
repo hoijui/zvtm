@@ -67,11 +67,11 @@ class GeoToolsManager {
     GeoToolsManager(WorldExplorer app, boolean queryGN, short lad){
         this.application = app;
         gnp = new GeoNamesParser(application);
-        if (lad >= 0){
+        if (lad >= 1){
             loadShapes(new File("data/TM_WORLD_BORDERS-0.3.shp"), "Loading countries...", COUNTRY_COLOR, LAD0);
             gnp.loadCountries();
         }
-        if (lad >= 1){
+        if (lad >= 2){
             loadShapes(new File("data/shapefiles/ca_provinces/province.shp"), "Loading Canadian provinces...", ADMIN_DIV_1_COLOR, LAD1);
             loadShapes(new File("data/shapefiles/us_states/statesp020.shp"), "Loading US states...", ADMIN_DIV_1_COLOR, LAD1);
             loadShapes(new File("data/shapefiles/mx_states/mx_state.shp"), "Loading Mexican states...", ADMIN_DIV_1_COLOR, LAD1);

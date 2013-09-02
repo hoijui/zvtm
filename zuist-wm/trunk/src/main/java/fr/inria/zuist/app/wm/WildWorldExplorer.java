@@ -142,7 +142,6 @@ public class WildWorldExplorer extends WorldExplorer {
     }
 
     public static void main(String[] args){
-        //new Viewer(true, fs, ogl, aa, xmlSceneFile);
         WEOptions options = new WEOptions();
         CmdLineParser parser = new CmdLineParser(options);
         try {
