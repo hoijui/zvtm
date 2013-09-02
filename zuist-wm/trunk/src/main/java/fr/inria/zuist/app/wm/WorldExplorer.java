@@ -69,11 +69,11 @@ import org.geonames.InsufficientStyleException;
  */
 
 public class WorldExplorer implements Java2DPainter {
-    
+
     String PATH_TO_HIERARCHY = "data/tgt";
     String PATH_TO_SCENE = PATH_TO_HIERARCHY + "/wm_scene.xml";
     File SCENE_FILE = new File(PATH_TO_SCENE);
-        
+
     /* screen dimensions, actual dimensions of windows */
     static int SCREEN_WIDTH =  Toolkit.getDefaultToolkit().getScreenSize().width;
     static int SCREEN_HEIGHT =  Toolkit.getDefaultToolkit().getScreenSize().height;
@@ -84,12 +84,12 @@ public class WorldExplorer implements Java2DPainter {
     /* dimensions of zoomable panel */
     int panelWidth, panelHeight;
 
-	static final Color BACKGROUND_COLOR = Color.BLACK;
-    
+    static final Color BACKGROUND_COLOR = Color.BLACK;
+
     boolean SHOW_MEMORY_USAGE = false;
-    
+
     boolean UPDATE_MAPS = true;
-    
+
     /* ZVTM objects */
     VirtualSpaceManager vsm;
     static final String mSpaceName = "BMNG Layer";
@@ -104,13 +104,13 @@ public class WorldExplorer implements Java2DPainter {
     GeoToolsManager gm;
     NavigationManager nm;
     AirTrafficManager ga;
-    
+
     WEGlassPane gp;
-    
+
     TranslucentTextArea console;
-    
+
     boolean antialiasing = false;
-    
+
     public WorldExplorer(boolean queryGN, short lad, boolean air,
                          boolean fullscreen, boolean opengl, boolean aa, File xmlSceneFile){
         VirtualSpaceManager.INSTANCE.getAnimationManager().setResolution(80);
@@ -122,11 +122,11 @@ public class WorldExplorer implements Java2DPainter {
         gp.setVisible(true);
         VirtualSpace[]  sceneSpaces = {mSpace};
         Camera[] sceneCameras = {mCamera};
-		sm = new SceneManager(sceneSpaces, sceneCameras);
-		if (xmlSceneFile != null){
+        sm = new SceneManager(sceneSpaces, sceneCameras);
+        if (xmlSceneFile != null){
             gp.setLabel("Loading "+xmlSceneFile.getName());
             sm.loadScene(parseXML(xmlSceneFile), xmlSceneFile.getParentFile(), true, gp);
-		}
+        }
         gm = new GeoToolsManager(this, queryGN, lad);
         ga = new AirTrafficManager(this, air);
         gp.setVisible(false);
@@ -140,8 +140,8 @@ public class WorldExplorer implements Java2DPainter {
            };
         nm.getGlobalView(ea);
         eh.cameraMoved(mCamera, null, 0);
-		nm.createOverview();
-		nm.updateOverview();
+        nm.createOverview();
+        nm.updateOverview();
         console.setVisible(true);
     }
 
@@ -153,7 +153,7 @@ public class WorldExplorer implements Java2DPainter {
         bSpace = vsm.addVirtualSpace(bSpaceName);
         mCamera = mSpace.addCamera();
         ovCamera = mSpace.addCamera();
-		bCamera = bSpace.addCamera();
+        bCamera = bSpace.addCamera();
         Vector cameras = new Vector();
         cameras.add(mCamera);
         cameras.add(bCamera);
@@ -165,17 +165,17 @@ public class WorldExplorer implements Java2DPainter {
         else {
             mView.setVisible(true);
         }
-		mView.setAntialiasing(antialiasing);
+        mView.setAntialiasing(antialiasing);
         eh = new ExplorerEventHandler(this);
         mCamera.addListener(eh);
         mView.setListener(eh, 0);
         mView.setListener(eh, 1);
         mView.setBackgroundColor(BACKGROUND_COLOR);
-		mView.getCursor().setColor(Color.WHITE);
-		mView.getCursor().setHintColor(Color.WHITE);
-		mView.getCursor().getDynaPicker().setDynaSpotColor(Color.WHITE);
+        mView.getCursor().setColor(Color.WHITE);
+        mView.getCursor().setHintColor(Color.WHITE);
+        mView.getCursor().getDynaPicker().setDynaSpotColor(Color.WHITE);
         mView.getCursor().getDynaPicker().setDynaSpotLagTime(200);
-		mView.getCursor().getDynaPicker().activateDynaSpot(true);
+        mView.getCursor().getDynaPicker().activateDynaSpot(true);
         mView.setJava2DPainter(this, Java2DPainter.AFTER_PORTALS);
         updatePanelSize();
         // console
@@ -202,15 +202,15 @@ public class WorldExplorer implements Java2DPainter {
         VIEW_W = (SCREEN_WIDTH <= VIEW_MAX_W) ? SCREEN_WIDTH : VIEW_MAX_W;
         VIEW_H = (SCREEN_HEIGHT <= VIEW_MAX_H) ? SCREEN_HEIGHT : VIEW_MAX_H;
     }
-    
+
     /* tells whether antialising was requested at launch time or not */
     boolean isAAEnabled(){
         return antialiasing;
     }
-    
-        
+
+
     ClosedShape selectedFeature = null;
-    
+
     void displayFeatureInfo(Toponym feature, Glyph g){
         if (feature != null){
             String t = feature.getName()+", "+feature.getCountryName()+
@@ -232,35 +232,35 @@ public class WorldExplorer implements Java2DPainter {
             unselectOldFeature();
         }
     }
-    
+
     void unselectOldFeature(){
         if (selectedFeature != null){
             selectedFeature.setColor(GeoNamesParser.FEATURE_COLOR);
             selectedFeature = null;
         }
     }
-    
+
     /*-------------     Navigation       -------------*/
-    
+
     boolean isDynaspotEnabled(){
         return true;
     }
 
-    
+
     void altitudeChanged(){}
-    
+
     void updatePanelSize(){
         Dimension d = mView.getPanel().getComponent().getSize();
         panelWidth = d.width;
         panelHeight = d.height;
         if (nm != null && nm.ovPortal != null){
-            nm.ovPortal.moveTo(panelWidth-nm.ovPortal.getDimensions().width-1, panelHeight-nm.ovPortal.getDimensions().height-1);            
+            nm.ovPortal.moveTo(panelWidth-nm.ovPortal.getDimensions().width-1, panelHeight-nm.ovPortal.getDimensions().height-1);
         }
         if (console != null){
             console.setBounds(20, panelHeight-100, panelWidth-250, 96);
         }
     }
-    
+
     void toggleMemoryUsageDisplay(){
         SHOW_MEMORY_USAGE = !SHOW_MEMORY_USAGE;
         vsm.repaint();
@@ -270,14 +270,14 @@ public class WorldExplorer implements Java2DPainter {
         UPDATE_MAPS = !UPDATE_MAPS;
         sm.setUpdateLevel(UPDATE_MAPS);
     }
-    
+
     void gc(){
         System.gc();
         if (SHOW_MEMORY_USAGE){
             vsm.repaint();
         }
     }
-    
+
     long maxMem = Runtime.getRuntime().maxMemory();
     int totalMemRatio, usedMemRatio;
 
@@ -311,10 +311,10 @@ public class WorldExplorer implements Java2DPainter {
             15);
         g2d.drawString(usedMemRatio + "%", 50, viewHeight - 28);
         g2d.drawString(totalMemRatio + "%", 100, viewHeight - 28);
-        g2d.drawString(maxMem/1048576 + " Mb", 170, viewHeight - 28);	
-    }    
-    
-    static Document parseXML(File f){ 
+        g2d.drawString(maxMem/1048576 + " Mb", 170, viewHeight - 28);
+    }
+
+    static Document parseXML(File f){
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             factory.setValidating(false);
@@ -329,43 +329,43 @@ public class WorldExplorer implements Java2DPainter {
         catch (SAXException e){e.printStackTrace();return null;}
         catch (IOException e){e.printStackTrace();return null;}
     }
-    
+
     void exit(){
         System.exit(0);
     }
 
     static void printCmdLineHelp(){
         System.out.println("Usage:\n\tjava -Xmx1024M -Xms512M -jar target/zuist-wm-X.X.X.jar <path_to_scene_dir> [options]");
-		System.out.println("\n\t-qgn: query geonames.org Web service");
-		System.out.println("\t-ladN: display N-th level administrative division boundaries (countries, states, provinces, ...)");
-		System.out.println("\t-air[N]: display air traffic data, optional N integer value represents min route weight to be displayed");
-		System.out.println("\t-fs: run application fullscreen");
-		System.out.println("\t-opengl: use Java2D OpenGL pipeline for rendering");
+        System.out.println("\n\t-qgn: query geonames.org Web service");
+        System.out.println("\t-ladN: display N-th level administrative division boundaries (countries, states, provinces, ...)");
+        System.out.println("\t-air[N]: display air traffic data, optional N integer value represents min route weight to be displayed");
+        System.out.println("\t-fs: run application fullscreen");
+        System.out.println("\t-opengl: use Java2D OpenGL pipeline for rendering");
         System.out.println("\t-aa: enable antialiasing");
-		System.exit(0);
+        System.exit(0);
     }
 
     public static void main(String[] args){
         File xmlSceneFile = null;
-		boolean fs = false;
-		boolean ogl = false;
-		boolean aa = false;
-		boolean queryGN = false;
-		short lad = -1;
-		boolean air = false;
-		for (int i=0;i<args.length;i++){
-			if (args[i].startsWith("-")){
-				if (args[i].substring(1).equals("fs")){fs = true;}
-				else if (args[i].substring(1).equals("opengl")){ogl = true;}
-				else if (args[i].substring(1).equals("aa")){aa = true;}
-				else if (args[i].substring(1).equals("qgn")){queryGN = true;}
-				else if (args[i].substring(1).startsWith("lad")){lad = Short.parseShort(args[i].substring(4));}
-				else if (args[i].substring(1).startsWith("air")){
-				    air = true;
-				    if (args[i].length() > 4){AirTrafficManager.MIN_WEIGHT = Integer.parseInt(args[i].substring(4));}
-				}
-				else if (args[i].substring(1).equals("h") || args[i].substring(1).equals("--help")){WorldExplorer.printCmdLineHelp();System.exit(0);}
-			}
+        boolean fs = false;
+        boolean ogl = false;
+        boolean aa = false;
+        boolean queryGN = false;
+        short lad = -1;
+        boolean air = false;
+        for (int i=0;i<args.length;i++){
+            if (args[i].startsWith("-")){
+                if (args[i].substring(1).equals("fs")){fs = true;}
+                else if (args[i].substring(1).equals("opengl")){ogl = true;}
+                else if (args[i].substring(1).equals("aa")){aa = true;}
+                else if (args[i].substring(1).equals("qgn")){queryGN = true;}
+                else if (args[i].substring(1).startsWith("lad")){lad = Short.parseShort(args[i].substring(4));}
+                else if (args[i].substring(1).startsWith("air")){
+                    air = true;
+                    if (args[i].length() > 4){AirTrafficManager.MIN_WEIGHT = Integer.parseInt(args[i].substring(4));}
+                }
+                else if (args[i].substring(1).equals("h") || args[i].substring(1).equals("--help")){WorldExplorer.printCmdLineHelp();System.exit(0);}
+            }
             else {
                 // the only other thing allowed as a cmd line param is a scene file
                 File f = new File(args[i]);
@@ -380,11 +380,11 @@ public class WorldExplorer implements Java2DPainter {
                         }
                     }
                     else {
-                        xmlSceneFile = f;                        
+                        xmlSceneFile = f;
                     }
                 }
             }
-		}
+        }
         if (!fs && Utils.osIsMacOS()){
             System.setProperty("apple.laf.useScreenMenuBar", "true");
         }
@@ -396,11 +396,11 @@ public class WorldExplorer implements Java2DPainter {
 }
 
 class WEGlassPane extends JComponent implements ProgressListener {
-    
+
     static final int BAR_WIDTH = 200;
     static final int BAR_HEIGHT = 10;
 
-    static final AlphaComposite GLASS_ALPHA = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.65f);    
+    static final AlphaComposite GLASS_ALPHA = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.65f);
     static final Color MSG_COLOR = Color.DARK_GRAY;
     GradientPaint PROGRESS_GRADIENT = new GradientPaint(0, 0, Color.ORANGE, 0, BAR_HEIGHT, Color.BLUE);
 
@@ -408,14 +408,14 @@ class WEGlassPane extends JComponent implements ProgressListener {
     String msg = EMPTY_STRING;
     int msgX = 0;
     int msgY = 0;
-    
+
     int completion = 0;
     int prX = 0;
     int prY = 0;
     int prW = 0;
-    
+
     WorldExplorer application;
-    
+
     static final Font GLASSPANE_FONT = new Font("Arial", Font.PLAIN, 12);
 
     WEGlassPane(WorldExplorer app){
@@ -425,7 +425,7 @@ class WEGlassPane extends JComponent implements ProgressListener {
         addMouseMotionListener(new MouseMotionAdapter(){});
         addKeyListener(new KeyAdapter(){});
     }
-    
+
     public void setValue(int c){
         completion = c;
         prX = application.panelWidth/2-BAR_WIDTH/2;
@@ -434,14 +434,14 @@ class WEGlassPane extends JComponent implements ProgressListener {
         PROGRESS_GRADIENT = new GradientPaint(0, prY, Color.LIGHT_GRAY, 0, prY+BAR_HEIGHT, Color.DARK_GRAY);
         repaint(prX, prY, BAR_WIDTH, BAR_HEIGHT);
     }
-    
+
     public void setLabel(String m){
         msg = m;
         msgX = application.panelWidth/2-BAR_WIDTH/2;
         msgY = application.panelHeight/2-BAR_HEIGHT/2 - 10;
         repaint(msgX, msgY-50, 400, 70);
     }
-    
+
     protected void paintComponent(Graphics g){
         Graphics2D g2 = (Graphics2D)g;
         Rectangle clip = g.getClipBounds();
@@ -459,5 +459,5 @@ class WEGlassPane extends JComponent implements ProgressListener {
         g2.setColor(MSG_COLOR);
         g2.drawRect(prX, prY, BAR_WIDTH, BAR_HEIGHT);
     }
-    
+
 }

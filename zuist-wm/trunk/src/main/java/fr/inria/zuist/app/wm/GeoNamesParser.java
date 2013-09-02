@@ -33,7 +33,7 @@ import fr.inria.zvtm.glyphs.VText;
 import au.com.bytecode.opencsv.CSVReader;
 
 public class GeoNamesParser {
-    
+
     static final Color SELECTED_FEATURE_COLOR = Color.ORANGE;
     static final Color FEATURE_COLOR = Color.GRAY;
     static final Color COUNTRY_LABEL_COLOR = Color.WHITE;
@@ -51,12 +51,12 @@ public class GeoNamesParser {
             ToponymSearchResult searchResults = WebService.search(searchCriteria);
             for (Toponym toponym : searchResults.getToponyms()) {
                 bw.write(toponym.getCountryName()+OUTPUT_CSV_SEP+toponym.getLatitude()+OUTPUT_CSV_SEP+toponym.getLongitude()+OUTPUT_CSV_SEP+toponym.getPopulation());
-        	    bw.newLine();
+                bw.newLine();
             }
-    	    bw.flush();
+            bw.flush();
             System.out.println("\nReturned a total of " + searchResults.getTotalResultsCount()  + "results\n");
         }
-        catch (Exception e){e.printStackTrace();} 
+        catch (Exception e){e.printStackTrace();}
     }
 
     static void getEntitiesFromWebService(String fileName){
@@ -65,7 +65,7 @@ public class GeoNamesParser {
         }
         catch (Exception e){e.printStackTrace();}
     }
-    
+
     static void getEntitiesFromWebService(OutputStreamWriter osw){
         try {
             BufferedWriter bw = new BufferedWriter(osw);
@@ -75,11 +75,11 @@ public class GeoNamesParser {
             ToponymSearchResult searchResult = WebService.search(searchCriteria);
             for (Toponym toponym : searchResult.getToponyms()) {
                 bw.write(toponym.getName()+OUTPUT_CSV_SEP+toponym.getCountryName()+OUTPUT_CSV_SEP+toponym.getLatitude()+OUTPUT_CSV_SEP+toponym.getLongitude());
-        	    bw.newLine();
+                bw.newLine();
             }
-    	    bw.flush();
+            bw.flush();
         }
-        catch (Exception e){e.printStackTrace();} 
+        catch (Exception e){e.printStackTrace();}
     }
 
     public static void main (String[] args){
@@ -87,11 +87,11 @@ public class GeoNamesParser {
         getEntitiesFromWebService(args[0], Integer.parseInt(args[1]), args[2]);
         System.exit(0);
     }
-    
+
     /*------------------------------------------*/
-    
+
     WorldExplorer application;
-    
+
     GeoNamesParser(WorldExplorer app){
         this.application = app;
     }
@@ -118,7 +118,7 @@ public class GeoNamesParser {
             ex.printStackTrace();
         }
     }
-    
+
     void loadCities(){
         try {
             ToponymSearchCriteria searchCriteria = new ToponymSearchCriteria();

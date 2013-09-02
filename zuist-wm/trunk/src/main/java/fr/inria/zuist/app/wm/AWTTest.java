@@ -34,15 +34,15 @@ import com.vividsolutions.jts.geom.util.PolygonExtracter;
 
 
 public class AWTTest extends JFrame {
-    
+
     static final double CC = 1280 / 360.0;
-    
+
     GeoPanel p;
-    
+
     Polygon[] countryBoundaries;
-    
+
     boolean paint = false;
-    
+
     public AWTTest(String shapeFilePath){
         super();
         p = new GeoPanel(this);
@@ -113,7 +113,7 @@ public class AWTTest extends JFrame {
             uex.printStackTrace();
         }
     }
-    
+
     public static void main(String[] args){
         System.out.println("Using GeoTools v" + GeoTools.getVersion());
         new AWTTest(args[0]);
@@ -122,14 +122,14 @@ public class AWTTest extends JFrame {
 }
 
 class GeoPanel extends JPanel {
-    
+
     AWTTest application;
     Polygon[] cb;
-    
+
     GeoPanel(AWTTest app){
         this.application = app;
     }
-    
+
     public void paintComponent(Graphics g){
         if (cb != null){
             g.setColor(Color.BLACK);
@@ -138,5 +138,5 @@ class GeoPanel extends JPanel {
             }
         }
     }
-    
+
 }

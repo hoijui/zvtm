@@ -15,7 +15,7 @@ import javax.swing.JSlider;
 class Preferences extends JFrame {
 
     WorldExplorer application;
-    
+
     JSlider slider;
 
     Preferences(WorldExplorer app){
@@ -34,5 +34,5 @@ class Preferences extends JFrame {
             }
         );
     }
-   
+
 }

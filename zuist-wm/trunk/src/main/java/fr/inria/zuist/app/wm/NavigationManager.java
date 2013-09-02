@@ -35,7 +35,7 @@ class NavigationManager {
     static final short MOVE_DOWN = 1;
     static final short MOVE_LEFT = 2;
     static final short MOVE_RIGHT = 3;
-    
+
     /* misc. lens settings */
     Lens lens;
     TemporalLens tLens;
@@ -49,28 +49,28 @@ class NavigationManager {
     /* LENS MAGNIFICATION */
     static float WHEEL_MM_STEP = 1.0f;
     static final float MAX_MAG_FACTOR = 12.0f;
-    
+
     static final int NO_LENS = 0;
     static final int ZOOMIN_LENS = 1;
     static final int ZOOMOUT_LENS = -1;
     int lensType = NO_LENS;
-    
+
     /* lens distance and drop-off functions */
     static final short L2_Gaussian = 0;
     static final short L2_SCB = 1;
     short lensFamily = L2_SCB;
-    
+
     static final float FLOOR_ALTITUDE = 100.0f;
 
     WorldExplorer application;
     VirtualSpaceManager vsm;
-    
+
     NavigationManager(WorldExplorer app){
         this.application = app;
         vsm = VirtualSpaceManager.INSTANCE;
     }
 
-	/* -------------- pan-zoom ------------------- */
+    /* -------------- pan-zoom ------------------- */
 
     void getGlobalView(EndAction ea){
         application.sm.getGlobalView(application.mCamera, NavigationManager.ANIM_MOVE_DURATION, ea);
@@ -121,77 +121,77 @@ class NavigationManager {
         vsm.getAnimationManager().startAnimation(a, false);
     }
 
-	/* -------------- Overview ------------------- */
-	
-	static final int MAX_OVERVIEW_WIDTH = 200;
-	static final int MAX_OVERVIEW_HEIGHT = 200;
-	static final Color OBSERVED_REGION_COLOR = Color.GREEN;
-	static final float OBSERVED_REGION_ALPHA = 0.5f;
-	static final Color OV_BORDER_COLOR = Color.WHITE;
-	static final Color OV_INSIDE_BORDER_COLOR = Color.WHITE;
-	
-	OverviewPortal ovPortal;
-	
-	double[] scene_bounds = {0, 0, 0, 0};
-	
-	void createOverview(){
+    /* -------------- Overview ------------------- */
+
+    static final int MAX_OVERVIEW_WIDTH = 200;
+    static final int MAX_OVERVIEW_HEIGHT = 200;
+    static final Color OBSERVED_REGION_COLOR = Color.GREEN;
+    static final float OBSERVED_REGION_ALPHA = 0.5f;
+    static final Color OV_BORDER_COLOR = Color.WHITE;
+    static final Color OV_INSIDE_BORDER_COLOR = Color.WHITE;
+
+    OverviewPortal ovPortal;
+
+    double[] scene_bounds = {0, 0, 0, 0};
+
+    void createOverview(){
         int ow = MAX_OVERVIEW_WIDTH;
         int oh = MAX_OVERVIEW_HEIGHT;
-	    Region[] rootRegions = application.sm.getRegionsAtLevel(0);
-	    if (rootRegions != null){
-    	    float ar = (float)(rootRegions[0].getWidth() / rootRegions[0].getHeight());
-    	    if (ar > 1){
-    	        // wider than high
-    	        oh = Math.round(ow/ar);
-    	    }
-    	    else {
-    	        // higher than wide
-    	        ow = Math.round(oh*ar);
-    	    }	        
-	    }
-	    else {
-	        ow = 1;
-	        oh = 1;
-	    }
-		ovPortal = new OverviewPortal(application.panelWidth-ow-1, application.panelHeight-oh-1, ow, oh, application.ovCamera, application.mCamera);
-		ovPortal.setPortalListener(application.eh);
-		ovPortal.setBackgroundColor(WorldExplorer.BACKGROUND_COLOR);
-		ovPortal.setObservedRegionColor(OBSERVED_REGION_COLOR);
-		ovPortal.setObservedRegionTranslucency(OBSERVED_REGION_ALPHA);
-		VirtualSpaceManager.INSTANCE.addPortal(ovPortal, application.mView);
-		ovPortal.setBorder(Color.GREEN);
-		updateOverview();
-	}
-	
-	void updateOverview(){
-		if (ovPortal != null){
-		    int l = 0;
-    		while (application.sm.getRegionsAtLevel(l) == null){
-    			l++;
-    			if (l > application.sm.getLevelCount()){
-    				l = -1;
-    				break;
-    			}
-    		}
-    		if (l > -1){
-    			scene_bounds = application.sm.getLevel(l).getBounds();
-    	        ovPortal.centerOnRegion(NavigationManager.ANIM_MOVE_DURATION, scene_bounds[0], scene_bounds[1], scene_bounds[2], scene_bounds[3]);		
-    		}
-		}
-	}
-	
-	/* -------------- Sigma Lenses ------------------- */
+        Region[] rootRegions = application.sm.getRegionsAtLevel(0);
+        if (rootRegions != null){
+            float ar = (float)(rootRegions[0].getWidth() / rootRegions[0].getHeight());
+            if (ar > 1){
+                // wider than high
+                oh = Math.round(ow/ar);
+            }
+            else {
+                // higher than wide
+                ow = Math.round(oh*ar);
+            }
+        }
+        else {
+            ow = 1;
+            oh = 1;
+        }
+        ovPortal = new OverviewPortal(application.panelWidth-ow-1, application.panelHeight-oh-1, ow, oh, application.ovCamera, application.mCamera);
+        ovPortal.setPortalListener(application.eh);
+        ovPortal.setBackgroundColor(WorldExplorer.BACKGROUND_COLOR);
+        ovPortal.setObservedRegionColor(OBSERVED_REGION_COLOR);
+        ovPortal.setObservedRegionTranslucency(OBSERVED_REGION_ALPHA);
+        VirtualSpaceManager.INSTANCE.addPortal(ovPortal, application.mView);
+        ovPortal.setBorder(Color.GREEN);
+        updateOverview();
+    }
+
+    void updateOverview(){
+        if (ovPortal != null){
+            int l = 0;
+            while (application.sm.getRegionsAtLevel(l) == null){
+                l++;
+                if (l > application.sm.getLevelCount()){
+                    l = -1;
+                    break;
+                }
+            }
+            if (l > -1){
+                scene_bounds = application.sm.getLevel(l).getBounds();
+                ovPortal.centerOnRegion(NavigationManager.ANIM_MOVE_DURATION, scene_bounds[0], scene_bounds[1], scene_bounds[2], scene_bounds[3]);
+            }
+        }
+    }
+
+    /* -------------- Sigma Lenses ------------------- */
 
     void toggleLensType(){
-	    if (lensFamily == L2_Gaussian){
-	        lensFamily = L2_SCB;
-	        //application.ovm.say(Messages.SCB);
-	    }
-	    else {
-	        lensFamily = L2_Gaussian;
-	        //application.ovm.say(Messages.FISHEYE);
-	    }
-	}
+        if (lensFamily == L2_Gaussian){
+            lensFamily = L2_SCB;
+            //application.ovm.say(Messages.SCB);
+        }
+        else {
+            lensFamily = L2_Gaussian;
+            //application.ovm.say(Messages.FISHEYE);
+        }
+    }
 
     void setLens(int t){
         lensType = t;
@@ -220,7 +220,7 @@ class NavigationManager {
         VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
         setLens(ZOOMIN_LENS);
     }
-    
+
     void zoomInPhase2(double mx, double my){
         // compute camera animation parameters
         double cameraAbsAlt = application.mCamera.getAltitude()+application.mCamera.getFocal();
@@ -230,15 +230,15 @@ class NavigationManager {
         // -(cameraAbsAlt)*(MAG_FACTOR-1)/MAG_FACTOR
         Float deltAlt = new Float((cameraAbsAlt)*(1-MAG_FACTOR)/MAG_FACTOR);
         if (cameraAbsAlt + deltAlt.floatValue() > FLOOR_ALTITUDE){
-            //	    cadata.add(deltAlt);
-            //	    cadata.add(new LongPoint(c2x-application.mCamera.vx, c2y-application.mCamera.vy));
+            //      cadata.add(deltAlt);
+            //      cadata.add(new LongPoint(c2x-application.mCamera.vx, c2y-application.mCamera.vy));
             // animate lens and camera simultaneously (lens will die at the end)
-            //	    VirtualSpaceManager.INSTANCE.getAnimationManager().createLensAnimation(LENS_ANIM_TIME, AnimManager.LS_MM_LIN, new Float(-MAG_FACTOR+1),
-            //					     lens.getID(), new ZP2LensAction(this));
+            //      VirtualSpaceManager.INSTANCE.getAnimationManager().createLensAnimation(LENS_ANIM_TIME, AnimManager.LS_MM_LIN, new Float(-MAG_FACTOR+1),
+            //                       lens.getID(), new ZP2LensAction(this));
             Animation al = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens,
                 new Float(-MAG_FACTOR+1), true, IdentityInterpolator.getInstance(), new ZP2LensAction(this));
-            //	    VirtualSpaceManager.INSTANCE.getAnimationManager().createCameraAnimation(LENS_ANIM_TIME, AnimManager.CA_ALT_TRANS_LIN,
-            //					       cadata, application.mCamera.getID(), null);
+            //      VirtualSpaceManager.INSTANCE.getAnimationManager().createCameraAnimation(LENS_ANIM_TIME, AnimManager.CA_ALT_TRANS_LIN,
+            //                         cadata, application.mCamera.getID(), null);
             Animation at = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createCameraTranslation(LENS_ANIM_TIME, application.mCamera,
                 new Point2D.Double(c2x-application.mCamera.vx, c2y-application.mCamera.vy), true, IdentityInterpolator.getInstance(), null);
             Animation aa = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createCameraAltAnim(LENS_ANIM_TIME, application.mCamera,
@@ -250,16 +250,16 @@ class NavigationManager {
         else {
             Float actualDeltAlt = new Float(FLOOR_ALTITUDE - cameraAbsAlt);
             double ratio = actualDeltAlt.floatValue() / deltAlt.floatValue();
-            //	    cadata.add(actualDeltAlt);
-            //	    cadata.add(new LongPoint(Math.round((c2x-application.mCamera.vx)*ratio),
-            //				     Math.round((c2y-application.mCamera.vy)*ratio)));
+            //      cadata.add(actualDeltAlt);
+            //      cadata.add(new LongPoint(Math.round((c2x-application.mCamera.vx)*ratio),
+            //                   Math.round((c2y-application.mCamera.vy)*ratio)));
             // animate lens and camera simultaneously (lens will die at the end)
-            //	    VirtualSpaceManager.INSTANCE.getAnimationManager().createLensAnimation(LENS_ANIM_TIME, AnimManager.LS_MM_LIN, new Float(-MAG_FACTOR+1),
-            //					     lens.getID(), new ZP2LensAction(this));
+            //      VirtualSpaceManager.INSTANCE.getAnimationManager().createLensAnimation(LENS_ANIM_TIME, AnimManager.LS_MM_LIN, new Float(-MAG_FACTOR+1),
+            //                       lens.getID(), new ZP2LensAction(this));
             Animation al = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens,
                 new Float(-MAG_FACTOR+1), true, IdentityInterpolator.getInstance(), new ZP2LensAction(this));
             //      VirtualSpaceManager.INSTANCE.getAnimationManager().createCameraAnimation(LENS_ANIM_TIME, AnimManager.CA_ALT_TRANS_LIN,
-            //  				       cadata, application.mCamera.getID(), null);
+            //                         cadata, application.mCamera.getID(), null);
             Animation at = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createCameraTranslation(LENS_ANIM_TIME, application.mCamera,
                 new Point2D.Double((c2x-application.mCamera.vx)*ratio, (c2y-application.mCamera.vy)*ratio), true, IdentityInterpolator.getInstance(), null);
             Animation aa = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createCameraAltAnim(LENS_ANIM_TIME, application.mCamera,
@@ -381,18 +381,18 @@ class NavigationManager {
         }
         return res;
     }
-    
+
 }
 
 class ZP2LensAction implements EndAction {
 
     NavigationManager nm;
-    
+
     ZP2LensAction(NavigationManager nm){
-	    this.nm = nm;
+        this.nm = nm;
     }
-    
-    public void	execute(Object subject, Animation.Dimension dimension){
+
+    public void execute(Object subject, Animation.Dimension dimension){
         ((Lens)subject).getOwningView().setLens(null);
         ((Lens)subject).dispose();
         nm.setMagFactor(NavigationManager.DEFAULT_MAG_FACTOR);
@@ -400,5 +400,5 @@ class ZP2LensAction implements EndAction {
         nm.setLens(NavigationManager.NO_LENS);
         nm.application.sm.setUpdateLevel(true);
     }
-    
+
 }

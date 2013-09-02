@@ -42,13 +42,13 @@ import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
 
 class GeoToolsManager {
-    
+
     static final double CC = 21600 * 2 / 180.0;
 
     static final Color COUNTRY_COLOR = new Color(245,255,157);
     static final Color COUNTRY_FILL_HIGHLIGHT_COLOR = Color.GREEN;
     static final Color ADMIN_DIV_1_COLOR = new Color(151,255,151);
-    
+
     /* type of administrative division (0=country, 1= state, province, ...) */
     static final String LAD0 = "AD0";
     static final String LAD1 = "AD1";
@@ -57,13 +57,13 @@ class GeoToolsManager {
 
     WorldExplorer application;
     GeoNamesParser gnp;
-    
+
     static final short[] transitions = {Region.APPEAR, Region.APPEAR, Region.DISAPPEAR, Region.DISAPPEAR};
 
     int polygonID = 0;
-    
+
     boolean isShowing = false;
-    
+
     GeoToolsManager(WorldExplorer app, boolean queryGN, short lad){
         this.application = app;
         gnp = new GeoNamesParser(application);
@@ -79,7 +79,7 @@ class GeoToolsManager {
             loadShapes(new File("data/shapefiles/china/CHN1.shp"), "Loading Chinese administrative divisions...", ADMIN_DIV_1_COLOR, LAD1);
         }
         if (queryGN){
-            loadEntities();            
+            loadEntities();
         }
     }
 
@@ -103,7 +103,7 @@ class GeoToolsManager {
                 int i = 0;
                 while(fi.hasNext()){
                     SimpleFeature f = fi.next();
-                    Geometry geometry = (Geometry)f.getDefaultGeometry();                    
+                    Geometry geometry = (Geometry)f.getDefaultGeometry();
                     Object[] polygons = PolygonExtracter.getPolygons(geometry).toArray();
                     for (int k=0;k<polygons.length;k++){
                         Geometry simplifiedPolygon = DouglasPeuckerSimplifier.simplify((Geometry)polygons[k], 0.01);
@@ -155,11 +155,11 @@ class GeoToolsManager {
         }
         isShowing = true;
     }
-    
+
     void toggleCountryDisplay(){
         showCountries(!isShowing);
     }
-    
+
     void showCountries(boolean b){
         Vector<Glyph> boundaries = application.bSpace.getGlyphsOfType(LAD0);
         for (final Glyph g:boundaries){
@@ -167,7 +167,7 @@ class GeoToolsManager {
                 application.bSpace.show(g);
             }
             else {
-                application.bSpace.hide(g);                
+                application.bSpace.hide(g);
             }
         }
         boundaries = application.bSpace.getGlyphsOfType(LAD1);
@@ -176,7 +176,7 @@ class GeoToolsManager {
                 application.bSpace.show(g);
             }
             else {
-                application.bSpace.hide(g);                
+                application.bSpace.hide(g);
             }
         }
         Vector<Glyph> ctryNames = application.bSpace.getGlyphsOfType(CTRY);
@@ -191,7 +191,7 @@ class GeoToolsManager {
                 Animation a = application.vsm.getAnimationManager().getAnimationFactory().createTranslucencyAnim(NavigationManager.ANIM_MOVE_DURATION, g,
                     0, false, IdentityInterpolator.getInstance(),
                     new EndAction(){
-                        public void	execute(Object subject, Animation.Dimension dimension){
+                        public void execute(Object subject, Animation.Dimension dimension){
                             application.bSpace.hide(g);
                         }
                     });
@@ -200,7 +200,7 @@ class GeoToolsManager {
         }
         isShowing = b;
     }
-    
+
     void loadEntities(){
         application.gp.setValue(10);
         application.gp.setLabel("Loading GeoNames features");

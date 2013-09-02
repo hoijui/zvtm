@@ -89,7 +89,7 @@ public class WildWorldExplorer extends WorldExplorer {
         bSpace = vsm.addVirtualSpace(bSpaceName);
         mCamera = mSpace.addCamera();
         ovCamera = mSpace.addCamera();
-		bCamera = bSpace.addCamera();
+        bCamera = bSpace.addCamera();
         Vector cameras = new Vector();
         cameras.add(mCamera);
         cameras.add(bCamera);
@@ -101,20 +101,20 @@ public class WildWorldExplorer extends WorldExplorer {
         else {
             mView.setVisible(true);
         }
-		mView.setAntialiasing(aa);
+        mView.setAntialiasing(aa);
         eh = new ExplorerEventHandler(this);
         mCamera.addListener(eh);
         mView.setListener(eh, 0);
         mView.setListener(eh, 1);
         mView.setBackgroundColor(BACKGROUND_COLOR);
-		mView.getCursor().setColor(Color.WHITE);
-		mView.getCursor().setHintColor(Color.WHITE);
-		//mView.getCursor().setDynaSpotColor(Color.WHITE);
+        mView.getCursor().setColor(Color.WHITE);
+        mView.getCursor().setHintColor(Color.WHITE);
+        //mView.getCursor().setDynaSpotColor(Color.WHITE);
         //mView.getCursor().setDynaSpotLagTime(200);
-		//mView.getCursor().activateDynaSpot(true);
+        //mView.getCursor().activateDynaSpot(true);
         mView.setJava2DPainter(this, Java2DPainter.AFTER_PORTALS);
         updatePanelSize();
-        
+
         ClusterGeometry cg = new ClusterGeometry(2760, 1800, 8, 4);
         //ClusterGeometry cg = new ClusterGeometry(600,400,1,1);
         Vector ccameras = new Vector();
@@ -123,7 +123,7 @@ public class WildWorldExplorer extends WorldExplorer {
         ClusteredView cv = new ClusteredView(cg, 3, 8, 4, ccameras);
         //ClusteredView cv = new ClusteredView(cg, 0, 1, 1, ccameras);
         vsm.addClusteredView(cv);
-        
+
         // console
         JLayeredPane lp = ((JFrame)mView.getFrame()).getRootPane().getLayeredPane();
         console = new TranslucentTextArea(2, 80);
@@ -136,32 +136,32 @@ public class WildWorldExplorer extends WorldExplorer {
         mView.setActiveLayer(1);
         mView.getPanel().getComponent().addComponentListener(eh);
     }
-    
+
     boolean isDynaspotEnabled(){
         return false;
     }
 
     public static void main(String[] args){
         File xmlSceneFile = null;
-		boolean fs = false;
-		boolean ogl = false;
-		boolean aa = false;
-		boolean queryGN = false;
-		short lad = -1;
-		boolean air = false;
-		for (int i=0;i<args.length;i++){
-			if (args[i].startsWith("-")){
-				if (args[i].substring(1).equals("fs")){fs = true;}
-				else if (args[i].substring(1).equals("opengl")){ogl = true;}
-				else if (args[i].substring(1).equals("aa")){aa = true;}
-				else if (args[i].substring(1).equals("qgn")){queryGN = true;}
-				else if (args[i].substring(1).startsWith("lad")){lad = Short.parseShort(args[i].substring(4));}
-				else if (args[i].substring(1).startsWith("air")){
-				    air = true;
-				    if (args[i].length() > 4){AirTrafficManager.MIN_WEIGHT = Integer.parseInt(args[i].substring(4));}
-				}
-				else if (args[i].substring(1).equals("h") || args[i].substring(1).equals("--help")){WorldExplorer.printCmdLineHelp();System.exit(0);}
-			}
+        boolean fs = false;
+        boolean ogl = false;
+        boolean aa = false;
+        boolean queryGN = false;
+        short lad = -1;
+        boolean air = false;
+        for (int i=0;i<args.length;i++){
+            if (args[i].startsWith("-")){
+                if (args[i].substring(1).equals("fs")){fs = true;}
+                else if (args[i].substring(1).equals("opengl")){ogl = true;}
+                else if (args[i].substring(1).equals("aa")){aa = true;}
+                else if (args[i].substring(1).equals("qgn")){queryGN = true;}
+                else if (args[i].substring(1).startsWith("lad")){lad = Short.parseShort(args[i].substring(4));}
+                else if (args[i].substring(1).startsWith("air")){
+                    air = true;
+                    if (args[i].length() > 4){AirTrafficManager.MIN_WEIGHT = Integer.parseInt(args[i].substring(4));}
+                }
+                else if (args[i].substring(1).equals("h") || args[i].substring(1).equals("--help")){WorldExplorer.printCmdLineHelp();System.exit(0);}
+            }
             else {
                 // the only other thing allowed as a cmd line param is a scene file
                 File f = new File(args[i]);
@@ -176,11 +176,11 @@ public class WildWorldExplorer extends WorldExplorer {
                         }
                     }
                     else {
-                        xmlSceneFile = f;                        
+                        xmlSceneFile = f;
                     }
                 }
             }
-		}
+        }
         if (!fs && Utils.osIsMacOS()){
             System.setProperty("apple.laf.useScreenMenuBar", "true");
         }
