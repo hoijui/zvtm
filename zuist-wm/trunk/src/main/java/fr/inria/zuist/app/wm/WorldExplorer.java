@@ -64,6 +64,9 @@ import org.geotools.factory.GeoTools;
 import org.geonames.Toponym;
 import org.geonames.InsufficientStyleException;
 
+import org.kohsuke.args4j.CmdLineException;
+import org.kohsuke.args4j.CmdLineParser;
+
 /**
  * @author Emmanuel Pietriga
  */
@@ -111,11 +114,10 @@ public class WorldExplorer implements Java2DPainter {
 
     boolean antialiasing = false;
 
-    public WorldExplorer(boolean queryGN, short lad, boolean air,
-                         boolean fullscreen, boolean opengl, boolean aa, File xmlSceneFile){
+    public WorldExplorer(WEOptions options, File xmlSceneFile){
         VirtualSpaceManager.INSTANCE.getAnimationManager().setResolution(80);
         nm = new NavigationManager(this);
-        initGUI(fullscreen, opengl, aa);
+        initGUI(options);
         gp = new WEGlassPane(this);
         ((JFrame)mView.getFrame()).setGlassPane(gp);
         gp.setValue(0);
@@ -127,8 +129,8 @@ public class WorldExplorer implements Java2DPainter {
             gp.setLabel("Loading "+xmlSceneFile.getName());
             sm.loadScene(parseXML(xmlSceneFile), xmlSceneFile.getParentFile(), true, gp);
         }
-        gm = new GeoToolsManager(this, queryGN, lad);
-        ga = new AirTrafficManager(this, air);
+        gm = new GeoToolsManager(this, options.queryGN, options.lad);
+        ga = new AirTrafficManager(this, options.air);
         gp.setVisible(false);
         gp.setLabel(WEGlassPane.EMPTY_STRING);
         mCamera.setAltitude(9000.0f);
@@ -145,9 +147,9 @@ public class WorldExplorer implements Java2DPainter {
         console.setVisible(true);
     }
 
-    void initGUI(boolean fullscreen, boolean opengl, boolean aa){
+    void initGUI(WEOptions options){
         windowLayout();
-        antialiasing = aa;
+        antialiasing = !options.noaa;
         vsm = VirtualSpaceManager.INSTANCE;
         mSpace = vsm.addVirtualSpace(mSpaceName);
         bSpace = vsm.addVirtualSpace(bSpaceName);
@@ -158,8 +160,8 @@ public class WorldExplorer implements Java2DPainter {
         cameras.add(mCamera);
         cameras.add(bCamera);
         //mCamera.stick(bCamera, true);
-        mView = vsm.addFrameView(cameras, mViewName, (opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, !fullscreen, null);
-        if (fullscreen && GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().isFullScreenSupported()){
+        mView = vsm.addFrameView(cameras, mViewName, (options.opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, !options.fullscreen, null);
+        if (options.fullscreen && GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().isFullScreenSupported()){
             GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow((JFrame)mView.getFrame());
         }
         else {
@@ -346,51 +348,22 @@ public class WorldExplorer implements Java2DPainter {
     }
 
     public static void main(String[] args){
-        File xmlSceneFile = null;
-        boolean fs = false;
-        boolean ogl = false;
-        boolean aa = false;
-        boolean queryGN = false;
-        short lad = -1;
-        boolean air = false;
-        for (int i=0;i<args.length;i++){
-            if (args[i].startsWith("-")){
-                if (args[i].substring(1).equals("fs")){fs = true;}
-                else if (args[i].substring(1).equals("opengl")){ogl = true;}
-                else if (args[i].substring(1).equals("aa")){aa = true;}
-                else if (args[i].substring(1).equals("qgn")){queryGN = true;}
-                else if (args[i].substring(1).startsWith("lad")){lad = Short.parseShort(args[i].substring(4));}
-                else if (args[i].substring(1).startsWith("air")){
-                    air = true;
-                    if (args[i].length() > 4){AirTrafficManager.MIN_WEIGHT = Integer.parseInt(args[i].substring(4));}
-                }
-                else if (args[i].substring(1).equals("h") || args[i].substring(1).equals("--help")){WorldExplorer.printCmdLineHelp();System.exit(0);}
-            }
-            else {
-                // the only other thing allowed as a cmd line param is a scene file
-                File f = new File(args[i]);
-                if (f.exists()){
-                    if (f.isDirectory()){
-                        // if arg is a directory, take first xml file we find in that directory
-                        String[] xmlFiles = f.list(new FilenameFilter(){
-                                                public boolean accept(File dir, String name){return name.endsWith(".xml");}
-                                            });
-                        if (xmlFiles.length > 0){
-                            xmlSceneFile = new File(f, xmlFiles[0]);
-                        }
-                    }
-                    else {
-                        xmlSceneFile = f;
-                    }
-                }
-            }
+        WEOptions options = new WEOptions();
+        CmdLineParser parser = new CmdLineParser(options);
+        try {
+            parser.parseArgument(args);
+        } catch(CmdLineException ex){
+            System.err.println(ex.getMessage());
+            parser.printUsage(System.err);
+            return;
         }
-        if (!fs && Utils.osIsMacOS()){
+        File xmlSceneFile = (options.path_to_zuist_map != null) ? new File(options.path_to_zuist_map) : null;
+        if (!options.fullscreen && Utils.osIsMacOS()){
             System.setProperty("apple.laf.useScreenMenuBar", "true");
         }
         System.out.println("--help for command line options");
         System.out.println("Using GeoTools v" + GeoTools.getVersion());
-        new WorldExplorer(queryGN, lad, air, fs, ogl, aa, xmlSceneFile);
+        new WorldExplorer(options, xmlSceneFile);
     }
 
 }

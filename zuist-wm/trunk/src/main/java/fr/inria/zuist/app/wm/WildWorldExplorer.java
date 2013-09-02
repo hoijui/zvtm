@@ -68,18 +68,20 @@ import org.geotools.factory.GeoTools;
 import org.geonames.Toponym;
 import org.geonames.InsufficientStyleException;
 
+import org.kohsuke.args4j.CmdLineException;
+import org.kohsuke.args4j.CmdLineParser;
+
 /**
  * @author Emmanuel Pietriga
  */
 
 public class WildWorldExplorer extends WorldExplorer {
 
-    public WildWorldExplorer(boolean queryGN, short lad, boolean air,
-                             boolean fullscreen, boolean opengl, boolean aa, File xmlSceneFile){
-        super(queryGN, lad, air, fullscreen, opengl, aa, xmlSceneFile);
+    public WildWorldExplorer(WEOptions options, File xmlSceneFile){
+        super(options, xmlSceneFile);
     }
 
-    void initGUI(boolean fullscreen, boolean opengl, boolean aa){
+    void initGUI(WEOptions options){
         AirTrafficManager.EDGE_STROKE_WIDTH = 4f;
         AirTrafficManager.MIN_ALPHA = .3f;
         windowLayout();
@@ -94,14 +96,14 @@ public class WildWorldExplorer extends WorldExplorer {
         cameras.add(mCamera);
         cameras.add(bCamera);
         //mCamera.stick(bCamera, true);
-        mView = vsm.addFrameView(cameras, mViewName, (opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, !fullscreen, null);
-        if (fullscreen && GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().isFullScreenSupported()){
+        mView = vsm.addFrameView(cameras, mViewName, (options.opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, !options.fullscreen, null);
+        if (options.fullscreen && GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().isFullScreenSupported()){
             GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow((JFrame)mView.getFrame());
         }
         else {
             mView.setVisible(true);
         }
-        mView.setAntialiasing(aa);
+        mView.setAntialiasing(!options.noaa);
         eh = new ExplorerEventHandler(this);
         mCamera.addListener(eh);
         mView.setListener(eh, 0);
@@ -115,13 +117,11 @@ public class WildWorldExplorer extends WorldExplorer {
         mView.setJava2DPainter(this, Java2DPainter.AFTER_PORTALS);
         updatePanelSize();
 
-        ClusterGeometry cg = new ClusterGeometry(2760, 1800, 8, 4);
-        //ClusterGeometry cg = new ClusterGeometry(600,400,1,1);
+        ClusterGeometry cg = new ClusterGeometry(options.blockWidth, options.blockHeight, options.numCols, options.numRows);
         Vector ccameras = new Vector();
         ccameras.add(mCamera);
         ccameras.add(bCamera);
-        ClusteredView cv = new ClusteredView(cg, 3, 8, 4, ccameras);
-        //ClusteredView cv = new ClusteredView(cg, 0, 1, 1, ccameras);
+        ClusteredView cv = new ClusteredView(cg, options.numRows-1, options.numCols, options.numRows, ccameras);
         vsm.addClusteredView(cv);
 
         // console
@@ -142,51 +142,23 @@ public class WildWorldExplorer extends WorldExplorer {
     }
 
     public static void main(String[] args){
-        File xmlSceneFile = null;
-        boolean fs = false;
-        boolean ogl = false;
-        boolean aa = false;
-        boolean queryGN = false;
-        short lad = -1;
-        boolean air = false;
-        for (int i=0;i<args.length;i++){
-            if (args[i].startsWith("-")){
-                if (args[i].substring(1).equals("fs")){fs = true;}
-                else if (args[i].substring(1).equals("opengl")){ogl = true;}
-                else if (args[i].substring(1).equals("aa")){aa = true;}
-                else if (args[i].substring(1).equals("qgn")){queryGN = true;}
-                else if (args[i].substring(1).startsWith("lad")){lad = Short.parseShort(args[i].substring(4));}
-                else if (args[i].substring(1).startsWith("air")){
-                    air = true;
-                    if (args[i].length() > 4){AirTrafficManager.MIN_WEIGHT = Integer.parseInt(args[i].substring(4));}
-                }
-                else if (args[i].substring(1).equals("h") || args[i].substring(1).equals("--help")){WorldExplorer.printCmdLineHelp();System.exit(0);}
-            }
-            else {
-                // the only other thing allowed as a cmd line param is a scene file
-                File f = new File(args[i]);
-                if (f.exists()){
-                    if (f.isDirectory()){
-                        // if arg is a directory, take first xml file we find in that directory
-                        String[] xmlFiles = f.list(new FilenameFilter(){
-                                                public boolean accept(File dir, String name){return name.endsWith(".xml");}
-                                            });
-                        if (xmlFiles.length > 0){
-                            xmlSceneFile = new File(f, xmlFiles[0]);
-                        }
-                    }
-                    else {
-                        xmlSceneFile = f;
-                    }
-                }
-            }
+        //new Viewer(true, fs, ogl, aa, xmlSceneFile);
+        WEOptions options = new WEOptions();
+        CmdLineParser parser = new CmdLineParser(options);
+        try {
+            parser.parseArgument(args);
+        } catch(CmdLineException ex){
+            System.err.println(ex.getMessage());
+            parser.printUsage(System.err);
+            return;
         }
-        if (!fs && Utils.osIsMacOS()){
+        File xmlSceneFile = (options.path_to_zuist_map != null) ? new File(options.path_to_zuist_map) : null;
+        if (!options.fullscreen && Utils.osIsMacOS()){
             System.setProperty("apple.laf.useScreenMenuBar", "true");
         }
         System.out.println("--help for command line options");
         System.out.println("Using GeoTools v" + GeoTools.getVersion());
-        new WildWorldExplorer(queryGN, lad, air, fs, ogl, aa, xmlSceneFile);
+        new WildWorldExplorer(options, xmlSceneFile);
     }
 
 }

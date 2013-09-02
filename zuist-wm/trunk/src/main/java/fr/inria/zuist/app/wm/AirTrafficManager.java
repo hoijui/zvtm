@@ -71,10 +71,11 @@ class AirTrafficManager {
 
     AnimationManager AM;
 
-    AirTrafficManager(WorldExplorer app, boolean show){
+    AirTrafficManager(WorldExplorer app, int air){
         this.application = app;
+        AirTrafficManager.MIN_WEIGHT = air;
         AM = VirtualSpaceManager.INSTANCE.getAnimationManager();
-        if (show){
+        if (AirTrafficManager.MIN_WEIGHT > 0){
             System.out.println("Loading air traffic information...");
             loadTraffic(loadAirports());
         }
