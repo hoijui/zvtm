@@ -338,19 +338,19 @@ public aspect GlyphCreation {
     }
 
     private static class VCircleReplicator extends ClosedShapeReplicator {
-        private final double radius;
+        private final double size;
 
         VCircleReplicator(VCircle source){
             super(source);
-            this.radius = source.getSize();
+            this.size = source.getSize();
         }
 
         public Glyph doCreateGlyph(){
-            return new VCircle(0d,0d,0,radius,Color.BLACK);
+            return new VCircle(0d,0d,0,size,Color.BLACK);
         }
 
         @Override public String toString(){
-            return "VCircleReplicator, radius=" + radius;
+            return "VCircleReplicator, size=" + size;
         }
     }
 
@@ -425,30 +425,30 @@ public aspect GlyphCreation {
     }
 
     private static class SIRectangleReplicator extends ClosedShapeReplicator {
-        private final double halfWidth;
-        private final double halfHeight;
+        private final double width;
+        private final double height;
 
         SIRectangleReplicator(SIRectangle source){
             super(source);
-            this.halfWidth = source.getWidth();
-            this.halfHeight = source.getHeight();
+            this.width = source.getWidth();
+            this.height = source.getHeight();
         }
 
         public Glyph doCreateGlyph(){
-            return new SIRectangle(0d,0d,0,halfWidth,halfHeight,Color.BLACK);
+            return new SIRectangle(0d,0d,0,width,height,Color.BLACK);
         }
     }
 
     private static class SICircleReplicator extends ClosedShapeReplicator {
-        private final double radius;
+        private final double size;
 
         SICircleReplicator(SICircle source){
             super(source);
-            this.radius = source.getSize();
+            this.size = source.getSize();
         }
 
         public Glyph doCreateGlyph(){
-            return new SICircle(0d,0d,0,radius,Color.BLACK);
+            return new SICircle(0d,0d,0,size,Color.BLACK);
         }
     }
 
