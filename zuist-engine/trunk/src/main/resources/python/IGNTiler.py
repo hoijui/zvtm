@@ -122,12 +122,12 @@ def processSrcDir():
             maxRow = row
         if row < minRow:
             minRow = row
-    log("Processing Columns %s-%s x Rows %s-%s" % (minCol, maxCol, minRow, maxRow), 2)
+    log("Processing Columns %s-%s x Rows %s-%s" % (minCol, maxCol, minRow, maxRow), 1)
     counter = 0
     for tiffFile in TIFF_FILES:
         counter = counter + 1
-        log("Subtiling: %s" % tiffFile.split("/")[-1], 1)
-        log("--- %3.1f%%" % (100 * counter/float(len(TIFF_FILES))), 1)
+        log("Subtiling: %s" % tiffFile.split("/")[-1], 2)
+        log("--- %3.1f%%" % (100 * counter/float(len(TIFF_FILES))), 2)
         tileTile(tiffFile)
     # serialize the XML tree
     tree = ET.ElementTree(outputroot)
@@ -142,11 +142,30 @@ def tileTile(tiffFile):
     col = int(tokens[-3])
     row = int(tokens[-2])
     # load tile
-
+    im = CGImageImport(CGDataProviderCreateWithFilename(tiffFile))
+    src_sz = (im.getWidth(), im.getHeight())
+    if src_sz[0] != SRC_TILE_SIZE or src_sz[1] != SRC_TILE_SIZE:
+        log("WARNING: unexpected tile dimensions: (%d,%d) for %s" % (src_sz[0], src_sz[1], tiffFile.split("/")[-1]))
     # split it in NB_SUBTILES x NB_SUBTILES tiles
+    tileDir = "%s/%d_%d" % (TGT_DIR, col, row)
+    if not os.path.exists(tileDir):
+        log("Creating tile directory %s" % tileDir, 3)
+        os.mkdir(tileDir)
     for i in range(NB_SUBTILES):
         for j in range(NB_SUBTILES):
-            pass
+            subTileName = "%d_%d-%d_%d" % (col, row, i, NB_SUBTILES-j-1)
+            subTilePath = "%s/%s.%s" % (tileDir, subTileName, OUTPUT_FILE_EXT)
+            if os.path.exists(subTilePath) and not FORCE_GENERATE_TILES:
+                log("%s already exists (skipped)" % (subTilePath), 2)
+            else:
+                log("Generating tile %s" % (subTilePath), 2)
+                log("Cropping at (%d,%d,%d,%d)" % (i*TGT_TILE_SIZE, j*TGT_TILE_SIZE, TGT_TILE_SIZE, TGT_TILE_SIZE), 3)
+                cim = im.createWithImageInRect(CGRectMake(i*TGT_TILE_SIZE, j*TGT_TILE_SIZE, TGT_TILE_SIZE, TGT_TILE_SIZE))
+                bitmap = CGBitmapContextCreateWithColor(TGT_TILE_SIZE, TGT_TILE_SIZE, COLOR_SPACE, CGFloatArray(4))
+                bitmap.setInterpolationQuality(kCGInterpolationHigh)
+                rect = CGRectMake(0, 0, TGT_TILE_SIZE, TGT_TILE_SIZE)
+                bitmap.drawImage(rect, cim)
+                bitmap.writeToFile(subTilePath, kCGImageFormatPNG)
 
 ################################################################################
 # Trace exec on std output
