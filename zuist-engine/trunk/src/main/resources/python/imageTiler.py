@@ -113,7 +113,7 @@ def computeMaxTileCount(i, sum):
         return computeMaxTileCount(i-1, sum+math.pow(4,i))
     else:
         return sum + 1
-        
+
 ################################################################################
 # Count number of levels in ZUIST scene
 # (source image size from PIL, parent XML element)
@@ -186,7 +186,7 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
         return
     if os.path.exists(tilePath) and not FORCE_GENERATE_TILES:
         log("---- %.2f%%\n%s already exists (skipped)" % (PROGRESS/float(maxTileCount)*100, tilePath), 2)
-    else:    
+    else:
         log("---- %.2f%%\nGenerating tile %s" % (PROGRESS/float(maxTileCount)*100, tileIDstr), 2)
         if USE_CG:
             # this will work only with a Mac
@@ -245,7 +245,7 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
     buildTiles(tileID, BL, level+1, levelCount, x, y+TILE_SIZE*scale/2, src_sz, rootEL, im, regionEL.get("id"))
     # call to lower level, bottom right
     buildTiles(tileID, BR, level+1, levelCount, x+TILE_SIZE*scale/2, y+TILE_SIZE*scale/2, src_sz, rootEL, im, regionEL.get("id"))
-    
+
 ################################################################################
 # Create tiles and ZUIST XML scene from source image
 ################################################################################
