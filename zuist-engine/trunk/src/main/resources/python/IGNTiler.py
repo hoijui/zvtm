@@ -41,11 +41,14 @@ NB_SUBTILES = SRC_TILE_SIZE / TGT_TILE_SIZE
 
 OUTPUT_FILE_EXT = "png"
 
-PROGRESS = 0
-
 COLOR_SPACE = None
 
 FORCE_GENERATE_TILES = False
+
+# camera focal distance
+F = 100.0
+# camera max altitude
+MAX_ALT = "100000"
 
 ################################################################################
 # Create target directory if it does not exist yet
@@ -77,22 +80,11 @@ def generateLevels(src_sz, rootEL):
         depth = int(res-i-1)
         altitudes.append(int(F*math.pow(2,i+1)-F))
         level = ET.SubElement(rootEL, "level")
-        level.set("depth", str(depth+DL))
+        level.set("depth", str(depth))
         level.set("floor", str(altitudes[-2]))
         level.set("ceiling", str(altitudes[-1]))
-    if DL == 0:
-        # fix max scene altitude (for highest region)
-        level.set("ceiling", MAX_ALT)
-    else:
-        # log2 slice of unused space between declared MAX_ALT and actual max alt
-        # for empty levels (exist if DL > 0)
-        faltitudes = [int(MAX_ALT),]
-        for i in range(DL):
-            faltitudes.append((faltitudes[-1]-altitudes[-1])/2)
-            level = ET.SubElement(rootEL, "level")
-            level.set("depth", str(i))
-            level.set("floor", str(faltitudes[-1]))
-            level.set("ceiling", str(faltitudes[-2]))
+    # fix max scene altitude (for highest region)
+    level.set("ceiling", MAX_ALT)
     return res
 
 ################################################################################
@@ -104,31 +96,37 @@ def processSrcDir():
     outputroot = ET.Element("scene")
     # walk src dir
     TIFF_FILES = glob.glob("%s/*.tif" % SRC_DIR)
-    tokens = TIFF_FILES[0].split("_")
-    # seek min/max cols/rows
-    minCol = int(tokens[-3])
-    maxCol = int(tokens[-3])
-    minRow = int(tokens[-2])
-    maxRow = int(tokens[-2])
-    for tiffFile in TIFF_FILES[1:]:
-        tokens = tiffFile.split("_")
-        col = int(tokens[-3])
-        if col > maxCol:
-            maxCol = col
-        if col < minCol:
-            minCol = col
-        row = int(tokens[-2])
-        if row > maxRow:
-            maxRow = row
-        if row < minRow:
-            minRow = row
-    log("Processing Columns %s-%s x Rows %s-%s" % (minCol, maxCol, minRow, maxRow), 1)
     counter = 0
     for tiffFile in TIFF_FILES:
         counter = counter + 1
         log("Subtiling: %s" % tiffFile.split("/")[-1], 2)
         log("--- %3.1f%%" % (100 * counter/float(len(TIFF_FILES))), 2)
         tileTile(tiffFile)
+
+    L0_TILE_DIRS = os.listdir("%s/L0" % TGT_DIR)
+    print L0_TILE_DIRS[0]
+    tokens = L0_TILE_DIRS[0].split("_")
+    # seek min/max cols/rows
+    minCol = int(tokens[0])
+    maxCol = int(tokens[0])
+    minRow = int(tokens[1])
+    maxRow = int(tokens[1])
+    for tileDir in L0_TILE_DIRS[1:]:
+        tokens = tileDir.split("_")
+        col = int(tokens[0])
+        if col > maxCol:
+            maxCol = col
+        if col < minCol:
+            minCol = col
+        row = int(tokens[1])
+        if row > maxRow:
+            maxRow = row
+        if row < minRow:
+            minRow = row
+    log("Processing Columns %s-%s x Rows %s-%s" % (minCol, maxCol, minRow, maxRow), 1)
+
+
+
     # serialize the XML tree
     tree = ET.ElementTree(outputroot)
     log("Writing %s" % outputSceneFile)
@@ -147,18 +145,21 @@ def tileTile(tiffFile):
     if src_sz[0] != SRC_TILE_SIZE or src_sz[1] != SRC_TILE_SIZE:
         log("WARNING: unexpected tile dimensions: (%d,%d) for %s" % (src_sz[0], src_sz[1], tiffFile.split("/")[-1]))
     # split it in NB_SUBTILES x NB_SUBTILES tiles
-    tileDir = "%s/%d_%d" % (TGT_DIR, col, row)
+    tileDir = "%s/L0/%d_%d" % (TGT_DIR, col, row)
     if not os.path.exists(tileDir):
         log("Creating tile directory %s" % tileDir, 3)
+        L0dir = "%s/L0" % (TGT_DIR)
+        if not os.path.exists(L0dir):
+            os.mkdir(L0dir)
         os.mkdir(tileDir)
     for i in range(NB_SUBTILES):
         for j in range(NB_SUBTILES):
             subTileName = "%d_%d-%d_%d" % (col, row, i, NB_SUBTILES-j-1)
             subTilePath = "%s/%s.%s" % (tileDir, subTileName, OUTPUT_FILE_EXT)
             if os.path.exists(subTilePath) and not FORCE_GENERATE_TILES:
-                log("%s already exists (skipped)" % (subTilePath), 2)
+                log("%s already exists (skipped)" % (subTilePath), 3)
             else:
-                log("Generating tile %s" % (subTilePath), 2)
+                log("Generating tile %s" % (subTilePath), 3)
                 log("Cropping at (%d,%d,%d,%d)" % (i*TGT_TILE_SIZE, j*TGT_TILE_SIZE, TGT_TILE_SIZE, TGT_TILE_SIZE), 3)
                 cim = im.createWithImageInRect(CGRectMake(i*TGT_TILE_SIZE, j*TGT_TILE_SIZE, TGT_TILE_SIZE, TGT_TILE_SIZE))
                 bitmap = CGBitmapContextCreateWithColor(TGT_TILE_SIZE, TGT_TILE_SIZE, COLOR_SPACE, CGFloatArray(4))
