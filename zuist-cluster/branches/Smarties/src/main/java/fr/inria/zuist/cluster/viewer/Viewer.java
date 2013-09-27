@@ -85,6 +85,9 @@ import org.xml.sax.SAXException;
 
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
+
+
+
 /**
  * @author Emmanuel Pietriga
  * @author Romain Primet
@@ -135,81 +138,91 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 
     private final boolean standalone;
 
-	OverlayManager ovm;
-	VWGlassPane gp;
-	PieMenu mainPieMenu;
+    OverlayManager ovm;
+    VWGlassPane gp;
+    PieMenu mainPieMenu;
 
     private WallCursor wallCursor; //cursor, and zoom center
     private Point panStart;
 
     //Toggle view bezels on/off
-    private void toggleClusterView(){
-        VirtualSpaceManager.INSTANCE.destroyClusteredView(clusteredView);
-        sceneUnderBezels = !sceneUnderBezels;
-        if(sceneUnderBezels){
-            clusteredView = new ClusteredView(
-                    withBezels,
-                    3, //origin (block number)
-                    8, //use complete
-                    4, //cluster surface
-                    sceneCam);
-        } else {
-            clusteredView = new ClusteredView(
-                    withoutBezels,
-                    3, //origin (block number)
-                    8, //use complete
-                    4, //cluster surface
-                    sceneCam);
-        }
-        VirtualSpaceManager.INSTANCE.addClusteredView(clusteredView);
+    private void toggleClusterView()
+    {
+	    VirtualSpaceManager.INSTANCE.destroyClusteredView(clusteredView);
+	    sceneUnderBezels = !sceneUnderBezels;
+	    if(sceneUnderBezels){
+		    clusteredView = new ClusteredView(
+			    withBezels,
+			    3, //origin (block number)
+			    8, //use complete
+			    4, //cluster surface
+			    sceneCam);
+	    } else {
+		    clusteredView = new ClusteredView(
+			    withoutBezels,
+			    3, //origin (block number)
+			    8, //use complete
+			    4, //cluster surface
+			    sceneCam);
+	    }
+	    VirtualSpaceManager.INSTANCE.addClusteredView(clusteredView);
     }
 
-    public Viewer(ViewerOptions options, File xmlSceneFile){
-        this.standalone = options.standalone;
-		ovm = new OverlayManager(this);
-		initGUI(options);
-        VirtualSpace[]  sceneSpaces = {mSpace};
-        Camera[] sceneCameras = {mCamera};
-        sm = new SceneManager(sceneSpaces, sceneCameras);
-        sm.setRegionListener(this);
-        sm.setLevelListener(this);
-		previousLocations = new Vector();
-		ovm.initConsole();
-        if (xmlSceneFile != null){
-            sm.enableRegionUpdater(false);
-			loadScene(xmlSceneFile);
-			EndAction ea  = new EndAction(){
-                   public void execute(Object subject, Animation.Dimension dimension){
-                       sm.setUpdateLevel(true);
-                       sm.enableRegionUpdater(true);
-                   }
-               };
-			getGlobalView(ea);
-		}
-		ovm.toggleConsole();
+    public Viewer(ViewerOptions options, File xmlSceneFile)
+    {
+	    this.standalone = options.standalone;
+	    ovm = new OverlayManager(this);
+	    initGUI(options);
+	    VirtualSpace[]  sceneSpaces = {mSpace};
+	    Camera[] sceneCameras = {mCamera};
+	    sm = new SceneManager(sceneSpaces, sceneCameras);
+	    sm.setRegionListener(this);
+	    sm.setLevelListener(this);
+	    previousLocations = new Vector();
+	    ovm.initConsole();
+	    if (xmlSceneFile != null){
+		    sm.enableRegionUpdater(false);
+		    loadScene(xmlSceneFile);
+		    EndAction ea  = new EndAction(){
+			    public void execute(Object subject, Animation.Dimension dimension){
+				    sm.setUpdateLevel(true);
+				    sm.enableRegionUpdater(true);
+			    }
+		    };
+		    getGlobalView(ea);
+	    }
+	    ovm.toggleConsole();
+
+	    vSmarties vs = new vSmarties(this);
     }
 
-    private void initGUI(ViewerOptions options){
+    private void initGUI(ViewerOptions options)
+    {
         windowLayout();
         vsm = VirtualSpaceManager.INSTANCE;
         vsm.setMaster("ZuistCluster");
         mSpace = vsm.addVirtualSpace(mSpaceName);
         VirtualSpace mnSpace = vsm.addVirtualSpace(mnSpaceName);
         mCamera = mSpace.addCamera();
-		mnSpace.addCamera().setAltitude(10);
+	mnSpace.addCamera().setAltitude(10);
         ovSpace = vsm.addVirtualSpace(ovSpaceName);
-		ovSpace.addCamera();
+	ovSpace.addCamera();
         cursorSpace = vsm.addVirtualSpace("cursorSpace");
         cursorCamera = cursorSpace.addCamera();
         Vector cameras = new Vector();
         cameras.add(mCamera);
         cameras.add(cursorCamera);
-		cameras.add(vsm.getVirtualSpace(mnSpaceName).getCamera(0));
-		cameras.add(vsm.getVirtualSpace(ovSpaceName).getCamera(0));
+	cameras.add(vsm.getVirtualSpace(mnSpaceName).getCamera(0));
+	cameras.add(vsm.getVirtualSpace(ovSpaceName).getCamera(0));
         if(options.standalone){
-            mView = vsm.addFrameView(cameras, mViewName, (options.opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, !options.fullscreen, initMenu());
+            mView = vsm.addFrameView(
+		    cameras, mViewName,
+		    (options.opengl) ? View.OPENGL_VIEW : View.STD_VIEW, 
+		    VIEW_W, VIEW_H, false, false, !options.fullscreen, initMenu());
         } else {
-            mView = vsm.addPanelView(cameras, mViewName, (options.opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H);
+		mView = vsm.addPanelView(
+			cameras, mViewName, (options.opengl) ? View.OPENGL_VIEW : View.STD_VIEW,
+			VIEW_W, VIEW_H);
         }
         sceneCam = new Vector<Camera>();
         sceneCam.add(mCamera);
@@ -219,83 +232,131 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
                 options.blockHeight,
                 options.numCols,
                 options.numRows);
-        withBezels = withoutBezels.addBezels(options.mullionWidth, 
-               options.mullionHeight);
-		clusteredView = 
-            new ClusteredView(
-                    withBezels,
-                    3, //origin (block number)
-                    options.numCols, //use complete
-                    options.numRows, //cluster surface
-                    sceneCam);
+        withBezels = withoutBezels.addBezels(options.mullionWidth,options.mullionHeight);
+	clusteredView = 
+		new ClusteredView(
+			withBezels,
+			3, //origin (block number)
+			options.numCols, //use complete
+			options.numRows, //cluster surface
+			sceneCam);
         clusteredView.setBackgroundColor(Color.GRAY);
         vsm.addClusteredView(clusteredView);
         wallCursor = new WallCursor(cursorSpace, 8, 120, Color.RED);
-        if (options.fullscreen){
-            GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow((JFrame)mView.getFrame());
+        if (options.fullscreen)
+	{
+		GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow(
+			(JFrame)mView.getFrame());
         }
-        else {
-            mView.setVisible(true);
+        else
+	{
+		mView.setVisible(true);
         }
         updatePanelSize();
-		gp = new VWGlassPane(this);
-		((JFrame)mView.getFrame()).setGlassPane(gp);
+	gp = new VWGlassPane(this);
+	((JFrame)mView.getFrame()).setGlassPane(gp);
         eh = new ViewerEventHandler(this);
         mView.setListener(eh, 0);
         mView.setListener(eh, 1);
         mView.setListener(ovm, 2);
-		mCamera.addListener(eh);
+	mCamera.addListener(eh);
         mView.setNotifyCursorMoved(true);
         mView.setBackgroundColor(Color.WHITE);
-		mView.setAntialiasing(!options.noaa);
-		mView.setJava2DPainter(this, Java2DPainter.AFTER_PORTALS);
-		mView.getPanel().getComponent().addComponentListener(eh);
-		ComponentAdapter ca0 = new ComponentAdapter(){
-			public void componentResized(ComponentEvent e){
-				updatePanelSize();
-			}
-		};
-		mView.getFrame().addComponentListener(ca0);
+	mView.setAntialiasing(!options.noaa);
+	mView.setJava2DPainter(this, Java2DPainter.AFTER_PORTALS);
+	mView.getPanel().getComponent().addComponentListener(eh);
+	ComponentAdapter ca0 = new ComponentAdapter(){
+		public void componentResized(ComponentEvent e){
+			updatePanelSize();
+		}
+	};
+	mView.getFrame().addComponentListener(ca0);
     }
 
-    /* external input section */
-
-    public void startPan(){
-        //set pan center
-        panStart = clusteredView.spaceToViewCoords(mCamera, wallCursor.getX(), wallCursor.getY());
+    public double getDisplayWidth()
+    {
+	    Dimension d;
+	    if(true)
+	    {
+		    d = mView.getPanelSize();
+	    }
+	    else
+	    {
+		    d = clusteredView.getSize();
+	    }
+	    return d.getWidth(); 
     }
 
-    /**
-     * @param xView
-     * @param yView
-     */
-    public void pan(int xView, int yView){
-        double a = (mCamera.focal + Math.abs(mCamera.altitude)) / mCamera.focal;
-        mCamera.moveTo(panStart.getX() + a*(panStart.getX() - xView), panStart.getY() + a*(yView - panStart.getY()));
+    public double getDisplayHeight()
+    {
+	     Dimension  d;
+	    if(true)
+	    {
+		    d = mView.getPanelSize();
+	    }
+	    else
+	    {
+		    d = clusteredView.getSize();
+	    }
+	     return d.getHeight(); 
     }
 
-    public void stopPan(){
+    /* (X Window) screen coordinate */
+    public void directTranslate(double x, double y)
+    {
+	    double a = (mCamera.focal+Math.abs(mCamera.altitude)) / mCamera.focal;
+
+	    Location l = mCamera.getLocation();
+	    double newx = l.getX()+a*x;
+	    double newy = l.getY()+a*y;
+	    
+	    mCamera.setLocation(new Location(newx, newy, l.getAltitude()));
     }
 
-    /**
-     *
-     * @param xView
-     * @param yView
-     */
-    public void point(int xView, int yView){
-       //find the cursor coordinates for the view coordinates (xview, yview) and move the cursor there
-        Point2D.Double cursCoord = clusteredView.viewToSpaceCoords(cursorCamera, xView, yView);
-        wallCursor.moveTo(cursCoord.getX(), cursCoord.getY());
+    /* (X Window) screen coordinate */
+    public void centredZoom(double f, double x, double y)
+    {
+	    Location cgl = mCamera.getLocation();
+	    double a = (mCamera.focal + mCamera.altitude) / mCamera.focal;
+
+	    //System.out.println("centredZoom: " + a + " " + mCamera.altitude + " " + f);
+
+	    double newz = mCamera.focal * a * f - mCamera.focal;
+	    //System.out.println("newz: " + newz);
+
+	    if (newz <= 0.0)
+	    {	
+		    newz = 0;
+		    f = mCamera.focal/ (a * mCamera.focal);
+		    // System.out.println("newz is <= 0, fixing f: " + f);
+	    }
+
+	    double[] r = windowToViewCoordinate(x, y);
+
+	    double dx = cgl.getX() - r[0];
+	    double dy = cgl.getY() - r[1];
+	    double newx, newy;
+	    newx = cgl.getX() + (f*dx - dx); // *a/(mCamera.altitude+ mCamera.focal));
+	    newy = cgl.getY() + (f*dy - dy);
+	    mCamera.setLocation(new Location(newx, newy, newz));
     }
 
-    //XXX todo: add relative pan and point operations
+    public double[] windowToViewCoordinate(double x, double y)
+    {
+	Location cgl = mCamera.getLocation();
+	double a = (mCamera.focal + mCamera.getAltitude()) / mCamera.focal;
+	// 
+	double xx = (long)((double)x - ((double)getDisplayWidth()/2.0));
+	double yy = (long)(-(double)y + ((double)getDisplayHeight()/2.0));
+	//
+	xx = cgl.getX()+ a*xx;
+	yy = cgl.getY()+ a*yy;
+	
+	double[] r = new double[2];
+	r[0] = xx;
+	r[1] = yy;
 
-    /**
-     * Zoom (centered on the wall cursor)
-     */
-    public void zoom(float altitudeOffset){
-        Point2D mCursorCoords = cursorCoordsInMainSpace();
-        mCamera.setLocation(new Location(mCursorCoords.getX(), mCursorCoords.getY(), mCamera.getAltitude() + altitudeOffset));
+	return r;
     }
 
     private Point2D cursorCoordsInMainSpace(){
