@@ -34,6 +34,9 @@ public class ViewerOptions {
     @Option(name = "-noaa", usage = "disable anti-aliasing")
     public boolean noaa = false;
 
+    @Option(name = "-d", usage = "running on the desktop only")
+    public boolean desktop = false;
+
     @Argument
     List<String> arguments = new ArrayList<String>();
 

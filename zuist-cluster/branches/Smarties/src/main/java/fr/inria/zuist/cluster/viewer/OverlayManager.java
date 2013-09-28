@@ -172,6 +172,7 @@ class OverlayManager implements ViewListener {
 	public void exitGlyph(Glyph g){}
 
 	public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
+		System.out.println("Kpress " + code);
 		hideAbout();
 	}
 

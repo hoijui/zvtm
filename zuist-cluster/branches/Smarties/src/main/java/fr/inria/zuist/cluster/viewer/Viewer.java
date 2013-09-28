@@ -91,6 +91,7 @@ import org.kohsuke.args4j.CmdLineParser;
 /**
  * @author Emmanuel Pietriga
  * @author Romain Primet
+ * @author Olivier Chapuis
  */
 
 public class Viewer implements Java2DPainter, RegionListener, LevelListener {
@@ -136,17 +137,18 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     private ClusterGeometry withBezels;
     private boolean sceneUnderBezels = true;
 
-    private final boolean standalone;
+    private boolean desktoponly = false; 
+    private int numRows, numCols;
 
+    private final boolean standalone;
+    
     OverlayManager ovm;
     VWGlassPane gp;
     PieMenu mainPieMenu;
 
-    private WallCursor wallCursor; //cursor, and zoom center
-    private Point panStart;
 
     //Toggle view bezels on/off
-    private void toggleClusterView()
+    public void toggleClusterView()
     {
 	    VirtualSpaceManager.INSTANCE.destroyClusteredView(clusteredView);
 	    sceneUnderBezels = !sceneUnderBezels;
@@ -154,15 +156,15 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		    clusteredView = new ClusteredView(
 			    withBezels,
 			    3, //origin (block number)
-			    8, //use complete
-			    4, //cluster surface
+			    numCols, //use complete
+			    numRows, //cluster surface
 			    sceneCam);
 	    } else {
 		    clusteredView = new ClusteredView(
 			    withoutBezels,
 			    3, //origin (block number)
-			    8, //use complete
-			    4, //cluster surface
+			    numCols, //use complete
+			    numRows, //cluster surface
 			    sceneCam);
 	    }
 	    VirtualSpaceManager.INSTANCE.addClusteredView(clusteredView);
@@ -171,6 +173,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     public Viewer(ViewerOptions options, File xmlSceneFile)
     {
 	    this.standalone = options.standalone;
+	    this.desktoponly =  options.desktop;
 	    ovm = new OverlayManager(this);
 	    initGUI(options);
 	    VirtualSpace[]  sceneSpaces = {mSpace};
@@ -227,6 +230,8 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         sceneCam = new Vector<Camera>();
         sceneCam.add(mCamera);
         sceneCam.add(cursorCamera);
+	numCols = options.numCols;
+	numRows = options.numRows;
         withoutBezels = new ClusterGeometry(
                 options.blockWidth,
                 options.blockHeight,
@@ -242,7 +247,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 			sceneCam);
         clusteredView.setBackgroundColor(Color.GRAY);
         vsm.addClusteredView(clusteredView);
-        wallCursor = new WallCursor(cursorSpace, 8, 120, Color.RED);
+        //wallCursor = new WallCursor(cursorSpace, 8, 120, Color.RED);
         if (options.fullscreen)
 	{
 		GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow(
@@ -256,8 +261,8 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 	gp = new VWGlassPane(this);
 	((JFrame)mView.getFrame()).setGlassPane(gp);
         eh = new ViewerEventHandler(this);
-        mView.setListener(eh, 0);
-        mView.setListener(eh, 1);
+        mView.setListener(eh); //, 0);
+        //mView.setListener(eh, 1);
         mView.setListener(ovm, 2);
 	mCamera.addListener(eh);
         mView.setNotifyCursorMoved(true);
@@ -276,7 +281,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     public double getDisplayWidth()
     {
 	    Dimension d;
-	    if(true)
+	    if(desktoponly)
 	    {
 		    d = mView.getPanelSize();
 	    }
@@ -290,7 +295,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     public double getDisplayHeight()
     {
 	     Dimension  d;
-	    if(true)
+	    if(desktoponly)
 	    {
 		    d = mView.getPanelSize();
 	    }
@@ -301,7 +306,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 	     return d.getHeight(); 
     }
 
-    /* (X Window) screen coordinate */
+    /* x,y in (X Window) screen coordinate */
     public void directTranslate(double x, double y)
     {
 	    double a = (mCamera.focal+Math.abs(mCamera.altitude)) / mCamera.focal;
@@ -313,7 +318,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 	    mCamera.setLocation(new Location(newx, newy, l.getAltitude()));
     }
 
-    /* (X Window) screen coordinate */
+    /* x,y in (X Window) screen coordinate */
     public void centredZoom(double f, double x, double y)
     {
 	    Location cgl = mCamera.getLocation();
@@ -357,11 +362,6 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 	r[1] = yy;
 
 	return r;
-    }
-
-    private Point2D cursorCoordsInMainSpace(){
-        Point vCoords = clusteredView.spaceToViewCoords(cursorCamera, wallCursor.getX(), wallCursor.getY());
-        return clusteredView.viewToSpaceCoords(mCamera, (int)vCoords.getX(), (int)vCoords.getY());
     }
 
     //XXX todo: add zoom centered on any coordinate (in view coord system or mCamera system)
@@ -505,6 +505,10 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 	    worker.start();
 	}
 
+	public void openScene(String xmlSceneFile) {
+		openScene(new File(xmlSceneFile));
+	}
+
 	public void openScene(File xmlSceneFile) {
 		reset();
 		sm.setUpdateLevel(false);
@@ -555,17 +559,19 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		if (l > -1){
 			rememberLocation(mCamera.getLocation());
 			double[] wnes = sm.getLevel(l).getBounds();
-	        mCamera.getOwningView().centerOnRegion(mCamera, Viewer.ANIM_MOVE_LENGTH, wnes[0], wnes[1], wnes[2], wnes[3], ea);
+			mCamera.getOwningView().centerOnRegion(
+				mCamera, Viewer.ANIM_MOVE_LENGTH, wnes[0], wnes[1], wnes[2], wnes[3], ea);
 		}
     }
 
     /* Higher view */
-    void getHigherView(){
-		rememberLocation(mCamera.getLocation());
-        Float alt = new Float(mCamera.getAltitude() + mCamera.getFocal());
-        Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(Viewer.ANIM_MOVE_LENGTH, mCamera,
-            alt, true, SlowInSlowOutInterpolator.getInstance(), null);
-        vsm.getAnimationManager().startAnimation(a, false);
+    void getHigherView() {
+	    rememberLocation(mCamera.getLocation());
+	    Float alt = new Float(mCamera.getAltitude() + mCamera.getFocal());
+	    Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(
+		    Viewer.ANIM_MOVE_LENGTH, mCamera,
+		    alt, true, SlowInSlowOutInterpolator.getInstance(), null);
+	    vsm.getAnimationManager().startAnimation(a, false);
     }
 
     public View getView(){
@@ -575,10 +581,11 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     /* Higher view */
     void getLowerView(){
 		rememberLocation(mCamera.getLocation());
-        Float alt=new Float(-(mCamera.getAltitude() + mCamera.getFocal())/2.0f);
-        Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(Viewer.ANIM_MOVE_LENGTH, mCamera,
-            alt, true, SlowInSlowOutInterpolator.getInstance(), null);
-        vsm.getAnimationManager().startAnimation(a, false);
+		Float alt=new Float(-(mCamera.getAltitude() + mCamera.getFocal())/2.0f);
+		Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(
+			Viewer.ANIM_MOVE_LENGTH, mCamera,
+			alt, true, SlowInSlowOutInterpolator.getInstance(), null);
+		vsm.getAnimationManager().startAnimation(a, false);
     }
 
     /* Direction should be one of Viewer.MOVE_* */
@@ -602,8 +609,9 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
             double qt = (rb[0]-rb[2])/4.0;
             trans = new Point2D.Double(qt,0);
         }
-        Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(Viewer.ANIM_MOVE_LENGTH, mCamera,
-            trans, true, SlowInSlowOutInterpolator.getInstance(), null);
+        Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(
+		Viewer.ANIM_MOVE_LENGTH, mCamera,
+		trans, true, SlowInSlowOutInterpolator.getInstance(), null);
         vsm.getAnimationManager().startAnimation(a, false);
     }
 
@@ -635,45 +643,54 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 	static final int MAX_PREV_LOC = 100;
 	
 	void rememberLocation(){
-	    rememberLocation(mCamera.getLocation());
-    }
+		rememberLocation(mCamera.getLocation());
+	}
     
-	void rememberLocation(Location l){
+	void rememberLocation(Location l)
+	{
 		if (previousLocations.size() >= MAX_PREV_LOC){
 			// as a result of release/click being undifferentiated)
 			previousLocations.removeElementAt(0);
 		}
 		if (previousLocations.size()>0){
 			if (!Location.equals((Location)previousLocations.lastElement(),l)){
-                previousLocations.add(l);
-            }
+				previousLocations.add(l);
+			}
 		}
 		else {previousLocations.add(l);}
 	}
 	
-	void moveBack(){		
-		if (previousLocations.size()>0){
-			Vector animParams = Location.getDifference(mSpace.getCamera(0).getLocation(), (Location)previousLocations.lastElement());
+	void moveBack()
+	{		
+		if (previousLocations.size()>0)
+		{
+			Vector animParams = Location.getDifference(
+				mSpace.getCamera(0).getLocation(), (Location)previousLocations.lastElement());
 			sm.setUpdateLevel(false);
       
-            class LevelUpdater implements EndAction {
-                public void execute(Object subject, Animation.Dimension dimension){
-                    sm.setUpdateLevel(true);
-                }
-            }
-            Animation at = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(Viewer.ANIM_MOVE_LENGTH, mSpace.getCamera(0),
-                (Point2D.Double)animParams.elementAt(1), true, SlowInSlowOutInterpolator.getInstance(), null);
-            Animation aa = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(Viewer.ANIM_MOVE_LENGTH, mSpace.getCamera(0),
-                (Float)animParams.elementAt(0), true, SlowInSlowOutInterpolator.getInstance(), new LevelUpdater());
-            vsm.getAnimationManager().startAnimation(at, false);
-            vsm.getAnimationManager().startAnimation(aa, false);
+			class LevelUpdater implements EndAction {
+				public void execute(Object subject, Animation.Dimension dimension){
+					sm.setUpdateLevel(true);
+				}
+			}
+			Animation at = 
+				vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(
+					Viewer.ANIM_MOVE_LENGTH, mSpace.getCamera(0),
+					(Point2D.Double)animParams.elementAt(1), true,
+					SlowInSlowOutInterpolator.getInstance(), null);
+			Animation aa = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(
+				Viewer.ANIM_MOVE_LENGTH, mSpace.getCamera(0),
+				(Float)animParams.elementAt(0), true, SlowInSlowOutInterpolator.getInstance(),
+				new LevelUpdater());
+			vsm.getAnimationManager().startAnimation(at, false);
+			vsm.getAnimationManager().startAnimation(aa, false);
 			previousLocations.removeElementAt(previousLocations.size()-1);
 		}
 	}
 	
-    void altitudeChanged(){
-        mCameraAltStr = Messages.ALTITUDE + String.valueOf(mCamera.altitude);
-    }
+	void altitudeChanged(){
+		mCameraAltStr = Messages.ALTITUDE + String.valueOf(mCamera.altitude);
+	}
     
     void updatePanelSize(){
         Dimension d = mView.getPanel().getComponent().getSize();

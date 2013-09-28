@@ -29,6 +29,7 @@ import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.event.CameraListener;
+import fr.inria.zvtm.event.ViewAdapter;
 
 import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zuist.engine.Region;
@@ -40,8 +41,8 @@ class ViewerEventHandler implements ViewListener, ComponentListener, CameraListe
     static float ZOOM_SPEED_COEF = 1.0f/50.0f;
     static double PAN_SPEED_COEF = 50.0;
     
-    static final float WHEEL_ZOOMIN_FACTOR = 21.0f;
-    static final float WHEEL_ZOOMOUT_FACTOR = 22.0f;
+    static final float WHEEL_ZOOMIN_FACTOR = 1.1f;
+    static final float WHEEL_ZOOMOUT_FACTOR = 1/1.1f;
             
     //remember last mouse coords to compute translation  (dragging)
     int lastJPX,lastJPY;
@@ -169,13 +170,11 @@ class ViewerEventHandler implements ViewListener, ComponentListener, CameraListe
 	public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
 		double a = (application.mCamera.focal+Math.abs(application.mCamera.altitude)) / application.mCamera.focal;
 		if (wheelDirection  == WHEEL_UP){
-			// zooming in
-			application.mCamera.altitudeOffset(a*WHEEL_ZOOMOUT_FACTOR);
+			application.centredZoom(WHEEL_ZOOMIN_FACTOR, jpx, jpy);
 			application.vsm.repaint();
 		}
 		else {
-			//wheelDirection == WHEEL_DOWN, zooming out
-			application.mCamera.altitudeOffset(-a*WHEEL_ZOOMIN_FACTOR);
+			application.centredZoom(WHEEL_ZOOMOUT_FACTOR, jpx, jpy);
 			application.vsm.repaint();
 		}
 	}
@@ -199,15 +198,18 @@ class ViewerEventHandler implements ViewListener, ComponentListener, CameraListe
 		}
     }
 
-    public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
-        if (code==KeyEvent.VK_PAGE_UP){application.getHigherView();}
-    	else if (code==KeyEvent.VK_PAGE_DOWN){application.getLowerView();}
-    	else if (code==KeyEvent.VK_HOME){application.getGlobalView(null);}
-    	else if (code==KeyEvent.VK_UP){application.translateView(Viewer.MOVE_UP);}
-    	else if (code==KeyEvent.VK_DOWN){application.translateView(Viewer.MOVE_DOWN);}
-    	else if (code==KeyEvent.VK_LEFT){application.translateView(Viewer.MOVE_LEFT);}
-    	else if (code==KeyEvent.VK_RIGHT){application.translateView(Viewer.MOVE_RIGHT);}
-    	else if (code==KeyEvent.VK_N){toggleNavMode();}
+    public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e)
+    {
+	    //System.out.println("Kpress " + code);
+	    code = e.getKeyCode();
+	    if (code==KeyEvent.VK_PAGE_UP){application.getHigherView();}
+	    else if (code==KeyEvent.VK_PAGE_DOWN){application.getLowerView();}
+	    else if (code==KeyEvent.VK_HOME){application.getGlobalView(null);}
+	    else if (code==KeyEvent.VK_UP){application.translateView(Viewer.MOVE_UP);}
+	    else if (code==KeyEvent.VK_DOWN){application.translateView(Viewer.MOVE_DOWN);}
+	    else if (code==KeyEvent.VK_LEFT){application.translateView(Viewer.MOVE_LEFT);}
+	    else if (code==KeyEvent.VK_RIGHT){application.translateView(Viewer.MOVE_RIGHT);}
+	    else if (code==KeyEvent.VK_N){toggleNavMode();}
 //		else if (code == KeyEvent.VK_F1){application.toggleMiscInfoDisplay();}
 //        else if (code == KeyEvent.VK_F7){application.gc();}
 //        else if (code == KeyEvent.VK_F2){application.ovm.toggleConsole();}
