@@ -174,16 +174,49 @@ def generateLevels(cr_coords, rootEL):
 
 
 ################################################################################
-# Create target directory if it does not exist yet
-# (source image min/max cols/rows in IGN coords, elementtree XML root)
+# for all IGN tiles, generate pyramid, build regions and resource descriptions
+# (source image min/max cols/rows in IGN coords, number of levels overall, elementtree XML root)
 ################################################################################
-def buildScene(cr_coords, levelCount, outputroot):
+def buildScene(cr_coords, levelCount, rootEL):
+    depth = levelCount-1
     for col in range(cr_coords[0]/10,cr_coords[1]/10+1):
         # /10 because src tile IDs increment by 10
         for row in range(cr_coords[2]/10,cr_coords[3]/10+1):
             col10 = col * 10
             row10 = row * 10
+            for subcol in range(SRC_TILE_SIZE/TGT_TILE_SIZE):
+                for subrow in range(SRC_TILE_SIZE/TGT_TILE_SIZE):
+                    regionEL = ET.SubElement(rootEL, "region")
+                    regionEL.set("id", "R%d_%d-%d_%d-%d" % (depth, col10, row10, subcol, subrow))
+                    regionEL.set("containedIn", "R%d_%d-%d_%d-%d" % (depth-1, col10, row10, subcol/2, subrow/2))
+                    #XXX FOR DEBUGGING
+                    regionEL.set("levels", "0;%d" % depth)
+                    # regionEL.set("levels", str(int(depth)))
+                    x = col*SRC_TILE_SIZE + subcol*TGT_TILE_SIZE
+                    y = row*SRC_TILE_SIZE + subrow*TGT_TILE_SIZE
+                    regionEL.set("x", str(int(x)))
+                    regionEL.set("y", str(int(y)))
+                    regionEL.set("w", str(int(TGT_TILE_SIZE)))
+                    regionEL.set("h", str(int(TGT_TILE_SIZE)))
+                    objectEL = ET.SubElement(regionEL, "resource")
+                    objectEL.set("id", "I%d_%d-%d_%d-%d" % (depth, col10, row10, subcol, subrow))
+                    # make sure lowest res tile, visible on each level, is always drawn below higher-res tiles
+                    objectEL.set("z-index", "10")
+                    objectEL.set("type", "img")
+                    objectEL.set("x", str(int(x)))
+                    objectEL.set("y", str(int(y)))
+                    objectEL.set("w", str(int(TGT_TILE_SIZE)))
+                    objectEL.set("h", str(int(TGT_TILE_SIZE)))
+                    objectEL.set("src", "L%02d/%d_%d/%d_%d-%d_%d.png" % (depth, col10, row10, col10, row10, subcol, subrow))
+            buildUpperLevel(col10, row10, depth-1, outputroot)
 
+
+################################################################################
+# for a given IGN tile, generate lower levels from subtiles
+# (IGN tile coords, number of levels overall, elementtree XML root)
+################################################################################
+def buildUpperLevel(col10, row10, levelDepth, rootEL):
+    return
 
   # <region x="0" y="0" w="86400" h="43200" id ="R0" layer="BMNG Layer" levels="0;4">
   #       <resource h="43200" id="I0" sensitive="false" src="0-0-0-0-0.jpg" type="img" w="86400" x="0" y="0" z-index="0"/>
