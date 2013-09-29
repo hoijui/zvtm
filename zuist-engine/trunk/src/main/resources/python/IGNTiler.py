@@ -58,84 +58,57 @@ def createTargetDir():
         log("Creating target directory %s" % TGT_DIR, 2)
         os.mkdir(TGT_DIR)
 
-################################################################################
-# Count number of levels in ZUIST scene
-# (source image size from PIL, parent XML element)
-################################################################################
-def generateLevels(src_sz, rootEL):
-    # number of horizontal tiles at lowest level
-    htc = src_sz[0] / TILE_SIZE
-    if src_sz[0] % TILE_SIZE > 0:
-        htc += 1
-    # number of vertical tiles at lowest level
-    vtc = src_sz[1] / TILE_SIZE
-    if src_sz[1] % TILE_SIZE > 0:
-        vtc += 1
-    # number of levels
-    res = math.ceil(max(math.log(vtc,2)+1, math.log(htc,2)+1))
-    log("Will generate %d level(s)" % res, 2)
-    # generate ZUIST levels
-    altitudes = [0,]
-    for i in range(int(res)):
-        depth = int(res-i-1)
-        altitudes.append(int(F*math.pow(2,i+1)-F))
-        level = ET.SubElement(rootEL, "level")
-        level.set("depth", str(depth))
-        level.set("floor", str(altitudes[-2]))
-        level.set("ceiling", str(altitudes[-1]))
-    # fix max scene altitude (for highest region)
-    level.set("ceiling", MAX_ALT)
-    return res
 
 ################################################################################
 # Create target directory if it does not exist yet
 ################################################################################
-def processSrcDir():
-    outputSceneFile = "%s/scene.xml" % TGT_DIR
-    # prepare the XML scene
-    outputroot = ET.Element("scene")
-    # walk src dir
+def analyzeTree():
+    # walk subtile dirs and generate pyramid
+    TIFF_FILES = glob.glob("%s/*.tif" % SRC_DIR)
+    TIFF_FILES.sort()
+    initialized = False
+    maxCol = minCol = 0
+    maxRow = minRow = 0
+    for tiffFile in TIFF_FILES:
+        tokens = tiffFile.split("/")[-1].split("_")
+        print tokens
+        col = int(tokens[2])
+        row = int(tokens[3])
+        if initialized:
+            if col > maxCol:
+                maxCol = col
+            if col < minCol:
+                minCol = col
+            if row > maxRow:
+                maxRow = row
+            if row < minRow:
+                minRow = row
+        else:
+            maxCol = minCol = col
+            maxRow = minRow = row
+            initialized = True
+    log("Processing Columns %s-%s x Rows %s-%s" % (minCol, maxCol, minRow, maxRow), 1)
+    return (minCol, maxCol, minRow, maxRow)
+
+
+################################################################################
+# Create target directory if it does not exist yet
+################################################################################
+def processSrcDir(levelCount):
+    # walk src dir and perform tile subtiling
     TIFF_FILES = glob.glob("%s/*.tif" % SRC_DIR)
     counter = 0
     for tiffFile in TIFF_FILES:
         counter = counter + 1
         log("Subtiling: %s" % tiffFile.split("/")[-1], 2)
         log("--- %3.1f%%" % (100 * counter/float(len(TIFF_FILES))), 2)
-        tileTile(tiffFile)
+        tileTile(tiffFile, levelCount)
 
-    L0_TILE_DIRS = os.listdir("%s/L0" % TGT_DIR)
-    print L0_TILE_DIRS[0]
-    tokens = L0_TILE_DIRS[0].split("_")
-    # seek min/max cols/rows
-    minCol = int(tokens[0])
-    maxCol = int(tokens[0])
-    minRow = int(tokens[1])
-    maxRow = int(tokens[1])
-    for tileDir in L0_TILE_DIRS[1:]:
-        tokens = tileDir.split("_")
-        col = int(tokens[0])
-        if col > maxCol:
-            maxCol = col
-        if col < minCol:
-            minCol = col
-        row = int(tokens[1])
-        if row > maxRow:
-            maxRow = row
-        if row < minRow:
-            minRow = row
-    log("Processing Columns %s-%s x Rows %s-%s" % (minCol, maxCol, minRow, maxRow), 1)
-
-
-
-    # serialize the XML tree
-    tree = ET.ElementTree(outputroot)
-    log("Writing %s" % outputSceneFile)
-    tree.write(outputSceneFile, encoding='utf-8')
 
 ################################################################################
 # Further tile original tiles
 ################################################################################
-def tileTile(tiffFile):
+def tileTile(tiffFile, levelCount):
     tokens = tiffFile.split("_")
     col = int(tokens[-3])
     row = int(tokens[-2])
@@ -145,10 +118,10 @@ def tileTile(tiffFile):
     if src_sz[0] != SRC_TILE_SIZE or src_sz[1] != SRC_TILE_SIZE:
         log("WARNING: unexpected tile dimensions: (%d,%d) for %s" % (src_sz[0], src_sz[1], tiffFile.split("/")[-1]))
     # split it in NB_SUBTILES x NB_SUBTILES tiles
-    tileDir = "%s/L0/%d_%d" % (TGT_DIR, col, row)
+    tileDir = "%s/L%02d/%d_%d" % (TGT_DIR, levelCount-1, col, row)
     if not os.path.exists(tileDir):
         log("Creating tile directory %s" % tileDir, 3)
-        L0dir = "%s/L0" % (TGT_DIR)
+        L0dir = "%s/L%02d" % (TGT_DIR, levelCount-1)
         if not os.path.exists(L0dir):
             os.mkdir(L0dir)
         os.mkdir(tileDir)
@@ -167,6 +140,56 @@ def tileTile(tiffFile):
                 rect = CGRectMake(0, 0, TGT_TILE_SIZE, TGT_TILE_SIZE)
                 bitmap.drawImage(rect, cim)
                 bitmap.writeToFile(subTilePath, kCGImageFormatPNG)
+
+
+################################################################################
+# Count number of levels in ZUIST scene
+# (source image min/max cols/rows in IGN coords, elementtree XML root)
+################################################################################
+def generateLevels(cr_coords, rootEL):
+    # number of horizontal tiles at lowest level
+    # /10 because src tile IDs increment by 10
+    hsz = ((cr_coords[1]-cr_coords[0])/10+1) * SRC_TILE_SIZE
+    htc = hsz / TGT_TILE_SIZE
+    # number of vertical tiles at lowest level
+    # /10 because src tile IDs increment by 10
+    vsz = ((cr_coords[3]-cr_coords[2])/10+1) * SRC_TILE_SIZE
+    vtc = vsz / TGT_TILE_SIZE
+    log("Scene size: %d x %d" % (hsz, vsz), 2)
+    # number of levels
+    res = math.ceil(max(math.log(vtc,2)+1, math.log(htc,2)+1))
+    log("Will generate %d level(s)" % res, 2)
+    # generate ZUIST levels
+    altitudes = [0,]
+    for i in range(int(res)):
+        depth = int(res-i-1)
+        altitudes.append(int(F*math.pow(2,i+1)-F))
+        level = ET.SubElement(rootEL, "level")
+        level.set("depth", str(depth))
+        level.set("floor", str(altitudes[-2]))
+        level.set("ceiling", str(altitudes[-1]))
+    # fix max scene altitude (for highest region)
+    level.set("ceiling", MAX_ALT)
+    return res
+
+
+################################################################################
+# Create target directory if it does not exist yet
+# (source image min/max cols/rows in IGN coords, elementtree XML root)
+################################################################################
+def buildScene(cr_coords, levelCount, outputroot):
+    for col in range(cr_coords[0]/10,cr_coords[1]/10+1):
+        # /10 because src tile IDs increment by 10
+        for row in range(cr_coords[2]/10,cr_coords[3]/10+1):
+            col10 = col * 10
+            row10 = row * 10
+
+
+  # <region x="0" y="0" w="86400" h="43200" id ="R0" layer="BMNG Layer" levels="0;4">
+  #       <resource h="43200" id="I0" sensitive="false" src="0-0-0-0-0.jpg" type="img" w="86400" x="0" y="0" z-index="0"/>
+  # </region>
+
+
 
 ################################################################################
 # Trace exec on std output
@@ -196,8 +219,20 @@ if len(sys.argv) > 2:
 else:
     log(CMD_LINE_HELP)
     sys.exit(0)
-
+log("--------------------")
 log("Tile Size: %dx%d" % (TGT_TILE_SIZE, TGT_TILE_SIZE), 1)
 createTargetDir()
-processSrcDir()
+outputSceneFile = "%s/scene.xml" % TGT_DIR
+outputroot = ET.Element("scene")
+# subtile tiles
+cr_coords = analyzeTree()
+# generate ZUIST levels
+levelCount = generateLevels(cr_coords, outputroot)
+processSrcDir(levelCount)
+# build ZUIST pyramid
+buildScene(cr_coords, levelCount, outputroot)
+# serialize the XML tree
+tree = ET.ElementTree(outputroot)
+log("Writing %s" % outputSceneFile)
+tree.write(outputSceneFile, encoding='utf-8')
 log("--------------------")
