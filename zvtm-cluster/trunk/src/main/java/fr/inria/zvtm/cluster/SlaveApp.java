@@ -125,11 +125,13 @@ public class SlaveApp {
                 new HashMap<String, GraphicsDevice>();
 
             System.out.print("available devices: ");
-            for(GraphicsDevice d: devices) {
-                devMap.put(d.getIDstring(), d);
-                System.out.print(d.getIDstring());
+            for(int i=0;i<devices.length;i++) {
+                devMap.put(devices[i].getIDstring(), devices[i]);
             }
-            System.out.println("");
+            for(int i=0;i<devices.length-1;i++) {
+                System.out.print(devices[i].getIDstring()+", ");
+            }
+            System.out.println(devices[devices.length-1].getIDstring());
             GraphicsDevice device = null;
             if(!options.device.equals("")){
                 device = devMap.get(options.device);
