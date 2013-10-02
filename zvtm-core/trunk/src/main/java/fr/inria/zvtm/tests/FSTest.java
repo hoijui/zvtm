@@ -39,7 +39,7 @@ import fr.inria.zvtm.glyphs.*;
 
 public class FSTest  {
 
-    static final float DEFAULT_MAX = 100;
+    static final float DEFAULT_MAX = 50;
     float MAX = DEFAULT_MAX;
 
     VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE;
@@ -47,13 +47,16 @@ public class FSTest  {
     View mViewL, mViewR;
     Camera mCameraL, mCameraR;
 
-    public FSTest(String vt, float nbObj){
-        init(vt);
-        MAX = nbObj;
+    static final String CONFIG_BOTH = "both";
+    static final String CONFIG_00 = "0";
+    static final String CONFIG_01 = "1";
+
+    public FSTest(String cfg){
+        init(cfg);
         populate();
     }
 
-    void init(String vt){
+    void init(String config){
         GraphicsEnvironment ge =
             GraphicsEnvironment.getLocalGraphicsEnvironment();
 
@@ -73,62 +76,51 @@ public class FSTest  {
         }
         System.out.println(devices[devices.length-1].getIDstring());
 
-
-
         mSpace = vsm.addVirtualSpace(VirtualSpace.ANONYMOUS);
         mCameraL = mSpace.addCamera();
         mCameraR = mSpace.addCamera();
-
         Vector camerasL = new Vector(1);
         camerasL.add(mCameraL);
-        mViewL = vsm.addFrameView(camerasL,
-                "L",
-                View.STD_VIEW,
-                100,
-                100,
-                false, false, false, null);
         Vector camerasR = new Vector(1);
         camerasR.add(mCameraR);
-        mViewR = vsm.addFrameView(camerasR,
-                "R",
-                View.STD_VIEW,
-                100,
-                100,
-                false, false, false, null);
 
-        FSListener fehL = new FSListener(this);
-        mViewL.setListener(fehL, 0);
-        FSListener fehR = new FSListener(this);
-        mViewR.setListener(fehR, 0);
+        if (config.equals(CONFIG_00) || config.equals(CONFIG_BOTH)){
+            System.out.println("Creating view on 0");
+            mViewL = vsm.addFrameView(camerasL,
+                    "L", View.STD_VIEW, 100, 100,
+                    false, false, false, null);
+            FSListener fehL = new FSListener(this);
+            mViewL.setListener(fehL, 0);
+            GraphicsDevice device = devices[0];
 
 
-
-        GraphicsDevice device = devices[0];
-
-
-        ((JFrame)mViewL.getFrame()).removeNotify();
-        ((JFrame)mViewL.getFrame()).setUndecorated(true);
-        device.setFullScreenWindow((JFrame)mViewL.getFrame());
-        ((JFrame)mViewL.getFrame()).addNotify();
-        mViewL.setBackgroundColor(Color.RED);
-
-        device = devices[1];
-
-        ((JFrame)mViewR.getFrame()).removeNotify();
-        ((JFrame)mViewR.getFrame()).setUndecorated(true);
-        device.setFullScreenWindow((JFrame)mViewR.getFrame());
-        ((JFrame)mViewR.getFrame()).addNotify();
-
-        mViewR.setBackgroundColor(Color.BLUE);
-
-
+            ((JFrame)mViewL.getFrame()).removeNotify();
+            ((JFrame)mViewL.getFrame()).setUndecorated(true);
+            device.setFullScreenWindow((JFrame)mViewL.getFrame());
+            ((JFrame)mViewL.getFrame()).addNotify();
+            mViewL.setBackgroundColor(Color.RED);
+        }
+        if (config.equals(CONFIG_01) || config.equals(CONFIG_BOTH)){
+            System.out.println("Creating view on 1");
+            mViewR = vsm.addFrameView(camerasR,
+                    "R", View.STD_VIEW, 100, 100,
+                    false, false, false, null);
+            FSListener fehR = new FSListener(this);
+            mViewR.setListener(fehR, 0);
+            GraphicsDevice device = devices[1];
+            ((JFrame)mViewR.getFrame()).removeNotify();
+            ((JFrame)mViewR.getFrame()).setUndecorated(true);
+            device.setFullScreenWindow((JFrame)mViewR.getFrame());
+            ((JFrame)mViewR.getFrame()).addNotify();
+            mViewR.setBackgroundColor(Color.BLUE);
+        }
     }
 
     void populate(){
         Glyph[] glyphs = new Glyph[(int)(MAX*MAX)];
         for (int i=0;i<MAX;i++){
             for (int j=0;j<MAX;j++){
-                VRectangle r = new VRectangle(i*20,j*20,0,20,20,Color.getHSBColor(i/MAX,j/MAX,1));
+                VRectangle r = new VRectangle(i*20-MAX*10,j*20-MAX*10,0,20,20,Color.getHSBColor(i/MAX,j/MAX,1));
                 r.setDrawBorder(false);
                 glyphs[(int)(i*MAX+j)] = r;
             }
@@ -151,24 +143,8 @@ public class FSTest  {
         System.out.println("User name: "+System.getProperty("user.name"));
         System.out.println("User home directory: "+System.getProperty("user.home"));
         System.out.println("-----------------");
-        String vt = "";
-        float nbObj = DEFAULT_MAX;
-        for (String arg:args){
-            if (arg.equals("ogl")){vt = arg;}
-            else {
-                try {
-                    nbObj = Integer.parseInt(arg);
-                }
-                catch (NumberFormatException ex){
-                    ex.printStackTrace();
-                    System.exit(1);
-                }
-            }
-        }
-        if (vt.equals("ogl")){
-           System.setProperty("sun.java2d.opengl", "True");
-        }
-        new FSTest(vt, nbObj);
+        String config = args[0];
+        new FSTest(config);
     }
 
 }
