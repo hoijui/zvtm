@@ -126,7 +126,7 @@ public class FSTest  {
             ((JFrame)mViewR.getFrame()).setUndecorated(true);
             device.setFullScreenWindow((JFrame)mViewR.getFrame());
             ((JFrame)mViewR.getFrame()).addNotify();
-            mViewR.setBackgroundColor(Color.BLUE);
+            mViewR.setBackgroundColor(Color.BLACK);
         }
     }
 
