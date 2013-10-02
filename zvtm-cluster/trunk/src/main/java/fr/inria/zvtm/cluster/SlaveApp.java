@@ -82,16 +82,13 @@ public class SlaveApp {
     }
 
     void createLocalView(ClusteredView cv){
-        if(!cv.ownsBlock(options.blockNumber)){
+        if (!cv.ownsBlock(options.blockNumber)){
             return;
         }
-
-        if(view != null){
+        if (view != null){
             throw new IllegalStateException("local view already exists");
         }
-
         clusteredView = cv;
-
         view = vsm.addFrameView(cv.getCameras(),
                 "slaveView " + options.blockNumber,
                 getViewType(),
@@ -101,54 +98,47 @@ public class SlaveApp {
         view.setBackgroundColor(cv.getBackgroundColor());
         view.setListener(new SlaveEventHandler());
         view.getPanel().setRefreshRate(options.refreshPeriod);
-
         if (options.antialiasing){
             view.setAntialiasing(true);
         }
-
-        if(!options.fullscreen){
-            ((JFrame)view.getFrame()).setLocation(
-            options.xOffset,
-            options.yOffset);
-        }
-
         // inputs: block width, block height, fullscreen
-        if(options.fullscreen){
-            GraphicsEnvironment ge =
-                GraphicsEnvironment.getLocalGraphicsEnvironment();
-
+        if (options.fullscreen){
+            System.out.println("Attempting to go fullscreen on: "+options.device);
+            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
             GraphicsDevice[] devices = ge.getScreenDevices();
-            if(devices.length == 0){
-                throw new Error("no screen devices found");
+            if (devices.length == 0){
+                throw new Error("No screen devices found");
             }
-            Map<String, GraphicsDevice> devMap =
-                new HashMap<String, GraphicsDevice>();
-
-            System.out.print("available devices: ");
-            for(int i=0;i<devices.length;i++) {
+            Map<String, GraphicsDevice> devMap = new HashMap<String, GraphicsDevice>();
+            System.out.print("Available devices: ");
+            for(int i=0;i<devices.length;i++){
                 devMap.put(devices[i].getIDstring(), devices[i]);
             }
-            for(int i=0;i<devices.length-1;i++) {
+            for(int i=0;i<devices.length-1;i++){
                 System.out.print(devices[i].getIDstring()+", ");
             }
             System.out.println(devices[devices.length-1].getIDstring());
             GraphicsDevice device = null;
-            if(!options.device.equals("")){
+            if (!options.device.equals("")){
                 device = devMap.get(options.device);
-                if(null == device){
+                if (null == device){
                     System.out.println("Warning: could not find device named " + options.device);
                 }
             }
-            if(null == device){
+            if (null == device){
                 device = ge.getDefaultScreenDevice();
+                System.out.println("Display device not found: falling back to default device "+device);
             }
-
-            if (device.isFullScreenSupported()) {
+            if (device.isFullScreenSupported()){
+                System.out.println("Entering fullscreen mode");
                 ((JFrame)view.getFrame()).removeNotify();
                 ((JFrame)view.getFrame()).setUndecorated(true);
                 device.setFullScreenWindow((JFrame)view.getFrame());
                 ((JFrame)view.getFrame()).addNotify();
             }
+        }
+        else {
+            ((JFrame)view.getFrame()).setLocation(options.xOffset, options.yOffset);
         }
         view.setVisible(true);
     }
