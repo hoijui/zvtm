@@ -84,8 +84,8 @@ public class FSTest  {
         Vector camerasR = new Vector(1);
         camerasR.add(mCameraR);
 
-        if (config.startsWith("_") || config.equals(CONFIG_BOTH)){
-            if (config.equals(CONFIG_00)){
+        if (config.startsWith("_")){
+            if (config.equals(CONFIG_00) || config.equals(CONFIG_BOTH)){
                 System.out.println("Creating view on 0: "+devices[0].getIDstring()+" "+devices[0]);
                 mViewL = vsm.addFrameView(camerasL,
                         "L", View.STD_VIEW, 100, 100,
@@ -99,7 +99,7 @@ public class FSTest  {
                 ((JFrame)mViewL.getFrame()).addNotify();
                 mViewL.setBackgroundColor(Color.RED);
             }
-            if (config.equals(CONFIG_01)){
+            if (config.equals(CONFIG_01) || config.equals(CONFIG_BOTH)){
                 System.out.println("Creating view on 1: "+devices[1].getIDstring()+" "+devices[1]);
                 mViewR = vsm.addFrameView(camerasR,
                         "R", View.STD_VIEW, 100, 100,
