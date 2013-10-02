@@ -121,26 +121,27 @@ public class SlaveApp {
             GraphicsDevice device = null;
             if (!options.device.equals("")){
                 device = devMap.get(options.device);
-                if (null == device){
-                    System.out.println("Warning: could not find device named " + options.device);
+                if (device != null){
+                    System.out.println("Assigning view to device: " + options.device);
+                }
+                else {
+                    System.out.println("Warning: could not find device: " + options.device);
                 }
             }
             if (null == device){
                 device = ge.getDefaultScreenDevice();
                 System.out.println("Display device not found: falling back to default device "+device);
             }
-            if (device.isFullScreenSupported()){
-                System.out.println("Entering fullscreen mode");
-                ((JFrame)view.getFrame()).removeNotify();
-                ((JFrame)view.getFrame()).setUndecorated(true);
-                device.setFullScreenWindow((JFrame)view.getFrame());
-                ((JFrame)view.getFrame()).addNotify();
-            }
+            System.out.println("Entering fullscreen mode");
+            ((JFrame)view.getFrame()).removeNotify();
+            ((JFrame)view.getFrame()).setUndecorated(true);
+            device.setFullScreenWindow((JFrame)view.getFrame());
+            ((JFrame)view.getFrame()).addNotify();
         }
         else {
             ((JFrame)view.getFrame()).setLocation(options.xOffset, options.yOffset);
+            view.setVisible(true);
         }
-        view.setVisible(true);
     }
 
     void setCameraLocation(Location masterLoc,
