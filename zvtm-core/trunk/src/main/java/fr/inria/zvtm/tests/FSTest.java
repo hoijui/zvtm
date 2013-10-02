@@ -47,9 +47,9 @@ public class FSTest  {
     View mViewL, mViewR;
     Camera mCameraL, mCameraR;
 
-    static final String CONFIG_BOTH = "both";
-    static final String CONFIG_00 = "0";
-    static final String CONFIG_01 = "1";
+    static final String CONFIG_BOTH = "_both";
+    static final String CONFIG_00 = "_0";
+    static final String CONFIG_01 = "_1";
 
     public FSTest(String cfg){
         init(cfg);
@@ -84,30 +84,44 @@ public class FSTest  {
         Vector camerasR = new Vector(1);
         camerasR.add(mCameraR);
 
-        if (config.equals(CONFIG_00) || config.equals(CONFIG_BOTH)){
-            System.out.println("Creating view on 0");
-            mViewL = vsm.addFrameView(camerasL,
-                    "L", View.STD_VIEW, 100, 100,
-                    false, false, false, null);
-            FSListener fehL = new FSListener(this);
-            mViewL.setListener(fehL, 0);
-            GraphicsDevice device = devices[0];
-
-
-            ((JFrame)mViewL.getFrame()).removeNotify();
-            ((JFrame)mViewL.getFrame()).setUndecorated(true);
-            device.setFullScreenWindow((JFrame)mViewL.getFrame());
-            ((JFrame)mViewL.getFrame()).addNotify();
-            mViewL.setBackgroundColor(Color.RED);
+        if (config.startsWith("_") || config.equals(CONFIG_BOTH)){
+            if (config.equals(CONFIG_00)){
+                System.out.println("Creating view on 0: "+devices[0].getIDstring()+" "+devices[0]);
+                mViewL = vsm.addFrameView(camerasL,
+                        "L", View.STD_VIEW, 100, 100,
+                        false, false, false, null);
+                FSListener fehL = new FSListener(this);
+                mViewL.setListener(fehL, 0);
+                GraphicsDevice device = devices[0];
+                ((JFrame)mViewL.getFrame()).removeNotify();
+                ((JFrame)mViewL.getFrame()).setUndecorated(true);
+                device.setFullScreenWindow((JFrame)mViewL.getFrame());
+                ((JFrame)mViewL.getFrame()).addNotify();
+                mViewL.setBackgroundColor(Color.RED);
+            }
+            if (config.equals(CONFIG_01)){
+                System.out.println("Creating view on 1: "+devices[1].getIDstring()+" "+devices[1]);
+                mViewR = vsm.addFrameView(camerasR,
+                        "R", View.STD_VIEW, 100, 100,
+                        false, false, false, null);
+                FSListener fehR = new FSListener(this);
+                mViewR.setListener(fehR, 0);
+                GraphicsDevice device = devices[1];
+                ((JFrame)mViewR.getFrame()).removeNotify();
+                ((JFrame)mViewR.getFrame()).setUndecorated(true);
+                device.setFullScreenWindow((JFrame)mViewR.getFrame());
+                ((JFrame)mViewR.getFrame()).addNotify();
+                mViewR.setBackgroundColor(Color.BLUE);
+            }
         }
-        if (config.equals(CONFIG_01) || config.equals(CONFIG_BOTH)){
-            System.out.println("Creating view on 1");
+        else {
+            System.out.println("Creating view for: "+config+" "+devMap.get(config));
             mViewR = vsm.addFrameView(camerasR,
-                    "R", View.STD_VIEW, 100, 100,
+                    "D", View.STD_VIEW, 100, 100,
                     false, false, false, null);
             FSListener fehR = new FSListener(this);
             mViewR.setListener(fehR, 0);
-            GraphicsDevice device = devices[1];
+            GraphicsDevice device = devMap.get(config);
             ((JFrame)mViewR.getFrame()).removeNotify();
             ((JFrame)mViewR.getFrame()).setUndecorated(true);
             device.setFullScreenWindow((JFrame)mViewR.getFrame());
