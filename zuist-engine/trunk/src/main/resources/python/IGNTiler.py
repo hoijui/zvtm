@@ -216,10 +216,15 @@ def buildScene(cr_coords, levelCount, rootEL):
                     objectEL.set("h", str(int(TGT_TILE_SIZE)))
                     objectEL.set("src", "L%02d/%d_%d/%d_%d-%d_%d.png" % (depth, col10, row10, col10, row10, subcol, subrow))
             buildUpperLevel(col10, row10, depth-1, 2, SRC_TILE_SIZE/TGT_TILE_SIZE/2, outputroot)
+    if levelCount > 4:
+        # subtiling generates 4 levels
+        # if there are more levels than that, then we need to further aggregate
+        # tiles, across IGN tiles
+        aggregateAcrossIGNTiles(levelCount, rootEL)
 
 
 ################################################################################
-# for a given IGN tile, generate lower levels from subtiles
+# for a given IGN tile, generate upper levels from subtiles
 # (IGN tile coords, number of levels overall, elementtree XML root)
 ################################################################################
 def buildUpperLevel(col10, row10, levelDepth, scale, subdivisions, rootEL):
@@ -272,6 +277,19 @@ def aggregateTiles(col10, row10, levelDepth, scale, agcol, agrow, rootEL):
     objectEL.set("h", str(int(scsz)))
     objectEL.set("src", agTilePath)
 
+
+################################################################################
+# Further aggregeation, across IGN tiles
+################################################################################
+def aggregateAcrossIGNTiles(levelCount, rootEL):
+    log("------------------------ Aggreting accross tiles ---------------------")
+    upperLevels = range(int(levelCount) - 4)
+    upperLevels.reverse()
+    log("Generating %d levels across IGN tiles" % len(upperLevels), 2)
+    for level in upperLevels:
+        #XXX:TBW
+        print level
+
 ################################################################################
 # Trace exec on std output
 ################################################################################
@@ -300,7 +318,7 @@ if len(sys.argv) > 2:
 else:
     log(CMD_LINE_HELP)
     sys.exit(0)
-log("--------------------------------------------------------------------------")
+log("---------------------------------------------------------------------")
 log("Tile Size: %dx%d" % (TGT_TILE_SIZE, TGT_TILE_SIZE), 1)
 createTargetDir()
 outputSceneFile = "%s/scene.xml" % TGT_DIR
@@ -309,13 +327,13 @@ outputroot = ET.Element("scene")
 cr_coords = analyzeTree()
 # generate ZUIST levels
 levelCount = generateLevels(cr_coords, outputroot)
-log("---------------------------- Subtiling -----------------------------------")
+log("------------------------- Subtiling ---------------------------------")
 processSrcDir(levelCount)
 # build ZUIST pyramid
-log("------------------ Build scene (aggregate tiles) -------------------------")
+log("--------------- Build scene (aggregate tiles) -----------------------")
 buildScene(cr_coords, levelCount, outputroot)
 # serialize the XML tree
 tree = ET.ElementTree(outputroot)
 log("Writing %s" % outputSceneFile)
 tree.write(outputSceneFile, encoding='utf-8')
-log("--------------------")
+log("---------------------------------------------------------------------")
