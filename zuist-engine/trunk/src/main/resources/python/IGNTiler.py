@@ -180,11 +180,17 @@ def generateLevels(cr_coords, rootEL):
 ################################################################################
 def buildScene(cr_coords, levelCount, rootEL):
     depth = levelCount-1
-    for col in range(cr_coords[0]/10,cr_coords[1]/10+1):
+    counter = 0
+    cols = range(cr_coords[0]/10,cr_coords[1]/10+1)
+    rows = range(cr_coords[2]/10,cr_coords[3]/10+1)
+    total = len(cols) * len(rows)
+    for col in cols:
         # /10 because src tile IDs increment by 10
-        for row in range(cr_coords[2]/10,cr_coords[3]/10+1):
+        for row in rows:
             col10 = col * 10
             row10 = row * 10
+            counter = counter + 1
+            log("--- %3.1f%%" % (100 * counter/float(total)), 2)
             for subcol in range(SRC_TILE_SIZE/TGT_TILE_SIZE):
                 for subrow in range(SRC_TILE_SIZE/TGT_TILE_SIZE):
                     regionEL = ET.SubElement(rootEL, "region")
@@ -217,6 +223,7 @@ def buildScene(cr_coords, levelCount, rootEL):
 # (IGN tile coords, number of levels overall, elementtree XML root)
 ################################################################################
 def buildUpperLevel(col10, row10, levelDepth, scale, subdivisions, rootEL):
+    log("Aggregating tiles (level %d) for tile %02d_%02d" % (levelDepth, col10, row10), 2)
     tileDir = "%s/L%02d/%d_%d" % (TGT_DIR, levelDepth, col10, row10)
     createLevelDir(tileDir, levelDepth)
     for agcol in range(subdivisions):
@@ -300,7 +307,7 @@ if len(sys.argv) > 2:
 else:
     log(CMD_LINE_HELP)
     sys.exit(0)
-log("--------------------")
+log("--------------------------------------------------------------------------")
 log("Tile Size: %dx%d" % (TGT_TILE_SIZE, TGT_TILE_SIZE), 1)
 createTargetDir()
 outputSceneFile = "%s/scene.xml" % TGT_DIR
@@ -309,8 +316,10 @@ outputroot = ET.Element("scene")
 cr_coords = analyzeTree()
 # generate ZUIST levels
 levelCount = generateLevels(cr_coords, outputroot)
+log("---------------------------- Subtiling -----------------------------------")
 processSrcDir(levelCount)
 # build ZUIST pyramid
+log("------------------ Build scene (aggregate tiles) -------------------------")
 buildScene(cr_coords, levelCount, outputroot)
 # serialize the XML tree
 tree = ET.ElementTree(outputroot)
