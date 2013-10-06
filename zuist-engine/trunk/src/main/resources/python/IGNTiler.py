@@ -244,18 +244,11 @@ def aggregateTiles(col10, row10, levelDepth, scale, agcol, agrow, rootEL):
         bitmap.setInterpolationQuality(kCGInterpolationHigh)
         thsz = TGT_TILE_SIZE/2
         # load upper left, upper right, lower left amd lower right tiles to be aggregated into a single tile
-        imUL = CGImageImport(CGDataProviderCreateWithFilename("%s/%d_%d-%d_%d.png" % (lltDir, col10, row10, 2*agcol, 2*agrow)))
-        rectUL = CGRectMake(0, 0, thsz, thsz)
-        bitmap.drawImage(rectUL, imUL)
-        imUR = CGImageImport(CGDataProviderCreateWithFilename("%s/%d_%d-%d_%d.png" % (lltDir, col10, row10, 2*agcol+1, 2*agrow)))
-        rectUR = CGRectMake(thsz, 0, thsz, thsz)
-        bitmap.drawImage(rectUR, imUR)
-        imLL = CGImageImport(CGDataProviderCreateWithFilename("%s/%d_%d-%d_%d.png" % (lltDir, col10, row10, 2*agcol, 2*agrow+1)))
-        rectLL = CGRectMake(0, thsz, thsz, thsz)
-        bitmap.drawImage(rectLL, imLL)
-        imLR = CGImageImport(CGDataProviderCreateWithFilename("%s/%d_%d-%d_%d.png" % (lltDir, col10, row10, 2*agcol+1, 2*agrow+1)))
-        rectLR = CGRectMake(thsz, thsz, thsz, thsz)
-        bitmap.drawImage(rectLR, imLR)
+        for i in range(2):
+            for j in range(2):
+                im = CGImageImport(CGDataProviderCreateWithFilename("%s/%d_%d-%d_%d.png" % (lltDir, col10, row10, 2*agcol+i, 2*agrow+j)))
+                rect = CGRectMake(i*thsz, j*thsz, thsz, thsz)
+                bitmap.drawImage(rect, im)
         bitmap.writeToFile(agTilePath, kCGImageFormatPNG)
     regionEL = ET.SubElement(rootEL, "region")
     regionEL.set("id", "R%d_%d-%d_%d-%d" % (levelDepth, col10, row10, agcol, agrow))
