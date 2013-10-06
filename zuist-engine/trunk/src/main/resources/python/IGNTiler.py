@@ -58,6 +58,13 @@ def createTargetDir():
         log("Creating target directory %s" % TGT_DIR, 2)
         os.mkdir(TGT_DIR)
 
+def createLevelDir(tileDir, level):
+    if not os.path.exists(tileDir):
+        log("Creating tile level directory %s" % tileDir, 3)
+        levelDir = "%s/L%02d" % (TGT_DIR, level)
+        if not os.path.exists(levelDir):
+            os.mkdir(levelDir)
+        os.mkdir(tileDir)
 
 ################################################################################
 # Create target directory if it does not exist yet
@@ -71,7 +78,6 @@ def analyzeTree():
     maxRow = minRow = 0
     for tiffFile in TIFF_FILES:
         tokens = tiffFile.split("/")[-1].split("_")
-        print tokens
         col = int(tokens[2])
         row = int(tokens[3])
         if initialized:
@@ -119,12 +125,7 @@ def tileTile(tiffFile, levelCount):
         log("WARNING: unexpected tile dimensions: (%d,%d) for %s" % (src_sz[0], src_sz[1], tiffFile.split("/")[-1]))
     # split it in NB_SUBTILES x NB_SUBTILES tiles
     tileDir = "%s/L%02d/%d_%d" % (TGT_DIR, levelCount-1, col, row)
-    if not os.path.exists(tileDir):
-        log("Creating tile directory %s" % tileDir, 3)
-        L0dir = "%s/L%02d" % (TGT_DIR, levelCount-1)
-        if not os.path.exists(L0dir):
-            os.mkdir(L0dir)
-        os.mkdir(tileDir)
+    createLevelDir(tileDir, levelCount-1)
     for i in range(NB_SUBTILES):
         for j in range(NB_SUBTILES):
             subTileName = "%d_%d-%d_%d" % (col, row, i, NB_SUBTILES-j-1)
@@ -190,10 +191,10 @@ def buildScene(cr_coords, levelCount, rootEL):
                     regionEL.set("id", "R%d_%d-%d_%d-%d" % (depth, col10, row10, subcol, subrow))
                     regionEL.set("containedIn", "R%d_%d-%d_%d-%d" % (depth-1, col10, row10, subcol/2, subrow/2))
                     #XXX FOR DEBUGGING
-                    regionEL.set("levels", "0;%d" % depth)
-                    # regionEL.set("levels", str(int(depth)))
-                    x = col*SRC_TILE_SIZE + subcol*TGT_TILE_SIZE
-                    y = row*SRC_TILE_SIZE + subrow*TGT_TILE_SIZE
+                    #regionEL.set("levels", "0;%d" % depth)
+                    regionEL.set("levels", str(int(depth)))
+                    x = col*SRC_TILE_SIZE + (subcol+.5)*TGT_TILE_SIZE
+                    y = row*SRC_TILE_SIZE + (subrow+.5)*TGT_TILE_SIZE
                     regionEL.set("x", str(int(x)))
                     regionEL.set("y", str(int(y)))
                     regionEL.set("w", str(int(TGT_TILE_SIZE)))
@@ -208,21 +209,68 @@ def buildScene(cr_coords, levelCount, rootEL):
                     objectEL.set("w", str(int(TGT_TILE_SIZE)))
                     objectEL.set("h", str(int(TGT_TILE_SIZE)))
                     objectEL.set("src", "L%02d/%d_%d/%d_%d-%d_%d.png" % (depth, col10, row10, col10, row10, subcol, subrow))
-            buildUpperLevel(col10, row10, depth-1, outputroot)
+            buildUpperLevel(col10, row10, depth-1, 2, SRC_TILE_SIZE/TGT_TILE_SIZE/2, outputroot)
 
 
 ################################################################################
 # for a given IGN tile, generate lower levels from subtiles
 # (IGN tile coords, number of levels overall, elementtree XML root)
 ################################################################################
-def buildUpperLevel(col10, row10, levelDepth, rootEL):
-    return
+def buildUpperLevel(col10, row10, levelDepth, scale, subdivisions, rootEL):
+    tileDir = "%s/L%02d/%d_%d" % (TGT_DIR, levelDepth, col10, row10)
+    createLevelDir(tileDir, levelDepth)
+    for agcol in range(subdivisions):
+        for agrow in range(subdivisions):
+            aggregateTiles(col10, row10, levelDepth, scale, agcol, agrow, rootEL)
+    if subdivisions >= 2:
+        buildUpperLevel(col10, row10, levelDepth-1, scale*2, subdivisions/2, rootEL)
 
-  # <region x="0" y="0" w="86400" h="43200" id ="R0" layer="BMNG Layer" levels="0;4">
-  #       <resource h="43200" id="I0" sensitive="false" src="0-0-0-0-0.jpg" type="img" w="86400" x="0" y="0" z-index="0"/>
-  # </region>
-
-
+def aggregateTiles(col10, row10, levelDepth, scale, agcol, agrow, rootEL):
+    # lower level tile dir
+    lltDir = "%s/L%02d/%d_%d" % (TGT_DIR, levelDepth+1, col10, row10)
+    agTilePath = "%s/L%02d/%d_%d/%d_%d-%d_%d.png" % (TGT_DIR, levelDepth, col10, row10, col10, row10, agcol, agrow)
+    if os.path.exists(agTilePath) and not FORCE_GENERATE_TILES:
+        log("%s already exists (skipped)" % (agTilePath), 3)
+    else:
+        log("Aggregating tile %s" % agTilePath, 3)
+        bitmap = CGBitmapContextCreateWithColor(TGT_TILE_SIZE, TGT_TILE_SIZE, COLOR_SPACE, CGFloatArray(4))
+        bitmap.setInterpolationQuality(kCGInterpolationHigh)
+        thsz = TGT_TILE_SIZE/2
+        # load upper left, upper right, lower left amd lower right tiles to be aggregated into a single tile
+        imUL = CGImageImport(CGDataProviderCreateWithFilename("%s/%d_%d-%d_%d.png" % (lltDir, col10, row10, 2*agcol, 2*agrow)))
+        rectUL = CGRectMake(0, 0, thsz, thsz)
+        bitmap.drawImage(rectUL, imUL)
+        imUR = CGImageImport(CGDataProviderCreateWithFilename("%s/%d_%d-%d_%d.png" % (lltDir, col10, row10, 2*agcol+1, 2*agrow)))
+        rectUR = CGRectMake(thsz, 0, thsz, thsz)
+        bitmap.drawImage(rectUR, imUR)
+        imLL = CGImageImport(CGDataProviderCreateWithFilename("%s/%d_%d-%d_%d.png" % (lltDir, col10, row10, 2*agcol, 2*agrow+1)))
+        rectLL = CGRectMake(0, thsz, thsz, thsz)
+        bitmap.drawImage(rectLL, imLL)
+        imLR = CGImageImport(CGDataProviderCreateWithFilename("%s/%d_%d-%d_%d.png" % (lltDir, col10, row10, 2*agcol+1, 2*agrow+1)))
+        rectLR = CGRectMake(thsz, thsz, thsz, thsz)
+        bitmap.drawImage(rectLR, imLR)
+        bitmap.writeToFile(agTilePath, kCGImageFormatPNG)
+    regionEL = ET.SubElement(rootEL, "region")
+    regionEL.set("id", "R%d_%d-%d_%d-%d" % (levelDepth, col10, row10, agcol, agrow))
+    regionEL.set("containedIn", "R%d_%d-%d_%d-%d" % (levelDepth-1, col10, row10, agcol/2, agrow/2))
+    regionEL.set("levels", str(int(levelDepth)))
+    scsz = TGT_TILE_SIZE*scale
+    x = col10/10*SRC_TILE_SIZE + (agcol+.5)*scsz
+    y = row10/10*SRC_TILE_SIZE + (agrow+.5)*scsz
+    regionEL.set("x", str(int(x)))
+    regionEL.set("y", str(int(y)))
+    regionEL.set("w", str(int(scsz)))
+    regionEL.set("h", str(int(scsz)))
+    objectEL = ET.SubElement(regionEL, "resource")
+    objectEL.set("id", "I%d_%d-%d_%d-%d" % (levelDepth, col10, row10, agcol, agrow))
+    # make sure lowest res tile, visible on each level, is always drawn below higher-res tiles
+    objectEL.set("z-index", "10")
+    objectEL.set("type", "img")
+    objectEL.set("x", str(int(x)))
+    objectEL.set("y", str(int(y)))
+    objectEL.set("w", str(int(scsz)))
+    objectEL.set("h", str(int(scsz)))
+    objectEL.set("src", agTilePath)
 
 ################################################################################
 # Trace exec on std output
