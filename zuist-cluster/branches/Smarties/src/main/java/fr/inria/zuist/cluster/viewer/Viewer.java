@@ -509,6 +509,44 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 	    worker.start();
 	}
 
+	public void openSceneDestroy(String xmlSceneFile)
+	{
+		// this does not work !!
+		mSpace.removeAllGlyphs();
+		VirtualSpaceManager.INSTANCE.destroyClusteredView(clusteredView);
+		sm.setUpdateLevel(false);
+		sm.enableRegionUpdater(false);
+		for (int l = 0; l < sm.getLevelCount(); l++)
+		{
+			sm.destroyRegionsAtLevel(l);
+		}
+		sm.shutdown();
+		sm = null;
+		VirtualSpace[]  sceneSpaces = {mSpace};
+		Camera[] sceneCameras = {mCamera};
+		sm = new SceneManager(sceneSpaces, sceneCameras);
+		sm.setRegionListener(this);
+		sm.setLevelListener(this);
+		if(sceneUnderBezels)
+		{
+			clusteredView = new ClusteredView(
+				withBezels,
+				3, //origin (block number)
+				numCols, //use complete
+				numRows, //cluster surface
+				sceneCam);
+		} else {
+			clusteredView = new ClusteredView(
+				withoutBezels,
+				3, //origin (block number)
+				numCols, //use complete
+				numRows, //cluster surface
+				sceneCam);
+		}
+		VirtualSpaceManager.INSTANCE.addClusteredView(clusteredView);
+		openScene(new File(xmlSceneFile));
+	}
+
 	public void openScene(String xmlSceneFile) {
 		openScene(new File(xmlSceneFile));
 	}

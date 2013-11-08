@@ -373,7 +373,7 @@ public class changeImage implements SmartiesWidgetHandler
 
 		if (w.item < xmlfiles.size())
 		{
-			viewer.openScene(xmlfiles.get(w.item));
+			viewer.openSceneDestroy(xmlfiles.get(w.item));
 		} 
 		return true;
 	}
