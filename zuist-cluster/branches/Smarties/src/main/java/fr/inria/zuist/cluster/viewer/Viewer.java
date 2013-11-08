@@ -45,6 +45,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import java.io.File;
 import java.io.IOException;
@@ -137,8 +139,10 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     private ClusterGeometry withBezels;
     private boolean sceneUnderBezels = true;
 
-    private boolean desktoponly = false; 
-    private int numRows, numCols;
+    public boolean desktoponly = false; 
+    public int numRows, numCols;
+    public double[] sceneBounds = null;
+    public double sceneWidth = 0, sceneHeight= 0;
 
     private final boolean standalone;
     
@@ -364,7 +368,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 	return r;
     }
 
-    //XXX todo: add zoom centered on any coordinate (in view coord system or mCamera system)
+
 
     JMenuItem infoMI, consoleMI;
 
@@ -509,18 +513,19 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		openScene(new File(xmlSceneFile));
 	}
 
-	public void openScene(File xmlSceneFile) {
+	public void openScene(File xmlSceneFile)
+	{
 		reset();
 		sm.setUpdateLevel(false);
 		sm.enableRegionUpdater(false);
 		loadScene(xmlSceneFile);
 		EndAction ea  = new EndAction(){
-               public void execute(Object subject, Animation.Dimension dimension){
-                   sm.setUpdateLevel(true);
-                   sm.enableRegionUpdater(true);
-               }
-           };
-		getGlobalView(ea);		
+			public void execute(Object subject, Animation.Dimension dimension){
+				sm.setUpdateLevel(true);
+				sm.enableRegionUpdater(true);
+			}
+		};
+		getGlobalView(ea);
 	}
 	
 	void loadScene(File xmlSceneFile){
@@ -532,22 +537,19 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		gp.setValue(0);
 		gp.setVisible(true);
 		SCENE_FILE = xmlSceneFile;
-	    SCENE_FILE_DIR = SCENE_FILE.getParentFile();
-	    sm.loadScene(SceneManager.parseXML(SCENE_FILE), SCENE_FILE_DIR, true, gp);
-	    HashMap sceneAttributes = sm.getSceneAttributes();
-	    if (sceneAttributes.containsKey(SceneManager._background)){
-	        mView.setBackgroundColor((Color)sceneAttributes.get(SceneManager._background));
-            clusteredView.setBackgroundColor((Color)sceneAttributes.get(SceneManager._background));
-	    }
+		SCENE_FILE_DIR = SCENE_FILE.getParentFile();
+		sm.loadScene(SceneManager.parseXML(SCENE_FILE), SCENE_FILE_DIR, true, gp);
+		HashMap sceneAttributes = sm.getSceneAttributes();
+		if (sceneAttributes.containsKey(SceneManager._background)){
+			mView.setBackgroundColor((Color)sceneAttributes.get(SceneManager._background));
+			clusteredView.setBackgroundColor((Color)sceneAttributes.get(SceneManager._background));
+		}
 		MAX_NB_REQUESTS = sm.getObjectCount() / 100;
-	    gp.setVisible(false);
-	    gp.setLabel(VWGlassPane.EMPTY_STRING);
-        mCamera.setAltitude(0.0f);
-	}
-    
-    /*-------------     Navigation       -------------*/
+		gp.setVisible(false);
+		gp.setLabel(VWGlassPane.EMPTY_STRING);
 
-    void getGlobalView(EndAction ea){
+		sceneWidth = 0; sceneHeight= 0;
+		sceneBounds = null;
 		int l = 0;
 		while (sm.getRegionsAtLevel(l) == null){
 			l++;
@@ -558,10 +560,54 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		}
 		if (l > -1){
 			rememberLocation(mCamera.getLocation());
-			double[] wnes = sm.getLevel(l).getBounds();
-			mCamera.getOwningView().centerOnRegion(
-				mCamera, Viewer.ANIM_MOVE_LENGTH, wnes[0], wnes[1], wnes[2], wnes[3], ea);
+			// wnes
+			sceneBounds = sm.getLevel(l).getBounds();
+			System.out.println(
+				"Bounds ("+ l+ ") WNES: " 
+				+ sceneBounds[0] +" "+ sceneBounds[1] +" "+  sceneBounds[2] +" "+ sceneBounds[3]);
+			sceneWidth = - sceneBounds[0] +  sceneBounds[2];
+			sceneHeight = sceneBounds[1]  - sceneBounds[3];
 		}
+
+		if (sceneBounds != null)
+		{
+			mCamera.moveTo((sceneBounds[0] +  sceneBounds[2])/2, (sceneBounds[1]  + sceneBounds[3])/2);
+		}
+		mCamera.setAltitude(0.0);
+	}
+    
+    /*-------------     Navigation       -------------*/
+
+    void getGlobalView(EndAction ea)
+    {
+	    // ok on the desktop ...
+	    if (sceneBounds != null) {
+		    rememberLocation(mCamera.getLocation());
+		    if (false)
+		    {
+			    mCamera.getOwningView().centerOnRegion(
+				    mCamera, Viewer.ANIM_MOVE_LENGTH,
+				    sceneBounds[0], sceneBounds[1], sceneBounds[2], sceneBounds[3], ea);
+		    }
+		    else
+		    {
+			    mCamera.moveTo(
+				    (sceneBounds[0] +  sceneBounds[2])/2, (sceneBounds[1] + sceneBounds[3])/2);
+			    double fw = (double) sceneWidth / (double) getDisplayWidth();
+			    double fh = (double) sceneHeight / (double) getDisplayHeight();
+			    double f = fw;
+			    //System.out.println("fw: " + fw + ", fh: " + fh);
+			    if (fh > fw) f = fh;
+			    mCamera.setAltitude(0.0);
+			    double a = (mCamera.focal + mCamera.altitude) / mCamera.focal;
+			    double newz = mCamera.focal * a * f - mCamera.focal;
+			    mCamera.setAltitude(newz);
+			    if (ea != null)
+			    {
+				    ea.execute(null,null);
+			    }
+		    }
+	    }
     }
 
     /* Higher view */

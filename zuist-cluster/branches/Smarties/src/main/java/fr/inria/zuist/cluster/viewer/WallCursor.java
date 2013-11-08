@@ -6,6 +6,7 @@ import java.awt.geom.Point2D;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.glyphs.SIRectangle;
 
+// for better cursors see ~/src/svn-insitu/WILDHead2/trunk/src/technique/cursor/*
 /**
  * A cursor suitable for interacting with the clustered viewer on a large display.
  */
