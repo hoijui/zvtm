@@ -1,0 +1,32 @@
+zuit-engine and zuist-cluster !!
+
+sandboxes ...
+
+On peut faire tourner le bouzin tout seul ... comment ?
+
+./single_run.sh -f  /usr/local/share/bigimages/zuist/NASA-Curiosity/ZVTM/scene.xml
+./single_run.sh -f  /usr/local/share/bigimages/zuist/paris26GP/scene_fullL0.xml
+./single_run.sh -f  /usr/local/share/bigimages/zuist/ssc2008-11/scene.xml
+
+./master_run.sh /home/olivier/bigimages/zuist/NASA-Curiosity/ZVTM/scene.xml
+
+scp -r wild@frontal-1.wild.lri.fr:/Users/wild/sandboxes/stuf/ZUIST-scenes/NASA-Curiosity ./
+scp -r wild@frontal-1.wild.lri.fr:/Users/wild/sandboxes/epietrig/zuist-scenes/astronomy/ssc2008-11 ./
+
+# epietrig 
+
+
+## linux
+./mycluster_run.sh -n ZuistCluster
+## mac
+./cluster_run.sh -n ZuistCluster
+
+./master_run.sh /usr/local/share/bigimages/zuist/NASA-Curiosity/ZVTM/scene.xml
+
+./master_run.sh /usr/local/share/bigimages/zuist/paris26GP/scene_fullL0.xml
+
+
+##
+wildo sudo mkdir -p  /usr/local/share/bigimages/zuist/NASA-Curiosity/
+wildo "cd  /usr/local/share/bigimages/zuist/; sudo ln -s /Users/wild/sandboxes/stuf/ZUIST-scenes/NASA-Curiosity NASA-Curiosity"
+wildo "cd  /usr/local/share/bigimages/zuist/; sudo ln -s /Users/wild/sandboxes/epietrig/zuist-scenes/misc/paris26GP paris26GP"
