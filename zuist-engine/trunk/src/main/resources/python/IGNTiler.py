@@ -199,8 +199,8 @@ def buildScene(cr_coords, levelCount, rootEL):
                     #XXX FOR DEBUGGING
                     #regionEL.set("levels", "0;%d" % depth)
                     regionEL.set("levels", str(int(depth)))
-                    x = col*SRC_TILE_SIZE + (subcol+.5)*TGT_TILE_SIZE
-                    y = row*SRC_TILE_SIZE + (subrow+.5)*TGT_TILE_SIZE
+                    x = col*SRC_TILE_SIZE + (subcol+.5)*TGT_TILE_SIZE + X_OFFSET
+                    y = row*SRC_TILE_SIZE + (subrow+.5)*TGT_TILE_SIZE + Y_OFFSET
                     regionEL.set("x", str(int(x)))
                     regionEL.set("y", str(int(y)))
                     regionEL.set("w", str(int(TGT_TILE_SIZE)))
@@ -260,8 +260,8 @@ def aggregateTiles(col10, row10, levelDepth, scale, agcol, agrow, rootEL):
     regionEL.set("containedIn", "R%d_%d-%d_%d-%d" % (levelDepth-1, col10, row10, agcol/2, agrow/2))
     regionEL.set("levels", str(int(levelDepth)))
     scsz = TGT_TILE_SIZE*scale
-    x = col10/10*SRC_TILE_SIZE + (agcol+.5)*scsz
-    y = row10/10*SRC_TILE_SIZE + (agrow+.5)*scsz
+    x = col10/10*SRC_TILE_SIZE + (agcol+.5)*scsz + X_OFFSET
+    y = row10/10*SRC_TILE_SIZE + (agrow+.5)*scsz + Y_OFFSET
     regionEL.set("x", str(int(x)))
     regionEL.set("y", str(int(y)))
     regionEL.set("w", str(int(scsz)))
@@ -308,6 +308,8 @@ if len(sys.argv) > 2:
     else:
         log("CoreGraphics not available")
         sys.exit(0)
+    X_OFFSET = 0
+    Y_OFFSET = 0
     if len(sys.argv) > 3:
         for arg in sys.argv[3:]:
             if arg == "-f":
@@ -315,6 +317,10 @@ if len(sys.argv) > 2:
                 log("Force tile generation")
             elif arg.startswith("-tl="):
                 TRACE_LEVEL = int(arg[4:])
+            elif arg.startswith("-dx="):
+                X_OFFSET = int(arg[4:])
+            elif arg.startswith("-dy="):
+                Y_OFFSET = int(arg[4:])
 else:
     log(CMD_LINE_HELP)
     sys.exit(0)
@@ -331,6 +337,7 @@ log("------------------------- Subtiling ---------------------------------")
 processSrcDir(levelCount)
 # build ZUIST pyramid
 log("--------------- Build scene (aggregate tiles) -----------------------")
+log("Offset: %s, %s" % (X_OFFSET, Y_OFFSET))
 buildScene(cr_coords, levelCount, outputroot)
 # serialize the XML tree
 tree = ET.ElementTree(outputroot)
