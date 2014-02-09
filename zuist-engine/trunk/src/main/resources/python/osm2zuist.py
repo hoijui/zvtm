@@ -245,7 +245,7 @@ class RenderThread:
                     # unknown...
                     else:
                         self.printLock.acquire()
-                        log("WARNING: Unkown empty tile %s" % ID)
+                        log("WARNING: Unknown empty tile %s" % ID)
                         self.printLock.release()
                 else:
                     # non-empty tile
@@ -285,7 +285,10 @@ def generateLevels(zf):
 #
 ################################################################################
 def render_tiles(bbox, mapfile, tile_dir, minZoom=1,maxZoom=18, name="unknown", num_threads=NUM_THREADS):
-    log("Rendering levels %s to %s ..." % (MIN_ZOOM, MAX_ZOOM))
+    log("Rendering region: min long=%s, min lat=%s, max long=%s, max lat=%s" % bbox)
+    log("from level %s to level %s" % (MIN_ZOOM, MAX_ZOOM))
+    log("using map %s" % mapfile)
+    log("storing tiles in %s" % tile_dir)
     # Launch rendering threads
     queue = Queue(32)
     printLock = threading.Lock()
