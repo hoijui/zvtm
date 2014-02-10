@@ -23,7 +23,7 @@ CMD_LINE_HELP = "OSM ZUIST Scene Generator\n\nUsage:\n\n" + \
     "\t-log\t\tlog log exec to osm2zuist.log\n"+\
     "\t-min=N\t\tmin zoom level (N in [0:maxN])\n"+\
     "\t-max=N\t\tmax zoom level (N in [minN:18])\n"
-    
+
 DEG_TO_RAD = math.pi/180
 RAD_TO_DEG = 180/math.pi
 
@@ -69,7 +69,7 @@ def minmax (a,b,c):
     a = max(a,b)
     a = min(a,c)
     return a
-    
+
 def hasEmptyAncestor(z, x, y, et_set):
     if z <= 1:
         return False
@@ -98,14 +98,14 @@ class GoogleProjection:
             self.zc.append((e,e))
             self.Ac.append(c)
             c *= 2
-                
+
     def fromLLtoPixel(self,ll,zoom):
          d = self.zc[zoom]
          e = round(d[0] + ll[0] * self.Bc[zoom])
          f = minmax(math.sin(DEG_TO_RAD * ll[1]),-0.9999,0.9999)
          g = round(d[1] + 0.5*math.log((1+f)/(1-f))*-self.Cc[zoom])
          return (e,g)
-     
+
     def fromPixelToLL(self,px,zoom):
          e = self.zc[zoom]
          f = (px[0] - e[0])/self.Bc[zoom]
@@ -199,7 +199,7 @@ class RenderThread:
                 if z == 0:
                     zi = 0
                 else:
-                    zi = 1                
+                    zi = 1
                 bytes = os.stat(tile_uri)[6]
                 if bytes == 126:
                     # empty tile
@@ -260,8 +260,8 @@ class RenderThread:
                     self.zf.write("  <region id=\"R%s\" %s levels=\"%s\" x=\"%d\" y=\"%d\" w=\"%d\" h=\"%d\">\n" % (ID, ci, levels, x, y, w, h))
                     self.zf.write("    <resource type=\"img\" id=\"T%s\" src=\"%s\" params=\"im=%s\" x=\"%d\" y=\"%d\" w=\"%d\" h=\"%d\" z-index=\"%d\"/>\n" % (ID, src, INTERPOLATION, x, y, w, h, zi))
                     self.zf.write("  </region>\n")
-                    self.xmlLock.release()                
-            
+                    self.xmlLock.release()
+
             self.zf.flush()
             self.q.task_done()
 
@@ -306,11 +306,11 @@ def render_tiles(bbox, mapfile, tile_dir, minZoom=1,maxZoom=18, name="unknown", 
         renderers[i] = render_thread
 
 
-    gprj = GoogleProjection(maxZoom+1) 
+    gprj = GoogleProjection(maxZoom+1)
 
     ll0 = (bbox[0],bbox[3])
     ll1 = (bbox[2],bbox[1])
-    
+
     zf.write("<?xml version=\"1.0\"?>\n")
     zf.write("<scene background=\"white\">\n")
     generateLevels(zf)
@@ -348,13 +348,13 @@ def render_tiles(bbox, mapfile, tile_dir, minZoom=1,maxZoom=18, name="unknown", 
     queue.join()
     for i in range(num_threads):
         renderers[i].join()
-    
+
     zf.write("</scene>\n")
     zf.flush()
     zf.close()
     if LOG_FILE is not None:
         LOG_FILE.flush()
-        LOG_FILE.close()    
+        LOG_FILE.close()
 
 ################################################################################
 # Trace exec on std output and log file
@@ -365,11 +365,11 @@ def log(msg, level=0):
         if LOG_FILE is not None:
             LOG_FILE.write(msg+"\n")
             LOG_FILE.flush()
-        
+
 def initLogFile():
     global LOG_FILE
     LOG_FILE = open(LOG_FILE_NAME, 'w')
-        
+
 ################################################################################
 #
 ################################################################################
@@ -388,7 +388,7 @@ if __name__ == "__main__":
             elif arg.startswith("-h"):
                 log(CMD_LINE_HELP)
                 sys.exit(0)
-    
+
     home = os.environ['HOME']
     try:
         mapfile = os.environ['MAPNIK_MAP_FILE']
@@ -398,6 +398,6 @@ if __name__ == "__main__":
         tile_dir = os.environ['MAPNIK_TILE_DIR']
     except KeyError:
         tile_dir = home + "/zuist/tiles/"
-    
+
     bbox = (-180.0,-90.0, 180.0,90.0)
     render_tiles(bbox, mapfile, tile_dir, MIN_ZOOM, MAX_ZOOM, "World")
