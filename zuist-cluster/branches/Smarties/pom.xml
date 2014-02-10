@@ -28,10 +28,18 @@
       </repository>
     </distributionManagement>
     <repositories>
-		<repository>
-                	<id>Smarties repository</id>
-                	<url>http://insitu.lri.fr/smarties/repository/maven2/</url>
-		</repository>
+	<repository>
+            <id>fr.lri.smarties</id>
+            <name>Smarties Repository</name>
+            <url>http://smarties.lri.fr/repository/maven2/</url>
+	</repository>
+<!--        
+      <repository>
+            <id>central</id>
+            <name>Maven Repository</name>
+            <url>http://repo1.maven.org/maven2</url>
+        </repository>
+-->
     </repositories>
     <dependencies>
         <dependency>
@@ -63,7 +71,7 @@
 	<dependency>
 		<groupId>fr.lri.smarties</groupId>
                 <artifactId>javaSmarties</artifactId>
-	         <version>1.0.0</version>
+	         <version>1.0.1-SNAPSHOT</version>
 	</dependency>
     </dependencies>
     <build>
