@@ -33,6 +33,15 @@
             <name>Smarties Repository</name>
             <url>http://smarties.lri.fr/repository/maven2/</url>
 	</repository>
+        <repository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>central</id>
+            <name>Maven Repository Switchboard</name>
+         <url>http://repo1.maven.org/maven2</url>
+       </repository>
+
 <!--        
       <repository>
             <id>central</id>
