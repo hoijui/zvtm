@@ -42,8 +42,8 @@ MAX_ALT = "100000"
 MIN_ZOOM = 0
 MAX_ZOOM = 4
 
-EMPTY_SEA_TILES_512 = ["5429c11f64f842fa1ef2bdd78c0e91ae",]
-EMPTY_LAND_TILES_512 = ["19321692408961898d45d97d70be7313", "053d9da21fca556bc30cf5f375a892ea"]
+EMPTY_SEA_TILES_512 = ["5429c11f64f842fa1ef2bdd78c0e91ae","fcb33582b2d6c52e6249e6b43c36861d"]
+EMPTY_LAND_TILES_512 = ["19321692408961898d45d97d70be7313", "053d9da21fca556bc30cf5f375a892ea", "d5e2e198c100308642199a835cb86a26"]
 
 LOG_FILE_NAME = "osm2zuist.log"
 LOG_FILE = None
@@ -399,5 +399,8 @@ if __name__ == "__main__":
     except KeyError:
         tile_dir = home + "/zuist/tiles/"
 
+    #WORLD
     bbox = (-180.0,-90.0, 180.0,90.0)
+    #FRANCE
+    #bbox = (-5.0,41.3,9.6,51.1)
     render_tiles(bbox, mapfile, tile_dir, MIN_ZOOM, MAX_ZOOM, "World")
