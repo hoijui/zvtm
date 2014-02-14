@@ -30,11 +30,11 @@ bt.setBounds(x, y, w, h);
 */
 
 public class TranslucentButton extends JButton implements TranslucentWidget {
-	
+
 	AlphaComposite bgAC = AB_08;
 	AlphaComposite bgACro = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, .8f);
 	AlphaComposite fgAC = AB_10;
-	
+
 	/** Background rollover color. */
 	Color bgColro = Color.GRAY;
 	/** Foreground selected/pressed color. */
@@ -43,10 +43,10 @@ public class TranslucentButton extends JButton implements TranslucentWidget {
 	Color fgCol = Color.WHITE;
 	/** Background color. */
 	Color bgCol = Color.BLACK;
-	
+
 	boolean cursorInside = false;
 	boolean buttonPressed = false;
-	
+
 	public TranslucentButton(){
 		super();
 		init();
@@ -56,30 +56,30 @@ public class TranslucentButton extends JButton implements TranslucentWidget {
 		super(a);
 		init();
 	}
-	
+
 	public TranslucentButton(Icon icon){
 		super(icon);
 		init();
 	}
-	
+
 	public TranslucentButton(String text){
 		super(text);
 		init();
 	}
-	
+
 	public TranslucentButton(String text, Icon icon){
 		super(text, icon);
 		init();
 	}
-	
+
 	void init(){
 		setOpaque(false);
 		setContentAreaFilled(false);
 		setBorderPainted(false);
-		initColors();	
-		initListeners();	    
+		initColors();
+		initListeners();
 	}
-	
+
 	void initColors(){
         setForeground(fgCol);
         setBackground(bgCol);
@@ -104,12 +104,12 @@ public class TranslucentButton extends JButton implements TranslucentWidget {
 			}
 			public void mouseReleased(MouseEvent e){
 				buttonPressed = false;
-				setForeground(fgCol);	
-				repaint();			
+				setForeground(fgCol);
+				repaint();
 			}
 		});
 	}
-	
+
 	/**Set the translucence value of this button's background.
 	 *@param alpha blending value, in [0.0,1.0]. Default is 0.8
 	 */
@@ -123,14 +123,14 @@ public class TranslucentButton extends JButton implements TranslucentWidget {
 	public void setForegroundTranslucence(float alpha){
 		this.fgAC = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
 	}
-	
+
 	/**Set the translucence value of this button's background when the cursor is hover it.
 	 *@param alpha blending value, in [0.0,1.0]. Default is 1.0
-	 */	
+	 */
 	public void setRolloverBackgroundTranslucence(float alpha){
 		this.bgAC = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
 	}
-	
+
 	@Override
 	public void paint(Graphics g){
 		Graphics2D g2d = (Graphics2D)g;
@@ -147,5 +147,5 @@ public class TranslucentButton extends JButton implements TranslucentWidget {
 		g2d.drawRect(0,0,getWidth()-1,getHeight()-1);
 		super.paint(g2d);
 	}
-	
+
 }
