@@ -80,9 +80,9 @@ import org.w3c.dom.Document;
  */
 
 public class TiledImageViewer {
-    
+
     File SCENE_FILE, SCENE_FILE_DIR;
-        
+
     /* screen dimensions, actual dimensions of windows */
     static int SCREEN_WIDTH =  Toolkit.getDefaultToolkit().getScreenSize().width;
     static int SCREEN_HEIGHT =  Toolkit.getDefaultToolkit().getScreenSize().height;
@@ -94,9 +94,9 @@ public class TiledImageViewer {
     int panelWidth, panelHeight;
 
 	static Color BACKGROUND_COLOR = Color.BLACK;
-    
+
     boolean UPDATE_TILES = true;
-    
+
     /* ZVTM objects */
     VirtualSpaceManager vsm;
     static final String mSpaceName = "Image Layer";
@@ -110,9 +110,9 @@ public class TiledImageViewer {
     SceneManager sm;
     TIVNavigationManager nm;
     Overlay ovm;
-    
+
     WEGlassPane gp;
-    
+
     public TiledImageViewer(boolean fullscreen, boolean opengl, boolean antialiased, File xmlSceneFile){
         ovm = new Overlay(this);
         initGUI(fullscreen, opengl, antialiased);
@@ -142,7 +142,7 @@ public class TiledImageViewer {
 		nm.createOverview(sm.getRegionsAtLevel(0)[0]);
         nm.updateOverview();
     }
-    
+
     void initGUI(boolean fullscreen, boolean opengl, boolean antialiased){
         windowLayout();
         vsm = VirtualSpaceManager.INSTANCE;
@@ -227,15 +227,15 @@ public class TiledImageViewer {
         VIEW_W = (SCREEN_WIDTH <= VIEW_MAX_W) ? SCREEN_WIDTH : VIEW_MAX_W;
         VIEW_H = (SCREEN_HEIGHT <= VIEW_MAX_H) ? SCREEN_HEIGHT : VIEW_MAX_H;
     }
-    
-    
+
+
     /*-------------  Scene management    -------------*/
-	
+
 	void reset(){
 		sm.reset();
 		mSpace.removeAllGlyphs();
 	}
-	
+
 	void openFile(){
 		final JFileChooser fc = new JFileChooser(SCENE_FILE_DIR);
 		fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -248,7 +248,7 @@ public class TiledImageViewer {
                     sm.enableRegionUpdater(false);
 					reset();
 					loadScene(fc.getSelectedFile());
-					return null; 
+					return null;
 			    }
 			};
 		    worker.start();
@@ -261,7 +261,7 @@ public class TiledImageViewer {
 		    public Object construct(){
 				reset();
 				loadScene(SCENE_FILE);
-				return null; 
+				return null;
 		    }
 		};
 	    worker.start();
@@ -269,7 +269,7 @@ public class TiledImageViewer {
 
 	void loadScene(File xmlSceneFile){
 		try {
-			mView.setTitle(mViewName + " - " + xmlSceneFile.getCanonicalPath());			
+			mView.setTitle(mViewName + " - " + xmlSceneFile.getCanonicalPath());
 		}
 		catch (IOException ex){}
 		gp.setValue(0);
@@ -292,13 +292,13 @@ public class TiledImageViewer {
            };
 		nm.getGlobalView(ea);
 	}
-    
+
     void updatePanelSize(){
         Dimension d = mView.getPanel().getComponent().getSize();
         panelWidth = d.width;
         panelHeight = d.height;
         if (nm != null && nm.ovPortal != null){
-            nm.ovPortal.moveTo(panelWidth-nm.ovPortal.getDimensions().width-1, panelHeight-nm.ovPortal.getDimensions().height-1);            
+            nm.ovPortal.moveTo(panelWidth-nm.ovPortal.getDimensions().width-1, panelHeight-nm.ovPortal.getDimensions().height-1);
         }
     }
 
@@ -306,11 +306,11 @@ public class TiledImageViewer {
         UPDATE_TILES = !UPDATE_TILES;
         sm.setUpdateLevel(UPDATE_TILES);
     }
-    
+
     /* ---- Benchmark animation ----*/
-	
+
 	Animation cameraAlt;
-	
+
 	void toggleBenchAnim(){
 	    if (cameraAlt == null){
 	        animate(20000);
@@ -320,7 +320,7 @@ public class TiledImageViewer {
 	        cameraAlt = null;
 	    }
 	}
-	
+
 	void animate(final double gvAlt){
 	    cameraAlt = vsm.getAnimationManager().getAnimationFactory().createAnimation(
            5000, Animation.INFINITE, Animation.RepeatBehavior.REVERSE, mCamera, Animation.Dimension.ALTITUDE,
@@ -334,11 +334,11 @@ public class TiledImageViewer {
         );
         vsm.getAnimationManager().startAnimation(cameraAlt, false);
     }
-    
+
     void gc(){
         System.gc();
     }
-    
+
     void exit(){
         System.exit(0);
     }
@@ -370,7 +370,7 @@ public class TiledImageViewer {
                         }
                     }
                     else {
-                        xmlSceneFile = f;                        
+                        xmlSceneFile = f;
                     }
                 }
             }
@@ -384,7 +384,7 @@ public class TiledImageViewer {
         System.out.println("--help for command line options");
         new TiledImageViewer(fs, ogl, aa, xmlSceneFile);
     }
-    
+
     private static void printCmdLineHelp(){
 		System.out.println("Usage:\n\tjava -Xmx1024M -Xms512M -cp target/timingframework-1.0.jar:zuist-engine-0.2.0-SNAPSHOT.jar:target/:target/:target/zvtm-0.10.0-SNAPSHOT.jar <path_to_scene_dir> [-fs] [-opengl]");
         System.out.println("Options:\n\t-fs: fullscreen mode");
@@ -396,11 +396,11 @@ public class TiledImageViewer {
 }
 
 class WEGlassPane extends JComponent implements ProgressListener {
-    
+
     static final int BAR_WIDTH = 200;
     static final int BAR_HEIGHT = 10;
 
-    static final AlphaComposite GLASS_ALPHA = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.65f);    
+    static final AlphaComposite GLASS_ALPHA = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.65f);
     static final Color MSG_COLOR = Color.DARK_GRAY;
     GradientPaint PROGRESS_GRADIENT = new GradientPaint(0, 0, Color.ORANGE, 0, BAR_HEIGHT, Color.BLUE);
 
@@ -408,14 +408,14 @@ class WEGlassPane extends JComponent implements ProgressListener {
     String msg = EMPTY_STRING;
     int msgX = 0;
     int msgY = 0;
-    
+
     int completion = 0;
     int prX = 0;
     int prY = 0;
     int prW = 0;
-    
+
     TiledImageViewer application;
-    
+
     static final Font GLASSPANE_FONT = new Font("Arial", Font.PLAIN, 12);
 
     WEGlassPane(TiledImageViewer app){
@@ -425,7 +425,7 @@ class WEGlassPane extends JComponent implements ProgressListener {
         addMouseMotionListener(new MouseMotionAdapter(){});
         addKeyListener(new KeyAdapter(){});
     }
-    
+
     public void setValue(int c){
         completion = c;
         prX = application.panelWidth/2-BAR_WIDTH/2;
@@ -434,14 +434,14 @@ class WEGlassPane extends JComponent implements ProgressListener {
         PROGRESS_GRADIENT = new GradientPaint(0, prY, Color.LIGHT_GRAY, 0, prY+BAR_HEIGHT, Color.DARK_GRAY);
         repaint(prX, prY, BAR_WIDTH, BAR_HEIGHT);
     }
-    
+
     public void setLabel(String m){
         msg = m;
         msgX = application.panelWidth/2-BAR_WIDTH/2;
         msgY = application.panelHeight/2-BAR_HEIGHT/2 - 10;
         repaint(msgX, msgY-50, 400, 70);
     }
-    
+
     protected void paintComponent(Graphics g){
         Graphics2D g2 = (Graphics2D)g;
         Rectangle clip = g.getClipBounds();
@@ -459,15 +459,15 @@ class WEGlassPane extends JComponent implements ProgressListener {
         g2.setColor(MSG_COLOR);
         g2.drawRect(prX, prY, BAR_WIDTH, BAR_HEIGHT);
     }
-    
+
 }
 
 class Overlay implements ViewListener {
-    
+
     static final Color SAY_MSG_COLOR = Color.LIGHT_GRAY;
     static final Font SAY_MSG_FONT = new Font("Arial", Font.PLAIN, 24);
     static final int SAY_DURATION = 500;
-    
+
     static final Color FADE_REGION_FILL = Color.BLACK;
     static final Color FADE_REGION_STROKE = Color.WHITE;
 
@@ -487,7 +487,7 @@ class Overlay implements ViewListener {
     Overlay(TiledImageViewer app){
         this.application = app;
     }
-    
+
     void init(){
         fadedRegion = new VRectangle(0, 0, 0, 10, 10, FADE_REGION_FILL, FADE_REGION_STROKE, 0.85f);
         application.aboutSpace.addGlyph(fadedRegion);
@@ -497,7 +497,7 @@ class Overlay implements ViewListener {
         application.aboutSpace.addGlyph(sayGlyph);
         sayGlyph.setVisible(false);
     }
-    
+
     void showAbout(){
         if (!showingAbout){
             fadeAbout = new VRectangle(0, 0, 0, Math.round(application.panelWidth/1.05), Math.round(application.panelHeight/1.5),
@@ -515,7 +515,7 @@ class Overlay implements ViewListener {
             application.aboutSpace.addGlyph(inriaLogo);
             application.aboutSpace.addGlyph(insituLogo);
 			for (int i=0;i<aboutLines.length;i++){
-	            application.aboutSpace.addGlyph(aboutLines[i]);				
+	            application.aboutSpace.addGlyph(aboutLines[i]);
 			}
             showingAbout = true;
         }
@@ -541,7 +541,7 @@ class Overlay implements ViewListener {
 	            if (aboutLines[i] != null){
 	                application.aboutSpace.removeGlyph(aboutLines[i]);
 	                aboutLines[i] = null;
-	            }				
+	            }
 			}
 		}
 		application.mView.setActiveLayer(0);

@@ -38,7 +38,7 @@ import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.widgets.TranslucentTextArea;
 
 class OverlayManager implements ViewListener {
-    
+
     static final Color FADE_REGION_FILL = Color.BLACK;
     static final Color FADE_REGION_STROKE = Color.WHITE;
 
@@ -52,7 +52,7 @@ class OverlayManager implements ViewListener {
 
 	// west, east and south margins of console (north bound depends on frame's height)
 	int[] consoleMarginsWES = {10, 10, 10};
-	
+
 	int[] consolePaddingWNES = {5, 5, 5, 5};
 
     OverlayManager(Viewer app){
@@ -69,32 +69,32 @@ class OverlayManager implements ViewListener {
 		lp.add(consoleSP, (Integer)(JLayeredPane.DEFAULT_LAYER+33));
 		updateConsoleBounds();
 	}
-	
+
 	void updateConsoleBounds(){
 		consoleSP.setBounds(consoleMarginsWES[0], Math.round(application.panelHeight*.8f),
 		                  application.panelWidth-consoleMarginsWES[1]-consoleMarginsWES[0], Math.round(application.panelHeight*.2f-consoleMarginsWES[2]));
 	}
-	
+
 	void toggleConsole(){
 		consoleSP.setVisible(!consoleSP.isVisible());
 		if (consoleSP.isVisible()){
 		    application.consoleMI.setText(Messages.CONSOLE_HIDE);
 		}
 		else {
-		    application.consoleMI.setText(Messages.CONSOLE_SHOW);		    
+		    application.consoleMI.setText(Messages.CONSOLE_SHOW);
 		}
 	}
-	
+
 	void sayInConsole(String text){
 		console.setText(console.getText()+text);
 		console.setCaretPosition(console.getDocument().getLength());
 	}
-    
+
     boolean showingAbout = false;
     VRectangle fadeAbout;
     VImage insituLogo, inriaLogo;
     VText[] aboutLines;
-    
+
     void showAbout(){
         if (!showingAbout){
             fadeAbout = new VRectangle(0, 0, 0, Math.round(application.panelWidth/1.05), Math.round(application.panelHeight/1.5),
@@ -112,7 +112,7 @@ class OverlayManager implements ViewListener {
             application.ovSpace.addGlyph(inriaLogo);
             application.ovSpace.addGlyph(insituLogo);
 			for (int i=0;i<aboutLines.length;i++){
-	            application.ovSpace.addGlyph(aboutLines[i]);				
+	            application.ovSpace.addGlyph(aboutLines[i]);
 			}
             showingAbout = true;
         }
@@ -138,7 +138,7 @@ class OverlayManager implements ViewListener {
 	            if (aboutLines[i] != null){
 	                application.ovSpace.removeGlyph(aboutLines[i]);
 	                aboutLines[i] = null;
-	            }				
+	            }
 			}
 		}
 		application.mView.setActiveLayer(0);

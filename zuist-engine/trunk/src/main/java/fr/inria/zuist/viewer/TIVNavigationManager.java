@@ -31,14 +31,14 @@ import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 import fr.inria.zuist.engine.Region;
 
 class TIVNavigationManager {
-    
+
     /* Navigation constants */
     static final int ANIM_MOVE_DURATION = 300;
     static final short MOVE_UP = 0;
     static final short MOVE_DOWN = 1;
     static final short MOVE_LEFT = 2;
     static final short MOVE_RIGHT = 3;
-    
+
     /* misc. lens settings */
     Lens lens;
     TemporalLens tLens;
@@ -52,24 +52,24 @@ class TIVNavigationManager {
     /* LENS MAGNIFICATION */
     static float WHEEL_MM_STEP = 1.0f;
     static final float MAX_MAG_FACTOR = 12.0f;
-    
+
     static final int NO_LENS = 0;
     static final int ZOOMIN_LENS = 1;
     static final int ZOOMOUT_LENS = -1;
     int lensType = NO_LENS;
-    
+
     /* lens distance and drop-off functions */
     static final short L2_Gaussian = 0;
     static final short L2_SCB = 1;
     short lensFamily = L2_Gaussian;
-    
+
     static final float FLOOR_ALTITUDE = 100.0f;
 
     TiledImageViewer application;
-    
+
     Camera mCamera;
     VirtualSpaceManager vsm;
-    
+
     TIVNavigationManager(TiledImageViewer app){
         this.application = app;
         this.vsm = VirtualSpaceManager.INSTANCE;
@@ -80,7 +80,7 @@ class TIVNavigationManager {
     }
 
     void getGlobalView(EndAction ea){
-		application.sm.getGlobalView(mCamera, TIVNavigationManager.ANIM_MOVE_DURATION, ea);		
+		application.sm.getGlobalView(mCamera, TIVNavigationManager.ANIM_MOVE_DURATION, ea);
     }
 
     /* Higher view */
@@ -127,24 +127,24 @@ class TIVNavigationManager {
             trans, true, SlowInSlowOutInterpolator.getInstance(), null);
         vsm.getAnimationManager().startAnimation(a, false);
     }
-    
+
     void altitudeChanged(){
 
     }
 
 	/* -------------- Overview ------------------- */
-	
+
 	static final int MAX_OVERVIEW_WIDTH = 200;
 	static final int MAX_OVERVIEW_HEIGHT = 200;
 	static final Color OBSERVED_REGION_COLOR = Color.GREEN;
 	static final float OBSERVED_REGION_ALPHA = 0.5f;
 	static final Color OV_BORDER_COLOR = Color.WHITE;
 	static final Color OV_INSIDE_BORDER_COLOR = Color.WHITE;
-	
+
 	OverviewPortal ovPortal;
-	
+
 	double[] scene_bounds = {0, 0, 0, 0};
-	
+
 	void createOverview(Region rootRegion){
 	    int ow, oh;
 	    float ar = (float) (rootRegion.getWidth() / (float)rootRegion.getHeight());
@@ -167,7 +167,7 @@ class TIVNavigationManager {
 		ovPortal.setBorder(Color.GREEN);
 		updateOverview();
 	}
-	
+
 	void updateOverview(){
 		if (ovPortal != null){
 		    int l = 0;
@@ -180,7 +180,7 @@ class TIVNavigationManager {
     		}
     		if (l > -1){
     			scene_bounds = application.sm.getLevel(l).getBounds();
-    	        ovPortal.centerOnRegion(TIVNavigationManager.ANIM_MOVE_DURATION, scene_bounds[0], scene_bounds[1], scene_bounds[2], scene_bounds[3]);		
+    	        ovPortal.centerOnRegion(TIVNavigationManager.ANIM_MOVE_DURATION, scene_bounds[0], scene_bounds[1], scene_bounds[2], scene_bounds[3]);
     		}
 		}
 	}
@@ -190,9 +190,9 @@ class TIVNavigationManager {
         ovPortal.setVisible(b);
         vsm.repaint(application.mView);
     }
-    
+
 	/* -------------- Sigma Lenses ------------------- */
-	
+
 	void toggleLensType(){
 	    if (lensFamily == L2_Gaussian){
 	        lensFamily = L2_SCB;
@@ -229,7 +229,7 @@ class TIVNavigationManager {
         VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
         setLens(ZOOMIN_LENS);
     }
-    
+
     void zoomInPhase2(double mx, double my){
         // compute camera animation parameters
         double cameraAbsAlt = application.mCamera.getAltitude()+application.mCamera.getFocal();
@@ -364,16 +364,16 @@ From this we can get the altitude difference (a2 - a1)                       */
         }
         return res;
     }
-    
+
     /* ---------------- Screen saver ---------------------- */
-    
+
     boolean screensaverEnabled = false;
-    
+
     int SCREEN_SAVER_INTERVAL = 2000;
-    
+
     ScreenSaver ss;
-	Timer ssTimer;    
-    
+	Timer ssTimer;
+
     void toggleScreenSaver(){
         screensaverEnabled = !screensaverEnabled;
         ss.setEnabled(screensaverEnabled);
@@ -383,10 +383,10 @@ From this we can get the altitude difference (a2 - a1)                       */
 }
 
 class ScreenSaver extends TimerTask {
-	
+
 	TIVNavigationManager nm;
     boolean enabled = false;
-	
+
 	ScreenSaver(TIVNavigationManager nm){
 		super();
         this.nm = nm;
@@ -395,13 +395,13 @@ class ScreenSaver extends TimerTask {
     void setEnabled(boolean b){
         enabled = b;
     }
-	
+
 	public void run(){
 		if (enabled){
 		    move();
 		}
 	}
-	
+
 	void move(){
 	    int r = (int)Math.round(Math.random()*20);
 	    if (r < 6){
@@ -426,17 +426,17 @@ class ScreenSaver extends TimerTask {
 	        nm.translateView(TIVNavigationManager.MOVE_RIGHT);
 	    }
 	}
-		
+
 }
 
 class ZP2LensAction implements EndAction {
 
     TIVNavigationManager nm;
-    
+
     ZP2LensAction(TIVNavigationManager nm){
 	    this.nm = nm;
     }
-    
+
     public void	execute(Object subject, Animation.Dimension dimension){
         (((Lens)subject).getOwningView()).setLens(null);
         ((Lens)subject).dispose();
@@ -445,5 +445,5 @@ class ZP2LensAction implements EndAction {
         nm.setLens(TIVNavigationManager.NO_LENS);
         nm.application.sm.setUpdateLevel(true);
     }
-    
+
 }

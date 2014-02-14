@@ -15,10 +15,10 @@ import fr.inria.zvtm.engine.Utils;
 import fr.inria.zuist.engine.Region;
 
 public class Launcher {
-    
+
     static final String VIEWER_TYPE_TILEDIMAGE = "I";
     static final String VIEWER_TYPE_DEBUGGER = "D";
-    
+
     public static void main(String[] args){
         File xmlSceneFile = null;
 		boolean fs = false;
@@ -50,7 +50,7 @@ public class Launcher {
                         }
                     }
                     else {
-                        xmlSceneFile = f;                        
+                        xmlSceneFile = f;
                     }
                 }
             }
@@ -63,15 +63,15 @@ public class Launcher {
         }
         System.out.println("--help for command line options");
         if (viewerType.equals(VIEWER_TYPE_TILEDIMAGE)){
-            new TiledImageViewer(fs, ogl, aa, xmlSceneFile);            
+            new TiledImageViewer(fs, ogl, aa, xmlSceneFile);
         }
         else {
             new Viewer(fs, ogl, aa, xmlSceneFile);
         }
     }
-    
+
     private static void printCmdLineHelp(){
-        System.out.println("Usage:\n\tjava -jar target/zuist-engine-X.X.X.jar <zuist_scene_file.xml> [viewer] [options]");    	
+        System.out.println("Usage:\n\tjava -jar target/zuist-engine-X.X.X.jar <zuist_scene_file.xml> [viewer] [options]");
 		System.out.println("Viewer:\n\tI: tiled image scene");
 		System.out.println("\tD: debugger");
 		System.out.println("\nOptions:\n\t-fs: fullscreen mode");
@@ -79,5 +79,5 @@ public class Launcher {
         System.out.println("\t-noaa: no antialiasing");
         System.out.println("\t-smooth: default to smooth transitions between levels when none specified");
     }
-    
+
 }
