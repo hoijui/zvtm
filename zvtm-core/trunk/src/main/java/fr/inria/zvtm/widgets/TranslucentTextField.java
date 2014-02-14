@@ -88,10 +88,18 @@ public class TranslucentTextField extends JTextField implements TranslucentWidge
 		this.fgAC = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
 	}
 
+	/**
+	 * Set the textfield's border color.
+	 *@param c the border's color. Pass null to avoid drawing a border.
+	 */
 	public void setBorderColor(Color c){
 		borderColor = c;
 	}
 
+	/**
+	 * Get the textfield's border color.
+	 *@return the border's color. null if not drawing a border.
+	 */
 	public Color getBorderColor(){
 		return borderColor;
 	}
@@ -103,8 +111,10 @@ public class TranslucentTextField extends JTextField implements TranslucentWidge
 		g2d.setColor(getBackground());
 		g2d.fillRect(0,0,getWidth(),getHeight());
 		g2d.setComposite(fgAC);
-		g2d.setColor(borderColor);
-		g2d.drawRect(0,0,getWidth()-1,getHeight()-1);
+		if (borderColor != null){
+			g2d.setColor(borderColor);
+			g2d.drawRect(0,0,getWidth()-1,getHeight()-1);
+		}
 		g2d.setColor(getForeground());
 		super.paint(g2d);
 	}
