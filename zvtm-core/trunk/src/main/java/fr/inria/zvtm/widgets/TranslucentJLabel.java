@@ -21,6 +21,8 @@ public class TranslucentJLabel extends JLabel implements TranslucentWidget {
     AlphaComposite bgAC = AB_08;
     AlphaComposite fgAC = AB_10;
 
+    boolean drawBorder = true;
+
     public TranslucentJLabel() {
         super();
         init();
@@ -91,6 +93,20 @@ public class TranslucentJLabel extends JLabel implements TranslucentWidget {
         this.fgAC = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
     }
 
+    /**
+     * Should the widget's border be drawn or not.
+     */
+    public void setDrawBorder(boolean b){
+        drawBorder = b;
+    }
+
+    /**
+     * Is the widget's border drawn or not.
+     */
+    public boolean getDrawBorder(){
+        return drawBorder;
+    }
+
     @Override
     public void paint(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
@@ -98,8 +114,10 @@ public class TranslucentJLabel extends JLabel implements TranslucentWidget {
         g2d.setColor(getBackground());
         g2d.fillRect(0, 0, getWidth(), getHeight());
         g2d.setComposite(fgAC);
-        g2d.setColor(getForeground());
-        g2d.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
+        if (drawBorder){
+            g2d.setColor(getForeground());
+            g2d.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
+        }
         super.paint(g2d);
     }
 
