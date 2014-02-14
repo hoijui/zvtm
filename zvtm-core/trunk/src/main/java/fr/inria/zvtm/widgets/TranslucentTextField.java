@@ -30,93 +30,93 @@ t.setBounds(x, y, w, h);
 
 public class TranslucentTextField extends JTextField implements TranslucentWidget {
 
-	AlphaComposite bgAC = AB_08;
-	AlphaComposite fgAC = AB_10;
+    AlphaComposite bgAC = AB_08;
+    AlphaComposite fgAC = AB_10;
 
-	Color borderColor;
+    Color borderColor;
 
-	public TranslucentTextField(){
-		super();
+    public TranslucentTextField(){
+        super();
         init();
-	}
+    }
 
-	public TranslucentTextField(javax.swing.text.Document doc, String text, int columns){
-		super(doc, text, columns);
+    public TranslucentTextField(javax.swing.text.Document doc, String text, int columns){
+        super(doc, text, columns);
         init();
-	}
+    }
 
-	public TranslucentTextField(int columns){
-		super(columns);
+    public TranslucentTextField(int columns){
+        super(columns);
         init();
-	}
+    }
 
-	public TranslucentTextField(String text){
-		super(text);
+    public TranslucentTextField(String text){
+        super(text);
         init();
-	}
+    }
 
-	public TranslucentTextField(String text, int columns){
-		super(text, columns);
+    public TranslucentTextField(String text, int columns){
+        super(text, columns);
         init();
-	}
+    }
 
     void init(){
         setOpaque(false);
         initColors();
     }
 
-	void initColors(){
+    void initColors(){
         setForeground(Color.WHITE);
         setBackground(Color.BLACK);
         setSelectionColor(Color.WHITE);
         setSelectedTextColor(Color.BLACK);
-		//setCaretColor(Color.WHITE);
-		setBorderColor(Color.WHITE);
-	}
+        //setCaretColor(Color.WHITE);
+        setBorderColor(Color.WHITE);
+    }
 
-	/**Set the translucence value of this text area's background.
-	 *@param alpha blending value, in [0.0,1.0]. Default is 0.8
-	 */
-	public void setBackgroundTranslucence(float alpha){
-		this.bgAC = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
-	}
+    /**Set the translucence value of this text area's background.
+     *@param alpha blending value, in [0.0,1.0]. Default is 0.8
+     */
+    public void setBackgroundTranslucence(float alpha){
+        this.bgAC = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
+    }
 
-	/**Set the translucence value of this text area's foreground.
-	 *@param alpha blending value, in [0.0,1.0]. Default is 1.0
-	 */
-	public void setForegroundTranslucence(float alpha){
-		this.fgAC = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
-	}
+    /**Set the translucence value of this text area's foreground.
+     *@param alpha blending value, in [0.0,1.0]. Default is 1.0
+     */
+    public void setForegroundTranslucence(float alpha){
+        this.fgAC = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
+    }
 
-	/**
-	 * Set the textfield's border color.
-	 *@param c the border's color. Pass null to avoid drawing a border.
-	 */
-	public void setBorderColor(Color c){
-		borderColor = c;
-	}
+    /**
+     * Set the textfield's border color.
+     *@param c the border's color. Pass null to avoid drawing a border.
+     */
+    public void setBorderColor(Color c){
+        borderColor = c;
+    }
 
-	/**
-	 * Get the textfield's border color.
-	 *@return the border's color. null if not drawing a border.
-	 */
-	public Color getBorderColor(){
-		return borderColor;
-	}
+    /**
+     * Get the textfield's border color.
+     *@return the border's color. null if not drawing a border.
+     */
+    public Color getBorderColor(){
+        return borderColor;
+    }
 
-	@Override
-	public void paint(Graphics g){
-		Graphics2D g2d = (Graphics2D)g;
-		g2d.setComposite(bgAC);
-		g2d.setColor(getBackground());
-		g2d.fillRect(0,0,getWidth(),getHeight());
-		g2d.setComposite(fgAC);
-		if (borderColor != null){
-			g2d.setColor(borderColor);
-			g2d.drawRect(0,0,getWidth()-1,getHeight()-1);
-		}
-		g2d.setColor(getForeground());
-		super.paint(g2d);
-	}
+    @Override
+    public void paint(Graphics g){
+        Graphics2D g2d = (Graphics2D)g;
+        g2d.setComposite(bgAC);
+        g2d.setColor(getBackground());
+        g2d.fillRect(0,0,getWidth(),getHeight());
+        g2d.setComposite(fgAC);
+        if (borderColor != null){
+            g2d.setColor(borderColor);
+            g2d.drawRect(0,0,getWidth()-1,getHeight()-1);
+        }
+        g2d.setColor(getForeground());
+        super.paint(g2d);
+    }
 
 }
