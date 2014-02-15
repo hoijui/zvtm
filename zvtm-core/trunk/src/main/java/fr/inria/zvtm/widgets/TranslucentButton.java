@@ -110,6 +110,24 @@ public class TranslucentButton extends JButton implements TranslucentWidget {
 		});
 	}
 
+	public void setRolloverBackgroundColor(Color c){
+		bgColro = c;
+	}
+
+	public void setSelectedForegroundColor(Color c){
+		fgColsel = c;
+	}
+
+	public void setBackgroundColor(Color c){
+		bgCol = c;
+		setBackground(bgCol);
+	}
+
+	public void setForegroundColor(Color c){
+		fgCol = c;
+		setForeground(fgCol);
+	}
+
 	/**Set the translucence value of this button's background.
 	 *@param alpha blending value, in [0.0,1.0]. Default is 0.8
 	 */
