@@ -101,6 +101,7 @@ public class SlaveApp {
         if (options.antialiasing){
             view.setAntialiasing(true);
         }
+        System.out.println("Antialiasing " + ((options.antialiasing) ? "enabled" : "disabled"));
         // inputs: block width, block height, fullscreen
         if (options.fullscreen){
             System.out.println("Attempting to go fullscreen on: "+options.device);
