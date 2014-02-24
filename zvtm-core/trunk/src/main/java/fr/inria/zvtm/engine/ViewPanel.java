@@ -171,6 +171,9 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
     /**Lens (fisheye, etc.)*/
     protected Lens lens;
 
+    boolean[] drawInContext;
+    boolean[] drawInLens;
+
     /** Stop this view. */
     abstract void stop();
 
@@ -780,6 +783,19 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
     /**return Lens cyrrently used by this view (null if none)*/
     protected Lens getLens(){
 	return this.lens;
+    }
+
+    protected void setLayerVisibility(boolean[] context, boolean[] lens){
+        System.arraycopy(context, 0, drawInContext, 0, drawInContext.length);
+        System.arraycopy(lens, 0, drawInLens, 0, drawInLens.length);
+    }
+
+    protected boolean[] getLayerVisibilityOfContext(){
+        return drawInContext;
+    }
+
+    protected boolean[] getLayerVisibilityOfLens(){
+        return drawInLens;
     }
 
     /** Get the padding values customizing the region inside the view in which objects are actually visible.

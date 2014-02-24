@@ -698,6 +698,32 @@ public abstract class View {
 		return name;
 	}
 
+	/**
+     * Set the visibility of each layer in the context and lens regions of a view.
+     * This is useful to implement magic lenses. By setting some layers visible or not in the
+     * context and lens region, different objects, from possibily different virtual spaces, will
+     * be revealed by the lens.
+	 * By default, all are true in both arrays, meaning that everything is visible in both the context and the lens.
+     *@param context an array with booleans, one for each layer from 0 to N. True (default) means that the layer will be rendered in the context region, false that it will not.
+     *@param lens an array with booleans, one for each layer from 0 to N. True (default) means that the layer will be rendered in the lens region, false that it will not.
+	 */
+    public void setLayerVisibility(boolean[] context, boolean[] lens){
+    	panel.setLayerVisibility(context, lens);
+    }
+
+	/**
+     * Get the visibility of each layer in the context and lens regions of a view.
+     * This is useful to implement magic lenses. By setting some layers visible or not in the
+     * context and lens region, different objects, from possibily different virtual spaces, will
+     * be revealed by the lens.
+	 * By default, all are true in both arrays, meaning that everything is visible in both the context and the lens.
+     *@return two arrays (context and lens) both filled with booleans, one for each layer from 0 to N. True (default) means that the layer will be rendered in the context/lens region, false that it will not.
+	 */
+    public boolean[][] getLayerVisibility(){
+    	boolean[][] res = {panel.getLayerVisibilityOfContext(),panel.getLayerVisibilityOfLens()};
+    	return res;
+    }
+
 	/** Set the padding values customizing the region inside the view in which objects are actually visible.
 	 *@param wnesPadding padding values in pixels for the west, north, east and south borders
 	 */

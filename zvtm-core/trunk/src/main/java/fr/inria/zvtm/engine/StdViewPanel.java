@@ -111,6 +111,10 @@ public class StdViewPanel extends ViewPanel {
 		for (int i=0;i<visibilityPadding.length;i++){
 			Arrays.fill(visibilityPadding[i], 0);
 		}
+		drawInLens = new boolean[cams.length];
+		drawInContext = new boolean[cams.length];
+		Arrays.fill(drawInLens, true);
+		Arrays.fill(drawInContext, true);
 		//init other stuff
 		panel.setBackground(backColor);
 		panel.addMouseListener(this);
@@ -240,7 +244,7 @@ public class StdViewPanel extends ViewPanel {
 				double lviewSC = 0;
 				double lensVx = 0;
 				double lensVy = 0;
-				if(drawLens){
+				if (drawLens && drawInLens[nbcam]){
 					lviewWC = cams[nbcam].vx + (lens.lx-lens.lensWidth/2) * uncoef;
 					lviewNC = cams[nbcam].vy + (-lens.ly+lens.lensHeight/2) * uncoef;
 					lviewEC = cams[nbcam].vx + (lens.lx+lens.lensWidth/2) * uncoef;
@@ -255,12 +259,14 @@ public class StdViewPanel extends ViewPanel {
 							/* if glyph is at least partially visible in the reg. seen from this view,
 							   compute in which buffer it should be rendered: */
 							/* always draw in the main buffer */
-							gll[i].project(cams[nbcam], size);
-							if (gll[i].isVisible()){
-								gll[i].draw(stableRefToBackBufferGraphics, size.width, size.height, cams[nbcam].getIndex(),
-										standardStroke, standardTransform, 0, 0);
+							if (drawInContext[nbcam]){
+								gll[i].project(cams[nbcam], size);
+								if (gll[i].isVisible()){
+									gll[i].draw(stableRefToBackBufferGraphics, size.width, size.height, cams[nbcam].getIndex(),
+											standardStroke, standardTransform, 0, 0);
+								}
 							}
-							if(drawLens){
+							if (drawLens && drawInLens[nbcam]){
 								if (gll[i].visibleInViewport(lviewWC, lviewNC, lviewEC, lviewSC, cams[nbcam])){
 									/* partially within the region seen through the lens
 									   draw it in both buffers */
