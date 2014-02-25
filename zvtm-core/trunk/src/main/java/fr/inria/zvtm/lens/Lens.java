@@ -106,7 +106,7 @@ public abstract class Lens {
      *@param mm maximum magnification factor, mm in [0,+inf[
      */
     public void setMaximumMagnification(float mm){
-	setMaximumMagnification(mm, true);
+        setMaximumMagnification(mm, true);
     }
 
     /**
@@ -116,123 +116,124 @@ public abstract class Lens {
      *@param forceRaster true if the magnification raster size should be updated according to the new maximum magnification factor (default is true)
      */
     public void setMaximumMagnification(float mm, boolean forceRaster){
-	this.MM = mm;
-	updateMagBufferWorkingDimensions();
-	if (forceRaster){
-	    setMagRasterDimensions(mbw, mbh);
-	}
-	owningView.parent.repaint();
+        this.MM = mm;
+        updateMagBufferWorkingDimensions();
+        if (forceRaster){
+            setMagRasterDimensions(mbw, mbh);
+        }
+        owningView.parent.repaint();
     }
 
     /**
      * get the lens' maximum magnification
      */
     public float getMaximumMagnification(){
-	return this.MM;
+        return this.MM;
     }
 
     public float getActualMaximumMagnification(){
-	return this.MM;
+        return this.MM;
     }
+
     /**
      * set the lens' buffer threshold, beyond which magnification should pixels be taken from the magnified buffer rather than from the source buffer
      */
     public void setBufferThreshold(float t){
-	this.mSwitchThreshold = t;
-	owningView.parent.repaint();
+        this.mSwitchThreshold = t;
+        owningView.parent.repaint();
     }
 
     /**
      * get the lens' buffer threshold, beyond which magnification should pixels be taken from the magnified buffer rather than from the source buffer
      */
     public float getBufferThreshold(){
-	return this.mSwitchThreshold;
+        return this.mSwitchThreshold;
     }
 
     void initBuffers(int mainBufferSize, int magBufferSize){
-	switch(transferType){
-	case DataBuffer.TYPE_INT:{/*Mac OS X (256/1K/1M), Windows (32bits), Linux/Xorg (24bits and maybe 32bits)*/
-	    // in theory this should be s.width*s.height*Raster.getNumDataElements
-	    // the latter seems to always be 1 in our context
-	    oPixelsI = new int[mainBufferSize];
-	    mPixelsI = new int[magBufferSize];
-	    tPixelsI = new int[mainBufferSize];
-	    initialized = true;
-	    break;
-	}
-	case DataBuffer.TYPE_USHORT:{/*Windows (16bits), Linux/Xorg (16bits, 15bits)*/
-	    // same comment as above
-	    oPixelsS = new short[mainBufferSize];
-	    mPixelsS = new short[magBufferSize];
-	    tPixelsS = new short[mainBufferSize];
-	    initialized = true;
-	    break;
-	}
-	case DataBuffer.TYPE_BYTE:{/*Linux/Xorg (8bits)*/
-	    // same comment as above
-	    oPixelsB = new byte[mainBufferSize];
-	    mPixelsB = new byte[magBufferSize];
-	    tPixelsB = new byte[mainBufferSize];
-	    initialized = true;
-	    break;
-	}
-	case DataBuffer.TYPE_SHORT:{
-	    // same comment as above
-	    oPixelsS = new short[mainBufferSize];
-	    mPixelsS = new short[magBufferSize];
-	    tPixelsS = new short[mainBufferSize];
-	    initialized = true;
-	    break;
-	}
-	default:{
-	    // same comment as above
-	    oPixelsI = new int[mainBufferSize];
-	    mPixelsI = new int[magBufferSize];
-	    tPixelsI = new int[mainBufferSize];
-	    initialized = true;
-	    break;
-	}
-	}
+        switch(transferType){
+        case DataBuffer.TYPE_INT:{/*Mac OS X (256/1K/1M), Windows (32bits), Linux/Xorg (24bits and maybe 32bits)*/
+            // in theory this should be s.width*s.height*Raster.getNumDataElements
+            // the latter seems to always be 1 in our context
+            oPixelsI = new int[mainBufferSize];
+            mPixelsI = new int[magBufferSize];
+            tPixelsI = new int[mainBufferSize];
+            initialized = true;
+            break;
+        }
+        case DataBuffer.TYPE_USHORT:{/*Windows (16bits), Linux/Xorg (16bits, 15bits)*/
+            // same comment as above
+            oPixelsS = new short[mainBufferSize];
+            mPixelsS = new short[magBufferSize];
+            tPixelsS = new short[mainBufferSize];
+            initialized = true;
+            break;
+        }
+        case DataBuffer.TYPE_BYTE:{/*Linux/Xorg (8bits)*/
+            // same comment as above
+            oPixelsB = new byte[mainBufferSize];
+            mPixelsB = new byte[magBufferSize];
+            tPixelsB = new byte[mainBufferSize];
+            initialized = true;
+            break;
+        }
+        case DataBuffer.TYPE_SHORT:{
+            // same comment as above
+            oPixelsS = new short[mainBufferSize];
+            mPixelsS = new short[magBufferSize];
+            tPixelsS = new short[mainBufferSize];
+            initialized = true;
+            break;
+        }
+        default:{
+            // same comment as above
+            oPixelsI = new int[mainBufferSize];
+            mPixelsI = new int[magBufferSize];
+            tPixelsI = new int[mainBufferSize];
+            initialized = true;
+            break;
+        }
+        }
     }
-    
+
     public boolean isInitialized(){
-	return initialized;
+        return initialized;
     }
 
     /**Actual code that transforms incoming <em>sbi</em> Buffered image
      *@param sbi Buffered image to be transformed
      */
     public void transform(BufferedImage sbi){
- 	try {
-	    switch(transferType){
-	    case DataBuffer.TYPE_INT:{
-		transformI(sbi.getRaster(), mbi.getRaster());
-		break;
-	    }
-	    case DataBuffer.TYPE_USHORT:{
-		transformS(sbi.getRaster(), mbi.getRaster());
-		break;
-	    }
-	    case DataBuffer.TYPE_BYTE:{
-		transformB(sbi.getRaster(), mbi.getRaster());
-		break;
-	    }
-	    case DataBuffer.TYPE_SHORT:{
-		transformS(sbi.getRaster(), mbi.getRaster());
-		break;
-	    }
-	    default:{// branch unlikely to be reached, but likely to fail if reached
-		transformI(sbi.getRaster(), mbi.getRaster());
-		break;
-	    }
-	    }
-	}
-	catch (Exception ex){
-	    if (VirtualSpaceManager.debugModeON()){
-		System.err.println("Lens error probably due to an unsupported screen color depth.");
-		ex.printStackTrace();
-	    }
-	}
+        try {
+            switch(transferType){
+            case DataBuffer.TYPE_INT:{
+            transformI(sbi.getRaster(), mbi.getRaster());
+            break;
+            }
+            case DataBuffer.TYPE_USHORT:{
+            transformS(sbi.getRaster(), mbi.getRaster());
+            break;
+            }
+            case DataBuffer.TYPE_BYTE:{
+            transformB(sbi.getRaster(), mbi.getRaster());
+            break;
+            }
+            case DataBuffer.TYPE_SHORT:{
+            transformS(sbi.getRaster(), mbi.getRaster());
+            break;
+            }
+            default:{// branch unlikely to be reached, but likely to fail if reached
+            transformI(sbi.getRaster(), mbi.getRaster());
+            break;
+            }
+            }
+        }
+        catch (Exception ex){
+            if (VirtualSpaceManager.debugModeON()){
+            System.err.println("Lens error probably due to an unsupported screen color depth.");
+            ex.printStackTrace();
+            }
+        }
     }
 
     /**Actual code that transforms incoming <em>iwr</em> writable raster associated with the buffered image, when the transfer type is DataBuffer.TYPE_INT
@@ -263,24 +264,24 @@ public abstract class Lens {
         * Depends on the outer radius and maximum magnification.
         */
     void updateMagBufferWorkingDimensions(){
-            // synchronized to manage concurrent access to the raster while
-            // animating the lens and transforming in the View thread (drawing)
-            hmbw = getRadius() * MM;
-            hmbh = getRadius() * MM;
-            mbw = Math.round(2 * hmbw);
-            mbh = Math.round(2 * hmbh);
+        // synchronized to manage concurrent access to the raster while
+        // animating the lens and transforming in the View thread (drawing)
+        hmbw = getRadius() * MM;
+        hmbh = getRadius() * MM;
+        mbw = Math.round(2 * hmbw);
+        mbh = Math.round(2 * hmbh);
     }
-    
+
     /**Force the magnification buffer to a new width and height.
      * The buffered image raster as well as the 1D array used for the transformation get new values
      * corresponding to the provided size
      *
-     *@param size 
+     *@param size
      */
     public void setMagRasterDimensions(int size){
-	setMagRasterDimensions(size, size);
+        setMagRasterDimensions(size, size);
     }
-    
+
     /**Force the magnification buffer to a new width and height.
      * The buffered image raster as well as the 1D array used for the transformation get new values
      * from w and h that should be equal to or larger than the region of the miagnification buffer
@@ -290,81 +291,81 @@ public abstract class Lens {
      *@param h height of the magnification buffer (in pixels)
      */
     public void setMagRasterDimensions(int w, int h){
-	    switch(transferType){
-	    case DataBuffer.TYPE_INT:{/*Mac OS X (256/1K/1M), Windows (32bits), Linux/Xorg (24bits and maybe 32bits)*/
-		// in theory this should be s.width*s.height*Raster.getNumDataElements
-		// the latter seems to always be 1 in our context
-		mPixelsI = new int[w*h];
-		break;
-	    }
-	    case DataBuffer.TYPE_USHORT:{/*Windows (16bits), Linux/Xorg (16bits, 15bits)*/
-		// same comment as above
-		mPixelsS = new short[w*h];
-		break;
-	    }
-	    case DataBuffer.TYPE_BYTE:{/*Linux/Xorg (8bits)*/
-		// same comment as above
-		mPixelsB = new byte[w*h];
-		break;
-	    }
-	    case DataBuffer.TYPE_SHORT:{
-		// same comment as above
-		mPixelsS = new short[w*h];
-		break;
-	    }
-	    default:{
-		// same comment as above
-		mPixelsI = new int[w*h];
-		break;
-	    }
-	    }
-	    mbi = new BufferedImage(w, h, imageType);
-	    magnifiedGraphics = mbi.createGraphics();
+        switch(transferType){
+        case DataBuffer.TYPE_INT:{/*Mac OS X (256/1K/1M), Windows (32bits), Linux/Xorg (24bits and maybe 32bits)*/
+            // in theory this should be s.width*s.height*Raster.getNumDataElements
+            // the latter seems to always be 1 in our context
+            mPixelsI = new int[w*h];
+            break;
+        }
+        case DataBuffer.TYPE_USHORT:{/*Windows (16bits), Linux/Xorg (16bits, 15bits)*/
+            // same comment as above
+            mPixelsS = new short[w*h];
+            break;
+        }
+            case DataBuffer.TYPE_BYTE:{/*Linux/Xorg (8bits)*/
+            // same comment as above
+            mPixelsB = new byte[w*h];
+            break;
+        }
+        case DataBuffer.TYPE_SHORT:{
+            // same comment as above
+            mPixelsS = new short[w*h];
+            break;
+        }
+        default:{
+            // same comment as above
+            mPixelsI = new int[w*h];
+            break;
+        }
+        }
+        mbi = new BufferedImage(w, h, imageType);
+        magnifiedGraphics = mbi.createGraphics();
     }
 
     public void resetMagnificationBuffer(){
-	if (mbi != null){
-	    mbi.flush();
-	    mbi = null;
-	}
-	if (magnifiedGraphics != null){
-	    magnifiedGraphics.dispose();
-	    magnifiedGraphics = null;
-	}
+        if (mbi != null){
+            mbi.flush();
+            mbi = null;
+        }
+        if (magnifiedGraphics != null){
+            magnifiedGraphics.dispose();
+            magnifiedGraphics = null;
+        }
     }
 
     public Graphics2D getMagnificationGraphics(){
-	    if (mbi == null){
-		mbi = new BufferedImage(mbw, mbh, imageType);
-	    }
-	    if (magnifiedGraphics == null){
-		magnifiedGraphics = mbi.createGraphics();
-	    }
-	    return magnifiedGraphics;
+        if (mbi == null){
+            mbi = new BufferedImage(mbw, mbh, imageType);
+        }
+        if (magnifiedGraphics == null){
+            magnifiedGraphics = mbi.createGraphics();
+        }
+        return magnifiedGraphics;
     }
 
     public void dispose(){
-	resetMagnificationBuffer();
+        resetMagnificationBuffer();
     }
 
     public View getOwningView(){
-	return owningView.parent;
+        return owningView.parent;
     }
 
     /**returns bounds of rectangle representing virtual space's region seen through camera c [west,north,east,south]
      *@param c camera
      *@param res array which will contain the result */
     public long[] getVisibleRegion(Camera c, long[] res){
-	float uncoef = (float)((c.focal+c.altitude)/c.focal);
-	res[0] = (long)(c.vx + (lx-lensWidth/2)*uncoef);
-	res[1] = (long)(c.vy + (-ly+lensHeight/2)*uncoef);
-	res[2] = (long)(c.vx + (lx+lensWidth/2)*uncoef);
-	res[3] = (long)(c.vy + (-ly-lensHeight/2)*uncoef);
-	return res;
+        float uncoef = (float)((c.focal+c.altitude)/c.focal);
+        res[0] = (long)(c.vx + (lx-lensWidth/2)*uncoef);
+        res[1] = (long)(c.vy + (-ly+lensHeight/2)*uncoef);
+        res[2] = (long)(c.vx + (lx+lensWidth/2)*uncoef);
+        res[3] = (long)(c.vy + (-ly-lensHeight/2)*uncoef);
+        return res;
     }
 
     public void drawBoundary(Graphics2D g2d){
-	
+
     }
 
     /*------------------- focus offset ------------------*/
@@ -379,21 +380,21 @@ public abstract class Lens {
     public void setYfocusOffset(int y){
         dy = y;
     }
-    
+
     public int getXfocusOffset(){
         return dx;
     }
-    
+
     public int getYfocusOffset(){
         return dy;
     }
 
-	/*------------------- focus control ------------------*/
+    /*------------------- focus control ------------------*/
 
-	public abstract void setFocusControlled(boolean isFocusControlled, short speedBehavior);
-	
-	public abstract void setFocusControlled(boolean isFocusControlled);
-	
-	public abstract void moveLensBy(int dx, int dy, long currentTime);
+    public abstract void setFocusControlled(boolean isFocusControlled, short speedBehavior);
+
+    public abstract void setFocusControlled(boolean isFocusControlled);
+
+    public abstract void moveLensBy(int dx, int dy, long currentTime);
 
 }
