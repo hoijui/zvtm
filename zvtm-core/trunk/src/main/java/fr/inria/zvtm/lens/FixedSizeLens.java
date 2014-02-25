@@ -51,6 +51,7 @@ public abstract class FixedSizeLens extends Lens {
     public void setOuterRadius(int r){
         LR1 = r;
         updateMagBufferWorkingDimensions();
+        updateLensRegion();
         setMagRasterDimensions(mbw, mbh);
         owningView.parent.repaint();
     }
@@ -63,6 +64,7 @@ public abstract class FixedSizeLens extends Lens {
     public void setInnerRadius(int r){
         LR2 = r;
         updateMagBufferWorkingDimensions();
+        updateLensRegion();
         setMagRasterDimensions(mbw, mbh);
         owningView.parent.repaint();
     }
@@ -88,6 +90,7 @@ public abstract class FixedSizeLens extends Lens {
         LR1 = outerRadius;
         LR2 = innerRadius;
         updateMagBufferWorkingDimensions();
+        updateLensRegion();
         if (forceRaster){
             setMagRasterDimensions(mbw, mbh);
         }
@@ -118,6 +121,7 @@ public abstract class FixedSizeLens extends Lens {
         LR1 = outerRadius;
         LR2 = innerRadius;
         updateMagBufferWorkingDimensions();
+        updateLensRegion();
         if (forceRaster){
             setMagRasterDimensions(mbw, mbh);
         }
@@ -168,6 +172,19 @@ public abstract class FixedSizeLens extends Lens {
         imageType = tbi.getType();
         transferType = tbi.getRaster().getTransferType();
         initBuffers((lensWidth)*(lensHeight), (mbw)*(mbh));
+    }
+
+    void updateLensRegion(){
+        lurd[0] = lx + sw - getRadius();
+        lurd[1] = ly + sh - getRadius();
+        lurd[2] = lx + sw + getRadius();
+        lurd[3] = ly + sh + getRadius();
+        if (lurd[0] < 0){lurd[0] = 0;}
+        if (lurd[1] < 0){lurd[1] = 0;}
+        if (lurd[2] > w){lurd[2] = w;}
+        if (lurd[3] > h){lurd[3] = h;}
+        lensWidth = lurd[2] - lurd[0];
+        lensHeight = lurd[3] - lurd[1];
     }
 
     void transformI(WritableRaster iwr, WritableRaster ewr){
