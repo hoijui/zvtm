@@ -2,7 +2,7 @@
  *   DATE OF CREATION:  Wed Nov 03 11:51:19 2004
  *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2004-2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2014. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -303,7 +303,7 @@ public abstract class Lens {
             mPixelsS = new short[w*h];
             break;
         }
-            case DataBuffer.TYPE_BYTE:{/*Linux/Xorg (8bits)*/
+        case DataBuffer.TYPE_BYTE:{/*Linux/Xorg (8bits)*/
             // same comment as above
             mPixelsB = new byte[w*h];
             break;
@@ -319,6 +319,7 @@ public abstract class Lens {
             break;
         }
         }
+        resetMagnificationBuffer();
         mbi = new BufferedImage(w, h, imageType);
         magnifiedGraphics = mbi.createGraphics();
     }
