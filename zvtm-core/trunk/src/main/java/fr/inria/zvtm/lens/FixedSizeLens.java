@@ -2,7 +2,7 @@
  *   DATE OF CREATION:  Tue Nov 09 11:51:28 2004
  *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2004-2013. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2014. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -51,6 +51,8 @@ public abstract class FixedSizeLens extends Lens {
     public void setOuterRadius(int r){
         LR1 = r;
         updateMagBufferWorkingDimensions();
+        setMagRasterDimensions(mbw, mbh);
+        owningView.parent.repaint();
     }
 
     /**
@@ -61,6 +63,8 @@ public abstract class FixedSizeLens extends Lens {
     public void setInnerRadius(int r){
         LR2 = r;
         updateMagBufferWorkingDimensions();
+        setMagRasterDimensions(mbw, mbh);
+        owningView.parent.repaint();
     }
 
     /**
@@ -87,6 +91,7 @@ public abstract class FixedSizeLens extends Lens {
         if (forceRaster){
             setMagRasterDimensions(mbw, mbh);
         }
+        owningView.parent.repaint();
     }
 
     /**
@@ -116,6 +121,7 @@ public abstract class FixedSizeLens extends Lens {
         if (forceRaster){
             setMagRasterDimensions(mbw, mbh);
         }
+        owningView.parent.repaint();
     }
 
     /**
