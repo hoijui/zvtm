@@ -6,7 +6,7 @@
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
- */ 
+ */
 
 
 package fr.inria.zvtm.lens;
@@ -37,11 +37,11 @@ public abstract class BlendingLens extends FixedSizeLens {
     int Rr, Gr, Br;
 
     public void gf(float x, float y, float[] g){
-	d = Math.max(Math.abs(x-sw-lx), Math.abs(y-sh-ly));
-	if (d <= LR2)
-	    g[0] = g[1] = MM;
-	else
-	    g[0] = g[1] = 1;
+        d = Math.max(Math.abs(x-sw-lx), Math.abs(y-sh-ly));
+        if (d <= LR2)
+            g[0] = g[1] = MM;
+        else
+            g[0] = g[1] = 1;
     }
 
     public abstract void gfT(float x, float y, float[] g);
@@ -178,11 +178,11 @@ public abstract class BlendingLens extends FixedSizeLens {
     synchronized void transformB(WritableRaster iwr, WritableRaster ewr){System.err.println("Error: translucent lens: Sample model not supported yet");}
 
     public float getFocusTranslucencyValue(){
-	return MMTf;
+        return MMTf;
     }
 
     public float getContextTranslucencyValue(){
-	return MMTc;
+        return MMTc;
     }
 
 }
