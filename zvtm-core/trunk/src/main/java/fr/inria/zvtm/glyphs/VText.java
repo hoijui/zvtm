@@ -493,12 +493,18 @@ public class VText<T> extends ClosedShape {
             }
             if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(trueCoef, trueCoef));}
             g.setTransform(at);
-            int rectH = (int)Math.round(pc[i].ch / scaleFactor);
             if (alphaC != null){
                 g.setComposite(alphaC);
                 if (isBorderDrawn()){
                     g.setColor(borderColor);
-                    g.fillRect(dx-paddingX, dy-rectH+1+2*paddingY, (int)Math.round(pc[i].cw / scaleFactor+paddingX), rectH-1+2*paddingY);
+                    if (zoomSensitive){
+                        int rectH = (int)Math.round(pc[i].ch / scaleFactor);
+                        g.fillRect(dx-paddingX, dy-rectH+1+2*paddingY, (int)Math.round(pc[i].cw/scaleFactor + paddingX), rectH-1+2*paddingY);
+                    }
+                    else {
+                        int rectH = (int)Math.round(pc[i].ch * coef / scaleFactor);
+                        g.fillRect(dx-paddingX, dy-rectH+1+2*paddingY, (int)Math.round(coef*pc[i].cw/scaleFactor + paddingX), rectH-1+2*paddingY);
+                    }
                 }
                 g.setColor(this.color);
                 g.drawString(text, 0.0f, 0.0f);
@@ -507,7 +513,14 @@ public class VText<T> extends ClosedShape {
             else {
                 if (isBorderDrawn()){
                     g.setColor(borderColor);
-                    g.fillRect(dx-paddingX, dy-rectH+1+2*paddingY, (int)Math.round(pc[i].cw / scaleFactor+paddingX), rectH-1+2*paddingY);
+                    if (zoomSensitive){
+                        int rectH = (int)Math.round(pc[i].ch / scaleFactor);
+                        g.fillRect(dx-paddingX, dy-rectH+1+2*paddingY, (int)Math.round(pc[i].cw/scaleFactor + paddingX), rectH-1+2*paddingY);
+                    }
+                    else {
+                        int rectH = (int)Math.round(pc[i].ch * coef / scaleFactor);
+                        g.fillRect(dx-paddingX, dy-rectH+1+2*paddingY, (int)Math.round(coef*pc[i].cw/scaleFactor + paddingX), rectH-1+2*paddingY);
+                    }
                 }
                 g.setColor(this.color);
                 g.drawString(text, 0.0f, 0.0f);
@@ -548,25 +561,56 @@ public class VText<T> extends ClosedShape {
         double trueCoef = scaleFactor * lcoef;
         g.setColor(this.color);
         if (trueCoef*fontSize > VText.TEXT_AS_LINE_PROJ_COEF || !zoomSensitive){
-            g.setFont((font!=null) ? font : getMainFont());
             //if this value is < to about 0.5, AffineTransform.scale does not work properly (anyway, font is too small to be readable)
+            g.setFont((font!=null) ? font : getMainFont());
             AffineTransform at;
-            if (text_anchor==TEXT_ANCHOR_START){at=AffineTransform.getTranslateInstance(dx+pc[i].lcx,dy+pc[i].lcy);}
-            else if (text_anchor==TEXT_ANCHOR_MIDDLE){at=AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw*lcoef/2.0f,dy+pc[i].lcy);}
-            else {at=AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw*lcoef,dy+pc[i].lcy);}
+            if (text_anchor==TEXT_ANCHOR_START){
+                at = AffineTransform.getTranslateInstance(dx+pc[i].lcx,dy+pc[i].lcy);
+            }
+            else if (text_anchor==TEXT_ANCHOR_MIDDLE){
+                at = AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw*coef/2.0f,dy+pc[i].lcy);
+                }
+            else {
+                at = AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw*coef,dy+pc[i].lcy);
+            }
             if (zoomSensitive){at.concatenate(AffineTransform.getScaleInstance(trueCoef, trueCoef));}
             g.setTransform(at);
             if (alphaC != null){
                 g.setComposite(alphaC);
+                if (isBorderDrawn()){
+                    g.setColor(borderColor);
+                    if (zoomSensitive){
+                        int rectH = (int)Math.round(pc[i].lch / scaleFactor);
+                        g.fillRect(dx-paddingX, dy-rectH+1+2*paddingY, (int)Math.round(pc[i].lcw/scaleFactor + paddingX), rectH-1+2*paddingY);
+                    }
+                    else {
+                        int rectH = (int)Math.round(pc[i].lch * coef / scaleFactor);
+                        g.fillRect(dx-paddingX, dy-rectH+1+2*paddingY, (int)Math.round(coef*pc[i].lcw/scaleFactor + paddingX), rectH-1+2*paddingY);
+                    }
+                }
+                g.setColor(this.color);
                 g.drawString(text, 0.0f, 0.0f);
                 g.setComposite(acO);
             }
             else {
+                if (isBorderDrawn()){
+                    g.setColor(borderColor);
+                    if (zoomSensitive){
+                        int rectH = (int)Math.round(pc[i].lch / scaleFactor);
+                        g.fillRect(dx-paddingX, dy-rectH+1+2*paddingY, (int)Math.round(pc[i].lcw/scaleFactor + paddingX), rectH-1+2*paddingY);
+                    }
+                    else {
+                        int rectH = (int)Math.round(pc[i].lch * coef / scaleFactor);
+                        g.fillRect(dx-paddingX, dy-rectH+1+2*paddingY, (int)Math.round(coef*pc[i].lcw/scaleFactor + paddingX), rectH-1+2*paddingY);
+                    }
+                }
+                g.setColor(this.color);
                 g.drawString(text, 0.0f, 0.0f);
             }
             g.setTransform(stdT);
         }
         else {
+            g.setColor(this.color);
             if (alphaC != null){
                 g.setComposite(alphaC);
                 g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
