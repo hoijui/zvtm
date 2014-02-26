@@ -2,7 +2,7 @@
  *   DATE OF CREATION:  Thu Oct 05 14:00:04 2006
  *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2004-2009. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2014. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -177,8 +177,20 @@ public abstract class BlendingLens extends FixedSizeLens {
 
     synchronized void transformB(WritableRaster iwr, WritableRaster ewr){System.err.println("Error: translucent lens: Sample model not supported yet");}
 
+    abstract void computeDropoffFactors();
+
+    public void setFocusTranslucencyValue(float t){
+        this.MMTf = t;
+        computeDropoffFactors();
+    }
+
     public float getFocusTranslucencyValue(){
         return MMTf;
+    }
+
+    public void setContextTranslucencyValue(float t){
+        this.MMTc = t;
+        computeDropoffFactors();
     }
 
     public float getContextTranslucencyValue(){

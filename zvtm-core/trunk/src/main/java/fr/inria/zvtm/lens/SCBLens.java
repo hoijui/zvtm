@@ -116,6 +116,8 @@ public class SCBLens extends BlendingLens implements TemporalLens {
 	initTimer();
     }
 
+    void computeDropoffFactors(){}
+
     void computeOpacityFactors(float minT, float maxT){
 	a = maxT - minT;
 	b = minT;
