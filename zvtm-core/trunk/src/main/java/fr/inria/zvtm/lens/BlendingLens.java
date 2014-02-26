@@ -180,7 +180,7 @@ public abstract class BlendingLens extends FixedSizeLens {
     abstract void computeDropoffFactors();
 
     public void setFocusTranslucencyValue(float t){
-        this.MMTf = t;
+        this.MMTf = (t > 1) ? 1f : (t < 0) ? 0 : t;
         computeDropoffFactors();
     }
 
@@ -189,7 +189,7 @@ public abstract class BlendingLens extends FixedSizeLens {
     }
 
     public void setContextTranslucencyValue(float t){
-        this.MMTc = t;
+        this.MMTc = (t > 1) ? 1f : (t < 0) ? 0 : t;
         computeDropoffFactors();
     }
 
