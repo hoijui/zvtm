@@ -372,21 +372,24 @@ public aspect GlyphCreation {
     private static class VTextReplicator extends AbstractGlyphReplicator {
         protected final String text;
         protected final float scaleFactor;
+        protected final boolean scaleIndep;
         protected final short textAnchor;
-    protected final Font font;
+        protected final Font font;
 
         VTextReplicator(VText source){
             super(source);
             this.text = source.getText();
             this.scaleFactor = source.getScale();
+            this.scaleIndep = source.isScaleIndependent();
             this.textAnchor = source.getTextAnchor();
-      this.font = source.getFont();
+            this.font = source.getFont();
         }
 
         public Glyph doCreateGlyph(){
             VText retval = new VText(0d,0d,0,Color.BLACK,text,textAnchor,scaleFactor);
-      retval.setFont(this.font);
-      return retval;
+            retval.setScaleIndependent(scaleIndep);
+            retval.setFont(this.font);
+            return retval;
         }
     }
 
@@ -419,6 +422,7 @@ public aspect GlyphCreation {
 
         @Override public Glyph doCreateGlyph(){
             VTextOr retval = new VTextOr(0d,0d,0,Color.BLACK,text,0f,textAnchor,scaleFactor);
+            retval.setScaleIndependent(scaleIndep);
             retval.setFont(font);
             return retval;
         }

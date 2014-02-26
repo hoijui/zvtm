@@ -62,6 +62,7 @@ public aspect AutoReplay extends AbstractAutoReplay {
          execution(public void VText.setFont(Font)) ||
          execution(public void VText.setText(String)) ||
          execution(public void VText.setScale(float)) ||
+         execution(public void VText.setScaleIndependent(boolean)) ||
          execution(public void ClosedShape.setDrawBorder(boolean)) ||
          execution(public void ClosedShape.setFilled(boolean)) ||
          execution(public void DPath.addSegment(double, double, boolean)) ||
