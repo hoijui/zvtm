@@ -74,7 +74,7 @@ public class AdaptiveText<T> extends VText {
     /**
      * Ignored (AdaptiveText is zoom sensitive)
      */
-    @Override public void setZoomSensitive(boolean ignored){}
+    @Override public void setScaleIndependent(boolean ignored){}
 
     /**
      * Ignored.
