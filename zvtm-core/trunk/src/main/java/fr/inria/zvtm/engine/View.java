@@ -4,7 +4,7 @@
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2000-2002. All Rights Reserved
  *   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2013. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2014. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -31,6 +31,7 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.Point2D;
+import java.awt.Point;
 import java.awt.GridBagConstraints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -1087,6 +1088,38 @@ public abstract class View {
 			}
 		}
 		if (res.isEmpty()){res=null;}
+		return res;
+	}
+
+	/* --------------------------------------------------*/
+
+	/** Transform coordinates from screen space (JPanel coordinates) to VirtualSpace.
+	 *@param x source x-coord (from upper-left corner of Swing Component)
+	 *@param y source y-coord (from upper-left corner of Swing Component)
+	 *@param c the camera in this view observing the corresponding VirtualSpace
+	 *@param res an instance of Point2D that will hold the transformation's result
+	 *@return the matching coordinates in VirtualSpace
+	 *@see #fromVSToPanelCoordinates(double vx, double vy, Camera c, Point res)
+	 */
+	public Point2D.Double fromPanelToVSCoordinates(int x, int y, Camera c, Point2D.Double res){
+		double ucoef = (c.focal+c.altitude) / c.focal;
+		res.setLocation((x-panel.size.width/2) * ucoef + c.vx,
+			            (panel.size.height/2-y) * ucoef + c.vy);
+		return res;
+	}
+
+	/** Transform coordinates from VirtualSpace to screen space (JPanel coordinates).
+	 *@param vx source x-coord in VirtualSpace
+	 *@param vy source y-coord in VirtualSpace
+	 *@param c the camera in this view observing the corresponding VirtualSpace
+	 *@param res an instance of Point that will hold the transformation's result
+	 *@return the matching coordinates in screen space (from upper-left corner of Swing Component)
+	 *@see #fromPanelToVSCoordinates(int x, int y, Camera c, Point2D.Double res)
+	 */
+	public Point fromVSToPanelCoordinates(double vx, double vy, Camera c, Point res){
+		double coef = c.focal / (c.focal+c.altitude);
+		res.setLocation(panel.size.width/2 + (vx-c.vx) * coef,
+			            panel.size.height/2 - (vy-c.vy) * coef);
 		return res;
 	}
 
