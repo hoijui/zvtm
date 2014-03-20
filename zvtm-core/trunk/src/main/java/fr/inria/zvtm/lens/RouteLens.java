@@ -12,7 +12,33 @@ import java.awt.geom.PathIterator;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.awt.Point;
 
+import fr.inria.zvtm.engine.View;
+import fr.inria.zvtm.engine.Camera;
+import fr.inria.zvtm.lens.Lens;
+import fr.inria.zvtm.glyphs.DPath;
+
+/** A utility class implementing the RouteLens motor behavior.
+ * The RouteLens motor behavior is described in <strong>J. Alvina, C. Appert, O. Chapuis, E. Pietriga, RouteLens: Easy Route Following for Map Applications, AVI '14: Proceedings of the 12th working conference on Advanced visual interfaces</strong>.
+ * It can be coupled with any type of ZVTM lens.
+ * When moving a lens, simply call RouteLens.moveLens(x, y) instead of Lens.setAbsolutePosition(x, y);
+<p>Example of use, specifying that Lens l's position should stick to the route who's geometry is encoded by a DPath:</p>
+<pre>
+DPath route = ...;
+Lens l = ...;
+Camera c = ...;
+RouteLens rl = new RouteLens(l, route, c);
+
+...
+
+public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
+    rl.moveLens(jpx, jpy);
+}
+</pre>
+ *@author Caroline Appert
+ *@since 0.11.2
+ */
 
 public class RouteLens {
 
@@ -205,5 +231,55 @@ public class RouteLens {
         return newPoints;
     }
 
-}
+    /*----------------------------------------*/
 
+    Lens lens;
+    View view;
+    Camera camera;
+    GeneralPath route;
+    double delta;
+    static final int DEFAULT_P = 2;
+    int param_p = DEFAULT_P;
+
+    Point2D.Double cursorInVS = new Point2D.Double();
+    Point lensCenterInPanel = new Point();
+
+    /**
+     *@param l the lens whose position will be influenced by route dp.
+     *@param route the route that should influence the lens' position.
+     *@param c the camera observing the route in the View that holds the lens.
+     *@param mad the maximum attraction distance, beyond which a route segment will not exert any influence on the lens.
+     *@param p power parameter used to fine-tune the attraction effet. Default is 2, typically in range [2,6].
+     */
+    public RouteLens(Lens l, DPath route, Camera c, double mad, int p){
+        this.lens = l;
+        this.camera = c;
+        this.view = c.getOwningView();
+        this.route = route.getJava2DGeneralPath();
+        this.delta = mad;
+        this.param_p = p;
+    }
+
+    /**
+     *@param l the lens whose position will be influenced by route dp.
+     *@param route the route that should influence the lens' position.
+     *@param c the camera observing the route in the View that holds the lens.
+     */
+    public RouteLens(Lens l, DPath route, Camera c){
+        this.lens = l;
+        this.camera = c;
+        this.view = c.getOwningView();
+        this.route = route.getJava2DGeneralPath();
+        this.delta = l.getRadius();
+        this.param_p = 2;
+    }
+
+    public void moveLens(int x, int y){
+        view.fromPanelToVSCoordinates(x, y, camera, cursorInVS);
+        Point2D lensCenterInVS = RouteLens.getLensPosition(route, cursorInVS, delta, param_p);
+        view.fromVSToPanelCoordinates(lensCenterInVS.getX(), lensCenterInVS.getY(), camera, lensCenterInPanel);
+        lens.setAbsolutePosition(lensCenterInPanel.x, lensCenterInPanel.y);
+        view.repaint();
+    }
+
+}
