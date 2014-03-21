@@ -305,4 +305,32 @@ public class RouteLens {
         return this.enabled;
     }
 
+	/**
+	 * @return the maximum attraction distance, beyond which a route segment will not exert any influence on the lens.
+	 */
+	public double getMad() {
+		return delta;
+	}
+
+	/**
+	 * @param mad the maximum attraction distance, beyond which a route segment will not exert any influence on the lens.
+	 */
+	public void setMad(double mad) {
+		this.delta = mad;
+	}
+
+	/**
+	 * @return power parameter used to fine-tune the attraction effet. Default is 2, typically in range [2,6].
+	 */
+	public int getP() {
+		return param_p;
+	}
+
+	/**
+	 * @param p power parameter used to fine-tune the attraction effet. Default is 2, typically in range [2,6].
+	 */
+	public void setP(int p) {
+		this.param_p = p;
+	}
+
 }
