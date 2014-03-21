@@ -54,17 +54,17 @@ public class WEOptions {
     @Option(name = "-ss", aliases = {"--scene-step"}, usage = "scene step in virtual space")
     public int sceneStep = 500;
 
-    @Option(name = "-wb", usage = "west boundary")
-    public float b_w = 0;
+    // @Option(name = "-left", usage = "leftmost value")
+    // public float b_w = 0;
 
-    @Option(name = "-nb", usage = "north boundary")
-    public float b_n = 1;
+    // @Option(name = "-top", usage = "topmost value")
+    // public float b_n = 1;
 
-    @Option(name = "-eb", usage = "east boundary")
-    public float b_e = 1;
+    // @Option(name = "-right", usage = "rightmost value")
+    // public float b_e = 1;
 
-    @Option(name = "-sb", usage = "south boundary")
-    public float b_s = 0;
+    // @Option(name = "-bottom", usage = "bottommost value")
+    // public float b_s = 0;
 
     @Argument
     List<String> arguments = new ArrayList<String>();

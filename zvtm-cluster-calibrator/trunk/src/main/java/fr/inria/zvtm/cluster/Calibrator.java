@@ -140,12 +140,10 @@ public class Calibrator {
         VCircle c = new VCircle(np.x*SCENE_W-SCENE_W/2, np.y*SCENE_H-SCENE_H/2, 100, 20, Color.RED, Color.RED);
         c.setDrawBorder(false);
         mSpace.addGlyph(c);
-        System.out.println("Added "+c);
     }
 
     Point2D.Double normalize(TuioPoint p){
-        // XXX: write normalization code based on WEOptions.b_*
-        return new Point2D.Double(p.getX(), p.getY());
+        return new Point2D.Double(p.getX(), 1-p.getY());
     }
 
     public static void main(String[] args){
@@ -176,7 +174,7 @@ class TUIOListener implements TuioListener {
     }
 
     public void addTuioCursor(TuioCursor tcur){
-        System.out.println("A C "+tcur.getPosition());
+        System.out.println("A C "+tcur.getPosition().getX()+" "+tcur.getPosition().getY());
         application.addObject(tcur.getPosition());
     }
 
@@ -198,11 +196,11 @@ class TUIOListener implements TuioListener {
     }
 
     public void updateTuioCursor(TuioCursor tcur){
-        System.out.println("U C "+tcur.getPosition());
+        // System.out.println("U C "+tcur.getPosition().getX()+" "+tcur.getPosition().getY());
     }
 
     public void updateTuioObject(TuioObject tobj){
-        System.out.println("U O "+tobj.getPosition());
+        // System.out.println("U O "+tobj.getPosition());
     }
 
 }
