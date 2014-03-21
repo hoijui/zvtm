@@ -42,6 +42,9 @@ public class WEOptions {
     @Option(name = "-noaa", usage = "disable anti-aliasing")
     public boolean noaa = false;
 
+    @Option(name = "-tuio", usage = "TUIO listening port")
+    public int tuioPort = 3333;
+
     @Argument
     List<String> arguments = new ArrayList<String>();
 

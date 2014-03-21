@@ -32,6 +32,12 @@ import fr.inria.zvtm.glyphs.VRectangle;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
+import TUIO.TuioListener;
+import TUIO.TuioClient;
+import TUIO.TuioCursor;
+import TUIO.TuioObject;
+import TUIO.TuioTime;
+
 public class Calibrator {
 
     static final int VIEW_W = 1280;
@@ -45,6 +51,8 @@ public class Calibrator {
 
     ClusteredView cv;
     ClusterGeometry cg;
+
+    TuioListener tl;
 
     public Calibrator(WEOptions options){
         vsm.setMaster("Calibrator");
@@ -65,10 +73,19 @@ public class Calibrator {
         ccameras.add(mCamera);
         cv = new ClusteredView(cg, options.numRows-1, options.numCols, options.numRows, ccameras);
         vsm.addClusteredView(cv);
-        init();
+        initTUIO(options.tuioPort);
+        initScene();
     }
 
-    void init(){
+    void initTUIO(int port){
+        tl = new TUIOListener(this);
+        TuioClient client = new TuioClient(port);
+        client.addTuioListener(tl);
+        client.connect();
+        System.out.println("Listening to TUIO events on port "+port);
+    }
+
+    void initScene(){
         mSpace.addGlyph(new VCircle(0, 0 , 0, 400, Color.RED));
         for (float angle=0;angle<2*Math.PI;){
             mSpace.addGlyph(new VRectangle(400*Math.cos(angle), 400*Math.sin(angle), 10, 20, 20, Color.WHITE));
@@ -91,6 +108,44 @@ public class Calibrator {
         }
         System.out.println("--help for command line options");
         new Calibrator(options);
+    }
+
+}
+
+class TUIOListener implements TuioListener {
+
+    Calibrator application;
+
+    TUIOListener(Calibrator app){
+        this.application = app;
+    }
+
+    public void addTuioCursor(TuioCursor tcur){
+        System.out.println("Added cursor "+tcur);
+    }
+
+    public void addTuioObject(TuioObject tobj){
+        System.out.println("Added object "+tobj);
+    }
+
+    public void refresh(TuioTime btime){
+        System.out.println("TUIO Refresh at "+btime);
+    }
+
+    public void removeTuioCursor(TuioCursor tcur){
+        System.out.println("Removed cursor "+tcur);
+    }
+
+    public void removeTuioObject(TuioObject tobj){
+        System.out.println("Removed object "+tobj);
+    }
+
+    public void updateTuioCursor(TuioCursor tcur){
+        System.out.println("Updated cursor "+tcur);
+    }
+
+    public void updateTuioObject(TuioObject tobj){
+        System.out.println("Updated object "+tobj);
     }
 
 }
