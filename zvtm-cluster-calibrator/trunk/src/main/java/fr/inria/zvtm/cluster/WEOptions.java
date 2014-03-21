@@ -46,13 +46,25 @@ public class WEOptions {
     public int tuioPort = 3333;
 
     @Option(name = "-sw", aliases = {"--scene-width"}, usage = "scene width in virtual space")
-    public int sceneWidth = 16000;
+    public int sceneWidth = 12000;
 
     @Option(name = "-sh", aliases = {"--scene-height"}, usage = "scene height in virtual space")
-    public int sceneHeight = 8000;
+    public int sceneHeight = 4500;
 
     @Option(name = "-ss", aliases = {"--scene-step"}, usage = "scene step in virtual space")
     public int sceneStep = 500;
+
+    @Option(name = "-wb", usage = "west boundary")
+    public float b_w = 0;
+
+    @Option(name = "-nb", usage = "north boundary")
+    public float b_n = 1;
+
+    @Option(name = "-eb", usage = "east boundary")
+    public float b_e = 1;
+
+    @Option(name = "-sb", usage = "south boundary")
+    public float b_s = 0;
 
     @Argument
     List<String> arguments = new ArrayList<String>();

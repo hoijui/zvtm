@@ -7,6 +7,7 @@
 package fr.inria.zvtm.cluster;
 
 import java.awt.Color;
+import java.awt.geom.Point2D;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
@@ -37,6 +38,7 @@ import TUIO.TuioClient;
 import TUIO.TuioCursor;
 import TUIO.TuioObject;
 import TUIO.TuioTime;
+import TUIO.TuioPoint;
 
 public class Calibrator {
 
@@ -46,6 +48,9 @@ public class Calibrator {
 
     static final int VIEW_W = 1280;
     static final int VIEW_H = 1024;
+
+    double SCENE_W = 12000;
+    double SCENE_H = 4500;
 
     VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE;
     VirtualSpace mSpace;
@@ -91,6 +96,8 @@ public class Calibrator {
     }
 
     void initScene(int w, int h, int step){
+        SCENE_W = w;
+        SCENE_H = h;
         // vertical lines
         int i = -w/2;
         while (i <= w/2){
@@ -128,6 +135,19 @@ public class Calibrator {
         }
     }
 
+    void addObject(TuioPoint p){
+        Point2D.Double np = normalize(p);
+        VCircle c = new VCircle(np.x*SCENE_W-SCENE_W/2, np.y*SCENE_H-SCENE_H/2, 100, 20, Color.RED, Color.RED);
+        c.setDrawBorder(false);
+        mSpace.addGlyph(c);
+        System.out.println("Added "+c);
+    }
+
+    Point2D.Double normalize(TuioPoint p){
+        // XXX: write normalization code based on WEOptions.b_*
+        return new Point2D.Double(p.getX(), p.getY());
+    }
+
     public static void main(String[] args){
         WEOptions options = new WEOptions();
         CmdLineParser parser = new CmdLineParser(options);
@@ -156,31 +176,33 @@ class TUIOListener implements TuioListener {
     }
 
     public void addTuioCursor(TuioCursor tcur){
-        System.out.println("Added cursor "+tcur);
+        System.out.println("A C "+tcur.getPosition());
+        application.addObject(tcur.getPosition());
     }
 
     public void addTuioObject(TuioObject tobj){
-        System.out.println("Added object "+tobj);
+        System.out.println("A O "+tobj.getPosition());
+        application.addObject(tobj.getPosition());
     }
 
     public void refresh(TuioTime btime){
-        System.out.println("TUIO Refresh at "+btime);
+        // System.out.println("R at "+btime);
     }
 
     public void removeTuioCursor(TuioCursor tcur){
-        System.out.println("Removed cursor "+tcur);
+        // System.out.println("R C "+tcur);
     }
 
     public void removeTuioObject(TuioObject tobj){
-        System.out.println("Removed object "+tobj);
+        // System.out.println("R O "+tobj);
     }
 
     public void updateTuioCursor(TuioCursor tcur){
-        System.out.println("Updated cursor "+tcur);
+        System.out.println("U C "+tcur.getPosition());
     }
 
     public void updateTuioObject(TuioObject tobj){
-        System.out.println("Updated object "+tobj);
+        System.out.println("U O "+tobj.getPosition());
     }
 
 }
