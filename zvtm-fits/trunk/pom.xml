@@ -12,7 +12,7 @@ $Id: pom.xml 3429 2010-07-20 07:32:30Z rprimet $
   <packaging>jar</packaging>
   <name>zvtm-fits</name>
   <version>0.1.3-SNAPSHOT</version>
-  <url>http://zvtm.sourceforge.net</url>
+  <url>http://zvtm.sourceforge.net</url>         
   <licenses>
     <license>
       <name>GNU Lesser General Public License (LGPL)</name>

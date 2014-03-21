@@ -279,7 +279,11 @@ def processSrcImg():
             return
         else:
             IMG_SRC_PATH = SRC_PATH
-        im = CGImageImport(CGDataProviderCreateWithFilename(IMG_SRC_PATH))
+        ax = CGDataProviderCreateWithFilename(IMG_SRC_PATH)
+        print ax
+        ay = CGImageImport(ax)
+        print ay
+        im = ay
         src_sz = (im.getWidth(), im.getHeight())
     else:
         im = Image.open(SRC_PATH)
