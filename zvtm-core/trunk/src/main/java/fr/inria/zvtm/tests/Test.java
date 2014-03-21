@@ -24,42 +24,15 @@ import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.Java2DPainter;
 import fr.inria.zvtm.engine.Utils;
-import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.DefaultTimingHandler;
-import fr.inria.zvtm.animation.EndAction;
-import fr.inria.zvtm.animation.interpolation.*;
+import fr.inria.zvtm.animation.interpolation.ConstantAccInterpolator;
 import fr.inria.zvtm.event.ViewAdapter;
 
 import fr.inria.zvtm.glyphs.*;
-import fr.inria.zvtm.lens.*;
 
 
 public class Test implements Java2DPainter {
-
-    /* misc. lens settings */
-    FixedSizeLens lens;
-    static int LENS_R1 = 200;
-    static int LENS_R2 = 50;
-    static final int WHEEL_ANIM_TIME = 50;
-    static final int LENS_ANIM_TIME = 300;
-    static double DEFAULT_MAG_FACTOR = 1f;
-    static double MAG_FACTOR = DEFAULT_MAG_FACTOR;
-    static double INV_MAG_FACTOR = 1/MAG_FACTOR;
-    /* LENS MAGNIFICATION */
-    static float WHEEL_MM_STEP = 1.0f;
-    static final float MAX_MAG_FACTOR = 12.0f;
-
-    static final int NO_LENS = 0;
-    static final int ZOOMIN_LENS = 1;
-    static final int ZOOMOUT_LENS = -1;
-    int lensType = NO_LENS;
-
-    /* lens distance and drop-off functions */
-    static final short L2_Gaussian = 0;
-    short lensFamily = L2_Gaussian;
-
-    static final float FLOOR_ALTITUDE = 100.0f;
 
 	/* screen dimensions, actual dimensions of windows */
     static int SCREEN_WIDTH =  Toolkit.getDefaultToolkit().getScreenSize().width;
@@ -74,37 +47,35 @@ public class Test implements Java2DPainter {
 	float MAX = DEFAULT_MAX;
 
 	VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE;
-	VirtualSpace mSpace,bSpace;
+	VirtualSpace mSpace;
 	View mView;
-	Camera mCamera,bCamera;
+	Camera mCamera;
 
 	public Test(String vt, float nbObj){
 		init(vt);
 		MAX = nbObj;
 		populate();
-        mCamera.setLocation(new Location(0,0,0));
-        bCamera.setLocation(new Location(0,0,0));
-        mView.setActiveLayer(0);
-        mView.setLayerVisibility(new boolean[]{true,false}, new boolean[]{false, true});
+		mView.getGlobalView(mCamera, 0);
 	}
 
     void init(String vt){
         windowLayout();
         mSpace = vsm.addVirtualSpace(VirtualSpace.ANONYMOUS);
         mCamera = mSpace.addCamera();
-        bSpace = vsm.addVirtualSpace(VirtualSpace.ANONYMOUS);
-        bCamera = bSpace.addCamera();
-        Vector cameras = new Vector(2);
+        Vector cameras = new Vector(1);
         cameras.add(mCamera);
-        cameras.add(bCamera);
-        System.out.println("Instantiating a regular Java2D view");
-        mView = vsm.addFrameView(cameras, View.ANONYMOUS, View.STD_VIEW, VIEW_W, VIEW_H, true);
-        mView.setBackgroundColor(Color.WHITE);
+        if (vt.equals("ogl")){
+            System.out.println("Instantiating a regular Java2D view with Sun's OGL pipeline");
+            mView = vsm.addFrameView(cameras, View.ANONYMOUS, View.OPENGL_VIEW, VIEW_W, VIEW_H, true);
+        }
+        else {
+            System.out.println("Instantiating a regular Java2D view");
+            mView = vsm.addFrameView(cameras, View.ANONYMOUS, View.STD_VIEW, VIEW_W, VIEW_H, true);
+        }
+        mView.setBackgroundColor(Color.LIGHT_GRAY);
         mView.setListener(new MainListener(this), 0);
         mView.setRefreshRate(1);
-        mView.setAntialiasing(true);
         mView.setJava2DPainter(this, Java2DPainter.FOREGROUND);
-        mCamera.stick(bCamera);
     }
 
 	void windowLayout(){
@@ -113,29 +84,17 @@ public class Test implements Java2DPainter {
     }
 
 	void populate(){
-
 	    Glyph[] glyphs = new Glyph[(int)(MAX*MAX)];
         for (int i=0;i<MAX;i++){
             for (int j=0;j<MAX;j++){
-                VRectangle r = new VRectangle(i*20,j*20,0,20,20, ((i*MAX+j) % 2 != 0) ? Color.RED : Color.BLUE);
+                VRectangle r = new VRectangle(i*20,j*20,0,20,20,Color.getHSBColor(i/MAX,j/MAX,1));
                 r.setDrawBorder(false);
                 glyphs[(int)(i*MAX+j)] = r;
             }
         }
         mSpace.addGlyphs(glyphs);
-
-
-        glyphs = new Glyph[(int)(MAX*MAX)];
-        for (int i=0;i<MAX;i++){
-            for (int j=0;j<MAX;j++){
-                VRectangle r = new VRectangle(i*20,j*20,0,20,20, ((i*MAX+j) % 2 != 0) ? Color.WHITE : Color.BLACK);
-                r.setDrawBorder(false);
-                glyphs[(int)(i*MAX+j)] = r;
-            }
-        }
-        bSpace.addGlyphs(glyphs);
 	}
-
+	
 	void startAnim(){
 	    double gvAlt = mView.getGlobalView(mCamera).getAltitude();
 		animate(gvAlt);
@@ -154,67 +113,6 @@ public class Test implements Java2DPainter {
         );
         vsm.getAnimationManager().startAnimation(cameraAlt, false);
     }
-
-    /* -------------- Sigma Lenses ------------------- */
-
-    void moveLens(int x, int y){
-        lens.setAbsolutePosition(x, y);
-        VirtualSpaceManager.INSTANCE.repaint();
-    }
-
-    void zoomInPhase1(int x, int y){
-        // create lens if it does not exist
-        if (lens == null){
-            lens = (FixedSizeLens)mView.setLens(getLensDefinition(x, y));
-            lens.setBufferThreshold(1f);
-        }
-        Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens,
-            new Float(MAG_FACTOR-1), true, IdentityInterpolator.getInstance(), null);
-        VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
-    }
-
-    void setMagFactor(double m){
-        MAG_FACTOR = m;
-        INV_MAG_FACTOR = 1 / MAG_FACTOR;
-    }
-
-    Lens getLensDefinition(int x, int y){
-        // Lens res = new FSGaussianLens(2.0f, LENS_R1, LENS_R2, x - VIEW_W/2, y - VIEW_H/2);
-        Lens res = new BGaussianLens(1.0f, 0, 1, LENS_R1, LENS_R2, x - VIEW_W/2, y - VIEW_H/2);
-        return res;
-    }
-
-    // void decLens(){
-    //     Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createLensMagAnim(500, (FixedSizeLens)lens,
-    //         -1, true, IdentityInterpolator.getInstance(), null);
-    //     VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
-    // }
-
-    // void incLens(){
-    //     Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createLensMagAnim(500, (FixedSizeLens)lens,
-    //         1, true, IdentityInterpolator.getInstance(), null);
-    //     VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
-    // }
-
-
-    void decLens(){
-        BlendingLens bl = (BlendingLens)lens;
-        bl.setFocusTranslucencyValue(bl.getFocusTranslucencyValue()-0.05f);
-        System.out.println(bl.getFocusTranslucencyValue());
-        // Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createLensRadiusAnim(1000, (FixedSizeLens)lens,
-        //     -10, -10, true, IdentityInterpolator.getInstance(), null);
-        // VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
-    }
-
-    void incLens(){
-        BlendingLens bl = (BlendingLens)lens;
-        bl.setFocusTranslucencyValue(bl.getFocusTranslucencyValue()+0.05f);
-        System.out.println(bl.getFocusTranslucencyValue());
-        // Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createLensRadiusAnim(1000, (FixedSizeLens)lens,
-        //     10, 10, true, IdentityInterpolator.getInstance(), null);
-        // VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
-    }
-
 
 	public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
 	    float rr = 1000 / (float)(mView.getPanel().getDelay());
@@ -283,21 +181,8 @@ class MainListener extends ViewAdapter {
         v.setDrawDrag(false);
     }
 
-    public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-        application.zoomInPhase1(jpx, jpy);
-    }
-
 	static float ZOOM_SPEED_COEF = 1.0f/50.0f;
     static double PAN_SPEED_COEF = 50.0;
-
-    public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
-        if (application.lens != null){
-            application.moveLens(jpx, jpy);
-        }
-        java.awt.geom.Point2D.Double p = application.mView.fromPanelToVSCoordinates(jpx, jpy, application.mCamera, new java.awt.geom.Point2D.Double());
-        System.out.println("---" + p);
-        System.out.println(application.mView.fromVSToPanelCoordinates(p.getX(), p.getY(), application.mCamera, new java.awt.Point()));
-    }
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
         if (buttonNumber == 1){
@@ -332,10 +217,9 @@ class MainListener extends ViewAdapter {
     }
 
     public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
-        if (code == KeyEvent.VK_Q){application.decLens();}
-        if (code == KeyEvent.VK_W){application.incLens();}
+        if (code==KeyEvent.VK_A){application.startAnim();}
     }
-
+    
     public void enterGlyph(Glyph g){
         g.highlight(true, null);
     }
@@ -346,24 +230,6 @@ class MainListener extends ViewAdapter {
 
     public void viewClosing(View v){
         System.exit(0);
-    }
-
-}
-
-
-class ZP2LensAction implements EndAction {
-
-    Test app;
-
-    ZP2LensAction(Test app){
-        this.app = app;
-    }
-
-    public void execute(Object subject, Animation.Dimension dimension){
-        (((Lens)subject).getOwningView()).setLens(null);
-        ((Lens)subject).dispose();
-        app.setMagFactor(Test.DEFAULT_MAG_FACTOR);
-        app.lens = null;
     }
 
 }

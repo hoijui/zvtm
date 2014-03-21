@@ -68,13 +68,6 @@ $Id$
 		<artifactId>jcip-annotations</artifactId>
 		<version>1.0</version>
 	</dependency>
-
-
-<dependency>
-  <groupId>net.sourceforge.tuio</groupId>
-  <artifactId>tuio</artifactId>
-  <version>1.4</version>
-</dependency>
 </dependencies>
 
   <!-- Build -->
