@@ -241,6 +241,8 @@ public class RouteLens {
     static final int DEFAULT_P = 2;
     int param_p = DEFAULT_P;
 
+    boolean enabled = true;
+
     Point2D.Double cursorInVS = new Point2D.Double();
     Point lensCenterInPanel = new Point();
 
@@ -274,12 +276,33 @@ public class RouteLens {
         this.param_p = 2;
     }
 
+    /** Move the lens to coordinates x,y, possibly adjusting its actual position depending on attraction forces exterted by the route.
+     *@param x x-coord of the default lens center position. Usually the mouse cursor's x-coord in screen space (JPanel coord sys).
+     *@param y y-coord of the default lens center position. Usually the mouse cursor's y-coord in screen space (JPanel coord sys).
+     */
     public void moveLens(int x, int y){
-        view.fromPanelToVSCoordinates(x, y, camera, cursorInVS);
-        Point2D lensCenterInVS = RouteLens.getLensPosition(route, cursorInVS, delta, param_p);
-        view.fromVSToPanelCoordinates(lensCenterInVS.getX(), lensCenterInVS.getY(), camera, lensCenterInPanel);
-        lens.setAbsolutePosition(lensCenterInPanel.x, lensCenterInPanel.y);
+        if (enabled){
+            view.fromPanelToVSCoordinates(x, y, camera, cursorInVS);
+            Point2D lensCenterInVS = RouteLens.getLensPosition(route, cursorInVS,
+                                                               delta * (camera.altitude + camera.focal) / camera.focal,
+                                                               param_p);
+            view.fromVSToPanelCoordinates(lensCenterInVS.getX(), lensCenterInVS.getY(), camera, lensCenterInPanel);
+            lens.setAbsolutePosition(lensCenterInPanel.x, lensCenterInPanel.y);
+        }
+        else {
+            lens.setAbsolutePosition(x, y);
+        }
         view.repaint();
+    }
+
+    /**Enabled/disable RouteLens attraction.*/
+    public void setEnabled(boolean b){
+        this.enabled = b;
+    }
+
+    /**Is RouteLens attraction enabled or disabled.*/
+    public boolean isEnabled(){
+        return this.enabled;
     }
 
 }
