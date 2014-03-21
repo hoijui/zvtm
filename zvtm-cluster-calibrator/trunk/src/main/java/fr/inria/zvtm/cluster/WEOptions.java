@@ -45,6 +45,15 @@ public class WEOptions {
     @Option(name = "-tuio", usage = "TUIO listening port")
     public int tuioPort = 3333;
 
+    @Option(name = "-sw", aliases = {"--scene-width"}, usage = "scene width in virtual space")
+    public int sceneWidth = 16000;
+
+    @Option(name = "-sh", aliases = {"--scene-height"}, usage = "scene height in virtual space")
+    public int sceneHeight = 8000;
+
+    @Option(name = "-ss", aliases = {"--scene-step"}, usage = "scene step in virtual space")
+    public int sceneStep = 500;
+
     @Argument
     List<String> arguments = new ArrayList<String>();
 

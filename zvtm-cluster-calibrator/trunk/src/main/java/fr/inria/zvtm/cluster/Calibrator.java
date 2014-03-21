@@ -27,7 +27,7 @@ import fr.inria.zvtm.cluster.ClusteredView;
 
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VCircle;
-import fr.inria.zvtm.glyphs.VRectangle;
+import fr.inria.zvtm.glyphs.VSegment;
 
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -39,6 +39,10 @@ import TUIO.TuioObject;
 import TUIO.TuioTime;
 
 public class Calibrator {
+
+    static final Color HV_LINE_COLOR = Color.GRAY;
+    static final Color D_LINE_COLOR = Color.DARK_GRAY;
+    static final Color CIRCLE_COLOR = Color.GREEN;
 
     static final int VIEW_W = 1280;
     static final int VIEW_H = 1024;
@@ -72,9 +76,10 @@ public class Calibrator {
         Vector ccameras = new Vector();
         ccameras.add(mCamera);
         cv = new ClusteredView(cg, options.numRows-1, options.numCols, options.numRows, ccameras);
+        cv.setBackgroundColor(Color.BLACK);
         vsm.addClusteredView(cv);
         initTUIO(options.tuioPort);
-        initScene();
+        initScene(options.sceneWidth, options.sceneHeight, options.sceneStep);
     }
 
     void initTUIO(int port){
@@ -85,11 +90,41 @@ public class Calibrator {
         System.out.println("Listening to TUIO events on port "+port);
     }
 
-    void initScene(){
-        mSpace.addGlyph(new VCircle(0, 0 , 0, 400, Color.RED));
-        for (float angle=0;angle<2*Math.PI;){
-            mSpace.addGlyph(new VRectangle(400*Math.cos(angle), 400*Math.sin(angle), 10, 20, 20, Color.WHITE));
-            angle += Math.PI/12d;
+    void initScene(int w, int h, int step){
+        // vertical lines
+        int i = -w/2;
+        while (i <= w/2){
+            VSegment s = new VSegment(i, 0, 5, HV_LINE_COLOR, 1, 0);
+            s.setEndPoints(i, -h/2, i, h/2);
+            mSpace.addGlyph(s);
+            i += step;
+        }
+        // horizontal lines
+        i = -h/2;
+        while (i <= h/2){
+            VSegment s = new VSegment(0, i, 5, HV_LINE_COLOR, 1, 0);
+            s.setEndPoints(-w/2, i, w/2, i);
+            mSpace.addGlyph(s);
+            i += step;
+        }
+        // diagonal lines
+        i = -w;
+        while (i <= w){
+            VSegment s = new VSegment(i, 0, 5, D_LINE_COLOR, 1, 0);
+            s.setEndPoints(i+h/2, -h/2, i-h/2, h/2);
+            mSpace.addGlyph(s);
+            s = new VSegment(i, 0, 5, D_LINE_COLOR, 1, 0);
+            s.setEndPoints(i+h/2, h/2, i-h/2, -h/2);
+            mSpace.addGlyph(s);
+            i += step;
+        }
+        // circles
+        i = step;
+        while (i<=w/2 && i<=h/2){
+            VCircle c = new VCircle(0, 0, 10, 2*i, Color.BLACK, CIRCLE_COLOR);
+            c.setFilled(false);
+            mSpace.addGlyph(c);
+            i += step;
         }
     }
 
@@ -209,11 +244,11 @@ class CalibratorListener extends ViewAdapter {
     }
 
     public void enterGlyph(Glyph g){
-        g.highlight(true, null);
+        // g.highlight(true, null);
     }
 
     public void exitGlyph(Glyph g){
-        g.highlight(false, null);
+        // g.highlight(false, null);
     }
 
 }
