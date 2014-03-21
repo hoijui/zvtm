@@ -251,7 +251,7 @@ public class RouteLens {
      *@param route the route that should influence the lens' position.
      *@param c the camera observing the route in the View that holds the lens.
      *@param mad the maximum attraction distance, beyond which a route segment will not exert any influence on the lens.
-     *@param p power parameter used to fine-tune the attraction effet. Default is 2, typically in range [2,6].
+     *@param p power parameter used to fine-tune the attraction effect. Default is 2, typically in range [2,6].
      */
     public RouteLens(Lens l, DPath route, Camera c, double mad, int p){
         this.lens = l;
@@ -320,14 +320,14 @@ public class RouteLens {
 	}
 
 	/**
-	 * @return power parameter used to fine-tune the attraction effet. Default is 2, typically in range [2,6].
+	 * @return power parameter used to fine-tune the attraction effect. Default is 2, typically in range [2,6].
 	 */
 	public int getP() {
 		return param_p;
 	}
 
 	/**
-	 * @param p power parameter used to fine-tune the attraction effet. Default is 2, typically in range [2,6].
+	 * @param p power parameter used to fine-tune the attraction effect. Default is 2, typically in range [2,6].
 	 */
 	public void setP(int p) {
 		this.param_p = p;
