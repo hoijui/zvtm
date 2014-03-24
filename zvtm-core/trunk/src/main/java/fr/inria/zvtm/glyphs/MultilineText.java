@@ -52,7 +52,6 @@ public class MultilineText<T> extends VText {
      *@param y coordinate in virtual space
      *@param z z-index (pass 0 if you do not use z-ordering)
      *@param c fill color
-     *@param bkg background color (null if not painted)
      *@param t text string
      *@param ta text-anchor (for alignment: one of TEXT_ANCHOR_*)
      *@param scale scaleFactor w.r.t original image size

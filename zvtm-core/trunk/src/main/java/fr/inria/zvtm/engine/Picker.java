@@ -125,7 +125,7 @@ public class Picker {
      *@param tolerance the rectangular area's half width/height considered as the cursor intersecting region, in virtual space units (default tolerance is 5)
      *@param x picker x-coordinate, in virtual space coordinates system
      *@param y picker y-coordinate, in virtual space coordinates system
-     *@see #intersectsPath(DPath p)
+     *@see #intersectsPath(DPath p, int tolerance, Graphics2D g2d)
      */
 	public boolean intersectsPath(DPath p, int tolerance, double x, double y, Graphics2D g2d){
 		if (!p.coordsInsideBoundingBox(x, y)){return false;}
@@ -136,7 +136,7 @@ public class Picker {
     /** Tells whether the picker is hovering a particular DPath or not.
      *@param p DPath instance to be tested
      *@param tolerance the rectangular area's half width/height considered as the cursor intersecting region, in virtual space units (default tolerance is 5)
-     *@see #intersectsPath(DPath p, int tolerance, double cursorX, double cursorY)
+     *@see #intersectsPath(DPath p, int tolerance, double x, double y, Graphics2D g2d)
      */
     public boolean intersectsPath(DPath p, int tolerance, Graphics2D g2d){
 		return intersectsPath(p, tolerance, vx, vy, g2d);

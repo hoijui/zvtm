@@ -84,9 +84,9 @@ public class RouteLens {
         }
         return paths;
     }
-    
+
     public static GeneralPath concatPath(GeneralPath path1, GeneralPath path2) {
-    	GeneralPath path = (GeneralPath)path1.clone();
+        GeneralPath path = (GeneralPath)path1.clone();
         PathIterator pathIterator = path2.getPathIterator(null);
         double[] coords = new double[6];
         while(!pathIterator.isDone()) {
@@ -96,7 +96,7 @@ public class RouteLens {
                 path.moveTo(coords[0], coords[1]);
                 break;
             case PathIterator.SEG_LINETO:
-            	path.lineTo(coords[0], coords[1]);
+                path.lineTo(coords[0], coords[1]);
                 break;
             case PathIterator.SEG_QUADTO:
                 path.quadTo(coords[0], coords[1], coords[2], coords[3]);
@@ -205,7 +205,7 @@ public class RouteLens {
         ArrayList<GeneralPath> routeSegments = cutPath(route);
         return getLensPosition(routeSegments, C, delta, p);
     }
-    
+
     public static Point2D getLensPosition(ArrayList<GeneralPath> routeSegments, Point2D C, double delta, int p) {
         Point2D L = C;
         Point2D Rc = null;
@@ -331,30 +331,32 @@ public class RouteLens {
         }
         view.repaint();
     }
-    
+
     protected void updateGeneralPath() {
-    	GeneralPath route = this.routes.get(0).getJava2DGeneralPath();
-    	for (int i = 1; i < this.routes.size(); i++) {
-    		DPath path = this.routes.get(i);
-    		route = RouteLens.concatPath(route, path.getJava2DGeneralPath());
-		}
-    	routeSegments = cutPath(route);
+        GeneralPath route = this.routes.get(0).getJava2DGeneralPath();
+        for (int i = 1; i < this.routes.size(); i++) {
+            DPath path = this.routes.get(i);
+            route = RouteLens.concatPath(route, path.getJava2DGeneralPath());
+        }
+        routeSegments = cutPath(route);
     }
-    
+
     /**
      * *@param route a route that should influence the lens' position.
+     *@see #removeRoute(DPath route)
      */
     public void addRoute(DPath route) {
-    	this.routes.add(route);
-    	updateGeneralPath();
+        this.routes.add(route);
+        updateGeneralPath();
     }
-    
+
     /**
      * @param route a route that does not influence anymore the lens' position.
+     *@see #addRoute(DPath route)
      */
     public void removeRoute(DPath route) {
-    	this.routes.remove(route);
-    	updateGeneralPath();
+        this.routes.remove(route);
+        updateGeneralPath();
     }
 
     /**Enabled/disable RouteLens attraction.*/
@@ -367,32 +369,32 @@ public class RouteLens {
         return this.enabled;
     }
 
-	/**
-	 * @return the maximum attraction distance, beyond which a route segment will not exert any influence on the lens.
-	 */
-	public double getMad() {
-		return delta;
-	}
+    /**
+     * @return the maximum attraction distance, beyond which a route segment will not exert any influence on the lens.
+     */
+    public double getMad() {
+        return delta;
+    }
 
-	/**
-	 * @param mad the maximum attraction distance, beyond which a route segment will not exert any influence on the lens.
-	 */
-	public void setMad(double mad) {
-		this.delta = mad;
-	}
+    /**
+     * @param mad the maximum attraction distance, beyond which a route segment will not exert any influence on the lens.
+     */
+    public void setMad(double mad) {
+        this.delta = mad;
+    }
 
-	/**
-	 * @return power parameter used to fine-tune the attraction effect. Default is 2, typically in range [2,6].
-	 */
-	public int getP() {
-		return param_p;
-	}
+    /**
+     * @return power parameter used to fine-tune the attraction effect. Default is 2, typically in range [2,6].
+     */
+    public int getP() {
+        return param_p;
+    }
 
-	/**
-	 * @param p power parameter used to fine-tune the attraction effect. Default is 2, typically in range [2,6].
-	 */
-	public void setP(int p) {
-		this.param_p = p;
-	}
+    /**
+     * @param p power parameter used to fine-tune the attraction effect. Default is 2, typically in range [2,6].
+     */
+    public void setP(int p) {
+        this.param_p = p;
+    }
 
 }
