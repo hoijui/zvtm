@@ -82,6 +82,33 @@ public class RouteLens {
         }
         return paths;
     }
+    
+    public static GeneralPath concatPath(GeneralPath path1, GeneralPath path2) {
+    	GeneralPath path = (GeneralPath)path1.clone();
+        PathIterator pathIterator = path2.getPathIterator(null);
+        double[] coords = new double[6];
+        while(!pathIterator.isDone()) {
+            int type = pathIterator.currentSegment(coords);
+            switch(type) {
+            case PathIterator.SEG_MOVETO:
+                path.moveTo(coords[0], coords[1]);
+                break;
+            case PathIterator.SEG_LINETO:
+            	path.lineTo(coords[0], coords[1]);
+                break;
+            case PathIterator.SEG_QUADTO:
+                path.quadTo(coords[0], coords[1], coords[2], coords[3]);
+                break;
+            case PathIterator.SEG_CUBICTO:
+                path.curveTo(coords[0], coords[1], coords[2], coords[3], coords[4], coords[5]);
+                break;
+            default:
+                System.out.println("unexpected segment type: "+type);
+            }
+            pathIterator.next();
+        }
+        return path;
+    }
 
     public static Point2D getClosestPoint(Point2D pt, GeneralPath path, double maxSegmentLength) {
         ArrayList<Point2D> points = getPoints(path, maxSegmentLength);
@@ -237,6 +264,7 @@ public class RouteLens {
     View view;
     Camera camera;
     GeneralPath route;
+    ArrayList<DPath> routes;
     double delta;
     static final int DEFAULT_P = 2;
     int param_p = DEFAULT_P;
@@ -260,6 +288,8 @@ public class RouteLens {
         this.route = route.getJava2DGeneralPath();
         this.delta = mad;
         this.param_p = p;
+        this.routes = new ArrayList<DPath>();
+        this.routes.add(route);
     }
 
     /**
@@ -274,6 +304,8 @@ public class RouteLens {
         this.route = route.getJava2DGeneralPath();
         this.delta = l.getRadius();
         this.param_p = 2;
+        this.routes = new ArrayList<DPath>();
+        this.routes.add(route);
     }
 
     /** Move the lens to coordinates x,y, possibly adjusting its actual position depending on attraction forces exterted by the route.
@@ -293,6 +325,24 @@ public class RouteLens {
             lens.setAbsolutePosition(x, y);
         }
         view.repaint();
+    }
+    
+    protected void updateGeneralPath() {
+    	this.route = this.routes.get(0).getJava2DGeneralPath();
+    	for (int i = 1; i < this.routes.size(); i++) {
+    		DPath path = this.routes.get(i);
+    		this.route = RouteLens.concatPath(this.route, path.getJava2DGeneralPath());
+		}
+    }
+    
+    public void addRoute(DPath route) {
+    	this.routes.add(route);
+    	updateGeneralPath();
+    }
+    
+    public void removeRoute(DPath route) {
+    	this.routes.remove(route);
+    	updateGeneralPath();
     }
 
     /**Enabled/disable RouteLens attraction.*/
