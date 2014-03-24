@@ -25,11 +25,13 @@ import fr.inria.zvtm.glyphs.DPath;
  * When moving a lens, simply call RouteLens.moveLens(x, y) instead of Lens.setAbsolutePosition(x, y);
 <p>Example of use, specifying that Lens l's position should stick to the route who's geometry is encoded by a DPath:</p>
 <pre>
-DPath route = ...;
+DPath route1 = ...;
+DPath route2 = ...;
 Lens l = ...;
 Camera c = ...;
-RouteLens rl = new RouteLens(l, route, c);
-
+RouteLens rl = new RouteLens(l, c);
+rl.addRoute(route1);
+rl.addRoute(route2);
 ...
 
 public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
@@ -146,7 +148,10 @@ public class RouteLens {
         return points;
     }
 
-    public static Point2D[] getLensPosition(GeneralPath route, Point2D C, double delta, int p, ArrayList<Point2D> attractionPoints, ArrayList<Point2D> attractionValues, Point2D overallAttraction) {
+    /**
+     * For debug purpose
+     */
+    static Point2D[] getLensPosition(GeneralPath route, Point2D C, double delta, int p, ArrayList<Point2D> attractionPoints, ArrayList<Point2D> attractionValues, Point2D overallAttraction) {
         Point2D L = C;
         Point2D Rc = null;
         Point2D closest = null;
@@ -197,13 +202,17 @@ public class RouteLens {
     }
 
     public static Point2D getLensPosition(GeneralPath route, Point2D C, double delta, int p) {
+        ArrayList<GeneralPath> routeSegments = cutPath(route);
+        return getLensPosition(routeSegments, C, delta, p);
+    }
+    
+    public static Point2D getLensPosition(ArrayList<GeneralPath> routeSegments, Point2D C, double delta, int p) {
         Point2D L = C;
         Point2D Rc = null;
         double dmin = Double.MAX_VALUE;
         double dc;
         int n = 0;
         Point2D A = new Point2D.Double(0, 0);
-        ArrayList<GeneralPath> routeSegments = cutPath(route);
         double sumWeights = 0.0;
         for (Iterator<GeneralPath> iterator = routeSegments.iterator(); iterator.hasNext();) {
             GeneralPath routeSegment = iterator.next();
@@ -263,8 +272,8 @@ public class RouteLens {
     Lens lens;
     View view;
     Camera camera;
-    GeneralPath route;
     ArrayList<DPath> routes;
+    ArrayList<GeneralPath> routeSegments;
     double delta;
     static final int DEFAULT_P = 2;
     int param_p = DEFAULT_P;
@@ -276,36 +285,32 @@ public class RouteLens {
 
     /**
      *@param l the lens whose position will be influenced by route dp.
-     *@param route the route that should influence the lens' position.
      *@param c the camera observing the route in the View that holds the lens.
      *@param mad the maximum attraction distance, beyond which a route segment will not exert any influence on the lens.
      *@param p power parameter used to fine-tune the attraction effect. Default is 2, typically in range [2,6].
      */
-    public RouteLens(Lens l, DPath route, Camera c, double mad, int p){
+    public RouteLens(Lens l, Camera c, double mad, int p){
         this.lens = l;
         this.camera = c;
         this.view = c.getOwningView();
-        this.route = route.getJava2DGeneralPath();
         this.delta = mad;
         this.param_p = p;
+        this.routeSegments = new ArrayList<GeneralPath>();
         this.routes = new ArrayList<DPath>();
-        this.routes.add(route);
     }
 
     /**
      *@param l the lens whose position will be influenced by route dp.
-     *@param route the route that should influence the lens' position.
      *@param c the camera observing the route in the View that holds the lens.
      */
-    public RouteLens(Lens l, DPath route, Camera c){
+    public RouteLens(Lens l, Camera c){
         this.lens = l;
         this.camera = c;
         this.view = c.getOwningView();
-        this.route = route.getJava2DGeneralPath();
         this.delta = l.getRadius();
         this.param_p = 2;
+        this.routeSegments = new ArrayList<GeneralPath>();
         this.routes = new ArrayList<DPath>();
-        this.routes.add(route);
     }
 
     /** Move the lens to coordinates x,y, possibly adjusting its actual position depending on attraction forces exterted by the route.
@@ -315,7 +320,7 @@ public class RouteLens {
     public void moveLens(int x, int y){
         if (enabled){
             view.fromPanelToVSCoordinates(x, y, camera, cursorInVS);
-            Point2D lensCenterInVS = RouteLens.getLensPosition(route, cursorInVS,
+            Point2D lensCenterInVS = RouteLens.getLensPosition(routeSegments, cursorInVS,
                                                                delta * (camera.altitude + camera.focal) / camera.focal,
                                                                param_p);
             view.fromVSToPanelCoordinates(lensCenterInVS.getX(), lensCenterInVS.getY(), camera, lensCenterInPanel);
@@ -328,18 +333,25 @@ public class RouteLens {
     }
     
     protected void updateGeneralPath() {
-    	this.route = this.routes.get(0).getJava2DGeneralPath();
+    	GeneralPath route = this.routes.get(0).getJava2DGeneralPath();
     	for (int i = 1; i < this.routes.size(); i++) {
     		DPath path = this.routes.get(i);
-    		this.route = RouteLens.concatPath(this.route, path.getJava2DGeneralPath());
+    		route = RouteLens.concatPath(route, path.getJava2DGeneralPath());
 		}
+    	routeSegments = cutPath(route);
     }
     
+    /**
+     * *@param route a route that should influence the lens' position.
+     */
     public void addRoute(DPath route) {
     	this.routes.add(route);
     	updateGeneralPath();
     }
     
+    /**
+     * @param route a route that does not influence anymore the lens' position.
+     */
     public void removeRoute(DPath route) {
     	this.routes.remove(route);
     	updateGeneralPath();
