@@ -23,7 +23,7 @@ import fr.inria.zvtm.glyphs.DPath;
  * The RouteLens motor behavior is described in <strong>J. Alvina, C. Appert, O. Chapuis, E. Pietriga, RouteLens: Easy Route Following for Map Applications, AVI '14: Proceedings of the 12th working conference on Advanced visual interfaces</strong>.
  * It can be coupled with any type of ZVTM lens.
  * When moving a lens, simply call RouteLens.moveLens(x, y) instead of Lens.setAbsolutePosition(x, y);
-<p>Example of use, specifying that Lens l's position should stick to the route who's geometry is encoded by a DPath:</p>
+<p>Example of use, specifying that Lens l's position should stick to the route whose geometry is encoded by a DPath:</p>
 <pre>
 DPath route1 = ...;
 DPath route2 = ...;
