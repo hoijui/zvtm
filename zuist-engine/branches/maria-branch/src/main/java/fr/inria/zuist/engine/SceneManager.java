@@ -1214,13 +1214,28 @@ public class SceneManager implements CameraListener {
      * of camera 'cam', or -1 if 'cam' does not belong
      * to cameras tracked by this ZUIST instance.
      */
-    private int getLayerIndex(Camera cam){
+    public int getLayerIndex(Camera cam){
         for(int i=0; i<sceneCameras.length; ++i){
             if(sceneCameras[i] == cam){
                 return i;
             }
         }
         return -1;
+    }
+
+    public Region[] regionsAtLayer(Camera cam)
+    {
+        Vector regions = new Vector();
+        for (Object r : id2region.values())
+        {
+            Region region = (Region)r;
+            if(region.getLayerIndex()==getLayerIndex(cam))
+                regions.add(region);
+        }
+        Region[] regionsLayer = new Region[regions.size()];
+        for(int i=0; i<regions.size(); i++)
+            regionsLayer[i]= (Region)regions.get(i);
+        return regionsLayer;
     }
     
     /* ------------------ DEBUGGING --------------------- */

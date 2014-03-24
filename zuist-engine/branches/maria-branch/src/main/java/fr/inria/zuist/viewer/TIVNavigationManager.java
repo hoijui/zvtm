@@ -14,19 +14,35 @@ import java.awt.event.ItemListener;
 import javax.swing.JFrame;
 import javax.swing.JComboBox;
 import java.awt.geom.Point2D;
+import java.awt.BasicStroke;
 
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.Vector;
+import java.util.Map;
+
+import java.io.*;
+import java.util.List;
+
 
 import fr.inria.zvtm.engine.VirtualSpaceManager;
+import fr.inria.zvtm.engine.VirtualSpace;
+import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.glyphs.VRectangle;
+import fr.inria.zvtm.glyphs.SIRectangle;
+import fr.inria.zvtm.glyphs.DPath;
+
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.lens.*;
 import fr.inria.zvtm.engine.portals.OverviewPortal;
+import fr.inria.zvtm.engine.portals.CameraPortal;
 import fr.inria.zvtm.animation.EndAction;
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
 import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
+
+import fr.inria.zvtm.engine.View;
+import fr.inria.zvtm.engine.ViewPanel;
 
 import fr.inria.zuist.engine.Region;
 
@@ -42,11 +58,12 @@ class TIVNavigationManager {
     /* misc. lens settings */
     Lens lens;
     TemporalLens tLens;
-    static int LENS_R1 = 100;
-    static int LENS_R2 = 50;
+    static int LENS_R1 = 200;
+    static int LENS_R2 = 100;
     static final int WHEEL_ANIM_TIME = 50;
     static final int LENS_ANIM_TIME = 300;
-    static double DEFAULT_MAG_FACTOR = 4.0;
+    //static double DEFAULT_MAG_FACTOR = 4.0;
+    static double DEFAULT_MAG_FACTOR = 3.0f;
     static double MAG_FACTOR = DEFAULT_MAG_FACTOR;
     static double INV_MAG_FACTOR = 1/MAG_FACTOR;
     /* LENS MAGNIFICATION */
@@ -61,7 +78,13 @@ class TIVNavigationManager {
     /* lens distance and drop-off functions */
     static final short L2_Gaussian = 0;
     static final short L2_SCB = 1;
-    short lensFamily = L2_Gaussian;
+    static final short Blense=2;
+    static final short BInverseCosine=3;
+    static final short BGaussianLens=4;
+    //short lensFamily = L2_SCB;
+    short lensFamily = BGaussianLens;
+    static boolean lense=false;
+    static boolean pieMenu=false;
 
     static final float FLOOR_ALTITUDE = 100.0f;
 
@@ -69,6 +92,14 @@ class TIVNavigationManager {
 
     Camera mCamera;
     VirtualSpaceManager vsm;
+
+    static boolean [] contextVisibility = new boolean [6];
+    static boolean [] lenseVisibility = new boolean [6];
+
+    static String contextLayer;
+    static String lenseLayer;
+
+    View fakeCursorView=null;
 
     TIVNavigationManager(TiledImageViewer app){
         this.application = app;
@@ -142,6 +173,7 @@ class TIVNavigationManager {
 	static final Color OV_INSIDE_BORDER_COLOR = Color.WHITE;
 
 	OverviewPortal ovPortal;
+    
 
 	double[] scene_bounds = {0, 0, 0, 0};
 
@@ -158,7 +190,7 @@ class TIVNavigationManager {
 	        oh = MAX_OVERVIEW_HEIGHT;
 	        ow = Math.round(oh*ar);
 	    }
-		ovPortal = new OverviewPortal(application.panelWidth-ow-1, application.panelHeight-oh-1, ow, oh, application.ovCamera, application.mCamera);
+		ovPortal = new OverviewPortal(application.panelWidth-ow-1, application.panelHeight-oh-1, ow, oh, application.ovCamera, application.scanCamera);
 		ovPortal.setPortalListener(application.eh);
 		ovPortal.setBackgroundColor(TiledImageViewer.BACKGROUND_COLOR);
 		ovPortal.setObservedRegionColor(OBSERVED_REGION_COLOR);
@@ -166,6 +198,10 @@ class TIVNavigationManager {
 		VirtualSpaceManager.INSTANCE.addPortal(ovPortal, application.mView);
 		ovPortal.setBorder(Color.GREEN);
 		updateOverview();
+
+        
+
+
 	}
 
 	void updateOverview(){
@@ -191,7 +227,270 @@ class TIVNavigationManager {
         vsm.repaint(application.mView);
     }
 
+    /* -------------- Modes -------------------------- */
+
+
+    CameraPortal cPortal=null;
+    CameraPortal mPortal=null;
+
+    Glyph fakeCursorH = null;
+    Glyph fakeCursorV=null;
+
+    Vector <DPath> paths = new Vector <DPath>();
+    void loadMode(int mode)
+    {
+
+        if(mode==application.lenses)
+        {
+            saveLayerVisibility();
+
+        }
+        if(mode==application.routeLens)
+        {
+            lensFamily = L2_Gaussian;
+            DEFAULT_MAG_FACTOR = 3.0f;
+            LENS_R1 = 150;
+            LENS_R2 = 100;
+
+            //Uncomment to create the virtual space for magnification
+            //application.magnifyCamera = application.mCamera;
+            //application.loadLenseSpace();
+            readPath();
+
+        }
+
+        if(mode==application.covisualization2)
+        {
+            Color c = new Color(137,60,255);
+            fakeCursorH = new SIRectangle(0,0,0,20,3,c);
+            fakeCursorV = new SIRectangle(0,0,0,3,20,c);
+        }
+    }
+
+    void loadCovisualization()
+    {
+        cPortal = new CameraPortal(application.panelWidth/2,0,application.panelWidth/2, application.panelHeight,application.orthoCamera);
+        mPortal = new CameraPortal(0,0,application.panelWidth/2, application.panelHeight, application.scanCamera);
+        //mPortal = new CameraPortal(0,0,application.panelWidth/2, application.panelHeight, application.littCamera);
+        cPortal.setPortalListener(application.eh);
+        mPortal.setPortalListener(application.eh);
+        //cPortal.setPortalListener(application.eh);
+        cPortal.setBackgroundColor(Color.BLACK);
+        mPortal.setBackgroundColor(Color.BLACK);
+        VirtualSpaceManager.INSTANCE.addPortal(cPortal, application.mView);
+        VirtualSpaceManager.INSTANCE.addPortal(mPortal, application.mView);
+
+
+    }
+
+    void resizeCovisualization()
+    {
+        if(cPortal!=null)
+            VirtualSpaceManager.INSTANCE.destroyPortal(cPortal);
+        if(mPortal != null)
+            VirtualSpaceManager.INSTANCE.destroyPortal(mPortal);
+        loadCovisualization();
+    }
+
+    //Switching layers. Only for mode=swipe.
+    void hideLayer(VirtualSpace vs)
+    {
+        System.out.println(vs.getName());
+        //for (Glyph g:vs.getAllGlyphs())
+        for(Glyph g:application.scanSpace.getAllGlyphs())
+        {
+            vs.hide(g);
+        }
+    } 
+
+    void showLayer(VirtualSpace vs)
+    {
+        for(Glyph g:vs.getAllGlyphs())
+        {
+            vs.show(g);
+        }
+    }
+
+    //Mixing representations with translucency. Only for mode = alpha_swipe
+    public void alphaLayer (VirtualSpace vs, int i)
+    {
+        if(i==1)
+        {
+            if(vs.getVisibleGlyphsList()[0].getTranslucencyValue()>0.1)
+                for (Glyph g : vs.getAllGlyphs())
+                    g.setTranslucencyValue(g.getTranslucencyValue()-0.1f);
+            else
+                for (Glyph g : vs.getAllGlyphs())
+                    g.setTranslucencyValue(0f);
+        } 
+        if(i==0)
+        {
+            if(vs.getVisibleGlyphsList()[0].getTranslucencyValue()<0.9)
+                for (Glyph g : vs.getAllGlyphs())
+                    g.setTranslucencyValue(g.getTranslucencyValue()+0.1f);
+            else
+                for (Glyph g : vs.getAllGlyphs())
+                    g.setTranslucencyValue(1f);
+        }   
+    }
+
+    //Moves the cursor in the inactive screen, only in mode=covisualization
+    public void moveFakeCursor(ViewPanel v, double jpx, double jpy)
+    {
+        if (fakeCursorView == null || fakeCursorView == v.parent || !(application.covisHash.get(fakeCursorView).contains(fakeCursorH)))
+        {
+            if (fakeCursorView !=null && (application.covisHash.get(fakeCursorView).contains(fakeCursorH)) )
+            {
+                application.covisHash.get(fakeCursorView).removeGlyph(fakeCursorH);
+                application.covisHash.get(fakeCursorView).removeGlyph(fakeCursorV);
+            }
+
+            if(application.covisHash.keySet().toArray()[0]==v.parent)
+                fakeCursorView = (View)(application.covisHash.keySet().toArray()[1]);
+            else
+                fakeCursorView = (View)(application.covisHash.keySet().toArray()[0]);
+            application.covisHash.get(fakeCursorView).addGlyph(fakeCursorH);
+            application.covisHash.get(fakeCursorView).addGlyph(fakeCursorV);
+        }
+
+        if(fakeCursorV !=null && fakeCursorH !=null)
+        {
+            application.covisHash.get(fakeCursorView).onTop(fakeCursorV);
+            application.covisHash.get(fakeCursorView).onTop(fakeCursorH);
+            fakeCursorV.moveTo(jpx,jpy);
+            fakeCursorH.moveTo(jpx,jpy);
+        }
+    }
+
+    public void changeLayers(String vsName)
+    {
+        if(lense)
+        {
+            changeLayerLense(vsName);
+        
+        }
+        else
+        {
+            changeLayerContext(vsName);
+        }
+    }
+
+    public void loadSavedLayers()
+    {
+        application.mView.setLayerVisibility(contextVisibility, lenseVisibility);
+    }
+
+    public void saveLayerVisibility()
+    {
+        System.arraycopy(application.mView.getLayerVisibility()[0],0,contextVisibility,0, application.mView.getLayerVisibility()[0].length);
+        System.arraycopy(application.mView.getLayerVisibility()[1],0,lenseVisibility,0, application.mView.getLayerVisibility()[1].length);
+    }
+
+    //Change representations in lenses mode.
+    public void changeLayerContext(String name)
+    {
+        for (String key : application.layersIndex.keySet())
+        {
+
+            if(key==name)
+            {
+                System.out.println("CONTEXT LAYER: "+contextLayer);
+                application.mView.getLayerVisibility()[0][application.layersIndex.get(key)]=true;
+                application.mView.setLayerVisibility(application.mView.getLayerVisibility()[0], application.mView.getLayerVisibility()[1]);
+            }
+            else
+            {
+                application.mView.getLayerVisibility()[0][application.layersIndex.get(key)]=false;
+                application.mView.setLayerVisibility(application.mView.getLayerVisibility()[0], application.mView.getLayerVisibility()[1]);
+            }
+        }
+
+    }
+
+    public void changeLayerLense(String name)
+    {
+        for (String key : application.layersIndex.keySet())
+        {
+            if(key==name)
+            {
+                application.mView.getLayerVisibility()[1][application.layersIndex.get(key)]=true;
+                application.mView.setLayerVisibility(application.mView.getLayerVisibility()[0], application.mView.getLayerVisibility()[1]);
+            }
+            else
+            {
+                application.mView.getLayerVisibility()[1][application.layersIndex.get(key)]=false;
+                application.mView.setLayerVisibility(application.mView.getLayerVisibility()[0], application.mView.getLayerVisibility()[1]);
+            }
+        }
+    }
+
+    //For creating paths clicking, only in mode=none
+    public void writePath(List <String> lines)
+    {
+        try{
+        File f = new File ("points4.txt");
+        OutputStream outputStream = new FileOutputStream(f);
+        PrintStream ps = new PrintStream(f);
+        for (String line : lines)
+        {
+            ps.println(line);
+        }
+        ps.close();
+        }
+        catch(Exception e)
+        {
+            System.out.println("Not able to write file");
+        }
+    }
+
+    public DPath readPath()
+    {
+        DPath path = null;
+        try {
+        File f = new File ("points.txt");
+        BufferedReader br = new BufferedReader(new FileReader(f));
+        String line;
+        Double x;
+        Double y;
+        path = new DPath();
+        while ((line = br.readLine()) != null) {
+            //System.out.println("LINEEE "+line);
+            if(line.equals("-----"))
+            {
+                System.out.println("------");
+                paths.add(path);
+                String firstPoint=br.readLine();
+                String[] coordinates = firstPoint.split(":");
+                x = Double.parseDouble(coordinates[0]);
+                y = Double.parseDouble(coordinates[1]);
+                path=new DPath(x,y,11,Color.CYAN);
+            }
+            else
+            {
+            String[] coordinates = line.split(":");
+            x = Double.parseDouble(coordinates[0]);
+            y = Double.parseDouble(coordinates[1]);
+            System.out.println("X: "+x);
+            System.out.println("Y: "+y);
+            path.addSegment(x,y,true);
+            }
+           
+        }
+        br.close();
+        }
+        catch(Exception e) {System.out.println("Not able to read file");}
+        for (DPath dp : paths)
+        {
+        BasicStroke s = new BasicStroke(7f);
+        dp.setStroke(s);
+        application.lenseSpace.addGlyph(dp);
+        }
+        return path;
+
+    }
+
 	/* -------------- Sigma Lenses ------------------- */
+    RouteLens rLens = null;
 
 	void toggleLensType(){
 	    if (lensFamily == L2_Gaussian){
@@ -361,8 +660,78 @@ From this we can get the altitude difference (a2 - a1)                       */
                 res = (Lens)tLens;
                 break;
             }
+            case Blense:{
+                res=new BLinearLens(1.0f, 0, 1, LENS_R1, LENS_R2, x - application.VIEW_W/2, y - application.VIEW_H/2);
+                break;
+            }
+            case BInverseCosine:{
+                res=new BInverseCosineLens(1.0f, 0, 1, LENS_R1, LENS_R2, x - application.VIEW_W/2, y - application.VIEW_H/2);
+                break;
+            }
+            case BGaussianLens:{
+                res=new BGaussianLens(1.0f, 0, 1, LENS_R1, LENS_R2, x - application.VIEW_W/2, y - application.VIEW_H/2);
+                break;
+            }
+        }
+        if(application.mode == application.routeLens)
+        {
+            //Paths are in lenseSpace
+            System.out.println("RouteLens");
+            rLens= new RouteLens(res, application.lenseCamera);
+            for (DPath dp : paths)
+                rLens.addRoute(dp);
+            System.out.println("PATHS "+paths.size());
         }
         return res;
+    }
+
+    void updateTranslucency(float f, int x, int y)
+    {
+        //System.out.println("updateTranslucency");
+        float minAlpha=0.3f;
+        float alpha=((BlendingLens) lens).getFocusTranslucencyValue()+f;
+        if(alpha<=1 && alpha>=minAlpha)
+            ((BlendingLens) lens).setFocusTranslucencyValue(alpha);
+        else
+        {
+            if(alpha>=1) ((BlendingLens) lens).setFocusTranslucencyValue(1f);
+            if(alpha<=minAlpha) ((BlendingLens) lens).setFocusTranslucencyValue(minAlpha);
+        }
+        //System.out.println("alpha "+alpha);
+        //lens.dispose();
+        //zoomInPhase1(x,y);
+
+        /*lens = application.mView.setLens(getLensDefinition(x, y));
+        lens.setBufferThreshold(1.5f);*/
+        Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createLensMagAnim(50, (FixedSizeLens)lens,
+            new Float(MAG_FACTOR-1), true, IdentityInterpolator.getInstance(), null);
+        VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
+        setLens(ZOOMIN_LENS);
+    }
+
+    public void incrementLensRadius(int r1, int r2)
+    {
+        ((FixedSizeLens) lens).setMMandRadii(1, getLensOuterRadius()+r1, getLensInnerRadius()+r2,true);
+    }
+    
+    public void reduceLensRadius(int r1, int r2)
+    {
+        ((FixedSizeLens) lens).setMMandRadii(1, getLensOuterRadius()-r1, getLensInnerRadius()-r2,true);
+    }
+
+    public void returnOriginalRadius()
+    {
+        ((FixedSizeLens) lens).setMMandRadii(1, LENS_R1, LENS_R2,true);
+    }
+    
+    public int getLensInnerRadius()
+    {
+        return ((FixedSizeLens)lens).getInnerRadius();
+    }
+    
+    public int getLensOuterRadius()
+    {
+        return ((FixedSizeLens)lens).getOuterRadius();
     }
 
     /* ---------------- Screen saver ---------------------- */

@@ -157,6 +157,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener, Obj
         VirtualSpace mnSpace = vsm.addVirtualSpace(mnSpaceName);
         mCamera = mSpace.addCamera();
 		mnSpace.addCamera().setAltitude(10);
+		mCamera.setZoomFloor(-100);
         ovSpace = vsm.addVirtualSpace(ovSpaceName);
 		ovSpace.addCamera();
         Vector cameras = new Vector();
@@ -183,6 +184,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener, Obj
         mView.setListener(eh, 0);
         mView.setListener(eh, 1);
         mView.setListener(ovm, 2);
+        
 		mCamera.addListener(eh);
         mView.setBackgroundColor(Color.WHITE);
 		mView.setAntialiasing(antialiased);

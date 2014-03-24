@@ -24,9 +24,11 @@ public class Launcher {
 		boolean fs = false;
 		boolean ogl = false;
 		boolean aa = true;
-		String viewerType = VIEWER_TYPE_DEBUGGER;
+		String viewerType = VIEWER_TYPE_TILEDIMAGE;
+        //String viewerType = VIEWER_TYPE_DEBUGGER;
 		for (int i=0;i<args.length;i++){
 			if (args[i].startsWith("-")){
+                System.out.println(args[i]);
 				if (args[i].substring(1).equals("fs")){fs = true;}
 				else if (args[i].substring(1).equals("opengl")){ogl = true;}
 				else if (args[i].substring(1).equals("noaa")){aa = false;}
@@ -35,7 +37,7 @@ public class Launcher {
 			}
 			else if (args[i].toUpperCase().equals(VIEWER_TYPE_TILEDIMAGE) || args[i].toUpperCase().equals(VIEWER_TYPE_DEBUGGER)){
 			    viewerType = args[i];
-			}
+			}  
             else {
                 // the only other thing allowed as a cmd line param is a scene file
                 File f = new File(args[i]);
@@ -64,6 +66,7 @@ public class Launcher {
         System.out.println("--help for command line options");
         if (viewerType.equals(VIEWER_TYPE_TILEDIMAGE)){
             new TiledImageViewer(fs, ogl, aa, xmlSceneFile);
+            //System.out.println("TileImageViewer");
         }
         else {
             new Viewer(fs, ogl, aa, xmlSceneFile);

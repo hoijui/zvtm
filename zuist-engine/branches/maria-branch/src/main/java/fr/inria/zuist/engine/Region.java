@@ -481,6 +481,13 @@ public class Region {
         return res;
     }
 
+    /*public boolean isVisibleInViewPort(double[] viewportBounds)
+    {
+        boolean iviv = (wnes[0] < viewportBounds[2] && wnes[2] > viewportBounds[0]
+            && wnes[3] < viewportBounds[1] && wnes[1] > viewportBounds[3]);
+        return iviv;
+    }*/
+
 }
 
 class DistanceComparator implements Comparator<ObjectDescription> {

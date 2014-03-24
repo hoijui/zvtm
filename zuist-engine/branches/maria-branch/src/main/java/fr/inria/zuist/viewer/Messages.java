@@ -51,9 +51,16 @@ class Messages {
 
     static final String COORD_SEP = ", ";
 
+    static final String ORTHO = "Ortho";
+    static final String LITT = "Littoral";
+    static final String SCAN = "Scan";
+
     static final String[] mainMenuLabels = {PM_GLOBALVIEW, PM_OPEN, PM_BACK, PM_RELOAD};
+    static final String [] layers = {ORTHO, LITT, SCAN};
     static final Point2D.Double[] mainMenuLabelOffsets = {new Point2D.Double(10, 0), new Point2D.Double(0, 0),
 						     new Point2D.Double(-10, 0), new Point2D.Double(0, -10)};
+    static final Point2D.Double[] layerLabelOffsets = {new Point2D.Double(0, 40), new Point2D.Double(0, -40),
+                             new Point2D.Double(0, -50)};                         
 
 	static final String ZON = "Zero-Order Navigation";
 	static final String FON = "First-Order Navigation";

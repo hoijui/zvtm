@@ -292,6 +292,8 @@ public class ImageDescription extends ResourceDescription {
     public float getTranslucencyValue(){
         return alpha;
     }
+
+    
     
 }
 

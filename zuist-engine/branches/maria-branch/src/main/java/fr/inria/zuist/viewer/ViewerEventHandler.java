@@ -14,7 +14,7 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.ComponentEvent;
 import java.awt.geom.Point2D;
-
+import java.awt.Dimension;
 import java.util.Vector;
 
 import fr.inria.zvtm.engine.VCursor;
@@ -139,7 +139,9 @@ class ViewerEventHandler implements ViewListener, ComponentListener, CameraListe
 		v.parent.setActiveLayer(0);
 	}
 
-    public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
+    public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
+        System.out.println("click3");
+    }
 
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
         application.setCursorCoords(v.getVCursor().getVSXCoordinate(), v.getVCursor().getVSYCoordinate());

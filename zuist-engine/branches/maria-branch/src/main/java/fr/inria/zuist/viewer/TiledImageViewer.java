@@ -10,7 +10,6 @@ package fr.inria.zuist.viewer;
 import java.io.File;
 import java.io.IOException;
 import java.io.FilenameFilter;
-
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -32,21 +31,27 @@ import java.awt.event.ComponentListener;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.Cursor;
+
 import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.KeyStroke;
-
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.ImageIcon;
+import javax.swing.JSplitPane;
+import javax.swing.JPanel;
 
 import java.util.Vector;
 import java.util.HashMap;
-
+import java.util.Hashtable;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+
 
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
@@ -66,20 +71,26 @@ import fr.inria.zvtm.animation.EndAction;
 import fr.inria.zvtm.animation.DefaultTimingHandler;
 import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 import fr.inria.zvtm.event.RepaintListener;
-
 import fr.inria.zvtm.engine.AgileGLCanvasFactory;
-
+import fr.inria.zuist.engine.LevelListener;
 import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zuist.engine.Region;
+import fr.inria.zuist.engine.ImageDescription;
 import fr.inria.zuist.engine.ProgressListener;
+import fr.inria.zuist.engine.ObjectDescription;
 
 import org.w3c.dom.Document;
+import fr.inria.zvtm.engine.portals.CameraPortal;
+
+import fr.inria.zvtm.widgets.PieMenu;
+import fr.inria.zvtm.widgets.PieMenuFactory;
+import fr.inria.zvtm.engine.Java2DPainter;
 
 /**
  * @author Emmanuel Pietriga
  */
 
-public class TiledImageViewer {
+public class TiledImageViewer implements LevelListener {
 
     File SCENE_FILE, SCENE_FILE_DIR;
 
@@ -101,17 +112,52 @@ public class TiledImageViewer {
     VirtualSpaceManager vsm;
     static final String mSpaceName = "Image Layer";
     static final String aboutSpaceName = "About layer";
-    VirtualSpace mSpace, aboutSpace;
-    Camera mCamera, ovCamera;
+    VirtualSpace mSpace, aboutSpace, orthoSpace;
+    VirtualSpace scanSpace;
+    VirtualSpace littSpace;
+    VirtualSpace menuSpace;
+    VirtualSpace lenseSpace;
+    Camera mCamera, ovCamera, orthoCamera, menuCamera;
+    Camera scanCamera;
+    Camera littCamera;
+    Camera lenseCamera;
     static final String mViewName = "ZUIST Tiled Image Viewer";
-    View mView;
+    View mView, orthoView;
     TIVEventHandler eh;
+    CameraPortal cp;
 
     SceneManager sm;
     TIVNavigationManager nm;
     Overlay ovm;
 
     WEGlassPane gp;
+    int layer=0;
+
+    //static int covisualization = 0;
+    static int covisualization2=4;
+    static int swipe = 1;
+    static int alpha_swipe=2;
+    static int lenses=3;
+    static int routeLens = 5;
+    static int none=6;
+    Vector <VirtualSpace> swipes = new Vector();
+    PieMenu mainPieMenu;
+
+    static int mode=routeLens;
+    //Define mode here. 
+    //Covisualization2 puts Ortho layer and Scan layer side by side. Purple cursor follows the movement in the active side.
+    //In swipe mode change Ortho by Scan typing "k"
+    //In alpha_swipe mode update scan translucency typing "j" and "h"
+    // In lenses, one click activates the lense and another remove it. To activate the pie menu, right click
+
+    Hashtable <String, Integer> layersIndex  = new Hashtable <String, Integer> ();
+    Hashtable <View, VirtualSpace> covisHash = new Hashtable <View, VirtualSpace> ();
+    JFrame frame;
+    JSplitPane splitPane;
+    //Camera for virtualSpace that will be magnified.
+    public Camera magnifyCamera;
+
+
 
     public TiledImageViewer(boolean fullscreen, boolean opengl, boolean antialiased, File xmlSceneFile){
         ovm = new Overlay(this);
@@ -121,9 +167,18 @@ public class TiledImageViewer {
         eh.nm = this.nm;
         gp = new WEGlassPane(this);
         ((JFrame)mView.getFrame()).setGlassPane(gp);
-        VirtualSpace[]  sceneSpaces = {mSpace};
-        Camera[] sceneCameras = {mCamera};
-        sm = new SceneManager(sceneSpaces, sceneCameras);
+        VirtualSpace[]  sceneLenseSpaces = {mSpace,orthoSpace, littSpace, scanSpace, lenseSpace};
+        VirtualSpace[]  sceneSpaces = {mSpace,orthoSpace, littSpace, scanSpace};
+        //VirtualSpace[]  sceneSpaces = {mSpace, orthoSpace,scanSpace};
+        Camera[] sceneLenseCameras = {mCamera,orthoCamera, littCamera, scanCamera, lenseCamera};
+        Camera[] sceneCameras = {mCamera,orthoCamera, littCamera, scanCamera};
+        //Camera[] sceneCameras = {mCamera, orthoCamera, scanCamera};
+        //mCamera.setZoomFloor(-100);
+        if(mode == routeLens)
+            sm = new SceneManager(sceneLenseSpaces, sceneLenseCameras);
+        else
+            sm = new SceneManager(sceneSpaces, sceneCameras);
+        sm.setLevelListener(this);
 		if (xmlSceneFile != null){
 			loadScene(xmlSceneFile);
 			HashMap sa = sm.getSceneAttributes();
@@ -138,34 +193,94 @@ public class TiledImageViewer {
         else {
             mView.getCursor().setColor(Color.WHITE);
     		mView.getCursor().setHintColor(Color.WHITE);
+            if(mode==covisualization2)
+            {
+                orthoView.getCursor().setColor(Color.WHITE);
+                orthoView.getCursor().setHintColor(Color.WHITE);
+            }
         }
-		nm.createOverview(sm.getRegionsAtLevel(0)[0]);
-        nm.updateOverview();
+        if(mode!=covisualization2 && mode!=routeLens)
+		  nm.createOverview(sm.getRegionsAtLevel(0)[0]);
+        
+
+        nm.loadMode(mode);
+
+        //nm.updateOverview();
+        
+        
     }
 
     void initGUI(boolean fullscreen, boolean opengl, boolean antialiased){
         windowLayout();
         vsm = VirtualSpaceManager.INSTANCE;
+       
+        aboutSpace = vsm.addVirtualSpace(aboutSpaceName);
+		aboutSpace.addCamera();
+        //scanSpace = vsm.addVirtualSpace("scan");
+        scanSpace = vsm.addVirtualSpace("scan");
+        scanCamera = scanSpace.addCamera();
+        orthoSpace = vsm.addVirtualSpace("Ortho");
+        orthoCamera = orthoSpace.addCamera();
+        
+        //orthoCamera = mSpace.addCamera();
+        littSpace = vsm.addVirtualSpace("litt");
+        littCamera = littSpace.addCamera();
+
         mSpace = vsm.addVirtualSpace(mSpaceName);
         mCamera = mSpace.addCamera();
         ovCamera = mSpace.addCamera();
-        aboutSpace = vsm.addVirtualSpace(aboutSpaceName);
-		aboutSpace.addCamera();
+
+        lenseSpace = vsm.addVirtualSpace("Lense");
+        lenseCamera = lenseSpace.addCamera();
+
         Vector cameras = new Vector();
+        Vector camerasOrtho = new Vector();
         cameras.add(mCamera);
         cameras.add(aboutSpace.getCamera(0));
+        cameras.add(orthoCamera);
+        camerasOrtho.add(orthoCamera);
+        cameras.add(scanCamera);
+        //if(mode!=0)
+        cameras.add(littCamera);
+        if(mode==routeLens)
+            cameras.add(lenseCamera);
+        menuSpace = vsm.addVirtualSpace("menu");
+        menuCamera=menuSpace.addCamera();
+        cameras.add(menuCamera);
+           
+        layersIndex.put("Ortho",2);
+        layersIndex.put("Scan",3);
+        if(mode == lenses)
+            layersIndex.put("Littoral",4);
+
+        nm.contextLayer = Messages.SCAN;
+        nm.lenseLayer = Messages.ORTHO;
+       
+        mCamera.stick(orthoCamera);
+        mCamera.stick(scanCamera);
+        mCamera.stick(littCamera);
+        mCamera.stick(lenseCamera);
+        //mCamera.stick(menuCamera);
         if (opengl){
             View.registerViewPanelFactory(AgileGLCanvasFactory.AGILE_GLC_VIEW, new AgileGLCanvasFactory());
             mView = vsm.addFrameView(cameras, mViewName, AgileGLCanvasFactory.AGILE_GLC_VIEW, VIEW_W, VIEW_H, false, false, !fullscreen, (!fullscreen) ? initMenu() : null);
         }
         else {
             mView = vsm.addFrameView(cameras, mViewName, View.STD_VIEW, VIEW_W, VIEW_H, false, false, !fullscreen, (!fullscreen) ? initMenu() : null);
+            //orthoView = vsm.addFrameView(camerasOrtho, "Ortho", View.STD_VIEW, VIEW_W, VIEW_H, false, false, !fullscreen, (!fullscreen) ? initMenu() : null);
+            if(mode==covisualization2)
+            {
+                orthoView=vsm.addPanelView(camerasOrtho, "Ortho", View.STD_VIEW, VIEW_W, VIEW_H);
+                createCovisualization();
+            }
         }
         if (fullscreen && GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().isFullScreenSupported()){
             GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow((JFrame)mView.getFrame());
         }
         else {
             mView.setVisible(true);
+            if(mode==covisualization2)
+                orthoView.setVisible(true);
         }
         eh = new TIVEventHandler(this);
         mView.setListener(eh, 0);
@@ -174,9 +289,71 @@ public class TiledImageViewer {
 		mView.setAntialiasing(antialiased);
         mView.getPanel().getComponent().addComponentListener(eh);
         mCamera.addListener(eh);
+        mView.setListener(eh,menuCamera);
+        if(mode==covisualization2)
+        {
+            orthoView.setListener(eh,orthoCamera);
+            orthoView.getPanel().getComponent().addComponentListener(eh);
+            //orthoView.setAntialiasing(antialiased);
+            orthoCamera.addListener(eh);
+        }
         updatePanelSize();
         mView.setActiveLayer(0);
+        //orthoView.setActiveLayer(orthoCamera);
+
+        //Setting lens and context cameras.
+        if(mode==lenses)
+            mView.setLayerVisibility(new boolean[]{true,true,false,true,false,true}, new boolean[]{false, false, true,false,false,false});
+        if(mode==swipe || mode==alpha_swipe)
+        {
+            mView.setLayerVisibility(new boolean[]{true,true,true,true,false,false}, new boolean[]{false, false, true,false,false,false});
+        }
+        if(mode==covisualization2)
+            mView.setLayerVisibility(new boolean[]{true,true,false,true,false,false}, new boolean[]{false, false, true,false,false,false});
+        //if(mode==routeLens)
+            //mView.setLayerVisibility(new boolean[]{true,true,false,true,false,false,false}, new boolean[]{false,false,false,false,false,true,false});
+        //mCamera.unstick(orthoCamera);
+        //scanCamera.move(VIEW_W/2,0);
+        if(mode==swipe)
+        {
+            swipes.add(scanSpace);
+            swipes.add(orthoSpace);
+        }
+
+        if(mode==covisualization2)
+             ((JFrame)mView.getFrame()).setVisible(false);
+        
     }
+
+    //For covisualization mode. Creates two views, one for Orthoimages and the other for Scan. They are synchronized.
+    void createCovisualization()
+    {
+        frame = new JFrame(mViewName);
+        //frame=((JFrame)mView.getFrame());
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+
+       splitPane = new JSplitPane (JSplitPane.HORIZONTAL_SPLIT, (JPanel)mView.getPanel().getComponent(), (JPanel)orthoView.getPanel().getComponent());
+       
+        //splitPane.setOneTouchExpandable(true);
+        splitPane.setDividerLocation(VIEW_W/2);
+ 
+        //Provide minimum sizes for the two components in the split pane.
+        Dimension minimumSize = new Dimension(100, 50);
+        ((JPanel)orthoView.getPanel().getComponent()).setMinimumSize(minimumSize);
+        ((JPanel)mView.getPanel().getComponent()).setMinimumSize(minimumSize);
+ 
+        //Provide a preferred size for the split pane.
+        splitPane.setPreferredSize(new Dimension(VIEW_W, VIEW_H));
+        splitPane.setResizeWeight(0.5);
+        frame.add(splitPane);
+        frame.pack();
+        frame.setVisible(true);
+        covisHash.put(mView, scanSpace);
+        covisHash.put(orthoView, orthoSpace);
+
+    }
+
 
 	private JMenuBar initMenu(){
 		final JMenuItem openMI = new JMenuItem(Messages.OPEN);
@@ -284,6 +461,7 @@ public class TiledImageViewer {
 	    gp.setVisible(false);
 	    gp.setLabel(WEGlassPane.EMPTY_STRING);
         mCamera.setAltitude(0.0f);
+        //orthoCamera.setAltitude(0.0f);
         EndAction ea  = new EndAction(){
                public void execute(Object subject, Animation.Dimension dimension){
                    sm.setUpdateLevel(true);
@@ -305,6 +483,49 @@ public class TiledImageViewer {
     void toggleUpdateTiles(){
         UPDATE_TILES = !UPDATE_TILES;
         sm.setUpdateLevel(UPDATE_TILES);
+    }
+
+
+    //Creates the regions for the lens' space when magnifying. Only in mode = routeLens
+    public void loadLenseSpace()
+    {
+        short[] transitions = {Region.APPEAR,Region.DISAPPEAR,Region.APPEAR,Region.DISAPPEAR};
+        Vector <Integer> levels = new Vector <Integer>();
+        for (int i=0; i<sm.getLevelCount(); i++)
+            if(sm.getRegionsAtLevel(i).length>0)
+                levels.add(i);
+        int min=(Integer)Collections.min(levels);
+        int max = (Integer)Collections.max(levels);
+        for (Region r: sm.regionsAtLayer(magnifyCamera))
+        {
+            if(r.getLowestLevel()>min)
+            {
+                int nl=r.getLowestLevel()-1;
+                if(r.getLowestLevel()==max)
+                {
+                    Region nr = sm.createRegion(r.getX(), r.getY(), r.getWidth(), r.getHeight(), max, max,r.getID()+max+"-lense", r.getTitle(), sm.getLayerIndex(lenseCamera),transitions,Region.ORDERING_DISTANCE,true,null,null);
+                    for (ObjectDescription o: r.getObjectsInRegion())
+                    {
+                        ImageDescription img;
+                        try {
+                            img=(ImageDescription)o;
+                            sm.createImageDescription(img.getX(),img.getY(),nr.getWidth(),nr.getHeight(),img.getID()+max+"-lense",img.getZindex(),nr,img.getURL(),o.isSensitive(),null,1.0f,"");
+                        }
+                        catch(Exception e) {System.out.println("No glyphs added to lenseSpace");}
+                    }
+                }  
+                Region nr = sm.createRegion(r.getX(), r.getY(), r.getWidth(), r.getHeight(), nl, nl,r.getID()+nl+"-lense", r.getTitle(), sm.getLayerIndex(lenseCamera),transitions,Region.ORDERING_DISTANCE,true,null,null);
+                for (ObjectDescription o: r.getObjectsInRegion())
+                {
+                    ImageDescription img;
+                    try {
+                        img=(ImageDescription)o;
+                        sm.createImageDescription(img.getX(),img.getY(),nr.getWidth(),nr.getHeight(),img.getID()+nl+"-lense",img.getZindex(),nr,img.getURL(),o.isSensitive(),null,1.0f,"");
+                    }
+                    catch(Exception e) {System.out.println("No glyphs added to lenseSpace");}
+                }
+            }
+        }
     }
 
     /* ---- Benchmark animation ----*/
@@ -392,6 +613,115 @@ public class TiledImageViewer {
 		System.out.println("\t-opengl: use Java2D OpenGL rendering pipeline (Java 6+Linux/Windows), requires that -Dsun.java2d.opengl=true be set on cmd line");
         System.out.println("\t-smooth: default to smooth transitions between levels when none specified");
     }
+
+
+    public void enteredLevel(int depth){
+    System.out.println("Entered level "+depth+"\n");
+    //levelStr = Messages.LEVEL + String.valueOf(depth);
+    }
+
+    public void exitedLevel(int depth){
+       System.out.println("Exited level "+depth+"\n");
+    }
+
+    void exchangeLayers()
+    {
+        if(layer==0)
+        {
+            mView.setLayerVisibility(new boolean[]{false,true,true}, new boolean[]{true, true,false});
+        }
+        if(layer==1)
+        {
+            mView.setLayerVisibility(new boolean[]{true,true,false}, new boolean[]{false, true,true});
+        }
+        layer=Math.abs(layer-1);
+    }
+
+    //Pie menu for switching representations. Only in mode=lenses.
+    /*------ Pie Menu -------*/
+    static Color PIEMENU_FILL_COLOR = Color.BLACK;
+    static Color PIEMENU_BORDER_COLOR = Color.WHITE;
+    static Color PIEMENU_INSIDE_COLOR = Color.DARK_GRAY;
+    static final Font PIEMENU_FONT = new Font("Dialog", Font.PLAIN, 12);
+
+    void displayMainPieMenu(boolean b){
+        if (b){
+            PieMenuFactory.setItemFillColor(PIEMENU_FILL_COLOR);
+            PieMenuFactory.setItemBorderColor(PIEMENU_BORDER_COLOR);
+            PieMenuFactory.setSelectedItemFillColor(PIEMENU_INSIDE_COLOR);
+            PieMenuFactory.setSelectedItemBorderColor(null);
+            PieMenuFactory.setLabelColor(PIEMENU_BORDER_COLOR);
+            PieMenuFactory.setFont(PIEMENU_FONT);
+            PieMenuFactory.setTranslucency(0.7f);
+            PieMenuFactory.setSensitivityRadius(0.5);
+            PieMenuFactory.setAngle(-Math.PI/2.0);
+            PieMenuFactory.setRadius(150);
+            //PieMenuFactory.setRingInnerRatio(0.4f);
+            ArrayList <String> l = new ArrayList <String> ();
+            String [] labels = new String [l.size()];
+            if(nm.lens!=null)
+            {
+                //PieMenuFactory.setRingInnerRatio(0.6f);
+                for (String key : layersIndex.keySet())
+                {
+                    if (key != nm.lenseLayer)
+                    {
+                        l.add(key);
+                    }
+                } 
+            }
+            else
+                for (String key : layersIndex.keySet())
+                {
+                    if (key != nm.contextLayer)
+                    {
+                        l.add(key);
+                    }
+                }  
+            mainPieMenu = PieMenuFactory.createPieMenu(l.toArray(labels), Messages.layerLabelOffsets, 0, mView, vsm);
+            Glyph[] items = mainPieMenu.getItems();
+            items[0].setType(Messages.PM_ENTRY);
+            items[1].setType(Messages.PM_ENTRY);
+            //items[2].setType(Messages.PM_ENTRY);
+            //items[3].setType(Messages.PM_ENTRY);
+            System.out.println("PIE MENU: TRUE");
+        }
+        else {
+            mainPieMenu.destroy(0);
+            mainPieMenu = null;
+            System.out.println("PIE MENU: FALSE");
+        }
+    }
+
+    void pieMenuEvent(Glyph menuItem){
+        int index = mainPieMenu.getItemIndex(menuItem);
+        if (index != -1){
+            String label = mainPieMenu.getLabels()[index].getText();
+            if (label == Messages.ORTHO){ nm.changeLayers(label);//moveBack();
+                System.out.println(label);}
+            else if (label == Messages.LITT){//getGlobalView(null);
+            System.out.println(label);
+            nm.changeLayers(label);}
+            else if (label == Messages.SCAN){//openFile();
+            System.out.println(label);
+            nm.changeLayers(label);}
+            //else if (label == Messages.PM_RELOAD){//reload();
+            //System.out.println(label);}           
+        }
+
+    }
+
+    void updateLayer(Glyph menuItem){
+        int index = mainPieMenu.getItemIndex(menuItem);
+        if (index != -1){
+            String label = mainPieMenu.getLabels()[index].getText();
+            if(nm.lense)
+                nm.lenseLayer = label;
+            else
+                nm.contextLayer = label;         
+        }
+    }
+
 
 }
 
@@ -623,3 +953,6 @@ class Overlay implements ViewListener {
 		application.exit();
 	}
 }
+
+
+
