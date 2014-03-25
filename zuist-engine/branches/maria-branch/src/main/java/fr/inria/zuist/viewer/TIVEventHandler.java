@@ -195,12 +195,12 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
         {
             if(!nm.lense)
             {
-                System.out.print("!nm.lense");
+                //System.out.print("!nm.lense");
                 nm.lense=true;
                 if (!inPortal){
-                    System.out.print("HEREEEE");
+                    //System.out.print("HEREEEE");
                     if (nm.lensType != TIVNavigationManager.NO_LENS){
-                        System.out.println("Here 1");
+                        //System.out.println("Here 1");
                         nm.zoomInPhase2(lastVX, lastVY);
                     }
                     else {
@@ -210,17 +210,17 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
                             return;
                         }
                         nm.zoomInPhase1(jpx, jpy);
-                        System.out.println("Here 2");
+                        //System.out.println("Here 2");
                     }
                 }
             }
             else      
             {
-                System.out.print("nm.lense");
+                //System.out.print("nm.lense");
                 nm.lense=false;
                 if (nm.lensType != TIVNavigationManager.NO_LENS){
                 nm.zoomOutPhase2();
-                System.out.println("Here 3");
+                //System.out.println("Here 3");
                 }
                 else {
                     if (cursorNearBorder){
@@ -228,7 +228,7 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
                         return;
                     }
                  nm.zoomOutPhase1(jpx, jpy, lastVX, lastVY);
-                 System.out.println("Here 4");
+                 //System.out.println("Here 4");
                 }
 
             }

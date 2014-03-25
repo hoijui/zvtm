@@ -66,7 +66,7 @@ public class Launcher {
         System.out.println("--help for command line options");
         if (viewerType.equals(VIEWER_TYPE_TILEDIMAGE)){
             new TiledImageViewer(fs, ogl, aa, xmlSceneFile);
-            //System.out.println("TileImageViewer");
+            System.out.println("TileImageViewer");
         }
         else {
             new Viewer(fs, ogl, aa, xmlSceneFile);
