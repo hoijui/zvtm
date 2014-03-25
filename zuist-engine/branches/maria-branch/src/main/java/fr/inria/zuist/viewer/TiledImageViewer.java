@@ -243,7 +243,7 @@ public class TiledImageViewer implements LevelListener {
         //if(mode!=0)
         cameras.add(littCamera);
         if(mode==routeLens)
-            cameras.add(lenseCamera);
+            {cameras.add(lenseCamera);}
         menuSpace = vsm.addVirtualSpace("menu");
         menuCamera=menuSpace.addCamera();
         cameras.add(menuCamera);
@@ -251,7 +251,7 @@ public class TiledImageViewer implements LevelListener {
         layersIndex.put("Ortho",2);
         layersIndex.put("Scan",3);
         if(mode == lenses)
-            layersIndex.put("Littoral",4);
+        { layersIndex.put("Littoral",4); }
 
         nm.contextLayer = Messages.SCAN;
         nm.lenseLayer = Messages.ORTHO;
@@ -303,15 +303,15 @@ public class TiledImageViewer implements LevelListener {
 
         //Setting lens and context cameras.
         if(mode==lenses)
-            mView.setLayerVisibility(new boolean[]{true,true,false,true,false,true}, new boolean[]{false, false, true,false,false,false});
+        { mView.setLayerVisibility(new boolean[]{true,true,false,true,false,true}, new boolean[]{false, false, true,false,false,false}); }
         if(mode==swipe || mode==alpha_swipe)
         {
             mView.setLayerVisibility(new boolean[]{true,true,true,true,false,false}, new boolean[]{false, false, true,false,false,false});
         }
         if(mode==covisualization2)
-            mView.setLayerVisibility(new boolean[]{true,true,false,true,false,false}, new boolean[]{false, false, true,false,false,false});
-        //if(mode==routeLens)
-            //mView.setLayerVisibility(new boolean[]{true,true,false,true,false,false,false}, new boolean[]{false,false,false,false,false,true,false});
+        { mView.setLayerVisibility(new boolean[]{true,true,false,true,false,false}, new boolean[]{false, false, true,false,false,false}); }
+        if(mode==routeLens)
+            { mView.setLayerVisibility(new boolean[]{true,true,false,true,false,false,false}, new boolean[]{false,false,false,false,false,true,false}); }
         //mCamera.unstick(orthoCamera);
         //scanCamera.move(VIEW_W/2,0);
         if(mode==swipe)
@@ -321,7 +321,7 @@ public class TiledImageViewer implements LevelListener {
         }
 
         if(mode==covisualization2)
-             ((JFrame)mView.getFrame()).setVisible(false);
+        { ((JFrame)mView.getFrame()).setVisible(false); }
         
     }
 

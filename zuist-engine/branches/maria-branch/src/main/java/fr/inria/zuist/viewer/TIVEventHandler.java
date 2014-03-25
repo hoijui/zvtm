@@ -195,27 +195,32 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
         {
             if(!nm.lense)
             {
-                //System.out.print("Create Lense");
+                System.out.print("!nm.lense");
                 nm.lense=true;
                 if (!inPortal){
-                    //System.out.print("HEREEEE");
+                    System.out.print("HEREEEE");
                     if (nm.lensType != TIVNavigationManager.NO_LENS){
+                        System.out.println("Here 1");
                         nm.zoomInPhase2(lastVX, lastVY);
                     }
                     else {
                         if (cursorNearBorder){
                         // do not activate the lens when cursor is near the border
+                            nm.lense=false;
                             return;
                         }
                         nm.zoomInPhase1(jpx, jpy);
+                        System.out.println("Here 2");
                     }
                 }
             }
             else      
             {
+                System.out.print("nm.lense");
                 nm.lense=false;
                 if (nm.lensType != TIVNavigationManager.NO_LENS){
                 nm.zoomOutPhase2();
+                System.out.println("Here 3");
                 }
                 else {
                     if (cursorNearBorder){
@@ -223,6 +228,7 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
                         return;
                     }
                  nm.zoomOutPhase1(jpx, jpy, lastVX, lastVY);
+                 System.out.println("Here 4");
                 }
 
             }
@@ -261,7 +267,6 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
     }
 
     public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-        System.out.println("HEREE IN ELSE");
             Glyph g = v.lastGlyphEntered();
             if (g != null && g.getType() == Messages.PM_ENTRY){
                 //nm.saveLayerVisibility();
@@ -307,8 +312,9 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
 //        System.err.println(v.getVCursor().vx+" "+v.getVCursor().vy);
         //System.out.print("mouse: "+jpx+","+jpy);
-        if(application.mode==application.covisualization2)
+        if(application.mode==application.covisualization2) {
             nm.moveFakeCursor(v,v.getVCursor().getVSXCoordinate(),v.getVCursor().getVSYCoordinate());
+        }
     	if ((jpx-TIVNavigationManager.LENS_R1) < 0){
     	    jpx = TIVNavigationManager.LENS_R1;
     	    cursorNearBorder = true;
@@ -331,7 +337,9 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
     	if (nm.lensType != 0 && nm.lens != null){
     	    nm.moveLens(jpx, jpy, e.getWhen());
             if(nm.rLens != null)
+            {
                 nm.rLens.moveLens(jpx, jpy);
+            }
     	}
     }
 
@@ -342,7 +350,6 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
         {
             if((jpx-lastCenterX)*(jpx-lastCenterX)+(jpy-lastCenterY)*(jpy-lastCenterY)>=150*150)
             {
-                System.out.println("BORDER");
                 boolean delete = false;
                 if(delete)
                 {
@@ -458,19 +465,17 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
 
     public void exitGlyph(Glyph g){
         //System.out.println("Exit Glyph "+g.getType());
-        System.out.println(nm.lense);
         if(g.getType() == Messages.PM_ENTRY)
         {
             if(nm.lense)
             {
-                
                 //nm.loadSavedLayers();
                 nm.changeLayers(nm.lenseLayer);
-                System.out.print("Exit Glyph");
+                //System.out.print("Exit Glyph");
             }
             else
             {
-                System.out.println("IN IF, EXIT GLYPH");
+                //System.out.println("IN IF, EXIT GLYPH");
                 nm.changeLayers(nm.contextLayer);
             }
         }
@@ -498,7 +503,6 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
     }
 
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){
-        System.out.println(c);
         if(c=='t')
         {
             for (Glyph g : application.orthoSpace.getAllGlyphs())
@@ -521,7 +525,6 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
 
         if(c=='k')
         {
-            System.out.println("KK");
             if(application.mode == application.swipe)
             {
 
@@ -546,46 +549,53 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
 
         if(c=='j')
         {
-            if (application.mode == application.alpha_swipe)
+            if (application.mode == application.alpha_swipe) {
                 nm.alphaLayer(application.scanSpace,1);
+            }
             /*for (Glyph g: application.scanSpace.getAllGlyphs())
                 application.scanSpace.hide(g);*/
         }
 
         if(c=='h')
         {
-            if (application.mode == application.alpha_swipe)
+            if (application.mode == application.alpha_swipe) {
                 nm.alphaLayer(application.scanSpace,0);
+            }
         }
 
         if(c=='p')
         {
-             System.out.println("Release 2");
-            Glyph g = v.lastGlyphEntered();
-            if (g != null && g.getType() == Messages.PM_ENTRY){
-                application.pieMenuEvent(g);
-        }
-        if (application.mainPieMenu != null){
-            application.displayMainPieMenu(false);
-        }
-        v.parent.setActiveLayer(0);
+           if (application.mode == application.routeLens) {
+                nm.rLens.setP(nm.rLens.getP()+1); 
+                System.out.println("P: "+nm.rLens.getP());
+            }
         }
         
         if(c=='o')
         {
-            if(application.mode == application.none)
+            if(application.mode == application.none) {
                 nm.writePath(lines);
+            }
+            if(application.mode == application.routeLens) {
+                if(nm.rLens.getP()>0) {
+                nm.rLens.setP(nm.rLens.getP()-1);
+                }
+                System.out.println("P: "+nm.rLens.getP());
+            }
+
         }
         
         if(c=='q')
         {
-            if(application.mode==application.none)
+            if(application.mode==application.none) {
                 nm.readPath();
+            }
         }
         if(c=='w')
         {
-            if(application.mode==application.none)
+            if(application.mode==application.none) {
                 lines.add("-----");
+            }
         }
         if(c=='d')
         {
@@ -613,13 +623,6 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
     public void componentMoved(ComponentEvent e){}
     public void componentResized(ComponentEvent e){
         application.updatePanelSize();
-        if(application.mode==application.covisualization2)
-        {
-            /*System.out.print(application.splitPane.getPreferredSize().getHeight());
-            application.splitPane.setPreferredSize(new Dimension(application.panelWidth,application.panelHeight));
-            System.out.print(application.splitPane.getPreferredSize().getHeight());
-            application.frame.pack();*/
-        }
     }
     public void componentShown(ComponentEvent e){}
 

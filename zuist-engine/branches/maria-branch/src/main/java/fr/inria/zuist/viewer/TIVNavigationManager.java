@@ -23,6 +23,7 @@ import java.util.Map;
 
 import java.io.*;
 import java.util.List;
+import java.io.IOException;
 
 
 import fr.inria.zvtm.engine.VirtualSpaceManager;
@@ -252,9 +253,9 @@ class TIVNavigationManager {
             LENS_R1 = 150;
             LENS_R2 = 100;
 
-            //Uncomment to create the virtual space for magnification
-            //application.magnifyCamera = application.mCamera;
-            //application.loadLenseSpace();
+            //Camera that will be magnified in the lense
+            application.magnifyCamera = application.mCamera;
+            application.loadLenseSpace();
             readPath();
 
         }
@@ -316,21 +317,28 @@ class TIVNavigationManager {
     {
         if(i==1)
         {
-            if(vs.getVisibleGlyphsList()[0].getTranslucencyValue()>0.1)
-                for (Glyph g : vs.getAllGlyphs())
+            if(vs.getVisibleGlyphsList()[0].getTranslucencyValue()>0.1){
+                for (Glyph g : vs.getAllGlyphs()){
                     g.setTranslucencyValue(g.getTranslucencyValue()-0.1f);
-            else
-                for (Glyph g : vs.getAllGlyphs())
+                }
+            }
+                
+            else {
+                for (Glyph g : vs.getAllGlyphs()){
                     g.setTranslucencyValue(0f);
+                }
+            }
         } 
         if(i==0)
         {
-            if(vs.getVisibleGlyphsList()[0].getTranslucencyValue()<0.9)
-                for (Glyph g : vs.getAllGlyphs())
-                    g.setTranslucencyValue(g.getTranslucencyValue()+0.1f);
-            else
-                for (Glyph g : vs.getAllGlyphs())
-                    g.setTranslucencyValue(1f);
+            if(vs.getVisibleGlyphsList()[0].getTranslucencyValue()<0.9){
+                for (Glyph g : vs.getAllGlyphs()){
+                    g.setTranslucencyValue(g.getTranslucencyValue()+0.1f);}
+            }
+            else{
+                for (Glyph g : vs.getAllGlyphs()){
+                    g.setTranslucencyValue(1f);}
+            }
         }   
     }
 
@@ -345,10 +353,10 @@ class TIVNavigationManager {
                 application.covisHash.get(fakeCursorView).removeGlyph(fakeCursorV);
             }
 
-            if(application.covisHash.keySet().toArray()[0]==v.parent)
-                fakeCursorView = (View)(application.covisHash.keySet().toArray()[1]);
-            else
-                fakeCursorView = (View)(application.covisHash.keySet().toArray()[0]);
+            if(application.covisHash.keySet().toArray()[0]==v.parent) {
+                fakeCursorView = (View)(application.covisHash.keySet().toArray()[1]);}
+            else {
+                fakeCursorView = (View)(application.covisHash.keySet().toArray()[0]);}
             application.covisHash.get(fakeCursorView).addGlyph(fakeCursorH);
             application.covisHash.get(fakeCursorView).addGlyph(fakeCursorV);
         }
@@ -454,24 +462,24 @@ class TIVNavigationManager {
         Double y;
         path = new DPath();
         while ((line = br.readLine()) != null) {
-            //System.out.println("LINEEE "+line);
             if(line.equals("-----"))
             {
-                System.out.println("------");
                 paths.add(path);
-                String firstPoint=br.readLine();
+                String firstPoint=null;
+                if(br.readLine() != null) {
+                firstPoint=br.readLine();
                 String[] coordinates = firstPoint.split(":");
                 x = Double.parseDouble(coordinates[0]);
                 y = Double.parseDouble(coordinates[1]);
                 path=new DPath(x,y,11,Color.CYAN);
+                }
+                
             }
             else
             {
             String[] coordinates = line.split(":");
             x = Double.parseDouble(coordinates[0]);
             y = Double.parseDouble(coordinates[1]);
-            System.out.println("X: "+x);
-            System.out.println("Y: "+y);
             path.addSegment(x,y,true);
             }
            
@@ -484,6 +492,7 @@ class TIVNavigationManager {
         BasicStroke s = new BasicStroke(7f);
         dp.setStroke(s);
         application.lenseSpace.addGlyph(dp);
+        application.mSpace.addGlyph(dp);
         }
         return path;
 
@@ -676,11 +685,10 @@ From this we can get the altitude difference (a2 - a1)                       */
         if(application.mode == application.routeLens)
         {
             //Paths are in lenseSpace
-            System.out.println("RouteLens");
             rLens= new RouteLens(res, application.lenseCamera);
+            rLens.setP(6);
             for (DPath dp : paths)
                 rLens.addRoute(dp);
-            System.out.println("PATHS "+paths.size());
         }
         return res;
     }
