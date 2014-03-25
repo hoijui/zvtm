@@ -156,6 +156,7 @@ public class TiledImageViewer implements LevelListener {
     JSplitPane splitPane;
     //Camera for virtualSpace that will be magnified.
     public Camera magnifyCamera;
+    public static File pathFile=null;
 
 
 
@@ -564,11 +565,13 @@ public class TiledImageViewer implements LevelListener {
         System.exit(0);
     }
 
+
     public static void main(String[] args){
         File xmlSceneFile = null;
 		boolean fs = false;
 		boolean ogl = false;
 		boolean aa = true;
+        File pathFile=null;
 		for (int i=0;i<args.length;i++){
 			if (args[i].startsWith("-")){
 				if (args[i].substring(1).equals("fs")){fs = true;}

@@ -25,22 +25,26 @@ public class Launcher {
 		boolean ogl = false;
 		boolean aa = true;
 		String viewerType = VIEWER_TYPE_TILEDIMAGE;
+        File pathFile = null;
         //String viewerType = VIEWER_TYPE_DEBUGGER;
 		for (int i=0;i<args.length;i++){
 			if (args[i].startsWith("-")){
-                System.out.println(args[i]);
 				if (args[i].substring(1).equals("fs")){fs = true;}
 				else if (args[i].substring(1).equals("opengl")){ogl = true;}
 				else if (args[i].substring(1).equals("noaa")){aa = false;}
 				else if (args[i].substring(1).equals("smooth")){Region.setDefaultTransitions(Region.FADE_IN, Region.FADE_OUT);}
 				else if (args[i].substring(1).equals("h") || args[i].substring(1).equals("--help")){Launcher.printCmdLineHelp();System.exit(0);}
-			}
-			else if (args[i].toUpperCase().equals(VIEWER_TYPE_TILEDIMAGE) || args[i].toUpperCase().equals(VIEWER_TYPE_DEBUGGER)){
-			    viewerType = args[i];
-			}  
-            else {
+                else if (args[i].substring(1).equals("path")) {
+                    if(i<args.length-1) {
+                        File f = new File(args[i+1]);
+                        if(f.exists() && args[i+1].endsWith(".txt")) {pathFile=f;}
+                    }
+
+                }
+                else if (args[i].substring(1).equals("map")){
                 // the only other thing allowed as a cmd line param is a scene file
-                File f = new File(args[i]);
+                if(i<args.length-1){
+                File f = new File(args[i+1]);
                 if (f.exists()){
                     if (f.isDirectory()){
                         // if arg is a directory, take first xml file we find in that directory
@@ -55,7 +59,13 @@ public class Launcher {
                         xmlSceneFile = f;
                     }
                 }
+                }
             }
+			}
+			else if (args[i].toUpperCase().equals(VIEWER_TYPE_TILEDIMAGE) || args[i].toUpperCase().equals(VIEWER_TYPE_DEBUGGER)){
+			    viewerType = args[i];
+			}  
+           
 		}
 		//if (ogl){
 		//    System.setProperty("sun.java2d.opengl", "True");
@@ -65,8 +75,8 @@ public class Launcher {
         }
         System.out.println("--help for command line options");
         if (viewerType.equals(VIEWER_TYPE_TILEDIMAGE)){
+            TIVNavigationManager.pathFile = pathFile;
             new TiledImageViewer(fs, ogl, aa, xmlSceneFile);
-            System.out.println("TileImageViewer");
         }
         else {
             new Viewer(fs, ogl, aa, xmlSceneFile);

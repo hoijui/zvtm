@@ -101,6 +101,10 @@ class TIVNavigationManager {
     static String lenseLayer;
 
     View fakeCursorView=null;
+    public 
+
+
+    static File pathFile = null;
 
     TIVNavigationManager(TiledImageViewer app){
         this.application = app;
@@ -454,45 +458,46 @@ class TIVNavigationManager {
     public DPath readPath()
     {
         DPath path = null;
-        try {
-        File f = new File ("points.txt");
-        BufferedReader br = new BufferedReader(new FileReader(f));
-        String line;
-        Double x;
-        Double y;
-        path = new DPath();
-        while ((line = br.readLine()) != null) {
-            if(line.equals("-----"))
-            {
-                paths.add(path);
-                String firstPoint=null;
-                if(br.readLine() != null) {
-                firstPoint=br.readLine();
-                String[] coordinates = firstPoint.split(":");
+        if(pathFile!=null){
+            try {
+            BufferedReader br = new BufferedReader(new FileReader(pathFile));
+            String line;
+            Double x;
+            Double y;
+            path = new DPath();
+            while ((line = br.readLine()) != null) {
+                if(line.equals("-----"))
+                {
+                    paths.add(path);
+                    String firstPoint=null;
+                    if(br.readLine() != null) {
+                    firstPoint=br.readLine();
+                    String[] coordinates = firstPoint.split(":");
+                    x = Double.parseDouble(coordinates[0]);
+                    y = Double.parseDouble(coordinates[1]);
+                    path=new DPath(x,y,11,Color.CYAN);
+                    }
+                    
+                }
+                else
+                {
+                String[] coordinates = line.split(":");
                 x = Double.parseDouble(coordinates[0]);
                 y = Double.parseDouble(coordinates[1]);
-                path=new DPath(x,y,11,Color.CYAN);
+                path.addSegment(x,y,true);
                 }
-                
+               
             }
-            else
+            br.close();
+            }
+            catch(Exception e) {System.out.println("Not able to read file");}
+            for (DPath dp : paths)
             {
-            String[] coordinates = line.split(":");
-            x = Double.parseDouble(coordinates[0]);
-            y = Double.parseDouble(coordinates[1]);
-            path.addSegment(x,y,true);
+            BasicStroke s = new BasicStroke(7f);
+            dp.setStroke(s);
+            application.lenseSpace.addGlyph(dp);
+            application.mSpace.addGlyph(dp);
             }
-           
-        }
-        br.close();
-        }
-        catch(Exception e) {System.out.println("Not able to read file");}
-        for (DPath dp : paths)
-        {
-        BasicStroke s = new BasicStroke(7f);
-        dp.setStroke(s);
-        application.lenseSpace.addGlyph(dp);
-        application.mSpace.addGlyph(dp);
         }
         return path;
 
