@@ -12,6 +12,9 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
+import java.awt.Image;
+import javax.swing.ImageIcon;
+
 import java.util.Vector;
 
 import fr.inria.zvtm.engine.VirtualSpaceManager;
@@ -29,6 +32,7 @@ import fr.inria.zvtm.cluster.ClusteredView;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VCircle;
 import fr.inria.zvtm.glyphs.VSegment;
+import fr.inria.zvtm.glyphs.VImage;
 
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -62,6 +66,8 @@ public class Calibrator {
     ClusterGeometry cg;
 
     TuioListener tl;
+
+    public static final Image CALIBRATION_IMG = (new ImageIcon(Calibrator.class.getResource("/images/calibration_img.png"))).getImage();
 
     public Calibrator(WEOptions options){
         vsm.setMaster("Calibrator");
@@ -133,6 +139,11 @@ public class Calibrator {
             mSpace.addGlyph(c);
             i += step;
         }
+
+        VImage img = new VImage(CALIBRATION_IMG);
+        img.setWidth(SCENE_W);
+        img.setHeight(SCENE_H);
+        mSpace.addGlyph(img);
     }
 
     void addObject(TuioPoint p){
