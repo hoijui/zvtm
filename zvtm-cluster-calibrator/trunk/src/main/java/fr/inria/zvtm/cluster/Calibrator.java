@@ -67,7 +67,7 @@ public class Calibrator {
 
     TuioListener tl;
 
-    public static final Image CALIBRATION_IMG = (new ImageIcon(Calibrator.class.getResource("/images/calibration_img.png"))).getImage();
+    public static final Image CALIBRATION_IMG = (new ImageIcon(Calibrator.class.getResource("/images/calibration_img_2048x768.png"))).getImage();
 
     public Calibrator(WEOptions options){
         vsm.setMaster("Calibrator");
@@ -142,8 +142,8 @@ public class Calibrator {
 
         VImage img = new VImage(CALIBRATION_IMG);
         img.setWidth(SCENE_W);
-        img.setHeight(SCENE_H);
-        mSpace.addGlyph(img);
+        img.setHeight(SCENE_H)
+;        mSpace.addGlyph(img);
     }
 
     void addObject(TuioPoint p){
