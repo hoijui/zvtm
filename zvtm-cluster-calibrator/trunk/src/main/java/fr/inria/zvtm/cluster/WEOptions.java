@@ -52,7 +52,7 @@ public class WEOptions {
     public int sceneHeight = 4500;
 
     @Option(name = "-ss", aliases = {"--scene-step"}, usage = "scene step in virtual space")
-    public int sceneStep = 500;
+    public int sceneStep = 250;
 
     // @Option(name = "-left", usage = "leftmost value")
     // public float b_w = 0;

@@ -140,10 +140,24 @@ public class Calibrator {
             i += step;
         }
 
+        int[] x = {-w/4, w/4};
+        int[] y = {-h/4, h/4};
+        for(int ii : x)
+            for(int jj : y){
+                VCircle c = new VCircle(ii, jj, 10, step, Color.GREEN, Color.GREEN);
+                c.setFilled(false);
+                mSpace.addGlyph(c);
+                VSegment s = new VSegment(ii-step/2, jj, ii+step/2, jj, 5, Color.GREEN, 1);
+                mSpace.addGlyph(s);
+                s = new VSegment(ii, jj-step/2, ii, jj+step/2, 5, Color.GREEN, 1);
+                mSpace.addGlyph(s);
+            }
+/*
         VImage img = new VImage(CALIBRATION_IMG);
         img.setWidth(SCENE_W);
-        img.setHeight(SCENE_H)
-;        mSpace.addGlyph(img);
+        img.setHeight(SCENE_H);
+        mSpace.addGlyph(img);
+*/
     }
 
     void addObject(TuioPoint p){
