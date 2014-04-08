@@ -33,6 +33,7 @@ import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VCircle;
 import fr.inria.zvtm.glyphs.VSegment;
 import fr.inria.zvtm.glyphs.VImage;
+import fr.inria.zvtm.glyphs.VText;
 
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -50,11 +51,16 @@ public class Calibrator {
     static final Color D_LINE_COLOR = Color.DARK_GRAY;
     static final Color CIRCLE_COLOR = Color.GREEN;
 
+    static final String T_POINT_TUIO = "Pt";
+    static final int Z_GLYPH = 100;
+    static final int Z_LINE = 5;
+    static final int Z_CIRCLE = 10;
+
     static final int VIEW_W = 1280;
     static final int VIEW_H = 1024;
 
-    double SCENE_W = 12000;
-    double SCENE_H = 4500;
+    public static double SCENE_W = 12000;
+    public static double SCENE_H = 4500;
 
     VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE;
     VirtualSpace mSpace;
@@ -66,8 +72,6 @@ public class Calibrator {
     ClusterGeometry cg;
 
     TuioListener tl;
-
-    public static final Image CALIBRATION_IMG = (new ImageIcon(Calibrator.class.getResource("/images/calibration_img_2048x768.png"))).getImage();
 
     public Calibrator(WEOptions options){
         vsm.setMaster("Calibrator");
@@ -107,7 +111,7 @@ public class Calibrator {
         // vertical lines
         int i = -w/2;
         while (i <= w/2){
-            VSegment s = new VSegment(i, 0, 5, HV_LINE_COLOR, 1, 0);
+            VSegment s = new VSegment(i, 0, Z_LINE, HV_LINE_COLOR, 1, 0);
             s.setEndPoints(i, -h/2, i, h/2);
             mSpace.addGlyph(s);
             i += step;
@@ -115,7 +119,7 @@ public class Calibrator {
         // horizontal lines
         i = -h/2;
         while (i <= h/2){
-            VSegment s = new VSegment(0, i, 5, HV_LINE_COLOR, 1, 0);
+            VSegment s = new VSegment(0, i, Z_LINE, HV_LINE_COLOR, 1, 0);
             s.setEndPoints(-w/2, i, w/2, i);
             mSpace.addGlyph(s);
             i += step;
@@ -123,10 +127,10 @@ public class Calibrator {
         // diagonal lines
         i = -w;
         while (i <= w){
-            VSegment s = new VSegment(i, 0, 5, D_LINE_COLOR, 1, 0);
+            VSegment s = new VSegment(i, 0, Z_LINE, D_LINE_COLOR, 1, 0);
             s.setEndPoints(i+h/2, -h/2, i-h/2, h/2);
             mSpace.addGlyph(s);
-            s = new VSegment(i, 0, 5, D_LINE_COLOR, 1, 0);
+            s = new VSegment(i, 0, Z_LINE, D_LINE_COLOR, 1, 0);
             s.setEndPoints(i+h/2, h/2, i-h/2, -h/2);
             mSpace.addGlyph(s);
             i += step;
@@ -134,7 +138,7 @@ public class Calibrator {
         // circles
         i = step;
         while (i<=w/2 && i<=h/2){
-            VCircle c = new VCircle(0, 0, 10, 2*i, Color.BLACK, CIRCLE_COLOR);
+            VCircle c = new VCircle(0, 0, Z_CIRCLE, 2*i, Color.BLACK, CIRCLE_COLOR);
             c.setFilled(false);
             mSpace.addGlyph(c);
             i += step;
@@ -144,26 +148,21 @@ public class Calibrator {
         int[] y = {-h/4, h/4};
         for(int ii : x)
             for(int jj : y){
-                VCircle c = new VCircle(ii, jj, 10, step, Color.GREEN, Color.GREEN);
+                VCircle c = new VCircle(ii, jj, Z_CIRCLE, step, Color.GREEN, Color.GREEN);
                 c.setFilled(false);
                 mSpace.addGlyph(c);
-                VSegment s = new VSegment(ii-step/2, jj, ii+step/2, jj, 5, Color.GREEN, 1);
+                VSegment s = new VSegment(ii-step/2, jj, ii+step/2, jj, Z_CIRCLE, Color.GREEN, 1);
                 mSpace.addGlyph(s);
-                s = new VSegment(ii, jj-step/2, ii, jj+step/2, 5, Color.GREEN, 1);
+                s = new VSegment(ii, jj-step/2, ii, jj+step/2, Z_CIRCLE, Color.GREEN, 1);
                 mSpace.addGlyph(s);
             }
-/*
-        VImage img = new VImage(CALIBRATION_IMG);
-        img.setWidth(SCENE_W);
-        img.setHeight(SCENE_H);
-        mSpace.addGlyph(img);
-*/
     }
 
     void addObject(TuioPoint p){
         Point2D.Double np = normalize(p);
-        VCircle c = new VCircle(np.x*SCENE_W-SCENE_W/2, np.y*SCENE_H-SCENE_H/2, 100, 20, Color.RED, Color.RED);
+        VCircle c = new VCircle(np.x*SCENE_W-SCENE_W/2, np.y*SCENE_H-SCENE_H/2, Z_GLYPH, 20, Color.RED, Color.RED);
         c.setDrawBorder(false);
+        c.setType(T_POINT_TUIO);
         mSpace.addGlyph(c);
     }
 
@@ -264,6 +263,17 @@ class CalibratorListener extends ViewAdapter {
         panning = false;
     }
 
+    public void press3(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){
+        VCircle c = new VCircle(v.getVCursor().getVSXCoordinate(), v.getVCursor().getVSYCoordinate(), Calibrator.Z_GLYPH, 20, Color.RED, Color.RED);
+        c.setDrawBorder(false);
+        c.setType(Calibrator.T_POINT_TUIO);
+        application.mSpace.addGlyph(c);
+    }
+
+    public void release3(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){
+        System.out.println("release3");
+    }
+
     public void mouseDragged(ViewPanel v, int mod, int buttonNumber, int jpx, int jpy, MouseEvent e){
         if (panning){
             Camera c = v.cams[0];
@@ -290,10 +300,20 @@ class CalibratorListener extends ViewAdapter {
 
     public void enterGlyph(Glyph g){
         // g.highlight(true, null);
+        if(g.getType().equals(Calibrator.T_POINT_TUIO)){
+            Point2D.Double l = g.getLocation();
+            VText label = new VText(l.getX() + 100, l.getY(), Calibrator.Z_GLYPH, Color.RED, Color.BLUE, "Hello", (short)100, 1.0f, 0.9f);
+            g.setOwner((Object)label);
+            application.mSpace.addGlyph(label);
+        }
     }
 
     public void exitGlyph(Glyph g){
+        
         // g.highlight(false, null);
+        if(g.getType().equals(Calibrator.T_POINT_TUIO)){
+            application.mSpace.removeGlyph((Glyph)g.getOwner());
+        }
     }
 
 }
