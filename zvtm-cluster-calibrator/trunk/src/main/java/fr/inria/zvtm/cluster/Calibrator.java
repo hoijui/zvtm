@@ -170,6 +170,10 @@ public class Calibrator {
         return new Point2D.Double(p.getX(), 1-p.getY());
     }
 
+    void exit(){
+        System.exit(0);
+    }
+
     public static void main(String[] args){
         WEOptions options = new WEOptions();
         CmdLineParser parser = new CmdLineParser(options);
@@ -314,6 +318,10 @@ class CalibratorListener extends ViewAdapter {
         if(g.getType().equals(Calibrator.T_POINT_TUIO)){
             application.mSpace.removeGlyph((Glyph)g.getOwner());
         }
+    }
+
+    public void viewClosing(View v){
+        application.exit();
     }
 
 }
