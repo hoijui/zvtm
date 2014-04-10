@@ -157,7 +157,13 @@ public class FSTest  {
         System.out.println("User name: "+System.getProperty("user.name"));
         System.out.println("User home directory: "+System.getProperty("user.home"));
         System.out.println("-----------------");
-        String config = args[0];
+        String config;
+	if(args.length > 0){ config = args[0];}
+	else {
+		System.out.println("Parameter \"_both\", \"_0\" or \"_1\"");
+		System.out.println("default \"_0\"");
+		config = "_0";
+	}
         new FSTest(config);
     }
 
