@@ -114,6 +114,7 @@ class TIVNavigationManager {
 
     View fakeCursorView=null;
     public static File pathFile = null;
+    boolean speedCoupled = true;
 
     TIVNavigationManager(TiledImageViewer app){
         this.application = app;
@@ -595,14 +596,13 @@ class TIVNavigationManager {
 	void toggleLensType(){
         if(lensFamily == SCBGaussianLens)
         {
-            lensFamily = BGaussianLens;
+            boolean sc = ((SCBGaussianLens)lens).getSpeedCoupled();
+            ((SCBGaussianLens) lens).setSpeedCoupled(!sc);
+            speedCoupled = !sc;
+            /*lensFamily = BGaussianLens;
             if(tLens != null) {
                 tLens = null;
-            }
-        }
-        else if (lensFamily == BGaussianLens)
-        {
-            lensFamily = SCBGaussianLens;
+            }*/
         }
 	    else if (lensFamily == L2_Gaussian){
 	        lensFamily = L2_SCB;
@@ -786,6 +786,7 @@ From this we can get the altitude difference (a2 - a1)                       */
             }
             case SCBGaussianLens:{
                 tLens = new SCBGaussianLens(1.0f, 0.0f, 1.0f, LENS_R1, LENS_R2, x - application.panelWidth/2, y - application.panelHeight/2);
+                ((SCBGaussianLens)tLens).setSpeedCoupled(speedCoupled);
                 //((SCBGaussianLens)tLens).setBoundaryColor(Color.RED);
                 //((SCBGaussianLens)tLens).setObservedRegionColor(Color.RED);
                 res = (Lens)tLens;

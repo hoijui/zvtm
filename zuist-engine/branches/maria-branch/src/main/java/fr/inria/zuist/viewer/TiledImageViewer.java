@@ -180,6 +180,7 @@ public class TiledImageViewer implements LevelListener {
         else
             sm = new SceneManager(sceneSpaces, sceneCameras);
         sm.setLevelListener(this);
+        sm.setFadeInDuration(600);
 		if (xmlSceneFile != null){
 			loadScene(xmlSceneFile);
 			HashMap sa = sm.getSceneAttributes();
@@ -205,6 +206,7 @@ public class TiledImageViewer implements LevelListener {
         
 
         nm.loadMode(mode);
+
 
         //nm.updateOverview();
         
