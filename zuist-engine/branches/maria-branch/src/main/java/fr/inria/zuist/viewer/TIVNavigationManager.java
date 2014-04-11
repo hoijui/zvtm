@@ -520,17 +520,12 @@ class TIVNavigationManager {
         Vector <String> contextOptions= new Vector <String> ();
         for (String key : application.layersIndex.keySet())
         {
-            if (key != lenseLayer)
-            {
-                lenseOptions.add(key);
-            }
+            lenseOptions.add(key);
         } 
         for (String key : application.layersIndex.keySet())
         {
-            if (key != contextLayer)
-            {
-                contextOptions.add(key);
-            }
+
+            contextOptions.add(key);
         }  
         v.parent.setActiveLayer(application.menuCamera);
         lensMenu = new LensMenu(lenseOptions,contextOptions, v.parent.getActiveCamera().getOwningSpace(),2*lensMenuRadius,3*lensMenuRadius, new Point2D.Double(centerX,centerY));
