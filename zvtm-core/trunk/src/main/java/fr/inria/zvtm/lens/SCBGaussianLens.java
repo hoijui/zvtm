@@ -39,6 +39,7 @@ public class SCBGaussianLens extends BGaussianLens implements TemporalLens {
     protected double cutoffParamB = 0.05;  // increase to lower time to go back to rest position
 
     protected SpeedCoupling speedCoupling = new SpeedCoupling();
+    protected boolean speedCoupled = true;
 
     //protected SpeedCoupling speedCoupling = null;
 
@@ -126,12 +127,14 @@ public class SCBGaussianLens extends BGaussianLens implements TemporalLens {
     public synchronized void setAbsolutePosition(int ax, int ay, long absTime){
 	synchronized(this){
 	    super.setAbsolutePosition(ax, ay);
-	    updateFrequency(absTime);
-	    updateTimeBasedParams(ax, ay);
-	    if (speedCoupling != null)
-	    {
-		speedCoupling.addPoint(ax, ay, absTime);
-	    }
+        if(speedCoupled) {
+    	    updateFrequency(absTime);
+    	    updateTimeBasedParams(ax, ay);
+    	    if (speedCoupling != null)
+    	    {
+    		speedCoupling.addPoint(ax, ay, absTime);
+    	    }
+        }   
 	}
     }
 
@@ -163,7 +166,12 @@ public class SCBGaussianLens extends BGaussianLens implements TemporalLens {
 	    double opacity;
         if (speedCoupling != null)
         {
+            //if(speedCoupled) {
             opacity = 1.0 - (double)speedCoupling.getCoef();
+            //}
+            //else {
+                //opacity=1.0;
+            //}
         }
         else
         {
@@ -210,6 +218,7 @@ public class SCBGaussianLens extends BGaussianLens implements TemporalLens {
     }
 
     public void setSpeedCoupling(SpeedCoupling sc){
+    speedCoupled = true;
 	speedCoupling = sc;
     }
 
@@ -327,6 +336,15 @@ public class SCBGaussianLens extends BGaussianLens implements TemporalLens {
         return this.tpl;
     }
 
+    public void setSpeedCoupled(boolean b)
+    {
+        speedCoupled = b;
+    }
+
+    public boolean getSpeedCoupled()
+    {
+        return speedCoupled;
+    }
 }
 
 
