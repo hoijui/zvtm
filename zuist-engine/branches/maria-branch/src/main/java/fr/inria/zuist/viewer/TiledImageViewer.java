@@ -143,7 +143,7 @@ public class TiledImageViewer implements LevelListener {
     Vector <VirtualSpace> swipes = new Vector();
     PieMenu mainPieMenu;
 
-    static int mode=routeLens;
+    static int mode=lenses;
     //Define mode here. 
     //Covisualization2 puts Ortho layer and Scan layer side by side. Purple cursor follows the movement in the active side.
     //In swipe mode change Ortho by Scan typing "k"
@@ -304,7 +304,7 @@ public class TiledImageViewer implements LevelListener {
 
         //Setting lens and context cameras.
         if(mode==lenses)
-        { mView.setLayerVisibility(new boolean[]{true,true,false,true,false,true}, new boolean[]{false, false, true,false,false,false}); }
+        { mView.setLayerVisibility(new boolean[]{true,true,false,true,false,true}, new boolean[]{false, false, true,false,false,true}); }
         if(mode==swipe || mode==alpha_swipe)
         {
             mView.setLayerVisibility(new boolean[]{true,true,true,true,false,false}, new boolean[]{false, false, true,false,false,false});
@@ -658,7 +658,7 @@ public class TiledImageViewer implements LevelListener {
             PieMenuFactory.setTranslucency(0.7f);
             PieMenuFactory.setSensitivityRadius(0.5);
             PieMenuFactory.setAngle(-Math.PI/2.0);
-            PieMenuFactory.setRadius(150);
+            PieMenuFactory.setRadius(100);
             //PieMenuFactory.setRingInnerRatio(0.4f);
             ArrayList <String> l = new ArrayList <String> ();
             String [] labels = new String [l.size()];

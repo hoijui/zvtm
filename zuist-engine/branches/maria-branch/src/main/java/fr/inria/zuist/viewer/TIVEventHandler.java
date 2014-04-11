@@ -37,6 +37,7 @@ import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.glyphs.VCircle;
+import fr.inria.zvtm.glyphs.VRing;
 import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.event.CameraListener;
 import fr.inria.zvtm.engine.portals.Portal;
@@ -49,6 +50,7 @@ import fr.inria.zvtm.lens.*;
 import fr.inria.zuist.engine.Region;
 import fr.inria.zuist.engine.ObjectDescription;
 import fr.inria.zuist.engine.TextDescription;
+import fr.inria.zuist.engine.LensMenu;
 
 
 
@@ -94,6 +96,11 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
     List <String> lines  = new ArrayList <String> ();
 
     DelayedUpdateTimer dut;
+
+    int enterPointPosition;
+    int enterPointLens;
+    int enterPointContext;
+
 
     TIVEventHandler(TiledImageViewer app){
         this.application = app;
@@ -238,6 +245,13 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
     public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
          lastJPX = jpx;
         lastJPY = jpy;
+        lastVX = v.getVCursor().getVSXCoordinate();
+        lastVY = v.getVCursor().getVSYCoordinate();
+        String [] lenseOptions = {"Littoral", "Scan"};
+        String [] contextOptions = {"Ortho", "Littoral"};
+         v.parent.setActiveLayer(application.menuCamera);
+         nm.showLensMenu(v,lastVX,lastVY);
+        //LensMenu lensMenu = new LensMenu(lenseOptions,contextOptions, v.parent.getActiveCamera().getOwningSpace(),80,120, new Point2D.Double(lastVX,lastVY));
         
     }
 
@@ -247,11 +261,13 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
     }
 
     public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-        System.out.println(application.orthoView.getCursor().getStickedGlyphsNumber());
-        System.out.println(application.mView.getCursor().getStickedGlyphsNumber());
+        //System.out.println(application.orthoView.getCursor().getStickedGlyphsNumber());
+        //System.out.println(application.mView.getCursor().getStickedGlyphsNumber());
     }
 
     public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+        //lastVX = v.getVCursor().getVSXCoordinate();
+        //lastVY = v.getVCursor().getVSYCoordinate();
         if(application.mode==application.lenses)
         {
             lastCenterX = jpx;
@@ -259,9 +275,14 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
              v.parent.setActiveLayer(application.menuCamera);
                 Camera c=v.parent.getActiveCamera();
                 System.out.println(c.getOwningSpace().getName());
-                application.displayMainPieMenu(true);
-            if (nm.lense)
-                nm.reduceLensRadius(50,50);
+            if(!nm.lense) {
+                application.displayMainPieMenu(true); }
+            if (nm.lense) {
+                
+                nm.setLensRadius(nm.lensMenuRadius*2, nm.lensMenuRadius*2); 
+                v.parent.setActiveLayer(application.menuCamera);
+                nm.showLensMenu(v, application.mView.mouse.getVSXCoordinate(),application.mView.mouse.getVSYCoordinate());
+            }
         }
 
     }
@@ -273,11 +294,19 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
                 application.updateLayer(g);
                 application.pieMenuEvent(g);
             }
+            if(g != null && (g.getType()==Messages.LENS_MENU_LENS || g.getType()==Messages.LENS_MENU_CONTEXT)) {
+                nm.lenseLayer = nm.temporaryLenseLayer;
+                nm.contextLayer = nm.temporaryContextLayer;
+            }
+
             if (application.mainPieMenu != null){
                 application.displayMainPieMenu(false);
             }
-            if(nm.lense && application.mode == application.lenses)
+            if(nm.lense && application.mode == application.lenses && nm.lensMenu!=null)
+            {
                 nm.returnOriginalRadius();
+                nm.lensMenu.hideLensMenu();
+            }
             v.parent.setActiveLayer(application.mCamera);
     }
 
@@ -346,7 +375,7 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
 	    Camera c = application.mCamera;
         //System.out.println("Mouse moved "+jpx + " "+ jpy);
-        if(nm.lense && application.mainPieMenu!=null)
+        /*if(nm.lense && application.mainPieMenu!=null)
         {
             if((jpx-lastCenterX)*(jpx-lastCenterX)+(jpy-lastCenterY)*(jpy-lastCenterY)>=150*150)
             {
@@ -379,6 +408,48 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
                 }
                 //robot.mouseMove(lastInsideX,lastInsideY);
             }
+        }*/
+        if(nm.lense && nm.lensMenu!=null)
+        {
+            Glyph g = v.lastGlyphEntered();
+            //System.out.println("Glyph in mouseDragged"+g);
+            int pos = nm.lensMenu.positionInMenu(new Point2D.Double(application.mView.mouse.getVSXCoordinate(), application.mView.mouse.getVSYCoordinate()));
+            if(g==null && pos!=-1) {enterPointPosition = pos;
+                //System.out.println("Enter Point "+pos);
+            }
+            
+
+            /*if((jpx-lastCenterX)*(jpx-lastCenterX)+(jpy-lastCenterY)*(jpy-lastCenterY)>=(nm.lensMenuRadius*3)*(nm.lensMenuRadius*3))
+            {
+                boolean delete = false;
+                if(delete)
+                {
+                nm.lense=false;
+                if (nm.lensType != TIVNavigationManager.NO_LENS){
+                    nm.zoomOutPhase2();
+                }
+                else {
+                    if (cursorNearBorder){
+                    // do not activate the lens when cursor is near the border
+                        return;
+                    }
+                nm.zoomOutPhase1(jpx, jpy, lastVX, lastVY);
+                }
+                nm.lensMenu.hideLensMenu();
+                }
+                else
+                {
+                    lastCenterX = jpx;
+                    lastCenterY = jpy;
+                    nm.moveLens(jpx,jpy, e.getWhen());
+                    nm.lensMenu.hideLensMenu();
+                    nm.showLensMenu(v,application.mView.mouse.getVSXCoordinate(),application.mView.mouse.getVSYCoordinate());
+                    nm.changeLayers(nm.lenseLayer);
+
+
+                }
+                //robot.mouseMove(lastInsideX,lastInsideY);
+            }*/
         }
         if (zero_order_dragging){
             //System.out.println("Zero order");
@@ -418,8 +489,10 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
     public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
         if (nm.lensType != 0 && nm.lens != null){
             if (wheelDirection  == ViewListener.WHEEL_UP){
-                if (application.mode==application.lenses)
+                if (application.mode==application.lenses) {
+                    //System.out.println("Update translucency");
                     nm.updateTranslucency(WHEEL_ALPHA_FACTOR, jpx, jpy);
+                }
                 else if(application.mode == application.routeLens)
                     nm.magnifyFocus(TIVNavigationManager.WHEEL_MM_STEP, nm.lensType, application.mCamera);
             }
@@ -459,12 +532,29 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
         //System.out.println("Enter Glyph " +g.getType());
         if(g.getType() == Messages.PM_ENTRY)
             application.pieMenuEvent(g);
+        if(g.getType() == Messages.LENS_MENU_LENS)
+        {
+            nm.lensMenu.highlight(g);
+            //System.out.println("GLYPH: "+nm.lensMenu.getLabel(g));
+            //System.out.println("Enter Point in enterGlyph"+nm.lensMenu.positionInMenu(new Point2D.Double(application.mView.mouse.getVSXCoordinate(),application.mView.mouse.getVSYCoordinate())));
+            nm.lensMenuChangeLayer(g);
+            enterPointLens = enterPointPosition;
+        }
+         if(g.getType() == Messages.LENS_MENU_CONTEXT)
+        {
+            nm.lensMenu.highlight(g);
+            //System.out.println("GLYPH: "+nm.lensMenu.getLabel(g));
+            nm.lensMenuChangeLayer(g);
+            enterPointContext = enterPointPosition;
+            //System.out.println("Enter Point in enterGlyph"+nm.lensMenu.positionInMenu(new Point2D.Double(application.mView.mouse.getVSXCoordinate(),application.mView.mouse.getVSYCoordinate())));
+        }
         //System.out.println("GLYPH " + g.getZindex());
 //        g.highlight(true, null);
     }
 
     public void exitGlyph(Glyph g){
         //System.out.println("Exit Glyph "+g.getType());
+
         if(g.getType() == Messages.PM_ENTRY)
         {
             if(nm.lense)
@@ -479,6 +569,60 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
                 nm.changeLayers(nm.contextLayer);
             }
         }
+        if(application.mView.getPanel().lastGlyphEntered()!=null)
+            {System.out.println(application.mView.getPanel().lastGlyphEntered());}
+            //application.mView.getPanel().lastGlyphEntered().setColor(Color.YELLOW);
+
+        if(g.getType() == Messages.LENS_MENU_LENS)   
+        {
+            System.out.println("Enter Point "+enterPointLens);
+            System.out.println("Exit Point "+nm.lensMenu.positionInMenu(new Point2D.Double(application.mView.mouse.getVSXCoordinate(),application.mView.mouse.getVSYCoordinate())));
+            nm.lensMenu.unHighlight(g);
+            if(!nm.lensMenu.isInShowedMenu(new Point2D.Double(application.mView.mouse.getVSXCoordinate(),application.mView.mouse.getVSYCoordinate()))) {
+                if(enterPointLens == nm.lensMenu.positionInMenu(new Point2D.Double(application.mView.mouse.getVSXCoordinate(),application.mView.mouse.getVSYCoordinate()))) {
+                    
+                    nm.changeLayerLense(nm.lenseLayer);
+                    nm.temporaryLenseLayer = nm.lenseLayer;
+                    
+                }
+                else {
+                    //nm.lenseLayer = nm.temporaryLenseLayer;
+                    nm.lenseLayer = nm.temporaryLenseLayer;
+                    nm.changeLensOptions();
+                    //nm.lensMenu.hideLensMenu();
+                }
+            //nm.lensMenu.exitShowEvent(g,new Point2D.Double(application.mView.mouse.getVSXCoordinate(),application.mView.mouse.getVSYCoordinate()));
+            }
+        }
+        if(g.getType() == Messages.LENS_MENU_CONTEXT)
+        {
+            nm.lensMenu.unHighlight(g);
+             System.out.println("Enter Point "+enterPointContext);
+            System.out.println("Exit Point "+nm.lensMenu.positionInMenu(new Point2D.Double(application.mView.mouse.getVSXCoordinate(),application.mView.mouse.getVSYCoordinate())));
+            if(!nm.lensMenu.isInShowedMenu(new Point2D.Double(application.mView.mouse.getVSXCoordinate(),application.mView.mouse.getVSYCoordinate()))) {
+                if(enterPointContext == nm.lensMenu.positionInMenu(new Point2D.Double(application.mView.mouse.getVSXCoordinate(),application.mView.mouse.getVSYCoordinate()))) {
+                    nm.changeLayerContext(nm.contextLayer);
+                    nm.temporaryContextLayer = nm.contextLayer;
+                    //System.out.println("Enter Point "+enterPointPosition);
+                    //System.out.println("Exit Point "+nm.lensMenu.positionInMenu(new Point2D.Double(application.mView.mouse.getVSXCoordinate(),application.mView.mouse.getVSYCoordinate())));
+                }
+                else {
+                    //nm.lenseLayer = nm.temporaryLenseLayer;
+                    nm.contextLayer = nm.temporaryContextLayer;
+                    nm.changeContextOptions();
+                    //nm.lensMenu.hideLensMenu();
+                }
+            }
+            //nm.lensMenu.exitShowEvent(g,new Point2D.Double(application.mView.mouse.getVSXCoordinate(),application.mView.mouse.getVSYCoordinate()));
+        }
+      
+
+        /*if(nm.lensMenu.isInCenterMenu(new Point2D.Double(application.mView.mouse.getVSXCoordinate(),application.mView.mouse.getVSYCoordinate())) && nm.lensMenu.getLayerType(g)=="context"){
+            nm.changeLayers(nm.contextLayer);
+            nm.returnLensAndContext();
+        }*/
+
+
 //        g.highlight(false, null);
     }
 
@@ -545,6 +689,10 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
                     nm.contextLayer = Messages.SCAN;
                 }
             }
+            if(application.mode == application.lenses)
+            {
+                application.nm.toggleLensType();
+            }
         }
 
         if(c=='j')
@@ -599,7 +747,8 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
         }
         if(c=='d')
         {
-            application.orthoCamera.move(-application.VIEW_W/2,0);
+            v.parent.setActiveLayer(application.menuCamera);
+            v.parent.getActiveCamera().getOwningSpace().addGlyph(new VRing(0, 0, 0, 100, Math.PI/2, 0.5f, Math.PI*3/4, Color.BLACK, Color.BLACK));
         }
 
     }

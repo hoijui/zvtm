@@ -23,6 +23,7 @@ import java.util.Map;
 
 import java.io.*;
 import java.util.List;
+import java.util.ArrayList;
 import java.io.IOException;
 
 
@@ -46,6 +47,7 @@ import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewPanel;
 
 import fr.inria.zuist.engine.Region;
+import fr.inria.zuist.engine.LensMenu;
 
 class TIVNavigationManager {
 
@@ -64,7 +66,7 @@ class TIVNavigationManager {
     static final int WHEEL_ANIM_TIME = 50;
     static final int LENS_ANIM_TIME = 300;
     //static double DEFAULT_MAG_FACTOR = 4.0;
-    static double DEFAULT_MAG_FACTOR = 3.0f;
+    static double DEFAULT_MAG_FACTOR = 1.0f;
     static double MAG_FACTOR = DEFAULT_MAG_FACTOR;
     static double INV_MAG_FACTOR = 1/MAG_FACTOR;
     /* LENS MAGNIFICATION */
@@ -82,8 +84,13 @@ class TIVNavigationManager {
     static final short Blense=2;
     static final short BInverseCosine=3;
     static final short BGaussianLens=4;
+    static final short SCBGaussianLens=5;
+    static final short SCFGaussianLens = 6;
+    
     //short lensFamily = L2_SCB;
-    short lensFamily = BGaussianLens;
+    //short lensFamily = BGaussianLens;
+    short lensFamily = SCBGaussianLens;
+    //short lensFamily = BGaussianLens;
     static boolean lense=false;
     static boolean pieMenu=false;
 
@@ -94,17 +101,19 @@ class TIVNavigationManager {
     Camera mCamera;
     VirtualSpaceManager vsm;
 
+    LensMenu lensMenu;
+
     static boolean [] contextVisibility = new boolean [6];
     static boolean [] lenseVisibility = new boolean [6];
 
     static String contextLayer;
     static String lenseLayer;
+    static String temporaryContextLayer;
+    static String temporaryLenseLayer;
+    static int lensMenuRadius = 40;
 
     View fakeCursorView=null;
-    public 
-
-
-    static File pathFile = null;
+    public static File pathFile = null;
 
     TIVNavigationManager(TiledImageViewer app){
         this.application = app;
@@ -406,7 +415,7 @@ class TIVNavigationManager {
 
             if(key==name)
             {
-                System.out.println("CONTEXT LAYER: "+contextLayer);
+                System.out.println("CONTEXT LAYER: "+name);
                 application.mView.getLayerVisibility()[0][application.layersIndex.get(key)]=true;
                 application.mView.setLayerVisibility(application.mView.getLayerVisibility()[0], application.mView.getLayerVisibility()[1]);
             }
@@ -425,6 +434,7 @@ class TIVNavigationManager {
         {
             if(key==name)
             {
+                System.out.println("LENSE LAYER: "+name);
                 application.mView.getLayerVisibility()[1][application.layersIndex.get(key)]=true;
                 application.mView.setLayerVisibility(application.mView.getLayerVisibility()[0], application.mView.getLayerVisibility()[1]);
             }
@@ -503,15 +513,102 @@ class TIVNavigationManager {
 
     }
 
+    public void showLensMenu(ViewPanel v, double centerX, double centerY)
+    {
+        Vector <String> lenseOptions= new Vector <String> ();
+        Vector <String> contextOptions= new Vector <String> ();
+        for (String key : application.layersIndex.keySet())
+        {
+            if (key != lenseLayer)
+            {
+                lenseOptions.add(key);
+            }
+        } 
+        for (String key : application.layersIndex.keySet())
+        {
+            if (key != contextLayer)
+            {
+                contextOptions.add(key);
+            }
+        }  
+        v.parent.setActiveLayer(application.menuCamera);
+        lensMenu = new LensMenu(lenseOptions,contextOptions, v.parent.getActiveCamera().getOwningSpace(),2*lensMenuRadius,3*lensMenuRadius, new Point2D.Double(centerX,centerY));
+        lensMenu.drawLensMenu(new Point2D.Double(centerX,centerY));
+        //application.mView.centerOnGlyph(lensMenu.getOuterItems().get(0),v.parent.getActiveCamera(),0);
+        System.out.println("CONTEXT LAYER in showLensMenu "+contextLayer);
+        System.out.println("LENS LAYER in showLensMenu "+lenseLayer);
+        temporaryLenseLayer = lenseLayer;
+        temporaryContextLayer = contextLayer;
+    }
+
+    public void changeLensOptions()
+    {
+        Vector <String> lenseOptions= new Vector <String> ();
+        for (String key : application.layersIndex.keySet())
+        {
+            if (key != lenseLayer)
+            {
+                lenseOptions.add(key);
+            }
+        } 
+        lensMenu.changeLabelsInner(lenseOptions);
+    }
+
+    public void changeContextOptions()
+    {
+        Vector <String> contextOptions= new Vector <String> ();
+        for (String key : application.layersIndex.keySet())
+        {
+            if (key != contextLayer)
+            {
+                contextOptions.add(key);
+            }
+        } 
+        lensMenu.changeLabelsOuter(contextOptions);
+    }
+
+    public void lensMenuChangeLayer(Glyph g)
+    {
+        String label = lensMenu.getLabel(g);
+        if(g.getType()== Messages.LENS_MENU_LENS) {
+            changeLayerLense(label);
+            temporaryLenseLayer = label;
+        }
+        if(g.getType()== Messages.LENS_MENU_CONTEXT) {
+            changeLayerContext(label);
+            temporaryContextLayer = label;
+        }
+    }
+
+    public void returnLensAndContext()
+    {
+        System.out.println("CONTEXT LAYER in returnLensAndContext "+contextLayer);
+        System.out.println("LENS LAYER in returnLensAndContext "+lenseLayer);
+        changeLayerContext(contextLayer);
+        changeLayerLense(lenseLayer);
+    }
+
+
 	/* -------------- Sigma Lenses ------------------- */
     RouteLens rLens = null;
 
 	void toggleLensType(){
-	    if (lensFamily == L2_Gaussian){
+        if(lensFamily == SCBGaussianLens)
+        {
+            lensFamily = BGaussianLens;
+            if(tLens != null) {
+                tLens = null;
+            }
+        }
+        else if (lensFamily == BGaussianLens)
+        {
+            lensFamily = SCBGaussianLens;
+        }
+	    else if (lensFamily == L2_Gaussian){
 	        lensFamily = L2_SCB;
 	        application.ovm.say(Messages.SCB);
 	    }
-	    else {
+	    else if(lensFamily == L2_SCB) {
 	        lensFamily = L2_Gaussian;
 	        application.ovm.say(Messages.FISHEYE);
 	    }
@@ -668,9 +765,10 @@ From this we can get the altitude difference (a2 - a1)                       */
                 break;
             }
             case L2_SCB:{
-                tLens = new SCBLens(1.0f, 0.0f, 1.0f, LENS_R1, x - application.panelWidth/2, y - application.panelHeight/2);
+                tLens = new SCBLens(1.0f, 0.5f, 1.0f, LENS_R1, x - application.panelWidth/2, y - application.panelHeight/2);
                 ((SCBLens)tLens).setBoundaryColor(Color.RED);
                 ((SCBLens)tLens).setObservedRegionColor(Color.RED);
+                ((SCBLens)tLens).setRadii(200, 100);
                 res = (Lens)tLens;
                 break;
             }
@@ -683,8 +781,22 @@ From this we can get the altitude difference (a2 - a1)                       */
                 break;
             }
             case BGaussianLens:{
-                res=new BGaussianLens(1.0f, 0, 1, LENS_R1, LENS_R2, x - application.VIEW_W/2, y - application.VIEW_H/2);
+                res=new BGaussianLens(1.0f, 0, 1, LENS_R1, LENS_R2, x - application.panelWidth/2, y - application.panelHeight/2);
                 break;
+            }
+            case SCBGaussianLens:{
+                tLens = new SCBGaussianLens(1.0f, 0.0f, 1.0f, LENS_R1, LENS_R2, x - application.panelWidth/2, y - application.panelHeight/2);
+                //((SCBGaussianLens)tLens).setBoundaryColor(Color.RED);
+                //((SCBGaussianLens)tLens).setObservedRegionColor(Color.RED);
+                res = (Lens)tLens;
+                break;
+            }
+            case SCFGaussianLens:{
+                tLens = new SCFGaussianLens(2.0f, LENS_R1, LENS_R2, x - application.panelWidth/2, y - application.panelHeight/2);
+                //((SCFGaussianLens)tLens).setBoundaryColor(Color.RED);
+                //((SCFGaussianLens)tLens).setObservedRegionColor(Color.RED);
+                res = (Lens)tLens;
+                break;    
             }
         }
         if(application.mode == application.routeLens)
@@ -703,8 +815,16 @@ From this we can get the altitude difference (a2 - a1)                       */
         //System.out.println("updateTranslucency");
         float minAlpha=0.3f;
         float alpha=((BlendingLens) lens).getFocusTranslucencyValue()+f;
+        //System.out.println("Alpha"+alpha);
         if(alpha<=1 && alpha>=minAlpha)
+        {
+            
             ((BlendingLens) lens).setFocusTranslucencyValue(alpha);
+            if (lensFamily == SCBGaussianLens) {
+                ((SCBGaussianLens) lens).setMaxTranslucency(alpha);
+            }
+            //System.out.println("BlendingLens" +((BlendingLens) lens).getFocusTranslucencyValue());
+        }
         else
         {
             if(alpha>=1) ((BlendingLens) lens).setFocusTranslucencyValue(1f);
@@ -745,6 +865,11 @@ From this we can get the altitude difference (a2 - a1)                       */
     public int getLensOuterRadius()
     {
         return ((FixedSizeLens)lens).getOuterRadius();
+    }
+
+    public void setLensRadius(int r1, int r2)
+    {
+        ((FixedSizeLens) lens).setMMandRadii(1, r1, r2,true);
     }
 
     /* ---------------- Screen saver ---------------------- */

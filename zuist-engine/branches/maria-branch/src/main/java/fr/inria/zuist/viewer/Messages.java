@@ -59,7 +59,7 @@ class Messages {
     static final String [] layers = {ORTHO, LITT, SCAN};
     static final Point2D.Double[] mainMenuLabelOffsets = {new Point2D.Double(10, 0), new Point2D.Double(0, 0),
 						     new Point2D.Double(-10, 0), new Point2D.Double(0, -10)};
-    static final Point2D.Double[] layerLabelOffsets = {new Point2D.Double(0, 40), new Point2D.Double(0, -40),
+    static final Point2D.Double[] layerLabelOffsets = {new Point2D.Double(0, 0), new Point2D.Double(0, 0),
                              new Point2D.Double(0, -50)};                         
 
 	static final String ZON = "Zero-Order Navigation";
@@ -67,5 +67,8 @@ class Messages {
 
 	static final String SCB = "Speed-coupled Blending Lens";
 	static final String FISHEYE = "Fisheye Lens";
+
+    static final String LENS_MENU_LENS = "lensMenuLens";
+    static final String LENS_MENU_CONTEXT = "lensMenuContext";
 
 }
