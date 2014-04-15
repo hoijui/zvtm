@@ -48,11 +48,12 @@ public class LensMenu {
 		double startAngle = totalAngle/(2*lenseOptions.size());
 		//startAngle = Math.PI/3;
 		double angleWidth = totalAngle/(lenseOptions.size());
-		System.out.println("Options"+lenseOptions.size());
+		//System.out.println("Options"+lenseOptions.size());
 		double angle;
+		double angleLabel;
 		double [] offsetsX={5,-5,0};
 		double[] offsetsY = {-5,-5,0};
-		double offset=5;
+		double offset=0;
 
 		int direction = 1;	
 			//System.out.println("TYPE " + types[j]);
@@ -60,18 +61,19 @@ public class LensMenu {
 			{
 				
 				angle = direction*(startAngle+i*angleWidth);
-				double offsetX = (Double)Math.signum(Math.cos(angle))*offset;
-				double offsetY = (Double)Math.signum(Math.sin(angle))*offset;
+				angleLabel = direction *(startAngle + i*angleWidth/2);
+				double offsetX = (Double)Math.signum(Math.cos(angleLabel))*offset;
+				double offsetY = (Double)Math.signum(Math.sin(angleLabel))*offset;
 				VRing innerRing = new VRing(centerCoordinates.getX(), centerCoordinates.getY(), 0, inner_radius, angleWidth, 0.5f, -angle, fillColor, lineColor, translucencyValue);
 
 				VRing outerRing = new VRing(centerCoordinates.getX(), centerCoordinates.getY(), 0, outer_radius, angleWidth, 0.67f, angle, fillColor, lineColor, translucencyValue);
 				innerItems.add(innerRing);
 				outerItems.add(outerRing);
-				VTextOr labelOuter = new VTextOr(offsetX+centerCoordinates.getX()+Math.cos(angle)*outer_radius*3/4, offsetY+
-	                        centerCoordinates.getY()+Math.sin(angle)*outer_radius*3/4,
+				VTextOr labelOuter = new VTextOr(offsetX+centerCoordinates.getX()+Math.cos(angle)*outer_radius*4/5, offsetY+
+	                        centerCoordinates.getY()+Math.sin(angle)*outer_radius*4/5,
 	                        0, Color.LIGHT_GRAY, contextOptions.get(i),0, VText.TEXT_ANCHOR_MIDDLE);
 
-				VTextOr labelInner = new VTextOr(offsetX+centerCoordinates.getX()+Math.cos(angle)*inner_radius*3/4, (offsetY+
+				VTextOr labelInner = new VTextOr(centerCoordinates.getX()+Math.cos(angle)*inner_radius*3/4, (
 	                        centerCoordinates.getY()-Math.sin(angle)*inner_radius*3/4),
 	                        0, Color.LIGHT_GRAY, lenseOptions.get(i),0, VText.TEXT_ANCHOR_MIDDLE);
 				innerLabels.add(labelInner);
@@ -126,10 +128,10 @@ public class LensMenu {
 		
 	}
 
-	public Vector<Glyph> getOuterItems()
+	/*public Vector<Glyph> getOuterItems()
 	{
 		return outerItems;
-	}
+	}*/
 
 	public boolean isInMenu(Point2D.Double coordinates)
 	{
@@ -188,7 +190,7 @@ public class LensMenu {
 		if ((isInInnerMenu(coordinates) && coordinates.getY()<= centerCoordinates.getY()) || (isInOuterMenu(coordinates)&&coordinates.getY()>=centerCoordinates.getY())) {return true;}
 		else {return false;}
 	}
-	public  String getLayerType(Glyph g)
+	/*public  String getLayerType(Glyph g)
 	{
 		String layer = null;
 		if (innerItems.contains(g)) {
@@ -198,8 +200,8 @@ public class LensMenu {
 			layer = "context";
 		}
 		return layer;
-	}
-	public void exitHideEvent(Glyph item, Point2D.Double coordinates)
+	}*/
+	/*public void exitHideEvent(Glyph item, Point2D.Double coordinates)
 	{
 		
 		if(innerItems.contains(item) && !(isInInnerMenu(coordinates))) {
@@ -262,19 +264,19 @@ public class LensMenu {
 			int index = innerItems.indexOf(g);
 			//System.out.println(((VText)innerLabels.get(index)).getText());
 		}
-	}
+	}*/
 
 	public String getLabel(Glyph g) {
 		String label=null;
 		if (innerItems.contains(g)) {
 			int index = innerItems.indexOf(g);
-			System.out.println("Index Inner Item "+index);
+			//System.out.println("Index Inner Item "+index);
 			label = ((VText)innerLabels.get(index)).getText();
 
 		}
 		else if (outerItems.contains(g)) {
 			int index = outerItems.indexOf(g);
-			System.out.println("Index Outer Item"+index);
+			//System.out.println("Index Outer Item"+index);
 			label = ((VText)outerLabels.get(index)).getText();
 		}
 		return label;
@@ -284,7 +286,7 @@ public class LensMenu {
 		return centerCoordinates;
 	}
 
-	public void changeLabelsInner(Vector <String> options)
+	/*public void changeLabelsInner(Vector <String> options)
 	{
 		for(int i=0; i<options.size(); i++)
 		{
@@ -300,7 +302,7 @@ public class LensMenu {
 			((VText)outerLabels.get(i)).setText(options.get(i));
 			//outerLabels.get(i).draw();
 		}
-	}
+	}*/
 
 	public void highlight (Glyph g)
 	{

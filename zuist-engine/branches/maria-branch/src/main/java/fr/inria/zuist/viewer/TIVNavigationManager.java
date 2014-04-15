@@ -115,6 +115,7 @@ class TIVNavigationManager {
     View fakeCursorView=null;
     public static File pathFile = null;
     boolean speedCoupled = true;
+    public Point2D.Double pieMenuCenter = null;
 
     TIVNavigationManager(TiledImageViewer app){
         this.application = app;
@@ -310,7 +311,7 @@ class TIVNavigationManager {
     //Switching layers. Only for mode=swipe.
     void hideLayer(VirtualSpace vs)
     {
-        System.out.println(vs.getName());
+        //System.out.println(vs.getName());
         //for (Glyph g:vs.getAllGlyphs())
         for(Glyph g:application.scanSpace.getAllGlyphs())
         {
@@ -416,7 +417,7 @@ class TIVNavigationManager {
 
             if(key==name)
             {
-                System.out.println("CONTEXT LAYER: "+name);
+                //System.out.println("CONTEXT LAYER in changeLayerContext: "+name);
                 application.mView.getLayerVisibility()[0][application.layersIndex.get(key)]=true;
                 application.mView.setLayerVisibility(application.mView.getLayerVisibility()[0], application.mView.getLayerVisibility()[1]);
             }
@@ -435,7 +436,7 @@ class TIVNavigationManager {
         {
             if(key==name)
             {
-                System.out.println("LENSE LAYER: "+name);
+                //System.out.println("LENSE LAYER: "+name);
                 application.mView.getLayerVisibility()[1][application.layersIndex.get(key)]=true;
                 application.mView.setLayerVisibility(application.mView.getLayerVisibility()[0], application.mView.getLayerVisibility()[1]);
             }
@@ -520,6 +521,7 @@ class TIVNavigationManager {
         Vector <String> contextOptions= new Vector <String> ();
         for (String key : application.layersIndex.keySet())
         {
+            //System.out.println("KEYS"+key);
             lenseOptions.add(key);
         } 
         for (String key : application.layersIndex.keySet())
@@ -531,13 +533,13 @@ class TIVNavigationManager {
         lensMenu = new LensMenu(lenseOptions,contextOptions, v.parent.getActiveCamera().getOwningSpace(),2*lensMenuRadius,3*lensMenuRadius, new Point2D.Double(centerX,centerY));
         lensMenu.drawLensMenu(new Point2D.Double(centerX,centerY));
         //application.mView.centerOnGlyph(lensMenu.getOuterItems().get(0),v.parent.getActiveCamera(),0);
-        System.out.println("CONTEXT LAYER in showLensMenu "+contextLayer);
-        System.out.println("LENS LAYER in showLensMenu "+lenseLayer);
+        //System.out.println("CONTEXT LAYER in showLensMenu "+contextLayer);
+        //System.out.println("LENS LAYER in showLensMenu "+lenseLayer);
         temporaryLenseLayer = lenseLayer;
         temporaryContextLayer = contextLayer;
     }
 
-    public void changeLensOptions()
+    /*public void changeLensOptions()
     {
         Vector <String> lenseOptions= new Vector <String> ();
         for (String key : application.layersIndex.keySet())
@@ -561,7 +563,7 @@ class TIVNavigationManager {
             }
         } 
         lensMenu.changeLabelsOuter(contextOptions);
-    }
+    }*/
 
     public void lensMenuChangeLayer(Glyph g)
     {
@@ -578,8 +580,8 @@ class TIVNavigationManager {
 
     public void returnLensAndContext()
     {
-        System.out.println("CONTEXT LAYER in returnLensAndContext "+contextLayer);
-        System.out.println("LENS LAYER in returnLensAndContext "+lenseLayer);
+        //System.out.println("CONTEXT LAYER in returnLensAndContext "+contextLayer);
+        //System.out.println("LENS LAYER in returnLensAndContext "+lenseLayer);
         changeLayerContext(contextLayer);
         changeLayerLense(lenseLayer);
     }

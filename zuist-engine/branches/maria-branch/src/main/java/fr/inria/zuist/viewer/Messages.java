@@ -60,7 +60,7 @@ class Messages {
     static final Point2D.Double[] mainMenuLabelOffsets = {new Point2D.Double(10, 0), new Point2D.Double(0, 0),
 						     new Point2D.Double(-10, 0), new Point2D.Double(0, -10)};
     static final Point2D.Double[] layerLabelOffsets = {new Point2D.Double(0, 0), new Point2D.Double(0, 0),
-                             new Point2D.Double(0, -50)};                         
+                             new Point2D.Double(0,0)};                         
 
 	static final String ZON = "Zero-Order Navigation";
 	static final String FON = "First-Order Navigation";

@@ -100,6 +100,7 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
     int enterPointPosition;
     int enterPointLens;
     int enterPointContext;
+    int enterPointPieMenu;
 
 
     TIVEventHandler(TiledImageViewer app){
@@ -276,7 +277,9 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
                 Camera c=v.parent.getActiveCamera();
                 System.out.println(c.getOwningSpace().getName());
             if(!nm.lense) {
-                application.displayMainPieMenu(true); }
+                application.displayMainPieMenu(true);
+                nm.pieMenuCenter = new Point2D.Double(application.mView.mouse.getVSXCoordinate(),application.mView.mouse.getVSYCoordinate());
+                }
             if (nm.lense) {
                 
                 nm.setLensRadius(nm.lensMenuRadius*2, nm.lensMenuRadius*2); 
@@ -451,6 +454,21 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
                 //robot.mouseMove(lastInsideX,lastInsideY);
             }*/
         }
+        if (application.mainPieMenu != null) {
+             Glyph g = v.lastGlyphEntered();
+            //System.out.println("Glyph in mouseDragged"+g);
+            int pos = application.positionInPieMenu(new Point2D.Double(application.mView.mouse.getVSXCoordinate(), application.mView.mouse.getVSYCoordinate()));
+            if(g==null) {
+                if(pos!=-1 && pos!=1) {
+                enterPointPosition=pos;
+                }
+            }
+            else if(g.getType()==null) {
+                if(pos!=-1 && pos!=1) {
+                enterPointPosition=pos;
+                }
+            }
+        }                                                                          
         if (zero_order_dragging){
             //System.out.println("Zero order");
             double a = (c.focal+Math.abs(c.altitude)) / c.focal;
@@ -531,7 +549,11 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
     public void enterGlyph(Glyph g ){
         //System.out.println("Enter Glyph " +g.getType());
         if(g.getType() == Messages.PM_ENTRY)
+        {
             application.pieMenuEvent(g);
+            enterPointPieMenu = enterPointPosition;
+            //System.out.println("PM_ENTRY");
+        }
         if(g.getType() == Messages.LENS_MENU_LENS)
         {
             nm.lensMenu.highlight(g);
@@ -557,26 +579,31 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
 
         if(g.getType() == Messages.PM_ENTRY)
         {
-            if(nm.lense)
-            {
-                //nm.loadSavedLayers();
-                nm.changeLayers(nm.lenseLayer);
-                //System.out.print("Exit Glyph");
-            }
-            else
-            {
-                //System.out.println("IN IF, EXIT GLYPH");
-                nm.changeLayers(nm.contextLayer);
+                //System.out.println("IN IF, EXIT GLYPH")
+            int cursorPosition = application.positionInPieMenu(new Point2D.Double(application.mView.mouse.getVSXCoordinate(), application.mView.mouse.getVSYCoordinate()));
+            //System.out.println("Cursor_coordinates" + cursorPosition);
+            if(cursorPosition != 1) {
+                //System.out.println("application.positionInPieMenu "+ cursorPosition);
+                //System.out.println("enterPointPieMenu "+enterPointPieMenu);
+                if(cursorPosition == enterPointPieMenu)
+                {
+                    //System.out.println("Context Layer" + nm.contextLayer);
+                    nm.changeLayers(nm.contextLayer);
+                }
+                else
+                {
+                    application.updateLayer(g);
+                }
             }
         }
-        if(application.mView.getPanel().lastGlyphEntered()!=null)
-            {System.out.println(application.mView.getPanel().lastGlyphEntered());}
+        //if(application.mView.getPanel().lastGlyphEntered()!=null)
+            //{System.out.println("Last Glyph" + application.mView.getPanel().lastGlyphEntered());}
             //application.mView.getPanel().lastGlyphEntered().setColor(Color.YELLOW);
 
         if(g.getType() == Messages.LENS_MENU_LENS)   
         {
-            System.out.println("Enter Point "+enterPointLens);
-            System.out.println("Exit Point "+nm.lensMenu.positionInMenu(new Point2D.Double(application.mView.mouse.getVSXCoordinate(),application.mView.mouse.getVSYCoordinate())));
+            //System.out.println("Enter Point "+enterPointLens);
+            //System.out.println("Exit Point "+nm.lensMenu.positionInMenu(new Point2D.Double(application.mView.mouse.getVSXCoordinate(),application.mView.mouse.getVSYCoordinate())));
             nm.lensMenu.unHighlight(g);
             if(!nm.lensMenu.isInShowedMenu(new Point2D.Double(application.mView.mouse.getVSXCoordinate(),application.mView.mouse.getVSYCoordinate()))) {
                 if(enterPointLens == nm.lensMenu.positionInMenu(new Point2D.Double(application.mView.mouse.getVSXCoordinate(),application.mView.mouse.getVSYCoordinate()))) {
@@ -588,7 +615,7 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
                 else {
                     //nm.lenseLayer = nm.temporaryLenseLayer;
                     nm.lenseLayer = nm.temporaryLenseLayer;
-                    nm.changeLensOptions();
+                    //nm.changeLensOptions();
                     //nm.lensMenu.hideLensMenu();
                 }
             //nm.lensMenu.exitShowEvent(g,new Point2D.Double(application.mView.mouse.getVSXCoordinate(),application.mView.mouse.getVSYCoordinate()));
@@ -597,8 +624,8 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
         if(g.getType() == Messages.LENS_MENU_CONTEXT)
         {
             nm.lensMenu.unHighlight(g);
-             System.out.println("Enter Point "+enterPointContext);
-            System.out.println("Exit Point "+nm.lensMenu.positionInMenu(new Point2D.Double(application.mView.mouse.getVSXCoordinate(),application.mView.mouse.getVSYCoordinate())));
+            //System.out.println("Enter Point "+enterPointContext);
+            //System.out.println("Exit Point "+nm.lensMenu.positionInMenu(new Point2D.Double(application.mView.mouse.getVSXCoordinate(),application.mView.mouse.getVSYCoordinate())));
             if(!nm.lensMenu.isInShowedMenu(new Point2D.Double(application.mView.mouse.getVSXCoordinate(),application.mView.mouse.getVSYCoordinate()))) {
                 if(enterPointContext == nm.lensMenu.positionInMenu(new Point2D.Double(application.mView.mouse.getVSXCoordinate(),application.mView.mouse.getVSYCoordinate()))) {
                     nm.changeLayerContext(nm.contextLayer);
@@ -609,7 +636,7 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
                 else {
                     //nm.lenseLayer = nm.temporaryLenseLayer;
                     nm.contextLayer = nm.temporaryContextLayer;
-                    nm.changeContextOptions();
+                    //nm.changeContextOptions();
                     //nm.lensMenu.hideLensMenu();
                 }
             }

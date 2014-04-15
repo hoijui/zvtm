@@ -32,6 +32,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.Cursor;
+import java.awt.geom.Point2D;
 
 import javax.swing.JFileChooser;
 import javax.swing.JMenu;
@@ -252,9 +253,9 @@ public class TiledImageViewer implements LevelListener {
         cameras.add(menuCamera);
            
         layersIndex.put("Ortho",2);
-        layersIndex.put("Scan",3);
         if(mode == lenses)
         { layersIndex.put("Littoral",4); }
+        layersIndex.put("Scan",3);
 
         nm.contextLayer = Messages.SCAN;
         nm.lenseLayer = Messages.ORTHO;
@@ -648,6 +649,10 @@ public class TiledImageViewer implements LevelListener {
     static Color PIEMENU_BORDER_COLOR = Color.WHITE;
     static Color PIEMENU_INSIDE_COLOR = Color.DARK_GRAY;
     static final Font PIEMENU_FONT = new Font("Dialog", Font.PLAIN, 12);
+    static long PIEMENU_RADIUS = 100;
+    static int inCenter = 0;
+    static int inMenu = 1;
+    static int outsideMenu = 2;
 
     void displayMainPieMenu(boolean b){
         if (b){
@@ -660,7 +665,7 @@ public class TiledImageViewer implements LevelListener {
             PieMenuFactory.setTranslucency(0.7f);
             PieMenuFactory.setSensitivityRadius(0.5);
             PieMenuFactory.setAngle(-Math.PI/2.0);
-            PieMenuFactory.setRadius(100);
+            PieMenuFactory.setRadius(PIEMENU_RADIUS);
             //PieMenuFactory.setRingInnerRatio(0.4f);
             ArrayList <String> l = new ArrayList <String> ();
             String [] labels = new String [l.size()];
@@ -669,32 +674,24 @@ public class TiledImageViewer implements LevelListener {
                 //PieMenuFactory.setRingInnerRatio(0.6f);
                 for (String key : layersIndex.keySet())
                 {
-                    if (key != nm.lenseLayer)
-                    {
-                        l.add(key);
-                    }
+                    l.add(key);
                 } 
             }
             else
                 for (String key : layersIndex.keySet())
                 {
-                    if (key != nm.contextLayer)
-                    {
-                        l.add(key);
-                    }
+                    l.add(key);
                 }  
             mainPieMenu = PieMenuFactory.createPieMenu(l.toArray(labels), Messages.layerLabelOffsets, 0, mView, vsm);
             Glyph[] items = mainPieMenu.getItems();
             items[0].setType(Messages.PM_ENTRY);
             items[1].setType(Messages.PM_ENTRY);
-            //items[2].setType(Messages.PM_ENTRY);
+            items[2].setType(Messages.PM_ENTRY);
             //items[3].setType(Messages.PM_ENTRY);
-            System.out.println("PIE MENU: TRUE");
         }
         else {
             mainPieMenu.destroy(0);
             mainPieMenu = null;
-            System.out.println("PIE MENU: FALSE");
         }
     }
 
@@ -702,16 +699,8 @@ public class TiledImageViewer implements LevelListener {
         int index = mainPieMenu.getItemIndex(menuItem);
         if (index != -1){
             String label = mainPieMenu.getLabels()[index].getText();
-            if (label == Messages.ORTHO){ nm.changeLayers(label);//moveBack();
-                System.out.println(label);}
-            else if (label == Messages.LITT){//getGlobalView(null);
-            System.out.println(label);
-            nm.changeLayers(label);}
-            else if (label == Messages.SCAN){//openFile();
-            System.out.println(label);
-            nm.changeLayers(label);}
-            //else if (label == Messages.PM_RELOAD){//reload();
-            //System.out.println(label);}           
+            nm.temporaryContextLayer = label;
+            nm.changeLayers(label);         
         }
 
     }
@@ -727,6 +716,16 @@ public class TiledImageViewer implements LevelListener {
         }
     }
 
+    public int positionInPieMenu (Point2D.Double coordinates)
+    {
+        int result = -1;
+        if(coordinates.distance(nm.pieMenuCenter)<=12f) {result=inCenter;}
+        if(coordinates.distance(nm.pieMenuCenter)>=12f && coordinates.distance(nm.pieMenuCenter)<=PIEMENU_RADIUS) {result=inMenu;}
+        if(coordinates.distance(nm.pieMenuCenter)>=PIEMENU_RADIUS){result=outsideMenu;}
+
+        return result;
+            
+    }
 
 }
 
