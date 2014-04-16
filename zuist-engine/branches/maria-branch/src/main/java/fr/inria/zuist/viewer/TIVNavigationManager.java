@@ -591,7 +591,11 @@ class TIVNavigationManager {
     RouteLens rLens = null;
 
 	void toggleLensType(){
-        if(lensFamily == SCBGaussianLens)
+        if(application.mode == application.routeLens) {
+            if(rLens!=null)
+            rLens.setEnabled(!rLens.isEnabled());
+        }
+        else if(lensFamily == SCBGaussianLens)
         {
             boolean sc = ((SCBGaussianLens)lens).getSpeedCoupled();
             ((SCBGaussianLens) lens).setSpeedCoupled(!sc);
@@ -609,6 +613,7 @@ class TIVNavigationManager {
 	        lensFamily = L2_Gaussian;
 	        application.ovm.say(Messages.FISHEYE);
 	    }
+       
 	}
 
     void setLens(int t){

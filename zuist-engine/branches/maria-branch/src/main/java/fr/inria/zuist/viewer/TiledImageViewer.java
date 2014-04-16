@@ -144,7 +144,7 @@ public class TiledImageViewer implements LevelListener {
     Vector <VirtualSpace> swipes = new Vector();
     PieMenu mainPieMenu;
 
-    static int mode=lenses;
+    static int mode=routeLens;
     //Define mode here. 
     //Covisualization2 puts Ortho layer and Scan layer side by side. Purple cursor follows the movement in the active side.
     //In swipe mode change Ortho by Scan typing "k"
