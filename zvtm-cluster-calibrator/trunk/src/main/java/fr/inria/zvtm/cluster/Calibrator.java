@@ -143,19 +143,45 @@ public class Calibrator {
             mSpace.addGlyph(c);
             i += step;
         }
-
+        // circles for calibration
         int[] x = {-w/4, w/4};
         int[] y = {-h/4, h/4};
         for(int ii : x)
             for(int jj : y){
-                VCircle c = new VCircle(ii, jj, Z_CIRCLE, step, Color.GREEN, Color.GREEN);
+                VCircle c = new VCircle(ii, jj, Z_CIRCLE, step, CIRCLE_COLOR, CIRCLE_COLOR);
                 c.setFilled(false);
                 mSpace.addGlyph(c);
-                VSegment s = new VSegment(ii-step/2, jj, ii+step/2, jj, Z_CIRCLE, Color.GREEN, 1);
+                VSegment s = new VSegment(ii-step/2, jj, ii+step/2, jj, Z_CIRCLE, CIRCLE_COLOR, 1);
                 mSpace.addGlyph(s);
-                s = new VSegment(ii, jj-step/2, ii, jj+step/2, Z_CIRCLE, Color.GREEN, 1);
+                s = new VSegment(ii, jj-step/2, ii, jj+step/2, Z_CIRCLE, CIRCLE_COLOR, 1);
                 mSpace.addGlyph(s);
             }
+
+        // enumeration
+        String[] letters = {"A", "B", "C"};
+        String[] numbers = {"1", "2", "3", "4"};
+        String[] orientations = {"left", "right"};
+
+        int incrX = w/6;
+        int incrY = h/4;
+        
+        int j = h/4 + h/8;
+        for(String number: numbers){
+            i = -w/3 - w/12;
+            for(String letter: letters){
+                for(String orientation: orientations){
+                    //System.out.println(letter+number+"_"+orientation);
+                    VText labelPC = new VText(i, j, Z_CIRCLE, CIRCLE_COLOR,letter+number+"_"+orientation, VText.TEXT_ANCHOR_MIDDLE);
+                    labelPC.setScale(20);
+                    mSpace.addGlyph(labelPC);
+                    i += incrX;
+                }
+            }
+            j -= incrY;
+        }
+        
+
+
     }
 
     void addObject(TuioPoint p){
