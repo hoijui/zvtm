@@ -11,7 +11,7 @@ $Id: pom.xml 3429 2010-07-20 07:32:30Z rprimet $
   <artifactId>zvtm-fits</artifactId>
   <packaging>jar</packaging>
   <name>zvtm-fits</name>
-  <version>0.1.3-SNAPSHOT</version>
+  <version>0.1.3</version>
   <url>http://zvtm.sourceforge.net</url>
   <licenses>
     <license>
@@ -37,6 +37,14 @@ $Id: pom.xml 3429 2010-07-20 07:32:30Z rprimet $
       <name>Maven Repository</name>
       <url>http://repo1.maven.org/maven2</url>
     </repository>
+
+<!-- javax.media.jai.core -->
+    <repository>
+        <id>com.springsource.repository.bundles.external</id>
+        <name>SpringSource Enterprise Bundle Repository - External Bundle Releases</name>
+        <url>http://repository.springsource.com/maven/bundles/external</url>
+    </repository>
+
   </repositories>
   
   <!-- Distribution - Deploy to FTP -->
@@ -52,7 +60,7 @@ $Id: pom.xml 3429 2010-07-20 07:32:30Z rprimet $
 	<dependency>
       <groupId>fr.inria.zvtm</groupId>
       <artifactId>zvtm-core</artifactId>
-      <version>0.11.0-SNAPSHOT</version>
+      <version>0.11.2-SNAPSHOT</version>
     </dependency>
 
 <!--
@@ -65,11 +73,12 @@ $Id: pom.xml 3429 2010-07-20 07:32:30Z rprimet $
 
     jsky is supplied in the 'libs' directory
 -->
-	<dependency>
+	  <dependency>
       <groupId>ivoa.fits</groupId>
       <artifactId>fits</artifactId>
       <version>0.3.0</version>
     </dependency>
+
     <dependency>
       <groupId>jsky</groupId>
       <artifactId>jsky</artifactId>
@@ -82,7 +91,22 @@ $Id: pom.xml 3429 2010-07-20 07:32:30Z rprimet $
         <artifactId>hcompress</artifactId>
         <version>0.52</version>
     </dependency>
+
+    <dependency>
+        <groupId>javax.media.jai</groupId>
+        <artifactId>com.springsource.javax.media.jai.core</artifactId>
+        <version>1.1.3</version>
+    </dependency>
+    <dependency>
+        <groupId>javax.media.jai</groupId>
+        <artifactId>com.springsource.javax.media.jai.codec</artifactId>
+        <version>1.1.3</version>
+    </dependency>
+
+            
+
   </dependencies>
+
   
   <!-- Build -->
   <build>
