@@ -36,6 +36,8 @@ import java.awt.Font;
 import java.awt.geom.Point2D;
 
 import java.io.IOException;
+import java.io.File;
+
 import java.util.Vector;
 
 import java.awt.event.KeyEvent;
@@ -44,6 +46,13 @@ import java.awt.event.MouseWheelEvent;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+
+// Options
+
+import org.kohsuke.args4j.CmdLineException;
+import org.kohsuke.args4j.CmdLineParser;
+
+
 /**
  * Sample FITS application.
  */
@@ -56,20 +65,30 @@ public class FitsExample {
     private RangeSelection rs;
     private View view;
 
-	FitsExample(String imgUrl) throws IOException {
+	FitsExample(FitsOptions options) throws IOException {
+
 		VirtualSpace vs = vsm.addVirtualSpace("testSpace");
 		Camera cam = vs.addCamera();
 		Vector<Camera> cameras = new Vector<Camera>();
 		cameras.add(cam);	
         
         view = vsm.addFrameView(cameras, "Master View",
-                View.STD_VIEW, 800, 600, false, true, true, null);	
+                View.STD_VIEW, options.blockWidth, options.blockHeight, false, true, true, null);	
         view.setBackgroundColor(Color.GRAY);
         view.setListener(new PanZoomEventHandler());
 
-        hi = new FitsImage(0,0,0,new URL(imgUrl));
+        if(options.url != null){
+            hi = new FitsImage(0,0,0,new URL(options.url));
+            
+        } else if(options.file != null){
+            hi = new FitsImage(0,0,0,new File(options.file));
+        } else {
+            System.exit(0);
+            return;
+        }
+
         hi.setScaleMethod(FitsImage.ScaleMethod.LINEAR);
-        vs.addGlyph(hi, false);	
+        vs.addGlyph(hi, false); 
        
         scaleBounds = ZScale.computeScale(hi.getUnderlyingImage());
         hi.rescale(scaleBounds[0], scaleBounds[1], 1);
@@ -96,6 +115,7 @@ public class FitsExample {
 
         MultipleGradientPaint rainbowGrad = Utils.makeGradient(new RainbowFilter());
         vs.addGlyph(new PRectangle(0, -300, 0, 200, 20, rainbowGrad, Color.BLACK));
+        
     }
 
     private Point2D.Double viewToSpace(Camera cam, int jpx, int jpy){
@@ -114,11 +134,27 @@ public class FitsExample {
     }
 
 	public static void main(String[] args) throws IOException{
+
+        FitsOptions options = new FitsOptions();
+        CmdLineParser parser = new CmdLineParser(options);
+
+        try {
+            parser.parseArgument(args);
+        } catch(CmdLineException ex){
+            System.err.println(ex.getMessage());
+            parser.printUsage(System.err);
+            return;
+        }
+
+        new FitsExample(options);
+
+        /*
         if(args.length == 0){
             System.err.println("usage: FitsExample image_URL");
             return;
         }    
 		new FitsExample(args[0]);
+        */
 	}
 
 	private class PanZoomEventHandler implements ViewListener {
@@ -232,5 +268,8 @@ public class FitsExample {
 		public void viewClosing(View v){System.exit(0);}
 
 	}
+    
 }
+
+
 

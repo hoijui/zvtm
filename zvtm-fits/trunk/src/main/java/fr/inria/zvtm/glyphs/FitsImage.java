@@ -39,10 +39,17 @@ import fr.inria.zvtm.fits.NomWcsKeywordProvider;
 import fr.inria.zvtm.fits.Sampler;
 import fr.inria.zvtm.fits.ZScale;
 
+import java.io.File;
+
+
 //provide an accessor to scale parameters
 class ExFITSImage extends FITSImage{
     ExFITSImage(URL imgUrl) throws Exception{
         super(imgUrl);
+    }
+
+    ExFITSImage(File imgFile) throws Exception{
+        super(imgFile);
     }
 
     double[] getScaleParams(){ 
@@ -133,6 +140,7 @@ public class FitsImage extends VImage {
     }
 
     private final URL imgUrl;
+    private final File imgFile;
 
     /**
      * Creates a new FitsImage.
@@ -148,10 +156,46 @@ public class FitsImage extends VImage {
             boolean useDataMinMax) throws IOException {
         super(x,y,z,new BufferedImage(10,10,BufferedImage.TYPE_INT_RGB),scaleFactor);
         this.imgUrl = imgUrl;
+        this.imgFile = null;
         filter = ColorFilter.NOP.getFilter();
 
         try{
             fitsImage = new ExFITSImage(imgUrl);
+            wcsTransform = new WCSTransform(new NomWcsKeywordProvider(fitsImage.getFits().getHDU(0).getHeader()));
+        } catch(Exception e){
+            throw new Error(e);
+        }
+        fitsImage.setScaleMethod(scaleMethod.toIvoaValue());
+        if(useDataMinMax){
+            try{
+                double min = fitsImage.getImageHDU().getMinimumValue();
+                double max = fitsImage.getImageHDU().getMaximumValue();
+                fitsImage.rescale(min, max, min/2. + max/2.); 
+            } catch (Exception fe){
+                System.err.println("image rescale failed: " + fe);
+            }
+        }
+        recreateDisplayImage();
+    }
+    /**
+     * Creates a new FitsImage.
+     * @param x x coordinate
+     * @param y y coordinate
+     * @param z z-index
+     * @param imgFile image location
+     * @param scaleFactor scale factor
+     * @param useDataMinMax use the FITS header items DATAMIN and DATAMAX to
+     * scale images (will produce a blank image if undefined).
+     */
+    public FitsImage(double x, double y, int z, File imgFile, double scaleFactor,
+            boolean useDataMinMax) throws IOException {
+        super(x,y,z,new BufferedImage(10,10,BufferedImage.TYPE_INT_RGB),scaleFactor);
+        this.imgUrl = null;
+        this.imgFile = imgFile;
+        filter = ColorFilter.NOP.getFilter();
+
+        try{
+            fitsImage = new ExFITSImage(imgFile);
             wcsTransform = new WCSTransform(new NomWcsKeywordProvider(fitsImage.getFits().getHDU(0).getHeader()));
         } catch(Exception e){
             throw new Error(e);
@@ -175,6 +219,12 @@ public class FitsImage extends VImage {
     public FitsImage(double x, double y, int z, URL imgUrl, double scaleFactor) throws IOException{
         this(x,y,z,imgUrl,scaleFactor,false);
     }
+    /**
+     * Creates a new FitsImage
+     */
+    public FitsImage(double x, double y, int z, File imgFile, double scaleFactor) throws IOException{
+        this(x,y,z,imgFile,scaleFactor,false);
+    }
 
     /**
      * Creates a new FitsImage.
@@ -185,6 +235,17 @@ public class FitsImage extends VImage {
      */
     public FitsImage(double x, double y, int z, URL imgUrl) throws IOException{
         this(x,y,z,imgUrl,1);
+    }
+
+    /**
+     * Creates a new FitsImage.
+     * @param x x coordinate
+     * @param y y coordinate
+     * @param z z-index
+     * @param imgFile image location
+     */
+    public FitsImage(double x, double y, int z, File imgFile) throws IOException{
+        this(x,y,z,imgFile,1);
     }
 
     /**
