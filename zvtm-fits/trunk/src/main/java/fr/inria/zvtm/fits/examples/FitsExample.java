@@ -4,8 +4,11 @@
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id:$
- */ 
+ */
+
 package fr.inria.zvtm.fits.examples;
+
+import java.awt.Toolkit;
 
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.Location;
@@ -23,6 +26,10 @@ import fr.inria.zvtm.fits.filters.RainbowFilter;
 import fr.inria.zvtm.fits.RangeSelection;
 import fr.inria.zvtm.fits.Utils;
 import fr.inria.zvtm.fits.ZScale;
+
+import java.awt.image.ImageFilter;
+
+import edu.jhu.pha.sdss.fits.FITSImage;  
 
 import fr.inria.zvtm.glyphs.PRectangle;
 
@@ -44,38 +51,78 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
+import java.awt.GraphicsEnvironment;
+import java.awt.GraphicsDevice;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 
-// Options
+import javax.swing.JFrame;
 
+// Options
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
+
+//Menu
+import java.awt.Cursor;
 
 
 /**
  * Sample FITS application.
  */
 public class FitsExample {
+
+
+    /* screen dimensions, actual dimensions of windows */
+    static int SCREEN_WIDTH =  Toolkit.getDefaultToolkit().getScreenSize().width;
+    static int SCREEN_HEIGHT =  Toolkit.getDefaultToolkit().getScreenSize().height;
+    static int VIEW_MAX_W = 1280;
+    static int VIEW_MAX_H = 800;
+    int VIEW_W, VIEW_H;
+    int VIEW_X, VIEW_Y;
+
+    public static final int WIDTH_MENU = 200;
+
+    /* dimensions of zoomable panel */
+    int panelWidth, panelHeight;
+
+    static final Color BACKGROUND_COLOR = Color.GRAY;
+
 	//shortcut
-	private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE; 
-    private FitsImage hi;
-    private double[] scaleBounds;
-    private boolean dragLeft = false, dragRight = false;
+	VirtualSpaceManager vsm;
+    FitsImage hi;
+    double[] scaleBounds;
+    //private boolean dragLeft = false, dragRight = false;
     private RangeSelection rs;
-    private View view;
+    private View mView;
+
+    static final String mSpaceName = "FITS Layer";
+    static final String bSpaceName = "Data Layer";
+    static final String mnSpaceName = "Menu Layer";
+    VirtualSpace mSpace, bSpace, mnSpace;
+    Camera mCamera, bCamera, mnCamera;
+
+    PanZoomEventHandler eh;
+    FitsMenu menu;
+
+    static final String APP_TITLE = "FITS Example";
+
 
 	FitsExample(FitsOptions options) throws IOException {
 
+/*
 		VirtualSpace vs = vsm.addVirtualSpace("testSpace");
 		Camera cam = vs.addCamera();
 		Vector<Camera> cameras = new Vector<Camera>();
 		cameras.add(cam);	
         
-        view = vsm.addFrameView(cameras, "Master View",
-                View.STD_VIEW, options.blockWidth, options.blockHeight, false, true, true, null);	
-        view.setBackgroundColor(Color.GRAY);
-        view.setListener(new PanZoomEventHandler());
+        mView = vsm.addFrameView(cameras, "Master View",
+                View.STD_VIEW, options.blockWidth, options.blockHeight, false, true, !options.fullscreen, null);	
+        mView.setBackgroundColor(BACKGROUND_COLOR);
+        mView.setListener(new PanZoomEventHandler());
+*/
+
+        initGUI(options);
 
         if(options.url != null){
             hi = new FitsImage(0,0,0,new URL(options.url));
@@ -83,46 +130,151 @@ public class FitsExample {
         } else if(options.file != null){
             hi = new FitsImage(0,0,0,new File(options.file));
         } else {
+            System.err.println("usage: FitsExample -file image_File or -url image_URL");
             System.exit(0);
             return;
         }
 
-        hi.setScaleMethod(FitsImage.ScaleMethod.LINEAR);
-        vs.addGlyph(hi, false); 
-       
+        hi.setScaleMethod(FitsImage.ScaleMethod.LINEAR);//ASINH);//.LINEAR);
+
+        //hi.setColorFilter(FitsImage.ColorFilter.RAINBOW);
+
+        mSpace.addGlyph(hi, false); 
+
+
         scaleBounds = ZScale.computeScale(hi.getUnderlyingImage());
         hi.rescale(scaleBounds[0], scaleBounds[1], 1);
 
         FitsHistogram hist = FitsHistogram.fromFitsImage(hi);
         hist.reSize(0.8f);
-        vs.addGlyph(hist);
+        mnSpace.addGlyph(hist);
         rs = new RangeSelection();
         double min = hi.getUnderlyingImage().getHistogram().getMin();
         double max = hi.getUnderlyingImage().getHistogram().getMax();
         rs.setTicksVal((scaleBounds[0]-min)/(max-min), (scaleBounds[1]-min)/(max-min));
-        vs.addGlyph(rs);
+        mnSpace.addGlyph(rs);
         rs.move(0, -30);
         
         // example fake gradient
         Point2D start = new Point2D.Float(0,0);
         Point2D end = new Point2D.Float(200,0);
 
-        MultipleGradientPaint nopGrad = Utils.makeGradient(new NopFilter());
-        vs.addGlyph(new PRectangle(0, -200, 0, 200, 20, nopGrad, Color.BLACK));
 
-        MultipleGradientPaint heatGrad = Utils.makeGradient(new HeatFilter());
-        vs.addGlyph(new PRectangle(0, -250, 0, 200, 20, heatGrad, Color.BLACK));
-
-        MultipleGradientPaint rainbowGrad = Utils.makeGradient(new RainbowFilter());
-        vs.addGlyph(new PRectangle(0, -300, 0, 200, 20, rainbowGrad, Color.BLACK));
         
     }
+
+    void initGUI(FitsOptions options){
+        windowLayout();
+        vsm = VirtualSpaceManager.INSTANCE;
+        mSpace = vsm.addVirtualSpace(mSpaceName);
+        bSpace = vsm.addVirtualSpace(bSpaceName);
+        mnSpace = vsm.addVirtualSpace(mnSpaceName);
+        mCamera = mSpace.addCamera();
+        bCamera = bSpace.addCamera();
+        mnCamera = mnSpace.addCamera();
+        Vector<Camera> cameras = new Vector<Camera>();
+        cameras.add(mCamera);
+        cameras.add(bCamera);
+        cameras.add(mnCamera);
+        mView = vsm.addFrameView(cameras, APP_TITLE, View.STD_VIEW, VIEW_W, VIEW_H, false, false, !options.fullscreen, null);
+        // fullscreen or not
+        if (options.fullscreen && GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().isFullScreenSupported()){
+            GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow((JFrame)mView.getFrame());
+        }
+        else {
+            mView.setVisible(true);
+        }
+
+        menu = new FitsMenu(this);
+        
+        eh = new PanZoomEventHandler(this);
+        //mCamera.addListener(eh);
+        mView.setListener(eh, 0);
+        mView.setListener(eh, 1);
+        mView.setListener(menu, 2);
+
+        mView.setBackgroundColor(BACKGROUND_COLOR);
+
+        //mView.setActiveLayer(2);
+
+    }
+
+    public void setColorFilter(ImageFilter filter){
+
+        hi.setColorFilter(filter);
+    }
+
+    public void setScaleMethod(int scale){
+        switch(scale){
+            case FITSImage.SCALE_ASINH:
+                hi.setScaleMethod(FitsImage.ScaleMethod.ASINH);
+                break;
+            case FITSImage.SCALE_HISTOGRAM_EQUALIZATION:
+                hi.setScaleMethod(FitsImage.ScaleMethod.HISTOGRAM_EQUALIZATION);
+                break;
+            case FITSImage.SCALE_LINEAR:
+                hi.setScaleMethod(FitsImage.ScaleMethod.LINEAR);
+                break;
+            case FITSImage.SCALE_LOG:
+                hi.setScaleMethod(FitsImage.ScaleMethod.LOG);
+                break;
+            case FITSImage.SCALE_SQUARE:
+                hi.setScaleMethod(FitsImage.ScaleMethod.SQUARE);
+                break;
+            case FITSImage.SCALE_SQUARE_ROOT:
+                hi.setScaleMethod(FitsImage.ScaleMethod.SQUARE_ROOT);
+                break;
+            default:
+                hi.setScaleMethod(FitsImage.ScaleMethod.LINEAR);
+                break;
+        }
+    }
+
+    public boolean isRunningOnCluster(){
+        return false;
+    }
+
+    int getDisplayWidth(){
+        return (SCREEN_WIDTH > VIEW_MAX_W) ? VIEW_MAX_W : SCREEN_WIDTH;
+    }
+
+    int getDisplayHeight(){
+        return (SCREEN_HEIGHT > VIEW_MAX_H) ? VIEW_MAX_H : SCREEN_HEIGHT;
+    }
+
+    int getColumnCount(){
+        return 1;
+    }
+
+    int getRowCount(){
+        return 1;
+    }
+
+    void windowLayout(){
+
+        VIEW_X = 80;
+        SCREEN_WIDTH -= 80;
+
+        /*
+        if (Utils.osIsWindows()){
+            VIEW_X = VIEW_Y = 0;
+        }
+        else if (Utils.osIsMacOS()){
+            VIEW_X = 80;
+            SCREEN_WIDTH -= 80;
+        }
+        */
+        VIEW_W = (SCREEN_WIDTH <= VIEW_MAX_W) ? SCREEN_WIDTH : VIEW_MAX_W;
+        VIEW_H = (SCREEN_HEIGHT <= VIEW_MAX_H) ? SCREEN_HEIGHT : VIEW_MAX_H;
+    }
+
+
 
     private Point2D.Double viewToSpace(Camera cam, int jpx, int jpy){
         Location camLoc = cam.getLocation();
         double focal = cam.getFocal();
         double altCoef = (focal + camLoc.alt) / focal;
-        Dimension viewSize = view.getPanelSize();
+        Dimension viewSize = mView.getPanelSize();
 
         //find coords of view origin in the virtual space
         double viewOrigX = camLoc.vx - (0.5*viewSize.width*altCoef);
@@ -147,127 +299,9 @@ public class FitsExample {
         }
 
         new FitsExample(options);
-
-        /*
-        if(args.length == 0){
-            System.err.println("usage: FitsExample image_URL");
-            return;
-        }    
-		new FitsExample(args[0]);
-        */
 	}
 
-	private class PanZoomEventHandler implements ViewListener {
-		private int lastJPX;
-		private int lastJPY;
-
-		public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-            Point2D.Double cursorPos = viewToSpace(vsm.getActiveCamera(), jpx, jpy);
-            if(rs.overLeftTick(cursorPos.x, cursorPos.y)){
-                dragLeft = true;
-            } else if(rs.overRightTick(cursorPos.x, cursorPos.y)){
-                dragRight = true;
-            }
-        }
-
-		public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-            dragLeft = false;
-            dragRight = false;
-            double min = hi.getUnderlyingImage().getHistogram().getMin();
-            double max = hi.getUnderlyingImage().getHistogram().getMax();
-            hi.rescale(min + rs.getLeftValue()*(max - min),
-                    min + rs.getRightValue()*(max - min),
-                    1);
-        }
-
-		public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
-
-		public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
-
-		public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
-
-		public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
-
-		public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-			lastJPX=jpx;
-			lastJPY=jpy;
-			v.setDrawDrag(true);
-			vsm.getActiveView().mouse.setSensitivity(false);
-			//because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
-		}
-
-		public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-			v.cams[0].setXspeed(0);
-			v.cams[0].setYspeed(0);
-			v.cams[0].setZspeed(0);
-			v.setDrawDrag(false);
-			vsm.getActiveView().mouse.setSensitivity(true);
-		}
-
-		public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
-
-		public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){}
-
-		public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
-            if(buttonNumber == 1){
-                if(dragLeft) {
-                    rs.setLeftTickPos(viewToSpace(vsm.getActiveCamera(), jpx, jpy).x);
-                } else if(dragRight){
-                    rs.setRightTickPos(viewToSpace(vsm.getActiveCamera(), jpx, jpy).x);
-                }
-            }
-
-			if (buttonNumber == 3 || ((mod == META_MOD || mod == META_SHIFT_MOD) && buttonNumber == 1)){
-				Camera c=vsm.getActiveCamera();
-				double a=(c.focal+Math.abs(c.altitude))/c.focal;
-				if (mod == META_SHIFT_MOD) {
-					v.cams[0].setXspeed(0);
-					v.cams[0].setYspeed(0);
-					v.cams[0].setZspeed((c.altitude>0) ? (lastJPY-jpy)*(a/4.0) : (lastJPY-jpy)/(a*4));
-
-				}
-				else {
-					v.cams[0].setXspeed((c.altitude>0) ? (jpx-lastJPX)*(a/4.0) : (jpx-lastJPX)/(a*4));
-					v.cams[0].setYspeed((c.altitude>0) ? (lastJPY-jpy)*(a/4.0) : (lastJPY-jpy)/(a*4));
-					v.cams[0].setZspeed(0);
-				}
-			}
-		}
-
-		public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){}
-
-		public void enterGlyph(Glyph g){
-		}
-
-		public void exitGlyph(Glyph g){
-		}
-
-		public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){
-            if(c == '-'){
-                scaleBounds[1] -= 100;
-                hi.rescale(scaleBounds[0], scaleBounds[1], 1);
-            } else if (c == '+'){
-                scaleBounds[1] += 100;
-                hi.rescale(scaleBounds[0], scaleBounds[1], 1);
-            }
-        }
-
-		public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
-		}
-
-		public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
-
-		public void viewActivated(View v){}
-
-		public void viewDeactivated(View v){}
-
-		public void viewIconified(View v){}
-
-		public void viewDeiconified(View v){}
-
-		public void viewClosing(View v){System.exit(0);}
-
-	}
+	
     
 }
 
