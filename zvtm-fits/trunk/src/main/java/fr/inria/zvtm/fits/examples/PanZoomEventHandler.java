@@ -41,9 +41,9 @@ class PanZoomEventHandler implements ViewListener {
 	public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
         /*
         Point2D.Double cursorPos = viewToSpace(vsm.getActiveCamera(), jpx, jpy);
-        if(rs.overLeftTick(cursorPos.x, cursorPos.y)){
+        if(app.rs.overLeftTick(cursorPos.x, cursorPos.y)){
             dragLeft = true;
-        } else if(rs.overRightTick(cursorPos.x, cursorPos.y)){
+        } else if(app.rs.overRightTick(cursorPos.x, cursorPos.y)){
             dragRight = true;
         }
         */
@@ -55,11 +55,12 @@ class PanZoomEventHandler implements ViewListener {
         dragRight = false;
         double min = hi.getUnderlyingImage().getHistogram().getMin();
         double max = hi.getUnderlyingImage().getHistogram().getMax();
-        app.hi.rescale(min + rs.getLeftValue()*(max - min),
-                min + rs.getRightValue()*(max - min),
+        app.hi.rescale(min + app.rs.getLeftValue()*(max - min),
+                min + app.rs.getRightValue()*(max - min),
                 1);
-        //v.parent.setActiveLayer(0);
         */
+        //v.parent.setActiveLayer(0);
+        
     }
 
 	public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
@@ -93,8 +94,9 @@ class PanZoomEventHandler implements ViewListener {
 	public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
 
         //System.out.println(app.menu.BORDER_BOTTON_HISTOGRAM + " > " + jpy + " > " + app.menu.BORDER_TOP_HISTOGRAM);
+        //System.out.println(app.menu.BORDER_LEFT_HISTOGRAM + " < " + jpx + " < " + app.menu.BORDER_RIGHT_HISTOGRAM);
 
-        if((jpx < app.WIDTH_MENU && jpy > app.menu.BORDER_BOTTON_FILTER && jpy < app.menu.BORDER_TOP_FILTER) || (jpy > app.menu.BORDER_TOP_HISTOGRAM && jpy < app.menu.BORDER_BOTTON_HISTOGRAM)){
+        if((jpx < app.WIDTH_MENU && jpy > app.menu.BORDER_BOTTON_FILTER && jpy < app.menu.BORDER_TOP_FILTER) || (jpy > app.menu.BORDER_TOP_HISTOGRAM && jpy < app.menu.BORDER_BOTTON_HISTOGRAM && jpx > app.menu.BORDER_LEFT_HISTOGRAM && jpx < app.menu.BORDER_RIGHT_HISTOGRAM )){
             v.parent.setActiveLayer(2);
             v.parent.setCursorIcon(Cursor.DEFAULT_CURSOR);
         } else {

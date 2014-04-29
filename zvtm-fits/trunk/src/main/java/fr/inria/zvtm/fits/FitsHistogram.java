@@ -23,26 +23,39 @@ import edu.jhu.pha.sdss.fits.FITSImage;
  * Graphical representation of an histogram
  */
 public class FitsHistogram extends Composite {
-    private static final double DEFAULT_BIN_WIDTH = 6;
-    private static final Color DEFAULT_FILL_COLOR = new Color(0,0,255,127);
+    public static final double DEFAULT_BIN_WIDTH = 6;
+    public static final Color DEFAULT_FILL_COLOR = new Color(0,0,255,127);
+    public static final Color SELECTED_FILL_COLOR = new Color(0,0,255,210);
     private static final Color DEFAULT_BORDER_COLOR = new Color(0,0,255,180);
+
     double width;
     double height = 100;
+    VRectangle[] bars = new VRectangle[128]; 
 
     public FitsHistogram(int[] data, int min, int max, Color fillColor){
-        int i = 0;
         
-        for(int val: data){
-            double h = (Math.sqrt(val) * height) / Math.sqrt(max - min); 
-            VRectangle bar = new VRectangle(i, h/2, FitsMenu.Z_BUTTON, DEFAULT_BIN_WIDTH, h, 
-                    fillColor);
+        width = DEFAULT_BIN_WIDTH*data.length;
+        VRectangle backgrown = new VRectangle(width/2, height/2, FitsMenu.Z_BUTTON, width, height, Color.GRAY, Color.BLACK, 0.2f);
+        addChild(backgrown);
+
+        int i = 0;
+        //int val;
+        for(int j = 0; j< data.length; j++){
+            //val = data[j];
+            double h = (Math.sqrt(data[j]) * height) / Math.sqrt(max - min);
+            int hh = (int)(h);
+            hh = ( hh % 2 == 0) ? hh : hh + 1;
+            VRectangle bar = new VRectangle(i+DEFAULT_BIN_WIDTH/2, (int)(hh/2), FitsMenu.Z_BUTTON, DEFAULT_BIN_WIDTH, (int)(hh), fillColor);
             bar.setBorderColor(DEFAULT_BORDER_COLOR);
             addChild(bar);
+            bars[j] = bar;
             i += DEFAULT_BIN_WIDTH;
         }
-        width = DEFAULT_BIN_WIDTH*data.length;
-        VRectangle backgrown = new VRectangle(width/2 - 5, height/2 - 5, FitsMenu.Z_BUTTON+1, width + 20, height + 30, Color.GRAY, Color.BLACK, 0.2f);
-        addChild(backgrown);
+        
+    }
+
+    public VRectangle[] getBars(){
+        return bars;
     }
 
     public FitsHistogram(int[] data, int min, int max){
@@ -52,7 +65,8 @@ public class FitsHistogram extends Composite {
     //Scale method linear
     public static FitsHistogram fromFitsImage(FitsImage image, Color fillColor){
         Histogram hist = image.getUnderlyingImage().getHistogram();
-        int[] data = new int[128]; 
+        int[] data = new int[128];
+        
         for(int i=0; i<hist.getCounts().length; ++i){
             data[i/(hist.getCounts().length / data.length)] += hist.getCounts()[i];
         }

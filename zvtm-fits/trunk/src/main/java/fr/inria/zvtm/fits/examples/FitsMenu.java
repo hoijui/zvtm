@@ -23,6 +23,7 @@ import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.FitsImage;
 import fr.inria.zvtm.glyphs.VText;
+import fr.inria.zvtm.glyphs.VRectangle;
 
 import java.awt.Font;
 import java.awt.Cursor;
@@ -74,6 +75,10 @@ public class FitsMenu implements ViewListener{
 
 	public int BORDER_TOP_HISTOGRAM;
 	public int BORDER_BOTTON_HISTOGRAM;
+	public int BORDER_LEFT_HISTOGRAM;
+	public int BORDER_RIGHT_HISTOGRAM;
+
+//	int CONST = 636;
 
 	//public static final FitsImage.ScaleMethod[] SCALE_METHOD = {FitsImage.ScaleMethod.ASINH, FitsImage.ScaleMethod.HISTOGRAM_EQUALIZATION, FitsImage.ScaleMethod.LINEAR, FitsImage.ScaleMethod.LOG, FitsImage.ScaleMethod.SQUARE, FitsImage.ScaleMethod.SQUARE_ROOT};
 	
@@ -86,8 +91,9 @@ public class FitsMenu implements ViewListener{
 
 	FitsHistogram hist;
 
-	//int scale_method;
+	int lastJPX;
 
+	VRectangle shadow;
 
 	FitsMenu(FitsExample app){
 		this.app = app;
@@ -124,18 +130,21 @@ public class FitsMenu implements ViewListener{
 			//mnSpace.addGlyph(ln);
 	        py -= (HEIGHT_BUTTON + 2*BORDER);
 		}
-
 		BORDER_BOTTON_FILTER = py + HEIGHT_BUTTON - 2*BORDER;
 	}
 
 	public void drawHistogram(){
-		BORDER_TOP_HISTOGRAM = (int)(app.VIEW_H - 180);
+
 		if(app.hi != null){
 			hist = FitsHistogram.fromFitsImage(app.hi);
 			hist.moveTo(-app.VIEW_W/2 + (app.VIEW_W - hist.getWidth())/2 , -app.VIEW_H/2 + 50);
 	        mnSpace.addGlyph(hist);
 		}
-		BORDER_BOTTON_HISTOGRAM = app.VIEW_H;
+
+		BORDER_TOP_HISTOGRAM = (int)(app.VIEW_H - hist.getHeight() - 65 );
+		BORDER_BOTTON_HISTOGRAM = app.VIEW_H - 65;
+		BORDER_LEFT_HISTOGRAM = (int)( (app.VIEW_W - hist.getWidth())/2 - 2*FitsHistogram.DEFAULT_BIN_WIDTH) ;
+		BORDER_RIGHT_HISTOGRAM = (int)( (app.VIEW_W + hist.getWidth())/2 + 2*FitsHistogram.DEFAULT_BIN_WIDTH) ;
 	}
 /*
 	public void redrawHistogram(){
@@ -199,11 +208,79 @@ public class FitsMenu implements ViewListener{
 	}
 */
 
-	public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+	public void press1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){
+		if(jpy > app.menu.BORDER_TOP_HISTOGRAM && jpy < app.menu.BORDER_BOTTON_HISTOGRAM){
+			lastJPX = jpx;
+			if(shadow != null)
+				app.mnSpace.removeGlyph(shadow);
+			/*
+			VRectangle[] bars = hist.getBars();
+			for(VRectangle b : bars){
+				b.setColor(FitsHistogram.SELECTED_FILL_COLOR);
+			}
+			*/
+		}
+	}
 
-	public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+	public void release1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){
+		if(jpy > app.menu.BORDER_TOP_HISTOGRAM && jpy < app.menu.BORDER_BOTTON_HISTOGRAM){
+			/*
+			VRectangle[] bars = hist.getBars();
+			for(VRectangle b : bars){
+				if(b.getLocation().getX() > ((lastJPX < jpx)? lastJPX : jpx) - app.VIEW_W/2 && b.getLocation().getX() < ((lastJPX < jpx)? jpx : lastJPX) - app.VIEW_W/2){
+					b.setColor(FitsHistogram.DEFAULT_FILL_COLOR);
+				}
+			}
+			*/
 
-	public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
+			double min = app.hi.getUnderlyingImage().getHistogram().getMin();
+        	double max = app.hi.getUnderlyingImage().getHistogram().getMax();
+			
+			double left = ( ((lastJPX < jpx)? lastJPX : jpx) - (app.VIEW_W - hist.getWidth())/2 ) / hist.getWidth();
+			double right = ( ((lastJPX < jpx)? jpx : lastJPX) - (app.VIEW_W - hist.getWidth())/2 ) / hist.getWidth();
+			left = (left < 0) ? 0 : left;
+			right = (right > 1) ? 1 : right;
+			app.hi.rescale(min + left*(max - min), min + right*(max - min), 1);
+
+			if(lastJPX < jpx){
+				if(lastJPX < BORDER_LEFT_HISTOGRAM)
+					lastJPX = BORDER_LEFT_HISTOGRAM;
+				if(jpx > BORDER_RIGHT_HISTOGRAM)
+					jpx = BORDER_RIGHT_HISTOGRAM;
+			} else {
+				if(jpx < BORDER_LEFT_HISTOGRAM)
+					jpx = BORDER_LEFT_HISTOGRAM;
+				if(lastJPX > BORDER_RIGHT_HISTOGRAM)
+					lastJPX = BORDER_RIGHT_HISTOGRAM;
+			}
+
+			shadow = new VRectangle( ((lastJPX < jpx)? lastJPX : jpx) + Math.abs(lastJPX - jpx)/2 - app.VIEW_W/2, -app.VIEW_H/2 + 100, Z_BUTTON, Math.abs(lastJPX - jpx), hist.getHeight() + 10, Color.WHITE, Color.BLACK, .2f);
+			app.mnSpace.addGlyph(shadow);
+
+			lastJPX = 0;
+		}
+	}
+
+	public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
+		//System.out.println("clickNumber: " + clickNumber);
+		if(clickNumber == 2){
+			double min = app.hi.getUnderlyingImage().getHistogram().getMin();
+        	double max = app.hi.getUnderlyingImage().getHistogram().getMax();
+			double left = 0;
+			double right = 1;
+			app.hi.rescale(min + left*(max - min), min + right*(max - min), 1);
+
+			if(shadow != null)
+				app.mnSpace.removeGlyph(shadow);
+
+			/*
+			VRectangle[] bars = hist.getBars();
+			for(VRectangle b : bars){
+				b.setColor(FitsHistogram.DEFAULT_FILL_COLOR);
+			}
+			*/
+		}
+	}
 
 	public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
@@ -218,10 +295,11 @@ public class FitsMenu implements ViewListener{
 	public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
 	public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
-	
 		//System.out.println(app.menu.BORDER_BOTTON_HISTOGRAM + " > " + jpy + " > " + app.menu.BORDER_TOP_HISTOGRAM);
-
-        if((jpx < app.WIDTH_MENU && jpy > app.menu.BORDER_BOTTON_FILTER && jpy < app.menu.BORDER_TOP_FILTER) || (jpy > app.menu.BORDER_TOP_HISTOGRAM && jpy < app.menu.BORDER_BOTTON_HISTOGRAM)){
+		//System.out.println(hist.vx + " " + hist.vy + " " + hist.getWidth() + " " + hist.getHeight());
+		//System.out.println(BORDER_LEFT_HISTOGRAM + " < " + jpx + " < " + BORDER_RIGHT_HISTOGRAM);
+        if((jpx < app.WIDTH_MENU && jpy > app.menu.BORDER_BOTTON_FILTER && jpy < app.menu.BORDER_TOP_FILTER) ||
+          (jpy > app.menu.BORDER_TOP_HISTOGRAM && jpy < app.menu.BORDER_BOTTON_HISTOGRAM && jpx > app.menu.BORDER_LEFT_HISTOGRAM && jpx < app.menu.BORDER_RIGHT_HISTOGRAM )){
             v.parent.setActiveLayer(2);
             v.parent.setCursorIcon(Cursor.DEFAULT_CURSOR);
         } else {

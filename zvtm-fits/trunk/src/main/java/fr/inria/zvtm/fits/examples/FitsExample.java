@@ -142,25 +142,27 @@ public class FitsExample {
         menu.drawHistogram();
 
 
-        //scaleBounds = ZScale.computeScale(hi.getUnderlyingImage());
+        scaleBounds = ZScale.computeScale(hi.getUnderlyingImage());
         //hi.rescale(scaleBounds[0], scaleBounds[1], 1);
-        //System.out.println(scaleBounds[0] + ", " + scaleBounds[1]);
+        System.out.println(scaleBounds[0] + ", " + scaleBounds[1]);
 
         //FitsHistogram hist = FitsHistogram.fromFitsImage(hi);
+        
+        //hist.reSize(0.8f);
+        //mnSpace.addGlyph(hist);
         /*
-        hist.reSize(0.8f);
-        mnSpace.addGlyph(hist);
-        //rs = new RangeSelection();
+        rs = new RangeSelection();
         double min = hi.getUnderlyingImage().getHistogram().getMin();
         double max = hi.getUnderlyingImage().getHistogram().getMax();
-        //rs.setTicksVal((scaleBounds[0]-min)/(max-min), (scaleBounds[1]-min)/(max-min));
-        //mnSpace.addGlyph(rs);
-        //rs.move(0, -30);
+        rs.setTicksVal((scaleBounds[0]-min)/(max-min), (scaleBounds[1]-min)/(max-min));
+
+        mSpace.addGlyph(rs);
+        rs.move(0, -30);
         
         // example fake gradient
         Point2D start = new Point2D.Float(0,0);
         Point2D end = new Point2D.Float(200,0);
-    */
+        */
 
         
     }
