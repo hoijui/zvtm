@@ -22,17 +22,26 @@ import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.FitsImage;
+import fr.inria.zvtm.glyphs.VText;
 
+import java.awt.Font;
 import java.awt.Cursor;
 import java.awt.image.ImageFilter;
 import java.awt.image.RGBImageFilter;
 import java.awt.geom.Point2D;
+
+import java.awt.BasicStroke;
+import java.awt.Stroke;
 
 import edu.jhu.pha.sdss.fits.FITSImage;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+
+import java.util.Vector;
+
+import fr.inria.zvtm.fits.FitsHistogram;
 
 
 public class FitsMenu implements ViewListener{
@@ -42,6 +51,10 @@ public class FitsMenu implements ViewListener{
 
 	public static final int HEIGHT_BUTTON = 20;
 	public static final Color BORDER_COLOR_BTN = Color.BLACK;
+	public static final Color TEXT_COLOR_BUTTON = Color.RED;
+	public static final Font FONT_BUTTON = new Font("Bold", Font.PLAIN, 11);
+	//public static final Color LINE_COLOR = Color.RED;
+	//public static final Stroke LINE_STROKE = new BasicStroke(1f);
 
 	private static final int BORDER = 5;
 
@@ -53,31 +66,48 @@ public class FitsMenu implements ViewListener{
 	public static final ColorGradient[] COLOR_GRADIANT = {new NopFilter(), new HeatFilter(), new RainbowFilter(), new MousseFilter(), new StandardFilter(), new RandomFilter()};
 
 	public static final int[] SCALE_METHOD = {FITSImage.SCALE_ASINH, FITSImage.SCALE_HISTOGRAM_EQUALIZATION, FITSImage.SCALE_LINEAR, FITSImage.SCALE_LOG, FITSImage.SCALE_SQUARE, FITSImage.SCALE_SQUARE_ROOT};
-	//public static final FitsImage.ScaleMethod[] SCALE_METHOD = {FitsImage.ScaleMethod.ASINH, FitsImage.ScaleMethod.HISTOGRAM_EQUALIZATION, FitsImage.ScaleMethod.LINEAR, FitsImage.ScaleMethod.LOG, FitsImage.ScaleMethod.SQUARE, FitsImage.ScaleMethod.SQUARE_ROOT};
+	public static final String[] SCALE_NAME = {"ASINH", "HISTOGRAM_EQUALIZATION", "LINEAR", "LOG", "SQUARE", "SQUARE_ROOT"};
 
+
+	public int BORDER_BOTTON_FILTER;
+	public int BORDER_TOP_FILTER;
+
+	public int BORDER_TOP_HISTOGRAM;
+	public int BORDER_BOTTON_HISTOGRAM;
+
+	//public static final FitsImage.ScaleMethod[] SCALE_METHOD = {FitsImage.ScaleMethod.ASINH, FitsImage.ScaleMethod.HISTOGRAM_EQUALIZATION, FitsImage.ScaleMethod.LINEAR, FitsImage.ScaleMethod.LOG, FitsImage.ScaleMethod.SQUARE, FitsImage.ScaleMethod.SQUARE_ROOT};
+	
+	//private static Vector<Point2D.Double> ASINH;
+	//private static double FACTOR_H_ASINH = (HEIGHT_BUTTON-2)/2/3;
+	//private static double FACTOR_W_ASINH = (WIDTH_MENU - 2*BORDER)/4;
 
 	FitsExample app;
 	VirtualSpace mnSpace;
+
+	FitsHistogram hist;
+
+	//int scale_method;
 
 
 	FitsMenu(FitsExample app){
 		this.app = app;
 		mnSpace = app.mnSpace;
 		drawFiltersColor();
-
 	}
 
 	private void drawFiltersColor(){
 
-		System.out.println("view_h: " + app.VIEW_H);
+		BORDER_TOP_FILTER =  app.VIEW_H/2;
+
 		int py = app.VIEW_H/2 - 2*HEIGHT_BUTTON - BORDER;
+		
 		for(int i = 0; i < COLOR_GRADIANT.length; i++){
 			MultipleGradientPaint grad = Utils.makeGradient((RGBImageFilter)COLOR_GRADIANT[i]);
 			PRectangle filter = new PRectangle(-app.VIEW_W/2 + WIDTH_MENU/2 + BORDER, py, Z_BUTTON, WIDTH_MENU - 2*BORDER, HEIGHT_BUTTON, grad, BORDER_COLOR_BTN);
 	        filter.setType(T_FILTER);
 	        filter.setOwner(COLOR_GRADIANT[i]);
 	        mnSpace.addGlyph(filter);
-	        py -= HEIGHT_BUTTON + 2*BORDER;
+	        py -= (HEIGHT_BUTTON + 2*BORDER);
 		}
 
 		for(int i = 0; i < SCALE_METHOD.length; i++){
@@ -85,9 +115,89 @@ public class FitsMenu implements ViewListener{
 			filter.setType(T_SCALE);
 			filter.setOwner(SCALE_METHOD[i]);
 			mnSpace.addGlyph(filter);
-	        py -= HEIGHT_BUTTON + 2*BORDER;
+
+			VText scaleText = new VText(-app.VIEW_W/2 + WIDTH_MENU/2 + BORDER , py - BORDER, Z_BUTTON, TEXT_COLOR_BUTTON, SCALE_NAME[i], VText.TEXT_ANCHOR_MIDDLE);
+			scaleText.setFont(FONT_BUTTON);
+			mnSpace.addGlyph(scaleText);
+			//Glyph ln = drawMethod(SCALE_METHOD[i]);
+			//ln.moveTo(-app.VIEW_W/2 + WIDTH_MENU/2 + BORDER , py);
+			//mnSpace.addGlyph(ln);
+	        py -= (HEIGHT_BUTTON + 2*BORDER);
 		}
+
+		BORDER_BOTTON_FILTER = py + HEIGHT_BUTTON - 2*BORDER;
 	}
+
+	public void drawHistogram(){
+		BORDER_TOP_HISTOGRAM = (int)(app.VIEW_H - 180);
+		if(app.hi != null){
+			hist = FitsHistogram.fromFitsImage(app.hi);
+			hist.moveTo(-app.VIEW_W/2 + (app.VIEW_W - hist.getWidth())/2 , -app.VIEW_H/2 + 50);
+	        mnSpace.addGlyph(hist);
+		}
+		BORDER_BOTTON_HISTOGRAM = app.VIEW_H;
+	}
+/*
+	public void redrawHistogram(){
+		mnSpace.removeGlyph(hist);
+		hist = FitsHistogram.fromFitsImage(app.hi, scale_method);
+		hist.moveTo(-app.VIEW_W/2 + (app.VIEW_W - hist.getWidth())/2 , -app.VIEW_H/2 + 50);
+        mnSpace.addGlyph(hist);
+	}
+*/
+
+/*
+	private Glyph drawMethod(int scaleMethod){
+		DPath ln;
+
+		switch(scaleMethod){
+			case FITSImage.SCALE_ASINH:
+				ASINH = new Vector<Point2D.Double>();
+				double x = -2;
+				double y;
+				while(x <= 2){
+					y = Math.log(x+Math.sqrt(1+x*x));
+					ASINH.add(new Point2D.Double(x,y));
+					x+=0.1;
+				}
+				ln = new DPath(ASINH.get(0).getX()*FACTOR_W_ASINH, ASINH.get(0).getY()*FACTOR_H_ASINH, Z_BUTTON, LINE_COLOR, 1f);
+				for(Point2D.Double p : ASINH){
+					ln.addSegment(p.getX()*FACTOR_W_ASINH, p.getY()*FACTOR_H_ASINH, true);
+				}
+				break;
+			case FITSImage.SCALE_HISTOGRAM_EQUALIZATION:
+				ln = new DPath(ASINH.get(0).getX(), ASINH.get(0).getY(), Z_BUTTON, LINE_COLOR, 1f);
+				for(Point2D.Double p : ASINH){
+					ln.addSegment(p.getX(), p.getY(), true);
+				}
+				break;
+			case FITSImage.SCALE_LINEAR:
+				ln = new DPath(0, 0, Z_BUTTON, LINE_COLOR, 1f);
+				ln.addSegment(WIDTH_MENU - 2*BORDER, 0, true);
+				break;
+			case FITSImage.SCALE_SQUARE:
+				ln = new DPath(ASINH.get(0).getX(), ASINH.get(0).getY(), Z_BUTTON, LINE_COLOR, 1f);
+				for(Point2D.Double p : ASINH){
+					ln.addSegment(p.getX(), p.getY(), true);
+				}
+				break;
+			case FITSImage.SCALE_SQUARE_ROOT:
+				ln = new DPath(ASINH.get(0).getX(), ASINH.get(0).getY(), Z_BUTTON, LINE_COLOR, 1f);
+				for(Point2D.Double p : ASINH){
+					ln.addSegment(p.getX(), p.getY(), true);
+				}
+				break;
+			default:
+				ln = new DPath(ASINH.get(0).getX(), ASINH.get(0).getY(), Z_BUTTON, LINE_COLOR, 1f);
+				for(Point2D.Double p : ASINH){
+					ln.addSegment(p.getX(), p.getY(), true);
+				}
+				break;
+		}
+		ln.setStroke(LINE_STROKE);
+		return ln;
+	}
+*/
 
 	public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
@@ -108,7 +218,10 @@ public class FitsMenu implements ViewListener{
 	public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
 	public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
-        if(jpx < app.WIDTH_MENU){
+	
+		//System.out.println(app.menu.BORDER_BOTTON_HISTOGRAM + " > " + jpy + " > " + app.menu.BORDER_TOP_HISTOGRAM);
+
+        if((jpx < app.WIDTH_MENU && jpy > app.menu.BORDER_BOTTON_FILTER && jpy < app.menu.BORDER_TOP_FILTER) || (jpy > app.menu.BORDER_TOP_HISTOGRAM && jpy < app.menu.BORDER_BOTTON_HISTOGRAM)){
             v.parent.setActiveLayer(2);
             v.parent.setCursorIcon(Cursor.DEFAULT_CURSOR);
         } else {
@@ -128,6 +241,7 @@ public class FitsMenu implements ViewListener{
             app.setColorFilter((ImageFilter)g.getOwner());
         } else if(g.getType().equals(T_SCALE)){
         	app.setScaleMethod((Integer)g.getOwner());
+        	//scale_method = (Integer)g.getOwner();
         }
 
 	}

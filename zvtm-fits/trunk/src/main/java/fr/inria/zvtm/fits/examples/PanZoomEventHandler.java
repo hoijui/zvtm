@@ -92,7 +92,9 @@ class PanZoomEventHandler implements ViewListener {
 
 	public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
 
-        if(jpx < app.WIDTH_MENU){
+        //System.out.println(app.menu.BORDER_BOTTON_HISTOGRAM + " > " + jpy + " > " + app.menu.BORDER_TOP_HISTOGRAM);
+
+        if((jpx < app.WIDTH_MENU && jpy > app.menu.BORDER_BOTTON_FILTER && jpy < app.menu.BORDER_TOP_FILTER) || (jpy > app.menu.BORDER_TOP_HISTOGRAM && jpy < app.menu.BORDER_BOTTON_HISTOGRAM)){
             v.parent.setActiveLayer(2);
             v.parent.setCursorIcon(Cursor.DEFAULT_CURSOR);
         } else {

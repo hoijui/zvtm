@@ -15,31 +15,41 @@ import fr.inria.zvtm.glyphs.FitsImage;
 import fr.inria.zvtm.glyphs.VRectangle;
 import edu.jhu.pha.sdss.fits.Histogram;
 
+import fr.inria.zvtm.fits.examples.FitsMenu;
+
+import edu.jhu.pha.sdss.fits.FITSImage; 
+
 /**
  * Graphical representation of an histogram
  */
 public class FitsHistogram extends Composite {
-    private static final double DEFAULT_BIN_WIDTH = 8;
+    private static final double DEFAULT_BIN_WIDTH = 6;
     private static final Color DEFAULT_FILL_COLOR = new Color(0,0,255,127);
     private static final Color DEFAULT_BORDER_COLOR = new Color(0,0,255,180);
+    double width;
+    double height = 100;
 
     public FitsHistogram(int[] data, int min, int max, Color fillColor){
         int i = 0;
-        double height = 100;
+        
         for(int val: data){
             double h = (Math.sqrt(val) * height) / Math.sqrt(max - min); 
-            VRectangle bar = new VRectangle(i, h/2, 0, DEFAULT_BIN_WIDTH, h, 
+            VRectangle bar = new VRectangle(i, h/2, FitsMenu.Z_BUTTON, DEFAULT_BIN_WIDTH, h, 
                     fillColor);
             bar.setBorderColor(DEFAULT_BORDER_COLOR);
             addChild(bar);
             i += DEFAULT_BIN_WIDTH;
         }
+        width = DEFAULT_BIN_WIDTH*data.length;
+        VRectangle backgrown = new VRectangle(width/2 - 5, height/2 - 5, FitsMenu.Z_BUTTON+1, width + 20, height + 30, Color.GRAY, Color.BLACK, 0.2f);
+        addChild(backgrown);
     }
 
     public FitsHistogram(int[] data, int min, int max){
         this(data, min, max, DEFAULT_FILL_COLOR);
     }
 
+    //Scale method linear
     public static FitsHistogram fromFitsImage(FitsImage image, Color fillColor){
         Histogram hist = image.getUnderlyingImage().getHistogram();
         int[] data = new int[128]; 
@@ -59,9 +69,18 @@ public class FitsHistogram extends Composite {
         return new FitsHistogram(data, min, max, fillColor);
     }
 
+
+    public double getHeight(){
+        return height;
+    }
+    public double getWidth(){
+        return width;
+    }
+
     public static FitsHistogram fromFitsImage(FitsImage image){
         return fromFitsImage(image, DEFAULT_FILL_COLOR);
     }
+
 
 }
 
