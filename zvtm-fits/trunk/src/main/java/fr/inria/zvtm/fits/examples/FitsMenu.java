@@ -65,6 +65,8 @@ public class FitsMenu implements ViewListener{
 	public static final String T_SCALE = "Scl";
 	public static final String T_SCROLL = "Scrll";
 
+	public static final float WHEEL_FACTOR = 15.0f;
+
 
 	public static final ColorGradient[] COLOR_GRADIANT = {new NopFilter(), new HeatFilter(), new RainbowFilter(), new MousseFilter(), new StandardFilter(), new RandomFilter()};
 
@@ -342,7 +344,30 @@ public class FitsMenu implements ViewListener{
         }
 	}
 
-	public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){}
+	public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
+
+		if(shadow != null){
+
+			double mvx = v.getVCursor().getVSXCoordinate();
+        	double mvy = v.getVCursor().getVSYCoordinate();
+
+			if(wheelDirection == WHEEL_UP){
+				if((shadow.vx+shadow.vw/2 + app.VIEW_W/2) < BORDER_RIGHT_HISTOGRAM ) shadow.move( WHEEL_FACTOR, 0 );
+			} else {
+				if((shadow.vx-shadow.vw/2 + app.VIEW_W/2) > BORDER_LEFT_HISTOGRAM ) shadow.move( -WHEEL_FACTOR, 0 );
+			}
+
+			double min = app.hi.getUnderlyingImage().getHistogram().getMin();
+        	double max = app.hi.getUnderlyingImage().getHistogram().getMax();
+        	//System.out.println("shadow: " + shadow.vx + " " + (shadow.vx + shadow.vw) + " - " + hist.getWidth());
+			double left = ( shadow.vx + hist.getWidth()/2) / (hist.getWidth());
+			double right = ( shadow.vx + shadow.vw + hist.getWidth()/2) / (hist.getWidth());
+			//System.out.println("left: " + left + " right: " + right);
+			left = (left < 0) ? 0 : left;
+			right = (right > 1) ? 1 : right;
+			app.hi.rescale(min + left*(max - min), min + right*(max - min), 1);
+		}
+	}
 
 	public void enterGlyph(Glyph g){
         if(g.getType().equals(T_FILTER)){

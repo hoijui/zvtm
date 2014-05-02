@@ -135,16 +135,16 @@ public class FitsExample {
             return;
         }
 
-        hi.setScaleMethod(FitsImage.ScaleMethod.LINEAR);//ASINH);//.LINEAR);
+        //hi.setScaleMethod(FitsImage.ScaleMethod.LINEAR);//ASINH);//.LINEAR);
         //hi.setColorFilter(FitsImage.ColorFilter.RAINBOW);
         mSpace.addGlyph(hi, false); 
 
         menu.drawHistogram();
 
 
-        scaleBounds = ZScale.computeScale(hi.getUnderlyingImage());
+        //scaleBounds = ZScale.computeScale(hi.getUnderlyingImage());
         //hi.rescale(scaleBounds[0], scaleBounds[1], 1);
-        System.out.println(scaleBounds[0] + ", " + scaleBounds[1]);
+        //System.out.println(scaleBounds[0] + ", " + scaleBounds[1]);
 
         //FitsHistogram hist = FitsHistogram.fromFitsImage(hi);
         
