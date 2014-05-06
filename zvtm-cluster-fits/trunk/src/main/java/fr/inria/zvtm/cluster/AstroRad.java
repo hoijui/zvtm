@@ -12,12 +12,14 @@ import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
+/*
 import fr.inria.vit.pan.IPhodPan;
 import fr.inria.vit.pan.PanEventSource;
 import fr.inria.vit.point.ClutchEventType;
 import fr.inria.vit.point.MouseLaserPoint;
 import fr.inria.vit.point.PointEventSource;
 import fr.inria.vit.point.PointListener;
+*/
 
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.Location;
@@ -85,17 +87,17 @@ public class AstroRad {
     private WallCursor ctrlCursor;
     private WallCursor imgCursor;
 
-    private MouseLaserPoint pointSource;
+    //private MouseLaserPoint pointSource;
 
     private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE;
     private AROptions options;
 
     private View masterView;
 
-    public AstroRad(String fileOrUrl, AROptions options){
+    public AstroRad(AROptions options){
         this.options = options;
         setup();
-        addImage(fileOrUrl);
+        addImage(options.url);
     }
 
     private void setup(){
@@ -163,6 +165,7 @@ public class AstroRad {
         imgCursor.onTop(IMGCURSOR_ZINDEX);
         detailBox = new AODetailBox(detailSpace);
 
+/*
         pointSource = new MouseLaserPoint(masterView.getPanel().getComponent());
         pointSource.addListener(new PointListener(){
             boolean dragging = false;
@@ -207,6 +210,7 @@ public class AstroRad {
 
         });
         pointSource.start();
+*/
 
         if(options.debugView){
             setupControlZone(0, 0, 400, 300);
@@ -400,13 +404,14 @@ public class AstroRad {
             return;
         }
 
-        if(options.arguments.size() < 1){
-            System.err.println("Usage: AstroRad [options] image_URL");
+        if(options.file == null && options.url == null){
+        //if(options.arguments.size() < 1){
+            System.err.println("Usage: AstroRad [options] -url image_URL or -file image_file");
             System.exit(0);
         }
 
-        AstroRad ar = new AstroRad(args[0], options);
-        new AstroServer(ar, 8000);
+        AstroRad ar = new AstroRad(options);
+        //new AstroServer(ar, 8000);
     }
 
     private void drawSymbols(List<AstroObject> objs){
@@ -575,6 +580,12 @@ public class AstroRad {
 class AROptions {
         @Option(name = "-d", aliases = {"--debug-view"}, usage = "debug view") 
         boolean debugView = false;
+
+        @Option(name = "-file", usage = "input file of fits")
+        String file = null;
+
+        @Option(name = "-url", usage = "input url of fits") 
+        String url = null;
 
         // receives other command line parameters than options
         @Argument

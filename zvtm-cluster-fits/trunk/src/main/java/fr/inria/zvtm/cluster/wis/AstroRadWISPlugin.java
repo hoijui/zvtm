@@ -17,7 +17,8 @@ public class AstroRadWISPlugin extends AbstractFlowStatesPlugin {
     
     public void init(){
         try {
-            ar = new AstroRad(new URL("file:///Users/epietrig/tools/FITS/ngc4587.fits"), null);
+            //ar = new AstroRad(new URL("file:///Users/epietrig/tools/FITS/ngc4587.fits"), null);
+            ar = new AstroRad(new URL("http://chandra.harvard.edu/photo/2013/g19/fits/g19_0.3-7.5keV.fits"), null);
             new AstroServer(ar, 8000);
         }
         catch (Exception ex){
