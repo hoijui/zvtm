@@ -19,6 +19,8 @@ import fr.inria.zvtm.glyphs.JSkyFitsImage;
 import fr.inria.zvtm.fits.RangeSelection;
 import fr.inria.zvtm.fits.Utils;
 
+import fr.inria.zvtm.glyphs.VRectangle;
+
 import fr.inria.zvtm.glyphs.PRectangle;
 
 import java.awt.GradientPaint;
@@ -62,8 +64,28 @@ public class JSkyFitsExample {
         view.setBackgroundColor(Color.GRAY);
         view.setListener(new PanZoomEventHandler());
 
+        
         img = new JSkyFitsImage(imgUrl);
-        vs.addGlyph(img, false);	
+        System.out.println("img: " + img);
+
+        //img.setColorLookupTable("Heat");
+        //img.setScaleAlgorithm(JSkyFitsImage.ScaleAlgorithm.LINEAR);
+
+        vs.addGlyph(img);
+
+		/*
+		System.out.println("addGlyph");
+		double[] bound_img = img.getBounds();
+		System.out.println("bounds:");
+		for(double it : bound_img) System.out.println("\t" + it);
+		Point2D.Double loc = img.getLocation();
+
+		VRectangle border = new VRectangle(loc.getX(), loc.getY(), 1, Math.abs(bound_img[2]-bound_img[0]), Math.abs(bound_img[3]-bound_img[1]), Color.BLACK, Color.BLACK, 0.2f);
+		vs.addGlyph(border);
+		System.out.println(border);
+		*/
+
+
     }
 
     private Point2D.Double viewToSpace(Camera cam, int jpx, int jpy){
