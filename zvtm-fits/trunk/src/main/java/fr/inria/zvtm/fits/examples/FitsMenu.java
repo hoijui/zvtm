@@ -303,6 +303,15 @@ public class FitsMenu implements ViewListener{
 		if(scroll){
 			press3_scroll = false;
 			lastJPX = 0;
+			double min = app.hi.getUnderlyingImage().getHistogram().getMin();
+        	double max = app.hi.getUnderlyingImage().getHistogram().getMax();
+        	//System.out.println("shadow: " + shadow.vx + " " + (shadow.vx + shadow.vw) + " - " + hist.getWidth());
+			double left = ( shadow.vx + hist.getWidth()/2) / (hist.getWidth());
+			double right = ( shadow.vx + shadow.vw + hist.getWidth()/2) / (hist.getWidth());
+			//System.out.println("left: " + left + " right: " + right);
+			left = (left < 0) ? 0 : left;
+			right = (right > 1) ? 1 : right;
+			app.hi.rescale(min + left*(max - min), min + right*(max - min), 1);
 		}
 	}
 	public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
@@ -330,7 +339,7 @@ public class FitsMenu implements ViewListener{
         	if( (jpx-shadow.vw/2) > app.menu.BORDER_LEFT_HISTOGRAM && (jpx+shadow.vw/2) < app.menu.BORDER_RIGHT_HISTOGRAM){
         		shadow.move(jpx - lastJPX,0);
         		lastJPX = jpx;
-
+        		/*
         		double min = app.hi.getUnderlyingImage().getHistogram().getMin();
 	        	double max = app.hi.getUnderlyingImage().getHistogram().getMax();
 	        	//System.out.println("shadow: " + shadow.vx + " " + (shadow.vx + shadow.vw) + " - " + hist.getWidth());
@@ -340,6 +349,7 @@ public class FitsMenu implements ViewListener{
 				left = (left < 0) ? 0 : left;
 				right = (right > 1) ? 1 : right;
 				app.hi.rescale(min + left*(max - min), min + right*(max - min), 1);
+				*/
         	}
         }
 	}

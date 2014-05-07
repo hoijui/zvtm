@@ -63,7 +63,7 @@ public class ZScale {
         System.err.println("zscale: lowCut = " + lowCut + ", highCut = " + highCut);
 
         return new double[]{lowCut, highCut};
-}
+    }
 
     /**
      * @return a 2-element array containing (lowcut, highcut),

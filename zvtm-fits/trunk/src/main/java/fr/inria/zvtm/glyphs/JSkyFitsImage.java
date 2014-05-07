@@ -56,7 +56,12 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
         imageLocation = fileOrUrl;
         vw = fitsImage.getWidth() * scale;
         vh = fitsImage.getHeight() * scale;
-        proc = new ImageProcessor(new RenderedImageAdapter(fitsImage), new Rectangle2D.Double(0,0, fitsImage.getWidth(), fitsImage.getHeight()));
+        RenderedImageAdapter ria = new RenderedImageAdapter(fitsImage);
+        Rectangle2D.Double region = new Rectangle2D.Double(0,0, fitsImage.getWidth(), fitsImage.getHeight());
+        //proc = new ImageProcessor(ria, new Rectangle2D.Double(0,0, fitsImage.getWidth(), fitsImage.getHeight()));
+        proc = new ImageProcessor();
+        proc.setSourceImage(ria, region);
+
         wcsTransform = new WCSTransform(new FITSKeywordProvider(fitsImage));
     }
 

@@ -129,13 +129,14 @@ public class FitsExample {
             
         } else if(options.file != null){
             hi = new FitsImage(0,0,0,new File(options.file));
+
         } else {
             System.err.println("usage: FitsExample -file image_File or -url image_URL");
             System.exit(0);
             return;
         }
 
-        //hi.setScaleMethod(FitsImage.ScaleMethod.LINEAR);//ASINH);//.LINEAR);
+        //hi.setScaleMethod(FitsImage.ScaleMethod.LINEAR);//ASINH);
         //hi.setColorFilter(FitsImage.ColorFilter.RAINBOW);
         mSpace.addGlyph(hi, false); 
 
