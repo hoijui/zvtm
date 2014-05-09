@@ -42,36 +42,46 @@ import java.awt.event.MouseWheelEvent;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+// Options
+import org.kohsuke.args4j.CmdLineException;
+import org.kohsuke.args4j.CmdLineParser;
+
 /**
  * Sample FITS application.
  */
 public class JSkyFitsExample {
 	//shortcut
-	private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE; 
-    private JSkyFitsImage img;
-    private double[] scaleBounds;
-    private boolean dragLeft = false, dragRight = false;
-    private View view;
+	VirtualSpaceManager vsm; 
 
-	JSkyFitsExample(String imgUrl) throws IOException {
-		VirtualSpace vs = vsm.addVirtualSpace("testSpace");
-		Camera cam = vs.addCamera();
-		Vector<Camera> cameras = new Vector<Camera>();
-		cameras.add(cam);	
-        
-        view = vsm.addFrameView(cameras, "Master View",
-                View.STD_VIEW, 800, 600, false, true, true, null);	
-        view.setBackgroundColor(Color.GRAY);
-        view.setListener(new PanZoomEventHandler());
+	VirtualSpace mSpace;
+	Camera mCamera;
 
-        
-        img = new JSkyFitsImage(imgUrl);
-        System.out.println("img: " + img);
+    JSkyFitsImage img;
+    double[] scaleBounds;
+    //private boolean dragLeft = false, dragRight = false;
 
-        //img.setColorLookupTable("Heat");
-        //img.setScaleAlgorithm(JSkyFitsImage.ScaleAlgorithm.LINEAR);
+    private View mView;
+    private PanZoomEventHandler eh;
 
-        vs.addGlyph(img);
+    public FitsMenu menu;
+
+	JSkyFitsExample(FitsOptions options) throws IOException {
+		
+		initGUI(options);
+
+		if(options.url != null){
+			img = new JSkyFitsImage(options.url);
+
+        } else if(options.file != null){
+            img = new JSkyFitsImage(options.file);
+
+        } else {
+            System.err.println("usage: JSkyFitsExample -file image_File or -url image_URL");
+            System.exit(0);
+            return;
+        }
+
+        mSpace.addGlyph(img);
 
 		/*
 		System.out.println("addGlyph");
@@ -81,18 +91,33 @@ public class JSkyFitsExample {
 		Point2D.Double loc = img.getLocation();
 
 		VRectangle border = new VRectangle(loc.getX(), loc.getY(), 1, Math.abs(bound_img[2]-bound_img[0]), Math.abs(bound_img[3]-bound_img[1]), Color.BLACK, Color.BLACK, 0.2f);
-		vs.addGlyph(border);
+		mSpace.addGlyph(border);
 		System.out.println(border);
 		*/
 
 
     }
 
+    void initGUI(FitsOptions options){
+    	vsm = VirtualSpaceManager.INSTANCE;
+    	mSpace = vsm.addVirtualSpace("testSpace");
+		mCamera = mSpace.addCamera();
+		Vector<Camera> cameras = new Vector<Camera>();
+		cameras.add(mCamera);	
+        
+        mView = vsm.addFrameView(cameras, "Master View",
+                View.STD_VIEW, 800, 600, false, true, true, null);	
+        mView.setBackgroundColor(Color.GRAY);
+
+        eh = new PanZoomEventHandler(this);
+        mView.setListener(eh);
+    }
+
     private Point2D.Double viewToSpace(Camera cam, int jpx, int jpy){
         Location camLoc = cam.getLocation();
         double focal = cam.getFocal();
         double altCoef = (focal + camLoc.alt) / focal;
-        Dimension viewSize = view.getPanelSize();
+        Dimension viewSize = mView.getPanelSize();
 
         //find coords of view origin in the virtual space
         double viewOrigX = camLoc.vx - (0.5*viewSize.width*altCoef);
@@ -104,13 +129,22 @@ public class JSkyFitsExample {
     }
 
 	public static void main(String[] args) throws IOException{
-        if(args.length == 0){
-            System.err.println("usage: JSkyFitsExample image_URL");
+
+        FitsOptions options = new FitsOptions();
+        CmdLineParser parser = new CmdLineParser(options);
+
+        try {
+            parser.parseArgument(args);
+        } catch(CmdLineException ex){
+            System.err.println(ex.getMessage());
+            parser.printUsage(System.err);
             return;
-        }    
-		new JSkyFitsExample(args[0]);
+        }
+
+		new JSkyFitsExample(options);
 	}
 
+/*
 	private class PanZoomEventHandler implements ViewListener {
 		private int lastJPX;
 		private int lastJPY;
@@ -207,5 +241,7 @@ public class JSkyFitsExample {
 		public void viewClosing(View v){System.exit(0);}
 
 	}
+*/
+
 }
 

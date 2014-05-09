@@ -29,11 +29,12 @@ class PanZoomEventHandler implements ViewListener {
     static final float WHEEL_ZOOMOUT_FACTOR = 22.0f;
 
 
-    FitsExample app;
+    //FitsExample app;
+    Object app;
 
 
     //private double[] scaleBounds;
-    private boolean dragLeft = false, dragRight = false;
+    //private boolean dragLeft = false, dragRight = false;
     //private RangeSelection rs;
 
 	private int lastJPX;
@@ -47,7 +48,11 @@ class PanZoomEventHandler implements ViewListener {
 
 
     PanZoomEventHandler(FitsExample app){
-        this.app = app;
+        this.app = (Object)app;
+    }
+
+    PanZoomEventHandler(JSkyFitsExample app){
+        this.app = (Object)app;
     }
 
 	public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
@@ -86,7 +91,7 @@ class PanZoomEventHandler implements ViewListener {
 
         zero_order_dragging = false;
         if (first_order_dragging){
-            Camera c = app.mCamera;
+            Camera c = (app instanceof FitsExample) ? ((FitsExample)app).mCamera : ((JSkyFitsExample)app).mCamera;
             c.setXspeed(0);
             c.setYspeed(0);
             c.setZspeed(0);
@@ -138,19 +143,24 @@ class PanZoomEventHandler implements ViewListener {
         //System.out.println(app.menu.BORDER_BOTTON_HISTOGRAM + " > " + jpy + " > " + app.menu.BORDER_TOP_HISTOGRAM);
         //System.out.println(app.menu.BORDER_LEFT_HISTOGRAM + " < " + jpx + " < " + app.menu.BORDER_RIGHT_HISTOGRAM);
 
-        if((jpx < app.WIDTH_MENU && jpy > app.menu.BORDER_BOTTON_FILTER && jpy < app.menu.BORDER_TOP_FILTER) || (jpy > app.menu.BORDER_TOP_HISTOGRAM && jpy < app.menu.BORDER_BOTTON_HISTOGRAM && jpx > app.menu.BORDER_LEFT_HISTOGRAM && jpx < app.menu.BORDER_RIGHT_HISTOGRAM )){
-            v.parent.setActiveLayer(2);
-            v.parent.setCursorIcon(Cursor.DEFAULT_CURSOR);
-        } else {
-            v.parent.setActiveLayer(0);
-            v.parent.setCursorIcon(Cursor.CUSTOM_CURSOR);
+        if(app instanceof FitsExample){
+            if((jpx < ((FitsExample)app).WIDTH_MENU && jpy > ((FitsExample)app).menu.BORDER_BOTTON_FILTER && jpy < ((FitsExample)app).menu.BORDER_TOP_FILTER) ||
+                        (jpy > ((FitsExample)app).menu.BORDER_TOP_HISTOGRAM && jpy < ((FitsExample)app).menu.BORDER_BOTTON_HISTOGRAM && jpx > ((FitsExample)app).menu.BORDER_LEFT_HISTOGRAM && 
+                        jpx < ((FitsExample)app).menu.BORDER_RIGHT_HISTOGRAM )){
+                v.parent.setActiveLayer(2);
+                v.parent.setCursorIcon(Cursor.DEFAULT_CURSOR);
+            } else {
+                v.parent.setActiveLayer(0);
+                v.parent.setCursorIcon(Cursor.CUSTOM_CURSOR);
+            }
         }
+        
 
     }
 
 	public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
 
-        Camera c = app.mCamera;
+        Camera c = (app instanceof FitsExample) ? ((FitsExample)app).mCamera : ((JSkyFitsExample)app).mCamera;
         double a = (c.focal+Math.abs(c.altitude)) / c.focal;
         if (zero_order_dragging){
             c.move(a*(lastJPX-jpx), a*(jpy-lastJPY));
@@ -161,7 +171,7 @@ class PanZoomEventHandler implements ViewListener {
             if (mod == SHIFT_MOD){
                 c.setXspeed(0);
                 c.setYspeed(0);
-                c.setZspeed(((lastJPY-jpy)*(ZOOM_SPEED_COEF)));
+                c.setZspeed( (c.altitude>0) ? ((lastJPY-jpy)*(ZOOM_SPEED_COEF)) : ((lastJPY-jpy)/(ZOOM_SPEED_COEF)));
             }
             else {
                 c.setXspeed((c.altitude>0) ? (jpx-lastJPX)*(a/PAN_SPEED_COEF) : (jpx-lastJPX)/(a*PAN_SPEED_COEF));
@@ -201,26 +211,58 @@ class PanZoomEventHandler implements ViewListener {
 	}
 
 	public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
-        double a = (app.mCamera.focal+Math.abs(app.mCamera.altitude)) / app.mCamera.focal;
+
+        if(app instanceof FitsExample){
+            Camera c = ((FitsExample)app).mCamera;
+
+            double a = (c.focal+Math.abs(c.altitude)) / c.focal;
+            double mvx = v.getVCursor().getVSXCoordinate();
+            double mvy = v.getVCursor().getVSYCoordinate();
+            if (wheelDirection  == WHEEL_UP){
+                // zooming out
+                c.move(-((mvx - c.vx) * WHEEL_ZOOMOUT_FACTOR / c.focal),
+                                         -((mvy - c.vy) * WHEEL_ZOOMOUT_FACTOR / c.focal));
+                c.altitudeOffset(a*WHEEL_ZOOMOUT_FACTOR);
+                ((FitsExample)app).vsm.repaint();
+            }
+            else {
+                //wheelDirection == WHEEL_DOWN, zooming in
+                if (c.getAltitude()-a*WHEEL_ZOOMIN_FACTOR >= c.getZoomFloor()){
+                    // this test to prevent translation when camera is not actually zoming in
+                    c.move((mvx - c.vx) * WHEEL_ZOOMIN_FACTOR / c.focal,
+                                             ((mvy - c.vy) * WHEEL_ZOOMIN_FACTOR / c.focal));
+                }
+                c.altitudeOffset(-a*WHEEL_ZOOMIN_FACTOR);
+                ((FitsExample)app).vsm.repaint();
+            }
+
+
+        }
+        /*
+        Camera c = (app instanceof FitsExample) ? ((FitsExample)app).mCamera : ((JSkyFitsExample)app).mCamera;
+        double a = (c.focal+Math.abs(c.altitude)) / c.focal;
         double mvx = v.getVCursor().getVSXCoordinate();
         double mvy = v.getVCursor().getVSYCoordinate();
         if (wheelDirection  == WHEEL_UP){
             // zooming out
-            app.mCamera.move(-((mvx - app.mCamera.vx) * WHEEL_ZOOMOUT_FACTOR / app.mCamera.focal),
-                                     -((mvy - app.mCamera.vy) * WHEEL_ZOOMOUT_FACTOR / app.mCamera.focal));
-            app.mCamera.altitudeOffset(a*WHEEL_ZOOMOUT_FACTOR);
-            app.vsm.repaint();
+            c.move(-((mvx - c.vx) * WHEEL_ZOOMOUT_FACTOR / c.focal),
+                                     -((mvy - c.vy) * WHEEL_ZOOMOUT_FACTOR / c.focal));
+            c.altitudeOffset(a*WHEEL_ZOOMOUT_FACTOR);
+            if(app instanceof FitsExample) ((FitsExample)app).vsm.repaint();
+            else ((JSkyFitsExample)app).vsm.repaint();
         }
         else {
             //wheelDirection == WHEEL_DOWN, zooming in
-            if (app.mCamera.getAltitude()-a*WHEEL_ZOOMIN_FACTOR >= app.mCamera.getZoomFloor()){
+            if (c.getAltitude()-a*WHEEL_ZOOMIN_FACTOR >= c.getZoomFloor()){
                 // this test to prevent translation when camera is not actually zoming in
-                app.mCamera.move((mvx - app.mCamera.vx) * WHEEL_ZOOMIN_FACTOR / app.mCamera.focal,
-                                         ((mvy - app.mCamera.vy) * WHEEL_ZOOMIN_FACTOR / app.mCamera.focal));
+                c.move((mvx - c.vx) * WHEEL_ZOOMIN_FACTOR / c.focal,
+                                         ((mvy - c.vy) * WHEEL_ZOOMIN_FACTOR / c.focal));
             }
-            app.mCamera.altitudeOffset(-a*WHEEL_ZOOMIN_FACTOR);
-            app.vsm.repaint();
+            c.altitudeOffset(-a*WHEEL_ZOOMIN_FACTOR);
+            if(app instanceof FitsExample) ((FitsExample)app).vsm.repaint();
+            else ((JSkyFitsExample)app).vsm.repaint();
         }
+        */
     }
 
 	public void enterGlyph(Glyph g){}
@@ -228,13 +270,25 @@ class PanZoomEventHandler implements ViewListener {
 	public void exitGlyph(Glyph g){}
 
 	public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){
-        if(c == '-'){
-            app.scaleBounds[1] -= 100;
-            app.hi.rescale(app.scaleBounds[0], app.scaleBounds[1], 1);
-        } else if (c == '+'){
-            app.scaleBounds[1] += 100;
-            app.hi.rescale(app.scaleBounds[0], app.scaleBounds[1], 1);
+        //System.out.println("Ktype:" + c);
+        if(app instanceof FitsExample){
+            if(c == '-'){
+                ((FitsExample)app).scaleBounds[1] -= 100;
+                ((FitsExample)app).hi.rescale(((FitsExample)app).scaleBounds[0], ((FitsExample)app).scaleBounds[1], 1);
+            } else if (c == '+'){
+                ((FitsExample)app).scaleBounds[1] += 100;
+                ((FitsExample)app).hi.rescale(((FitsExample)app).scaleBounds[0], ((FitsExample)app).scaleBounds[1], 1);
+            }
+        } else {
+            if(c == '-'){
+                //((JSkyFitsExample)app).scaleBounds[1] -= 100;
+                //((JSkyFitsExample)app).img.rescale(((JSkyFitsExample)app).scaleBounds[0], ((JSkyFitsExample)app).scaleBounds[1], 1);
+            } else if (c == '+'){
+                //((JSkyFitsExample)app).scaleBounds[1] += 100;
+                //((JSkyFitsExample)app).img.rescale(((JSkyFitsExample)app).scaleBounds[0], ((JSkyFitsExample)app).scaleBounds[1], 1);
+            }
         }
+        
     }
 
 	public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){

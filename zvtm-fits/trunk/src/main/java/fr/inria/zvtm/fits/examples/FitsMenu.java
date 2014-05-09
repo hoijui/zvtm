@@ -145,13 +145,16 @@ public class FitsMenu implements ViewListener{
 		if(app.hi != null){
 			hist = FitsHistogram.fromFitsImage(app.hi);
 			hist.moveTo(-app.VIEW_W/2 + (app.VIEW_W - hist.getWidth())/2 , -app.VIEW_H/2 + 50);
-	        mnSpace.addGlyph(hist);
 		}
 
 		BORDER_TOP_HISTOGRAM = (int)(app.VIEW_H - hist.getHeight() - 65 );
 		BORDER_BOTTON_HISTOGRAM = app.VIEW_H - 65;
-		BORDER_LEFT_HISTOGRAM = (int)( (app.VIEW_W - hist.getWidth())/2 - 2*FitsHistogram.DEFAULT_BIN_WIDTH) ;
-		BORDER_RIGHT_HISTOGRAM = (int)( (app.VIEW_W + hist.getWidth())/2 + 2*FitsHistogram.DEFAULT_BIN_WIDTH) ;
+		BORDER_LEFT_HISTOGRAM = (int)( (app.VIEW_W - hist.getWidth())/2 - FitsHistogram.DEFAULT_BIN_WIDTH) ;
+		BORDER_RIGHT_HISTOGRAM = (int)( (app.VIEW_W + hist.getWidth())/2 + FitsHistogram.DEFAULT_BIN_WIDTH) ;
+
+		VRectangle board = new VRectangle(hist.vx+hist.getWidth()/2, hist.vy+hist.getHeight()/2, Z_BUTTON, BORDER_RIGHT_HISTOGRAM-BORDER_LEFT_HISTOGRAM, BORDER_BOTTON_HISTOGRAM-BORDER_TOP_HISTOGRAM+10, Color.WHITE, Color.WHITE, 0.8f);
+		mnSpace.addGlyph(board);
+		mnSpace.addGlyph(hist);
 	}
 /*
 	public void redrawHistogram(){
@@ -241,8 +244,15 @@ public class FitsMenu implements ViewListener{
 			*/
 			double min = app.hi.getUnderlyingImage().getHistogram().getMin();
         	double max = app.hi.getUnderlyingImage().getHistogram().getMax();
-			double left = ( ((lastJPX < jpx)? lastJPX : jpx) - (app.VIEW_W - hist.getWidth())/2 ) / hist.getWidth();
-			double right = ( ((lastJPX < jpx)? jpx : lastJPX) - (app.VIEW_W - hist.getWidth())/2 ) / hist.getWidth();
+			//double left = ( ((lastJPX < jpx)? lastJPX : jpx) - (app.VIEW_W - hist.getWidth())/2 ) / hist.getWidth();
+			//double right = ( ((lastJPX < jpx)? jpx : lastJPX) - (app.VIEW_W - hist.getWidth())/2 ) / hist.getWidth();
+			
+        	double left = ( ((lastJPX < jpx)? lastJPX : jpx) - app.VIEW_W/2 + hist.getWidth()/2) / hist.getWidth();
+			double right = ( ((lastJPX < jpx)? jpx : lastJPX) - app.VIEW_W/2 + hist.getWidth()/2) / hist.getWidth();
+			
+
+			System.out.println("left: " + left + " right: " + right);
+
 			left = (left < 0) ? 0 : left;
 			right = (right > 1) ? 1 : right;
 			app.hi.rescale(min + left*(max - min), min + right*(max - min), 1);
@@ -306,9 +316,11 @@ public class FitsMenu implements ViewListener{
 			double min = app.hi.getUnderlyingImage().getHistogram().getMin();
         	double max = app.hi.getUnderlyingImage().getHistogram().getMax();
         	//System.out.println("shadow: " + shadow.vx + " " + (shadow.vx + shadow.vw) + " - " + hist.getWidth());
-			double left = ( shadow.vx + hist.getWidth()/2) / (hist.getWidth());
-			double right = ( shadow.vx + shadow.vw + hist.getWidth()/2) / (hist.getWidth());
-			//System.out.println("left: " + left + " right: " + right);
+			double left = ( shadow.vx + hist.getWidth()/2 - shadow.vw/2) / (hist.getWidth());
+			double right = ( shadow.vx + hist.getWidth()/2 + shadow.vw/2 ) / (hist.getWidth());
+			
+			System.out.println("left: " + left + " right: " + right);
+
 			left = (left < 0) ? 0 : left;
 			right = (right > 1) ? 1 : right;
 			app.hi.rescale(min + left*(max - min), min + right*(max - min), 1);
