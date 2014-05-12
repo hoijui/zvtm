@@ -35,7 +35,7 @@ public class FitsHistogram extends Composite {
     public FitsHistogram(int[] data, int min, int max, Color fillColor){
         
         width = DEFAULT_BIN_WIDTH*data.length;
-        VRectangle backgrown = new VRectangle(width/2, height/2, FitsMenu.Z_BUTTON, width, height, Color.GRAY, Color.BLACK, 0.2f);
+        VRectangle backgrown = new VRectangle(width/2, height/2, FitsMenu.Z_BTN, width, height, Color.GRAY, Color.BLACK, 0.2f);
         addChild(backgrown);
 
         int i = 0;
@@ -45,7 +45,7 @@ public class FitsHistogram extends Composite {
             double h = (Math.sqrt(data[j]) * height) / Math.sqrt(max - min);
             int hh = (int)(h);
             hh = ( hh % 2 == 0) ? hh : hh + 1;
-            VRectangle bar = new VRectangle(i+DEFAULT_BIN_WIDTH/2, (int)(hh/2), FitsMenu.Z_BUTTON, DEFAULT_BIN_WIDTH, (int)(hh), fillColor);
+            VRectangle bar = new VRectangle(i+DEFAULT_BIN_WIDTH/2, (int)(hh/2), FitsMenu.Z_BTN, DEFAULT_BIN_WIDTH, (int)(hh), fillColor);
             bar.setBorderColor(DEFAULT_BORDER_COLOR);
             addChild(bar);
             bars[j] = bar;

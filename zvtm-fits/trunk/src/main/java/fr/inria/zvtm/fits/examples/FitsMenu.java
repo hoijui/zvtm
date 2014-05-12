@@ -50,16 +50,17 @@ public class FitsMenu implements ViewListener{
 
 	public static final int WIDTH_MENU = 200;
 
-	public static final int HEIGHT_BUTTON = 20;
+	public static final int HEIGHT_BTN = 20;
 	public static final Color BORDER_COLOR_BTN = Color.BLACK;
-	public static final Color TEXT_COLOR_BUTTON = Color.RED;
-	public static final Font FONT_BUTTON = new Font("Bold", Font.PLAIN, 11);
+	public static final Color TEXT_COLOR_BTN = Color.BLACK;
+	public static final Color BACKGROUND_COLOR_BTN = Color.LIGHT_GRAY;
+	public static final Font FONT_BTN = new Font("Bold", Font.PLAIN, 11);
 	//public static final Color LINE_COLOR = Color.RED;
 	//public static final Stroke LINE_STROKE = new BasicStroke(1f);
 
 	private static final int BORDER = 5;
 
-	public static final int Z_BUTTON = 0;
+	public static final int Z_BTN = 0;
 
 	public static final String T_FILTER = "Fltr";
 	public static final String T_SCALE = "Scl";
@@ -81,6 +82,9 @@ public class FitsMenu implements ViewListener{
 	public int BORDER_BOTTON_HISTOGRAM;
 	public int BORDER_LEFT_HISTOGRAM;
 	public int BORDER_RIGHT_HISTOGRAM;
+
+	PRectangle scale_selected;
+	PRectangle color_selected;
 
 //	int CONST = 636;
 
@@ -112,32 +116,33 @@ public class FitsMenu implements ViewListener{
 
 		BORDER_TOP_FILTER =  app.VIEW_H/2;
 
-		int py = app.VIEW_H/2 - 2*HEIGHT_BUTTON - BORDER;
+		int py = app.VIEW_H/2 - 2*HEIGHT_BTN - BORDER;
 		
 		for(int i = 0; i < COLOR_GRADIANT.length; i++){
 			MultipleGradientPaint grad = Utils.makeGradient((RGBImageFilter)COLOR_GRADIANT[i]);
-			PRectangle filter = new PRectangle(-app.VIEW_W/2 + WIDTH_MENU/2 + BORDER, py, Z_BUTTON, WIDTH_MENU - 2*BORDER, HEIGHT_BUTTON, grad, BORDER_COLOR_BTN);
+			PRectangle filter = new PRectangle(-app.VIEW_W/2 + WIDTH_MENU/2, py, Z_BTN, WIDTH_MENU - BORDER, HEIGHT_BTN, grad, BORDER_COLOR_BTN);
 	        filter.setType(T_FILTER);
 	        filter.setOwner(COLOR_GRADIANT[i]);
 	        mnSpace.addGlyph(filter);
-	        py -= (HEIGHT_BUTTON + 2*BORDER);
+	        py -= (HEIGHT_BTN + 2*BORDER);
 		}
 
 		for(int i = 0; i < SCALE_METHOD.length; i++){
-			PRectangle filter = new PRectangle(-app.VIEW_W/2 + WIDTH_MENU/2 + BORDER, py, Z_BUTTON, WIDTH_MENU - 2*BORDER, HEIGHT_BUTTON, Color.WHITE, BORDER_COLOR_BTN);
+			PRectangle filter = new PRectangle(-app.VIEW_W/2 + WIDTH_MENU/2, py, Z_BTN, WIDTH_MENU - BORDER, HEIGHT_BTN, BACKGROUND_COLOR_BTN, BORDER_COLOR_BTN);
 			filter.setType(T_SCALE);
 			filter.setOwner(SCALE_METHOD[i]);
 			mnSpace.addGlyph(filter);
 
-			VText scaleText = new VText(-app.VIEW_W/2 + WIDTH_MENU/2 + BORDER , py - BORDER, Z_BUTTON, TEXT_COLOR_BUTTON, SCALE_NAME[i], VText.TEXT_ANCHOR_MIDDLE);
-			scaleText.setFont(FONT_BUTTON);
+			VText scaleText = new VText(-app.VIEW_W/2 + WIDTH_MENU/2, py - BORDER, Z_BTN, TEXT_COLOR_BTN, SCALE_NAME[i], VText.TEXT_ANCHOR_MIDDLE);
+			scaleText.setFont(FONT_BTN);
 			mnSpace.addGlyph(scaleText);
+			filter.stick(scaleText);
 			//Glyph ln = drawMethod(SCALE_METHOD[i]);
 			//ln.moveTo(-app.VIEW_W/2 + WIDTH_MENU/2 + BORDER , py);
 			//mnSpace.addGlyph(ln);
-	        py -= (HEIGHT_BUTTON + 2*BORDER);
+	        py -= (HEIGHT_BTN + 2*BORDER);
 		}
-		BORDER_BOTTON_FILTER = py + HEIGHT_BUTTON - 2*BORDER;
+		BORDER_BOTTON_FILTER = py + HEIGHT_BTN - 2*BORDER;
 	}
 
 	public void drawHistogram(){
@@ -152,7 +157,7 @@ public class FitsMenu implements ViewListener{
 		BORDER_LEFT_HISTOGRAM = (int)( (app.VIEW_W - hist.getWidth())/2 - FitsHistogram.DEFAULT_BIN_WIDTH) ;
 		BORDER_RIGHT_HISTOGRAM = (int)( (app.VIEW_W + hist.getWidth())/2 + FitsHistogram.DEFAULT_BIN_WIDTH) ;
 
-		VRectangle board = new VRectangle(hist.vx+hist.getWidth()/2, hist.vy+hist.getHeight()/2, Z_BUTTON, BORDER_RIGHT_HISTOGRAM-BORDER_LEFT_HISTOGRAM, BORDER_BOTTON_HISTOGRAM-BORDER_TOP_HISTOGRAM+10, Color.WHITE, Color.WHITE, 0.8f);
+		VRectangle board = new VRectangle(hist.vx+hist.getWidth()/2, hist.vy+hist.getHeight()/2, Z_BTN, BORDER_RIGHT_HISTOGRAM-BORDER_LEFT_HISTOGRAM, BORDER_BOTTON_HISTOGRAM-BORDER_TOP_HISTOGRAM+10, Color.WHITE, Color.WHITE, 0.8f);
 		mnSpace.addGlyph(board);
 		mnSpace.addGlyph(hist);
 	}
@@ -267,7 +272,7 @@ public class FitsMenu implements ViewListener{
 				if(lastJPX > BORDER_RIGHT_HISTOGRAM)
 					lastJPX = BORDER_RIGHT_HISTOGRAM;
 			}
-			shadow = new VRectangle( ((lastJPX < jpx)? lastJPX : jpx) + Math.abs(lastJPX - jpx)/2 - app.VIEW_W/2, -app.VIEW_H/2 + 100, Z_BUTTON, Math.abs(lastJPX - jpx), hist.getHeight() + 10, Color.WHITE, Color.BLACK, .2f);
+			shadow = new VRectangle( ((lastJPX < jpx)? lastJPX : jpx) + Math.abs(lastJPX - jpx)/2 - app.VIEW_W/2, -app.VIEW_H/2 + 100, Z_BTN, Math.abs(lastJPX - jpx), hist.getHeight() + 10, Color.WHITE, Color.BLACK, .2f);
 			shadow.setType(T_SCROLL);
 			app.mnSpace.addGlyph(shadow);
 			lastJPX = 0;
@@ -404,8 +409,22 @@ public class FitsMenu implements ViewListener{
 	public void enterGlyph(Glyph g){
         if(g.getType().equals(T_FILTER)){
             app.setColorFilter((ImageFilter)g.getOwner());
+            if(color_selected != null){
+            	color_selected.setWidth(color_selected.getWidth()-BORDER*2);
+            	color_selected.move(-BORDER,0);
+            }
+            ((PRectangle)g).setWidth(((PRectangle)g).getWidth()+BORDER*2);
+            g.move(BORDER, 0);
+            color_selected = (PRectangle)g;
         } else if(g.getType().equals(T_SCALE)){
         	app.setScaleMethod((Integer)g.getOwner());
+        	if(scale_selected != null){
+        		scale_selected.setWidth(scale_selected.getWidth()-BORDER*2);
+        		scale_selected.move(-BORDER,0);
+        	}
+        	((PRectangle)g).setWidth(((PRectangle)g).getWidth()+BORDER*2);
+        	g.move(BORDER,0);
+        	scale_selected = (PRectangle)g;
         } else if(g.getType().equals(T_SCROLL)){
         	scroll = true;
         	//v.parent.setCursorIcon(Cursor.);
