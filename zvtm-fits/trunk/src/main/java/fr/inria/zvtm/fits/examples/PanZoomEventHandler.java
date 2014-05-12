@@ -238,6 +238,33 @@ class PanZoomEventHandler implements ViewListener {
 
 
         }
+
+        if(app instanceof JSkyFitsExample){
+
+            Camera c = ((JSkyFitsExample)app).mCamera;
+
+            double a = (c.focal+Math.abs(c.altitude)) / c.focal;
+            double mvx = v.getVCursor().getVSXCoordinate();
+            double mvy = v.getVCursor().getVSYCoordinate();
+            if (wheelDirection  == WHEEL_UP){
+                // zooming out
+                c.move(-((mvx - c.vx) * WHEEL_ZOOMOUT_FACTOR / c.focal),
+                                         -((mvy - c.vy) * WHEEL_ZOOMOUT_FACTOR / c.focal));
+                c.altitudeOffset(a*WHEEL_ZOOMOUT_FACTOR);
+                //((JSkyFitsExample)app).vsm.repaint();
+            }
+            else {
+                //wheelDirection == WHEEL_DOWN, zooming in
+                if (c.getAltitude()-a*WHEEL_ZOOMIN_FACTOR >= c.getZoomFloor()){
+                    // this test to prevent translation when camera is not actually zoming in
+                    c.move((mvx - c.vx) * WHEEL_ZOOMIN_FACTOR / c.focal,
+                                             ((mvy - c.vy) * WHEEL_ZOOMIN_FACTOR / c.focal));
+                }
+                c.altitudeOffset(-a*WHEEL_ZOOMIN_FACTOR);
+                //((JSkyFitsExample)app).vsm.repaint();
+            }
+
+        }
         /*
         Camera c = (app instanceof FitsExample) ? ((FitsExample)app).mCamera : ((JSkyFitsExample)app).mCamera;
         double a = (c.focal+Math.abs(c.altitude)) / c.focal;

@@ -12,13 +12,15 @@ import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.Shape;
+import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
+import fr.inria.zvtm.glyphs.projection.RProjectedCoordsP;
+
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
-import fr.inria.zvtm.glyphs.projection.RProjectedCoordsP;
 
 import jsky.coords.WCSTransform;
 import jsky.image.fits.FITSKeywordProvider;
@@ -30,7 +32,9 @@ import javax.media.jai.RenderedImageAdapter;
 
 //Fits support provided by JSky instead of IVOA FITS
 //Note: JSkyFitsImage requires JAI (Java Advanced Imaging)
+
 public class JSkyFitsImage extends ClosedShape implements RectangularShape {
+
     private final FITSImage fitsImage;
     private final String imageLocation;
     private final WCSTransform wcsTransform;
@@ -43,7 +47,23 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
 
     private double scale = 1;
 
+    /** For internal use. Made public for easier outside package subclassing. */
+    public boolean zoomSensitive = true;
+
+    /** For internal use. Made public for easier outside package subclassing. */
     private RProjectedCoordsP[] pc;
+
+    /** For internal use. Made public for easier outside package subclassing. */
+    public AffineTransform at;
+
+    /** For internal use. Made public for easier outside package subclassing. */
+    public double scaleFactor = 1.0f;
+
+    /** For internal use. Made public for easier outside package subclassing. */
+    public double trueCoef = 1.0f;
+
+    /** For internal use. Made public for easier outside package subclassing. */
+    public Object interpolationMethod = RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
 
 
     public JSkyFitsImage(String fileOrUrl){
@@ -53,6 +73,8 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
             //XXX change
             throw new Error("Could not create FitsImage: " + e);
         }
+        
+
         imageLocation = fileOrUrl;
         vw = fitsImage.getWidth() * scale;
         vh = fitsImage.getHeight() * scale;
@@ -70,6 +92,7 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
 
         wcsTransform = new WCSTransform(new FITSKeywordProvider(fitsImage));
     }
+
 
     /**
      * Returns the underlying FITSImage
@@ -289,6 +312,7 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
                 int dx,
                 int dy){
             //XXX change to make image zoomable
+            /*
             double trueCoef = 1; //scaleFactor * coef
             AffineTransform at = AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch);
             g.setTransform(at);
@@ -298,6 +322,120 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
             g.drawRenderedImage(proc.getDisplayImage(), AffineTransform.getScaleInstance(trueCoef,trueCoef));
             g.setComposite(acO);
             g.setTransform(stdT);
+            */
+            //XXX
+
+            // draw from the VImage
+            if (alphaC != null && alphaC.getAlpha()==0){return;}
+            if ((pc[i].cw>=1) || (pc[i].ch>=1)){
+                if (zoomSensitive){
+                    trueCoef = scaleFactor*coef;
+                }
+                else{
+                    trueCoef = scaleFactor;
+                }
+                //a threshold greater than 0.01 causes jolts when zooming-unzooming around the 1.0 scale region
+                if (Math.abs(trueCoef-1.0f)<0.01f){trueCoef=1.0f;}
+                if (trueCoef!=1.0f){
+                    // translate
+                    at = AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch);
+                    g.setTransform(at);
+                    // rescale and draw
+                    if (alphaC != null){
+                        // translucent
+                        g.setComposite(alphaC);
+                        if (interpolationMethod != RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR){
+                            g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, interpolationMethod);
+                            //g.drawImage(image,AffineTransform.getScaleInstance(trueCoef,trueCoef),null);
+                            g.drawRenderedImage(proc.getDisplayImage(), AffineTransform.getScaleInstance(trueCoef,trueCoef));
+                            g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, java.awt.RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+                        }
+                        else {
+                            //g.drawImage(image,AffineTransform.getScaleInstance(trueCoef,trueCoef),null);
+                            g.drawRenderedImage(proc.getDisplayImage(), AffineTransform.getScaleInstance(trueCoef,trueCoef));
+                        }
+                        g.setTransform(stdT);
+                        if (paintBorder){
+                            g.setColor(borderColor);
+                            if (stroke!=null) {
+                                g.setStroke(stroke);
+                                g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
+                                g.setStroke(stdS);
+                            }
+                            else {
+                                g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
+                            }
+                        }
+                        g.setComposite(acO);
+                    }
+                    else {
+                        // opaque
+                        if (interpolationMethod != RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR){
+                            g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, interpolationMethod);
+                            //g.drawImage(image,AffineTransform.getScaleInstance(trueCoef,trueCoef),null);
+                            g.drawRenderedImage(proc.getDisplayImage(), AffineTransform.getScaleInstance(trueCoef,trueCoef));
+                            g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, java.awt.RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+                        }
+                        else {
+                            //g.drawImage(image,AffineTransform.getScaleInstance(trueCoef,trueCoef),null);
+                            g.drawRenderedImage(proc.getDisplayImage(), AffineTransform.getScaleInstance(trueCoef,trueCoef));
+                        }
+                        g.setTransform(stdT);
+                        if (paintBorder){
+                            g.setColor(borderColor);
+                            if (stroke!=null) {
+                                g.setStroke(stroke);
+                                g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
+                                g.setStroke(stdS);
+                            }
+                            else {
+                                g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
+                            }
+                        }
+                    }
+                }
+                else {
+                    if (alphaC != null){
+                        // translucent
+                        g.setComposite(alphaC);
+                        //g.drawImage(image,dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,null);
+                        g.drawRenderedImage(proc.getDisplayImage(), AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw, dy+pc[i].cy-pc[i].ch));
+                        if (paintBorder){
+                            g.setColor(borderColor);
+                            if (stroke!=null) {
+                                g.setStroke(stroke);
+                                g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
+                                g.setStroke(stdS);
+                            }
+                            else {
+                                g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
+                            }
+                        }
+                        g.setComposite(acO);
+                    }
+                    else {
+                        // opaque
+                        //g.drawImage(image,dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,null);
+                        g.drawRenderedImage(proc.getDisplayImage(), AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw, dy+pc[i].cy-pc[i].ch));
+                        if (paintBorder){
+                            g.setColor(borderColor);
+                            if (stroke!=null) {
+                                g.setStroke(stroke);
+                                g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
+                                g.setStroke(stdS);
+                            }
+                            else {
+                                g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
+                            }
+                        }
+                    }
+                }
+            }
+            else {
+                g.setColor(this.borderColor);
+                g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
+            }
+
         }
 
     @Override
@@ -320,8 +458,14 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
             pc[i].cy = (int)Math.round((d.height/2d)-(vy-c.vy)*coef);
 
             //project width and height
-            pc[i].cw = (int)Math.round(vw/2d);
-            pc[i].ch = (int)Math.round(vh/2d);
+            if (zoomSensitive){
+            pc[i].cw = (int)Math.round(vw/2d*coef);
+            pc[i].ch = (int)Math.round(vh/2d*coef);
+            }
+            else{
+                pc[i].cw = (int)Math.round(vw/2d);
+                pc[i].ch = (int)Math.round(vh/2d);
+            }
         }
 
     @Override
