@@ -310,7 +310,7 @@ public class FitsMenu implements ViewListener{
 	}
 
 	public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-		if(scroll){
+		//if(scroll){
 			press3_scroll = false;
 			lastJPX = 0;
 			double min = app.hi.getUnderlyingImage().getHistogram().getMin();
@@ -324,7 +324,7 @@ public class FitsMenu implements ViewListener{
 			left = (left < 0) ? 0 : left;
 			right = (right > 1) ? 1 : right;
 			app.hi.rescale(min + left*(max - min), min + right*(max - min), 1);
-		}
+		//}
 	}
 	public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
@@ -348,20 +348,23 @@ public class FitsMenu implements ViewListener{
 	public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
 		if(press3_scroll){
         	
-        	if( (jpx-shadow.vw/2) > app.menu.BORDER_LEFT_HISTOGRAM && (jpx+shadow.vw/2) < app.menu.BORDER_RIGHT_HISTOGRAM){
+        	if( (shadow.vx-shadow.vw/2 + app.VIEW_W/2 + (jpx - lastJPX)) > app.menu.BORDER_LEFT_HISTOGRAM &&
+        		(shadow.vx+shadow.vw/2 + app.VIEW_W/2 + (jpx - lastJPX)) < app.menu.BORDER_RIGHT_HISTOGRAM){
+
         		shadow.move(jpx - lastJPX,0);
         		lastJPX = jpx;
-        		/*
-        		double min = app.hi.getUnderlyingImage().getHistogram().getMin();
-	        	double max = app.hi.getUnderlyingImage().getHistogram().getMax();
-	        	//System.out.println("shadow: " + shadow.vx + " " + (shadow.vx + shadow.vw) + " - " + hist.getWidth());
-				double left = ( shadow.vx + hist.getWidth()/2) / (hist.getWidth());
-				double right = ( shadow.vx + shadow.vw + hist.getWidth()/2) / (hist.getWidth());
-				//System.out.println("left: " + left + " right: " + right);
-				left = (left < 0) ? 0 : left;
-				right = (right > 1) ? 1 : right;
-				app.hi.rescale(min + left*(max - min), min + right*(max - min), 1);
-				*/
+        		
+        	} else if( (shadow.vx-shadow.vw/2 + app.VIEW_W/2) > app.menu.BORDER_LEFT_HISTOGRAM &&
+        		(shadow.vx+shadow.vw/2 + app.VIEW_W/2) < app.menu.BORDER_RIGHT_HISTOGRAM){
+        		if( (jpx - lastJPX) > 0 ){
+        			shadow.move( app.menu.BORDER_RIGHT_HISTOGRAM - (shadow.vx+shadow.vw/2 + app.VIEW_W/2) ,0);
+        			lastJPX = jpx;
+
+        		} else if( (jpx - lastJPX) < 0 ){
+        			shadow.move( app.menu.BORDER_LEFT_HISTOGRAM - (shadow.vx-shadow.vw/2 + app.VIEW_W/2) ,0);
+        			lastJPX = jpx;
+
+        		}
         	}
         }
 	}
@@ -374,16 +377,23 @@ public class FitsMenu implements ViewListener{
         	double mvy = v.getVCursor().getVSYCoordinate();
 
 			if(wheelDirection == WHEEL_UP){
-				if((shadow.vx+shadow.vw/2 + app.VIEW_W/2) < BORDER_RIGHT_HISTOGRAM ) shadow.move( WHEEL_FACTOR, 0 );
+				if((shadow.vx+shadow.vw/2 + app.VIEW_W/2 + WHEEL_FACTOR) < BORDER_RIGHT_HISTOGRAM ) shadow.move( WHEEL_FACTOR, 0 );
+				else if( (shadow.vx+shadow.vw/2 + app.VIEW_W/2) < BORDER_RIGHT_HISTOGRAM){
+					shadow.move( BORDER_RIGHT_HISTOGRAM - (shadow.vx+shadow.vw/2 + app.VIEW_W/2), 0 );
+				} 
 			} else {
-				if((shadow.vx-shadow.vw/2 + app.VIEW_W/2) > BORDER_LEFT_HISTOGRAM ) shadow.move( -WHEEL_FACTOR, 0 );
+				if((shadow.vx-shadow.vw/2 + app.VIEW_W/2 - WHEEL_FACTOR) > BORDER_LEFT_HISTOGRAM ) shadow.move( -WHEEL_FACTOR, 0 );
+				else if( (shadow.vx-shadow.vw/2 + app.VIEW_W/2) > BORDER_LEFT_HISTOGRAM){
+					shadow.move( BORDER_LEFT_HISTOGRAM - (shadow.vx-shadow.vw/2 + app.VIEW_W/2) , 0 );
+				}
 			}
 
 			double min = app.hi.getUnderlyingImage().getHistogram().getMin();
         	double max = app.hi.getUnderlyingImage().getHistogram().getMax();
         	//System.out.println("shadow: " + shadow.vx + " " + (shadow.vx + shadow.vw) + " - " + hist.getWidth());
-			double left = ( shadow.vx + hist.getWidth()/2) / (hist.getWidth());
-			double right = ( shadow.vx + shadow.vw + hist.getWidth()/2) / (hist.getWidth());
+			double left = ( shadow.vx + hist.getWidth()/2 - shadow.vw/2) / (hist.getWidth());
+			double right = ( shadow.vx + hist.getWidth()/2 + shadow.vw/2 ) / (hist.getWidth());
+			
 			//System.out.println("left: " + left + " right: " + right);
 			left = (left < 0) ? 0 : left;
 			right = (right > 1) ? 1 : right;
