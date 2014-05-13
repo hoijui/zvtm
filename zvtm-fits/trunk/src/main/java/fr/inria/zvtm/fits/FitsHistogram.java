@@ -13,11 +13,14 @@ import fr.inria.zvtm.glyphs.Composite;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.FitsImage;
 import fr.inria.zvtm.glyphs.VRectangle;
-import edu.jhu.pha.sdss.fits.Histogram;
+
 
 import fr.inria.zvtm.fits.examples.FitsMenu;
 
 import edu.jhu.pha.sdss.fits.FITSImage; 
+import edu.jhu.pha.sdss.fits.Histogram;
+
+//import jsky.image.fits.codec.FITSImage;
 
 /**
  * Graphical representation of an histogram
@@ -82,6 +85,28 @@ public class FitsHistogram extends Composite {
         }
         return new FitsHistogram(data, min, max, fillColor);
     }
+
+    /*
+    public static FitsHistogram fromJSkyFitsImage(FitsImage image, Color fillColor){
+        Histogram hist = image.getUnderlyingImage().getHistogram();
+        int[] data = new int[128];
+        
+        for(int i=0; i<hist.getCounts().length; ++i){
+            data[i/(hist.getCounts().length / data.length)] += hist.getCounts()[i];
+        }
+        int min = Integer.MAX_VALUE;
+        int max = Integer.MIN_VALUE;
+        for(int j=0; j<data.length; ++j){
+            if (data[j] < min){
+                min = data[j];
+            }
+            if(data[j] > max){
+                max = data[j];
+            }
+        }
+        return new FitsHistogram(data, min, max, fillColor);
+    }
+    */
 
 
     public double getHeight(){

@@ -144,9 +144,20 @@ class PanZoomEventHandler implements ViewListener {
         //System.out.println(app.menu.BORDER_LEFT_HISTOGRAM + " < " + jpx + " < " + app.menu.BORDER_RIGHT_HISTOGRAM);
 
         if(app instanceof FitsExample){
-            if((jpx < ((FitsExample)app).WIDTH_MENU && jpy > ((FitsExample)app).menu.BORDER_BOTTON_FILTER && jpy < ((FitsExample)app).menu.BORDER_TOP_FILTER) ||
+            if((jpx < ((FitsExample)app).menu.WIDTH_MENU && jpy > ((FitsExample)app).menu.BORDER_BOTTON_FILTER && jpy < ((FitsExample)app).menu.BORDER_TOP_FILTER) ||
                         (jpy > ((FitsExample)app).menu.BORDER_TOP_HISTOGRAM && jpy < ((FitsExample)app).menu.BORDER_BOTTON_HISTOGRAM && jpx > ((FitsExample)app).menu.BORDER_LEFT_HISTOGRAM && 
                         jpx < ((FitsExample)app).menu.BORDER_RIGHT_HISTOGRAM )){
+                v.parent.setActiveLayer(2);
+                v.parent.setCursorIcon(Cursor.DEFAULT_CURSOR);
+            } else {
+                v.parent.setActiveLayer(0);
+                v.parent.setCursorIcon(Cursor.CUSTOM_CURSOR);
+            }
+        }
+        else if(app instanceof JSkyFitsExample){
+            if((jpx < ((JSkyFitsExample)app).menu.WIDTH_MENU && jpy > ((JSkyFitsExample)app).menu.BORDER_BOTTON_FILTER && jpy < ((JSkyFitsExample)app).menu.BORDER_TOP_FILTER) ||
+                        (jpy > ((JSkyFitsExample)app).menu.BORDER_TOP_HISTOGRAM && jpy < ((JSkyFitsExample)app).menu.BORDER_BOTTON_HISTOGRAM && jpx > ((JSkyFitsExample)app).menu.BORDER_LEFT_HISTOGRAM && 
+                        jpx < ((JSkyFitsExample)app).menu.BORDER_RIGHT_HISTOGRAM )){
                 v.parent.setActiveLayer(2);
                 v.parent.setCursorIcon(Cursor.DEFAULT_CURSOR);
             } else {
@@ -251,7 +262,7 @@ class PanZoomEventHandler implements ViewListener {
                 c.move(-((mvx - c.vx) * WHEEL_ZOOMOUT_FACTOR / c.focal),
                                          -((mvy - c.vy) * WHEEL_ZOOMOUT_FACTOR / c.focal));
                 c.altitudeOffset(a*WHEEL_ZOOMOUT_FACTOR);
-                //((JSkyFitsExample)app).vsm.repaint();
+                ((JSkyFitsExample)app).vsm.repaint();
             }
             else {
                 //wheelDirection == WHEEL_DOWN, zooming in
@@ -261,7 +272,7 @@ class PanZoomEventHandler implements ViewListener {
                                              ((mvy - c.vy) * WHEEL_ZOOMIN_FACTOR / c.focal));
                 }
                 c.altitudeOffset(-a*WHEEL_ZOOMIN_FACTOR);
-                //((JSkyFitsExample)app).vsm.repaint();
+                ((JSkyFitsExample)app).vsm.repaint();
             }
 
         }

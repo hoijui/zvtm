@@ -45,16 +45,32 @@ import java.net.URL;
 // Options
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
+import java.awt.Toolkit;
+
+import java.awt.GraphicsEnvironment;
+import javax.swing.JFrame;
+
 
 /**
  * Sample FITS application.
  */
-public class JSkyFitsExample {
+public class JSkyFitsExample{
+
+	/* screen dimensions, actual dimensions of windows */
+    static int SCREEN_WIDTH =  Toolkit.getDefaultToolkit().getScreenSize().width;
+    static int SCREEN_HEIGHT =  Toolkit.getDefaultToolkit().getScreenSize().height;
+    static int VIEW_MAX_W = 1280;
+    static int VIEW_MAX_H = 800;
+    int VIEW_W, VIEW_H;
+    int VIEW_X, VIEW_Y;
+
+    String APP_TITLE = "Master View";
+
 	//shortcut
 	VirtualSpaceManager vsm; 
 
-	VirtualSpace mSpace;
-	Camera mCamera;
+	VirtualSpace mSpace, bSpace, mnSpace;
+	Camera mCamera, bCamera, mnCamera;
 
     JSkyFitsImage img;
     double[] scaleBounds;
@@ -63,7 +79,16 @@ public class JSkyFitsExample {
     private View mView;
     private PanZoomEventHandler eh;
 
-    public FitsMenu menu;
+    public JSkyFitsMenu menu;
+
+    static final String mSpaceName = "FITS Layer";
+    static final String bSpaceName = "Data Layer";
+	static final String mnSpaceName = "Menu Layer";
+
+	static final int LAYER_FITS = 0;
+	static final int LAYER_DATA = 1;
+	static final int LAYER_MENU = 2;
+
 
 	JSkyFitsExample(FitsOptions options) throws IOException {
 		
@@ -83,34 +108,45 @@ public class JSkyFitsExample {
 
         mSpace.addGlyph(img);
 
-		/*
-		System.out.println("addGlyph");
-		double[] bound_img = img.getBounds();
-		System.out.println("bounds:");
-		for(double it : bound_img) System.out.println("\t" + it);
-		Point2D.Double loc = img.getLocation();
-
-		VRectangle border = new VRectangle(loc.getX(), loc.getY(), 1, Math.abs(bound_img[2]-bound_img[0]), Math.abs(bound_img[3]-bound_img[1]), Color.BLACK, Color.BLACK, 0.2f);
-		mSpace.addGlyph(border);
-		System.out.println(border);
-		*/
-
 
     }
 
     void initGUI(FitsOptions options){
+    	windowLayout();
     	vsm = VirtualSpaceManager.INSTANCE;
-    	mSpace = vsm.addVirtualSpace("testSpace");
+    	mSpace = vsm.addVirtualSpace(mSpaceName);
+    	bSpace = vsm.addVirtualSpace(bSpaceName);
+    	mnSpace = vsm.addVirtualSpace(mnSpaceName);
 		mCamera = mSpace.addCamera();
+		bCamera = bSpace.addCamera();
+		mnCamera = mnSpace.addCamera();
 		Vector<Camera> cameras = new Vector<Camera>();
-		cameras.add(mCamera);	
-        
-        mView = vsm.addFrameView(cameras, "Master View",
-                View.STD_VIEW, 800, 600, false, true, true, null);	
+		cameras.add(mCamera);
+		cameras.add(bCamera);
+		cameras.add(mnCamera);
+
+
+        mView = vsm.addFrameView(cameras, APP_TITLE, View.STD_VIEW, VIEW_W, VIEW_H, false, false, !options.fullscreen, null);
+        // fullscreen or not
+        if (options.fullscreen && GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().isFullScreenSupported()){
+            GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow((JFrame)mView.getFrame());
+        }
+        else {
+            mView.setVisible(true);
+        }
+
+
         mView.setBackgroundColor(Color.GRAY);
 
+        menu = new JSkyFitsMenu(this);
+
         eh = new PanZoomEventHandler(this);
-        mView.setListener(eh);
+        mView.setListener(eh, LAYER_FITS);
+        mView.setListener(eh, LAYER_DATA);
+        mView.setListener(menu, LAYER_MENU);
+
+        //menu.drawHistogram();
+        
     }
 
     private Point2D.Double viewToSpace(Camera cam, int jpx, int jpy){
@@ -128,6 +164,53 @@ public class JSkyFitsExample {
                 viewOrigY - (altCoef*jpy));
     }
 
+    public VirtualSpace getMSpace(){
+    	return mSpace;
+    }
+	public VirtualSpace getMnSpace(){
+		return mnSpace;
+	}
+
+	public void setScaleMethod(int scale){
+
+	}
+	public JSkyFitsMenu getMenu(){
+		return menu;
+	}
+
+	public int getViewW(){
+		return VIEW_W;
+	}
+	public int getViewH(){
+		return VIEW_H;
+	}
+
+	public Camera getMCamera(){
+		return mCamera;
+	}
+	public Camera getMnCamera(){
+		return mnCamera;
+	}
+
+	void windowLayout(){
+
+        VIEW_X = 80;
+        SCREEN_WIDTH -= 80;
+
+        /*
+        if (Utils.osIsWindows()){
+            VIEW_X = VIEW_Y = 0;
+        }
+        else if (Utils.osIsMacOS()){
+            VIEW_X = 80;
+            SCREEN_WIDTH -= 80;
+        }
+        */
+        VIEW_W = (SCREEN_WIDTH <= VIEW_MAX_W) ? SCREEN_WIDTH : VIEW_MAX_W;
+        VIEW_H = (SCREEN_HEIGHT <= VIEW_MAX_H) ? SCREEN_HEIGHT : VIEW_MAX_H;
+    }
+
+
 	public static void main(String[] args) throws IOException{
 
         FitsOptions options = new FitsOptions();
@@ -143,105 +226,6 @@ public class JSkyFitsExample {
 
 		new JSkyFitsExample(options);
 	}
-
-/*
-	private class PanZoomEventHandler implements ViewListener {
-		private int lastJPX;
-		private int lastJPY;
-
-		public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-            Point2D.Double cursorPos = viewToSpace(vsm.getActiveCamera(), jpx, jpy);
-        }
-
-		public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-            dragLeft = false;
-            dragRight = false;
-        }
-
-		public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
-
-		public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
-
-		public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
-
-		public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
-
-		public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-			lastJPX=jpx;
-			lastJPY=jpy;
-			v.setDrawDrag(true);
-			vsm.getActiveView().mouse.setSensitivity(false);
-			//because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
-		}
-
-		public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-			v.cams[0].setXspeed(0);
-			v.cams[0].setYspeed(0);
-			v.cams[0].setZspeed(0);
-			v.setDrawDrag(false);
-			vsm.getActiveView().mouse.setSensitivity(true);
-		}
-
-		public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
-
-		public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){}
-
-		public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
-            if(buttonNumber == 1){
-            }
-
-			if (buttonNumber == 3 || ((mod == META_MOD || mod == META_SHIFT_MOD) && buttonNumber == 1)){
-				Camera c=vsm.getActiveCamera();
-				double a=(c.focal+Math.abs(c.altitude))/c.focal;
-				if (mod == META_SHIFT_MOD) {
-					v.cams[0].setXspeed(0);
-					v.cams[0].setYspeed(0);
-					v.cams[0].setZspeed((c.altitude>0) ? (lastJPY-jpy)*(a/4.0) : (lastJPY-jpy)/(a*4));
-
-				}
-				else {
-					v.cams[0].setXspeed((c.altitude>0) ? (jpx-lastJPX)*(a/4.0) : (jpx-lastJPX)/(a*4));
-					v.cams[0].setYspeed((c.altitude>0) ? (lastJPY-jpy)*(a/4.0) : (lastJPY-jpy)/(a*4));
-					v.cams[0].setZspeed(0);
-				}
-			}
-		}
-
-		public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){}
-
-		public void enterGlyph(Glyph g){
-		}
-
-		public void exitGlyph(Glyph g){
-		}
-
-		public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){
-            if(c == '-'){
-                scaleBounds[1] -= 100;
-              //  img.rescale(scaleBounds[0], scaleBounds[1], 1);
-            } else if (c == '+'){
-                scaleBounds[1] += 100;
-              //  img.rescale(scaleBounds[0], scaleBounds[1], 1);
-            }
-        }
-
-		public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
-		}
-
-		public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
-
-		public void viewActivated(View v){}
-
-		public void viewDeactivated(View v){}
-
-		public void viewIconified(View v){}
-
-		public void viewDeiconified(View v){}
-
-		public void viewClosing(View v){System.exit(0);}
-
-	}
-*/
 
 }
 

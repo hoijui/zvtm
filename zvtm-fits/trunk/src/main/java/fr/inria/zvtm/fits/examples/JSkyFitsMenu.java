@@ -42,10 +42,12 @@ import java.awt.event.MouseWheelEvent;
 
 import java.util.Vector;
 
-import fr.inria.zvtm.fits.FitsHistogram;
+//import fr.inria.zvtm.fits.FitsHistogram;
 
 
-public class FitsMenu implements ViewListener{
+
+
+public class JSkyFitsMenu implements ViewListener{
 	
 
 	public static final int WIDTH_MENU = 200;
@@ -94,10 +96,10 @@ public class FitsMenu implements ViewListener{
 	//private static double FACTOR_H_ASINH = (HEIGHT_BUTTON-2)/2/3;
 	//private static double FACTOR_W_ASINH = (WIDTH_MENU - 2*BORDER)/4;
 
-	FitsExample app;
+	JSkyFitsExample app;
 	VirtualSpace mnSpace;
 
-	FitsHistogram hist;
+	//FitsHistogram hist;
 
 	int lastJPX;
 
@@ -106,7 +108,7 @@ public class FitsMenu implements ViewListener{
 	boolean scroll = false;
 	boolean press3_scroll = false;
 
-	FitsMenu(FitsExample app){
+	JSkyFitsMenu(JSkyFitsExample app){
 		this.app = app;
 		mnSpace = app.mnSpace;
 		drawFiltersColor();
@@ -145,6 +147,8 @@ public class FitsMenu implements ViewListener{
 		BORDER_BOTTON_FILTER = py + HEIGHT_BTN - 2*BORDER;
 	}
 
+	/*
+
 	public void drawHistogram(){
 
 		if(app.hi != null){
@@ -161,6 +165,7 @@ public class FitsMenu implements ViewListener{
 		mnSpace.addGlyph(board);
 		mnSpace.addGlyph(hist);
 	}
+	*/
 /*
 	public void redrawHistogram(){
 		mnSpace.removeGlyph(hist);
@@ -238,19 +243,11 @@ public class FitsMenu implements ViewListener{
 	}
 
 	public void release1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){
+		/*
 		if(jpy > app.menu.BORDER_TOP_HISTOGRAM && jpy < app.menu.BORDER_BOTTON_HISTOGRAM){
-			/*
-			VRectangle[] bars = hist.getBars();
-			for(VRectangle b : bars){
-				if(b.getLocation().getX() > ((lastJPX < jpx)? lastJPX : jpx) - app.VIEW_W/2 && b.getLocation().getX() < ((lastJPX < jpx)? jpx : lastJPX) - app.VIEW_W/2){
-					b.setColor(FitsHistogram.DEFAULT_FILL_COLOR);
-				}
-			}
-			*/
-			double min = app.hi.getUnderlyingImage().getHistogram().getMin();
-        	double max = app.hi.getUnderlyingImage().getHistogram().getMax();
-			//double left = ( ((lastJPX < jpx)? lastJPX : jpx) - (app.VIEW_W - hist.getWidth())/2 ) / hist.getWidth();
-			//double right = ( ((lastJPX < jpx)? jpx : lastJPX) - (app.VIEW_W - hist.getWidth())/2 ) / hist.getWidth();
+			
+			//double min = app.hi.getUnderlyingImage().getHistogram().getMin();
+        	//double max = app.hi.getUnderlyingImage().getHistogram().getMax();
 			
         	double left = ( ((lastJPX < jpx)? lastJPX : jpx) - app.VIEW_W/2 + hist.getWidth()/2) / hist.getWidth();
 			double right = ( ((lastJPX < jpx)? jpx : lastJPX) - app.VIEW_W/2 + hist.getWidth()/2) / hist.getWidth();
@@ -260,7 +257,7 @@ public class FitsMenu implements ViewListener{
 
 			left = (left < 0) ? 0 : left;
 			right = (right > 1) ? 1 : right;
-			app.hi.rescale(min + left*(max - min), min + right*(max - min), 1);
+			//app.hi.rescale(min + left*(max - min), min + right*(max - min), 1);
 			if(lastJPX < jpx){
 				if(lastJPX < BORDER_LEFT_HISTOGRAM)
 					lastJPX = BORDER_LEFT_HISTOGRAM;
@@ -277,16 +274,17 @@ public class FitsMenu implements ViewListener{
 			app.mnSpace.addGlyph(shadow);
 			lastJPX = 0;
 		}
+		*/
 	}
 
 	public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
 		//System.out.println("clickNumber: " + clickNumber);
 		if(clickNumber == 2){
-			double min = app.hi.getUnderlyingImage().getHistogram().getMin();
-        	double max = app.hi.getUnderlyingImage().getHistogram().getMax();
+			//double min = app.hi.getUnderlyingImage().getHistogram().getMin();
+        	//double max = app.hi.getUnderlyingImage().getHistogram().getMax();
 			double left = 0;
 			double right = 1;
-			app.hi.rescale(min + left*(max - min), min + right*(max - min), 1);
+			//app.hi.rescale(min + left*(max - min), min + right*(max - min), 1);
 
 			if(shadow != null)
 				app.mnSpace.removeGlyph(shadow);
@@ -315,6 +313,7 @@ public class FitsMenu implements ViewListener{
 	}
 
 	public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+		/*
 		//if(scroll){
 			press3_scroll = false;
 			lastJPX = 0;
@@ -328,8 +327,9 @@ public class FitsMenu implements ViewListener{
 
 			left = (left < 0) ? 0 : left;
 			right = (right > 1) ? 1 : right;
-			app.hi.rescale(min + left*(max - min), min + right*(max - min), 1);
+			//app.hi.rescale(min + left*(max - min), min + right*(max - min), 1);
 		//}
+		*/
 	}
 	public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
@@ -337,20 +337,20 @@ public class FitsMenu implements ViewListener{
 		//System.out.println(app.menu.BORDER_BOTTON_HISTOGRAM + " > " + jpy + " > " + app.menu.BORDER_TOP_HISTOGRAM);
 		//System.out.println(hist.vx + " " + hist.vy + " " + hist.getWidth() + " " + hist.getHeight());
 		//System.out.println(BORDER_LEFT_HISTOGRAM + " < " + jpx + " < " + BORDER_RIGHT_HISTOGRAM);
-        if((jpx < app.menu.WIDTH_MENU && jpy > app.menu.BORDER_BOTTON_FILTER && jpy < app.menu.BORDER_TOP_FILTER) ||
-          (jpy > app.menu.BORDER_TOP_HISTOGRAM && jpy < app.menu.BORDER_BOTTON_HISTOGRAM && jpx > app.menu.BORDER_LEFT_HISTOGRAM && jpx < app.menu.BORDER_RIGHT_HISTOGRAM )){
-            v.parent.setActiveLayer(2);
+        if((jpx < app.menu.WIDTH_MENU && jpy > app.menu.BORDER_BOTTON_FILTER && jpy < app.menu.BORDER_TOP_FILTER)){// ||
+          //(jpy > app.menu.BORDER_TOP_HISTOGRAM && jpy < app.menu.BORDER_BOTTON_HISTOGRAM && jpx > app.menu.BORDER_LEFT_HISTOGRAM && jpx < app.menu.BORDER_RIGHT_HISTOGRAM )){
+            v.parent.setActiveLayer(app.LAYER_MENU);
             v.parent.setCursorIcon(Cursor.DEFAULT_CURSOR);
         } else {
-            v.parent.setActiveLayer(0);
+            v.parent.setActiveLayer(app.LAYER_FITS);
             v.parent.setCursorIcon(Cursor.CUSTOM_CURSOR);
         }
-
         
 
     }
 
 	public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
+		/*
 		if(press3_scroll){
         	
         	if( (shadow.vx-shadow.vw/2 + app.VIEW_W/2 + (jpx - lastJPX)) > app.menu.BORDER_LEFT_HISTOGRAM &&
@@ -372,10 +372,11 @@ public class FitsMenu implements ViewListener{
         		}
         	}
         }
+        */
 	}
 
 	public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
-
+		/*
 		if(shadow != null){
 
 			double mvx = v.getVCursor().getVSXCoordinate();
@@ -393,8 +394,9 @@ public class FitsMenu implements ViewListener{
 				}
 			}
 
-			double min = app.hi.getUnderlyingImage().getHistogram().getMin();
-        	double max = app.hi.getUnderlyingImage().getHistogram().getMax();
+			//double min = app.hi.getUnderlyingImage().getHistogram().getMin();
+        	//double max = app.hi.getUnderlyingImage().getHistogram().getMax();
+        	
         	//System.out.println("shadow: " + shadow.vx + " " + (shadow.vx + shadow.vw) + " - " + hist.getWidth());
 			double left = ( shadow.vx + hist.getWidth()/2 - shadow.vw/2) / (hist.getWidth());
 			double right = ( shadow.vx + hist.getWidth()/2 + shadow.vw/2 ) / (hist.getWidth());
@@ -402,13 +404,14 @@ public class FitsMenu implements ViewListener{
 			//System.out.println("left: " + left + " right: " + right);
 			left = (left < 0) ? 0 : left;
 			right = (right > 1) ? 1 : right;
-			app.hi.rescale(min + left*(max - min), min + right*(max - min), 1);
+			//app.hi.rescale(min + left*(max - min), min + right*(max - min), 1);
 		}
+		*/
 	}
 
 	public void enterGlyph(Glyph g){
         if(g.getType().equals(T_FILTER)){
-            app.setColorFilter((ImageFilter)g.getOwner());
+            //app.setColorFilter((ImageFilter)g.getOwner());
             if(color_selected != null){
             	color_selected.setWidth(color_selected.getWidth()-BORDER*2);
             	color_selected.move(-BORDER,0);
@@ -417,7 +420,7 @@ public class FitsMenu implements ViewListener{
             g.move(BORDER, 0);
             color_selected = (PRectangle)g;
         } else if(g.getType().equals(T_SCALE)){
-        	app.setScaleMethod((Integer)g.getOwner());
+        	//app.setScaleMethod((Integer)g.getOwner());
         	if(scale_selected != null){
         		scale_selected.setWidth(scale_selected.getWidth()-BORDER*2);
         		scale_selected.move(-BORDER,0);

@@ -70,7 +70,7 @@ import java.awt.Cursor;
 /**
  * Sample FITS application.
  */
-public class FitsExample {
+public class FitsExample{
 
 
     /* screen dimensions, actual dimensions of windows */
@@ -80,8 +80,6 @@ public class FitsExample {
     static int VIEW_MAX_H = 800;
     int VIEW_W, VIEW_H;
     int VIEW_X, VIEW_Y;
-
-    public static final int WIDTH_MENU = 200;
 
     /* dimensions of zoomable panel */
     int panelWidth, panelHeight;
@@ -99,6 +97,11 @@ public class FitsExample {
     static final String mSpaceName = "FITS Layer";
     static final String bSpaceName = "Data Layer";
     static final String mnSpaceName = "Menu Layer";
+
+    static final int LAYER_FITS = 0;
+    static final int LAYER_DATA = 1;
+    static final int LAYER_MENU = 2;
+
     VirtualSpace mSpace, bSpace, mnSpace;
     Camera mCamera, bCamera, mnCamera;
 
@@ -196,9 +199,9 @@ public class FitsExample {
         
         eh = new PanZoomEventHandler(this);
         //mCamera.addListener(eh);
-        mView.setListener(eh, 0);
-        mView.setListener(eh, 1);
-        mView.setListener(menu, 2);
+        mView.setListener(eh, LAYER_FITS);
+        mView.setListener(eh, LAYER_DATA);
+        mView.setListener(menu, LAYER_MENU);
 
         mView.setBackgroundColor(BACKGROUND_COLOR);
 
@@ -291,6 +294,33 @@ public class FitsExample {
         return new Point2D.Double(
                 viewOrigX + (altCoef*jpx),
                 viewOrigY - (altCoef*jpy));
+    }
+
+    public VirtualSpace getMSpace(){
+        return mSpace;
+    }
+    public VirtualSpace getMnSpace(){
+        return mnSpace;
+    }
+    public FitsMenu getMenu(){
+        return menu;
+    }
+
+    public int getViewW(){
+        return VIEW_W;
+    }
+    public int getViewH(){
+        return VIEW_H;
+    }
+
+    public Camera getMCamera(){
+        return mCamera;
+    }
+    public Camera getMnCamera(){
+        return mnCamera;
+    }
+    public FitsImage getImage(){
+        return hi;
     }
 
 	public static void main(String[] args) throws IOException{
