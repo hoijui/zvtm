@@ -147,22 +147,23 @@ class PanZoomEventHandler implements ViewListener {
             if((jpx < ((FitsExample)app).menu.WIDTH_MENU && jpy > ((FitsExample)app).menu.BORDER_BOTTON_FILTER && jpy < ((FitsExample)app).menu.BORDER_TOP_FILTER) ||
                         (jpy > ((FitsExample)app).menu.BORDER_TOP_HISTOGRAM && jpy < ((FitsExample)app).menu.BORDER_BOTTON_HISTOGRAM && jpx > ((FitsExample)app).menu.BORDER_LEFT_HISTOGRAM && 
                         jpx < ((FitsExample)app).menu.BORDER_RIGHT_HISTOGRAM )){
-                v.parent.setActiveLayer(2);
+                v.parent.setActiveLayer(((FitsExample)app).LAYER_MENU);
                 v.parent.setCursorIcon(Cursor.DEFAULT_CURSOR);
             } else {
-                v.parent.setActiveLayer(0);
+                v.parent.setActiveLayer(((FitsExample)app).LAYER_FITS);
                 v.parent.setCursorIcon(Cursor.CUSTOM_CURSOR);
             }
         }
         else if(app instanceof JSkyFitsExample){
-            if((jpx < ((JSkyFitsExample)app).menu.WIDTH_MENU && jpy > ((JSkyFitsExample)app).menu.BORDER_BOTTON_FILTER && jpy < ((JSkyFitsExample)app).menu.BORDER_TOP_FILTER) ||
-                        (jpy > ((JSkyFitsExample)app).menu.BORDER_TOP_HISTOGRAM && jpy < ((JSkyFitsExample)app).menu.BORDER_BOTTON_HISTOGRAM && jpx > ((JSkyFitsExample)app).menu.BORDER_LEFT_HISTOGRAM && 
-                        jpx < ((JSkyFitsExample)app).menu.BORDER_RIGHT_HISTOGRAM )){
-                v.parent.setActiveLayer(2);
+            //System.out.println(jpx + " < " + ((JSkyFitsExample)app).menu.WIDTH_MENU + " " + ((JSkyFitsExample)app).menu.BORDER_BOTTON_FILTER + " < " + jpy + " < " + ((JSkyFitsExample)app).menu.BORDER_TOP_FILTER);
+            if((jpx < ((JSkyFitsExample)app).menu.WIDTH_MENU && jpy < ((JSkyFitsExample)app).menu.BORDER_BOTTON_FILTER  && jpy > ((JSkyFitsExample)app).menu.BORDER_TOP_FILTER) ){ // ||
+                        //(jpy > ((JSkyFitsExample)app).menu.BORDER_TOP_HISTOGRAM && jpy < ((JSkyFitsExample)app).menu.BORDER_BOTTON_HISTOGRAM && jpx > ((JSkyFitsExample)app).menu.BORDER_LEFT_HISTOGRAM && 
+                        //jpx < ((JSkyFitsExample)app).menu.BORDER_RIGHT_HISTOGRAM )){
+                v.parent.setActiveLayer(((JSkyFitsExample)app).LAYER_MENU);
                 v.parent.setCursorIcon(Cursor.DEFAULT_CURSOR);
             } else {
-                v.parent.setActiveLayer(0);
-                v.parent.setCursorIcon(Cursor.CUSTOM_CURSOR);
+                v.parent.setActiveLayer(((JSkyFitsExample)app).LAYER_FITS);
+                v.parent.setCursorIcon(Cursor.CUSTOM_CURSOR);     
             }
         }
         

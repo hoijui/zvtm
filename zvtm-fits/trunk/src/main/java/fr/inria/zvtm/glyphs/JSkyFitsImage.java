@@ -28,7 +28,13 @@ import jsky.image.fits.codec.FITSImage;
 import jsky.image.ImageProcessor;
 import jsky.image.ImageLookup;
 
+//import jsky.image.ImageHistogram;
+import javax.media.jai.Histogram;
+
 import javax.media.jai.RenderedImageAdapter;
+
+import javax.media.jai.PlanarImage;
+import javax.media.jai.ROI;
 
 //Fits support provided by JSky instead of IVOA FITS
 //Note: JSkyFitsImage requires JAI (Java Advanced Imaging)
@@ -61,6 +67,8 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
 
     /** For internal use. Made public for easier outside package subclassing. */
     public double trueCoef = 1.0f;
+
+    public boolean paintBorder = false;
 
     /** For internal use. Made public for easier outside package subclassing. */
     public Object interpolationMethod = RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
@@ -131,6 +139,13 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
         return fitsImage.getScale();
     }
 
+
+    /*
+    public Histogram getHistogram(int size){
+        return proc.getHistogram(size, new ROI(proc.getRescaledSourceImage()));
+    }
+    */
+
     /*
     public void setScale(float scaleFactor){
         //XXX
@@ -155,6 +170,55 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
         proc.update();
         VirtualSpaceManager.INSTANCE.repaint();
     }
+    public void setScaleAlgorithm(int method){
+        switch(method){
+            case ImageLookup.LINEAR_SCALE:
+                proc.setScaleAlgorithm(ImageLookup.LINEAR_SCALE);
+                break;
+            case ImageLookup.LOG_SCALE:
+                proc.setScaleAlgorithm(ImageLookup.LOG_SCALE);
+                break;
+            case ImageLookup.HIST_EQ:
+                proc.setScaleAlgorithm(ImageLookup.HIST_EQ);
+                break;
+            case ImageLookup.SQRT_SCALE:
+                proc.setScaleAlgorithm(ImageLookup.SQRT_SCALE);
+                break;
+
+            default:
+                proc.setScaleAlgorithm(ImageLookup.LINEAR_SCALE);
+                break;
+        }
+        proc.update();
+        VirtualSpaceManager.INSTANCE.repaint();
+    }
+
+    public ImageProcessor getImageProcessor(){
+        return proc;
+    }
+
+/*
+             LINEAR{
+            @Override int toJSkyValue(){
+                return ImageLookup.LINEAR_SCALE;
+            }
+        },
+        LOG{
+            @Override int toJSkyValue(){
+                return ImageLookup.LOG_SCALE;
+            }
+        },
+        HIST_EQ{
+            @Override int toJSkyValue(){
+                return ImageLookup.HIST_EQ;
+            }
+        },
+        SQRT{
+            @Override int toJSkyValue(){
+                return ImageLookup.SQRT_SCALE;
+        
+    }
+*/
 
     /**
      * Sets the cut levels for this image.
@@ -513,21 +577,21 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
                 return ImageLookup.LINEAR_SCALE;
             }
         },
-            LOG{
-                @Override int toJSkyValue(){
-                    return ImageLookup.LOG_SCALE;
-                }
-            },
-            HIST_EQ{
-                @Override int toJSkyValue(){
-                    return ImageLookup.HIST_EQ;
-                }
-            },
-            SQRT{
-                @Override int toJSkyValue(){
-                    return ImageLookup.SQRT_SCALE;
-                }
-            };
+        LOG{
+            @Override int toJSkyValue(){
+                return ImageLookup.LOG_SCALE;
+            }
+        },
+        HIST_EQ{
+            @Override int toJSkyValue(){
+                return ImageLookup.HIST_EQ;
+            }
+        },
+        SQRT{
+            @Override int toJSkyValue(){
+                return ImageLookup.SQRT_SCALE;
+            }
+        };
         abstract int toJSkyValue();
     }
 

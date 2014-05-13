@@ -34,7 +34,7 @@ import java.awt.geom.Point2D;
 import java.awt.BasicStroke;
 import java.awt.Stroke;
 
-import edu.jhu.pha.sdss.fits.FITSImage;
+//import edu.jhu.pha.sdss.fits.FITSImage;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -42,7 +42,9 @@ import java.awt.event.MouseWheelEvent;
 
 import java.util.Vector;
 
-//import fr.inria.zvtm.fits.FitsHistogram;
+import fr.inria.zvtm.fits.JSkyFitsHistogram;
+
+import jsky.image.ImageLookup;
 
 
 
@@ -71,11 +73,20 @@ public class JSkyFitsMenu implements ViewListener{
 	public static final float WHEEL_FACTOR = 15.0f;
 
 
-	public static final ColorGradient[] COLOR_GRADIANT = {new NopFilter(), new HeatFilter(), new RainbowFilter(), new MousseFilter(), new StandardFilter(), new RandomFilter()};
+	/**
+     * Sets the color lookup table.
+     * Currently, accepted values are: "Background", "Blue", "Heat", "Isophot", "Light", "Pastel", "Ramp", "Real", "Smooth", "Staircase", "Standard".
+     */
+	public static final ColorGradient[] COLOR_GRADIANT = {new StandardFilter(),  new HeatFilter()};//, new NopFilter(), new RainbowFilter(), new MousseFilter(), , new RandomFilter()};
+	public static final String[] COLOR_NAME = {"Standard", "Heat"};
 
-	public static final int[] SCALE_METHOD = {FITSImage.SCALE_ASINH, FITSImage.SCALE_HISTOGRAM_EQUALIZATION, FITSImage.SCALE_LINEAR, FITSImage.SCALE_LOG, FITSImage.SCALE_SQUARE, FITSImage.SCALE_SQUARE_ROOT};
-	public static final String[] SCALE_NAME = {"ASINH", "HISTOGRAM_EQUALIZATION", "LINEAR", "LOG", "SQUARE", "SQUARE_ROOT"};
+	public static final int[] SCALE_METHOD = {ImageLookup.LINEAR_SCALE, ImageLookup.LOG_SCALE, ImageLookup.HIST_EQ, ImageLookup.SQRT_SCALE};
+	public static final String[] SCALE_NAME = {"LINEAR", "LOG", "HISTOGRAM_EQUALIZATION", "SQUARE"};
 
+	/**
+     * Sets the color lookup table.
+     * Currently, accepted values are: "Background", "Blue", "Heat", "Isophot", "Light", "Pastel", "Ramp", "Real", "Smooth", "Staircase", "Standard".
+     */
 
 	public int BORDER_BOTTON_FILTER;
 	public int BORDER_TOP_FILTER;
@@ -99,7 +110,7 @@ public class JSkyFitsMenu implements ViewListener{
 	JSkyFitsExample app;
 	VirtualSpace mnSpace;
 
-	//FitsHistogram hist;
+	JSkyFitsHistogram hist;
 
 	int lastJPX;
 
@@ -116,7 +127,7 @@ public class JSkyFitsMenu implements ViewListener{
 
 	private void drawFiltersColor(){
 
-		BORDER_TOP_FILTER =  app.VIEW_H/2;
+		BORDER_TOP_FILTER =  0;//app.VIEW_H/2;
 
 		int py = app.VIEW_H/2 - 2*HEIGHT_BTN - BORDER;
 		
@@ -124,7 +135,7 @@ public class JSkyFitsMenu implements ViewListener{
 			MultipleGradientPaint grad = Utils.makeGradient((RGBImageFilter)COLOR_GRADIANT[i]);
 			PRectangle filter = new PRectangle(-app.VIEW_W/2 + WIDTH_MENU/2, py, Z_BTN, WIDTH_MENU - BORDER, HEIGHT_BTN, grad, BORDER_COLOR_BTN);
 	        filter.setType(T_FILTER);
-	        filter.setOwner(COLOR_GRADIANT[i]);
+	        filter.setOwner(COLOR_NAME[i]);
 	        mnSpace.addGlyph(filter);
 	        py -= (HEIGHT_BTN + 2*BORDER);
 		}
@@ -144,36 +155,42 @@ public class JSkyFitsMenu implements ViewListener{
 			//mnSpace.addGlyph(ln);
 	        py -= (HEIGHT_BTN + 2*BORDER);
 		}
-		BORDER_BOTTON_FILTER = py + HEIGHT_BTN - 2*BORDER;
+		BORDER_BOTTON_FILTER = COLOR_GRADIANT.length * ( HEIGHT_BTN + BORDER*2 ) + SCALE_METHOD.length * ( HEIGHT_BTN + BORDER*2 ) + HEIGHT_BTN + BORDER;
 	}
 
-	/*
+	
 
 	public void drawHistogram(){
 
-		if(app.hi != null){
-			hist = FitsHistogram.fromFitsImage(app.hi);
+		if(app.img != null){
+			hist = JSkyFitsHistogram.fromFitsImage(app.img);
 			hist.moveTo(-app.VIEW_W/2 + (app.VIEW_W - hist.getWidth())/2 , -app.VIEW_H/2 + 50);
+		
+			BORDER_TOP_HISTOGRAM = (int)(app.VIEW_H - hist.getHeight() - 65 );
+			BORDER_BOTTON_HISTOGRAM = app.VIEW_H - 65;
+			BORDER_LEFT_HISTOGRAM = (int)( (app.VIEW_W - hist.getWidth())/2 - JSkyFitsHistogram.DEFAULT_BIN_WIDTH) ;
+			BORDER_RIGHT_HISTOGRAM = (int)( (app.VIEW_W + hist.getWidth())/2 + JSkyFitsHistogram.DEFAULT_BIN_WIDTH) ;
+
+			VRectangle board = new VRectangle(hist.vx+hist.getWidth()/2, hist.vy+hist.getHeight()/2, Z_BTN, BORDER_RIGHT_HISTOGRAM-BORDER_LEFT_HISTOGRAM, BORDER_BOTTON_HISTOGRAM-BORDER_TOP_HISTOGRAM+10, Color.WHITE, Color.WHITE, 0.8f);
+			mnSpace.addGlyph(board);
+			mnSpace.addGlyph(hist);
 		}
-
-		BORDER_TOP_HISTOGRAM = (int)(app.VIEW_H - hist.getHeight() - 65 );
-		BORDER_BOTTON_HISTOGRAM = app.VIEW_H - 65;
-		BORDER_LEFT_HISTOGRAM = (int)( (app.VIEW_W - hist.getWidth())/2 - FitsHistogram.DEFAULT_BIN_WIDTH) ;
-		BORDER_RIGHT_HISTOGRAM = (int)( (app.VIEW_W + hist.getWidth())/2 + FitsHistogram.DEFAULT_BIN_WIDTH) ;
-
-		VRectangle board = new VRectangle(hist.vx+hist.getWidth()/2, hist.vy+hist.getHeight()/2, Z_BTN, BORDER_RIGHT_HISTOGRAM-BORDER_LEFT_HISTOGRAM, BORDER_BOTTON_HISTOGRAM-BORDER_TOP_HISTOGRAM+10, Color.WHITE, Color.WHITE, 0.8f);
-		mnSpace.addGlyph(board);
-		mnSpace.addGlyph(hist);
 	}
-	*/
-/*
+	
+
+	/*
 	public void redrawHistogram(){
 		mnSpace.removeGlyph(hist);
-		hist = FitsHistogram.fromFitsImage(app.hi, scale_method);
+		hist = JSkyFitsHistogram.fromFitsImage(app.img);
 		hist.moveTo(-app.VIEW_W/2 + (app.VIEW_W - hist.getWidth())/2 , -app.VIEW_H/2 + 50);
+        
+		VRectangle board = new VRectangle(hist.vx+hist.getWidth()/2, hist.vy+hist.getHeight()/2, Z_BTN, BORDER_RIGHT_HISTOGRAM-BORDER_LEFT_HISTOGRAM, BORDER_BOTTON_HISTOGRAM-BORDER_TOP_HISTOGRAM+10, Color.WHITE, Color.WHITE, 0.8f);
+		mnSpace.addGlyph(board);
         mnSpace.addGlyph(hist);
 	}
-*/
+
+	*/
+
 
 /*
 	private Glyph drawMethod(int scaleMethod){
@@ -337,7 +354,8 @@ public class JSkyFitsMenu implements ViewListener{
 		//System.out.println(app.menu.BORDER_BOTTON_HISTOGRAM + " > " + jpy + " > " + app.menu.BORDER_TOP_HISTOGRAM);
 		//System.out.println(hist.vx + " " + hist.vy + " " + hist.getWidth() + " " + hist.getHeight());
 		//System.out.println(BORDER_LEFT_HISTOGRAM + " < " + jpx + " < " + BORDER_RIGHT_HISTOGRAM);
-        if((jpx < app.menu.WIDTH_MENU && jpy > app.menu.BORDER_BOTTON_FILTER && jpy < app.menu.BORDER_TOP_FILTER)){// ||
+        //System.out.println(jpx + " < " + app.menu.WIDTH_MENU + " " + app.menu.BORDER_BOTTON_FILTER + " < " + jpy + " < " + app.menu.BORDER_TOP_FILTER);
+        if((jpx < app.menu.WIDTH_MENU && jpy < app.menu.BORDER_BOTTON_FILTER && jpy > app.menu.BORDER_TOP_FILTER)){// ||
           //(jpy > app.menu.BORDER_TOP_HISTOGRAM && jpy < app.menu.BORDER_BOTTON_HISTOGRAM && jpx > app.menu.BORDER_LEFT_HISTOGRAM && jpx < app.menu.BORDER_RIGHT_HISTOGRAM )){
             v.parent.setActiveLayer(app.LAYER_MENU);
             v.parent.setCursorIcon(Cursor.DEFAULT_CURSOR);
@@ -411,23 +429,29 @@ public class JSkyFitsMenu implements ViewListener{
 
 	public void enterGlyph(Glyph g){
         if(g.getType().equals(T_FILTER)){
-            //app.setColorFilter((ImageFilter)g.getOwner());
-            if(color_selected != null){
-            	color_selected.setWidth(color_selected.getWidth()-BORDER*2);
-            	color_selected.move(-BORDER,0);
-            }
-            ((PRectangle)g).setWidth(((PRectangle)g).getWidth()+BORDER*2);
-            g.move(BORDER, 0);
-            color_selected = (PRectangle)g;
-        } else if(g.getType().equals(T_SCALE)){
-        	//app.setScaleMethod((Integer)g.getOwner());
-        	if(scale_selected != null){
-        		scale_selected.setWidth(scale_selected.getWidth()-BORDER*2);
-        		scale_selected.move(-BORDER,0);
+        	if(color_selected != ((PRectangle)g)){
+        		app.img.setColorLookupTable((String)g.getOwner());
+	            if(color_selected != null){
+	            	color_selected.setWidth(color_selected.getWidth()-BORDER*2);
+	            	color_selected.move(-BORDER,0);
+	            }
+	            ((PRectangle)g).setWidth(((PRectangle)g).getWidth()+BORDER*2);
+	            g.move(BORDER, 0);
+	            color_selected = (PRectangle)g;
+	            //redrawHistogram();
         	}
-        	((PRectangle)g).setWidth(((PRectangle)g).getWidth()+BORDER*2);
-        	g.move(BORDER,0);
-        	scale_selected = (PRectangle)g;
+        } else if(g.getType().equals(T_SCALE)){
+        	if(scale_selected != (PRectangle)g){
+        		app.img.setScaleAlgorithm((Integer)g.getOwner());
+	        	if(scale_selected != null){
+	        		scale_selected.setWidth(scale_selected.getWidth()-BORDER*2);
+	        		scale_selected.move(-BORDER,0);
+	        	}
+	        	((PRectangle)g).setWidth(((PRectangle)g).getWidth()+BORDER*2);
+	        	g.move(BORDER,0);
+	        	scale_selected = (PRectangle)g;
+	        	//redrawHistogram();
+        	}
         } else if(g.getType().equals(T_SCROLL)){
         	scroll = true;
         	//v.parent.setCursorIcon(Cursor.);

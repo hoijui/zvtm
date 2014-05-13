@@ -64,7 +64,7 @@ public class JSkyFitsExample{
     int VIEW_W, VIEW_H;
     int VIEW_X, VIEW_Y;
 
-    String APP_TITLE = "Master View";
+    String APP_TITLE = "JSkyFitsImage viewer";
 
 	//shortcut
 	VirtualSpaceManager vsm; 
@@ -108,6 +108,8 @@ public class JSkyFitsExample{
 
         mSpace.addGlyph(img);
 
+        menu.drawHistogram();
+
 
     }
 
@@ -145,7 +147,7 @@ public class JSkyFitsExample{
         mView.setListener(eh, LAYER_DATA);
         mView.setListener(menu, LAYER_MENU);
 
-        //menu.drawHistogram();
+        
         
     }
 
@@ -171,9 +173,6 @@ public class JSkyFitsExample{
 		return mnSpace;
 	}
 
-	public void setScaleMethod(int scale){
-
-	}
 	public JSkyFitsMenu getMenu(){
 		return menu;
 	}
