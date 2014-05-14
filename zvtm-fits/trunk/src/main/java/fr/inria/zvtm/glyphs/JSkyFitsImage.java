@@ -73,6 +73,10 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
     /** For internal use. Made public for easier outside package subclassing. */
     public Object interpolationMethod = RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
 
+    private double originLowCut;
+
+    private double originHighCut;
+
 
     public JSkyFitsImage(String fileOrUrl){
         try{
@@ -89,14 +93,21 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
         RenderedImageAdapter ria = new RenderedImageAdapter(fitsImage);
         Rectangle2D.Double region = new Rectangle2D.Double(0,0, fitsImage.getWidth(), fitsImage.getHeight());
         //proc = new ImageProcessor(ria, new Rectangle2D.Double(0,0, fitsImage.getWidth(), fitsImage.getHeight()));
+        proc = new ImageProcessor(ria, region);
+        /*
         proc = new ImageProcessor();
         proc.setSourceImage(ria, region);
+        */
         
         /*DEFAULT*/
         proc.setColorLookupTable("Standard");
         proc.setScaleAlgorithm(ImageLookup.LINEAR_SCALE);
         proc.update();
+
         VirtualSpaceManager.INSTANCE.repaint();
+
+        originLowCut = proc.getLowCut();
+        originHighCut = proc.getHighCut();
 
         wcsTransform = new WCSTransform(new FITSKeywordProvider(fitsImage));
     }
@@ -234,6 +245,10 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
      */
     public double[] getCutLevels(){
         return new double[]{proc.getLowCut(), proc.getHighCut()};
+    }
+
+    public double[] getOriginCutLevels(){
+        return new double[]{originLowCut, originHighCut};
     }
 
     /**

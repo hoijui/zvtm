@@ -129,6 +129,7 @@ class PanZoomEventHandler implements ViewListener {
 		app.vsm.getActiveView().mouse.setSensitivity(true);
         */
         //v.parent.setActiveLayer(0);
+        System.out.println("panzoomEH release3");
 	}
 
 	public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
@@ -156,9 +157,9 @@ class PanZoomEventHandler implements ViewListener {
         }
         else if(app instanceof JSkyFitsExample){
             //System.out.println(jpx + " < " + ((JSkyFitsExample)app).menu.WIDTH_MENU + " " + ((JSkyFitsExample)app).menu.BORDER_BOTTON_FILTER + " < " + jpy + " < " + ((JSkyFitsExample)app).menu.BORDER_TOP_FILTER);
-            if((jpx < ((JSkyFitsExample)app).menu.WIDTH_MENU && jpy < ((JSkyFitsExample)app).menu.BORDER_BOTTON_FILTER  && jpy > ((JSkyFitsExample)app).menu.BORDER_TOP_FILTER) ){ // ||
-                        //(jpy > ((JSkyFitsExample)app).menu.BORDER_TOP_HISTOGRAM && jpy < ((JSkyFitsExample)app).menu.BORDER_BOTTON_HISTOGRAM && jpx > ((JSkyFitsExample)app).menu.BORDER_LEFT_HISTOGRAM && 
-                        //jpx < ((JSkyFitsExample)app).menu.BORDER_RIGHT_HISTOGRAM )){
+            if((jpx < ((JSkyFitsExample)app).menu.WIDTH_MENU && jpy < ((JSkyFitsExample)app).menu.BORDER_BOTTON_FILTER  && jpy > ((JSkyFitsExample)app).menu.BORDER_TOP_FILTER) ||
+                        (jpy > ((JSkyFitsExample)app).menu.BORDER_TOP_HISTOGRAM && jpy < ((JSkyFitsExample)app).menu.BORDER_BOTTON_HISTOGRAM && jpx > ((JSkyFitsExample)app).menu.BORDER_LEFT_HISTOGRAM && 
+                        jpx < ((JSkyFitsExample)app).menu.BORDER_RIGHT_HISTOGRAM )){
                 v.parent.setActiveLayer(((JSkyFitsExample)app).LAYER_MENU);
                 v.parent.setCursorIcon(Cursor.DEFAULT_CURSOR);
             } else {
