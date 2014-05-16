@@ -1,6 +1,6 @@
 #!/bin/sh
 
-libs=target/zvtm-cluster-0.2.6.jar
+libs=target/zvtm-cluster-0.2.8-SNAPSHOT.jar
 libs=$libs:target/fits-0.3.0.jar
 libs=$libs:target/zvtm-cluster-fits-0.1.2-SNAPSHOT.jar
 libs=$libs:target/args4j-2.0.12.jar

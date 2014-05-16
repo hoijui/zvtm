@@ -1,3 +1,4 @@
+
 package fr.inria.zvtm.cluster;
 
 import java.awt.geom.Point2D;
@@ -5,6 +6,7 @@ import java.awt.Color;
 import java.awt.LinearGradientPaint;
 
 import java.net.URL;
+import java.io.File;
 
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.glyphs.FitsImage;
@@ -15,28 +17,30 @@ import fr.inria.zvtm.fits.RangeSelection;
 import fr.inria.zvtm.fits.Slider;
 
 public aspect FitsGlyphCreation {
-    @Override GlyphReplicator FitsImage.getReplicator(){
+    @Override public GlyphReplicator FitsImage.getReplicator(){
         return new FitsImageReplicator(this);
     }
 
-    @Override GlyphReplicator JSkyFitsImage.getReplicator(){
+    @Override public GlyphReplicator JSkyFitsImage.getReplicator(){
         return new JSkyFitsImageReplicator(this);
     }
 
-    @Override GlyphReplicator RangeSelection.getReplicator(){
+
+    @Override public GlyphReplicator RangeSelection.getReplicator(){
         return new RangeSelectionReplicator(this);
     }
 
-    @Override GlyphReplicator Slider.getReplicator(){
+    @Override public GlyphReplicator Slider.getReplicator(){
         return new SliderReplicator(this);
     }
     
-    @Override GlyphReplicator LGRectangle.getReplicator(){
+    @Override public GlyphReplicator LGRectangle.getReplicator(){
         return new LGRectangleReplicator(this);
     }
 
+
     private static class FitsImageReplicator extends GlyphCreation.ClosedShapeReplicator {
-        private final URL imageLocation;
+        private final Object imageLocation;
         private final double scaleFactor;
 
         FitsImageReplicator(FitsImage source){
@@ -47,7 +51,8 @@ public aspect FitsGlyphCreation {
 
         Glyph doCreateGlyph(){
             try{
-                return new FitsImage(0.,0.,0,imageLocation, scaleFactor);
+                if(imageLocation instanceof URL) return new FitsImage(0.,0.,0,(URL)imageLocation, scaleFactor);
+                else return new FitsImage(0.,0.,0,(File)imageLocation, scaleFactor);
             } catch(Exception e){
                 //XXX error handling
                 throw new Error(e);
@@ -124,6 +129,9 @@ public aspect FitsGlyphCreation {
             LGRectangle retval = new LGRectangle(0, 0, 0, width, height, new LinearGradientPaint(startPoint, endPoint, fractions, colors));
             return retval;
         }
-    }
-    
+    }    
+
+
+
 }
+

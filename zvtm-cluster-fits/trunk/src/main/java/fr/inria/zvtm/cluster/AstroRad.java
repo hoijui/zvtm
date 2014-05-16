@@ -97,7 +97,8 @@ public class AstroRad {
     public AstroRad(AROptions options){
         this.options = options;
         setup();
-        addImage(options.url);
+        if(options.url != null) addImage(options.url);
+        else if(options.file != null) addImage(options.file);
     }
 
     private void setup(){
@@ -131,7 +132,7 @@ public class AstroRad {
 
         ClusterGeometry clGeom;
         ClusteredView imageView;
-        ClusteredView controlView;
+        //ClusteredView controlView;
         if(options.debugView){
             //debugging clustered view, suitable for a single host
             clGeom = new ClusterGeometry(
@@ -140,24 +141,25 @@ public class AstroRad {
                 2, //columns
                 1);
             imageView = new ClusteredView(clGeom,0,1,1,imgCamList);
-            controlView = new ClusteredView(clGeom,1,1,1,controlCamList);
+            //controlView = new ClusteredView(clGeom,1,1,1,controlCamList);
         } else {
             //WILD view
             clGeom = new ClusterGeometry(
-                    2840,
-                    1800,
-                    8,
-                    4);
-            imageView = new ClusteredView(clGeom, 3, 6, 4, imgCamList);
+                    600, //2840,
+                    400,//1800,
+                    2, //8, 
+                    1);//4);
+            //imageView = new ClusteredView(clGeom, 3, 6, 4, imgCamList);
+            imageView = new ClusteredView(clGeom, 0, 2, 1, imgCamList);
             imageView.setBackgroundColor(Color.BLACK);
-            controlView = new ClusteredView(clGeom, 27, 2, 4, controlCamList);
-            controlView.setBackgroundColor(new Color(0, 40, 0));
+            //controlView = new ClusteredView(clGeom, 27, 2, 4, controlCamList);
+            //controlView.setBackgroundColor(new Color(0, 40, 0));
         }
         assert(clGeom != null);
         assert(imageView != null);
-        assert(controlView != null);
+        //assert(controlView != null);
         vsm.addClusteredView(imageView);
-        vsm.addClusteredView(controlView);
+        //vsm.addClusteredView(controlView);
 
         ctrlCursor = new WallCursor(controlSpace);
         ctrlCursor.onTop(CTRLCURSOR_ZINDEX);
@@ -212,11 +214,12 @@ public class AstroRad {
         pointSource.start();
 */
 
-        if(options.debugView){
+        //if(options.debugView){
             setupControlZone(0, 0, 400, 300);
-        } else {
+        /*} else {
             setupControlZone(0,0, 4000, 5000);
         }
+        */
     }
 
     //@param x
@@ -226,12 +229,14 @@ public class AstroRad {
     private void setupControlZone(double x, double y, double width, double height){
         range = new RangeManager(controlSpace, 0, height/8, width);
 
+        
         radio = new RadioGroup(controlSpace, -height/4, -height/5, 
                 new String[]{"gray", "heat", "rainbow"}, 
                 new LinearGradientPaint[]{NopFilter.getGradientS((float)height/5f), HeatFilter.getGradientS((float)height/5f), RainbowFilter.getGradientS((float)height/5f)},
                 height/5
                 );
         slider = new SliderManager(controlSpace, 0, -2.*height/5, width);
+        
 
         range.addObserver(new RangeStateObserver(){
             public void onStateChange(RangeManager source, double low, double high){
@@ -245,7 +250,9 @@ public class AstroRad {
             }
         });
 
+
         //XXX maybe separate this step from construction to avoid escaping 'this'
+        
         radio.addObserver(new RadioStateObserver(){
             public void onStateChange(RadioGroup source, int activeIdx, String label){
                 if(selectedImage == null){
@@ -271,6 +278,7 @@ public class AstroRad {
                 selectedImage.setTranslucencyValue((float)value);
             }
         });
+        
 
         wcsCoords = new VText(-width/4 + 100, height/3 - 100, 0, Color.YELLOW, "unknown coords", VText.TEXT_ANCHOR_MIDDLE, options.debugView? 2: 15);
         controlSpace.addGlyph(wcsCoords);
@@ -278,6 +286,7 @@ public class AstroRad {
     }
 
     private void imgCursorPressed(double x, double y){
+        System.out.println("imgCursorPressed");
         int highestZindex = -1;
         for(JSkyFitsImage img: images){
             if(AstroUtil.isInside(img, x, y) && (img.getZindex() > highestZindex)){
@@ -291,6 +300,7 @@ public class AstroRad {
     }
 
     private void imgCursorDragged(double x, double y){
+        System.out.println("imgCursorDragged");
         if(draggedImage == null){
             return;
         }
@@ -308,6 +318,7 @@ public class AstroRad {
      * Returns the first snap candidate.
      */
     private JSkyFitsImage getSnapCandidate(JSkyFitsImage image){
+        System.out.println("getSnapCandidate");
         final double SNAP_DISTANCE = 90; //pixels
         JSkyFitsImage retval = null;
         for(JSkyFitsImage candidate: images){
@@ -329,6 +340,7 @@ public class AstroRad {
     }
 
     private void addImage(String fileOrUrl, double x, double y){
+        System.out.println("addImage(String, double, double)");
         try{
             JSkyFitsImage image = new JSkyFitsImage(fileOrUrl);
             images.add(image);
@@ -350,10 +362,12 @@ public class AstroRad {
 
     //package-accessible (may be invoked by an embedded web server)
     void addImage(String fileOrUrl){
+        System.out.println("addImage(String)");
         addImage(fileOrUrl, 0, 0);
     }
 
     private void imageFocusChanged(JSkyFitsImage focused){
+        System.out.println("imageFocusChanged");
         if(focused == null){
             return;
         }
@@ -385,6 +399,7 @@ public class AstroRad {
     }
 
     private void removeSelectedImage(){
+        System.out.println("removeSelectedImage");
         if(selectedImage == null){
             return;
         }
@@ -415,6 +430,7 @@ public class AstroRad {
     }
 
     private void drawSymbols(List<AstroObject> objs){
+        System.out.println("drawSymbols");
         if(selectedImage == null){
             return;
         }
@@ -433,6 +449,7 @@ public class AstroRad {
         private CircleSelectionManager selMan = new CircleSelectionManager(imageSpace);
 
         public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+            System.out.println("press1");
             Point2D.Double spcCoords = masterView.getPanel().viewToSpaceCoords(controlCamera, jpx, jpy);
             range.onPress1(spcCoords.x, spcCoords.y);
             Point2D.Double spcImgCoords = masterView.getPanel().viewToSpaceCoords(imageCamera, jpx, jpy);
@@ -440,6 +457,7 @@ public class AstroRad {
         }
 
         public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+            System.out.println("release1");
             range.onRelease1();
             Point2D.Double spcImgCoords = masterView.getPanel().viewToSpaceCoords(imageCamera, jpx, jpy);
             if(selMan.onRelease1(spcImgCoords.x, spcImgCoords.y)){
@@ -482,6 +500,7 @@ public class AstroRad {
         }
 
         public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
+            System.out.println("click1");
             Point2D.Double spcCoords = masterView.getPanel().viewToSpaceCoords(controlCamera, jpx, jpy);
             radio.onClick1(spcCoords.x, spcCoords.y);
         }
@@ -546,10 +565,12 @@ public class AstroRad {
         public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){}
 
         public void enterGlyph(Glyph g){
+            System.out.println("enterGlyph");
             detailBox.onEnterGlyph(g);
         }
 
         public void exitGlyph(Glyph g){
+            System.out.println("exitGlyph");
             detailBox.onExitGlyph(g);
         }
 

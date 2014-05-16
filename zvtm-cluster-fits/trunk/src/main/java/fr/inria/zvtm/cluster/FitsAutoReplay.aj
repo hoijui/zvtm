@@ -1,3 +1,4 @@
+
 package fr.inria.zvtm.cluster;
 
 import fr.inria.zvtm.cluster.Identifiable;
@@ -11,6 +12,7 @@ import fr.inria.zvtm.fits.Slider;
  * See the AbstractAutoReplay aspect in ZVTM-cluster for more details.
  * @see fr.inria.zvtm.AbstractAutoReplay
  */
+ 
 aspect FitsAutoReplay extends AbstractAutoReplay {
     public pointcut autoReplayMethods(Identifiable replayTarget) :
         this(replayTarget) &&
@@ -29,4 +31,3 @@ aspect FitsAutoReplay extends AbstractAutoReplay {
          execution(public void Slider.setTickPos(double)) 
         );
 }
-

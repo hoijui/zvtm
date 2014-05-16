@@ -9,11 +9,12 @@ libs=$libs:target/log4j-1.2.14.jar
 libs=$libs:target/slf4j-api-1.5.9-RC0.jar
 libs=$libs:target/slf4j-log4j12-1.5.9-RC0.jar
 libs=$libs:target/timingframework-1.0.jar
-libs=$libs:target/zvtm-cluster-0.2.6.jar
+#libs=$libs:target/zvtm-cluster-0.2.6.jar
+libs=$libs:target/zvtm-cluster-0.2.8-SNAPSHOT.jar
 libs=$libs:target/commons-logging-1.1.jar
 libs=$libs:target/zvtm-cluster-fits-0.1.2-SNAPSHOT.jar
 libs=$libs:target/hcompress-0.52.jar
 libs=$libs:target/zvtm-fits-0.1.4-SNAPSHOT.jar
 
-java -Djava.net.preferIPv4Stack=true -Djgroups.bind_addr="127.0.0.1" -Xmx4g -cp $libs fr.inria.zvtm.cluster.AstroRad "$@" 
+java -Djava.net.preferIPv4Stack=true -Dcom.sun.media.jai.disableMediaLib=true -Djgroups.bind_addr="127.0.0.1" -Xmx4g -cp $libs fr.inria.zvtm.cluster.AstroRad "$@" 
 

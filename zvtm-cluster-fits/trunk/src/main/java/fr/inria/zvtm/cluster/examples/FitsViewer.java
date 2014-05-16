@@ -81,16 +81,23 @@ public class FitsViewer {
         view.getCursor().setColor(Color.GREEN);
 
 		URL imgURL = null;
+
+		System.out.println("options: " + options + " options.source: " + options.source);
+
 		try {
 			if(options.source.equals("")){
-				imgURL = new URL("http://fits.gsfc.nasa.gov/samples/FOCx38i0101t_c0f.fits");
+				System.out.println("options.source.equals("+options.source+")");
+				imgURL = new URL("http://chandra.harvard.edu/photo/2013/g19/fits/g19_0.3-7.5keV.fits");
 			} else {
+				System.out.println("options.source.equals("+options.source+")");
 				imgURL = new URL(options.source);
 			}
 		} catch (MalformedURLException e){
 			throw new Error("Malformed URL");
 		}
+		System.out.println("before new FitsImage");
 		image = new FitsImage(0,0,0,imgURL);
+		System.out.println("after new FitsImage");
 		vs.addGlyph(image);
         image.setScaleMethod(FitsImage.ScaleMethod.LINEAR);
         scaleBounds = ZScale.computeScale(image.getUnderlyingImage());
