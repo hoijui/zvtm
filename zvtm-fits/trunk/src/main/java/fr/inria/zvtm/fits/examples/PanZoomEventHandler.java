@@ -98,6 +98,8 @@ class PanZoomEventHandler implements ViewListener {
             v.setDrawDrag(false);
             first_order_dragging = false;
         }
+
+        //System.out.println("panzoomEH release1");
         
     }
 
@@ -129,7 +131,7 @@ class PanZoomEventHandler implements ViewListener {
 		app.vsm.getActiveView().mouse.setSensitivity(true);
         */
         //v.parent.setActiveLayer(0);
-        System.out.println("panzoomEH release3");
+        //System.out.println("panzoomEH release3");
 	}
 
 	public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}

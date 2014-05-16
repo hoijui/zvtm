@@ -15,8 +15,8 @@ import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.fits.examples.JSkyFitsMenu;
 
 import javax.media.jai.Histogram;
-import javax.media.jai.ROI;
-import javax.media.jai.ROIShape;
+//import javax.media.jai.ROI;
+//import javax.media.jai.ROIShape;
 
 import jsky.image.BasicImageReadableProcessor;
 import jsky.image.ImageChangeEvent;
@@ -97,11 +97,13 @@ public class JSkyFitsHistogram extends Composite {
 	 * Plot a histogram for the image
 	 */
 
-		double lowCut = image.getImageProcessor().getLowCut();
-        double highCut = image.getImageProcessor().getHighCut();
+        double[] cutlevels = image.getCutLevels();
+
+		double lowCut = cutlevels[0];
+        double highCut = cutlevels[1];
 
         int numValues = HISTOGRAM_SIZE;
-        int dataType = image.getImageProcessor().getSourceImage().getSampleModel().getDataType();
+        int dataType = image.getDataType();
         boolean isFloatingPoint = (dataType == DataBuffer.TYPE_FLOAT || dataType == DataBuffer.TYPE_DOUBLE);
         double n = highCut - lowCut;
 
@@ -127,9 +129,8 @@ public class JSkyFitsHistogram extends Composite {
             yValues[i] = 0;
         }
         if (factor >= 0.0) {
-            Rectangle2D.Double region = new Rectangle2D.Double(0,0, image.getUnderlyingImage().getWidth(), image.getUnderlyingImage().getHeight());
-            ROI roi = new ROIShape(region);
-            Histogram histogram = image.getImageProcessor().getHistogram(numValues, roi);
+            
+            Histogram histogram = image.getHistogram(numValues);
             yValues = histogram.getBins(0);
             //chart.getXYPlot().setDataset(new SimpleDataset(xValues, yValues));
         }

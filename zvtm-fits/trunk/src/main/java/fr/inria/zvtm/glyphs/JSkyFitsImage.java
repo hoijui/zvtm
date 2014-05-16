@@ -29,12 +29,14 @@ import jsky.image.ImageProcessor;
 import jsky.image.ImageLookup;
 
 //import jsky.image.ImageHistogram;
-import javax.media.jai.Histogram;
 
 import javax.media.jai.RenderedImageAdapter;
-
+import javax.media.jai.Histogram;
 import javax.media.jai.PlanarImage;
 import javax.media.jai.ROI;
+import javax.media.jai.ROIShape;
+
+
 
 //Fits support provided by JSky instead of IVOA FITS
 //Note: JSkyFitsImage requires JAI (Java Advanced Imaging)
@@ -92,22 +94,12 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
         vh = fitsImage.getHeight() * scale;
         RenderedImageAdapter ria = new RenderedImageAdapter(fitsImage);
         Rectangle2D.Double region = new Rectangle2D.Double(0,0, fitsImage.getWidth(), fitsImage.getHeight());
-        //proc = new ImageProcessor(ria, new Rectangle2D.Double(0,0, fitsImage.getWidth(), fitsImage.getHeight()));
         proc = new ImageProcessor(ria, region);
-        /*
-        proc = new ImageProcessor();
-        proc.setSourceImage(ria, region);
-        */
-        
-        /*DEFAULT*/
-        proc.setColorLookupTable("Standard");
-        proc.setScaleAlgorithm(ImageLookup.LINEAR_SCALE);
-        proc.update();
-
-        VirtualSpaceManager.INSTANCE.repaint();
 
         originLowCut = proc.getLowCut();
         originHighCut = proc.getHighCut();
+
+        System.out.println("originLowCut: " + originLowCut + " originHighCut: " + originHighCut);
 
         wcsTransform = new WCSTransform(new FITSKeywordProvider(fitsImage));
     }
@@ -150,19 +142,6 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
         return fitsImage.getScale();
     }
 
-
-    /*
-    public Histogram getHistogram(int size){
-        return proc.getHistogram(size, new ROI(proc.getRescaledSourceImage()));
-    }
-    */
-
-    /*
-    public void setScale(float scaleFactor){
-        //XXX
-    }
-    */
-
     /**
      * Sets the color lookup table.
      * Currently, accepted values are: "Background", "Blue", "Heat", "Isophot", "Light", "Pastel", "Ramp", "Real", "Smooth", "Staircase", "Standard".
@@ -204,32 +183,11 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
         VirtualSpaceManager.INSTANCE.repaint();
     }
 
+    /*
     public ImageProcessor getImageProcessor(){
         return proc;
     }
-
-/*
-             LINEAR{
-            @Override int toJSkyValue(){
-                return ImageLookup.LINEAR_SCALE;
-            }
-        },
-        LOG{
-            @Override int toJSkyValue(){
-                return ImageLookup.LOG_SCALE;
-            }
-        },
-        HIST_EQ{
-            @Override int toJSkyValue(){
-                return ImageLookup.HIST_EQ;
-            }
-        },
-        SQRT{
-            @Override int toJSkyValue(){
-                return ImageLookup.SQRT_SCALE;
-        
-    }
-*/
+    */
 
     /**
      * Sets the cut levels for this image.
@@ -257,6 +215,7 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
     public void autoSetCutLevels(Rectangle2D.Double rect){
         proc.autoSetCutLevels(rect);
         proc.update();
+        VirtualSpaceManager.INSTANCE.repaint();
     }
 
     /**
@@ -264,6 +223,16 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
      */
     public void autoSetCutLevels(){
         autoSetCutLevels(new Rectangle2D.Double(0,0,fitsImage.getWidth(),fitsImage.getHeight()));
+    }
+
+    public int getDataType(){
+        return proc.getSourceImage().getSampleModel().getDataType();
+    }
+
+    public Histogram getHistogram(int numValues){
+        Rectangle2D.Double region = new Rectangle2D.Double(0,0, fitsImage.getWidth(), fitsImage.getHeight());
+        ROI roi = new ROIShape(region);
+        return proc.getHistogram(numValues, roi);
     }
 
     /**
@@ -626,7 +595,6 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
             throw new Error(ex);
         }
     }
-
     private void recreateDisplayImage(){
         ImageProducer producer = fitsImage.getSource();
         producer = new FilteredImageSource(producer, filter);
@@ -641,5 +609,6 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
         setImage(compatibleImage);
     }
     */
+
 }
 

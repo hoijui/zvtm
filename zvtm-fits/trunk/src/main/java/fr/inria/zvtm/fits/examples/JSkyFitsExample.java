@@ -106,6 +106,10 @@ public class JSkyFitsExample{
             return;
         }
 
+        /* DEFAULT */
+        img.setColorLookupTable("Standard");
+        img.setScaleAlgorithm(JSkyFitsImage.ScaleAlgorithm.LINEAR);
+
         mSpace.addGlyph(img);
 
         menu.drawHistogram();
@@ -151,7 +155,7 @@ public class JSkyFitsExample{
         
     }
 
-    private Point2D.Double viewToSpace(Camera cam, int jpx, int jpy){
+    public Point2D.Double viewToSpace(Camera cam, int jpx, int jpy){
         Location camLoc = cam.getLocation();
         double focal = cam.getFocal();
         double altCoef = (focal + camLoc.alt) / focal;
