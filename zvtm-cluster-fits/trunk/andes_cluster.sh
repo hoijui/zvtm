@@ -44,9 +44,9 @@ do
       colNum $col
       SLAVENUM1=`expr $? \* 4 + $row - 1`
       SLAVENUM2=`expr $SLAVENUM1 + 4`
-      ssh wall@$col$row.wall.inria.cl -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "export DISPLAY=:0.0 && cd /home/wall/zvtm-code/zvtm-cluster-fits/trunk && java -XX:+DoEscapeAnalysis -XX:+UseConcMarkSweepGC -Djava.net.preferIPv4Stack=true -Djgroups.bind_addr="\"$col$row.wall.inria.cl\"" -Xmx4g -Dcom.sun.media.jai.disableMediaLib=true -cp .:$LIBS fr.inria.zvtm.cluster.SlaveApp -n JSkyFitsImage -b $SLAVENUM1 -f -a " $* &
+      ssh wall@$col$row.wall.inria.cl -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "export DISPLAY=:0.0 && cd /home/wall/zvtm-code/zvtm-cluster-fits/trunk && java -XX:+DoEscapeAnalysis -XX:+UseConcMarkSweepGC -Djava.net.preferIPv4Stack=true -Djgroups.bind_addr="\"$col$row.wall.inria.cl\"" -Xmx4g -Dcom.sun.media.jai.disableMediaLib=true -cp .:$LIBS:$JAR fr.inria.zvtm.cluster.SlaveApp -n JSkyFitsImage -b $SLAVENUM1 -f -a " $* &
       sleep 1
-      ssh wall@$col$row.wall.inria.cl -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "export DISPLAY=:0.1 && cd /home/wall/zvtm-code/zvtm-cluster-fits/trunk && java -XX:+DoEscapeAnalysis -XX:+UseConcMarkSweepGC -Djava.net.preferIPv4Stack=true -Djgroups.bind_addr="\"$col$row.wall.inria.cl\"" -Xmx4g -Dcom.sun.media.jai.disableMediaLib=true -cp .:$LIBS fr.inria.zvtm.cluster.SlaveApp -n JSkyFitsImage -b $SLAVENUM2 -f -a " $* &
+      ssh wall@$col$row.wall.inria.cl -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "export DISPLAY=:0.1 && cd /home/wall/zvtm-code/zvtm-cluster-fits/trunk && java -XX:+DoEscapeAnalysis -XX:+UseConcMarkSweepGC -Djava.net.preferIPv4Stack=true -Djgroups.bind_addr="\"$col$row.wall.inria.cl\"" -Xmx4g -Dcom.sun.media.jai.disableMediaLib=true -cp .:$LIBS:$JAR fr.inria.zvtm.cluster.SlaveApp -n JSkyFitsImage -b $SLAVENUM2 -f -a " $* &
     done
 done
 
