@@ -18,25 +18,37 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import fr.inria.zvtm.engine.VCursor;
-import fr.inria.zvtm.engine.LongPoint;
+
+//import fr.inria.zvtm.engine.LongPoint;
+import java.awt.geom.Point2D;
+
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
-import fr.inria.zvtm.engine.Utilities;
+
+//import fr.inria.zvtm.engine.Utilities;
+import fr.inria.zvtm.engine.Utils;
+
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VText;
-import fr.inria.zvtm.engine.ViewEventHandler;
-import fr.inria.zvtm.engine.CameraListener;
+
+//import fr.inria.zvtm.engine.ViewEventHandler;
+import fr.inria.zvtm.event.ViewListener;
+
+//import fr.inria.zvtm.engine.CameraListener;
+import fr.inria.zvtm.event.CameraListener;
+
 
 import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zuist.engine.Region;
 import fr.inria.zuist.engine.ObjectDescription;
 import fr.inria.zuist.engine.TextDescription;
 
-class FitsViewerEventHandler implements ViewEventHandler, ComponentListener, CameraListener {
-    
+//class FitsViewerEventHandler implements ViewEventHandler, ComponentListener, CameraListener {
+class FitsViewerEventHandler implements ViewListener, ComponentListener, CameraListener {
+
     static float ZOOM_SPEED_COEF = 1.0f/50.0f;
     static double PAN_SPEED_COEF = 50.0;
     
@@ -51,6 +63,8 @@ class FitsViewerEventHandler implements ViewEventHandler, ComponentListener, Cam
     
     Glyph g;
     
+    double oldCameraAltitude;
+
     boolean zero_order_dragging = false;
     boolean first_order_dragging = false;
 	static final short ZERO_ORDER = 0;
@@ -62,6 +76,8 @@ class FitsViewerEventHandler implements ViewEventHandler, ComponentListener, Cam
 	
     FitsViewerEventHandler(FitsViewer app){
         this.application = app;
+        oldCameraAltitude = this.application.mCamera.getAltitude();
+
     }
 
     public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
@@ -90,11 +106,16 @@ class FitsViewerEventHandler implements ViewEventHandler, ComponentListener, Cam
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-		Vector gum = v.getVCursor().getIntersectingGlyphs(v.cams[0]);
+        /*
+        Vector gum = v.getVCursor().getIntersectingGlyphs(v.cams[0]);
 		if (gum == null){
 			return;
 		}
 		Glyph g = (Glyph)gum.lastElement();
+        */
+
+        Glyph g = v.lastGlyphEntered();
+        
 		if (objectJustSelected != null && g == objectJustSelected){
 			// last click was on this object, already centered on it,
 			// check if it takes somewhere and go there if it does
@@ -149,7 +170,7 @@ class FitsViewerEventHandler implements ViewEventHandler, ComponentListener, Cam
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
         Camera c = application.mCamera;
-        float a = (c.focal+Math.abs(c.altitude)) / c.focal;
+        double a = (c.focal+Math.abs(c.altitude)) / c.focal;
         if (zero_order_dragging){
             c.move(Math.round(a*(lastJPX-jpx)), Math.round(a*(jpy-lastJPY)));
             lastJPX = jpx;
@@ -170,16 +191,19 @@ class FitsViewerEventHandler implements ViewEventHandler, ComponentListener, Cam
     }
 
 	public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
-		float a = (application.mCamera.focal+Math.abs(application.mCamera.altitude)) / application.mCamera.focal;
-		if (wheelDirection  == WHEEL_UP){
+		double a = (application.mCamera.focal+Math.abs(application.mCamera.altitude)) / application.mCamera.focal;
+		//if (wheelDirection  == WHEEL_UP){
+        if (wheelDirection  == WHEEL_UP){
 			// zooming in
 			application.mCamera.altitudeOffset(a*WHEEL_ZOOMOUT_FACTOR);
-			application.vsm.repaintNow();
+			//application.vsm.repaintNow();
+            application.vsm.repaint();
 		}
 		else {
 			//wheelDirection == WHEEL_DOWN, zooming out
 			application.mCamera.altitudeOffset(-a*WHEEL_ZOOMIN_FACTOR);
-			application.vsm.repaintNow();
+			//application.vsm.repaintNow();
+            application.vsm.repaint();
 		}
 	}
 
@@ -189,7 +213,8 @@ class FitsViewerEventHandler implements ViewEventHandler, ComponentListener, Cam
 			g.highlight(true, null);
 			VirtualSpace vs = application.vsm.getVirtualSpace(application.mnSpaceName);
 			vs.onTop(g);
-			int i = Utilities.indexOfGlyph(application.mainPieMenu.getItems(), g);
+			//int i = Utilities.indexOfGlyph(application.mainPieMenu.getItems(), g);
+            int i = Utils.indexOfGlyph(application.mainPieMenu.getItems(), g);
 			if (i != -1){
 				vs.onTop(application.mainPieMenu.getLabels()[i]);
 			}
@@ -247,8 +272,30 @@ class FitsViewerEventHandler implements ViewEventHandler, ComponentListener, Cam
     }
     public void componentShown(ComponentEvent e){}
     
-    public void cameraMoved(Camera cam, LongPoint coord, float alt){
+    //public void cameraMoved(Camera cam, LongPoint coord, float alt){
+    /*
+    public void cameraMoved(Camera cam, Point2D.Double coord, float alt){
         application.altitudeChanged();
+    }
+    */
+
+    public void cameraMoved(Camera cam, Point2D.Double coord, double a){
+        //application.bCamera.setAltitude(cam.getAltitude());
+        //application.bCamera.moveTo(cam.vx, cam.vy);
+        //dut.requestUpdate();
+    }
+
+    void cameraMoved(){
+        //application.mView.getVisibleRegion(application.mCamera, wnes);
+        // region seen through camera
+        double alt = application.mCamera.getAltitude();
+        if (alt != oldCameraAltitude){
+            oldCameraAltitude = alt;
+        }
+        else {
+            // camera movement was a simple translation
+            //dut.cancelUpdate();
+        }
     }
     
     void toggleNavMode(){

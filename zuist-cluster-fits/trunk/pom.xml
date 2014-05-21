@@ -4,7 +4,7 @@
     <groupId>fr.inria.zvtm</groupId>
     <artifactId>zuist-cluster-fits</artifactId>
     <packaging>jar</packaging>
-    <version>0.1.1-SNAPSHOT</version>
+    <version>0.1.2-SNAPSHOT</version>
     <name>zuist-cluster-fits</name>
     <url>http://zvtm.sourceforge.net</url>
     <licenses>
@@ -30,12 +30,12 @@
         <dependency>
             <groupId>fr.inria.zvtm</groupId>
             <artifactId>zuist-cluster</artifactId>
-            <version>0.1.0-SNAPSHOT</version>
+            <version>0.2.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>fr.inria.zvtm</groupId>
             <artifactId>zvtm-fits</artifactId>
-            <version>0.1.2-SNAPSHOT</version>
+            <version>0.1.4-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.aspectj</groupId>

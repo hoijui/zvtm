@@ -17,7 +17,8 @@ public class FitsImageDescription extends ResourceDescription {
 
     transient FitsImage glyph; //the actual FITS image
 
-    public FitsImageDescription(String id, long x, long y, int z, URL src, 
+    //public FitsImageDescription(String id, long x, long y, int z, URL src, 
+    public FitsImageDescription(String id, double x, double y, int z, URL src, 
             Region parentRegion, 
             float scaleFactor, FitsImage.ScaleMethod scaleMethod,
             FitsImage.ColorFilter colorFilter){
@@ -53,7 +54,8 @@ public class FitsImageDescription extends ResourceDescription {
     public void rescale(){
     }
 
-    public void createObject(final VirtualSpace vs, final boolean fadeIn){
+    //public void createObject(final VirtualSpace vs, final boolean fadeIn){
+    public void createObject(final SceneManager sm, final VirtualSpace vs, final boolean fadeIn){
         try{
             glyph = new FitsImage(vx,vy,zindex,src,scaleFactor,true);
         } catch(IOException ioe){
@@ -64,7 +66,8 @@ public class FitsImageDescription extends ResourceDescription {
         vs.addGlyph(glyph); 
     }
 
-    public void destroyObject(final VirtualSpace vs, boolean fadeOut){
+    //public void destroyObject(final VirtualSpace vs, boolean fadeOut){
+    public void destroyObject(final SceneManager sm, final VirtualSpace vs, boolean fadeOut){
         vs.removeGlyph(glyph);
         glyph = null;
     }

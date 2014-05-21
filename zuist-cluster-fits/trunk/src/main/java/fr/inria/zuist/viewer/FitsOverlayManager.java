@@ -33,10 +33,14 @@ import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VImage;
 import fr.inria.zvtm.glyphs.RImage;
-import fr.inria.zvtm.engine.ViewEventHandler;
+
+//import fr.inria.zvtm.engine.ViewEventHandler;
+import fr.inria.zvtm.event.ViewListener;
+
 import fr.inria.zvtm.widgets.TranslucentTextArea;
 
-class FitsOverlayManager implements ViewEventHandler {
+//class FitsOverlayManager implements ViewEventHandler {
+class FitsOverlayManager implements ViewListener {
     
     static final Color FADE_REGION_FILL = Color.BLACK;
     static final Color FADE_REGION_STROKE = Color.WHITE;
