@@ -81,5 +81,9 @@ def tile_level(srcpath, image_width, image_height, tile_width, tile_height, leve
 
 if __name__ == "__main__":
     options, args = parser.parse_args()
-    tile_image(args[0], 8192, 8192, 1024, 1024, 3)
+    #tile_image(args[0], 8192, 8192, 1024, 1024, 3)
+    #tile_image(args[0], 1784, 1691, 223, 89, 3)
+    #tile_image(args[0], 1784, 1691, 500, 500, 3)
+    #tile_image(args[0], 15655, 12774, 512, 512, 6)
+    tile_image(args[0], 12773, 15659, 512, 512, 6)
 

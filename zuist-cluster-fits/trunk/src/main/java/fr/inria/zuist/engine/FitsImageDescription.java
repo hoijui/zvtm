@@ -3,6 +3,7 @@ package fr.inria.zuist.engine;
 import java.io.IOException;
 import java.net.URL;
 import fr.inria.zvtm.engine.VirtualSpace;
+import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zvtm.glyphs.FitsImage;
 import fr.inria.zvtm.glyphs.Glyph;
 
@@ -14,8 +15,16 @@ public class FitsImageDescription extends ResourceDescription {
     private float scaleFactor = 1;
     private FitsImage.ScaleMethod scaleMethod;
     private FitsImage.ColorFilter colorFilter;
+    private URL src;
+    private String id;
+    private double vx;
+    private double vy;
+    private int zindex;
 
-    transient FitsImage glyph; //the actual FITS image
+    private volatile boolean display = true;
+    //private Color strokeColor = null;
+
+    private FitsImage glyph; //the actual FITS image
 
     //public FitsImageDescription(String id, long x, long y, int z, URL src, 
     public FitsImageDescription(String id, double x, double y, int z, URL src, 
@@ -31,6 +40,8 @@ public class FitsImageDescription extends ResourceDescription {
         this.scaleFactor = scaleFactor;
         this.scaleMethod = scaleMethod;
         this.colorFilter = colorFilter;
+        System.out.print("FitsImageDescription: ");
+        System.out.println(src);
     }
 
     public String getType(){
@@ -57,13 +68,16 @@ public class FitsImageDescription extends ResourceDescription {
     //public void createObject(final VirtualSpace vs, final boolean fadeIn){
     public void createObject(final SceneManager sm, final VirtualSpace vs, final boolean fadeIn){
         try{
-            glyph = new FitsImage(vx,vy,zindex,src,scaleFactor,true);
-        } catch(IOException ioe){
+            glyph = new FitsImage(vx,vy,zindex,src,scaleFactor,false);
+            System.out.println(glyph);
+        } catch(Exception ioe){
+            System.out.println("Could not create FitsImage");
             throw new Error("Could not create FitsImage");
         }
         glyph.setScaleMethod(scaleMethod);
         glyph.setColorFilter(colorFilter);
-        vs.addGlyph(glyph); 
+        glyph.setDrawBorder(false);
+        vs.addGlyph(glyph,false); 
     }
 
     //public void destroyObject(final VirtualSpace vs, boolean fadeOut){
@@ -72,8 +86,24 @@ public class FitsImageDescription extends ResourceDescription {
         glyph = null;
     }
 
+    @Override
     public Glyph getGlyph(){
         return glyph;
+    }
+
+    @Override
+    public double getX(){
+        return glyph.vx;
+    }
+
+    @Override
+    public double getY(){
+        return glyph.vy;
+    }
+
+    @Override
+    public void moveTo(double x, double y){
+        glyph.moveTo(x, y);
     }
 
 }

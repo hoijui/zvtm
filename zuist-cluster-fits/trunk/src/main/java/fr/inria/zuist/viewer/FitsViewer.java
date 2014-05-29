@@ -403,13 +403,17 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 	void loadScene(File xmlSceneFile){
 		try {
 			ovm.sayInConsole("Loading "+xmlSceneFile.getCanonicalPath()+"\n");
-			mView.setTitle(mViewName + " - " + xmlSceneFile.getCanonicalPath());			
+			System.out.println("Loading "+xmlSceneFile.getCanonicalPath()+"\n");
+			mView.setTitle(mViewName + " - " + xmlSceneFile.getCanonicalPath());
+			System.out.println(mViewName + " - " + xmlSceneFile.getCanonicalPath());	
 		}
 		catch (IOException ex){}
 		gp.setValue(0);
 		gp.setVisible(true);
 		SCENE_FILE = xmlSceneFile;
 	    SCENE_FILE_DIR = SCENE_FILE.getParentFile();
+	    System.out.println("dir: "+SCENE_FILE_DIR + " - file: " + SCENE_FILE);
+	    System.out.println("loadScene...");
 	    sm.loadScene(SceneManager.parseXML(SCENE_FILE), SCENE_FILE_DIR, true, gp);
 	    HashMap sceneAttributes = sm.getSceneAttributes();
 	    if (sceneAttributes.containsKey(SceneManager._background)){

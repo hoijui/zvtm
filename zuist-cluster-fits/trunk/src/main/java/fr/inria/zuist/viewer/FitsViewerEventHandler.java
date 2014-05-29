@@ -218,7 +218,8 @@ class FitsViewerEventHandler implements ViewListener, ComponentListener, CameraL
 			if (i != -1){
 				vs.onTop(application.mainPieMenu.getLabels()[i]);
 			}
-		}
+		} 
+
 	}
 
 	public void exitGlyph(Glyph g){

@@ -19,8 +19,9 @@ public class FitsResourceHandler implements ResourceHandler {
             URL resourceURL, boolean sensitivity, Color stroke, String params){
 
         float scaleFactor = 1;
-        FitsImage.ScaleMethod scaleMethod = FitsImage.ScaleMethod.ASINH;
-        FitsImage.ColorFilter colorFilter = FitsImage.ColorFilter.NOP;
+
+        FitsImage.ScaleMethod scaleMethod = FitsImage.ScaleMethod.LINEAR;
+        FitsImage.ColorFilter colorFilter = FitsImage.ColorFilter.HEAT;
 
         if (params != null){
             String[] paramTokens = params.split(SceneManager.PARAM_SEPARATOR);
