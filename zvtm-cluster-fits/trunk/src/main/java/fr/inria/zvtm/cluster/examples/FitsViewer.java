@@ -96,17 +96,21 @@ public class FitsViewer {
 			throw new Error("Malformed URL");
 		}
 		System.out.println("before new FitsImage");
-		image = new FitsImage(0,0,0,imgURL);
-		System.out.println("after new FitsImage");
-		vs.addGlyph(image);
-        image.setScaleMethod(FitsImage.ScaleMethod.LINEAR);
-        scaleBounds = ZScale.computeScale(image.getUnderlyingImage());
-        image.rescale(scaleBounds[0], scaleBounds[1], 1);
-        rsel = new RangeSelection();
-        double min = image.getUnderlyingImage().getHistogram().getMin();
-        double max = image.getUnderlyingImage().getHistogram().getMax();
-        rsel.setTicksVal((scaleBounds[0]-min)/(max-min), (scaleBounds[1]-min)/(max-min));
-        vs.addGlyph(rsel);
+		try{
+			image = new FitsImage(0,0,0,imgURL);
+			vs.addGlyph(image);
+	        image.setScaleMethod(FitsImage.ScaleMethod.LINEAR);
+	        scaleBounds = ZScale.computeScale(image.getUnderlyingImage());
+	        image.rescale(scaleBounds[0], scaleBounds[1], 1);
+	        rsel = new RangeSelection();
+	        double min = image.getUnderlyingImage().getHistogram().getMin();
+	        double max = image.getUnderlyingImage().getHistogram().getMax();
+	        rsel.setTicksVal((scaleBounds[0]-min)/(max-min), (scaleBounds[1]-min)/(max-min));
+	        vs.addGlyph(rsel);
+		} catch(Exception e){
+			System.out.println(e);
+		}
+		
 	}
 
 	public static void main(String[] args) throws Exception{
