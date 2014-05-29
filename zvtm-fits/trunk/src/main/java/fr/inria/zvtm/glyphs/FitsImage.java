@@ -30,9 +30,7 @@ import jsky.coords.WCSTransform;
 
 import nom.tam.fits.FitsException;
 
-import fr.inria.zvtm.fits.filters.HeatFilter;
-import fr.inria.zvtm.fits.filters.NopFilter;
-import fr.inria.zvtm.fits.filters.RainbowFilter;
+import fr.inria.zvtm.fits.filters.*;
 import fr.inria.zvtm.fits.DefaultSampler;
 import fr.inria.zvtm.fits.Grid;
 import fr.inria.zvtm.fits.NomWcsKeywordProvider;
@@ -64,8 +62,8 @@ class ExFITSImage extends FITSImage{
 public class FitsImage extends VImage {
     //original image (dataset preserved)
     private final ExFITSImage fitsImage;
-    private ImageFilter filter;
-    private ScaleMethod scaleMethod = ScaleMethod.LINEAR;
+    private ImageFilter filter = ColorFilter.RAINBOW.getFilter();
+    private ScaleMethod scaleMethod = ScaleMethod.HISTOGRAM_EQUALIZATION;
     private WCSTransform wcsTransform;
     private Grid grid = null;
 
@@ -129,6 +127,12 @@ public class FitsImage extends VImage {
                 return INSTANCE;
             }
         },
+        STANDARD{
+            private final ImageFilter INSTANCE = new StandardFilter();
+            @Override ImageFilter getFilter(){
+                return INSTANCE;
+            }
+        },
         NOP{
             private final ImageFilter INSTANCE = new NopFilter();
             @Override ImageFilter getFilter(){
@@ -154,17 +158,20 @@ public class FitsImage extends VImage {
      */
     public FitsImage(double x, double y, int z, URL imgUrl, double scaleFactor,
             boolean useDataMinMax) throws IOException {
+        //System.out.println("before constructor FitsImage(double, double, int, URL, double, boolean)");
         super(x,y,z,new BufferedImage(10,10,BufferedImage.TYPE_INT_RGB),scaleFactor);
         this.imgUrl = imgUrl;
         this.imgFile = null;
-        filter = ColorFilter.NOP.getFilter();
-
+        //filter = ColorFilter.RAINBOW.getFilter();
         try{
             fitsImage = new ExFITSImage(imgUrl);
+            System.out.println("new ExFITSImage(imgUrl)");
             wcsTransform = new WCSTransform(new NomWcsKeywordProvider(fitsImage.getFits().getHDU(0).getHeader()));
+            System.out.println("new WCSTransform(new NomWcsKeywordProvider( " + fitsImage.getFits().getHDU(0).getHeader() + " ))");
         } catch(Exception e){
             throw new Error(e);
         }
+        //System.out.println("scaleMethod.toIvoaValue(): "+scaleMethod.toIvoaValue());
         fitsImage.setScaleMethod(scaleMethod.toIvoaValue());
         if(useDataMinMax){
             try{
@@ -192,14 +199,17 @@ public class FitsImage extends VImage {
         super(x,y,z,new BufferedImage(10,10,BufferedImage.TYPE_INT_RGB),scaleFactor);
         this.imgUrl = null;
         this.imgFile = imgFile;
-        filter = ColorFilter.NOP.getFilter();
+        //filter = ColorFilter.RAINBOW.getFilter();
 
         try{
             fitsImage = new ExFITSImage(imgFile);
+            System.out.println("new ExFITSImage(imgUrl)");
             wcsTransform = new WCSTransform(new NomWcsKeywordProvider(fitsImage.getFits().getHDU(0).getHeader()));
+            System.out.println("new WCSTransform(new NomWcsKeywordProvider( " + fitsImage.getFits().getHDU(0).getHeader() + "))");
         } catch(Exception e){
             throw new Error(e);
         }
+        //System.out.println("scaleMethod.toIvoaValue(): "+scaleMethod.toIvoaValue());
         fitsImage.setScaleMethod(scaleMethod.toIvoaValue());
         if(useDataMinMax){
             try{
@@ -253,9 +263,9 @@ public class FitsImage extends VImage {
      * @param scaleMethod the new scale method.
      */
     public void setScaleMethod(ScaleMethod scaleMethod){
-            this.scaleMethod = scaleMethod;
-            fitsImage.setScaleMethod(scaleMethod.toIvoaValue());
-            recreateDisplayImage();
+        this.scaleMethod = scaleMethod;
+        fitsImage.setScaleMethod(scaleMethod.toIvoaValue());
+        recreateDisplayImage();
     }
 
     /**
@@ -287,6 +297,7 @@ public class FitsImage extends VImage {
      * Flexible version.
      */
     public void setColorFilter(ImageFilter filter){
+        System.out.println("setColorFilter( " + filter + " )");
         this.filter = filter;
         recreateDisplayImage();
     }

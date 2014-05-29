@@ -38,6 +38,7 @@ import javax.media.jai.ROIShape;
 
 
 
+
 //Fits support provided by JSky instead of IVOA FITS
 //Note: JSkyFitsImage requires JAI (Java Advanced Imaging)
 
@@ -101,7 +102,13 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
 
         System.out.println("originLowCut: " + originLowCut + " originHighCut: " + originHighCut);
 
-        wcsTransform = new WCSTransform(new FITSKeywordProvider(fitsImage));
+        try{
+            wcsTransform = new WCSTransform(new FITSKeywordProvider(fitsImage));
+        } catch (Exception e){
+            throw new Error("Could not create wcsTransform: " + e);
+            
+        }
+   
     }
 
 
@@ -160,6 +167,7 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
         proc.update();
         VirtualSpaceManager.INSTANCE.repaint();
     }
+    /*
     public void setScaleAlgorithm(int method){
         switch(method){
             case ImageLookup.LINEAR_SCALE:
@@ -182,6 +190,7 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
         proc.update();
         VirtualSpaceManager.INSTANCE.repaint();
     }
+    */
 
     /*
     public ImageProcessor getImageProcessor(){
@@ -244,12 +253,14 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
         return wcsTransform.pix2wcs(x, y);
     }
 
+
     /**
      * Converts World Coordinates to pixel coordinates. Returns null if the WCSTransform is invalid, or if the WCS position does not fall within the image.
      */
     public Point2D.Double wcs2pix(double ra, double dec){
         return wcsTransform.wcs2pix(ra, dec);
     }
+
 
     /** 
      * Gets the bounding box of this Glyph in virtual space coordinates.

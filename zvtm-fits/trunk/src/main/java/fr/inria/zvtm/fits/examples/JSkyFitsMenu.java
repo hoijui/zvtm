@@ -48,6 +48,8 @@ import fr.inria.zvtm.fits.JSkyFitsHistogram;
 import jsky.image.ImageLookup;
 import jsky.image.ImageProcessor;
 
+import fr.inria.zvtm.glyphs.JSkyFitsImage;
+
 
 
 public class JSkyFitsMenu implements ViewListener{
@@ -100,7 +102,8 @@ public class JSkyFitsMenu implements ViewListener{
         "Random3","Random4",/*"Random5","Random6",*/"Real","Red","Smooth",/*"Smooth1","Smooth2","Smooth3",*/
         "Staircase", "Stairs8", "Stairs9", "Standard"};
 
-	public static final int[] SCALE_METHOD = {ImageLookup.LINEAR_SCALE, ImageLookup.LOG_SCALE, ImageLookup.HIST_EQ, ImageLookup.SQRT_SCALE};
+	//public static final int[] SCALE_METHOD = {ImageLookup.LINEAR_SCALE, ImageLookup.LOG_SCALE, ImageLookup.HIST_EQ, ImageLookup.SQRT_SCALE};
+	public static final JSkyFitsImage.ScaleAlgorithm[] SCALE_METHOD = {JSkyFitsImage.ScaleAlgorithm.LINEAR, JSkyFitsImage.ScaleAlgorithm.LOG, JSkyFitsImage.ScaleAlgorithm.HIST_EQ, JSkyFitsImage.ScaleAlgorithm.SQRT};
 	public static final String[] SCALE_NAME = {"LINEAR SCALE", "LOGARITHMIC", "HISTOGRAM EQUALIZATION", "SQUARE ROOT"};
 
 	public int BORDER_BOTTON_FILTER;
@@ -423,7 +426,7 @@ public class JSkyFitsMenu implements ViewListener{
         } else if(g.getType().equals(T_SCALE)){
         	lastGlyph = g;
         	if(scale_selected != (PRectangle)g){
-        		app.img.setScaleAlgorithm((Integer)g.getOwner());
+        		app.img.setScaleAlgorithm((JSkyFitsImage.ScaleAlgorithm)g.getOwner());
 	        	if(scale_selected != null){
 	        		scale_selected.setWidth(scale_selected.getWidth()-DISPLACE*2);
 	        		scale_selected.move(-DISPLACE,0);

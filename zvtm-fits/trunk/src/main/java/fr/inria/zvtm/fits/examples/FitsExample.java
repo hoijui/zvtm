@@ -214,6 +214,7 @@ public class FitsExample{
         hi.setColorFilter(filter);
     }
 
+    /*
     public void setScaleMethod(int scale){
         switch(scale){
             case FITSImage.SCALE_ASINH:
@@ -240,6 +241,7 @@ public class FitsExample{
         }
         //menu.redrawHistogram();
     }
+    */
 
     public boolean isRunningOnCluster(){
         return false;
