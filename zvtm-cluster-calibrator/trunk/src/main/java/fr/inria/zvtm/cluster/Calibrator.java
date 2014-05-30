@@ -169,7 +169,7 @@ public class Calibrator {
             i = -w/3 - w/12;
             for(String letter: letters){
                 for (String orientation: orientations ) {
-                    VText labelPC = new VText(i, j, Z_CIRCLE, CIRCLE_COLOR, letter+number+"_"+orientation, VText.TEXT_ANCHOR_MIDDLE);
+                    VText labelPC = new VText(i, j, Z_CIRCLE, CIRCLE_COLOR, letter+number+"_"+orientation, VText.TEXT_ANCHOR_MIDDLE, 0.5f);
                     labelPC.setScale(20);
                     mSpace.addGlyph(labelPC);
                     i += incrX;               
