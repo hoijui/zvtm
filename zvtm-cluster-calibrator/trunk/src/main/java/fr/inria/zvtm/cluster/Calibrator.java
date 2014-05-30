@@ -160,7 +160,7 @@ public class Calibrator {
 
     void addObject(TuioPoint p){
         Point2D.Double np = normalize(p);
-        VCircle c = new VCircle(np.x*SCENE_W-SCENE_W/2, np.y*SCENE_H-SCENE_H/2, Z_GLYPH, 20, Color.RED, Color.RED, 0.2);
+        VCircle c = new VCircle(np.x*SCENE_W-SCENE_W/2, np.y*SCENE_H-SCENE_H/2, Z_GLYPH, 20, Color.RED, Color.RED, 0.2f);
         c.setDrawBorder(false);
         c.setType(T_POINT_TUIO);
         mSpace.addGlyph(c);
