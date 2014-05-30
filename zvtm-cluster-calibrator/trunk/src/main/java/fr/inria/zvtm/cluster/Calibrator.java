@@ -156,11 +156,32 @@ public class Calibrator {
                 s = new VSegment(ii, jj-step/2, ii, jj+step/2, Z_CIRCLE, Color.GREEN, 1);
                 mSpace.addGlyph(s);
             }
+
+        //enumeration
+        String[] letters = {"A", "B", "C"};
+        String[] numbers = {"1", "2", "3", "4"};
+        String[] orientations = {"left", "right"};
+
+        int incrX = w/6;
+        int incrY = h/4;
+        int j = h/4 + h/8;
+        for(String number: numbers){
+            i = -w/3 - w/12;
+            for(String letter: letters){
+                for (String orientation: orientations ) {
+                    VText labelPC = new VText(i, j, Z_CIRCLE, CIRCLE_COLOR, letter+number+"_"+orientation, VText.TEXT_ANCHOR_MIDDLE);
+                    labelPC.setScale(20);
+                    mSpace.addGlyph(labelPC);
+                    i += incrX;               
+                }
+            }
+            j -= incrY;
+        }
     }
 
     void addObject(TuioPoint p){
         Point2D.Double np = normalize(p);
-        VCircle c = new VCircle(np.x*SCENE_W-SCENE_W/2, np.y*SCENE_H-SCENE_H/2, Z_GLYPH, 20, Color.RED, Color.RED, 0.2f);
+        VCircle c = new VCircle(np.x*SCENE_W-SCENE_W/2, np.y*SCENE_H-SCENE_H/2, Z_GLYPH, 20, Color.RED, Color.RED, 0.3f);
         c.setDrawBorder(false);
         c.setType(T_POINT_TUIO);
         mSpace.addGlyph(c);
