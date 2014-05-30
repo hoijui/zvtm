@@ -71,7 +71,7 @@ public class Calibrator {
     ClusteredView cv;
     ClusterGeometry cg;
 
-    TuioListener tl;
+    //TuioListener tl;
 
     public Calibrator(WEOptions options){
         vsm.setMaster("Calibrator");
@@ -93,10 +93,14 @@ public class Calibrator {
         cv = new ClusteredView(cg, options.numRows-1, options.numCols, options.numRows, ccameras);
         cv.setBackgroundColor(Color.BLACK);
         vsm.addClusteredView(cv);
-        initTUIO(options.tuioPort);
+
+        //initTUIO(options.tuioPort);
+        TUIOEventHandler teh = new TUIOEventHandler(this);
+
         initScene(options.sceneWidth, options.sceneHeight, options.sceneStep);
     }
 
+/*
     void initTUIO(int port){
         tl = new TUIOListener(this);
         TuioClient client = new TuioClient(port);
@@ -104,6 +108,7 @@ public class Calibrator {
         client.connect();
         System.out.println("Listening to TUIO events on port "+port);
     }
+*/
 
     void initScene(int w, int h, int step){
         SCENE_W = w;
@@ -211,6 +216,8 @@ public class Calibrator {
 
 }
 
+/*
+
 class TUIOListener implements TuioListener {
 
     Calibrator application;
@@ -250,6 +257,8 @@ class TUIOListener implements TuioListener {
     }
 
 }
+
+*/
 
 class CalibratorListener extends ViewAdapter {
 
