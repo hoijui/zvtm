@@ -143,61 +143,32 @@ public class Calibrator {
             mSpace.addGlyph(c);
             i += step;
         }
-        // circles for calibration
+
         int[] x = {-w/4, w/4};
         int[] y = {-h/4, h/4};
         for(int ii : x)
             for(int jj : y){
-                VCircle c = new VCircle(ii, jj, Z_CIRCLE, step, CIRCLE_COLOR, CIRCLE_COLOR);
+                VCircle c = new VCircle(ii, jj, Z_CIRCLE, step, Color.GREEN, Color.GREEN);
                 c.setFilled(false);
                 mSpace.addGlyph(c);
-                VSegment s = new VSegment(ii-step/2, jj, ii+step/2, jj, Z_CIRCLE, CIRCLE_COLOR, 1);
+                VSegment s = new VSegment(ii-step/2, jj, ii+step/2, jj, Z_CIRCLE, Color.GREEN, 1);
                 mSpace.addGlyph(s);
-                s = new VSegment(ii, jj-step/2, ii, jj+step/2, Z_CIRCLE, CIRCLE_COLOR, 1);
+                s = new VSegment(ii, jj-step/2, ii, jj+step/2, Z_CIRCLE, Color.GREEN, 1);
                 mSpace.addGlyph(s);
             }
-
-        // enumeration
-        String[] letters = {"A", "B", "C"};
-        String[] numbers = {"1", "2", "3", "4"};
-        String[] orientations = {"left", "right"};
-
-        int incrX = w/6;
-        int incrY = h/4;
-        
-        int j = h/4 + h/8;
-        for(String number: numbers){
-            i = -w/3 - w/12;
-            for(String letter: letters){
-                for(String orientation: orientations){
-                    //System.out.println(letter+number+"_"+orientation);
-                    VText labelPC = new VText(i, j, Z_CIRCLE, CIRCLE_COLOR,letter+number+"_"+orientation, VText.TEXT_ANCHOR_MIDDLE);
-                    labelPC.setScale(20);
-                    mSpace.addGlyph(labelPC);
-                    i += incrX;
-                }
-            }
-            j -= incrY;
-        }
-        
-
-
     }
 
     void addObject(TuioPoint p){
         Point2D.Double np = normalize(p);
-        VCircle c = new VCircle(np.x*SCENE_W-SCENE_W/2, np.y*SCENE_H-SCENE_H/2, Z_GLYPH, 20, Color.RED, Color.RED);
+        VCircle c = new VCircle(np.x*SCENE_W-SCENE_W/2, np.y*SCENE_H-SCENE_H/2, Z_GLYPH, 20, Color.RED, Color.RED, 0.2);
         c.setDrawBorder(false);
         c.setType(T_POINT_TUIO);
         mSpace.addGlyph(c);
     }
 
     Point2D.Double normalize(TuioPoint p){
-        return new Point2D.Double(p.getX(), 1-p.getY());
-    }
-
-    void exit(){
-        System.exit(0);
+        System.out.println("    " + "( " + p.getX() + ", " + p.getY() + " )");
+        return new Point2D.Double(p.getX(), p.getY());
     }
 
     public static void main(String[] args){
@@ -344,10 +315,6 @@ class CalibratorListener extends ViewAdapter {
         if(g.getType().equals(Calibrator.T_POINT_TUIO)){
             application.mSpace.removeGlyph((Glyph)g.getOwner());
         }
-    }
-
-    public void viewClosing(View v){
-        application.exit();
     }
 
 }
