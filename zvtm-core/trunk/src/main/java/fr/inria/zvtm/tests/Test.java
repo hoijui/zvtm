@@ -14,6 +14,7 @@ import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+import javax.swing.ImageIcon;
 
 import java.util.Vector;
 
@@ -24,6 +25,7 @@ import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.Java2DPainter;
 import fr.inria.zvtm.engine.Utils;
+import fr.inria.zvtm.engine.portals.CameraPortal;
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.DefaultTimingHandler;
 import fr.inria.zvtm.animation.interpolation.ConstantAccInterpolator;
@@ -43,27 +45,30 @@ public class Test implements Java2DPainter {
 
 	static final Font FPS_FONT = new Font("Arial", Font.PLAIN, 12);
 
-	static final float DEFAULT_MAX = 100;
+	static final float DEFAULT_MAX = 40;
 	float MAX = DEFAULT_MAX;
 
 	VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE;
-	VirtualSpace mSpace;
+	VirtualSpace mSpace, sSpace;
 	View mView;
-	Camera mCamera;
+	Camera mCamera, sCamera;
 
 	public Test(String vt, float nbObj){
 		init(vt);
 		MAX = nbObj;
 		populate();
-		mView.getGlobalView(mCamera, 0);
+		//mView.getGlobalView(mCamera, 0);
 	}
 
     void init(String vt){
         windowLayout();
         mSpace = vsm.addVirtualSpace(VirtualSpace.ANONYMOUS);
+        sSpace = vsm.addVirtualSpace(VirtualSpace.ANONYMOUS);
         mCamera = mSpace.addCamera();
-        Vector cameras = new Vector(1);
+        sCamera = sSpace.addCamera();
+        Vector cameras = new Vector(2);
         cameras.add(mCamera);
+        // cameras.add(sCamera);
         if (vt.equals("ogl")){
             System.out.println("Instantiating a regular Java2D view with Sun's OGL pipeline");
             mView = vsm.addFrameView(cameras, View.ANONYMOUS, View.OPENGL_VIEW, VIEW_W, VIEW_H, true);
@@ -84,41 +89,32 @@ public class Test implements Java2DPainter {
     }
 
 	void populate(){
-	    Glyph[] glyphs = new Glyph[(int)(MAX*MAX)];
-        for (int i=0;i<MAX;i++){
-            for (int j=0;j<MAX;j++){
-                VRectangle r = new VRectangle(i*20,j*20,0,20,20,Color.getHSBColor(i/MAX,j/MAX,1));
-                r.setDrawBorder(false);
-                glyphs[(int)(i*MAX+j)] = r;
-            }
-        }
-        mSpace.addGlyphs(glyphs);
-	}
-	
-	void startAnim(){
-	    double gvAlt = mView.getGlobalView(mCamera).getAltitude();
-		animate(gvAlt);
+        mSpace.addGlyph(new VImage(0, 0, 0, (new ImageIcon("scan.png")).getImage()));
+        sSpace.addGlyph(new VImage(0, 0, 0, (new ImageIcon("ortho.png")).getImage()));
 	}
 
-	void animate(final double gvAlt){
-	    Animation cameraAlt = vsm.getAnimationManager().getAnimationFactory().createAnimation(
-           2000, Animation.INFINITE, Animation.RepeatBehavior.REVERSE, mCamera, Animation.Dimension.ALTITUDE,
-           new DefaultTimingHandler(){
-               public void timingEvent(float fraction, Object subject, Animation.Dimension dim){
-                   Camera c = (Camera)subject;
-                   c.setAltitude(2*Double.valueOf(fraction*gvAlt).doubleValue());
-               }
-           },
-           ConstantAccInterpolator.getInstance()
-        );
-        vsm.getAnimationManager().startAnimation(cameraAlt, false);
+    CameraPortal tp = null;
+
+    public void togglePortal(int x, int y){
+        if (tp == null){
+            tp = new CameraPortal(x, y, 200, 200, sCamera);
+            vsm.addPortal(tp, mView);
+        }
+        else {
+            vsm.destroyPortal(tp);
+            tp = null;
+        }
+    }
+
+    void updatePortal(int x, int y, double cx, double cy){
+        if (tp != null){
+            sCamera.moveTo(cx, cy);
+            tp.moveTo(x, y);
+            mView.repaint();
+        }
     }
 
 	public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
-	    float rr = 1000 / (float)(mView.getPanel().getDelay());
-	    g2d.setColor(Color.BLACK);
-	    g2d.setFont(FPS_FONT);
-	    g2d.drawString(String.valueOf(rr), 10, 20);
 	}
 
 	public static void main(String[] args){
@@ -172,6 +168,7 @@ class MainListener extends ViewAdapter {
         lastJPX = jpx;
         lastJPY = jpy;
         v.setDrawDrag(true);
+        application.togglePortal(jpx, jpy);
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
@@ -183,6 +180,10 @@ class MainListener extends ViewAdapter {
 
 	static float ZOOM_SPEED_COEF = 1.0f/50.0f;
     static double PAN_SPEED_COEF = 50.0;
+
+    public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
+        application.updatePortal(jpx, jpy, v.getVCursor().getVSXCoordinate(), v.getVCursor().getVSYCoordinate());
+    }
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
         if (buttonNumber == 1){
@@ -217,7 +218,6 @@ class MainListener extends ViewAdapter {
     }
 
     public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
-        if (code==KeyEvent.VK_A){application.startAnim();}
     }
     
     public void enterGlyph(Glyph g){
