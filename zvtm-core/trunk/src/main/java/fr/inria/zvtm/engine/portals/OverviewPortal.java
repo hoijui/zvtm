@@ -2,7 +2,7 @@
  *   DATE OF CREATION:  Sat Jun 17 07:19:59 2006
  *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2004-2012. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2014. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -167,10 +167,10 @@ public class OverviewPortal extends CameraPortal {
             drawnGlyphs.removeAllElements();
             duncoef = (camera.focal+camera.altitude) / camera.focal;
             //compute region seen from this view through camera
-            viewWC = camera.vx - (w/2)*duncoef;
-            viewNC = camera.vy + (h/2)*duncoef;
-            viewEC = camera.vx + (w/2)*duncoef;
-            viewSC = camera.vy - (h/2)*duncoef;
+            viewWC = camera.vx - (w/2d)*duncoef;
+            viewNC = camera.vy + (h/2d)*duncoef;
+            viewEC = camera.vx + (w/2d)*duncoef;
+            viewSC = camera.vy - (h/2d)*duncoef;
             gll = cameraSpace.getDrawingList();
             for (int i=0;i<gll.length;i++){
                 if (gll[i] != null){
@@ -191,8 +191,8 @@ public class OverviewPortal extends CameraPortal {
         observedRegion = observedRegionView.getVisibleRegion(observedRegionCamera, observedRegion);
         g2d.setColor(observedRegionColor);
         orcoef = (float)(camera.focal/(camera.focal+camera.altitude));
-        int nwx = (int)(x+w/2 + Math.round((observedRegion[0]-camera.vx)*orcoef));
-        int nwy = (int)(y+h/2 - Math.round((observedRegion[1]-camera.vy)*orcoef));
+        int nwx = (int)(x+w/2d + Math.round((observedRegion[0]-camera.vx)*orcoef));
+        int nwy = (int)(y+h/2d - Math.round((observedRegion[1]-camera.vy)*orcoef));
         int orw = (int)Math.round((observedRegion[2]-observedRegion[0])*orcoef);
         int orh = (int)Math.round((observedRegion[1]-observedRegion[3])*orcoef);
         if (acST != null){

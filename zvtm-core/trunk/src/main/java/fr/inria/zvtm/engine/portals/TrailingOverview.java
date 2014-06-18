@@ -2,7 +2,7 @@
  *   DATE OF CREATION:  Mon Jul 10 14:07:06 2006
  *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2006-2012. All Rights Reserved
+ *   Copyright (c) INRIA, 2006-2014. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -113,10 +113,10 @@ public class TrailingOverview extends TrailingCameraPortal {
             drawnGlyphs.removeAllElements();
             duncoef = (camera.focal+camera.altitude) / camera.focal;
             //compute region seen from this view through camera
-            viewWC = camera.vx - (w/2)*duncoef;
-            viewNC = camera.vy + (h/2)*duncoef;
-            viewEC = camera.vx + (w/2)*duncoef;
-            viewSC = camera.vy - (h/2)*duncoef;
+            viewWC = camera.vx - (w/2d)*duncoef;
+            viewNC = camera.vy + (h/2d)*duncoef;
+            viewEC = camera.vx + (w/2d)*duncoef;
+            viewSC = camera.vy - (h/2d)*duncoef;
             gll = cameraSpace.getDrawingList();
             for (int i=0;i<gll.length;i++){
                 if (gll[i] != null){

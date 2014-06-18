@@ -2,7 +2,7 @@
  *   DATE OF CREATION:  Sat Jun 17 07:19:59 2006
  *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2004-2012. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2014. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -168,7 +168,7 @@ public class CameraPortal extends Portal {
      */
     public Point2D.Double getVSCoordinates(int cx, int cy){
         double uncoef = (camera.focal+camera.altitude) / camera.focal;
-        return new Point2D.Double((camera.vx + (cx-x-w/2)*uncoef), (camera.vy - (cy-y-h/2)*uncoef));
+        return new Point2D.Double((camera.vx + (cx-x-w/2d)*uncoef), (camera.vy - (cy-y-h/2d)*uncoef));
     }
 
     /** Get bounds of rectangular region of the VirtualSpace seen through this camera portal.
@@ -344,10 +344,10 @@ public class CameraPortal extends Portal {
             drawnGlyphs.removeAllElements();
             duncoef = (camera.focal+camera.altitude) / camera.focal;
             //compute region seen from this view through camera
-            viewWC = camera.vx - (w/2) * duncoef;
-            viewNC = camera.vy + (h/2) * duncoef;
-            viewEC = camera.vx + (w/2) * duncoef;
-            viewSC = camera.vy - (h/2) * duncoef;
+            viewWC = camera.vx - (w/2d) * duncoef;
+            viewNC = camera.vy + (h/2d) * duncoef;
+            viewEC = camera.vx + (w/2d) * duncoef;
+            viewSC = camera.vy - (h/2d) * duncoef;
             gll = cameraSpace.getDrawingList();
             for (int i=0;i<gll.length;i++){
                 if (gll[i] != null){
@@ -377,8 +377,8 @@ public class CameraPortal extends Portal {
     public void pick(int cx, int cy, ViewListener eh){
         picker.setJPanelCoordinates(cx-x, cy-y);
         double uncoef = (camera.focal+camera.altitude) / camera.focal;
-        double pvx = (camera.vx + (cx-x-w/2)*uncoef);
-        double pvy = (camera.vy - (cy-y-h/2)*uncoef);
+        double pvx = (camera.vx + (cx-x-w/2d)*uncoef);
+        double pvy = (camera.vy - (cy-y-h/2d)*uncoef);
         picker.setVSCoordinates(pvx, pvy);
         picker.computePickedGlyphList(eh, camera);
     }
