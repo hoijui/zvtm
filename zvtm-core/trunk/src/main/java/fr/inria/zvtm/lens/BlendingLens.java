@@ -58,10 +58,17 @@ public abstract class BlendingLens extends FixedSizeLens {
                 BOl = SMl.getBitOffsets();
                 BOm = SMm.getBitOffsets();
             }
+            int eox = 0, eoy = 0;
+            if (ly+sh < LR1){
+                eoy = Math.round((LR1-(ly+sh)));
+            }
+            if (lx+sw < LR1){
+                eox = Math.round((LR1-(lx+sw)));
+            }
             // get source pixels in an array
             iwr.getDataElements(lurd[0], lurd[1], lensWidth, lensHeight, oPixelsI);
             // get magnified source pixels in a second array
-            ewr.getDataElements(0, 0, mbw, mbh, mPixelsI);
+            ewr.getDataElements(eox, eoy, mbw-eox, mbh-eoy, mPixelsI);
             // transfer them to the target array taking the gain function into account
             if (BMl.length == 4){
                 // the sample model features four bands
@@ -69,7 +76,7 @@ public abstract class BlendingLens extends FixedSizeLens {
                     for (int y=lurd[1];y<lurd[3];y++){
                         //this.gf(x,y,gain);
                         // get pixel from lens raster
-                        Pl = mPixelsI[Math.round(((y-lurd[1]) * MM - hmbh) / MM + hmbh + dy)*mbw+Math.round(((x-lurd[0]) * MM - hmbw) / MM + hmbw + dx)];
+                        Pl = mPixelsI[Math.round(((y-lurd[1]) * MM - hmbh) / MM + hmbh + dy)*(mbw-eox)+Math.round(((x-lurd[0]) * MM - hmbw) / MM + hmbw + dx)];
                         Rl = (Pl & BMl[0]) >>> BOl[0];
                         Gl = (Pl & BMl[1]) >>> BOl[1];
                         Bl = (Pl & BMl[2]) >>> BOl[2];
@@ -99,7 +106,7 @@ public abstract class BlendingLens extends FixedSizeLens {
                     for (int y=lurd[1];y<lurd[3];y++){
                         //this.gf(x,y,gain);
                         // get pixel from lens raster
-                        Pl = mPixelsI[Math.round(((y-lurd[1]) * MM - hmbh) / MM + hmbh + dy)*mbw+Math.round(((x-lurd[0]) * MM - hmbw) / MM + hmbw + dx)];
+                        Pl = mPixelsI[Math.round(((y-lurd[1]) * MM - hmbh) / MM + hmbh + dy)*(mbw-eox)+Math.round(((x-lurd[0]) * MM - hmbw) / MM + hmbw + dx)];
                         Rl = (Pl & BMl[0]) >>> BOl[0];
                         Gl = (Pl & BMl[1]) >>> BOl[1];
                         Bl = (Pl & BMl[2]) >>> BOl[2];
@@ -139,16 +146,23 @@ public abstract class BlendingLens extends FixedSizeLens {
                 BOl = SMl.getBitOffsets();
                 BOm = SMm.getBitOffsets();
             }
+            int eox = 0, eoy = 0;
+            if (ly+sh < LR1){
+                eoy = Math.round((LR1-(ly+sh)));
+            }
+            if (lx+sw < LR1){
+                eox = Math.round((LR1-(lx+sw)));
+            }
             // get source pixels in an array
             iwr.getDataElements(lurd[0], lurd[1], lensWidth, lensHeight, oPixelsS);
             // get magnified source pixels in a second array
-            ewr.getDataElements(0, 0, mbw, mbh, mPixelsS);
+            ewr.getDataElements(eox, eoy, mbw-eox, mbh-eoy, mPixelsS);
             // transfer them to the target array taking the gain function into account
             for (int x=lurd[0];x<lurd[2];x++){
                 for (int y=lurd[1];y<lurd[3];y++){
                     //this.gf(x,y,gain);
                     // get pixel from lens raster
-                    Pl = mPixelsS[Math.round(((y-lurd[1]) * MM - hmbh) / MM + hmbh + dy)*mbw+Math.round(((x-lurd[0]) * MM - hmbw) / MM + hmbw + dx)];
+                    Pl = mPixelsS[Math.round(((y-lurd[1]) * MM - hmbh) / MM + hmbh + dy)*(mbw-eox)+Math.round(((x-lurd[0]) * MM - hmbw) / MM + hmbw + dx)];
                     Rl = (Pl & BMl[0]) >>> BOl[0];
                     Gl = (Pl & BMl[1]) >>> BOl[1];
                     Bl = (Pl & BMl[2]) >>> BOl[2];
