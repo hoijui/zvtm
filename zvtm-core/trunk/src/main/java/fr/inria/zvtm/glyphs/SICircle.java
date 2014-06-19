@@ -98,6 +98,8 @@ public class SICircle<T> extends VCircle {
         res.borderColor=this.borderColor;
         res.cursorInsideColor=this.cursorInsideColor;
         res.bColor=this.bColor;
+        res.filled = this.filled;
+        res.paintBorder = this.paintBorder;
         return res;
     }
 }
