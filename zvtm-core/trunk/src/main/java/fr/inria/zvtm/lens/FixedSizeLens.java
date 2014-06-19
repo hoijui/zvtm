@@ -188,10 +188,18 @@ public abstract class FixedSizeLens extends Lens {
     }
 
     void transformI(WritableRaster iwr, WritableRaster ewr){
+        // handle case when lens intersects upper or left border (partially visible)
+        int eox = 0, eoy = 0;
+        if (ly+sh < LR1){
+            eoy = Math.round((LR1-(ly+sh)));
+        }
+        if (lx+sw < LR1){
+            eox = Math.round((LR1-(lx+sw)));
+        }
         // get source pixels in an array
         iwr.getDataElements(lurd[0], lurd[1], lensWidth, lensHeight, oPixelsI);
         // get magnified source pixels in a second array
-        ewr.getDataElements(0, 0, mbw, mbh, mPixelsI);
+        ewr.getDataElements(eox, eoy, mbw-eox, mbh-eoy, mPixelsI);
         // transfer them to the target array taking the gain function into account
         for (int x=lurd[0];x<lurd[2];x++){
             for (int y=lurd[1];y<lurd[3];y++){
@@ -201,11 +209,11 @@ public abstract class FixedSizeLens extends Lens {
                 if (gain[0] > mSwitchThreshold || gain[1] > mSwitchThreshold){
                     /* following 3 commented lines left here for documentation of what the actual
                        single instruction means, x0 and y0 being mere int variables */
-                    //x0 = Math.round(((x-lurd[0]) * MM - hmbw) / gain[0] + hmbw);
-                    //y0 = Math.round(((y-lurd[1]) * MM - hmbh) / gain[1] + hmbh);
-                    //tPixelsI[(y-lurd[1])*(lensWidth)+(x-lurd[0])] = mPixelsI[Math.round(y0*mbw+x0)];
+                    // int x0 = Math.round(((x-lurd[0]) * MM - hmbw) / gain[0] + hmbw);
+                    // int y0 = Math.round(((y-lurd[1]) * MM - hmbh) / gain[1] + hmbh);
+                    // tPixelsI[(y-lurd[1])*(lensWidth)+(x-lurd[0])] = mPixelsI[Math.round(y0*(mbw-eox)+x0)];
                     tPixelsI[(y-lurd[1])*(lensWidth)+(x-lurd[0])] =
-                        mPixelsI[Math.round(((y-lurd[1]) * MM - hmbh) / gain[1] + hmbh + dy)*mbw + Math.round(((x-lurd[0]) * MM - hmbw) / gain[0] + hmbw + dx)];
+                        mPixelsI[Math.round(((y-lurd[1]) * MM - hmbh) / gain[1] + hmbh + dy)* (mbw-eox) + Math.round(((x-lurd[0]) * MM - hmbw) / gain[0] + hmbw + dx)];
                 }
                 else {
                     //x0 = Math.round((((float)x-sw-lx)/gain[0])+sw+lx);
@@ -221,10 +229,18 @@ public abstract class FixedSizeLens extends Lens {
     }
 
     void transformS(WritableRaster iwr, WritableRaster ewr){
+        // handle case when lens intersects upper or left border (partially visible)
+        int eox = 0, eoy = 0;
+        if (ly+sh < LR1){
+            eoy = Math.round((LR1-(ly+sh)));
+        }
+        if (lx+sw < LR1){
+            eox = Math.round((LR1-(lx+sw)));
+        }
         // get source pixels in an array
         iwr.getDataElements(lurd[0], lurd[1], lensWidth, lensHeight, oPixelsS);
         // get magnified source pixels in a second array
-        ewr.getDataElements(0, 0, mbw, mbh, mPixelsS);
+        ewr.getDataElements(eox, eoy, mbw-eox, mbh-eoy, mPixelsS);
         // transfer them to the target array taking the gain function into account
         for (int x=lurd[0];x<lurd[2];x++){
             for (int y=lurd[1];y<lurd[3];y++){
@@ -236,9 +252,9 @@ public abstract class FixedSizeLens extends Lens {
                         single instruction means, x0 and y0 being mere int variables */
                     //x0 = Math.round(((x-lurd[0]) * MM - hmbw) / gain[0] + hmbw);
                     //y0 = Math.round(((y-lurd[1]) * MM - hmbh) / gain[1] + hmbh);
-                    //tPixelsS[(y-lurd[1])*(lensWidth)+(x-lurd[0])] = mPixelsS[Math.round(y0*mbw+x0];
+                    //tPixelsS[(y-lurd[1])*(lensWidth)+(x-lurd[0])] = mPixelsS[Math.round(y0*(mbw-eox)+x0];
                     tPixelsS[(y-lurd[1])*(lensWidth)+(x-lurd[0])] =
-                        mPixelsS[Math.round(((y-lurd[1]) * MM - hmbh) / gain[1] + hmbh + dy)*mbw+Math.round(((x-lurd[0]) * MM - hmbw) / gain[0] + hmbw + dx)];
+                        mPixelsS[Math.round(((y-lurd[1]) * MM - hmbh) / gain[1] + hmbh + dy)*(mbw-eox)+Math.round(((x-lurd[0]) * MM - hmbw) / gain[0] + hmbw + dx)];
                 }
                 else {
                     //x0 = Math.round((((float)x-sw-lx)/gain[0])+sw+lx);
@@ -254,10 +270,18 @@ public abstract class FixedSizeLens extends Lens {
     }
 
     void transformB(WritableRaster iwr, WritableRaster ewr){
+        // handle case when lens intersects upper or left border (partially visible)
+        int eox = 0, eoy = 0;
+        if (ly+sh < LR1){
+            eoy = Math.round((LR1-(ly+sh)));
+        }
+        if (lx+sw < LR1){
+            eox = Math.round((LR1-(lx+sw)));
+        }
         // get source pixels in an array
         iwr.getDataElements(lurd[0], lurd[1], lensWidth, lensHeight, oPixelsB);
         // get magnified source pixels in a second array
-        ewr.getDataElements(0, 0, mbw, mbh, mPixelsB);
+        ewr.getDataElements(eox, eoy, mbw-eox, mbh-eoy, mPixelsB);
         // transfer them to the target array taking the gain function into account
         for (int x=lurd[0];x<lurd[2];x++){
             for (int y=lurd[1];y<lurd[3];y++){
@@ -269,9 +293,9 @@ public abstract class FixedSizeLens extends Lens {
                         single instruction means, x0 and y0 being mere int variables */
                     //x0 = Math.round(((x-lurd[0]) * MM - hmbw) / gain[0] + hmbw);
                     //y0 = Math.round(((y-lurd[1]) * MM - hmbh) / gain[1] + hmbh);
-                    //tPixelsB[(y-lurd[1])*(lensWidth)+(x-lurd[0])] = mPixelsB[Math.round(y0*mbw+x0];
+                    //tPixelsB[(y-lurd[1])*(lensWidth)+(x-lurd[0])] = mPixelsB[Math.round(y0*(mbw-eox)+x0];
                     tPixelsB[(y-lurd[1])*(lensWidth)+(x-lurd[0])] =
-                        mPixelsB[Math.round(((y-lurd[1]) * MM - hmbh) / gain[1] + hmbh + dy)*mbw+Math.round(((x-lurd[0]) * MM - hmbw) / gain[0] + hmbw + dx)];
+                        mPixelsB[Math.round(((y-lurd[1]) * MM - hmbh) / gain[1] + hmbh + dy)*(mbw-eox)+Math.round(((x-lurd[0]) * MM - hmbw) / gain[0] + hmbw + dx)];
                 }
                 else {
                     //x0 = Math.round((((float)x-sw-lx)/gain[0])+sw+lx);
