@@ -185,6 +185,18 @@ public class VImage<T> extends ClosedShape implements RectangularShape {
         size = Math.sqrt(vw*vw + vh*vh);
     }
 
+    public void setScale(double s){
+        scaleFactor = s;
+        vw = image.getWidth(null) * scaleFactor;
+        vh = image.getHeight(null) * scaleFactor;
+        computeSize();
+        VirtualSpaceManager.INSTANCE.repaint();
+    }
+
+    public double getScale(){
+        return scaleFactor;
+    }
+
     public void setWidth(double w){
         vw = w;
         vh = vw / ar;
