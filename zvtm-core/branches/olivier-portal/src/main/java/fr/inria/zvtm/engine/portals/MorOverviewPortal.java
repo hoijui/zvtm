@@ -13,6 +13,8 @@ package fr.inria.zvtm.engine.portals;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Dimension;
+
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.*;
@@ -28,7 +30,7 @@ import fr.inria.zvtm.event.ObservedRegionListener;
 public class MorOverviewPortal extends CameraPortal
 {
     Camera[] observedRegionCameras;
-    View[] observedRegionViews;
+    View observedRegionView;  // only one valide view !!!
     double[][] observedRegions;
     double orcoef;
 
@@ -37,7 +39,7 @@ public class MorOverviewPortal extends CameraPortal
     /** For translucency of the rectangle representing the region observed through the main viewport (default is 0.5)*/
     AlphaComposite acST;
     /** Alpha channel value. */
-    float alpha = 0.5f;
+    float alpha = 0.2f;
 
     //Timer borderTimer;
     
@@ -55,13 +57,12 @@ public class MorOverviewPortal extends CameraPortal
     {
 	    super(x, y, w, h, pc);
 	    this.observedRegionCameras = new Camera[orcs.length];
-	    this.observedRegionViews = new View[orcs.length];
+	    this.observedRegionView = orcs[0].getOwningView();
 	    this.observedRegions = new double[orcs.length][];
 	    this.observedRegionColors = new Color[orcs.length];
 	    for(int i = 0; i < orcs.length; i++)
 	    {
 		    this.observedRegionCameras[i] = orcs[i];
-		    this.observedRegionViews[i] = orcs[i].getOwningView();
 		    this.observedRegions[i] = new double[4];
 		    if (colors != null &&  colors.length > i)
 		    {
@@ -72,6 +73,31 @@ public class MorOverviewPortal extends CameraPortal
 			    this.observedRegionColors[i] = Color.GREEN;
 		    }
 	    }
+	    // find a valid view !!
+	    for(int i = 0; i < orcs.length; i++)
+	    {
+		    observedRegionView = orcs[i].getOwningView();
+		    if (observedRegionView != null)
+		    {
+			    observedRegions[i] =
+				    observedRegionView.getVisibleRegion(observedRegionCameras[i], observedRegions[i]);
+			    if (observedRegions[i] != null)
+			    {
+				    borderColor = observedRegionColors[i];
+			    }
+			    break;
+		    }
+	    }
+	    
+	    if (observedRegionView == null)
+	    {
+		    // dead !!!
+		    System.out.print("MorOverviewPortal: None of the OR Cameras has a Valid View. Soon a Crash !!"); 
+		    
+	    }
+	   
+	    setObservedRegionTranslucency(alpha);
+
 	    //borderTimer = new Timer();
 	    //borderTimer.scheduleAtFixedRate(new BorderTimer(this), 40, 40);
     }
@@ -98,6 +124,10 @@ public class MorOverviewPortal extends CameraPortal
 
 /*     } */
 
+
+    public Camera[] getObservedRegionCameras() {
+	    return observedRegionCameras;
+    }
     public void drawObservedRegionLocator(boolean b){
         drawObservedRegionLocator = b;
     }
@@ -207,9 +237,24 @@ public class MorOverviewPortal extends CameraPortal
 
         // paint region observed through observedRegionCamera
 	orcoef = (float)(camera.focal/(camera.focal+camera.altitude));
+	g2d.setStroke(standardStroke);
+	double uncoef;
+	Dimension panelSize = observedRegionView.getPanel().getComponent().getSize();
 	for(int i = 0; i < observedRegionCameras.length; i++)
 	{
-		observedRegions[i] = observedRegionViews[i].getVisibleRegion(observedRegionCameras[i], observedRegions[i]);
+		//System.out.println("PAINT " + i + " " + observedRegionCameras.length);
+
+		//observedRegions[i] = observedRegionViews[i].getVisibleRegion(observedRegionCameras[i], observedRegions[i]);
+		uncoef = (observedRegionCameras[i].focal+observedRegionCameras[i].altitude) / observedRegionCameras[i].focal;
+		observedRegions[i][0] = observedRegionCameras[i].vx-(panelSize.width/2-0)*uncoef;
+		observedRegions[i][1] = observedRegionCameras[i].vy+(panelSize.height/2-0)*uncoef;
+		observedRegions[i][2] = observedRegionCameras[i].vx+(panelSize.width/2-0)*uncoef;
+		observedRegions[i][3] = observedRegionCameras[i].vy-(panelSize.height/2-0)*uncoef;
+		//System.out.println(
+		//	" observedRegions("+i+"):" +
+		//	observedRegions[i][0]+" "+observedRegions[i][1]+" "+
+		//	observedRegions[i][2]+" "+observedRegions[i][3]);
+
 		g2d.setColor(observedRegionColors[i]);
        
 		int nwx = (int)(x+w/2d + Math.round((observedRegions[i][0]-camera.vx)*orcoef));
@@ -221,7 +266,7 @@ public class MorOverviewPortal extends CameraPortal
 			g2d.fillRect(nwx, nwy, orw, orh);
 			g2d.setComposite(Translucent.acO);
 		}
-		g2d.setStroke(standardStroke);
+		//g2d.setStroke(standardStroke);
 		g2d.drawRect(nwx, nwy, orw, orh);
 		if (drawObservedRegionLocator){
 			// west
@@ -233,12 +278,13 @@ public class MorOverviewPortal extends CameraPortal
 			// south
 			g2d.drawRect(nwx+orw/2, nwy+orh, 1, y+h-(nwy+orh));
 		}
-		// reset Graphics2D
-		g2d.setClip(0, 0, viewWidth, viewHeight);
-		if (borderColor != null){
-			g2d.setColor(borderColor);
-			g2d.drawRect(x, y, w, h);
-		}
+	}
+
+	// reset Graphics2D
+	g2d.setClip(0, 0, viewWidth, viewHeight);
+	if (borderColor != null){
+		g2d.setColor(borderColor);
+		g2d.drawRect(x, y, w, h);
 	}
     }
 
