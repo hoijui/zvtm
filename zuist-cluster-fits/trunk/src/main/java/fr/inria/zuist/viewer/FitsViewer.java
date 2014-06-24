@@ -138,9 +138,11 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     FitsImage.ScaleMethod scaleMethod = FitsImage.ScaleMethod.LINEAR;
 
     
-    public FitsViewer(boolean fullscreen, boolean opengl, boolean antialiased, File xmlSceneFile){
+    //public FitsViewer(boolean fullscreen, boolean opengl, boolean antialiased, File xmlSceneFile){
+    public FitsViewer(Options options){k
 		ovm = new FitsOverlayManager(this);
-		initGUI(fullscreen, opengl, antialiased);
+		//initGUI(fullscreen, opengl, antialiased);
+		initGUI(options);
         VirtualSpace[]  sceneSpaces = {mSpace};
         Camera[] sceneCameras = {mCamera};
         sm = new SceneManager(sceneSpaces, sceneCameras);
@@ -161,8 +163,8 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 		}
 		ovm.toggleConsole();
     }
-
-    void initGUI(boolean fullscreen, boolean opengl, boolean antialiased){
+    //void initGUI(boolean fullscreen, boolean opengl, boolean antialiased){
+    void initGUI(Options options){
         windowLayout();
         vsm = VirtualSpaceManager.INSTANCE;
         vsm.setMaster("ZuistCluster");
@@ -176,24 +178,14 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         cameras.add(mCamera);
 		cameras.add(vsm.getVirtualSpace(mnSpaceName).getCamera(0));
 		cameras.add(vsm.getVirtualSpace(ovSpaceName).getCamera(0));
-        mView = vsm.addFrameView(cameras, mViewName, (opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, !fullscreen, initMenu());
+        mView = vsm.addFrameView(cameras, mViewName, (options.opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, !options.fullscreen, initMenu());
         Vector<Camera> sceneCam = new Vector<Camera>();
         sceneCam.add(mCamera);
-        ClusterGeometry clGeom = new ClusterGeometry(
-                2680,
-                1700,
-                8,
-                4);
-		clusteredView = 
-            new ClusteredView(
-                    clGeom,
-                    3, //origin (block number)
-                    8, //use complete
-                    4, //cluster surface
-                    sceneCam);
+        ClusterGeometry clGeom = new ClusterGeometry(options.blockWidth, options.blockHeight, options.numCols, options.numRows);
+		clusteredView = new ClusteredView(clGeom, options.numRows-1, options.numCols, options.numRows, sceneCam);
         clusteredView.setBackgroundColor(Color.GRAY);
         vsm.addClusteredView(clusteredView);
-        if (fullscreen){
+        if (options.fullscreen){
             GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow((JFrame)mView.getFrame());
         }
         else {
