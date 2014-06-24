@@ -89,6 +89,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
+import org.kohsuke.args4j.CmdLineException;
+import org.kohsuke.args4j.CmdLineParser;
+
 /**
  * @author Emmanuel Pietriga
  */
@@ -139,7 +142,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 
     
     //public FitsViewer(boolean fullscreen, boolean opengl, boolean antialiased, File xmlSceneFile){
-    public FitsViewer(Options options){k
+    public FitsViewer(Options options){
 		ovm = new FitsOverlayManager(this);
 		//initGUI(fullscreen, opengl, antialiased);
 		initGUI(options);
@@ -150,8 +153,9 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         sm.setLevelListener(this);
 		previousLocations = new Vector();
 		ovm.initConsole();
-        if (xmlSceneFile != null){
+        if (options.xmlSceneFile != null){
             sm.enableRegionUpdater(false);
+            File xmlSceneFile = new File(options.xmlSceneFile);
 			loadScene(xmlSceneFile);
 			EndAction ea  = new EndAction(){
                    public void execute(Object subject, Animation.Dimension dimension){
@@ -208,7 +212,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 		mCamera.addListener(eh);
         //mView.setNotifyMouseMoved(true);
         mView.setBackgroundColor(Color.WHITE);
-		mView.setAntialiasing(antialiased);
+		mView.setAntialiasing(!options.noaa);//antialiased);
 		mView.setJava2DPainter(this, Java2DPainter.AFTER_PORTALS);
 		//mView.getPanel().addComponentListener(eh);
 		mView.getPanel().getComponent().addComponentListener(eh);
@@ -695,6 +699,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         System.exit(0);
     }
 
+    /*
     public static void main(String[] args){
         File xmlSceneFile = null;
 		boolean fs = false;
@@ -735,7 +740,28 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         System.out.println("--help for command line options");
         new FitsViewer(fs, ogl, aa, xmlSceneFile);
     }
-    
+    */
+    public static void main(String[] args){
+
+    	Options options = new Options();
+        CmdLineParser parser = new CmdLineParser(options);
+        try {
+            parser.parseArgument(args);
+        } catch(CmdLineException ex){
+            System.err.println(ex.getMessage());
+            parser.printUsage(System.err);
+            return;
+        }
+        
+        if (!options.fullscreen && Utils.osIsMacOS()){
+            System.setProperty("apple.laf.useScreenMenuBar", "true");
+        }
+        System.out.println("--help for command line options");
+        new FitsViewer(options);
+
+    }
+
+    /*
     private static void printCmdLineHelp(){
         System.out.println("Usage:\n\tjava -Xmx1024M -Xms512M -cp target/timingframework-1.0.jar:zuist-engine-0.2.0-SNAPSHOT.jar:target/zvtm-0.10.0-SNAPSHOT.jar <path_to_scene_dir> [options]");
         System.out.println("Options:\n\t-fs: fullscreen mode");
@@ -743,6 +769,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 		System.out.println("\t-opengl: use Java2D OpenGL rendering pipeline (Java 6+Linux/Windows), requires that -Dsun.java2d.opengl=true be set on cmd line");
         System.out.println("\t-smooth: default to smooth transitions between levels when none specified");
     }
+    */
     
 }
 
