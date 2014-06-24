@@ -20,7 +20,7 @@ public class FitsResourceHandler implements ResourceHandler {
 
         float scaleFactor = 1;
 
-        FitsImage.ScaleMethod scaleMethod = FitsImage.ScaleMethod.LINEAR;
+        FitsImage.ScaleMethod scaleMethod = FitsImage.ScaleMethod.HISTOGRAM_EQUALIZATION;
         FitsImage.ColorFilter colorFilter = FitsImage.ColorFilter.HEAT;
 
         if (params != null){
