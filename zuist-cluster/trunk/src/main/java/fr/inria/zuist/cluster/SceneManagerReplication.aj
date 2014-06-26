@@ -26,6 +26,7 @@ import fr.inria.zvtm.glyphs.ClosedShape;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zuist.engine.ClosedShapeDescription;
+import fr.inria.zuist.engine.GlyphDescription;
 import fr.inria.zuist.engine.ImageDescription;
 import fr.inria.zuist.engine.ObjectDescription;
 import fr.inria.zuist.engine.SceneFragmentDescription;
@@ -549,5 +550,56 @@ aspect SceneManagerReplication {
             su.putSlaveObject(descId, desc);
         }
     }
-}
 
+    pointcut createGlyphDescription(SceneManager sceneManager,
+            Glyph g, String id, int zindex, Region region, boolean sensitivity) :
+        execution(public GlyphDescription SceneManager.createGlyphDescription(Glyph, String, int, Region, boolean)) &&
+        this(sceneManager) &&
+        args(g, id, zindex, region, sensitivity);
+
+    after(SceneManager sceneManager,
+            Glyph g, String id, int zindex, Region region, boolean sensitivity)
+        returning(GlyphDescription gDesc) :
+            createGlyphDescription(sceneManager, g, id, zindex, region, sensitivity) &&
+            if(VirtualSpaceManager.INSTANCE.isMaster()) &&
+            !cflowbelow(createGlyphDescription(SceneManager, Glyph, String, int, Region, boolean)) {
+                gDesc.setReplicated(true);
+
+                Delta delta = new GlyphCreateDelta(sceneManager.getObjId(),
+                        gDesc, id, zindex, region.getObjId(), sensitivity);
+                VirtualSpaceManager.INSTANCE.sendDelta(delta);
+            }
+
+    private static class GlyphCreateDelta implements Delta {
+        private final ObjId<SceneManager> smId;
+        private final ObjId<ObjectDescription> descId;
+        private final GlyphReplicator gReplicator;
+        private final String id;
+        private final int zindex;
+        private final ObjId<Region> regionId;
+        private final boolean sensitivity;
+
+        GlyphCreateDelta(ObjId<SceneManager> smId,
+                GlyphDescription gDesc,
+                String id, int zindex, ObjId<Region> regionId,
+                boolean sensitivity){
+            this.smId = smId;
+            this.descId = gDesc.getObjId();
+            this.gReplicator = gDesc.getGlyph().getReplicator();
+            this.id = id;
+            this.zindex = zindex;
+            this.regionId = regionId;
+            this.sensitivity = sensitivity;
+        }
+
+       public void apply(SlaveUpdater su){
+           SceneManager sm = su.getSlaveObject(smId);
+           Region region = su.getSlaveObject(regionId);
+           GlyphDescription desc = sm.createGlyphDescription(
+                   (Glyph)(gReplicator.createGlyph()), id, zindex, region,
+                   sensitivity);
+           su.putSlaveObject(descId, desc);
+       }
+    }
+
+}
