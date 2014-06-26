@@ -6,7 +6,7 @@ import fr.inria.zvtm.glyphs.Glyph;
 /**
  * ZUIST description of a Glyph.
  */
-class GlyphDescription extends ObjectDescription {
+public class GlyphDescription extends ObjectDescription {
   private Glyph glyph;
 
   public GlyphDescription(String id, Glyph glyph, int z, Region pr, boolean sensitive){
