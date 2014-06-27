@@ -156,7 +156,10 @@ class FitsOverlayManager implements ViewListener {
 
 	public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
-	public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){}
+	public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
+		System.out.println("FitsOverlayManager");
+		System.out.println(v.parent.getActiveLayer());
+	}
 
 	public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){}
 

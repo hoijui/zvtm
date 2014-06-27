@@ -18,6 +18,8 @@ import java.util.TimerTask;
 
 import fr.inria.zvtm.engine.VCursor;
 
+import java.awt.Cursor;
+
 //import fr.inria.zvtm.engine.LongPoint;
 import java.awt.geom.Point2D;
 
@@ -104,7 +106,7 @@ class FitsViewerEventHandler implements ViewListener, ComponentListener, CameraL
         }
     }
 
-    public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
+    public void click1(ViewPanel v, int mod, int jpx, int jpy, int clickNumber, MouseEvent e){
         /*
         Vector gum = v.getVCursor().getIntersectingGlyphs(v.cams[0]);
 		if (gum == null){
@@ -165,7 +167,20 @@ class FitsViewerEventHandler implements ViewListener, ComponentListener, CameraL
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
-    public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){}
+    public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
+
+        System.out.println("FitsViewerEventHandler");
+        System.out.println(v.parent.getActiveLayer());
+        if((jpx < application.menu.WIDTH_MENU && jpy > application.menu.BORDER_BOTTON_FILTER && jpy < application.menu.BORDER_TOP_FILTER) ||
+                    (jpy > application.menu.BORDER_TOP_HISTOGRAM && jpy < application.menu.BORDER_BOTTON_HISTOGRAM && jpx > application.menu.BORDER_LEFT_HISTOGRAM && 
+                    jpx < application.menu.BORDER_RIGHT_HISTOGRAM )){
+            v.parent.setActiveLayer(application.LAYER_MENU);
+            v.parent.setCursorIcon(Cursor.DEFAULT_CURSOR);
+        } else {
+            v.parent.setActiveLayer(application.LAYER_SCENE);
+            v.parent.setCursorIcon(Cursor.CUSTOM_CURSOR);
+        }
+    }
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
         Camera c = application.mCamera;

@@ -92,6 +92,9 @@ import org.xml.sax.SAXException;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
+// filter
+import java.awt.image.ImageFilter;
+
 /**
  * @author Emmanuel Pietriga
  */
@@ -122,8 +125,20 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     static final String mSpaceName = "Scene Space";
     static final String mnSpaceName = "PieMenu Space";
     static final String ovSpaceName = "Overlay Space";
+    static final String menuSpaceName = "Menu Space";
+
+    static final int LAYER_SCENE = 0;
+    static final int LAYER_PIEMENU = 1;
+    static final int LAYER_OVERLAY = 2;
+    static final int LAYER_MENU = 3;
+
+    //static final int LAYER_OVERLAY = 1;
+    
+
     VirtualSpace mSpace, ovSpace;
+    VirtualSpace menuSpace;
     Camera mCamera;
+    Camera menuCamera;
     String mCameraAltStr = Messages.ALTITUDE + "0";
     String levelStr = Messages.LEVEL + "0";
     static final String mViewName = "ZUIST Viewer";
@@ -140,7 +155,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     FitsImage.ColorFilter cfilter = FitsImage.ColorFilter.RAINBOW;
     FitsImage.ScaleMethod scaleMethod = FitsImage.ScaleMethod.LINEAR;
 
-    //public FitsMenu menu;
+    public FitsMenu menu;
     
     //public FitsViewer(boolean fullscreen, boolean opengl, boolean antialiased, File xmlSceneFile){
     public FitsViewer(Options options){
@@ -178,14 +193,23 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         vsm.setMaster("ZuistCluster");
         mSpace = vsm.addVirtualSpace(mSpaceName);
         VirtualSpace mnSpace = vsm.addVirtualSpace(mnSpaceName);
+
         mCamera = mSpace.addCamera();
+		
 		mnSpace.addCamera().setAltitude(10);
+
         ovSpace = vsm.addVirtualSpace(ovSpaceName);
 		ovSpace.addCamera();
+
+		menuSpace = vsm.addVirtualSpace(menuSpaceName);
+		menuCamera = menuSpace.addCamera();
+
         Vector cameras = new Vector();
         cameras.add(mCamera);
 		cameras.add(vsm.getVirtualSpace(mnSpaceName).getCamera(0));
 		cameras.add(vsm.getVirtualSpace(ovSpaceName).getCamera(0));
+		cameras.add(menuCamera);
+
         mView = vsm.addFrameView(cameras, mViewName, (options.opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, !options.fullscreen, initMenu());
         Vector<Camera> sceneCam = new Vector<Camera>();
         sceneCam.add(mCamera);
@@ -204,16 +228,21 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 		//((JFrame)mView.getFrame()).setGlassPane(gp);
         eh = new FitsViewerEventHandler(this);
 
+        menu = new FitsMenu(this);
+        
         /*
         mView.setEventHandler(eh, 0);
         mView.setEventHandler(eh, 1);
         mView.setEventHandler(ovm, 2);
         */
-        mView.setListener(eh, 0);
-        mView.setListener(eh, 1);
-        mView.setListener(ovm, 2);
+        mView.setListener(eh, LAYER_SCENE);
+        mView.setListener(eh, LAYER_PIEMENU);
+        mView.setListener(ovm, LAYER_OVERLAY);
+        mView.setListener(menu, LAYER_MENU);
+        
 
 		mCamera.addListener(eh);
+
         //mView.setNotifyMouseMoved(true);
         mView.setBackgroundColor(Color.WHITE);
 		mView.setAntialiasing(!options.noaa);//antialiased);
@@ -227,7 +256,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 		};
 		mView.getFrame().addComponentListener(ca0);
 
-		//menu = new FitsMenu(this);
+		
 
     }
 
@@ -303,6 +332,14 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
                 ((FitsImageDescription)desc).setScaleMethod(next);
             }
         } 
+    }
+
+    public void setColorFilter(ImageFilter filter){
+        //hi.setColorFilter(filter);
+    }
+
+    public void setScaleMethod(FitsImage.ScaleMethod method){
+
     }
 
 	void displayMainPieMenu(boolean b){
