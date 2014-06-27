@@ -24,6 +24,8 @@ import java.awt.BorderLayout;
 import javax.swing.BoxLayout;
 import javax.swing.JPanel;
 
+import java.util.Scanner;
+
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
@@ -40,6 +42,18 @@ import fr.inria.zvtm.widgets.TranslucentTextArea;
 
 //class FitsOverlayManager implements ViewEventHandler {
 class FitsOverlayManager implements ViewListener {
+
+	static String VERSION;
+
+	static {
+	    Scanner sc = new Scanner(Messages.class.getResourceAsStream("/properties")).useDelimiter("\\s*=\\s*");
+        while (sc.hasNext()){
+            String token = sc.next();
+            if (token.equals("version")){
+                Messages.VERSION = sc.next();
+            }
+        }
+	}
 
     static final Color FADE_REGION_FILL = Color.BLACK;
     static final Color FADE_REGION_STROKE = Color.WHITE;
@@ -97,7 +111,7 @@ class FitsOverlayManager implements ViewListener {
                 FADE_REGION_FILL, FADE_REGION_STROKE, 0.85f);
             aboutLines = new VText[5];
 			aboutLines[0] = new VText(0, 100, 0, Color.WHITE, "ZUIST FITS Image Viewer", VText.TEXT_ANCHOR_MIDDLE, 4.0f);
-            aboutLines[1] = new VText(0, 40, 0, Color.WHITE, "v0.2.0", VText.TEXT_ANCHOR_MIDDLE, 2.0f);
+            aboutLines[1] = new VText(0, 40, 0, Color.WHITE, "v"+VERSION, VText.TEXT_ANCHOR_MIDDLE, 2.0f);
             aboutLines[2] = new VText(0, 0, 0, Color.WHITE, "Emmanuel Pietriga, Romain Primet, Fernando del Campo", VText.TEXT_ANCHOR_MIDDLE, 2.0f);
             aboutLines[3] = new VText(0, -120, 0, Color.WHITE, "Based on the ZVTM toolkit", VText.TEXT_ANCHOR_MIDDLE, 2.0f);
             aboutLines[4] = new VText(0, -160, 0, Color.WHITE, "http://zvtm.sf.net", VText.TEXT_ANCHOR_MIDDLE, 2.0f);
