@@ -44,9 +44,6 @@ class FitsOverlayManager implements ViewListener {
     static final Color FADE_REGION_FILL = Color.BLACK;
     static final Color FADE_REGION_STROKE = Color.WHITE;
 
-    static final String INSITU_LOGO_PATH = "/images/insitu.png";
-    static final String INRIA_LOGO_PATH = "/images/inria.png";
-
     FitsViewer application;
 
 	TranslucentTextArea console;
@@ -96,20 +93,15 @@ class FitsOverlayManager implements ViewListener {
 
     void showAbout(){
         if (!showingAbout){
-            fadeAbout = new VRectangle(0, 0, 0, Math.round(application.panelWidth/2.1), Math.round(application.panelHeight/3),
+            fadeAbout = new VRectangle(0, 0, 0, 600, 400,
                 FADE_REGION_FILL, FADE_REGION_STROKE, 0.85f);
             aboutLines = new VText[5];
-			aboutLines[0] = new VText(0, 150, 0, Color.WHITE, "ZUIST Viewer", VText.TEXT_ANCHOR_MIDDLE, 4.0f);
-            aboutLines[1] = new VText(0, 110, 0, Color.WHITE, "v"+Messages.VERSION, VText.TEXT_ANCHOR_MIDDLE, 2.0f);
-            aboutLines[2] = new VText(0, 0, 0, Color.WHITE, "By Emmanuel Pietriga and Romain Primet", VText.TEXT_ANCHOR_MIDDLE, 2.0f);
-            RImage.setReflectionHeight(0.7f);
-            inriaLogo = new RImage(-150, -70, 0, (new ImageIcon(this.getClass().getResource(INRIA_LOGO_PATH))).getImage(), 1.0f);
-            insituLogo = new RImage(200, -70, 0, (new ImageIcon(this.getClass().getResource(INSITU_LOGO_PATH))).getImage(), 1.0f);
-            aboutLines[3] = new VText(0, -170, 0, Color.WHITE, "Based on the ZVTM toolkit", VText.TEXT_ANCHOR_MIDDLE, 2.0f);
-            aboutLines[4] = new VText(0, -200, 0, Color.WHITE, "http://zvtm.sf.net", VText.TEXT_ANCHOR_MIDDLE, 2.0f);
+			aboutLines[0] = new VText(0, 100, 0, Color.WHITE, "ZUIST FITS Image Viewer", VText.TEXT_ANCHOR_MIDDLE, 4.0f);
+            aboutLines[1] = new VText(0, 40, 0, Color.WHITE, "v0.1.2", VText.TEXT_ANCHOR_MIDDLE, 2.0f);
+            aboutLines[2] = new VText(0, 0, 0, Color.WHITE, "Emmanuel Pietriga, Romain Primet, Fernando del Campo", VText.TEXT_ANCHOR_MIDDLE, 2.0f);
+            aboutLines[3] = new VText(0, -120, 0, Color.WHITE, "Based on the ZVTM toolkit", VText.TEXT_ANCHOR_MIDDLE, 2.0f);
+            aboutLines[4] = new VText(0, -160, 0, Color.WHITE, "http://zvtm.sf.net", VText.TEXT_ANCHOR_MIDDLE, 2.0f);
             application.ovSpace.addGlyph(fadeAbout);
-            application.ovSpace.addGlyph(inriaLogo);
-            application.ovSpace.addGlyph(insituLogo);
 			for (int i=0;i<aboutLines.length;i++){
 	            application.ovSpace.addGlyph(aboutLines[i]);
 			}
