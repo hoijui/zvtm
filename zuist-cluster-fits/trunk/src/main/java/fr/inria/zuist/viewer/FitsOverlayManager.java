@@ -46,11 +46,11 @@ class FitsOverlayManager implements ViewListener {
 	static String VERSION;
 
 	static {
-	    Scanner sc = new Scanner(Messages.class.getResourceAsStream("/properties")).useDelimiter("\\s*=\\s*");
+	    Scanner sc = new Scanner(Messages.class.getResourceAsStream("/p/v_properties")).useDelimiter("\\s*=\\s*");
         while (sc.hasNext()){
             String token = sc.next();
             if (token.equals("version")){
-                Messages.VERSION = sc.next();
+                VERSION = sc.next();
             }
         }
 	}
@@ -112,7 +112,7 @@ class FitsOverlayManager implements ViewListener {
             aboutLines = new VText[5];
 			aboutLines[0] = new VText(0, 100, 0, Color.WHITE, "ZUIST FITS Image Viewer", VText.TEXT_ANCHOR_MIDDLE, 4.0f);
             aboutLines[1] = new VText(0, 40, 0, Color.WHITE, "v"+VERSION, VText.TEXT_ANCHOR_MIDDLE, 2.0f);
-            aboutLines[2] = new VText(0, 0, 0, Color.WHITE, "Emmanuel Pietriga, Romain Primet, Fernando del Campo", VText.TEXT_ANCHOR_MIDDLE, 2.0f);
+            aboutLines[2] = new VText(0, 0, 0, Color.WHITE, "Romain Primet, Fernando del Campo, Emmanuel Pietriga", VText.TEXT_ANCHOR_MIDDLE, 2.0f);
             aboutLines[3] = new VText(0, -120, 0, Color.WHITE, "Based on the ZVTM toolkit", VText.TEXT_ANCHOR_MIDDLE, 2.0f);
             aboutLines[4] = new VText(0, -160, 0, Color.WHITE, "http://zvtm.sf.net", VText.TEXT_ANCHOR_MIDDLE, 2.0f);
             application.ovSpace.addGlyph(fadeAbout);
