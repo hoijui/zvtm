@@ -11,6 +11,8 @@ import fr.inria.zvtm.cluster.GlyphCreation;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.engine.VirtualSpace;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 aspect VirtualSpaceIntroduction {
     private boolean VirtualSpace.isZuistOwned = false;
     void VirtualSpace.setZuistOwned(boolean value){ this.isZuistOwned = value; }

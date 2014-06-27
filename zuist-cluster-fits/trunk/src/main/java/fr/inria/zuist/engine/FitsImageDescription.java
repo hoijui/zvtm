@@ -13,11 +13,17 @@ import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zvtm.glyphs.FitsImage;
 import fr.inria.zvtm.glyphs.Glyph;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Describes a FITS images and creates / releases the corresponding
  * ZVTM glyph on demand.
  */
 public class FitsImageDescription extends ResourceDescription {
+
+    private static final Logger logger = LoggerFactory.getLogger(FitsImageDescription.class);
+
     private float scaleFactor = 1;
     private FitsImage.ScaleMethod scaleMethod;
     private FitsImage.ColorFilter colorFilter;
@@ -32,9 +38,8 @@ public class FitsImageDescription extends ResourceDescription {
 
     private FitsImage glyph; //the actual FITS image
 
-    //public FitsImageDescription(String id, long x, long y, int z, URL src, 
-    public FitsImageDescription(String id, double x, double y, int z, URL src, 
-            Region parentRegion, 
+    public FitsImageDescription(String id, double x, double y, int z, URL src,
+            Region parentRegion,
             float scaleFactor, FitsImage.ScaleMethod scaleMethod,
             FitsImage.ColorFilter colorFilter){
         this.id = id;
@@ -46,8 +51,6 @@ public class FitsImageDescription extends ResourceDescription {
         this.scaleFactor = scaleFactor;
         this.scaleMethod = scaleMethod;
         this.colorFilter = colorFilter;
-        System.out.print("FitsImageDescription: ");
-        System.out.println(src);
     }
 
     public String getType(){
@@ -64,7 +67,7 @@ public class FitsImageDescription extends ResourceDescription {
     public void setScaleMethod(FitsImage.ScaleMethod scaleMethod){
         this.scaleMethod = scaleMethod;
         if(glyph != null){
-            glyph.setScaleMethod(scaleMethod); 
+            glyph.setScaleMethod(scaleMethod);
         }
     }
 
@@ -83,10 +86,9 @@ public class FitsImageDescription extends ResourceDescription {
         glyph.setScaleMethod(scaleMethod);
         glyph.setColorFilter(colorFilter);
         glyph.setDrawBorder(false);
-        vs.addGlyph(glyph,false); 
+        vs.addGlyph(glyph,false);
     }
 
-    //public void destroyObject(final VirtualSpace vs, boolean fadeOut){
     public void destroyObject(final SceneManager sm, final VirtualSpace vs, boolean fadeOut){
         vs.removeGlyph(glyph);
         glyph = null;

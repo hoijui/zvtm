@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) INRIA, 2010-2013. All Rights Reserved
+ *   Copyright (c) INRIA, 2010-2014. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -13,6 +13,8 @@ import fr.inria.zvtm.cluster.AbstractAutoReplay;
 import fr.inria.zvtm.cluster.Identifiable;
 import fr.inria.zuist.engine.Region;
 import fr.inria.zuist.engine.SceneManager;
+import fr.inria.zvtm.glyphs.FitsImage;
+import fr.inria.zuist.engine.FitsImageDescription;
 
 /**
  * Add methods that should be replay by the generic Delta here.
@@ -30,7 +32,9 @@ aspect AutoReplay extends AbstractAutoReplay {
          execution(public void SceneManager.enableRegionUpdater(boolean)) ||
          execution(public void SceneManager.updateVisibleRegions()) ||
          execution(public void Region.setContainingRegion(Region)) ||
-         execution(public void Region.addContainedRegion(Region)) 
+         execution(public void Region.addContainedRegion(Region)) ||
+         execution(public void FitsImageDescription.setScaleMethod(FitsImage.ScaleMethod)) ||
+         execution(public void FitsImageDescription.setColorFilter(FitsImage.ColorFilter))
         );
 }
 

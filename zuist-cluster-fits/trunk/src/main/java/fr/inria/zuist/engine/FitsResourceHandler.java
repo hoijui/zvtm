@@ -17,9 +17,6 @@ public class FitsResourceHandler implements ResourceHandler {
     private static final String SM_ID = "sm="; //scale method in params
     private static final String CF_ID = "cf="; //color filter in params
 
-//    public ResourceDescription createResourceDescription(
-//            long x, long y, String id, int zindex, Region region,
-//            URL resourceURL, boolean sensitivity, Color stroke, String params){
     public ResourceDescription createResourceDescription(
             double x, double y, String id, int zindex, Region region,
             URL resourceURL, boolean sensitivity, Color stroke, String params){

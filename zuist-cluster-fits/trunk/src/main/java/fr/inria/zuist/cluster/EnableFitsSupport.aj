@@ -29,5 +29,6 @@ aspect EnableZuistSupport {
                 FitsResourceHandler.RESOURCE_TYPE_FITS,
                 new FitsResourceHandler()
                 );
+
     }
 }
