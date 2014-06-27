@@ -1,4 +1,5 @@
-/*   Copyright (c) INRIA, 2010. All Rights Reserved
+/*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
+ *   Copyright (c) INRIA, 2010. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -96,9 +97,9 @@ import org.kohsuke.args4j.CmdLineParser;
  */
 
 public class FitsViewer implements Java2DPainter, RegionListener, LevelListener {
-
+    
     File SCENE_FILE, SCENE_FILE_DIR;
-
+        
     /* screen dimensions, actual dimensions of windows */
     static int SCREEN_WIDTH =  Toolkit.getDefaultToolkit().getScreenSize().width;
     static int SCREEN_HEIGHT =  Toolkit.getDefaultToolkit().getScreenSize().height;
@@ -108,14 +109,14 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     int VIEW_X, VIEW_Y;
     /* dimensions of zoomable panel */
     int panelWidth, panelHeight;
-
+    
     /* Navigation constants */
     static final int ANIM_MOVE_LENGTH = 300;
     static final short MOVE_UP = 0;
     static final short MOVE_DOWN = 1;
     static final short MOVE_LEFT = 2;
     static final short MOVE_RIGHT = 3;
-
+    
     /* ZVTM objects */
     VirtualSpaceManager vsm;
     static final String mSpaceName = "Scene Space";
@@ -139,7 +140,8 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     FitsImage.ColorFilter cfilter = FitsImage.ColorFilter.RAINBOW;
     FitsImage.ScaleMethod scaleMethod = FitsImage.ScaleMethod.LINEAR;
 
-
+    //public FitsMenu menu;
+    
     //public FitsViewer(boolean fullscreen, boolean opengl, boolean antialiased, File xmlSceneFile){
     public FitsViewer(Options options){
 		ovm = new FitsOverlayManager(this);
@@ -154,7 +156,6 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 		ovm.initConsole();
         if (options.xmlSceneFile != null){
             sm.enableRegionUpdater(false);
-            sm.setUpdateLevel(false);
             File xmlSceneFile = new File(options.xmlSceneFile);
 			loadScene(xmlSceneFile);
 			EndAction ea  = new EndAction(){
@@ -166,12 +167,15 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 			getGlobalView(ea);
 		}
 		ovm.toggleConsole();
+
+		//menu.drawHistogram();
+
     }
     //void initGUI(boolean fullscreen, boolean opengl, boolean antialiased){
     void initGUI(Options options){
         windowLayout();
         vsm = VirtualSpaceManager.INSTANCE;
-        vsm.setMaster("FitsViewer");
+        vsm.setMaster("ZuistCluster");
         mSpace = vsm.addVirtualSpace(mSpaceName);
         VirtualSpace mnSpace = vsm.addVirtualSpace(mnSpaceName);
         mCamera = mSpace.addCamera();
@@ -196,8 +200,8 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
             mView.setVisible(true);
         }
         updatePanelSize();
-		gp = new VWGlassPane(this);
-		((JFrame)mView.getFrame()).setGlassPane(gp);
+		//gp = new VWGlassPane(this);
+		//((JFrame)mView.getFrame()).setGlassPane(gp);
         eh = new FitsViewerEventHandler(this);
 
         /*
@@ -222,6 +226,9 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 			}
 		};
 		mView.getFrame().addComponentListener(ca0);
+
+		//menu = new FitsMenu(this);
+
     }
 
     JMenuItem infoMI, consoleMI;
@@ -275,27 +282,27 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 		aboutMI.addActionListener(a0);
 		return jmb;
 	}
-
+	
     void toggleColorFilter(){
-        FitsImage.ColorFilter next =
+        FitsImage.ColorFilter next = 
             cfilter.ordinal() == (FitsImage.ColorFilter.values().length - 1) ? FitsImage.ColorFilter.values()[0] : FitsImage.ColorFilter.values()[cfilter.ordinal() + 1];
         cfilter = next;
         for(ObjectDescription desc: sm.getObjectDescriptions()){
             if(desc instanceof FitsImageDescription){
                 ((FitsImageDescription)desc).setColorFilter(next);
             }
-        }
+        } 
     }
 
     void toggleTransferFun(){
-        FitsImage.ScaleMethod next =
+        FitsImage.ScaleMethod next = 
             scaleMethod.ordinal() == (FitsImage.ScaleMethod.values().length - 1) ? FitsImage.ScaleMethod.values()[0] : FitsImage.ScaleMethod.values()[scaleMethod.ordinal() + 1];
         scaleMethod = next;
         for(ObjectDescription desc: sm.getObjectDescriptions()){
             if(desc instanceof FitsImageDescription){
                 ((FitsImageDescription)desc).setScaleMethod(next);
             }
-        }
+        } 
     }
 
 	void displayMainPieMenu(boolean b){
@@ -335,7 +342,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 	}
 
     void windowLayout(){
-
+    	
         if (Utils.osIsWindows()){
             VIEW_X = VIEW_Y = 0;
         }
@@ -352,12 +359,12 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     }
 
 	/*-------------  Scene management    -------------*/
-
+	
 	void reset(){
 		sm.reset();
 		mSpace.removeAllGlyphs();
 	}
-
+	
 	void openFile(){
 		final JFileChooser fc = new JFileChooser(SCENE_FILE_DIR);
 		fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -377,7 +384,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
                            }
                        };
 					getGlobalView(ea);
-					return null;
+					return null; 
 			    }
 			};
 		    worker.start();
@@ -390,7 +397,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 		    public Object construct(){
 				reset();
 				loadScene(SCENE_FILE);
-				return null;
+				return null; 
 		    }
 		};
 	    worker.start();
@@ -401,27 +408,28 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 			ovm.sayInConsole("Loading "+xmlSceneFile.getCanonicalPath()+"\n");
 			System.out.println("Loading "+xmlSceneFile.getCanonicalPath()+"\n");
 			mView.setTitle(mViewName + " - " + xmlSceneFile.getCanonicalPath());
-			System.out.println(mViewName + " - " + xmlSceneFile.getCanonicalPath());
+			System.out.println(mViewName + " - " + xmlSceneFile.getCanonicalPath());	
 		}
 		catch (IOException ex){}
-		gp.setValue(0);
-		gp.setVisible(true);
+		//gp.setValue(0);
+		//gp.setVisible(true);
 		SCENE_FILE = xmlSceneFile;
 	    SCENE_FILE_DIR = SCENE_FILE.getParentFile();
 	    System.out.println("dir: "+SCENE_FILE_DIR + " - file: " + SCENE_FILE);
 	    System.out.println("loadScene...");
-	    sm.loadScene(SceneManager.parseXML(SCENE_FILE), SCENE_FILE_DIR, true, gp);
+	    //sm.loadScene(SceneManager.parseXML(SCENE_FILE), SCENE_FILE_DIR, true, gp);
+	    sm.loadScene(SceneManager.parseXML(SCENE_FILE), SCENE_FILE_DIR, true);
 	    HashMap sceneAttributes = sm.getSceneAttributes();
 	    if (sceneAttributes.containsKey(SceneManager._background)){
 	        mView.setBackgroundColor((Color)sceneAttributes.get(SceneManager._background));
             clusteredView.setBackgroundColor((Color)sceneAttributes.get(SceneManager._background));
 	    }
 		MAX_NB_REQUESTS = sm.getObjectCount() / 100;
-	    gp.setVisible(false);
-	    gp.setLabel(VWGlassPane.EMPTY_STRING);
+	    //gp.setVisible(false);
+	    //gp.setLabel(VWGlassPane.EMPTY_STRING);
         mCamera.setAltitude(0.0f);
 	}
-
+    
     /*-------------     Navigation       -------------*/
 
     void getGlobalView(EndAction ea){
@@ -493,7 +501,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(FitsViewer.ANIM_MOVE_LENGTH, mCamera,
             trans, true, SlowInSlowOutInterpolator.getInstance(), null);
         vsm.getAnimationManager().startAnimation(a, false);
-
+        
     }
 
 	void centerOnObject(String id){
@@ -503,7 +511,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 			Glyph g = od.getGlyph();
 			if (g != null){
 				rememberLocation(mCamera.getLocation());
-				mCamera.getOwningView().centerOnGlyph(g, mCamera, FitsViewer.ANIM_MOVE_LENGTH, true, 1.2f);
+				mCamera.getOwningView().centerOnGlyph(g, mCamera, FitsViewer.ANIM_MOVE_LENGTH, true, 1.2f);				
 			}
 		}
 	}
@@ -515,18 +523,18 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 			Glyph g = r.getBounds();
 			if (g != null){
 				rememberLocation(mCamera.getLocation());
-				mCamera.getOwningView().centerOnGlyph(g, mCamera, FitsViewer.ANIM_MOVE_LENGTH, true, 1.2f);
+				mCamera.getOwningView().centerOnGlyph(g, mCamera, FitsViewer.ANIM_MOVE_LENGTH, true, 1.2f);				
 			}
-		}
+		}		
 	}
 
 	Vector previousLocations;
 	static final int MAX_PREV_LOC = 100;
-
+	
 	void rememberLocation(){
 	    rememberLocation(mCamera.getLocation());
     }
-
+    
 	void rememberLocation(Location l){
 		if (previousLocations.size() >= MAX_PREV_LOC){
 			// as a result of release/click being undifferentiated)
@@ -539,7 +547,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 		}
 		else {previousLocations.add(l);}
 	}
-
+	
 	void moveBack(){
 		if (previousLocations.size()>0){
 			Vector animParams = Location.getDifference(mSpace.getCamera(0).getLocation(), (Location)previousLocations.lastElement());
@@ -558,11 +566,11 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 			previousLocations.removeElementAt(previousLocations.size()-1);
 		}
 	}
-
+	
     void altitudeChanged(){
         mCameraAltStr = Messages.ALTITUDE + String.valueOf(mCamera.altitude);
     }
-
+    
     void updatePanelSize(){
         //Dimension d = mView.getPanel().getSize();
         Dimension d = mView.getPanel().getComponent().getSize();
@@ -574,7 +582,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 	}
 
 	/* ---- Debug information ----*/
-
+	
 	public void enteredRegion(Region r){
 	    ovm.sayInConsole("Entered region "+r.getID()+"\n");
 	}
@@ -591,9 +599,9 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 	public void exitedLevel(int depth){
 	    ovm.sayInConsole("Exited level "+depth+"\n");
 	}
-
+	
     long maxMem = Runtime.getRuntime().maxMemory();
-    int totalMemRatio, usedMemRatio;
+    int totalMemRatio, usedMemRatio;	
     boolean SHOW_MISC_INFO = true;
 
     void toggleMiscInfoDisplay(){
@@ -636,7 +644,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
             13);
         g2d.drawString(usedMemRatio + "%", 50, 14);
         g2d.drawString(totalMemRatio + "%", 100, 14);
-        g2d.drawString(maxMem/1048576 + " Mb", 160, 14);
+        g2d.drawString(maxMem/1048576 + " Mb", 160, 14);	
     }
 
     // consider 1000 as the maximum number of requests that can be in the queue at any given time
@@ -645,7 +653,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     float MAX_NB_REQUESTS = 1000;
     static final int REQ_QUEUE_BAR_WIDTH = 100;
     static final int REQ_QUEUE_BAR_HEIGHT = 6;
-
+    
     void showReqQueueStatus(Graphics2D g2d, int viewWidth, int viewHeight){
         float ratio = sm.getPendingRequestQueueSize()/(MAX_NB_REQUESTS);
         if (ratio > 1.0f){
@@ -656,8 +664,8 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         g2d.fillRect(viewWidth-Math.round(REQ_QUEUE_BAR_WIDTH * ratio)-10, 7, Math.round(REQ_QUEUE_BAR_WIDTH * ratio), REQ_QUEUE_BAR_HEIGHT);
         g2d.drawRect(viewWidth-REQ_QUEUE_BAR_WIDTH-10, 7, REQ_QUEUE_BAR_WIDTH, REQ_QUEUE_BAR_HEIGHT);
     }
-
-    void showAltitude(Graphics2D g2d, int viewWidth, int viewHeight){
+    
+    void showAltitude(Graphics2D g2d, int viewWidth, int viewHeight){        
         g2d.setColor(Color.DARK_GRAY);
         g2d.fillRect(240,
             3,
@@ -682,7 +690,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     }
 
     /* ----- Misc  ------*/
-
+    
     void about(){
         ovm.showAbout();
     }
@@ -694,7 +702,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 			vsm.repaint();
 		}
     }
-
+    
     void exit(){
         System.exit(0);
     }
@@ -727,16 +735,16 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
                         }
                     }
                     else {
-                        xmlSceneFile = f;
+                        xmlSceneFile = f;                        
                     }
                 }
             }
 		}
-
+		
         if (!fs && Utils.osIsMacOS()){
             System.setProperty("apple.laf.useScreenMenuBar", "true");
         }
-
+        
         System.out.println("--help for command line options");
         new FitsViewer(fs, ogl, aa, xmlSceneFile);
     }
@@ -752,7 +760,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
             parser.printUsage(System.err);
             return;
         }
-
+        
         if (!options.fullscreen && Utils.osIsMacOS()){
             System.setProperty("apple.laf.useScreenMenuBar", "true");
         }
@@ -770,15 +778,15 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         System.out.println("\t-smooth: default to smooth transitions between levels when none specified");
     }
     */
-
+    
 }
 
 class VWGlassPane extends JComponent implements ProgressListener {
-
+    
     static final int BAR_WIDTH = 200;
     static final int BAR_HEIGHT = 10;
 
-    static final AlphaComposite GLASS_ALPHA = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.65f);
+    static final AlphaComposite GLASS_ALPHA = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.65f);    
     static final Color MSG_COLOR = Color.DARK_GRAY;
     GradientPaint PROGRESS_GRADIENT = new GradientPaint(0, 0, Color.ORANGE, 0, BAR_HEIGHT, Color.BLUE);
 
@@ -786,14 +794,14 @@ class VWGlassPane extends JComponent implements ProgressListener {
     String msg = EMPTY_STRING;
     int msgX = 0;
     int msgY = 0;
-
+    
     int completion = 0;
     int prX = 0;
     int prY = 0;
     int prW = 0;
-
+    
     FitsViewer application;
-
+    
     VWGlassPane(FitsViewer app){
         super();
         this.application = app;
@@ -801,7 +809,7 @@ class VWGlassPane extends JComponent implements ProgressListener {
         addMouseMotionListener(new MouseMotionAdapter(){});
         addKeyListener(new KeyAdapter(){});
     }
-
+    
     public void setValue(int c){
         completion = c;
         prX = application.panelWidth/2-BAR_WIDTH/2;
@@ -810,14 +818,14 @@ class VWGlassPane extends JComponent implements ProgressListener {
         PROGRESS_GRADIENT = new GradientPaint(0, prY, Color.LIGHT_GRAY, 0, prY+BAR_HEIGHT, Color.DARK_GRAY);
         repaint(prX, prY, BAR_WIDTH, BAR_HEIGHT);
     }
-
+    
     public void setLabel(String m){
         msg = m;
         msgX = application.panelWidth/2-BAR_WIDTH/2;
         msgY = application.panelHeight/2-BAR_HEIGHT/2 - 10;
         repaint(msgX, msgY-50, 400, 70);
     }
-
+    
     protected void paintComponent(Graphics g){
         Graphics2D g2 = (Graphics2D)g;
         Rectangle clip = g.getClipBounds();
@@ -835,7 +843,7 @@ class VWGlassPane extends JComponent implements ProgressListener {
         g2.setColor(MSG_COLOR);
         g2.drawRect(prX, prY, BAR_WIDTH, BAR_HEIGHT);
     }
-
+    
 }
 
 class ConfigManager {
@@ -843,7 +851,7 @@ class ConfigManager {
 	static Color PIEMENU_FILL_COLOR = Color.BLACK;
 	static Color PIEMENU_BORDER_COLOR = Color.WHITE;
 	static Color PIEMENU_INSIDE_COLOR = Color.DARK_GRAY;
-
+	
 	static final Font DEFAULT_FONT = new Font("Dialog", Font.PLAIN, 12);
 
     static final Font PIEMENU_FONT = DEFAULT_FONT;

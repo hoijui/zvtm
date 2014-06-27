@@ -60,6 +60,7 @@ TR = 2
 BL = 3
 BR = 4
 
+
 CMD_LINE_HELP = "ZUIST Image Tiling Script\n\nUsage:\n\n" + \
     " \timageTiler <src_image_path> <target_dir> [options]\n\n" + \
     "Options:\n\n"+\
@@ -74,7 +75,9 @@ CMD_LINE_HELP = "ZUIST Image Tiling Script\n\nUsage:\n\n" + \
     "\t-dx=y\t\tx offset for all regions and objects\n"+\
     "\t-dy=x\t\ty offset for all regions and objects\n"+\
     "\t-dl=l\t\tlevel offset for all regions and objects\n"+\
-    "\t-scale=s\ts scale factor w.r.t default size for PDF input\n"
+    "\t-scale=s\ts scale factor w.r.t default size for PDF input\n"+\
+    "\t-xini=x\t\torigin x axis"+\
+    "\t-yini=y\t\torigin y axis"
 
 TRACE_LEVEL = 1
 
@@ -102,6 +105,10 @@ DX = 0
 DY = 0
 # level offset
 DL = 0
+
+#origin x y
+XINI = 0
+YINI = 0
 
 ID_PREFIX = ""
 
@@ -284,7 +291,7 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
         regionEL.set("levels", str(level+DL))
         # make sure lowest res tile, visible on each level, is always drawn below higher-res tiles
         objectEL.set("z-index", "1")
-    regionEL.set("stroke", "red")
+    #regionEL.set("stroke", "red")
     regionEL.set("x", str(int(DX+x+aw/2)))
     regionEL.set("y", str(int(DY-y-ah/2)))
     regionEL.set("w", str(int(aw)))
@@ -438,7 +445,7 @@ def shrink(data, w, h, aw, ah):
             try:
                 newdata[i, j] = data[idi, idj]
             except IndexError:
-                log("IndexError:  i: %d - j: %d - idx: %d - idj: %d" % (i, j, idx, idj))
+                log("IndexError:  i: %d - j: %d - idi: %d - idj: %d" % (i, j, idi, idj))
     return newdata
 
 ################################################################################
@@ -492,6 +499,10 @@ if len(sys.argv) > 2:
                 DL = int(arg[len("-dl="):])
             elif arg.startswith("-scale"):
                 PDF_SCALE_FACTOR = float(arg[len("-scale="):])
+            elif arg.startswith("-tileprefix"):
+                TILE_FILE_PREFIX = str(arg[len("-tileprefix="):])
+            
+
 else:
     log(CMD_LINE_HELP)
     sys.exit(0)
