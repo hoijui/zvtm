@@ -171,7 +171,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     void initGUI(Options options){
         windowLayout();
         vsm = VirtualSpaceManager.INSTANCE;
-        vsm.setMaster("ZuistCluster");
+        vsm.setMaster("FitsViewer");
         mSpace = vsm.addVirtualSpace(mSpaceName);
         VirtualSpace mnSpace = vsm.addVirtualSpace(mnSpaceName);
         mCamera = mSpace.addCamera();

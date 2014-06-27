@@ -20,4 +20,3 @@ aspect FitsAutoReplay extends AbstractAutoReplay {
          execution(public void FitsImageDescription.setColorFilter(FitsImage.ColorFilter))
         );
 }
-
