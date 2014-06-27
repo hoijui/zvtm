@@ -1,8 +1,7 @@
-/*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2010. All Rights Reserved
+/*   Copyright (c) INRIA, 2010. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: FitsViewer.java 2985 2010-02-26 16:11:05Z epietrig $
+ * $Id$
  */
 
 package fr.inria.zuist.viewer;

@@ -1,8 +1,7 @@
-/*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2010. All Rights Reserved
+/*   Copyright (c) INRIA, 2010. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: FitsOverlayManager.java 2879 2010-02-09 16:19:03Z epietrig $
+ * $Id$
  */
 
 package fr.inria.zuist.viewer;
@@ -41,7 +40,7 @@ import fr.inria.zvtm.widgets.TranslucentTextArea;
 
 //class FitsOverlayManager implements ViewEventHandler {
 class FitsOverlayManager implements ViewListener {
-    
+
     static final Color FADE_REGION_FILL = Color.BLACK;
     static final Color FADE_REGION_STROKE = Color.WHITE;
 
@@ -54,7 +53,7 @@ class FitsOverlayManager implements ViewListener {
 
 	// west, east and south margins of console (north bound depends on frame's height)
 	int[] consoleMarginsWES = {10, 10, 10};
-	
+
 	int[] consolePaddingWNES = {5, 5, 5, 5};
 
     FitsOverlayManager(FitsViewer app){
@@ -70,31 +69,31 @@ class FitsOverlayManager implements ViewListener {
 		lp.add(console, (Integer)(JLayeredPane.DEFAULT_LAYER+33));
 		updateConsoleBounds();
 	}
-	
+
 	void updateConsoleBounds(){
 		console.setBounds(consoleMarginsWES[0], Math.round(application.panelHeight*.8f),
 		                  application.panelWidth-consoleMarginsWES[1]-consoleMarginsWES[0], Math.round(application.panelHeight*.2f-consoleMarginsWES[2]));
 	}
-	
+
 	void toggleConsole(){
 		console.setVisible(!console.isVisible());
 		if (console.isVisible()){
 		    application.consoleMI.setText(Messages.CONSOLE_HIDE);
 		}
 		else {
-		    application.consoleMI.setText(Messages.CONSOLE_SHOW);		    
+		    application.consoleMI.setText(Messages.CONSOLE_SHOW);
 		}
 	}
-	
+
 	void sayInConsole(String text){
 		console.setText(console.getText()+text);
 	}
-    
+
     boolean showingAbout = false;
     VRectangle fadeAbout;
     VImage insituLogo, inriaLogo;
     VText[] aboutLines;
-    
+
     void showAbout(){
         if (!showingAbout){
             fadeAbout = new VRectangle(0, 0, 0, Math.round(application.panelWidth/2.1), Math.round(application.panelHeight/3),
@@ -112,7 +111,7 @@ class FitsOverlayManager implements ViewListener {
             application.ovSpace.addGlyph(inriaLogo);
             application.ovSpace.addGlyph(insituLogo);
 			for (int i=0;i<aboutLines.length;i++){
-	            application.ovSpace.addGlyph(aboutLines[i]);				
+	            application.ovSpace.addGlyph(aboutLines[i]);
 			}
             showingAbout = true;
         }
@@ -138,7 +137,7 @@ class FitsOverlayManager implements ViewListener {
 	            if (aboutLines[i] != null){
 	                application.ovSpace.removeGlyph(aboutLines[i]);
 	                aboutLines[i] = null;
-	            }				
+	            }
 			}
 		}
 		application.mView.setActiveLayer(0);

@@ -1,8 +1,7 @@
-/*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2010. All Rights Reserved
+/*   Copyright (c) INRIA, 2010. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: FitsViewerEventHandler.java 2984 2010-02-26 16:00:44Z epietrig $
+ * $Id$
  */
 
 package fr.inria.zuist.viewer;
@@ -51,18 +50,18 @@ class FitsViewerEventHandler implements ViewListener, ComponentListener, CameraL
 
     static float ZOOM_SPEED_COEF = 1.0f/50.0f;
     static double PAN_SPEED_COEF = 50.0;
-    
+
     static final float WHEEL_ZOOMIN_FACTOR = 21.0f;
     static final float WHEEL_ZOOMOUT_FACTOR = 22.0f;
-            
+
     //remember last mouse coords to compute translation  (dragging)
     int lastJPX,lastJPY;
     long lastVX, lastVY;
 
     FitsViewer application;
-    
+
     Glyph g;
-    
+
     double oldCameraAltitude;
 
     boolean zero_order_dragging = false;
@@ -72,8 +71,8 @@ class FitsViewerEventHandler implements ViewListener, ComponentListener, CameraL
 	short navMode = ZERO_ORDER;
 
 	Glyph objectJustSelected = null;
-	
-	
+
+
     FitsViewerEventHandler(FitsViewer app){
         this.application = app;
         oldCameraAltitude = this.application.mCamera.getAltitude();
@@ -115,7 +114,7 @@ class FitsViewerEventHandler implements ViewListener, ComponentListener, CameraL
         */
 
         Glyph g = v.lastGlyphEntered();
-        
+
 		if (objectJustSelected != null && g == objectJustSelected){
 			// last click was on this object, already centered on it,
 			// check if it takes somewhere and go there if it does
@@ -129,12 +128,12 @@ class FitsViewerEventHandler implements ViewListener, ComponentListener, CameraL
 						case SceneManager.TAKES_TO_REGION:{application.centerOnRegion(takesToID);break;}
 					}
 				}
-			}				
+			}
 		}
 		else {
 			// last click was not on this object, center on it
 			application.rememberLocation(application.mCamera.getLocation());
-			v.cams[0].getOwningView().centerOnGlyph(g, v.cams[0], FitsViewer.ANIM_MOVE_LENGTH, true, 1.2f);				
+			v.cams[0].getOwningView().centerOnGlyph(g, v.cams[0], FitsViewer.ANIM_MOVE_LENGTH, true, 1.2f);
 			objectJustSelected = g;
 		}
     }
@@ -165,7 +164,7 @@ class FitsViewerEventHandler implements ViewListener, ComponentListener, CameraL
 	}
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
-        
+
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){}
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
@@ -218,7 +217,7 @@ class FitsViewerEventHandler implements ViewListener, ComponentListener, CameraL
 			if (i != -1){
 				vs.onTop(application.mainPieMenu.getLabels()[i]);
 			}
-		} 
+		}
 
 	}
 
@@ -254,7 +253,7 @@ class FitsViewerEventHandler implements ViewListener, ComponentListener, CameraL
     public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 
     public void viewActivated(View v){}
-    
+
     public void viewDeactivated(View v){}
 
     public void viewIconified(View v){}
@@ -272,7 +271,7 @@ class FitsViewerEventHandler implements ViewListener, ComponentListener, CameraL
         application.updatePanelSize();
     }
     public void componentShown(ComponentEvent e){}
-    
+
     //public void cameraMoved(Camera cam, LongPoint coord, float alt){
     /*
     public void cameraMoved(Camera cam, Point2D.Double coord, float alt){
@@ -298,12 +297,12 @@ class FitsViewerEventHandler implements ViewListener, ComponentListener, CameraL
             //dut.cancelUpdate();
         }
     }
-    
+
     void toggleNavMode(){
         switch(navMode){
             case FIRST_ORDER:{navMode = ZERO_ORDER;break;}
             case ZERO_ORDER:{navMode = FIRST_ORDER;break;}
         }
     }
-    
+
 }

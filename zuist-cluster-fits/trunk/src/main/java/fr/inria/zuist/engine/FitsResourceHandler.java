@@ -1,3 +1,9 @@
+/*   Copyright (c) INRIA, 2010-2014. All Rights Reserved
+ *   Licensed under the GNU LGPL. For full terms see the file COPYING.
+ *
+ * $Id$
+ */
+
 package fr.inria.zuist.engine;
 
 import java.net.URL;
@@ -12,10 +18,10 @@ public class FitsResourceHandler implements ResourceHandler {
     private static final String CF_ID = "cf="; //color filter in params
 
 //    public ResourceDescription createResourceDescription(
-//            long x, long y, String id, int zindex, Region region, 
+//            long x, long y, String id, int zindex, Region region,
 //            URL resourceURL, boolean sensitivity, Color stroke, String params){
     public ResourceDescription createResourceDescription(
-            double x, double y, String id, int zindex, Region region, 
+            double x, double y, String id, int zindex, Region region,
             URL resourceURL, boolean sensitivity, Color stroke, String params){
 
         float scaleFactor = 1;
@@ -46,14 +52,14 @@ public class FitsResourceHandler implements ResourceHandler {
                 else {
                     System.err.println("Unknown type of resource parameter: "+paramTokens[i]);
                 }
-            }            
+            }
         }
 
         FitsImageDescription desc = new FitsImageDescription(
-                id, x, y, zindex, resourceURL, region, 
+                id, x, y, zindex, resourceURL, region,
                 scaleFactor, scaleMethod, colorFilter);
         region.addObject(desc);
-        return desc;             
+        return desc;
     }
 
 

@@ -1,3 +1,9 @@
+/*   Copyright (c) INRIA, 2010-2014. All Rights Reserved
+ *   Licensed under the GNU LGPL. For full terms see the file COPYING.
+ *
+ * $Id$
+ */
+
 package fr.inria.zuist.cluster;
 
 import java.awt.Color;
@@ -17,29 +23,29 @@ aspect FitsImageDescReplication {
     //capture creation of a FitsImage object
     //and send the appropriate Delta
     pointcut createFitsImageDescription(SceneManager sceneManager, long x,
-            long y, String id, int zindex, Region region, URL resourceURL, 
-            String type, boolean sensitivity, Color stroke, String params) : 
-        execution(public ResourceDescription 
-                SceneManager.createResourceDescription(long, 
+            long y, String id, int zindex, Region region, URL resourceURL,
+            String type, boolean sensitivity, Color stroke, String params) :
+        execution(public ResourceDescription
+                SceneManager.createResourceDescription(long,
                     long, String, int, Region,
                     URL, String, boolean, Color, String)) &&
         if(VirtualSpaceManager.INSTANCE.isMaster()) &&
         if(type.equals(FitsResourceHandler.RESOURCE_TYPE_FITS)) &&
         this(sceneManager) &&
-        args(x, y, id, zindex, region, resourceURL, type, 
+        args(x, y, id, zindex, region, resourceURL, type,
                 sensitivity, stroke, params);
 
     after(SceneManager sceneManager,
-            long x, long y, 
+            long x, long y,
             String id, int zindex, Region region,
-            URL imageURL, String type, boolean sensitivity, 
+            URL imageURL, String type, boolean sensitivity,
             Color stroke, String params)
-        returning(ResourceDescription rdesc): 
+        returning(ResourceDescription rdesc):
             createFitsImageDescription(sceneManager, x, y, id,
                     zindex, region, imageURL, type, sensitivity,
                     stroke, params) &&
-            !cflowbelow(createFitsImageDescription(SceneManager, long, long, 
-                        String, int, Region, URL, String, 
+            !cflowbelow(createFitsImageDescription(SceneManager, long, long,
+                        String, int, Region, URL, String,
                         boolean, Color, String)){
                 rdesc.setReplicated(true);
                 FitsImageCreateDelta delta = new FitsImageCreateDelta(
@@ -59,7 +65,7 @@ aspect FitsImageDescReplication {
         private final URL location;
         private final String params;
 
-        FitsImageCreateDelta(String id, ObjId<SceneManager> smId, 
+        FitsImageCreateDelta(String id, ObjId<SceneManager> smId,
                 ObjId<ResourceDescription> descId, long x, long y,
                 int z, ObjId<Region> regionId, URL location, String params){
             this.id = id;
