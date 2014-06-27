@@ -154,6 +154,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 		ovm.initConsole();
         if (options.xmlSceneFile != null){
             sm.enableRegionUpdater(false);
+            sm.setUpdateLevel(false);
             File xmlSceneFile = new File(options.xmlSceneFile);
 			loadScene(xmlSceneFile);
 			EndAction ea  = new EndAction(){
