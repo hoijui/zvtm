@@ -169,9 +169,7 @@ class FitsViewerEventHandler implements ViewListener, ComponentListener, CameraL
 
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
 
-        System.out.println("FitsViewerEventHandler");
-        System.out.println(v.parent.getActiveLayer());
-        if((jpx < application.menu.WIDTH_MENU && jpy > application.menu.BORDER_BOTTON_FILTER && jpy < application.menu.BORDER_TOP_FILTER) ||
+        if((jpx < application.menu.WIDTH_MENU && jpy < application.menu.BORDER_BOTTON_FILTER && jpy > application.menu.BORDER_TOP_FILTER) ||
                     (jpy > application.menu.BORDER_TOP_HISTOGRAM && jpy < application.menu.BORDER_BOTTON_HISTOGRAM && jpx > application.menu.BORDER_LEFT_HISTOGRAM && 
                     jpx < application.menu.BORDER_RIGHT_HISTOGRAM )){
             v.parent.setActiveLayer(application.LAYER_MENU);
@@ -250,9 +248,16 @@ class FitsViewerEventHandler implements ViewListener, ComponentListener, CameraL
     	else if (code==KeyEvent.VK_DOWN){application.translateView(FitsViewer.MOVE_DOWN);}
     	else if (code==KeyEvent.VK_LEFT){application.translateView(FitsViewer.MOVE_LEFT);}
     	else if (code==KeyEvent.VK_RIGHT){application.translateView(FitsViewer.MOVE_RIGHT);}
-    	else if (code==KeyEvent.VK_N){toggleNavMode();}
-        else if (code==KeyEvent.VK_C){toggleColorFilter();}
-        else if (c == 't'){toggleTransferFun();}
+        else if (code==KeyEvent.VK_R){ application.rescaleGlobal();}
+    	else if (code==KeyEvent.VK_N){
+            System.out.println("toggleNavMode()");
+            toggleNavMode();}
+        else if (code==KeyEvent.VK_C){
+            System.out.println("toggleColorFilter();");
+            toggleColorFilter();}
+        else if (c == 't'){
+            System.out.println("toggleTransferFun()");
+            toggleTransferFun();}
     }
 
     private void toggleColorFilter(){

@@ -69,7 +69,8 @@ public class FitsMenu implements ViewListener{
 	public static final float WHEEL_FACTOR = 15.0f;
 
 
-	public static final ColorGradient[] COLOR_GRADIANT = {new NopFilter(), new HeatFilter(), new RainbowFilter(), new MousseFilter(), new StandardFilter(), new RandomFilter()};
+	//public static final ColorGradient[] COLOR_GRADIANT = {new NopFilter(), new HeatFilter(), new RainbowFilter(), new MousseFilter(), new StandardFilter(), new RandomFilter()};
+	public static final FitsImage.ColorFilter[] COLOR_FILTER = {FitsImage.ColorFilter.NOP, FitsImage.ColorFilter.HEAT, FitsImage.ColorFilter.RAINBOW, FitsImage.ColorFilter.MOUSSE, FitsImage.ColorFilter.STANDARD, FitsImage.ColorFilter.RANDOM};
 
 	//public static final int[] SCALE_METHOD = {FITSImage.SCALE_ASINH, FITSImage.SCALE_HISTOGRAM_EQUALIZATION, FITSImage.SCALE_LINEAR, FITSImage.SCALE_LOG, FITSImage.SCALE_SQUARE, FITSImage.SCALE_SQUARE_ROOT};
 	public static final FitsImage.ScaleMethod[] SCALE_METHOD = {FitsImage.ScaleMethod.LINEAR, FitsImage.ScaleMethod.LOG, FitsImage.ScaleMethod.HISTOGRAM_EQUALIZATION, FitsImage.ScaleMethod.SQUARE, FitsImage.ScaleMethod.SQUARE_ROOT, FitsImage.ScaleMethod.ASINH};
@@ -107,15 +108,16 @@ public class FitsMenu implements ViewListener{
 
 	private void drawFiltersColor(){
 
-		BORDER_TOP_FILTER =  app.VIEW_H/2 - 20;
+		BORDER_TOP_FILTER = 20; //app.VIEW_H/2 - 20;
 
-		int py = BORDER_TOP_FILTER - 2*HEIGHT_BTN - BORDER;
+		int py = app.VIEW_H/2 - 20 - 2*HEIGHT_BTN - BORDER;
 		
-		for(int i = 0; i < COLOR_GRADIANT.length; i++){
-			MultipleGradientPaint grad = Utils.makeGradient((RGBImageFilter)COLOR_GRADIANT[i]);
+		
+		for(int i = 0; i < COLOR_FILTER.length; i++){
+			MultipleGradientPaint grad = Utils.makeGradient((RGBImageFilter)(COLOR_FILTER[i].getFilter()));
 			PRectangle filter = new PRectangle(-app.VIEW_W/2 + WIDTH_MENU/2, py, Z_BTN, WIDTH_MENU - BORDER, HEIGHT_BTN, grad, BORDER_COLOR_BTN);
 	        filter.setType(T_FILTER);
-	        filter.setOwner(COLOR_GRADIANT[i]);
+	        filter.setOwner(COLOR_FILTER[i]);
 	        menuSpace.addGlyph(filter);
 	        py -= (HEIGHT_BTN + 2*BORDER);
 		}
@@ -135,9 +137,7 @@ public class FitsMenu implements ViewListener{
 			//menuSpace.addGlyph(ln);
 	        py -= (HEIGHT_BTN + 2*BORDER);
 		}
-		BORDER_BOTTON_FILTER = py + HEIGHT_BTN - 2*BORDER;
-		System.out.println("BORDER_BOTTON_FILTER: " + BORDER_BOTTON_FILTER);
-		System.out.println("BORDER_TOP_FILTER: " + BORDER_TOP_FILTER);
+		BORDER_BOTTON_FILTER = app.VIEW_H/2 - BORDER_TOP_FILTER - py;// - HEIGHT_BTN - 2*BORDER;
 	}
 
 /*
@@ -259,9 +259,7 @@ public class FitsMenu implements ViewListener{
 		//System.out.println(app.menu.BORDER_BOTTON_HISTOGRAM + " > " + jpy + " > " + app.menu.BORDER_TOP_HISTOGRAM);
 		//System.out.println(hist.vx + " " + hist.vy + " " + hist.getWidth() + " " + hist.getHeight());
 		//System.out.println(BORDER_LEFT_HISTOGRAM + " < " + jpx + " < " + BORDER_RIGHT_HISTOGRAM);
-        System.out.println("FitsMenu");
-        System.out.println(v.parent.getActiveLayer());
-        if((jpx < app.menu.WIDTH_MENU && jpy > app.menu.BORDER_BOTTON_FILTER && jpy < app.menu.BORDER_TOP_FILTER) ||
+        if((jpx < app.menu.WIDTH_MENU && jpy < app.menu.BORDER_BOTTON_FILTER && jpy > app.menu.BORDER_TOP_FILTER) ||
           (jpy > app.menu.BORDER_TOP_HISTOGRAM && jpy < app.menu.BORDER_BOTTON_HISTOGRAM && jpx > app.menu.BORDER_LEFT_HISTOGRAM && jpx < app.menu.BORDER_RIGHT_HISTOGRAM )){
             v.parent.setActiveLayer(app.LAYER_MENU);
             v.parent.setCursorIcon(Cursor.DEFAULT_CURSOR);
@@ -269,7 +267,6 @@ public class FitsMenu implements ViewListener{
             v.parent.setActiveLayer(app.LAYER_SCENE);
             v.parent.setCursorIcon(Cursor.CUSTOM_CURSOR);
         }
-
         
 
     }
@@ -333,8 +330,8 @@ public class FitsMenu implements ViewListener{
 	}
 
 	public void enterGlyph(Glyph g){
-        if(g.getType().equals(T_FILTER)){
-            app.setColorFilter((ImageFilter)g.getOwner());
+        if(g.getType().equals(T_FILTER) && color_selected != (PRectangle)g ){
+            app.setColorFilter((FitsImage.ColorFilter)g.getOwner());
             if(color_selected != null){
             	color_selected.setWidth(color_selected.getWidth()-BORDER*2);
             	color_selected.move(-BORDER,0);
@@ -342,9 +339,7 @@ public class FitsMenu implements ViewListener{
             ((PRectangle)g).setWidth(((PRectangle)g).getWidth()+BORDER*2);
             g.move(BORDER, 0);
             color_selected = (PRectangle)g;
-        } else if(g.getType().equals(T_SCALE)){
-        	//app.setScaleMethod((Integer)g.getOwner());
-        	
+        } else if(g.getType().equals(T_SCALE) && scale_selected != (PRectangle)g){
         	app.setScaleMethod((FitsImage.ScaleMethod)g.getOwner());
         	if(scale_selected != null){
         		scale_selected.setWidth(scale_selected.getWidth()-BORDER*2);

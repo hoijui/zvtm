@@ -334,12 +334,42 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         } 
     }
 
-    public void setColorFilter(ImageFilter filter){
-        //hi.setColorFilter(filter);
+    public void setColorFilter(FitsImage.ColorFilter filter){
+        for(ObjectDescription desc: sm.getObjectDescriptions()){
+            if(desc instanceof FitsImageDescription){
+                ((FitsImageDescription)desc).setColorFilter(filter);
+            }
+        } 
     }
 
     public void setScaleMethod(FitsImage.ScaleMethod method){
+    	for(ObjectDescription desc: sm.getObjectDescriptions()){
+            if(desc instanceof FitsImageDescription){
+                ((FitsImageDescription)desc).setScaleMethod(method);
+            }
+        } 
+    }
 
+    public void rescale(double min, double max, double sigma){
+    	System.out.println("rescale");
+    	for(ObjectDescription desc: sm.getObjectDescriptions()){
+            if(desc instanceof FitsImageDescription){
+                ((FitsImageDescription)desc).rescale(min, max, sigma);
+            }
+        }
+    }
+
+    public void rescaleGlobal(){
+    	double[] globalScaleParams = {Double.MAX_VALUE, Double.MIN_VALUE};
+    	for(ObjectDescription desc: sm.getObjectDescriptions()){
+            if(desc instanceof FitsImageDescription){
+                double[] localScaleParams = ((FitsImageDescription)desc).getLocalScaleParams();
+                if(localScaleParams[0] < globalScaleParams[0]) globalScaleParams[0] = localScaleParams[0];
+                if(localScaleParams[1] > globalScaleParams[1]) globalScaleParams[1] = localScaleParams[1];
+            }
+        }
+        System.out.println("max: " + globalScaleParams[1] + " min: " + globalScaleParams[0]);
+        rescale(globalScaleParams[0], globalScaleParams[1], globalScaleParams[0]/2. + globalScaleParams[1]/2.);
     }
 
 	void displayMainPieMenu(boolean b){

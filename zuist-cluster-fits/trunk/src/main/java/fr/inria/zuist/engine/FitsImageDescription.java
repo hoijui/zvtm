@@ -13,6 +13,8 @@ import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zvtm.glyphs.FitsImage;
 import fr.inria.zvtm.glyphs.Glyph;
 
+import java.awt.image.ImageFilter;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,6 +35,14 @@ public class FitsImageDescription extends ResourceDescription {
     private double vy;
     private int zindex;
 
+    private double gmin = Double.MAX_VALUE;
+    private double gmax = Double.MIN_VALUE;
+    private double gsigma;
+
+    private double lmin = Double.MAX_VALUE;
+    private double lmax = Double.MIN_VALUE;
+    private double lsigma;
+
     private volatile boolean display = true;
     //private Color strokeColor = null;
 
@@ -51,6 +61,7 @@ public class FitsImageDescription extends ResourceDescription {
         this.scaleFactor = scaleFactor;
         this.scaleMethod = scaleMethod;
         this.colorFilter = colorFilter;
+
     }
 
     public String getType(){
@@ -64,6 +75,7 @@ public class FitsImageDescription extends ResourceDescription {
         }
     }
 
+
     public void setScaleMethod(FitsImage.ScaleMethod scaleMethod){
         this.scaleMethod = scaleMethod;
         if(glyph != null){
@@ -71,13 +83,28 @@ public class FitsImageDescription extends ResourceDescription {
         }
     }
 
-    public void rescale(){
+    public void rescale(double min, double max, double sigma){
+        if(glyph != null){
+            gmin = min;
+            gmax = max;
+            gsigma = sigma;
+            glyph.rescale(min, max, sigma);
+        }
+    }
+
+    public double[] getLocalScaleParams(){
+        return new double[]{lmin, lmax};
     }
 
     //public void createObject(final VirtualSpace vs, final boolean fadeIn){
     public void createObject(final SceneManager sm, final VirtualSpace vs, final boolean fadeIn){
+        System.out.println("createObject");
         try{
             glyph = new FitsImage(vx,vy,zindex,src,scaleFactor,false);
+
+            if(lmin == Double.MAX_VALUE) lmin = glyph.getScaleParams()[0];
+            if(lmax == Double.MIN_VALUE) lmax = glyph.getScaleParams()[1];
+            System.out.println("localmin: " + lmin + " localmax: " + lmax);
             System.out.println(glyph);
         } catch(Exception ioe){
             System.out.println("Could not create FitsImage");
@@ -85,11 +112,13 @@ public class FitsImageDescription extends ResourceDescription {
         }
         glyph.setScaleMethod(scaleMethod);
         glyph.setColorFilter(colorFilter);
+        if(gmin != Double.MAX_VALUE && gmax != Double.MIN_VALUE) glyph.rescale(gmin, gmax, gmin/2. + gmax/2.);
         glyph.setDrawBorder(false);
         vs.addGlyph(glyph,false);
     }
 
     public void destroyObject(final SceneManager sm, final VirtualSpace vs, boolean fadeOut){
+        System.out.println("destroyObject");
         vs.removeGlyph(glyph);
         glyph = null;
     }
