@@ -116,35 +116,69 @@ public class FitsImage extends VImage {
      */
     public enum ColorFilter {
         HEAT{
-            private final ImageFilter INSTANCE = new HeatFilter();
-            @Override ImageFilter getFilter(){
+            public final ImageFilter INSTANCE = new HeatFilter();
+            @Override public ImageFilter getFilter(){
                 return INSTANCE;
             }
         },
         RAINBOW{
-            private final ImageFilter INSTANCE = new RainbowFilter();
-            @Override ImageFilter getFilter(){
+            public final ImageFilter INSTANCE = new RainbowFilter();
+            @Override public ImageFilter getFilter(){
                 return INSTANCE;
             }
         },
         STANDARD{
-            private final ImageFilter INSTANCE = new StandardFilter();
-            @Override ImageFilter getFilter(){
+            public final ImageFilter INSTANCE = new StandardFilter();
+            @Override public ImageFilter getFilter(){
                 return INSTANCE;
             }
         },
         NOP{
-            private final ImageFilter INSTANCE = new NopFilter();
-            @Override ImageFilter getFilter(){
+            public final ImageFilter INSTANCE = new NopFilter();
+            @Override public ImageFilter getFilter(){
+                return INSTANCE;
+            }
+        },
+        MOUSSE{
+            public final ImageFilter INSTANCE = new MousseFilter();
+            @Override public ImageFilter getFilter(){
+                return INSTANCE;
+            }
+        },
+        RANDOM{
+            public final ImageFilter INSTANCE = new RandomFilter();
+            @Override public ImageFilter getFilter(){
                 return INSTANCE;
             }
         };
 
-        abstract ImageFilter getFilter();
+        abstract public ImageFilter getFilter();
     }
 
     private final URL imgUrl;
     private final File imgFile;
+
+    public FitsImage(double x, double y, int z, URL imgUrl, double scaleFactor,
+            double min, double max) throws IOException {
+        super(x,y,z,new BufferedImage(10,10,BufferedImage.TYPE_INT_RGB),scaleFactor);
+        this.imgUrl = imgUrl;
+        this.imgFile = null;
+        //filter = ColorFilter.RAINBOW.getFilter();
+        try{
+            fitsImage = new ExFITSImage(imgUrl);
+            wcsTransform = new WCSTransform(new NomWcsKeywordProvider(fitsImage.getFits().getHDU(0).getHeader()));
+        } catch(Exception e){
+            throw new Error(e);
+        }
+        //System.out.println("scaleMethod.toIvoaValue(): "+scaleMethod.toIvoaValue());
+        fitsImage.setScaleMethod(scaleMethod.toIvoaValue());
+        try{
+            fitsImage.rescale(min, max, min/2. + max/2.); 
+        } catch (Exception fe){
+            System.err.println("image rescale failed: " + fe);
+        }
+        recreateDisplayImage();
+    }
 
     /**
      * Creates a new FitsImage.
@@ -158,16 +192,13 @@ public class FitsImage extends VImage {
      */
     public FitsImage(double x, double y, int z, URL imgUrl, double scaleFactor,
             boolean useDataMinMax) throws IOException {
-        //System.out.println("before constructor FitsImage(double, double, int, URL, double, boolean)");
         super(x,y,z,new BufferedImage(10,10,BufferedImage.TYPE_INT_RGB),scaleFactor);
         this.imgUrl = imgUrl;
         this.imgFile = null;
         //filter = ColorFilter.RAINBOW.getFilter();
         try{
             fitsImage = new ExFITSImage(imgUrl);
-            System.out.println("new ExFITSImage(imgUrl)");
             wcsTransform = new WCSTransform(new NomWcsKeywordProvider(fitsImage.getFits().getHDU(0).getHeader()));
-            System.out.println("new WCSTransform(new NomWcsKeywordProvider( " + fitsImage.getFits().getHDU(0).getHeader() + " ))");
         } catch(Exception e){
             throw new Error(e);
         }
@@ -203,9 +234,7 @@ public class FitsImage extends VImage {
 
         try{
             fitsImage = new ExFITSImage(imgFile);
-            System.out.println("new ExFITSImage(imgUrl)");
             wcsTransform = new WCSTransform(new NomWcsKeywordProvider(fitsImage.getFits().getHDU(0).getHeader()));
-            System.out.println("new WCSTransform(new NomWcsKeywordProvider( " + fitsImage.getFits().getHDU(0).getHeader() + "))");
         } catch(Exception e){
             throw new Error(e);
         }
