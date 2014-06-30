@@ -259,15 +259,14 @@ public class FitsMenu implements ViewListener{
 		//System.out.println(app.menu.BORDER_BOTTON_HISTOGRAM + " > " + jpy + " > " + app.menu.BORDER_TOP_HISTOGRAM);
 		//System.out.println(hist.vx + " " + hist.vy + " " + hist.getWidth() + " " + hist.getHeight());
 		//System.out.println(BORDER_LEFT_HISTOGRAM + " < " + jpx + " < " + BORDER_RIGHT_HISTOGRAM);
-        if((jpx < app.menu.WIDTH_MENU && jpy < app.menu.BORDER_BOTTON_FILTER && jpy > app.menu.BORDER_TOP_FILTER) ||
-          (jpy > app.menu.BORDER_TOP_HISTOGRAM && jpy < app.menu.BORDER_BOTTON_HISTOGRAM && jpx > app.menu.BORDER_LEFT_HISTOGRAM && jpx < app.menu.BORDER_RIGHT_HISTOGRAM )){
-            v.parent.setActiveLayer(app.LAYER_MENU);
-            v.parent.setCursorIcon(Cursor.DEFAULT_CURSOR);
-        } else {
-            v.parent.setActiveLayer(app.LAYER_SCENE);
-            v.parent.setCursorIcon(Cursor.CUSTOM_CURSOR);
-        }
         
+        if(!(jpx < app.menu.WIDTH_MENU && jpy < app.menu.BORDER_BOTTON_FILTER && jpy > app.menu.BORDER_TOP_FILTER) ||
+                    (jpy > app.menu.BORDER_TOP_HISTOGRAM && jpy < app.menu.BORDER_BOTTON_HISTOGRAM && jpx > app.menu.BORDER_LEFT_HISTOGRAM && 
+                    jpx < app.menu.BORDER_RIGHT_HISTOGRAM )){
+            v.parent.setActiveLayer(app.LAYER_SCENE);
+            //v.parent.setCursorIcon(Cursor.CUSTOM_CURSOR);
+            v.parent.setCursorIcon(Cursor.CROSSHAIR_CURSOR);
+        }
 
     }
 

@@ -16,6 +16,8 @@ public class FitsResourceHandler implements ResourceHandler {
     private static final String SC_ID = "sc="; //scale factor in params
     private static final String SM_ID = "sm="; //scale method in params
     private static final String CF_ID = "cf="; //color filter in params
+    private static final String MIN_VAL_ID = "minvalue="; //min value for rescale in params
+    private static final String MAX_VAL_ID = "maxvalue="; //max value for rescale in params
 
     public ResourceDescription createResourceDescription(
             double x, double y, String id, int zindex, Region region,
@@ -26,6 +28,8 @@ public class FitsResourceHandler implements ResourceHandler {
         FitsImage.ScaleMethod scaleMethod = FitsImage.ScaleMethod.HISTOGRAM_EQUALIZATION;
         FitsImage.ColorFilter colorFilter = FitsImage.ColorFilter.HEAT;
 
+        double min = Double.MAX_VALUE;
+        double max = Double.MIN_VALUE;
         if (params != null){
             String[] paramTokens = params.split(SceneManager.PARAM_SEPARATOR);
             for (int i=0;i<paramTokens.length;i++) {
@@ -46,15 +50,37 @@ public class FitsResourceHandler implements ResourceHandler {
                         System.err.println("Incorrect color filter, using default instead");
                     }
                 }
+                else if (paramTokens[i].startsWith(MIN_VAL_ID)){
+                    try{
+                        min = Double.parseDouble(paramTokens[i].substring(MIN_VAL_ID.length()));
+                    } catch(IllegalArgumentException ignored){
+                        System.err.println("Incorrect min value, using default instead");
+                    }
+                }
+                else if (paramTokens[i].startsWith(MAX_VAL_ID)){
+                    try{
+                        max = Double.parseDouble(paramTokens[i].substring(MAX_VAL_ID.length()));
+                    } catch(IllegalArgumentException ignored){
+                        System.err.println("Incorrect max value, using default instead");
+                    }
+                }
                 else {
                     System.err.println("Unknown type of resource parameter: "+paramTokens[i]);
                 }
             }
         }
 
-        FitsImageDescription desc = new FitsImageDescription(
+        FitsImageDescription desc;
+        if (max != Double.MIN_VALUE && min != Double.MAX_VALUE){
+            desc = new FitsImageDescription(
+                id, x, y, zindex, resourceURL, region,
+                scaleFactor, scaleMethod, colorFilter, min, max);
+        } else {
+            desc = new FitsImageDescription(
                 id, x, y, zindex, resourceURL, region,
                 scaleFactor, scaleMethod, colorFilter);
+        }
+        
         region.addObject(desc);
         return desc;
     }

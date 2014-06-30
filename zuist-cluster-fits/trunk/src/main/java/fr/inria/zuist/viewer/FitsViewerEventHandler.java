@@ -170,14 +170,12 @@ class FitsViewerEventHandler implements ViewListener, ComponentListener, CameraL
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
 
         if((jpx < application.menu.WIDTH_MENU && jpy < application.menu.BORDER_BOTTON_FILTER && jpy > application.menu.BORDER_TOP_FILTER) ||
-                    (jpy > application.menu.BORDER_TOP_HISTOGRAM && jpy < application.menu.BORDER_BOTTON_HISTOGRAM && jpx > application.menu.BORDER_LEFT_HISTOGRAM && 
-                    jpx < application.menu.BORDER_RIGHT_HISTOGRAM )){
+          (jpy > application.menu.BORDER_TOP_HISTOGRAM && jpy < application.menu.BORDER_BOTTON_HISTOGRAM && jpx > application.menu.BORDER_LEFT_HISTOGRAM && jpx < application.menu.BORDER_RIGHT_HISTOGRAM )){
             v.parent.setActiveLayer(application.LAYER_MENU);
             v.parent.setCursorIcon(Cursor.DEFAULT_CURSOR);
-        } else {
-            v.parent.setActiveLayer(application.LAYER_SCENE);
-            v.parent.setCursorIcon(Cursor.CUSTOM_CURSOR);
         }
+
+        
     }
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
@@ -248,7 +246,8 @@ class FitsViewerEventHandler implements ViewListener, ComponentListener, CameraL
     	else if (code==KeyEvent.VK_DOWN){application.translateView(FitsViewer.MOVE_DOWN);}
     	else if (code==KeyEvent.VK_LEFT){application.translateView(FitsViewer.MOVE_LEFT);}
     	else if (code==KeyEvent.VK_RIGHT){application.translateView(FitsViewer.MOVE_RIGHT);}
-        else if (code==KeyEvent.VK_R){ application.rescaleGlobal();}
+        else if (code==KeyEvent.VK_L){ application.rescaleGlobal(false);}
+        else if (code==KeyEvent.VK_G){ application.rescaleGlobal(true);}
     	else if (code==KeyEvent.VK_N){
             System.out.println("toggleNavMode()");
             toggleNavMode();}

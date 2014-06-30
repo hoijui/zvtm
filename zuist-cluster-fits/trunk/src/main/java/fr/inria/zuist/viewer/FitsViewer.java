@@ -156,6 +156,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     FitsImage.ScaleMethod scaleMethod = FitsImage.ScaleMethod.LINEAR;
 
     public FitsMenu menu;
+    double[] globalScaleParams = {Double.MAX_VALUE, Double.MIN_VALUE};
     
     //public FitsViewer(boolean fullscreen, boolean opengl, boolean antialiased, File xmlSceneFile){
     public FitsViewer(Options options){
@@ -224,8 +225,12 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
             mView.setVisible(true);
         }
         updatePanelSize();
-		//gp = new VWGlassPane(this);
-		//((JFrame)mView.getFrame()).setGlassPane(gp);
+
+		gp = new VWGlassPane(this);
+		((JFrame)mView.getFrame()).setGlassPane(gp);
+        gp.setValue(0);
+        gp.setVisible(true);
+
         eh = new FitsViewerEventHandler(this);
 
         menu = new FitsMenu(this);
@@ -359,8 +364,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         }
     }
 
-    public void rescaleGlobal(){
-    	double[] globalScaleParams = {Double.MAX_VALUE, Double.MIN_VALUE};
+    public void rescaleGlobal(boolean global){
     	for(ObjectDescription desc: sm.getObjectDescriptions()){
             if(desc instanceof FitsImageDescription){
                 double[] localScaleParams = ((FitsImageDescription)desc).getLocalScaleParams();
@@ -368,8 +372,19 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
                 if(localScaleParams[1] > globalScaleParams[1]) globalScaleParams[1] = localScaleParams[1];
             }
         }
-        System.out.println("max: " + globalScaleParams[1] + " min: " + globalScaleParams[0]);
-        rescale(globalScaleParams[0], globalScaleParams[1], globalScaleParams[0]/2. + globalScaleParams[1]/2.);
+        for(ObjectDescription desc: sm.getObjectDescriptions()){
+            if(desc instanceof FitsImageDescription){ 
+                ((FitsImageDescription)desc).setRescaleGlobal(globalScaleParams[0], globalScaleParams[1]);
+                ((FitsImageDescription)desc).setRescaleGlobal(global);
+            }
+        }
+        System.out.println(" min: " + globalScaleParams[0] + " max: " + globalScaleParams[1] );
+        for(ObjectDescription desc: sm.getObjectDescriptions()){
+            if(desc instanceof FitsImageDescription){
+                if(global) ((FitsImageDescription)desc).rescaleGlobal();
+                else ((FitsImageDescription)desc).rescaleLocal();
+            }
+        }
     }
 
 	void displayMainPieMenu(boolean b){
@@ -484,16 +499,18 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 	    SCENE_FILE_DIR = SCENE_FILE.getParentFile();
 	    System.out.println("dir: "+SCENE_FILE_DIR + " - file: " + SCENE_FILE);
 	    System.out.println("loadScene...");
-	    //sm.loadScene(SceneManager.parseXML(SCENE_FILE), SCENE_FILE_DIR, true, gp);
-	    sm.loadScene(SceneManager.parseXML(SCENE_FILE), SCENE_FILE_DIR, true);
+	    sm.loadScene(SceneManager.parseXML(SCENE_FILE), SCENE_FILE_DIR, true, gp);
+	    //sm.loadScene(SceneManager.parseXML(SCENE_FILE), SCENE_FILE_DIR, true);
 	    HashMap sceneAttributes = sm.getSceneAttributes();
 	    if (sceneAttributes.containsKey(SceneManager._background)){
 	        mView.setBackgroundColor((Color)sceneAttributes.get(SceneManager._background));
             clusteredView.setBackgroundColor((Color)sceneAttributes.get(SceneManager._background));
 	    }
+
+
 		MAX_NB_REQUESTS = sm.getObjectCount() / 100;
-	    //gp.setVisible(false);
-	    //gp.setLabel(VWGlassPane.EMPTY_STRING);
+	    gp.setVisible(false);
+	    gp.setLabel(VWGlassPane.EMPTY_STRING);
         mCamera.setAltitude(0.0f);
 	}
     
