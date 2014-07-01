@@ -55,13 +55,13 @@ public class ImageDescription extends ResourceDescription {
     private static int N_THREADS = 10;
     private static int CAPACITY = 2000;
 
-    static {   
-        imageLoader = new ThreadPoolExecutor(5, N_THREADS, 
-                10000L, TimeUnit.MILLISECONDS, 
+    static {
+        imageLoader = new ThreadPoolExecutor(5, N_THREADS,
+                10000L, TimeUnit.MILLISECONDS,
                 new LinkedBlockingQueue<Runnable>(CAPACITY));
         imageLoader.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-        imageUnloader = new ThreadPoolExecutor(5, N_THREADS, 
-                10000L, TimeUnit.MILLISECONDS, 
+        imageUnloader = new ThreadPoolExecutor(5, N_THREADS,
+                10000L, TimeUnit.MILLISECONDS,
                 new LinkedBlockingQueue<Runnable>(CAPACITY));
         imageUnloader.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
     }
@@ -94,7 +94,7 @@ public class ImageDescription extends ResourceDescription {
                             if (av > 0){
                                 bis.read(imgData, bytesRead, av);
                                 bytesRead += av;
-                                vrp.setProgress(bytesRead, dataLength);                                    
+                                vrp.setProgress(bytesRead, dataLength);
                             }
                         }
                         finishCreatingObject(sm, vs, (new ImageIcon(imgData)).getImage(), vrp, fadeIn);
@@ -114,7 +114,7 @@ public class ImageDescription extends ResourceDescription {
                         finishCreatingObject(sm, vs, (new ImageIcon(src)).getImage(), null, fadeIn);
                     }
                 }
-            }     
+            }
         }
     }
 
@@ -133,7 +133,7 @@ public class ImageDescription extends ResourceDescription {
             display = false;
             try {
                 loadTask.get();
-            } 
+            }
             catch(InterruptedException ie){ /*ie.printStackTrace();*/ }
             catch(ExecutionException ee){ /*ee.printStackTrace();*/ }
             if (glyph != null){
@@ -148,7 +148,7 @@ public class ImageDescription extends ResourceDescription {
                     try {
                         SwingUtilities.invokeAndWait(new Runnable(){
                         public void run(){
-    	                    vs.removeGlyph(glyph);
+                            vs.removeGlyph(glyph);
                             glyph.getImage().flush();
                             glyph = null;
                             sm.objectDestroyed(ImageDescription.this);
@@ -175,7 +175,7 @@ public class ImageDescription extends ResourceDescription {
     //ImageDescription(String id, double x, double y, int z, double w, double h, URL p, Color sc, Region pr){
     //    this(id,x,y,z,w,h,p,sc,1f,null,pr);
     //}
-    
+
     /** Constructs the description of an image (VImageST).
         *@param id ID of object in scene
         *@param x x-coordinate in scene
@@ -196,24 +196,24 @@ public class ImageDescription extends ResourceDescription {
         this.zindex = z;
         this.vw = w;
         this.vh = h;
-		this.setURL(p);
+        this.setURL(p);
         this.strokeColor = sc;
         this.alpha = alpha;
         this.interpolationMethod = (im != null) ? im : RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
         this.parentRegion = pr;
     }
-    
+
     @Override
-	public String getType(){
-	    return RESOURCE_TYPE_IMG;
-	}
+    public String getType(){
+        return RESOURCE_TYPE_IMG;
+    }
 
     @Override
     public void createObject(final SceneManager sm, final VirtualSpace vs, final boolean fadeIn){
         display = true;
         loadTask = imageLoader.submit(new ImageLoadTask(sm, vs, fadeIn));
     }
-    
+
     private void finishCreatingObject(final SceneManager sm, final VirtualSpace vs, Image i, VRectProgress vrp, boolean fadeIn){
         // fit image in declared "bounding box"
         double sf = Math.min(vw / ((double)i.getWidth(null)), vh / ((double)i.getHeight(null)));
@@ -234,7 +234,7 @@ public class ImageDescription extends ResourceDescription {
                 // remove visual feedback about loading (smoothly)
                 Animation a2 = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, vrp,
                     alpha, false, IdentityInterpolator.getInstance(), new FeedbackHideAction(vs));
-                VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a2, false);                    
+                VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a2, false);
             }
             // smoothly fade glyph in
             Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_IN_DURATION, glyph,
@@ -267,20 +267,20 @@ public class ImageDescription extends ResourceDescription {
                     sm.objectCreated(ImageDescription.this);
                 }
                 });
-        } catch(InterruptedException ie){ /*ie.printStackTrace();*/} 
+        } catch(InterruptedException ie){ /*ie.printStackTrace();*/}
         catch(InvocationTargetException ite){ /*ite.printStackTrace();*/}
     }
 
     @Override
     public void destroyObject(final SceneManager sm, final VirtualSpace vs, boolean fadeOut){
-        imageUnloader.submit(new ImageUnloadTask(sm, vs, fadeOut));        
+        imageUnloader.submit(new ImageUnloadTask(sm, vs, fadeOut));
     }
-    
+
     @Override
     public Glyph getGlyph(){
-	    return glyph;
+        return glyph;
     }
-    
+
     @Override
     public void moveTo(double x, double y){
         super.moveTo(x, y);
@@ -288,23 +288,23 @@ public class ImageDescription extends ResourceDescription {
             glyph.moveTo(vx, vy);
         }
     }
-    
+
     public float getTranslucencyValue(){
         return alpha;
     }
-    
+
 }
 
 class ImageHideAction implements EndAction {
-    
+
     SceneManager sm;
     VirtualSpace vs;
-    
+
     ImageHideAction(SceneManager sm, VirtualSpace vs){
-	    this.sm = sm;
-	    this.vs = vs;
+        this.sm = sm;
+        this.vs = vs;
     }
-    
+
     public void execute(Object subject, Animation.Dimension dimension){
         try {
             vs.removeGlyph((Glyph)subject);
@@ -320,24 +320,24 @@ class ImageHideAction implements EndAction {
     public void recoverFailingAnimationEnded(Object subject, Animation.Dimension dimension){
         try {
             vs.removeGlyph((Glyph)subject);
-            ((VImage)subject).getImage().flush();                
+            ((VImage)subject).getImage().flush();
             sm.objectDestroyed((ImageDescription)((Glyph)subject).getOwner());
         }
         catch(ArrayIndexOutOfBoundsException ex){
             if (SceneManager.getDebugMode()){System.err.println("Warning: attempt at destroying image " + ((Glyph)subject).hashCode() + " failed. Giving up.");}
-        }	
+        }
     }
 
 }
 
 class FeedbackHideAction implements EndAction {
-    
+
     VirtualSpace vs;
-    
+
     FeedbackHideAction(VirtualSpace vs){
-	    this.vs = vs;
+        this.vs = vs;
     }
-    
+
     public void execute(Object subject, Animation.Dimension dimension){
         try {
             vs.removeGlyph((Glyph)subject);
@@ -354,7 +354,7 @@ class FeedbackHideAction implements EndAction {
         }
         catch(ArrayIndexOutOfBoundsException ex){
             if (SceneManager.getDebugMode()){System.err.println("Warning: attempt at destroying label " + ((Glyph)subject).hashCode() + " failed. Giving up.");}
-        }	
+        }
     }
 
 }

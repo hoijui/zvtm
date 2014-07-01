@@ -39,7 +39,7 @@ public class ClosedShapeDescription extends ObjectDescription {
         this.id = id;
         this.glyph = g;
         this.zindex = z;
-		this.glyph.setZindex(this.zindex);
+        this.glyph.setZindex(this.zindex);
         this.parentRegion = pr;
         this.sensitive = sensitive;
     }
@@ -105,37 +105,37 @@ public class ClosedShapeDescription extends ObjectDescription {
     /** Get actual ClosedShape instance wrapped in this ZUIST object description. */
     @Override
     public Glyph getGlyph(){
-	    return glyph;
+        return glyph;
     }
-    
+
     @Override
     public double getX(){
         return glyph.vx;
     }
-    
+
     @Override
     public double getY(){
         return glyph.vy;
     }
-    
+
     @Override
     public void moveTo(double x, double y){
         this.glyph.moveTo(x, y);
     }
-    
+
 }
 
 class ClosedShapeHideAction implements EndAction {
-    
+
     VirtualSpace vs;
     SceneManager sm;
-    
+
     ClosedShapeHideAction(SceneManager sm, VirtualSpace vs){
-	    this.sm = sm;
-	    this.vs = vs;
+        this.sm = sm;
+        this.vs = vs;
     }
-    
-    public void	execute(Object subject, Animation.Dimension dimension) {
+
+    public void execute(Object subject, Animation.Dimension dimension) {
         try {
             vs.removeGlyph((Glyph)subject);
             sm.objectDestroyed((ClosedShapeDescription)((Glyph)subject).getOwner());
@@ -156,5 +156,5 @@ class ClosedShapeHideAction implements EndAction {
             recoverFailingAnimationEnded(subject, dimension);
         }
     }
-    
+
 }

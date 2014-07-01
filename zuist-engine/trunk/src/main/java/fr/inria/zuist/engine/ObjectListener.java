@@ -12,15 +12,15 @@ package fr.inria.zuist.engine;
  */
 
 public interface ObjectListener {
-	
-	/**Fired when an object is loaded/created.
-	 *@param od corresponding object description.
-	 */
-	public void objectCreated(ObjectDescription od);
+
+    /**Fired when an object is loaded/created.
+     *@param od corresponding object description.
+     */
+    public void objectCreated(ObjectDescription od);
 
     /**Fired when an object is unloaded/destroyed.
      *@param od corresponding object description.
      */
-    public void objectDestroyed(ObjectDescription od);	
-	
+    public void objectDestroyed(ObjectDescription od);
+
 }

@@ -157,7 +157,7 @@ public class Region {
 
     /** Get Region ID. */
     public String getID(){
-	    return id;
+        return id;
     }
 
     /** Set Region title. */
@@ -183,20 +183,20 @@ public class Region {
     /** Get index of highest and lowest levels this region belongs to.
      */
     public int getHighestLevel(){
-	    return hli;
+        return hli;
     }
 
     /** Get index of highest and lowest levels this region belongs to.
      */
     public int getLowestLevel(){
-	    return lli;
+        return lli;
     }
 
     /** Get containing region, if any has been declared.
      *@return null if no containing region declared
      */
     public Region getContainingRegion(){
-	    return containingRegion;
+        return containingRegion;
     }
 
     /** Get containing regions recursively, if any have been declared.
@@ -229,72 +229,72 @@ public class Region {
      *@return the actual rectangle, not a clone. Do not temper with.
      */
     public VRectangle getBounds(){
-	    return bounds;
+        return bounds;
     }
 
-	/** Get this region's center x-coordinate.
-	 */
-	public double getX(){
-		return x;
-	}
+    /** Get this region's center x-coordinate.
+     */
+    public double getX(){
+        return x;
+    }
 
-	/** Get this region's center y-coordinate.
-	 */
-	public double getY(){
-		return y;
-	}
+    /** Get this region's center y-coordinate.
+     */
+    public double getY(){
+        return y;
+    }
 
-	/** Get this region's width.
-	 */
-	public double getWidth(){
-		return w;
-	}
+    /** Get this region's width.
+     */
+    public double getWidth(){
+        return w;
+    }
 
-	/** Get this region's height.
-	 */
-	public double getHeight(){
-		return h;
-	}
+    /** Get this region's height.
+     */
+    public double getHeight(){
+        return h;
+    }
 
-	/** Set this region's center (x,y)-coordinates.
-	 */
-	public void moveTo(double x, double y){
-	    this.x = x;
-	    this.y = y;
-	    updateGeometry();
-	}
+    /** Set this region's center (x,y)-coordinates.
+     */
+    public void moveTo(double x, double y){
+        this.x = x;
+        this.y = y;
+        updateGeometry();
+    }
 
-	/** Set this region's width.
-	 */
-	public void setWidth(double w){
-	    this.w = w;
-	    updateGeometry();
-	}
+    /** Set this region's width.
+     */
+    public void setWidth(double w){
+        this.w = w;
+        updateGeometry();
+    }
 
-	/** Set this region's height.
-	 */
-	public void setHeight(double h){
-	    this.h = h;
-	    updateGeometry();
-	}
+    /** Set this region's height.
+     */
+    public void setHeight(double h){
+        this.h = h;
+        updateGeometry();
+    }
 
-	void updateGeometry(){
-	    setGeometry(this.x, this.y, this.w, this.h);
-	}
+    void updateGeometry(){
+        setGeometry(this.x, this.y, this.w, this.h);
+    }
 
-	/** Set this region's center (x,y)-coordinates, width and height.
-	 */
-	public void setGeometry(double x, double y, double w, double h){
-	    wnes[0] = x - w/2;
+    /** Set this region's center (x,y)-coordinates, width and height.
+     */
+    public void setGeometry(double x, double y, double w, double h){
+        wnes[0] = x - w/2;
         wnes[1] = y + h/2;
         wnes[2] = x + w/2;
         wnes[3] = y - h/2;
-		if (bounds != null){
-			bounds.moveTo(x, y);
-			bounds.setWidth(w);
-			bounds.setHeight(h);
-		}
-	}
+        if (bounds != null){
+            bounds.moveTo(x, y);
+            bounds.setWidth(w);
+            bounds.setHeight(h);
+        }
+    }
 
     /** Should the rectangle representing the region's bounds be sensitive to cursor entry/exit. */
     public void setSensitive(boolean b){
@@ -307,7 +307,7 @@ public class Region {
         return isSensitive;
     }
 
-	/** For internal use. Outside-package subclassing. */
+    /** For internal use. Outside-package subclassing. */
     public void addObject(ObjectDescription od){
         ObjectDescription[] newObjects = new ObjectDescription[objects.length+1];
         System.arraycopy(objects, 0, newObjects, 0, objects.length);
@@ -488,22 +488,22 @@ class DistanceComparator implements Comparator<ObjectDescription> {
     double x,y;
 
     DistanceComparator(double x, double y){
-	this.x = x;
-	this.y = y;
+    this.x = x;
+    this.y = y;
     }
 
-	public int compare(ObjectDescription od1, ObjectDescription od2){
-		double d1 = (x-od1.getX())*(x-od1.getX()) + (y-od1.getY())*(y-od1.getY());
-		double d2 = (x-od2.getX())*(x-od2.getX()) + (y-od2.getY())*(y-od2.getY());
-		if (d1 < d2){
-			return -1;
-		}
-		else if (d1 > d2){
-			return 1;
-		}
-		else {
-			return 0;
-		}
-	}
+    public int compare(ObjectDescription od1, ObjectDescription od2){
+        double d1 = (x-od1.getX())*(x-od1.getX()) + (y-od1.getY())*(y-od1.getY());
+        double d2 = (x-od2.getX())*(x-od2.getX()) + (y-od2.getY())*(y-od2.getY());
+        if (d1 < d2){
+            return -1;
+        }
+        else if (d1 > d2){
+            return 1;
+        }
+        else {
+            return 0;
+        }
+    }
 
 }

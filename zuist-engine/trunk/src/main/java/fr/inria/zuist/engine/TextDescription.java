@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2007-2011. All Rights Reserved
+ *   Copyright (c) INRIA, 2007-2012. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -36,10 +36,10 @@ public class TextDescription extends ObjectDescription {
     String text;
     short anchor = VText.TEXT_ANCHOR_MIDDLE;
     Font font;
-    
+
     Color fillColor;
     float alpha;
-    
+
     private volatile VText glyph;
 
     ///** Constructs the description of an image (VTextST).
@@ -72,7 +72,7 @@ public class TextDescription extends ObjectDescription {
         this.id = id;
         this.vx = x;
         this.vy = y;
-    	this.zindex = z;
+        this.zindex = z;
         this.scale = s;
         this.text = tx;
         this.fillColor = c;
@@ -144,46 +144,46 @@ public class TextDescription extends ObjectDescription {
 
     /** Get the AWT Font used to draw this text. */
     public void setFont(Font f){
-	    this.font = f;
+        this.font = f;
     }
 
     /** Get the AWT Font object used to draw this text. */
     public Font getFont(){
-	    return font;
+        return font;
     }
 
     @Override
     public Glyph getGlyph(){
-	    return glyph;
+        return glyph;
     }
-    
+
     /** Get this text object's text string. */
     public String getText(){
         return text;
     }
-    
+
     /** Get this text object's scale multiplication factor. Default is 1.0. */
     public float getScale(){
         return scale;
     }
-    
+
     /** Get ZVTM constant value representing anchors "start", "midlle", "end". */
     public static short getAnchor(String anchor){
         if (anchor.equals(_start)){return VText.TEXT_ANCHOR_START;}
         else if (anchor.equals(_end)){return VText.TEXT_ANCHOR_END;}
         else {return VText.TEXT_ANCHOR_MIDDLE;}
     }
-    
+
     @Override
     public double getX(){
         return vx;
     }
-    
+
     @Override
     public double getY(){
         return vy;
     }
-    
+
     @Override
     public void moveTo(double x, double y){
         this.vx = x;
@@ -192,24 +192,24 @@ public class TextDescription extends ObjectDescription {
             glyph.moveTo(vx, vy);
         }
     }
-    
+
     public float getTranslucencyValue(){
         return alpha;
     }
-    
+
 }
 
 class TextHideAction implements EndAction {
-    
+
     VirtualSpace vs;
     SceneManager sm;
-    
+
     TextHideAction(SceneManager sm, VirtualSpace vs){
-	    this.sm = sm;
-	    this.vs = vs;
+        this.sm = sm;
+        this.vs = vs;
     }
-    
-    public void	execute(Object subject, Animation.Dimension dimension) {
+
+    public void execute(Object subject, Animation.Dimension dimension) {
         try {
             vs.removeGlyph((Glyph)subject);
             sm.objectDestroyed((TextDescription)((Glyph)subject).getOwner());
@@ -230,5 +230,5 @@ class TextHideAction implements EndAction {
             recoverFailingAnimationEnded(subject, dimension);
         }
     }
-    
+
 }

@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2007-2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2007-2013. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -58,7 +58,7 @@ import fr.inria.zvtm.engine.Location;
  */
 
 public class SceneManager implements CameraListener {
-    
+
     public static final String _none = "none";
     public static final String _level = "level";
     public static final String _region = "region";
@@ -116,14 +116,14 @@ public class SceneManager implements CameraListener {
     public static final String _italic = "italic";
     public static final String _bold = "bold";
     public static final String _boldItalic = "boldItalic";
-    
+
     public static final String PARAM_SEPARATOR = ";";
     public static final String COORD_SEPARATOR = ",";
 
     public static final short TAKES_TO_OBJECT = 0;
     public static final short TAKES_TO_REGION = 1;
-    
-    
+
+
     static final String URL_PROTOCOL_SEQ = ":/";
     static final String JAR_PROTOCOL_SEQ = ":!/";
     static final String FILE_PROTOCOL_HEAD = "file://";
@@ -141,16 +141,16 @@ public class SceneManager implements CameraListener {
     Hashtable id2region;
     /** Contains a mapping from object IDs to actual objects. */
     Hashtable<String, ObjectDescription> id2object;
-    
+
     LevelListener levelListener;
     RegionListener regionListener;
     ObjectListener objectListener;
 
     /** Set to something else than 0,0 to translate a scene to another location than that defined originally. */
     Point2D.Double origin = new Point2D.Double(0, 0);
-    
+
     HashMap sceneAttrs;
-    
+
     HashMap<String, ResourceHandler> RESOURCE_HANDLERS;
 
     private class RegionUpdater {
@@ -158,7 +158,7 @@ public class SceneManager implements CameraListener {
         private boolean active;
         private static final int DEFAULT_PERIOD = 200; //milliseconds
         private int period;
-        
+
         private boolean enabled = true;
 
         RegionUpdater(){
@@ -176,14 +176,14 @@ public class SceneManager implements CameraListener {
         void setPeriod(int period){
             this.period = period;
         }
-        
+
         void setEnabled(boolean b){
             enabled = b;
         }
 
         void addEntry(Camera cam, Location loc){
             if (!enabled){return;}
-            //add or overwrite update target 
+            //add or overwrite update target
             toUpdate.put(cam, loc);
 
             //if not active, create timer task and start it
@@ -209,7 +209,7 @@ public class SceneManager implements CameraListener {
 
                     }
                     active = false;
-                    toUpdate.clear(); 
+                    toUpdate.clear();
                  }
         };
         active = true;
@@ -253,7 +253,7 @@ public class SceneManager implements CameraListener {
     public void shutdown(){
         glyphLoader.shutdown();
     }
-    
+
     /** Declare a ResourceHandler for a given type of resource.
      *@param rType type of resource to be handled, e.g., "pdf", "img", ...
      *@param rh class implementing ResourceHandler for that type of resource
@@ -261,7 +261,7 @@ public class SceneManager implements CameraListener {
     public void setResourceHandler(String rType, ResourceHandler rh){
         RESOURCE_HANDLERS.put(rType, rh);
     }
-    
+
     /** Get the class handling a given type of resource.
      *@param rType type of resource to handled, e.g., "pdf", "img", ...
      *@return instance of class implementing ResourceHandler for that type of resource. Null if none associated with rType.
@@ -269,10 +269,10 @@ public class SceneManager implements CameraListener {
     public ResourceHandler getResourceHandler(String rType){
         return RESOURCE_HANDLERS.get(rType);
     }
-    
+
 
     /**
-     * Gets an unmodifiable view of every ObjectDescription known 
+     * Gets an unmodifiable view of every ObjectDescription known
      * to this SceneManager
      */
     public Collection<ObjectDescription> getObjectDescriptions(){
@@ -283,12 +283,12 @@ public class SceneManager implements CameraListener {
     public void setOrigin(Point2D.Double p){
         origin = p;
     }
-    
+
     /** Is set to something else than 0,0 when translating a scene to another location than that defined originally. */
     public Point2D.Double getOrigin(){
         return origin;
     }
-    
+
     /**
         *@return the actual hashmap used internally to store scene attributes.
         */
@@ -298,67 +298,67 @@ public class SceneManager implements CameraListener {
 
 
     public Enumeration getRegionIDs(){
-	return id2region.keys();
+    return id2region.keys();
     }
 
     /** Get a region knowing its ID.
      *@return null if no region associated with this ID.
      */
     public Region getRegion(String id){
-	return (Region)id2region.get(id);
+    return (Region)id2region.get(id);
     }
 
-	/** Get a list of all object IDs, at any level and in any region.
-	 *@return sequence of object IDs in no particular order
-	 */
-	public Enumeration getObjectIDs(){
-		return id2object.keys();
-	}
+    /** Get a list of all object IDs, at any level and in any region.
+     *@return sequence of object IDs in no particular order
+     */
+    public Enumeration getObjectIDs(){
+        return id2object.keys();
+    }
 
     /** Get an object knowing its ID.
      *@return null if no object associated with this ID.
      */
     public ObjectDescription getObject(String id){
-	return id2object.get(id);
+    return id2object.get(id);
     }
 
-	/** Get the total number of objects (at any level and in any region) in the scene. */
+    /** Get the total number of objects (at any level and in any region) in the scene. */
     public int getObjectCount(){
         return id2object.size();
     }
 
-	/** Get the total number of regions (at any level) in the scene. */
+    /** Get the total number of regions (at any level) in the scene. */
     public int getRegionCount(){
         return id2region.size();
     }
-    
-	/** Get the total number of levels in the scene. */
+
+    /** Get the total number of levels in the scene. */
     public int getLevelCount(){
         return levels.length;
     }
 
-	/** Get a level.
-	 *@param index index of level.
- 	 *@return null if level index does not correspond to an actual level.
-	 */
-	public Level getLevel(int index){
-		return (index < levels.length) ? levels[index] : null;
-	}
+    /** Get a level.
+     *@param index index of level.
+     *@return null if level index does not correspond to an actual level.
+     */
+    public Level getLevel(int index){
+        return (index < levels.length) ? levels[index] : null;
+    }
 
-	/** Get all regions that belong to a given level.
-	 *@param level index of level.
-	 *@return sequence of regions at this level, in no particular order.
-	 *        Returns null if level index does not correspond to an actual level.
-	 */
-	public Region[] getRegionsAtLevel(int level){
-		if (level < levels.length){
-			Region[] res = new Region[levels[level].regions.length];
-			System.arraycopy(levels[level].regions, 0, res, 0, levels[level].regions.length);
-			return res;
-		}
-		return null;
-	}
-	
+    /** Get all regions that belong to a given level.
+     *@param level index of level.
+     *@return sequence of regions at this level, in no particular order.
+     *        Returns null if level index does not correspond to an actual level.
+     */
+    public Region[] getRegionsAtLevel(int level){
+        if (level < levels.length){
+            Region[] res = new Region[levels[level].regions.length];
+            System.arraycopy(levels[level].regions, 0, res, 0, levels[level].regions.length);
+            return res;
+        }
+        return null;
+    }
+
     /* ----------- ZUIST events ----------- */
 
     public void setLevelListener(LevelListener ll){
@@ -376,12 +376,12 @@ public class SceneManager implements CameraListener {
     public RegionListener getRegionListener(){
         return regionListener;
     }
-    
+
     public int getPendingRequestQueueSize(){
         //return glyphLoader.requestQueue.size();
-	    return 0; //XXX fix or drop the method
+        return 0; //XXX fix or drop the method
     }
-    
+
     public void setObjectListener(ObjectListener ol){
         objectListener = ol;
     }
@@ -389,15 +389,15 @@ public class SceneManager implements CameraListener {
     public ObjectListener getObjectListener(){
         return objectListener;
     }
-    
-	/** For internal use. */
+
+    /** For internal use. */
     public void objectCreated(ObjectDescription od){
         if (objectListener != null){
             objectListener.objectCreated(od);
         }
     }
 
-	/** For internal use. Made public for outside package subclassing  */
+    /** For internal use. Made public for outside package subclassing  */
     public void objectDestroyed(ObjectDescription od){
         if (objectListener != null){
             objectListener.objectDestroyed(od);
@@ -406,12 +406,12 @@ public class SceneManager implements CameraListener {
 
     /* ----------- level / region / object creation (API and XML) ----------- */
 
-	public void reset(){
-		id2region.clear();
-		id2object.clear();
-		sceneAttrs.clear();
-		levels = new Level[0];
-	}
+    public void reset(){
+        id2region.clear();
+        id2object.clear();
+        sceneAttrs.clear();
+        levels = new Level[0];
+    }
 
     /** Load a multi-scale scene configuration described in an XML document.
      *@param scene XML document (DOM) containing the scene description
@@ -428,9 +428,9 @@ public class SceneManager implements CameraListener {
      *@param reset reset scene (default is true) ; if false, append regions and objects to existing scene, new levels are ignored (as they would most likely conflict).
      */
     public Region[] loadScene(Document scene, File sceneFileDirectory, boolean reset, ProgressListener pl){
-		if (reset){
-		    reset();
-	    }
+        if (reset){
+            reset();
+        }
         Element root = scene.getDocumentElement();
         // scene attributes
         processSceneAttributes(root);
@@ -451,7 +451,7 @@ public class SceneManager implements CameraListener {
                         processLevel(e);
                     }
                 }
-            }            
+            }
         }
         if (pl != null){
             pl.setLabel("Creating regions, loading object descriptions...");
@@ -479,7 +479,7 @@ public class SceneManager implements CameraListener {
                 Region cr = (Region)id2region.get(regionName2containerRegionName.get(rn));
                 if (r != null && cr != null){
                     cr.addContainedRegion(r);
-                    r.setContainingRegion(cr);                    
+                    r.setContainingRegion(cr);
                 }
                 else {
                     if (DEBUG_MODE){
@@ -511,8 +511,8 @@ public class SceneManager implements CameraListener {
             pl.setValue(95);
         }
         regionName2containerRegionName.clear();
-        //    	printLevelInfo();
-        //   	printRegionInfo();
+        //      printLevelInfo();
+        //      printRegionInfo();
         System.gc();
         if (pl != null){
             pl.setLabel("Scene file loaded successfully");
@@ -520,7 +520,7 @@ public class SceneManager implements CameraListener {
         }
         return (Region[])regions.toArray(new Region[regions.size()]);
     }
-    
+
     void processSceneAttributes(Element sceneEL){
         if (sceneEL.hasAttribute(_background)){
             Color bkg = SVGReader.getColor(sceneEL.getAttribute(_background));
@@ -529,18 +529,18 @@ public class SceneManager implements CameraListener {
             }
         }
     }
-    
+
     public SceneFragmentDescription createSceneFragmentDescription(double x, double y, String id, Region region, URL resourceURL){
         //System.out.println("Creating scene fragment "+resourceURL);
         SceneFragmentDescription sd = new SceneFragmentDescription(id, x, y, resourceURL, region, this);
         region.addObject(sd);
         return sd;
     }
-    
+
     public void destroySceneFragment(SceneFragmentDescription sd){
         //System.out.println("Destroying fragment "+sd.getID());
     }
-    
+
     /** Create a new level in the scene.
      *@param depth of this level (0 corresponds to the highest level in terms of altitude range)
      *@param calt ceiling altitude
@@ -555,12 +555,12 @@ public class SceneManager implements CameraListener {
         levels[depth] = new Level(calt, falt);
         return levels[depth];
     }
-    
+
     Level processLevel(Element levelEL){
         return createLevel(Integer.parseInt(levelEL.getAttribute(_depth)),
             Double.parseDouble(levelEL.getAttribute(_ceiling)), Double.parseDouble(levelEL.getAttribute(_floor)));
     }
-    
+
     /** Create a new region.
      * Important: when called directly from the client application, Region.setContainingRegion() should also be called manually (if there is any such containing region).
      * Also important: if the region is neither visible nor sensitive at instantiation time, its associated glyph is not added to the virtual space.
@@ -569,7 +569,7 @@ public class SceneManager implements CameraListener {
      *@param y center of region
      *@param w width of region
      *@param h height of region
-     *@param highestLevel index of highest level in level span for this region (highestLevel <= lowestLevel) 
+     *@param highestLevel index of highest level in level span for this region (highestLevel <= lowestLevel)
      *@param lowestLevel index of lowest level in level span for this region (highestLevel <= lowestLevel)
      *@param id region ID
      *@param title region's title (metadata)
@@ -672,22 +672,22 @@ public class SceneManager implements CameraListener {
         }
         return region;
     }
-    
-	/** Destroy all regions at a given level.
-	 * Destroying a region destroys all object descriptions it contains.
-	 *@param l level index
-	 */
+
+    /** Destroy all regions at a given level.
+     * Destroying a region destroys all object descriptions it contains.
+     *@param l level index
+     */
     public void destroyRegionsAtLevel(int l){
         Region[] ral = getRegionsAtLevel(l);
         for (int i=0;i<ral.length;i++){
             destroyRegion(ral[i]);
         }
     }
-    
-	/** Destroy a region.
-	 * Destroying a region destroys all object descriptions it contains.
-	 *@param r region to be destroyed
-	 */
+
+    /** Destroy a region.
+     * Destroying a region destroys all object descriptions it contains.
+     *@param r region to be destroyed
+     */
     public void destroyRegion(Region r){
         r.forceHide(Region.DISAPPEAR, r.x, r.y);
         ObjectDescription[] ods = r.getObjectsInRegion();
@@ -749,9 +749,9 @@ public class SceneManager implements CameraListener {
         Color stroke = SVGReader.getColor(resourceEL.getAttribute(_stroke));
         boolean sensitivity = (resourceEL.hasAttribute(_sensitive)) ? Boolean.parseBoolean(resourceEL.getAttribute(_sensitive)) : true;
         float alpha = (resourceEL.hasAttribute(_alpha)) ? Float.parseFloat(resourceEL.getAttribute(_alpha)) : 1f;
-		URL absoluteSrc = SceneManager.getAbsoluteURL(src, sceneFileDirectory);
+        URL absoluteSrc = SceneManager.getAbsoluteURL(src, sceneFileDirectory);
         if (type.equals(ImageDescription.RESOURCE_TYPE_IMG)){
-    		double w = Double.parseDouble(resourceEL.getAttribute(_w));
+            double w = Double.parseDouble(resourceEL.getAttribute(_w));
             double h = Double.parseDouble(resourceEL.getAttribute(_h));
             return createImageDescription(x+origin.x, y+origin.y, w, h, id, zindex, region, absoluteSrc, sensitivity, stroke, alpha, params);
         }
@@ -779,7 +779,7 @@ public class SceneManager implements CameraListener {
                                                          URL resourceURL, String type, boolean sensitivity, Color stroke, String params){
         if (RESOURCE_HANDLERS.containsKey(type)){
             ResourceDescription rd = (RESOURCE_HANDLERS.get(type)).createResourceDescription(x, y, id, zindex, region,
-                                                                                             resourceURL, sensitivity, stroke, params);            
+                                                                                             resourceURL, sensitivity, stroke, params);
             if (!id2object.containsKey(id)){
                 id2object.put(id, rd);
             }
@@ -821,7 +821,7 @@ public class SceneManager implements CameraListener {
         }
         return imd;
     }
-    
+
     protected static Object parseInterpolation(String im){
         if (im.equals(_bilinear)){
             return RenderingHints.VALUE_INTERPOLATION_BILINEAR;
@@ -833,7 +833,7 @@ public class SceneManager implements CameraListener {
             return RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
         }
     }
-        
+
     /**
      *@param g any ClosedShape. It must implement fr.inria.zvtm.glyphs.Translucent if fade in/out transitions are used in the parent region.
      */
@@ -849,7 +849,7 @@ public class SceneManager implements CameraListener {
         return gd;
     }
 
-    public GlyphDescription createGlyphDescription(Glyph g, String id, 
+    public GlyphDescription createGlyphDescription(Glyph g, String id,
             int zindex, Region region, boolean sensitivity){
         GlyphDescription gd = new GlyphDescription(id, g, zindex, region, sensitivity);
         region.addObject(gd);
@@ -889,7 +889,7 @@ public class SceneManager implements CameraListener {
         if (stroke == null){g.setDrawBorder(false);}
         return createClosedShapeDescription(g, id, zindex, region, sensitivity);
     }
-    
+
     public static Point2D.Double[] parseVertexCoordinates(String s, Point2D.Double orig){
         String[] points = s.split(PARAM_SEPARATOR);
         Point2D.Double[] res = new Point2D.Double[points.length];
@@ -900,7 +900,7 @@ public class SceneManager implements CameraListener {
         }
         return res;
     }
-    
+
     /** Process XML description of a text object. */
     TextDescription processText(Element textEL, String id, int zindex, Region region){
         double x = Double.parseDouble(textEL.getAttribute(_x));
@@ -920,7 +920,7 @@ public class SceneManager implements CameraListener {
                                                    sensitivity);
         return od;
     }
-    
+
     public static int getFontStyle(String style){
         if (style.equals(_italic)){
             return Font.ITALIC;
@@ -935,7 +935,7 @@ public class SceneManager implements CameraListener {
             return Font.PLAIN;
         }
     }
-    
+
     /** Creates a text object and adds it to a region.
      *
      */
@@ -959,9 +959,9 @@ public class SceneManager implements CameraListener {
         }
         return td;
     }
-    
+
     /* ---------- inclusions (of other scene files) ----------- */
-    
+
     void processInclude(Element includeEL, File sceneFileDirectory){
         double x = Double.parseDouble(includeEL.getAttribute(_x));
         double y = Double.parseDouble(includeEL.getAttribute(_y));
@@ -972,10 +972,10 @@ public class SceneManager implements CameraListener {
         loadScene(parseXML(f), f.getParentFile(), false, null);
         setOrigin(new Point2D.Double(0, 0));
     }
-    
+
 
     /* ----------- level / region visibility update ----------- */
-    
+
     public void enableRegionUpdater(boolean b){
         regUpdater.setEnabled(b);
     }
@@ -983,17 +983,17 @@ public class SceneManager implements CameraListener {
     int previousLevel = -2;
     int currentLevel = -1;
     boolean updateLevel = false;
-    
+
     /** Enable/disable level updating.
      * Calls to updateLevel(altitude) have no effect if level updating is disabled.
      *@see #updateLevel(int layerIndex, double[] cameraBounds, double altitude)
      */
     public void setUpdateLevel(boolean b){
-	updateLevel = b;
+    updateLevel = b;
     //update level for every camera
     if(updateLevel){
         for(Camera cam: sceneCameras){
-            updateLevel(getLayerIndex(cam), 
+            updateLevel(getLayerIndex(cam),
                     cam.getOwningView().getVisibleRegion(cam),
                     cam.getAltitude());
         }
@@ -1026,24 +1026,24 @@ public class SceneManager implements CameraListener {
         }
     }
 
-    /** Get the current level. 
+    /** Get the current level.
      *@return index of level at which camera is right now (highest level is 0)
      */
     public int getCurrentLevel(){
-	return currentLevel;
+    return currentLevel;
     }
 
     private void enterLevel(int layerIndex, double[] cameraBounds, int depth, int prev_depth){
         boolean arrivingFromHigherAltLevel = depth > prev_depth;
-	    updateVisibleRegions(layerIndex, cameraBounds, depth, (arrivingFromHigherAltLevel) ? Region.TFUL : Region.TFLL);
-	    if (levelListener != null){
-	        levelListener.enteredLevel(depth);
-	    }
+        updateVisibleRegions(layerIndex, cameraBounds, depth, (arrivingFromHigherAltLevel) ? Region.TFUL : Region.TFLL);
+        if (levelListener != null){
+            levelListener.enteredLevel(depth);
+        }
     }
 
     private void exitLevel(int depth, int new_depth){
         boolean goingToLowerAltLevel = new_depth > depth;
-        for (int i=0;i<levels[depth].regions.length;i++){            
+        for (int i=0;i<levels[depth].regions.length;i++){
             // hide only if region does not span the level where we are going
             if ((goingToLowerAltLevel && !levels[new_depth].contains(levels[depth].regions[i]))
                 || (!goingToLowerAltLevel && !levels[new_depth].contains(levels[depth].regions[i]))){
@@ -1052,36 +1052,36 @@ public class SceneManager implements CameraListener {
             }
         }
         if (levelListener != null){
-	        levelListener.exitedLevel(depth);
-	    }
+            levelListener.exitedLevel(depth);
+        }
     }
 
-	/** Get region whose center is closest to a given location at the current level. */
-	public Region getClosestRegionAtCurrentLevel(Point2D.Double lp){
-		return levels[currentLevel].getClosestRegion(lp);
-	}
+    /** Get region whose center is closest to a given location at the current level. */
+    public Region getClosestRegionAtCurrentLevel(Point2D.Double lp){
+        return levels[currentLevel].getClosestRegion(lp);
+    }
 
     /** Notify camera translations. It is up to the client application to notify the scene manager each time the position of the camera used to observe the scene changes.
      *
      */
     private void updateVisibleRegions(int layerIndex, double[] cameraBounds){
-        //called when an x-y movement occurs but no altitude change 
+        //called when an x-y movement occurs but no altitude change
         updateVisibleRegions(layerIndex, cameraBounds, currentLevel, Region.TASL);
     }
 
-   
+
     private void updateVisibleRegions(int layerIndex, double[] cameraBounds, int level, short transition){
         try {
-	        for (int i=0;i<levels[level].regions.length;i++){
+            for (int i=0;i<levels[level].regions.length;i++){
                 if(layerIndex != levels[level].regions[i].li){
                     continue;
                 }
-	            levels[level].regions[i].updateVisibility(cameraBounds, currentLevel, transition, regionListener);
-	        }
+                levels[level].regions[i].updateVisibility(cameraBounds, currentLevel, transition, regionListener);
+            }
         }
-        catch ( Exception e) { 
-	        if (DEBUG_MODE){
-	            System.err.println("ZUIST: Error: failed to update visible region. Possible causes:\n\t- the camera's current altitude is not in the range of any scene level.");
+        catch ( Exception e) {
+            if (DEBUG_MODE){
+                System.err.println("ZUIST: Error: failed to update visible region. Possible causes:\n\t- the camera's current altitude is not in the range of any scene level.");
                 e.printStackTrace();
             }
         }
@@ -1093,13 +1093,13 @@ public class SceneManager implements CameraListener {
             updateVisibleRegions(getLayerIndex(cam), cam.getOwningView().getVisibleRegion(cam));
         }
     }
-    
+
     public void setFadeInDuration(int d){
-	glyphLoader.FADE_IN_DURATION = d;
+    glyphLoader.FADE_IN_DURATION = d;
     }
 
     public void setFadeOutDuration(int d){
-	glyphLoader.FADE_OUT_DURATION = d;
+    glyphLoader.FADE_OUT_DURATION = d;
     }
 
     int getLayerIndex(String spaceName){
@@ -1111,49 +1111,49 @@ public class SceneManager implements CameraListener {
         return -1;
     }
 
-	public VirtualSpace getSpaceByIndex(int layerIndex){
-		if ((layerIndex < 0) || (layerIndex > sceneLayers.length)){
-			return null;
-		}
-		return sceneLayers[layerIndex];
-	}
+    public VirtualSpace getSpaceByIndex(int layerIndex){
+        if ((layerIndex < 0) || (layerIndex > sceneLayers.length)){
+            return null;
+        }
+        return sceneLayers[layerIndex];
+    }
 
     // debug
 //     void printLevelInfo(){
-// 	for (int i=0;i<levels.length;i++){
-// 	    System.out.println("-------------------------------- Level "+i);
-// 	    System.out.println(levels[i].toString());
-// 	}
+//  for (int i=0;i<levels.length;i++){
+//      System.out.println("-------------------------------- Level "+i);
+//      System.out.println(levels[i].toString());
+//  }
 //     }
 
 //     void printRegionInfo(){
-// 	for (int i=0;i<levels.length;i++){
-// 	    System.out.println("-------------------------------- Level "+i);
-// 	    for (int j=0;j<levels[i].regions.length;j++){
-// 		System.out.println(levels[i].regions[j].toString());
-// 	    }
-// 	}
+//  for (int i=0;i<levels.length;i++){
+//      System.out.println("-------------------------------- Level "+i);
+//      for (int j=0;j<levels[i].regions.length;j++){
+//      System.out.println(levels[i].regions[j].toString());
+//      }
+//  }
 //     }
 
     /* -------- Navigation ----------------- */
-    
+
     /** Get the bounding box of all regions in this scene.
      *@return bounds in virtual space
      */
-	public double[] findFarmostRegionCoords(){
-		int l = 0;
-		while (getRegionsAtLevel(l) == null){
-			l++;
-			if (l > getLevelCount()){
-				l = -1;
-				break;
-			}
-		}
-		if (l > -1){
-			return getLevel(l).getBounds();
-		}
-		else return new double[]{0,0,0,0};		
-	}
+    public double[] findFarmostRegionCoords(){
+        int l = 0;
+        while (getRegionsAtLevel(l) == null){
+            l++;
+            if (l > getLevelCount()){
+                l = -1;
+                break;
+            }
+        }
+        if (l > -1){
+            return getLevel(l).getBounds();
+        }
+        else return new double[]{0,0,0,0};
+    }
 
     /** Get a global view of the scene.
      *@param c camera that should show a global view
@@ -1162,9 +1162,9 @@ public class SceneManager implements CameraListener {
      @return bounds in virtual space
      */
     public double[] getGlobalView(Camera c, int d, EndAction ea){
-		double[] wnes = findFarmostRegionCoords();
-	    c.getOwningView().centerOnRegion(c, d, wnes[0], wnes[1], wnes[2], wnes[3], ea);
-	    return wnes;
+        double[] wnes = findFarmostRegionCoords();
+        c.getOwningView().centerOnRegion(c, d, wnes[0], wnes[1], wnes[2], wnes[3], ea);
+        return wnes;
     }
 
     /* -------------- Utils ------------------- */
@@ -1187,29 +1187,29 @@ public class SceneManager implements CameraListener {
 
     public static URL getAbsoluteURL(String src, File sceneFileDir){
         if (src.indexOf(URL_PROTOCOL_SEQ) != -1 || src.indexOf(JAR_PROTOCOL_SEQ) != -1){
-    		try {
-    			return new URL(src);
-    		}
-    		catch(MalformedURLException ex){if (DEBUG_MODE)System.err.println("Error: malformed resource URL: "+src);}
-		}
-    	else {
-    		// probably a local file URL
-    		try {
-    			return new URL(FILE_PROTOCOL_HEAD +
-    			               (((new File(src)).isAbsolute()) ? src
-    			                                               : sceneFileDir.getAbsolutePath() + File.separatorChar + src));
-    		}
-    		catch(MalformedURLException ex){if (DEBUG_MODE){System.err.println("Error: malformed local resource URL: "+src);ex.printStackTrace();}}		
-    	}
-    	return null;
+            try {
+                return new URL(src);
+            }
+            catch(MalformedURLException ex){if (DEBUG_MODE)System.err.println("Error: malformed resource URL: "+src);}
+        }
+        else {
+            // probably a local file URL
+            try {
+                return new URL(FILE_PROTOCOL_HEAD +
+                               (((new File(src)).isAbsolute()) ? src
+                                                               : sceneFileDir.getAbsolutePath() + File.separatorChar + src));
+            }
+            catch(MalformedURLException ex){if (DEBUG_MODE){System.err.println("Error: malformed local resource URL: "+src);ex.printStackTrace();}}
+        }
+        return null;
     }
-        
+
     /* Camera events handling */
     public void cameraMoved(Camera cam, Point2D.Double loc, double alt){
         regUpdater.addEntry(cam, new Location(loc.x, loc.y, alt));
     }
 
-    /** 
+    /**
      * returns the layer index (0-based)
      * of camera 'cam', or -1 if 'cam' does not belong
      * to cameras tracked by this ZUIST instance.
@@ -1222,16 +1222,16 @@ public class SceneManager implements CameraListener {
         }
         return -1;
     }
-    
+
     /* ------------------ DEBUGGING --------------------- */
     private static boolean DEBUG_MODE = false;
-    
+
     public static void setDebugMode(boolean b){
         DEBUG_MODE = b;
     }
-    
+
     public static boolean getDebugMode(){
         return DEBUG_MODE;
     }
-    
+
 }

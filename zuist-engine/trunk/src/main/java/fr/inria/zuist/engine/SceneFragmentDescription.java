@@ -30,7 +30,7 @@ public class SceneFragmentDescription extends ResourceDescription {
 
     public static final String RESOURCE_TYPE_SCENE = "scn";
     SceneManager sm;
-    
+
     Vector<Region> regions;
 
     /** Constructs the description of an image (VImageST).
@@ -79,7 +79,7 @@ public class SceneFragmentDescription extends ResourceDescription {
                 }
                 sm.updateVisibleRegions();
             }
-            catch (URISyntaxException ex){if (SceneManager.getDebugMode()){ex.printStackTrace();}}            
+            catch (URISyntaxException ex){if (SceneManager.getDebugMode()){ex.printStackTrace();}}
         }
     }
 
@@ -89,11 +89,11 @@ public class SceneFragmentDescription extends ResourceDescription {
             for (Region region:regions){
                 sm.destroyRegion(region);
             }
-            regions = null;            
+            regions = null;
         }
         sm.destroySceneFragment(this);
     }
-    
+
     /** Does not return anything since this is a scene fragment. */
     @Override
     public Glyph getGlyph(){

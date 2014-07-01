@@ -1,10 +1,10 @@
 /*   AUTHOR: Romain Primet (romain.primet@inria.fr)
- *   Copyright (c) INRIA, 2007-2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2007-2012. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
  */
- 
+
 package fr.inria.zuist.engine;
 
 import fr.inria.zvtm.engine.VirtualSpace;
@@ -18,7 +18,7 @@ import java.util.concurrent.ThreadFactory;
  * from the same thread, normally the Swing EDT.
  *@author Romain Primet, Emmanuel Pietriga
  */
- 
+
 class GlyphLoader {
 
     private final SceneManager sceneManager;
@@ -51,7 +51,7 @@ class GlyphLoader {
             if (SceneManager.getDebugMode()){System.err.println("addLoadRequest: could not retrieve virtual space "+layerIndex);}
             return;
         }
-        loader.submit(new Request(this.sceneManager, target, od, transition));	
+        loader.submit(new Request(this.sceneManager, target, od, transition));
     }
 
     /**
