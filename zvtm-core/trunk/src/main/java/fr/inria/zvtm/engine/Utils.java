@@ -2,7 +2,7 @@
  *   DATE OF CREATION:  Fri Aug 26 09:31:59 2005
  *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2006-2013. All Rights Reserved
+ *   Copyright (c) INRIA, 2006-2014. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -17,6 +17,8 @@ import java.awt.Paint;
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.awt.event.InputEvent;
+import java.awt.Toolkit;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,6 +32,7 @@ import javax.imageio.ImageWriter;
 import javax.imageio.stream.ImageInputStream;
 
 import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.event.ViewListener;
 
 public class Utils {
 
@@ -198,6 +201,22 @@ public class Utils {
             keyword = keyword.toLowerCase();
         }
         return COLORS_BY_KW.get(keyword);
+    }
+
+    public static int getMenuShortcutKeyMod(){
+        switch(Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()){
+            case InputEvent.META_MASK:{return ViewListener.META_MOD;}
+            // default is InputEvent.CTRL_MASK
+            default:{return ViewListener.CTRL_MOD;}
+        }
+    }
+
+    public static int getMenuShortcutKeyPlusShiftMod(){
+        switch(Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()){
+            case InputEvent.META_MASK:{return ViewListener.META_SHIFT_MOD;}
+            // default is InputEvent.CTRL_MASK
+            default:{return ViewListener.CTRL_SHIFT_MOD;}
+        }
     }
 
     /*takes an array of floats and returns a single string containing all values separated by commas*/
