@@ -173,6 +173,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         if (options.xmlSceneFile != null){
             sm.enableRegionUpdater(false);
             File xmlSceneFile = new File(options.xmlSceneFile);
+            System.out.println("load scene: " + options.xmlSceneFile);
 			loadScene(xmlSceneFile);
 			EndAction ea  = new EndAction(){
                    public void execute(Object subject, Animation.Dimension dimension){
@@ -229,7 +230,8 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 		gp = new VWGlassPane(this);
 		((JFrame)mView.getFrame()).setGlassPane(gp);
         gp.setValue(0);
-        gp.setVisible(true);
+        if(options.xmlSceneFile != null) gp.setVisible(true);
+        else gp.setVisible(false);
 
         eh = new FitsViewerEventHandler(this);
 

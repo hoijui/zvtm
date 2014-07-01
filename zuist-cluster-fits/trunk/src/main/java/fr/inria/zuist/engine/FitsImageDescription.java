@@ -119,10 +119,14 @@ public class FitsImageDescription extends ResourceDescription {
     }
 
     public void rescaleGlobal(){
-        if(glyph != null) glyph.rescale(gmax, gmin, gsigma);
+        System.out.println("rescaleGlobal()");
+        System.out.println("glyph.rescale("+gmax+", "+gmin+", "+gsigma+")");
+        if(glyph != null) glyph.rescale(gmin, gmax, gsigma);
     }
 
     public void rescaleLocal(){
+        System.out.println("rescaleLocal()");
+        System.out.println("glyph.rescale("+lmax+", "+lmin+", "+lsigma+")");
         if(glyph != null) glyph.rescale(lmin, lmax, lsigma);
     }
 
