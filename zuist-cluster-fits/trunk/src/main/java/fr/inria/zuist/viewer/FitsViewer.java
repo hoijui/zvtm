@@ -179,11 +179,14 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
                    public void execute(Object subject, Animation.Dimension dimension){
                        sm.setUpdateLevel(true);
                        sm.enableRegionUpdater(true);
+                       
                    }
                };
 			getGlobalView(ea);
 		}
 		ovm.toggleConsole();
+        System.out.println("setActiveLayer(LAYER_SCENE)");
+        mView.setActiveLayer(LAYER_SCENE);
 
 		//menu.drawHistogram();
 
@@ -358,7 +361,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     }
 
     public void rescale(double min, double max, double sigma){
-    	System.out.println("rescale");
+    	//System.out.println("rescale");
     	for(ObjectDescription desc: sm.getObjectDescriptions()){
             if(desc instanceof FitsImageDescription){
                 ((FitsImageDescription)desc).rescale(min, max, sigma);
@@ -367,6 +370,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     }
 
     public void rescaleGlobal(boolean global){
+        //System.out.println("rescaleGlobal("+global+")");
     	for(ObjectDescription desc: sm.getObjectDescriptions()){
             if(desc instanceof FitsImageDescription){
                 double[] localScaleParams = ((FitsImageDescription)desc).getLocalScaleParams();
@@ -380,7 +384,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
                 ((FitsImageDescription)desc).setRescaleGlobal(global);
             }
         }
-        System.out.println(" min: " + globalScaleParams[0] + " max: " + globalScaleParams[1] );
+        //System.out.println(" min: " + globalScaleParams[0] + " max: " + globalScaleParams[1] );
         for(ObjectDescription desc: sm.getObjectDescriptions()){
             if(desc instanceof FitsImageDescription){
                 if(global) ((FitsImageDescription)desc).rescaleGlobal();
@@ -465,6 +469,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
                            public void execute(Object subject, Animation.Dimension dimension){
                                sm.setUpdateLevel(true);
                                sm.enableRegionUpdater(true);
+                               
                            }
                        };
 					getGlobalView(ea);
@@ -481,7 +486,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 		    public Object construct(){
 				reset();
 				loadScene(SCENE_FILE);
-				return null; 
+                return null; 
 		    }
 		};
 	    worker.start();
@@ -532,6 +537,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 			//long[] wnes = sm.getLevel(l).getBounds();
 			double[] wnes = sm.getLevel(l).getBounds();
 	        mCamera.getOwningView().centerOnRegion(mCamera, FitsViewer.ANIM_MOVE_LENGTH, wnes[0], wnes[1], wnes[2], wnes[3], ea);
+
 		}
     }
 

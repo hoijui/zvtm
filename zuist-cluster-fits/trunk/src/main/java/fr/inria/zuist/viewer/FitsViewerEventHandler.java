@@ -142,7 +142,7 @@ class FitsViewerEventHandler implements ViewListener, ComponentListener, CameraL
 
     public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
         //toggleColorFilter();
-        toggleTransferFun();
+        //toggleTransferFun();
     }
 
     public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
@@ -150,7 +150,7 @@ class FitsViewerEventHandler implements ViewListener, ComponentListener, CameraL
 	public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
 	public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-		v.parent.setActiveLayer(1);
+		v.parent.setActiveLayer(application.LAYER_PIEMENU);
 		application.displayMainPieMenu(true);
 	}
 
@@ -162,7 +162,7 @@ class FitsViewerEventHandler implements ViewListener, ComponentListener, CameraL
 		if (application.mainPieMenu != null){
 			application.displayMainPieMenu(false);
 		}
-		v.parent.setActiveLayer(0);
+		v.parent.setActiveLayer(application.LAYER_SCENE);
 	}
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
@@ -267,7 +267,9 @@ class FitsViewerEventHandler implements ViewListener, ComponentListener, CameraL
         application.toggleTransferFun();
     }
 
-    public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
+    public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){
+        System.out.println("ktype: "+ c);
+    }
 
     public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 

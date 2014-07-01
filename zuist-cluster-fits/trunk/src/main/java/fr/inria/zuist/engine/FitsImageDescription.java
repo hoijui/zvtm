@@ -119,14 +119,14 @@ public class FitsImageDescription extends ResourceDescription {
     }
 
     public void rescaleGlobal(){
-        System.out.println("rescaleGlobal()");
-        System.out.println("glyph.rescale("+gmax+", "+gmin+", "+gsigma+")");
+        //System.out.println("rescaleGlobal()");
+        //System.out.println("glyph.rescale("+gmax+", "+gmin+", "+gsigma+")");
         if(glyph != null) glyph.rescale(gmin, gmax, gsigma);
     }
 
     public void rescaleLocal(){
-        System.out.println("rescaleLocal()");
-        System.out.println("glyph.rescale("+lmax+", "+lmin+", "+lsigma+")");
+        //System.out.println("rescaleLocal()");
+        //System.out.println("glyph.rescale("+lmax+", "+lmin+", "+lsigma+")");
         if(glyph != null) glyph.rescale(lmin, lmax, lsigma);
     }
 
@@ -138,8 +138,9 @@ public class FitsImageDescription extends ResourceDescription {
     public void createObject(final SceneManager sm, final VirtualSpace vs, final boolean fadeIn){
         System.out.println("createObject");
         try{
-            if(isRescaleGlobal) glyph = new FitsImage(vx,vy,zindex,src,scaleFactor,gmin, gmax);
-            else glyph = new FitsImage(vx,vy,zindex,src,scaleFactor);
+            //if(isRescaleGlobal) glyph = new FitsImage(vx,vy,zindex,src,scaleFactor,gmin, gmax);
+            //else glyph = new FitsImage(vx,vy,zindex,src,scaleFactor);
+            glyph = new FitsImage(vx,vy,zindex,src,scaleFactor);
             //if(gmin == Double.MAX_VALUE && gmax == Double.MIN_VALUE) glyph = new FitsImage(vx,vy,zindex,src,scaleFactor,false);
             //else glyph = new FitsImage(vx,vy,zindex,src,scaleFactor,gmin, gmax);
             //if(lmin == Double.MAX_VALUE) 
@@ -155,6 +156,8 @@ public class FitsImageDescription extends ResourceDescription {
         }
         glyph.setScaleMethod(scaleMethod);
         glyph.setColorFilter(colorFilter);
+        if(isRescaleGlobal) glyph.rescale(gmin, gmax, gsigma);
+        else glyph.rescale(lmin, lmax, lsigma);
         //if(gmin != Double.MAX_VALUE && gmax != Double.MIN_VALUE) glyph.rescale(gmin, gmax, gmin/2. + gmax/2.);
         glyph.setDrawBorder(false);
         vs.addGlyph(glyph,false);

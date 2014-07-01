@@ -121,7 +121,7 @@ class FitsOverlayManager implements ViewListener {
 			}
             showingAbout = true;
         }
-		application.mView.setActiveLayer(2);
+		application.mView.setActiveLayer(application.LAYER_OVERLAY);
     }
 
     void hideAbout(){
@@ -146,7 +146,7 @@ class FitsOverlayManager implements ViewListener {
 	            }
 			}
 		}
-		application.mView.setActiveLayer(0);
+		application.mView.setActiveLayer(application.LAYER_SCENE);
 	}
 
 	public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
@@ -187,7 +187,9 @@ class FitsOverlayManager implements ViewListener {
 		hideAbout();
 	}
 
-	public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
+	public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){
+		System.out.println("ktype: "+ c);
+	}
 
 	public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 

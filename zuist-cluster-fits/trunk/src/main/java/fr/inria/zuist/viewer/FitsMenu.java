@@ -361,6 +361,7 @@ public class FitsMenu implements ViewListener{
 	}
 
 	public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){
+		System.out.println("ktype: "+ c);
     }
 
 	public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
