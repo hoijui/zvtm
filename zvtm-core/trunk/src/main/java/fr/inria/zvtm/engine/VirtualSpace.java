@@ -471,6 +471,26 @@ public class VirtualSpace {
         }
     }
 
+    /** Get glyphs whose hotspot is in region delimited by rectangle (x1,y1,x2,y2) in this VirtualSpace.
+     *@param x1 x coord of first point
+     *@param y1 y coord of first point
+     *@param x2 x coord of opposite point
+     *@param y2 y coord of opposite point
+     */
+    public Glyph[] getGlyphsInRegion(double x1, double y1, double x2, double y2){
+        Vector<Glyph> res = new Vector<Glyph>();
+        double minX = Math.min(x1,x2);
+        double minY = Math.min(y1,y2);
+        double maxX = Math.max(x1,x2);
+        double maxY = Math.max(y1,y2);
+        for (Glyph g:getAllGlyphs()){
+            if ((g.vx>=minX) && (g.vy>=minY) && (g.vx<=maxX) && (g.vy<=maxY)){
+                res.add(g);
+            }
+        }
+        return res.toArray(new Glyph[res.size()]);
+    }
+
     /** Get the bounding box of all glyphs visible in this virtual space.
      *@return boundaries in VirtualSpace coordinates {west,north,east,south}
      */

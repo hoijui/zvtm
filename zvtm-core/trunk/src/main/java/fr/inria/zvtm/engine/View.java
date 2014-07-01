@@ -1056,41 +1056,6 @@ public abstract class View {
         return new Location(dx, dy, na);
     }
 
-    /** Get glyphs whose hotspot is in region delimited by rectangle (x1,y1,x2,y2) in VirtualSpace vs.
-     * Coordinates of the mouse cursor in virtual space are available in instance variables vx and vy of class VCursor.
-     * The selection rectangle can be drawn on screen by using ViewPanel.setDrawRect(true) (e.g. call when mouse button is pressed)/ViewPanel.setDrawRect(false) (e.g. call when mouse button is released).
-     *@return null if empty.
-     *@param x1 x coord of first point
-     *@param y1 y coord of first point
-     *@param x2 x coord of opposite point
-     *@param y2 y coord of opposite point
-     *@param vsn name of virtual space
-     *@param wg which glyphs in the region should be returned (among VIS_AND_SENS_GLYPHS (default), VISIBLE_GLYPHS, SENSIBLE_GLYPHS, ALL_GLYPHS)
-     */
-    public Vector<Glyph> getGlyphsInRegion(double x1,double y1,double x2,double y2,String vsn,int wg){
-        Vector<Glyph> res = new Vector<Glyph>();
-        VirtualSpace vs = VirtualSpaceManager.INSTANCE.getVirtualSpace(vsn);
-        double minX = Math.min(x1,x2);
-        double minY = Math.min(y1,y2);
-        double maxX = Math.max(x1,x2);
-        double maxY = Math.max(y1,y2);
-        if (vs!=null){
-            Vector<Glyph> allG = vs.getAllGlyphs();
-            Glyph g;
-            for (int i=0;i<allG.size();i++){
-                g=(Glyph)allG.elementAt(i);
-                if ((g.vx>=minX) && (g.vy>=minY) && (g.vx<=maxX) && (g.vy<=maxY)){
-                    if ((wg==VirtualSpaceManager.VIS_AND_SENS_GLYPHS) && g.isSensitive() && g.isVisible()){res.add(g);}
-                    else if ((wg==VirtualSpaceManager.VISIBLE_GLYPHS) && g.isVisible()){res.add(g);}
-                    else if ((wg==VirtualSpaceManager.SENSITIVE_GLYPHS) && g.isSensitive()){res.add(g);}
-                    else if (wg==VirtualSpaceManager.ALL_GLYPHS){res.add(g);}
-                }
-            }
-        }
-        if (res.isEmpty()){res=null;}
-        return res;
-    }
-
     /* --------------------------------------------------*/
 
     /** Transform coordinates from screen space (JPanel coordinates) to VirtualSpace.
