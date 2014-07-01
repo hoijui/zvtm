@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2007-2013. All Rights Reserved
+ *   Copyright (c) INRIA, 2007-2014. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -1195,11 +1195,14 @@ public class SceneManager implements CameraListener {
         else {
             // probably a local file URL
             try {
-                return new URL(FILE_PROTOCOL_HEAD +
-                               (((new File(src)).isAbsolute()) ? src
-                                                               : sceneFileDir.getAbsolutePath() + File.separatorChar + src));
+
+                File f = new File(src);
+                if (!f.isAbsolute()){
+                    f = new File(sceneFileDir.getCanonicalPath() + File.separator + src);
+                }
+                return f.toURI().toURL();
             }
-            catch(MalformedURLException ex){if (DEBUG_MODE){System.err.println("Error: malformed local resource URL: "+src);ex.printStackTrace();}}
+            catch(IOException ex){if (DEBUG_MODE){System.err.println("Error: unable to make URL from path to: "+src);ex.printStackTrace();}}
         }
         return null;
     }
