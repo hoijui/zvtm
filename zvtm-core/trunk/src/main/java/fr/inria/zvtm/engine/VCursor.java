@@ -208,6 +208,7 @@ public class VCursor {
         for (int i=0;i<stickedGlyphs.length;i++){
             if (stickedGlyphs[i] == g){
                 g.stickedTo = null;
+                g.setSensitivity(true);
                 Glyph[] newStickList = new Glyph[stickedGlyphs.length - 1];
                 System.arraycopy(stickedGlyphs, 0, newStickList, 0, i);
                 System.arraycopy(stickedGlyphs, i+1, newStickList, i, stickedGlyphs.length-i-1);
