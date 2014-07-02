@@ -397,13 +397,21 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 
     public void rescaleGlobal(boolean global){
         //System.out.println("rescaleGlobal("+global+")");
+
+        boolean globalData = false;
+        if(!globalData)
     	for(ObjectDescription desc: sm.getObjectDescriptions()){
             if(desc instanceof FitsImageDescription){
+                if(((FitsImageDescription)desc).isCreatedWithGlobalData()){
+                    globalData = true;
+                    break;
+                }
                 double[] localScaleParams = ((FitsImageDescription)desc).getLocalScaleParams();
                 if(localScaleParams[0] < globalScaleParams[0]) globalScaleParams[0] = localScaleParams[0];
                 if(localScaleParams[1] > globalScaleParams[1]) globalScaleParams[1] = localScaleParams[1];
             }
         }
+        if(!globalData)
         for(ObjectDescription desc: sm.getObjectDescriptions()){
             if(desc instanceof FitsImageDescription){ 
                 ((FitsImageDescription)desc).setRescaleGlobal(globalScaleParams[0], globalScaleParams[1]);

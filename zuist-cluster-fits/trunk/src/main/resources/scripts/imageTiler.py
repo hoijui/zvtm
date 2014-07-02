@@ -60,6 +60,9 @@ TR = 2
 BL = 3
 BR = 4
 
+MINVALUE = None
+MAXVALUE = None
+
 
 CMD_LINE_HELP = "ZUIST Image Tiling Script\n\nUsage:\n\n" + \
     " \timageTiler <src_image_path> <target_dir> [options]\n\n" + \
@@ -118,6 +121,8 @@ USE_GRAPHICSMAGICK = False
 USE_ASTROPY = False
 
 WCSDATA = ""
+
+ONLYXML = False
 
 ################################################################################
 # Create target directory if it does not exist yet
@@ -233,6 +238,10 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
             data = im[y:y+ah, x:x+aw]
             log(data.shape)
             
+            #minvalue = np.amin(data)
+            #maxvalue = np.amax(data)
+
+            #log("min: %f - max: %f" % (minvalue, maxvalue))
             
             if scale > 1.:
                 log("Resizing to (%d, %d)" % (aw/scale, ah/scale), 3)
@@ -254,9 +263,9 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
                 n = n+1
             #hdu.writeto(tilePathn)
             
-            if scale > 1.0:
+            if not ONLYXML and scale > 1.0:
                 fits.writeto(tilePathn, resizedata, header)
-            else:
+            elif not ONLYXML:
                 fits.writeto(tilePathn, data, header)
             
             tileFileName = tileFileNamen
@@ -305,7 +314,10 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
     objectEL.set("w", str(int(aw)))
     objectEL.set("h", str(int(ah)))
     if USE_ASTROPY:
-        objectEL.set("params", str("sc=%.4f" % (scale) ) )
+        if MINVALUE and MAXVALUE:
+            objectEL.set("params", str("sc=%.4f;minvalue=%.4f;maxvalue=%.4f" % (scale, MINVALUE, MAXVALUE) ))
+        else:
+            objectEL.set("params", str("sc=%.4f" % (scale) ))
     objectEL.set("src", tileFileName)
     objectEL.set("sensitive", "false")
     log("Image in scene: scale=%.4f, w=%d, h=%d" % (scale, aw, ah))
@@ -326,6 +338,8 @@ def processSrcImg():
     global OUTPUT_FILE_EXT
     global IMG_SRC_PATH
     global WCSDATA
+    global MINVALUE
+    global MAXVALUE
     outputSceneFile = "%s/scene.xml" % TGT_DIR
     # prepare the XML scene
     outputroot = ET.Element("scene")
@@ -378,6 +392,12 @@ def processSrcImg():
                 log("Naxis == %d" % (hdulist[0].header['NAXIS']) )
                 return
 
+            minvalue = np.amin(im)
+            maxvalue = np.amax(im)
+            if MINVALUE > minvalue:
+                MINVALUE = minvalue
+            if MAXVALUE < maxvalue:
+                MAXVALUE = maxvalue
 
             OUTPUT_FILE_EXT = "fits"
         else:
@@ -446,6 +466,7 @@ def shrink(data, w, h, aw, ah):
                 log("IndexError:  i: %d - j: %d - idi: %d - idj: %d" % (i, j, idi, idj))
     return newdata
 
+
 ################################################################################
 # Trace exec on std output
 ################################################################################
@@ -501,6 +522,12 @@ if len(sys.argv) > 2:
                 TILE_FILE_PREFIX = str(arg[len("-tileprefix="):])
             elif arg.startswith("-layer"):
                 LAYER = str(arg[len("-layer="):])
+            elif arg.startswith("-minvalue"):
+                MINVALUE = float(arg[len("-minvalue="):])
+            elif arg.startswith("-minvalue"):
+                MAXVALUE = float(arg[len("-maxvalue="):])
+            elif arg == "-onlyxml":
+                ONLYXML = True
             
 
 else:

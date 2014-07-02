@@ -55,6 +55,8 @@ public class FitsImageDescription extends ResourceDescription {
 
     private int layerIndex;
 
+    private boolean createdWithGlobalData = false;
+
     public FitsImageDescription(String id, double x, double y, int z, URL src,
             Region parentRegion,
             float scaleFactor, FitsImage.ScaleMethod scaleMethod,
@@ -78,7 +80,7 @@ public class FitsImageDescription extends ResourceDescription {
     public FitsImageDescription(String id, double x, double y, int z, URL src,
             Region parentRegion,
             float scaleFactor, FitsImage.ScaleMethod scaleMethod,
-            FitsImage.ColorFilter colorFilter, double max, double min){
+            FitsImage.ColorFilter colorFilter, double min, double max){
         this.id = id;
         this.vx = x;
         this.vy = y;
@@ -92,6 +94,9 @@ public class FitsImageDescription extends ResourceDescription {
         gmax = max;
         gsigma = min/2. + max/2.;
 
+        isRescaleGlobal = true;
+        createdWithGlobalData = true;
+
         isVisible = true;
 
         layerIndex = parentRegion.getLayerIndex();
@@ -100,6 +105,10 @@ public class FitsImageDescription extends ResourceDescription {
 
     public int getLayerIndex(){
         return layerIndex;
+    }
+
+    public boolean isCreatedWithGlobalData(){
+        return createdWithGlobalData;
     }
 
     public String getType(){
