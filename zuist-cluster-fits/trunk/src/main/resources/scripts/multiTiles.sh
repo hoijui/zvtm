@@ -73,35 +73,35 @@ mkdir fitsUC
 
 
 
-mkdir fitsUC/01064
-./imageTiler.py ~/zuist-scenes-tmp/fits/J/v20100411_01064_st_tl.fit fitsUC/ -f -astropy -ts=500 -tl=6 -dx=-38321 -dy=0 -tileprefix=01064/tile- -idprefix=01064 -layer=SceneJSpace
-mv fitsUC/scene.xml fitsUC/scene_01064.xml
+#mkdir fitsUC/01064
+#./imageTiler.py ~/zuist-scenes-tmp/fits/J/v20100411_01064_st_tl.fit fitsUC/ -f -astropy -ts=500 -tl=6 -dx=-38321 -dy=0 -tileprefix=01064/tile- -idprefix=01064 -layer=SceneJSpace
+#mv fitsUC/scene.xml fitsUC/scene_01064.xml
 
-mkdir fitsUC/00992
-./imageTiler.py ~/zuist-scenes-tmp/fits/J/v20100411_00992_st_tl.fit fitsUC/ -f -astropy -ts=500 -tl=6 -dx=-25546 -dy=0 -tileprefix=00992/tile- -idprefix=00992 -layer=SceneSSpace
-mv fitsUC/scene.xml fitsUC/scene_00992.xml
+#mkdir fitsUC/00992
+#./imageTiler.py ~/zuist-scenes-tmp/fits/J/v20100411_00992_st_tl.fit fitsUC/ -f -astropy -ts=500 -tl=6 -dx=-25546 -dy=0 -tileprefix=00992/tile- -idprefix=00992 -layer=SceneSSpace
+#mv fitsUC/scene.xml fitsUC/scene_00992.xml
 
-mkdir fitsUC/00956
-./imageTiler.py ~/zuist-scenes-tmp/fits/J/v20100411_00956_st_tl.fit fitsUC/ -f -astropy -ts=500 -tl=6 -dx=-12774 -dy=0 -tileprefix=00956/tile- -idprefix=00956 -layer=SceneJSpace
-mv fitsUC/scene.xml fitsUC/scene_00956.xml
+#mkdir fitsUC/00956
+#./imageTiler.py ~/zuist-scenes-tmp/fits/J/v20100411_00956_st_tl.fit fitsUC/ -f -astropy -ts=500 -tl=6 -dx=-12774 -dy=0 -tileprefix=00956/tile- -idprefix=00956 -layer=SceneJSpace
+#mv fitsUC/scene.xml fitsUC/scene_00956.xml
 
-mkdir fitsUC/00884
-./imageTiler.py ~/zuist-scenes-tmp/fits/J/v20100411_00884_st_tl.fit fitsUC/ -f -astropy -ts=500 -tl=6 -tileprefix=00884/tile- -idprefix=00884 -layer=SceneJSpace
-mv fitsUC/scene.xml fitsUC/scene_00884.xml
+#mkdir fitsUC/00884
+#./imageTiler.py ~/zuist-scenes-tmp/fits/J/v20100411_00884_st_tl.fit fitsUC/ -f -astropy -ts=500 -tl=6 -tileprefix=00884/tile- -idprefix=00884 -layer=SceneJSpace
+#mv fitsUC/scene.xml fitsUC/scene_00884.xml
 
 
 mkdir fitsUC/00382
-./imageTiler.py ~/zuist-scenes-tmp/fits/J/v20100420_00382_st_tl.fit fitsUC/ -f -astropy -ts=500 -tl=6 -dx=-00382 -dy=-15654 -tileprefix=00382/tile- -idprefix=00382 -layer=SceneJSpace
+./imageTiler.py ~/zuist-scenes-tmp/fits/J/v20100420_00382_st_tl.fit fitsUC/ -f -astropy -ts=500 -tl=6 -dx=-38321 -dy=-15654 -tileprefix=00382/tile- -idprefix=00382 -layer=SceneJSpace
 mv fitsUC/scene.xml fitsUC/scene_00382.xml
 
-mkdir fitsUC/01028
-./imageTiler.py ~/zuist-scenes-tmp/fits/J/v20100411_01028_st_tl.fit fitsUC/ -f -astropy -ts=500 -tl=6 -dx=-25546 -dy=-15658 -tileprefix=01028/tile- -idprefix=01028 -layer=SceneJSpace
-mv fitsUC/scene.xml fitsUC/scene_01028.xml
+#mkdir fitsUC/01028
+#./imageTiler.py ~/zuist-scenes-tmp/fits/J/v20100411_01028_st_tl.fit fitsUC/ -f -astropy -ts=500 -tl=6 -dx=-25546 -dy=-15658 -tileprefix=01028/tile- -idprefix=01028 -layer=SceneJSpace
+#mv fitsUC/scene.xml fitsUC/scene_01028.xml
 
-mkdir fitsUC/00920
-./imageTiler.py ~/zuist-scenes-tmp/fits/J/v20100411_00920_st_tl.fit fitsUC/ -f -astropy -ts=500 -tl=6 -dx=-12774 -dy=-15662 -tileprefix=00920/tile- -idprefix=00920 -layer=SceneJSpace
-mv fitsUC/scene.xml fitsUC/scene_00920.xml
+#mkdir fitsUC/00920
+#./imageTiler.py ~/zuist-scenes-tmp/fits/J/v20100411_00920_st_tl.fit fitsUC/ -f -astropy -ts=500 -tl=6 -dx=-12774 -dy=-15662 -tileprefix=00920/tile- -idprefix=00920 -layer=SceneJSpace
+#mv fitsUC/scene.xml fitsUC/scene_00920.xml
 
-mkdir fitsUC/00424
-./imageTiler.py ~/zuist-scenes-tmp/fits/J/v20110508_00424_st_tl.fit fitsUC/ -f -astropy -ts=500 -tl=6 -dy=-15654 -tileprefix=00424/tile- -idprefix=00424 -layer=SceneJSpace
-mv fitsUC/scene.xml fitsUC/scene_00424.xml
+#mkdir fitsUC/00424
+#./imageTiler.py ~/zuist-scenes-tmp/fits/J/v20110508_00424_st_tl.fit fitsUC/ -f -astropy -ts=500 -tl=6 -dy=-15654 -tileprefix=00424/tile- -idprefix=00424 -layer=SceneJSpace
+#mv fitsUC/scene.xml fitsUC/scene_00424.xml

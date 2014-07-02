@@ -243,6 +243,9 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         Vector<Camera> sceneCam = new Vector<Camera>();
 
         sceneCam.add(mCamera);
+        sceneCam.add(mCameraKs);
+        sceneCam.add(mCameraH);
+        sceneCam.add(mCameraJ);
 
         ClusterGeometry clGeom = new ClusterGeometry(options.blockWidth, options.blockHeight, options.numCols, options.numRows);
 		clusteredView = new ClusteredView(clGeom, options.numRows-1, options.numCols, options.numRows, sceneCam);
