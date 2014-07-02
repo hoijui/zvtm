@@ -123,21 +123,25 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     /* ZVTM objects */
     VirtualSpaceManager vsm;
     static final String mSpaceName = "Scene Space";
+    static final String mSpaceKsName = "SceneKsSpace";
+    static final String mSpaceHName = "SceneHSpace";
     static final String mnSpaceName = "PieMenu Space";
     static final String ovSpaceName = "Overlay Space";
     static final String menuSpaceName = "Menu Space";
 
     static final int LAYER_SCENE = 0;
-    static final int LAYER_PIEMENU = 1;
-    static final int LAYER_OVERLAY = 2;
-    static final int LAYER_MENU = 3;
-
-    //static final int LAYER_OVERLAY = 1;
+    static final int LAYER_SCENE_KS = 1;
+    static final int LAYER_SCENE_H = 2;
+    static final int LAYER_PIEMENU = 3;
+    static final int LAYER_OVERLAY = 4;
+    static final int LAYER_MENU = 5;
     
 
     VirtualSpace mSpace, ovSpace;
+    VirtualSpace mSpaceKs, mSpaceH;
     VirtualSpace menuSpace;
     Camera mCamera;
+    Camera mCameraKs, mCameraH;
     Camera menuCamera;
     String mCameraAltStr = Messages.ALTITUDE + "0";
     String levelStr = Messages.LEVEL + "0";
@@ -163,8 +167,8 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 		ovm = new FitsOverlayManager(this);
 		//initGUI(fullscreen, opengl, antialiased);
 		initGUI(options);
-        VirtualSpace[]  sceneSpaces = {mSpace};
-        Camera[] sceneCameras = {mCamera};
+        VirtualSpace[]  sceneSpaces = {mSpace, mSpaceKs, mSpaceH};
+        Camera[] sceneCameras = {mCamera, mCameraKs, mCameraH};
         sm = new SceneManager(sceneSpaces, sceneCameras);
         sm.setRegionListener(this);
         sm.setLevelListener(this);
@@ -187,6 +191,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 		ovm.toggleConsole();
         System.out.println("setActiveLayer(LAYER_SCENE)");
         mView.setActiveLayer(LAYER_SCENE);
+        
 
 		//menu.drawHistogram();
 
@@ -197,10 +202,19 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         vsm = VirtualSpaceManager.INSTANCE;
         vsm.setMaster("FitsViewer");
         mSpace = vsm.addVirtualSpace(mSpaceName);
+
+        mSpaceKs = vsm.addVirtualSpace(mSpaceKsName);
+        mSpaceH = vsm.addVirtualSpace(mSpaceHName);
+
         VirtualSpace mnSpace = vsm.addVirtualSpace(mnSpaceName);
 
         mCamera = mSpace.addCamera();
-		
+
+        mCameraKs = mSpaceKs.addCamera();
+        mCameraH = mSpaceH.addCamera();
+        mCamera.stick(mCameraKs);
+		mCamera.stick(mCameraH);
+
 		mnSpace.addCamera().setAltitude(10);
 
         ovSpace = vsm.addVirtualSpace(ovSpaceName);
@@ -210,14 +224,20 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 		menuCamera = menuSpace.addCamera();
 
         Vector cameras = new Vector();
+
         cameras.add(mCamera);
+        cameras.add(mCameraKs);
+        cameras.add(mCameraH);
+
 		cameras.add(vsm.getVirtualSpace(mnSpaceName).getCamera(0));
 		cameras.add(vsm.getVirtualSpace(ovSpaceName).getCamera(0));
 		cameras.add(menuCamera);
 
         mView = vsm.addFrameView(cameras, mViewName, (options.opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, !options.fullscreen, initMenu());
         Vector<Camera> sceneCam = new Vector<Camera>();
+
         sceneCam.add(mCamera);
+
         ClusterGeometry clGeom = new ClusterGeometry(options.blockWidth, options.blockHeight, options.numCols, options.numRows);
 		clusteredView = new ClusteredView(clGeom, options.numRows-1, options.numCols, options.numRows, sceneCam);
         clusteredView.setBackgroundColor(Color.GRAY);
@@ -250,7 +270,6 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         mView.setListener(ovm, LAYER_OVERLAY);
         mView.setListener(menu, LAYER_MENU);
         
-
 		mCamera.addListener(eh);
 
         //mView.setNotifyMouseMoved(true);
@@ -265,9 +284,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 			}
 		};
 		mView.getFrame().addComponentListener(ca0);
-
 		
-
     }
 
     JMenuItem infoMI, consoleMI;
@@ -391,6 +408,39 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
                 else ((FitsImageDescription)desc).rescaleLocal();
             }
         }
+    }
+
+    public void hideLayer(VirtualSpace vs){
+        for(ObjectDescription desc: sm.getObjectDescriptions()){
+            if(desc instanceof FitsImageDescription){
+                if( ((FitsImageDescription)desc).getVirtualSpace() == vs){
+                    Glyph g = ((FitsImageDescription)desc).getGlyph();
+                    if(g != null) vs.hide(g);
+                    ((FitsImageDescription)desc).setVisible(false);
+                }
+            }
+        }
+        /*for(Glyph g:vs.getAllGlyphs()){
+            vs.hide(g);
+        }*/
+    }
+
+    public void showLayer(VirtualSpace vs, float alpha){
+        for(ObjectDescription desc: sm.getObjectDescriptions()){
+            if(desc instanceof FitsImageDescription){
+                if( ((FitsImageDescription)desc).getVirtualSpace() == vs){
+                    Glyph g = ((FitsImageDescription)desc).getGlyph();
+                    if(g != null) vs.show(g);
+                    ((FitsImageDescription)desc).setVisible(true);
+                    ((FitsImageDescription)desc).setTranslucencyValue(alpha);
+                }
+            }
+        }
+        /*for(Glyph g:vs.getAllGlyphs()){
+            vs.show(g);
+            g.setTranslucencyValue(alpha);
+        }
+        */
     }
 
 	void displayMainPieMenu(boolean b){

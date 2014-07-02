@@ -329,6 +329,7 @@ public class FitsMenu implements ViewListener{
 	}
 
 	public void enterGlyph(Glyph g){
+		System.out.println(g);
         if(g.getType().equals(T_FILTER) && color_selected != (PRectangle)g ){
             app.setColorFilter((FitsImage.ColorFilter)g.getOwner());
             if(color_selected != null){

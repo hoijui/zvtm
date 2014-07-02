@@ -35,6 +35,9 @@ public class FitsImageDescription extends ResourceDescription {
     private double vy;
     private int zindex;
 
+    private float alpha = 1f;
+    private boolean isVisible = false;
+
     private double gmin = Double.MAX_VALUE;
     private double gmax = Double.MIN_VALUE;
     private double gsigma;
@@ -50,6 +53,8 @@ public class FitsImageDescription extends ResourceDescription {
 
     private FitsImage glyph; //the actual FITS image
 
+    private VirtualSpace vs;
+
     public FitsImageDescription(String id, double x, double y, int z, URL src,
             Region parentRegion,
             float scaleFactor, FitsImage.ScaleMethod scaleMethod,
@@ -63,6 +68,8 @@ public class FitsImageDescription extends ResourceDescription {
         this.scaleFactor = scaleFactor;
         this.scaleMethod = scaleMethod;
         this.colorFilter = colorFilter;
+
+        isVisible = true;
 
     }
 
@@ -83,6 +90,12 @@ public class FitsImageDescription extends ResourceDescription {
         gmax = max;
         gsigma = min/2. + max/2.;
 
+        isVisible = true;
+
+    }
+
+    public VirtualSpace getVirtualSpace(){
+        return vs;
     }
 
     public String getType(){
@@ -136,6 +149,9 @@ public class FitsImageDescription extends ResourceDescription {
 
     //public void createObject(final VirtualSpace vs, final boolean fadeIn){
     public void createObject(final SceneManager sm, final VirtualSpace vs, final boolean fadeIn){
+        if(this.vs == null) this.vs = vs;
+       
+
         System.out.println("createObject");
         try{
             //if(isRescaleGlobal) glyph = new FitsImage(vx,vy,zindex,src,scaleFactor,gmin, gmax);
@@ -147,25 +163,34 @@ public class FitsImageDescription extends ResourceDescription {
             lmin = glyph.getScaleParams()[0];
             //if(lmax == Double.MIN_VALUE) 
             lmax = glyph.getScaleParams()[1];
-            System.out.println("localmin: " + lmin + " localmax: " + lmax);
-            System.out.println("globalmin: " + gmin + " globalmax: " + gmax);
-            System.out.println(glyph);
+            
         } catch(Exception ioe){
             System.out.println("Could not create FitsImage");
             throw new Error("Could not create FitsImage");
         }
+        
+        //if(gmin != Double.MAX_VALUE && gmax != Double.MIN_VALUE) glyph.rescale(gmin, gmax, gmin/2. + gmax/2.);
+        glyph.setVisible(isVisible);
+        glyph.setDrawBorder(false);
+        glyph.setTranslucencyValue(alpha);
+
         glyph.setScaleMethod(scaleMethod);
         glyph.setColorFilter(colorFilter);
         if(isRescaleGlobal) glyph.rescale(gmin, gmax, gsigma);
         else glyph.rescale(lmin, lmax, lsigma);
-        //if(gmin != Double.MAX_VALUE && gmax != Double.MIN_VALUE) glyph.rescale(gmin, gmax, gmin/2. + gmax/2.);
-        glyph.setDrawBorder(false);
+
+        System.out.println("localmin: " + lmin + " localmax: " + lmax);
+        System.out.println("globalmin: " + gmin + " globalmax: " + gmax);
+        System.out.println(glyph);
+
         vs.addGlyph(glyph,false);
+        
+
     }
 
     public void destroyObject(final SceneManager sm, final VirtualSpace vs, boolean fadeOut){
         System.out.println("destroyObject");
-        vs.removeGlyph(glyph);
+        if(glyph != null) vs.removeGlyph(glyph);
         glyph = null;
     }
 
@@ -187,6 +212,17 @@ public class FitsImageDescription extends ResourceDescription {
     @Override
     public void moveTo(double x, double y){
         glyph.moveTo(x, y);
+    }
+
+    public void setTranslucencyValue(float alpha){
+        this.alpha = alpha;
+        if(glyph != null) glyph.setTranslucencyValue(alpha);
+    }
+
+    public void setVisible(boolean visible){
+        System.out.println("setVisible(" + visible + ")");
+        this.isVisible = visible;
+        if(glyph != null) glyph.setVisible(visible);
     }
 
 }
