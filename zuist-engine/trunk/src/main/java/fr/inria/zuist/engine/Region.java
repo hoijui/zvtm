@@ -171,12 +171,12 @@ public class Region {
     }
 
     /** Set this region's layer index. */
-    void setLayerIndex(int i){
+    public void setLayerIndex(int i){
         li = i;
     }
 
     /** Get this region's layer index. */
-    int getLayerIndex(){
+    public int getLayerIndex(){
         return li;
     }
 
