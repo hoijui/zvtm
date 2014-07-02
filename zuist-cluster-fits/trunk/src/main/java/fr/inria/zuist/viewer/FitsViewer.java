@@ -125,6 +125,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     static final String mSpaceName = "Scene Space";
     static final String mSpaceKsName = "SceneKsSpace";
     static final String mSpaceHName = "SceneHSpace";
+    static final String mSpaceJName = "SceneJSpace";
     static final String mnSpaceName = "PieMenu Space";
     static final String ovSpaceName = "Overlay Space";
     static final String menuSpaceName = "Menu Space";
@@ -132,16 +133,17 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     static final int LAYER_SCENE = 0;
     static final int LAYER_SCENE_KS = 1;
     static final int LAYER_SCENE_H = 2;
-    static final int LAYER_PIEMENU = 3;
-    static final int LAYER_OVERLAY = 4;
-    static final int LAYER_MENU = 5;
+    static final int LAYER_SCENE_J = 3;
+    static final int LAYER_PIEMENU = 4;
+    static final int LAYER_OVERLAY = 5;
+    static final int LAYER_MENU = 6;
     
 
     VirtualSpace mSpace, ovSpace;
-    VirtualSpace mSpaceKs, mSpaceH;
+    VirtualSpace mSpaceKs, mSpaceH, mSpaceJ;
     VirtualSpace menuSpace;
     Camera mCamera;
-    Camera mCameraKs, mCameraH;
+    Camera mCameraKs, mCameraH, mCameraJ;
     Camera menuCamera;
     String mCameraAltStr = Messages.ALTITUDE + "0";
     String levelStr = Messages.LEVEL + "0";
@@ -167,8 +169,8 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 		ovm = new FitsOverlayManager(this);
 		//initGUI(fullscreen, opengl, antialiased);
 		initGUI(options);
-        VirtualSpace[]  sceneSpaces = {mSpace, mSpaceKs, mSpaceH};
-        Camera[] sceneCameras = {mCamera, mCameraKs, mCameraH};
+        VirtualSpace[]  sceneSpaces = {mSpace, mSpaceKs, mSpaceH, mSpaceJ};
+        Camera[] sceneCameras = {mCamera, mCameraKs, mCameraH, mCameraJ};
         sm = new SceneManager(sceneSpaces, sceneCameras);
         sm.setRegionListener(this);
         sm.setLevelListener(this);
@@ -205,6 +207,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 
         mSpaceKs = vsm.addVirtualSpace(mSpaceKsName);
         mSpaceH = vsm.addVirtualSpace(mSpaceHName);
+        mSpaceJ = vsm.addVirtualSpace(mSpaceJName);
 
         VirtualSpace mnSpace = vsm.addVirtualSpace(mnSpaceName);
 
@@ -212,8 +215,10 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 
         mCameraKs = mSpaceKs.addCamera();
         mCameraH = mSpaceH.addCamera();
+        mCameraJ = mSpaceJ.addCamera();
         mCamera.stick(mCameraKs);
 		mCamera.stick(mCameraH);
+        mCamera.stick(mCameraJ);
 
 		mnSpace.addCamera().setAltitude(10);
 
@@ -228,6 +233,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         cameras.add(mCamera);
         cameras.add(mCameraKs);
         cameras.add(mCameraH);
+        cameras.add(mCameraJ);
 
 		cameras.add(vsm.getVirtualSpace(mnSpaceName).getCamera(0));
 		cameras.add(vsm.getVirtualSpace(ovSpaceName).getCamera(0));
