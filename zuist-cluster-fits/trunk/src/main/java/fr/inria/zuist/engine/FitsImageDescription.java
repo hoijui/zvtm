@@ -71,7 +71,7 @@ public class FitsImageDescription extends ResourceDescription {
 
         isVisible = true;
 
-        layerIndex = getParentRegion().getLayerIndex();
+        layerIndex = parentRegion.getLayerIndex();
 
     }
 
@@ -94,7 +94,7 @@ public class FitsImageDescription extends ResourceDescription {
 
         isVisible = true;
 
-        layerIndex = getParentRegion().getLayerIndex();
+        layerIndex = parentRegion.getLayerIndex();
 
     }
 
