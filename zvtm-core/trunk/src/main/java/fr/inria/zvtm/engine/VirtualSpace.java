@@ -321,7 +321,7 @@ public class VirtualSpace {
             if (g.stickedTo!=null){
                 if (g.stickedTo instanceof Glyph){((Glyph)g.stickedTo).unstick(g);}
                 else if (g.stickedTo instanceof Camera){((Camera)g.stickedTo).unstick(g);}
-                else {((VCursor)g.stickedTo).unstickSpecificGlyph(g);}
+                else {((VCursor)g.stickedTo).unstickGlyph(g);}
             }
             for (int i=0;i<camera2drawnList.length;i++){
                 if (camera2drawnList[i]!=null){

@@ -4,7 +4,7 @@
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2000-2002. All Rights Reserved
  *   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2011. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2014. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -203,8 +203,8 @@ public class VCursor {
     /** Get the number of glyphs sticked to the cursor. */
     public int getStickedGlyphsNumber(){return stickedGlyphs.length;}
 
-    /** Detach glyph from cursor. */
-    void unstickSpecificGlyph(Glyph g){
+    /** Unstick glyph from cursor. */
+    public void unstickGlyph(Glyph g){
         for (int i=0;i<stickedGlyphs.length;i++){
             if (stickedGlyphs[i] == g){
                 g.stickedTo = null;
