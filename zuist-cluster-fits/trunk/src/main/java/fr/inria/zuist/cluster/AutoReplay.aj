@@ -34,7 +34,16 @@ aspect AutoReplay extends AbstractAutoReplay {
          execution(public void Region.setContainingRegion(Region)) ||
          execution(public void Region.addContainedRegion(Region)) ||
          execution(public void FitsImageDescription.setScaleMethod(FitsImage.ScaleMethod)) ||
-         execution(public void FitsImageDescription.setColorFilter(FitsImage.ColorFilter))
+         execution(public void FitsImageDescription.setColorFilter(FitsImage.ColorFilter)) ||
+         execution(public VirtualSpace FitsImageDescription.getVirtualSpace()) ||
+         execution(public void FitsImageDescription.setRescaleGlobal(double, double)) ||
+         execution(public void FitsImageDescription.setRescaleGlobal(boolean)) || 
+         execution(public void FitsImageDescription.rescale(double, double, double)) ||
+         execution(public void FitsImageDescription.rescaleGlobal()) ||
+         execution(public void FitsImageDescription.rescaleLocal()) ||
+         execution(public double[] FitsImageDescription.getLocalScaleParams()) ||
+         execution(public void FitsImageDescription.setTranslucency(float)) ||
+         execution(public void FitsImageDescription.setVisible(boolean))
         );
 }
 
