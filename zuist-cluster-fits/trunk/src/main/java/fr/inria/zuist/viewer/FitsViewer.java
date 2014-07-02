@@ -419,12 +419,10 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         }
     }
 
-    public void hideLayer(VirtualSpace vs){
+    public void hideLayer(int layerIndex){
         for(ObjectDescription desc: sm.getObjectDescriptions()){
             if(desc instanceof FitsImageDescription){
-                if( ((FitsImageDescription)desc).getVirtualSpace() == vs){
-                    Glyph g = ((FitsImageDescription)desc).getGlyph();
-                    if(g != null) vs.hide(g);
+                if( ((FitsImageDescription)desc).getLayerIndex() == layerIndex){
                     ((FitsImageDescription)desc).setVisible(false);
                 }
             }
@@ -434,12 +432,10 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         }*/
     }
 
-    public void showLayer(VirtualSpace vs, float alpha){
+    public void showLayer(int layerIndex, float alpha){
         for(ObjectDescription desc: sm.getObjectDescriptions()){
             if(desc instanceof FitsImageDescription){
-                if( ((FitsImageDescription)desc).getVirtualSpace() == vs){
-                    Glyph g = ((FitsImageDescription)desc).getGlyph();
-                    if(g != null) vs.show(g);
+                if( ((FitsImageDescription)desc).getLayerIndex() == layerIndex){
                     ((FitsImageDescription)desc).setVisible(true);
                     ((FitsImageDescription)desc).setTranslucencyValue(alpha);
                 }

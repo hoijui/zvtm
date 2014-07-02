@@ -76,7 +76,7 @@ CMD_LINE_HELP = "ZUIST Image Tiling Script\n\nUsage:\n\n" + \
     "\t-dy=x\t\ty offset for all regions and objects\n"+\
     "\t-dl=l\t\tlevel offset for all regions and objects\n"+\
     "\t-scale=s\ts scale factor w.r.t default size for PDF input\n"+\
-    "\t-layer=l\t\tname layer from the zuist"
+    "\t-layer=name\t\tname layer from the zuist"
 
 TRACE_LEVEL = 1
 
@@ -105,7 +105,7 @@ DY = 0
 # level offset
 DL = 0
 
-LAYER = "Scene Space"
+LAYER = None
 
 ID_PREFIX = ""
 
@@ -293,7 +293,8 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
     regionEL.set("y", str(int(DY-y-ah/2)))
     regionEL.set("w", str(int(aw)))
     regionEL.set("h", str(int(ah)))
-    regionEL.set("layer", str(LAYER))
+    if LAYER:
+        regionEL.set("layer", str(LAYER))
     objectEL.set("id", "I%s-%s" % (ID_PREFIX, tileIDstr))
     if USE_ASTROPY:
         objectEL.set("type", "fits")
@@ -377,7 +378,6 @@ def processSrcImg():
                 log("Naxis == %d" % (hdulist[0].header['NAXIS']) )
                 return
 
-            
 
             OUTPUT_FILE_EXT = "fits"
         else:

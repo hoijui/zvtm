@@ -53,7 +53,7 @@ public class FitsImageDescription extends ResourceDescription {
 
     private FitsImage glyph; //the actual FITS image
 
-    private VirtualSpace vs;
+    private int layerIndex;
 
     public FitsImageDescription(String id, double x, double y, int z, URL src,
             Region parentRegion,
@@ -70,6 +70,8 @@ public class FitsImageDescription extends ResourceDescription {
         this.colorFilter = colorFilter;
 
         isVisible = true;
+
+        layerIndex = getParentRegion().getLayerIndex();
 
     }
 
@@ -92,10 +94,12 @@ public class FitsImageDescription extends ResourceDescription {
 
         isVisible = true;
 
+        layerIndex = getParentRegion().getLayerIndex();
+
     }
 
-    public VirtualSpace getVirtualSpace(){
-        return vs;
+    public int getLayerIndex(){
+        return layerIndex;
     }
 
     public String getType(){
@@ -149,9 +153,7 @@ public class FitsImageDescription extends ResourceDescription {
 
     //public void createObject(final VirtualSpace vs, final boolean fadeIn){
     public void createObject(final SceneManager sm, final VirtualSpace vs, final boolean fadeIn){
-        if(this.vs == null) this.vs = vs;
        
-
         System.out.println("createObject");
         try{
             //if(isRescaleGlobal) glyph = new FitsImage(vx,vy,zindex,src,scaleFactor,gmin, gmax);
@@ -184,12 +186,11 @@ public class FitsImageDescription extends ResourceDescription {
         System.out.println(glyph);
 
         vs.addGlyph(glyph,false);
-        
 
     }
 
     public void destroyObject(final SceneManager sm, final VirtualSpace vs, boolean fadeOut){
-        System.out.println("destroyObject");
+        //System.out.println("destroyObject");
         if(glyph != null) vs.removeGlyph(glyph);
         glyph = null;
     }
@@ -220,7 +221,6 @@ public class FitsImageDescription extends ResourceDescription {
     }
 
     public void setVisible(boolean visible){
-        System.out.println("setVisible(" + visible + ")");
         this.isVisible = visible;
         if(glyph != null) glyph.setVisible(visible);
     }

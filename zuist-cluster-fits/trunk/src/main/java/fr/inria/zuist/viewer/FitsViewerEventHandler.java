@@ -249,11 +249,11 @@ class FitsViewerEventHandler implements ViewListener, ComponentListener, CameraL
     	else if (code==KeyEvent.VK_RIGHT){application.translateView(FitsViewer.MOVE_RIGHT);}
         else if (code==KeyEvent.VK_L){ application.rescaleGlobal(false);}
         else if (code==KeyEvent.VK_G){ application.rescaleGlobal(true);}
-        else if (code==KeyEvent.VK_1){ application.hideLayer(application.mSpaceJ); application.hideLayer(application.mSpaceH); application.showLayer(application.mSpaceKs, 1f);}
-        else if (code==KeyEvent.VK_2){ application.hideLayer(application.mSpaceJ); application.showLayer(application.mSpaceH, 0.8f);application.showLayer(application.mSpaceKs, 0.8f);}
-        else if (code==KeyEvent.VK_3){ application.hideLayer(application.mSpaceJ); application.hideLayer(application.mSpaceKs); application.showLayer(application.mSpaceH, 1f);}
-        else if (code==KeyEvent.VK_4){ application.hideLayer(application.mSpaceKs); application.showLayer(application.mSpaceH, 0.8f);application.showLayer(application.mSpaceJ, 0.8f);}
-        else if (code==KeyEvent.VK_5){ application.hideLayer(application.mSpaceKs); application.hideLayer(application.mSpaceH); application.showLayer(application.mSpaceJ, 1f);}
+        else if (code==KeyEvent.VK_1){ application.hideLayer(application.LAYER_SCENE_J); application.hideLayer(application.LAYER_SCENE_H); application.showLayer(application.LAYER_SCENE_KS, 1f);}
+        else if (code==KeyEvent.VK_2){ application.hideLayer(application.LAYER_SCENE_J); application.showLayer(application.LAYER_SCENE_H, 0.8f);application.showLayer(application.LAYER_SCENE_KS, 0.8f);}
+        else if (code==KeyEvent.VK_3){ application.hideLayer(application.LAYER_SCENE_J); application.hideLayer(application.LAYER_SCENE_KS); application.showLayer(application.LAYER_SCENE_H, 1f);}
+        else if (code==KeyEvent.VK_4){ application.hideLayer(application.LAYER_SCENE_KS); application.showLayer(application.LAYER_SCENE_H, 0.8f);application.showLayer(application.LAYER_SCENE_J, 0.8f);}
+        else if (code==KeyEvent.VK_5){ application.hideLayer(application.LAYER_SCENE_KS); application.hideLayer(application.LAYER_SCENE_H); application.showLayer(application.LAYER_SCENE_J, 1f);}
     	else if (code==KeyEvent.VK_N){
             System.out.println("toggleNavMode()");
             toggleNavMode();}
