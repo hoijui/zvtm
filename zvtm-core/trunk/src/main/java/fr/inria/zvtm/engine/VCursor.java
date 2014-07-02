@@ -116,12 +116,12 @@ public class VCursor {
 
     /** Set cursor size (crosshair length). */
     public void setSize(int s){
-	    this.size = s;
+        this.size = s;
     }
 
     /** Get cursor size (crosshair length).*/
     public int getSize(){
-	    return size;
+        return size;
     }
 
     /** Get the cursor's location in virtual space (for active layer/camera). */
@@ -132,7 +132,7 @@ public class VCursor {
 
     /** Set whether this ZVTM cursor is synchronized with the system cursor or not. */
     public void setSync(boolean b){
-	    sync = b;
+        sync = b;
     }
 
     /** Tells whether this ZVTM cursor is synchronized with the system cursor or not. */
@@ -142,12 +142,12 @@ public class VCursor {
 
     /** Set cursor color. */
     public void setColor(Color c){
-	    this.color = c;
+        this.color = c;
     }
 
     /** Set color of elements associated with cursor (drag segment, selection rectangle, etc.). */
     public void setHintColor(Color c){
-	    this.hcolor = c;
+        this.hcolor = c;
     }
 
     /** Move mouse cursor (JPanel coordinates).
@@ -170,35 +170,35 @@ public class VCursor {
     }
 
     /** Attach glyph g to cursor. */
-	public void stickGlyph(Glyph g){
-		if (g==null){return;}
-		//make it unsensitive (was automatically disabled when glyph was sticked to mouse)
-		//because false enter/exit events can be generated when moving the mouse too fast
-		//in small glyphs   (I did not find a way to correct this bug yet)
-		g.setSensitivity(false);
-		Glyph[] newStickList = new Glyph[stickedGlyphs.length + 1];
-		System.arraycopy(stickedGlyphs, 0, newStickList, 0, stickedGlyphs.length);
-		newStickList[stickedGlyphs.length] = g;
-		stickedGlyphs = newStickList;
-		g.stickedTo = this;
-	}
+    public void stickGlyph(Glyph g){
+        if (g==null){return;}
+        //make it unsensitive (was automatically disabled when glyph was sticked to mouse)
+        //because false enter/exit events can be generated when moving the mouse too fast
+        //in small glyphs   (I did not find a way to correct this bug yet)
+        g.setSensitivity(false);
+        Glyph[] newStickList = new Glyph[stickedGlyphs.length + 1];
+        System.arraycopy(stickedGlyphs, 0, newStickList, 0, stickedGlyphs.length);
+        newStickList[stickedGlyphs.length] = g;
+        stickedGlyphs = newStickList;
+        g.stickedTo = this;
+    }
 
     /** Unstick glyph that was last sticked to mouse.
      * The glyph is automatically made sensitive to mouse events.
      * The number of glyphs sticked to the mouse can be obtained by calling VCursor.getStickedGlyphsNumber().
      */
-	public Glyph unstickLastGlyph(){
-		if (stickedGlyphs.length>0){
-			Glyph g = stickedGlyphs[stickedGlyphs.length - 1];
-			g.setSensitivity(true);  //make it sensitive again (was automatically disabled when glyph was sticked to mouse)
-			g.stickedTo = null;
-			Glyph[] newStickList = new Glyph[stickedGlyphs.length - 1];
-			System.arraycopy(stickedGlyphs, 0, newStickList, 0, stickedGlyphs.length - 1);
-			stickedGlyphs = newStickList;
-			return g;
-		}
-		return null;
-	}
+    public Glyph unstickLastGlyph(){
+        if (stickedGlyphs.length>0){
+            Glyph g = stickedGlyphs[stickedGlyphs.length - 1];
+            g.setSensitivity(true);  //make it sensitive again (was automatically disabled when glyph was sticked to mouse)
+            g.stickedTo = null;
+            Glyph[] newStickList = new Glyph[stickedGlyphs.length - 1];
+            System.arraycopy(stickedGlyphs, 0, newStickList, 0, stickedGlyphs.length - 1);
+            stickedGlyphs = newStickList;
+            return g;
+        }
+        return null;
+    }
 
     /** Get the number of glyphs sticked to the cursor. */
     public int getStickedGlyphsNumber(){return stickedGlyphs.length;}
@@ -221,17 +221,17 @@ public class VCursor {
      *@return the actual list, not a copy.
      */
     public Glyph[] getStickedGlyphArray(){
-	    return stickedGlyphs;
+        return stickedGlyphs;
     }
 
     /** Should the cursor glyph be drawn or not. */
     public void setVisibility(boolean b){
-	    isVisible = b;
+        isVisible = b;
     }
 
     /** Enable/disable entry/exit of cursor into/from glyphs. */
     public void setSensitivity(boolean b){
-	    sensit = b;
+        sensit = b;
     }
 
     /** Tells whether entry/exit of cursor into/from glyphs is enabled or disabled. */
@@ -297,22 +297,22 @@ public class VCursor {
 
     /** Get the cursor's x-coordinate in JPanel coordinates system. */
     public int getPanelXCoordinate(){
-	    return jpx;
+        return jpx;
     }
 
     /** Get the cursor's y-coordinate in JPanel coordinates system. */
     public int getPanelYCoordinate(){
-	    return jpy;
+        return jpy;
     }
 
     /** Get the cursor's x-coordinate in virtual space coordinates system. */
     public double getVSXCoordinate(){
-	    return vx;
+        return vx;
     }
 
     /** Get the cursor's y-coordinate in virtual space coordinates system. */
     public double getVSYCoordinate(){
-	    return vy;
+        return vy;
     }
 
     /** Draw cursor crosshair. */
@@ -322,16 +322,16 @@ public class VCursor {
             g.drawLine(jpx-size,jpy,jpx+size,jpy);
             g.drawLine(jpx,jpy-size,jpx,jpy+size);
         }
-		if (dynaPicker.dynaSpotActivated && dynaPicker.showDynarea){
-			g.setColor(dynaPicker.DYNASPOT_COLOR);
-			switch(dynaPicker.dynaSpotVisibility){
-				case DynaPicker.DYNASPOT_VISIBILITY_VISIBLE:{g.setComposite(dynaPicker.dsST);break;}
-				case DynaPicker.DYNASPOT_VISIBILITY_FADEIN:{g.setComposite(Translucency.acs[(int)Math.round((1-dynaPicker.opacity) * dynaPicker.DYNASPOT_MAX_TRANSLUCENCY * Translucency.ACS_ACCURACY)]);break;}
-				case DynaPicker.DYNASPOT_VISIBILITY_FADEOUT:{g.setComposite(Translucency.acs[(int)Math.round(dynaPicker.opacity * dynaPicker.DYNASPOT_MAX_TRANSLUCENCY * Translucency.ACS_ACCURACY)]);break;}
-			}
-			g.fillOval(jpx-dynaPicker.dynaSpotRadius, jpy-dynaPicker.dynaSpotRadius, 2*dynaPicker.dynaSpotRadius, 2*dynaPicker.dynaSpotRadius);
-			g.setComposite(Translucent.acO);
-		}
-	}
+        if (dynaPicker.dynaSpotActivated && dynaPicker.showDynarea){
+            g.setColor(dynaPicker.DYNASPOT_COLOR);
+            switch(dynaPicker.dynaSpotVisibility){
+                case DynaPicker.DYNASPOT_VISIBILITY_VISIBLE:{g.setComposite(dynaPicker.dsST);break;}
+                case DynaPicker.DYNASPOT_VISIBILITY_FADEIN:{g.setComposite(Translucency.acs[(int)Math.round((1-dynaPicker.opacity) * dynaPicker.DYNASPOT_MAX_TRANSLUCENCY * Translucency.ACS_ACCURACY)]);break;}
+                case DynaPicker.DYNASPOT_VISIBILITY_FADEOUT:{g.setComposite(Translucency.acs[(int)Math.round(dynaPicker.opacity * dynaPicker.DYNASPOT_MAX_TRANSLUCENCY * Translucency.ACS_ACCURACY)]);break;}
+            }
+            g.fillOval(jpx-dynaPicker.dynaSpotRadius, jpy-dynaPicker.dynaSpotRadius, 2*dynaPicker.dynaSpotRadius, 2*dynaPicker.dynaSpotRadius);
+            g.setComposite(Translucent.acO);
+        }
+    }
 
 }

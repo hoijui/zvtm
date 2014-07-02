@@ -144,13 +144,13 @@ public class VirtualSpace {
         }
     }
 
-	/** Destroy this virtual space.*/
-	protected void destroy(){
-		for (int i=0;i<cm.cameraList.length;i++){
-			this.removeCamera(i);
-		}
-		removeAllGlyphs(false);
-	}
+    /** Destroy this virtual space.*/
+    protected void destroy(){
+        for (int i=0;i<cm.cameraList.length;i++){
+            this.removeCamera(i);
+        }
+        removeAllGlyphs(false);
+    }
 
     /** Add glyph g to this virtual space. */
     public void addGlyph(Glyph g, boolean initColors, boolean repaint){
@@ -184,50 +184,50 @@ public class VirtualSpace {
      * glyphs with lower indices in the list will be added first in the virtual space and will consequently be lower in the drawing stack.
      *@param repaint pass false if views should not be repainted as a consequence of this addition (default is true).
      */
-	public void addGlyphs(Glyph[] glyphs, boolean repaint){
-		for(Glyph glyph: glyphs){
-			glyph.initCams(cm.cameraList.length);
-			visualEnts.add(glyph);
-		}
-		addGlyphsToDrawingList(glyphs);
-		if (repaint){VirtualSpaceManager.INSTANCE.repaint();}
-	}
+    public void addGlyphs(Glyph[] glyphs, boolean repaint){
+        for(Glyph glyph: glyphs){
+            glyph.initCams(cm.cameraList.length);
+            visualEnts.add(glyph);
+        }
+        addGlyphsToDrawingList(glyphs);
+        if (repaint){VirtualSpaceManager.INSTANCE.repaint();}
+    }
 
     /** Add a list of glyphs to this virtual space.
      * glyphs with lower indices in the list will be added first in the virtual space and will consequently be lower in the drawing stack.
      */
-	public void addGlyphs(Glyph[] glyphs){
-		addGlyphs(glyphs, true);
-	}
+    public void addGlyphs(Glyph[] glyphs){
+        addGlyphs(glyphs, true);
+    }
 
     /** Get all glyphs in this virtual space, visible or not, sensitive or not.
      * IMPORTANT: Read-only. Do not temper with this data structure unless you know what you are doing.
      * It is highly recommended to clone it if you want to add/remove elements from it for your own purposes.
      */
     public Vector<Glyph> getAllGlyphs(){
-	    return visualEnts;
+        return visualEnts;
     }
 
     /** Tests whether a glyph belongs to this virtual space or not.
      */
-	public boolean contains(Glyph g){
-		return visualEnts.contains(g);
-	}
+    public boolean contains(Glyph g){
+        return visualEnts.contains(g);
+    }
 
     /** Get all visible glyphs (not cloned).
      *@see #getVisibleGlyphsList()
      */
-	public Glyph[] getDrawingList(){
-		return drawingList;
-	}
+    public Glyph[] getDrawingList(){
+        return drawingList;
+    }
 
     /** Get all visible glyphs (clone).
      *@see #getDrawingList()
      */
     public Glyph[] getVisibleGlyphsList(){
-		Glyph[] res = new Glyph[drawingList.length];
-		System.arraycopy(drawingList, 0, res, 0, drawingList.length);
-		return res;
+        Glyph[] res = new Glyph[drawingList.length];
+        System.arraycopy(drawingList, 0, res, 0, drawingList.length);
+        return res;
     }
 
     /**
@@ -405,45 +405,45 @@ public class VirtualSpace {
      * g will be drawn after every other glyph that has z-index z, but before any glyph that has a z-index higher than z (if any).
      *@param z the considered z-index
      */
-	public void onTop(Glyph g, int z){
-		if (glyphIndexInDrawingList(g) != -1){
+    public void onTop(Glyph g, int z){
+        if (glyphIndexInDrawingList(g) != -1){
             removeGlyphFromDrawingList(g);
-	        // insert at bottom of list if no other glyph has a lower z-index
-	        int insertAt = 0;
-	            // insert glyph in the drawing list so that
-	            // it is the last glyph to be drawn for a given z-index
-	            for (int i=drawingList.length-1;i>=0;i--){
-	                if (drawingList[i].getZindex() <= z){
-	                    insertAt = i + 1;
-	                    break;
-	                }
-	            }
-	            insertGlyphInDrawingList(g, insertAt);
+            // insert at bottom of list if no other glyph has a lower z-index
+            int insertAt = 0;
+                // insert glyph in the drawing list so that
+                // it is the last glyph to be drawn for a given z-index
+                for (int i=drawingList.length-1;i>=0;i--){
+                    if (drawingList[i].getZindex() <= z){
+                        insertAt = i + 1;
+                        break;
+                    }
+                }
+                insertGlyphInDrawingList(g, insertAt);
             g.setZindex(z);
         }
-	}
+    }
 
     /** Put this glyph before the first glyph that has z-index z, but after any glyph that has a z-index lower than z (if any).
      * g will be drawn before every other glyph that has z-index z, but after any glyph that has a z-index lower than z (if any).
      *@param z the considered z-index
      */
-	public void atBottom(Glyph g, int z){
-		if (glyphIndexInDrawingList(g) != -1){
+    public void atBottom(Glyph g, int z){
+        if (glyphIndexInDrawingList(g) != -1){
             removeGlyphFromDrawingList(g);
-	        // insert at bottom of list if no other glyph has a lower z-index
-	        int insertAt = 0;
-	            // insert glyph in the drawing list so that
-	            // it is the last glyph to be drawn for a given z-index
-	            for (int i=0;i<drawingList.length;i++){
-	                if (drawingList[i].getZindex() > z){
-	                    insertAt = i;
-	                    break;
-	                }
-	            }
-	            insertGlyphInDrawingList(g, insertAt);
+            // insert at bottom of list if no other glyph has a lower z-index
+            int insertAt = 0;
+                // insert glyph in the drawing list so that
+                // it is the last glyph to be drawn for a given z-index
+                for (int i=0;i<drawingList.length;i++){
+                    if (drawingList[i].getZindex() > z){
+                        insertAt = i;
+                        break;
+                    }
+                }
+                insertGlyphInDrawingList(g, insertAt);
             g.setZindex(z);
         }
-	}
+    }
 
     /** Put glyph g1 just above glyph g2 in the drawing list (g1 painted after g2).
         * Important: this might affect the g1's z-index.
@@ -462,7 +462,7 @@ public class VirtualSpace {
         * Important: this might affect the g1's z-index.
         */
     public void below(Glyph g1, Glyph g2){
-	    if (g1 == g2) return;
+        if (g1 == g2) return;
         if ((glyphIndexInDrawingList(g1) != -1) && (glyphIndexInDrawingList(g2) != -1)){
             removeGlyphFromDrawingList(g1);
             int i = glyphIndexInDrawingList(g2);
@@ -503,66 +503,66 @@ public class VirtualSpace {
      *@param res array which will contain the result
      *@return boundaries in VirtualSpace coordinates {west,north,east,south}
      */
-	public double[] findFarmostGlyphCoords(double[] res){
-		return findFarmostGlyphCoords(getVisibleGlyphsList(), res);
-	}
+    public double[] findFarmostGlyphCoords(double[] res){
+        return findFarmostGlyphCoords(getVisibleGlyphsList(), res);
+    }
 
     /** Get the bounding box of a set of glyphs visible in this virtual space.
      *@param gl list of glyphs to iterate upon (will typically be a subset of all glyphs in the virtual space)
      *@param res array which will contain the result
      *@return boundaries in VirtualSpace coordinates {west,north,east,south}
      */
-	public double[] findFarmostGlyphCoords(Glyph[] gl, double[] res){
-		if (gl.length > 0){
-			RectangularShape rs;
-			double size;
-			//init result with first glyph found
-			if (gl[0] instanceof RectangularShape){
-				rs = (RectangularShape)gl[0];
-				res[0] = gl[0].vx - rs.getWidth()/2d;
-				res[1] = gl[0].vy + rs.getHeight()/2d;
-				res[2] = gl[0].vx + rs.getWidth()/2d;
-				res[3] = gl[0].vy - rs.getHeight()/2d;
-			}
-			else {
-				size = gl[0].getSize() / 2d;
-				res[0] = gl[0].vx - size;
-				res[1] = gl[0].vy + size;
-				res[2] = gl[0].vx + size;
-				res[3] = gl[0].vy - size;
-			}
-			double tmp;
-			for (int i=1;i<gl.length;i++){
-				if (gl[i] instanceof RectangularShape){
-					rs = (RectangularShape)gl[i];
-					tmp = gl[i].vx - rs.getWidth()/2d;if (tmp<res[0]){res[0] = tmp;}
-					tmp = gl[i].vy + rs.getHeight()/2d;if (tmp>res[1]){res[1] = tmp;}
-					tmp = gl[i].vx + rs.getWidth()/2d;if (tmp>res[2]){res[2] = tmp;}
-					tmp = gl[i].vy - rs.getHeight()/2d;if (tmp<res[3]){res[3] = tmp;}
-				}
-				else {
-					size = gl[i].getSize() / 2d;
-					tmp = gl[i].vx - size;if (tmp<res[0]){res[0] = tmp;}
-					tmp = gl[i].vy + size;if (tmp>res[1]){res[1] = tmp;}
-					tmp = gl[i].vx + size;if (tmp>res[2]){res[2] = tmp;}
-					tmp = gl[i].vy - size;if (tmp<res[3]){res[3] = tmp;}
-				}
-			}
-			return res;
-		}
-		else {
-			Arrays.fill(res, 0);
-			return res;
-		}
-	}
+    public double[] findFarmostGlyphCoords(Glyph[] gl, double[] res){
+        if (gl.length > 0){
+            RectangularShape rs;
+            double size;
+            //init result with first glyph found
+            if (gl[0] instanceof RectangularShape){
+                rs = (RectangularShape)gl[0];
+                res[0] = gl[0].vx - rs.getWidth()/2d;
+                res[1] = gl[0].vy + rs.getHeight()/2d;
+                res[2] = gl[0].vx + rs.getWidth()/2d;
+                res[3] = gl[0].vy - rs.getHeight()/2d;
+            }
+            else {
+                size = gl[0].getSize() / 2d;
+                res[0] = gl[0].vx - size;
+                res[1] = gl[0].vy + size;
+                res[2] = gl[0].vx + size;
+                res[3] = gl[0].vy - size;
+            }
+            double tmp;
+            for (int i=1;i<gl.length;i++){
+                if (gl[i] instanceof RectangularShape){
+                    rs = (RectangularShape)gl[i];
+                    tmp = gl[i].vx - rs.getWidth()/2d;if (tmp<res[0]){res[0] = tmp;}
+                    tmp = gl[i].vy + rs.getHeight()/2d;if (tmp>res[1]){res[1] = tmp;}
+                    tmp = gl[i].vx + rs.getWidth()/2d;if (tmp>res[2]){res[2] = tmp;}
+                    tmp = gl[i].vy - rs.getHeight()/2d;if (tmp<res[3]){res[3] = tmp;}
+                }
+                else {
+                    size = gl[i].getSize() / 2d;
+                    tmp = gl[i].vx - size;if (tmp<res[0]){res[0] = tmp;}
+                    tmp = gl[i].vy + size;if (tmp>res[1]){res[1] = tmp;}
+                    tmp = gl[i].vx + size;if (tmp>res[2]){res[2] = tmp;}
+                    tmp = gl[i].vy - size;if (tmp<res[3]){res[3] = tmp;}
+                }
+            }
+            return res;
+        }
+        else {
+            Arrays.fill(res, 0);
+            return res;
+        }
+    }
 
-	Vector<Picker> externalPickers = new Vector(0);
+    Vector<Picker> externalPickers = new Vector(0);
 
-	/** Register an external picker with this view.
-	 *  The picker is said to be <em>external</em> because it is not associated with a VCursor.
-	 *@return true if the picker was not already registered with this view, false if it was.
-	 */
-	public boolean registerPicker(Picker p){
+    /** Register an external picker with this view.
+     *  The picker is said to be <em>external</em> because it is not associated with a VCursor.
+     *@return true if the picker was not already registered with this view, false if it was.
+     */
+    public boolean registerPicker(Picker p){
         if (!externalPickers.contains(p)){
             externalPickers.add(p);
             return true;
@@ -570,15 +570,15 @@ public class VirtualSpace {
         else {
             return false;
         }
-	}
+    }
 
-	/** Unregister an external picker from this view.
-	 *  The picker is said to be <em>external</em> because it is not associated with a VCursor.
-	 *@return true if the picker was registered with this view and did get unregistered, false if it was not.
-	 */
-	public boolean unregisterPicker(Picker p){
-	    return externalPickers.remove(p);
-	}
+    /** Unregister an external picker from this view.
+     *  The picker is said to be <em>external</em> because it is not associated with a VCursor.
+     *@return true if the picker was registered with this view and did get unregistered, false if it was not.
+     */
+    public boolean unregisterPicker(Picker p){
+        return externalPickers.remove(p);
+    }
 
     protected synchronized void addGlyphToDrawingList(Glyph g){
         int zindex = g.getZindex();
