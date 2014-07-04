@@ -39,6 +39,17 @@ import java.util.Arrays;
 
 public class DPath<T> extends Glyph implements RectangularShape {
 
+    /** Draw the general path that gets compiled each time we make a change to the DPath (default).
+     * A side effect of this method is that the stroke set, if any, is sensitive to zooming.
+     */
+    public static final short DRAW_GENERAL_PATH = 0;
+    /** Iterate on the path's components (each line, quad curve, cubic curve) and draw them step by step.
+      * A side effect of this method is that the stroke set, if any, is not sensitive to zooming.
+      */
+    public static final short DRAW_SUBPATHS = 1;
+
+    short drawingMethod = DRAW_GENERAL_PATH;
+
     static final short MOV = 0;
     static final short SEG = 1;
     static final short QDC = 2;
@@ -71,14 +82,14 @@ public class DPath<T> extends Glyph implements RectangularShape {
         this(0, 0, 0, Color.BLACK);
     }
 
-    /**
+    /** Drawing method: DRAW_GENERAL_PATH.
      *@param z z-index (pass 0 if you do not use z-ordering)
      */
     public DPath(int z){
         this(0, 0, z, Color.BLACK);
     }
 
-    /**
+    /** Drawing method: DRAW_GENERAL_PATH.
         *@param x start coordinate in virtual space
         *@param y start coordinate in virtual space
         *@param z z-index (pass 0 if you do not use z-ordering)
@@ -88,7 +99,7 @@ public class DPath<T> extends Glyph implements RectangularShape {
         this(x, y, z, c, 1.0f);
     }
 
-    /**
+    /** Drawing method: DRAW_GENERAL_PATH.
         *@param x start coordinate in virtual space
         *@param y start coordinate in virtual space
         *@param z z-index (pass 0 if you do not use z-ordering)
@@ -96,6 +107,24 @@ public class DPath<T> extends Glyph implements RectangularShape {
         *@param alpha alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
         */
     public DPath(double x, double y, int z, Color c, float alpha){
+        this(x, y, z, c, alpha, DRAW_GENERAL_PATH);
+    }
+
+    /**
+        *@param x start coordinate in virtual space
+        *@param y start coordinate in virtual space
+        *@param z z-index (pass 0 if you do not use z-ordering)
+        *@param c color
+        *@param alpha alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
+        *@param m method to draw this glyph.
+        *  <ul>
+        *    <li> DRAW_GENERAL_PATH will draw the general path that gets compiled each time we make a change to the DPath (default).
+                  A side effect of this method is that the stroke set, if any, is sensitive to zooming.</li>
+        *    <li> DRAW_SUBPATHS will iterate on the path's components (each line, quad curve, cubic curve) and draw them step by step.
+                  A side effect of this method is that the stroke set, if any, is not sensitive to zooming.</li>
+        *  </ul>
+        */
+    public DPath(double x, double y, int z, Color c, float alpha, short m){
         spx = x;
         spy = y;
         vz = z;
@@ -110,7 +139,7 @@ public class DPath<T> extends Glyph implements RectangularShape {
         setTranslucencyValue(alpha);
     }
 
-    /**
+    /** Drawing method: DRAW_GENERAL_PATH.
      *@param pi PathIterator describing this path (virtual space coordinates)
      *@param z z-index (pass 0 if you do not use z-ordering)
      *@param c color
@@ -119,7 +148,7 @@ public class DPath<T> extends Glyph implements RectangularShape {
         this(pi, z, c, 1.0f);
     }
 
-    /**
+    /** Drawing method: DRAW_GENERAL_PATH.
      *@param pi PathIterator describing this path (virtual space coordinates)
      *@param z z-index (pass 0 if you do not use z-ordering)
      *@param c color
@@ -497,17 +526,6 @@ public class DPath<T> extends Glyph implements RectangularShape {
             elements[j].projectForLens(i, lhw, lhh, lensx, lensy, coef, elements[j-1].getlX(i), elements[j-1].getlY(i));
         }
     }
-
-    /** Draw the general path that gets compiled each time we make a change to the DPath (default).
-     * A side effect of this method is that the stroke set, if any, is sensitive to zooming.
-     */
-    public static final short DRAW_GENERAL_PATH = 0;
-    /** Iterate on the path's components (each line, quad curve, cubic curve) and draw them step by step.
-      * A side effect of this method is that the stroke set, if any, is not sensitive to zooming.
-      */
-    public static final short DRAW_SUBPATHS = 1;
-
-    short drawingMethod = DRAW_GENERAL_PATH;
 
     /** Specify what drawing method to use to paint this path.
      *@param m method to draw this glyph.
