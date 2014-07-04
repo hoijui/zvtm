@@ -494,15 +494,19 @@ public aspect GlyphCreation {
         //note that GeneralPath is only serializable
         //starting with Java 1.6
         protected final GeneralPath path;
+        protected final short drawingMethod;
 
         DPathReplicator(DPath source){
             super(source);
             this.path = source.getJava2DGeneralPath();
+            this.drawingMethod = source.getDrawingMethod();
         }
 
         public Glyph doCreateGlyph(){
-            return new DPath(path.getPathIterator(null),
+            DPath d = new DPath(path.getPathIterator(null),
                     0, Color.BLACK);
+            d.setDrawingMethod(drawingMethod);
+            return d;
         }
     }
 
