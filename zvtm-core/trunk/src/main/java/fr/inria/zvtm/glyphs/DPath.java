@@ -137,6 +137,7 @@ public class DPath<T> extends Glyph implements RectangularShape {
         sensit = true;
         setColor(c);
         setTranslucencyValue(alpha);
+        setDrawingMethod(m);
     }
 
     /** Drawing method: DRAW_GENERAL_PATH.
@@ -538,6 +539,19 @@ public class DPath<T> extends Glyph implements RectangularShape {
      */
     public void setDrawingMethod(short m){
         drawingMethod = m;
+    }
+
+    /** The drawing method employed.
+     *@return
+     *  <ul>
+     *    <li> DRAW_GENERAL_PATH will draw the general path that gets compiled each time we make a change to the DPath (default).
+               A side effect of this method is that the stroke set, if any, is sensitive to zooming.</li>
+     *    <li> DRAW_SUBPATHS will iterate on the path's components (each line, quad curve, cubic curve) and draw them step by step.
+               A side effect of this method is that the stroke set, if any, is not sensitive to zooming.</li>
+     *  </ul>
+     */
+    public short getDrawingMethod(){
+        return drawingMethod;
     }
 
     @Override
