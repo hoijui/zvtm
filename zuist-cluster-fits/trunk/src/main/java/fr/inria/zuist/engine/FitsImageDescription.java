@@ -162,8 +162,7 @@ public class FitsImageDescription extends ResourceDescription {
 
     //public void createObject(final VirtualSpace vs, final boolean fadeIn){
     public void createObject(final SceneManager sm, final VirtualSpace vs, final boolean fadeIn){
-       
-        System.out.println("createObject");
+        //System.out.println("createObject");
         try{
             //if(isRescaleGlobal) glyph = new FitsImage(vx,vy,zindex,src,scaleFactor,gmin, gmax);
             //else glyph = new FitsImage(vx,vy,zindex,src,scaleFactor);
@@ -190,9 +189,9 @@ public class FitsImageDescription extends ResourceDescription {
         if(isRescaleGlobal) glyph.rescale(gmin, gmax, gsigma);
         else glyph.rescale(lmin, lmax, lsigma);
 
-        System.out.println("localmin: " + lmin + " localmax: " + lmax);
-        System.out.println("globalmin: " + gmin + " globalmax: " + gmax);
-        System.out.println(glyph);
+        //System.out.println("localmin: " + lmin + " localmax: " + lmax);
+        //System.out.println("globalmin: " + gmin + " globalmax: " + gmax);
+        //System.out.println(glyph);
 
         vs.addGlyph(glyph,false);
 

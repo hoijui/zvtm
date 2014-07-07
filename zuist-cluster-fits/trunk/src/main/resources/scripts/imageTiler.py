@@ -121,8 +121,9 @@ USE_GRAPHICSMAGICK = False
 USE_ASTROPY = False
 
 WCSDATA = ""
-
-ONLYXML = False
+OBJECT = ""
+HEADER = ""
+SIZE = [0, 0]
 
 ################################################################################
 # Create target directory if it does not exist yet
@@ -238,18 +239,79 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
             data = im[y:y+ah, x:x+aw]
             log(data.shape)
             
-            #minvalue = np.amin(data)
-            #maxvalue = np.amax(data)
-
-            #log("min: %f - max: %f" % (minvalue, maxvalue))
-            
             if scale > 1.:
                 log("Resizing to (%d, %d)" % (aw/scale, ah/scale), 3)
                 resizedata = shrink(data, ah, aw, ah/scale, aw/scale)
                 log(resizedata.shape)
             
 
-            header = WCSDATA.to_header()
+            #header = WCSDATA.to_header()
+            w = wcs.WCS(naxis=2)
+            ra, dec = WCSDATA.wcs_pix2world(x+aw/2, SIZE[1]-y-ah/2, 0)
+            w.wcs.crval = [ra, dec]
+            w.wcs.ctype = WCSDATA.wcs.ctype
+            w.wcs.equinox = WCSDATA.wcs.equinox
+            w.wcs.dateobs = WCSDATA.wcs.dateobs
+            w.wcs.crpix = [aw/2, ah/2]
+            if WCSDATA.wcs.has_cd:
+                cd = WCSDATA.wcs.cd
+                w.wcs.cd = cd*scale
+
+
+            '''
+            # Some pixel coordinates of interest.
+            pixcrd = np.array([[0, 0], [aw/2, ah/2], [aw, ah]], np.float_)
+
+            log("pixcrd")
+            log(pixcrd)
+
+            # Convert pixel coordinates to world coordinates
+            # The second argument is "origin" -- in this case we're declaring we
+            # have 1-based (Fortran-like) coordinates.
+            world = WCSDATA.wcs_pix2world(pixcrd, 1)
+            log("world")
+            log(world)
+
+            # Convert the same coordinates back to pixel coordinates.
+            pixcrd2 = WCSDATA.wcs_world2pix(world, 1)
+            log("pixcrd2")
+            log(pixcrd2)
+
+            # These should be the same as the original pixel coordinates, modulo
+            # some floating-point error.
+            assert np.max(np.abs(pixcrd - pixcrd2)) < 1e-6
+
+            log("error")
+            log( np.abs(pixcrd - pixcrd2) )
+            
+            ra, dec = WCSDATA.wcs_pix2world(x+aw/2, y+ah/2, 0)
+            #ra, dec = WCSDATA.wcs_pix2world(x+aw/2, -y+ah/2, 1)
+            #w.wcs.crval = [ra, dec]
+            w.wcs.crval = world[1]
+            #w.wcs.crval = WCSDATA.wcs.crval
+            w.wcs.ctype = WCSDATA.wcs.ctype
+            w.wcs.equinox = WCSDATA.wcs.equinox
+            w.wcs.dateobs = WCSDATA.wcs.dateobs
+            w.wcs.crpix = [aw/2, ah/2]
+
+
+            
+            if WCSDATA.wcs.has_cd:
+                cd = WCSDATA.wcs.cd
+                w.wcs.cd = cd*scale
+            ''
+            elif WCSDATA.wcs.has_crota:
+                w.wcs.crota = WCSDATA.wcs.get_crota()*scale
+            if WCSDATA.wcs.has_pc:
+                pc = WCSDATA.wcs.get_pc()
+                w.wcs.pc = pc*scale
+            ''
+
+            w.wcs.cdelt = [-1/scale, 1/scale]
+            '''
+            header = w.to_header()
+            header['OBJECT'] = OBJECT
+
             #log("header wcs")
             #log(header)
             #hdu = fits.PrimaryHDU(newData)
@@ -263,9 +325,9 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
                 n = n+1
             #hdu.writeto(tilePathn)
             
-            if not ONLYXML and scale > 1.0:
+            if scale > 1.0:
                 fits.writeto(tilePathn, resizedata, header)
-            elif not ONLYXML:
+            else:
                 fits.writeto(tilePathn, data, header)
             
             tileFileName = tileFileNamen
@@ -338,8 +400,11 @@ def processSrcImg():
     global OUTPUT_FILE_EXT
     global IMG_SRC_PATH
     global WCSDATA
+    global OBJECT
+    global HEADER
     global MINVALUE
     global MAXVALUE
+    global SIZE
     outputSceneFile = "%s/scene.xml" % TGT_DIR
     # prepare the XML scene
     outputroot = ET.Element("scene")
@@ -384,10 +449,16 @@ def processSrcImg():
                 src_sz = (hdulist[0].header['NAXIS1'], hdulist[0].header['NAXIS2'])
                 im = hdulist[0].data
                 WCSDATA = wcs.WCS(hdulist[0].header)
+                HEADER = hdulist[0].header
+                OBJECT = hdulist[0].header['OBJECT']
+                SIZE = src_sz
             elif hdulist[1].header['NAXIS'] == 2:
                 src_sz = (hdulist[1].header['NAXIS1'], hdulist[1].header['NAXIS2'])
                 im = hdulist[1].data
                 WCSDATA = wcs.WCS(hdulist[1].header)
+                HEADER = hdulist[1].header
+                OBJECT = hdulist[1].header['OBJECT']
+                SIZE = src_sz
             else:
                 log("Naxis == %d" % (hdulist[0].header['NAXIS']) )
                 return
@@ -526,8 +597,6 @@ if len(sys.argv) > 2:
                 MINVALUE = float(arg[len("-minvalue="):])
             elif arg.startswith("-minvalue"):
                 MAXVALUE = float(arg[len("-maxvalue="):])
-            elif arg == "-onlyxml":
-                ONLYXML = True
             
 
 else:
@@ -546,3 +615,4 @@ log("Tile Size: %dx%d" % (TILE_SIZE, TILE_SIZE), 1)
 createTargetDir()
 processSrcImg()
 log("--------------------")
+

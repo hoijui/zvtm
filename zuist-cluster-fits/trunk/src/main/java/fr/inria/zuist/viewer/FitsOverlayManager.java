@@ -170,10 +170,7 @@ class FitsOverlayManager implements ViewListener {
 
 	public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
-	public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
-		System.out.println("FitsOverlayManager");
-		System.out.println(v.parent.getActiveLayer());
-	}
+	public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){}
 
 	public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){}
 
@@ -187,9 +184,7 @@ class FitsOverlayManager implements ViewListener {
 		hideAbout();
 	}
 
-	public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){
-		System.out.println("ktype: "+ c);
-	}
+	public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 
 	public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 

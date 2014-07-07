@@ -155,7 +155,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     SceneManager sm;
 
 	FitsOverlayManager ovm;
-	VWGlassPane gp;
+	//VWGlassPane gp;
 	PieMenu mainPieMenu;
 
     FitsImage.ColorFilter cfilter = FitsImage.ColorFilter.RAINBOW;
@@ -259,11 +259,11 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         }
         updatePanelSize();
 
-		gp = new VWGlassPane(this);
-		((JFrame)mView.getFrame()).setGlassPane(gp);
-        gp.setValue(0);
-        if(options.xmlSceneFile != null) gp.setVisible(true);
-        else gp.setVisible(false);
+		//gp = new VWGlassPane(this);
+		//((JFrame)mView.getFrame()).setGlassPane(gp);
+        //gp.setValue(0);
+        //if(options.xmlSceneFile != null) gp.setVisible(true);
+        //else gp.setVisible(false);
 
         eh = new FitsViewerEventHandler(this);
 
@@ -569,8 +569,8 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 	    SCENE_FILE_DIR = SCENE_FILE.getParentFile();
 	    System.out.println("dir: "+SCENE_FILE_DIR + " - file: " + SCENE_FILE);
 	    System.out.println("loadScene...");
-	    sm.loadScene(SceneManager.parseXML(SCENE_FILE), SCENE_FILE_DIR, true, gp);
-	    //sm.loadScene(SceneManager.parseXML(SCENE_FILE), SCENE_FILE_DIR, true);
+	    //sm.loadScene(SceneManager.parseXML(SCENE_FILE), SCENE_FILE_DIR, true, gp);
+	    sm.loadScene(SceneManager.parseXML(SCENE_FILE), SCENE_FILE_DIR, true);
 	    HashMap sceneAttributes = sm.getSceneAttributes();
 	    if (sceneAttributes.containsKey(SceneManager._background)){
 	        mView.setBackgroundColor((Color)sceneAttributes.get(SceneManager._background));
@@ -579,8 +579,8 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 
 
 		MAX_NB_REQUESTS = sm.getObjectCount() / 100;
-	    gp.setVisible(false);
-	    gp.setLabel(VWGlassPane.EMPTY_STRING);
+	    //gp.setVisible(false);
+	    //gp.setLabel(VWGlassPane.EMPTY_STRING);
         mCamera.setAltitude(0.0f);
 	}
     

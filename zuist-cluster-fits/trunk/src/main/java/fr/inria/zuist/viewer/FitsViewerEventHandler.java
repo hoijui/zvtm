@@ -219,7 +219,8 @@ class FitsViewerEventHandler implements ViewListener, ComponentListener, CameraL
 	}
 
 	public void enterGlyph(Glyph g){
-		if (application.vsm.getActiveView().getActiveLayer() == 1){
+        System.out.println("enterGlyph: activeLayer: " + application.vsm.getActiveView().getActiveLayer());
+		if (application.vsm.getActiveView().getActiveLayer() == application.LAYER_PIEMENU){
 			// interacting with pie menu
 			g.highlight(true, null);
 			VirtualSpace vs = application.vsm.getVirtualSpace(application.mnSpaceName);
@@ -229,12 +230,15 @@ class FitsViewerEventHandler implements ViewListener, ComponentListener, CameraL
 			if (i != -1){
 				vs.onTop(application.mainPieMenu.getLabels()[i]);
 			}
-		}
+		} else if(application.vsm.getActiveView().getActiveLayer() == application.LAYER_SCENE_KS || application.vsm.getActiveView().getActiveLayer() == application.LAYER_SCENE_H || application.vsm.getActiveView().getActiveLayer() == application.LAYER_SCENE_J){
+            System.out.println("enterGlyph");
+            System.out.println(g);
+        }
 
 	}
 
 	public void exitGlyph(Glyph g){
-		if (application.vsm.getActiveView().getActiveLayer() == 1){
+		if (application.vsm.getActiveView().getActiveLayer() == application.LAYER_PIEMENU){
 			g.highlight(false, null);
 		}
     }
@@ -250,9 +254,9 @@ class FitsViewerEventHandler implements ViewListener, ComponentListener, CameraL
         else if (code==KeyEvent.VK_L){ application.rescaleGlobal(false);}
         else if (code==KeyEvent.VK_G){ application.rescaleGlobal(true);}
         else if (code==KeyEvent.VK_1){  application.showLayer(application.LAYER_SCENE_KS, 1f);application.hideLayer(application.LAYER_SCENE_J); application.hideLayer(application.LAYER_SCENE_H);}
-        else if (code==KeyEvent.VK_2){  application.showLayer(application.LAYER_SCENE_H, 0.8f);application.showLayer(application.LAYER_SCENE_KS, 0.8f);application.hideLayer(application.LAYER_SCENE_J);}
+        else if (code==KeyEvent.VK_2){  application.showLayer(application.LAYER_SCENE_H, 0.5f);application.showLayer(application.LAYER_SCENE_KS, 1f);application.hideLayer(application.LAYER_SCENE_J);}
         else if (code==KeyEvent.VK_3){  application.showLayer(application.LAYER_SCENE_H, 1f);application.hideLayer(application.LAYER_SCENE_J); application.hideLayer(application.LAYER_SCENE_KS);}
-        else if (code==KeyEvent.VK_4){  application.showLayer(application.LAYER_SCENE_H, 0.8f);application.showLayer(application.LAYER_SCENE_J, 0.8f);application.hideLayer(application.LAYER_SCENE_KS);}
+        else if (code==KeyEvent.VK_4){  application.showLayer(application.LAYER_SCENE_H, 1f);application.showLayer(application.LAYER_SCENE_J, 0.5f);application.hideLayer(application.LAYER_SCENE_KS);}
         else if (code==KeyEvent.VK_5){  application.showLayer(application.LAYER_SCENE_J, 1f);application.hideLayer(application.LAYER_SCENE_KS); application.hideLayer(application.LAYER_SCENE_H);}
     	else if (code==KeyEvent.VK_N){
             System.out.println("toggleNavMode()");
