@@ -120,6 +120,8 @@ USE_CG = False
 USE_GRAPHICSMAGICK = False
 USE_ASTROPY = False
 
+ONLYXML = False
+
 WCSDATA = ""
 OBJECT = ""
 HEADER = ""
@@ -214,7 +216,7 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
         return
     if os.path.exists(tilePath) and not FORCE_GENERATE_TILES:
         log("---- %.2f%%\n%s already exists (skipped)" % (PROGRESS/float(maxTileCount)*100, tilePath), 2)
-    else:
+    elif not ONLYXML:
         log("---- %.2f%%\nGenerating tile %s" % (PROGRESS/float(maxTileCount)*100, tileIDstr), 2)
         if USE_CG:
             # this will work only with a Mac
@@ -351,7 +353,8 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
     regionEL.set("id", "R%s-%s" % (ID_PREFIX, tileIDstr))
     objectEL = ET.SubElement(regionEL, "resource")
     if parentRegionID is None:
-        regionEL.set("levels", "0;%d" % (levelCount-1+DL))
+        #regionEL.set("levels", "0;%d" % (levelCount-1+DL))
+        regionEL.set("levels", "0")
         # make sure lowest res tile, visible on each level, is always drawn below higher-res tiles
         objectEL.set("z-index", "0")
     else:
@@ -377,11 +380,14 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
     objectEL.set("h", str(int(ah)))
     if USE_ASTROPY:
         if MINVALUE and MAXVALUE:
-            objectEL.set("params", str("sc=%.4f;minvalue=%.4f;maxvalue=%.4f" % (scale, MINVALUE, MAXVALUE) ))
+            objectEL.set("params", str("sc=%f;minvalue=%f;maxvalue=%f" % (scale, MINVALUE, MAXVALUE) ))
         else:
-            objectEL.set("params", str("sc=%.4f" % (scale) ))
+            objectEL.set("params", str("sc=%f" % (scale) ))
     objectEL.set("src", tileFileName)
-    objectEL.set("sensitive", "false")
+    if USE_ASTROPY:
+        objectEL.set("sensitive", "true")    
+    else:
+        objectEL.set("sensitive", "false")
     log("Image in scene: scale=%.4f, w=%d, h=%d" % (scale, aw, ah))
     # call to lower level, top left
     buildTiles(tileID, TL, level+1, levelCount, x, y, src_sz, rootEL, im, regionEL.get("id"))
@@ -597,6 +603,8 @@ if len(sys.argv) > 2:
                 MINVALUE = float(arg[len("-minvalue="):])
             elif arg.startswith("-minvalue"):
                 MAXVALUE = float(arg[len("-maxvalue="):])
+            elif arg.startswith("-onlyxml"):
+                ONLYXML = True
             
 
 else:

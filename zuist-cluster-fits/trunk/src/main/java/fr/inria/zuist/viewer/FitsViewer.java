@@ -60,6 +60,7 @@ import fr.inria.zvtm.engine.Utils;
 import fr.inria.zvtm.engine.SwingWorker;
 import fr.inria.zvtm.glyphs.FitsImage;
 import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.glyphs.Translucent;
 
 //import fr.inria.zvtm.glyphs.PieMenu;
@@ -95,8 +96,11 @@ import org.kohsuke.args4j.CmdLineParser;
 // filter
 import java.awt.image.ImageFilter;
 
+import cl.inria.massda.SmartiesManager;
+import cl.inria.massda.TuioEventHandler;
+
 /**
- * @author Emmanuel Pietriga
+ * @author Emmanuel Pietriga, Fernando del Campo
  */
 
 public class FitsViewer implements Java2DPainter, RegionListener, LevelListener {
@@ -112,6 +116,9 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     int VIEW_X, VIEW_Y;
     /* dimensions of zoomable panel */
     int panelWidth, panelHeight;
+
+    public static double SCENE_W = 12000;//11520;//12000;
+    public static double SCENE_H = 4500;//4320;//4500;
     
     /* Navigation constants */
     static final int ANIM_MOVE_LENGTH = 300;
@@ -129,6 +136,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     static final String mnSpaceName = "PieMenu Space";
     static final String ovSpaceName = "Overlay Space";
     static final String menuSpaceName = "Menu Space";
+    static final String cursorSpaceName = "CursorSpace";
 
     static final int LAYER_SCENE = 0;
     static final int LAYER_SCENE_KS = 1;
@@ -137,14 +145,19 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     static final int LAYER_PIEMENU = 4;
     static final int LAYER_OVERLAY = 5;
     static final int LAYER_MENU = 6;
-    
+    static final int LAYER_CURSOR = 7;
 
-    VirtualSpace mSpace, ovSpace;
+    public VirtualSpace mSpace;
+    VirtualSpace ovSpace;
     VirtualSpace mSpaceKs, mSpaceH, mSpaceJ;
     VirtualSpace menuSpace;
-    Camera mCamera;
+    public VirtualSpace cursorSpace;
+    
+    public Camera mCamera;
     Camera mCameraKs, mCameraH, mCameraJ;
     Camera menuCamera;
+    public Camera cursorCamera;
+
     String mCameraAltStr = Messages.ALTITUDE + "0";
     String levelStr = Messages.LEVEL + "0";
     static final String mViewName = "ZUIST Viewer";
@@ -164,6 +177,14 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     public FitsMenu menu;
     double[] globalScaleParams = {Double.MAX_VALUE, Double.MIN_VALUE};
     
+    SmartiesManager smartiesMngr;
+    TuioEventHandler teh;
+
+    VText wcsLabel;
+    
+    //JSONArray readed;
+    //Vector<SavedPosition> savedPositions;
+
     //public FitsViewer(boolean fullscreen, boolean opengl, boolean antialiased, File xmlSceneFile){
     public FitsViewer(Options options){
 		ovm = new FitsOverlayManager(this);
@@ -191,11 +212,13 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 			getGlobalView(ea);
 		}
 		ovm.toggleConsole();
-        System.out.println("setActiveLayer(LAYER_SCENE)");
-        mView.setActiveLayer(LAYER_SCENE);
+        //System.out.println("setActiveLayer(LAYER_SCENE)");
+        //mView.setActiveLayer(LAYER_SCENE);
         
 
 		//menu.drawHistogram();
+        smartiesMngr = new SmartiesManager(this);
+        teh = new TuioEventHandler(this);
 
     }
     //void initGUI(boolean fullscreen, boolean opengl, boolean antialiased){
@@ -208,6 +231,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         mSpaceKs = vsm.addVirtualSpace(mSpaceKsName);
         mSpaceH = vsm.addVirtualSpace(mSpaceHName);
         mSpaceJ = vsm.addVirtualSpace(mSpaceJName);
+        cursorSpace = vsm.addVirtualSpace(cursorSpaceName);
 
         VirtualSpace mnSpace = vsm.addVirtualSpace(mnSpaceName);
 
@@ -219,6 +243,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         mCamera.stick(mCameraKs);
 		mCamera.stick(mCameraH);
         mCamera.stick(mCameraJ);
+        cursorCamera = cursorSpace.addCamera();
 
 		mnSpace.addCamera().setAltitude(10);
 
@@ -234,10 +259,10 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         cameras.add(mCameraKs);
         cameras.add(mCameraH);
         cameras.add(mCameraJ);
-
 		cameras.add(vsm.getVirtualSpace(mnSpaceName).getCamera(0));
 		cameras.add(vsm.getVirtualSpace(ovSpaceName).getCamera(0));
 		cameras.add(menuCamera);
+        cameras.add(cursorCamera);
 
         mView = vsm.addFrameView(cameras, mViewName, (options.opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, !options.fullscreen, initMenu());
         Vector<Camera> sceneCam = new Vector<Camera>();
@@ -246,6 +271,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         sceneCam.add(mCameraKs);
         sceneCam.add(mCameraH);
         sceneCam.add(mCameraJ);
+        sceneCam.add(cursorCamera);
 
         ClusterGeometry clGeom = new ClusterGeometry(options.blockWidth, options.blockHeight, options.numCols, options.numRows);
 		clusteredView = new ClusteredView(clGeom, options.numRows-1, options.numCols, options.numRows, sceneCam);
@@ -294,6 +320,14 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 		};
 		mView.getFrame().addComponentListener(ca0);
 		
+    }
+
+    public int getDisplayWidth(){
+        return SCREEN_WIDTH;
+    }
+
+    public int getDisplayHeight(){
+        return SCREEN_HEIGHT;
     }
 
     JMenuItem infoMI, consoleMI;
@@ -456,6 +490,76 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         */
     }
 
+    public Vector<Glyph> getGlyphOnPoint(double jpx, double jpy){
+        System.out.println("getGlyphOnPoint("+jpx+", "+jpy+")");
+        Vector<Glyph> result = new Vector<Glyph>();
+        for(ObjectDescription desc: sm.getObjectDescriptions()){
+            if(desc instanceof FitsImageDescription && ((FitsImageDescription)desc).getGlyph() != null){
+                Glyph g = ((FitsImageDescription)desc).getGlyph();
+                //System.out.println("x: " + ((FitsImageDescription)desc).getX() + " - y: " + ((FitsImageDescription)desc).getY() );
+                double[] border = g.getBounds();
+                //System.out.println(border[0]+" < "+jpx+" && "+border[1]+" > "+jpy+" && "+border[2]+" > "+jpx+" && "+border[3]+" < "+jpy );
+                if(border[0] < jpx && border[1] > jpy && border[2] > jpx && border[3] < jpy){
+                    //System.out.println(((FitsImageDescription)desc).getX() + " - " + ((FitsImageDescription)desc).getY());
+                    result.add(g);
+                }
+            }
+        }
+        return result;
+    }
+
+    
+    public void toggleWCS(Point2D.Double xy){
+        if (cursorSpace.contains(wcsLabel)){
+            cursorSpace.removeGlyph(wcsLabel);
+        }
+        else {
+            updateWCS(xy);
+            if(wcsLabel != null) cursorSpace.addGlyph(wcsLabel);
+            if(wcsLabel != null) wcsLabel.moveTo(xy.getX()+40, xy.getY()-20);
+            
+        }
+        System.out.println(xy);
+
+    }
+
+    void updateWCS(Point2D.Double xy){
+
+        Camera c = mCamera;
+        double a = (c.focal+Math.abs(c.altitude)) / c.focal;
+        double vx = c.vx;
+        double vy = c.vy;
+        //System.out.println("VirtualSpace: Camera("+vx+","+vy+") (" + jpx + ", " + jpy + ")");
+        //System.out.println("(" + (vx + a*(jpx-application.VIEW_W/2) ) + ", " + (vy + a*(jpy-application.VIEW_H/2) ) + ")");
+        //System.out.println("VIEW_W: " + application.VIEW_W + " - VIEW_H: " + application.VIEW_H);
+        
+        double[] pos = windowToViewCoordinate(xy.getX(), xy.getY());
+        Point2D.Double cur = new Point2D.Double(pos[0], pos[1]);
+        
+
+        Vector<Glyph> g = getGlyphOnPoint(cur.getX(), cur.getY() );
+        FitsImage fi;
+        if(g.size() > 0){
+            fi = (FitsImage)g.firstElement();
+        } else {
+            return;
+        }
+
+        double x = (cur.getX()-fi.getLocation().getX());
+        double y = (cur.getY()-fi.getLocation().getY());
+
+        System.out.println("cursor-fits:");
+        System.out.println(x + " " + y);
+
+
+        Point2D.Double wcs = fi.pix2wcs(x, y);
+
+        System.out.println(wcs);
+
+        //wcsLabel = new VText(xy.getX(), xy.getY(), 100, Color.RED, "POSICION WCS: " + wcs.toString() );
+    }
+
+
 	void displayMainPieMenu(boolean b){
 		if (b){
 			PieMenuFactory.setItemFillColor(ConfigManager.PIEMENU_FILL_COLOR);
@@ -500,10 +604,10 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         else if (Utils.osIsMacOS()){
             VIEW_X = 80;
             SCREEN_WIDTH -= 80;
-        }
-
-        VIEW_X = 80;
-        SCREEN_WIDTH -= 80;
+        } else{
+            VIEW_X = 80;
+            SCREEN_WIDTH -= 80;
+        }        
 
         VIEW_W = (SCREEN_WIDTH <= VIEW_MAX_W) ? SCREEN_WIDTH : VIEW_MAX_W;
         VIEW_H = (SCREEN_HEIGHT <= VIEW_MAX_H) ? SCREEN_HEIGHT : VIEW_MAX_H;
@@ -586,7 +690,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     
     /*-------------     Navigation       -------------*/
 
-    void getGlobalView(EndAction ea){
+    public void getGlobalView(EndAction ea){
 		int l = 0;
 		while (sm.getRegionsAtLevel(l) == null){
 			l++;
@@ -605,7 +709,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     }
 
     /* Higher view */
-    void getHigherView(){
+    public void getHigherView(){
 		rememberLocation(mCamera.getLocation());
         Float alt = new Float(mCamera.getAltitude() + mCamera.getFocal());
 //        vsm.animator.createCameraAnimation(FitsViewer.ANIM_MOVE_LENGTH, AnimManager.CA_ALT_SIG, alt, mCamera.getID());
@@ -615,7 +719,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     }
 
     /* Higher view */
-    void getLowerView(){
+    public void getLowerView(){
 		rememberLocation(mCamera.getLocation());
         Float alt=new Float(-(mCamera.getAltitude() + mCamera.getFocal())/2.0f);
 //        vsm.animator.createCameraAnimation(FitsViewer.ANIM_MOVE_LENGTH, AnimManager.CA_ALT_SIG, alt, mCamera.getID());
@@ -625,7 +729,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     }
 
     /* Direction should be one of FitsViewer.MOVE_* */
-    void translateView(short direction){
+    public void translateView(short direction){
         //LongPoint trans;
         Point2D.Double trans;
         //long[] rb = mView.getVisibleRegion(mCamera);
@@ -659,7 +763,84 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         
     }
 
-	void centerOnObject(String id){
+    /* x,y in (X Window) screen coordinate */
+    public void directTranslate(double x, double y){
+        double a = (mCamera.focal+Math.abs(mCamera.altitude)) / mCamera.focal;
+        Location l = mCamera.getLocation();
+        double newx = l.getX() + a*x;
+        double newy = l.getY() + a*y;
+        mCamera.setLocation(new Location(newx, newy, l.getAltitude()));
+    }
+
+    public void zoomAnimated(double f, EndAction ea){
+        Float alt = new Float(f);
+        //f.out.println(" f: " + f);
+        //vsm.animator.createCameraAnimation(NavigationManager.ANIM_MOVE_DURATION, AnimManager.CA_ALT_SIG, alt, mCamera.getID());
+        Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(Viewer.ANIM_MOVE_LENGTH, mSpace.getCamera(0),
+            alt, true, SlowInSlowOutInterpolator.getInstance(), ea);
+        vsm.getAnimationManager().startAnimation(a, false);
+    }
+
+    public void centeredZoom(double f, double x, double y){
+        Location l = mCamera.getLocation();
+        double a = (mCamera.focal+Math.abs(mCamera.altitude)) / mCamera.focal;
+        double newz = mCamera.focal * a * f - mCamera.focal;
+        if (newz < 0){
+            newz = 0;
+            f = mCamera.focal / (a*mCamera.focal);
+        }
+
+        System.out.println("x: " + x + " - y: " + y);
+
+        double xx = (long)((double)x - (SCENE_W/2.0))*a + l.getX();
+        double yy = (long)(-(double)y + (SCENE_H/2.0))*a + l.getY();
+
+        System.out.println("xx: " + xx + " - yy: " + yy);
+
+        double dx = l.getX() - xx;
+        double dy = l.getY() - yy;
+
+        System.out.println("dx: " + dx + " - dy: " + dy);
+
+        double newx = l.getX() + (f*dx - dx); // *a/(mCamera.altitude+ mCamera.focal));
+        double newy = l.getY() + (f*dy - dy);
+
+        System.out.println("newx: " + newx + " - newy: " + newy + " - newz: " + newz);
+
+        mCamera.setLocation(new Location(newx, newy, newz));
+    }
+
+    public void traslateAnimated(double x, double y, EndAction ea){
+        Location l = mCamera.getLocation();
+        double a = (mCamera.focal+Math.abs(mCamera.altitude)) / mCamera.focal;
+        double[] r = windowToViewCoordinate(x, y);
+        double dx = l.getX() - r[0];
+        double dy = l.getY() - r[1];
+
+        Point2D.Double trans = new Point2D.Double(-dx,-dy);
+
+        Animation ani = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(Viewer.ANIM_MOVE_LENGTH, mCamera,
+            trans, true, SlowInSlowOutInterpolator.getInstance(), ea);
+        vsm.getAnimationManager().startAnimation(ani, false);
+    }
+
+    public double[] windowToViewCoordinate(double x, double y){
+        Location l = mCamera.getLocation();
+        double a = (mCamera.focal + mCamera.getAltitude()) / mCamera.focal;
+        //
+        double xx = (long)((double)x - ((double)getDisplayWidth()/2.0));
+        double yy = (long)(-(double)y + ((double)getDisplayHeight()/2.0));
+        //
+        xx = l.getX()+ a*xx;
+        yy = l.getY()+ a*yy;
+        double[] r = new double[2];
+        r[0] = xx;
+        r[1] = yy;
+        return r;
+    }
+
+
+	public void centerOnObject(String id){
 		ovm.sayInConsole("Centering on object "+id+"\n");
 		ObjectDescription od = sm.getObject(id);
 		if (od != null){
@@ -671,7 +852,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 		}
 	}
 
-	void centerOnRegion(String id){
+	public void centerOnRegion(String id){
 		ovm.sayInConsole("Centering on region "+id+"\n");
 		Region r = sm.getRegion(id);
 		if (r != null){
@@ -686,11 +867,11 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 	Vector previousLocations;
 	static final int MAX_PREV_LOC = 100;
 	
-	void rememberLocation(){
+	public void rememberLocation(){
 	    rememberLocation(mCamera.getLocation());
     }
     
-	void rememberLocation(Location l){
+	public void rememberLocation(Location l){
 		if (previousLocations.size() >= MAX_PREV_LOC){
 			// as a result of release/click being undifferentiated)
 			previousLocations.removeElementAt(0);
@@ -703,7 +884,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 		else {previousLocations.add(l);}
 	}
 	
-	void moveBack(){
+	public void moveBack(){
 		if (previousLocations.size()>0){
 			Vector animParams = Location.getDifference(mSpace.getCamera(0).getLocation(), (Location)previousLocations.lastElement());
 			sm.setUpdateLevel(false);

@@ -264,8 +264,8 @@ public class FitsMenu implements ViewListener{
                     (jpy > app.menu.BORDER_TOP_HISTOGRAM && jpy < app.menu.BORDER_BOTTON_HISTOGRAM && jpx > app.menu.BORDER_LEFT_HISTOGRAM && 
                     jpx < app.menu.BORDER_RIGHT_HISTOGRAM )){
             v.parent.setActiveLayer(app.LAYER_SCENE);
-            //v.parent.setCursorIcon(Cursor.CUSTOM_CURSOR);
-            v.parent.setCursorIcon(Cursor.CROSSHAIR_CURSOR);
+            v.parent.setCursorIcon(Cursor.CUSTOM_CURSOR);
+            //v.parent.setCursorIcon(Cursor.CROSSHAIR_CURSOR);
         }
 
     }

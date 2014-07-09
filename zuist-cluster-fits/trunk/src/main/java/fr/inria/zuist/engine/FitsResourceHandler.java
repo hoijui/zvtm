@@ -69,7 +69,7 @@ public class FitsResourceHandler implements ResourceHandler {
                 }
             }
         }
-
+        
         FitsImageDescription desc;
         if (max != Double.MIN_VALUE && min != Double.MAX_VALUE){
             desc = new FitsImageDescription(

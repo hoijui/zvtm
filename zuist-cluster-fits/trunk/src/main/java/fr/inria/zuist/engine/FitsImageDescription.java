@@ -37,6 +37,7 @@ public class FitsImageDescription extends ResourceDescription {
 
     private float alpha = 1f;
     private boolean isVisible = false;
+    //private boolean isSensitive;
 
     private double gmin = Double.MAX_VALUE;
     private double gmax = Double.MIN_VALUE;
@@ -180,6 +181,8 @@ public class FitsImageDescription extends ResourceDescription {
         }
         
         //if(gmin != Double.MAX_VALUE && gmax != Double.MIN_VALUE) glyph.rescale(gmin, gmax, gmin/2. + gmax/2.);
+        //glyph.setSensitivity(isSensitive);
+        //System.out.println("glyph.setSensitivity("+isSensitive+")");
         glyph.setVisible(isVisible);
         glyph.setDrawBorder(false);
         glyph.setTranslucencyValue(alpha);

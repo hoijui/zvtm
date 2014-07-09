@@ -47,6 +47,8 @@ import fr.inria.zuist.engine.Region;
 import fr.inria.zuist.engine.ObjectDescription;
 import fr.inria.zuist.engine.TextDescription;
 
+import fr.inria.zvtm.glyphs.FitsImage;
+
 //class FitsViewerEventHandler implements ViewEventHandler, ComponentListener, CameraListener {
 class FitsViewerEventHandler implements ViewListener, ComponentListener, CameraListener {
 
@@ -176,6 +178,32 @@ class FitsViewerEventHandler implements ViewListener, ComponentListener, CameraL
             v.parent.setCursorIcon(Cursor.DEFAULT_CURSOR);
         }
 
+/*
+        Camera c = application.mCamera;
+        double a = (c.focal+Math.abs(c.altitude)) / c.focal;
+        double vx = c.vx;
+        double vy = c.vy;
+        //System.out.println("VirtualSpace: Camera("+vx+","+vy+") (" + jpx + ", " + jpy + ")");
+        //System.out.println("(" + (vx + a*(jpx-application.VIEW_W/2) ) + ", " + (vy + a*(jpy-application.VIEW_H/2) ) + ")");
+        //System.out.println("VIEW_W: " + application.VIEW_W + " - VIEW_H: " + application.VIEW_H);
+        Point2D.Double cur = new Point2D.Double(v.getVCursor().getVSXCoordinate(), v.getVCursor().getVSYCoordinate());
+
+        FitsImage fi = (FitsImage)(application.getGlyphOnPoint(cur.getX(), cur.getY() ).firstElement());
+        
+
+        double x = (cur.getX()-fi.getLocation().getX());
+        double y = (cur.getY()-fi.getLocation().getY());
+
+        System.out.println("cursor-fits:");
+        System.out.println(x + " " + y);
+
+
+        Point2D.Double wcs = fi.pix2wcs(x, y);
+
+        System.out.println(wcs);
+        //System.out.println(wcs2);
+        //System.out.println(wcs3);
+*/
         
     }
 
@@ -219,7 +247,6 @@ class FitsViewerEventHandler implements ViewListener, ComponentListener, CameraL
 	}
 
 	public void enterGlyph(Glyph g){
-        System.out.println("enterGlyph: activeLayer: " + application.vsm.getActiveView().getActiveLayer());
 		if (application.vsm.getActiveView().getActiveLayer() == application.LAYER_PIEMENU){
 			// interacting with pie menu
 			g.highlight(true, null);
@@ -230,10 +257,7 @@ class FitsViewerEventHandler implements ViewListener, ComponentListener, CameraL
 			if (i != -1){
 				vs.onTop(application.mainPieMenu.getLabels()[i]);
 			}
-		} else if(application.vsm.getActiveView().getActiveLayer() == application.LAYER_SCENE_KS || application.vsm.getActiveView().getActiveLayer() == application.LAYER_SCENE_H || application.vsm.getActiveView().getActiveLayer() == application.LAYER_SCENE_J){
-            System.out.println("enterGlyph");
-            System.out.println(g);
-        }
+		}
 
 	}
 
