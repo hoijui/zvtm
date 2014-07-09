@@ -341,7 +341,7 @@ public class SmartiesManager implements Observer {
                 application.cursorSpace,
                 (true) ? 10 : 2, (true) ? 100 : 20,
                 this.color);
-            label = new VText(0.0, 0.0, 0, color, Color.GRAY, "WCS Position: ", VText.TEXT_ANCHOR_START, 1f, 1f);
+            label = new VText(0.0, 0.0, 0, color, Color.BLACK, "", VText.TEXT_ANCHOR_START, 1f, 1f);
             label.setFont(FONT);
 
             label.setVisible(labelVisible);
@@ -357,7 +357,7 @@ public class SmartiesManager implements Observer {
             label.moveTo((long)(x*application.SCENE_W - application.SCENE_W/2.0+50), (long)(application.SCENE_H/2.0 - y*application.SCENE_H+50));
             Point2D.Double pWCS = new Point2D.Double(wc.getX(), wc.getY());
             Point2D.Double radec = application.coordinateWCS(pWCS);
-            updateLabel("ra: " + radec.getX() + " - dec: " + radec.getY());
+            updateLabel("RA: " + radec.getX() + " - DEC: " + radec.getY());
         }
 
         public void labelSetVisible(boolean b){
@@ -366,7 +366,7 @@ public class SmartiesManager implements Observer {
         }
 
         public void updateLabel(String text){
-            label.setText("WCS Position: " + text);
+            label.setText(text);
         }
 
     } // class myCursor
