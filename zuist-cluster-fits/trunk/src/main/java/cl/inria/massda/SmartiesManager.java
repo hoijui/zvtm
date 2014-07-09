@@ -357,7 +357,7 @@ public class SmartiesManager implements Observer {
             label.moveTo((long)(x*application.SCENE_W - application.SCENE_W/2.0+50), (long)(application.SCENE_H/2.0 - y*application.SCENE_H+50));
             Point2D.Double pWCS = new Point2D.Double(wc.getX(), wc.getY());
             Point2D.Double radec = application.coordinateWCS(pWCS);
-            updateLabel("RA: " + radec.getX() + " - DEC: " + radec.getY());
+            updateLabel("Ra: " + radec.getX() + " - Dec: " + radec.getY());
         }
 
         public void labelSetVisible(boolean b){
@@ -430,7 +430,7 @@ public class SmartiesManager implements Observer {
                 //Point2D.Double pWCS = new Point2D.Double(px, py);
                 Point2D.Double pWCS = new Point2D.Double(c.wc.getX(), c.wc.getY());
                 Point2D.Double radec = application.coordinateWCS(pWCS);
-                c.updateLabel("ra: " + radec.getX() + " - dec: " + radec.getY());
+                c.updateLabel("Ra: " + radec.getX() + " - Dec: " + radec.getY());
                 if(!c.labelVisible)
                     c.labelSetVisible(true);
                 else
