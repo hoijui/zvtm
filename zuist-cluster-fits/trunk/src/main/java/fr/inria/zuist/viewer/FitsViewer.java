@@ -61,6 +61,7 @@ import fr.inria.zvtm.engine.SwingWorker;
 import fr.inria.zvtm.glyphs.FitsImage;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VText;
+import fr.inria.zvtm.glyphs.VCircle;
 import fr.inria.zvtm.glyphs.Translucent;
 
 //import fr.inria.zvtm.glyphs.PieMenu;
@@ -240,10 +241,12 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         mCameraKs = mSpaceKs.addCamera();
         mCameraH = mSpaceH.addCamera();
         mCameraJ = mSpaceJ.addCamera();
-        mCamera.stick(mCameraKs);
-		mCamera.stick(mCameraH);
-        mCamera.stick(mCameraJ);
         cursorCamera = cursorSpace.addCamera();
+
+        mCamera.stick(mCameraKs);
+        mCamera.stick(mCameraH);
+        mCamera.stick(mCameraJ);
+        //mCamera.stick(cursorCamera);
 
 		mnSpace.addCamera().setAltitude(10);
 
@@ -498,7 +501,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
                 Glyph g = ((FitsImageDescription)desc).getGlyph();
                 //System.out.println("x: " + ((FitsImageDescription)desc).getX() + " - y: " + ((FitsImageDescription)desc).getY() );
                 double[] border = g.getBounds();
-                //System.out.println(border[0]+" < "+jpx+" && "+border[1]+" > "+jpy+" && "+border[2]+" > "+jpx+" && "+border[3]+" < "+jpy );
+                System.out.println(border[0]+" < "+jpx+" && "+border[1]+" > "+jpy+" && "+border[2]+" > "+jpx+" && "+border[3]+" < "+jpy );
                 if(border[0] < jpx && border[1] > jpy && border[2] > jpx && border[3] < jpy){
                     //System.out.println(((FitsImageDescription)desc).getX() + " - " + ((FitsImageDescription)desc).getY());
                     result.add(g);
@@ -509,33 +512,52 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     }
 
     
-    public void toggleWCS(Point2D.Double xy){
-        if (cursorSpace.contains(wcsLabel)){
-            cursorSpace.removeGlyph(wcsLabel);
-        }
-        else {
-            updateWCS(xy);
-            if(wcsLabel != null) cursorSpace.addGlyph(wcsLabel);
-            if(wcsLabel != null) wcsLabel.moveTo(xy.getX()+40, xy.getY()-20);
-            
-        }
-        System.out.println(xy);
+    public Point2D.Double coordinateWCS(Point2D.Double xy){
 
+        System.out.println("coordinateWCS(" + xy.getX() + " - " + xy.getY() + ")");
+        double[] coord = windowToViewCoordinate(xy.getX(), xy.getY());
+        System.out.println("windowToViewCoordinate: " + coord[0] + " - " + coord[1]);
+
+        Vector<Glyph> g = getGlyphOnPoint(coord[0], coord[1] );
+        FitsImage fi;
+        if(g.size() > 0){
+            fi = (FitsImage)g.firstElement();
+        } else {
+            return new Point2D.Double(0.0,0.0);
+        }
+
+        double x = (xy.getX()-fi.getLocation().getX());
+        double y = (xy.getY()-fi.getLocation().getY());
+
+        System.out.println("cursor-fits:");
+        System.out.println(x + " " + y);
+
+        Point2D.Double radec = fi.pix2wcs(x, y);
+
+        return radec;
     }
 
+/*
     void updateWCS(Point2D.Double xy){
 
-        Camera c = mCamera;
-        double a = (c.focal+Math.abs(c.altitude)) / c.focal;
-        double vx = c.vx;
-        double vy = c.vy;
+        //Camera c = mCamera;
+        //double a = (c.focal+Math.abs(c.altitude)) / c.focal;
+        //double vx = c.vx;
+        //double vy = c.vy;
         //System.out.println("VirtualSpace: Camera("+vx+","+vy+") (" + jpx + ", " + jpy + ")");
         //System.out.println("(" + (vx + a*(jpx-application.VIEW_W/2) ) + ", " + (vy + a*(jpy-application.VIEW_H/2) ) + ")");
         //System.out.println("VIEW_W: " + application.VIEW_W + " - VIEW_H: " + application.VIEW_H);
         
+        System.out.println("updateWCS xy: " + xy.getX() + " " + xy.getY());
+
+
+
         double[] pos = windowToViewCoordinate(xy.getX(), xy.getY());
         Point2D.Double cur = new Point2D.Double(pos[0], pos[1]);
         
+        System.out.println(pos[0] + " " + pos[1]);
+
+        System.out.println(windowToViewCoordinate(0, 0)[0] + " " + windowToViewCoordinate(0, 0)[1]);
 
         Vector<Glyph> g = getGlyphOnPoint(cur.getX(), cur.getY() );
         FitsImage fi;
@@ -555,10 +577,14 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         Point2D.Double wcs = fi.pix2wcs(x, y);
 
         System.out.println(wcs);
-
-        //wcsLabel = new VText(xy.getX(), xy.getY(), 100, Color.RED, "POSICION WCS: " + wcs.toString() );
+        if(wcsLabel == null)
+            wcsLabel = new VText(xy.getX(), xy.getY(), 100, Color.RED, "POSICION WCS: " + wcs.toString() );
+        else
+            wcsLabel.setText("POSICION WCS: " + wcs.toString());
+        VCircle test = new VCircle(xy.getX(), xy.getY(), 100, 100, Color.RED);
     }
 
+*/
 
 	void displayMainPieMenu(boolean b){
 		if (b){
@@ -596,8 +622,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 		}
 	}
 
-    void windowLayout(){
-    	
+    void windowLayout(){	
         if (Utils.osIsWindows()){
             VIEW_X = VIEW_Y = 0;
         }
@@ -607,8 +632,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         } else{
             VIEW_X = 80;
             SCREEN_WIDTH -= 80;
-        }        
-
+        }
         VIEW_W = (SCREEN_WIDTH <= VIEW_MAX_W) ? SCREEN_WIDTH : VIEW_MAX_W;
         VIEW_H = (SCREEN_HEIGHT <= VIEW_MAX_H) ? SCREEN_HEIGHT : VIEW_MAX_H;
     }
@@ -826,13 +850,24 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 
     public double[] windowToViewCoordinate(double x, double y){
         Location l = mCamera.getLocation();
+        System.out.println("mCamera.getLocation(): " + l.getX() + " " + l.getY());
         double a = (mCamera.focal + mCamera.getAltitude()) / mCamera.focal;
+
+        Location lc = cursorCamera.getLocation();
+        System.out.println("cursorCamera.getLocation(): " + lc.getX() + " " + lc.getY());
+
         //
-        double xx = (long)((double)x - ((double)getDisplayWidth()/2.0));
-        double yy = (long)(-(double)y + ((double)getDisplayHeight()/2.0));
+        //double xx = (long)((double)x - ((double)getDisplayWidth()/2.0));
+        //double yy = (long)(-(double)y + ((double)getDisplayHeight()/2.0));
+        //double xx = (long)((double)x - ((double)SCENE_W/2.0));
+        //double yy = (long)(-(double)y + ((double)SCENE_H/2.0));
         //
-        xx = l.getX()+ a*xx;
-        yy = l.getY()+ a*yy;
+        //xx = l.getX()+ a*xx;
+        //yy = l.getY()+ a*yy;
+
+        double xx = l.getX()+ a*x;
+        double yy = l.getY()+ a*y;
+
         double[] r = new double[2];
         r[0] = xx;
         r[1] = yy;

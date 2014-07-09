@@ -27,6 +27,9 @@ import fr.lri.smarties.libserver.SmartiesWidgetHandler;
 import java.util.Observer;
 import java.util.Observable;
 
+import fr.inria.zvtm.glyphs.VText;
+import java.awt.Font;
+
 import fr.inria.zuist.viewer.FitsViewer;
 
 public class SmartiesManager implements Observer {
@@ -169,8 +172,8 @@ public class SmartiesManager implements Observer {
                             double x = (se.p != null) ? se.p.x : se.x;
                             double y = (se.p != null) ? se.p.y : se.y;
                             application.centeredZoom(prevMFPinchD/se.d,
-                                                        x*(float)application.getDisplayWidth(),
-                                                        y*(float)application.getDisplayHeight());
+                                                        x*(float)application.SCENE_W,
+                                                        y*(float)application.SCENE_H);
                         }
                         prevMFPinchD = se.d;
                     }
@@ -323,13 +326,11 @@ public class SmartiesManager implements Observer {
         public Color color;
         public WallCursor wc;
         public Point2D.Double delta;
+        public VText label;
+        boolean labelVisible = false;
 
-        public void move(double x, double y){
-            this.x = x; this.y = y;
-            //wc.moveTo((long)(x*application.getDisplayWidth() - application.getDisplayWidth()/2.0), (long)(application.getDisplayHeight()/2.0 - y*application.getDisplayHeight()));
-            wc.moveTo((long)(x*application.SCENE_W - application.SCENE_W/2.0), (long)(application.SCENE_H/2.0 - y*application.SCENE_H));
-        }
-
+        Font FONT = new Font("default", Font.PLAIN, 16);
+        
         public myCursor(int id, double x, double y){
             this.id = id;
             this.x = x;
@@ -340,7 +341,32 @@ public class SmartiesManager implements Observer {
                 application.cursorSpace,
                 (true) ? 10 : 2, (true) ? 100 : 20,
                 this.color);
+            label = new VText(0.0, 0.0, 0, color, Color.GRAY, "WCS Position: ", VText.TEXT_ANCHOR_START, 1f, 1f);
+            label.setFont(FONT);
+
+            label.setVisible(labelVisible);
+            application.cursorSpace.addGlyph(label);
+            application.cursorSpace.onTop(label);
             move(x, y);
+        }
+
+        public void move(double x, double y){
+            this.x = x; this.y = y;
+            //wc.moveTo((long)(x*application.getDisplayWidth() - application.getDisplayWidth()/2.0), (long)(application.getDisplayHeight()/2.0 - y*application.getDisplayHeight()));
+            wc.moveTo((long)(x*application.SCENE_W - application.SCENE_W/2.0), (long)(application.SCENE_H/2.0 - y*application.SCENE_H));
+            label.moveTo((long)(x*application.SCENE_W - application.SCENE_W/2.0+50), (long)(application.SCENE_H/2.0 - y*application.SCENE_H+50));
+            Point2D.Double pWCS = new Point2D.Double(wc.getX(), wc.getY());
+            Point2D.Double radec = application.coordinateWCS(pWCS);
+            updateLabel("ra: " + radec.getX() + " - dec: " + radec.getY());
+        }
+
+        public void labelSetVisible(boolean b){
+            labelVisible = b;
+            label.setVisible(b);
+        }
+
+        public void updateLabel(String text){
+            label.setText("WCS Position: " + text);
         }
 
     } // class myCursor
@@ -400,9 +426,15 @@ public class SmartiesManager implements Observer {
                 double altitude = application.cursorCamera.getAltitude();
                 double px = c.wc.getX() * (focal + altitude)/focal;
                 double py = c.wc.getY()* (focal + altitude)/focal;
-                Point2D.Double pWCS = new Point2D.Double(px + application.cursorCamera.vx, py  + application.cursorCamera.vy);
-
-                application.toggleWCS(pWCS);
+                //Point2D.Double pWCS = new Point2D.Double(px + application.cursorCamera.vx, py  + application.cursorCamera.vy);
+                //Point2D.Double pWCS = new Point2D.Double(px, py);
+                Point2D.Double pWCS = new Point2D.Double(c.wc.getX(), c.wc.getY());
+                Point2D.Double radec = application.coordinateWCS(pWCS);
+                c.updateLabel("ra: " + radec.getX() + " - dec: " + radec.getY());
+                if(!c.labelVisible)
+                    c.labelSetVisible(true);
+                else
+                    c.labelSetVisible(false);
                 
             } else {
                 System.out.println("WCS without Puck");

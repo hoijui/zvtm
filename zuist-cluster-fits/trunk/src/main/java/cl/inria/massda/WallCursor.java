@@ -13,6 +13,8 @@ import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.glyphs.SIRectangle;
 
 
+
+
 /**
  * A cursor suitable for interacting with the clustered viewer on a large display.
  */
