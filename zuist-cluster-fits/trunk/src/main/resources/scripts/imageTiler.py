@@ -248,17 +248,53 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
             
 
             #header = WCSDATA.to_header()
-            w = wcs.WCS(naxis=2)
+            w = wcs.WCS(naxis=2, relax=False)#relax=wcs.WCSHDR_RADESYS)#, relax=(wcs.WCSHDR_RADECSYS | wcs.WCSHDR_EPOCHa | wcs.WCSHDR_CD00i00j))#, relax=wcs.WCSHDR_CD00i00j) #wcs.WCSHDR_CD00i00j RADESYS
+
+            '''
+            ra, dec = WCSDATA.wcs_pix2world(WCSDATA.wcs.crpix[0], WCSDATA.wcs.crpix[1] , 0)
+            log("ra: %f - dec: %f" % (ra, dec) )
+            px, py = WCSDATA.wcs_world2pix(WCSDATA.wcs.crval[0], WCSDATA.wcs.crval[1], 0)
+            log("px: %f - py: %f" % (px, py) )
+            '''
+
             ra, dec = WCSDATA.wcs_pix2world(x+aw/2, SIZE[1]-y-ah/2, 0)
+            
             w.wcs.crval = [ra, dec]
             w.wcs.ctype = WCSDATA.wcs.ctype
             w.wcs.equinox = WCSDATA.wcs.equinox
             w.wcs.dateobs = WCSDATA.wcs.dateobs
-            w.wcs.crpix = [aw/2, ah/2]
-            if WCSDATA.wcs.has_cd:
-                cd = WCSDATA.wcs.cd
-                w.wcs.cd = cd*scale
+            w.wcs.crpix = [aw/scale/2, ah/scale/2]
+            #if WCSDATA.wcs.has_cd:
+            #    cd = WCSDATA.wcs.cd
+            #    w.wcs.cd = cd*scale
 
+            cd = WCSDATA.wcs.cd
+            w.wcs.cd = cd*scale
+            w.wcs.cdelt = [np.sqrt(w.wcs.cd[0,0]*w.wcs.cd[0,0]+w.wcs.cd[1,0]*w.wcs.cd[1,0]), np.sqrt(w.wcs.cd[0,1]*w.wcs.cd[0,1]+w.wcs.cd[1,1]*w.wcs.cd[1,1])]
+            w.wcs.pc = [[w.wcs.cd[0,0]/ w.wcs.cdelt[0], w.wcs.cd[0,1]/ w.wcs.cdelt[0]],[w.wcs.cd[1,0]/ w.wcs.cdelt[1], w.wcs.cd[1,1]/ w.wcs.cdelt[1]]]
+
+            #pc = WCSDATA.wcs.get_pc()
+            #w.wcs.pc = pc*scale
+            #w.wcs.cdelt = [np.sqrt(w.wcs.cd[0,0]*w.wcs.cd[0,0]+w.wcs.cd[1,0]*w.wcs.cd[1,0]), np.sqrt(w.wcs.cd[0,1]*w.wcs.cd[0,1]+w.wcs.cd[1,1]*w.wcs.cd[1,1])]
+            #w.wcs.cdelt = [1, 1]
+
+            #w.wcs.cd = [[w.wcs.pc[0,0]* w.wcs.cdelt[0], w.wcs.pc[0,1]* w.wcs.cdelt[0]],[w.wcs.pc[1,0]* w.wcs.cdelt[1], w.wcs.pc[1,1]* w.wcs.cdelt[1]]]
+            #log("cdelt: ")
+            #log(w.wcs.cdelt)
+
+            #log("cd")
+            #log(w.wcs.cd)
+
+            #log("pc")
+            #log(w.wcs.pc)
+
+            #del w.wcs.pc
+            #del w.wcs.cdelt
+
+            #w.wcs.pc = [[0,0],[0,0]]
+            #w.wcs.cdelt = [0,0]
+            
+            #w.wcs.print_contents()
 
             '''
             # Some pixel coordinates of interest.

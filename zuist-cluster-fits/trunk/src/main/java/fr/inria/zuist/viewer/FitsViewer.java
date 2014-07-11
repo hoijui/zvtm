@@ -494,14 +494,14 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     }
 
     public Vector<Glyph> getGlyphOnPoint(double jpx, double jpy){
-        System.out.println("getGlyphOnPoint("+jpx+", "+jpy+")");
+        //System.out.println("getGlyphOnPoint("+jpx+", "+jpy+")");
         Vector<Glyph> result = new Vector<Glyph>();
         for(ObjectDescription desc: sm.getObjectDescriptions()){
             if(desc instanceof FitsImageDescription && ((FitsImageDescription)desc).getGlyph() != null){
                 Glyph g = ((FitsImageDescription)desc).getGlyph();
                 //System.out.println("x: " + ((FitsImageDescription)desc).getX() + " - y: " + ((FitsImageDescription)desc).getY() );
                 double[] border = g.getBounds();
-                System.out.println(border[0]+" < "+jpx+" && "+border[1]+" > "+jpy+" && "+border[2]+" > "+jpx+" && "+border[3]+" < "+jpy );
+                //System.out.println(border[0]+" < "+jpx+" && "+border[1]+" > "+jpy+" && "+border[2]+" > "+jpx+" && "+border[3]+" < "+jpy );
                 if(border[0] < jpx && border[1] > jpy && border[2] > jpx && border[3] < jpy){
                     //System.out.println(((FitsImageDescription)desc).getX() + " - " + ((FitsImageDescription)desc).getY());
                     result.add(g);
@@ -526,15 +526,29 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
             return new Point2D.Double(0.0,0.0);
         }
 
-        double x = (xy.getX()-fi.getLocation().getX());
-        double y = (xy.getY()-fi.getLocation().getY());
-
-        System.out.println("cursor-fits:");
-        System.out.println(x + " " + y);
+        //double x = (xy.getX()-fi.getLocation().getX() + fi.getFitsWidth()/2 );
+        //double y = (xy.getY()-fi.getLocation().getY() + fi.getFitsHeight()/2 );
+        double x = (coord[0]-fi.getLocation().getX() + fi.getFitsWidth()/2 );
+        double y = (coord[1]-fi.getLocation().getY() + fi.getFitsHeight()/2 );
 
         Point2D.Double radec = fi.pix2wcs(x, y);
 
+        System.out.println("pix2wcs("+ x+", "+y+" )");
+        System.out.println("wcs: (" + radec.getX() + ", " + radec.getY() + ")");
+
         return radec;
+    }
+
+    public String getObjectName(Point2D.Double xy){
+        double[] coord = windowToViewCoordinate(xy.getX(), xy.getY());
+        Vector<Glyph> g = getGlyphOnPoint(coord[0], coord[1] );
+        FitsImage fi;
+        if(g.size() > 0){
+            fi = (FitsImage)g.firstElement();
+        } else {
+            return "";
+        }
+        return fi.getObjectName();
     }
 
 /*
