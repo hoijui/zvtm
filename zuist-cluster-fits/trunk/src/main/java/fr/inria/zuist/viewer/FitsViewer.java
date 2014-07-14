@@ -515,8 +515,10 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     public Point2D.Double coordinateWCS(Point2D.Double xy){
 
         System.out.println("coordinateWCS(" + xy.getX() + " - " + xy.getY() + ")");
-        double[] coord = windowToViewCoordinate(xy.getX(), xy.getY());
-        System.out.println("windowToViewCoordinate: " + coord[0] + " - " + coord[1]);
+        double[] coord = windowToViewCoordinateFromSmarties(xy.getX(), xy.getY());
+        System.out.println("windowToViewCoordinateFromSmarties: (" + coord[0] + ", " + coord[1] + ")");
+
+        double a = (mCamera.focal + mCamera.getAltitude()) / mCamera.focal;
 
         Vector<Glyph> g = getGlyphOnPoint(coord[0], coord[1] );
         FitsImage fi;
@@ -528,8 +530,11 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 
         //double x = (xy.getX()-fi.getLocation().getX() + fi.getFitsWidth()/2 );
         //double y = (xy.getY()-fi.getLocation().getY() + fi.getFitsHeight()/2 );
-        double x = (coord[0]-fi.getLocation().getX() + fi.getFitsWidth()/2 );
-        double y = (coord[1]-fi.getLocation().getY() + fi.getFitsHeight()/2 );
+        double x = (coord[0]/a - fi.getLocation().getX()/a + fi.getFitsWidth()/2 );
+        double y = (coord[1]/a - fi.getLocation().getY()/a + fi.getFitsHeight()/2 );
+
+        System.out.println("a: "+ a);
+        System.out.println("("+coord[0]+"-"+fi.getLocation().getX()+" + "+fi.getFitsWidth()+"/2 ), ("+coord[1]+"-"+fi.getLocation().getY()+" + "+fi.getFitsHeight()+"/2 )");
 
         Point2D.Double radec = fi.pix2wcs(x, y);
 
@@ -873,14 +878,39 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         //
         //double xx = (long)((double)x - ((double)getDisplayWidth()/2.0));
         //double yy = (long)(-(double)y + ((double)getDisplayHeight()/2.0));
+        double xx = (long)((double)x - ((double)SCENE_W/2.0));
+        double yy = (long)(-(double)y + ((double)SCENE_H/2.0));
+        
+        xx = l.getX()+ a*xx;
+        yy = l.getY()+ a*yy;
+
+        //double xx = l.getX()+ a*x;
+        //double yy = l.getY()+ a*y;
+
+        double[] r = new double[2];
+        r[0] = xx;
+        r[1] = yy;
+        return r;
+    }
+
+    public double[] windowToViewCoordinateFromSmarties(double x, double y){
+        Location l = mCamera.getLocation();
+        System.out.println("mCamera.getLocation(): " + l.getX() + " " + l.getY());
+        double a = (mCamera.focal + mCamera.getAltitude()) / mCamera.focal;
+
+        Location lc = cursorCamera.getLocation();
+        System.out.println("cursorCamera.getLocation(): " + lc.getX() + " " + lc.getY());
+
+        //double xx = (long)((double)x - ((double)getDisplayWidth()/2.0));
+        //double yy = (long)(-(double)y + ((double)getDisplayHeight()/2.0));
         //double xx = (long)((double)x - ((double)SCENE_W/2.0));
         //double yy = (long)(-(double)y + ((double)SCENE_H/2.0));
-        //
+        
         //xx = l.getX()+ a*xx;
         //yy = l.getY()+ a*yy;
 
-        double xx = l.getX()+ a*x;
-        double yy = l.getY()+ a*y;
+        double xx = l.getX()+ lc.getX() + a*x;//x/a;//a*x;
+        double yy = l.getY()+ lc.getY() + a*y;//y/a;//a*y;
 
         double[] r = new double[2];
         r[0] = xx;

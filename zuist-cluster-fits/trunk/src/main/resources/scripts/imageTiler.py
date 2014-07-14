@@ -483,10 +483,6 @@ def processSrcImg():
 
             hdulist = fits.open(IMG_SRC_PATH)
 
-            log("--------------------")
-            log(hdulist.info())
-            log("--------------------\n")
-
             if hdulist[0].header['NAXIS'] == 2:
                 src_sz = (hdulist[0].header['NAXIS1'], hdulist[0].header['NAXIS2'])
                 im = hdulist[0].data
