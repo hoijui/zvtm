@@ -8,14 +8,28 @@ package fr.inria.zvtm.fits;
 
 import jsky.coords.WCSKeywordProvider;
 import nom.tam.fits.Header;
+import nom.tam.fits.HeaderCard;
 
 public class NomWcsKeywordProvider implements WCSKeywordProvider{
     private final Header header;
 
     public NomWcsKeywordProvider(Header hdr){
         this.header = hdr;
+        /*
+        HeaderCard it = hdr.nextCard();
+        while(it != null){
+            showHeaderCard(it);
+            it = hdr.nextCard();
+        }
+        */
     }
-
+/*
+    public void showHeaderCard(HeaderCard it){
+        if(it != null){
+            System.out.println(it.getKey() + ": "+it.getValue() + " //"+it.getComment() );
+        }
+    }
+*/
     public boolean findKey(java.lang.String key){
         return header.findKey(key) != null;
     }

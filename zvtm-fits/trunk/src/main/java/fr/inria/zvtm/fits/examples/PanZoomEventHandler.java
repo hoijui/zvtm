@@ -156,6 +156,17 @@ class PanZoomEventHandler implements ViewListener {
                 v.parent.setActiveLayer(((FitsExample)app).LAYER_FITS);
                 v.parent.setCursorIcon(Cursor.CUSTOM_CURSOR);
             }
+
+            Point2D.Double cur = new Point2D.Double(v.getVCursor().getVSXCoordinate(), v.getVCursor().getVSYCoordinate());
+            Point2D.Double fi = new Point2D.Double(0,0);
+            System.out.println( "[" + ((FitsExample)app).hi.getFitsWidth()/2 + ", " + ((FitsExample)app).hi.getFitsHeight()/2 + "]");
+            double x = cur.getX() - fi.getX() + ((FitsExample)app).hi.getFitsWidth()/2;
+            double y = cur.getY() - fi.getY() + ((FitsExample)app).hi.getFitsHeight()/2;
+            System.out.println( x + " - " + y );
+            Point2D.Double wcs = ((FitsExample)app).hi.pix2wcs( x, y );
+            System.out.println("pix2wcs("+ x+", "+y+" )");
+            System.out.println("wcs: (" + wcs.getX() + ", " + wcs.getY() + ")");
+
         }
         else if(app instanceof JSkyFitsExample){
             //System.out.println(jpx + " < " + ((JSkyFitsExample)app).menu.WIDTH_MENU + " " + ((JSkyFitsExample)app).menu.BORDER_BOTTON_FILTER + " < " + jpy + " < " + ((JSkyFitsExample)app).menu.BORDER_TOP_FILTER);

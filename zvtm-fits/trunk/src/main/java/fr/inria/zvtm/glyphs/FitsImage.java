@@ -27,6 +27,7 @@ import edu.jhu.pha.sdss.fits.FITSImage;
 import edu.jhu.pha.sdss.fits.imageio.FITSReaderSpi;
 
 import jsky.coords.WCSTransform;
+import jsky.image.fits.FITSKeywordProvider;
 
 import nom.tam.fits.FitsException;
 
@@ -66,6 +67,7 @@ public class FitsImage extends VImage {
     private ScaleMethod scaleMethod = ScaleMethod.HISTOGRAM_EQUALIZATION;
     private WCSTransform wcsTransform;
     private Grid grid = null;
+    private String objectName = "";
 
     static {
         IIORegistry.getDefaultInstance().
@@ -166,7 +168,11 @@ public class FitsImage extends VImage {
         //filter = ColorFilter.RAINBOW.getFilter();
         try{
             fitsImage = new ExFITSImage(imgUrl);
-            wcsTransform = new WCSTransform(new NomWcsKeywordProvider(fitsImage.getFits().getHDU(0).getHeader()));
+            NomWcsKeywordProvider wcsKeyProvider = new NomWcsKeywordProvider(fitsImage.getFits().getHDU(0).getHeader());
+            wcsTransform = new WCSTransform(wcsKeyProvider);
+            
+            objectName = wcsKeyProvider.getStringValue("OBJECT");
+            //wcsTransform = new WCSTransform(double cra, double cdec, double xsecpix, double ysecpix, double xrpix, double yrpix, int nxpix, int nypix, double rotate, int equinox, double epoch, java.lang.String proj) 
         } catch(Exception e){
             throw new Error(e);
         }
@@ -177,6 +183,7 @@ public class FitsImage extends VImage {
         } catch (Exception fe){
             System.err.println("image rescale failed: " + fe);
         }
+        
         recreateDisplayImage();
     }
 
@@ -198,7 +205,12 @@ public class FitsImage extends VImage {
         //filter = ColorFilter.RAINBOW.getFilter();
         try{
             fitsImage = new ExFITSImage(imgUrl);
-            wcsTransform = new WCSTransform(new NomWcsKeywordProvider(fitsImage.getFits().getHDU(0).getHeader()));
+            
+            NomWcsKeywordProvider wcsKeyProvider = new NomWcsKeywordProvider(fitsImage.getFits().getHDU(0).getHeader());
+            wcsTransform = new WCSTransform(wcsKeyProvider);
+            
+            objectName = wcsKeyProvider.getStringValue("OBJECT");
+            //wcsTransform = new WCSTransform(double cra, double cdec, double xsecpix, double ysecpix, double xrpix, double yrpix, int nxpix, int nypix, double rotate, int equinox, double epoch, java.lang.String proj) 
         } catch(Exception e){
             throw new Error(e);
         }
@@ -234,7 +246,12 @@ public class FitsImage extends VImage {
 
         try{
             fitsImage = new ExFITSImage(imgFile);
-            wcsTransform = new WCSTransform(new NomWcsKeywordProvider(fitsImage.getFits().getHDU(0).getHeader()));
+            
+            NomWcsKeywordProvider wcsKeyProvider = new NomWcsKeywordProvider(fitsImage.getFits().getHDU(0).getHeader());
+            wcsTransform = new WCSTransform(wcsKeyProvider);
+            
+            objectName = wcsKeyProvider.getStringValue("OBJECT");
+            //wcsTransform = new WCSTransform(double cra, double cdec, double xsecpix, double ysecpix, double xrpix, double yrpix, int nxpix, int nypix, double rotate, int equinox, double epoch, java.lang.String proj) 
         } catch(Exception e){
             throw new Error(e);
         }
@@ -287,6 +304,10 @@ public class FitsImage extends VImage {
         this(x,y,z,imgFile,1);
     }
 
+    public String getObjectName(){
+        return objectName;
+    }
+
     /**
      * Sets the image scale method.
      * @param scaleMethod the new scale method.
@@ -326,7 +347,7 @@ public class FitsImage extends VImage {
      * Flexible version.
      */
     public void setColorFilter(ImageFilter filter){
-        System.out.println("setColorFilter( " + filter + " )");
+        //System.out.println("setColorFilter( " + filter + " )");
         this.filter = filter;
         recreateDisplayImage();
     }
@@ -339,9 +360,11 @@ public class FitsImage extends VImage {
      * saturated.
      */
     public void rescale(double min, double max, double sigma){
+        //System.out.println("rescale("+min+", "+max+", "+sigma +")");
         try{
             fitsImage.rescale(min, max, sigma);
             recreateDisplayImage();
+            //System.out.println("recreateDisplayImage");
         } catch(Exception ex){
             throw new Error(ex);
         }
@@ -405,6 +428,13 @@ public class FitsImage extends VImage {
         return grid;
     }
 
+    public int getFitsHeight(){
+        return fitsImage.getHeight();
+    }
+
+    public int getFitsWidth(){
+        return fitsImage.getWidth();
+    }
     private void recreateDisplayImage(){
         ImageProducer producer = fitsImage.getSource();
         producer = new FilteredImageSource(producer, filter);
