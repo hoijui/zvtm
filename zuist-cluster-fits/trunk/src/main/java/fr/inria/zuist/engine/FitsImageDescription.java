@@ -69,7 +69,7 @@ public class FitsImageDescription extends ResourceDescription {
 
     private boolean createdWithGlobalData = false;
 
-    private Region parentRegion;
+    //private Region parentRegion;
 
     public FitsImageDescription(String id, double x, double y, int z, URL src,
             Region parentRegion, float scaleFactor, FitsImage.ScaleMethod scaleMethod,
@@ -91,7 +91,7 @@ public class FitsImageDescription extends ResourceDescription {
 
         layerIndex = parentRegion.getLayerIndex();
 
-        this.parentRegion = parentRegion;
+        //this.parentRegion = parentRegion;
 
         try{
             FITSImage fitsImage = new FITSImage(src);
@@ -140,7 +140,7 @@ public class FitsImageDescription extends ResourceDescription {
 
         layerIndex = parentRegion.getLayerIndex();
 
-        this.parentRegion = parentRegion;
+        //this.parentRegion = parentRegion;
 
         try{
             FITSImage fitsImage = new FITSImage(src);
