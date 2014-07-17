@@ -18,6 +18,12 @@ import java.awt.image.ImageFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import jsky.coords.WCSTransform;
+import fr.inria.zvtm.fits.NomWcsKeywordProvider;
+import edu.jhu.pha.sdss.fits.FITSImage; 
+import java.awt.geom.Point2D;
+import nom.tam.fits.FitsException;
+
 /**
  * Describes a FITS images and creates / releases the corresponding
  * ZVTM glyph on demand.
@@ -34,6 +40,11 @@ public class FitsImageDescription extends ResourceDescription {
     private double vx;
     private double vy;
     private int zindex;
+    private double w;
+    private double h;
+
+    private WCSTransform wcsTransform;
+    private String objectName; 
 
     private float alpha = 1f;
     private boolean isVisible = false;
@@ -58,15 +69,19 @@ public class FitsImageDescription extends ResourceDescription {
 
     private boolean createdWithGlobalData = false;
 
+    private Region parentRegion;
+
     public FitsImageDescription(String id, double x, double y, int z, URL src,
-            Region parentRegion,
-            float scaleFactor, FitsImage.ScaleMethod scaleMethod,
+            Region parentRegion, float scaleFactor, FitsImage.ScaleMethod scaleMethod,
             FitsImage.ColorFilter colorFilter){
         this.id = id;
         this.vx = x;
         this.vy = y;
         this.zindex = z;
         this.src = src;
+
+        w = parentRegion.getWidth();
+        h = parentRegion.getHeight();
 
         this.scaleFactor = scaleFactor;
         this.scaleMethod = scaleMethod;
@@ -76,17 +91,40 @@ public class FitsImageDescription extends ResourceDescription {
 
         layerIndex = parentRegion.getLayerIndex();
 
+        this.parentRegion = parentRegion;
+
+        try{
+            FITSImage fitsImage = new FITSImage(src);
+            NomWcsKeywordProvider wcsKeyProvider = new NomWcsKeywordProvider(fitsImage.getFits().getHDU(0).getHeader());
+            wcsTransform = new WCSTransform(wcsKeyProvider);
+            objectName = wcsKeyProvider.getStringValue("OBJECT");
+        } catch(IOException ioe){
+            wcsTransform = null;
+            objectName = "";
+        } catch (FitsException fe){
+            wcsTransform = null;
+            objectName = "";
+        } catch(FITSImage.NoImageDataFoundException nidfe){
+            wcsTransform = null;
+            objectName = "";
+        } catch(FITSImage.DataTypeNotSupportedException dtnse) {
+            wcsTransform = null;
+            objectName = "";
+        }
+
     }
 
     public FitsImageDescription(String id, double x, double y, int z, URL src,
-            Region parentRegion,
-            float scaleFactor, FitsImage.ScaleMethod scaleMethod,
+            Region parentRegion, float scaleFactor, FitsImage.ScaleMethod scaleMethod,
             FitsImage.ColorFilter colorFilter, double min, double max){
         this.id = id;
         this.vx = x;
         this.vy = y;
         this.zindex = z;
         this.src = src;
+
+        w = parentRegion.getWidth();
+        h = parentRegion.getHeight();
 
         this.scaleFactor = scaleFactor;
         this.scaleMethod = scaleMethod;
@@ -102,6 +140,31 @@ public class FitsImageDescription extends ResourceDescription {
 
         layerIndex = parentRegion.getLayerIndex();
 
+        this.parentRegion = parentRegion;
+
+        try{
+            FITSImage fitsImage = new FITSImage(src);
+            NomWcsKeywordProvider wcsKeyProvider = new NomWcsKeywordProvider(fitsImage.getFits().getHDU(0).getHeader());
+            wcsTransform = new WCSTransform(wcsKeyProvider);
+            objectName = wcsKeyProvider.getStringValue("OBJECT");
+        } catch(IOException ioe){
+            wcsTransform = null;
+            objectName = "";
+        } catch (FitsException fe){
+            wcsTransform = null;
+            objectName = "";
+        } catch(FITSImage.NoImageDataFoundException nidfe){
+            wcsTransform = null;
+            objectName = "";
+        } catch(FITSImage.DataTypeNotSupportedException dtnse) {
+            wcsTransform = null;
+            objectName = "";
+        }
+
+    }
+
+    public String getObjectName(){
+        return objectName;
     }
 
     public int getLayerIndex(){
@@ -110,6 +173,10 @@ public class FitsImageDescription extends ResourceDescription {
 
     public boolean isCreatedWithGlobalData(){
         return createdWithGlobalData;
+    }
+
+    public Region getParentRegion(){
+        return parentRegion;
     }
 
     public String getType(){
@@ -206,6 +273,14 @@ public class FitsImageDescription extends ResourceDescription {
         glyph = null;
     }
 
+    public double getWidth(){
+        return w;
+    }
+
+    public double getHeight(){
+        return h;
+    }
+
     @Override
     public Glyph getGlyph(){
         return glyph;
@@ -213,12 +288,32 @@ public class FitsImageDescription extends ResourceDescription {
 
     @Override
     public double getX(){
-        return glyph.vx;
+        //return glyph.vx;
+        return vx;
     }
 
     @Override
     public double getY(){
-        return glyph.vy;
+        //return glyph.vy;
+        return vy;
+    }
+
+    /**
+     * Converts pixel coordinates to World Coordinates. Returns null if the WCSTransform is not valid.
+     * @param x x-coordinates, in the FITS system: (0,0) lower left, x axis increases to the right, y axis increases upwards
+     * @param y y-coordinates, in the FITS system: (0,0) lower left, x axis increases to the right, y axis increases upwards
+     */
+    public Point2D.Double pix2wcs(double x, double y){
+        if(wcsTransform != null) return wcsTransform.pix2wcs(x, y);
+        else return null;
+    }
+
+    /**
+     * Converts World Coordinates to pixel coordinates. Returns null if the WCSTransform is invalid, or if the WCS position does not fall within the image.
+     */
+    public Point2D.Double wcs2pix(double ra, double dec){
+        if(wcsTransform != null) return wcsTransform.wcs2pix(ra, dec);
+        else return null;
     }
 
     @Override
@@ -234,6 +329,10 @@ public class FitsImageDescription extends ResourceDescription {
     public void setVisible(boolean visible){
         this.isVisible = visible;
         if(glyph != null) glyph.setVisible(visible);
+    }
+
+    public boolean isVisible(){
+        return isVisible;
     }
 
 }

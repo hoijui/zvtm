@@ -259,6 +259,10 @@ public class SmartiesManager implements Observer {
                         dragDevice = null;
                         dragPuck = null;
                     }
+                    if (se.p != null){
+                        myCursor c = (myCursor)se.p.app_data;
+                        c.updateWCS();
+                    }
                
                     break;
                 }
@@ -356,15 +360,19 @@ public class SmartiesManager implements Observer {
             wc.moveTo((long)(x*application.SCENE_W - application.SCENE_W/2.0), (long)(application.SCENE_H/2.0 - y*application.SCENE_H));
             label.moveTo((long)(x*application.SCENE_W - application.SCENE_W/2.0+50), (long)(application.SCENE_H/2.0 - y*application.SCENE_H+50));
             Point2D.Double pWCS = new Point2D.Double(wc.getX(), wc.getY());
-            Point2D.Double radec = application.coordinateWCS(pWCS);
-            updateLabel("Ra: " + radec.getX() + " - Dec: " + radec.getY()+" - Object: "+application.getObjectName(pWCS));
-
-
         }
 
         public void labelSetVisible(boolean b){
             labelVisible = b;
             label.setVisible(b);
+        }
+
+        public void updateWCS(){
+            Point2D.Double pWCS = new Point2D.Double(wc.getX(), wc.getY());
+            if(labelVisible){
+                Point2D.Double radec = application.coordinateWCS(pWCS);
+                updateLabel("Ra: " + radec.getX() + " - Dec: " + radec.getY());//+" - Object: "+application.getObjectName(pWCS));
+            }
         }
 
         public void updateLabel(String text){

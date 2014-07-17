@@ -43,6 +43,12 @@ aspect AutoReplay extends AbstractAutoReplay {
          execution(public void FitsImageDescription.rescaleLocal()) ||
          execution(public double[] FitsImageDescription.getLocalScaleParams()) ||
          execution(public void FitsImageDescription.setTranslucency(float)) ||
+         execution(public String FitsImageDescription.getObjectName()) ||
+         execution(public double FitsImageDescription.getWidth()) ||
+         execution(public double FitsImageDescription.getHeight()) ||
+         execution(public double FitsImageDescription.getX()) ||
+         execution(public double FitsImageDescription.getY()) ||
+         execution(public boolean FitsImageDescription.isVisible()) ||
          execution(public void FitsImageDescription.setVisible(boolean))
         );
 }

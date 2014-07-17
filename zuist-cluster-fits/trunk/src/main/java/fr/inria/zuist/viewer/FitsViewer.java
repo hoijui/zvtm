@@ -493,10 +493,61 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         */
     }
 
-    public Vector<Glyph> getGlyphOnPoint(double jpx, double jpy){
+    ObjectDescription beforeFits;
+
+    //public Vector<ObjectDescription> getGlyphOnPoint(double jpx, double jpy){
+    public ObjectDescription getGlyphOnPoint(double jpx, double jpy){
         //System.out.println("getGlyphOnPoint("+jpx+", "+jpy+")");
-        Vector<Glyph> result = new Vector<Glyph>();
+        //Vector<ObjectDescription> result = new Vector<ObjectDescription>();
+        //double a = (mCamera.focal + mCamera.getAltitude()) / mCamera.focal;
+        //System.out.println("a: "+a);
+        //a = mCamera.focal / (mCamera.focal+ mCamera.getAltitude());
+        //System.out.println("a: "+a);
+        double h, w, x, y;
+
+        if(beforeFits != null && ((FitsImageDescription)beforeFits).isVisible()){
+            h = ((FitsImageDescription)beforeFits).getHeight();
+            w = ((FitsImageDescription)beforeFits).getWidth();
+            x = ((FitsImageDescription)beforeFits).getX();
+            y = ((FitsImageDescription)beforeFits).getY();
+            if(x-w/2 < jpx && x+w/2 > jpx && y-h/2 < jpy && y+h/2 > jpy){
+                return beforeFits;
+            }
+
+            /*
+            int i = 0;
+            for(ObjectDescription desc: ((FitsImageDescription)beforeFits).getParentRegion().getObjectsInRegion() ){
+                System.out.println(i++);
+                h = ((FitsImageDescription)desc).getHeight();
+                w = ((FitsImageDescription)desc).getWidth();
+                x = ((FitsImageDescription)desc).getX();
+                y = ((FitsImageDescription)desc).getY();
+                if(x-w/2 < jpx && x+w/2 > jpx && y-h/2 < jpy && y+h/2 > jpy){
+                    //result.add((FitsImageDescription)desc);
+                    //return result;
+                    beforeFits = desc;
+                    return desc;
+                }
+            }
+            */
+
+        }
+ 
+
         for(ObjectDescription desc: sm.getObjectDescriptions()){
+            if(desc instanceof FitsImageDescription && ((FitsImageDescription)desc).isVisible()){
+                h = ((FitsImageDescription)desc).getHeight();
+                w = ((FitsImageDescription)desc).getWidth();
+                x = ((FitsImageDescription)desc).getX();
+                y = ((FitsImageDescription)desc).getY();
+                if(x-w/2 < jpx && x+w/2 > jpx && y-h/2 < jpy && y+h/2 > jpy){
+                    //result.add((FitsImageDescription)desc);
+                    //return result;
+                    beforeFits = desc;
+                    return desc;
+                }
+            }
+            /*
             if(desc instanceof FitsImageDescription && ((FitsImageDescription)desc).getGlyph() != null){
                 Glyph g = ((FitsImageDescription)desc).getGlyph();
                 //System.out.println("x: " + ((FitsImageDescription)desc).getX() + " - y: " + ((FitsImageDescription)desc).getY() );
@@ -507,8 +558,10 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
                     result.add(g);
                 }
             }
+            */
         }
-        return result;
+        //return result;
+        return null;
     }
 
     
@@ -520,21 +573,33 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 
         double a = (mCamera.focal + mCamera.getAltitude()) / mCamera.focal;
 
-        Vector<Glyph> g = getGlyphOnPoint(coord[0], coord[1] );
-        FitsImage fi;
+        /*
+        Vector<ObjectDescription> g = getGlyphOnPoint(coord[0], coord[1] );
+        FitsImageDescription fi;
         if(g.size() > 0){
-            fi = (FitsImage)g.firstElement();
+            fi = (FitsImageDescription)(g.firstElement());
+        } else {
+            return new Point2D.Double(0.0,0.0);
+        }
+        */
+
+        ObjectDescription g = getGlyphOnPoint(coord[0], coord[1] );
+        FitsImageDescription fi;
+        if(g != null){
+            fi = (FitsImageDescription)(g);
         } else {
             return new Point2D.Double(0.0,0.0);
         }
 
         //double x = (xy.getX()-fi.getLocation().getX() + fi.getFitsWidth()/2 );
         //double y = (xy.getY()-fi.getLocation().getY() + fi.getFitsHeight()/2 );
-        double x = (coord[0]/a - fi.getLocation().getX()/a + fi.getFitsWidth()/2 );
-        double y = (coord[1]/a - fi.getLocation().getY()/a + fi.getFitsHeight()/2 );
+        //double x = (coord[0]/a - fi.getLocation().getX()/a + fi.getFitsWidth()/2 );
+        //double y = (coord[1]/a - fi.getLocation().getY()/a + fi.getFitsHeight()/2 );
+        double x = (coord[0]/a - fi.getX()/a + fi.getWidth()/2 );
+        double y = (coord[1]/a - fi.getY()/a + fi.getHeight()/2 );
 
-        System.out.println("a: "+ a);
-        System.out.println("("+coord[0]+"-"+fi.getLocation().getX()+" + "+fi.getFitsWidth()+"/2 ), ("+coord[1]+"-"+fi.getLocation().getY()+" + "+fi.getFitsHeight()+"/2 )");
+        //System.out.println("a: "+ a);
+        //System.out.println("("+coord[0]+"-"+fi.getLocation().getX()+" + "+fi.getFitsWidth()+"/2 ), ("+coord[1]+"-"+fi.getLocation().getY()+" + "+fi.getFitsHeight()+"/2 )");
 
         Point2D.Double radec = fi.pix2wcs(x, y);
 
@@ -544,17 +609,19 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         return radec;
     }
 
+/*
     public String getObjectName(Point2D.Double xy){
         double[] coord = windowToViewCoordinate(xy.getX(), xy.getY());
-        Vector<Glyph> g = getGlyphOnPoint(coord[0], coord[1] );
-        FitsImage fi;
-        if(g.size() > 0){
-            fi = (FitsImage)g.firstElement();
+        ObjectDescription g = getGlyphOnPoint(coord[0], coord[1] );
+        FitsImageDescription fi;
+        if(g != null){
+            fi = (FitsImageDescription)(g);
         } else {
             return "";
         }
         return fi.getObjectName();
     }
+*/
 
 /*
     void updateWCS(Point2D.Double xy){

@@ -74,11 +74,13 @@ public class FitsResourceHandler implements ResourceHandler {
         if (max != Double.MIN_VALUE && min != Double.MAX_VALUE){
             desc = new FitsImageDescription(
                 id, x, y, zindex, resourceURL, region,
-                scaleFactor, scaleMethod, colorFilter, min, max);
+                scaleFactor, scaleMethod, colorFilter, min, max
+            );
         } else {
             desc = new FitsImageDescription(
                 id, x, y, zindex, resourceURL, region,
-                scaleFactor, scaleMethod, colorFilter);
+                scaleFactor, scaleMethod, colorFilter
+            );
         }
         
         region.addObject(desc);
