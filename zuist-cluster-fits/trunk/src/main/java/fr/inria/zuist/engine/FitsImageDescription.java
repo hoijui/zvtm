@@ -175,9 +175,11 @@ public class FitsImageDescription extends ResourceDescription {
         return createdWithGlobalData;
     }
 
+    /*
     public Region getParentRegion(){
         return parentRegion;
     }
+    */
 
     public String getType(){
         return FitsResourceHandler.RESOURCE_TYPE_FITS;

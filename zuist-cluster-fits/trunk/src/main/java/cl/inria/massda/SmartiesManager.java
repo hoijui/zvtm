@@ -359,7 +359,6 @@ public class SmartiesManager implements Observer {
             //wc.moveTo((long)(x*application.getDisplayWidth() - application.getDisplayWidth()/2.0), (long)(application.getDisplayHeight()/2.0 - y*application.getDisplayHeight()));
             wc.moveTo((long)(x*application.SCENE_W - application.SCENE_W/2.0), (long)(application.SCENE_H/2.0 - y*application.SCENE_H));
             label.moveTo((long)(x*application.SCENE_W - application.SCENE_W/2.0+50), (long)(application.SCENE_H/2.0 - y*application.SCENE_H+50));
-            Point2D.Double pWCS = new Point2D.Double(wc.getX(), wc.getY());
         }
 
         public void labelSetVisible(boolean b){
