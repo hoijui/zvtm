@@ -23,6 +23,9 @@ import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.Utils;
 import fr.inria.zvtm.engine.Camera;
+import fr.inria.zvtm.engine.Location;
+import fr.inria.zvtm.animation.EndAction;
+
 import fr.inria.zvtm.event.ViewAdapter;
 import fr.inria.zvtm.event.ViewListener;
 
@@ -59,12 +62,14 @@ public class Calibrator {
     static final int VIEW_W = 1280;
     static final int VIEW_H = 1024;
 
-    public static double SCENE_W = 12000;
-    public static double SCENE_H = 4500;
+    public static double SCENE_W = 11520;//12000;
+    public static double SCENE_H = 4320;//4500;
 
-    VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE;
-    VirtualSpace mSpace;
-    Camera mCamera;
+    VirtualSpaceManager vsm;
+    static final String mSpaceName = "Scene Space";
+    static final String cursorSpaceName = "Cursor Space";
+    VirtualSpace mSpace, cursorSpace;
+    Camera mCamera, cursorCamera;
     View mView;
     ViewListener eh;
 
@@ -74,11 +79,24 @@ public class Calibrator {
     //TuioListener tl;
 
     public Calibrator(WEOptions options){
+        
+        initGUI(options);
+        TUIOEventHandler teh = new TUIOEventHandler(this);
+
+        initScene(options.sceneWidth, options.sceneHeight, options.sceneStep);
+    }
+
+    public void initGUI(WEOptions options){
+        vsm = VirtualSpaceManager.INSTANCE;
         vsm.setMaster("Calibrator");
-        mSpace = vsm.addVirtualSpace(VirtualSpace.ANONYMOUS);
+
+        mSpace = vsm.addVirtualSpace(mSpaceName);
         mCamera = mSpace.addCamera();
+        cursorSpace = vsm.addVirtualSpace(cursorSpaceName);
+        cursorCamera = cursorSpace.addCamera();
         Vector cameras = new Vector();
         cameras.add(mCamera);
+        cameras.add(cursorCamera);
         // local view (on master)
         mView = vsm.addFrameView(cameras, "zvtm-cluster-calibrator", View.STD_VIEW, VIEW_W, VIEW_H, true);
         mView.setAntialiasing(true);
@@ -90,25 +108,12 @@ public class Calibrator {
         cg = new ClusterGeometry(options.blockWidth, options.blockHeight, options.numCols, options.numRows);
         Vector ccameras = new Vector();
         ccameras.add(mCamera);
+        ccameras.add(cursorCamera);
         cv = new ClusteredView(cg, options.numRows-1, options.numCols, options.numRows, ccameras);
         cv.setBackgroundColor(Color.BLACK);
         vsm.addClusteredView(cv);
 
-        //initTUIO(options.tuioPort);
-        TUIOEventHandler teh = new TUIOEventHandler(this);
-
-        initScene(options.sceneWidth, options.sceneHeight, options.sceneStep);
     }
-
-/*
-    void initTUIO(int port){
-        tl = new TUIOListener(this);
-        TuioClient client = new TuioClient(port);
-        client.addTuioListener(tl);
-        client.connect();
-        System.out.println("Listening to TUIO events on port "+port);
-    }
-*/
 
     void initScene(int w, int h, int step){
         SCENE_W = w;
@@ -214,51 +219,31 @@ public class Calibrator {
         new Calibrator(options);
     }
 
-}
 
-/*
 
-class TUIOListener implements TuioListener {
+    void centeredZoom(double f, double x, double y){
+        Location l = mCamera.getLocation();
+        double a = (mCamera.focal+Math.abs(mCamera.altitude)) / mCamera.focal;
+        double newz = mCamera.focal * a * f - mCamera.focal;
+        if (newz < 0){
+            newz = 0;
+            f = mCamera.focal / (a*mCamera.focal);
+        }
 
-    Calibrator application;
+        double xx = (long)((double)x - (SCENE_W/2.0))*a + l.getX();
+        double yy = (long)(-(double)y + (SCENE_H/2.0))*a + l.getY();
 
-    TUIOListener(Calibrator app){
-        this.application = app;
-    }
+        double dx = l.getX() - xx;
+        double dy = l.getY() - yy;
 
-    public void addTuioCursor(TuioCursor tcur){
-        System.out.println("A C "+tcur.getPosition().getX()+" "+tcur.getPosition().getY());
-        application.addObject(tcur.getPosition());
-    }
+        double newx = l.getX() + (f*dx - dx); // *a/(mCamera.altitude+ mCamera.focal));
+        double newy = l.getY() + (f*dy - dy);
 
-    public void addTuioObject(TuioObject tobj){
-        System.out.println("A O "+tobj.getPosition());
-        application.addObject(tobj.getPosition());
-    }
-
-    public void refresh(TuioTime btime){
-        // System.out.println("R at "+btime);
-    }
-
-    public void removeTuioCursor(TuioCursor tcur){
-        // System.out.println("R C "+tcur);
-    }
-
-    public void removeTuioObject(TuioObject tobj){
-        // System.out.println("R O "+tobj);
-    }
-
-    public void updateTuioCursor(TuioCursor tcur){
-        // System.out.println("U C "+tcur.getPosition().getX()+" "+tcur.getPosition().getY());
-    }
-
-    public void updateTuioObject(TuioObject tobj){
-        // System.out.println("U O "+tobj.getPosition());
+        mCamera.setLocation(new Location(newx, newy, newz));
     }
 
 }
 
-*/
 
 class CalibratorListener extends ViewAdapter {
 
@@ -340,7 +325,6 @@ class CalibratorListener extends ViewAdapter {
     }
 
     public void exitGlyph(Glyph g){
-        
         // g.highlight(false, null);
         if(g.getType().equals(Calibrator.T_POINT_TUIO)){
             application.mSpace.removeGlyph((Glyph)g.getOwner());

@@ -14,26 +14,39 @@ import TUIO.TuioTime;
 import TUIO.TuioPoint;
 
 import fr.inria.zvtm.engine.VirtualSpace;
+import fr.inria.zvtm.engine.Camera;
 
 import java.util.Vector;
+
+import java.lang.ArrayIndexOutOfBoundsException;
+import java.awt.Color;
+import fr.inria.zvtm.glyphs.VCircle;
 
 
 class TUIOEventHandler implements TuioListener{
 
 	Calibrator application;
-	Vector<WallTuioCursor> cursors;
+
+    WallTuioCursor[] cursors;
+    int[] countCorrect;
+    private boolean pan = false;
+    private boolean zoom = false;
+    private static final int minTrust = 4;
+    static final float WHEEL_ZOOMIN_FACTOR = 15.0f;
+    static final float WHEEL_ZOOMOUT_FACTOR = 16.0f;
+
+    double lastDistance = 0.0;
 
 
 	TUIOEventHandler(Calibrator app){
-		application = app;
-		initTUIO(3333);
-        cursors = new Vector<WallTuioCursor>();
-	}
+        this(app, 3333);
+    }
 
 	TUIOEventHandler(Calibrator app, int port){
 		application = app;
 		initTUIO(port);
-        cursors = new Vector<WallTuioCursor>();
+        cursors = new WallTuioCursor[40];
+        countCorrect = new int[40];
 	}
 
 	void initTUIO(int port){
@@ -41,82 +54,111 @@ class TUIOEventHandler implements TuioListener{
         client.addTuioListener(this);
         client.connect();
         System.out.println("Listening to TUIO events on port "+port);
-    }
-
-
-    public void addTuioCursor(TuioCursor tcur){
-        //System.out.println("A C "+tcur.getPosition().getX()+" "+tcur.getPosition().getY());
-        //application.addObject(tcur.getPosition());
-        //System.out.println("addTuioCursor");
-        //showCursor(tcur);
-
-        
-        int cursorID = tcur.getCursorID();
-        if(cursorID >= cursors.size()){
-            WallTuioCursor wtc = new WallTuioCursor(application.mSpace, tcur);
-            wtc.setVisible(true);
-            double x = tcur.getPosition().getX()*application.SCENE_W - application.SCENE_W/2;
-            double y = application.SCENE_H/2 - tcur.getPosition().getY()*application.SCENE_H;
-            wtc.moveTo(x, y);
-            cursors.add(wtc);
-        } else {
-            WallTuioCursor wtc = cursors.get(tcur.getCursorID());
-            wtc.setVisible(true);
-            double x = tcur.getPosition().getX()*application.SCENE_W - application.SCENE_W/2;
-            double y = application.SCENE_H/2 - tcur.getPosition().getY()*application.SCENE_H;
-            wtc.moveTo(x, y);
-        }
-        
-    }
-
-    public void addTuioObject(TuioObject tobj){
-        //System.out.println("A O "+tobj.getPosition());
-        //application.addObject(tobj.getPosition());
-    }
+    }   
 
     public void refresh(TuioTime btime){
-        // System.out.println("R at "+btime);
+        
+        int countTouch = 0;
+        Vector<Integer> touchs = new Vector();
+        for(int i = 0; i < cursors.length; i++){
+            if(cursors[i] != null){
+                if(( btime.getTotalMilliseconds() - cursors[i].getTotalMilliseconds() ) == 0 ){
+                    countCorrect[i]++;
+                } else {
+                    countCorrect[i] = 0;
+                }
+                if( countCorrect[i] >= minTrust){
+                    cursors[i].setVisible(true);
+                    touchs.add(i);
+                    countTouch++;
+                } else {
+                    cursors[i].setVisible(false);
+                }
+                if(countCorrect[i] != 0) System.out.println("countCorrect: " + countCorrect[i]);
+            }
+        }
+
+        if(countTouch != 0) System.out.println("countTouch: "+countTouch);
+
+        Camera c = application.mCamera;
+        double a = (c.focal+Math.abs(c.altitude)) / c.focal;
+        double distance = 0.0;
+
+        switch(countTouch){
+            case 3:
+
+                break;
+            case 2:
+                if(zoom){
+                    distance = ( cursors[touchs.get(countTouch-1)].getDistance(cursors[touchs.get(countTouch-2)]));
+                    double x =  (cursors[touchs.get(countTouch-1)].getX() + cursors[touchs.get(countTouch-2)].getX() )/2;
+                    double y =  (cursors[touchs.get(countTouch-1)].getY() + cursors[touchs.get(countTouch-2)].getY() )/2;
+
+                    application.centeredZoom( (lastDistance / distance), x+Calibrator.SCENE_W/2, y+Calibrator.SCENE_H/2);
+                }
+                zoom = true;
+                pan = false;
+                distance = ( cursors[touchs.get(countTouch-1)].getDistance(cursors[touchs.get(countTouch-2)]));
+                lastDistance = distance;
+                break;
+            case 1:
+                if(pan){
+                    c.move( a*cursors[touchs.get(countTouch-1)].getDistanceX(), a*cursors[touchs.get(countTouch-1)].getDistanceY());
+                }
+                pan = true;
+                zoom = false;
+                break;
+            
+            default:
+                pan = false;
+                zoom = false;
+                break;
+        }
+    }
+
+    public void addTuioCursor(TuioCursor tcur){
+        int cursorID = tcur.getCursorID();
+        double x = tcur.getX();
+        double y = tcur.getY();
+        long time = tcur.getTuioTime().getTotalMilliseconds();
+
+        double xx = x*application.SCENE_W-application.SCENE_W/2;
+        double yy = (1-y)*application.SCENE_H-application.SCENE_H/2;
+
+        if(cursorID >= 0 && cursorID < cursors.length && x >= 0 && x <=1 && y >= 0 && y <= 1){
+            if(cursors[cursorID] == null){
+                WallTuioCursor wtc = new WallTuioCursor(application.cursorSpace, cursorID, xx, yy, time);
+                cursors[cursorID] = wtc;
+            } else {
+                cursors[cursorID].setTuioCursor(time, xx, yy);
+            } 
+        }
+    }
+    
+    public void updateTuioCursor(TuioCursor tcur){
+        int cursorID = tcur.getCursorID();
+        double x = tcur.getX();
+        double y = tcur.getY();
+        long time = tcur.getTuioTime().getTotalMilliseconds();
+
+        double xx = x*application.SCENE_W-application.SCENE_W/2;
+        double yy = (1-y)*application.SCENE_H-application.SCENE_H/2;
+        if(cursorID >= 0 && cursorID < cursors.length && x >= 0 && x <=1 && y >= 0 && y <= 1){
+            if(cursors[cursorID] == null){
+                WallTuioCursor wtc = new WallTuioCursor(application.cursorSpace, cursorID, xx, yy, time);
+                cursors[cursorID] = wtc;
+            } else {
+                cursors[cursorID].setTuioCursor(time, xx, yy);
+            } 
+        }
+
     }
 
     public void removeTuioCursor(TuioCursor tcur){
-        // System.out.println("R C "+tcur);
-        //System.out.println("removeTuioCursor");
-        //showCursor(tcur);
-
-        WallTuioCursor wtc = cursors.get(tcur.getCursorID());
-        wtc.setVisible(false);
     }
-
-    public void removeTuioObject(TuioObject tobj){
-        // System.out.println("R O "+tobj);
-    }
-
-    public void updateTuioCursor(TuioCursor tcur){
-        // System.out.println("U C "+tcur.getPosition().getX()+" "+tcur.getPosition().getY());
-        //System.out.println("updateTuioCursor");
-        //showCursor(tcur);
-
-        WallTuioCursor wtc = cursors.get(tcur.getCursorID());
-        double x = tcur.getPosition().getX()*Calibrator.SCENE_W - Calibrator.SCENE_W/2;
-        double y = Calibrator.SCENE_H/2 - tcur.getPosition().getY()*Calibrator.SCENE_H;
-        wtc.moveTo(x, y);
-
-    }
-
-    public void updateTuioObject(TuioObject tobj){
-        // System.out.println("U O "+tobj.getPosition());
-    }
-
-    private void showCursor(TuioCursor tcur){
-    	System.out.println("    ID        : "+tcur.getCursorID());
-    	//System.out.println("    Accel     : "+tcur.getMotionAccel());
-		//System.out.println("    Speed     : "+tcur.getMotionSpeed());
-		System.out.println("    Point     : ("+tcur.getPosition().getX() + ", " + tcur.getPosition().getY() + ")");
-		//System.out.println("    SessionID : " + tcur.getSessionID());
-		System.out.println("    TuioState : " + tcur.getTuioState());
-        //System.out.println("    XSpeed    : " + tcur.getXSpeed());
-        //System.out.println("    YSpeed    : " + tcur.getYSpeed());
-        System.out.println("    isMoving  : " + tcur.isMoving());
-    }
+    
+    public void addTuioObject(TuioObject tobj){}
+    public void updateTuioObject(TuioObject tobj){}
+    public void removeTuioObject(TuioObject tobj){}
 
 }

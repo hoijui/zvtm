@@ -6,6 +6,8 @@ import java.awt.geom.Point2D;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.glyphs.SIRectangle;
 
+import fr.inria.zvtm.glyphs.VCircle;
+
 /**
  * A cursor suitable for interacting with the clustered viewer on a large display.
  */
@@ -20,15 +22,15 @@ public class WallCursor {
     private SIRectangle hRect;
     private SIRectangle vRect;
 
-    WallCursor(VirtualSpace target){
-        this(target, 10, 80, Color.RED);
+    public WallCursor(VirtualSpace target){
+        this(target, 5, 50, Color.RED);
     }
 
-    WallCursor(VirtualSpace target, double thickness, double length){
+    public WallCursor(VirtualSpace target, double thickness, double length){
         this(target, thickness, length, Color.RED);
     }
 
-    WallCursor(VirtualSpace target, double thickness, double length, Color color){
+    public WallCursor(VirtualSpace target, double thickness, double length, Color color){
         this.target = target;
         this.thickness = thickness;
         this.length = length;
@@ -49,7 +51,7 @@ public class WallCursor {
 
     public void moveTo(double x, double y){
         hRect.moveTo(x, y);
-        vRect.moveTo(x, y);
+        vRect.moveTo(x, y);        
     }
     
     public void move(double x, double y){
@@ -82,5 +84,9 @@ public class WallCursor {
     }
 
     public void setVisible(boolean v) { hRect.setVisible(v); vRect.setVisible(v);}
+
+    public boolean isVisible() {
+        return hRect.isVisible() || vRect.isVisible();
+    }
 
 }
