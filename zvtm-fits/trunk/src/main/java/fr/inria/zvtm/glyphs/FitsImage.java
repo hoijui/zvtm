@@ -41,26 +41,12 @@ import fr.inria.zvtm.fits.ZScale;
 import java.io.File;
 
 
-//provide an accessor to scale parameters
-class ExFITSImage extends FITSImage{
-    ExFITSImage(URL imgUrl) throws Exception{
-        super(imgUrl);
-    }
 
-    ExFITSImage(File imgFile) throws Exception{
-        super(imgFile);
-    }
-
-    double[] getScaleParams(){ 
-        return new double[]{ _min, _max };
-    }
-
-}
 
 /**
  * Basic FITS image support. Use the IVOA FITS library internally.
  */
-public class FitsImage extends VImage {
+public class FitsImage extends VImageOr {
     //original image (dataset preserved)
     private final ExFITSImage fitsImage;
     private ImageFilter filter = ColorFilter.RAINBOW.getFilter();
@@ -162,7 +148,9 @@ public class FitsImage extends VImage {
 
     public FitsImage(double x, double y, int z, URL imgUrl, double scaleFactor,
             double min, double max) throws IOException {
-        super(x,y,z,new BufferedImage(10,10,BufferedImage.TYPE_INT_RGB),scaleFactor);
+        super(x,y,z,new BufferedImage(10,10,BufferedImage.TYPE_INT_RGB), scaleFactor);
+        setScale(scaleFactor);
+        orientTo(0.0);
         this.imgUrl = imgUrl;
         this.imgFile = null;
         //filter = ColorFilter.RAINBOW.getFilter();
@@ -199,7 +187,9 @@ public class FitsImage extends VImage {
      */
     public FitsImage(double x, double y, int z, URL imgUrl, double scaleFactor,
             boolean useDataMinMax) throws IOException {
-        super(x,y,z,new BufferedImage(10,10,BufferedImage.TYPE_INT_RGB),scaleFactor);
+        super(x,y,z,new BufferedImage(10,10,BufferedImage.TYPE_INT_RGB), scaleFactor);
+        setScale(scaleFactor);
+        orientTo(0.0);
         this.imgUrl = imgUrl;
         this.imgFile = null;
         //filter = ColorFilter.RAINBOW.getFilter();
@@ -239,7 +229,9 @@ public class FitsImage extends VImage {
      */
     public FitsImage(double x, double y, int z, File imgFile, double scaleFactor,
             boolean useDataMinMax) throws IOException {
-        super(x,y,z,new BufferedImage(10,10,BufferedImage.TYPE_INT_RGB),scaleFactor);
+        super(x,y,z,new BufferedImage(10,10,BufferedImage.TYPE_INT_RGB), scaleFactor);
+        setScale(scaleFactor);
+        orientTo(0.0);
         this.imgUrl = null;
         this.imgFile = imgFile;
         //filter = ColorFilter.RAINBOW.getFilter();
@@ -435,6 +427,8 @@ public class FitsImage extends VImage {
     public int getFitsWidth(){
         return fitsImage.getWidth();
     }
+
+
     private void recreateDisplayImage(){
         ImageProducer producer = fitsImage.getSource();
         producer = new FilteredImageSource(producer, filter);

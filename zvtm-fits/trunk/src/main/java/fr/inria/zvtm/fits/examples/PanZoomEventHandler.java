@@ -17,6 +17,8 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 
+import fr.inria.zvtm.fits.Grid;
+
 
 
 class PanZoomEventHandler implements ViewListener {
@@ -318,9 +320,11 @@ class PanZoomEventHandler implements ViewListener {
         */
     }
 
-	public void enterGlyph(Glyph g){}
+	public void enterGlyph(Glyph g){
+    }
 
-	public void exitGlyph(Glyph g){}
+	public void exitGlyph(Glyph g){
+    }
 
 	public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){
         //System.out.println("Ktype:" + c);
@@ -331,6 +335,17 @@ class PanZoomEventHandler implements ViewListener {
             } else if (c == '+'){
                 ((FitsExample)app).scaleBounds[1] += 100;
                 ((FitsExample)app).hi.rescale(((FitsExample)app).scaleBounds[0], ((FitsExample)app).scaleBounds[1], 1);
+            } else if(c == 'g'){
+                System.out.println("Grid");
+                Camera cam = ((FitsExample)app).mCamera;
+                double a = (cam.focal+Math.abs(cam.altitude)) / cam.focal;
+                System.out.println("a: " + a);
+                Grid grid = Grid.makeGrid( ((FitsExample)app).hi, 100, 100 );
+                ((FitsExample)app).hi.setGrid(grid);
+                ((FitsExample)app).mSpace.addGlyph(grid);
+                
+            } else if(c == 'r'){
+                ((FitsExample)app).hi.orientTo(3*Math.PI/5);
             }
         } else {
             if(c == '-'){
