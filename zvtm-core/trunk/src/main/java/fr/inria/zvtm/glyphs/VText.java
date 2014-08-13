@@ -267,21 +267,22 @@ public class VText<T> extends ClosedShape {
     @Override
     public double getOrient(){return orient;}
 
-    /** Set to false if the text should not be scaled according to camera's altitude. Its apparent size will always be the same, no matter the camera's altitude.
+    /** Set to true if the text should not be scaled according to camera's altitude.
+     * Its apparent size will always be the same, no matter the camera's altitude.
+     *@param b false by default.
      *@see #isScaleIndependent()
      */
     public void setScaleIndependent(boolean b){
-    if (zoomSensitive!=b){
-        zoomSensitive=b;
+        zoomSensitive = !b;
         VirtualSpaceManager.INSTANCE.repaint();
-    }
     }
 
     /** Indicates whether the text is scaled according to camera's altitude.
+     *@return true if it is scale independent (text is not scaled according to camera altitude).
      *@see #setScaleIndependent(boolean b)
      */
     public boolean isScaleIndependent(){
-    return zoomSensitive;
+        return !zoomSensitive;
     }
 
     static float TEXT_AS_LINE_PROJ_COEF = .5f;
