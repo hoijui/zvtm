@@ -105,7 +105,19 @@ class PanZoomEventHandler implements ViewListener {
         
     }
 
-	public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
+	public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
+
+        Point2D.Double cur = new Point2D.Double(v.getVCursor().getVSXCoordinate(), v.getVCursor().getVSYCoordinate());
+        Point2D.Double fi = new Point2D.Double(0,0);
+        System.out.println( "[" + ((FitsExample)app).hi.getFitsWidth()/2 + ", " + ((FitsExample)app).hi.getFitsHeight()/2 + "]");
+        double x = cur.getX() - fi.getX() + ((FitsExample)app).hi.getFitsWidth()/2;
+        double y = cur.getY() - fi.getY() + ((FitsExample)app).hi.getFitsHeight()/2;
+        System.out.println( x + " - " + y );
+        Point2D.Double wcs = ((FitsExample)app).hi.pix2wcs( x, y );
+        System.out.println("pix2wcs("+ x+", "+y+" )");
+        System.out.println("wcs: (" + wcs.getX() + ", " + wcs.getY() + ")");
+            
+    }
 
 	public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
@@ -159,6 +171,8 @@ class PanZoomEventHandler implements ViewListener {
                 v.parent.setCursorIcon(Cursor.CUSTOM_CURSOR);
             }
 
+
+            /*
             Point2D.Double cur = new Point2D.Double(v.getVCursor().getVSXCoordinate(), v.getVCursor().getVSYCoordinate());
             Point2D.Double fi = new Point2D.Double(0,0);
             System.out.println( "[" + ((FitsExample)app).hi.getFitsWidth()/2 + ", " + ((FitsExample)app).hi.getFitsHeight()/2 + "]");
@@ -168,6 +182,7 @@ class PanZoomEventHandler implements ViewListener {
             Point2D.Double wcs = ((FitsExample)app).hi.pix2wcs( x, y );
             System.out.println("pix2wcs("+ x+", "+y+" )");
             System.out.println("wcs: (" + wcs.getX() + ", " + wcs.getY() + ")");
+            */
 
         }
         else if(app instanceof JSkyFitsExample){
@@ -340,7 +355,7 @@ class PanZoomEventHandler implements ViewListener {
                 Camera cam = ((FitsExample)app).mCamera;
                 double a = (cam.focal+Math.abs(cam.altitude)) / cam.focal;
                 System.out.println("a: " + a);
-                Grid grid = Grid.makeGrid( ((FitsExample)app).hi, 100, 100 );
+                Grid grid = Grid.makeGrid( ((FitsExample)app).hi, 100 );
                 ((FitsExample)app).hi.setGrid(grid);
                 ((FitsExample)app).mSpace.addGlyph(grid);
                 
