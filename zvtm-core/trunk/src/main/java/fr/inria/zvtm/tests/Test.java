@@ -89,30 +89,23 @@ public class Test implements Java2DPainter {
     }
 
 	void populate(){
-        mSpace.addGlyph(new VImage(0, 0, 0, (new ImageIcon("scan.png")).getImage()));
-        sSpace.addGlyph(new VImage(0, 0, 0, (new ImageIcon("ortho.png")).getImage()));
+        VCircle c = new VCircle(500, 100, 0, 10, Color.RED, Color.BLACK);
+        mSpace.addGlyph(c);
+        c = new VCircle(500, 200, 0, 10, Color.RED, Color.BLACK);
+        mSpace.addGlyph(c);
+        c = new VCircle(500, 300, 0, 10, Color.RED, Color.BLACK);
+        mSpace.addGlyph(c);
+        VText t = new VText(500, 100, 0, Color.BLACK, "TEXT_ALIGN_LEFT", VText.TEXT_ANCHOR_START);
+        // t.setScaleIndependent(true);
+        mSpace.addGlyph(t);
+        t = new VText(500, 200, 0, Color.BLACK, "TEXT_ALIGN_MIDDLE", VText.TEXT_ANCHOR_MIDDLE);
+        // t.setScaleIndependent(true);
+        mSpace.addGlyph(t);
+        t = new VText(500, 300, 0, Color.BLACK, "TEXT_ALIGN_RIGHT", VText.TEXT_ANCHOR_END);
+        // t.setScaleIndependent(true);
+        mSpace.addGlyph(t);
 	}
 
-    CameraPortal tp = null;
-
-    public void togglePortal(int x, int y){
-        if (tp == null){
-            tp = new CameraPortal(x, y, 200, 200, sCamera);
-            vsm.addPortal(tp, mView);
-        }
-        else {
-            vsm.destroyPortal(tp);
-            tp = null;
-        }
-    }
-
-    void updatePortal(int x, int y, double cx, double cy){
-        if (tp != null){
-            sCamera.moveTo(cx, cy);
-            tp.moveTo(x, y);
-            mView.repaint();
-        }
-    }
 
 	public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
 	}
@@ -168,7 +161,6 @@ class MainListener extends ViewAdapter {
         lastJPX = jpx;
         lastJPY = jpy;
         v.setDrawDrag(true);
-        application.togglePortal(jpx, jpy);
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
@@ -181,9 +173,7 @@ class MainListener extends ViewAdapter {
 	static float ZOOM_SPEED_COEF = 1.0f/50.0f;
     static double PAN_SPEED_COEF = 50.0;
 
-    public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
-        application.updatePortal(jpx, jpy, v.getVCursor().getVSXCoordinate(), v.getVCursor().getVSYCoordinate());
-    }
+    public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){}
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
         if (buttonNumber == 1){
