@@ -1,0 +1,111 @@
+<!--
+Author: Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
+ZUIST DTD, for v0.3.0 and above.
+-->
+
+<!-- $Id$ -->
+
+<!ELEMENT scene (level+,region+,include*)>
+<!ATTLIST scene background CDATA #IMPLIED>
+
+<!ELEMENT level EMPTY>
+<!ATTLIST level depth CDATA #REQUIRED
+                floor CDATA #REQUIRED
+                ceiling CDATA #REQUIRED>
+
+<!ENTITY % ID "id ID #REQUIRED">
+
+<!ENTITY % x "x CDATA #REQUIRED">
+<!ENTITY % y "y CDATA #REQUIRED">
+<!ENTITY % zindex "z-index CDATA #IMPLIED">
+
+<!ENTITY % width "w CDATA">
+<!ENTITY % height "h CDATA">
+<!ENTITY % scale "scale CDATA #IMPLIED">
+
+<!ENTITY % stroke "stroke CDATA #IMPLIED">
+<!ENTITY % fill "fill CDATA #IMPLIED">
+
+<!ENTITY % sensitive "sensitive  (true|false)">
+<!ENTITY % takesToObject "tto IDREF #IMPLIED">
+<!ENTITY % takesToRegion "ttr IDREF #IMPLIED">
+
+<!ENTITY % params "params CDATA #IMPLIED">
+
+<!ELEMENT region (text|rect|polygon|resource)*>
+<!ATTLIST region levels CDATA #REQUIRED
+                 %ID;
+                 title CDATA #IMPLIED
+                 containedIn IDREF #IMPLIED
+                 %x;
+                 %y;
+                 %width; #REQUIRED
+                 %height; #REQUIRED
+                 %stroke;
+                 %fill;
+                 tful (appear|disappear|fadein|fadeout) "appear"
+                 tfll (appear|disappear|fadein|fadeout) "appear"
+                 ttul (appear|disappear|fadein|fadeout) "disappear"
+                 ttll (appear|disappear|fadein|fadeout) "disappear"
+                 %sensitive; "false"
+                 requestOrdering (decl|dist) "dist"
+                 layer CDATA #IMPLIED>
+
+<!ELEMENT text ANY>
+<!ATTLIST text %ID;
+               %x;
+               %y;
+               %zindex;
+               %scale;
+               %fill;
+               %takesToObject;
+               %takesToRegion;
+               %sensitive; "true"
+               anchor (start|middle|end) "middle"
+			   font-family CDATA #IMPLIED
+			   font-style (plain|bold|italic|boldItalic) "plain"
+			   font-size CDATA #IMPLIED>
+
+<!ELEMENT rect ANY>
+<!ATTLIST rect %ID;
+               %x;
+               %y;
+               %zindex;
+               %width; #REQUIRED
+               %height; #REQUIRED
+               %stroke;
+			   %fill;
+               %takesToObject;
+               %takesToRegion;
+               %sensitive; "true">
+
+<!ELEMENT polygon ANY>
+<!ATTLIST polygon %ID;
+                  points CDATA #IMPLIED
+                  %zindex;
+                  %stroke;
+				  %fill;
+                  %takesToObject;
+                  %takesToRegion;
+                  %sensitive; "true">
+
+<!ELEMENT resource ANY>
+<!ATTLIST resource %ID;
+                   type (img|pdf|scn) #REQUIRED
+                   %x;
+                   %y;
+                   %zindex;
+                   %width; #IMPLIED
+                   %height; #IMPLIED
+                   %scale;
+                   src CDATA #REQUIRED
+				   %stroke;
+				   %fill;
+	               %takesToObject;
+	               %takesToRegion;
+                   %sensitive; "true"
+                   %params;>
+
+<!ELEMENT include EMPTY>
+<!ATTLIST include %x;
+                  %y;>

@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+$Id$
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>fr.inria.zvtm</groupId>
+  <artifactId>zuist-engine</artifactId>
+  <packaging>jar</packaging>
+  <name>ZUIST</name>
+  <version>0.4.0</version>
+  <description>ZUIST is a generic multi-scale scene engine/API for ZVTM which makes it easier for developers to develop multi-scale interfaces in which objects representing a scene at varying levels of detail are loaded/unloaded dynamically to/from memory depending on the region of the virtual space scene through the camera. Multi-scale scenes can be built through the ZUIST API (see javadoc) or can be loaded from files using a dedicated XML vocabulary.</description>
+  <url>http://zvtm.sourceforge.net/zuist/</url>
+  <licenses>
+    <license>
+      <name>GNU Lesser General Public License (LGPL)</name>
+      <url>http://www.gnu.org/licenses/lgpl.html</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+  <scm>
+    <url>https://zvtm.svn.sourceforge.net/svnroot/zvtm/zuist-engine/</url>
+  </scm>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+  
+  <!-- Repositories -->
+  <repositories>
+	<repository>
+      <id>zvtm repository</id>
+      <url>http://zvtm.sourceforge.net/maven</url>
+    </repository>
+    <repository>
+      <id>central</id>
+      <name>Maven Repository</name>
+      <url>http://repo1.maven.org/maven2</url>
+    </repository>
+	<repository>
+        <id>agile2d.sf.net</id>
+        <url>http://agile2d.sourceforge.net/maven</url>
+    </repository>
+	<repository>
+        <id>jogamp.org</id>
+        <url>http://jogamp.org/deployment/maven</url>
+    </repository>
+  </repositories>
+  
+  <!-- Distribution - Deploy to FTP -->
+  <distributionManagement>
+	<repository>
+      <id>zvtm.sf.net</id>
+      <url>scp://shell.sourceforge.net/home/project-web/zvtm/htdocs/maven</url>
+    </repository>
+  </distributionManagement>
+  
+  <profiles>
+    <profile>
+      <id>osx</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <build.type>natives-macosx-universal</build.type>
+      </properties>
+    </profile>
+    <profile>
+      <id>lin32</id>
+      <properties>
+        <build.type>natives-linux-i586</build.type>
+      </properties>
+    </profile>
+    <profile>
+      <id>lin64</id>
+      <properties>
+        <build.type>natives-linux-amd64</build.type>
+      </properties>
+    </profile>
+    <profile>
+      <id>win32</id>
+      <properties>
+        <build.type>natives-windows-i586</build.type>
+      </properties>
+    </profile>
+    <profile>
+      <id>win64</id>
+      <properties>
+        <build.type>natives-windows-amd64</build.type>
+      </properties>
+    </profile>
+  </profiles>
+
+  <!-- Dependencies -->
+  <dependencies>
+	<dependency>
+      <groupId>fr.inria.zvtm</groupId>
+      <artifactId>zvtm-core</artifactId>
+      <version>[0.11.1,)</version>
+    </dependency>
+	<dependency>
+      <groupId>fr.inria.zvtm</groupId>
+      <artifactId>zvtm-agile2d</artifactId>
+      <version>[0.1.0,)</version>
+    </dependency>
+	<dependency>
+      <groupId>fr.inria.zvtm</groupId>
+      <artifactId>zvtm-svg</artifactId>
+      <version>[0.2.1,)</version>
+    </dependency>
+  </dependencies>
+  
+  <!-- Build -->
+  <build>
+      <extensions>
+        <extension>
+          <groupId>org.apache.maven.wagon</groupId>
+           <artifactId>wagon-ssh</artifactId>
+           <version>2.2</version>
+        </extension>
+      </extensions>
+	<resources>
+	  <resource>
+	    <directory>src/main/resources/p</directory>
+	    <filtering>true</filtering>
+	  </resource>
+	  <resource>
+        <directory>src/main/resources</directory> 
+          <excludes> 
+		    <exclude>*.dtd</exclude>
+		    <exclude>python/**</exclude>
+		</excludes> 
+      </resource>
+	</resources>
+    <plugins>
+		<plugin>
+		  <groupId>org.apache.maven.plugins</groupId>
+		  <artifactId>maven-dependency-plugin</artifactId>
+		  <executions>
+		    <execution>
+		      <id>unpack</id>
+		      <phase>compile</phase>
+		      <goals>
+		        <goal>unpack</goal>
+		      </goals>
+		      <configuration>
+		        <artifactItems>
+					<artifactItem>
+					  <groupId>org.jogamp.jogl</groupId>
+					  <artifactId>jogl-all</artifactId>
+					  <version>2.0-rc9</version>
+		 			  <classifier>${build.type}</classifier>
+					  <type>jar</type>
+					  <includes>*.jnilib,*.lib,*.so,*.dll</includes>
+					  <overWrite>true</overWrite>
+					  <outputDirectory>${project.build.directory}/lib</outputDirectory>
+					</artifactItem>
+					<artifactItem>
+					  <groupId>org.jogamp.gluegen</groupId>
+					  <artifactId>gluegen-rt</artifactId>
+					  <version>2.0-rc9</version>
+		 			  <classifier>${build.type}</classifier>
+					  <type>jar</type>
+		              <includes>*.jnilib,*.lib,*.so,*.dll</includes>
+					  <!-- Exclude native library files of jogl for mobile platforms -->
+		              <!-- <excludes>%ant[*mobile*]</excludes> -->
+					  <overWrite>true</overWrite>
+					  <outputDirectory>${project.build.directory}/lib</outputDirectory>
+					</artifactItem>
+		        </artifactItems>
+		      </configuration>
+		    </execution>
+		  </executions>
+		</plugin>
+	
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>dependency-maven-plugin</artifactId>
+        <version>1.0</version>
+        <executions>
+          <execution>
+            <id>copy-dependencies</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+    	<version>2.3.2</version>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+		  <showDeprecation>true</showDeprecation>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+    	<version>2.3.1</version>
+        <configuration>
+          <archive>
+            <manifest>
+              <useUniqueVersions>false</useUniqueVersions>
+              <mainClass>fr.inria.zuist.viewer.Launcher</mainClass>
+              <packageName>fr.inria.zuist.viewer</packageName>
+              <addClasspath>true</addClasspath>
+            </manifest>
+            <manifestEntries>
+              <mode>development</mode>
+              <url>${project.url}</url>
+            </manifestEntries>
+          </archive>
+        </configuration>
+      </plugin>
+      <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-eclipse-plugin</artifactId>
+      	<version>2.8</version>
+          <configuration>
+              <downloadSources>true</downloadSources>
+          </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+    	<version>2.7</version>
+        <configuration>
+          <code>javadoc:aggregate</code>
+          <overview>${basedir}/overview.html</overview>
+          <doctitle><![CDATA[<h1>ZUIST API documentation</h1>]]></doctitle>
+          <bottom><![CDATA[<i>Copyright &#169; 2007-2010 INRIA. All Rights Reserved<br />Licensed under the GNU LGPL. For full terms see the file COPYING.</i>]]></bottom>
+          <links> 
+            <link>http://java.sun.com/j2se/1.5.0/docs/api</link>
+            <link>http://zvtm.sourceforge.net/apidocs</link>
+          </links>
+         <excludePackageNames>fr.inria.zuist.viewer</excludePackageNames>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  
+</project>
