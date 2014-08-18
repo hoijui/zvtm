@@ -15,6 +15,7 @@ import fr.inria.zvtm.glyphs.Composite;
 import fr.inria.zvtm.glyphs.FitsImage;
 import fr.inria.zvtm.glyphs.VSegment;
 import fr.inria.zvtm.glyphs.VText;
+import fr.inria.zvtm.glyphs.VCircle;
 
 /**
  * A Grid that may be overlaid on a FitsImage
@@ -285,79 +286,87 @@ public class Grid extends Composite {
 
   private void cutLine(Point2D outline, Point2D inline, double vx, double vy, double width, double height){
 
-    if(outline.getX() < vx - width/2 && outline.getY() < vy + height/2 && outline.getY() > vy - height/2){
+    if(outline.getX() < vx - width/2 && outline.getY() < vy + height/2 && outline.getY() > vy - height/2){  // west
 
       Point2D intersection = getIntersectionPoint( new Point2D.Double(vx - width/2, vy - height/2), 
                                               new Point2D.Double(vx - width/2, vy + height/2), outline, inline);
       outline.setLocation(intersection.getX(), intersection.getY());
 
-    }else if(outline.getX() > vx + width/2 && outline.getY() < vy + height/2 && outline.getY() > vy - height/2){
+    }else if(outline.getX() > vx + width/2 && outline.getY() < vy + height/2 && outline.getY() > vy - height/2){  // east
 
       Point2D intersection = getIntersectionPoint( new Point2D.Double(vx + width/2, vy - height/2), 
                                               new Point2D.Double(vx + width/2, vy + height/2), outline, inline);
       outline.setLocation(intersection.getX(), intersection.getY());
 
-    }else if(outline.getY() < vy + width/2 && outline.getX() < vx + width/2 && outline.getX() > vx - width/2){
+    }else if(outline.getY() < vy + height/2 && outline.getX() < vx + width/2 && outline.getX() > vx - width/2){  // south
 
       Point2D intersection = getIntersectionPoint( new Point2D.Double(vx - width/2, vy - height/2), 
                                               new Point2D.Double(vx + width/2, vy - height/2), outline, inline);
       outline.setLocation(intersection.getX(), intersection.getY());
 
-    }else if(outline.getY() > vy - width/2 && outline.getX() < vx + width/2 && outline.getX() > vx - width/2){
+    }else if(outline.getY() > vy - height/2 && outline.getX() < vx + width/2 && outline.getX() > vx - width/2){  // north
       Point2D intersection = getIntersectionPoint( new Point2D.Double(vx - width/2, vy + height/2), 
                                               new Point2D.Double(vx + width/2, vy + height/2), outline, inline);
       outline.setLocation(intersection.getX(), intersection.getY());
 
-    }else if(outline.getX() < vx - width/2 && outline.getY() > vy + height/2){
-      Point2D intersection = getIntersectionPoint( new Point2D.Double(vx - width/2, vy - height/2), 
+    }else if(outline.getX() < vx - width/2 && outline.getY() > vy + height/2){  // south-west
+
+      Point2D intersection1 = getIntersectionPoint( new Point2D.Double(vx - width/2, vy - height/2), 
                                               new Point2D.Double(vx - width/2, vy + height/2), outline, inline);
-
-      if(intersection.getX() == vx-width/2 || intersection.getY() == vy+height/2 ){
-        outline.setLocation(intersection.getX(), intersection.getY());
-      } else {
-        intersection = getIntersectionPoint( new Point2D.Double(vx - width/2, vy + height/2), 
-                                          new Point2D.Double(vx + width/2, vy + height/2), outline, inline);
-        outline.setLocation(intersection.getX(), intersection.getY());
-      }
-
-    }else if(outline.getX() < vx - width/2 && outline.getY() < vy - height/2){
-
-      Point2D intersection = getIntersectionPoint( new Point2D.Double(vx - width/2, vy - height/2), 
-                                              new Point2D.Double(vx - width/2, vy + height/2), outline, inline);
-
-      if(intersection.getX() == vx-width/2 || intersection.getY() == vy-height/2 ){
-        outline.setLocation(intersection.getX(), intersection.getY());
-      } else {
-        intersection = getIntersectionPoint( new Point2D.Double(vx - width/2, vy - height/2), 
-                                          new Point2D.Double(vx + width/2, vy - height/2), outline, inline);
-        outline.setLocation(intersection.getX(), intersection.getY());
-      }
-
-    }else if(outline.getX() > vx + width/2 && outline.getY() > vy + height/2){
-
-      Point2D intersection = getIntersectionPoint( new Point2D.Double(vx + width/2, vy - height/2), 
+      Point2D intersection2 = getIntersectionPoint( new Point2D.Double(vx - width/2, vy + height/2), 
                                               new Point2D.Double(vx + width/2, vy + height/2), outline, inline);
 
-      if(intersection.getX() == vx+width/2 || intersection.getY() == vy+height/2 ){
-        outline.setLocation(intersection.getX(), intersection.getY());
-      } else {
-        intersection = getIntersectionPoint( new Point2D.Double(vx - width/2, vy + height/2), 
-                                          new Point2D.Double(vx + width/2, vy + height/2), outline, inline);
-        outline.setLocation(intersection.getX(), intersection.getY());
-      }
+      double d1 = intersection1.distance(vx, vy);
+      double d2 = intersection2.distance(vx, vy);
+      if(d1 < d2)
+        outline.setLocation(intersection1.getX(), intersection1.getY());
+      else
+        outline.setLocation(intersection2.getX(), intersection2.getY());
 
-    }else if(outline.getX() > vx + width/2 && outline.getY() < vy - height/2){
+    }else if(outline.getX() < vx - width/2 && outline.getY() < vy - height/2){  // north-west
 
-      Point2D intersection = getIntersectionPoint( new Point2D.Double(vx + width/2, vy - height/2), 
+      Point2D intersection1 = getIntersectionPoint( new Point2D.Double(vx - width/2, vy - height/2), 
+                                              new Point2D.Double(vx - width/2, vy + height/2), outline, inline);
+
+      Point2D intersection2 = getIntersectionPoint( new Point2D.Double(vx - width/2, vy - height/2), 
+                                              new Point2D.Double(vx + width/2, vy - height/2), outline, inline);
+      
+      double d1 = intersection1.distance(vx, vy);
+      double d2 = intersection2.distance(vx, vy);
+      if(d1 < d2)
+        outline.setLocation(intersection1.getX(), intersection1.getY());
+      else
+        outline.setLocation(intersection2.getX(), intersection2.getY());
+
+    }else if(outline.getX() > vx + width/2 && outline.getY() > vy + height/2){  // south-east
+
+      Point2D intersection1 = getIntersectionPoint( new Point2D.Double(vx + width/2, vy - height/2), 
+                                              new Point2D.Double(vx + width/2, vy + height/2), outline, inline);
+      Point2D intersection2 = getIntersectionPoint( new Point2D.Double(vx - width/2, vy + height/2), 
                                               new Point2D.Double(vx + width/2, vy + height/2), outline, inline);
 
-      if(intersection.getX() == vx+width/2 || intersection.getY() == vy-height/2 ){
-        outline.setLocation(intersection.getX(), intersection.getY());
-      } else {
-        intersection = getIntersectionPoint( new Point2D.Double(vx - width/2, vy - height/2), 
-                                          new Point2D.Double(vx + width/2, vy - height/2), outline, inline);
-        outline.setLocation(intersection.getX(), intersection.getY());
-      }
+      double d1 = intersection1.distance(vx, vy);
+      double d2 = intersection2.distance(vx, vy);
+      if(d1 < d2)
+        outline.setLocation(intersection1.getX(), intersection1.getY());
+      else
+        outline.setLocation(intersection2.getX(), intersection2.getY());
+
+
+    }else if(outline.getX() > vx + width/2 && outline.getY() < vy - height/2){  // north-east
+
+      Point2D intersection1 = getIntersectionPoint( new Point2D.Double(vx + width/2, vy - height/2), 
+                                              new Point2D.Double(vx + width/2, vy + height/2), outline, inline);
+      Point2D intersection2 = getIntersectionPoint( new Point2D.Double(vx - width/2, vy - height/2), 
+                                              new Point2D.Double(vx + width/2, vy - height/2), outline, inline);
+      
+      double d1 = intersection1.distance(vx, vy);
+      double d2 = intersection2.distance(vx, vy);
+      if(d1 < d2)
+        outline.setLocation(intersection1.getX(), intersection1.getY());
+      else
+        outline.setLocation(intersection2.getX(), intersection2.getY());
+
     }
 
   }
