@@ -3,7 +3,7 @@
  *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- */ 
+ */
 package fr.inria.zvtm.cluster.examples;
 
 import org.kohsuke.args4j.Argument;
@@ -36,20 +36,20 @@ import java.net.URL;
  */
 public class ZOrderExample {
 	//shortcut
-	private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE; 
+	private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE;
 
 	ZOrderExample(ZOptions options){
 		vsm.setMaster("ZOrderExample");
 		VirtualSpace vs = vsm.addVirtualSpace("testSpace");
 		Camera cam = vs.addCamera();
 		Vector<Camera> cameras = new Vector<Camera>();
-		cameras.add(cam);	
+		cameras.add(cam);
         ClusterGeometry clGeom = new ClusterGeometry(
                 options.blockWidth,
                 options.blockHeight,
                 options.numCols,
                 options.numRows);
-		ClusteredView cv = 
+		ClusteredView cv =
             new ClusteredView(
                     clGeom,
                     options.numRows-1, //origin (block number)
@@ -62,16 +62,16 @@ public class ZOrderExample {
         //the view below is just a standard, non-clustered view
         //that lets an user navigate the scene
         View view = vsm.addFrameView(cameras, "Master View",
-                View.STD_VIEW, 800, 600, false, true, true, null);	
+                View.STD_VIEW, 800, 600, false, true, true, null);
         view.setListener(new PanZoomEventHandler());
 
         //create overlapping circles
         Glyph redC  = new VCircle(0, 0, 0, 30, Color.RED);
         Glyph yellC = new VCircle(30, 0, 0, 30, Color.YELLOW);
         Glyph blueC = new VCircle(60, 0, 0, 30, Color.BLUE);
-        vs.addGlyph(redC, false);	
-        vs.addGlyph(yellC, false);	
-        vs.addGlyph(blueC, false);	
+        vs.addGlyph(redC, false);
+        vs.addGlyph(yellC, false);
+        vs.addGlyph(blueC, false);
         vs.above(yellC,blueC);
 
         Glyph greenC = new VCircle(0, -80, 0, 30, Color.GREEN);

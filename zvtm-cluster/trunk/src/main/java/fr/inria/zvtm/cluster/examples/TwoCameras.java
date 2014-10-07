@@ -3,7 +3,7 @@
  *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- */ 
+ */
 package fr.inria.zvtm.cluster.examples;
 
 import org.kohsuke.args4j.Argument;
@@ -34,7 +34,7 @@ import java.awt.event.MouseWheelEvent;
  */
 public class TwoCameras {
 	//shortcut
-	private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE; 
+	private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE;
 
 	TwoCameras(TCOptions options){
 		vsm.setMaster("TwoCameras");
@@ -42,14 +42,14 @@ public class TwoCameras {
 		Camera cam = vs.addCamera();
 		Camera otherCam = vs.addCamera();
 		Vector<Camera> cameras = new Vector<Camera>();
-		cameras.add(cam);	
+		cameras.add(cam);
 		cameras.add(otherCam);
         ClusterGeometry clGeom = new ClusterGeometry(
                 options.blockWidth,
                 options.blockHeight,
                 options.numCols,
                 options.numRows);
-		ClusteredView cv = 
+		ClusteredView cv =
 			new ClusteredView(
                     clGeom,
                     options.numRows-1, //origin (block number)
@@ -64,7 +64,7 @@ public class TwoCameras {
 		//the view below is just a standard, non-clustered view
 		//that lets an user navigate the scene
 		View view = vsm.addFrameView(cameras, "Master View",
-			   View.STD_VIEW, 800, 600, false, true, true, null);	
+			   View.STD_VIEW, 800, 600, false, true, true, null);
 		view.setListener(new ColorRectEventHandler());
 
 		double xOffset = 0;
@@ -73,7 +73,7 @@ public class TwoCameras {
 		double rectHeight = options.height / options.yNum;
 		for(int i=0; i<options.xNum; ++i){
 			for(int j=0; j<options.yNum; ++j){
-				VRectangle rect = 
+				VRectangle rect =
 					new VRectangle(xOffset+i*rectWidth,
 							yOffset+j*rectHeight,
 							0,

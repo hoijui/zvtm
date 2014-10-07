@@ -1,11 +1,10 @@
-
-/* 	  
+/*
  *	AUTHOR : Romain Primet (romain.primet@inria.fr)
  *
  *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- */ 
+ */
 package fr.inria.zvtm.cluster.examples;
 
 import org.kohsuke.args4j.Argument;
@@ -53,20 +52,20 @@ import org.icepdf.core.exceptions.PDFSecurityException;
  */
 public class OGLClusterExample {
 	//shortcut
-	private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE; 
+	private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE;
 
 	OGLClusterExample(OGLClusterOptions options){
 		vsm.setMaster("OGLClusterExample");
 		VirtualSpace vs = vsm.addVirtualSpace("testSpace");
 		Camera cam = vs.addCamera();
 		Vector<Camera> cameras = new Vector<Camera>();
-		cameras.add(cam);	
+		cameras.add(cam);
         ClusterGeometry clGeom = new ClusterGeometry(
                 options.blockWidth,
                 options.blockHeight,
                 options.numCols,
                 options.numRows);
-		ClusteredView cv = 
+		ClusteredView cv =
             new ClusteredView(
                     clGeom,
                     options.numRows-1, //origin (block number)
@@ -79,7 +78,7 @@ public class OGLClusterExample {
         //the view below is just a standard, non-clustered view
         //that lets an user navigate the scene
         View view = vsm.addFrameView(cameras, "Master View",
-                View.STD_VIEW, 800, 600, false, true, true, null);	
+                View.STD_VIEW, 800, 600, false, true, true, null);
 //        view.setBackgroundColor(Color.GRAY);
         view.setListener(new PanZoomEventHandler());
 
@@ -101,7 +100,7 @@ public class OGLClusterExample {
 	VCircle circ = new VCircle(500,
 					400,
 					0,
-					200,					
+					200,
 					2);
 				rect.setDrawBorder(true);
 	vs.addGlyph(circ, false);
@@ -110,14 +109,14 @@ public class OGLClusterExample {
 	IcePDFPageImg samplepdf = new IcePDFPageImg(50,
 					50,
 					0,
-					200,					
+					200,
 					//Color.getHSBColor(0.38f, 1f, 1f));
 					Color.BLUE);
 				rect.setDrawBorder(true);
 	vs.addGlyph(circ, false);
 */
 
-	VRing ring = new VRing(100, 
+	VRing ring = new VRing(100,
 					100,
 					0,
 					400.0,
@@ -132,7 +131,7 @@ public class OGLClusterExample {
 
         VTextOr hi = new VTextOr(0,0,0,Color.BLACK,"Hello Clustered ZVTM", 0f);
         hi.orientTo((float)Math.PI / 4f);
-        vs.addGlyph(hi, false);	
+        vs.addGlyph(hi, false);
         hi.setFont(new Font("Serif", Font.PLAIN, 20));
     }
 

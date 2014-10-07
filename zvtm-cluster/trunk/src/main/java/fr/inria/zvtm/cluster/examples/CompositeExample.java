@@ -3,7 +3,7 @@
  *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2010.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- */ 
+ */
 package fr.inria.zvtm.cluster.examples;
 
 import org.kohsuke.args4j.Argument;
@@ -37,20 +37,20 @@ import java.net.URL;
  */
 public class CompositeExample {
 	//shortcut
-	private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE; 
+	private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE;
 
 	CompositeExample(CompositeOptions options){
 		vsm.setMaster("CompositeExample");
 		VirtualSpace vs = vsm.addVirtualSpace("testSpace");
 		Camera cam = vs.addCamera();
 		Vector<Camera> cameras = new Vector<Camera>();
-		cameras.add(cam);	
+		cameras.add(cam);
         ClusterGeometry clGeom = new ClusterGeometry(
                 options.blockWidth,
                 options.blockHeight,
                 options.numCols,
                 options.numRows);
-		ClusteredView cv = 
+		ClusteredView cv =
             new ClusteredView(
                     clGeom,
                     options.numRows-1, //origin (block number)
@@ -63,11 +63,11 @@ public class CompositeExample {
         //the view below is just a standard, non-clustered view
         //that lets an user navigate the scene
         View view = vsm.addFrameView(cameras, "Master View",
-                View.STD_VIEW, 800, 600, false, true, true, null);	
+                View.STD_VIEW, 800, 600, false, true, true, null);
         view.setBackgroundColor(Color.GRAY);
         view.setListener(new PanZoomEventHandler());
 
-        VRectangle origin = new VRectangle(0,0,0,10,10,Color.RED); 
+        VRectangle origin = new VRectangle(0,0,0,10,10,Color.RED);
         Composite comp = new Composite();
         comp.addChild(new VRectangle(0,0,0,5,30, Color.GREEN));
         comp.addChild(new VRectangle(0,0,0,30,5, Color.BLUE));

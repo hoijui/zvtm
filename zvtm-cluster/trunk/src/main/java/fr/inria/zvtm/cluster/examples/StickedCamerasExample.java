@@ -3,7 +3,7 @@
  *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2010.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- */ 
+ */
 package fr.inria.zvtm.cluster.examples;
 
 import org.kohsuke.args4j.Argument;
@@ -40,7 +40,7 @@ import javax.swing.ImageIcon;
  */
 public class StickedCamerasExample {
 	//shortcut
-    private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE; 
+    private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE;
 
     /* Navigation constants */
     static final int ANIM_MOVE_DURATION = 300;
@@ -51,9 +51,9 @@ public class StickedCamerasExample {
 
     Camera cam1;
     Camera cam2;
-    
+
     View view;
-    
+
     StickedCamerasExample(SCamOptions options){
         vsm.setMaster("StickedCamerasExample");
         VirtualSpace vs1 = vsm.addVirtualSpace("testSpace1");
@@ -61,14 +61,14 @@ public class StickedCamerasExample {
         Vector<Camera> cameras = new Vector<Camera>();
         cam1 = vs1.addCamera();
         cam2 = vs2.addCamera();
-        cameras.add(cam1);	
-        cameras.add(cam2);	
+        cameras.add(cam1);
+        cameras.add(cam2);
         ClusterGeometry clGeom = new ClusterGeometry(
                 options.blockWidth,
                 options.blockHeight,
                 options.numCols,
                 options.numRows);
-        ClusteredView cv = 
+        ClusteredView cv =
             new ClusteredView(
                     clGeom,
                     options.numRows-1, //origin (block number)
@@ -91,7 +91,7 @@ public class StickedCamerasExample {
 		VCircle c2 = new VCircle(20, 0, 0, 20, Color.WHITE);
 		vs2.addGlyph(c2, false);
 	}
-	
+
 	/* Higher view */
     void getHigherView(){
         Float alt = new Float(cam1.getAltitude() + cam1.getFocal());
@@ -152,11 +152,11 @@ public class StickedCamerasExample {
 	}
 
 	private class PanZoomEventHandler implements ViewListener, CameraListener {
-	    
+
 	    final float WHEEL_ZOOMIN_FACTOR = 21.0f;
         final float WHEEL_ZOOMOUT_FACTOR = 22.0f;
         float WHEEL_MM_STEP = 1.0f;
-        
+
 		private int lastJPX;
 		private int lastJPY;
 		boolean panning = false;
@@ -215,7 +215,7 @@ public class StickedCamerasExample {
             cam2.setAltitude(cam1.getAltitude());
             cam2.moveTo(cam1.vx, cam1.vy);
         }
-        
+
 		public void enterGlyph(Glyph g){
 		}
 

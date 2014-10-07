@@ -1,10 +1,9 @@
-
 /*   AUTHOR : Romain Primet (romain.primet@inria.fr)
  *
  *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- */ 
+ */
 package fr.inria.zvtm.cluster.examples;
 
 import org.kohsuke.args4j.Argument;
@@ -39,20 +38,20 @@ import java.net.URL;
  */
 public class TextExample {
 	//shortcut
-	private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE; 
+	private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE;
 
 	TextExample(TextOptions options){
 		vsm.setMaster("TextExample");
 		VirtualSpace vs = vsm.addVirtualSpace("testSpace");
 		Camera cam = vs.addCamera();
 		Vector<Camera> cameras = new Vector<Camera>();
-		cameras.add(cam);	
+		cameras.add(cam);
         ClusterGeometry clGeom = new ClusterGeometry(
                 options.blockWidth,
                 options.blockHeight,
                 options.numCols,
                 options.numRows);
-		ClusteredView cv = 
+		ClusteredView cv =
             new ClusteredView(
                     clGeom,
                     options.numRows-1, //origin (block number)
@@ -65,14 +64,14 @@ public class TextExample {
         //the view below is just a standard, non-clustered view
         //that lets an user navigate the scene
         View view = vsm.addFrameView(cameras, "Master View",
-                View.STD_VIEW, 800, 600, false, true, true, null);	
+                View.STD_VIEW, 800, 600, false, true, true, null);
         view.setBackgroundColor(Color.GRAY);
         view.setListener(new PanZoomEventHandler());
 
         VTextOr hi = new VTextOr(0,0,0,Color.GREEN,"Hello Clustered ZVTM", 0f);
         hi.setFont(new Font("Serif", Font.PLAIN, 20));
         hi.orientTo((float)Math.PI / 4f);
-        vs.addGlyph(hi, false);	
+        vs.addGlyph(hi, false);
 
         MultilineText quote = new MultilineText("In many of the more relaxed civilizations on the Outer Eastern Rim of the Galaxy, the 'Hitchiker's Guide' has already supplanted the great 'Encyclopedia Galactica' as the standard repository of all knowledge and wisdom, for though it has many omissions and contains much that is apocryphal, or at least wildly inaccurate, it scores over the older, more pedestrian work in two important respects. First, it is slightly cheaper; and second, it has the words 'DON'T PANIC' inscribed in large friendly letters on its cover.");
         quote.setFont(new Font("Serif", Font.PLAIN, 11));

@@ -3,7 +3,7 @@
  *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2010.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- */ 
+ */
 package fr.inria.zvtm.cluster.examples;
 
 import org.kohsuke.args4j.Argument;
@@ -35,20 +35,20 @@ import javax.swing.ImageIcon;
  */
 public class VImageExample {
 	//shortcut
-    private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE; 
+    private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE;
 
     VImageExample(VImOptions options){
         vsm.setMaster("VImageExample");
         VirtualSpace vs = vsm.addVirtualSpace("testSpace");
         Camera cam = vs.addCamera();
         Vector<Camera> cameras = new Vector<Camera>();
-        cameras.add(cam);	
+        cameras.add(cam);
         ClusterGeometry clGeom = new ClusterGeometry(
                 options.blockWidth,
                 options.blockHeight,
                 options.numCols,
                 options.numRows);
-        ClusteredView cv = 
+        ClusteredView cv =
             new ClusteredView(
                     clGeom,
                     options.numRows-1, //origin (block number)
@@ -61,7 +61,7 @@ public class VImageExample {
         //the view below is just a standard, non-clustered view
         //that lets an user navigate the scene
         View view = vsm.addFrameView(cameras, "Master View",
-                View.STD_VIEW, 800, 600, false, true, true, null);	
+                View.STD_VIEW, 800, 600, false, true, true, null);
 		view.setListener(new PanZoomEventHandler());
 
 		VImage img = new VImage(0,0,0,

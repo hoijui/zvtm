@@ -3,7 +3,7 @@
  *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- */ 
+ */
 package fr.inria.zvtm.cluster.examples;
 
 import org.kohsuke.args4j.Argument;
@@ -36,37 +36,37 @@ import java.awt.event.MouseWheelEvent;
  */
 public class CenterOnRegion {
     //shortcut
-    private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE; 
+    private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE;
 
     CenterOnRegion(){
         vsm.setMaster("CenterOnRegion");
         VirtualSpace vs = vsm.addVirtualSpace("testSpace");
         Camera cam = vs.addCamera();
         Vector<Camera> cameras = new Vector<Camera>();
-        cameras.add(cam);	
+        cameras.add(cam);
         ClusterGeometry clGeom = new ClusterGeometry(
                 2760,
                 1740,
                 8,
                 4);
-        ClusteredView cv = 
+        ClusteredView cv =
             new ClusteredView(
                     clGeom,
                     3, //origin (block number)
-                    3, 
-                    4, 
+                    3,
+                    4,
                     cameras);
         vsm.addClusteredView(cv);
 
         Camera cam2 = vs.addCamera();
         Vector<Camera> cameras2 = new Vector<Camera>();
         cameras2.add(cam2);
-        ClusteredView cv2 = 
+        ClusteredView cv2 =
             new ClusteredView(
                     clGeom,
                     27, //origin (block number)
-                    2, 
-                    4, 
+                    2,
+                    4,
                     cameras2);
         vsm.addClusteredView(cv2);
 
@@ -76,7 +76,7 @@ public class CenterOnRegion {
         long east = -20000;
         long radius = 1700; //radius (circle) or half width/height (rect)
 
-        VRectangle northWest = new VRectangle(west,north,0,radius,radius,Color.GREEN); 
+        VRectangle northWest = new VRectangle(west,north,0,radius,radius,Color.GREEN);
         VCircle    northEast = new VCircle(east,north,0,radius,Color.YELLOW);
         VCircle    southWest = new VCircle(west,south,0,radius,Color.RED);
         VRectangle southEast = new VRectangle(east,south,0,radius,radius,Color.BLUE);

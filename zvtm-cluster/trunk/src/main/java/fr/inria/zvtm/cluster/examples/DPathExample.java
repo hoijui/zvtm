@@ -3,7 +3,7 @@
  *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- */ 
+ */
 package fr.inria.zvtm.cluster.examples;
 
 import org.kohsuke.args4j.Argument;
@@ -40,20 +40,20 @@ import java.net.URL;
  */
 public class DPathExample {
 	//shortcut
-	private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE; 
+	private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE;
 
 	DPathExample(PathOptions options){
 		vsm.setMaster("DPathExample");
 		VirtualSpace vs = vsm.addVirtualSpace("testSpace");
 		Camera cam = vs.addCamera();
 		Vector<Camera> cameras = new Vector<Camera>();
-		cameras.add(cam);	
+		cameras.add(cam);
         ClusterGeometry clGeom = new ClusterGeometry(
                 options.blockWidth,
                 options.blockHeight,
                 options.numCols,
                 options.numRows);
-		ClusteredView cv = 
+		ClusteredView cv =
             new ClusteredView(
                     clGeom,
                     options.numRows-1, //origin (block number)
@@ -66,11 +66,11 @@ public class DPathExample {
         //the view below is just a standard, non-clustered view
         //that lets an user navigate the scene
         View view = vsm.addFrameView(cameras, "Master View",
-                View.STD_VIEW, 800, 600, false, true, true, null);	
+                View.STD_VIEW, 800, 600, false, true, true, null);
         view.setBackgroundColor(Color.GRAY);
         view.setListener(new PanZoomEventHandler());
 
-        DPath path = new DPath(30,50,0,Color.GREEN);	
+        DPath path = new DPath(30,50,0,Color.GREEN);
         path.addSegment(100,200,true);
         path.addSegment(200,0,true);
         path.addSegment(0,0,true);
@@ -80,7 +80,7 @@ public class DPathExample {
                 1,
                 new float[]{10, 4},
                 0));
-        vs.addGlyph(path, false);	
+        vs.addGlyph(path, false);
         path.moveTo(100,200);
         System.out.println("path position: (" + path.vx + ", " + path.vy + ")");
         path.moveTo(100,-200);
