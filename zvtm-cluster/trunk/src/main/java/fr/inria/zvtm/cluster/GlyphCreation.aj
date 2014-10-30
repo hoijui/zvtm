@@ -32,6 +32,7 @@ import fr.inria.zvtm.glyphs.SIRectangle;
 import fr.inria.zvtm.glyphs.VCircle;
 import fr.inria.zvtm.glyphs.VEllipse;
 import fr.inria.zvtm.glyphs.VImage;
+import fr.inria.zvtm.glyphs.VImageOr;
 import fr.inria.zvtm.glyphs.VPoint;
 import fr.inria.zvtm.glyphs.VPolygon;
 import fr.inria.zvtm.glyphs.VRectangle;
@@ -158,6 +159,10 @@ public aspect GlyphCreation {
 
     @Override public GlyphReplicator VImage.getReplicator(){
         return new VImageReplicator(this);
+    }
+
+    @Override public GlyphReplicator VImageOr.getReplicator(){
+        return new VImageOrReplicator(this);
     }
 
     @Override public GlyphReplicator ClusteredImage.getReplicator(){
@@ -473,6 +478,24 @@ public aspect GlyphCreation {
         public Glyph doCreateGlyph(){
             return new VImage(0d,0d,0,serImage.getImage(), scaleFactor);
         }
+    }
+
+    private static class VImageOrReplicator extends ClosedShapeReplicator {
+        //Note that serialized ImageIcon instances (as most AWT objects)
+        //are not guaranteed to be portable across toolkits.
+        //If this becomes a practical concern, then another serialization
+        //mechanism is to be used.
+        protected final ImageIcon serImage;
+
+        VImageOrReplicator(VImageOr source){
+            super(source);
+            this.serImage = new ImageIcon(source.getImage());
+        }
+
+        public Glyph doCreateGlyph(){
+            return new VImageOr(0d,0d,0,serImage.getImage(),0);
+        }
+
     }
 
     private static class ClusteredImageReplicator extends ClosedShapeReplicator {

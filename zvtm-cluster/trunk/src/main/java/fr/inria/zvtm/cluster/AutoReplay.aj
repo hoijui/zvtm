@@ -15,6 +15,7 @@ import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.RectangularShape;
 import fr.inria.zvtm.glyphs.VSegment;
 import fr.inria.zvtm.glyphs.VText;
+import fr.inria.zvtm.glyphs.VImage;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -73,6 +74,7 @@ public aspect AutoReplay extends AbstractAutoReplay {
          //execution(public void DPath.edit(Point2D.Double[], boolean)) ||
          execution(public void RectangularShape.setHeight(double)) ||
          execution(public void RectangularShape.setWidth(double)) ||
+         execution(public void VImage.setZoomSensitive(boolean)) ||
          execution(public void VirtualSpace.show(Glyph)) ||
          execution(public void VirtualSpace.hide(Glyph)) ||
 
