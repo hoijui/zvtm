@@ -97,8 +97,8 @@ public class SlaveApp {
         view = vsm.addFrameView(cv.getCameras(),
                 "slaveView " + options.blockNumber,
                 getViewType(),
-                cv.getClusterGeometry().getBlockWidth(),
-                cv.getClusterGeometry().getBlockHeight(),
+                cv.getClusterGeometry().getBlockWidth()*options.width,
+                cv.getClusterGeometry().getBlockHeight()*options.height,
                 false, false, !options.undecorated, null);
         view.setBackgroundColor(cv.getBackgroundColor());
         view.setListener(new SlaveEventHandler());
@@ -170,8 +170,8 @@ public class SlaveApp {
         int row = clusteredView.rowNum(options.blockNumber) - clusteredView.rowNum(clusteredView.getOrigin());
         int col = clusteredView.colNum(options.blockNumber) - clusteredView.colNum(clusteredView.getOrigin());
 
-        double xOffset = -((viewCols-1)*virtBlockWidth)/2;
-        double yOffset = ((viewRows-1)*virtBlockHeight)/2;
+        double xOffset = -((viewCols-1)*virtBlockWidth)/2 + ((options.width-1)*virtBlockWidth/2);
+        double yOffset = ((viewRows-1)*virtBlockHeight)/2 + ((options.height-1)*virtBlockHeight/2);
 
         double newX = xOffset + masterLoc.vx + col*virtBlockWidth;
         double newY = -yOffset + masterLoc.vy - row*virtBlockHeight;
@@ -238,5 +238,11 @@ class SlaveOptions {
 
     @Option(name = "-r", aliases = {"--refresh-period"}, usage = "time between two scene repaints (milliseconds)")
         int refreshPeriod = 25;
+    
+    @Option(name = "-wb", aliases = {"--w-block"}, usage = "width in block (default 1)")
+    	int width = 1;
+
+    @Option(name = "-hb", aliases = {"--h-block"}, usage = "height in block (default 1)")
+		int height = 1;
 }
 
