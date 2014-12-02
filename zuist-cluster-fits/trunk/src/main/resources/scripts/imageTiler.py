@@ -268,10 +268,20 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
             #    cd = WCSDATA.wcs.cd
             #    w.wcs.cd = cd*scale
 
-            cd = WCSDATA.wcs.cd
-            w.wcs.cd = cd*scale
-            w.wcs.cdelt = [np.sqrt(w.wcs.cd[0,0]*w.wcs.cd[0,0]+w.wcs.cd[1,0]*w.wcs.cd[1,0]), np.sqrt(w.wcs.cd[0,1]*w.wcs.cd[0,1]+w.wcs.cd[1,1]*w.wcs.cd[1,1])]
-            w.wcs.pc = [[w.wcs.cd[0,0]/ w.wcs.cdelt[0], w.wcs.cd[0,1]/ w.wcs.cdelt[0]],[w.wcs.cd[1,0]/ w.wcs.cdelt[1], w.wcs.cd[1,1]/ w.wcs.cdelt[1]]]
+
+            if WCSDATA.wcs.has_cd():
+                cd = WCSDATA.wcs.cd
+                w.wcs.cd = cd*scale
+                w.wcs.cdelt = [np.sqrt(w.wcs.cd[0,0]*w.wcs.cd[0,0]+w.wcs.cd[1,0]*w.wcs.cd[1,0]), np.sqrt(w.wcs.cd[0,1]*w.wcs.cd[0,1]+w.wcs.cd[1,1]*w.wcs.cd[1,1])]
+                w.wcs.pc = [[w.wcs.cd[0,0]/ w.wcs.cdelt[0], w.wcs.cd[0,1]/ w.wcs.cdelt[0]],[w.wcs.cd[1,0]/ w.wcs.cdelt[1], w.wcs.cd[1,1]/ w.wcs.cdelt[1]]]
+            else:
+                w.wcs.pc = WCSDATA.wcs.pc
+                cdelt = WCSDATA.wcs.cdelt
+                print "cdelt"
+                print cdelt
+                print scale
+                w.wcs.cdelt = cdelt*scale
+                print w.wcs.cdelt
 
             #pc = WCSDATA.wcs.get_pc()
             #w.wcs.pc = pc*scale

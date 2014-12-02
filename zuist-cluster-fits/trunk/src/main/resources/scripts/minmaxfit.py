@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 # -*- coding: UTF-8 -*-
 
 import os, sys
@@ -37,36 +37,36 @@ def openFits(SRC_PATH):
 ################################################################################
 
 path_Ks = {
-	"/home/fdelcampo/zuist-scenes-tmp/fits/v20100411_01052_st_tl.fit",
-	"/home/fdelcampo/zuist-scenes-tmp/fits/v20100411_00980_st_tl.fit",
-	"/home/fdelcampo/zuist-scenes-tmp/fits/v20100411_00944_st_tl.fit",
-	"/home/fdelcampo/zuist-scenes-tmp/fits/v20100411_00872_st_tl.fit",
-	"/home/fdelcampo/zuist-scenes-tmp/fits/v20100420_00370_st_tl.fit",
-	"/home/fdelcampo/zuist-scenes-tmp/fits/v20100411_01016_st_tl.fit",
-	"/home/fdelcampo/zuist-scenes-tmp/fits/v20100411_00908_st_tl.fit",
-	"/home/fdelcampo/zuist-scenes-tmp/fits/v20110508_00412_st_tl.fit"
+	"/home/fdelcampo/zuist-scenes-local/fits/Ks/v20100411_01052_st_tl.fit",
+	"/home/fdelcampo/zuist-scenes-local/fits/Ks/v20100411_00980_st_tl.fit",
+	"/home/fdelcampo/zuist-scenes-local/fits/Ks/v20100411_00944_st_tl.fit",
+	"/home/fdelcampo/zuist-scenes-local/fits/Ks/v20100411_00872_st_tl.fit",
+	"/home/fdelcampo/zuist-scenes-local/fits/Ks/v20100420_00370_st_tl.fit",
+	"/home/fdelcampo/zuist-scenes-local/fits/Ks/v20100411_01016_st_tl.fit",
+	"/home/fdelcampo/zuist-scenes-local/fits/Ks/v20100411_00908_st_tl.fit",
+	"/home/fdelcampo/zuist-scenes-local/fits/Ks/v20110508_00412_st_tl.fit"
 }
 
 path_H = {
-	"/home/fdelcampo/zuist-scenes-tmp/fits/v20100411_01040_st_tl.fit",
-	"/home/fdelcampo/zuist-scenes-tmp/fits/v20100411_00968_st_tl.fit",
-	"/home/fdelcampo/zuist-scenes-tmp/fits/v20100411_00932_st_tl.fit",
-	"/home/fdelcampo/zuist-scenes-tmp/fits/v20100411_00860_st_tl.fit",
-	"/home/fdelcampo/zuist-scenes-tmp/fits/v20100420_00358_st_tl.fit",
-	"/home/fdelcampo/zuist-scenes-tmp/fits/v20100411_01004_st_tl.fit",
-	"/home/fdelcampo/zuist-scenes-tmp/fits/v20100411_00896_st_tl.fit",
-	"/home/fdelcampo/zuist-scenes-tmp/fits/v20110508_00400_st_tl.fit"
+	"/home/fdelcampo/zuist-scenes-local/fits/H/v20100411_01040_st_tl.fit",
+	"/home/fdelcampo/zuist-scenes-local/fits/H/v20100411_00968_st_tl.fit",
+	"/home/fdelcampo/zuist-scenes-local/fits/H/v20100411_00932_st_tl.fit",
+	"/home/fdelcampo/zuist-scenes-local/fits/H/v20100411_00860_st_tl.fit",
+	"/home/fdelcampo/zuist-scenes-local/fits/H/v20100420_00358_st_tl.fit",
+	"/home/fdelcampo/zuist-scenes-local/fits/H/v20100411_01004_st_tl.fit",
+	"/home/fdelcampo/zuist-scenes-local/fits/H/v20100411_00896_st_tl.fit",
+	"/home/fdelcampo/zuist-scenes-local/fits/H/v20110508_00400_st_tl.fit"
 }
 
 path_J = {
-	"/home/fdelcampo/zuist-scenes-tmp/fits/J/v20100411_01064_st_tl.fit",
-	"/home/fdelcampo/zuist-scenes-tmp/fits/J/v20100411_00992_st_tl.fit",
-	"/home/fdelcampo/zuist-scenes-tmp/fits/J/v20100411_00956_st_tl.fit",
-	"/home/fdelcampo/zuist-scenes-tmp/fits/J/v20100411_00884_st_tl.fit",
-	"/home/fdelcampo/zuist-scenes-tmp/fits/J/v20100420_00382_st_tl.fit",
-	"/home/fdelcampo/zuist-scenes-tmp/fits/J/v20100411_01028_st_tl.fit",
-	"/home/fdelcampo/zuist-scenes-tmp/fits/J/v20100411_00920_st_tl.fit",
-	"/home/fdelcampo/zuist-scenes-tmp/fits/J/v20110508_00424_st_tl.fit"
+	"/home/fdelcampo/zuist-scenes-local/fits/J/v20100411_01064_st_tl.fit",
+	"/home/fdelcampo/zuist-scenes-local/fits/J/v20100411_00992_st_tl.fit",
+	"/home/fdelcampo/zuist-scenes-local/fits/J/v20100411_00956_st_tl.fit",
+	"/home/fdelcampo/zuist-scenes-local/fits/J/v20100411_00884_st_tl.fit",
+	"/home/fdelcampo/zuist-scenes-local/fits/J/v20100420_00382_st_tl.fit",
+	"/home/fdelcampo/zuist-scenes-local/fits/J/v20100411_01028_st_tl.fit",
+	"/home/fdelcampo/zuist-scenes-local/fits/J/v20100411_00920_st_tl.fit",
+	"/home/fdelcampo/zuist-scenes-local/fits/J/v20110508_00424_st_tl.fit"
 }
 
 if not SUCCEEDED_IMPORTING_ASTROPY:

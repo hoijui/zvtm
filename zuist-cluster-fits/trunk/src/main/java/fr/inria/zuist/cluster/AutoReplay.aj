@@ -16,6 +16,8 @@ import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zvtm.glyphs.FitsImage;
 import fr.inria.zuist.engine.FitsImageDescription;
 
+import java.net.URL;
+
 /**
  * Add methods that should be replay by the generic Delta here.
  * See the AbstractAutoReplay aspect in ZVTM-cluster for more details.
@@ -49,6 +51,9 @@ aspect AutoReplay extends AbstractAutoReplay {
          execution(public double FitsImageDescription.getX()) ||
          execution(public double FitsImageDescription.getY()) ||
          execution(public boolean FitsImageDescription.isVisible()) ||
+         execution(public URL FitsImageDescription.getSrc()) ||
+         execution(public void FitsImageDescription.moveTo(double, double)) ||
+         execution(public void FitsImageDescription.orientTo(double)) ||
          execution(public void FitsImageDescription.setVisible(boolean))
         );
 }

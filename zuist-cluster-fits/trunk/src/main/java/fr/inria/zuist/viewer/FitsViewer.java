@@ -100,6 +100,15 @@ import java.awt.image.ImageFilter;
 import cl.inria.massda.SmartiesManager;
 import cl.inria.massda.TuioEventHandler;
 
+import edu.jhu.pha.sdss.fits.FITSImage; 
+import jsky.coords.WCSTransform;
+import nom.tam.fits.FitsException;
+import fr.inria.zvtm.fits.NomWcsKeywordProvider;
+
+import jsky.coords.WorldPos;
+import cl.inria.massda.PythonWCS;
+
+
 /**
  * @author Emmanuel Pietriga, Fernando del Campo
  */
@@ -181,7 +190,15 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     SmartiesManager smartiesMngr;
     TuioEventHandler teh;
 
+    FitsImageDescription fitsImageDescRef;
+    //NomWcsKeywordProvider wcsKeyProviderRef;
+    //WCSTransform wcsTransformRef;
+
     VText wcsLabel;
+
+    String reference;
+
+    PythonWCS pythonWCS;
     
     //JSONArray readed;
     //Vector<SavedPosition> savedPositions;
@@ -220,6 +237,11 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 		//menu.drawHistogram();
         smartiesMngr = new SmartiesManager(this);
         teh = new TuioEventHandler(this);
+
+        reference = options.reference;
+
+        pythonWCS = new PythonWCS();
+        pythonWCS.sendCoordinate(0,0);
 
     }
     //void initGUI(boolean fullscreen, boolean opengl, boolean antialiased){
@@ -493,6 +515,235 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         */
     }
 
+    
+    public void orientTo(double angle){
+        System.out.println("angle: "+angle);
+        for(ObjectDescription desc: sm.getObjectDescriptions()){
+            if(desc instanceof FitsImageDescription){
+                ((FitsImageDescription)desc).orientTo(angle);
+            }
+        }
+    }
+
+    private void loadFitsReference(){
+        if(reference == null){
+            for(ObjectDescription desc: sm.getObjectDescriptions()){
+                if(desc instanceof FitsImageDescription){
+                    if( ((FitsImageDescription)desc).isReference()){
+                        System.out.println("Reference");
+                        System.out.println(desc);
+
+                        fitsImageDescRef = (FitsImageDescription)desc;
+                        /*
+                        try{
+                            fitsImageDescRef = (FitsImageDescription)desc;
+                            //FITSImage fitsImage = new FITSImage( fitsImageDescRef.getSrc() );
+                            //wcsKeyProviderRef = new NomWcsKeywordProvider( fitsImage.getFits().getHDU(0).getHeader());
+                            //wcsTransformRef = new WCSTransform(wcsKeyProviderRef);
+
+                        } catch(IOException ioe){
+                            wcsTransformRef = null;
+                        } catch (FitsException fe){
+                            wcsTransformRef = null;
+                        } catch(FITSImage.NoImageDataFoundException nidfe){
+                            wcsTransformRef = null;
+                        } catch(FITSImage.DataTypeNotSupportedException dtnse) {
+                            wcsTransformRef = null;
+                        }
+                        */
+
+                        break;
+                    }
+                }
+            }
+        } else {
+
+            System.out.println("ref: " + reference);
+
+            fitsImageDescRef = null;
+            /*
+            try{
+                
+                
+                FITSImage fitsImage = new FITSImage( reference );
+                wcsKeyProviderRef = new NomWcsKeywordProvider( fitsImage.getFits().getHDU(0).getHeader());
+                wcsTransformRef = new WCSTransform(wcsKeyProviderRef);
+
+            } catch(IOException ioe){
+                wcsTransformRef = null;
+            } catch (FitsException fe){
+                wcsTransformRef = null;
+            } catch(FITSImage.NoImageDataFoundException nidfe){
+                wcsTransformRef = null;
+            } catch(FITSImage.DataTypeNotSupportedException dtnse) {
+                wcsTransformRef = null;
+            }
+            */
+
+        }
+        
+        
+        System.out.println("loadFitsReference end");
+    }
+
+    
+
+    /*
+    public void moveToCoordinatesWCS(){
+
+
+        Point2D.Double origin = null;
+        Point2D.Double cdelt = null;
+
+        String idTile = "I00358";//"I00370";
+
+        for(ObjectDescription desc: sm.getObjectDescriptions()){
+            if(desc instanceof FitsImageDescription){
+                //System.out.println("index: "+((FitsImageDescription)desc).getID());
+                if(((FitsImageDescription)desc).getID().equals(idTile+"-1-4-1-4-1-4")) {
+                //if(((FitsImageDescription)desc).getID().equals(idTile+"-1-0-0-0-0-0")) {
+
+                    try{
+                        FITSImage fitsImage = new FITSImage(((FitsImageDescription)desc).getSrc());
+                        System.out.println("src: "+((FitsImageDescription)desc).getSrc());
+                        wcsKeyProvider = new NomWcsKeywordProvider(fitsImage.getFits().getHDU(0).getHeader());
+                        wcsTransform = new WCSTransform(wcsKeyProvider);
+                        Point2D.Double pix = wcsTransform.wcs2pix(wcsKeyProvider.getDoubleValue("CRVAL1"), wcsKeyProvider.getDoubleValue("CRVAL2"));
+                        cdelt = new Point2D.Double(wcsKeyProvider.getDoubleValue("CDELT1"), wcsKeyProvider.getDoubleValue("CDELT2"));
+                        //System.out.print("origin: (;" + origin.getX() + ";, ;" + origin.getY() + ";) --> (;");
+                        ((FitsImageDescription)desc).moveTo(pix.getX(), pix.getY());
+                        origin = new Point2D.Double(pix.getX(), pix.getY());
+                        System.out.println("origin: (" + origin.getX() + ", " + origin.getY() + "): RA: " + wcsKeyProvider.getDoubleValue("CRVAL1") + " -- DEC: " + wcsKeyProvider.getDoubleValue("CRVAL2") );
+                        double h = ((FitsImageDescription)desc).getHeight();
+                        double w = ((FitsImageDescription)desc).getWidth();
+                        double x = ((FitsImageDescription)desc).getX();
+                        double y = ((FitsImageDescription)desc).getY();
+                        System.out.println("h: "+ h + " w: " + w + " x: " + x + " y: " + y);
+                        System.out.print(wcsTransform.wcs2pix(273.0544, -23.673911) );
+                        System.out.print(" -- ");
+                        System.out.println(wcsTransform.wcs2pix(274.21448, -24.24497) );
+                        System.out.print(wcsTransform.wcs2pix(272.27939, -24.967136) );
+                        System.out.print(" -- ");
+                        System.out.println(wcsTransform.wcs2pix(273.45378, -25.550794) );
+
+                        break;
+                    } catch(IOException ioe){
+                        wcsTransform = null;
+                    } catch (FitsException fe){
+                        wcsTransform = null;
+                    } catch(FITSImage.NoImageDataFoundException nidfe){
+                        wcsTransform = null;
+                    } catch(FITSImage.DataTypeNotSupportedException dtnse) {
+                        wcsTransform = null;
+                    }
+                }
+            }
+        }
+
+        for(ObjectDescription desc: sm.getObjectDescriptions()){
+            if(desc instanceof FitsImageDescription ){ //&& !((FitsImageDescription)desc).getID().equals("I00358-1-1-1-1-1-1")){
+                /*
+                if(origin == null){
+                    origin = desc;
+                    try{
+                        FITSImage fitsImage = new FITSImage(((FitsImageDescription)origin).getSrc());
+                        System.out.println("src: "+((FitsImageDescription)origin).getSrc());
+                        wcsKeyProvider = new NomWcsKeywordProvider(fitsImage.getFits().getHDU(0).getHeader());
+                        wcsTransform = new WCSTransform(wcsKeyProvider);
+                        Point2D.Double pix = wcsTransform.wcs2pix(wcsKeyProvider.getDoubleValue("CRVAL1"), wcsKeyProvider.getDoubleValue("CRVAL2"));
+                        //System.out.print("origin: (;" + origin.getX() + ";, ;" + origin.getY() + ";) --> (;");
+                        //origin.moveTo(pix.getX(), pix.getY());
+                        //System.out.println(origin.getX() + ";, ;" + origin.getY() + ";);");
+                    } catch(IOException ioe){
+                        wcsTransform = null;
+                    } catch (FitsException fe){
+                        wcsTransform = null;
+                    } catch(FITSImage.NoImageDataFoundException nidfe){
+                        wcsTransform = null;
+                    } catch(FITSImage.DataTypeNotSupportedException dtnse) {
+                        wcsTransform = null;
+                    }
+                } else {
+                *
+                    try{
+                        FITSImage fitsImage = new FITSImage(((FitsImageDescription)desc).getSrc());
+                        NomWcsKeywordProvider wcsKeyProvider2 = new NomWcsKeywordProvider(fitsImage.getFits().getHDU(0).getHeader());
+                        WCSTransform wcsTransform2 = new WCSTransform(wcsKeyProvider2);
+
+                        Point2D.Double pix = wcsTransform.wcs2pix(wcsKeyProvider2.getDoubleValue("CRVAL1"), wcsKeyProvider2.getDoubleValue("CRVAL2"));
+                        //Point2D.Double pix = wcsTransform2.wcs2pix(wcsKeyProvider.getDoubleValue("CRVAL1"), wcsKeyProvider.getDoubleValue("CRVAL2"));
+                        Point2D.Double pc1 = new Point2D.Double(wcsKeyProvider2.getDoubleValue("PC1_1"), wcsKeyProvider2.getDoubleValue("PC1_2"));
+                        Point2D.Double pc2 = new Point2D.Double(wcsKeyProvider2.getDoubleValue("PC2_1"), wcsKeyProvider2.getDoubleValue("PC2_2"));
+
+                        // MATRIX PROJECTION
+                        /**
+                        * alpha * | cos(teta)  -sin(teta) |
+                        *         | sen(teta)   cos(teta) |
+                        * alpha = sqrt( cos(teta)^2 + sin(teta)^2)
+                        **
+
+                        double alpha = Math.sqrt(pc1.getX()*pc1.getX() + pc2.getX()*pc2.getX());
+                        double teta = Math.acos( pc1.getX()/(alpha) );
+
+                        Point2D.Double pixo = wcsTransform2.wcs2pix(wcsKeyProvider2.getDoubleValue("CRVAL1"), wcsKeyProvider2.getDoubleValue("CRVAL2"));
+                        //System.out.print("desc: (;" + desc.getX() + ";, ;" + desc.getY() + ";) --> (;");
+                        
+                        //if( ((FitsImageDescription)desc).getID().equals("I00358-1-1-1-1-1-0") || ((FitsImageDescription)desc).getID().equals("I00358-1-1-1-1-1-1") || ((FitsImageDescription)desc).getID().equals("I00358-1-1-1-1-1-2") || ((FitsImageDescription)desc).getID().equals("I00358-1-1-1-1-1-3") || ((FitsImageDescription)desc).getID().equals("I00358-1-1-1-1-1-4") ){
+                        //    System.out.println(origin.getX() + ", " + origin.getY() + " -- " + pix.getX() + ", " + pix.getY() + " -- " + pixo.getX() + ", " + pixo.getY() + " -- " + ((FitsImageDescription)desc).getID() + " -- RA: " + wcsKeyProvider2.getDoubleValue("CRVAL1") + " DEC: " + wcsKeyProvider2.getDoubleValue("CRVAL2") );
+                        //}
+
+
+                        if( ((FitsImageDescription)desc).getID().equals(idTile+"-1-1-0-0-0-0") || ((FitsImageDescription)desc).getID().equals(idTile+"-1-2-0-0-0-0") || ((FitsImageDescription)desc).getID().equals(idTile+"-1-3-0-0-0-0") || ((FitsImageDescription)desc).getID().equals(idTile+"-1-4-0-0-0-0") || ((FitsImageDescription)desc).getID().equals(idTile+"-1-0-0-0-0-0") ){
+                            System.out.println(origin.getX() + ", " + origin.getY() + " -- " + pix.getX() + ", " + pix.getY() + " -- " + pixo.getX() + ", " + pixo.getY() + " -- " + ((FitsImageDescription)desc).getID() + " -- RA: " + wcsKeyProvider2.getDoubleValue("CRVAL1") + " DEC: " + wcsKeyProvider2.getDoubleValue("CRVAL2") );
+                            double h = ((FitsImageDescription)desc).getHeight();
+                            double w = ((FitsImageDescription)desc).getWidth();
+                            double x = ((FitsImageDescription)desc).getX();
+                            double y = ((FitsImageDescription)desc).getY();
+                            System.out.println("h: "+ h + " w: " + w + " x: " + x + " y: " + y);
+                            System.out.println("PC1: ");
+                            System.out.println(pc1);
+                            System.out.println("PC2: ");
+                            System.out.println(pc2);
+                            System.out.println("CDELT: ");
+                            System.out.println(cdelt);
+                            
+                            System.out.println("alpha: " + alpha);
+                            System.out.println("teta: " + teta );
+
+                            System.out.println("cdelt: " + cdelt.getX());
+                            System.out.println("pix*cdelt: " + (pix.getX()*cdelt.getX()));
+                            System.out.println( "pix/1.1011: "+(pix.getX()/1.1011));
+                            System.out.println("1/cdelt:: " + (1/cdelt.getX()));
+                        }
+                        
+                        //desc.moveTo( pix.getX()*(cdelt.getX()), pix.getY()*(cdelt.getY()) );
+                        //desc.moveTo( pix.getX(), pix.getY() );
+                        desc.moveTo( pix.getX()/1.10101, pix.getY()/1.005 );
+                        //desc.moveTo( pix.getX()/(alpha*1.125), pix.getY()/(alpha) );
+                        ((FitsImageDescription)desc).orientTo(-teta);
+
+                        //desc.moveTo(origin.getX() + pix.getX() + pixo.getX(), origin.getY() + pix.getY() - pixo.getY() );
+                        //System.out.println(desc.getX() + ";, ;" + desc.getY() + ";);");
+                        //System.out.println("("+pix.getX()+", "+pix.getY()+")");
+
+
+                    } catch(IOException ioe){
+                        //wcsTransform2 = null;
+                    } catch (FitsException fe){
+                        //wcsTransform2 = null;
+                    } catch(FITSImage.NoImageDataFoundException nidfe){
+                        //wcsTransform2 = null;
+                    } catch(FITSImage.DataTypeNotSupportedException dtnse) {
+                        //wcsTransform2 = null;
+                    }
+                    
+                //}
+            }
+        }
+
+    }
+
+
     ObjectDescription beforeFits;
 
     //public Vector<ObjectDescription> getGlyphOnPoint(double jpx, double jpy){
@@ -505,7 +756,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         //System.out.println("a: "+a);
         double h, w, x, y;
 
-        if(beforeFits != null && ((FitsImageDescription)beforeFits).isVisible()){
+        if(beforeFits != null && beforeFits.getGlyph() != null && ((FitsImageDescription)beforeFits).isVisible()){
             h = ((FitsImageDescription)beforeFits).getHeight();
             w = ((FitsImageDescription)beforeFits).getWidth();
             x = ((FitsImageDescription)beforeFits).getX();
@@ -529,13 +780,13 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
                     return desc;
                 }
             }
-            */
+            /
 
         }
  
 
         for(ObjectDescription desc: sm.getObjectDescriptions()){
-            if(desc instanceof FitsImageDescription && ((FitsImageDescription)desc).isVisible()){
+            if(desc instanceof FitsImageDescription && ((FitsImageDescription)desc).isVisible() && ((FitsImageDescription)desc).getGlyph() != null){
                 h = ((FitsImageDescription)desc).getHeight();
                 w = ((FitsImageDescription)desc).getWidth();
                 x = ((FitsImageDescription)desc).getX();
@@ -558,55 +809,167 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
                     result.add(g);
                 }
             }
-            */
+            /
         }
         //return result;
         return null;
     }
+    */
 
     
     public Point2D.Double coordinateWCS(Point2D.Double xy){
 
-        System.out.println("coordinateWCS(" + xy.getX() + " - " + xy.getY() + ")");
-        double[] coord = windowToViewCoordinateFromSmarties(xy.getX(), xy.getY());
-        System.out.println("windowToViewCoordinateFromSmarties: (" + coord[0] + ", " + coord[1] + ")");
+        try {
 
-        double a = (mCamera.focal + mCamera.getAltitude()) / mCamera.focal;
+            System.out.println("coordinateWCS(" + xy.getX() + ", " + xy.getY() + ")");
+            double[] coord = windowToViewCoordinateFromSmarties(xy.getX(), xy.getY());
+            System.out.println("windowToViewCoordinateFromSmarties: (" + coord[0] + ", " + coord[1] + ")");
+            System.out.println("windowToViewCoordinateFromSmarties Ref: (" + fitsImageDescRef.getX() + ", " + fitsImageDescRef.getY() + ")");
 
-        /*
-        Vector<ObjectDescription> g = getGlyphOnPoint(coord[0], coord[1] );
-        FitsImageDescription fi;
-        if(g.size() > 0){
-            fi = (FitsImageDescription)(g.firstElement());
-        } else {
-            return new Point2D.Double(0.0,0.0);
+            double a = (mCamera.focal + mCamera.getAltitude()) / mCamera.focal;
+
+            /*
+            Vector<ObjectDescription> g = getGlyphOnPoint(coord[0], coord[1] );
+            FitsImageDescription fi;
+            if(g.size() > 0){
+                fi = (FitsImageDescription)(g.firstElement());
+            } else {
+                return new Point2D.Double(0.0,0.0);
+            }
+            *
+
+            ObjectDescription g = getGlyphOnPoint(coord[0], coord[1] );
+            FitsImageDescription fi;
+            if(g != null){
+                fi = (FitsImageDescription)(g);
+            } else {
+                return new Point2D.Double(0.0,0.0);
+            }
+
+            //double x = (xy.getX()-fi.getLocation().getX() + fi.getFitsWidth()/2 );
+            //double y = (xy.getY()-fi.getLocation().getY() + fi.getFitsHeight()/2 );
+            //double x = (coord[0]/a - fi.getLocation().getX()/a + fi.getFitsWidth()/2 );
+            //double y = (coord[1]/a - fi.getLocation().getY()/a + fi.getFitsHeight()/2 );
+            double x = (coord[0]/a - fi.getX()/a + fi.getWidth()/a/2 );
+            double y = (coord[1]/a - fi.getY()/a + fi.getHeight()/a/2 );
+            //double x = (coord[0] - fi.getX() + fi.getWidth()/2 );
+            //double y = (coord[1] - fi.getY() + fi.getHeight()/2 );
+
+            //System.out.println("("+coord[0] + "/"+a+" - "+fi.getX()+"/"+ a + " + " + fi.getWidth()+"/2), ("+coord[1]+"/a -"+fi.getY()+"/a + "+fi.getHeight()+"/2 )");
+
+            Point2D.Double radec = (fi.getGlyph() != null ) ? ((FitsImage)fi.getGlyph()).pix2wcs(x, y) : new Point2D.Double(0,0);
+
+            System.out.println("pix2wcs("+ x+", "+y+" )");
+            System.out.println("wcs: (" + radec.getX() + ", " + radec.getY() + ")");
+            System.out.println("ID: " + fi.getID());
+
+            return radec;
+            */
+
+            System.out.println("coordinateWCS("+coord[0]+", "+coord[1]+")");
+            System.out.println("reference("+fitsImageDescRef.getX()+", "+fitsImageDescRef.getY()+")");
+            System.out.println("a: " + a);
+            System.out.println("factor: " + fitsImageDescRef.getFactor());
+
+            //System.out.println( "(" + ((coord[0]-fitsImageDescRef.getX()+fitsImageDescRef.getWidth()/2)  ) + ", " + (( coord[1]-fitsImageDescRef.getY()+fitsImageDescRef.getHeight()/2) ) + ")");
+            
+            //System.out.println( "(" + ((coord[0]-fitsImageDescRef.getX()+fitsImageDescRef.getWidth()/2)/a  ) + ", " + (( coord[1]-fitsImageDescRef.getY()+fitsImageDescRef.getHeight()/2)/a ) + ")");
+            
+            System.out.println( "(" + ((coord[0]-fitsImageDescRef.getX()+fitsImageDescRef.getWidthWithFactor()/2)/a  ) + ", " + (( coord[1]-fitsImageDescRef.getY()+fitsImageDescRef.getHeightWithFactor()/2)/a ) + ")");
+
+
+            System.out.println( "width: " +fitsImageDescRef.getWidth() + " height:" +fitsImageDescRef.getHeight());
+
+            System.out.println( "width/factor: " +(fitsImageDescRef.getWidth()/fitsImageDescRef.getFactor() ) + " height/a:" + (fitsImageDescRef.getHeight()/fitsImageDescRef.getFactor()) ) ;
+
+            /*
+            System.out.println("WCSCenter");
+            System.out.println( wcsTransformRef.getWCSCenter() );
+            System.out.println("PixCenter");
+            System.out.println( wcsTransformRef.getImageCenter() );
+            */
+
+            double x = (coord[0] - fitsImageDescRef.getX())/fitsImageDescRef.getFactor() + fitsImageDescRef.getWidth()/fitsImageDescRef.getFactor()/2 ;
+            double y = (coord[1] - fitsImageDescRef.getY())/fitsImageDescRef.getFactor() + fitsImageDescRef.getHeight()/fitsImageDescRef.getFactor()/2 ;
+
+
+            System.out.println( "(" + x + ", " + y + ")");
+
+            System.out.println("size: " + fitsImageDescRef.getWidthWithFactor() + ", " +  fitsImageDescRef.getHeightWithFactor());
+
+            /*
+            String obj = wcsKeyProviderRef.getStringValue("OBJECT");
+            double pc1_1 = wcsKeyProviderRef.getDoubleValue("PC1_1");
+            double pc1_2 = wcsKeyProviderRef.getDoubleValue("PC1_2");
+            double pc2_1 = wcsKeyProviderRef.getDoubleValue("PC2_1");
+            double pc2_2 = wcsKeyProviderRef.getDoubleValue("PC2_2");
+            double crota = wcsKeyProviderRef.getDoubleValue("CROTA2");
+            double cdelt1 = wcsKeyProviderRef.getDoubleValue("CDELT1");
+            double cdelt2 = wcsKeyProviderRef.getDoubleValue("CDELT2");
+
+            System.out.println("pc1_1: " + pc1_1);
+            System.out.println("pc1_2: " + pc1_2);
+            System.out.println("pc2_1: " + pc2_1);
+            System.out.println("pc2_2: " + pc2_2);
+            System.out.println("crota: " + crota);
+            System.out.println("cdelt1: " + cdelt1);
+            System.out.println("cdelt2: " + cdelt2);
+
+            Point2D.Double wcs = wcsTransformRef.pix2wcs(1/pc1_1*x+1/pc1_2*y, 1/pc2_1*x+1/pc2_2*y);
+
+            //Point2D.Double wcs = wcsTransformRef.pix2wcs(x, y);
+
+            System.out.println("x: " + x + " -> "+wcs.getX() );
+            System.out.println("y: " + y + " -> "+wcs.getY() );
+
+            System.out.println("WorldPos:");
+            System.out.println( WorldPos.getPosition(wcs.getX(), wcs.getY(), wcsTransformRef) );
+
+            *
+            Point2D.Double pix = wcsTransformRef.wcs2pix(273.05589, -23.664902);
+            VCircle dot = new VCircle(pix.getX(), pix.getY(), 1, 100, Color.RED);
+            mSpace.addGlyph(dot);
+
+            pix = wcsTransformRef.wcs2pix(274.2222, -24.236882);
+            dot = new VCircle(pix.getX(), pix.getY(), 1, 100, Color.YELLOW);
+            mSpace.addGlyph(dot);
+
+            dot = new VCircle(x, y, 1, 100, Color.GREEN);
+            mSpace.addGlyph(dot);
+            *
+
+            VCircle dot = new VCircle(coord[0], coord[1], 1, 100, Color.RED);
+            mSpace.addGlyph(dot);
+            dot = new VCircle(fitsImageDescRef.getX(), fitsImageDescRef.getY(), 1, 100, Color.YELLOW);
+            mSpace.addGlyph(dot);
+            dot = new VCircle(fitsImageDescRef.getX() - fitsImageDescRef.getWidth()/2, fitsImageDescRef.getY() - fitsImageDescRef.getHeight()/2, 1, 100, Color.GREEN);
+            mSpace.addGlyph(dot);
+
+            System.out.println( "distance: " + ((coord[0]-fitsImageDescRef.getX()+fitsImageDescRef.getWidth()/2)/a) + ", " + ((coord[1] - fitsImageDescRef.getY() + fitsImageDescRef.getHeight()/2)/a) );
+            System.out.println( wcsTransformRef.pix2wcs( (coord[0]-fitsImageDescRef.getX()+fitsImageDescRef.getWidth()/2)/a , (coord[1] - fitsImageDescRef.getY() + fitsImageDescRef.getHeight()/2)/a ) );
+
+            if(wcsTransformRef != null) {
+                return wcsTransformRef.pix2wcs(x,y);
+                //return wcsTransformRef.pix2wcs((coord[0]-fitsImageDescRef.getX())  , ( coord[1]-fitsImageDescRef.getY()) );
+            } else
+                return new Point2D.Double(0.0,0.0);
+            */
+
+            pythonWCS.sendCoordinate(x, y);
+
+            System.out.println(pythonWCS.getCoordinate());
+
+            if (pythonWCS.getCoordinate() != null)
+                return pythonWCS.getCoordinate();
+            else return new Point2D.Double(0,0);
+
+
+        } catch (NullPointerException e){
+            e.printStackTrace(System.out);
+            return new Point2D.Double(0,0);
         }
-        */
 
-        ObjectDescription g = getGlyphOnPoint(coord[0], coord[1] );
-        FitsImageDescription fi;
-        if(g != null){
-            fi = (FitsImageDescription)(g);
-        } else {
-            return new Point2D.Double(0.0,0.0);
-        }
-
-        //double x = (xy.getX()-fi.getLocation().getX() + fi.getFitsWidth()/2 );
-        //double y = (xy.getY()-fi.getLocation().getY() + fi.getFitsHeight()/2 );
-        //double x = (coord[0]/a - fi.getLocation().getX()/a + fi.getFitsWidth()/2 );
-        //double y = (coord[1]/a - fi.getLocation().getY()/a + fi.getFitsHeight()/2 );
-        double x = (coord[0]/a - fi.getX()/a + fi.getWidth()/2 );
-        double y = (coord[1]/a - fi.getY()/a + fi.getHeight()/2 );
-
-        //System.out.println("a: "+ a);
-        //System.out.println("("+coord[0]+"-"+fi.getLocation().getX()+" + "+fi.getFitsWidth()+"/2 ), ("+coord[1]+"-"+fi.getLocation().getY()+" + "+fi.getFitsHeight()+"/2 )");
-
-        Point2D.Double radec = fi.pix2wcs(x, y);
-
-        System.out.println("pix2wcs("+ x+", "+y+" )");
-        System.out.println("wcs: (" + radec.getX() + ", " + radec.getY() + ")");
-
-        return radec;
+        
     }
 
 /*
@@ -796,6 +1159,8 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 	    //gp.setVisible(false);
 	    //gp.setLabel(VWGlassPane.EMPTY_STRING);
         mCamera.setAltitude(0.0f);
+
+        loadFitsReference();
 	}
     
     /*-------------     Navigation       -------------*/

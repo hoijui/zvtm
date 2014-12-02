@@ -65,11 +65,15 @@ public class FitsImageDescription extends ResourceDescription {
 
     private FitsImage glyph; //the actual FITS image
 
+    private boolean isReference = false;
+
+    private double angle = 0;
+
     private int layerIndex;
 
     private boolean createdWithGlobalData = false;
 
-    //private Region parentRegion;
+    private Region parentRegion;
 
     public FitsImageDescription(String id, double x, double y, int z, URL src,
             Region parentRegion, float scaleFactor, FitsImage.ScaleMethod scaleMethod,
@@ -91,8 +95,9 @@ public class FitsImageDescription extends ResourceDescription {
 
         layerIndex = parentRegion.getLayerIndex();
 
-        //this.parentRegion = parentRegion;
+        this.parentRegion = parentRegion;
 
+        /*
         try{
             FITSImage fitsImage = new FITSImage(src);
             NomWcsKeywordProvider wcsKeyProvider = new NomWcsKeywordProvider(fitsImage.getFits().getHDU(0).getHeader());
@@ -111,6 +116,7 @@ public class FitsImageDescription extends ResourceDescription {
             wcsTransform = null;
             objectName = "";
         }
+        */
 
     }
 
@@ -140,8 +146,9 @@ public class FitsImageDescription extends ResourceDescription {
 
         layerIndex = parentRegion.getLayerIndex();
 
-        //this.parentRegion = parentRegion;
+        this.parentRegion = parentRegion;
 
+        /*
         try{
             FITSImage fitsImage = new FITSImage(src);
             NomWcsKeywordProvider wcsKeyProvider = new NomWcsKeywordProvider(fitsImage.getFits().getHDU(0).getHeader());
@@ -160,11 +167,28 @@ public class FitsImageDescription extends ResourceDescription {
             wcsTransform = null;
             objectName = "";
         }
+        */
 
+    }
+
+    public boolean isReference(){
+        return isReference;
+    }
+
+    public void setReference(boolean isReference){
+        this.isReference = isReference;
+    }
+
+    public URL getSrc(){
+        return src;
     }
 
     public String getObjectName(){
         return objectName;
+    }
+
+    public String getID(){
+        return id;
     }
 
     public int getLayerIndex(){
@@ -175,6 +199,11 @@ public class FitsImageDescription extends ResourceDescription {
         return createdWithGlobalData;
     }
 
+
+    public void orientTo(double angle){
+        this.angle = angle;
+        if (glyph != null) glyph.orientTo(angle);
+    }
     /*
     public Region getParentRegion(){
         return parentRegion;
@@ -264,6 +293,7 @@ public class FitsImageDescription extends ResourceDescription {
         //System.out.println("localmin: " + lmin + " localmax: " + lmax);
         //System.out.println("globalmin: " + gmin + " globalmax: " + gmax);
         //System.out.println(glyph);
+        glyph.orientTo(angle);
 
         vs.addGlyph(glyph,false);
 
@@ -283,6 +313,18 @@ public class FitsImageDescription extends ResourceDescription {
         return h;
     }
 
+    public double getWidthWithFactor(){
+        return w/scaleFactor;
+    }
+
+    public double getHeightWithFactor(){
+        return h/scaleFactor;
+    }
+
+    public double getFactor(){
+        return scaleFactor;
+    }
+
     @Override
     public Glyph getGlyph(){
         return glyph;
@@ -300,27 +342,36 @@ public class FitsImageDescription extends ResourceDescription {
         return vy;
     }
 
+
+
     /**
      * Converts pixel coordinates to World Coordinates. Returns null if the WCSTransform is not valid.
      * @param x x-coordinates, in the FITS system: (0,0) lower left, x axis increases to the right, y axis increases upwards
      * @param y y-coordinates, in the FITS system: (0,0) lower left, x axis increases to the right, y axis increases upwards
      */
+    /*
     public Point2D.Double pix2wcs(double x, double y){
         if(wcsTransform != null) return wcsTransform.pix2wcs(x, y);
         else return null;
     }
+    */
 
     /**
      * Converts World Coordinates to pixel coordinates. Returns null if the WCSTransform is invalid, or if the WCS position does not fall within the image.
      */
+    /*
     public Point2D.Double wcs2pix(double ra, double dec){
         if(wcsTransform != null) return wcsTransform.wcs2pix(ra, dec);
         else return null;
     }
+    */
 
     @Override
     public void moveTo(double x, double y){
-        glyph.moveTo(x, y);
+        if(glyph != null) glyph.moveTo(x, y);
+        vx = x;
+        vy = y;
+        parentRegion.moveTo(x,y);
     }
 
     public void setTranslucencyValue(float alpha){

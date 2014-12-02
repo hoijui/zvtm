@@ -47,6 +47,9 @@ public class Options {
     @Option(name = "-smooth", usage = "default to smooth transitions between levels when none specified")
     public boolean smooth = false;
 
+    @Option(name = "-ref", usage = "reference to fits image")
+    public String reference = null;
+
     @Argument
     List<String> arguments = new ArrayList<String>();
 

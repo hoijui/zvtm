@@ -2,10 +2,24 @@
 # -*- coding: UTF-8 -*-
 
 import os, sys
+import inspect
 
-from astropy.io import fits
-from astropy import wcs 
-import numpy as np
+SUCCEEDED_IMPORTING_NUMPY = True
+SUCCEEDED_IMPORTING_ASTROPY = True
+
+try:
+	import numpy as np
+except ImportError:
+	SUCCEEDED_IMPORTING_NUMPY = False
+
+# http://www.astropy.org/
+try:
+	from astropy.io import fits
+	from astropy import wcs 
+except ImportError:
+	SUCCEEDED_IMPORTING_ASTROPY = False
+
+
 
 
 OBJECT = ""
@@ -44,7 +58,8 @@ def header(SRC_PATH):
 	ah = SIZE[1]
 	
 	scale = 1
-	path = "/home/fdelcampo/git/Andes/zvtm-code/zuist-cluster-fits/trunk/src/main/resources/scripts/"
+
+	path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 	name = "wcs_"
 	ext = "fits"
 
@@ -66,16 +81,7 @@ def create_fits(tilepath, wcsdata, im, x, y, aw, ah, scale):
 
 	lon, lat = wcsdata.all_pix2world(aw/2, SIZE[1]-y-ah/2, 0)
 	print(lon, lat)
-	'''
-	if tl == 1:
-		ra, dec = wcsdata.wcs_pix2world(x+aw/2, y+ah+1, 0)
-	elif tl == 2:
-		ra, dec = wcsdata.wcs_pix2world(x+aw+1, y+ah+1, 0)
-	elif tl == 3:
-		ra, dec = wcsdata.wcs_pix2world(x+aw+1, y+ah/2, 0)
-	elif tl == 4:
-		ra, dec = wcsdata.wcs_pix2world(x+aw/2, y+ah/2, 0)
-	'''
+
 	w = wcs.WCS(naxis=2)
 	ra, dec = wcsdata.wcs_pix2world(x+aw/2, SIZE[1]-y-ah/2, 0)
 	w.wcs.crval = [ra, dec]
@@ -100,5 +106,7 @@ def create_fits(tilepath, wcsdata, im, x, y, aw, ah, scale):
 if len(sys.argv) > 1:
     SRC_PATH = os.path.realpath(sys.argv[1])
 
-
-header(SRC_PATH)
+if not SUCCEEDED_IMPORTING_ASTROPY and not SUCCEEDED_IMPORTING_NUMPY:
+	print "You need library Astropy and Numpy"
+else:
+	header(SRC_PATH)

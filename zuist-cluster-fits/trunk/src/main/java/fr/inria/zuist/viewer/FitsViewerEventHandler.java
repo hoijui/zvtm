@@ -117,6 +117,8 @@ class FitsViewerEventHandler implements ViewListener, ComponentListener, CameraL
 		}
 		Glyph g = (Glyph)gum.lastElement();
         */
+        System.out.println("click1: ");
+        System.out.println(v.viewToSpaceCoords(application.mCamera, jpx, jpy));
 
         Glyph g = v.lastGlyphEntered();
 
@@ -267,6 +269,10 @@ class FitsViewerEventHandler implements ViewListener, ComponentListener, CameraL
 		}
     }
 
+    int direction = 1;
+    double angle = 0;
+    double diffangle = Math.PI/180;
+
     public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
         if (code==KeyEvent.VK_PAGE_UP){application.getHigherView();}
     	else if (code==KeyEvent.VK_PAGE_DOWN){application.getLowerView();}
@@ -282,7 +288,25 @@ class FitsViewerEventHandler implements ViewListener, ComponentListener, CameraL
         else if (code==KeyEvent.VK_3){  application.showLayer(application.LAYER_SCENE_H, 1f);application.hideLayer(application.LAYER_SCENE_J); application.hideLayer(application.LAYER_SCENE_KS);}
         else if (code==KeyEvent.VK_4){  application.showLayer(application.LAYER_SCENE_H, 1f);application.showLayer(application.LAYER_SCENE_J, 0.5f);application.hideLayer(application.LAYER_SCENE_KS);}
         else if (code==KeyEvent.VK_5){  application.showLayer(application.LAYER_SCENE_J, 1f);application.hideLayer(application.LAYER_SCENE_KS); application.hideLayer(application.LAYER_SCENE_H);}
-    	else if (code==KeyEvent.VK_N){
+    	else if (code==KeyEvent.VK_P) {
+            System.out.println("change projections");
+            //application.moveToCoordinatesWCS();
+            //application.orientTo(-1.716612658);
+        }
+        else if (code==KeyEvent.VK_R){
+            if(direction > 0)
+                application.orientTo(angle+=diffangle);
+            else
+                application.orientTo(angle-=diffangle);
+            System.out.println("rotation: "+ angle);
+        }
+        else if (code==KeyEvent.VK_D){
+            if(direction > 0)
+                direction = -1;
+            else
+                direction = 1;
+        }
+        else if (code==KeyEvent.VK_N){
             System.out.println("toggleNavMode()");
             toggleNavMode();}
         else if (code==KeyEvent.VK_C){
