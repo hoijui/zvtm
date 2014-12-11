@@ -464,27 +464,31 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
             if(desc instanceof FitsImageDescription){
                 if(((FitsImageDescription)desc).isCreatedWithGlobalData()){
                     globalData = true;
-                    break;
+                    //break;
                 }
                 double[] localScaleParams = ((FitsImageDescription)desc).getLocalScaleParams();
                 if(localScaleParams[0] < globalScaleParams[0]) globalScaleParams[0] = localScaleParams[0];
                 if(localScaleParams[1] > globalScaleParams[1]) globalScaleParams[1] = localScaleParams[1];
             }
         }
-        if(!globalData)
+        if(globalData)
         for(ObjectDescription desc: sm.getObjectDescriptions()){
             if(desc instanceof FitsImageDescription){ 
                 ((FitsImageDescription)desc).setRescaleGlobal(globalScaleParams[0], globalScaleParams[1]);
                 ((FitsImageDescription)desc).setRescaleGlobal(global);
+                if(global) ((FitsImageDescription)desc).rescaleGlobal();
+                else ((FitsImageDescription)desc).rescaleLocal();
             }
         }
         //System.out.println(" min: " + globalScaleParams[0] + " max: " + globalScaleParams[1] );
+        /*
         for(ObjectDescription desc: sm.getObjectDescriptions()){
             if(desc instanceof FitsImageDescription){
                 if(global) ((FitsImageDescription)desc).rescaleGlobal();
                 else ((FitsImageDescription)desc).rescaleLocal();
             }
         }
+        */
     }
 
     public void hideLayer(int layerIndex){

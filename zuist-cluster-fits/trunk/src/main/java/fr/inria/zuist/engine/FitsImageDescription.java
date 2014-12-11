@@ -287,6 +287,7 @@ public class FitsImageDescription extends ResourceDescription {
 
         glyph.setScaleMethod(scaleMethod);
         glyph.setColorFilter(colorFilter);
+
         if(isRescaleGlobal) glyph.rescale(gmin, gmax, gsigma);
         else glyph.rescale(lmin, lmax, lsigma);
 
