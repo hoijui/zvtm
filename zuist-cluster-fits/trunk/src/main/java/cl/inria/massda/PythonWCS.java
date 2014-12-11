@@ -2,6 +2,8 @@
 package cl.inria.massda;
 
 import java.io.IOException;
+//import java.util.concurrent.locks.Lock;
+
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.AMQP.BasicProperties;
 import com.rabbitmq.client.Envelope;
@@ -12,11 +14,15 @@ import org.json.JSONObject;
 
 import java.awt.geom.Point2D;
 
+import cl.inria.massda.SmartiesManager.MyCursor;
+
 
 public class PythonWCS {
 
     Producer producer;
-    Point2D.Double coordinate;
+    //Point2D.Double coordinate;
+    //String galactic = "";
+
 
     static String PRODUCER_ROUTINGKEY = "java";
     static String CONSUMER_ROUTINGKEY = "python";
@@ -25,6 +31,10 @@ public class PythonWCS {
     static String USER_ID = "guest";
     static String PASSWORD = "guest";
     static String CONSUMER_TAG = "consumerTag";
+
+    MyCursor myCursor;
+
+    boolean galacticSystem = false;
 
 
     public class LocalConsumer extends DefaultConsumer{
@@ -46,10 +56,26 @@ public class PythonWCS {
 
             try{
                 JSONObject json = new JSONObject(str);
-                coordinate = new Point2D.Double(json.getDouble("x"), json.getDouble("y"));
+                String sexagesimal;
+                String coordinate;
+                if(!galacticSystem){
+                    sexagesimal = "Ecuatorial: " + json.getString("ecuatorial");
+                    coordinate = "Ra: " + json.getDouble("x") + " - Dec: " + json.getDouble("y");
+                } else {
+                    sexagesimal = "Galactic: " + json.getString("galactic");
+                    coordinate = "Lat: " + json.getDouble("lat") + " - Lon: " + json.getDouble("lon");
+                }
+                 
+                
+                //notify();
+                if(myCursor != null){
+                    myCursor.updateLabel(coordinate, sexagesimal);
+                } else {
+                    System.out.println("cursor null");
+                }
+
             } catch (JSONException e){
                 e.printStackTrace(System.out);
-                coordinate = new Point2D.Double(0.0, 0.0);
             }
 
             channel.basicAck(deliveryTag, false);
@@ -73,44 +99,55 @@ public class PythonWCS {
         } catch (IOException e){
             e.printStackTrace(System.out);
         }
-
-        
-
     }
 
+    /*
     public Point2D.Double getCoordinate(){
         return coordinate;
     }
 
-    public void sendCoordinate(double x, double y){
+    public String getGalactic(){
+        return galactic;
+    }
+    */
 
-        try{
-            JSONObject json = new JSONObject();
-            json.put("name", "pix2world");
-            json.put("x", x);
-            json.put("y", y);
+    public void changeCoordinateSystem(boolean galactic){
+        galacticSystem = galactic;
+    }
 
-            producer.publish(json.toString(), PRODUCER_ROUTINGKEY);
-            System.out.println("Message " + json.toString() + " sent.");
-        } catch (JSONException e){
-            e.printStackTrace(System.out);
-            System.out.println("Error send a JSON");
-        } catch (IOException e){
-            e.printStackTrace(System.out);
-            System.out.println("Error IO");
-        }
+    public void sendCoordinate(double x, double y, MyCursor mc){
+
+        //synchronized(this) {
+            try{
+
+                myCursor = mc;
+            
+                JSONObject json = new JSONObject();
+                json.put("name", "pix2world");
+                json.put("x", x);
+                json.put("y", y);
+
+                producer.publish(json.toString(), PRODUCER_ROUTINGKEY);
+                System.out.println("Message " + json.toString() + " sent.");
+
+                //wait();
+            
+            /*
+            } catch (InterruptedException e){
+
+                e.printStackTrace(System.out);
+                System.out.println("Interrupted");
+            */
+            } catch (JSONException e){
+                e.printStackTrace(System.out);
+                System.out.println("Error send a JSON");
+            } catch (IOException e){
+                e.printStackTrace(System.out);
+                System.out.println("Error IO");
+            }
+        //}
         
     }
 
-
-    public static void main(String[] args){
-
-        /* Example */
-        PythonWCS wcs = new PythonWCS();
-        wcs.sendCoordinate(0f,0f);
-        wcs.sendCoordinate(100f,100f);
-        wcs.sendCoordinate(100f,0f);
-        wcs.sendCoordinate(0f,100f);
-    }
 
 }

@@ -15,7 +15,10 @@ except ImportError:
 # http://www.astropy.org/
 try:
 	from astropy.io import fits
-	from astropy import wcs 
+	from astropy import wcs
+	from astropy import units as u
+	from astropy.coordinates import SkyCoord
+
 except ImportError:
 	SUCCEEDED_IMPORTING_ASTROPY = False
 
@@ -56,6 +59,24 @@ def pix2world(wcsdata, x, y):
 def world2pix(wcsdata, ra, dec):
 	return wcsdata.wcs_world2pix(ra, dec, 0)
 
+def icrs2galactic(ra, dec):
+	print "ra: %f - dec: %f" % (ra, dec)
+	ecuatorial = SkyCoord(ra=ra, dec=dec, frame='icrs', unit='deg')
+	print ecuatorial
+	galactic = ecuatorial.galactic
+	print galactic
+	print galactic.l.deg
+	print galactic.b.deg
+	return [galactic.l.deg, galactic.b.deg]
+
+def worldgalactic(ra, dec):
+	ecuatorial = SkyCoord(ra=ra, dec=dec, frame='icrs', unit='deg')
+	galactic = ecuatorial.galactic
+	return galactic.to_string('dms')
+
+def worldecuatorial(ra, dec):
+	ecuatorial = SkyCoord(ra=ra, dec=dec, frame='icrs', unit='deg')
+	return ecuatorial.to_string('hmsdms')
 
 
 # main

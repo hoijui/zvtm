@@ -52,6 +52,8 @@ public class SmartiesManager implements Observer {
 
     int countWidget;
     int ui_swwcs;
+    int ui_swsystem;
+
 
 
     public SmartiesManager(FitsViewer app){
@@ -79,6 +81,13 @@ public class SmartiesManager implements Observer {
         swWCS.labelOn = new String("WCS: On");
         swWCS.handler = new EventWCS();
         ui_swwcs = countWidget;
+        countWidget++;
+
+        swWCS = smarties.addWidget(
+                                SmartiesWidget.SMARTIES_WIDGET_TYPE_TOGGLE_BUTTON, "Ecuatorial", 3, 1, 2, 1);
+        swWCS.labelOn = new String("Galactical");
+        swWCS.handler = new EventCoordinateSystem();
+        ui_swsystem = countWidget;
         countWidget++;
 
 /*
@@ -122,8 +131,8 @@ public class SmartiesManager implements Observer {
 
                 case SmartiesEvent.SMARTIE_EVENTS_TYPE_CREATE:{
                     System.out.println("Create Puck: " + se.id);
-                    se.p.app_data = new myCursor(se.p.id, se.p.x, se.p.y);
-                    myCursor c = (myCursor)se.p.app_data;
+                    se.p.app_data = new MyCursor(se.p.id, se.p.x, se.p.y);
+                    MyCursor c = (MyCursor)se.p.app_data;
                     c.wc.setVisible(true);
                     break;
                 }
@@ -135,7 +144,7 @@ public class SmartiesManager implements Observer {
                 case SmartiesEvent.SMARTIE_EVENTS_TYPE_STORE:{
                     //repaint();
                     if (se.p != null){
-                        myCursor c = (myCursor)se.p.app_data;
+                        MyCursor c = (MyCursor)se.p.app_data;
                         c.wc.setVisible(false);
                         //_repaintCursor(c);
                     }
@@ -143,14 +152,14 @@ public class SmartiesManager implements Observer {
                 }
                 case SmartiesEvent.SMARTIE_EVENTS_TYPE_UNSTORE:{
                     if (se.p != null){
-                        myCursor c = (myCursor)se.p.app_data;
+                        MyCursor c = (MyCursor)se.p.app_data;
                         c.move(se.p.x, se.p.y);
                         c.wc.setVisible(true);
                     }
                     break;
                 }
                 case SmartiesEvent.SMARTIE_EVENTS_TYPE_DELETE:{
-                    myCursor c = (myCursor)se.p.app_data;
+                    MyCursor c = (MyCursor)se.p.app_data;
                     c.wc.dispose();
                     smarties.deletePuck(se.p.id);
                     break;
@@ -235,7 +244,7 @@ public class SmartiesManager implements Observer {
                 case SmartiesEvent.SMARTIE_EVENTS_TYPE_MOVE:{
                     System.out.println("SMARTIE_EVENTS_TYPE_MOVE");
                     if (se.p != null){
-                        myCursor c = (myCursor)se.p.app_data;
+                        MyCursor c = (MyCursor)se.p.app_data;
                         c.move(se.p.x, se.p.y);
 
                         if (se.mode == SmartiesEvent.SMARTIE_GESTUREMOD_DRAG && dragDevice == se.device ){//&& !modeDrawRect){
@@ -260,7 +269,7 @@ public class SmartiesManager implements Observer {
                         dragPuck = null;
                     }
                     if (se.p != null){
-                        myCursor c = (myCursor)se.p.app_data;
+                        MyCursor c = (MyCursor)se.p.app_data;
                         c.updateWCS();
                     }
                
@@ -286,7 +295,7 @@ public class SmartiesManager implements Observer {
                     if(se.num_taps == 2 && se.num_fingers == 1 && se.p != null){
                         double x = se.p.x;
                         double y = se.p.y;
-                        final myCursor c = (myCursor)se.p.app_data;
+                        final MyCursor c = (MyCursor)se.p.app_data;
                         c.wc.setVisible(false);
                         application.traslateAnimated(x*application.getDisplayWidth(), y*application.getDisplayHeight(), null);
                         EndAction ea  = new EndAction(){
@@ -323,19 +332,21 @@ public class SmartiesManager implements Observer {
     }
 
 
-    class myCursor{
+    public class MyCursor{
 
         public int id;
         public double x, y;
         public Color color;
         public WallCursor wc;
         public Point2D.Double delta;
-        public VText label;
+        public VText labelfst;
+        public VText labelsnd;
+        
         boolean labelVisible = false;
 
         Font FONT = new Font("default", Font.PLAIN, 16);
         
-        public myCursor(int id, double x, double y){
+        public MyCursor(int id, double x, double y){
             this.id = id;
             this.x = x;
             this.y = y;
@@ -345,12 +356,20 @@ public class SmartiesManager implements Observer {
                 application.cursorSpace,
                 (true) ? 10 : 2, (true) ? 100 : 20,
                 this.color);
-            label = new VText(0.0, 0.0, 0, color, Color.BLACK, "", VText.TEXT_ANCHOR_START, 1f, 1f);
-            label.setFont(FONT);
+            labelsnd = new VText(0.0, 0.0, 0, color, Color.BLACK, "", VText.TEXT_ANCHOR_START, 1f, 1f);
+            labelsnd.setFont(FONT);
 
-            label.setVisible(labelVisible);
-            application.cursorSpace.addGlyph(label);
-            application.cursorSpace.onTop(label);
+            labelsnd.setVisible(labelVisible);
+            application.cursorSpace.addGlyph(labelsnd);
+            application.cursorSpace.onTop(labelsnd);
+
+            labelfst = new VText(0.0, 0.0, 0, color, Color.BLACK, "", VText.TEXT_ANCHOR_START, 1f, 1f);
+            labelfst.setFont(FONT);
+
+            labelfst.setVisible(labelVisible);
+            application.cursorSpace.addGlyph(labelfst);
+            application.cursorSpace.onTop(labelfst);
+
             move(x, y);
         }
 
@@ -358,27 +377,35 @@ public class SmartiesManager implements Observer {
             this.x = x; this.y = y;
             //wc.moveTo((long)(x*application.getDisplayWidth() - application.getDisplayWidth()/2.0), (long)(application.getDisplayHeight()/2.0 - y*application.getDisplayHeight()));
             wc.moveTo((long)(x*application.SCENE_W - application.SCENE_W/2.0), (long)(application.SCENE_H/2.0 - y*application.SCENE_H));
-            label.moveTo((long)(x*application.SCENE_W - application.SCENE_W/2.0+50), (long)(application.SCENE_H/2.0 - y*application.SCENE_H+50));
+            labelsnd.moveTo((long)(x*application.SCENE_W - application.SCENE_W/2.0+50), (long)(application.SCENE_H/2.0 - y*application.SCENE_H+50));
+            labelfst.moveTo((long)(x*application.SCENE_W - application.SCENE_W/2.0+50), (long)(application.SCENE_H/2.0 - y*application.SCENE_H+70));
         }
 
         public void labelSetVisible(boolean b){
             labelVisible = b;
-            label.setVisible(b);
+            labelsnd.setVisible(b);
+            labelfst.setVisible(b);
         }
 
         public void updateWCS(){
             Point2D.Double pWCS = new Point2D.Double(wc.getX(), wc.getY());
             if(labelVisible){
-                Point2D.Double radec = application.coordinateWCS(pWCS);
-                updateLabel("Ra: " + radec.getX() + " - Dec: " + radec.getY());//+" - Object: "+application.getObjectName(pWCS));
+                application.coordinateWCS(pWCS, this);
+                //updateLabel(application.getRaDec(), application.getGalactic());//+" - Object: "+application.getObjectName(pWCS));
             }
         }
 
         public void updateLabel(String text){
-            label.setText(text);
+            labelsnd.setText(text);
         }
 
-    } // class myCursor
+        public void updateLabel(String text1, String text2){
+
+            labelsnd.setText(text1);
+            labelfst.setText(text2);
+        }
+
+    } // class MyCursor
 
 /*
     class PopupMenuButtonClicked implements SmartiesWidgetHandler
@@ -419,7 +446,7 @@ public class SmartiesManager implements Observer {
             System.out.println("CenterCursor");
             if(se.p != null){
                 smarties.movePuck(se.p.id, 0.5f, 0.5f);
-                myCursor c = (myCursor)se.p.app_data;
+                MyCursor c = (MyCursor)se.p.app_data;
                 c.move(se.p.x, se.p.y);
             }
             return true;
@@ -430,16 +457,14 @@ public class SmartiesManager implements Observer {
         public boolean callback(SmartiesWidget sw, SmartiesEvent se, Object user_data){
             System.out.println("EventWCS");
             if(se.p != null){
-                myCursor c = (myCursor)se.p.app_data;
+                MyCursor c = (MyCursor)se.p.app_data;
                 double focal = application.cursorCamera.getFocal();;
                 double altitude = application.cursorCamera.getAltitude();
                 double px = c.wc.getX() * (focal + altitude)/focal;
                 double py = c.wc.getY()* (focal + altitude)/focal;
-                //Point2D.Double pWCS = new Point2D.Double(px + application.cursorCamera.vx, py  + application.cursorCamera.vy);
-                //Point2D.Double pWCS = new Point2D.Double(px, py);
                 Point2D.Double pWCS = new Point2D.Double(c.wc.getX(), c.wc.getY());
-                Point2D.Double radec = application.coordinateWCS(pWCS);
-                c.updateLabel("Ra: " + radec.getX() + " - Dec: " + radec.getY());
+                application.coordinateWCS(pWCS, c);
+
                 if(!c.labelVisible)
                     c.labelSetVisible(true);
                 else
@@ -449,6 +474,28 @@ public class SmartiesManager implements Observer {
                 System.out.println("WCS without Puck");
                 smarties.sendWidgetLabel(ui_swwcs, "WCS: Off", se.device);
                 smarties.sendWidgetOnState(ui_swwcs, false, se.device);
+            }
+            return true;
+        }
+    }
+
+    class EventCoordinateSystem implements SmartiesWidgetHandler{
+        public boolean callback(SmartiesWidget sw, SmartiesEvent se, Object user_data){
+            System.out.println("EventCoordinateSystem");
+            if(se.p != null){
+
+                MyCursor c = (MyCursor)se.p.app_data;
+                double focal = application.cursorCamera.getFocal();;
+                double altitude = application.cursorCamera.getAltitude();
+                double px = c.wc.getX() * (focal + altitude)/focal;
+                double py = c.wc.getY()* (focal + altitude)/focal;
+                Point2D.Double pWCS = new Point2D.Double(c.wc.getX(), c.wc.getY());
+                application.changeCoordinateSystem(pWCS, c);
+
+            } else {
+                System.out.println("Coordinate System without Puck");
+                smarties.sendWidgetLabel(ui_swsystem, "Ecuatorial", se.device);
+                smarties.sendWidgetOnState(ui_swsystem, false, se.device);
             }
             return true;
         }

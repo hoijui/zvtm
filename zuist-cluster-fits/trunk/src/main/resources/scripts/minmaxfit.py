@@ -36,6 +36,15 @@ def openFits(SRC_PATH):
 # main
 ################################################################################
 
+if len(sys.argv) > 1:
+
+	SRC_PATH = os.path.realpath(sys.argv[1])
+	minmax = openFits(SRC_PATH)
+	print "min max values"
+	print [minmax[0], minmax[1]]
+	sys.exit(0)
+	
+
 path_Ks = {
 	"/home/fdelcampo/zuist-scenes-local/fits/Ks/v20100411_01052_st_tl.fit",
 	"/home/fdelcampo/zuist-scenes-local/fits/Ks/v20100411_00980_st_tl.fit",
@@ -75,6 +84,7 @@ if not SUCCEEDED_IMPORTING_ASTROPY:
 
 gmin_ks = sys.float_info.max
 gmax_ks = sys.float_info.min
+
 
 for path in path_Ks:
 	#SRC_PATH = os.path.realpath(path)

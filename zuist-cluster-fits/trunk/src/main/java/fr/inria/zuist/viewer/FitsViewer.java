@@ -105,8 +105,8 @@ import jsky.coords.WCSTransform;
 import nom.tam.fits.FitsException;
 import fr.inria.zvtm.fits.NomWcsKeywordProvider;
 
-import jsky.coords.WorldPos;
 import cl.inria.massda.PythonWCS;
+import cl.inria.massda.SmartiesManager.MyCursor;
 
 
 /**
@@ -199,6 +199,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     String reference;
 
     PythonWCS pythonWCS;
+    boolean galacticalSystem = false;
     
     //JSONArray readed;
     //Vector<SavedPosition> savedPositions;
@@ -241,7 +242,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         reference = options.reference;
 
         pythonWCS = new PythonWCS();
-        pythonWCS.sendCoordinate(0,0);
+        //pythonWCS.sendCoordinate(0,0, null);
 
     }
     //void initGUI(boolean fullscreen, boolean opengl, boolean antialiased){
@@ -816,8 +817,17 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     }
     */
 
+    public void changeCoordinateSystem(Point2D.Double xy, MyCursor mc){
+
+        if(galacticalSystem)
+            galacticalSystem = false;
+        else
+            galacticalSystem = true;
+        coordinateWCS(xy, mc);
+    }
+
     
-    public Point2D.Double coordinateWCS(Point2D.Double xy){
+    public void coordinateWCS(Point2D.Double xy, MyCursor mc){
 
         try {
 
@@ -828,52 +838,11 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 
             double a = (mCamera.focal + mCamera.getAltitude()) / mCamera.focal;
 
-            /*
-            Vector<ObjectDescription> g = getGlyphOnPoint(coord[0], coord[1] );
-            FitsImageDescription fi;
-            if(g.size() > 0){
-                fi = (FitsImageDescription)(g.firstElement());
-            } else {
-                return new Point2D.Double(0.0,0.0);
-            }
-            *
-
-            ObjectDescription g = getGlyphOnPoint(coord[0], coord[1] );
-            FitsImageDescription fi;
-            if(g != null){
-                fi = (FitsImageDescription)(g);
-            } else {
-                return new Point2D.Double(0.0,0.0);
-            }
-
-            //double x = (xy.getX()-fi.getLocation().getX() + fi.getFitsWidth()/2 );
-            //double y = (xy.getY()-fi.getLocation().getY() + fi.getFitsHeight()/2 );
-            //double x = (coord[0]/a - fi.getLocation().getX()/a + fi.getFitsWidth()/2 );
-            //double y = (coord[1]/a - fi.getLocation().getY()/a + fi.getFitsHeight()/2 );
-            double x = (coord[0]/a - fi.getX()/a + fi.getWidth()/a/2 );
-            double y = (coord[1]/a - fi.getY()/a + fi.getHeight()/a/2 );
-            //double x = (coord[0] - fi.getX() + fi.getWidth()/2 );
-            //double y = (coord[1] - fi.getY() + fi.getHeight()/2 );
-
-            //System.out.println("("+coord[0] + "/"+a+" - "+fi.getX()+"/"+ a + " + " + fi.getWidth()+"/2), ("+coord[1]+"/a -"+fi.getY()+"/a + "+fi.getHeight()+"/2 )");
-
-            Point2D.Double radec = (fi.getGlyph() != null ) ? ((FitsImage)fi.getGlyph()).pix2wcs(x, y) : new Point2D.Double(0,0);
-
-            System.out.println("pix2wcs("+ x+", "+y+" )");
-            System.out.println("wcs: (" + radec.getX() + ", " + radec.getY() + ")");
-            System.out.println("ID: " + fi.getID());
-
-            return radec;
-            */
-
             System.out.println("coordinateWCS("+coord[0]+", "+coord[1]+")");
             System.out.println("reference("+fitsImageDescRef.getX()+", "+fitsImageDescRef.getY()+")");
             System.out.println("a: " + a);
             System.out.println("factor: " + fitsImageDescRef.getFactor());
 
-            //System.out.println( "(" + ((coord[0]-fitsImageDescRef.getX()+fitsImageDescRef.getWidth()/2)  ) + ", " + (( coord[1]-fitsImageDescRef.getY()+fitsImageDescRef.getHeight()/2) ) + ")");
-            
-            //System.out.println( "(" + ((coord[0]-fitsImageDescRef.getX()+fitsImageDescRef.getWidth()/2)/a  ) + ", " + (( coord[1]-fitsImageDescRef.getY()+fitsImageDescRef.getHeight()/2)/a ) + ")");
             
             System.out.println( "(" + ((coord[0]-fitsImageDescRef.getX()+fitsImageDescRef.getWidthWithFactor()/2)/a  ) + ", " + (( coord[1]-fitsImageDescRef.getY()+fitsImageDescRef.getHeightWithFactor()/2)/a ) + ")");
 
@@ -882,12 +851,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 
             System.out.println( "width/factor: " +(fitsImageDescRef.getWidth()/fitsImageDescRef.getFactor() ) + " height/a:" + (fitsImageDescRef.getHeight()/fitsImageDescRef.getFactor()) ) ;
 
-            /*
-            System.out.println("WCSCenter");
-            System.out.println( wcsTransformRef.getWCSCenter() );
-            System.out.println("PixCenter");
-            System.out.println( wcsTransformRef.getImageCenter() );
-            */
+           
 
             double x = (coord[0] - fitsImageDescRef.getX())/fitsImageDescRef.getFactor() + fitsImageDescRef.getWidth()/fitsImageDescRef.getFactor()/2 ;
             double y = (coord[1] - fitsImageDescRef.getY())/fitsImageDescRef.getFactor() + fitsImageDescRef.getHeight()/fitsImageDescRef.getFactor()/2 ;
@@ -897,80 +861,28 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 
             System.out.println("size: " + fitsImageDescRef.getWidthWithFactor() + ", " +  fitsImageDescRef.getHeightWithFactor());
 
-            /*
-            String obj = wcsKeyProviderRef.getStringValue("OBJECT");
-            double pc1_1 = wcsKeyProviderRef.getDoubleValue("PC1_1");
-            double pc1_2 = wcsKeyProviderRef.getDoubleValue("PC1_2");
-            double pc2_1 = wcsKeyProviderRef.getDoubleValue("PC2_1");
-            double pc2_2 = wcsKeyProviderRef.getDoubleValue("PC2_2");
-            double crota = wcsKeyProviderRef.getDoubleValue("CROTA2");
-            double cdelt1 = wcsKeyProviderRef.getDoubleValue("CDELT1");
-            double cdelt2 = wcsKeyProviderRef.getDoubleValue("CDELT2");
-
-            System.out.println("pc1_1: " + pc1_1);
-            System.out.println("pc1_2: " + pc1_2);
-            System.out.println("pc2_1: " + pc2_1);
-            System.out.println("pc2_2: " + pc2_2);
-            System.out.println("crota: " + crota);
-            System.out.println("cdelt1: " + cdelt1);
-            System.out.println("cdelt2: " + cdelt2);
-
-            Point2D.Double wcs = wcsTransformRef.pix2wcs(1/pc1_1*x+1/pc1_2*y, 1/pc2_1*x+1/pc2_2*y);
-
-            //Point2D.Double wcs = wcsTransformRef.pix2wcs(x, y);
-
-            System.out.println("x: " + x + " -> "+wcs.getX() );
-            System.out.println("y: " + y + " -> "+wcs.getY() );
-
-            System.out.println("WorldPos:");
-            System.out.println( WorldPos.getPosition(wcs.getX(), wcs.getY(), wcsTransformRef) );
-
-            *
-            Point2D.Double pix = wcsTransformRef.wcs2pix(273.05589, -23.664902);
-            VCircle dot = new VCircle(pix.getX(), pix.getY(), 1, 100, Color.RED);
-            mSpace.addGlyph(dot);
-
-            pix = wcsTransformRef.wcs2pix(274.2222, -24.236882);
-            dot = new VCircle(pix.getX(), pix.getY(), 1, 100, Color.YELLOW);
-            mSpace.addGlyph(dot);
-
-            dot = new VCircle(x, y, 1, 100, Color.GREEN);
-            mSpace.addGlyph(dot);
-            *
-
-            VCircle dot = new VCircle(coord[0], coord[1], 1, 100, Color.RED);
-            mSpace.addGlyph(dot);
-            dot = new VCircle(fitsImageDescRef.getX(), fitsImageDescRef.getY(), 1, 100, Color.YELLOW);
-            mSpace.addGlyph(dot);
-            dot = new VCircle(fitsImageDescRef.getX() - fitsImageDescRef.getWidth()/2, fitsImageDescRef.getY() - fitsImageDescRef.getHeight()/2, 1, 100, Color.GREEN);
-            mSpace.addGlyph(dot);
-
-            System.out.println( "distance: " + ((coord[0]-fitsImageDescRef.getX()+fitsImageDescRef.getWidth()/2)/a) + ", " + ((coord[1] - fitsImageDescRef.getY() + fitsImageDescRef.getHeight()/2)/a) );
-            System.out.println( wcsTransformRef.pix2wcs( (coord[0]-fitsImageDescRef.getX()+fitsImageDescRef.getWidth()/2)/a , (coord[1] - fitsImageDescRef.getY() + fitsImageDescRef.getHeight()/2)/a ) );
-
-            if(wcsTransformRef != null) {
-                return wcsTransformRef.pix2wcs(x,y);
-                //return wcsTransformRef.pix2wcs((coord[0]-fitsImageDescRef.getX())  , ( coord[1]-fitsImageDescRef.getY()) );
-            } else
-                return new Point2D.Double(0.0,0.0);
-            */
-
-            pythonWCS.sendCoordinate(x, y);
-
-            System.out.println(pythonWCS.getCoordinate());
-
-            if (pythonWCS.getCoordinate() != null)
-                return pythonWCS.getCoordinate();
-            else return new Point2D.Double(0,0);
-
+            pythonWCS.changeCoordinateSystem(galacticalSystem);
+            pythonWCS.sendCoordinate(x, y, mc);
 
         } catch (NullPointerException e){
             e.printStackTrace(System.out);
-            return new Point2D.Double(0,0);
         }
 
         
     }
+
+    /*
+    public String getGalactic(){
+        return "Galactic: " + pythonWCS.getGalactic();
+    }
+
+    public String getRaDec(){
+        Point2D.Double coord = pythonWCS.getCoordinate();
+        return "Ra: " + coord.getX() + " - Dec: " + coord.getY();
+    }
+    */
+
+    
 
 /*
     public String getObjectName(Point2D.Double xy){
