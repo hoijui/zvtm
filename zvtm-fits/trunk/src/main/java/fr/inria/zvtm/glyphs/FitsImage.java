@@ -138,6 +138,30 @@ public class FitsImage extends VImageOr {
             @Override public ImageFilter getFilter(){
                 return INSTANCE;
             }
+        },
+        SMOOTH{
+            public final ImageFilter INSTANCE = new SmoothFilter();
+            @Override public ImageFilter getFilter(){
+                return INSTANCE;
+            }
+        },
+        IDL4{
+            public final ImageFilter INSTANCE = new Idl4Filter();
+            @Override public ImageFilter getFilter(){
+                return INSTANCE;
+            }
+        },
+        BLULUT{
+            public final ImageFilter INSTANCE = new BlulutFilter();
+            @Override public ImageFilter getFilter(){
+                return INSTANCE;
+            }
+        },
+        HAZE{
+            public final ImageFilter INSTANCE = new HazeFilter();
+            @Override public ImageFilter getFilter(){
+                return INSTANCE;
+            }
         };
 
         abstract public ImageFilter getFilter();
@@ -156,15 +180,27 @@ public class FitsImage extends VImageOr {
         //filter = ColorFilter.RAINBOW.getFilter();
         try{
             fitsImage = new ExFITSImage(imgUrl);
-            NomWcsKeywordProvider wcsKeyProvider = new NomWcsKeywordProvider(fitsImage.getFits().getHDU(0).getHeader());
-            wcsTransform = new WCSTransform(wcsKeyProvider);
-            
-            objectName = wcsKeyProvider.getStringValue("OBJECT");
+            NomWcsKeywordProvider wcsKeyProvider;
+            try{
+                wcsKeyProvider = new NomWcsKeywordProvider(fitsImage.getFits().getHDU(0).getHeader());
+                wcsTransform = new WCSTransform(wcsKeyProvider);
+            } catch(java.lang.IllegalArgumentException ie){
+                wcsKeyProvider = null;
+                wcsTransform = null;
+                ie.printStackTrace(System.out);
+            } catch(Exception e){
+                throw new Error(e);
+                //e.printStackTrace(System.out);
+            }
+            if (wcsKeyProvider != null)
+                objectName = wcsKeyProvider.getStringValue("OBJECT");
             //wcsTransform = new WCSTransform(double cra, double cdec, double xsecpix, double ysecpix, double xrpix, double yrpix, int nxpix, int nypix, double rotate, int equinox, double epoch, java.lang.String proj) 
         } catch(Exception e){
             throw new Error(e);
+            //e.printStackTrace(System.out);
         }
         //System.out.println("scaleMethod.toIvoaValue(): "+scaleMethod.toIvoaValue());
+        
         fitsImage.setScaleMethod(scaleMethod.toIvoaValue());
         try{
             fitsImage.rescale(min, max, min/2. + max/2.); 
@@ -195,14 +231,24 @@ public class FitsImage extends VImageOr {
         //filter = ColorFilter.RAINBOW.getFilter();
         try{
             fitsImage = new ExFITSImage(imgUrl);
-            
-            NomWcsKeywordProvider wcsKeyProvider = new NomWcsKeywordProvider(fitsImage.getFits().getHDU(0).getHeader());
-            wcsTransform = new WCSTransform(wcsKeyProvider);
-            
-            objectName = wcsKeyProvider.getStringValue("OBJECT");
+            NomWcsKeywordProvider wcsKeyProvider;
+            try{
+                wcsKeyProvider = new NomWcsKeywordProvider(fitsImage.getFits().getHDU(0).getHeader());
+                wcsTransform = new WCSTransform(wcsKeyProvider);
+            } catch(java.lang.IllegalArgumentException ie){
+                wcsKeyProvider = null;
+                wcsTransform = null;
+                ie.printStackTrace(System.out);
+            } catch(Exception e){
+                throw new Error(e);
+                //e.printStackTrace(System.out);
+            }
+            if (wcsKeyProvider != null)
+                objectName = wcsKeyProvider.getStringValue("OBJECT");
             //wcsTransform = new WCSTransform(double cra, double cdec, double xsecpix, double ysecpix, double xrpix, double yrpix, int nxpix, int nypix, double rotate, int equinox, double epoch, java.lang.String proj) 
         } catch(Exception e){
             throw new Error(e);
+            //e.printStackTrace(System.out);
         }
         //System.out.println("scaleMethod.toIvoaValue(): "+scaleMethod.toIvoaValue());
         fitsImage.setScaleMethod(scaleMethod.toIvoaValue());
@@ -238,17 +284,28 @@ public class FitsImage extends VImageOr {
 
         try{
             fitsImage = new ExFITSImage(imgFile);
-            
-            NomWcsKeywordProvider wcsKeyProvider = new NomWcsKeywordProvider(fitsImage.getFits().getHDU(0).getHeader());
-            wcsTransform = new WCSTransform(wcsKeyProvider);
-            
-            objectName = wcsKeyProvider.getStringValue("OBJECT");
+            NomWcsKeywordProvider wcsKeyProvider;
+            try{
+                wcsKeyProvider = new NomWcsKeywordProvider(fitsImage.getFits().getHDU(0).getHeader());
+                wcsTransform = new WCSTransform(wcsKeyProvider);
+            } catch(java.lang.IllegalArgumentException ie){
+                wcsKeyProvider = null;
+                wcsTransform = null;
+                ie.printStackTrace(System.out);
+            } catch(Exception e){
+                throw new Error(e);
+                //e.printStackTrace(System.out);
+            }
+            if (wcsKeyProvider != null)
+                objectName = wcsKeyProvider.getStringValue("OBJECT");
             //wcsTransform = new WCSTransform(double cra, double cdec, double xsecpix, double ysecpix, double xrpix, double yrpix, int nxpix, int nypix, double rotate, int equinox, double epoch, java.lang.String proj) 
         } catch(Exception e){
             throw new Error(e);
+            //e.printStackTrace(System.out);
         }
         //System.out.println("scaleMethod.toIvoaValue(): "+scaleMethod.toIvoaValue());
-        fitsImage.setScaleMethod(scaleMethod.toIvoaValue());
+        if(fitsImage != null)
+            fitsImage.setScaleMethod(scaleMethod.toIvoaValue());
         if(useDataMinMax){
             try{
                 double min = fitsImage.getImageHDU().getMinimumValue();

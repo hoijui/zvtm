@@ -48,6 +48,8 @@ class PanZoomEventHandler implements ViewListener {
     static final short FIRST_ORDER = 1;
     short navMode = ZERO_ORDER;
 
+    double angle = 0;
+
 
     PanZoomEventHandler(FitsExample app){
         this.app = (Object)app;
@@ -360,7 +362,8 @@ class PanZoomEventHandler implements ViewListener {
                 ((FitsExample)app).mSpace.addGlyph(grid);
                 
             } else if(c == 'r'){
-                ((FitsExample)app).hi.orientTo(3*Math.PI/5);
+                ((FitsExample)app).hi.orientTo(angle);
+                angle+=Math.PI/5;
             }
         } else {
             if(c == '-'){
