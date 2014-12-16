@@ -53,7 +53,7 @@ public class SmartiesManager implements Observer {
     int countWidget;
     int ui_swwcs;
     int ui_swsystem;
-
+    int ui_swrescale;
 
 
     public SmartiesManager(FitsViewer app){
@@ -83,10 +83,17 @@ public class SmartiesManager implements Observer {
         ui_swwcs = countWidget;
         countWidget++;
 
-        swWCS = smarties.addWidget(
-                                SmartiesWidget.SMARTIES_WIDGET_TYPE_TOGGLE_BUTTON, "Ecuatorial", 3, 1, 2, 1);
-        swWCS.labelOn = new String("Galactical");
-        swWCS.handler = new EventCoordinateSystem();
+        sw = smarties.addWidget(
+                                SmartiesWidget.SMARTIES_WIDGET_TYPE_TOGGLE_BUTTON, "Global", 3, 1, 1, 1);
+        sw.labelOn = new String("Local");
+        sw.handler = new EventRescale();
+        ui_swrescale = countWidget;
+        countWidget++;
+
+        sw = smarties.addWidget(
+                                SmartiesWidget.SMARTIES_WIDGET_TYPE_TOGGLE_BUTTON, "Ecuatorial", 4, 1, 1, 1);
+        sw.labelOn = new String("Galactical");
+        sw.handler = new EventCoordinateSystem();
         ui_swsystem = countWidget;
         countWidget++;
 
@@ -497,6 +504,15 @@ public class SmartiesManager implements Observer {
                 smarties.sendWidgetLabel(ui_swsystem, "Ecuatorial", se.device);
                 smarties.sendWidgetOnState(ui_swsystem, false, se.device);
             }
+            return true;
+        }
+    }
+
+    class EventRescale implements SmartiesWidgetHandler{
+        public boolean callback(SmartiesWidget sw, SmartiesEvent se, Object user_data){
+            System.out.println("EventRescale");
+            application.rescaleGlobal(!sw.on);
+            
             return true;
         }
     }

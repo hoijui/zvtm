@@ -26,8 +26,15 @@ public class WallCursor {
     private Color color;
     private final VirtualSpace target;
 
+    private static double PROP = 2.5;
+
     private SIRectangle hRect;
     private SIRectangle vRect;
+    private SIRectangle hRectLeft;
+    private SIRectangle hRectRight;
+    private SIRectangle vRectUp;
+    private SIRectangle vRectDown;
+    private double displace;
 
     public WallCursor(VirtualSpace target){
         this(target, 5, 50, Color.RED);
@@ -43,34 +50,62 @@ public class WallCursor {
         this.length = length;
         this.color = color;
 
-        hRect = new SIRectangle(xPos, yPos, 0, length, thickness, color);
+        double centerSize = length/PROP;
+        double otherSize = (length - centerSize)/2;
+        displace = centerSize/2+otherSize/2-1;
+
+        hRect = new SIRectangle(xPos, yPos, 0, centerSize, 1, color);
         hRect.setDrawBorder(false);
-        vRect = new SIRectangle(xPos, yPos, 0, thickness, length, color);
+        hRectLeft = new SIRectangle(xPos-displace, yPos, 0, otherSize, thickness, color);
+        hRectLeft.setDrawBorder(false);
+        hRectRight = new SIRectangle(xPos+displace, yPos, 0, otherSize, thickness, color);
+        hRectRight.setDrawBorder(false);
+        vRect = new SIRectangle(xPos, yPos, 0, 1, centerSize, color);
         vRect.setDrawBorder(false);
+        vRectUp = new SIRectangle(xPos, yPos-displace, 0, thickness, otherSize, color);
+        vRectUp.setDrawBorder(false);
+        vRectDown = new SIRectangle(xPos, yPos+displace, 0, thickness, otherSize, color);
+        vRectDown.setDrawBorder(false);
         target.addGlyph(hRect);
         target.addGlyph(vRect);
+        target.addGlyph(hRectLeft);
+        target.addGlyph(vRectUp);
+        target.addGlyph(hRectRight);
+        target.addGlyph(vRectDown);
     }
 
     public void dispose(){
         target.removeGlyph(hRect);
         target.removeGlyph(vRect);
+        target.removeGlyph(hRectLeft);
+        target.removeGlyph(hRectRight);
+        target.removeGlyph(vRectUp);
+        target.removeGlyph(vRectDown);
     }
 
     public void moveTo(double x, double y){
-        hRect.moveTo(x, y);
-        vRect.moveTo(x, y);        
+        hRect.moveTo(x,y);
+        hRectLeft.moveTo(x-displace, y);
+        hRectRight.moveTo(x+displace, y);
+        vRect.moveTo(x,y);
+        vRectUp.moveTo(x, y-displace);
+        vRectDown.moveTo(x, y+displace);   
     }
     
     public void move(double x, double y){
         hRect.move(x, y);
+        hRectLeft.move(x, y);
+        hRectRight.move(x, y);
         vRect.move(x, y);
+        vRectUp.move(x, y);
+        vRectDown.move(x, y);
     }
 
     /**
      * Gets the cursor position, in virtual space units.
      * @return the cursor position, in virtual space units.
      */
-   public  Point2D getLocation(){
+   public Point2D getLocation(){
         return hRect.getLocation();
     }
 
@@ -90,10 +125,10 @@ public class WallCursor {
         return getLocation().getY();
     }
 
-    public void setVisible(boolean v) { hRect.setVisible(v); vRect.setVisible(v);}
+    public void setVisible(boolean v) { hRect.setVisible(v); vRect.setVisible(v); hRectLeft.setVisible(v); hRectRight.setVisible(v); vRectUp.setVisible(v); vRectDown.setVisible(v);}
 
     public boolean isVisible() {
-        return hRect.isVisible() || vRect.isVisible();
+        return hRect.isVisible() || vRect.isVisible() || hRectLeft.isVisible() || hRectRight.isVisible() || vRectUp.isVisible() || vRectDown.isVisible();
     }
 
 }

@@ -70,7 +70,7 @@ public class FitsMenu implements ViewListener{
 
 
 	//public static final ColorGradient[] COLOR_GRADIANT = {new NopFilter(), new HeatFilter(), new RainbowFilter(), new MousseFilter(), new StandardFilter(), new RandomFilter()};
-	public static final FitsImage.ColorFilter[] COLOR_FILTER = {FitsImage.ColorFilter.NOP, FitsImage.ColorFilter.HEAT, FitsImage.ColorFilter.RAINBOW, FitsImage.ColorFilter.MOUSSE, FitsImage.ColorFilter.STANDARD, FitsImage.ColorFilter.RANDOM};
+	public static final FitsImage.ColorFilter[] COLOR_FILTER = {FitsImage.ColorFilter.NOP, FitsImage.ColorFilter.HEAT, FitsImage.ColorFilter.RAINBOW, FitsImage.ColorFilter.MOUSSE, FitsImage.ColorFilter.STANDARD, FitsImage.ColorFilter.RANDOM, FitsImage.ColorFilter.SMOOTH, FitsImage.ColorFilter.IDL4, FitsImage.ColorFilter.BLULUT, FitsImage.ColorFilter.HAZE};
 
 	//public static final int[] SCALE_METHOD = {FITSImage.SCALE_ASINH, FITSImage.SCALE_HISTOGRAM_EQUALIZATION, FITSImage.SCALE_LINEAR, FITSImage.SCALE_LOG, FITSImage.SCALE_SQUARE, FITSImage.SCALE_SQUARE_ROOT};
 	public static final FitsImage.ScaleMethod[] SCALE_METHOD = {FitsImage.ScaleMethod.LINEAR, FitsImage.ScaleMethod.LOG, FitsImage.ScaleMethod.HISTOGRAM_EQUALIZATION, FitsImage.ScaleMethod.SQUARE, FitsImage.ScaleMethod.SQUARE_ROOT, FitsImage.ScaleMethod.ASINH};
