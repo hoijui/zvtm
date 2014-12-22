@@ -16,6 +16,7 @@ import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.net.URL;
 
 import fr.inria.zvtm.glyphs.projection.RProjectedCoordsP;
 
@@ -36,7 +37,10 @@ import javax.media.jai.PlanarImage;
 import javax.media.jai.ROI;
 import javax.media.jai.ROIShape;
 
+import fr.inria.zvtm.fits.NomWcsKeywordProvider;
 
+import nom.tam.fits.Fits;
+import jsky.image.fits.codec.FITSDecodeParam;
 
 
 //Fits support provided by JSky instead of IVOA FITS
@@ -44,9 +48,10 @@ import javax.media.jai.ROIShape;
 
 public class JSkyFitsImage extends ClosedShape implements RectangularShape {
 
-    private final FITSImage fitsImage;
-    private final String imageLocation;
-    private final WCSTransform wcsTransform;
+    private FITSImage fitsImage;
+
+    private URL file;
+    //private WCSTransform wcsTransform;
     private final ImageProcessor proc;
 
     /** Width in virtual space */
@@ -80,34 +85,103 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
 
     private double originHighCut;
 
+    public static final String[] COLORFILTER = { "Background", "Blue", "Heat", "Isophot", "Light", "Pastel", "Ramp", "Real",
+                                    "Smooth", "Staircase", "Standard" };
 
-    public JSkyFitsImage(String fileOrUrl){
+
+    /** Construct an image at (0, 0) with original scale.
+     *@param img image to be displayed
+     */
+    public JSkyFitsImage(URL file){
+        this(0, 0, 0, file, 1.0, 1.0f);
+    }
+
+    /** Construct an image at (x, y) with original scale.
+     *@param x coordinate in virtual space
+     *@param y coordinate in virtual space
+     *@param z z-index (pass 0 if you do not use z-ordering)
+     *@param img image to be displayed
+     */
+    public JSkyFitsImage(double x,double y, int z, URL file){
+        this(x, y, z, file, 1.0, 1.0f);
+    }
+
+    /** Construct an image at (x, y) with a custom scale.
+     *@param x coordinate in virtual space
+     *@param y coordinate in virtual space
+     *@param z z-index (pass 0 if you do not use z-ordering)
+     *@param img image to be displayed
+     *@param scale scaleFactor w.r.t original image size
+     */
+    public JSkyFitsImage(double x, double y, int z, URL file, double scale){
+        this(x, y, z, file, scale, 1.0f);
+    }
+
+    /** Construct an image at (x, y) with a custom scale.
+     *@param x coordinate in virtual space
+     *@param y coordinate in virtual space
+     *@param z z-index (pass 0 if you do not use z-ordering)
+     *@param img image to be displayed
+     *@param scale scaleFactor w.r.t original image size
+      *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
+     */
+    public JSkyFitsImage(double x, double y, int z, URL file, double scale, float alpha){
+        vx = x;
+        vy = y;
+        vz = z;
+
         try{
-            fitsImage = new FITSImage(fileOrUrl);
-        } catch(Exception e){
-            //XXX change
+            //imageLocation = file
+            System.out.println("file: " + file.getFile());
+
+            this.file = file;
+            //this.file = "/home/fdelcampo/zuist-scenes-local/fits/Einstein.fits";
+            fitsImage = new FITSImage(file.getFile());
+            //fitsImage = new FITSImage("/home/fdelcampo/zuist-scenes-local/fits/Einstein.fits");
+            
+            vw = fitsImage.getWidth() * scale;
+            vh = fitsImage.getHeight() * scale;
+            RenderedImageAdapter ria = new RenderedImageAdapter(fitsImage);
+            Rectangle2D.Double region = new Rectangle2D.Double(0,0, fitsImage.getWidth(), fitsImage.getHeight());
+            System.out.print("ria: ");
+            System.out.println(ria);
+            System.out.print("sampleModel: ");
+            System.out.println(ria.getSampleModel());
+
+            System.out.print("region: ");
+            System.out.println(region);
+            try{
+                proc = new ImageProcessor(ria, region);
+                System.out.println("proc created");
+                originLowCut = proc.getLowCut();
+                System.out.println("originLowCut: " + originLowCut);
+                originHighCut = proc.getHighCut();
+                System.out.println("originHighCut: " + originHighCut);
+
+            } catch(java.lang.IllegalArgumentException ie){
+
+                throw new Error("Could not create ImageProcesor: " + ie);
+            }
+
+            /*
+            NomWcsKeywordProvider wcsKeyProvider;
+            try{
+                wcsKeyProvider = new NomWcsKeywordProvider(fitsImage.getFits().getHDU(0).getHeader());
+                wcsTransform = new WCSTransform(wcsKeyProvider);
+            } catch(java.lang.IllegalArgumentException ie){
+                wcsKeyProvider = null;
+                wcsTransform = null;
+                ie.printStackTrace(System.out);
+            } catch(Exception e){
+                throw new Error("Could not create wcsTransform: " + e);
+            }
+            */
+
+        } catch (Exception e){
             throw new Error("Could not create FitsImage: " + e);
         }
-        
-
-        imageLocation = fileOrUrl;
-        vw = fitsImage.getWidth() * scale;
-        vh = fitsImage.getHeight() * scale;
-        RenderedImageAdapter ria = new RenderedImageAdapter(fitsImage);
-        Rectangle2D.Double region = new Rectangle2D.Double(0,0, fitsImage.getWidth(), fitsImage.getHeight());
-        proc = new ImageProcessor(ria, region);
-
-        originLowCut = proc.getLowCut();
-        originHighCut = proc.getHighCut();
-
-        System.out.println("originLowCut: " + originLowCut + " originHighCut: " + originHighCut);
-
-        try{
-            wcsTransform = new WCSTransform(new FITSKeywordProvider(fitsImage));
-        } catch (Exception e){
-            throw new Error("Could not create wcsTransform: " + e);
-            
-        }
+        scaleFactor = scale;
+        setTranslucencyValue(alpha);
    
     }
 
@@ -133,8 +207,8 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
     @Override public void setHeight(double h){
     }
 
-    public String getImageLocation(){
-        return imageLocation;
+    public URL getImageLocation(){
+        return file;
     }
 
     public double getMinValue(){
@@ -167,30 +241,8 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
         proc.update();
         VirtualSpaceManager.INSTANCE.repaint();
     }
-    /*
-    public void setScaleAlgorithm(int method){
-        switch(method){
-            case ImageLookup.LINEAR_SCALE:
-                proc.setScaleAlgorithm(ImageLookup.LINEAR_SCALE);
-                break;
-            case ImageLookup.LOG_SCALE:
-                proc.setScaleAlgorithm(ImageLookup.LOG_SCALE);
-                break;
-            case ImageLookup.HIST_EQ:
-                proc.setScaleAlgorithm(ImageLookup.HIST_EQ);
-                break;
-            case ImageLookup.SQRT_SCALE:
-                proc.setScaleAlgorithm(ImageLookup.SQRT_SCALE);
-                break;
+    
 
-            default:
-                proc.setScaleAlgorithm(ImageLookup.LINEAR_SCALE);
-                break;
-        }
-        proc.update();
-        VirtualSpaceManager.INSTANCE.repaint();
-    }
-    */
 
     /*
     public ImageProcessor getImageProcessor(){
@@ -244,22 +296,24 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
         return proc.getHistogram(numValues, roi);
     }
 
-    /**
+    /*
      * Converts pixel coordinates to World Coordinates. Returns null if the WCSTransform is not valid.
      * @param x x-coordinates, in the FITS system: (0,0) lower left, x axis increases to the right, y axis increases upwards
      * @param y y-coordinates, in the FITS system: (0,0) lower left, x axis increases to the right, y axis increases upwards
-     */
+     *
     public Point2D.Double pix2wcs(double x, double y){
         return wcsTransform.pix2wcs(x, y);
     }
+    */
 
 
-    /**
+    /*
      * Converts World Coordinates to pixel coordinates. Returns null if the WCSTransform is invalid, or if the WCS position does not fall within the image.
-     */
+     *
     public Point2D.Double wcs2pix(double ra, double dec){
         return wcsTransform.wcs2pix(ra, dec);
     }
+    */
 
 
     /** 

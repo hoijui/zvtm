@@ -34,6 +34,7 @@ import java.awt.geom.Point2D;
 
 import java.io.IOException;
 import java.util.Vector;
+import java.io.File;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
@@ -95,10 +96,20 @@ public class JSkyFitsExample{
 		initGUI(options);
 
 		if(options.url != null){
-			img = new JSkyFitsImage(options.url);
+			img = new JSkyFitsImage(new URL(options.url) );
 
         } else if(options.file != null){
-            img = new JSkyFitsImage(options.file);
+            String path = new File ( options.file ).getAbsolutePath ();
+            if ( File.separatorChar != '/' )
+            {
+                path = path.replace ( File.separatorChar, '/' );
+            }
+            if ( !path.startsWith ( "/" ) )
+            {
+                path = "/" + path;
+            }
+            String retVal =  "file:" + path;
+            img = new JSkyFitsImage(new URL(retVal));
 
         } else {
             System.err.println("usage: JSkyFitsExample -file image_File or -url image_URL");
