@@ -37,6 +37,7 @@ import fr.inria.zuist.engine.SceneManager;
 
 import fr.inria.zuist.engine.ResourceDescription;
 import fr.inria.zuist.engine.FitsResourceHandler;
+import fr.inria.zuist.engine.JSkyFitsResourceHandler;
 
 aspect SceneManagerReplication {
     //instrument *createLevel, *createRegion, *destroyRegion,

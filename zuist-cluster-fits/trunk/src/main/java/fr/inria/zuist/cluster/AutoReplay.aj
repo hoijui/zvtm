@@ -54,7 +54,28 @@ aspect AutoReplay extends AbstractAutoReplay {
          execution(public URL FitsImageDescription.getSrc()) ||
          execution(public void FitsImageDescription.moveTo(double, double)) ||
          execution(public void FitsImageDescription.orientTo(double)) ||
-         execution(public void FitsImageDescription.setVisible(boolean))
+         execution(public void FitsImageDescription.setVisible(boolean)) ||
+         execution(public void JSkyFitsImageDescription.setScaleAlgorithm(JSkyFitsImage.ScaleAlgorithm)) ||
+         execution(public void JSkyFitsImageDescription.setColorLookupTable(String)) ||
+         execution(public VirtualSpace JSkyFitsImageDescription.getVirtualSpace()) ||
+         execution(public void JSkyFitsImageDescription.setRescaleGlobal(double, double)) ||
+         execution(public void JSkyFitsImageDescription.setRescaleGlobal(boolean)) || 
+         execution(public void JSkyFitsImageDescription.rescale(double, double)) ||
+         execution(public void JSkyFitsImageDescription.rescaleGlobal()) ||
+         execution(public void JSkyFitsImageDescription.rescaleLocal()) ||
+         execution(public double[] JSkyFitsImageDescription.getLocalScaleParams()) ||
+         execution(public double[] JSkyFitsImageDescription.getGlobalScaleParams()) ||
+         execution(public void JSkyFitsImageDescription.setTranslucency(float)) ||
+         execution(public String JSkyFitsImageDescription.getObjectName()) ||
+         execution(public double JSkyFitsImageDescription.getWidth()) ||
+         execution(public double JSkyFitsImageDescription.getHeight()) ||
+         execution(public double JSkyFitsImageDescription.getX()) ||
+         execution(public double JSkyFitsImageDescription.getY()) ||
+         execution(public boolean JSkyFitsImageDescription.isVisible()) ||
+         execution(public URL JSkyFitsImageDescription.getSrc()) ||
+         execution(public void JSkyFitsImageDescription.moveTo(double, double)) ||
+         execution(public void JSkyFitsImageDescription.orientTo(double)) ||
+         execution(public void JSkyFitsImageDescription.setVisible(boolean))
         );
 }
 

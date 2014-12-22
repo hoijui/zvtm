@@ -358,7 +358,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 
     JMenuItem infoMI, consoleMI;
 
-	private JMenuBar initMenu(){
+	public JMenuBar initMenu(){
 		final JMenuItem openMI = new JMenuItem("Open...");
 		openMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		final JMenuItem reloadMI = new JMenuItem("Reload");
@@ -530,7 +530,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         }
     }
 
-    private void loadFitsReference(){
+    public void loadFitsReference(){
         if(reference == null){
             for(ObjectDescription desc: sm.getObjectDescriptions()){
                 if(desc instanceof FitsImageDescription){
@@ -588,7 +588,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         }
         
         
-        System.out.println("loadFitsReference end");
+        System.out.println("loaded IVO Fits Reference");
     }
 
     
@@ -1049,6 +1049,8 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 	}
 
 	void loadScene(File xmlSceneFile){
+        System.out.print("this instanceof FitsViewer: ");
+        System.out.println( this instanceof FitsViewer );
 		try {
 			ovm.sayInConsole("Loading "+xmlSceneFile.getCanonicalPath()+"\n");
 			System.out.println("Loading "+xmlSceneFile.getCanonicalPath()+"\n");
