@@ -15,6 +15,8 @@ import fr.inria.zuist.engine.Region;
 import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zvtm.glyphs.FitsImage;
 import fr.inria.zuist.engine.FitsImageDescription;
+import fr.inria.zvtm.glyphs.JSkyFitsImage;
+import fr.inria.zuist.engine.JSkyFitsImageDescription;
 
 import java.net.URL;
 
