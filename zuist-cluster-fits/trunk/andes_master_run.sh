@@ -45,7 +45,8 @@ rm target/slf4j-simple-1.6.1.jar
 ADDR=192.168.1.213
 
 
-java -Djava.net.preferIPv4Stack=true -Djgroups.bind_addr="$ADDR" -Xmx2048M -cp $LIB:$JAR fr.inria.zuist.viewer.FitsViewer -r 4 -c 6 -bw 2020 -bh 1180 "@"
+#java -Djava.net.preferIPv4Stack=true -Djgroups.bind_addr="$ADDR" -Xmx4096M -Xms2048M -cp $LIB:$JAR fr.inria.zuist.viewer.FitsViewer -r 4 -c 6 -bw 2020 -bh 1180 "@"
+java -Djava.net.preferIPv4Stack=true -Djgroups.bind_addr="$ADDR" -Xmx4096M -Xms2048M -Dcom.sun.media.jai.disableMediaLib=true -cp $LIB:$JAR fr.inria.zuist.viewer.JSkyFitsViewer -r 4 -c 6 -bw 2020 -bh 1180 "@"
 
 #target/commons-collections-2.1.jar: fr.inria.zuist.viewer.FitsViewer -r 4 -c 6 -bw 2020 -bh 1180 "$@"
 
