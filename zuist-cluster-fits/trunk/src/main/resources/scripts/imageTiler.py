@@ -79,7 +79,11 @@ CMD_LINE_HELP = "ZUIST Image Tiling Script\n\nUsage:\n\n" + \
     "\t-dy=x\t\ty offset for all regions and objects\n"+\
     "\t-dl=l\t\tlevel offset for all regions and objects\n"+\
     "\t-scale=s\ts scale factor w.r.t default size for PDF input\n"+\
-    "\t-layer=name\t\tname layer from the zuist"
+    "\t-layer=name\t\tname layer from the zuist"+\
+    "\t-minvalue\t\tvalue minimum on fits images"+\
+    "\t-maxvalue\t\tvalue maximum on fits images"+\
+    "\t-onlyxml \t\tcreate only xml from the tiles"
+
 
 TRACE_LEVEL = 1
 
@@ -237,8 +241,12 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
             '''
             Check correctly wcs coordinates
             '''
-            log("Cropping at (%d,%d,%d,%d)" % (x, y, aw, ah), 3)
-            data = im[y:y+ah, x:x+aw]
+
+            log("Cropping at (%d,%d,%d,%d)" % (x, y, aw, ah))
+            #data = im[y:y+ah, x:x+aw]
+            #data = im[SIZE[1]-y-ah/2: SIZE[1]-y+ah/2, x:x+aw]
+            data = im[SIZE[1]-y-ah: SIZE[1]-y, x:x+aw]
+
             log(data.shape)
             
             if scale > 1.:
@@ -247,15 +255,16 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
                 log(resizedata.shape)
             
 
+            '''
             #header = WCSDATA.to_header()
             w = wcs.WCS(naxis=2, relax=False)#relax=wcs.WCSHDR_RADESYS)#, relax=(wcs.WCSHDR_RADECSYS | wcs.WCSHDR_EPOCHa | wcs.WCSHDR_CD00i00j))#, relax=wcs.WCSHDR_CD00i00j) #wcs.WCSHDR_CD00i00j RADESYS
 
-            '''
+            #'
             ra, dec = WCSDATA.wcs_pix2world(WCSDATA.wcs.crpix[0], WCSDATA.wcs.crpix[1] , 0)
             log("ra: %f - dec: %f" % (ra, dec) )
             px, py = WCSDATA.wcs_world2pix(WCSDATA.wcs.crval[0], WCSDATA.wcs.crval[1], 0)
             log("px: %f - py: %f" % (px, py) )
-            '''
+            #'
 
             ra, dec = WCSDATA.wcs_pix2world(x+aw/2, SIZE[1]-y-ah/2, 0)
             
@@ -274,7 +283,7 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
                 w.wcs.cd = cd*scale
                 w.wcs.cdelt = [np.sqrt(w.wcs.cd[0,0]*w.wcs.cd[0,0]+w.wcs.cd[1,0]*w.wcs.cd[1,0]), np.sqrt(w.wcs.cd[0,1]*w.wcs.cd[0,1]+w.wcs.cd[1,1]*w.wcs.cd[1,1])]
                 w.wcs.pc = [[w.wcs.cd[0,0]/ w.wcs.cdelt[0], w.wcs.cd[0,1]/ w.wcs.cdelt[0]],[w.wcs.cd[1,0]/ w.wcs.cdelt[1], w.wcs.cd[1,1]/ w.wcs.cdelt[1]]]
-            else:
+            elif WCSDATA.wcs.has_pc():
                 w.wcs.pc = WCSDATA.wcs.pc
                 cdelt = WCSDATA.wcs.cdelt
                 print "cdelt"
@@ -282,6 +291,38 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
                 print scale
                 w.wcs.cdelt = cdelt*scale
                 print w.wcs.cdelt
+
+            '''
+
+            ra, dec = WCSDATA.wcs_pix2world(x+aw/2, SIZE[1]-y-ah/2, 0)
+
+            header = HEADER.copy()
+
+            header.set('CRVAL1', (float)(ra) )
+            header.set('CRVAL2', (float)(dec) )
+            header.set('CRPIX1', (float)(aw/scale/2) )
+            header.set('CRPIX2', (float)(ah/scale/2) )
+            if WCSDATA.wcs.has_cd():
+                cd = WCSDATA.wcs.cd
+                header.set('CD1_1', cd[0,0]*scale )
+                header.set('CD1_2', cd[0,1]*scale )
+                header.set('CD2_1', cd[1,0]*scale )
+                header.set('CD2_2', cd[1,1]*scale )
+            elif WCSDATA.wcs.has_pc():
+                pc = WCSDATA.wcs.get_pc()
+                cdelt = WCSDATA.wcs.cdelt
+                header.set('PC1_1', pc[0,0] )
+                header.set('PC1_2', pc[0,1] )
+                header.set('PC2_1', pc[1,0] )
+                header.set('PC2_2', pc[1,1] )
+                header.set('CDELT1', cdelt[0]*scale)
+                header.set('CDELT2', cdelt[1]*scale)
+
+
+            #header['CD1_1'] = header['CD1_1']*scale
+            #header['CD1_2'] = header['CD1_2']*scale
+            #header['CD2_1'] = header['CD2_1']*scale
+            #header['CD2_2'] = header['CD1_1']*scale
 
             #pc = WCSDATA.wcs.get_pc()
             #w.wcs.pc = pc*scale
@@ -306,59 +347,9 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
             
             #w.wcs.print_contents()
 
-            '''
-            # Some pixel coordinates of interest.
-            pixcrd = np.array([[0, 0], [aw/2, ah/2], [aw, ah]], np.float_)
-
-            log("pixcrd")
-            log(pixcrd)
-
-            # Convert pixel coordinates to world coordinates
-            # The second argument is "origin" -- in this case we're declaring we
-            # have 1-based (Fortran-like) coordinates.
-            world = WCSDATA.wcs_pix2world(pixcrd, 1)
-            log("world")
-            log(world)
-
-            # Convert the same coordinates back to pixel coordinates.
-            pixcrd2 = WCSDATA.wcs_world2pix(world, 1)
-            log("pixcrd2")
-            log(pixcrd2)
-
-            # These should be the same as the original pixel coordinates, modulo
-            # some floating-point error.
-            assert np.max(np.abs(pixcrd - pixcrd2)) < 1e-6
-
-            log("error")
-            log( np.abs(pixcrd - pixcrd2) )
             
-            ra, dec = WCSDATA.wcs_pix2world(x+aw/2, y+ah/2, 0)
-            #ra, dec = WCSDATA.wcs_pix2world(x+aw/2, -y+ah/2, 1)
-            #w.wcs.crval = [ra, dec]
-            w.wcs.crval = world[1]
-            #w.wcs.crval = WCSDATA.wcs.crval
-            w.wcs.ctype = WCSDATA.wcs.ctype
-            w.wcs.equinox = WCSDATA.wcs.equinox
-            w.wcs.dateobs = WCSDATA.wcs.dateobs
-            w.wcs.crpix = [aw/2, ah/2]
-
-
-            
-            if WCSDATA.wcs.has_cd:
-                cd = WCSDATA.wcs.cd
-                w.wcs.cd = cd*scale
-            ''
-            elif WCSDATA.wcs.has_crota:
-                w.wcs.crota = WCSDATA.wcs.get_crota()*scale
-            if WCSDATA.wcs.has_pc:
-                pc = WCSDATA.wcs.get_pc()
-                w.wcs.pc = pc*scale
-            ''
-
-            w.wcs.cdelt = [-1/scale, 1/scale]
-            '''
-            header = w.to_header()
-            header['OBJECT'] = OBJECT
+            #header = w.to_header(relax=True)
+            #header['OBJECT'] = OBJECT
 
             #log("header wcs")
             #log(header)
@@ -417,7 +408,8 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
         regionEL.set("layer", str(LAYER))
     objectEL.set("id", "I%s-%s" % (ID_PREFIX, tileIDstr))
     if USE_ASTROPY:
-        objectEL.set("type", "fits")
+        #objectEL.set("type", "fits")
+        objectEL.set("type", "skyfits")
     else:
         objectEL.set("type", "img")
     objectEL.set("x", str(int(DX+x+aw/2)))
@@ -491,7 +483,15 @@ def processSrcImg():
         if SRC_PATH.lower().endswith(".fit") or SRC_PATH.lower().endswith(".fits"):
             IMG_SRC_PATH = SRC_PATH
 
-            hdulist = fits.open(IMG_SRC_PATH)
+            hdulist = fits.open(IMG_SRC_PATH, do_not_scale_image_data=True)
+
+            hdulist.info()
+
+            #print hdulist.header
+
+            print hdulist[0].data
+            print hdulist[0].data.dtype
+            print hdulist[0].data.dtype.name
 
             if hdulist[0].header['NAXIS'] == 2:
                 src_sz = (hdulist[0].header['NAXIS1'], hdulist[0].header['NAXIS2'])
@@ -510,6 +510,12 @@ def processSrcImg():
             else:
                 log("Naxis == %d" % (hdulist[0].header['NAXIS']) )
                 return
+
+            hdulist.close()
+
+            print im
+            print im.dtype
+            print im.dtype.name
 
             minvalue = np.amin(im)
             maxvalue = np.amax(im)
@@ -571,7 +577,7 @@ def resizeBilinear(data, w, h, aw, ah):
 def shrink(data, w, h, aw, ah):
     w2 = (int)(aw)
     h2 = (int)(ah)
-    newdata = np.zeros((w2, h2) )
+    newdata = np.zeros((w2, h2), dtype=data.dtype )
     log("newdata: (%f, %f)" % (newdata.shape) )
     log("data: (%f, %f)" % (data.shape) )
     for i in range(w2):
@@ -647,6 +653,9 @@ if len(sys.argv) > 2:
                 MAXVALUE = float(arg[len("-maxvalue="):])
             elif arg.startswith("-onlyxml"):
                 ONLYXML = True
+            else:
+                log("Parameters incorrect");
+                log(CMD_LINE_HELP);
             
 
 else:

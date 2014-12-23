@@ -84,8 +84,8 @@ public class JSkyFitsImageDescription extends ResourceDescription {
         this.zindex = z;
         this.src = src;
 
-        vw = parentRegion.getWidth();
-        vh = parentRegion.getHeight();
+        this.vw = parentRegion.getWidth();
+        this.vh = parentRegion.getHeight();
 
         this.scaleFactor = scaleFactor;
         this.scaleMethod = scaleMethod;

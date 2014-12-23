@@ -55,7 +55,7 @@ def header(src_path):
 	return {'header': header, 'wcsdata': wcsdata, 'size': size}
 
 def pix2world(wcsdata, x, y):
-	return wcsdata.wcs_pix2world(x, y, 0)
+	return wcsdata.wcs_pix2world(x, y, 1)
 def world2pix(wcsdata, ra, dec):
 	return wcsdata.wcs_world2pix(ra, dec, 0)
 
