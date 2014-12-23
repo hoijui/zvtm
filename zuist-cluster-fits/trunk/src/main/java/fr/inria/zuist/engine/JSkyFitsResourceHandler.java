@@ -38,7 +38,7 @@ public class JSkyFitsResourceHandler implements ResourceHandler {
             String[] paramTokens = params.split(SceneManager.PARAM_SEPARATOR);
             for (int i=0;i<paramTokens.length;i++) {
                 if (paramTokens[i].startsWith(SC_ID)){
-                    this.scaleFactor = Float.parseFloat(paramTokens[i].substring(SC_ID.length()));
+                    scaleFactor = Float.parseFloat(paramTokens[i].substring(SC_ID.length()));
                 }
                 else if (paramTokens[i].startsWith(SM_ID)){
                     try{
