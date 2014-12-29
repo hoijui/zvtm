@@ -68,7 +68,6 @@ aspect AutoReplay extends AbstractAutoReplay {
          execution(public double[] JSkyFitsImageDescription.getLocalScaleParams()) ||
          execution(public double[] JSkyFitsImageDescription.getGlobalScaleParams()) ||
          execution(public void JSkyFitsImageDescription.setTranslucency(float)) ||
-         execution(public String JSkyFitsImageDescription.getObjectName()) ||
          execution(public double JSkyFitsImageDescription.getWidth()) ||
          execution(public double JSkyFitsImageDescription.getHeight()) ||
          execution(public double JSkyFitsImageDescription.getX()) ||

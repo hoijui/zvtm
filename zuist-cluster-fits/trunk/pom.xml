@@ -51,11 +51,19 @@
             <artifactId>zvtm-cluster</artifactId>
             <version>0.2.8-SNAPSHOT</version>
           </dependency>
+        <!--
         <dependency>
             <groupId>fr.inria.zvtm</groupId>
             <artifactId>zvtm-fits</artifactId>
             <version>0.1.4-SNAPSHOT</version>
         </dependency>
+        -->
+        <dependency>
+            <groupId>fr.inria.zvtm</groupId>
+            <artifactId>zvtm-cluster-fits</artifactId>
+            <version>0.1.2-SNAPSHOT</version>
+        </dependency>
+        
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjrt</artifactId>
@@ -152,6 +160,7 @@
               <archive>
                 <manifest>
                     <useUniqueVersions>false</useUniqueVersions>
+                  <!-- ? -->
                   <mainClass>cl.inria.md.alma.ac.WallAntennaConfigurator</mainClass>
                   <packageName>cl.inria.md.alma.ac</packageName>
                   <addClasspath>true</addClasspath>
