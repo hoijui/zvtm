@@ -42,6 +42,8 @@ import fr.inria.zvtm.fits.NomWcsKeywordProvider;
 import nom.tam.fits.Fits;
 import jsky.image.fits.codec.FITSDecodeParam;
 
+import java.net.MalformedURLException;
+
 
 //Fits support provided by JSky instead of IVOA FITS
 //Note: JSkyFitsImage requires JAI (Java Advanced Imaging)
@@ -51,7 +53,7 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
     private FITSImage fitsImage;
 
     private URL file;
-    //private WCSTransform wcsTransform;
+    private WCSTransform wcsTransform;
     private final ImageProcessor proc;
 
     /** Width in virtual space */
@@ -89,6 +91,15 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
                                     "Smooth", "Staircase", "Standard" };
 
 
+    public JSkyFitsImage(String file) throws MalformedURLException {
+        this(new URL(file));
+        /*try{
+            this(new URL(file));
+        } catch(MalformedURLException e){
+            throw new Error("Could not create JSkyFitsImage, URL incorrect: " + e);
+        }
+        */
+    }
     /** Construct an image at (0, 0) with original scale.
      *@param img image to be displayed
      */
@@ -132,38 +143,47 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
 
         try{
             //imageLocation = file
-            System.out.println("file: " + file.getFile());
 
             this.file = file;
+            String strfile = file.toString();
+            
+            if(strfile.indexOf("file:") == 0){
+                System.out.println("str: " + strfile);
+                fitsImage = new FITSImage(strfile.substring(strfile.indexOf(":")+1));
+            } else {
+                fitsImage = new FITSImage(file.toString());
+            }
+
             //this.file = "/home/fdelcampo/zuist-scenes-local/fits/Einstein.fits";
-            fitsImage = new FITSImage(file.getFile());
+            //fitsImage = new FITSImage(file.toString());
+
             //fitsImage = new FITSImage("/home/fdelcampo/zuist-scenes-local/fits/Einstein.fits");
             
             vw = fitsImage.getWidth() * scale;
             vh = fitsImage.getHeight() * scale;
             RenderedImageAdapter ria = new RenderedImageAdapter(fitsImage);
             Rectangle2D.Double region = new Rectangle2D.Double(0,0, fitsImage.getWidth(), fitsImage.getHeight());
-            System.out.print("ria: ");
-            System.out.println(ria);
-            System.out.print("sampleModel: ");
-            System.out.println(ria.getSampleModel());
+            //System.out.print("ria: ");
+            //System.out.println(ria);
+            //System.out.print("sampleModel: ");
+            //System.out.println(ria.getSampleModel());
 
-            System.out.print("region: ");
-            System.out.println(region);
+            //System.out.print("region: ");
+            //System.out.println(region);
             try{
                 proc = new ImageProcessor(ria, region);
-                System.out.println("proc created");
+                //System.out.println("proc created");
                 originLowCut = proc.getLowCut();
-                System.out.println("originLowCut: " + originLowCut);
+                //System.out.println("originLowCut: " + originLowCut);
                 originHighCut = proc.getHighCut();
-                System.out.println("originHighCut: " + originHighCut);
+                //System.out.println("originHighCut: " + originHighCut);
 
             } catch(java.lang.IllegalArgumentException ie){
 
                 throw new Error("Could not create ImageProcesor: " + ie);
             }
 
-            /*
+            
             NomWcsKeywordProvider wcsKeyProvider;
             try{
                 wcsKeyProvider = new NomWcsKeywordProvider(fitsImage.getFits().getHDU(0).getHeader());
@@ -175,7 +195,7 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
             } catch(Exception e){
                 throw new Error("Could not create wcsTransform: " + e);
             }
-            */
+            
 
         } catch (Exception e){
             throw new Error("Could not create FitsImage: " + e);
@@ -202,9 +222,11 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
     }
 
     @Override public void setWidth(double w){
+        //vw = w;
     }
 
     @Override public void setHeight(double h){
+        //vh = h;
     }
 
     public URL getImageLocation(){
@@ -296,24 +318,24 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
         return proc.getHistogram(numValues, roi);
     }
 
-    /*
-     * Converts pixel coordinates to World Coordinates. Returns null if the WCSTransform is not valid.
+    
+    /* Converts pixel coordinates to World Coordinates. Returns null if the WCSTransform is not valid.
      * @param x x-coordinates, in the FITS system: (0,0) lower left, x axis increases to the right, y axis increases upwards
      * @param y y-coordinates, in the FITS system: (0,0) lower left, x axis increases to the right, y axis increases upwards
-     *
+     */
     public Point2D.Double pix2wcs(double x, double y){
         return wcsTransform.pix2wcs(x, y);
     }
-    */
+    
 
 
     /*
      * Converts World Coordinates to pixel coordinates. Returns null if the WCSTransform is invalid, or if the WCS position does not fall within the image.
-     *
+     */
     public Point2D.Double wcs2pix(double ra, double dec){
         return wcsTransform.wcs2pix(ra, dec);
     }
-    */
+    
 
 
     /** 
