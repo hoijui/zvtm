@@ -24,6 +24,10 @@ aspect FitsAutoReplay extends AbstractAutoReplay {
          execution(public void JSkyFitsImage.setColorLookupTable(String)) ||
          execution(public void JSkyFitsImage.setCutLevels(double, double)) ||
          execution(public void JSkyFitsImage.setScaleAlgorithm(JSkyFitsImage.ScaleAlgorithm)) ||
+         execution(public void JSkyFitsImage.setTranslucencyValue(float) ) ||
+         execution(public void JSkyFitsImage.setVisible(boolean) ) ||
+         execution(public void JSkyFitsImage.moveTo(double, double) ) ||
+         execution(public void JSkyFitsImage.orientTo(double) ) ||
          execution(public void RangeSelection.setTicksVal(double, double)) ||
          execution(public void RangeSelection.setLeftTickPos(double)) ||
          execution(public void RangeSelection.setRightTickPos(double)) ||

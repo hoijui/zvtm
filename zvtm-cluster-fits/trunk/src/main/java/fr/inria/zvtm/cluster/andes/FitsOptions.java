@@ -32,8 +32,10 @@ public class FitsOptions {
     @Option(name = "-noaa", usage = "disable anti-aliasing")
     public boolean noaa = false;
 
+    /*
     @Option(name = "-file", usage = "file of FITS")
     public String file = null;
+    */
 
     @Option(name = "-url", usage= "url of FITS")
     public String url = null;

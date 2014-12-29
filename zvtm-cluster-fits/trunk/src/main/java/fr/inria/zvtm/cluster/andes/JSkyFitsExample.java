@@ -100,11 +100,8 @@ public class JSkyFitsExample{
 		if(options.url != null){
 			img = new JSkyFitsImage(options.url);
 
-        } else if(options.file != null){
-            img = new JSkyFitsImage(options.file);
-
         } else {
-            System.err.println("usage: JSkyFitsExample -file image_File or -url image_URL");
+            System.err.println("usage: JSkyFitsExample -url image_URL");
             System.exit(0);
             return;
         }

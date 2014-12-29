@@ -18,5 +18,5 @@ libs=$libs:target/zvtm-fits-0.1.4-SNAPSHOT.jar
 
 #java -Djava.net.preferIPv4Stack=true -Dcom.sun.media.jai.disableMediaLib=true -Djgroups.bind_addr="127.0.0.1" -Xmx4g -cp $libs fr.inria.zvtm.cluster.AstroRad "$@" 
 
-java -Djava.net.preferIPv4Stack=true -Dcom.sun.media.jai.disableMediaLib=true -Djgroups.bind_addr="127.0.0.1" -Xmx4g -cp $libs fr.inria.zvtm.cluster.andes.JSkyFitsExample "$@"
+java -Djava.net.preferIPv4Stack=true -Dcom.sun.media.jai.disableMediaLib=true -Djgroups.bind_addr="127.0.0.1" -Xmx4096M -cp $libs fr.inria.zvtm.cluster.andes.JSkyFitsExample "$@"
 

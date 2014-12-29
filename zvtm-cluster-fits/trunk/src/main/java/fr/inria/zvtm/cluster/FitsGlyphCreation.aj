@@ -60,6 +60,7 @@ public aspect FitsGlyphCreation {
         }
     }
 
+    /*
     private static class JSkyFitsImageReplicator extends GlyphCreation.ClosedShapeReplicator {
         private final String fileOrUrl;
         
@@ -71,6 +72,26 @@ public aspect FitsGlyphCreation {
         Glyph doCreateGlyph(){
             try{
                 return new JSkyFitsImage(fileOrUrl);
+            } catch(Exception e){
+                //XXX error handling
+                throw new Error(e);
+            }
+        }
+    }*/
+
+    private static class JSkyFitsImageReplicator extends GlyphCreation.ClosedShapeReplicator {
+        private final Object imageLocation;
+        private final double scaleFactor;
+
+        JSkyFitsImageReplicator(JSkyFitsImage source){
+            super(source);
+            this.scaleFactor = source.scaleFactor;
+            this.imageLocation = source.getImageLocation();
+        }
+
+        Glyph doCreateGlyph(){
+            try{
+                return new JSkyFitsImage(0.,0.,0,(URL)imageLocation, scaleFactor);
             } catch(Exception e){
                 //XXX error handling
                 throw new Error(e);
