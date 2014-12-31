@@ -148,7 +148,6 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
             String strfile = file.toString();
             
             if(strfile.indexOf("file:") == 0){
-                System.out.println("str: " + strfile);
                 fitsImage = new FITSImage(strfile.substring(strfile.indexOf(":")+1));
             } else {
                 fitsImage = new FITSImage(file.toString());
