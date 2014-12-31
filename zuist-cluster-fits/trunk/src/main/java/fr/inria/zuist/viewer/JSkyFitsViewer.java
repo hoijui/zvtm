@@ -472,6 +472,51 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
     }
 
     @Override
+    public void coordinateWCS(Point2D.Double xy, MyCursor mc){
+
+        try {
+
+            System.out.println("coordinateWCS(" + xy.getX() + ", " + xy.getY() + ")");
+            double[] coord = windowToViewCoordinateFromSmarties(xy.getX(), xy.getY());
+            System.out.println("windowToViewCoordinateFromSmarties: (" + coord[0] + ", " + coord[1] + ")");
+            System.out.println("windowToViewCoordinateFromSmarties Ref: (" + fitsImageDescRef.getX() + ", " + fitsImageDescRef.getY() + ")");
+
+            double a = (mCamera.focal + mCamera.getAltitude()) / mCamera.focal;
+
+            System.out.println("coordinateWCS("+coord[0]+", "+coord[1]+")");
+            System.out.println("reference("+fitsImageDescRef.getX()+", "+fitsImageDescRef.getY()+")");
+            System.out.println("a: " + a);
+            System.out.println("factor: " + fitsImageDescRef.getFactor());
+
+            
+            System.out.println( "(" + ((coord[0]-fitsImageDescRef.getX()+fitsImageDescRef.getWidthWithFactor()/2)/a  ) + ", " + (( coord[1]-fitsImageDescRef.getY()+fitsImageDescRef.getHeightWithFactor()/2)/a ) + ")");
+
+
+            System.out.println( "width: " +fitsImageDescRef.getWidth() + " height:" +fitsImageDescRef.getHeight());
+
+            System.out.println( "width/factor: " +(fitsImageDescRef.getWidth()/fitsImageDescRef.getFactor() ) + " height/a:" + (fitsImageDescRef.getHeight()/fitsImageDescRef.getFactor()) ) ;
+
+           
+
+            double x = (coord[0] - fitsImageDescRef.getX())/fitsImageDescRef.getFactor() + fitsImageDescRef.getWidth()/fitsImageDescRef.getFactor()/2 ;
+            double y = (coord[1] - fitsImageDescRef.getY())/fitsImageDescRef.getFactor() + fitsImageDescRef.getHeight()/fitsImageDescRef.getFactor()/2 ;
+
+
+            System.out.println( "(" + x + ", " + y + ")");
+
+            System.out.println("size: " + fitsImageDescRef.getWidthWithFactor() + ", " +  fitsImageDescRef.getHeightWithFactor());
+
+            pythonWCS.changeCoordinateSystem(galacticalSystem);
+            pythonWCS.sendCoordinate(x, y, mc);
+
+        } catch (NullPointerException e){
+            e.printStackTrace(System.out);
+        }
+
+        
+    }
+
+    @Override
     public void loadFitsReference(){
         if(reference == null){
             for(ObjectDescription desc: sm.getObjectDescriptions()){

@@ -190,7 +190,8 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     SmartiesManager smartiesMngr;
     TuioEventHandler teh;
 
-    FitsImageDescription fitsImageDescRef;
+    public FitsImageDescription fitsImageDescRef;
+    //public Object fitsImageDescRef;
     //NomWcsKeywordProvider wcsKeyProviderRef;
     //WCSTransform wcsTransformRef;
 
