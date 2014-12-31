@@ -91,9 +91,11 @@ public aspect FitsGlyphCreation {
 
         Glyph doCreateGlyph(){
             try{
+                System.out.println("JSkyFitsGlyphCreation - doCreateGlyph - try");
                 return new JSkyFitsImage(0.,0.,0,(URL)imageLocation, scaleFactor);
             } catch(Exception e){
                 //XXX error handling
+                System.out.println("JSkyFitsGlyphCreation - doCreateGlyph - catch");
                 throw new Error(e);
             }
         }
