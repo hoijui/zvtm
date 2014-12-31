@@ -46,23 +46,25 @@
           <artifactId>zuist-engine</artifactId>
           <version>[0.4.0,)</version>
         </dependency>
+        
         <dependency>
             <groupId>fr.inria.zvtm</groupId>
             <artifactId>zvtm-cluster</artifactId>
             <version>0.2.8-SNAPSHOT</version>
           </dependency>
-        <!--
+        
         <dependency>
             <groupId>fr.inria.zvtm</groupId>
             <artifactId>zvtm-fits</artifactId>
             <version>0.1.4-SNAPSHOT</version>
         </dependency>
-        -->
+        <!--
         <dependency>
             <groupId>fr.inria.zvtm</groupId>
             <artifactId>zvtm-cluster-fits</artifactId>
             <version>0.1.2-SNAPSHOT</version>
         </dependency>
+      -->
         
         <dependency>
             <groupId>org.aspectj</groupId>

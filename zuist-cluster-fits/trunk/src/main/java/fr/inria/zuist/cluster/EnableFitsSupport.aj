@@ -7,6 +7,7 @@
 package fr.inria.zuist.cluster;
 
 import fr.inria.zuist.engine.JSkyFitsResourceHandler;
+import fr.inria.zuist.engine.FitsResourceHandler;
 import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VirtualSpace;
@@ -29,6 +30,11 @@ aspect EnableZuistSupport {
                 JSkyFitsResourceHandler.RESOURCE_TYPE_FITS,
                 new JSkyFitsResourceHandler()
                 );
+        sceneManager.setResourceHandler(
+                FitsResourceHandler.RESOURCE_TYPE_FITS,
+                new FitsResourceHandler()
+                );
 
     }
 }
+
