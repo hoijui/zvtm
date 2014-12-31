@@ -697,7 +697,7 @@ aspect SceneManagerReplication {
             URL imageURL, String type, boolean sensitivity,
             Color stroke, String params)
         returning(ResourceDescription rdesc):
-            createFitsImageDescription(sceneManager, x, y, id,
+            createJSkyFitsImageDescription(sceneManager, x, y, id,
                     zindex, region, imageURL, type, sensitivity,
                     stroke, params) &&
             !cflowbelow(createJSkyFitsImageDescription(SceneManager, double, double,
