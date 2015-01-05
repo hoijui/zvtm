@@ -82,7 +82,8 @@ CMD_LINE_HELP = "ZUIST Image Tiling Script\n\nUsage:\n\n" + \
     "\t-layer=name\t\tname layer from the zuist"+\
     "\t-minvalue\t\tvalue minimum on fits images"+\
     "\t-maxvalue\t\tvalue maximum on fits images"+\
-    "\t-onlyxml \t\tcreate only xml from the tiles"
+    "\t-onlyxml \t\tcreate only xml from the tiles"+\
+    "\t-shrink \t\tdefault use natural neighbor. change set to shrink"
 
 
 TRACE_LEVEL = 1
@@ -125,6 +126,7 @@ USE_GRAPHICSMAGICK = False
 USE_ASTROPY = False
 
 ONLYXML = False
+NATURAL_NEIGBOR = True
 
 WCSDATA = ""
 OBJECT = ""
@@ -251,7 +253,10 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
             
             if scale > 1.:
                 log("Resizing to (%d, %d)" % (aw/scale, ah/scale), 3)
-                resizedata = shrink(data, ah, aw, ah/scale, aw/scale)
+                if NATURAL_NEIGBOR:
+                    resizedata = natural_neighbor(data, ah, aw, ah/scale, aw/scale)
+                else:
+                    resizedata = shrink(data, ah, aw, ah/scale, aw/scale)
                 log(resizedata.shape)
             
 
@@ -580,6 +585,7 @@ def shrink(data, w, h, aw, ah):
     newdata = np.zeros((w2, h2), dtype=data.dtype )
     log("newdata: (%f, %f)" % (newdata.shape) )
     log("data: (%f, %f)" % (data.shape) )
+    log("scale: %f" % (aw/w) )
     for i in range(w2):
         for j in range(h2):
             idi = i * (w-1)/ w2
@@ -590,6 +596,53 @@ def shrink(data, w, h, aw, ah):
             except IndexError:
                 log("IndexError:  i: %d - j: %d - idi: %d - idj: %d" % (i, j, idi, idj))
     return newdata
+
+
+
+def natural_neighbor(data, w, h, aw, ah):
+    log("natural_neighbor")
+    w2 = (int)(aw)
+    h2 = (int)(ah)
+    newdata = np.zeros((w2, h2), dtype=data.dtype )
+    scale = (w/w2 + h/h2)/2
+    log("scale: %f" % (scale))
+
+    for i in range(w2):
+        for j in range(h2):
+            idi = i * (w-1)/ w2
+            idj = j * (h-1)/ h2
+            near = neighborhood(idi, idj, int(w), int(h), scale)
+            value = 0
+            for val in near:
+                value = value + data[ val[0], val[1] ] * val[2]
+            try:
+                newdata[i, j] = value
+            except IndexError:
+                log("IndexError:  i: %d - j: %d" % (i, j))
+
+    return newdata
+
+def neighborhood(i, j, aw, ah, scale):
+    ls = []
+    for ii in range(int(i-scale), int(i+scale+1)):
+        if ii >= 0 and ii < aw:
+            for jj in range(int(j-scale), int(j+scale+1)):
+                if jj >= 0 and jj < ah:
+                    distance = math.sqrt( (ii-i)*(ii-i)+(jj-j)*(jj-j) )
+                    if distance == 0:
+                        factor = 1
+                    else:
+                        factor = 1/distance
+                    #print "(%i, %i) - distance = %f - factor = %f" % (ii, jj, distance, factor)
+                    ls.append([ii,jj,factor])
+    sumfac = 0
+    for l in ls:
+        sumfac = sumfac + l[2]
+    for l in range(0, len(ls)):
+        ls[l][2] = ls[l][2]/sumfac
+    return ls
+
+
 
 
 ################################################################################
@@ -653,6 +706,8 @@ if len(sys.argv) > 2:
                 MAXVALUE = float(arg[len("-maxvalue="):])
             elif arg.startswith("-onlyxml"):
                 ONLYXML = True
+            elif arg.startswith("-shrink"):
+                NATURAL_NEIGBOR = False
             else:
                 log("Parameters incorrect");
                 log(CMD_LINE_HELP);
