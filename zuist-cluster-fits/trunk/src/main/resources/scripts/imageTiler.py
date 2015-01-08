@@ -79,11 +79,13 @@ CMD_LINE_HELP = "ZUIST Image Tiling Script\n\nUsage:\n\n" + \
     "\t-dy=x\t\ty offset for all regions and objects\n"+\
     "\t-dl=l\t\tlevel offset for all regions and objects\n"+\
     "\t-scale=s\ts scale factor w.r.t default size for PDF input\n"+\
-    "\t-layer=name\t\tname layer from the zuist"+\
-    "\t-minvalue\t\tvalue minimum on fits images"+\
-    "\t-maxvalue\t\tvalue maximum on fits images"+\
-    "\t-onlyxml \t\tcreate only xml from the tiles"+\
-    "\t-shrink \t\tdefault use natural neighbor. change set to shrink"
+    "\t-layer=name\tname layer from the zuist\n"+\
+    "\t-minvalue\tvalue minimum on fits images\n"+\
+    "\t-maxvalue\tvalue maximum on fits images\n"+\
+    "\t-onlyxml \tcreate only xml from the tiles\n"+\
+    "\t-shrink \tdefault use natural neighbor. change set to shrink\n"+\
+    "\t-notnewfile \tif exist file, not create new file\n"+\
+    "\t-withoutbackground \tWithout the image of the level 0\n"
 
 
 TRACE_LEVEL = 1
@@ -127,6 +129,9 @@ USE_ASTROPY = False
 
 ONLYXML = False
 NATURAL_NEIGBOR = True
+NEWFILE = True
+BACKGROUND = True
+
 
 WCSDATA = ""
 OBJECT = ""
@@ -237,147 +242,153 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
             bitmap.writeToFile(tilePath, kCGImageFormatPNG)
         elif USE_ASTROPY:
             
-            #wcsdata = wcs.WCS(IMG_SRC_PATH)
-            #log("wcsdata:")
-            #log(WCSDATA)
-            '''
-            Check correctly wcs coordinates
-            '''
+            if NEWFILE or (not os.path.exists(tilePath) and not NEWFILE):
 
-            log("Cropping at (%d,%d,%d,%d)" % (x, y, aw, ah))
-            #data = im[y:y+ah, x:x+aw]
-            #data = im[SIZE[1]-y-ah/2: SIZE[1]-y+ah/2, x:x+aw]
-            data = im[SIZE[1]-y-ah: SIZE[1]-y, x:x+aw]
+                #wcsdata = wcs.WCS(IMG_SRC_PATH)
+                #log("wcsdata:")
+                #log(WCSDATA)
+                '''
+                Check correctly wcs coordinates
+                '''
 
-            log(data.shape)
-            
-            if scale > 1.:
-                log("Resizing to (%d, %d)" % (aw/scale, ah/scale), 3)
-                if NATURAL_NEIGBOR:
-                    resizedata = natural_neighbor(data, ah, aw, ah/scale, aw/scale)
-                else:
-                    resizedata = shrink(data, ah, aw, ah/scale, aw/scale)
-                log(resizedata.shape)
-            
+                log("Cropping at (%d,%d,%d,%d)" % (x, y, aw, ah))
+                #data = im[y:y+ah, x:x+aw]
+                #data = im[SIZE[1]-y-ah/2: SIZE[1]-y+ah/2, x:x+aw]
+                data = im[SIZE[1]-y-ah: SIZE[1]-y, x:x+aw]
 
-            '''
-            #header = WCSDATA.to_header()
-            w = wcs.WCS(naxis=2, relax=False)#relax=wcs.WCSHDR_RADESYS)#, relax=(wcs.WCSHDR_RADECSYS | wcs.WCSHDR_EPOCHa | wcs.WCSHDR_CD00i00j))#, relax=wcs.WCSHDR_CD00i00j) #wcs.WCSHDR_CD00i00j RADESYS
+                log(data.shape)
+                
+                if scale > 1.:
+                    log("Resizing to (%d, %d)" % (aw/scale, ah/scale), 3)
+                    
+                    if NATURAL_NEIGBOR:
+                        resizedata = natural_neighbor(data, ah, aw, ah/scale, aw/scale)
+                    else:
+                        resizedata = shrink(data, ah, aw, ah/scale, aw/scale)
+                    
+                    log(resizedata.shape)
+                
 
-            #'
-            ra, dec = WCSDATA.wcs_pix2world(WCSDATA.wcs.crpix[0], WCSDATA.wcs.crpix[1] , 0)
-            log("ra: %f - dec: %f" % (ra, dec) )
-            px, py = WCSDATA.wcs_world2pix(WCSDATA.wcs.crval[0], WCSDATA.wcs.crval[1], 0)
-            log("px: %f - py: %f" % (px, py) )
-            #'
+                '''
+                #header = WCSDATA.to_header()
+                w = wcs.WCS(naxis=2, relax=False)#relax=wcs.WCSHDR_RADESYS)#, relax=(wcs.WCSHDR_RADECSYS | wcs.WCSHDR_EPOCHa | wcs.WCSHDR_CD00i00j))#, relax=wcs.WCSHDR_CD00i00j) #wcs.WCSHDR_CD00i00j RADESYS
 
-            ra, dec = WCSDATA.wcs_pix2world(x+aw/2, SIZE[1]-y-ah/2, 0)
-            
-            w.wcs.crval = [ra, dec]
-            w.wcs.ctype = WCSDATA.wcs.ctype
-            w.wcs.equinox = WCSDATA.wcs.equinox
-            w.wcs.dateobs = WCSDATA.wcs.dateobs
-            w.wcs.crpix = [aw/scale/2, ah/scale/2]
-            #if WCSDATA.wcs.has_cd:
-            #    cd = WCSDATA.wcs.cd
-            #    w.wcs.cd = cd*scale
+                #'
+                ra, dec = WCSDATA.wcs_pix2world(WCSDATA.wcs.crpix[0], WCSDATA.wcs.crpix[1] , 0)
+                log("ra: %f - dec: %f" % (ra, dec) )
+                px, py = WCSDATA.wcs_world2pix(WCSDATA.wcs.crval[0], WCSDATA.wcs.crval[1], 0)
+                log("px: %f - py: %f" % (px, py) )
+                #'
 
-
-            if WCSDATA.wcs.has_cd():
-                cd = WCSDATA.wcs.cd
-                w.wcs.cd = cd*scale
-                w.wcs.cdelt = [np.sqrt(w.wcs.cd[0,0]*w.wcs.cd[0,0]+w.wcs.cd[1,0]*w.wcs.cd[1,0]), np.sqrt(w.wcs.cd[0,1]*w.wcs.cd[0,1]+w.wcs.cd[1,1]*w.wcs.cd[1,1])]
-                w.wcs.pc = [[w.wcs.cd[0,0]/ w.wcs.cdelt[0], w.wcs.cd[0,1]/ w.wcs.cdelt[0]],[w.wcs.cd[1,0]/ w.wcs.cdelt[1], w.wcs.cd[1,1]/ w.wcs.cdelt[1]]]
-            elif WCSDATA.wcs.has_pc():
-                w.wcs.pc = WCSDATA.wcs.pc
-                cdelt = WCSDATA.wcs.cdelt
-                print "cdelt"
-                print cdelt
-                print scale
-                w.wcs.cdelt = cdelt*scale
-                print w.wcs.cdelt
-
-            '''
-
-            ra, dec = WCSDATA.wcs_pix2world(x+aw/2, SIZE[1]-y-ah/2, 0)
-
-            header = HEADER.copy()
-
-            header.set('CRVAL1', (float)(ra) )
-            header.set('CRVAL2', (float)(dec) )
-            header.set('CRPIX1', (float)(aw/scale/2) )
-            header.set('CRPIX2', (float)(ah/scale/2) )
-            if WCSDATA.wcs.has_cd():
-                cd = WCSDATA.wcs.cd
-                header.set('CD1_1', cd[0,0]*scale )
-                header.set('CD1_2', cd[0,1]*scale )
-                header.set('CD2_1', cd[1,0]*scale )
-                header.set('CD2_2', cd[1,1]*scale )
-            elif WCSDATA.wcs.has_pc():
-                pc = WCSDATA.wcs.get_pc()
-                cdelt = WCSDATA.wcs.cdelt
-                header.set('PC1_1', pc[0,0] )
-                header.set('PC1_2', pc[0,1] )
-                header.set('PC2_1', pc[1,0] )
-                header.set('PC2_2', pc[1,1] )
-                header.set('CDELT1', cdelt[0]*scale)
-                header.set('CDELT2', cdelt[1]*scale)
+                ra, dec = WCSDATA.wcs_pix2world(x+aw/2, SIZE[1]-y-ah/2, 0)
+                
+                w.wcs.crval = [ra, dec]
+                w.wcs.ctype = WCSDATA.wcs.ctype
+                w.wcs.equinox = WCSDATA.wcs.equinox
+                w.wcs.dateobs = WCSDATA.wcs.dateobs
+                w.wcs.crpix = [aw/scale/2, ah/scale/2]
+                #if WCSDATA.wcs.has_cd:
+                #    cd = WCSDATA.wcs.cd
+                #    w.wcs.cd = cd*scale
 
 
-            #header['CD1_1'] = header['CD1_1']*scale
-            #header['CD1_2'] = header['CD1_2']*scale
-            #header['CD2_1'] = header['CD2_1']*scale
-            #header['CD2_2'] = header['CD1_1']*scale
+                if WCSDATA.wcs.has_cd():
+                    cd = WCSDATA.wcs.cd
+                    w.wcs.cd = cd*scale
+                    w.wcs.cdelt = [np.sqrt(w.wcs.cd[0,0]*w.wcs.cd[0,0]+w.wcs.cd[1,0]*w.wcs.cd[1,0]), np.sqrt(w.wcs.cd[0,1]*w.wcs.cd[0,1]+w.wcs.cd[1,1]*w.wcs.cd[1,1])]
+                    w.wcs.pc = [[w.wcs.cd[0,0]/ w.wcs.cdelt[0], w.wcs.cd[0,1]/ w.wcs.cdelt[0]],[w.wcs.cd[1,0]/ w.wcs.cdelt[1], w.wcs.cd[1,1]/ w.wcs.cdelt[1]]]
+                elif WCSDATA.wcs.has_pc():
+                    w.wcs.pc = WCSDATA.wcs.pc
+                    cdelt = WCSDATA.wcs.cdelt
+                    print "cdelt"
+                    print cdelt
+                    print scale
+                    w.wcs.cdelt = cdelt*scale
+                    print w.wcs.cdelt
 
-            #pc = WCSDATA.wcs.get_pc()
-            #w.wcs.pc = pc*scale
-            #w.wcs.cdelt = [np.sqrt(w.wcs.cd[0,0]*w.wcs.cd[0,0]+w.wcs.cd[1,0]*w.wcs.cd[1,0]), np.sqrt(w.wcs.cd[0,1]*w.wcs.cd[0,1]+w.wcs.cd[1,1]*w.wcs.cd[1,1])]
-            #w.wcs.cdelt = [1, 1]
+                '''
 
-            #w.wcs.cd = [[w.wcs.pc[0,0]* w.wcs.cdelt[0], w.wcs.pc[0,1]* w.wcs.cdelt[0]],[w.wcs.pc[1,0]* w.wcs.cdelt[1], w.wcs.pc[1,1]* w.wcs.cdelt[1]]]
-            #log("cdelt: ")
-            #log(w.wcs.cdelt)
+                ra, dec = WCSDATA.wcs_pix2world(x+aw/2, SIZE[1]-y-ah/2, 0)
 
-            #log("cd")
-            #log(w.wcs.cd)
+                header = HEADER.copy()
 
-            #log("pc")
-            #log(w.wcs.pc)
+                header.set('CRVAL1', (float)(ra) )
+                header.set('CRVAL2', (float)(dec) )
+                header.set('CRPIX1', (float)(aw/scale/2) )
+                header.set('CRPIX2', (float)(ah/scale/2) )
+                if WCSDATA.wcs.has_cd():
+                    cd = WCSDATA.wcs.cd
+                    header.set('CD1_1', cd[0,0]*scale )
+                    header.set('CD1_2', cd[0,1]*scale )
+                    header.set('CD2_1', cd[1,0]*scale )
+                    header.set('CD2_2', cd[1,1]*scale )
+                elif WCSDATA.wcs.has_pc():
+                    pc = WCSDATA.wcs.get_pc()
+                    cdelt = WCSDATA.wcs.cdelt
+                    header.set('PC1_1', pc[0,0] )
+                    header.set('PC1_2', pc[0,1] )
+                    header.set('PC2_1', pc[1,0] )
+                    header.set('PC2_2', pc[1,1] )
+                    header.set('CDELT1', cdelt[0]*scale)
+                    header.set('CDELT2', cdelt[1]*scale)
 
-            #del w.wcs.pc
-            #del w.wcs.cdelt
 
-            #w.wcs.pc = [[0,0],[0,0]]
-            #w.wcs.cdelt = [0,0]
-            
-            #w.wcs.print_contents()
+                #header['CD1_1'] = header['CD1_1']*scale
+                #header['CD1_2'] = header['CD1_2']*scale
+                #header['CD2_1'] = header['CD2_1']*scale
+                #header['CD2_2'] = header['CD1_1']*scale
 
-            
-            #header = w.to_header(relax=True)
-            #header['OBJECT'] = OBJECT
+                #pc = WCSDATA.wcs.get_pc()
+                #w.wcs.pc = pc*scale
+                #w.wcs.cdelt = [np.sqrt(w.wcs.cd[0,0]*w.wcs.cd[0,0]+w.wcs.cd[1,0]*w.wcs.cd[1,0]), np.sqrt(w.wcs.cd[0,1]*w.wcs.cd[0,1]+w.wcs.cd[1,1]*w.wcs.cd[1,1])]
+                #w.wcs.cdelt = [1, 1]
 
-            #log("header wcs")
-            #log(header)
-            #hdu = fits.PrimaryHDU(newData)
-            #log("new file: %s" % (tilePath))
-            tilePathn = tilePath
-            tileFileNamen = tileFileName
-            n = 1
-            while os.path.exists(tilePathn):
-                tilePathn = "%s(%d)" % (tilePath, n)
-                tileFileNamen = "%s(%d)" % (tileFileName, n)
-                n = n+1
-            #hdu.writeto(tilePathn)
-            
-            if scale > 1.0:
-                fits.writeto(tilePathn, resizedata, header)
-            else:
-                fits.writeto(tilePathn, data, header)
-            
-            tileFileName = tileFileNamen
-            tilePath = tilePathn
+                #w.wcs.cd = [[w.wcs.pc[0,0]* w.wcs.cdelt[0], w.wcs.pc[0,1]* w.wcs.cdelt[0]],[w.wcs.pc[1,0]* w.wcs.cdelt[1], w.wcs.pc[1,1]* w.wcs.cdelt[1]]]
+                #log("cdelt: ")
+                #log(w.wcs.cdelt)
 
-            log("x: %d - y: %d - aw: %f - ah: %f - scale: %f" % (x , y, aw, ah , scale) )
+                #log("cd")
+                #log(w.wcs.cd)
+
+                #log("pc")
+                #log(w.wcs.pc)
+
+                #del w.wcs.pc
+                #del w.wcs.cdelt
+
+                #w.wcs.pc = [[0,0],[0,0]]
+                #w.wcs.cdelt = [0,0]
+                
+                #w.wcs.print_contents()
+
+                
+                #header = w.to_header(relax=True)
+                #header['OBJECT'] = OBJECT
+
+                #log("header wcs")
+                #log(header)
+                #hdu = fits.PrimaryHDU(newData)
+                #log("new file: %s" % (tilePath))
+                tilePathn = tilePath
+                tileFileNamen = tileFileName
+                n = 1
+                while os.path.exists(tilePathn) and NEWFILE:
+                    tilePathn = "%s(%d)" % (tilePath, n)
+                    tileFileNamen = "%s(%d)" % (tileFileName, n)
+                    n = n+1
+                #hdu.writeto(tilePathn)
+                
+                if scale > 1.0 and not os.path.exists(tilePathn):
+                    fits.writeto(tilePathn, resizedata, header)
+                elif not os.path.exists(tilePathn):
+                    fits.writeto(tilePathn, data, header)
+
+                
+                tileFileName = tileFileNamen
+                tilePath = tilePathn
+
+                log("x: %d - y: %d - aw: %f - ah: %f - scale: %f" % (x , y, aw, ah , scale) )
+
         else:
             ccl = "convert %s -crop %dx%d+%d+%d -quality 95 %s" % (SRC_PATH, aw, ah, x, y, tilePath)
             if USE_GRAPHICSMAGICK:
@@ -395,8 +406,10 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
     regionEL.set("id", "R%s-%s" % (ID_PREFIX, tileIDstr))
     objectEL = ET.SubElement(regionEL, "resource")
     if parentRegionID is None:
-        #regionEL.set("levels", "0;%d" % (levelCount-1+DL))
-        regionEL.set("levels", "0")
+        if BACKGROUND:
+            regionEL.set("levels", "0;%d" % (levelCount-1+DL))
+        else:
+            regionEL.set("levels", "0")
         # make sure lowest res tile, visible on each level, is always drawn below higher-res tiles
         objectEL.set("z-index", "0")
     else:
@@ -495,8 +508,9 @@ def processSrcImg():
             #print hdulist.header
 
             print hdulist[0].data
-            print hdulist[0].data.dtype
-            print hdulist[0].data.dtype.name
+
+            #print hdulist[0].data.dtype
+            #print hdulist[0].data.dtype.name
 
             if hdulist[0].header['NAXIS'] == 2:
                 src_sz = (hdulist[0].header['NAXIS1'], hdulist[0].header['NAXIS2'])
@@ -518,9 +532,13 @@ def processSrcImg():
 
             hdulist.close()
 
-            print im
-            print im.dtype
-            print im.dtype.name
+            #print im
+            #print im.dtype
+            #print im.dtype.name
+
+            if im.dtype.name == "float64":
+                log("Changed data type to float32")
+                im = im.astype(np.float32)
 
             minvalue = np.amin(im)
             maxvalue = np.amax(im)
@@ -597,21 +615,26 @@ def shrink(data, w, h, aw, ah):
                 log("IndexError:  i: %d - j: %d - idi: %d - idj: %d" % (i, j, idi, idj))
     return newdata
 
-
+nears = dict()
 
 def natural_neighbor(data, w, h, aw, ah):
     log("natural_neighbor")
     w2 = (int)(aw)
     h2 = (int)(ah)
     newdata = np.zeros((w2, h2), dtype=data.dtype )
-    scale = (w/w2 + h/h2)/2
+    scale = (int)((w/w2 + h/h2)/2)/2
     log("scale: %f" % (scale))
 
     for i in range(w2):
         for j in range(h2):
             idi = i * (w-1)/ w2
             idj = j * (h-1)/ h2
-            near = neighborhood(idi, idj, int(w), int(h), scale)
+            key = "%d,%d,%d,%d,%d" % (idi, idj, int(w), int(h), scale)
+            if nears.has_key(key):
+                near = nears[key]
+            else:
+                near = neighborhood(idi, idj, int(w), int(h), scale)
+                nears[key] = near
             value = 0
             for val in near:
                 value = value + data[ val[0], val[1] ] * val[2]
@@ -702,15 +725,20 @@ if len(sys.argv) > 2:
                 LAYER = str(arg[len("-layer="):])
             elif arg.startswith("-minvalue"):
                 MINVALUE = float(arg[len("-minvalue="):])
-            elif arg.startswith("-minvalue"):
+            elif arg.startswith("-maxvalue"):
                 MAXVALUE = float(arg[len("-maxvalue="):])
             elif arg.startswith("-onlyxml"):
                 ONLYXML = True
             elif arg.startswith("-shrink"):
                 NATURAL_NEIGBOR = False
+            elif arg.startswith("-notnewfile"):
+                NEWFILE = False
+            elif arg.startswith("-withoutbackground"):
+                BACKGROUND = False
             else:
                 log("Parameters incorrect");
                 log(CMD_LINE_HELP);
+		sys.exit(0);
             
 
 else:
