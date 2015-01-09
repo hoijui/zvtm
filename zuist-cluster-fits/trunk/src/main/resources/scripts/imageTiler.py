@@ -624,7 +624,7 @@ def natural_neighbor(data, w, h, aw, ah):
     newdata = np.zeros((w2, h2), dtype=data.dtype )
     scale = (int)((w/w2 + h/h2)/2)/2
     log("scale: %f" % (scale))
-    if MAX_NEIGBORHOOD > 0 and scale > MAX_NEIGBORHOOD
+    if MAX_NEIGBORHOOD > 0 and scale > MAX_NEIGBORHOOD:
         scale = MAX_NEIGBORHOOD
 
     for i in range(w2):
