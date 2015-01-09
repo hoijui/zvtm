@@ -85,7 +85,7 @@ CMD_LINE_HELP = "ZUIST Image Tiling Script\n\nUsage:\n\n" + \
     "\t-onlyxml \tcreate only xml from the tiles\n"+\
     "\t-shrink \tdefault use natural neighbor. change set to shrink\n"+\
     "\t-notnewfile \tif exist file, not create new file\n"+\
-    "\t-withoutbackground \tWithout the image of the level 0\n"
+    "\t-withbackground \tWithout the image of the level 0\n"
 
 
 TRACE_LEVEL = 1
@@ -130,8 +130,8 @@ USE_ASTROPY = False
 ONLYXML = False
 NATURAL_NEIGBOR = True
 NEWFILE = True
-BACKGROUND = True
-
+BACKGROUND = False
+MAX_NEIGBORHOOD = -1
 
 WCSDATA = ""
 OBJECT = ""
@@ -624,6 +624,8 @@ def natural_neighbor(data, w, h, aw, ah):
     newdata = np.zeros((w2, h2), dtype=data.dtype )
     scale = (int)((w/w2 + h/h2)/2)/2
     log("scale: %f" % (scale))
+    if MAX_NEIGBORHOOD > 0 and scale > MAX_NEIGBORHOOD
+        scale = MAX_NEIGBORHOOD
 
     for i in range(w2):
         for j in range(h2):
@@ -733,8 +735,10 @@ if len(sys.argv) > 2:
                 NATURAL_NEIGBOR = False
             elif arg.startswith("-notnewfile"):
                 NEWFILE = False
-            elif arg.startswith("-withoutbackground"):
-                BACKGROUND = False
+            elif arg.startswith("-withbackground"):
+                BACKGROUND = True
+            elif arg.startswith("-maxneighborhood"):
+                MAX_NEIGBORHOOD = int(arg[len("-maxneighborhood="):])
             else:
                 log("Parameters incorrect");
                 log(CMD_LINE_HELP);
