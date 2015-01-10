@@ -650,6 +650,7 @@ def natural_neighbor(data, w, h, aw, ah):
 
 def neighborhood(i, j, aw, ah, scale):
     ls = []
+    result = []
     for ii in range(int(i-scale), int(i+scale+1)):
         if ii >= 0 and ii < aw:
             for jj in range(int(j-scale), int(j+scale+1)):
@@ -667,7 +668,9 @@ def neighborhood(i, j, aw, ah, scale):
         sumfac = sumfac + l[2]
     for l in range(0, len(ls)):
         ls[l][2] = ls[l][2]/sumfac
-    return ls
+        if ls[l][2] > 0.01:
+            result.append(ls[l])
+    return result
 
 
 
