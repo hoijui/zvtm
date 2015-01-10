@@ -85,7 +85,8 @@ CMD_LINE_HELP = "ZUIST Image Tiling Script\n\nUsage:\n\n" + \
     "\t-onlyxml \tcreate only xml from the tiles\n"+\
     "\t-shrink \tdefault use natural neighbor. change set to shrink\n"+\
     "\t-notnewfile \tif exist file, not create new file\n"+\
-    "\t-withbackground \tWithout the image of the level 0\n"
+    "\t-withbackground\tWithout the image of the level 0\n"+\
+    "\t-maxneighborhood=N\tMaximum neighborhood\n"
 
 
 TRACE_LEVEL = 1
@@ -622,20 +623,20 @@ def natural_neighbor(data, w, h, aw, ah):
     w2 = (int)(aw)
     h2 = (int)(ah)
     newdata = np.zeros((w2, h2), dtype=data.dtype )
-    scale = (int)((w/w2 + h/h2)/2)/2
-    log("scale: %f" % (scale))
-    if MAX_NEIGBORHOOD > 0 and scale > MAX_NEIGBORHOOD:
-        scale = MAX_NEIGBORHOOD
+    scale = (int)((w/w2 + h/h2)/2)
+    numbrother = scale/2
+    if MAX_NEIGBORHOOD > 0 and numbrother > MAX_NEIGBORHOOD:
+        numbrother = MAX_NEIGBORHOOD
 
     for i in range(w2):
         for j in range(h2):
             idi = i * (w-1)/ w2
             idj = j * (h-1)/ h2
-            key = "%d,%d,%d,%d,%d" % (idi, idj, int(w), int(h), scale)
+            key = "%d,%d,%d,%d,%d" % (idi, idj, int(w), int(h), numbrother)
             if nears.has_key(key):
                 near = nears[key]
             else:
-                near = neighborhood(idi, idj, int(w), int(h), scale)
+                near = neighborhood(idi, idj, int(w), int(h), numbrother)
                 nears[key] = near
             value = 0
             for val in near:
@@ -659,7 +660,8 @@ def neighborhood(i, j, aw, ah, scale):
                     else:
                         factor = 1/distance
                     #print "(%i, %i) - distance = %f - factor = %f" % (ii, jj, distance, factor)
-                    ls.append([ii,jj,factor])
+                    if factor > 0.01:
+                        ls.append([ii,jj,factor])
     sumfac = 0
     for l in ls:
         sumfac = sumfac + l[2]
