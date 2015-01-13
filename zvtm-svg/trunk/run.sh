@@ -1,2 +1,2 @@
 #!/bin/sh
-java -jar target/zvtm-svg-0.2.1-SNAPSHOT.jar "$@"
+java -jar target/zvtm-svg-0.2.1.jar "$@"
