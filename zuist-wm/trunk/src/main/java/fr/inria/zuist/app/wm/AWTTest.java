@@ -96,7 +96,7 @@ public class AWTTest extends JFrame {
                     }
                 }
                 finally {
-                    featureCollection.close(fi);
+                    //featureCollection.close(fi);
                 }
                 countryBoundaries = new Polygon[awtPolygons.size()];
                 for (int h=0;h<awtPolygons.size();h++){
