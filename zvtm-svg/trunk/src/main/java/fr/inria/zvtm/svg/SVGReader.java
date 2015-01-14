@@ -885,8 +885,16 @@ public class SVGReader {
 		*@param ctx used to propagate contextual style information (put null if none)
 		*@param meta store metadata associated with this node (URL, title) in glyph's associated object
 		*/
+		
 	public static VText createText(Element e,Context ctx,boolean meta){
         String tx=(e.getFirstChild()==null) ? "" : e.getFirstChild().getNodeValue();
+		
+		NodeList nodes = e.getChildNodes();
+		for(int k = 0; k< nodes.getLength(); k++){
+			Node e2 = nodes.item(k);
+			tx += (e2.getFirstChild()==null) ? "" : e2.getFirstChild().getNodeValue();;
+		}
+		
         double x = Double.parseDouble(e.getAttribute(_x));
         double y = Double.parseDouble(e.getAttribute(_y));
         if (scale != 1.0) {
@@ -1189,6 +1197,7 @@ public class SVGReader {
         double y = Double.parseDouble(e.getAttribute(_y));
         double w = Double.parseDouble(e.getAttribute(_width));
         double h = Double.parseDouble(e.getAttribute(_height));
+		
         if (scale != 1.0) {
             x *= scale;
             y *= scale;
@@ -1199,14 +1208,19 @@ public class SVGReader {
         y += yoffset;
         VRectangleOr res;
         SVGStyle ss = ss = getStyle(e.getAttribute(_style), e);
+		
+		double xx = x+w/2;
+		double yy = -y-h/2;
+			
         if (ss != null){
+			
             if (ss.hasTransparencyInformation()){
-                if (ss.getFillColor()==null){res=new VRectangleOr(x+w,-y-h,0,w,h,Color.WHITE, Color.BLACK, 0, ss.getAlphaTransparencyValue());res.setFilled(false);}
-                else {res=new VRectangleOr(x+w,-y-h,0,w,h,ss.getFillColor(), Color.BLACK, 0, ss.getAlphaTransparencyValue());}
+                if (ss.getFillColor()==null){res=new VRectangleOr(xx,yy,0,w,h,Color.WHITE, Color.BLACK, 0, ss.getAlphaTransparencyValue());res.setFilled(false);}
+                else {res=new VRectangleOr(xx,yy,0,w,h,ss.getFillColor(), Color.BLACK, 0, ss.getAlphaTransparencyValue());}
             }
             else {
-                if (ss.getFillColor()==null){res=new VRectangleOr(x+w,-y-h,0,w,h,Color.WHITE, Color.BLACK, 0, 1.0f);res.setFilled(false);}
-                else {res=new VRectangleOr(x+w,-y-h,0,w,h,ss.getFillColor(), Color.BLACK, 0, 1.0f);}
+                if (ss.getFillColor()==null){res=new VRectangleOr(xx,yy,0,w,h,Color.WHITE, Color.BLACK, 0, 1.0f);res.setFilled(false);}
+                else {res=new VRectangleOr(xx,yy,0,w,h,ss.getFillColor(), Color.BLACK, 0, 1.0f);}
             }
             Color border=ss.getStrokeColor();
             if (border != null){
@@ -1222,12 +1236,12 @@ public class SVGReader {
         }
         else if (ctx!=null){
             if (ctx.hasTransparencyInformation()){
-                if (ctx.getFillColor()==null){res=new VRectangleOr(x+w,-y-h,0,w,h,Color.WHITE, Color.BLACK, 0, ctx.getAlphaTransparencyValue());res.setFilled(false);}
-                else {res=new VRectangleOr(x+w,-y-h,0,w,h,ctx.getFillColor(), Color.BLACK, 0, ctx.getAlphaTransparencyValue());}
+                if (ctx.getFillColor()==null){res=new VRectangleOr(xx,yy,0,w,h,Color.WHITE, Color.BLACK, 0, ctx.getAlphaTransparencyValue());res.setFilled(false);}
+                else {res=new VRectangleOr(xx,yy,0,w,h,ctx.getFillColor(), Color.BLACK, 0, ctx.getAlphaTransparencyValue());}
             }
             else {
-                if (ctx.getFillColor()==null){res=new VRectangleOr(x+w,-y-h,0,w,h,Color.WHITE, Color.BLACK, 0, 1.0f);res.setFilled(false);}
-                else {res=new VRectangleOr(x+w,-y-h,0,w,h,ctx.getFillColor(), Color.BLACK, 0, 1.0f);}
+                if (ctx.getFillColor()==null){res=new VRectangleOr(xx,yy,0,w,h,Color.WHITE, Color.BLACK, 0, 1.0f);res.setFilled(false);}
+                else {res=new VRectangleOr(xx,yy,0,w,h,ctx.getFillColor(), Color.BLACK, 0, 1.0f);}
             }
             Color border=ctx.getStrokeColor();
             if (border!=null){
@@ -1238,7 +1252,7 @@ public class SVGReader {
                 res.setDrawBorder(false);
             }
         }
-        else {res=new VRectangleOr(x+w,-y-h,0,w,h,Color.WHITE, Color.BLACK, 0, 1.0f);}
+        else {res=new VRectangleOr(xx,yy,0,w,h,Color.WHITE, Color.BLACK, 0, 1.0f);}
         if (meta){setMetadata(res,ctx);}
         if (e.hasAttribute(_class)){
             res.setType(e.getAttribute(_class));

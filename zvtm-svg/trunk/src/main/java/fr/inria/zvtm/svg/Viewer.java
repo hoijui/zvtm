@@ -37,10 +37,16 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
+import javax.swing.UIManager;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
 import java.io.FileOutputStream;
 import java.net.MalformedURLException;
 
@@ -128,6 +134,10 @@ public class Viewer {
         
     void initGUI(boolean fullscreen, boolean opengl, boolean antialiased){
         windowLayout();
+        
+        try{UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());}
+        catch(Exception ex){}
+        
         Glyph.setDefaultCursorInsideHighlightColor(Config.HIGHLIGHT_COLOR);
         vsm = VirtualSpaceManager.INSTANCE;
         ovm = new Overlay(this);
@@ -196,6 +206,14 @@ public class Viewer {
 	}
 	
 	void openFile(){
+		if(SCENE_FILE_DIR == null){
+			try{
+				FileInputStream file = new FileInputStream("config.txt");
+				ObjectInputStream reader = new ObjectInputStream(file);
+				SCENE_FILE_DIR = (File)reader.readObject();
+			}catch(Exception ex){ex.printStackTrace();}
+		}
+		
 		final JFileChooser fc = new JFileChooser(SCENE_FILE_DIR);
 		fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		fc.setDialogTitle("Find SVG File");
@@ -252,6 +270,16 @@ public class Viewer {
 	    SCENE_FILE_DIR = SCENE_FILE.getParentFile();
 	    mView.setTitle(Messages.mViewName + " - " + SCENE_FILE.getName());
         gp.setVisible(false);
+        
+        try{
+        	FileOutputStream file = new FileOutputStream("config.txt");
+			ObjectOutputStream writter = new ObjectOutputStream(file);
+			writter.writeObject(SCENE_FILE_DIR);
+			file.close();
+			writter.close();
+		}catch(Exception e){
+			e.printStackTrace();
+		}
     }
     
     /* --------------- SVG exporting ------------------*/
