@@ -310,6 +310,10 @@ public class VirtualSpace {
 
     /** Remove glyph g from this virtual space. ZVTM no longer holds a reference to it. View will be updated.
      * If the glyph was sticked to another glyph, a camera or a cursor, removing the glyph from virtual space unsticks it.
+     *@param g glyph to be removed
+     *@see #removeGlyph(Glyph g, boolean repaint)
+     *@see #removeGlyphs(Glyph[] gs)
+     *@see #removeGlyphs(Glyph[] gs, boolean repaint)
      */
     public void removeGlyph(Glyph g){
         removeGlyph(g, true);
@@ -317,7 +321,11 @@ public class VirtualSpace {
 
     /** Remove this glyph from this virtual space. ZVTM no longer holds a reference to it.
      * If the glyph was sticked to another glyph, a camera or a cursor, removing the glyph from virtual space unsticks it.
+     *@param g glyph to be removed
      *@param repaint should the view be updated automatically or not once the glyph has been removed. Default is true.
+     *@see #removeGlyphs(Glyph[] gs, boolean repaint)
+     *@see #removeGlyphs(Glyph[] gs)
+     *@see #removeGlyph(Glyph g)
      */
     public void removeGlyph(Glyph g, boolean repaint){
         try {
@@ -352,6 +360,14 @@ public class VirtualSpace {
         }
     }
 
+    /** Remove a set of glyphs from this virtual space. ZVTM no longer holds a reference to them.
+     * If the glyphs are sticked to other glyphs, cameras or cursors, removing the glyphs from virtual space unsticks them.
+     *@param gs glyphs to be removed
+     *@param repaint should the view be updated automatically or not once the glyphs have been removed. Default is true.
+     *@see #removeGlyph(Glyph g, boolean repaint)
+     *@see #removeGlyph(Glyph g)
+     *@see #removeGlyphs(Glyph[] gs)
+     */
     public void removeGlyphs(Glyph[] gs, boolean repaint){
         Glyph g;
         for (int i=0;i<gs.length;i++){
@@ -383,6 +399,13 @@ public class VirtualSpace {
         }
     }
 
+    /** Remove a set of glyphs from this virtual space. ZVTM no longer holds a reference to them.
+     * If the glyphs are sticked to other glyphs, cameras or cursors, removing the glyphs from virtual space unsticks them.
+     *@param gs glyphs to be removed
+     *@see #removeGlyph(Glyph g, boolean repaint)
+     *@see #removeGlyph(Glyph g)
+     *@see #removeGlyphs(Glyph[] gs, boolean repaint)
+     */
     public void removeGlyphs(Glyph[] gs){
         removeGlyphs(gs, true);
     }
