@@ -29,6 +29,9 @@ import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.RectangularShape;
 
 import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Vector;
 
@@ -349,6 +352,41 @@ public class VirtualSpace {
         }
     }
 
+    public void removeGlyphs(Glyph[] gs, boolean repaint){
+        Glyph g;
+        for (int i=0;i<gs.length;i++){
+            g = gs[i];
+            if (g.stickedTo != null){
+                if (g.stickedTo instanceof Glyph){((Glyph)g.stickedTo).unstick(g);}
+                else if (g.stickedTo instanceof Camera){((Camera)g.stickedTo).unstick(g);}
+                else {((VCursor)g.stickedTo).unstickGlyph(g);}
+            }
+            for (int j=0;j<camera2drawnList.length;j++){
+                if (camera2drawnList[j]!=null){
+                    //camera2drawnlist[i] can be null if camera i has been removed from the virtual space
+                    camera2drawnList[j].remove(g);
+                }
+            }
+            for (int k=0;k<cm.cameraList.length;k++){
+                if (cm.cameraList[k] != null && cm.cameraList[k].view != null){
+                    cm.cameraList[k].view.mouse.getPicker().removeGlyphFromList(g);
+                }
+            }
+            for (Picker p:externalPickers){
+                p.removeGlyphFromList(g);
+            }
+            visualEnts.remove(g);
+        }
+        removeGlyphsFromDrawingList(gs);
+        if (repaint){
+            VirtualSpaceManager.INSTANCE.repaint();
+        }
+    }
+
+    public void removeGlyphs(Glyph[] gs){
+        removeGlyphs(gs, true);
+    }
+
     /**show Glyph g
      * <br>- use show() and hide() to change both the visibility and sensitivity of glyphs
      * <br>- use Glyph.setVisible() to only change the glyph's visibility, but not its sensitivity.
@@ -636,6 +674,19 @@ public class VirtualSpace {
                 break;
             }
         }
+    }
+
+    protected synchronized void removeGlyphsFromDrawingList(final Glyph[] glyphs){
+        List<Glyph> dlist = new ArrayList<Glyph>(Arrays.asList(drawingList));
+        for (int i=0;i<glyphs.length;i++){
+            int j = dlist.indexOf(glyphs[i]);
+            if (j != -1){
+                drawingList[j] = null;
+            }
+        }
+        dlist = new ArrayList<Glyph>(Arrays.asList(drawingList));
+        dlist.removeAll(Collections.singleton(null));
+        drawingList = dlist.toArray(new Glyph[dlist.size()]);
     }
 
     protected synchronized int glyphIndexInDrawingList(Glyph g){
