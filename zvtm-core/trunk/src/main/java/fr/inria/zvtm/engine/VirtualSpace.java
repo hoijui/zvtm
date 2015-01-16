@@ -361,6 +361,7 @@ public class VirtualSpace {
     }
 
     /** Remove a set of glyphs from this virtual space. ZVTM no longer holds a reference to them.
+     * CAREFUL, THIS IS A NAIVE IMPLEMENTATION FOR NOW, THAT SEEMS TO BE SLOWER THAN ITERATING ON gs FROM OUTSIDE AND CALLING removeGlyph()
      * If the glyphs are sticked to other glyphs, cameras or cursors, removing the glyphs from virtual space unsticks them.
      *@param gs glyphs to be removed
      *@param repaint should the view be updated automatically or not once the glyphs have been removed. Default is true.
@@ -400,6 +401,7 @@ public class VirtualSpace {
     }
 
     /** Remove a set of glyphs from this virtual space. ZVTM no longer holds a reference to them.
+     * CAREFUL, THIS IS A NAIVE IMPLEMENTATION FOR NOW, THAT SEEMS TO BE SLOWER THAN ITERATING ON gs FROM OUTSIDE AND CALLING removeGlyph()
      * If the glyphs are sticked to other glyphs, cameras or cursors, removing the glyphs from virtual space unsticks them.
      *@param gs glyphs to be removed
      *@see #removeGlyph(Glyph g, boolean repaint)
