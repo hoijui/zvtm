@@ -702,16 +702,22 @@ public class VirtualSpace {
     }
 
     protected synchronized void removeGlyphsFromDrawingList(final Glyph[] glyphs){
-        List<Glyph> dlist = new ArrayList<Glyph>(Arrays.asList(drawingList));
-        for (int i=0;i<glyphs.length;i++){
-            int j = dlist.indexOf(glyphs[i]);
-            if (j != -1){
-                drawingList[j] = null;
+        // XXX: if not all glyphs could be found, then we'll have to fallback to a safer but less efficient version
+        Glyph[] newDrawingList = new Glyph[drawingList.length - glyphs.length];
+        int k = 0;
+        for (int i=0;i<drawingList.length;i++){
+            boolean remove = false;
+            for (int j=0;j<glyphs.length;j++){
+                if (drawingList[i] == glyphs[j]){
+                    remove = true;
+                    break;
+                }
+            }
+            if (!remove){
+                newDrawingList[k++] = drawingList[i];
             }
         }
-        dlist = new ArrayList<Glyph>(Arrays.asList(drawingList));
-        dlist.removeAll(Collections.singleton(null));
-        drawingList = dlist.toArray(new Glyph[dlist.size()]);
+        drawingList = newDrawingList;
     }
 
     protected synchronized int glyphIndexInDrawingList(Glyph g){
