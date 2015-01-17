@@ -702,9 +702,9 @@ public class VirtualSpace {
     }
 
     protected synchronized void removeGlyphsFromDrawingList(final Glyph[] glyphs){
-        // XXX: if not all glyphs could be found, then we'll have to fallback to a safer but less efficient version
         Glyph[] newDrawingList = new Glyph[drawingList.length - glyphs.length];
         int k = 0;
+        boolean success = true;
         for (int i=0;i<drawingList.length;i++){
             boolean remove = false;
             for (int j=0;j<glyphs.length;j++){
@@ -714,7 +714,19 @@ public class VirtualSpace {
                 }
             }
             if (!remove){
-                newDrawingList[k++] = drawingList[i];
+                if (k < newDrawingList.length){
+                    newDrawingList[k++] = drawingList[i];
+                }
+                else {
+                    // The new drawing list might not be of the right size.
+                    // If some glyphs are in the virtual space but hidden with VirtualSpace.hide().
+                    // In that case we fall back to a less efficient method, but that should
+                    // still be more efficient than iterative calls to VirtualSpace.removeGlyph().
+                    Glyph[] largerDrawingList = new Glyph[newDrawingList.length+1];
+                    System.arraycopy(newDrawingList, 0, largerDrawingList, 0, newDrawingList.length);
+                    largerDrawingList[newDrawingList.length] = drawingList[i];
+                    newDrawingList = largerDrawingList;
+                }
             }
         }
         drawingList = newDrawingList;
