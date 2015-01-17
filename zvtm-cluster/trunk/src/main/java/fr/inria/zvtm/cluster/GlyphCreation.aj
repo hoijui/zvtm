@@ -74,6 +74,12 @@ public aspect GlyphCreation {
         && args(glyph, ..)
         && this(virtualSpace);
 
+    pointcut glyphsRemove(Glyph[] glyphs, boolean repaint, VirtualSpace virtualSpace):
+        execution(public void VirtualSpace.removeGlyphs(Glyph[], boolean))
+        && if(VirtualSpaceManager.INSTANCE.isMaster())
+        && args(glyphs, repaint)
+        && this(virtualSpace);
+
     before(Glyph glyph, VirtualSpace virtualSpace):
         glyphAdd(glyph, virtualSpace){
             if(glyph == null){
@@ -90,6 +96,16 @@ public aspect GlyphCreation {
             }
             for(Glyph glyph: glyphs){
                 virtualSpace.addGlyph(glyph, repaint);
+            }
+        }
+
+    void around(Glyph[] glyphs, boolean repaint, VirtualSpace virtualSpace):
+        glyphsRemove(glyphs, repaint, virtualSpace){
+            if(glyphs == null){
+                return;
+            }
+            for(Glyph glyph: glyphs){
+                virtualSpace.removeGlyph(glyph, repaint);
             }
         }
 
