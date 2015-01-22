@@ -3,8 +3,8 @@
 $Id: pom.xml 2405 2009-09-25 09:07:33Z epietrig $
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>fr.inria.zvtm</groupId>
@@ -28,7 +28,7 @@ $Id: pom.xml 2405 2009-09-25 09:07:33Z epietrig $
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
-  
+
   <!-- Repositories -->
   <repositories>
 	<repository>
@@ -56,7 +56,7 @@ $Id: pom.xml 2405 2009-09-25 09:07:33Z epietrig $
       <url>scp://shell.sourceforge.net/home/project-web/zvtm/htdocs/maven</url>
     </repository>
   </distributionManagement>
-  
+
   <profiles>
     <profile>
       <id>osx</id>
@@ -116,12 +116,12 @@ $Id: pom.xml 2405 2009-09-25 09:07:33Z epietrig $
            <version>2.2</version>
         </extension>
       </extensions>
-    <resources> 
+    <resources>
   	  <resource>
-          <directory>src/main/resources</directory> 
-            <excludes> 
+          <directory>src/main/resources</directory>
+            <excludes>
   		    <exclude>test.jpg</exclude>
-  		</excludes> 
+  		</excludes>
         </resource>
   	</resources>
     <plugins>
@@ -164,7 +164,7 @@ $Id: pom.xml 2405 2009-09-25 09:07:33Z epietrig $
 		    </execution>
 		  </executions>
 		</plugin>
-	
+
     <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>dependency-maven-plugin</artifactId>
@@ -187,8 +187,8 @@ $Id: pom.xml 2405 2009-09-25 09:07:33Z epietrig $
         <artifactId>maven-compiler-plugin</artifactId>
     	<version>2.3.2</version>
         <configuration>
-          <source>1.5</source>
-          <target>1.5</target>
+          <source>1.6</source>
+          <target>1.6</target>
           <showDeprecation>true</showDeprecation>
         </configuration>
       </plugin>
@@ -230,5 +230,5 @@ $Id: pom.xml 2405 2009-09-25 09:07:33Z epietrig $
       </plugin>
     </plugins>
   </build>
-  
+
 </project>
