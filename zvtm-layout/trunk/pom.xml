@@ -3,8 +3,8 @@
 $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>fr.inria.zvtm</groupId>
@@ -40,7 +40,7 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
       <url>http://repo1.maven.org/maven2</url>
     </repository>
   </repositories>
-  
+
   <!-- Distribution - Deploy to FTP -->
   <distributionManagement>
 	<repository>
@@ -48,7 +48,7 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
       <url>scp://shell.sourceforge.net/home/project-web/zvtm/htdocs/maven</url>
     </repository>
   </distributionManagement>
-  
+
   <!-- Dependencies -->
   <dependencies>
 	<dependency>
@@ -77,7 +77,7 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
       <version>2.0.1</version>
     </dependency>
   </dependencies>
-  
+
   <!-- Build -->
   <build>
       <extensions>
@@ -110,8 +110,8 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
         <artifactId>maven-compiler-plugin</artifactId>
     	<version>2.3.2</version>
         <configuration>
-          <source>1.5</source>
-          <target>1.5</target>
+          <source>1.6</source>
+          <target>1.6</target>
         </configuration>
       </plugin>
       <plugin>
@@ -149,7 +149,7 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
           <aggregate>true</aggregate>
           <doctitle><![CDATA[<h1>ZVTM API documentation</h1>]]></doctitle>
           <bottom><![CDATA[Copyright &#169; 2007-2011 INRIA. All Rights Reserved<br />Licensed under the GNU LGPL. For full terms see the file COPYING.</i>]]></bottom>
-          <links> 
+          <links>
             <link>http://java.sun.com/j2se/1.5.0/docs/api</link>
             <link>http://zvtm.sourceforge.net/apidocs</link>
             <link>http://jung.sourceforge.net/doc/api</link>
