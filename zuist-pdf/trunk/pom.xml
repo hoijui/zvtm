@@ -3,8 +3,8 @@
 $Id: pom.xml 2427 2009-09-29 07:29:08Z epietrig $
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>fr.inria.zvtm</groupId>
@@ -29,7 +29,7 @@ $Id: pom.xml 2427 2009-09-29 07:29:08Z epietrig $
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	<icepdfVersion>4.2.0</icepdfVersion>
   </properties>
-  
+
   <!-- Repositories -->
   <repositories>
 	<repository>
@@ -42,7 +42,7 @@ $Id: pom.xml 2427 2009-09-29 07:29:08Z epietrig $
       <url>http://repo1.maven.org/maven2</url>
     </repository>
   </repositories>
-  
+
   <!-- Distribution - Deploy to FTP -->
   <distributionManagement>
 	<repository>
@@ -50,7 +50,7 @@ $Id: pom.xml 2427 2009-09-29 07:29:08Z epietrig $
       <url>scp://shell.sourceforge.net/home/project-web/zvtm/htdocs/maven</url>
     </repository>
   </distributionManagement>
-  
+
   <!-- Dependencies -->
   <dependencies>
 	<dependency>
@@ -70,10 +70,10 @@ $Id: pom.xml 2427 2009-09-29 07:29:08Z epietrig $
 		ICEpdf Pro is not available in any Maven repository for now.
 		Get icepdf-pro*.jar from http://www.icepdf.org/downloads.html
 		Install the JAR files in your local repository using the following command line:
-	        mvn install:install-file -Dfile=icepdf-pro.jar -DgroupId=org.icepdf -DartifactId=icepdf-pro -Dversion=4.2.0 -Dpackaging=jar	
-	        mvn install:install-file -Dfile=icepdf-pro-intl.jar -DgroupId=org.icepdf -DartifactId=icepdf-pro-intl -Dversion=4.2.0 -Dpackaging=jar	
+	        mvn install:install-file -Dfile=icepdf-pro.jar -DgroupId=org.icepdf -DartifactId=icepdf-pro -Dversion=4.2.0 -Dpackaging=jar
+	        mvn install:install-file -Dfile=icepdf-pro-intl.jar -DgroupId=org.icepdf -DartifactId=icepdf-pro-intl -Dversion=4.2.0 -Dpackaging=jar
 	-->
-	
+
 	<!--
 	<dependency>
 		<groupId>org.icepdf</groupId>
@@ -86,18 +86,13 @@ $Id: pom.xml 2427 2009-09-29 07:29:08Z epietrig $
 		<version>${icepdfVersion}</version>
 	</dependency>
     -->
-	
+
 	<dependency>
 	  <groupId>net.sf.ehcache</groupId>
 	  <artifactId>ehcache-core</artifactId>
 	  <version>2.4.7</version>
 	</dependency>
-	<dependency>
-	  <groupId>org.slf4j</groupId>
-	  <artifactId>slf4j-simple</artifactId>
-	  <version>1.6.1</version>
-	</dependency>
-  
+
 </dependencies>
 
   <!-- Build -->
@@ -109,13 +104,13 @@ $Id: pom.xml 2427 2009-09-29 07:29:08Z epietrig $
            <version>2.2</version>
         </extension>
       </extensions>
-	<resources> 
+	<resources>
 	  <resource>
-        <directory>src/main/resources</directory> 
-          <excludes> 
+        <directory>src/main/resources</directory>
+          <excludes>
 		    <exclude>images/*.ai</exclude>
 		    <exclude>images/cprogress/**</exclude>
-		</excludes> 
+		</excludes>
       </resource>
 	</resources>
     <plugins>
@@ -141,8 +136,8 @@ $Id: pom.xml 2427 2009-09-29 07:29:08Z epietrig $
         <artifactId>maven-compiler-plugin</artifactId>
     	<version>2.3.2</version>
         <configuration>
-          <source>1.5</source>
-          <target>1.5</target>
+          <source>1.6</source>
+          <target>1.6</target>
 		  <showDeprecation>true</showDeprecation>
         </configuration>
       </plugin>
@@ -182,7 +177,7 @@ $Id: pom.xml 2427 2009-09-29 07:29:08Z epietrig $
           <overview>${basedir}/overview.html</overview>
           <doctitle><![CDATA[<h1>ZUIST API documentation</h1>]]></doctitle>
           <bottom><![CDATA[<i>Copyright &#169; 2007-2010 INRIA. All Rights Reserved<br />Licensed under the GNU LGPL. For full terms see the file COPYING.</i>]]></bottom>
-          <links> 
+          <links>
             <link>http://java.sun.com/j2se/1.5.0/docs/api</link>
             <link>http://zvtm.sourceforge.net/apidocs</link>
           </links>
