@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" 
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>fr.inria.zvtm</groupId>
@@ -135,7 +135,7 @@
                   <aggregate>true</aggregate>
                   <doctitle><![CDATA[<h1>ZVTM API documentation</h1>]]></doctitle>
                   <bottom><![CDATA[Copyright &#169; 2009-2011 INRIA. All Rights Reserved<br />Licensed under the GNU LGPL. For full terms see the file COPYING.</i>]]></bottom>
-              <links> 
+              <links>
                   <link>http://java.sun.com/j2se/1.5.0/docs/api</link>
                   <link>http://zvtm.sourceforge.net/apidocs</link>
               </links>
