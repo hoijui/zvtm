@@ -129,8 +129,8 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
         <artifactId>maven-compiler-plugin</artifactId>
     	<version>2.3.2</version>
         <configuration>
-          <source>1.5</source>
-          <target>1.5</target>
+          <source>1.6</source>
+          <target>1.6</target>
         </configuration>
       </plugin>
       <plugin>
