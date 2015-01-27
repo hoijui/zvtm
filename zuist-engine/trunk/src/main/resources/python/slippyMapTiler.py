@@ -14,10 +14,12 @@ from copy import copy
 import xml.etree.ElementTree as ET
 
 CMD_LINE_HELP = "Slippy Map Tiling Script\n\nUsage:\n\n" + \
-    " \tslippyMapTiler <TMS_URL> <target_dir> [options]\n\n" + \
+    " \tslippyMapTiler <target_dir> [options]\n\n" + \
     "Options:\n\n"+\
     "\t-ts=N\t\ttile size (N in pixels)\n"+\
+    "\t-ext=<ext>\t\t<ext> one of {png,jpg}\n"+\
     "\t-mzl=N\t\tmaximum zoom level (N in [0,19])\n"+\
+    "\t-im=<i>\t\t<i> one of {bilinear,bicubic,nearestNeighbor}\n"+\
     "\t-tl=N\t\ttrace level (N in [0:2])\n"
 
 TRACE_LEVEL = 1
@@ -27,7 +29,9 @@ MAX_ZOOM_LEVEL = 3
 
 TMS_URL_PREFIX = "http://a.tile.openstreetmap.org/"
 
-OUTPUT_FILE_EXT = "png"
+TILE_EXT = "png"
+
+INTERPOLATION = "bilinear"
 
 # camera focal distance
 F = 100.0
@@ -38,6 +42,7 @@ MAX_ALT = "100000"
 TILE_FILE_PREFIX = "t-"
 
 PROGRESS = 0
+
 
 ################################################################################
 # TMS URL getter/setter
@@ -90,12 +95,55 @@ def generateTree():
     outputroot = ET.Element("scene")
     # source image
     levelCount = generateLevels(MAX_ZOOM_LEVEL, outputroot)
-    log("TMS URL prefix: "+getTMSURL())
-    #########buildTiles([0 for i in range(int(levelCount))], TL, 0, levelCount, 0, 0, src_sz, outputroot, im, None)
+    log("TMS URL prefix: %s" % getTMSURL(), 1)
+    log("Interpolation method: %s" % INTERPOLATION)
+    ox = -int(math.pow(2,levelCount-1)) * TILE_SIZE / 2
+    oy = int(math.pow(2,levelCount-1)) * TILE_SIZE / 2
+    for l in range(levelCount):
+        buildRegionsAtLevel(l, levelCount, outputroot, ox, oy)
     # serialize the XML tree
     tree = ET.ElementTree(outputroot)
     log("Writing %s" % outputSceneFile)
     tree.write(outputSceneFile, encoding='utf-8')
+
+
+def buildRegionsAtLevel(level, levelCount, rootEL, ox, oy):
+    tcal = int(math.pow(2,level)) # tile count at level
+    sf = int(math.pow(2,levelCount-level-1)) # tile scale factor
+    log("level: %d, tile count: %dx%d, tile scale factor: %d" % (level, tcal, tcal, sf), 2)
+    for x in range(tcal):
+        for y in range(tcal):
+            regionEL = ET.SubElement(rootEL, "region")
+            tileID = "%d-%d-%d" % (level, x, y)
+            regionID = "R%s" % tileID
+            regionEL.set("id", regionID)
+            objectEL = ET.SubElement(regionEL, "resource")
+            objectEL.set("id", "T%s" % tileID)
+            objectEL.set("type", "img")
+            objectEL.set("sensitive", "false")
+            objectEL.set("src", "%s%d/%d/%d.%s" % (getTMSURL(),level,x,y,TILE_EXT))
+            objectEL.set("z-index", str(level))
+            objectEL.set("params", "im=%s" % INTERPOLATION)
+            awh = int(sf*TILE_SIZE)
+            vx = ox + x*awh + awh/2
+            vy = oy - y*awh - awh/2
+            vw = awh
+            vh = awh
+            regionEL.set("x", str(int(vx)))
+            regionEL.set("y", str(int(vy)))
+            regionEL.set("w", str(int(vw)))
+            regionEL.set("h", str(int(vh)))
+            objectEL.set("x", str(int(vx)))
+            objectEL.set("y", str(int(vy)))
+            objectEL.set("w", str(int(vw)))
+            objectEL.set("h", str(int(vh)))
+            if level == 0:
+                regionEL.set("levels", "0;%d" % (levelCount-1))
+            else:
+                parentTileID = "R%d-%d-%d" % (level-1,x/2,y/2)
+                regionEL.set("containedIn", parentTileID)
+                regionEL.set("levels", str(level))
+    return
 
 ################################################################################
 # Trace exec on std output
@@ -107,24 +155,30 @@ def log(msg, level=0):
 ################################################################################
 # main
 ################################################################################
-if len(sys.argv) > 1:
+if len(sys.argv) > 1 and not sys.argv[1].startswith("-"):
     TGT_DIR = os.path.realpath(sys.argv[1])
     if len(sys.argv) > 2:
         for arg in sys.argv[2:]:
             if arg.startswith("-ts="):
                 TILE_SIZE = int(arg[4:])
             elif arg.startswith("-url="):
-                TMS_URL = arg[5:]
+                setTMSURL(arg[5:])
             elif arg.startswith("-mzl="):
                 MAX_ZOOM_LEVEL = int(arg[5:])
+            elif arg.startswith("-ext="):
+                TILE_EXT = arg[5:]
+            elif arg.startswith("-im="):
+                INTERPOLATION = arg[4:]
             elif arg.startswith("-tl="):
                 TRACE_LEVEL = int(arg[4:])
+            elif arg.startswith("-h"):
+                log(CMD_LINE_HELP)
+                sys.exit(0)
 else:
     log(CMD_LINE_HELP)
     sys.exit(0)
 
 log("Tile Size: %dx%d" % (TILE_SIZE, TILE_SIZE), 1)
-setTMSURL(TMS_URL)
 createTargetDir()
 generateTree()
 log("--------------------")
