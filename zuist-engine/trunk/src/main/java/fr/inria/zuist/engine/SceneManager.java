@@ -378,8 +378,7 @@ public class SceneManager implements CameraListener {
     }
 
     public int getPendingRequestQueueSize(){
-        //return glyphLoader.requestQueue.size();
-        return 0; //XXX fix or drop the method
+        return glyphLoader.getPendingRequestQueueSize();
     }
 
     public void setObjectListener(ObjectListener ol){

@@ -36,6 +36,10 @@ class GlyphLoader {
         tasks = new ConcurrentHashMap<ObjectDescription, LoadAction>();
     }
 
+    int getPendingRequestQueueSize(){
+        return tasks.size();
+    }
+
     /** Add a request to load an object in the queue.
      *@param od description of object to be loaded.
      *@param transition one of Region.{APPEAR,FADE_IN}
