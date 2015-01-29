@@ -17,7 +17,7 @@ CMD_LINE_HELP = "Slippy Map Tiling Script\n\nUsage:\n\n" + \
     " \tslippyMapTiler <target_dir> [options]\n\n" + \
     "Options:\n\n"+\
     "\t-ts=N\t\ttile size (N in pixels)\n"+\
-    "\t-ext=<ext>\t\t<ext> one of {png,jpg}\n"+\
+    "\t-ext=<ext>\t<ext> one of {png,jpg}\n"+\
     "\t-mzl=N\t\tmaximum zoom level (N in [0,19])\n"+\
     "\t-im=<i>\t\t<i> one of {bilinear,bicubic,nearestNeighbor}\n"+\
     "\t-tl=N\t\ttrace level (N in [0:2])\n"
@@ -55,7 +55,7 @@ def setTMSURL(url_p):
 
 def getTMSURL():
     #return "http://tile.stamen.com/watercolor/"
-    #return "http://tile.stamen.com/terrain"
+    #return "http://tile.stamen.com/terrain/"
     #return "http://tile.stamen.com/terrain-background/"
     #return "http://tile.stamen.com/toner/"
     #return "http://otile%d.mqcdn.com/tiles/1.0.0/sat/" % math.ceil(random.random()*4)
