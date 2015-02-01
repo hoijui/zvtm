@@ -54,13 +54,16 @@ def setTMSURL(url_p):
         TMS_URL_PREFIX = "%s/" % url_p
 
 def getTMSURL():
+    ### http://homepage.ntlworld.com/keir.clarke/leaflet/leafletlayers.htm
+    ###
+    #return "http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/"
     #return "http://tile.stamen.com/watercolor/"
-    #return "http://tile.stamen.com/terrain/"
+    return "http://tile.stamen.com/terrain/"  ## {a,b,c,d}.tile.stamen.com/...
     #return "http://tile.stamen.com/terrain-background/"
     #return "http://tile.stamen.com/toner/"
     #return "http://otile%d.mqcdn.com/tiles/1.0.0/sat/" % math.ceil(random.random()*4)
     #return "http://otile%d.mqcdn.com/tiles/1.0.0/osm/" % math.ceil(random.random()*4)
-    return TMS_URL_PREFIX
+    #return TMS_URL_PREFIX
 
 ################################################################################
 # Create target directory if it does not exist yet
