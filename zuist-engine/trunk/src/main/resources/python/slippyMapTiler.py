@@ -19,13 +19,19 @@ CMD_LINE_HELP = "Slippy Map Tiling Script\n\nUsage:\n\n" + \
     "\t-ts=N\t\ttile size (N in pixels)\n"+\
     "\t-ext=<ext>\t<ext> one of {png,jpg}\n"+\
     "\t-mzl=N\t\tmaximum zoom level (N in [0,19])\n"+\
+    "\t-xy\t\tinvert x and y in slippy tile URL coordinates system\n"+\
     "\t-im=<i>\t\t<i> one of {bilinear,bicubic,nearestNeighbor}\n"+\
     "\t-tl=N\t\ttrace level (N in [0:2])\n"
 
 TRACE_LEVEL = 1
 
 TILE_SIZE = 256
-MAX_ZOOM_LEVEL = 3
+
+# browse http://www.maptiler.org/google-maps-coordinates-tile-bounds-projection/
+# to find the coordinates of your root tile
+# use Zoom Z and Google: (X,Y)
+ZOOM_DEPTH = 3
+ROOT_TILE = (0,0,0) # zoom 0, x 0, y 0
 
 INVERT_X_Y = False
 
@@ -41,8 +47,6 @@ MAX_ALT = "100000"
 # prefix for image tile files
 TILE_FILE_PREFIX = "t-"
 
-PROGRESS = 0
-
 TILE_SERVER_LETTER_PREFIXES = ["a", "b", "c", "d"]
 
 ################################################################################
@@ -51,7 +55,7 @@ TILE_SERVER_LETTER_PREFIXES = ["a", "b", "c", "d"]
 
 def getTMSURL():
     ### OSM
-    return "http://%s.tile.openstreetmap.org/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*3))]
+    #return "http://%s.tile.openstreetmap.org/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*3))]
     ### ArcGIS orthoimagery, use with -yx
     #return "http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/"
     ### Stamen maps
@@ -62,6 +66,8 @@ def getTMSURL():
     ### Mapquest
     #return "http://otile%d.mqcdn.com/tiles/1.0.0/sat/" % math.ceil(random.random()*4)
     #return "http://otile%d.mqcdn.com/tiles/1.0.0/osm/" % math.ceil(random.random()*4)
+    ### Mapbox
+    return "http://%s.tiles.mapbox.com/v3/examples.xqwfusor/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*4))]
     ### More examples at http://homepage.ntlworld.com/keir.clarke/leaflet/leafletlayers.htm
 
 ################################################################################
@@ -73,46 +79,49 @@ def createTargetDir():
         os.mkdir(TGT_DIR)
 
 ################################################################################
-# Count number of levels in ZUIST scene
-# (source image size from PIL, parent XML element)
+# Generate levels for ZUIST scene
+# (root level, depth, zuist level offset, parent XML element)
 ################################################################################
-def generateLevels(mzl, rootEL):
-    # number of levels
-    res = mzl + 1
+def generateLevels(lroot, ldepth, zloffset, rootEL):
+    res = ldepth
     log("Will generate %d level(s)" % res, 2)
     # generate ZUIST levels
-    altitudes = [0,]
-    for i in range(int(res)):
-        depth = int(res-i-1)
-        altitudes.append(int(F*math.pow(2,i+1)-F))
+    altitudes = [str(int(F*math.pow(2,zloffset)-F)),]
+    for i in range(zloffset, zloffset+res):
+        depth = res-i-1
+        altitudes.append(str(int(F*math.pow(2,i+1)-F)))
         level = ET.SubElement(rootEL, "level")
         level.set("depth", str(depth))
-        level.set("floor", str(altitudes[-2]))
-        level.set("ceiling", str(altitudes[-1]))
+        level.set("floor", altitudes[-2])
+        level.set("ceiling", altitudes[-1])
+    log("Altitudes: %s" % ", ".join(altitudes), 3)
     return res
 
 ################################################################################
 # Create tiles and ZUIST XML scene from source image
+# root tile (z,x,y), zoom depth
 ################################################################################
-def generateTree():
+def generateTree(rt, zd):
     outputSceneFile = "%s/scene.xml" % TGT_DIR
     # prepare the XML scene
     outputroot = ET.Element("scene")
     # source image
-    levelCount = generateLevels(MAX_ZOOM_LEVEL, outputroot)
+    levelCount = generateLevels(rt[0], zd, 0, outputroot)
     log("TMS URL prefix: %s" % getTMSURL(), 1)
     log("Interpolation method: %s" % INTERPOLATION)
     ox = -int(math.pow(2,levelCount-1)) * TILE_SIZE / 2
     oy = int(math.pow(2,levelCount-1)) * TILE_SIZE / 2
     for l in range(levelCount):
-        buildRegionsAtLevel(l, levelCount, outputroot, ox, oy)
+        buildRegionsAtLevel(rt, l, levelCount, outputroot, ox, oy)
     # serialize the XML tree
     tree = ET.ElementTree(outputroot)
     log("Writing %s" % outputSceneFile)
     tree.write(outputSceneFile, encoding='utf-8')
 
-
-def buildRegionsAtLevel(level, levelCount, rootEL, ox, oy):
+################################################################################
+# Build all regions/tiles for a given zoom level
+################################################################################
+def buildRegionsAtLevel(rt, level, levelCount, rootEL, ox, oy):
     tcal = int(math.pow(2,level)) # tile count at level
     sf = int(math.pow(2,levelCount-level-1)) # tile scale factor
     log("level: %d, tile count: %dx%d, tile scale factor: %d" % (level, tcal, tcal, sf), 2)
@@ -127,9 +136,9 @@ def buildRegionsAtLevel(level, levelCount, rootEL, ox, oy):
             objectEL.set("type", "img")
             objectEL.set("sensitive", "false")
             if INVERT_X_Y:
-                objectEL.set("src", "%s%d/%d/%d.%s" % (getTMSURL(),level,y,x,TILE_EXT))
+                objectEL.set("src", "%s%d/%d/%d.%s" % (getTMSURL(),level+rt[0],y+tcal*rt[2],x+tcal*rt[1],TILE_EXT))
             else:
-                objectEL.set("src", "%s%d/%d/%d.%s" % (getTMSURL(),level,x,y,TILE_EXT))
+                objectEL.set("src", "%s%d/%d/%d.%s" % (getTMSURL(),level+rt[0],x+tcal*rt[1],y+tcal*rt[2],TILE_EXT))
             objectEL.set("z-index", str(level))
             objectEL.set("params", "im=%s" % INTERPOLATION)
             awh = int(sf*TILE_SIZE)
@@ -169,10 +178,11 @@ if len(sys.argv) > 1 and not sys.argv[1].startswith("-"):
         for arg in sys.argv[2:]:
             if arg.startswith("-ts="):
                 TILE_SIZE = int(arg[4:])
-            elif arg.startswith("-url="):
-                setTMSURL(arg[5:])
-            elif arg.startswith("-mzl="):
-                MAX_ZOOM_LEVEL = int(arg[5:])
+            elif arg.startswith("-zd="):
+                ZOOM_DEPTH = int(arg[4:])
+            elif arg.startswith("-rt="):
+                tokens = arg[4:].split("-")
+                ROOT_TILE = (int(tokens[0]), int(tokens[1]), int(tokens[2]))
             elif arg.startswith("-ext="):
                 TILE_EXT = arg[5:]
             elif arg.startswith("-im="):
@@ -190,5 +200,5 @@ else:
 
 log("Tile Size: %dx%d" % (TILE_SIZE, TILE_SIZE), 1)
 createTargetDir()
-generateTree()
+generateTree(ROOT_TILE, ZOOM_DEPTH)
 log("--------------------")
