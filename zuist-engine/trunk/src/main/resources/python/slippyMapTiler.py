@@ -27,7 +27,7 @@ TRACE_LEVEL = 1
 TILE_SIZE = 256
 MAX_ZOOM_LEVEL = 3
 
-TMS_URL_PREFIX = "http://a.tile.openstreetmap.org/"
+INVERT_X_Y = False
 
 TILE_EXT = "png"
 
@@ -43,27 +43,26 @@ TILE_FILE_PREFIX = "t-"
 
 PROGRESS = 0
 
+TILE_SERVER_LETTER_PREFIXES = ["a", "b", "c", "d"]
 
 ################################################################################
-# TMS URL getter/setter
+# TMS URL
 ################################################################################
-def setTMSURL(url_p):
-    if (url_p.endswith("/")):
-        TMS_URL_PREFIX = url_p
-    else:
-        TMS_URL_PREFIX = "%s/" % url_p
 
 def getTMSURL():
-    ### http://homepage.ntlworld.com/keir.clarke/leaflet/leafletlayers.htm
-    ###
+    ### OSM
+    return "http://%s.tile.openstreetmap.org/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*3))]
+    ### ArcGIS orthoimagery, use with -yx
     #return "http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/"
-    #return "http://tile.stamen.com/watercolor/"
-    return "http://tile.stamen.com/terrain/"  ## {a,b,c,d}.tile.stamen.com/...
-    #return "http://tile.stamen.com/terrain-background/"
-    #return "http://tile.stamen.com/toner/"
+    ### Stamen maps
+    #return "http://%s.tile.stamen.com/watercolor/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*4))]
+    #return "http://%s.tile.stamen.com/terrain/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*4))]
+    #return "http://%s.tile.stamen.com/terrain-background/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*4))]
+    #return "http://%s.tile.stamen.com/toner/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*4))]
+    ### Mapquest
     #return "http://otile%d.mqcdn.com/tiles/1.0.0/sat/" % math.ceil(random.random()*4)
     #return "http://otile%d.mqcdn.com/tiles/1.0.0/osm/" % math.ceil(random.random()*4)
-    #return TMS_URL_PREFIX
+    ### More examples at http://homepage.ntlworld.com/keir.clarke/leaflet/leafletlayers.htm
 
 ################################################################################
 # Create target directory if it does not exist yet
@@ -127,7 +126,10 @@ def buildRegionsAtLevel(level, levelCount, rootEL, ox, oy):
             objectEL.set("id", "T%s" % tileID)
             objectEL.set("type", "img")
             objectEL.set("sensitive", "false")
-            objectEL.set("src", "%s%d/%d/%d.%s" % (getTMSURL(),level,x,y,TILE_EXT))
+            if INVERT_X_Y:
+                objectEL.set("src", "%s%d/%d/%d.%s" % (getTMSURL(),level,y,x,TILE_EXT))
+            else:
+                objectEL.set("src", "%s%d/%d/%d.%s" % (getTMSURL(),level,x,y,TILE_EXT))
             objectEL.set("z-index", str(level))
             objectEL.set("params", "im=%s" % INTERPOLATION)
             awh = int(sf*TILE_SIZE)
@@ -177,6 +179,8 @@ if len(sys.argv) > 1 and not sys.argv[1].startswith("-"):
                 INTERPOLATION = arg[4:]
             elif arg.startswith("-tl="):
                 TRACE_LEVEL = int(arg[4:])
+            elif arg.startswith("-yx"):
+                INVERT_X_Y = True
             elif arg.startswith("-h"):
                 log(CMD_LINE_HELP)
                 sys.exit(0)
