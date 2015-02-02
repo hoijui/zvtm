@@ -8,6 +8,7 @@
 # $Id$
 
 import os, sys, math, random
+import urllib
 from copy import copy
 
 # http://effbot.org/zone/element-index.htm
@@ -32,6 +33,10 @@ TILE_SIZE = 256
 # use Zoom Z and Google: (X,Y)
 ZOOM_DEPTH = 3
 ROOT_TILE = (0,0,0) # zoom 0, x 0, y 0
+
+# Download tiles and reference local tiles
+# for levels in this range (expressed in original tileset's zoom level values)
+DOWNLOAD_LEVEL_RANGE = (-1,-1)
 
 INVERT_X_Y = False
 
@@ -136,9 +141,15 @@ def buildRegionsAtLevel(rt, level, levelCount, rootEL, ox, oy):
             objectEL.set("type", "img")
             objectEL.set("sensitive", "false")
             if INVERT_X_Y:
-                objectEL.set("src", "%s%d/%d/%d.%s" % (getTMSURL(),level+rt[0],y+tcal*rt[2],x+tcal*rt[1],TILE_EXT))
+                tileURL = "%s%d/%d/%d.%s" % (getTMSURL(),level+rt[0],y+tcal*rt[2],x+tcal*rt[1],TILE_EXT)
             else:
-                objectEL.set("src", "%s%d/%d/%d.%s" % (getTMSURL(),level+rt[0],x+tcal*rt[1],y+tcal*rt[2],TILE_EXT))
+                tileURL = "%s%d/%d/%d.%s" % (getTMSURL(),level+rt[0],x+tcal*rt[1],y+tcal*rt[2],TILE_EXT)
+            if level+rt[0] in range(DOWNLOAD_LEVEL_RANGE[0],DOWNLOAD_LEVEL_RANGE[1]+1):
+                log("Fetching tile %s" % tileURL, 3)
+                tilePath = fetchTile(tileURL, level+rt[0], x+tcal*rt[1], y+tcal*rt[2])
+                objectEL.set("src", tilePath)
+            else:
+                objectEL.set("src", tileURL)
             objectEL.set("z-index", str(level))
             objectEL.set("params", "im=%s" % INTERPOLATION)
             awh = int(sf*TILE_SIZE)
@@ -165,6 +176,24 @@ def buildRegionsAtLevel(rt, level, levelCount, rootEL, ox, oy):
 ################################################################################
 # Trace exec on std output
 ################################################################################
+def fetchTile(tileURL, z, x, y):
+    directories = ["%s/%d" % (TGT_DIR, z), "%s/%d/%d" % (TGT_DIR, z, x)]
+    for d in directories:
+        if not os.path.exists(d):
+            log("Creating target directory %s" % d, 3)
+            os.mkdir(d)
+    relPath = "%d/%d/%d.%s" % (z, x, y, TILE_EXT)
+    absPath = "%s/%s" % (TGT_DIR, relPath)
+    if os.path.exists(absPath):
+        log("Tile already fetched: %s" % absPath, 3)
+    else:
+        log("Saving tile to %s" % absPath, 3)
+        urllib.urlretrieve(tileURL, absPath)
+    return relPath
+
+################################################################################
+# Trace exec on std output
+################################################################################
 def log(msg, level=0):
     if level <= TRACE_LEVEL:
         print msg
@@ -183,6 +212,9 @@ if len(sys.argv) > 1 and not sys.argv[1].startswith("-"):
             elif arg.startswith("-rt="):
                 tokens = arg[4:].split("-")
                 ROOT_TILE = (int(tokens[0]), int(tokens[1]), int(tokens[2]))
+            elif arg.startswith("-dt="):
+                tokens = arg[4:].split("-")
+                DOWNLOAD_LEVEL_RANGE = (int(tokens[0]), int(tokens[1]))
             elif arg.startswith("-ext="):
                 TILE_EXT = arg[5:]
             elif arg.startswith("-im="):
@@ -201,4 +233,4 @@ else:
 log("Tile Size: %dx%d" % (TILE_SIZE, TILE_SIZE), 1)
 createTargetDir()
 generateTree(ROOT_TILE, ZOOM_DEPTH)
-log("--------------------")
+log("")
