@@ -33,7 +33,7 @@ public class ZGROptions {
     @Option(name = "-f", aliases = {"--gv-file"}, usage = "GraphViz file to display")
     public String gvFile = null;
 
-    @Option(name = "-P", aliases = {"--gv-program"}, usage = "GraphViz program used to compute the layout")
+    @Option(name = "-P", aliases = {"--gv-program"}, usage = "GraphViz program used to compute the layout: one of dot, neato, twopi, circo, svg")
     public String cmdLinePrg = null;
 
     @Option(name = "-plgDir", aliases = {"--plugin-dir"}, usage = "Directory where to look for ZGRViewer plugins")
@@ -57,3 +57,5 @@ public class ZGROptions {
     public boolean standalone = true; //not a CLI option
 
 }
+
+
