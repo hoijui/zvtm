@@ -1,7 +1,7 @@
 /*   FILE: ZGRViewer.java
  *   DATE OF CREATION:   Thu Jan 09 14:13:31 2003
  *   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2011. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2015. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  *   $Id$
@@ -41,6 +41,9 @@ import javax.swing.SwingUtilities;
 import org.apache.xerces.dom.DOMImplementationImpl;
 import org.w3c.dom.Document;
 
+import org.kohsuke.args4j.CmdLineException;
+import org.kohsuke.args4j.CmdLineParser;
+
 public class ZGRViewer implements ZGRApplication {
 
     static ConfigManager cfgMngr;
@@ -58,10 +61,11 @@ public class ZGRViewer implements ZGRApplication {
 
     boolean exitVMonClose = true;
 
-    public ZGRViewer(boolean acc){
+    public ZGRViewer(ZGROptions options){
+        setOptions(options);
         initConfig();
         //init GUI after config as we load some GUI prefs from the config file
-        initGUI(acc, false);
+        initGUI(options, false);
         if (cmdLineDOTFile!=null){loadCmdLineFile();}
     }
 
@@ -69,9 +73,33 @@ public class ZGRViewer implements ZGRApplication {
     {
     	initConfig();
         //init GUI after config as we load some GUI prefs from the config file
-        initGUI(false, true);
-
+        initGUI(null, true);
 	}
+
+    void setOptions(ZGROptions options){
+        if (options.cmdLinePrg != null){
+            cmdLinePrg = options.cmdLinePrg;
+        }
+        if (options.gvFile != null){
+            File f = new File(options.gvFile);
+            if (f.exists()){cmdLineDOTFile = f;}
+        }
+        if (options.pluginList != null){
+            //  -pluginList=<paths>        where <path> is a list of comma-separated relative
+            //                             to the JAR files that contain plugins
+            // takes precedence over -pluginDir
+            ConfigManager.setPlugInJARs(options.pluginList.split(","));
+        }
+        else if (options.pluginDir != null){
+            //  -pluginDir <path>          where <path> is the relative of full path to
+            //                             the directory where to look for plugins
+            ConfigManager.plugInDir = new File(options.pluginDir);
+        }
+        if (options.pluginMode != null){
+            // -pluginMode <PluginClass>  plugin mode enabled by default in tool palette
+            ToolPalette.setDefaultPluginMode(options.pluginMode);
+        }
+    }
 
     public void setFile(File dotFile)
     {
@@ -93,36 +121,36 @@ public class ZGRViewer implements ZGRApplication {
     }
 
     void loadCmdLineFile(){
-    if (cmdLinePrg!=null){
-        if (cmdLinePrg.equals("-Pneato")){
-        gvLdr.loadFile(cmdLineDOTFile, DOTManager.NEATO_PROGRAM, false);
-        }
-        else if (cmdLinePrg.equals("-Pdot")){
-        gvLdr.loadFile(cmdLineDOTFile, DOTManager.DOT_PROGRAM, false);
-        }
-        else if (cmdLinePrg.equals("-Pcirco")){
-        gvLdr.loadFile(cmdLineDOTFile, DOTManager.CIRCO_PROGRAM, false);
-        }
-        else if (cmdLinePrg.equals("-Ptwopi")){
-        gvLdr.loadFile(cmdLineDOTFile, DOTManager.TWOPI_PROGRAM, false);
-        }
-        else if (cmdLinePrg.equals("-Psvg")){
-        gvLdr.loadSVG(cmdLineDOTFile);
-        }
-        else {
-        System.err.println("Bad option: " + cmdLinePrg + "\n\t" + Messages.CMD_LINE_ERROR);
-        System.exit(0);
-        }
-    }
-    else {
-        if (cmdLineDOTFile.toString().toLowerCase().endsWith(".svg")
-            || cmdLineDOTFile.toString().toLowerCase().endsWith(".svgz")){
+        if (cmdLinePrg!=null){
+            if (cmdLinePrg.equals("neato")){
+            gvLdr.loadFile(cmdLineDOTFile, DOTManager.NEATO_PROGRAM, false);
+            }
+            else if (cmdLinePrg.equals("dot")){
+            gvLdr.loadFile(cmdLineDOTFile, DOTManager.DOT_PROGRAM, false);
+            }
+            else if (cmdLinePrg.equals("circo")){
+            gvLdr.loadFile(cmdLineDOTFile, DOTManager.CIRCO_PROGRAM, false);
+            }
+            else if (cmdLinePrg.equals("twopi")){
+            gvLdr.loadFile(cmdLineDOTFile, DOTManager.TWOPI_PROGRAM, false);
+            }
+            else if (cmdLinePrg.equals("svg")){
             gvLdr.loadSVG(cmdLineDOTFile);
+            }
+            else {
+            System.err.println("Bad option: " + cmdLinePrg + "\n\t" + Messages.CMD_LINE_ERROR);
+            System.exit(0);
+            }
         }
         else {
-        gvLdr.loadFile(cmdLineDOTFile, DOTManager.DOT_PROGRAM, false);
+            if (cmdLineDOTFile.toString().toLowerCase().endsWith(".svg")
+                || cmdLineDOTFile.toString().toLowerCase().endsWith(".svgz")){
+                gvLdr.loadSVG(cmdLineDOTFile);
+            }
+            else {
+            gvLdr.loadFile(cmdLineDOTFile, DOTManager.DOT_PROGRAM, false);
+            }
         }
-    }
     }
 
     void initConfig(){
@@ -140,11 +168,12 @@ public class ZGRViewer implements ZGRApplication {
     	return _gp;
 	}
 
-    void initGUI(boolean acc, boolean viewOnJPanel){
+    void initGUI(ZGROptions options, boolean viewOnJPanel){
+        boolean opengl = (options != null) ? options.opengl : false;
         exitVMonClose = !viewOnJPanel;
         cfgMngr.notifyPlugins(Plugin.NOTIFY_PLUGIN_GUI_INITIALIZING);
         Utils.initLookAndFeel();
-        JMenuBar jmb = initViewMenu(acc);
+        JMenuBar jmb = initViewMenu();
         if (viewOnJPanel)
         {
         	_panelView = grMngr.createPanelView(grMngr.createZVTMelements(true), 100, 100);
@@ -160,7 +189,7 @@ public class ZGRViewer implements ZGRApplication {
         }
         else
         {
-        	grMngr.createFrameView(grMngr.createZVTMelements(false), acc ? View.OPENGL_VIEW : View.STD_VIEW, jmb);
+        	grMngr.createFrameView(grMngr.createZVTMelements(false), opengl ? View.OPENGL_VIEW : View.STD_VIEW, jmb);
         }
 
         cfgMngr.notifyPlugins(Plugin.NOTIFY_PLUGIN_GUI_VIEW_CREATED);
@@ -174,23 +203,15 @@ public class ZGRViewer implements ZGRApplication {
 	}
 
 
-    JMenuBar initViewMenu(boolean accelerationMode){
+    JMenuBar initViewMenu(){
         JMenu open=new JMenu("Open");
-        // JMenu openD = new JMenu("Open with dot...");
-        // JMenu openN = new JMenu("Open with neato...");
-        // JMenu openC = new JMenu("Open with circo...");
-        // JMenu openT = new JMenu("Open with twopi...");
         final JMenuItem openO = new JMenuItem("Command line...");
         final JMenuItem openDG = new JMenuItem("dot...");
         openDG.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
         final JMenuItem openNG = new JMenuItem("neato...");
         openNG.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-        // final JMenuItem openDI = new JMenuItem("DOT pipeline (experimental)...");
-        // final JMenuItem openNI = new JMenuItem("DOT pipeline (experimental)...");
         final JMenuItem openCG = new JMenuItem("circo...");
-        // final JMenuItem openCI = new JMenuItem("DOT pipeline (experimental)...");
         final JMenuItem openTG = new JMenuItem("twopi...");
-        // final JMenuItem openTI = new JMenuItem("DOT pipeline (experimental)...");
         final JMenuItem openS=new JMenuItem("Open SVG generated by GraphViz...");
         final JMenuItem reloadI = new JMenuItem("Reload current file");
         reloadI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -219,12 +240,8 @@ public class ZGRViewer implements ZGRApplication {
             public void actionPerformed(ActionEvent e){
                 if (e.getSource()==openDG){gvLdr.open(DOTManager.DOT_PROGRAM, false);}
                 else if (e.getSource()==openNG){gvLdr.open(DOTManager.NEATO_PROGRAM, false);}
-                // else if (e.getSource()==openDI){gvLdr.open(DOTManager.DOT_PROGRAM, true);}
-                // else if (e.getSource()==openNI){gvLdr.open(DOTManager.NEATO_PROGRAM, true);}
                 else if (e.getSource()==openCG){gvLdr.open(DOTManager.CIRCO_PROGRAM, false);}
-                // else if (e.getSource()==openCI){gvLdr.open(DOTManager.CIRCO_PROGRAM, true);}
                 else if (e.getSource()==openTG){gvLdr.open(DOTManager.TWOPI_PROGRAM, false);}
-                // else if (e.getSource()==openTI){gvLdr.open(DOTManager.TWOPI_PROGRAM, true);}
                 else if (e.getSource()==openS){gvLdr.openSVGFile();}
                 else if (e.getSource()==openO){gvLdr.openOther();}
                 else if (e.getSource()==reloadI){gvLdr.reloadFile();}
@@ -252,19 +269,11 @@ public class ZGRViewer implements ZGRApplication {
         jmb.add(jm1);
         jmb.add(jm2);
         jmb.add(jm3);
-        // open.add(openD);
-        // open.add(openN);
-        // open.add(openC);
-        // open.add(openT);
         open.add(openO);
         open.add(openDG);
-        // openD.add(openDI);
         open.add(openNG);
-        // openN.add(openNI);
         open.add(openCG);
-        // openC.add(openCI);
         open.add(openTG);
-        // openT.add(openTI);
         open.addSeparator();
         open.add(openO);
         open.addSeparator();
@@ -294,13 +303,9 @@ public class ZGRViewer implements ZGRApplication {
         jm3.add(pluginsI);
         jm3.add(aboutI);
         openDG.addActionListener(a0);
-        // openDI.addActionListener(a0);
         openNG.addActionListener(a0);
-        // openNI.addActionListener(a0);
         openCG.addActionListener(a0);
-        // openCI.addActionListener(a0);
         openTG.addActionListener(a0);
-        // openTI.addActionListener(a0);
         openS.addActionListener(a0);
         openO.addActionListener(a0);
         reloadI.addActionListener(a0);
@@ -551,58 +556,21 @@ public class ZGRViewer implements ZGRApplication {
         }
     }
 
-    static void printCmdLineHelp(){
-        System.out.println("\njava -jar zgrviewer-0.9.0-SNAPSHOT.jar [options] [file]\n");
-        System.out.println("[options]");
-        System.out.println("   -opengl                    ZVTM will run in OpenGL accelerated mode");
-        System.out.println("                              (requires JDK 1.5 or later)\n");
-        System.out.println("   -Pxxx                      where xxx={dot, neato, svg} to specify what program");
-        System.out.println("                              to use to compute the [file]'s layout\n");
-        System.out.println("   -pluginDir=<path>          where <path> is the relative of full path to");
-        System.out.println("                              the directory where to look for plugins");
-        System.out.println("   -pluginList=<paths>        where <path> is a list of comma-separated relative");
-        System.out.println("                              to the JAR files that contain plugins");
-        System.out.println("   -pluginList                takes precedence over -pluginDir\n");
-        System.out.println("   -pluginMode=<PluginClass>  plugin mode enabled by default in tool palette\n");
-        System.out.println("[file]                 can be a relative or full path ; use the native OS path syntax\n\n");
-    }
-
     public static void main(String[] args){
-        if (Utils.osIsMacOS()){
+        ZGROptions options = new ZGROptions();
+        CmdLineParser parser = new CmdLineParser(options);
+        try {
+            parser.parseArgument(args);
+        } catch(CmdLineException ex){
+            System.err.println(ex.getMessage());
+            parser.printUsage(System.err);
+            return;
+        }
+        if (!options.fullscreen && Utils.osIsMacOS()){
             System.setProperty("apple.laf.useScreenMenuBar", "true");
         }
-        boolean acceleratedView = false;
-        for (int i=0;i<args.length;i++){
-            if (args[i].startsWith("-")){
-                if (args[i].equals("--help") || args[i].equals("-h")){
-                    printCmdLineHelp();
-                    System.exit(0);
-                }
-                else if (args[i].equals("-opengl")){
-                    System.setProperty("sun.java2d.opengl", "true");
-                    System.out.println("OpenGL accelerated mode");
-                    acceleratedView = true;
-                }
-                else if (args[i].startsWith("-P")){cmdLinePrg=args[i];}
-                else if (args[i].startsWith("-pluginDir=")){
-                    ConfigManager.plugInDir = new File(args[i].substring(11));
-                }
-                else if (args[i].startsWith("-pluginList=")){
-                    ConfigManager.setPlugInJARs(args[i].substring(12).split(","));
-                }
-                else if (args[i].startsWith("-pluginMode=")){
-                    ToolPalette.setDefaultPluginMode(args[i].substring(12));
-                }
-            }
-            else {
-                //the only other stuff allowed as a cmd line param is a dot file
-                File f=new File(args[i]);
-                if (f.exists()){cmdLineDOTFile=f;}
-            }
-        }
         System.out.println("--help for command line options");
-        final boolean av = acceleratedView;
-        new ZGRViewer(av);
+        new ZGRViewer(options);
     }
 
 }
