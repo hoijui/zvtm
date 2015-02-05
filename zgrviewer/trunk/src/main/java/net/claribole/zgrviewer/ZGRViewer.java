@@ -53,8 +53,8 @@ public class ZGRViewer implements ZGRApplication {
     static String cmdLinePrg=null;
 
     PieMenu mainPieMenu, subPieMenu;
-    private JPanel _panelView;
-	private ZGRGlassPane _gp;
+    JPanel _panelView;
+	ZGRGlassPane _gp;
 
     boolean exitVMonClose = true;
 

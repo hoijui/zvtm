@@ -59,11 +59,6 @@ $Id$
   <dependencies>
 	<dependency>
       <groupId>fr.inria.zvtm</groupId>
-      <artifactId>zvtm-core</artifactId>
-      <version>[0.11.1,)</version>
-    </dependency>
-	<dependency>
-      <groupId>fr.inria.zvtm</groupId>
       <artifactId>zvtm-svg</artifactId>
       <version>[0.2.1,)</version>
     </dependency>
@@ -78,6 +73,133 @@ $Id$
       <version>2.8.1</version>
     </dependency>
   </dependencies>
+
+
+  <profiles>
+    <profile>
+        <!-- mvn -P main ... -->
+        <id>main</id>
+        <activation>
+          <activeByDefault>true</activeByDefault>
+        </activation>
+        <dependencies>
+          <dependency>
+              <groupId>fr.inria.zvtm</groupId>
+              <artifactId>zvtm-core</artifactId>
+              <version>[0.11.1,)</version>
+            </dependency>
+        </dependencies>
+        <build>
+            <plugins>
+              <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>2.3.2</version>
+                <configuration>
+                  <source>1.6</source>
+                  <target>1.6</target>
+                  <excludes>
+                    <exclude>**/*Wall*.java</exclude>
+                  </excludes>
+                </configuration>
+              </plugin>
+             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.3.1</version>
+                <configuration>
+                  <archive>
+                    <manifest>
+                      <useUniqueVersions>false</useUniqueVersions>
+                      <mainClass>net.claribole.zgrviewer.ZGRViewer</mainClass>
+                      <packageName>net.claribole.zgrviewer</packageName>
+                      <addClasspath>true</addClasspath>
+                    </manifest>
+                    <manifestEntries>
+                      <mode>development</mode>
+                      <url>${project.url}</url>
+                    </manifestEntries>
+                  </archive>
+                </configuration>
+              </plugin>
+            </plugins>
+        </build>
+    </profile>
+    <profile>
+        <!-- mvn -P wall ... -->
+        <id>wall</id>
+        <dependencies>
+          <dependency>
+            <groupId>fr.inria.zvtm</groupId>
+            <artifactId>zvtm-cluster</artifactId>
+            <version>0.2.8-SNAPSHOT</version>
+          </dependency>
+        </dependencies>
+        <build>
+            <plugins>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>aspectj-maven-plugin</artifactId>
+                    <version>1.2</version>
+                    <configuration>
+                      <weaveDependencies>
+                        <weaveDependency>
+                          <groupId>fr.inria.zvtm</groupId>
+                          <artifactId>zvtm-cluster</artifactId>
+                      </weaveDependency>
+                      </weaveDependencies>
+                      <source>1.6</source>
+                      <target>1.6</target>
+                      <!--<showWeaveInfo>true</showWeaveInfo>-->
+                      <aspectLibraries>
+                        <aspectLibrary>
+                          <groupId>fr.inria.zvtm</groupId>
+                          <artifactId>zvtm-cluster</artifactId>
+                        </aspectLibrary>
+                      </aspectLibraries>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>compile</goal>
+                                <goal>test-compile</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-compiler-plugin</artifactId>
+                  <version>2.3.2</version>
+                  <configuration>
+                    <source>1.6</source>
+                    <target>1.6</target>
+                  </configuration>
+                </plugin>
+                <plugin>
+                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.3.1</version>
+                <configuration>
+                  <archive>
+                    <manifest>
+                      <useUniqueVersions>false</useUniqueVersions>
+                      <mainClass>net.claribole.zgrviewer.WallZGRViewer</mainClass>
+                      <packageName>net.claribole.zgrviewer</packageName>
+                      <addClasspath>true</addClasspath>
+                    </manifest>
+                    <manifestEntries>
+                      <mode>development</mode>
+                      <url>${project.url}</url>
+                    </manifestEntries>
+                  </archive>
+                </configuration>
+              </plugin>
+            </plugins>
+        </build>
+    </profile>
+  </profiles>
+
 
   <!-- Build -->
   <build>
@@ -95,9 +217,9 @@ $Id$
 	</resources>
     <plugins>
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>dependency-maven-plugin</artifactId>
-      	<version>1.0</version>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.9</version>
         <executions>
           <execution>
             <id>copy-dependencies</id>
@@ -106,62 +228,12 @@ $Id$
               <goal>copy-dependencies</goal>
             </goals>
             <configuration>
+              <excludeScope>provided</excludeScope>
               <outputDirectory>${project.build.directory}</outputDirectory>
             </configuration>
           </execution>
         </executions>
       </plugin>
-      <plugin>
-        <inherited>true</inherited>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-source-plugin</artifactId>
-      	<version>2.1.2</version>
-        <executions>
-          <execution>
-            <id>attach-sources</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-      	<version>2.3.2</version>
-        <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
-          <showDeprecation>true</showDeprecation>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-jar-plugin</artifactId>
-		<version>2.3.1</version>
-	      <configuration>
-          <archive>
-            <manifest>
-              <useUniqueVersions>false</useUniqueVersions>
-              <mainClass>net.claribole.zgrviewer.ZGRViewer</mainClass>
-              <packageName>net.claribole.zgrviewer</packageName>
-              <addClasspath>true</addClasspath>
-            </manifest>
-            <manifestEntries>
-              <mode>development</mode>
-              <url>${project.url}</url>
-            </manifestEntries>
-          </archive>
-        </configuration>
-      </plugin>
-      <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-eclipse-plugin</artifactId>
-      	<version>2.8</version>
-          <configuration>
-              <downloadSources>true</downloadSources>
-          </configuration>
-       </plugin>
     </plugins>
   </build>
 
@@ -176,7 +248,7 @@ $Id$
           <aggregate>true</aggregate>
           <overview>${basedir}/overview.html</overview>
           <doctitle><![CDATA[<h1>ZVTM API documentation</h1>]]></doctitle>
-          <bottom><![CDATA[Copyright &#169; 2003 World Wide Web Consortium. All Rights Reserved<br />Copyright &#169; 2004-2011 INRIA. All Rights Reserved<br />Licensed under the GNU LGPL. For full terms see the file COPYING.</i>]]></bottom>
+          <bottom><![CDATA[Copyright &#169; 2003 World Wide Web Consortium. All Rights Reserved<br />Copyright &#169; 2004-2015 INRIA. All Rights Reserved<br />Licensed under the GNU LGPL. For full terms see the file COPYING.</i>]]></bottom>
           <links>
             <link>http://java.sun.com/j2se/1.5.0/docs/api</link>
           </links>
