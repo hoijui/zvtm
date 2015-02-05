@@ -20,15 +20,7 @@ import java.net.MalformedURLException;
 import java.util.StringTokenizer;
 import javax.swing.JOptionPane;
 
-import net.claribole.zgrviewer.dot.DOTLexer;
-import net.claribole.zgrviewer.dot.DOTParser;
-import net.claribole.zgrviewer.dot.DOTTreeParser;
-import net.claribole.zgrviewer.dot.Graph;
-import net.claribole.zgrviewer.dot.ZgrReader;
-
 import org.w3c.dom.Document;
-
-import antlr.CommonAST;
 
 import fr.inria.zvtm.svg.SVGReader;
 
@@ -46,8 +38,6 @@ class DOTManager {
 
     File dotF;
     File svgF;
-
-    Graph graph;
 
     DOTManager(GraphicsManager gm, ConfigManager cm){
     this.grMngr = gm;
@@ -79,16 +69,16 @@ class DOTManager {
             grMngr.gp.setMessage("Preparing " + (parser ? "Augmented DOT" : "SVG")
                 + " Temp File");
             grMngr.gp.setProgress(10);
-            if (parser) {
-                if (!generateDOTFile(dotF.getAbsolutePath(), svgF.getAbsolutePath(), prg)) {
-                    deleteTempFiles();
-                    return;
-                }
-                displayDOT();
-                if (ConfigManager.DELETE_TEMP_FILES) {
-                    deleteTempFiles();
-                }
-            } else {
+            // if (parser) {
+            //     if (!generateDOTFile(dotF.getAbsolutePath(), svgF.getAbsolutePath(), prg)) {
+            //         deleteTempFiles();
+            //         return;
+            //     }
+            //     displayDOT();
+            //     if (ConfigManager.DELETE_TEMP_FILES) {
+            //         deleteTempFiles();
+            //     }
+            // } else {
                 if (!generateSVGFile(dotF.getAbsolutePath(), svgF.getAbsolutePath(), prg)) {
                     deleteTempFiles();
                     return;
@@ -97,7 +87,7 @@ class DOTManager {
                 if (ConfigManager.DELETE_TEMP_FILES) {
                     deleteTempFiles();
                 }
-            }
+            // }
         } catch (Exception e) {
             System.err.println("Exception generating graph: " + e.getMessage()
                 + "\n");
@@ -287,28 +277,6 @@ class DOTManager {
             System.err.println("Error loading SVG file.\n");
         }
     }
-
-    void displayDOT() throws Exception {
-        try {
-            grMngr.gp.setMessage("Parsing Augmented DOT...");
-            grMngr.gp.setProgress(60);
-            DataInputStream graphInput = new DataInputStream(new FileInputStream(
-                svgF));
-            DOTLexer graphLexer = new DOTLexer(graphInput);
-            DOTParser graphParser = new DOTParser(graphLexer);
-            graphParser.graph();
-            CommonAST ast = (CommonAST) graphParser.getAST();
-            DOTTreeParser graphWalker = new DOTTreeParser();
-            graph = graphWalker.graph(ast);
-            grMngr.gp.setMessage("Displaying...");
-            grMngr.gp.setProgress(80);
-            ZgrReader.load(graph, grMngr.vsm, grMngr.mSpace, true);
-        }
-        catch (NullPointerException ex){
-            JOptionPane.showMessageDialog(grMngr.mainView.getFrame(), Messages.ERROR_LOADING_DOT_FILE, "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
 
     /*checks that the command line options do not contain a -Txxx */
     static String checkOptions(String options){

@@ -34,7 +34,7 @@ public class Messages {
         }
     }
 
-    public static final String about = "ZGRViewer " + VERSION + "\n\nA Visualization Tool for GraphViz based on ZVTM\nhttp://zvtm.sourceforge.net/zgrviewer.html\n\nWritten by Emmanuel Pietriga\n(INRIA project In Situ)\nemmanuel.pietriga@inria.fr";
+    public static final String about = "ZGRViewer " + VERSION + "\n\nA Visualization Tool for GraphViz based on ZVTM\nhttp://zvtm.sourceforge.net/zgrviewer.html\n\nWritten by Emmanuel Pietriga\n(INRIA project ILDA)\nemmanuel.pietriga@inria.fr";
 
     public static final String commands="Under Mac OS X, replace Ctrl by the Command key\n\nMisc. Commands\n"
     +"* Press right mouse button to display the pie menu\n\n"
