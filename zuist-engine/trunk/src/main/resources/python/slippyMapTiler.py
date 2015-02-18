@@ -17,9 +17,11 @@ import xml.etree.ElementTree as ET
 CMD_LINE_HELP = "Slippy Map Tiling Script\n\nUsage:\n\n" + \
     " \tslippyMapTiler <target_dir> [options]\n\n" + \
     "Options:\n\n"+\
-    "\t-ts=N\t\ttile size (N in pixels)\n"+\
+    "\t-ts=S\t\ttile size (S in pixels)\n"+\
     "\t-ext=<ext>\t<ext> one of {png,jpg}\n"+\
-    "\t-mzl=N\t\tmaximum zoom level (N in [0,19])\n"+\
+    "\t-rt=z-x-y\troot tile (zoom-x-y) for this scene\n"+\
+    "\t-zd=N\t\tzoom depth from root (N in [0,19])\n"+\
+    "\t-dt=N-N\t\tdownload and save tiles for levels in the specified range (N in [0,19])\n"+\
     "\t-xy\t\tinvert x and y in slippy tile URL coordinates system\n"+\
     "\t-im=<i>\t\t<i> one of {bilinear,bicubic,nearestNeighbor}\n"+\
     "\t-tl=N\t\ttrace level (N in [0:2])\n"
@@ -64,7 +66,7 @@ def getTMSURL():
     ### ArcGIS orthoimagery, use with -yx
     #return "http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/"
     ### Stamen maps
-    #return "http://%s.tile.stamen.com/watercolor/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*4))]
+    return "http://%s.tile.stamen.com/watercolor/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*4))]
     #return "http://%s.tile.stamen.com/terrain/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*4))]
     #return "http://%s.tile.stamen.com/terrain-background/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*4))]
     #return "http://%s.tile.stamen.com/toner/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*4))]
@@ -72,7 +74,7 @@ def getTMSURL():
     #return "http://otile%d.mqcdn.com/tiles/1.0.0/sat/" % math.ceil(random.random()*4)
     #return "http://otile%d.mqcdn.com/tiles/1.0.0/osm/" % math.ceil(random.random()*4)
     ### Mapbox
-    return "http://%s.tiles.mapbox.com/v3/examples.xqwfusor/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*4))]
+    #return "http://%s.tiles.mapbox.com/v3/examples.xqwfusor/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*4))]
     ### More examples at http://homepage.ntlworld.com/keir.clarke/leaflet/leafletlayers.htm
 
 ################################################################################
