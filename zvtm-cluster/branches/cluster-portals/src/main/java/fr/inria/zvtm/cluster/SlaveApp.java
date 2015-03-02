@@ -12,6 +12,7 @@ import fr.inria.zvtm.event.ViewAdapter;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.engine.portals.Portal;
 
 import java.awt.Color;
 import java.awt.GraphicsDevice;
@@ -70,6 +71,10 @@ public class SlaveApp {
                 options.blockNumber);
         updater.setAppDelegate(app);
         updater.startOperation();
+    }
+
+    public View getView() {
+        return view;
     }
 
     protected String getViewType(){
@@ -177,6 +182,17 @@ public class SlaveApp {
         double newY = -yOffset + masterLoc.vy - row*virtBlockHeight;
 
         slaveCamera.setLocation(new Location(newX, newY, masterLoc.alt));
+    }
+
+    void setPortalLocation(Portal p, int x, int y, int w, int h) {
+        int virtBlockWidth = clusteredView.getClusterGeometry().getBlockWidth();
+        int virtBlockHeight = clusteredView.getClusterGeometry().getBlockHeight();
+
+        int row = clusteredView.rowNum(options.blockNumber) ;
+        int col = clusteredView.colNum(options.blockNumber) ;
+
+        p.moveTo(x-col*virtBlockWidth,y-row*virtBlockHeight);
+        p.sizeTo(w,h);
     }
 
     void stop(){

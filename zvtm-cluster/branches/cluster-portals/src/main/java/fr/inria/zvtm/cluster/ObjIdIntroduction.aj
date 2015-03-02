@@ -9,6 +9,8 @@ package fr.inria.zvtm.cluster;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.engine.portals.Portal;
+
 
 /**
  * Introduces an object ID into Glyph instances.
@@ -19,5 +21,6 @@ aspect ObjIdIntroduction {
     declare parents: VirtualSpace extends DefaultIdentifiable;
     declare parents: Glyph extends  DefaultIdentifiable;
     declare parents: Camera extends DefaultIdentifiable;
+    declare parents: Portal extends DefaultIdentifiable;
     }
 
