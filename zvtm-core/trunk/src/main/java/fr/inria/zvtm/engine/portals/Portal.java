@@ -15,6 +15,7 @@ import java.awt.Dimension;
 
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.event.PortalListener;
+import fr.inria.zvtm.engine.VirtualSpaceManager;
 
 public abstract class Portal {
 
@@ -48,6 +49,8 @@ public abstract class Portal {
     public void move(int dx, int dy){
         x += dx;
         y += dy;
+        if (owningView != null)
+        	VirtualSpaceManager.INSTANCE.repaint(owningView);
     }
 
     /** Move the portal inside the view (absolute).
@@ -57,6 +60,8 @@ public abstract class Portal {
     public void moveTo(int x, int y){
         this.x = x;
         this.y = y;
+        if (owningView != null)
+        	VirtualSpaceManager.INSTANCE.repaint(owningView);
     }
 
     /** Set the portal's size (multiplication factor). */
@@ -64,6 +69,8 @@ public abstract class Portal {
         w += dw;
         h += dh;
         updateDimensions();
+        if (owningView != null)
+        	VirtualSpaceManager.INSTANCE.repaint(owningView);
     }
 
     /** Set the portal's size (absolute value). */
@@ -71,6 +78,8 @@ public abstract class Portal {
         this.w = w;
         this.h = h;
         updateDimensions();
+        if (owningView != null)
+        	VirtualSpaceManager.INSTANCE.repaint(owningView);
     }
 
     public Dimension getDimensions(){
@@ -165,6 +174,8 @@ public abstract class Portal {
     /** Show/hide this portal. */
 	public void setVisible(boolean b){
 		visible = b;
+        if (owningView != null)
+        	VirtualSpaceManager.INSTANCE.repaint(owningView);
 	}
 
 	/** Tells wether this portal is currently visible or not. */

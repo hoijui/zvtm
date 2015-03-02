@@ -329,6 +329,11 @@ public class CameraPortal extends Portal {
             }
             g2d.setComposite(alphaC);
         }
+        
+        //Check if the portal is out of the view
+        if (x+w < 0 || y+h < 0 || x >= viewWidth || y >= viewHeight)
+            return;
+                
         g2d.setClip(x, y, w, h);
         if (bkgColor != null){
             g2d.setColor(bkgColor);
