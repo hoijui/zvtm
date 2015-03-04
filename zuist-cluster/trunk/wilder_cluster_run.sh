@@ -53,7 +53,7 @@ do
 		blockNum $col
 		BLOCKNB=$?
 		echo "-Djgroups.bind_addr=\"192.168.2.$startIp\" Slavenum: $SLAVENUM $BLOCKNB"
-	    ssh wild@192.168.2.$startIp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "export DISPLAY=:0 && cd /home2/wild/workspace/zvtm/Aria/trunk && java -XX:+DoEscapeAnalysis -XX:+UseConcMarkSweepGC -Djava.net.preferIPv4Stack=true -Djgroups.bind_addr="\"192.168.2.$startIp\"" -Xmx4g -cp $JARS fr.inria.zvtm.cluster.SlaveApp -n ZuistCluster -b $SLAVENUM -wb $BLOCKNB -f -a $*" &
+	    ssh wild@192.168.2.$startIp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "export DISPLAY=:0 && cd /home2/wild/workspace/zvtm/zuist-cluster/trunk && java -XX:+DoEscapeAnalysis -XX:+UseConcMarkSweepGC -Djava.net.preferIPv4Stack=true -Djgroups.bind_addr="\"192.168.2.$startIp\"" -Xmx4g -cp $JARS fr.inria.zvtm.cluster.SlaveApp -n ZuistCluster -b $SLAVENUM -wb $BLOCKNB -f -a $*" &
 
       done
 done
