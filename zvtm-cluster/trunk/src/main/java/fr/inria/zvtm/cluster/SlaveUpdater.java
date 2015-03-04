@@ -9,6 +9,8 @@ package fr.inria.zvtm.cluster;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.engine.VirtualSpace;
+import fr.inria.zvtm.engine.portals.Portal;
+
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -128,9 +130,22 @@ public class SlaveUpdater {
         appDelegate.createLocalView(cv);
     }
 
+    public fr.inria.zvtm.engine.View getLocalView() {
+        return appDelegate.getView();
+    }
+
     void setCameraLocation(Location masterLoc,
             Camera slaveCamera){
         appDelegate.setCameraLocation(masterLoc, slaveCamera);
+    }
+
+    void setPortalLocation(Portal slavePortal, int x, int y, int w, int h){
+        appDelegate.setPortalLocation(slavePortal, x, y, w, h);
+    }
+
+    void setPortalVisible(Portal slavePortal, boolean isVisible)
+    {
+        slavePortal.setVisible(isVisible);
     }
 
     void setBackgroundColor(ClusteredView cv, Color bgColor){
