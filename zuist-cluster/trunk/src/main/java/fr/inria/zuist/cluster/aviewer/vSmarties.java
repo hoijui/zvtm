@@ -47,44 +47,55 @@ vSmarties(Viewer v)
 
 
 	// add some Smarties widgets into a 3 x 3 grid
-	m_smarties.initWidgets(3,3);
+	m_smarties.initWidgets(3,1);
 
-	SmartiesWidget w = m_smarties.addWidget(
-		SmartiesWidget.SMARTIES_WIDGET_TYPE_BUTTON, "Mark Position", 1, 1, 1, 1);
-	//w.handler = new markMark();
-	w = m_smarties.addWidget(
-		SmartiesWidget.SMARTIES_WIDGET_TYPE_BUTTON, "Prev Mark", 2, 1, 0.66f, 1);
-	//w.handler = new markPrev();
-	w = m_smarties.addWidget(
-		SmartiesWidget.SMARTIES_WIDGET_TYPE_BUTTON, "Next Mark", 2.66f, 1, 0.66f, 1);
-	//w.handler = new markNext();
-	w = m_smarties.addWidget(
-		SmartiesWidget.SMARTIES_WIDGET_TYPE_BUTTON, "Curr Mark", 3.33f, 1, 0.66f, 1);
-	//w.handler = new markNext();
+	// SmartiesWidget w = m_smarties.addWidget(
+	// 	SmartiesWidget.SMARTIES_WIDGET_TYPE_BUTTON, "Mark Position", 1, 1, 1, 1);
+	// //w.handler = new markMark();
+	// w = m_smarties.addWidget(
+	// 	SmartiesWidget.SMARTIES_WIDGET_TYPE_BUTTON, "Prev Mark", 2, 1, 0.66f, 1);
+	// //w.handler = new markPrev();
+	// w = m_smarties.addWidget(
+	// 	SmartiesWidget.SMARTIES_WIDGET_TYPE_BUTTON, "Next Mark", 2.66f, 1, 0.66f, 1);
+	// //w.handler = new markNext();
+	// w = m_smarties.addWidget(
+	// 	SmartiesWidget.SMARTIES_WIDGET_TYPE_BUTTON, "Curr Mark", 3.33f, 1, 0.66f, 1);
+	// //w.handler = new markNext();
 
 	// global widgets
 
 	w = m_smarties.addWidget(
-		SmartiesWidget.SMARTIES_WIDGET_TYPE_BUTTON, "Reset View", 1, 3, 1, 1);
+		SmartiesWidget.SMARTIES_WIDGET_TYPE_BUTTON, "Reset View", 1, 1, 1, 1);
 	w.handler = new globalViewClicked();
 
 	w = m_smarties.addWidget(
-		SmartiesWidget.SMARTIES_WIDGET_TYPE_TOGGLE_BUTTON, "Draw Under Bezel: Off", 2, 3, 1, 1);
+		SmartiesWidget.SMARTIES_WIDGET_TYPE_TOGGLE_BUTTON, "Draw Under Bezel: Off", 2, 1, 1, 1);
 	w.labelOn = "Draw Under Bezel: On";
 	w.on = true;
 	w.handler = new drawUnderBezel();
 
 	w = m_smarties.addWidget(
-		SmartiesWidget.SMARTIES_WIDGET_TYPE_SPINNER, "Open Images", 3, 3, 1, 1);
+		SmartiesWidget.SMARTIES_WIDGET_TYPE_SPINNER, "Open Images", 3, 1, 1, 1);
 	w.handler = new changeImage();
 	w.items.add("Paris 26 Giga Pixels");
-	w.items.add("NASA Curiosity");
+	//w.items.add("NASA Curiosity");
+	w.items.add("moon");
+	w.items.add("cosmos");
+	w.items.add("galaxy");
+	w.items.add("france");
+	w.items.add("vela snr");
 	
 	xmlfiles = new Vector();
-	xmlfiles.add("/usr/local/share/bigimages/zuist/paris26GP/scene_fullL0.xml");
+	//xmlfiles.add("/usr/local/share/bigimages/zuist/paris26GP/scene_fullL0.xml");
 	//xmlfiles.add("/usr/local/share/bigimages/zuist/paris26GP/scene_generated.xml");
-	xmlfiles.add("/usr/local/share/bigimages/zuist/NASA-Curiosity/ZVTM/scene.xml");
- 
+	//xmlfiles.add("/usr/local/share/bigimages/zuist/NASA-Curiosity/ZVTM/scene.xml");
+ 	xmlfiles.add("/media/ssd/Demos/zvtm/paris26GP/scene_fullL0.xml");
+ 	xmlfiles.add("/media/ssd/Demos/zvtm/moon/scene.xml");
+ 	xmlfiles.add("/media/ssd/Demos/zvtm/cosmos/scene.xml");
+ 	xmlfiles.add("/media/ssd/Demos/zvtm/GLIMPSE360/scene.xml");
+ 	xmlfiles.add("/media/ssd/Demos/zvtm/france_bright/scene.xml");
+ 	xmlfiles.add("/media/ssd/Demos/zvtm/VelaSNR_d/scene.xml");
+
 	m_smarties.addObserver(this);
 	m_smarties.Run();
 	System.out.println("Smarties running " + width + " " + height);
