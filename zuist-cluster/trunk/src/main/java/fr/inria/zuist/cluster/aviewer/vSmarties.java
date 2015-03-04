@@ -48,7 +48,7 @@ vSmarties(Viewer v)
 
 	// add some Smarties widgets into a 3 x 3 grid
 	m_smarties.initWidgets(3,1);
-
+	SmartiesWidget w;
 	// SmartiesWidget w = m_smarties.addWidget(
 	// 	SmartiesWidget.SMARTIES_WIDGET_TYPE_BUTTON, "Mark Position", 1, 1, 1, 1);
 	// //w.handler = new markMark();
@@ -84,7 +84,7 @@ vSmarties(Viewer v)
 	w.items.add("galaxy");
 	w.items.add("france");
 	w.items.add("vela snr");
-	
+
 	xmlfiles = new Vector();
 	//xmlfiles.add("/usr/local/share/bigimages/zuist/paris26GP/scene_fullL0.xml");
 	//xmlfiles.add("/usr/local/share/bigimages/zuist/paris26GP/scene_generated.xml");
