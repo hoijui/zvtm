@@ -66,6 +66,7 @@ public void update(Observable obj, Object arg)
 				_firstId = e.id;
 				cx1 = sx1 = e.x; cy1 = sy1 = e.y;
 				_idNum = 1;
+				System.out.println("FIRST ID: " + _firstId);
 			}
 			else if (_numDown > 1 && _idNum == 1)
 			{
@@ -78,6 +79,7 @@ public void update(Observable obj, Object arg)
 					_idNum = 2;
 					cx2 = sx2 = e.x; cy2 = sy2 = e.y;
 					delta = dist(cx1, cy1, cx2, cy2);
+					System.out.println("SECOND ID: " + _secondId);
 				}
 			}
 		}
