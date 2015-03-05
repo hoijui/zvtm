@@ -84,6 +84,7 @@ public void update(Observable obj, Object arg)
 				else
 				{
 					System.out.println("CLUSTER " + e.id);
+					_firstId = e.id;
 				}
 			}
 		}
@@ -96,12 +97,12 @@ public void update(Observable obj, Object arg)
 		if (_idNum >= 1 && e.id == _firstId)
 		{
 			x1 = e.x; y1 = e.y;
-			System.out.println("fic: " + x1 + " " + y1 +  " / " +  x2 + " " + y2);
+			//System.out.println("fic: " + x1 + " " + y1 +  " / " +  x2 + " " + y2);
 		}
 		else if (_idNum >= 2 && e.id == _secondId)
 		{
 			x2 = e.x; y2 = e.y;
-			System.out.println("sic: " + x1 + " " + y1 +  " / " +  x2 + " " + y2);
+			//System.out.println("sic: " + x1 + " " + y1 +  " / " +  x2 + " " + y2);
 		}
 		else
 		{
@@ -153,7 +154,7 @@ public void update(Observable obj, Object arg)
 		else if (_mode == MODE_PINCH)
 		{
 			double nd = dist(x1, y1, x2, y2);
-			System.out.println("Pinch: " + nd);
+			//System.out.println("Pinch: " + nd);
 			// FIXME: compute angle
 			IldaEvent.Pinch ie = ildaEvent.new Pinch((x1+x2)/2, (y1+y2)/2, nd, 0);
 			setChanged(); notifyObservers(ie);

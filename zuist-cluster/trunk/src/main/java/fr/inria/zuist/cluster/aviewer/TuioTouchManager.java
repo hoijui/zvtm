@@ -29,7 +29,7 @@ TuioTouchManager(Viewer v)
 	width = viewer.getDisplayWidth();
 	height = viewer.getDisplayHeight();
 
-	tuioTouch = new TuioTouch((double)width/(double)height, 0.003, 0.00001, 0.04);
+	tuioTouch = new TuioTouch((double)width/(double)height, 0.003, 0.001, 0.02);
 	tuioTouch.addObserver(this);
 }
 
