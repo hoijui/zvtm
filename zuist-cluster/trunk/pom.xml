@@ -73,6 +73,11 @@
           <version>2.0.29</version>
           <optional>true</optional>
         </dependency>
+        <dependency>
+          <groupId>net.sourceforge.tuio</groupId>
+          <artifactId>tuio</artifactId>
+          <version>1.4</version>
+        </dependency>
     </dependencies>
     <build>
         <plugins>

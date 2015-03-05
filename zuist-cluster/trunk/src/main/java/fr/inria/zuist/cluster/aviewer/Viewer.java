@@ -201,6 +201,8 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 	    ovm.toggleConsole();
 
 	    vSmarties vs = new vSmarties(this);
+	    new TuioTouchManager(this);
+	    //System.out.println("Viewer created");
     }
 
     private void initGUI(ViewerOptions options)
