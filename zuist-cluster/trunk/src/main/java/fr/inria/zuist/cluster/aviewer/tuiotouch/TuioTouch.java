@@ -33,7 +33,7 @@ static final int MODE_PINCH = 2;
 
 int _numDown = 0;
 int _idNum = 0;
-int _mode = 0;
+int _mode = MODE_READY;
 int _firstId;
 int _secondId;
 
@@ -68,7 +68,7 @@ public void update(Observable obj, Object arg)
 				_idNum = 1;
 				System.out.println("FIRST ID: " + _firstId);
 			}
-			else if (_numDown > 1 && _idNum == 1)
+			else if (_numDown > 1 && _idNum == 1 && _firstId != e.id)
 			{
 				// distance check !!
 				double d = dist(cx1, cy1, e.x, e.y);
@@ -80,6 +80,10 @@ public void update(Observable obj, Object arg)
 					cx2 = sx2 = e.x; cy2 = sy2 = e.y;
 					sdelta = dist(cx1, cy1, cx2, cy2);
 					System.out.println("SECOND ID: " + _secondId);
+				}
+				else
+				{
+					System.out.println("CLUSTER " + e.id);
 				}
 			}
 		}
@@ -101,6 +105,7 @@ public void update(Observable obj, Object arg)
 		}
 		else
 		{
+			System.out.println("BREAK: " + e.id + " " + e.x + " " + e.y);
 			break;
 		}
 

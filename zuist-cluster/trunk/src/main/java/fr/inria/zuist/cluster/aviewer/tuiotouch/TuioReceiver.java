@@ -80,7 +80,7 @@ public void addTuioCursor(TuioCursor tcur)
 {
 	// down
 	TouchEvent e = new TouchEvent(
-		TouchEvent.DOWN, tcur.getCursorID(), tcur.getX(), tcur.getY(), 0);
+		TouchEvent.DOWN, (int)tcur.getSessionID(), tcur.getX(), tcur.getY(), 0);
 	setChanged();
 	notifyObservers(e);
 	if (verbose) 
@@ -98,7 +98,7 @@ public void updateTuioCursor(TuioCursor tcur)
 {
 	// move 
 	TouchEvent e = new TouchEvent(
-		TouchEvent.MOVE, tcur.getCursorID(), tcur.getX(), tcur.getY(), 0);
+		TouchEvent.MOVE, (int)tcur.getSessionID(), tcur.getX(), tcur.getY(), 0);
 	setChanged();
 	notifyObservers(e);
 	if (verbose)
@@ -117,7 +117,7 @@ public void removeTuioCursor(TuioCursor tcur)
 {
 	// up
 	TouchEvent e = new TouchEvent(
-		TouchEvent.UP, tcur.getCursorID(), tcur.getX(), tcur.getY(), 0);
+		TouchEvent.UP, (int)tcur.getSessionID(), tcur.getX(), tcur.getY(), 0);
 	setChanged();
 	notifyObservers(e);
 	if (verbose) 
