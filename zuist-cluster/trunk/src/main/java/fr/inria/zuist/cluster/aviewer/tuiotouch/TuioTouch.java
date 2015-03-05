@@ -49,8 +49,6 @@ double dist(double x1, double y1, double x2, double y2)
 
 public void update(Observable obj, Object arg)
 {
-	//System.out.println("update Tuio");
-
 	if (!(arg instanceof TouchEvent)) { return; }
 
 	TouchEvent e = (TouchEvent)arg;
@@ -58,6 +56,7 @@ public void update(Observable obj, Object arg)
 	switch(e.action)
 	{
 	case TouchEvent.DOWN:
+	{
 		_numDown++;
 		if (_mode == MODE_READY)
 		{
@@ -79,9 +78,11 @@ public void update(Observable obj, Object arg)
 				}
 			}
 		}
-	break;
+		break;
+	}
 	
 	case TouchEvent.MOVE:
+	{
 		double x1 = cx1, y1 = cy1, x2 = cx2, y2 = cy2;
 		if (_idNum >= 1 && e.id == _firstId)
 		{
@@ -117,7 +118,8 @@ public void update(Observable obj, Object arg)
 				{
 					_mode = MODE_PINCH;
 					// FIXME: compute angle
-					IldaEvent.StartPinch ie = ildaEvent.new StartPinch((sx1+sx2)/2, (sy1+sy2)/2, delta, 0);
+					IldaEvent.StartPinch ie =
+						ildaEvent.new StartPinch((sx1+sx2)/2, (sy1+sy2)/2, delta, 0);
 					setChanged(); notifyObservers(ie);
 					IldaEvent.Pinch iem = ildaEvent.new Pinch((x1+x2)/2, (y1+y2)/2, nd, 0);
 					setChanged(); notifyObservers(iem);
@@ -142,9 +144,12 @@ public void update(Observable obj, Object arg)
 		cx1 = x1; cy1 = y1;
 		cx2 = x2; cy2 = y2;
 		delta = dist(cx1, cy1, cx2, cy2);
-	break;
+	
+		break;
+	}
 
 	case TouchEvent.UP:
+	{
 		_numDown--;
 		if ((e.id == _firstId) || (_idNum == 2 && e.id == _secondId))
 		{
@@ -167,7 +172,8 @@ public void update(Observable obj, Object arg)
 			_mode = MODE_READY;
 			_idNum = 0;
 		}
-	break;
+		break;
+	}
 	}
 }
 
