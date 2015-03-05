@@ -88,7 +88,7 @@ public void update(Observable obj, Object arg)
 	
 	case TouchEvent.MOVE:
 	{
-		double x1 = cx1, y1 = cy1, x2 = cx2, y2 = cy2;
+		double x1 = cx1; double y1 = cy1; double x2 = cx2; double y2 = cy2;
 		if (_idNum >= 1 && e.id == _firstId)
 		{
 			x1 = e.x; y1 = e.y;
@@ -121,8 +121,9 @@ public void update(Observable obj, Object arg)
 			else if (_idNum == 2)
 			{
 				double nd = dist(x1, y1, x2, y2);
-				System.out.println("Pinch check: " + nd + " > " + pinchThreshold);
-				if (Math.abs(nd-delta) > pinchThreshold)
+				double d = Math.abs(nd-delta);
+				System.out.println("Pinch check: " + d + " > " + pinchThreshold);
+				if (d > pinchThreshold)
 				{
 					_mode = MODE_PINCH;
 					// FIXME: compute angle
