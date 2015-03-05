@@ -143,6 +143,7 @@ public void update(Observable obj, Object arg)
 		else if (_mode == MODE_PINCH)
 		{
 			double nd = dist(x1, y1, x2, y2);
+			System.out.println("Pinch: " + nd);
 			// FIXME: compute angle
 			IldaEvent.Pinch ie = ildaEvent.new Pinch((x1+x2)/2, (y1+y2)/2, nd, 0);
 			setChanged(); notifyObservers(ie);
@@ -167,7 +168,7 @@ public void update(Observable obj, Object arg)
 			}
 			else if (_mode == MODE_PINCH)
 			{
-				IldaEvent.Pinch ie = ildaEvent.new Pinch((cx1+cx2)/2, (cy1+cy2)/2, 0, 0);
+				IldaEvent.EndPinch ie = ildaEvent.new EndPinch((cx1+cx2)/2, (cy1+cy2)/2, 0, 0);
 				setChanged(); notifyObservers(ie);
 			}
 			_mode = MODE_STOP;

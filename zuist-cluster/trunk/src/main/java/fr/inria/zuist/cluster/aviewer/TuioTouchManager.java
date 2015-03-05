@@ -82,6 +82,7 @@ public void update(Observable obj, Object arg)
 			if (ee.d != 0)
 			{
 				double f = prevPinchD/ee.d;
+				System.out.println("Pinch factor " + f);
 				viewer.centredZoom(f, ee.cx*width, ee.cy*height);
 			}
 			prevPinchD = ee.d;
