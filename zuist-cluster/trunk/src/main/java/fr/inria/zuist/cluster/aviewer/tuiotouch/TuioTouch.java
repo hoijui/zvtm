@@ -105,7 +105,7 @@ public void update(Observable obj, Object arg)
 		}
 		else
 		{
-			System.out.println("BREAK: " + e.id + " " + e.x + " " + e.y);
+			//System.out.println("BREAK: " + e.id + " " + e.x + " " + e.y);
 			break;
 		}
 
