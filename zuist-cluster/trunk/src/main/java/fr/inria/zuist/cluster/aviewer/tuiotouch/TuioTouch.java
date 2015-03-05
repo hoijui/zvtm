@@ -10,11 +10,12 @@ public class TuioTouch  extends Observable implements Observer
 {
 
 private IldaEvent ildaEvent;
-private double dragThreshold, pinchThreshold, clusterThreshold;
+private double wrRatio, dragThreshold, pinchThreshold, clusterThreshold;
 
-public TuioTouch(double dragT, double pinchT, double clusterT)
+public TuioTouch(double whr, double dragT, double pinchT, double clusterT)
 {
 	super(); // Observable
+	wrRatio = whr;
 	dragThreshold = dragT;
 	pinchThreshold= pinchT; 
 	clusterThreshold = clusterT;
@@ -69,12 +70,14 @@ public void update(Observable obj, Object arg)
 			else if (_numDown > 1 && _idNum == 1)
 			{
 				// distance check !!
-				if (dist(cx1, cy1, e.x, e.y) > clusterThreshold)
+				double d = dist(cx1, cy1, e.x, e.y);
+				System.out.println("Dist check: " + d + " > " + clusterThreshold);
+				if (d > clusterThreshold)
 				{
 					_secondId = e.id;
 					_idNum = 2;
 					cx2 = sx2 = e.x; cy2 = sy2 = e.y;
-					delta = dist(cx1, cy1, e.x, e.y);
+					delta = dist(cx1, cy1, cx2, cy2);
 				}
 			}
 		}
@@ -101,7 +104,8 @@ public void update(Observable obj, Object arg)
 		{
 			if (_idNum == 1)
 			{
-				if (dist(sx1, sy1, e.x, e.y) > dragThreshold)
+				double d = dist(sx1, sy1, e.x, e.y);
+				if (d > dragThreshold)
 				{
 					_mode = MODE_MOVE;
 					// do drag x1 y1 vs. sx1, sx2

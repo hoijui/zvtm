@@ -29,7 +29,7 @@ TuioTouchManager(Viewer v)
 	width = viewer.getDisplayWidth();
 	height = viewer.getDisplayHeight();
 
-	tuioTouch = new TuioTouch(0.001, 0.001, 0.01);
+	tuioTouch = new TuioTouch((double)width/(double)height, 0.002, 0.002, 0.04);
 	tuioTouch.addObserver(this);
 }
 
@@ -48,7 +48,7 @@ public void update(Observable obj, Object arg)
 		case IldaEvent.START_MOVE:
 		{
 			IldaEvent.StartMove ee = (IldaEvent.StartMove)e;
-			//System.out.println("StartMove " + ee.x +" "+ ee.y);
+			System.out.println("StartMove " + ee.x +" "+ ee.y);
 			prevMoveX = ee.x; prevMoveY = ee.y;
 			break;
 		}
@@ -65,17 +65,20 @@ public void update(Observable obj, Object arg)
 		case IldaEvent.END_MOVE:
 		{
 			IldaEvent.EndMove ee = (IldaEvent.EndMove)e;
+			System.out.println("EndMove " + ee.x +" "+ ee.y);
 			break;
 		}
 		case IldaEvent.START_PINCH:
 		{
 			IldaEvent.StartPinch ee = (IldaEvent.StartPinch)e;
 			prevPinchD = ee.d; // prevPinchA = ee.a;
+			System.out.println("StartPinch " + ee.d);
 			break;
 		}
 		case IldaEvent.PINCH:
 		{
 			IldaEvent.Pinch ee = (IldaEvent.Pinch)e;
+			//System.out.println("SPinch " + ee.d);
 			if (ee.d != 0)
 			{
 				double f = prevPinchD/ee.d;
@@ -86,7 +89,8 @@ public void update(Observable obj, Object arg)
 		}
 		case IldaEvent.END_PINCH:
 		{
-			IldaEvent.StartMove ee = (IldaEvent.StartMove)e;
+			IldaEvent.EndPinch ee = (IldaEvent.EndPinch)e;
+			System.out.println("EndPinch ");
 			break;
 		}
 	}
