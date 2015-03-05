@@ -105,6 +105,7 @@ public void update(Observable obj, Object arg)
 			if (_idNum == 1)
 			{
 				double d = dist(sx1, sy1, e.x, e.y);
+				System.out.println("Move check: " + d + " > " + dragThreshold);
 				if (d > dragThreshold)
 				{
 					_mode = MODE_MOVE;
@@ -118,6 +119,7 @@ public void update(Observable obj, Object arg)
 			else if (_idNum == 2)
 			{
 				double nd = dist(x1, y1, x2, y2);
+				System.out.println("Pinch check: " + nd + " > " + pinchThreshold);
 				if (Math.abs(nd-delta) > pinchThreshold)
 				{
 					_mode = MODE_PINCH;
