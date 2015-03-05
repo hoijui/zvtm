@@ -130,7 +130,7 @@ public void update(Observable obj, Object arg)
 					_mode = MODE_PINCH;
 					// FIXME: compute angle
 					IldaEvent.StartPinch ie =
-						ildaEvent.new StartPinch((sx1+sx2)/2, (sy1+sy2)/2, delta, 0);
+						ildaEvent.new StartPinch((sx1+sx2)/2, (sy1+sy2)/2, sdelta, 0);
 					setChanged(); notifyObservers(ie);
 					IldaEvent.Pinch iem = ildaEvent.new Pinch((x1+x2)/2, (y1+y2)/2, nd, 0);
 					setChanged(); notifyObservers(iem);
