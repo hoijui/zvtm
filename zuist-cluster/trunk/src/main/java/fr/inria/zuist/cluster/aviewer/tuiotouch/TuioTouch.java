@@ -41,7 +41,7 @@ double sx1 = 0, sy1 = 0;
 double cx1 = 0, cy1 = 0;
 double sx2 = 0, sy2 = 0;
 double cx2 = 0, cy2 = 0;
-double delta = 0;
+double sdelta = 0;
 
 double dist(double x1, double y1, double x2, double y2)
 {
@@ -78,7 +78,7 @@ public void update(Observable obj, Object arg)
 					_secondId = e.id;
 					_idNum = 2;
 					cx2 = sx2 = e.x; cy2 = sy2 = e.y;
-					delta = dist(cx1, cy1, cx2, cy2);
+					sdelta = dist(cx1, cy1, cx2, cy2);
 					System.out.println("SECOND ID: " + _secondId);
 				}
 			}
@@ -92,10 +92,12 @@ public void update(Observable obj, Object arg)
 		if (_idNum >= 1 && e.id == _firstId)
 		{
 			x1 = e.x; y1 = e.y;
+			System.out.println("fic: " + x1 + " " + y1 +  " / " +  x2 + " " + y2);
 		}
 		else if (_idNum >= 2 && e.id == _secondId)
 		{
 			x2 = e.x; y2 = e.y;
+			System.out.println("sic: " + x1 + " " + y1 +  " / " +  x2 + " " + y2);
 		}
 		else
 		{
@@ -121,7 +123,7 @@ public void update(Observable obj, Object arg)
 			else if (_idNum == 2)
 			{
 				double nd = dist(x1, y1, x2, y2);
-				double d = Math.abs(nd-delta);
+				double d = Math.abs(nd-sdelta);
 				System.out.println("Pinch check: " + d + " > " + pinchThreshold);
 				if (d > pinchThreshold)
 				{
@@ -153,7 +155,6 @@ public void update(Observable obj, Object arg)
 		}
 		cx1 = x1; cy1 = y1;
 		cx2 = x2; cy2 = y2;
-		delta = dist(cx1, cy1, cx2, cy2);
 	
 		break;
 	}
