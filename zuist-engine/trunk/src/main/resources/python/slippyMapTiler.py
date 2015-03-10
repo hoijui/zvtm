@@ -61,20 +61,30 @@ TILE_SERVER_LETTER_PREFIXES = ["a", "b", "c", "d"]
 ################################################################################
 
 def getTMSURL():
-    ### OSM
+    ######################### OSM
+    ## EXT: png
     #return "http://%s.tile.openstreetmap.org/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*3))]
-    ### ArcGIS orthoimagery, use with -yx
+    ######################### ArcGIS orthoimagery, use with -yx
+    ## EXT: jpg
     #return "http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/"
-    ### Stamen maps
-    return "http://%s.tile.stamen.com/watercolor/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*4))]
-    #return "http://%s.tile.stamen.com/terrain/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*4))]
+    ######################### Stamen maps
+    ## EXT: jpg
+    #return "http://%s.tile.stamen.com/watercolor/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*4))]
+    ## EXT: jpg
+    return "http://%s.tile.stamen.com/terrain/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*4))]
+    ## EXT: jpg
     #return "http://%s.tile.stamen.com/terrain-background/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*4))]
+    ## EXT: png
     #return "http://%s.tile.stamen.com/toner/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*4))]
-    ### Mapquest
+    ######################### Mapquest
+    ## EXT: jpg
     #return "http://otile%d.mqcdn.com/tiles/1.0.0/sat/" % math.ceil(random.random()*4)
+    ## EXT: jpg
     #return "http://otile%d.mqcdn.com/tiles/1.0.0/osm/" % math.ceil(random.random()*4)
-    ### Mapbox
+    ######################### Mapbox
+    ## EXT: jpg
     #return "http://%s.tiles.mapbox.com/v3/examples.xqwfusor/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*4))]
+
     ### More examples at http://homepage.ntlworld.com/keir.clarke/leaflet/leafletlayers.htm
 
 ################################################################################
