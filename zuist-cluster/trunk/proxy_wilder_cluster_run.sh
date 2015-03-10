@@ -10,7 +10,7 @@ JARS=$JARS":target/slf4j-log4j12-1.7.10.jar"
 JARS=$JARS":target/timingframework-1.0.jar"
 JARS=$JARS":target/zuist-cluster-0.2.1-SNAPSHOT.jar"
 
-PROXY_SETTINGS="-Dhttp.proxyHost=http://foo.bar -Dhttp.proxyPort=3128"
+PROXY_SETTINGS="-Dhttp.proxyHost=\"192.168.2.254\" -Dhttp.proxyPort=\"3128\""
 
 function colNum {
   case "$1" in

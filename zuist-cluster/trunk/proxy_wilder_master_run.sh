@@ -15,6 +15,6 @@ JARS=$JARS":target/args4j-2.0.29.jar"
 JARS=$JARS":target/javaSmarties-1.2.0.jar"
 JARS=$JARS":target/zuist-cluster-0.2.1-SNAPSHOT.jar"
 
-PROXY_SETTINGS="-Dhttp.proxyHost=http://192.168.x.x -Dhttp.proxyPort=3128"
+PROXY_SETTINGS="-Dhttp.proxyHost=\"192.168.2.254\" -Dhttp.proxyPort=\"3128\""
 
 java -Djava.net.preferIPv4Stack=true -Djgroups.bind_addr="192.168.2.2" -Xmx1g $PROXY_SETTINGS -cp $JARS fr.inria.zuist.cluster.viewer.Viewer -r 5 -c 15 -bw 960 -bh 960 "$@"
