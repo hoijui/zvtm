@@ -56,6 +56,8 @@ TILE_FILE_PREFIX = "t-"
 
 TILE_SERVER_LETTER_PREFIXES = ["a", "b", "c", "d"]
 
+ACCESS_TOKEN = ""
+
 ################################################################################
 # TMS URL
 ################################################################################
@@ -63,7 +65,7 @@ TILE_SERVER_LETTER_PREFIXES = ["a", "b", "c", "d"]
 def getTMSURL():
     ######################### OSM
     ## EXT: png
-    #return "http://%s.tile.openstreetmap.org/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*3))]
+    return "http://%s.tile.openstreetmap.org/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*3))]
     ######################### ArcGIS orthoimagery, use with -yx
     ## EXT: jpg
     #return "http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/"
@@ -71,7 +73,7 @@ def getTMSURL():
     ## EXT: jpg
     #return "http://%s.tile.stamen.com/watercolor/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*4))]
     ## EXT: jpg
-    return "http://%s.tile.stamen.com/terrain/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*4))]
+    #return "http://%s.tile.stamen.com/terrain/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*4))]
     ## EXT: jpg
     #return "http://%s.tile.stamen.com/terrain-background/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*4))]
     ## EXT: png
@@ -82,8 +84,14 @@ def getTMSURL():
     ## EXT: jpg
     #return "http://otile%d.mqcdn.com/tiles/1.0.0/osm/" % math.ceil(random.random()*4)
     ######################### Mapbox
+    # Woodcut
     ## EXT: jpg
     #return "http://%s.tiles.mapbox.com/v3/examples.xqwfusor/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*4))]
+    #  Mars https://www.mapbox.com/blog/mars-maps/
+    ## EXT: png
+    #return "https://%s.tiles.mapbox.com/v4/matt.72ca085f/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*4))]
+    ## EXT: png
+    #return "https://%s.tiles.mapbox.com/v4/matt.d160fd9d/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*4))]
 
     ### More examples at http://homepage.ntlworld.com/keir.clarke/leaflet/leafletlayers.htm
 
@@ -161,7 +169,7 @@ def buildRegionsAtLevel(rt, level, levelCount, rootEL, ox, oy):
                 tilePath = fetchTile(tileURL, level+rt[0], x+tcal*rt[1], y+tcal*rt[2])
                 objectEL.set("src", tilePath)
             else:
-                objectEL.set("src", tileURL)
+                objectEL.set("src", "%s%s" % (tileURL, ACCESS_TOKEN))
             objectEL.set("z-index", str(level))
             objectEL.set("params", "im=%s" % INTERPOLATION)
             awh = int(sf*TILE_SIZE)
@@ -200,7 +208,7 @@ def fetchTile(tileURL, z, x, y):
         log("Tile already fetched: %s" % absPath, 3)
     else:
         log("Saving tile to %s" % absPath, 3)
-        urllib.urlretrieve(tileURL, absPath)
+        urllib.urlretrieve("%s%s" % (tileURL, ACCESS_TOKEN), absPath)
     return relPath
 
 ################################################################################
