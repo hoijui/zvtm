@@ -21,6 +21,7 @@ CMD_LINE_HELP = "Slippy Map Tiling Script\n\nUsage:\n\n" + \
     "\t-ext=<ext>\t<ext> one of {png,jpg}\n"+\
     "\t-rt=z-x-y\troot tile (zoom-x-y) for this scene\n"+\
     "\t-zd=N\t\tzoom depth from root (N in [0,19])\n"+\
+    "\t-mfd=N\t\tmaximum depth of scene fragments (0 to generate a single scene no matter the total depth)\n"+\
     "\t-dt=N-N\t\tdownload and save tiles for levels in the specified range (N in [0,19])\n"+\
     "\t-xy\t\tinvert x and y in slippy tile URL coordinates system\n"+\
     "\t-im=<i>\t\t<i> one of {bilinear,bicubic,nearestNeighbor}\n"+\
@@ -35,6 +36,8 @@ TILE_SIZE = 256
 # use Zoom Z and Google: (X,Y)
 ZOOM_DEPTH = 3
 ROOT_TILE = (0,0,0) # zoom 0, x 0, y 0
+
+MAX_FRAG_DEPTH = 4
 
 # Download tiles and reference local tiles
 # for levels in this range (expressed in original tileset's zoom level values)
@@ -98,10 +101,10 @@ def getTMSURL():
 ################################################################################
 # Create target directory if it does not exist yet
 ################################################################################
-def createTargetDir():
-    if not os.path.exists(TGT_DIR):
-        log("Creating target directory %s" % TGT_DIR, 2)
-        os.mkdir(TGT_DIR)
+def createTargetDir(tgtDir):
+    if not os.path.exists(tgtDir):
+        log("Creating target directory %s" % tgtDir, 2)
+        os.mkdir(tgtDir)
 
 ################################################################################
 # Generate levels for ZUIST scene
@@ -124,20 +127,21 @@ def generateLevels(lroot, ldepth, zloffset, rootEL):
 
 ################################################################################
 # Create tiles and ZUIST XML scene from source image
-# root tile (z,x,y), zoom depth
+# root tile (z,x,y), zoom depth, fragment top level, target dir
 ################################################################################
-def generateTree(rt, zd):
-    outputSceneFile = "%s/scene.xml" % TGT_DIR
+def generateTree(rt, zd, ftl, tgtDir):
+    outputSceneFile = "%s/scene.xml" % tgtDir
     # prepare the XML scene
     outputroot = ET.Element("scene")
-    # source image
-    levelCount = generateLevels(rt[0], zd, 0, outputroot)
-    log("TMS URL prefix: %s" % getTMSURL(), 1)
-    log("Interpolation method: %s" % INTERPOLATION)
-    ox = -int(math.pow(2,levelCount-1)) * TILE_SIZE / 2
-    oy = int(math.pow(2,levelCount-1)) * TILE_SIZE / 2
-    for l in range(levelCount):
-        buildRegionsAtLevel(rt, l, levelCount, outputroot, ox, oy)
+    totalLevelCount = generateLevels(rt[0], zd, 0, outputroot)
+    ox = -int(math.pow(2,totalLevelCount-1)) * TILE_SIZE / 2
+    oy = int(math.pow(2,totalLevelCount-1)) * TILE_SIZE / 2
+    if MAX_FRAG_DEPTH == 0:
+        levelRangeInFrag = range(ftl, ftl+totalLevelCount)
+    else:
+        levelRangeInFrag = range(ftl, ftl+MAX_FRAG_DEPTH) #XXX:FIXME
+    for l in levelRangeInFrag:
+        buildRegionsAtLevel(rt, l, ftl, totalLevelCount, outputroot, ox, oy, tgtDir)
     # serialize the XML tree
     tree = ET.ElementTree(outputroot)
     log("Writing %s" % outputSceneFile)
@@ -146,14 +150,17 @@ def generateTree(rt, zd):
 ################################################################################
 # Build all regions/tiles for a given zoom level
 ################################################################################
-def buildRegionsAtLevel(rt, level, levelCount, rootEL, ox, oy):
+def buildRegionsAtLevel(rt, level, ftl, totalLevelCount, rootEL, ox, oy, tgtDir):
+    # should call generateTree to create scene fragments for levels below this one
+    generateFrags = (level+1 == MAX_FRAG_DEPTH) and (level + 1 < totalLevelCount)
     tcal = int(math.pow(2,level)) # tile count at level
-    sf = int(math.pow(2,levelCount-level-1)) # tile scale factor
+    sf = int(math.pow(2,totalLevelCount-level-1)) # tile scale factor
     log("level: %d, tile count: %dx%d, tile scale factor: %d" % (level, tcal, tcal, sf), 2)
+    print generateFrags
     for x in range(tcal):
         for y in range(tcal):
             regionEL = ET.SubElement(rootEL, "region")
-            tileID = "%d-%d-%d" % (level, x, y)
+            tileID = "%d-%d-%d" % (level+rt[0], x+tcal*rt[1], y+tcal*rt[2])
             regionID = "R%s" % tileID
             regionEL.set("id", regionID)
             objectEL = ET.SubElement(regionEL, "resource")
@@ -166,11 +173,11 @@ def buildRegionsAtLevel(rt, level, levelCount, rootEL, ox, oy):
                 tileURL = "%s%d/%d/%d.%s" % (getTMSURL(),level+rt[0],x+tcal*rt[1],y+tcal*rt[2],TILE_EXT)
             if level+rt[0] in range(DOWNLOAD_LEVEL_RANGE[0],DOWNLOAD_LEVEL_RANGE[1]+1):
                 log("Fetching tile %s" % tileURL, 3)
-                tilePath = fetchTile(tileURL, level+rt[0], x+tcal*rt[1], y+tcal*rt[2])
+                tilePath = fetchTile(tileURL, level+rt[0], x+tcal*rt[1], y+tcal*rt[2], tgtDir)
                 objectEL.set("src", tilePath)
             else:
                 objectEL.set("src", "%s%s" % (tileURL, ACCESS_TOKEN))
-            objectEL.set("z-index", str(level))
+            objectEL.set("z-index", str(rt[0]+level))
             objectEL.set("params", "im=%s" % INTERPOLATION)
             awh = int(sf*TILE_SIZE)
             vx = ox + x*awh + awh/2
@@ -186,24 +193,36 @@ def buildRegionsAtLevel(rt, level, levelCount, rootEL, ox, oy):
             objectEL.set("w", str(int(vw)))
             objectEL.set("h", str(int(vh)))
             if level == 0:
-                regionEL.set("levels", "0;%d" % (levelCount-1))
+                regionEL.set("levels", "0;%d" % (totalLevelCount-1))
             else:
-                parentTileID = "R%d-%d-%d" % (level-1,x/2,y/2)
+                parentTileID = "R%d-%d-%d" % (rt[0]+level-1,(x+tcal*rt[1])/2,(y+tcal*rt[2])/2)
                 regionEL.set("containedIn", parentTileID)
                 regionEL.set("levels", str(level))
     return
 
+
+# def buildFragments(rt, level, totalLevelCount, rootEL, ox, oy, tgtDir):
+#     if generateFrags:
+#         log("%d %d" % (x,y))
+#         nTgtDir = "%s/%d/%d/%d" % (tgtDir, rt[0]+level, x+tcal*rt[1], y+tcal*rt[2])
+#         ntcal = int(math.pow(2,level+1))
+#         nrt = (rt[0]+level+1, x+ntcal*rt[1], y+ntcal*rt[2])
+#         print nrt
+#         # generateTree(nrt, 1, nTgtDir)
+
+
+
 ################################################################################
 # Trace exec on std output
 ################################################################################
-def fetchTile(tileURL, z, x, y):
-    directories = ["%s/%d" % (TGT_DIR, z), "%s/%d/%d" % (TGT_DIR, z, x)]
+def fetchTile(tileURL, z, x, y, tgtDir):
+    directories = ["%s/%d" % (tgtDir, z), "%s/%d/%d" % (tgtDir, z, x)]
     for d in directories:
         if not os.path.exists(d):
             log("Creating target directory %s" % d, 3)
             os.mkdir(d)
     relPath = "%d/%d/%d.%s" % (z, x, y, TILE_EXT)
-    absPath = "%s/%s" % (TGT_DIR, relPath)
+    absPath = "%s/%s" % (tgtDir, relPath)
     if os.path.exists(absPath):
         log("Tile already fetched: %s" % absPath, 3)
     else:
@@ -229,6 +248,8 @@ if len(sys.argv) > 1 and not sys.argv[1].startswith("-"):
                 TILE_SIZE = int(arg[4:])
             elif arg.startswith("-zd="):
                 ZOOM_DEPTH = int(arg[4:])
+            elif arg.startswith("-mfd="):
+                MAX_FRAG_DEPTH = int(arg[5:])
             elif arg.startswith("-rt="):
                 tokens = arg[4:].split("-")
                 ROOT_TILE = (int(tokens[0]), int(tokens[1]), int(tokens[2]))
@@ -251,6 +272,9 @@ else:
     sys.exit(0)
 
 log("Tile Size: %dx%d" % (TILE_SIZE, TILE_SIZE), 1)
-createTargetDir()
-generateTree(ROOT_TILE, ZOOM_DEPTH)
+log("Maximum levels in scene fragments: %d" % MAX_FRAG_DEPTH)
+log("TMS URL prefix: %s" % getTMSURL(), 1)
+log("Interpolation method: %s" % INTERPOLATION)
+createTargetDir(TGT_DIR)
+generateTree(ROOT_TILE, ZOOM_DEPTH, 0, TGT_DIR)
 log("")
