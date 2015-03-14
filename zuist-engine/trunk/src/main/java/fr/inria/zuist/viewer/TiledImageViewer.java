@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2009-2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2009-2015. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -345,6 +345,7 @@ public class TiledImageViewer {
 				if (args[i].substring(1).equals("fs")){fs = true;}
 				else if (args[i].substring(1).equals("opengl")){ogl = true;}
 				else if (args[i].substring(1).equals("noaa")){aa = false;}
+                else if (args[i].substring(1).equals("debug")){SceneManager.setDebugMode(true);}
 				else if (args[i].substring(1).equals("smooth")){Region.setDefaultTransitions(Region.FADE_IN, Region.FADE_OUT);}
 				else if (args[i].substring(1).equals("h") || args[i].substring(1).equals("--help")){TiledImageViewer.printCmdLineHelp();System.exit(0);}
 			}
@@ -383,6 +384,7 @@ public class TiledImageViewer {
         System.out.println("\t-noaa: no antialiasing");
 		System.out.println("\t-opengl: use Java2D OpenGL rendering pipeline (Java 6+Linux/Windows), requires that -Dsun.java2d.opengl=true be set on cmd line");
         System.out.println("\t-smooth: default to smooth transitions between levels when none specified");
+        System.out.println("\t-debug: enable debug mode");
     }
 
 }
