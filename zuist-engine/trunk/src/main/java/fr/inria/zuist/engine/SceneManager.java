@@ -135,7 +135,7 @@ public class SceneManager implements CameraListener {
     final VirtualSpace[] sceneLayers;
     final Camera[] sceneCameras;
     final double[] prevAlts; //previous altitudes
-    private final RegionUpdater regUpdater = new RegionUpdater();
+    private final RegionUpdater regUpdater;
 
     /** Contains a mapping from region IDs to actual Region objects. */
     Hashtable<String,Region> id2region;
@@ -162,7 +162,7 @@ public class SceneManager implements CameraListener {
         private boolean enabled = true;
 
         RegionUpdater(){
-            toUpdate = new HashMap<Camera, Location>();
+            toUpdate = new HashMap<Camera, Location>(sceneCameras.length);
             active = false;
             period = DEFAULT_PERIOD;
         }
@@ -226,12 +226,13 @@ public class SceneManager implements CameraListener {
     public SceneManager(VirtualSpace[] vss, Camera[] cs){
         this.sceneLayers = vss;
         this.sceneCameras = cs;
+        regUpdater = new RegionUpdater();
         prevAlts = new double[sceneCameras.length];
         glyphLoader = new GlyphLoader(this);
         id2region = new Hashtable<String,Region>();
         id2object = new Hashtable<String,ObjectDescription>();
         sceneAttrs = new HashMap(2);
-        RESOURCE_HANDLERS = new HashMap<String, ResourceHandler>();
+        RESOURCE_HANDLERS = new HashMap<String, ResourceHandler>(5);
         for(Camera cam: sceneCameras){
             cam.addListener(this);
         }
@@ -433,9 +434,7 @@ public class SceneManager implements CameraListener {
         Element root = scene.getDocumentElement();
         // scene attributes
         processSceneAttributes(root);
-        NodeList nl = root.getChildNodes();
-        Node n;
-        Element e;
+        NodeList nl = root.getElementsByTagName(_level);
         if (reset || levels.length == 0){
             // process new levels only if resetting and loading a new scene, or if appending but no level was ever created
             if (pl != null){
@@ -443,32 +442,21 @@ public class SceneManager implements CameraListener {
                 pl.setValue(10);
             }
             for (int i=0;i<nl.getLength();i++){
-                n = nl.item(i);
-                if (n.getNodeType() == Node.ELEMENT_NODE){
-                    e = (Element)n;
-                    if (e.getTagName().equals(_level)){
-                        processLevel(e);
-                    }
-                }
+                processLevel((Element)nl.item(i));
             }
         }
         if (pl != null){
             pl.setLabel("Creating regions, loading object descriptions...");
         }
         // temporary hashtable used to build structure
-        HashMap<String,String> regionName2containerRegionName = new HashMap<String,String>();
-        Vector regions = new Vector();
+        nl = root.getElementsByTagName(_region);
+        HashMap<String,String> regionName2containerRegionName = new HashMap<String,String>(nl.getLength());
+        Vector<Region> regions = new Vector(nl.getLength());
         for (int i=0;i<nl.getLength();i++){
-            n = nl.item(i);
-            if (n.getNodeType() == Node.ELEMENT_NODE){
-                e = (Element)n;
-                if (e.getTagName().equals(_region)){
-                    if (pl != null){
-                        pl.setValue(Math.round(10+i/((float)nl.getLength())*50.0f));
-                    }
-                    regions.add(processRegion(e, regionName2containerRegionName, sceneFileDirectory));
-                }
+            if (pl != null){
+                pl.setValue(Math.round(10+i/((float)nl.getLength())*50.0f));
             }
+            regions.add(processRegion((Element)nl.item(i), regionName2containerRegionName, sceneFileDirectory));
         }
         for (String rn:regionName2containerRegionName.keySet()){
             if (rn != null){
@@ -491,18 +479,12 @@ public class SceneManager implements CameraListener {
         if (pl != null){
             pl.setLabel("Processing inclusions...");
         }
-        nl = root.getChildNodes();
+        nl = root.getElementsByTagName(_include);
         for (int i=0;i<nl.getLength();i++){
-            n = nl.item(i);
-            if (n.getNodeType() == Node.ELEMENT_NODE){
-                e = (Element)n;
-                if (e.getTagName().equals(_include)){
-                    if (pl != null){
-                        pl.setValue(Math.round(60+i/((float)nl.getLength())*30.0f));
-                    }
-                    processInclude(e, sceneFileDirectory);
-                }
+            if (pl != null){
+                pl.setValue(Math.round(60+i/((float)nl.getLength())*30.0f));
             }
+            processInclude((Element)nl.item(i), sceneFileDirectory);
         }
         if (pl != null){
             pl.setLabel("Cleaning up temporary resources...");
@@ -658,13 +640,12 @@ public class SceneManager implements CameraListener {
         if (containerID != null){
             rn2crn.put(id, containerID);
         }
-        Node n;
-        Element e;
         NodeList nl = regionEL.getChildNodes();
+        Node n;
         for (int i=0;i<nl.getLength();i++){
             n = nl.item(i);
             if (n.getNodeType() == Node.ELEMENT_NODE){
-                processObject((Element)n, region, sceneFileDirectory);
+                processObject((Element)nl.item(i), region, sceneFileDirectory);
             }
         }
         return region;
@@ -1027,7 +1008,7 @@ public class SceneManager implements CameraListener {
      *@return index of level at which camera is right now (highest level is 0)
      */
     public int getCurrentLevel(){
-    return currentLevel;
+        return currentLevel;
     }
 
     private void enterLevel(int layerIndex, double[] cameraBounds, int depth, int prev_depth){
@@ -1092,11 +1073,11 @@ public class SceneManager implements CameraListener {
     }
 
     public void setFadeInDuration(int d){
-    glyphLoader.FADE_IN_DURATION = d;
+        glyphLoader.FADE_IN_DURATION = d;
     }
 
     public void setFadeOutDuration(int d){
-    glyphLoader.FADE_OUT_DURATION = d;
+        glyphLoader.FADE_OUT_DURATION = d;
     }
 
     int getLayerIndex(String spaceName){
