@@ -23,10 +23,9 @@ import java.net.MalformedURLException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Vector;
-import java.util.Hashtable;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Enumeration;
+import java.util.Set;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -138,9 +137,9 @@ public class SceneManager implements CameraListener {
     private final RegionUpdater regUpdater = new RegionUpdater();
 
     /** Contains a mapping from region IDs to actual Region objects. */
-    Hashtable id2region;
+    HashMap<String,Region> id2region;
     /** Contains a mapping from object IDs to actual objects. */
-    Hashtable<String, ObjectDescription> id2object;
+    HashMap<String,ObjectDescription> id2object;
 
     LevelListener levelListener;
     RegionListener regionListener;
@@ -149,7 +148,7 @@ public class SceneManager implements CameraListener {
     /** Set to something else than 0,0 to translate a scene to another location than that defined originally. */
     Point2D.Double origin = new Point2D.Double(0, 0);
 
-    HashMap sceneAttrs;
+    HashMap<String,Object> sceneAttrs;
 
     HashMap<String, ResourceHandler> RESOURCE_HANDLERS;
 
@@ -228,9 +227,9 @@ public class SceneManager implements CameraListener {
         this.sceneCameras = cs;
         prevAlts = new double[sceneCameras.length];
         glyphLoader = new GlyphLoader(this);
-        id2region = new Hashtable();
-        id2object = new Hashtable<String, ObjectDescription>();
-        sceneAttrs = new HashMap();
+        id2region = new HashMap<String,Region>();
+        id2object = new HashMap<String,ObjectDescription>();
+        sceneAttrs = new HashMap(2);
         RESOURCE_HANDLERS = new HashMap<String, ResourceHandler>();
         for(Camera cam: sceneCameras){
             cam.addListener(this);
@@ -297,22 +296,22 @@ public class SceneManager implements CameraListener {
     }
 
 
-    public Enumeration getRegionIDs(){
-    return id2region.keys();
+    public Set<String> getRegionIDs(){
+        return id2region.keySet();
     }
 
     /** Get a region knowing its ID.
      *@return null if no region associated with this ID.
      */
     public Region getRegion(String id){
-    return (Region)id2region.get(id);
+        return id2region.get(id);
     }
 
     /** Get a list of all object IDs, at any level and in any region.
      *@return sequence of object IDs in no particular order
      */
-    public Enumeration getObjectIDs(){
-        return id2object.keys();
+    public Set<String> getObjectIDs(){
+        return id2object.keySet();
     }
 
     /** Get an object knowing its ID.
@@ -473,8 +472,8 @@ public class SceneManager implements CameraListener {
         for (String rn:regionName2containerRegionName.keySet()){
             if (rn != null){
                 // region is contained in another region
-                Region r = (Region)id2region.get(rn);
-                Region cr = (Region)id2region.get(regionName2containerRegionName.get(rn));
+                Region r = id2region.get(rn);
+                Region cr = id2region.get(regionName2containerRegionName.get(rn));
                 if (r != null && cr != null){
                     cr.addContainedRegion(r);
                     r.setContainingRegion(cr);
