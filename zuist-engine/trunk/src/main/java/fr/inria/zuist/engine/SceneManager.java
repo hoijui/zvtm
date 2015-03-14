@@ -23,6 +23,7 @@ import java.net.MalformedURLException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Vector;
+import java.util.Hashtable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -137,9 +138,9 @@ public class SceneManager implements CameraListener {
     private final RegionUpdater regUpdater = new RegionUpdater();
 
     /** Contains a mapping from region IDs to actual Region objects. */
-    HashMap<String,Region> id2region;
+    Hashtable<String,Region> id2region;
     /** Contains a mapping from object IDs to actual objects. */
-    HashMap<String,ObjectDescription> id2object;
+    Hashtable<String,ObjectDescription> id2object;
 
     LevelListener levelListener;
     RegionListener regionListener;
@@ -227,8 +228,8 @@ public class SceneManager implements CameraListener {
         this.sceneCameras = cs;
         prevAlts = new double[sceneCameras.length];
         glyphLoader = new GlyphLoader(this);
-        id2region = new HashMap<String,Region>();
-        id2object = new HashMap<String,ObjectDescription>();
+        id2region = new Hashtable<String,Region>();
+        id2object = new Hashtable<String,ObjectDescription>();
         sceneAttrs = new HashMap(2);
         RESOURCE_HANDLERS = new HashMap<String, ResourceHandler>();
         for(Camera cam: sceneCameras){
