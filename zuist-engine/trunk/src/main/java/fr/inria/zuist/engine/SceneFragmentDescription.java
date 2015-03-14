@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2010-2011. All Rights Reserved
+ *   Copyright (c) INRIA, 2010-2015. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -11,7 +11,7 @@ import java.io.File;
 import java.net.URL;
 import java.net.URISyntaxException;
 import java.util.Vector;
-import java.util.Hashtable;
+import java.util.HashMap;
 
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.glyphs.Glyph;
@@ -33,7 +33,7 @@ public class SceneFragmentDescription extends ResourceDescription {
 
     Vector<Region> regions;
 
-    /** Constructs the description of an image (VImageST).
+    /** Constructs the description of a scene fragment.
     *@param id ID of object in scene
     *@param x x-coordinate in scene
     *@param y y-coordinate in scene
@@ -56,26 +56,19 @@ public class SceneFragmentDescription extends ResourceDescription {
 
     @Override
     public void createObject(SceneManager sm, final VirtualSpace vs, final boolean fadeIn){
-        //System.out.println("Loading fragment: "+src);
         if (regions == null){
             try {
                 File sceneFile = new File(src.toURI());
                 File sceneFileDirectory = sceneFile.getParentFile();
                 Document scene = SceneManager.parseXML(sceneFile);
                 Element root = scene.getDocumentElement();
-                NodeList nl = root.getChildNodes();
+                NodeList nl = root.getElementsByTagName(SceneManager._region);
                 Node n;
-                Element e;
-                Hashtable regionName2containerRegionName = new Hashtable();
-                regions = new Vector<Region>();
+                HashMap<String,String> regionName2containerRegionName = new HashMap<String,String>(nl.getLength());
+                regions = new Vector<Region>(nl.getLength());
                 for (int i=0;i<nl.getLength();i++){
                     n = nl.item(i);
-                    if (n.getNodeType() == Node.ELEMENT_NODE){
-                        e = (Element)n;
-                        if (e.getTagName().equals(SceneManager._region)){
-                            regions.add(sm.processRegion(e, regionName2containerRegionName, sceneFileDirectory));
-                        }
-                    }
+                    regions.add(sm.processRegion((Element)n, regionName2containerRegionName, sceneFileDirectory));
                 }
                 sm.updateVisibleRegions();
             }

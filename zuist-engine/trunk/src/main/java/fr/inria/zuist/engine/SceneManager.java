@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2007-2014. All Rights Reserved
+ *   Copyright (c) INRIA, 2007-2015. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -456,7 +456,7 @@ public class SceneManager implements CameraListener {
             pl.setLabel("Creating regions, loading object descriptions...");
         }
         // temporary hashtable used to build structure
-        Hashtable regionName2containerRegionName = new Hashtable();
+        HashMap<String,String> regionName2containerRegionName = new HashMap<String,String>();
         Vector regions = new Vector();
         for (int i=0;i<nl.getLength();i++){
             n = nl.item(i);
@@ -470,8 +470,7 @@ public class SceneManager implements CameraListener {
                 }
             }
         }
-        for (Enumeration en=regionName2containerRegionName.keys();en.hasMoreElements();){
-            String rn = (String)en.nextElement();
+        for (String rn:regionName2containerRegionName.keySet()){
             if (rn != null){
                 // region is contained in another region
                 Region r = (Region)id2region.get(rn);
@@ -530,7 +529,6 @@ public class SceneManager implements CameraListener {
     }
 
     public SceneFragmentDescription createSceneFragmentDescription(double x, double y, String id, Region region, URL resourceURL){
-        //System.out.println("Creating scene fragment "+resourceURL);
         SceneFragmentDescription sd = new SceneFragmentDescription(id, x, y, resourceURL, region, this);
         region.addObject(sd);
         return sd;
@@ -623,7 +621,7 @@ public class SceneManager implements CameraListener {
         return region;
     }
 
-    Region processRegion(Element regionEL, Hashtable rn2crn, File sceneFileDirectory){
+    Region processRegion(Element regionEL, HashMap<String,String> rn2crn, File sceneFileDirectory){
         double x = Double.parseDouble(regionEL.getAttribute(_x));
         double y = Double.parseDouble(regionEL.getAttribute(_y));
         double w = Double.parseDouble(regionEL.getAttribute(_w));
