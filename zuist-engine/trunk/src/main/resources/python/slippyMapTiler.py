@@ -37,7 +37,7 @@ TILE_SIZE = 256
 ZOOM_DEPTH = 3
 ROOT_TILE = (0,0,0) # zoom 0, x 0, y 0
 
-MAX_FRAG_DEPTH = 4
+MAX_FRAG_DEPTH = 0
 
 # Download tiles and reference local tiles
 # for levels in this range (expressed in original tileset's zoom level values)
