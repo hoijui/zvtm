@@ -162,7 +162,7 @@ public class SceneManager implements CameraListener {
         private boolean enabled = true;
 
         RegionUpdater(){
-            toUpdate = new HashMap<Camera, Location>(sceneCameras.length);
+            toUpdate = new HashMap<Camera, Location>(sceneCameras.length,1);
             active = false;
             period = DEFAULT_PERIOD;
         }
@@ -231,7 +231,7 @@ public class SceneManager implements CameraListener {
         glyphLoader = new GlyphLoader(this);
         id2region = new Hashtable<String,Region>();
         id2object = new Hashtable<String,ObjectDescription>();
-        sceneAttrs = new HashMap(2);
+        sceneAttrs = new HashMap(5,1);
         RESOURCE_HANDLERS = new HashMap<String, ResourceHandler>(5);
         for(Camera cam: sceneCameras){
             cam.addListener(this);
@@ -450,7 +450,7 @@ public class SceneManager implements CameraListener {
         }
         // temporary hashtable used to build structure
         nl = root.getElementsByTagName(_region);
-        HashMap<String,String> regionName2containerRegionName = new HashMap<String,String>(nl.getLength());
+        HashMap<String,String> regionName2containerRegionName = new HashMap<String,String>(nl.getLength(),1);
         Vector<Region> regions = new Vector(nl.getLength());
         for (int i=0;i<nl.getLength();i++){
             if (pl != null){
