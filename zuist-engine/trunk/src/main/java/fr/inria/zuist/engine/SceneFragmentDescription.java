@@ -61,14 +61,11 @@ public class SceneFragmentDescription extends ResourceDescription {
                 File sceneFile = new File(src.toURI());
                 File sceneFileDirectory = sceneFile.getParentFile();
                 Document scene = SceneManager.parseXML(sceneFile);
-                Element root = scene.getDocumentElement();
-                NodeList nl = root.getElementsByTagName(SceneManager._region);
-                Node n;
+                NodeList nl = scene.getDocumentElement().getElementsByTagName(SceneManager._region);
                 HashMap<String,String> regionName2containerRegionName = new HashMap<String,String>(nl.getLength());
                 regions = new Vector<Region>(nl.getLength());
                 for (int i=0;i<nl.getLength();i++){
-                    n = nl.item(i);
-                    regions.add(sm.processRegion((Element)n, regionName2containerRegionName, sceneFileDirectory));
+                    regions.add(sm.processRegion((Element)nl.item(i), regionName2containerRegionName, sceneFileDirectory));
                 }
                 sm.updateVisibleRegions();
             }
