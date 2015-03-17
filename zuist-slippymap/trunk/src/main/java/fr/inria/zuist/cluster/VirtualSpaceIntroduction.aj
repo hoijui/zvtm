@@ -2,7 +2,7 @@
  *   Copyright (c) INRIA, 2010-2013. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: VirtualSpaceIntroduction.aj 781 2015-01-21 12:59:34Z epietrig $
+ * $Id$
  */
 
 package fr.inria.zuist.cluster;

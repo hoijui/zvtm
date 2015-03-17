@@ -1,5 +1,5 @@
 /*   Copyright (c) INRIA, 2015. All Rights Reserved
- * $Id: AriaDemo.java 786 2015-01-26 14:59:26Z epietrig $
+ * $Id$
  */
 
 package fr.inria.zuist.viewer;

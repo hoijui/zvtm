@@ -1,5 +1,5 @@
 /*   Copyright (c) INRIA, 2015. All Rights Reserved
- * $Id:  $
+ * $Id$
  */
 
 package fr.inria.zuist.viewer;
