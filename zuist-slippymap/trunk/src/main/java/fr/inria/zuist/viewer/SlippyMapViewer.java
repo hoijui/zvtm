@@ -4,10 +4,6 @@
 
 package fr.inria.zuist.viewer;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.FilenameFilter;
-
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -28,9 +24,11 @@ import javax.swing.JLayeredPane;
 import javax.swing.ImageIcon;
 import java.awt.geom.Point2D;
 
-import java.util.Vector;
-
 import java.io.File;
+import java.io.IOException;
+import java.io.FilenameFilter;
+
+import java.util.Vector;
 
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
@@ -48,13 +46,6 @@ import fr.inria.zvtm.animation.EndAction;
 
 import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zuist.engine.ProgressListener;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.FactoryConfigurationError;
-import javax.xml.parsers.ParserConfigurationException;
-import org.w3c.dom.Document;
-import org.xml.sax.SAXException;
 
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -83,7 +74,6 @@ public class SlippyMapViewer implements Java2DPainter {
 
     static final short ZMAP_LAYER = 0;
     static final short BOUNDARY_LAYER = 1;
-    static final short CW_LAYER = 2;
 
     /* ZVTM objects */
     VirtualSpaceManager vsm;
@@ -98,29 +88,23 @@ public class SlippyMapViewer implements Java2DPainter {
     SceneManager sm;
     NavigationManager nm;
 
-    WEGlassPane gp;
-
     boolean antialiasing = false;
 
-    public SlippyMapViewer(SMVOptions options, File xmlSceneFile){
-        System.out.println(xmlSceneFile);
+    public SlippyMapViewer(SMVOptions options){
         VirtualSpaceManager.INSTANCE.getAnimationManager().setResolution(80);
         nm = new NavigationManager(this);
         initGUI(options);
-        gp = new WEGlassPane(this);
-        ((JFrame)mView.getFrame()).setGlassPane(gp);
-        gp.setValue(0);
-        gp.setVisible(true);
         VirtualSpace[]  sceneSpaces = {mSpace};
         Camera[] sceneCameras = {mCamera};
         sm = new SceneManager(sceneSpaces, sceneCameras);
-        if (xmlSceneFile != null){
-            System.out.println("Loading ZUIST map "+xmlSceneFile.getName());
-            gp.setLabel("Loading ZUIST map "+xmlSceneFile.getName());
-            sm.loadScene(parseXML(xmlSceneFile), xmlSceneFile.getParentFile(), true, gp);
-        }
-        gp.setVisible(false);
-        gp.setLabel(WEGlassPane.EMPTY_STRING);
+        initScene();
+        // if (xmlSceneFile != null){
+        //     System.out.println("Loading ZUIST map "+xmlSceneFile.getName());
+        //     gp.setLabel("Loading ZUIST map "+xmlSceneFile.getName());
+        //     sm.loadScene(parseXML(xmlSceneFile), xmlSceneFile.getParentFile(), true, gp);
+        // }
+        // gp.setVisible(false);
+        // gp.setLabel(WEGlassPane.EMPTY_STRING);
         EndAction ea  = new EndAction(){
                 public void execute(Object subject, Animation.Dimension dimension){
                    sm.setUpdateLevel(true);
@@ -202,6 +186,12 @@ public class SlippyMapViewer implements Java2DPainter {
 
     /*-------------     Navigation       -------------*/
 
+    void initScene(){
+        //XXX:TBW
+    }
+
+    /*-------------     Navigation       -------------*/
+
     void altitudeChanged(){}
 
     void updatePanelSize(){
@@ -233,22 +223,6 @@ public class SlippyMapViewer implements Java2DPainter {
     /*Java2DPainter interface*/
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){}
 
-    static Document parseXML(File f){
-        try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            factory.setValidating(false);
-            factory.setAttribute("http://apache.org/xml/features/nonvalidating/load-external-dtd", new Boolean(false));
-            factory.setNamespaceAware(true);
-            DocumentBuilder builder = factory.newDocumentBuilder();
-            Document res = builder.parse(f);
-            return res;
-        }
-        catch (FactoryConfigurationError e){e.printStackTrace();return null;}
-        catch (ParserConfigurationException e){e.printStackTrace();return null;}
-        catch (SAXException e){e.printStackTrace();return null;}
-        catch (IOException e){e.printStackTrace();return null;}
-    }
-
     void exit(){
         System.exit(0);
     }
@@ -263,79 +237,11 @@ public class SlippyMapViewer implements Java2DPainter {
             parser.printUsage(System.err);
             return;
         }
-        File xmlSceneFile = (options.path_to_zuist_map != null) ? new File(options.path_to_zuist_map) : null;
         if (!options.fullscreen && Utils.osIsMacOS()){
             System.setProperty("apple.laf.useScreenMenuBar", "true");
         }
         System.out.println("--help for command line options");
-        new SlippyMapViewer(options, xmlSceneFile);
-    }
-
-}
-
-class WEGlassPane extends JComponent implements ProgressListener {
-
-    static final int BAR_WIDTH = 200;
-    static final int BAR_HEIGHT = 10;
-
-    static final AlphaComposite GLASS_ALPHA = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.65f);
-    static final Color MSG_COLOR = Color.DARK_GRAY;
-    GradientPaint PROGRESS_GRADIENT = new GradientPaint(0, 0, Color.ORANGE, 0, BAR_HEIGHT, Color.BLUE);
-
-    static final String EMPTY_STRING = "";
-    String msg = EMPTY_STRING;
-    int msgX = 0;
-    int msgY = 0;
-
-    int completion = 0;
-    int prX = 0;
-    int prY = 0;
-    int prW = 0;
-
-    SlippyMapViewer application;
-
-    static final Font GLASSPANE_FONT = new Font("Arial", Font.PLAIN, 12);
-
-    WEGlassPane(SlippyMapViewer app){
-        super();
-        this.application = app;
-        addMouseListener(new MouseAdapter(){});
-        addMouseMotionListener(new MouseMotionAdapter(){});
-        addKeyListener(new KeyAdapter(){});
-    }
-
-    public void setValue(int c){
-        completion = c;
-        prX = application.panelWidth/2-BAR_WIDTH/2;
-        prY = application.panelHeight/2-BAR_HEIGHT/2;
-        prW = (int)(BAR_WIDTH * ((float)completion) / 100.0f);
-        PROGRESS_GRADIENT = new GradientPaint(0, prY, Color.LIGHT_GRAY, 0, prY+BAR_HEIGHT, Color.DARK_GRAY);
-        repaint(prX, prY, BAR_WIDTH, BAR_HEIGHT);
-    }
-
-    public void setLabel(String m){
-        msg = m;
-        msgX = application.panelWidth/2-BAR_WIDTH/2;
-        msgY = application.panelHeight/2-BAR_HEIGHT/2 - 10;
-        repaint(msgX, msgY-50, 400, 70);
-    }
-
-    protected void paintComponent(Graphics g){
-        Graphics2D g2 = (Graphics2D)g;
-        Rectangle clip = g.getClipBounds();
-        g2.setComposite(GLASS_ALPHA);
-        g2.setColor(Color.WHITE);
-        g2.fillRect(clip.x, clip.y, clip.width, clip.height);
-        g2.setComposite(AlphaComposite.Src);
-        if (msg != EMPTY_STRING){
-            g2.setColor(MSG_COLOR);
-            g2.setFont(GLASSPANE_FONT);
-            g2.drawString(msg, msgX, msgY);
-        }
-        g2.setPaint(PROGRESS_GRADIENT);
-        g2.fillRect(prX, prY, prW, BAR_HEIGHT);
-        g2.setColor(MSG_COLOR);
-        g2.drawRect(prX, prY, BAR_WIDTH, BAR_HEIGHT);
+        new SlippyMapViewer(options);
     }
 
 }
