@@ -22,7 +22,7 @@ $Id: pom.xml 2427 2009-09-29 07:29:08Z epietrig $
     </license>
   </licenses>
   <scm>
-    <url>https://zvtm.svn.sourceforge.net/svnroot/zvtm/zuist-pdf/</url>
+    <url>https://svn.code.sf.net/p/zvtm/code/zuist-pdf/</url>
   </scm>
 
   <properties>

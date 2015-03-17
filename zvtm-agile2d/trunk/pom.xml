@@ -22,7 +22,7 @@ $Id: pom.xml 2405 2009-09-25 09:07:33Z epietrig $
     </license>
   </licenses>
   <scm>
-    <url>https://zvtm.svn.sourceforge.net/svnroot/zvtm</url>
+    <url>https://svn.code.sf.net/p/zvtm/code/zvtm-agile2d/</url>
   </scm>
 
   <properties>

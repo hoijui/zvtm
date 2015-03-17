@@ -17,8 +17,8 @@
         </license>
     </licenses>
     <scm>
-        <url>https://zvtm.svn.sourceforge.net/svnroot/zvtm</url>
-        <developerConnection>scm:svn:https://zvtm.svn.sourceforge.net/svnroot/zvtm/zvtm-treemap/trunk/</developerConnection>
+        <url>https://svn.code.sf.net/p/zvtm/code/zvtm-treemap</url>
+        <developerConnection>scm:svn:https://svn.code.sf.net/p/zvtm/code/zvtm-treemap/trunk/</developerConnection>
     </scm>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

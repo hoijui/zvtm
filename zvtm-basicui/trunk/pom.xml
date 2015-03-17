@@ -21,7 +21,7 @@ $Id$
     </license>
   </licenses>
   <scm>
-    <url>https://zvtm.svn.sourceforge.net/svnroot/zvtm</url>
+    <url>https://svn.code.sf.net/p/zvtm/code/zvtm-basicui</url>
   </scm>
 
   <properties>
