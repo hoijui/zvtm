@@ -23,7 +23,7 @@ CMD_LINE_HELP = "Slippy Map Tiling Script\n\nUsage:\n\n" + \
     "\t-zd=N\t\tzoom depth from root (N in [0,19])\n"+\
     "\t-mfd=N\t\tmaximum depth of scene fragments (0 to generate a single scene no matter the total depth)\n"+\
     "\t-dt=N-N\t\tdownload and save tiles for levels in the specified range (N in [0,19])\n"+\
-    "\t-xy\t\tinvert x and y in slippy tile URL coordinates system\n"+\
+    "\t-yx\t\tinvert x and y in slippy tile URL coordinates system\n"+\
     "\t-im=<i>\t\t<i> one of {bilinear,bicubic,nearestNeighbor}\n"+\
     "\t-tl=N\t\ttrace level (N in [0:2])\n"
 
