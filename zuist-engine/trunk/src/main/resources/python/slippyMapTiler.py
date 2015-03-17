@@ -68,10 +68,10 @@ ACCESS_TOKEN = ""
 def getTMSURL():
     ######################### OSM
     ## EXT: png
-    return "http://%s.tile.openstreetmap.org/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*3))]
+    #return "http://%s.tile.openstreetmap.org/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*3))]
     ######################### ArcGIS orthoimagery, use with -yx
     ## EXT: jpg
-    #return "http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/"
+    return "http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/"
     ######################### Stamen maps
     ## EXT: jpg
     #return "http://%s.tile.stamen.com/watercolor/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*4))]
