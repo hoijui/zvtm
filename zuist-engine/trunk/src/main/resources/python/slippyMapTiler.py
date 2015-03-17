@@ -200,7 +200,7 @@ def buildRegionsAtLevel(rt, level, ftl, totalLevelCount, rootEL, ox, oy, tgtDir)
                     tileURL = "%s%d/%d/%d.%s" % (getTMSURL(),level-ftl+rt[0],y+tcal*rt[2],x+tcal*rt[1],TILE_EXT)
                 else:
                     tileURL = "%s%d/%d/%d.%s" % (getTMSURL(),level-ftl+rt[0],x+tcal*rt[1],y+tcal*rt[2],TILE_EXT)
-                if level+rt[0] in range(DOWNLOAD_LEVEL_RANGE[0],DOWNLOAD_LEVEL_RANGE[1]+1):
+                if level-ftl+rt[0] in range(DOWNLOAD_LEVEL_RANGE[0],DOWNLOAD_LEVEL_RANGE[1]+1):
                     log("Fetching tile %s" % tileURL, 3)
                     tilePath = fetchTile(tileURL, level-ftl+rt[0], x+tcal*rt[1], y+tcal*rt[2], tgtDir)
                     objectEL.set("src", tilePath)
