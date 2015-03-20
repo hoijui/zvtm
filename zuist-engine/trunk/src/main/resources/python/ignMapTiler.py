@@ -5,7 +5,7 @@
 # Copyright (c) INRIA, 2015. All Rights Reserved
 # Licensed under the GNU LGPL. For full terms see the file COPYING.
 
-# $Id:  $
+# $Id$
 
 import os, sys, math, random
 import urllib
