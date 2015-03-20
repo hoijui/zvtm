@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.BufferedInputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URISyntaxException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -33,6 +34,12 @@ import fr.inria.zvtm.animation.EndAction;
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
 import fr.inria.zvtm.glyphs.VRectProgress;
+
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.HttpClients;
 
 /** Description of bitmap image objects to be loaded/unloaded in the scene.
  *@author Emmanuel Pietriga
@@ -79,40 +86,63 @@ public class ImageDescription extends ResourceDescription {
 
         public void run(){
             if (glyph == null){
-                // open connection to data
-                if (showFeedbackWhenFetching){
-                    final VRectProgress vrp = new VRectProgress(vx, vy, zindex, vw, vh / 40);
-                    vs.addGlyph(vrp);
+                String protocol = src.getProtocol();
+                if (protocol.startsWith(ImageDescription.HTTP_PROTOCOL) || protocol.startsWith(ImageDescription.HTTPS_PROTOCOL)){
+                    VRectProgress vrp = null;
+                    if (showFeedbackWhenFetching){
+                        vrp = new VRectProgress(vx, vy, zindex, vw, vh / 40);
+                        vs.addGlyph(vrp);
+                    }
+                    // open connection to data
+                    CloseableHttpClient httpclient = HttpClients.createDefault();
                     try {
-                        URLConnection uc = src.openConnection();
-                        int dataLength = uc.getContentLength();
-                        byte[] imgData = new byte[dataLength];
-                        BufferedInputStream bis = new BufferedInputStream(uc.getInputStream());
-                        int bytesRead = 0;
-                        while (bytesRead < dataLength-1){
-                            int av = bis.available();
-                            if (av > 0){
-                                bis.read(imgData, bytesRead, av);
-                                bytesRead += av;
-                                vrp.setProgress(bytesRead, dataLength);
+                        CloseableHttpResponse response = null;
+                        BufferedInputStream bis = null;
+                        try {
+                            HttpGet httpget = new HttpGet(src.toURI());
+                            response = httpclient.execute(httpget);
+                            HttpEntity entity = response.getEntity();
+                            if (entity != null) {
+                                long dataLength = entity.getContentLength();
+                                byte[] imgData = new byte[(int)dataLength];
+                                bis = new BufferedInputStream(entity.getContent());
+                                int bytesRead = 0;
+                                while (bytesRead < dataLength-1){
+                                    int av = bis.available();
+                                    if (av > 0){
+                                        bis.read(imgData, bytesRead, av);
+                                        bytesRead += av;
+                                        if (showFeedbackWhenFetching){
+                                            vrp.setProgress(bytesRead, (int)dataLength);
+                                        }
+                                    }
+                                }
+                                finishCreatingObject(sm, vs, (new ImageIcon(imgData)).getImage(), vrp, fadeIn);
                             }
                         }
-                        finishCreatingObject(sm, vs, (new ImageIcon(imgData)).getImage(), vrp, fadeIn);
+                        catch(URISyntaxException usex){
+                            if (SceneManager.getDebugMode()){
+                                System.err.println("Error fetching Image resource (malformed URI) "+src.toString());
+                                usex.printStackTrace();
+                            }
+                        }
+                        finally {
+                            bis.close();
+                            response.close();
+                        }
                     }
-                    catch(IOException e){
+                    catch(IOException ioex){
                         if (SceneManager.getDebugMode()){
                             System.err.println("Error fetching Image resource "+src.toString());
-                            e.printStackTrace();
+                            ioex.printStackTrace();
                         }
                     }
                 }
+                else if (src.toString().startsWith(JAR_HEADER)){
+                    finishCreatingObject(sm, vs, (new ImageIcon(this.getClass().getResource(src.toString().substring(JAR_HEADER.length())))).getImage(), null, fadeIn);
+                }
                 else {
-                    if (src.toString().startsWith(JAR_HEADER)){
-                        finishCreatingObject(sm, vs, (new ImageIcon(this.getClass().getResource(src.toString().substring(JAR_HEADER.length())))).getImage(), null, fadeIn);
-                    }
-                    else {
-                        finishCreatingObject(sm, vs, (new ImageIcon(src)).getImage(), null, fadeIn);
-                    }
+                    finishCreatingObject(sm, vs, (new ImageIcon(src)).getImage(), null, fadeIn);
                 }
             }
         }

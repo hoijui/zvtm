@@ -31,6 +31,8 @@ import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
 
 public abstract class ResourceDescription extends ObjectDescription {
 
+    static final String HTTP_PROTOCOL = "http://";
+    static final String HTTPS_PROTOCOL = "https://";
     static final String FILE_PROTOCOL = "file";
     static final String JAR_PROTOCOL = "jar";
     static final String JAR_HEADER = "jar:file:!";

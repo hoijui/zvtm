@@ -66,6 +66,11 @@ $Id$
       <artifactId>zvtm-svg</artifactId>
       <version>[0.2.1,)</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+      <version>4.4</version>
+    </dependency>
   </dependencies>
 
   <!-- Build -->
