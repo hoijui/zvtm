@@ -8,7 +8,7 @@
 # $Id$
 
 import os, sys, math, random
-import urllib
+import urllib2
 from copy import copy
 
 # http://effbot.org/zone/element-index.htm
@@ -68,10 +68,10 @@ ACCESS_TOKEN = ""
 def getTMSURL():
     ######################### OSM
     ## EXT: png
-    #return "http://%s.tile.openstreetmap.org/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*3))]
+    return "http://%s.tile.openstreetmap.org/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*3))]
     ######################### ArcGIS orthoimagery, use with -yx
     ## EXT: jpg
-    return "http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/"
+    #return "http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/"
     ######################### Stamen maps
     ## EXT: jpg
     #return "http://%s.tile.stamen.com/watercolor/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*4))]
@@ -230,7 +230,10 @@ def fetchTile(tileURL, z, x, y, tgtDir):
         log("Tile already fetched: %s" % absPath, 3)
     else:
         log("Saving tile to %s" % absPath, 3)
-        urllib.urlretrieve("%s%s" % (tileURL, ACCESS_TOKEN), absPath)
+        tile = urllib2.urlopen("%s%s" % (tileURL, ACCESS_TOKEN))
+        tilef = open(absPath, 'wb')
+        tilef.write(tile.read())
+        tilef.close()
     return relPath
 
 ################################################################################
