@@ -8,7 +8,7 @@
 # $Id$
 
 import os, sys, math, random
-import urllib
+import urllib2
 from copy import copy
 
 # http://effbot.org/zone/element-index.htm
@@ -59,9 +59,13 @@ TILE_FILE_PREFIX = "t-"
 USER = ""
 PASSWD = ""
 API_KEY = ""
+SERVER = "wxs.ign.fr"
 
 ################################################################################
 # TMS URL
+#
+# Make sure SERVER above matches the server name for the URL returned by getTMSURL()
+#
 ################################################################################
 
 def getTMSURL(z, x, y, k):
@@ -191,6 +195,16 @@ def buildRegionsAtLevel(rt, level, ftl, totalLevelCount, rootEL, ox, oy, tgtDir)
     return
 
 ################################################################################
+# Initialize HTTPS login/password
+################################################################################
+def initializeHTTPS():
+    passman = urllib2.HTTPPasswordMgrWithDefaultRealm()
+    passman.add_password(None, SERVER, USER, PASSWD)
+    authhandler = urllib2.HTTPBasicAuthHandler(passman)
+    opener = urllib2.build_opener(authhandler)
+    urllib2.install_opener(opener)
+
+################################################################################
 # Trace exec on std output
 ################################################################################
 def fetchTile(tileURL, z, x, y, tgtDir):
@@ -204,9 +218,10 @@ def fetchTile(tileURL, z, x, y, tgtDir):
         log("Tile already fetched: %s" % absPath, 3)
     else:
         log("Saving tile to %s" % absPath, 3)
-        cmd = "wget -O %s --user=%s --password=%s \"%s\"" % (absPath, USER, PASSWD, tileURL)
-        os.system(cmd)
-        # urllib.urlretrieve("%s%s" % (tileURL), absPath)
+        tile = urllib2.urlopen(tileURL)
+        tilef = open(absPath, 'wb')
+        tilef.write(tile.read())
+        tilef.close()
     return relPath
 
 ################################################################################
@@ -259,6 +274,7 @@ log("Maximum levels in scene fragments: %d" % MAX_FRAG_DEPTH, 1)
 log("TMS URL prefix: %s" % getTMSURL(0,0,0,API_KEY), 1)
 log("Interpolation method: %s" % INTERPOLATION, 1)
 createTargetDir(TGT_DIR)
+initializeHTTPS()
 sox = -int(math.pow(2,ZOOM_DEPTH-1)) * TILE_SIZE / 2
 soy = int(math.pow(2,ZOOM_DEPTH-1)) * TILE_SIZE / 2
 generateTree(ROOT_TILE, ZOOM_DEPTH, 0, sox, soy, TGT_DIR)
