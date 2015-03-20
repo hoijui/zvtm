@@ -42,7 +42,7 @@ class OverlayManager implements ViewListener {
     static final Color FADE_REGION_FILL = Color.BLACK;
     static final Color FADE_REGION_STROKE = Color.WHITE;
 
-    static final String INSITU_LOGO_PATH = "/images/insitu.png";
+    static final String INSITU_LOGO_PATH = "/images/ilda.png";
     static final String INRIA_LOGO_PATH = "/images/inria.png";
 
     Viewer application;
@@ -92,7 +92,7 @@ class OverlayManager implements ViewListener {
 
     boolean showingAbout = false;
     VRectangle fadeAbout;
-    VImage insituLogo, inriaLogo;
+    VImage ildaLogo, inriaLogo;
     VText[] aboutLines;
 
     void showAbout(){
@@ -105,12 +105,14 @@ class OverlayManager implements ViewListener {
             aboutLines[2] = new VText(0, 0, 0, Color.WHITE, "By Emmanuel Pietriga and Romain Primet", VText.TEXT_ANCHOR_MIDDLE, 2.0f);
             RImage.setReflectionHeight(0.7f);
             inriaLogo = new RImage(-150, -70, 0, (new ImageIcon(this.getClass().getResource(INRIA_LOGO_PATH))).getImage(), 1.0f);
-            insituLogo = new RImage(200, -70, 0, (new ImageIcon(this.getClass().getResource(INSITU_LOGO_PATH))).getImage(), 1.0f);
+            ildaLogo = new RImage(200, -70, 0, (new ImageIcon(this.getClass().getResource(INSITU_LOGO_PATH))).getImage(), 1.0f);
+            inriaLogo.setDrawBorder(false);
+            ildaLogo.setDrawBorder(false);
             aboutLines[3] = new VText(0, -170, 0, Color.WHITE, "Based on the ZVTM toolkit", VText.TEXT_ANCHOR_MIDDLE, 2.0f);
             aboutLines[4] = new VText(0, -200, 0, Color.WHITE, "http://zvtm.sf.net", VText.TEXT_ANCHOR_MIDDLE, 2.0f);
             application.ovSpace.addGlyph(fadeAbout);
             application.ovSpace.addGlyph(inriaLogo);
-            application.ovSpace.addGlyph(insituLogo);
+            application.ovSpace.addGlyph(ildaLogo);
 			for (int i=0;i<aboutLines.length;i++){
 	            application.ovSpace.addGlyph(aboutLines[i]);
 			}
@@ -122,9 +124,9 @@ class OverlayManager implements ViewListener {
     void hideAbout(){
         if (showingAbout){
             showingAbout = false;
-            if (insituLogo != null){
-                application.ovSpace.removeGlyph(insituLogo);
-                insituLogo = null;
+            if (ildaLogo != null){
+                application.ovSpace.removeGlyph(ildaLogo);
+                ildaLogo = null;
             }
             if (inriaLogo != null){
                 application.ovSpace.removeGlyph(inriaLogo);
