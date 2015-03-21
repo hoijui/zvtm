@@ -80,6 +80,9 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
+import org.kohsuke.args4j.CmdLineException;
+import org.kohsuke.args4j.CmdLineParser;
+
 /**
  * @author Emmanuel Pietriga
  */
@@ -124,9 +127,9 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener, Obj
     VWGlassPane gp;
     PieMenu mainPieMenu;
 
-    public Viewer(boolean fullscreen, boolean opengl, boolean antialiased, File xmlSceneFile){
+    public Viewer(ViewerOptions options){
         ovm = new OverlayManager(this);
-        initGUI(fullscreen, opengl, antialiased);
+        initGUI(options);
         VirtualSpace[]  sceneSpaces = {mSpace};
         Camera[] sceneCameras = {mCamera};
         sm = new SceneManager(sceneSpaces, sceneCameras);
@@ -135,9 +138,12 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener, Obj
         sm.setObjectListener(this);
         previousLocations = new Vector();
         ovm.initConsole();
-        if (xmlSceneFile != null){
+        if (options.smooth){
+            Region.setDefaultTransitions(Region.FADE_IN, Region.FADE_OUT);
+        }
+        if (options.zuistScenePath != null){
             sm.enableRegionUpdater(false);
-            loadScene(xmlSceneFile);
+            loadScene(new File(options.zuistScenePath));
             EndAction ea  = new EndAction(){
                    public void execute(Object subject, Animation.Dimension dimension){
                        sm.setUpdateLevel(true);
@@ -149,7 +155,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener, Obj
         ovm.toggleConsole();
     }
 
-    void initGUI(boolean fullscreen, boolean opengl, boolean antialiased){
+    void initGUI(ViewerOptions options){
         windowLayout();
         vsm = VirtualSpaceManager.INSTANCE;
         mSpace = vsm.addVirtualSpace(mSpaceName);
@@ -162,8 +168,8 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener, Obj
         cameras.add(mCamera);
         cameras.add(vsm.getVirtualSpace(mnSpaceName).getCamera(0));
         cameras.add(vsm.getVirtualSpace(ovSpaceName).getCamera(0));
-        mView = vsm.addFrameView(cameras, mViewName, View.STD_VIEW, VIEW_W, VIEW_H, false, false, !fullscreen, (!fullscreen) ? initMenu() : null);
-        if (fullscreen){
+        mView = vsm.addFrameView(cameras, mViewName, (options.opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, !options.fullscreen, (!options.fullscreen) ? initMenu() : null);
+        if (options.fullscreen){
             GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow((JFrame)mView.getFrame());
         }
         else {
@@ -178,7 +184,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener, Obj
         mView.setListener(ovm, 2);
         mCamera.addListener(eh);
         mView.setBackgroundColor(Color.WHITE);
-        mView.setAntialiasing(antialiased);
+        mView.setAntialiasing(!options.noaa);
         mView.setJava2DPainter(this, Java2DPainter.AFTER_PORTALS);
         mView.getPanel().getComponent().addComponentListener(eh);
         ComponentAdapter ca0 = new ComponentAdapter(){
@@ -683,52 +689,23 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener, Obj
     }
 
     public static void main(String[] args){
-        File xmlSceneFile = null;
-        boolean fs = false;
-        boolean ogl = false;
-        boolean aa = true;
-        for (int i=0;i<args.length;i++){
-            if (args[i].startsWith("-")){
-                if (args[i].substring(1).equals("fs")){fs = true;}
-                else if (args[i].substring(1).equals("opengl")){ogl = true;}
-                else if (args[i].substring(1).equals("smooth")){Region.setDefaultTransitions(Region.FADE_IN, Region.FADE_OUT);}
-                else if (args[i].substring(1).equals("noaa")){aa = false;}
-                else if (args[i].substring(1).equals("debug")){SceneManager.setDebugMode(true);}
-                else if (args[i].substring(1).equals("h") || args[i].substring(1).equals("--help")){Viewer.printCmdLineHelp();System.exit(0);}
-            }
-            else {
-                // the only other thing allowed as a cmd line param is a scene file
-                File f = new File(args[i]);
-                if (f.exists()){
-                    if (f.isDirectory()){
-                        // if arg is a directory, take first xml file we find in that directory
-                        String[] xmlFiles = f.list(new FilenameFilter(){
-                                                public boolean accept(File dir, String name){return name.endsWith(".xml");}
-                                            });
-                        if (xmlFiles.length > 0){
-                            xmlSceneFile = new File(f, xmlFiles[0]);
-                        }
-                    }
-                    else {
-                        xmlSceneFile = f;
-                    }
-                }
-            }
+        ViewerOptions options = new ViewerOptions();
+        CmdLineParser parser = new CmdLineParser(options);
+        try {
+            parser.parseArgument(args);
+        } catch(CmdLineException ex){
+            System.err.println(ex.getMessage());
+            parser.printUsage(System.err);
+            return;
         }
-        if (!fs && Utils.osIsMacOS()){
+        if (!options.fullscreen && Utils.osIsMacOS()){
             System.setProperty("apple.laf.useScreenMenuBar", "true");
         }
-        System.out.println("--help for command line options");
-        new Viewer(fs, ogl, aa, xmlSceneFile);
-    }
-
-    private static void printCmdLineHelp(){
-        System.out.println("Usage:\n\tjava -Xmx1024M -Xms512M -cp target/timingframework-1.0.jar:zuist-engine-0.2.0-SNAPSHOT.jar:target/zvtm-0.10.0-SNAPSHOT.jar <path_to_scene_dir> [options]");
-        System.out.println("Options:\n\t-fs: fullscreen mode");
-        System.out.println("\t-noaa: no antialiasing");
-        System.out.println("\t-opengl: use Java2D OpenGL rendering pipeline (Java 6+Linux/Windows), requires that -Dsun.java2d.opengl=true be set on cmd line");
-        System.out.println("\t-smooth: default to smooth transitions between levels when none specified");
-        System.out.println("\t-debug: enable debug mode");
+        if (options.debug){
+            SceneManager.setDebugMode(true);
+        }
+        Launcher.setHTTPAuthentication(options.httpUser, options.httpPassword);
+        new Viewer(options);
     }
 
 }

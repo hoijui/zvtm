@@ -42,7 +42,7 @@ class OverlayManager implements ViewListener {
     static final Color FADE_REGION_FILL = Color.BLACK;
     static final Color FADE_REGION_STROKE = Color.WHITE;
 
-    static final String INSITU_LOGO_PATH = "/images/ilda.png";
+    static final String ILDA_LOGO_PATH = "/images/ilda.png";
     static final String INRIA_LOGO_PATH = "/images/inria.png";
 
     Viewer application;
@@ -105,7 +105,7 @@ class OverlayManager implements ViewListener {
             aboutLines[2] = new VText(0, 0, 0, Color.WHITE, "By Emmanuel Pietriga and Romain Primet", VText.TEXT_ANCHOR_MIDDLE, 2.0f);
             RImage.setReflectionHeight(0.7f);
             inriaLogo = new RImage(-150, -70, 0, (new ImageIcon(this.getClass().getResource(INRIA_LOGO_PATH))).getImage(), 1.0f);
-            ildaLogo = new RImage(200, -70, 0, (new ImageIcon(this.getClass().getResource(INSITU_LOGO_PATH))).getImage(), 1.0f);
+            ildaLogo = new RImage(200, -70, 0, (new ImageIcon(this.getClass().getResource(ILDA_LOGO_PATH))).getImage(), 1.0f);
             inriaLogo.setDrawBorder(false);
             ildaLogo.setDrawBorder(false);
             aboutLines[3] = new VText(0, -170, 0, Color.WHITE, "Based on the ZVTM toolkit", VText.TEXT_ANCHOR_MIDDLE, 2.0f);

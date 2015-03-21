@@ -14,73 +14,43 @@ import fr.inria.zvtm.engine.Utils;
 
 import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zuist.engine.Region;
+import fr.inria.zuist.engine.ResourceDescription;
+
+import org.kohsuke.args4j.CmdLineException;
+import org.kohsuke.args4j.CmdLineParser;
 
 public class Launcher {
 
-    static final String VIEWER_TYPE_TILEDIMAGE = "I";
-    static final String VIEWER_TYPE_DEBUGGER = "D";
-
-    public static void main(String[] args){
-        File xmlSceneFile = null;
-        boolean fs = false;
-        boolean ogl = false;
-        boolean aa = true;
-        String viewerType = VIEWER_TYPE_DEBUGGER;
-        for (int i=0;i<args.length;i++){
-            if (args[i].startsWith("-")){
-                if (args[i].substring(1).equals("fs")){fs = true;}
-                else if (args[i].substring(1).equals("opengl")){ogl = true;}
-                else if (args[i].substring(1).equals("noaa")){aa = false;}
-                else if (args[i].substring(1).equals("debug")){SceneManager.setDebugMode(true);}
-                else if (args[i].substring(1).equals("smooth")){Region.setDefaultTransitions(Region.FADE_IN, Region.FADE_OUT);}
-                else if (args[i].substring(1).equals("h") || args[i].substring(1).equals("--help")){Launcher.printCmdLineHelp();System.exit(0);}
-            }
-            else if (args[i].toUpperCase().equals(VIEWER_TYPE_TILEDIMAGE) || args[i].toUpperCase().equals(VIEWER_TYPE_DEBUGGER)){
-                viewerType = args[i];
-            }
-            else {
-                // the only other thing allowed as a cmd line param is a scene file
-                File f = new File(args[i]);
-                if (f.exists()){
-                    if (f.isDirectory()){
-                        // if arg is a directory, take first xml file we find in that directory
-                        String[] xmlFiles = f.list(new FilenameFilter(){
-                                                public boolean accept(File dir, String name){return name.endsWith(".xml");}
-                                            });
-                        if (xmlFiles.length > 0){
-                            xmlSceneFile = new File(f, xmlFiles[0]);
-                        }
-                    }
-                    else {
-                        xmlSceneFile = f;
-                    }
-                }
-            }
-        }
-        //if (ogl){
-        //    System.setProperty("sun.java2d.opengl", "True");
-        //}
-        if (!fs && Utils.osIsMacOS()){
-            System.setProperty("apple.laf.useScreenMenuBar", "true");
-        }
-        System.out.println("--help for command line options");
-        if (viewerType.equals(VIEWER_TYPE_TILEDIMAGE)){
-            new TiledImageViewer(fs, ogl, aa, xmlSceneFile);
-        }
-        else {
-            new Viewer(fs, ogl, aa, xmlSceneFile);
+    static void setHTTPAuthentication(String user, String password){
+        if (user != null && password != null){
+            ResourceDescription.setHTTPUser(user);
+            ResourceDescription.setHTTPPassword(password);
         }
     }
 
-    private static void printCmdLineHelp(){
-        System.out.println("Usage:\n\tjava -jar target/zuist-engine-X.X.X.jar <zuist_scene_file.xml> [viewer] [options]");
-        System.out.println("Viewer:\n\tI: tiled image scene");
-        System.out.println("\tD: debugger");
-        System.out.println("\nOptions:\n\t-fs: fullscreen mode");
-        System.out.println("\t-opengl: use Java2D OpenGL rendering pipeline (Java 6+Linux/Windows), requires that -Dsun.java2d.opengl=true be set on cmd line");
-        System.out.println("\t-noaa: no antialiasing");
-        System.out.println("\t-smooth: default to smooth transitions between levels when none specified");
-        System.out.println("\t-debug: enable debug mode");
+    public static void main(String[] args){
+        ViewerOptions options = new ViewerOptions();
+        CmdLineParser parser = new CmdLineParser(options);
+        try {
+            parser.parseArgument(args);
+        } catch(CmdLineException ex){
+            System.err.println(ex.getMessage());
+            parser.printUsage(System.err);
+            return;
+        }
+        if (!options.fullscreen && Utils.osIsMacOS()){
+            System.setProperty("apple.laf.useScreenMenuBar", "true");
+        }
+        if (options.debug){
+            SceneManager.setDebugMode(true);
+        }
+        Launcher.setHTTPAuthentication(options.httpUser, options.httpPassword);
+        if (options.basic_debugger){
+            new Viewer(options);
+        }
+        else {
+            new TiledImageViewer(options);
+        }
     }
 
 }

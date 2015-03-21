@@ -73,6 +73,9 @@ import fr.inria.zuist.engine.ProgressListener;
 
 import org.w3c.dom.Document;
 
+import org.kohsuke.args4j.CmdLineException;
+import org.kohsuke.args4j.CmdLineParser;
+
 /**
  * @author Emmanuel Pietriga
  */
@@ -111,9 +114,9 @@ public class TiledImageViewer {
 
     WEGlassPane gp;
 
-    public TiledImageViewer(boolean fullscreen, boolean opengl, boolean antialiased, File xmlSceneFile){
+    public TiledImageViewer(ViewerOptions options){
         ovm = new Overlay(this);
-        initGUI(fullscreen, opengl, antialiased);
+        initGUI(options);
         nm = new TIVNavigationManager(this);
         ovm.init();
         eh.nm = this.nm;
@@ -122,8 +125,11 @@ public class TiledImageViewer {
         VirtualSpace[]  sceneSpaces = {mSpace};
         Camera[] sceneCameras = {mCamera};
         sm = new SceneManager(sceneSpaces, sceneCameras);
-        if (xmlSceneFile != null){
-            loadScene(xmlSceneFile);
+        if (options.smooth){
+            Region.setDefaultTransitions(Region.FADE_IN, Region.FADE_OUT);
+        }
+        if (options.zuistScenePath != null){
+            loadScene(new File(options.zuistScenePath));
             HashMap sa = sm.getSceneAttributes();
             if (sa.containsKey(SceneManager._background)){
                 BACKGROUND_COLOR = (Color)sa.get(SceneManager._background);
@@ -141,7 +147,7 @@ public class TiledImageViewer {
         nm.updateOverview();
     }
 
-    void initGUI(boolean fullscreen, boolean opengl, boolean antialiased){
+    void initGUI(ViewerOptions options){
         windowLayout();
         vsm = VirtualSpaceManager.INSTANCE;
         mSpace = vsm.addVirtualSpace(mSpaceName);
@@ -152,8 +158,8 @@ public class TiledImageViewer {
         Vector cameras = new Vector();
         cameras.add(mCamera);
         cameras.add(aboutSpace.getCamera(0));
-        mView = vsm.addFrameView(cameras, mViewName, View.STD_VIEW, VIEW_W, VIEW_H, false, false, !fullscreen, (!fullscreen) ? initMenu() : null);
-        if (fullscreen && GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().isFullScreenSupported()){
+        mView = vsm.addFrameView(cameras, mViewName, (options.opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, !options.fullscreen, (!options.fullscreen) ? initMenu() : null);
+        if (options.fullscreen && GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().isFullScreenSupported()){
             GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow((JFrame)mView.getFrame());
         }
         else {
@@ -163,7 +169,7 @@ public class TiledImageViewer {
         mView.setListener(eh, 0);
         mView.setListener(ovm, 1);
         mView.setBackgroundColor(BACKGROUND_COLOR);
-        mView.setAntialiasing(antialiased);
+        mView.setAntialiasing(!options.noaa);
         mView.getPanel().getComponent().addComponentListener(eh);
         mCamera.addListener(eh);
         updatePanelSize();
@@ -336,55 +342,23 @@ public class TiledImageViewer {
     }
 
     public static void main(String[] args){
-        File xmlSceneFile = null;
-        boolean fs = false;
-        boolean ogl = false;
-        boolean aa = true;
-        for (int i=0;i<args.length;i++){
-            if (args[i].startsWith("-")){
-                if (args[i].substring(1).equals("fs")){fs = true;}
-                else if (args[i].substring(1).equals("opengl")){ogl = true;}
-                else if (args[i].substring(1).equals("noaa")){aa = false;}
-                else if (args[i].substring(1).equals("debug")){SceneManager.setDebugMode(true);}
-                else if (args[i].substring(1).equals("smooth")){Region.setDefaultTransitions(Region.FADE_IN, Region.FADE_OUT);}
-                else if (args[i].substring(1).equals("h") || args[i].substring(1).equals("--help")){TiledImageViewer.printCmdLineHelp();System.exit(0);}
-            }
-            else {
-                // the only other thing allowed as a cmd line param is a scene file
-                File f = new File(args[i]);
-                if (f.exists()){
-                    if (f.isDirectory()){
-                        // if arg is a directory, take first xml file we find in that directory
-                        String[] xmlFiles = f.list(new FilenameFilter(){
-                                                public boolean accept(File dir, String name){return name.endsWith(".xml");}
-                                            });
-                        if (xmlFiles.length > 0){
-                            xmlSceneFile = new File(f, xmlFiles[0]);
-                        }
-                    }
-                    else {
-                        xmlSceneFile = f;
-                    }
-                }
-            }
+        ViewerOptions options = new ViewerOptions();
+        CmdLineParser parser = new CmdLineParser(options);
+        try {
+            parser.parseArgument(args);
+        } catch(CmdLineException ex){
+            System.err.println(ex.getMessage());
+            parser.printUsage(System.err);
+            return;
         }
-        //if (ogl){
-        //    System.setProperty("sun.java2d.opengl", "True");
-        //}
-        if (!fs && Utils.osIsMacOS()){
+        if (!options.fullscreen && Utils.osIsMacOS()){
             System.setProperty("apple.laf.useScreenMenuBar", "true");
         }
-        System.out.println("--help for command line options");
-        new TiledImageViewer(fs, ogl, aa, xmlSceneFile);
-    }
-
-    private static void printCmdLineHelp(){
-        System.out.println("Usage:\n\tjava -Xmx1024M -Xms512M -cp target/timingframework-1.0.jar:zuist-engine-0.2.0-SNAPSHOT.jar:target/:target/:target/zvtm-0.10.0-SNAPSHOT.jar <path_to_scene_dir> [-fs] [-opengl]");
-        System.out.println("Options:\n\t-fs: fullscreen mode");
-        System.out.println("\t-noaa: no antialiasing");
-        System.out.println("\t-opengl: use Java2D OpenGL rendering pipeline (Java 6+Linux/Windows), requires that -Dsun.java2d.opengl=true be set on cmd line");
-        System.out.println("\t-smooth: default to smooth transitions between levels when none specified");
-        System.out.println("\t-debug: enable debug mode");
+        if (options.debug){
+            SceneManager.setDebugMode(true);
+        }
+        Launcher.setHTTPAuthentication(options.httpUser, options.httpPassword);
+        new TiledImageViewer(options);
     }
 
 }
@@ -465,14 +439,14 @@ class Overlay implements ViewListener {
     static final Color FADE_REGION_FILL = Color.BLACK;
     static final Color FADE_REGION_STROKE = Color.WHITE;
 
-    static final String INSITU_LOGO_PATH = "/images/insitu.png";
+    static final String ILDA_LOGO_PATH = "/images/ilda.png";
     static final String INRIA_LOGO_PATH = "/images/inria.png";
 
     TiledImageViewer application;
 
     boolean showingAbout = false;
     VRectangle fadeAbout;
-    VImage insituLogo, inriaLogo;
+    VImage ildaLogo, inriaLogo;
     VText[] aboutLines;
 
     VRectangle fadedRegion;
@@ -502,12 +476,14 @@ class Overlay implements ViewListener {
             aboutLines[2] = new VText(0, 0, 0, Color.WHITE, "By Emmanuel Pietriga and Romain Primet", VText.TEXT_ANCHOR_MIDDLE, 2.0f);
             RImage.setReflectionHeight(0.7f);
             inriaLogo = new RImage(-150, -70, 0, (new ImageIcon(this.getClass().getResource(INRIA_LOGO_PATH))).getImage(), 1.0f);
-            insituLogo = new RImage(200, -70, 0, (new ImageIcon(this.getClass().getResource(INSITU_LOGO_PATH))).getImage(), 1.0f);
+            ildaLogo = new RImage(200, -70, 0, (new ImageIcon(this.getClass().getResource(ILDA_LOGO_PATH))).getImage(), 1.0f);
+            inriaLogo.setDrawBorder(false);
+            ildaLogo.setDrawBorder(false);
             aboutLines[3] = new VText(0, -170, 0, Color.WHITE, "Based on the ZVTM toolkit", VText.TEXT_ANCHOR_MIDDLE, 2.0f);
             aboutLines[4] = new VText(0, -200, 0, Color.WHITE, "http://zvtm.sf.net", VText.TEXT_ANCHOR_MIDDLE, 2.0f);
             application.aboutSpace.addGlyph(fadeAbout);
             application.aboutSpace.addGlyph(inriaLogo);
-            application.aboutSpace.addGlyph(insituLogo);
+            application.aboutSpace.addGlyph(ildaLogo);
             for (int i=0;i<aboutLines.length;i++){
                 application.aboutSpace.addGlyph(aboutLines[i]);
             }
@@ -519,9 +495,9 @@ class Overlay implements ViewListener {
     void hideAbout(){
         if (showingAbout){
             showingAbout = false;
-            if (insituLogo != null){
-                application.aboutSpace.removeGlyph(insituLogo);
-                insituLogo = null;
+            if (ildaLogo != null){
+                application.aboutSpace.removeGlyph(ildaLogo);
+                ildaLogo = null;
             }
             if (inriaLogo != null){
                 application.aboutSpace.removeGlyph(inriaLogo);

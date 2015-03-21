@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2007-2012. All Rights Reserved
+ *   Copyright (c) INRIA, 2007-2015. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -35,11 +35,17 @@ import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
 import fr.inria.zvtm.glyphs.VRectProgress;
 
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.client.CredentialsProvider;
+import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.util.EntityUtils;
 
 /** Description of bitmap image objects to be loaded/unloaded in the scene.
  *@author Emmanuel Pietriga
@@ -88,35 +94,30 @@ public class ImageDescription extends ResourceDescription {
             if (glyph == null){
                 String protocol = src.getProtocol();
                 if (protocol.startsWith(ImageDescription.HTTP_PROTOCOL) || protocol.startsWith(ImageDescription.HTTPS_PROTOCOL)){
-                    VRectProgress vrp = null;
-                    if (showFeedbackWhenFetching){
-                        vrp = new VRectProgress(vx, vy, zindex, vw, vh / 40);
-                        vs.addGlyph(vrp);
-                    }
+                    Glyph vrp = null;
+                    // if (showFeedbackWhenFetching){
+                    //     vrp = new VRectProgress(vx, vy, zindex, vw, vh / 40);
+                    //     vs.addGlyph(vrp);
+                    // }
                     // open connection to data
-                    CloseableHttpClient httpclient = HttpClients.createDefault();
+                    CloseableHttpClient httpclient;
+                    if (ImageDescription.getHTTPUser() != null && ImageDescription.getHTTPPassword() != null){
+                        CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+                        credentialsProvider.setCredentials(AuthScope.ANY,
+                                                           new UsernamePasswordCredentials(ImageDescription.getHTTPUser(), ImageDescription.getHTTPPassword()));
+                        httpclient = HttpClientBuilder.create().setDefaultCredentialsProvider(credentialsProvider).build();
+                    }
+                    else {
+                        httpclient = HttpClients.createDefault();
+                    }
                     try {
                         CloseableHttpResponse response = null;
-                        BufferedInputStream bis = null;
                         try {
                             HttpGet httpget = new HttpGet(src.toURI());
                             response = httpclient.execute(httpget);
                             HttpEntity entity = response.getEntity();
                             if (entity != null) {
-                                long dataLength = entity.getContentLength();
-                                byte[] imgData = new byte[(int)dataLength];
-                                bis = new BufferedInputStream(entity.getContent());
-                                int bytesRead = 0;
-                                while (bytesRead < dataLength-1){
-                                    int av = bis.available();
-                                    if (av > 0){
-                                        bis.read(imgData, bytesRead, av);
-                                        bytesRead += av;
-                                        if (showFeedbackWhenFetching){
-                                            vrp.setProgress(bytesRead, (int)dataLength);
-                                        }
-                                    }
-                                }
+                                byte[] imgData = EntityUtils.toByteArray(entity);
                                 finishCreatingObject(sm, vs, (new ImageIcon(imgData)).getImage(), vrp, fadeIn);
                             }
                         }
@@ -127,8 +128,8 @@ public class ImageDescription extends ResourceDescription {
                             }
                         }
                         finally {
-                            bis.close();
                             response.close();
+                            httpclient.getConnectionManager().shutdown();
                         }
                     }
                     catch(IOException ioex){
@@ -244,7 +245,7 @@ public class ImageDescription extends ResourceDescription {
         loadTask = imageLoader.submit(new ImageLoadTask(sm, vs, fadeIn));
     }
 
-    private void finishCreatingObject(final SceneManager sm, final VirtualSpace vs, Image i, VRectProgress vrp, boolean fadeIn){
+    private void finishCreatingObject(final SceneManager sm, final VirtualSpace vs, Image i, Glyph vrp, boolean fadeIn){
         // fit image in declared "bounding box"
         double sf = Math.min(vw / ((double)i.getWidth(null)), vh / ((double)i.getHeight(null)));
         if (fadeIn){
