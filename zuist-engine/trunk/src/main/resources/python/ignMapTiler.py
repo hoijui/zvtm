@@ -23,8 +23,9 @@ CMD_LINE_HELP = "IGN Map Tiling Script\n\nUsage:\n\n" + \
     "\t-zd=N\t\tzoom depth from root (N in [0,19])\n"+\
     "\t-mfd=N\t\tmaximum depth of scene fragments (0 to generate a single scene no matter the total depth)\n"+\
     "\t-dt=N-N\t\tdownload and save tiles for levels in the specified range (N in [0,19])\n"+\
-    "\t-im=<i>\t\t<i> one of {bilinear,bicubic,nearestNeighbor}\n"+\
-    "\t-im=<i>\t\t<i> one of {bilinear,bicubic,nearestNeighbor}\n"+\
+    "\t-user=<u>\t\t<u> HTTPS authentication (user)\n"+\
+    "\t-password=<p>\t\t<p> HTTPS authentication (password)\n"+\
+    "\t-key=<p>\t\t<p> IGN API key\n"+\
     "\t-im=<i>\t\t<i> one of {bilinear,bicubic,nearestNeighbor}\n"+\
     "\t-tl=N\t\ttrace level (N in [0:2])\n"
 
