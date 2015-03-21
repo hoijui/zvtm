@@ -91,7 +91,7 @@ public class TiledImageViewer {
     /* dimensions of zoomable panel */
     int panelWidth, panelHeight;
 
-	static Color BACKGROUND_COLOR = Color.BLACK;
+    static Color BACKGROUND_COLOR = Color.BLACK;
 
     boolean UPDATE_TILES = true;
 
@@ -122,22 +122,22 @@ public class TiledImageViewer {
         VirtualSpace[]  sceneSpaces = {mSpace};
         Camera[] sceneCameras = {mCamera};
         sm = new SceneManager(sceneSpaces, sceneCameras);
-		if (xmlSceneFile != null){
-			loadScene(xmlSceneFile);
-			HashMap sa = sm.getSceneAttributes();
-			if (sa.containsKey(SceneManager._background)){
-			    BACKGROUND_COLOR = (Color)sa.get(SceneManager._background);
-			}
-		}
+        if (xmlSceneFile != null){
+            loadScene(xmlSceneFile);
+            HashMap sa = sm.getSceneAttributes();
+            if (sa.containsKey(SceneManager._background)){
+                BACKGROUND_COLOR = (Color)sa.get(SceneManager._background);
+            }
+        }
         if (BACKGROUND_COLOR.getRGB() == -1){
             mView.getCursor().setColor(Color.BLACK);
-    		mView.getCursor().setHintColor(Color.BLACK);
+            mView.getCursor().setHintColor(Color.BLACK);
         }
         else {
             mView.getCursor().setColor(Color.WHITE);
-    		mView.getCursor().setHintColor(Color.WHITE);
+            mView.getCursor().setHintColor(Color.WHITE);
         }
-		nm.createOverview(sm.getRegionsAtLevel(0)[0]);
+        nm.createOverview(sm.getRegionsAtLevel(0)[0]);
         nm.updateOverview();
     }
 
@@ -148,7 +148,7 @@ public class TiledImageViewer {
         mCamera = mSpace.addCamera();
         ovCamera = mSpace.addCamera();
         aboutSpace = vsm.addVirtualSpace(aboutSpaceName);
-		aboutSpace.addCamera();
+        aboutSpace.addCamera();
         Vector cameras = new Vector();
         cameras.add(mCamera);
         cameras.add(aboutSpace.getCamera(0));
@@ -163,50 +163,50 @@ public class TiledImageViewer {
         mView.setListener(eh, 0);
         mView.setListener(ovm, 1);
         mView.setBackgroundColor(BACKGROUND_COLOR);
-		mView.setAntialiasing(antialiased);
+        mView.setAntialiasing(antialiased);
         mView.getPanel().getComponent().addComponentListener(eh);
         mCamera.addListener(eh);
         updatePanelSize();
         mView.setActiveLayer(0);
     }
 
-	private JMenuBar initMenu(){
-		final JMenuItem openMI = new JMenuItem(Messages.OPEN);
-		openMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		final JMenuItem reloadMI = new JMenuItem(Messages.RELOAD);
-		reloadMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		final JMenuItem exitMI = new JMenuItem(Messages.EXIT);
-		final JCheckBoxMenuItem overviewMI = new JCheckBoxMenuItem(Messages.OVERVIEW, true);
-		final JMenuItem aboutMI = new JMenuItem(Messages.ABOUT);
-		ActionListener a0 = new ActionListener(){
-			public void actionPerformed(ActionEvent e){
-				if (e.getSource()==openMI){openFile();}
-				else if (e.getSource()==reloadMI){reload();}
-				else if (e.getSource()==exitMI){exit();}
-				else if (e.getSource()==overviewMI){nm.showOverview(overviewMI.isSelected());}
-				else if (e.getSource()==aboutMI){ovm.showAbout();}
-			}
-		};
-		JMenuBar jmb = new JMenuBar();
-		JMenu fileM = new JMenu(Messages.FILE);
-		JMenu viewM = new JMenu(Messages.VIEW);
-		JMenu helpM = new JMenu(Messages.HELP);
-		fileM.add(openMI);
-		fileM.add(reloadMI);
-		fileM.addSeparator();
-		fileM.add(exitMI);
-		viewM.add(overviewMI);
-		helpM.add(aboutMI);
-		jmb.add(fileM);
-		jmb.add(viewM);
-		jmb.add(helpM);
-		openMI.addActionListener(a0);
-		reloadMI.addActionListener(a0);
-		exitMI.addActionListener(a0);
-		overviewMI.addActionListener(a0);
-		aboutMI.addActionListener(a0);
-		return jmb;
-	}
+    private JMenuBar initMenu(){
+        final JMenuItem openMI = new JMenuItem(Messages.OPEN);
+        openMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        final JMenuItem reloadMI = new JMenuItem(Messages.RELOAD);
+        reloadMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        final JMenuItem exitMI = new JMenuItem(Messages.EXIT);
+        final JCheckBoxMenuItem overviewMI = new JCheckBoxMenuItem(Messages.OVERVIEW, true);
+        final JMenuItem aboutMI = new JMenuItem(Messages.ABOUT);
+        ActionListener a0 = new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+                if (e.getSource()==openMI){openFile();}
+                else if (e.getSource()==reloadMI){reload();}
+                else if (e.getSource()==exitMI){exit();}
+                else if (e.getSource()==overviewMI){nm.showOverview(overviewMI.isSelected());}
+                else if (e.getSource()==aboutMI){ovm.showAbout();}
+            }
+        };
+        JMenuBar jmb = new JMenuBar();
+        JMenu fileM = new JMenu(Messages.FILE);
+        JMenu viewM = new JMenu(Messages.VIEW);
+        JMenu helpM = new JMenu(Messages.HELP);
+        fileM.add(openMI);
+        fileM.add(reloadMI);
+        fileM.addSeparator();
+        fileM.add(exitMI);
+        viewM.add(overviewMI);
+        helpM.add(aboutMI);
+        jmb.add(fileM);
+        jmb.add(viewM);
+        jmb.add(helpM);
+        openMI.addActionListener(a0);
+        reloadMI.addActionListener(a0);
+        exitMI.addActionListener(a0);
+        overviewMI.addActionListener(a0);
+        aboutMI.addActionListener(a0);
+        return jmb;
+    }
 
     void windowLayout(){
         if (Utils.osIsWindows()){
@@ -223,58 +223,58 @@ public class TiledImageViewer {
 
     /*-------------  Scene management    -------------*/
 
-	void reset(){
-		sm.reset();
-		mSpace.removeAllGlyphs();
-	}
+    void reset(){
+        sm.reset();
+        mSpace.removeAllGlyphs();
+    }
 
-	void openFile(){
-		final JFileChooser fc = new JFileChooser(SCENE_FILE_DIR);
-		fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		fc.setDialogTitle("Find ZUIST Scene File");
-		int returnVal= fc.showOpenDialog(mView.getFrame());
-		if (returnVal == JFileChooser.APPROVE_OPTION){
-		    final SwingWorker worker = new SwingWorker(){
-			    public Object construct(){
-			        sm.setUpdateLevel(false);
+    void openFile(){
+        final JFileChooser fc = new JFileChooser(SCENE_FILE_DIR);
+        fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        fc.setDialogTitle("Find ZUIST Scene File");
+        int returnVal= fc.showOpenDialog(mView.getFrame());
+        if (returnVal == JFileChooser.APPROVE_OPTION){
+            final SwingWorker worker = new SwingWorker(){
+                public Object construct(){
+                    sm.setUpdateLevel(false);
                     sm.enableRegionUpdater(false);
-					reset();
-					loadScene(fc.getSelectedFile());
-					return null;
-			    }
-			};
-		    worker.start();
-		}
-	}
+                    reset();
+                    loadScene(fc.getSelectedFile());
+                    return null;
+                }
+            };
+            worker.start();
+        }
+    }
 
-	void reload(){
-		if (SCENE_FILE==null){return;}
-		final SwingWorker worker = new SwingWorker(){
-		    public Object construct(){
-				reset();
-				loadScene(SCENE_FILE);
-				return null;
-		    }
-		};
-	    worker.start();
-	}
+    void reload(){
+        if (SCENE_FILE==null){return;}
+        final SwingWorker worker = new SwingWorker(){
+            public Object construct(){
+                reset();
+                loadScene(SCENE_FILE);
+                return null;
+            }
+        };
+        worker.start();
+    }
 
-	void loadScene(File xmlSceneFile){
-		try {
-			mView.setTitle(mViewName + " - " + xmlSceneFile.getCanonicalPath());
-		}
-		catch (IOException ex){}
-		gp.setValue(0);
-		gp.setVisible(true);
-		SCENE_FILE = xmlSceneFile;
-	    SCENE_FILE_DIR = SCENE_FILE.getParentFile();
-	    sm.loadScene(SceneManager.parseXML(SCENE_FILE), SCENE_FILE_DIR, true, gp);
-	    HashMap sceneAttributes = sm.getSceneAttributes();
-	    if (sceneAttributes.containsKey(SceneManager._background)){
-	        mView.setBackgroundColor((Color)sceneAttributes.get(SceneManager._background));
-	    }
-	    gp.setVisible(false);
-	    gp.setLabel(WEGlassPane.EMPTY_STRING);
+    void loadScene(File xmlSceneFile){
+        try {
+            mView.setTitle(mViewName + " - " + xmlSceneFile.getCanonicalPath());
+        }
+        catch (IOException ex){}
+        gp.setValue(0);
+        gp.setVisible(true);
+        SCENE_FILE = xmlSceneFile;
+        SCENE_FILE_DIR = SCENE_FILE.getParentFile();
+        sm.loadScene(SceneManager.parseXML(SCENE_FILE), SCENE_FILE_DIR, true, gp);
+        HashMap sceneAttributes = sm.getSceneAttributes();
+        if (sceneAttributes.containsKey(SceneManager._background)){
+            mView.setBackgroundColor((Color)sceneAttributes.get(SceneManager._background));
+        }
+        gp.setVisible(false);
+        gp.setLabel(WEGlassPane.EMPTY_STRING);
         mCamera.setAltitude(0.0f);
         EndAction ea  = new EndAction(){
                public void execute(Object subject, Animation.Dimension dimension){
@@ -282,8 +282,8 @@ public class TiledImageViewer {
                    sm.enableRegionUpdater(true);
                }
            };
-		nm.getGlobalView(ea);
-	}
+        nm.getGlobalView(ea);
+    }
 
     void updatePanelSize(){
         Dimension d = mView.getPanel().getComponent().getSize();
@@ -301,20 +301,20 @@ public class TiledImageViewer {
 
     /* ---- Benchmark animation ----*/
 
-	Animation cameraAlt;
+    Animation cameraAlt;
 
-	void toggleBenchAnim(){
-	    if (cameraAlt == null){
-	        animate(20000);
-	    }
-	    else {
-	        vsm.getAnimationManager().stopAnimation(cameraAlt);
-	        cameraAlt = null;
-	    }
-	}
+    void toggleBenchAnim(){
+        if (cameraAlt == null){
+            animate(20000);
+        }
+        else {
+            vsm.getAnimationManager().stopAnimation(cameraAlt);
+            cameraAlt = null;
+        }
+    }
 
-	void animate(final double gvAlt){
-	    cameraAlt = vsm.getAnimationManager().getAnimationFactory().createAnimation(
+    void animate(final double gvAlt){
+        cameraAlt = vsm.getAnimationManager().getAnimationFactory().createAnimation(
            5000, Animation.INFINITE, Animation.RepeatBehavior.REVERSE, mCamera, Animation.Dimension.ALTITUDE,
            new DefaultTimingHandler(){
                public void timingEvent(float fraction, Object subject, Animation.Dimension dim){
@@ -337,18 +337,18 @@ public class TiledImageViewer {
 
     public static void main(String[] args){
         File xmlSceneFile = null;
-		boolean fs = false;
-		boolean ogl = false;
-		boolean aa = true;
-		for (int i=0;i<args.length;i++){
-			if (args[i].startsWith("-")){
-				if (args[i].substring(1).equals("fs")){fs = true;}
-				else if (args[i].substring(1).equals("opengl")){ogl = true;}
-				else if (args[i].substring(1).equals("noaa")){aa = false;}
+        boolean fs = false;
+        boolean ogl = false;
+        boolean aa = true;
+        for (int i=0;i<args.length;i++){
+            if (args[i].startsWith("-")){
+                if (args[i].substring(1).equals("fs")){fs = true;}
+                else if (args[i].substring(1).equals("opengl")){ogl = true;}
+                else if (args[i].substring(1).equals("noaa")){aa = false;}
                 else if (args[i].substring(1).equals("debug")){SceneManager.setDebugMode(true);}
-				else if (args[i].substring(1).equals("smooth")){Region.setDefaultTransitions(Region.FADE_IN, Region.FADE_OUT);}
-				else if (args[i].substring(1).equals("h") || args[i].substring(1).equals("--help")){TiledImageViewer.printCmdLineHelp();System.exit(0);}
-			}
+                else if (args[i].substring(1).equals("smooth")){Region.setDefaultTransitions(Region.FADE_IN, Region.FADE_OUT);}
+                else if (args[i].substring(1).equals("h") || args[i].substring(1).equals("--help")){TiledImageViewer.printCmdLineHelp();System.exit(0);}
+            }
             else {
                 // the only other thing allowed as a cmd line param is a scene file
                 File f = new File(args[i]);
@@ -367,10 +367,10 @@ public class TiledImageViewer {
                     }
                 }
             }
-		}
-		//if (ogl){
-		//    System.setProperty("sun.java2d.opengl", "True");
-		//}
+        }
+        //if (ogl){
+        //    System.setProperty("sun.java2d.opengl", "True");
+        //}
         if (!fs && Utils.osIsMacOS()){
             System.setProperty("apple.laf.useScreenMenuBar", "true");
         }
@@ -379,10 +379,10 @@ public class TiledImageViewer {
     }
 
     private static void printCmdLineHelp(){
-		System.out.println("Usage:\n\tjava -Xmx1024M -Xms512M -cp target/timingframework-1.0.jar:zuist-engine-0.2.0-SNAPSHOT.jar:target/:target/:target/zvtm-0.10.0-SNAPSHOT.jar <path_to_scene_dir> [-fs] [-opengl]");
+        System.out.println("Usage:\n\tjava -Xmx1024M -Xms512M -cp target/timingframework-1.0.jar:zuist-engine-0.2.0-SNAPSHOT.jar:target/:target/:target/zvtm-0.10.0-SNAPSHOT.jar <path_to_scene_dir> [-fs] [-opengl]");
         System.out.println("Options:\n\t-fs: fullscreen mode");
         System.out.println("\t-noaa: no antialiasing");
-		System.out.println("\t-opengl: use Java2D OpenGL rendering pipeline (Java 6+Linux/Windows), requires that -Dsun.java2d.opengl=true be set on cmd line");
+        System.out.println("\t-opengl: use Java2D OpenGL rendering pipeline (Java 6+Linux/Windows), requires that -Dsun.java2d.opengl=true be set on cmd line");
         System.out.println("\t-smooth: default to smooth transitions between levels when none specified");
         System.out.println("\t-debug: enable debug mode");
     }
@@ -497,7 +497,7 @@ class Overlay implements ViewListener {
             fadeAbout = new VRectangle(0, 0, 0, Math.round(application.panelWidth/1.05), Math.round(application.panelHeight/1.5),
                 FADE_REGION_FILL, FADE_REGION_STROKE, 0.85f);
             aboutLines = new VText[5];
-			aboutLines[0] = new VText(0, 150, 0, Color.WHITE, "ZUIST Tiled Image Viewer", VText.TEXT_ANCHOR_MIDDLE, 4.0f);
+            aboutLines[0] = new VText(0, 150, 0, Color.WHITE, "ZUIST Tiled Image Viewer", VText.TEXT_ANCHOR_MIDDLE, 4.0f);
             aboutLines[1] = new VText(0, 110, 0, Color.WHITE, "v"+Messages.VERSION, VText.TEXT_ANCHOR_MIDDLE, 2.0f);
             aboutLines[2] = new VText(0, 0, 0, Color.WHITE, "By Emmanuel Pietriga and Romain Primet", VText.TEXT_ANCHOR_MIDDLE, 2.0f);
             RImage.setReflectionHeight(0.7f);
@@ -508,12 +508,12 @@ class Overlay implements ViewListener {
             application.aboutSpace.addGlyph(fadeAbout);
             application.aboutSpace.addGlyph(inriaLogo);
             application.aboutSpace.addGlyph(insituLogo);
-			for (int i=0;i<aboutLines.length;i++){
-	            application.aboutSpace.addGlyph(aboutLines[i]);
-			}
+            for (int i=0;i<aboutLines.length;i++){
+                application.aboutSpace.addGlyph(aboutLines[i]);
+            }
             showingAbout = true;
         }
-		application.mView.setActiveLayer(1);
+        application.mView.setActiveLayer(1);
     }
 
     void hideAbout(){
@@ -531,89 +531,89 @@ class Overlay implements ViewListener {
                 application.aboutSpace.removeGlyph(fadeAbout);
                 fadeAbout = null;
             }
-			for (int i=0;i<aboutLines.length;i++){
-	            if (aboutLines[i] != null){
-	                application.aboutSpace.removeGlyph(aboutLines[i]);
-	                aboutLines[i] = null;
-	            }
-			}
-		}
-		application.mView.setActiveLayer(0);
-	}
+            for (int i=0;i<aboutLines.length;i++){
+                if (aboutLines[i] != null){
+                    application.aboutSpace.removeGlyph(aboutLines[i]);
+                    aboutLines[i] = null;
+                }
+            }
+        }
+        application.mView.setActiveLayer(0);
+    }
 
     void say(final String msg){
-    	final SwingWorker worker = new SwingWorker(){
-    		public Object construct(){
-    		    showMessage(msg);
-    		    sleep(SAY_DURATION);
-    		    hideMessage();
-    		    return null;
-    		}
-    	    };
-    	worker.start();
+        final SwingWorker worker = new SwingWorker(){
+            public Object construct(){
+                showMessage(msg);
+                sleep(SAY_DURATION);
+                hideMessage();
+                return null;
+            }
+            };
+        worker.start();
     }
 
     void showMessage(String msg){
-	    fadedRegion.setWidth(application.panelWidth-2);
-	    fadedRegion.setHeight(100);
-	    sayGlyph.setText(msg);
-	    fadedRegion.setVisible(true);
-	    sayGlyph.setVisible(true);
+        fadedRegion.setWidth(application.panelWidth-2);
+        fadedRegion.setHeight(100);
+        sayGlyph.setText(msg);
+        fadedRegion.setVisible(true);
+        sayGlyph.setVisible(true);
     }
 
     void hideMessage(){
-	    fadedRegion.setVisible(false);
-	    sayGlyph.setVisible(false);
+        fadedRegion.setVisible(false);
+        sayGlyph.setVisible(false);
     }
 
-	public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	}
+    public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+    }
 
-	public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+    public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
-	public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-		hideAbout();
-	}
+    public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
+        hideAbout();
+    }
 
-	public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+    public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
-	public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+    public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
-	public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
+    public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
-	public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+    public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
-	public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+    public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
-	public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
+    public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
-	public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){}
+    public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){}
 
-	public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){}
+    public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){}
 
-	public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){}
+    public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){}
 
-	public void enterGlyph(Glyph g){}
+    public void enterGlyph(Glyph g){}
 
-	public void exitGlyph(Glyph g){}
+    public void exitGlyph(Glyph g){}
 
-	public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
-		hideAbout();
-	}
+    public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
+        hideAbout();
+    }
 
-	public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
+    public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 
-	public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
+    public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 
-	public void viewActivated(View v){}
+    public void viewActivated(View v){}
 
-	public void viewDeactivated(View v){}
+    public void viewDeactivated(View v){}
 
-	public void viewIconified(View v){}
+    public void viewIconified(View v){}
 
-	public void viewDeiconified(View v){}
+    public void viewDeiconified(View v){}
 
-	public void viewClosing(View v){
-		application.exit();
-	}
+    public void viewClosing(View v){
+        application.exit();
+    }
 }

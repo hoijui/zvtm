@@ -22,22 +22,22 @@ public class Launcher {
 
     public static void main(String[] args){
         File xmlSceneFile = null;
-		boolean fs = false;
-		boolean ogl = false;
-		boolean aa = true;
-		String viewerType = VIEWER_TYPE_DEBUGGER;
-		for (int i=0;i<args.length;i++){
-			if (args[i].startsWith("-")){
-				if (args[i].substring(1).equals("fs")){fs = true;}
-				else if (args[i].substring(1).equals("opengl")){ogl = true;}
-				else if (args[i].substring(1).equals("noaa")){aa = false;}
+        boolean fs = false;
+        boolean ogl = false;
+        boolean aa = true;
+        String viewerType = VIEWER_TYPE_DEBUGGER;
+        for (int i=0;i<args.length;i++){
+            if (args[i].startsWith("-")){
+                if (args[i].substring(1).equals("fs")){fs = true;}
+                else if (args[i].substring(1).equals("opengl")){ogl = true;}
+                else if (args[i].substring(1).equals("noaa")){aa = false;}
                 else if (args[i].substring(1).equals("debug")){SceneManager.setDebugMode(true);}
-				else if (args[i].substring(1).equals("smooth")){Region.setDefaultTransitions(Region.FADE_IN, Region.FADE_OUT);}
-				else if (args[i].substring(1).equals("h") || args[i].substring(1).equals("--help")){Launcher.printCmdLineHelp();System.exit(0);}
-			}
-			else if (args[i].toUpperCase().equals(VIEWER_TYPE_TILEDIMAGE) || args[i].toUpperCase().equals(VIEWER_TYPE_DEBUGGER)){
-			    viewerType = args[i];
-			}
+                else if (args[i].substring(1).equals("smooth")){Region.setDefaultTransitions(Region.FADE_IN, Region.FADE_OUT);}
+                else if (args[i].substring(1).equals("h") || args[i].substring(1).equals("--help")){Launcher.printCmdLineHelp();System.exit(0);}
+            }
+            else if (args[i].toUpperCase().equals(VIEWER_TYPE_TILEDIMAGE) || args[i].toUpperCase().equals(VIEWER_TYPE_DEBUGGER)){
+                viewerType = args[i];
+            }
             else {
                 // the only other thing allowed as a cmd line param is a scene file
                 File f = new File(args[i]);
@@ -56,10 +56,10 @@ public class Launcher {
                     }
                 }
             }
-		}
-		//if (ogl){
-		//    System.setProperty("sun.java2d.opengl", "True");
-		//}
+        }
+        //if (ogl){
+        //    System.setProperty("sun.java2d.opengl", "True");
+        //}
         if (!fs && Utils.osIsMacOS()){
             System.setProperty("apple.laf.useScreenMenuBar", "true");
         }
@@ -74,10 +74,10 @@ public class Launcher {
 
     private static void printCmdLineHelp(){
         System.out.println("Usage:\n\tjava -jar target/zuist-engine-X.X.X.jar <zuist_scene_file.xml> [viewer] [options]");
-		System.out.println("Viewer:\n\tI: tiled image scene");
-		System.out.println("\tD: debugger");
-		System.out.println("\nOptions:\n\t-fs: fullscreen mode");
-		System.out.println("\t-opengl: use Java2D OpenGL rendering pipeline (Java 6+Linux/Windows), requires that -Dsun.java2d.opengl=true be set on cmd line");
+        System.out.println("Viewer:\n\tI: tiled image scene");
+        System.out.println("\tD: debugger");
+        System.out.println("\nOptions:\n\t-fs: fullscreen mode");
+        System.out.println("\t-opengl: use Java2D OpenGL rendering pipeline (Java 6+Linux/Windows), requires that -Dsun.java2d.opengl=true be set on cmd line");
         System.out.println("\t-noaa: no antialiasing");
         System.out.println("\t-smooth: default to smooth transitions between levels when none specified");
         System.out.println("\t-debug: enable debug mode");

@@ -13,17 +13,17 @@ import java.util.Scanner;
 
 class Messages {
 
-	static String VERSION;
+    static String VERSION;
 
-	static {
-	    Scanner sc = new Scanner(Messages.class.getResourceAsStream("/properties")).useDelimiter("\\s*=\\s*");
+    static {
+        Scanner sc = new Scanner(Messages.class.getResourceAsStream("/properties")).useDelimiter("\\s*=\\s*");
         while (sc.hasNext()){
             String token = sc.next();
             if (token.equals("version")){
                 Messages.VERSION = sc.next();
             }
         }
-	}
+    }
 
     static final String OPEN = "Open...";
     static final String EXIT = "Exit";
@@ -34,7 +34,7 @@ class Messages {
     static final String VIEW = "View";
     static final String HELP = "Help";
 
-	static final String PM_ENTRY = "mpmE";
+    static final String PM_ENTRY = "mpmE";
 
     static final String PM_BACK = "Back";
     static final String PM_GLOBALVIEW = "Global View";
@@ -53,12 +53,12 @@ class Messages {
 
     static final String[] mainMenuLabels = {PM_GLOBALVIEW, PM_OPEN, PM_BACK, PM_RELOAD};
     static final Point2D.Double[] mainMenuLabelOffsets = {new Point2D.Double(10, 0), new Point2D.Double(0, 0),
-						     new Point2D.Double(-10, 0), new Point2D.Double(0, -10)};
+                             new Point2D.Double(-10, 0), new Point2D.Double(0, -10)};
 
-	static final String ZON = "Zero-Order Navigation";
-	static final String FON = "First-Order Navigation";
+    static final String ZON = "Zero-Order Navigation";
+    static final String FON = "First-Order Navigation";
 
-	static final String SCB = "Speed-coupled Blending Lens";
-	static final String FISHEYE = "Fisheye Lens";
+    static final String SCB = "Speed-coupled Blending Lens";
+    static final String FISHEYE = "Fisheye Lens";
 
 }

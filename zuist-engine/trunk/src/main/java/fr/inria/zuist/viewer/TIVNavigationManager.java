@@ -76,11 +76,11 @@ class TIVNavigationManager {
         mCamera = app.mCamera;
         ss = new ScreenSaver(this);
         ssTimer = new Timer();
-    	ssTimer.scheduleAtFixedRate(ss, SCREEN_SAVER_INTERVAL, SCREEN_SAVER_INTERVAL);
+        ssTimer.scheduleAtFixedRate(ss, SCREEN_SAVER_INTERVAL, SCREEN_SAVER_INTERVAL);
     }
 
     void getGlobalView(EndAction ea){
-		application.sm.getGlobalView(mCamera, TIVNavigationManager.ANIM_MOVE_DURATION, ea);
+        application.sm.getGlobalView(mCamera, TIVNavigationManager.ANIM_MOVE_DURATION, ea);
     }
 
     /* Higher view */
@@ -132,58 +132,58 @@ class TIVNavigationManager {
 
     }
 
-	/* -------------- Overview ------------------- */
+    /* -------------- Overview ------------------- */
 
-	static final int MAX_OVERVIEW_WIDTH = 200;
-	static final int MAX_OVERVIEW_HEIGHT = 200;
-	static final Color OBSERVED_REGION_COLOR = Color.GREEN;
-	static final float OBSERVED_REGION_ALPHA = 0.5f;
-	static final Color OV_BORDER_COLOR = Color.WHITE;
-	static final Color OV_INSIDE_BORDER_COLOR = Color.WHITE;
+    static final int MAX_OVERVIEW_WIDTH = 200;
+    static final int MAX_OVERVIEW_HEIGHT = 200;
+    static final Color OBSERVED_REGION_COLOR = Color.GREEN;
+    static final float OBSERVED_REGION_ALPHA = 0.5f;
+    static final Color OV_BORDER_COLOR = Color.WHITE;
+    static final Color OV_INSIDE_BORDER_COLOR = Color.WHITE;
 
-	OverviewPortal ovPortal;
+    OverviewPortal ovPortal;
 
-	double[] scene_bounds = {0, 0, 0, 0};
+    double[] scene_bounds = {0, 0, 0, 0};
 
-	void createOverview(Region rootRegion){
-	    int ow, oh;
-	    float ar = (float) (rootRegion.getWidth() / (float)rootRegion.getHeight());
-	    if (ar > 1){
-	        // wider than high
-	        ow = MAX_OVERVIEW_WIDTH;
-	        oh = Math.round(ow/ar);
-	    }
-	    else {
-	        // higher than wide
-	        oh = MAX_OVERVIEW_HEIGHT;
-	        ow = Math.round(oh*ar);
-	    }
-		ovPortal = new OverviewPortal(application.panelWidth-ow-1, application.panelHeight-oh-1, ow, oh, application.ovCamera, application.mCamera);
-		ovPortal.setPortalListener(application.eh);
-		ovPortal.setBackgroundColor(TiledImageViewer.BACKGROUND_COLOR);
-		ovPortal.setObservedRegionColor(OBSERVED_REGION_COLOR);
-		ovPortal.setObservedRegionTranslucency(OBSERVED_REGION_ALPHA);
-		VirtualSpaceManager.INSTANCE.addPortal(ovPortal, application.mView);
-		ovPortal.setBorder(Color.GREEN);
-		updateOverview();
-	}
+    void createOverview(Region rootRegion){
+        int ow, oh;
+        float ar = (float) (rootRegion.getWidth() / (float)rootRegion.getHeight());
+        if (ar > 1){
+            // wider than high
+            ow = MAX_OVERVIEW_WIDTH;
+            oh = Math.round(ow/ar);
+        }
+        else {
+            // higher than wide
+            oh = MAX_OVERVIEW_HEIGHT;
+            ow = Math.round(oh*ar);
+        }
+        ovPortal = new OverviewPortal(application.panelWidth-ow-1, application.panelHeight-oh-1, ow, oh, application.ovCamera, application.mCamera);
+        ovPortal.setPortalListener(application.eh);
+        ovPortal.setBackgroundColor(TiledImageViewer.BACKGROUND_COLOR);
+        ovPortal.setObservedRegionColor(OBSERVED_REGION_COLOR);
+        ovPortal.setObservedRegionTranslucency(OBSERVED_REGION_ALPHA);
+        VirtualSpaceManager.INSTANCE.addPortal(ovPortal, application.mView);
+        ovPortal.setBorder(Color.GREEN);
+        updateOverview();
+    }
 
-	void updateOverview(){
-		if (ovPortal != null){
-		    int l = 0;
-    		while (application.sm.getRegionsAtLevel(l) == null){
-    			l++;
-    			if (l > application.sm.getLevelCount()){
-    				l = -1;
-    				break;
-    			}
-    		}
-    		if (l > -1){
-    			scene_bounds = application.sm.getLevel(l).getBounds();
-    	        ovPortal.centerOnRegion(TIVNavigationManager.ANIM_MOVE_DURATION, scene_bounds[0], scene_bounds[1], scene_bounds[2], scene_bounds[3]);
-    		}
-		}
-	}
+    void updateOverview(){
+        if (ovPortal != null){
+            int l = 0;
+            while (application.sm.getRegionsAtLevel(l) == null){
+                l++;
+                if (l > application.sm.getLevelCount()){
+                    l = -1;
+                    break;
+                }
+            }
+            if (l > -1){
+                scene_bounds = application.sm.getLevel(l).getBounds();
+                ovPortal.centerOnRegion(TIVNavigationManager.ANIM_MOVE_DURATION, scene_bounds[0], scene_bounds[1], scene_bounds[2], scene_bounds[3]);
+            }
+        }
+    }
 
     void showOverview(boolean b){
         if (b == ovPortal.isVisible()){return;}
@@ -191,18 +191,18 @@ class TIVNavigationManager {
         vsm.repaint(application.mView);
     }
 
-	/* -------------- Sigma Lenses ------------------- */
+    /* -------------- Sigma Lenses ------------------- */
 
-	void toggleLensType(){
-	    if (lensFamily == L2_Gaussian){
-	        lensFamily = L2_SCB;
-	        application.ovm.say(Messages.SCB);
-	    }
-	    else {
-	        lensFamily = L2_Gaussian;
-	        application.ovm.say(Messages.FISHEYE);
-	    }
-	}
+    void toggleLensType(){
+        if (lensFamily == L2_Gaussian){
+            lensFamily = L2_SCB;
+            application.ovm.say(Messages.SCB);
+        }
+        else {
+            lensFamily = L2_Gaussian;
+            application.ovm.say(Messages.FISHEYE);
+        }
+    }
 
     void setLens(int t){
         lensType = t;
@@ -302,48 +302,48 @@ class TIVNavigationManager {
     }
 
     void magnifyFocus(double magOffset, int zooming, Camera ca){
-	    double nmf = MAG_FACTOR + magOffset;
-	    if (nmf <= MAX_MAG_FACTOR && nmf > 1.0f){
-		    setMagFactor(nmf);
-		    if (zooming == ZOOMOUT_LENS){
-			    /* if unzooming, we want to keep the focus point stable, and unzoom the context
-			       this means that camera altitude must be adjusted to keep altitude + lens mag
-			       factor constant in the lens focus region. The camera must also be translated
-			       to keep the same region of the virtual space under the focus region */
-			    double a1 = application.mCamera.getAltitude();
-			    lens.setMaximumMagnification((float)nmf, true);
-			    /* explanation for the altitude offset computation: the projected size of an object
-			       in the focus region (in lens space) should remain the same before and after the
-			       change of magnification factor. The size of an object is a function of the
-			       projection coefficient (see any Glyph.projectForLens() method). This means that
-			       the following equation must be true, where F is the camera's focal distance, a1
-			       is the camera's altitude before the move and a2 is the camera altitude after the
+        double nmf = MAG_FACTOR + magOffset;
+        if (nmf <= MAX_MAG_FACTOR && nmf > 1.0f){
+            setMagFactor(nmf);
+            if (zooming == ZOOMOUT_LENS){
+                /* if unzooming, we want to keep the focus point stable, and unzoom the context
+                   this means that camera altitude must be adjusted to keep altitude + lens mag
+                   factor constant in the lens focus region. The camera must also be translated
+                   to keep the same region of the virtual space under the focus region */
+                double a1 = application.mCamera.getAltitude();
+                lens.setMaximumMagnification((float)nmf, true);
+                /* explanation for the altitude offset computation: the projected size of an object
+                   in the focus region (in lens space) should remain the same before and after the
+                   change of magnification factor. The size of an object is a function of the
+                   projection coefficient (see any Glyph.projectForLens() method). This means that
+                   the following equation must be true, where F is the camera's focal distance, a1
+                   is the camera's altitude before the move and a2 is the camera altitude after the
 move:
 MAG_FACTOR * F / (F + a1) = MAG_FACTOR + magOffset * F / (F + a2)
 From this we can get the altitude difference (a2 - a1)                       */
-			    application.mCamera.altitudeOffset((a1+application.mCamera.getFocal())*magOffset/(MAG_FACTOR-magOffset));
-			    /* explanation for the X offset computation: the position in X of an object in the
-			       focus region (lens space) should remain the same before and after the change of
-			       magnification factor. This means that the following equation must be true (taken
-			       by simplifying pc[i].lcx computation in a projectForLens() method):
-			       (vx-(lensx1))*coef1 = (vx-(lensx2))*coef2
-			       -- coef1 is actually MAG_FACTOR * F/(F+a1)
-			       -- coef2 is actually (MAG_FACTOR + magOffset) * F/(F+a2)
-			       -- lensx1 is actually camera.vx1 + ((F+a1)/F) * lens.lx
-			       -- lensx2 is actually camera.vx2 + ((F+a2)/F) * lens.lx
-			       Given that (MAG_FACTOR + magOffset) / (F+a2) = MAG_FACTOR / (F+a1)
-			       we eventually have:
-			       Xoffset = (a1 - a2) / F * lens.lx   (lens.lx being the position of the lens's center in
-			       JPanel coordinates w.r.t the view's center - see Lens.java)                */
-			    application.mCamera.move((a1-application.mCamera.getAltitude())/application.mCamera.getFocal()*lens.lx,
-					    -(a1-application.mCamera.getAltitude())/application.mCamera.getFocal()*lens.ly);
-		    }
-		    else {
-			    Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createLensMagAnim(WHEEL_ANIM_TIME, (FixedSizeLens)lens,
-					    new Float(magOffset), true, IdentityInterpolator.getInstance(), null);
-			    VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
-		    }
-	    }
+                application.mCamera.altitudeOffset((a1+application.mCamera.getFocal())*magOffset/(MAG_FACTOR-magOffset));
+                /* explanation for the X offset computation: the position in X of an object in the
+                   focus region (lens space) should remain the same before and after the change of
+                   magnification factor. This means that the following equation must be true (taken
+                   by simplifying pc[i].lcx computation in a projectForLens() method):
+                   (vx-(lensx1))*coef1 = (vx-(lensx2))*coef2
+                   -- coef1 is actually MAG_FACTOR * F/(F+a1)
+                   -- coef2 is actually (MAG_FACTOR + magOffset) * F/(F+a2)
+                   -- lensx1 is actually camera.vx1 + ((F+a1)/F) * lens.lx
+                   -- lensx2 is actually camera.vx2 + ((F+a2)/F) * lens.lx
+                   Given that (MAG_FACTOR + magOffset) / (F+a2) = MAG_FACTOR / (F+a1)
+                   we eventually have:
+                   Xoffset = (a1 - a2) / F * lens.lx   (lens.lx being the position of the lens's center in
+                   JPanel coordinates w.r.t the view's center - see Lens.java)                */
+                application.mCamera.move((a1-application.mCamera.getAltitude())/application.mCamera.getFocal()*lens.lx,
+                        -(a1-application.mCamera.getAltitude())/application.mCamera.getFocal()*lens.ly);
+            }
+            else {
+                Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createLensMagAnim(WHEEL_ANIM_TIME, (FixedSizeLens)lens,
+                        new Float(magOffset), true, IdentityInterpolator.getInstance(), null);
+                VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
+            }
+        }
     }
 
     Lens getLensDefinition(int x, int y){
@@ -372,7 +372,7 @@ From this we can get the altitude difference (a2 - a1)                       */
     int SCREEN_SAVER_INTERVAL = 2000;
 
     ScreenSaver ss;
-	Timer ssTimer;
+    Timer ssTimer;
 
     void toggleScreenSaver(){
         screensaverEnabled = !screensaverEnabled;
@@ -384,48 +384,48 @@ From this we can get the altitude difference (a2 - a1)                       */
 
 class ScreenSaver extends TimerTask {
 
-	TIVNavigationManager nm;
+    TIVNavigationManager nm;
     boolean enabled = false;
 
-	ScreenSaver(TIVNavigationManager nm){
-		super();
+    ScreenSaver(TIVNavigationManager nm){
+        super();
         this.nm = nm;
-	}
+    }
 
     void setEnabled(boolean b){
         enabled = b;
     }
 
-	public void run(){
-		if (enabled){
-		    move();
-		}
-	}
+    public void run(){
+        if (enabled){
+            move();
+        }
+    }
 
-	void move(){
-	    int r = (int)Math.round(Math.random()*20);
-	    if (r < 6){
-	        nm.getGlobalView(null);
-	    }
-	    else if (r < 8){
-	        nm.getHigherView();
-	    }
-	    else if (r < 16){
-	        nm.getLowerView();
-	    }
-	    else if (r < 17){
-	        nm.translateView(TIVNavigationManager.MOVE_UP);
-	    }
-	    else if (r < 18){
-	        nm.translateView(TIVNavigationManager.MOVE_DOWN);
-	    }
-	    else if (r < 19){
-	        nm.translateView(TIVNavigationManager.MOVE_LEFT);
-	    }
-	    else if (r <= 20){
-	        nm.translateView(TIVNavigationManager.MOVE_RIGHT);
-	    }
-	}
+    void move(){
+        int r = (int)Math.round(Math.random()*20);
+        if (r < 6){
+            nm.getGlobalView(null);
+        }
+        else if (r < 8){
+            nm.getHigherView();
+        }
+        else if (r < 16){
+            nm.getLowerView();
+        }
+        else if (r < 17){
+            nm.translateView(TIVNavigationManager.MOVE_UP);
+        }
+        else if (r < 18){
+            nm.translateView(TIVNavigationManager.MOVE_DOWN);
+        }
+        else if (r < 19){
+            nm.translateView(TIVNavigationManager.MOVE_LEFT);
+        }
+        else if (r <= 20){
+            nm.translateView(TIVNavigationManager.MOVE_RIGHT);
+        }
+    }
 
 }
 
@@ -434,10 +434,10 @@ class ZP2LensAction implements EndAction {
     TIVNavigationManager nm;
 
     ZP2LensAction(TIVNavigationManager nm){
-	    this.nm = nm;
+        this.nm = nm;
     }
 
-    public void	execute(Object subject, Animation.Dimension dimension){
+    public void execute(Object subject, Animation.Dimension dimension){
         (((Lens)subject).getOwningView()).setLens(null);
         ((Lens)subject).dispose();
         nm.setMagFactor(TIVNavigationManager.DEFAULT_MAG_FACTOR);

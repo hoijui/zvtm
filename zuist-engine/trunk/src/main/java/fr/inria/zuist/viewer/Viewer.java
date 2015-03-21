@@ -71,6 +71,7 @@ import fr.inria.zuist.engine.LevelListener;
 import fr.inria.zuist.engine.ObjectListener;
 import fr.inria.zuist.engine.ProgressListener;
 import fr.inria.zuist.engine.ObjectDescription;
+import fr.inria.zuist.engine.ResourceDescription;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -119,33 +120,33 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener, Obj
 
     SceneManager sm;
 
-	OverlayManager ovm;
-	VWGlassPane gp;
-	PieMenu mainPieMenu;
+    OverlayManager ovm;
+    VWGlassPane gp;
+    PieMenu mainPieMenu;
 
     public Viewer(boolean fullscreen, boolean opengl, boolean antialiased, File xmlSceneFile){
-		ovm = new OverlayManager(this);
-		initGUI(fullscreen, opengl, antialiased);
+        ovm = new OverlayManager(this);
+        initGUI(fullscreen, opengl, antialiased);
         VirtualSpace[]  sceneSpaces = {mSpace};
         Camera[] sceneCameras = {mCamera};
         sm = new SceneManager(sceneSpaces, sceneCameras);
         sm.setRegionListener(this);
         sm.setLevelListener(this);
-		sm.setObjectListener(this);
+        sm.setObjectListener(this);
         previousLocations = new Vector();
-		ovm.initConsole();
+        ovm.initConsole();
         if (xmlSceneFile != null){
             sm.enableRegionUpdater(false);
-			loadScene(xmlSceneFile);
-			EndAction ea  = new EndAction(){
+            loadScene(xmlSceneFile);
+            EndAction ea  = new EndAction(){
                    public void execute(Object subject, Animation.Dimension dimension){
                        sm.setUpdateLevel(true);
                        sm.enableRegionUpdater(true);
                    }
                };
-			getGlobalView(ea);
-		}
-		ovm.toggleConsole();
+            getGlobalView(ea);
+        }
+        ovm.toggleConsole();
     }
 
     void initGUI(boolean fullscreen, boolean opengl, boolean antialiased){
@@ -154,13 +155,13 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener, Obj
         mSpace = vsm.addVirtualSpace(mSpaceName);
         VirtualSpace mnSpace = vsm.addVirtualSpace(mnSpaceName);
         mCamera = mSpace.addCamera();
-		mnSpace.addCamera().setAltitude(10);
+        mnSpace.addCamera().setAltitude(10);
         ovSpace = vsm.addVirtualSpace(ovSpaceName);
-		ovSpace.addCamera();
+        ovSpace.addCamera();
         Vector cameras = new Vector();
         cameras.add(mCamera);
-		cameras.add(vsm.getVirtualSpace(mnSpaceName).getCamera(0));
-		cameras.add(vsm.getVirtualSpace(ovSpaceName).getCamera(0));
+        cameras.add(vsm.getVirtualSpace(mnSpaceName).getCamera(0));
+        cameras.add(vsm.getVirtualSpace(ovSpaceName).getCamera(0));
         mView = vsm.addFrameView(cameras, mViewName, View.STD_VIEW, VIEW_W, VIEW_H, false, false, !fullscreen, (!fullscreen) ? initMenu() : null);
         if (fullscreen){
             GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow((JFrame)mView.getFrame());
@@ -169,108 +170,108 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener, Obj
             mView.setVisible(true);
         }
         updatePanelSize();
-		gp = new VWGlassPane(this);
-		((JFrame)mView.getFrame()).setGlassPane(gp);
+        gp = new VWGlassPane(this);
+        ((JFrame)mView.getFrame()).setGlassPane(gp);
         eh = new ViewerEventHandler(this);
         mView.setListener(eh, 0);
         mView.setListener(eh, 1);
         mView.setListener(ovm, 2);
-		mCamera.addListener(eh);
+        mCamera.addListener(eh);
         mView.setBackgroundColor(Color.WHITE);
-		mView.setAntialiasing(antialiased);
-		mView.setJava2DPainter(this, Java2DPainter.AFTER_PORTALS);
-		mView.getPanel().getComponent().addComponentListener(eh);
-		ComponentAdapter ca0 = new ComponentAdapter(){
-			public void componentResized(ComponentEvent e){
-				updatePanelSize();
-			}
-		};
-		mView.getFrame().addComponentListener(ca0);
+        mView.setAntialiasing(antialiased);
+        mView.setJava2DPainter(this, Java2DPainter.AFTER_PORTALS);
+        mView.getPanel().getComponent().addComponentListener(eh);
+        ComponentAdapter ca0 = new ComponentAdapter(){
+            public void componentResized(ComponentEvent e){
+                updatePanelSize();
+            }
+        };
+        mView.getFrame().addComponentListener(ca0);
     }
 
     JMenuItem infoMI, consoleMI;
 
-	private JMenuBar initMenu(){
-		final JMenuItem openMI = new JMenuItem("Open...");
-		openMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		final JMenuItem reloadMI = new JMenuItem("Reload");
-		reloadMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
-		final JMenuItem exitMI = new JMenuItem("Exit");
-		infoMI = new JMenuItem(Messages.INFO_SHOW);
-		consoleMI = new JMenuItem(Messages.CONSOLE_HIDE);
-		final JMenuItem gcMI = new JMenuItem("Run Garbage Collector");
-		final JMenuItem aboutMI = new JMenuItem("About...");
-		ActionListener a0 = new ActionListener(){
-			public void actionPerformed(ActionEvent e){
-				if (e.getSource()==openMI){openFile();}
-				else if (e.getSource()==reloadMI){reload();}
-				else if (e.getSource()==exitMI){exit();}
-				else if (e.getSource()==infoMI){toggleMiscInfoDisplay();}
-				else if (e.getSource()==gcMI){gc();}
-				else if (e.getSource()==consoleMI){ovm.toggleConsole();}
-				else if (e.getSource()==aboutMI){about();}
-			}
-		};
-		JMenuBar jmb = new JMenuBar();
-		JMenu fileM = new JMenu("File");
-		JMenu viewM = new JMenu("View");
-		JMenu helpM = new JMenu("Help");
-		fileM.add(openMI);
-		fileM.add(reloadMI);
-		fileM.addSeparator();
-		fileM.add(exitMI);
-		viewM.add(infoMI);
-		viewM.add(gcMI);
-		viewM.add(consoleMI);
-		helpM.add(aboutMI);
-		jmb.add(fileM);
-		jmb.add(viewM);
-		jmb.add(helpM);
-		openMI.addActionListener(a0);
-		reloadMI.addActionListener(a0);
-		exitMI.addActionListener(a0);
-		infoMI.addActionListener(a0);
-		consoleMI.addActionListener(a0);
-		gcMI.addActionListener(a0);
-		aboutMI.addActionListener(a0);
-		return jmb;
-	}
+    private JMenuBar initMenu(){
+        final JMenuItem openMI = new JMenuItem("Open...");
+        openMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        final JMenuItem reloadMI = new JMenuItem("Reload");
+        reloadMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        final JMenuItem exitMI = new JMenuItem("Exit");
+        infoMI = new JMenuItem(Messages.INFO_SHOW);
+        consoleMI = new JMenuItem(Messages.CONSOLE_HIDE);
+        final JMenuItem gcMI = new JMenuItem("Run Garbage Collector");
+        final JMenuItem aboutMI = new JMenuItem("About...");
+        ActionListener a0 = new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+                if (e.getSource()==openMI){openFile();}
+                else if (e.getSource()==reloadMI){reload();}
+                else if (e.getSource()==exitMI){exit();}
+                else if (e.getSource()==infoMI){toggleMiscInfoDisplay();}
+                else if (e.getSource()==gcMI){gc();}
+                else if (e.getSource()==consoleMI){ovm.toggleConsole();}
+                else if (e.getSource()==aboutMI){about();}
+            }
+        };
+        JMenuBar jmb = new JMenuBar();
+        JMenu fileM = new JMenu("File");
+        JMenu viewM = new JMenu("View");
+        JMenu helpM = new JMenu("Help");
+        fileM.add(openMI);
+        fileM.add(reloadMI);
+        fileM.addSeparator();
+        fileM.add(exitMI);
+        viewM.add(infoMI);
+        viewM.add(gcMI);
+        viewM.add(consoleMI);
+        helpM.add(aboutMI);
+        jmb.add(fileM);
+        jmb.add(viewM);
+        jmb.add(helpM);
+        openMI.addActionListener(a0);
+        reloadMI.addActionListener(a0);
+        exitMI.addActionListener(a0);
+        infoMI.addActionListener(a0);
+        consoleMI.addActionListener(a0);
+        gcMI.addActionListener(a0);
+        aboutMI.addActionListener(a0);
+        return jmb;
+    }
 
-	void displayMainPieMenu(boolean b){
-		if (b){
-			PieMenuFactory.setItemFillColor(ConfigManager.PIEMENU_FILL_COLOR);
-			PieMenuFactory.setItemBorderColor(ConfigManager.PIEMENU_BORDER_COLOR);
-			PieMenuFactory.setSelectedItemFillColor(ConfigManager.PIEMENU_INSIDE_COLOR);
-			PieMenuFactory.setSelectedItemBorderColor(null);
-			PieMenuFactory.setLabelColor(ConfigManager.PIEMENU_BORDER_COLOR);
-			PieMenuFactory.setFont(ConfigManager.PIEMENU_FONT);
-			PieMenuFactory.setTranslucency(0.7f);
-			PieMenuFactory.setSensitivityRadius(0.5);
-			PieMenuFactory.setAngle(-Math.PI/2.0);
-			PieMenuFactory.setRadius(150);
-			mainPieMenu = PieMenuFactory.createPieMenu(Messages.mainMenuLabels, Messages.mainMenuLabelOffsets, 0, mView, vsm);
-			Glyph[] items = mainPieMenu.getItems();
-			items[0].setType(Messages.PM_ENTRY);
-			items[1].setType(Messages.PM_ENTRY);
-			items[2].setType(Messages.PM_ENTRY);
-			items[3].setType(Messages.PM_ENTRY);
-		}
-		else {
-			mainPieMenu.destroy(0);
-			mainPieMenu = null;
-		}
-	}
+    void displayMainPieMenu(boolean b){
+        if (b){
+            PieMenuFactory.setItemFillColor(ConfigManager.PIEMENU_FILL_COLOR);
+            PieMenuFactory.setItemBorderColor(ConfigManager.PIEMENU_BORDER_COLOR);
+            PieMenuFactory.setSelectedItemFillColor(ConfigManager.PIEMENU_INSIDE_COLOR);
+            PieMenuFactory.setSelectedItemBorderColor(null);
+            PieMenuFactory.setLabelColor(ConfigManager.PIEMENU_BORDER_COLOR);
+            PieMenuFactory.setFont(ConfigManager.PIEMENU_FONT);
+            PieMenuFactory.setTranslucency(0.7f);
+            PieMenuFactory.setSensitivityRadius(0.5);
+            PieMenuFactory.setAngle(-Math.PI/2.0);
+            PieMenuFactory.setRadius(150);
+            mainPieMenu = PieMenuFactory.createPieMenu(Messages.mainMenuLabels, Messages.mainMenuLabelOffsets, 0, mView, vsm);
+            Glyph[] items = mainPieMenu.getItems();
+            items[0].setType(Messages.PM_ENTRY);
+            items[1].setType(Messages.PM_ENTRY);
+            items[2].setType(Messages.PM_ENTRY);
+            items[3].setType(Messages.PM_ENTRY);
+        }
+        else {
+            mainPieMenu.destroy(0);
+            mainPieMenu = null;
+        }
+    }
 
-	void pieMenuEvent(Glyph menuItem){
-		int index = mainPieMenu.getItemIndex(menuItem);
-		if (index != -1){
-			String label = mainPieMenu.getLabels()[index].getText();
-			if (label == Messages.PM_BACK){moveBack();}
-			else if (label == Messages.PM_GLOBALVIEW){getGlobalView(null);}
-			else if (label == Messages.PM_OPEN){openFile();}
-			else if (label == Messages.PM_RELOAD){reload();}
-		}
-	}
+    void pieMenuEvent(Glyph menuItem){
+        int index = mainPieMenu.getItemIndex(menuItem);
+        if (index != -1){
+            String label = mainPieMenu.getLabels()[index].getText();
+            if (label == Messages.PM_BACK){moveBack();}
+            else if (label == Messages.PM_GLOBALVIEW){getGlobalView(null);}
+            else if (label == Messages.PM_OPEN){openFile();}
+            else if (label == Messages.PM_RELOAD){reload();}
+        }
+    }
 
     void windowLayout(){
         if (Utils.osIsWindows()){
@@ -284,93 +285,93 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener, Obj
         VIEW_H = (SCREEN_HEIGHT <= VIEW_MAX_H) ? SCREEN_HEIGHT : VIEW_MAX_H;
     }
 
-	/*-------------  Scene management    -------------*/
+    /*-------------  Scene management    -------------*/
 
-	void reset(){
-		sm.reset();
-		mSpace.removeAllGlyphs();
-	}
+    void reset(){
+        sm.reset();
+        mSpace.removeAllGlyphs();
+    }
 
-	void openFile(){
-		final JFileChooser fc = new JFileChooser(SCENE_FILE_DIR);
-		fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-		fc.setDialogTitle("Find ZUIST Scene File");
-		int returnVal= fc.showOpenDialog(mView.getFrame());
-		if (returnVal == JFileChooser.APPROVE_OPTION){
-		    final SwingWorker worker = new SwingWorker(){
-			    public Object construct(){
-					reset();
-					sm.setUpdateLevel(false);
-					sm.enableRegionUpdater(false);
-					loadScene(fc.getSelectedFile());
-					EndAction ea  = new EndAction(){
+    void openFile(){
+        final JFileChooser fc = new JFileChooser(SCENE_FILE_DIR);
+        fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        fc.setDialogTitle("Find ZUIST Scene File");
+        int returnVal= fc.showOpenDialog(mView.getFrame());
+        if (returnVal == JFileChooser.APPROVE_OPTION){
+            final SwingWorker worker = new SwingWorker(){
+                public Object construct(){
+                    reset();
+                    sm.setUpdateLevel(false);
+                    sm.enableRegionUpdater(false);
+                    loadScene(fc.getSelectedFile());
+                    EndAction ea  = new EndAction(){
                            public void execute(Object subject, Animation.Dimension dimension){
                                sm.setUpdateLevel(true);
                                sm.enableRegionUpdater(true);
                            }
                        };
-					getGlobalView(ea);
-					return null;
-			    }
-			};
-		    worker.start();
-		}
-	}
+                    getGlobalView(ea);
+                    return null;
+                }
+            };
+            worker.start();
+        }
+    }
 
-	void reload(){
-		if (SCENE_FILE==null){return;}
-		final SwingWorker worker = new SwingWorker(){
-		    public Object construct(){
-				reset();
-				loadScene(SCENE_FILE);
-				return null;
-		    }
-		};
-	    worker.start();
-	}
+    void reload(){
+        if (SCENE_FILE==null){return;}
+        final SwingWorker worker = new SwingWorker(){
+            public Object construct(){
+                reset();
+                loadScene(SCENE_FILE);
+                return null;
+            }
+        };
+        worker.start();
+    }
 
-	void loadScene(File xmlSceneFile){
-		try {
-			ovm.sayInConsole("Loading "+xmlSceneFile.getCanonicalPath()+"\n");
-			mView.setTitle(mViewName + " - " + xmlSceneFile.getCanonicalPath());
-		}
-		catch (IOException ex){}
-		gp.setValue(0);
-		gp.setVisible(true);
-		SCENE_FILE = xmlSceneFile;
-	    SCENE_FILE_DIR = SCENE_FILE.getParentFile();
-	    sm.loadScene(SceneManager.parseXML(SCENE_FILE), SCENE_FILE_DIR, true, gp);
-	    HashMap sceneAttributes = sm.getSceneAttributes();
-	    if (sceneAttributes.containsKey(SceneManager._background)){
-	        mView.setBackgroundColor((Color)sceneAttributes.get(SceneManager._background));
-	    }
-		MAX_NB_REQUESTS = sm.getObjectCount() / 100;
-	    gp.setVisible(false);
-	    gp.setLabel(VWGlassPane.EMPTY_STRING);
+    void loadScene(File xmlSceneFile){
+        try {
+            ovm.sayInConsole("Loading "+xmlSceneFile.getCanonicalPath()+"\n");
+            mView.setTitle(mViewName + " - " + xmlSceneFile.getCanonicalPath());
+        }
+        catch (IOException ex){}
+        gp.setValue(0);
+        gp.setVisible(true);
+        SCENE_FILE = xmlSceneFile;
+        SCENE_FILE_DIR = SCENE_FILE.getParentFile();
+        sm.loadScene(SceneManager.parseXML(SCENE_FILE), SCENE_FILE_DIR, true, gp);
+        HashMap sceneAttributes = sm.getSceneAttributes();
+        if (sceneAttributes.containsKey(SceneManager._background)){
+            mView.setBackgroundColor((Color)sceneAttributes.get(SceneManager._background));
+        }
+        MAX_NB_REQUESTS = sm.getObjectCount() / 100;
+        gp.setVisible(false);
+        gp.setLabel(VWGlassPane.EMPTY_STRING);
         mCamera.setAltitude(0.0f);
-	}
+    }
 
     /*-------------     Navigation       -------------*/
 
     void getGlobalView(EndAction ea){
-		int l = 0;
-		while (sm.getRegionsAtLevel(l) == null){
-			l++;
-			if (l > sm.getLevelCount()){
-				l = -1;
-				break;
-			}
-		}
-		if (l > -1){
-			rememberLocation(mCamera.getLocation());
-			double[] wnes = sm.getLevel(l).getBounds();
-	        mCamera.getOwningView().centerOnRegion(mCamera, Viewer.ANIM_MOVE_LENGTH, wnes[0], wnes[1], wnes[2], wnes[3], ea);
-		}
+        int l = 0;
+        while (sm.getRegionsAtLevel(l) == null){
+            l++;
+            if (l > sm.getLevelCount()){
+                l = -1;
+                break;
+            }
+        }
+        if (l > -1){
+            rememberLocation(mCamera.getLocation());
+            double[] wnes = sm.getLevel(l).getBounds();
+            mCamera.getOwningView().centerOnRegion(mCamera, Viewer.ANIM_MOVE_LENGTH, wnes[0], wnes[1], wnes[2], wnes[3], ea);
+        }
     }
 
     /* Higher view */
     void getHigherView(){
-		rememberLocation(mCamera.getLocation());
+        rememberLocation(mCamera.getLocation());
         Float alt = new Float(mCamera.getAltitude() + mCamera.getFocal());
 //        vsm.animator.createCameraAnimation(Viewer.ANIM_MOVE_LENGTH, AnimManager.CA_ALT_SIG, alt, mCamera.getID());
         Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(Viewer.ANIM_MOVE_LENGTH, mCamera,
@@ -380,7 +381,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener, Obj
 
     /* Higher view */
     void getLowerView(){
-		rememberLocation(mCamera.getLocation());
+        rememberLocation(mCamera.getLocation());
         Float alt=new Float(-(mCamera.getAltitude() + mCamera.getFocal())/2.0f);
 //        vsm.animator.createCameraAnimation(Viewer.ANIM_MOVE_LENGTH, AnimManager.CA_ALT_SIG, alt, mCamera.getID());
         Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(Viewer.ANIM_MOVE_LENGTH, mCamera,
@@ -415,57 +416,57 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener, Obj
         vsm.getAnimationManager().startAnimation(a, false);
     }
 
-	void centerOnObject(String id){
-		ovm.sayInConsole("Centering on object "+id+"\n");
-		ObjectDescription od = sm.getObject(id);
-		if (od != null){
-			Glyph g = od.getGlyph();
-			if (g != null){
-				rememberLocation(mCamera.getLocation());
-				mCamera.getOwningView().centerOnGlyph(g, mCamera, Viewer.ANIM_MOVE_LENGTH, true, 1.2f);
-			}
-		}
-	}
-
-	void centerOnRegion(String id){
-		ovm.sayInConsole("Centering on region "+id+"\n");
-		Region r = sm.getRegion(id);
-		if (r != null){
-			Glyph g = r.getBounds();
-			if (g != null){
-				rememberLocation(mCamera.getLocation());
-				mCamera.getOwningView().centerOnGlyph(g, mCamera, Viewer.ANIM_MOVE_LENGTH, true, 1.2f);
-			}
-		}
-	}
-
-	Vector previousLocations;
-	static final int MAX_PREV_LOC = 100;
-
-	void rememberLocation(){
-	    rememberLocation(mCamera.getLocation());
+    void centerOnObject(String id){
+        ovm.sayInConsole("Centering on object "+id+"\n");
+        ObjectDescription od = sm.getObject(id);
+        if (od != null){
+            Glyph g = od.getGlyph();
+            if (g != null){
+                rememberLocation(mCamera.getLocation());
+                mCamera.getOwningView().centerOnGlyph(g, mCamera, Viewer.ANIM_MOVE_LENGTH, true, 1.2f);
+            }
+        }
     }
 
-	void rememberLocation(Location l){
-		if (previousLocations.size() >= MAX_PREV_LOC){
-			// as a result of release/click being undifferentiated)
-			previousLocations.removeElementAt(0);
-		}
-		if (previousLocations.size()>0){
-			if (!Location.equals((Location)previousLocations.lastElement(),l)){
+    void centerOnRegion(String id){
+        ovm.sayInConsole("Centering on region "+id+"\n");
+        Region r = sm.getRegion(id);
+        if (r != null){
+            Glyph g = r.getBounds();
+            if (g != null){
+                rememberLocation(mCamera.getLocation());
+                mCamera.getOwningView().centerOnGlyph(g, mCamera, Viewer.ANIM_MOVE_LENGTH, true, 1.2f);
+            }
+        }
+    }
+
+    Vector previousLocations;
+    static final int MAX_PREV_LOC = 100;
+
+    void rememberLocation(){
+        rememberLocation(mCamera.getLocation());
+    }
+
+    void rememberLocation(Location l){
+        if (previousLocations.size() >= MAX_PREV_LOC){
+            // as a result of release/click being undifferentiated)
+            previousLocations.removeElementAt(0);
+        }
+        if (previousLocations.size()>0){
+            if (!Location.equals((Location)previousLocations.lastElement(),l)){
                 previousLocations.add(l);
             }
-		}
-		else {previousLocations.add(l);}
-	}
+        }
+        else {previousLocations.add(l);}
+    }
 
-	void moveBack(){
-		if (previousLocations.size()>0){
-			Vector animParams = Location.getDifference(mSpace.getCamera(0).getLocation(), (Location)previousLocations.lastElement());
-			sm.setUpdateLevel(false);
-//			vsm.animator.createCameraAnimation(Viewer.ANIM_MOVE_LENGTH, AnimManager.CA_ALT_TRANS_SIG,
-//				animParams, mSpace.getCamera(0).getID(),
-//				new PostAnimationAdapter(){
+    void moveBack(){
+        if (previousLocations.size()>0){
+            Vector animParams = Location.getDifference(mSpace.getCamera(0).getLocation(), (Location)previousLocations.lastElement());
+            sm.setUpdateLevel(false);
+//          vsm.animator.createCameraAnimation(Viewer.ANIM_MOVE_LENGTH, AnimManager.CA_ALT_TRANS_SIG,
+//              animParams, mSpace.getCamera(0).getID(),
+//              new PostAnimationAdapter(){
 //                    public void animationEnded(Object target, short type, String dimension){
 //                        sm.setUpdateLevel(true);
 //                        sm.updateLevel(mCamera.altitude);
@@ -482,9 +483,9 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener, Obj
                 (Double)animParams.elementAt(0), true, SlowInSlowOutInterpolator.getInstance(), new LevelUpdater());
             vsm.getAnimationManager().startAnimation(at, false);
             vsm.getAnimationManager().startAnimation(aa, false);
-			previousLocations.removeElementAt(previousLocations.size()-1);
-		}
-	}
+            previousLocations.removeElementAt(previousLocations.size()-1);
+        }
+    }
 
     void altitudeChanged(){
         mCameraAltStr = Messages.ALTITUDE + String.format("%d", Math.round(mCamera.altitude));
@@ -493,28 +494,28 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener, Obj
     void updatePanelSize(){
         Dimension d = mView.getPanel().getComponent().getSize();
         panelWidth = d.width;
-		panelHeight = d.height;
-		if (ovm.console != null){
-			ovm.updateConsoleBounds();
-		}
-	}
+        panelHeight = d.height;
+        if (ovm.console != null){
+            ovm.updateConsoleBounds();
+        }
+    }
 
-	/* ---- Benchmark animation ----*/
+    /* ---- Benchmark animation ----*/
 
-	Animation cameraAlt;
+    Animation cameraAlt;
 
-	void toggleBenchAnim(){
-	    if (cameraAlt == null){
-	        animate(20000);
-	    }
-	    else {
-	        vsm.getAnimationManager().stopAnimation(cameraAlt);
-	        cameraAlt = null;
-	    }
-	}
+    void toggleBenchAnim(){
+        if (cameraAlt == null){
+            animate(20000);
+        }
+        else {
+            vsm.getAnimationManager().stopAnimation(cameraAlt);
+            cameraAlt = null;
+        }
+    }
 
-	void animate(final double gvAlt){
-	    cameraAlt = vsm.getAnimationManager().getAnimationFactory().createAnimation(
+    void animate(final double gvAlt){
+        cameraAlt = vsm.getAnimationManager().getAnimationFactory().createAnimation(
            5000, Animation.INFINITE, Animation.RepeatBehavior.REVERSE, mCamera, Animation.Dimension.ALTITUDE,
            new DefaultTimingHandler(){
                public void timingEvent(float fraction, Object subject, Animation.Dimension dim){
@@ -527,31 +528,31 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener, Obj
         vsm.getAnimationManager().startAnimation(cameraAlt, false);
     }
 
-	/* ---- Debug information ----*/
+    /* ---- Debug information ----*/
 
-	public void enteredRegion(Region r){
-	    ovm.sayInConsole("Entered region "+r.getID()+"\n");
-	}
+    public void enteredRegion(Region r){
+        ovm.sayInConsole("Entered region "+r.getID()+"\n");
+    }
 
-	public void exitedRegion(Region r){
-	    ovm.sayInConsole("Exited region "+r.getID()+"\n");
-	}
+    public void exitedRegion(Region r){
+        ovm.sayInConsole("Exited region "+r.getID()+"\n");
+    }
 
-	public void enteredLevel(int depth){
-	    ovm.sayInConsole("Entered level "+depth+"\n");
-	    levelStr = Messages.LEVEL + String.valueOf(depth);
-	}
+    public void enteredLevel(int depth){
+        ovm.sayInConsole("Entered level "+depth+"\n");
+        levelStr = Messages.LEVEL + String.valueOf(depth);
+    }
 
-	public void exitedLevel(int depth){
-	    ovm.sayInConsole("Exited level "+depth+"\n");
-	}
+    public void exitedLevel(int depth){
+        ovm.sayInConsole("Exited level "+depth+"\n");
+    }
 
-	public void objectCreated(ObjectDescription od){
-	    ovm.sayInConsole("Created object "+od.getID()+"\n");
-	}
+    public void objectCreated(ObjectDescription od){
+        ovm.sayInConsole("Created object "+od.getID()+"\n");
+    }
 
     public void objectDestroyed(ObjectDescription od){
-	    ovm.sayInConsole("Destroyed object "+od.getID()+"\n");
+        ovm.sayInConsole("Destroyed object "+od.getID()+"\n");
     }
 
     long maxMem = Runtime.getRuntime().maxMemory();
@@ -569,8 +570,8 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener, Obj
         vsm.repaint();
     }
 
-	static final AlphaComposite acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.7f);
-	static final Color MID_DARK_GRAY = new Color(64,64,64);
+    static final AlphaComposite acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.7f);
+    static final Color MID_DARK_GRAY = new Color(64,64,64);
 
     void showMemoryUsage(Graphics2D g2d, int viewWidth, int viewHeight){
         totalMemRatio = (int)(Runtime.getRuntime().totalMemory() * 100 / maxMem);
@@ -656,12 +657,12 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener, Obj
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
         if (!SHOW_MISC_INFO){return;}
         g2d.setFont(ConfigManager.DEBUG_FONT);
-		g2d.setComposite(acST);
-		showMemoryUsage(g2d, viewWidth, viewHeight);
-		showReqQueueStatus(g2d, viewWidth, viewHeight);
-		showAltitude(g2d, viewWidth, viewHeight);
-		showCursorCoords(g2d, viewWidth, viewHeight);
-		g2d.setComposite(Translucent.acO);
+        g2d.setComposite(acST);
+        showMemoryUsage(g2d, viewWidth, viewHeight);
+        showReqQueueStatus(g2d, viewWidth, viewHeight);
+        showAltitude(g2d, viewWidth, viewHeight);
+        showCursorCoords(g2d, viewWidth, viewHeight);
+        g2d.setComposite(Translucent.acO);
     }
 
     /* ----- Misc  ------*/
@@ -670,11 +671,11 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener, Obj
         ovm.showAbout();
     }
 
-	void gc(){
-		System.gc();
-		if (SHOW_MISC_INFO){
-			vsm.repaint();
-		}
+    void gc(){
+        System.gc();
+        if (SHOW_MISC_INFO){
+            vsm.repaint();
+        }
     }
 
     void exit(){
@@ -683,18 +684,18 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener, Obj
 
     public static void main(String[] args){
         File xmlSceneFile = null;
-		boolean fs = false;
-		boolean ogl = false;
-		boolean aa = true;
-		for (int i=0;i<args.length;i++){
-			if (args[i].startsWith("-")){
-				if (args[i].substring(1).equals("fs")){fs = true;}
-				else if (args[i].substring(1).equals("opengl")){ogl = true;}
-				else if (args[i].substring(1).equals("smooth")){Region.setDefaultTransitions(Region.FADE_IN, Region.FADE_OUT);}
-				else if (args[i].substring(1).equals("noaa")){aa = false;}
-				else if (args[i].substring(1).equals("debug")){SceneManager.setDebugMode(true);}
-				else if (args[i].substring(1).equals("h") || args[i].substring(1).equals("--help")){Viewer.printCmdLineHelp();System.exit(0);}
-			}
+        boolean fs = false;
+        boolean ogl = false;
+        boolean aa = true;
+        for (int i=0;i<args.length;i++){
+            if (args[i].startsWith("-")){
+                if (args[i].substring(1).equals("fs")){fs = true;}
+                else if (args[i].substring(1).equals("opengl")){ogl = true;}
+                else if (args[i].substring(1).equals("smooth")){Region.setDefaultTransitions(Region.FADE_IN, Region.FADE_OUT);}
+                else if (args[i].substring(1).equals("noaa")){aa = false;}
+                else if (args[i].substring(1).equals("debug")){SceneManager.setDebugMode(true);}
+                else if (args[i].substring(1).equals("h") || args[i].substring(1).equals("--help")){Viewer.printCmdLineHelp();System.exit(0);}
+            }
             else {
                 // the only other thing allowed as a cmd line param is a scene file
                 File f = new File(args[i]);
@@ -713,7 +714,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener, Obj
                     }
                 }
             }
-		}
+        }
         if (!fs && Utils.osIsMacOS()){
             System.setProperty("apple.laf.useScreenMenuBar", "true");
         }
@@ -725,7 +726,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener, Obj
         System.out.println("Usage:\n\tjava -Xmx1024M -Xms512M -cp target/timingframework-1.0.jar:zuist-engine-0.2.0-SNAPSHOT.jar:target/zvtm-0.10.0-SNAPSHOT.jar <path_to_scene_dir> [options]");
         System.out.println("Options:\n\t-fs: fullscreen mode");
         System.out.println("\t-noaa: no antialiasing");
-		System.out.println("\t-opengl: use Java2D OpenGL rendering pipeline (Java 6+Linux/Windows), requires that -Dsun.java2d.opengl=true be set on cmd line");
+        System.out.println("\t-opengl: use Java2D OpenGL rendering pipeline (Java 6+Linux/Windows), requires that -Dsun.java2d.opengl=true be set on cmd line");
         System.out.println("\t-smooth: default to smooth transitions between levels when none specified");
         System.out.println("\t-debug: enable debug mode");
     }
@@ -799,13 +800,13 @@ class VWGlassPane extends JComponent implements ProgressListener {
 
 class ConfigManager {
 
-	static Color PIEMENU_FILL_COLOR = Color.BLACK;
-	static Color PIEMENU_BORDER_COLOR = Color.WHITE;
-	static Color PIEMENU_INSIDE_COLOR = Color.DARK_GRAY;
+    static Color PIEMENU_FILL_COLOR = Color.BLACK;
+    static Color PIEMENU_BORDER_COLOR = Color.WHITE;
+    static Color PIEMENU_INSIDE_COLOR = Color.DARK_GRAY;
 
-	static final Font DEFAULT_FONT = new Font("Dialog", Font.PLAIN, 12);
+    static final Font DEFAULT_FONT = new Font("Dialog", Font.PLAIN, 12);
 
-	static final Font DEBUG_FONT = new Font("Dialog", Font.PLAIN, 10);
+    static final Font DEBUG_FONT = new Font("Dialog", Font.PLAIN, 10);
 
     static final Font PIEMENU_FONT = DEFAULT_FONT;
 
