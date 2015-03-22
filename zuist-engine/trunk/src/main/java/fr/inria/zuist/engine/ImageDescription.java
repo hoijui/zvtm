@@ -101,10 +101,10 @@ public class ImageDescription extends ResourceDescription {
                     // }
                     // open connection to data
                     CloseableHttpClient httpclient;
-                    if (ImageDescription.getHTTPUser() != null && ImageDescription.getHTTPPassword() != null){
+                    if (SceneManager.getHTTPUser() != null && SceneManager.getHTTPPassword() != null){
                         CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
                         credentialsProvider.setCredentials(AuthScope.ANY,
-                                                           new UsernamePasswordCredentials(ImageDescription.getHTTPUser(), ImageDescription.getHTTPPassword()));
+                                                           new UsernamePasswordCredentials(SceneManager.getHTTPUser(), SceneManager.getHTTPPassword()));
                         httpclient = HttpClientBuilder.create().setDefaultCredentialsProvider(credentialsProvider).build();
                     }
                     else {

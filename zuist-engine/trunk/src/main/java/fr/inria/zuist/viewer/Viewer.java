@@ -132,7 +132,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener, Obj
         initGUI(options);
         VirtualSpace[]  sceneSpaces = {mSpace};
         Camera[] sceneCameras = {mCamera};
-        sm = new SceneManager(sceneSpaces, sceneCameras);
+        sm = new SceneManager(sceneSpaces, sceneCameras, Launcher.parseSceneOptions(options));
         sm.setRegionListener(this);
         sm.setLevelListener(this);
         sm.setObjectListener(this);
@@ -704,7 +704,6 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener, Obj
         if (options.debug){
             SceneManager.setDebugMode(true);
         }
-        Launcher.setHTTPAuthentication(options.httpUser, options.httpPassword);
         new Viewer(options);
     }
 

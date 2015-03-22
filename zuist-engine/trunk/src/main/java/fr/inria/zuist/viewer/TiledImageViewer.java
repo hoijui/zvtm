@@ -124,7 +124,7 @@ public class TiledImageViewer {
         ((JFrame)mView.getFrame()).setGlassPane(gp);
         VirtualSpace[]  sceneSpaces = {mSpace};
         Camera[] sceneCameras = {mCamera};
-        sm = new SceneManager(sceneSpaces, sceneCameras);
+        sm = new SceneManager(sceneSpaces, sceneCameras, Launcher.parseSceneOptions(options));
         if (options.smooth){
             Region.setDefaultTransitions(Region.FADE_IN, Region.FADE_OUT);
         }
@@ -357,7 +357,6 @@ public class TiledImageViewer {
         if (options.debug){
             SceneManager.setDebugMode(true);
         }
-        Launcher.setHTTPAuthentication(options.httpUser, options.httpPassword);
         new TiledImageViewer(options);
     }
 

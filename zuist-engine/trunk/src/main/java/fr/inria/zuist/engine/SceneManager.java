@@ -222,10 +222,13 @@ public class SceneManager implements CameraListener {
     /** Scene Manager: Main ZUIST class instantiated by client application.
      *@param vss virtual spaces in which the scene will be loaded
      *@param cs cameras associated to those virtual spaces, through which the scene will be observed
+     *@param properties properties that can be set on this scene manager.
+     *@see #setProperties(HashMap<String,Object> properties)
      */
-    public SceneManager(VirtualSpace[] vss, Camera[] cs){
+    public SceneManager(VirtualSpace[] vss, Camera[] cs, HashMap<String,String> properties){
         this.sceneLayers = vss;
         this.sceneCameras = cs;
+        this.setProperties(properties);
         regUpdater = new RegionUpdater();
         prevAlts = new double[sceneCameras.length];
         glyphLoader = new GlyphLoader(this);
@@ -237,6 +240,53 @@ public class SceneManager implements CameraListener {
             cam.addListener(this);
         }
     }
+
+    /* -------------- Properties -------------------- */
+
+    public static final String HTTP_AUTH_USER = "user";
+    public static final String HTTP_AUTH_PASSWORD = "password";
+
+    static String httpUser = null;
+    static String httpPassword = null;
+
+    /** Set properties on this scene manager.
+     * <ul>
+     *  <li>HTTP_AUTH_USER: username as a string for HTTP authentication when fetching resources from the Web.</li>
+     *  <li>HTTP_AUTH_PASSWORD: password as a string for HTTP authentication when fetching resources from the Web.</li>
+     * </ul>
+     */
+    public void setProperties(HashMap<String,String> properties){
+        for (String prop:properties.keySet()){
+            if (prop.equals(HTTP_AUTH_USER)){
+                setHTTPUser(properties.get(prop));
+            }
+            else if (prop.equals(HTTP_AUTH_PASSWORD)){
+                setHTTPPassword(properties.get(prop));
+            }
+            else {
+                System.out.println("Warning: trying to set unknown property on ZUIST SceneManager: "+prop);
+            }
+        }
+    }
+
+    /* HTTPS authentication */
+    public static void setHTTPUser(String u){
+        SceneManager.httpUser = u;
+    }
+
+    public static void setHTTPPassword(String p){
+        SceneManager.httpPassword = p;
+    }
+
+    public static String getHTTPUser(){
+        return SceneManager.httpUser;
+    }
+
+    public static String getHTTPPassword(){
+        return SceneManager.httpPassword;
+    }
+
+    /* -------------- Scene Management -------------------- */
 
     /**
      * Sets the RegionUpdater period.

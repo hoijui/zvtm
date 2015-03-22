@@ -7,6 +7,8 @@
 
 package fr.inria.zuist.viewer;
 
+import java.util.HashMap;
+
 import java.io.File;
 import java.io.FilenameFilter;
 
@@ -14,18 +16,21 @@ import fr.inria.zvtm.engine.Utils;
 
 import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zuist.engine.Region;
-import fr.inria.zuist.engine.ResourceDescription;
 
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
 public class Launcher {
 
-    static void setHTTPAuthentication(String user, String password){
-        if (user != null && password != null){
-            ResourceDescription.setHTTPUser(user);
-            ResourceDescription.setHTTPPassword(password);
+    static HashMap<String,String> parseSceneOptions(ViewerOptions options){
+        HashMap<String,String> res = new HashMap(2,1);
+        if (options.httpUser != null){
+            res.put(SceneManager.HTTP_AUTH_USER, options.httpUser);
         }
+        if (options.httpPassword != null){
+            res.put(SceneManager.HTTP_AUTH_PASSWORD, options.httpPassword);
+        }
+        return res;
     }
 
     public static void main(String[] args){
@@ -44,7 +49,6 @@ public class Launcher {
         if (options.debug){
             SceneManager.setDebugMode(true);
         }
-        Launcher.setHTTPAuthentication(options.httpUser, options.httpPassword);
         if (options.basic_debugger){
             new Viewer(options);
         }

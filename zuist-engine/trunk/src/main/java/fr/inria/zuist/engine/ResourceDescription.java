@@ -37,26 +37,6 @@ public abstract class ResourceDescription extends ObjectDescription {
     static final String JAR_PROTOCOL = "jar";
     static final String JAR_HEADER = "jar:file:!";
 
-    static String httpUser = null;
-    static String httpPassword = null;
-
-    /* HTTPS authentication */
-    public static void setHTTPUser(String u){
-        ResourceDescription.httpUser = u;
-    }
-
-    public static void setHTTPPassword(String p){
-        ResourceDescription.httpPassword = p;
-    }
-
-    protected static String getHTTPUser(){
-        return ResourceDescription.httpUser;
-    }
-
-    protected static String getHTTPPassword(){
-        return ResourceDescription.httpPassword;
-    }
-
     /** URL identifying this resource. */
     protected URL src;
 
