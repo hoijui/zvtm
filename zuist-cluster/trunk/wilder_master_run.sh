@@ -13,6 +13,6 @@ JARS=$JARS":target/zvtm-svg-0.2.2-SNAPSHOT.jar"
 JARS=$JARS":target/commons-logging-1.1.jar"
 JARS=$JARS":target/args4j-2.0.29.jar"
 JARS=$JARS":target/javaSmarties-1.2.0.jar"
-JARS=$JARS":target/zuist-cluster-0.2.1-SNAPSHOT.jar"
+JARS=$JARS":target/zuist-cluster-0.3.0-SNAPSHOT.jar"
 
 java -Djava.net.preferIPv4Stack=true -Djgroups.bind_addr="192.168.2.2" -Xmx1g -cp $JARS fr.inria.zuist.cluster.viewer.Viewer -r 5 -c 15 -bw 960 -bh 960 "$@"

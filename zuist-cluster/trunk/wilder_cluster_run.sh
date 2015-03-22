@@ -8,7 +8,7 @@ JARS=$JARS":target/log4j-1.2.17.jar"
 JARS=$JARS":target/slf4j-api-1.7.10.jar"
 JARS=$JARS":target/slf4j-log4j12-1.7.10.jar"
 JARS=$JARS":target/timingframework-1.0.jar"
-JARS=$JARS":target/zuist-cluster-0.2.1-SNAPSHOT.jar"
+JARS=$JARS":target/zuist-cluster-0.3.0-SNAPSHOT.jar"
 
 function colNum {
   case "$1" in
