@@ -37,6 +37,12 @@ public class ViewerOptions {
     @Option(name = "-d", usage = "running on the desktop only")
     public boolean desktop = false;
 
+    @Option(name = "-user", usage = "HTTPS user name")
+    public String httpUser = null;
+
+    @Option(name = "-password", usage = "HTTPS password")
+    public String httpPassword = null;
+
     @Argument
     List<String> arguments = new ArrayList<String>();
 

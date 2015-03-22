@@ -150,6 +150,16 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     VWGlassPane gp;
     PieMenu mainPieMenu;
 
+    static HashMap<String,String> parseSceneOptions(ViewerOptions options){
+        HashMap<String,String> res = new HashMap(2,1);
+        if (options.httpUser != null){
+            res.put(SceneManager.HTTP_AUTH_USER, options.httpUser);
+        }
+        if (options.httpPassword != null){
+            res.put(SceneManager.HTTP_AUTH_PASSWORD, options.httpPassword);
+        }
+        return res;
+    }
 
     //Toggle view bezels on/off
     public void toggleClusterView()
@@ -182,7 +192,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 	    initGUI(options);
 	    VirtualSpace[]  sceneSpaces = {mSpace};
 	    Camera[] sceneCameras = {mCamera};
-	    sm = new SceneManager(sceneSpaces, sceneCameras);
+	    sm = new SceneManager(sceneSpaces, sceneCameras, parseSceneOptions(options));
 	    sm.setRegionListener(this);
 	    sm.setLevelListener(this);
 	    previousLocations = new Vector();
@@ -526,7 +536,14 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		sm = null;
 		VirtualSpace[]  sceneSpaces = {mSpace};
 		Camera[] sceneCameras = {mCamera};
-		sm = new SceneManager(sceneSpaces, sceneCameras);
+		HashMap<String,String> properties = new HashMap(2,1);
+		if (SceneManager.getHTTPUser() != null){
+		    properties.put(SceneManager.HTTP_AUTH_USER, SceneManager.getHTTPUser());
+		}
+		if (SceneManager.getHTTPPassword() != null){
+		    properties.put(SceneManager.HTTP_AUTH_PASSWORD, SceneManager.getHTTPPassword());
+		}
+		sm = new SceneManager(sceneSpaces, sceneCameras, properties);
 		sm.setRegionListener(this);
 		sm.setLevelListener(this);
 		if(sceneUnderBezels)

@@ -12,6 +12,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashMap;
 
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VirtualSpace;
@@ -48,18 +49,19 @@ aspect SceneManagerReplication {
         }
 
     pointcut sceneManagerCreation(SceneManager sceneManager,
-            VirtualSpace[] spaces, Camera[] cameras) :
-        execution(public SceneManager.new(VirtualSpace[], Camera[])) &&
+            VirtualSpace[] spaces, Camera[] cameras, HashMap<String,String> properties) :
+        execution(public SceneManager.new(VirtualSpace[], Camera[], HashMap<String,String>)) &&
         if(VirtualSpaceManager.INSTANCE.isMaster()) &&
         this(sceneManager) &&
-        args(spaces, cameras);
+        args(spaces, cameras, properties);
 
     after(SceneManager sceneManager,
             VirtualSpace[] spaces,
-            Camera cameras[])
+            Camera cameras[],
+            HashMap<String,String> properties)
         returning() :
-        sceneManagerCreation(sceneManager, spaces, cameras) &&
-        !cflowbelow(sceneManagerCreation(SceneManager, VirtualSpace[], Camera[])){
+        sceneManagerCreation(sceneManager, spaces, cameras, properties) &&
+        !cflowbelow(sceneManagerCreation(SceneManager, VirtualSpace[], Camera[], HashMap<String,String>)){
             for(VirtualSpace vs: spaces){
                 vs.setZuistOwned(true);
             }
@@ -68,7 +70,7 @@ aspect SceneManagerReplication {
 
             SceneManagerCreateDelta delta =
                 new SceneManagerCreateDelta(sceneManager.getObjId(),
-                        Arrays.asList(spaces), Arrays.asList(cameras));
+                        Arrays.asList(spaces), Arrays.asList(cameras), properties);
             VirtualSpaceManager.INSTANCE.sendDelta(delta);
         }
 
@@ -76,17 +78,20 @@ aspect SceneManagerReplication {
         private final ObjId<SceneManager> smId;
         private final ArrayList<ObjId<VirtualSpace>> spaceRefs;
         private final ArrayList<ObjId<Camera>> cameraRefs;
+        private final HashMap<String,String> properties;
 
-        SceneManagerCreateDelta(ObjId<SceneManager> smId, List<VirtualSpace> spaces, List<Camera> cameras){
+        SceneManagerCreateDelta(ObjId<SceneManager> smId, List<VirtualSpace> spaces, List<Camera> cameras,
+                                HashMap<String,String> props){
             this.smId = smId;
             this.spaceRefs = Identifiables.getRefList(spaces);
             this.cameraRefs = Identifiables.getRefList(cameras);
+            this.properties = props;
         }
 
         public void apply(SlaveUpdater su){
             SceneManager sm =
                 new SceneManager(su.getSlaveObjectArrayList(spaceRefs).toArray(new VirtualSpace[0]),
-                        su.getSlaveObjectArrayList(cameraRefs).toArray(new Camera[0]));
+                        su.getSlaveObjectArrayList(cameraRefs).toArray(new Camera[0]), properties);
             su.putSlaveObject(smId, sm);
         }
     }
