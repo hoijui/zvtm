@@ -1,8 +1,8 @@
 /*
- *   Copyright (c) INRIA, 2011. All Rights Reserved
+ *   Copyright (c) INRIA, 2011-2015. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: $
+ * $Id$
  */
 
 package fr.inria.zvtm.basicui;
@@ -28,8 +28,12 @@ import fr.inria.zvtm.cluster.ClusteredView;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VCircle;
 import fr.inria.zvtm.glyphs.VRectangle;
+import fr.inria.zvtm.glyphs.VText;
 
-public class WildViewer {
+import org.kohsuke.args4j.CmdLineException;
+import org.kohsuke.args4j.CmdLineParser;
+
+public class WallViewer {
 
     static final int VIEW_W = 1024;
     static final int VIEW_H = 768;
@@ -40,13 +44,13 @@ public class WildViewer {
     View mView;
     ViewListener eh;
 
-    static final short CONFIG_WALL = 0;
-    static final short CONFIG_SIMULATOR = 1;
-    static final short CONFIG_SINGLE = 2;
-    static final short CONFIG_MINIWALL = 3;
+    private ClusteredView clusteredView;
+    private ClusterGeometry withoutBezels;
+    private ClusterGeometry withBezels;
+    private boolean sceneUnderBezels = true;
 
-    public WildViewer(short config){
-        vsm.setMaster("WildViewer");
+    public WallViewer(Options options){
+        vsm.setMaster("WallViewer");
         mSpace = vsm.addVirtualSpace("mainSpace");
         mCamera = mSpace.addCamera();
         Vector cameras = new Vector();
@@ -54,45 +58,29 @@ public class WildViewer {
         // local view (on master)
         mView = vsm.addFrameView(cameras, "zvtm-cluster-basicui", View.STD_VIEW, VIEW_W, VIEW_H, true);
         mView.setAntialiasing(true);
-        eh = new WildViewerEvtHld(this);
+        eh = new WallViewerEvtHld(this);
         mView.setListener(eh, 0);
         mView.setBackgroundColor(Color.BLACK);
         mView.getCursor().setColor(Color.WHITE);
         mView.getCursor().setHintColor(Color.WHITE);
-        // clustered view (wall)
-        if (config == CONFIG_WALL){
-            // wall made of 6 x 4 32" displays (1920x1080 each, with approx 100px bezels -- overlay mode)
-            ClusterGeometry cg = new ClusterGeometry(2120, 1280, 6, 4);
-            Vector ccameras = new Vector();
-            ccameras.add(mCamera);
-            ClusteredView cv = new ClusteredView(cg, 3, 6, 4, ccameras);
-            vsm.addClusteredView(cv);
-        }
-
-        else if (config == CONFIG_MINIWALL){
-            // wall made of 2 x 2 30" displays (1920x1080 each, with approx 100px bezels -- overlay mode)
-            ClusterGeometry cg = new ClusterGeometry(2120, 1280, 2, 2);
-            Vector ccameras = new Vector();
-            ccameras.add(mCamera);
-            ClusteredView cv = new ClusteredView(cg, 1, 2, 2, ccameras);
-            vsm.addClusteredView(cv);
-        }
-
-        else if (config == CONFIG_SIMULATOR){
-            // simulator on a single machine, with 6x4 small windows pretending to be different tiles
-            ClusterGeometry cg = new ClusterGeometry(200, 112, 6, 4);
-            Vector ccameras = new Vector();
-            ccameras.add(mCamera);
-            ClusteredView cv = new ClusteredView(cg, 3, 6, 4, ccameras);
-            vsm.addClusteredView(cv);
-        }
-        else if (config == CONFIG_SINGLE){
-            ClusterGeometry cg = new ClusterGeometry(800, 600, 1, 1);
-            Vector ccameras = new Vector();
-            ccameras.add(mCamera);
-            ClusteredView cv = new ClusteredView(cg, 0, 1, 1, ccameras);
-            vsm.addClusteredView(cv);
-        }
+        Vector<Camera> ccameras = new Vector(1);
+        ccameras.add(mCamera);
+        withoutBezels = new ClusterGeometry(
+                options.blockWidth,
+                options.blockHeight,
+                options.numCols,
+                options.numRows);
+        withBezels = withoutBezels.addBezels(options.mullionWidth,
+               options.mullionHeight);
+        clusteredView =
+            new ClusteredView(
+                    withBezels,
+                    options.numRows-1, //origin (block number)
+                    options.numCols, //use complete
+                    options.numRows, //cluster surface
+                    ccameras);
+        clusteredView.setBackgroundColor(Color.GRAY);
+        vsm.addClusteredView(clusteredView);
     }
 
     void init(){
@@ -101,22 +89,25 @@ public class WildViewer {
             mSpace.addGlyph(new VRectangle(400*Math.cos(angle), 400*Math.sin(angle), 10, 20, 20, Color.WHITE));
             angle += Math.PI/12d;
         }
+        mSpace.addGlyph(new VText(0, 0, 0, Color.WHITE, "Hello World!", VText.TEXT_ANCHOR_MIDDLE,4));
     }
 
     public static void main(String[] args){
-        short cfg = CONFIG_WALL;
-        for (String arg:args){
-            if (arg.equals("-single")){cfg = CONFIG_SINGLE;}
-            else if (arg.equals("-simulator")){cfg = CONFIG_SIMULATOR;}
-            else if (arg.equals("-mw")){cfg = CONFIG_MINIWALL;}
-            else if (arg.equals("-wall")){cfg = CONFIG_WALL;}
+        Options options = new Options();
+        CmdLineParser parser = new CmdLineParser(options);
+        try {
+            parser.parseArgument(args);
+        } catch(CmdLineException ex){
+            System.err.println(ex.getMessage());
+            parser.printUsage(System.err);
+            return;
         }
-        (new WildViewer(cfg)).init();
+        (new WallViewer(options)).init();
     }
 
 }
 
-class WildViewerEvtHld extends ViewAdapter {
+class WallViewerEvtHld extends ViewAdapter {
 
     static float ZOOM_SPEED_COEF = 1.0f/50.0f;
     static double PAN_SPEED_COEF = 50.0;
@@ -127,11 +118,11 @@ class WildViewerEvtHld extends ViewAdapter {
     //remember last mouse coords
     int lastJPX,lastJPY;
 
-    WildViewer application;
+    WallViewer application;
 
     boolean panning = false;
 
-    WildViewerEvtHld(WildViewer app){
+    WallViewerEvtHld(WallViewer app){
         this.application = app;
     }
 
