@@ -619,18 +619,24 @@ public abstract class Glyph<T> implements Cloneable, Translucent {
      *@param jpy provide projected JPanel coordinates of the associated view, not virtual space coordinates
      *@param cvx virtual space coordinates
      *@param cvy virtual space coordinates
+     *@see #coordInsideV(double cvx, double cvy, int camIndex)
+     *@see #coordInsideP(int jpx, int jpy, int camIndex)
      */
     public abstract boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy);
 
     /** Detect whether the given point is inside this glyph or not. Uses VirtualSpace coordinates.
      *@param cvx virtual space coordinates
      *@param cvy virtual space coordinates
+     *@see #coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy)
+     *@see #coordInsideP(int jpx, int jpy, int camIndex)
      */
     public abstract boolean coordInsideV(double cvx, double cvy, int camIndex);
 
     /** Detect whether the given point is inside this glyph or not. Uses projected coordinates in View.
      *@param jpx provide projected JPanel coordinates of the associated view, not virtual space coordinates
      *@param jpy provide projected JPanel coordinates of the associated view, not virtual space coordinates
+     *@see #coordInsideV(double cvx, double cvy, int camIndex)
+     *@see #coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy)
      */
     public abstract boolean coordInsideP(int jpx, int jpy, int camIndex);
 
