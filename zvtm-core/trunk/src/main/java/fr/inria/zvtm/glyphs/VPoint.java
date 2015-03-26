@@ -3,7 +3,7 @@
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@xrce.xerox.com)
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2002. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2013. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2015. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -155,6 +155,17 @@ public class VPoint<T> extends Glyph {
 
     @Override
     public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
+        return coordInsideP(jpx, jpy, camIndex);
+    }
+
+    @Override
+    public boolean coordInsideV(double cvx, double cvy, int camIndex){
+        // NOT IMPLEMENTED
+        return false;
+    }
+
+    @Override
+    public boolean coordInsideP(int jpx, int jpy, int camIndex){
         if (jpx==pc[camIndex].cx && jpy==pc[camIndex].cy){return true;}
         else {return false;}
     }

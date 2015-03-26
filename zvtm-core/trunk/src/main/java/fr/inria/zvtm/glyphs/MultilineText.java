@@ -1,4 +1,4 @@
-/*   Copyright (c) INRIA, 2010-2013. All Rights Reserved
+/*   Copyright (c) INRIA, 2010-2015. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id:  $
@@ -175,6 +175,11 @@ public class MultilineText<T> extends VText {
 
     @Override
     public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
+        return coordInsideV(cvx, cvy, camIndex);
+    }
+
+    @Override
+    public boolean coordInsideV(double cvx, double cvy, int camIndex){
         boolean res=false;
         switch (text_anchor){
             case VText.TEXT_ANCHOR_START:{
@@ -190,6 +195,12 @@ public class MultilineText<T> extends VText {
             }
         }
         return res;
+    }
+
+    @Override
+    public boolean coordInsideP(int jpx, int jpy, int camIndex){
+        // NOT IMPLEMENTED
+        return false;
     }
 
     void processText(){

@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2011-2012. All Rights Reserved
+ *   Copyright (c) INRIA, 2011-2015. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -118,6 +118,17 @@ public class VEclipse<T> extends VCircle {
 
     @Override
     public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
+        return coordInsideP(jpx, jpy, camIndex);
+    }
+
+    @Override
+    public boolean coordInsideV(double cvx, double cvy, int camIndex){
+        // NOT IMPLEMENTED
+        return false;
+    }
+
+    @Override
+    public boolean coordInsideP(int jpx, int jpy, int camIndex){
         if (((ProjEclipse)pc[camIndex]).eclipsed.contains(jpx, jpy) && ((ProjEclipse)pc[camIndex]).shadowSource.contains(jpx, jpy)){return true;}
         else {return false;}
     }

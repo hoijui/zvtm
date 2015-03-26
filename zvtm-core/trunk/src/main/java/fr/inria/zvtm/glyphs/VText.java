@@ -386,6 +386,11 @@ public class VText<T> extends ClosedShape {
 
     @Override
     public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
+        return coordInsideV(cvx, cvy, camIndex);
+    }
+
+    @Override
+    public boolean coordInsideV(double cvx, double cvy, int camIndex){
         boolean res=false;
         switch (text_anchor){
             // cw and ch actually hold width and height of text *in virtual space*
@@ -402,6 +407,12 @@ public class VText<T> extends ClosedShape {
             }
         }
         return res;
+    }
+
+    @Override
+    public boolean coordInsideP(int jpx, int jpy, int camIndex){
+        // NOT IMPLEMENTED
+        return false;
     }
 
     @Override

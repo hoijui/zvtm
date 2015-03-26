@@ -120,10 +120,23 @@ public class Composite<T> extends Glyph {
      * {@inheritDoc}
      */
     @Override
-        public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
-            //XXX implement
-            return true;
-        }
+    public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
+        // NOT IMPLEMENTED
+        return false;
+    }
+
+    @Override
+    public boolean coordInsideV(double cvx, double cvy, int camIndex){
+        // NOT IMPLEMENTED
+        return false;
+    }
+
+    @Override
+    public boolean coordInsideP(int jpx, int jpy, int camIndex){
+        // NOT IMPLEMENTED
+        return false;
+    }
+
 
     //XXX implement visibleInRegion (clipping)
 

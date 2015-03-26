@@ -4,7 +4,7 @@
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2000-2002. All Rights Reserved
  *   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2012. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2015. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -621,6 +621,18 @@ public abstract class Glyph<T> implements Cloneable, Translucent {
      *@param cvy virtual space coordinates
      */
     public abstract boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy);
+
+    /** Detect whether the given point is inside this glyph or not. Uses VirtualSpace coordinates.
+     *@param cvx virtual space coordinates
+     *@param cvy virtual space coordinates
+     */
+    public abstract boolean coordInsideV(double cvx, double cvy, int camIndex);
+
+    /** Detect whether the given point is inside this glyph or not. Uses projected coordinates in View.
+     *@param jpx provide projected JPanel coordinates of the associated view, not virtual space coordinates
+     *@param jpy provide projected JPanel coordinates of the associated view, not virtual space coordinates
+     */
+    public abstract boolean coordInsideP(int jpx, int jpy, int camIndex);
 
     /** Reset memory of cursor being inside the glyph. */
     public abstract void resetMouseIn();

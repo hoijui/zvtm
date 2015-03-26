@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2011-2013. All Rights Reserved
+ *   Copyright (c) INRIA, 2011-2015. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -348,6 +348,11 @@ public class VTextLayout<T> extends VText {
 
     @Override
     public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
+        return coordInsideV(cvx, cvy, camIndex);
+    }
+
+    @Override
+    public boolean coordInsideV(double cvx, double cvy, int camIndex){
         boolean res=false;
         switch (text_anchor){
             case VText.TEXT_ANCHOR_START:{
@@ -363,6 +368,12 @@ public class VTextLayout<T> extends VText {
             }
         }
         return res;
+    }
+
+    @Override
+    public boolean coordInsideP(int jpx, int jpy, int camIndex){
+        // NOT IMPLEMENTED
+        return false;
     }
 
     @Override

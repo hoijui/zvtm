@@ -1,4 +1,4 @@
-/*   Copyright (c) INRIA, 2010-2012. All Rights Reserved
+/*   Copyright (c) INRIA, 2010-2015. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -80,10 +80,22 @@ public class SemZoomGlyph<T> extends Glyph {
      * {@inheritDoc}
      */
     @Override
-        public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
-            //XXX implement
-            return true;
-        }
+    public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
+        // NOT IMPLEMENTED
+        return false;
+    }
+
+    @Override
+    public boolean coordInsideV(double cvx, double cvy, int camIndex){
+        // NOT IMPLEMENTED
+        return false;
+    }
+
+    @Override
+    public boolean coordInsideP(int jpx, int jpy, int camIndex){
+        // NOT IMPLEMENTED
+        return false;
+    }
 
     @Override 
         public void removeCamera(int index){

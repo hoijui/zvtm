@@ -3,7 +3,7 @@
  *   AUTHOR :            Emmanuel Pietriga (emmanuel@w3.org)
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Emmanuel Pietriga, 2002. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2013. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2015. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -204,6 +204,17 @@ public class VPolygon<T> extends ClosedShape {
 
     @Override
     public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
+        return coordInsideP(jpx, jpy, camIndex);
+    }
+
+    @Override
+    public boolean coordInsideV(double cvx, double cvy, int camIndex){
+        // NOT IMPLEMENTED
+        return false;
+    }
+
+    @Override
+    public boolean coordInsideP(int jpx, int jpy, int camIndex){
         if (pc[camIndex].p.contains(jpx, jpy)){return true;}
         else {return false;}
     }

@@ -2,7 +2,7 @@
  *   DATE OF CREATION:   Jan 09 2001
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@xrce.xerox.com)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2002. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2012. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2015. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -96,8 +96,20 @@ public class VImageOr<T> extends VImage {
     VirtualSpaceManager.INSTANCE.repaint();
     }
 
+
     @Override
     public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
+        return coordInsideP(jpx, jpy, camIndex);
+    }
+
+    @Override
+    public boolean coordInsideV(double cvx, double cvy, int camIndex){
+        // NOT IMPLEMENTED
+        return false;
+    }
+
+    @Override
+    public boolean coordInsideP(int jpx, int jpy, int camIndex){
         if (pc[camIndex].p.contains(jpx, jpy)){return true;}
         else {return false;}
     }

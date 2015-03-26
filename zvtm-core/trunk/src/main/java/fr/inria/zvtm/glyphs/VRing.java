@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2008-2013. All Rights Reserved
+ *   Copyright (c) INRIA, 2008-2015. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -341,6 +341,17 @@ public class VRing<T> extends ClosedShape {
 
     @Override
     public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
+        return coordInsideP(jpx, jpy, camIndex);
+    }
+
+    @Override
+    public boolean coordInsideV(double cvx, double cvy, int camIndex){
+        // NOT IMPLEMENTED
+        return false;
+    }
+
+    @Override
+    public boolean coordInsideP(int jpx, int jpy, int camIndex){
         if (Math.sqrt((jpx-pr[camIndex].cx)*(jpx-pr[camIndex].cx) + (jpy-pr[camIndex].cy)*(jpy-pr[camIndex].cy)) <= pr[camIndex].outerCircleRadius){
             if (pr[camIndex].ring.contains(jpx, jpy)){
                 return true;
