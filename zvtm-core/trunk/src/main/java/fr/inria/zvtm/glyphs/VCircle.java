@@ -180,14 +180,12 @@ public class VCircle<T> extends ClosedShape {
 
     @Override
     public boolean coordInsideV(double cvx, double cvy, int camIndex){
-        // NOT IMPLEMENTED
-        return false;
+        return Math.sqrt((cvx-vx)*(cvx-vx) + (cvy-vy)*(cvy-vy)) <= size/2d;
     }
 
     @Override
     public boolean coordInsideP(int jpx, int jpy, int camIndex){
-        if (Math.sqrt((jpx-pc[camIndex].cx)*(jpx-pc[camIndex].cx) + (jpy-pc[camIndex].cy)*(jpy-pc[camIndex].cy)) <= pc[camIndex].cr/2d){return true;}
-        else {return false;}
+        return Math.sqrt((jpx-pc[camIndex].cx)*(jpx-pc[camIndex].cx) + (jpy-pc[camIndex].cy)*(jpy-pc[camIndex].cy)) <= pc[camIndex].cr/2d;
     }
 
     @Override

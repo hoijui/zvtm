@@ -160,14 +160,12 @@ public class VPoint<T> extends Glyph {
 
     @Override
     public boolean coordInsideV(double cvx, double cvy, int camIndex){
-        // NOT IMPLEMENTED
-        return false;
+        return (cvx==vx) && (cvy==vy);
     }
 
     @Override
     public boolean coordInsideP(int jpx, int jpy, int camIndex){
-        if (jpx==pc[camIndex].cx && jpy==pc[camIndex].cy){return true;}
-        else {return false;}
+        return (jpx==pc[camIndex].cx) && (jpy==pc[camIndex].cy);
     }
 
     @Override

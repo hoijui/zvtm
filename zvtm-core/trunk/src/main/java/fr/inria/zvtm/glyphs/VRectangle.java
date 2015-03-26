@@ -221,14 +221,14 @@ public class VRectangle<T> extends ClosedShape implements RectangularShape {
 
     @Override
     public boolean coordInsideV(double cvx, double cvy, int camIndex){
-        // NOT IMPLEMENTED
-        return false;
+        return (cvx>=(vx-vw/2d)) && (cvx<=(vx+vw/2d)) &&
+               (cvy>=(vy-vh/2d)) && (cvy<=(vy+vh/2d));
     }
 
     @Override
     public boolean coordInsideP(int jpx, int jpy, int camIndex){
-        return ((jpx>=(pc[camIndex].cx-pc[camIndex].cw)) && (jpx<=(pc[camIndex].cx+pc[camIndex].cw)) &&
-            (jpy>=(pc[camIndex].cy-pc[camIndex].ch)) && (jpy<=(pc[camIndex].cy+pc[camIndex].ch)));
+        return (jpx>=(pc[camIndex].cx-pc[camIndex].cw)) && (jpx<=(pc[camIndex].cx+pc[camIndex].cw)) &&
+               (jpy>=(pc[camIndex].cy-pc[camIndex].ch)) && (jpy<=(pc[camIndex].cy+pc[camIndex].ch));
     }
 
     @Override
