@@ -308,6 +308,17 @@ public class VSegment<T> extends Glyph implements RectangularShape {
                                 x, y) <= tolerance;
     }
 
+    /** Detects whether the point (x,y) lies on the segment or not.
+     *@param x x-coord in virtual space
+     *@param y y-coord in virtual space
+     *@param tolerance the segment's clickable thickness in virtual space units
+     */
+    public boolean intersectsV(double cvx, double cvy, double tolerance){
+        return Line2D.ptSegDist(vx-vw/2d, vy+vh/2d,
+                                vx+vw/2d, vy-vh/2d,
+                                cvx, cvy) <= tolerance;
+    }
+
     @Override
     public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
         return Line2D.ptSegDist(vx-vw/2d, vy-vh/2d, vx+vw/2d, vy+vh/2d, dvx, dvy) <= dvr;
