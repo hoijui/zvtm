@@ -379,13 +379,13 @@ public class CameraPortal extends Portal {
         }
     }
 
-    public void pick(int cx, int cy, ViewListener eh){
+    public void pick(int cx, int cy){
         picker.setJPanelCoordinates(cx-x, cy-y);
         double uncoef = (camera.focal+camera.altitude) / camera.focal;
         double pvx = (camera.vx + (cx-x-w/2d)*uncoef);
         double pvy = (camera.vy - (cy-y-h/2d)*uncoef);
         picker.setVSCoordinates(pvx, pvy);
-        picker.computePickedGlyphList(eh, camera);
+        picker.computePickedGlyphList(camera);
     }
 
 }

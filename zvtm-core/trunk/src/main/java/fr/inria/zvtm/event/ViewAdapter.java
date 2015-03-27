@@ -6,7 +6,7 @@
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
- */ 
+ */
 
 package fr.inria.zvtm.event;
 
@@ -18,17 +18,17 @@ import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.glyphs.Glyph;
 
-/** 
+/**
  * An abstract adapter class for receiving view events. The methods in this class are empty. This class exists as convenience for creating listener objects.
  * @author Emmanuel Pietriga
  */
 
 public class ViewAdapter implements ViewListener {
-    
+
     public void press1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){}
 
     public void release1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){}
-    
+
     public void click1(ViewPanel v, int mod, int jpx, int jpy, int clickNumber, MouseEvent e){}
 
     public void press2(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){}
@@ -43,29 +43,17 @@ public class ViewAdapter implements ViewListener {
 
     public void click3(ViewPanel v, int mod, int jpx, int jpy, int clickNumber, MouseEvent e){}
 
-
-
     public void mouseMoved(ViewPanel v, int jpx, int jpy, MouseEvent e){}
 
     public void mouseDragged(ViewPanel v, int mod, int buttonNumber, int jpx, int jpy, MouseEvent e){}
 
     public void mouseWheelMoved(ViewPanel v, short wheelDirection, int jpx, int jpy, MouseWheelEvent e){}
 
-
-
-    public void enterGlyph(Glyph g){}
-
-    public void exitGlyph(Glyph g){}
-
-
-
     public void Ktype(ViewPanel v, char c, int code, int mod, KeyEvent e){}
-    
+
     public void Kpress(ViewPanel v, char c, int code, int mod, KeyEvent e){}
-    
+
     public void Krelease(ViewPanel v, char c, int code, int mod, KeyEvent e){}
-
-
 
     public void viewActivated(View v){}
 

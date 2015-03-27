@@ -87,10 +87,4 @@ public class ScrollingListener extends ViewAdapter {
         lastJPY = jpy;
     }
 
-	@Override
-    public void enterGlyph(Glyph g){}
-
-	@Override
-    public void exitGlyph(Glyph g){}
-
 }

@@ -1,8 +1,8 @@
 /*
- *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2011-2012.
+ *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2011-2015.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: Test.java 4913 2013-02-07 20:18:46Z epietrig $
+ * $Id$
  */
 
 package fr.inria.zvtm.tests;
@@ -33,6 +33,7 @@ import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.DefaultTimingHandler;
 import fr.inria.zvtm.animation.interpolation.ConstantAccInterpolator;
 import fr.inria.zvtm.event.ViewAdapter;
+import fr.inria.zvtm.event.PickerListener;
 
 import fr.inria.zvtm.glyphs.*;
 
@@ -92,6 +93,7 @@ public class FSTest  {
                         false, false, false, null);
                 FSListener fehL = new FSListener(this);
                 mViewL.setListener(fehL, 0);
+                mViewL.getCursor().getPicker().setListener(fehL);
                 GraphicsDevice device = devices[0];
                 ((JFrame)mViewL.getFrame()).removeNotify();
                 ((JFrame)mViewL.getFrame()).setUndecorated(true);
@@ -106,6 +108,7 @@ public class FSTest  {
                         false, false, false, null);
                 FSListener fehR = new FSListener(this);
                 mViewR.setListener(fehR, 0);
+                mViewR.getCursor().getPicker().setListener(fehR);
                 GraphicsDevice device = devices[1];
                 ((JFrame)mViewR.getFrame()).removeNotify();
                 ((JFrame)mViewR.getFrame()).setUndecorated(true);
@@ -169,7 +172,7 @@ public class FSTest  {
 
 }
 
-class FSListener extends ViewAdapter {
+class FSListener extends ViewAdapter implements PickerListener {
 
     FSTest application;
 

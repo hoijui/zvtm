@@ -1,15 +1,16 @@
 /*   AUTHOR : Romain Primet (romain.primet@inria.fr)
  *
- *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2011.
+ *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2011-2015.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id:$
+ * $Id$
  */ 
 package fr.inria.zvtm.tests;
 
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.event.RepaintListener;
 import fr.inria.zvtm.event.ViewAdapter;
+import fr.inria.zvtm.event.PickerListener;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.VirtualSpace;
@@ -44,7 +45,9 @@ public class MultilineTextTest {
 
         final View view = vsm.addFrameView(cameras, "MultilineText test",
                 View.STD_VIEW, 800, 600, false, true, true, null);	
-        view.setListener(new MultilineTestEventHandler());
+        MultilineTestEventHandler eh = new MultilineTestEventHandler();
+        view.setListener(eh);
+        view.getCursor().getPicker().setListener(eh);
         view.getCursor().setColor(Color.GREEN);
 
         final MultilineText adt = new MultilineText("Forty-two is six multiplied by nine.");
@@ -87,7 +90,7 @@ public class MultilineTextTest {
         new MultilineTextTest();
     }
 
-    class MultilineTestEventHandler extends ViewAdapter {
+    class MultilineTestEventHandler extends ViewAdapter implements PickerListener {
 
         float ZOOM_SPEED_COEF = 1.0f/50.0f;
         double PAN_SPEED_COEF = 50.0;

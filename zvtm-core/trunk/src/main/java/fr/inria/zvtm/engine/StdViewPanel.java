@@ -340,7 +340,7 @@ public class StdViewPanel extends ViewPanel {
             //we project the mouse cursor wrt the appropriate coord sys
             parent.mouse.unProject(cams[activeLayer],this);
             if (parent.mouse.isSensitive()){
-                parent.mouse.getPicker().computePickedGlyphList(evHs[activeLayer],cams[activeLayer], this);}
+                parent.mouse.getPicker().computePickedGlyphList(cams[activeLayer], this);}
         }
         catch (NullPointerException ex) {if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.drawdrag "+ex);}}
     }

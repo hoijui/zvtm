@@ -1,7 +1,7 @@
 /*
  * AUTHOR : Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *
- *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2010-2011.
+ *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2010-2015.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -28,7 +28,7 @@ public class AllGlyphsTest {
 
     VirtualSpaceManager vsm;
     VirtualSpace vs;
-    ViewListener eh;
+    TestEventHandler eh;
     Camera mCam;
 
     View testView;
@@ -49,6 +49,7 @@ public class AllGlyphsTest {
         testView = vsm.addFrameView(cameras, "All Glyphs Test", vt, 1024, 768, false, true, true, null);
         testView.setBackgroundColor(Color.LIGHT_GRAY);
         testView.setListener(eh);
+        testView.getCursor().getPicker().setListener(eh);
         vs.getCamera(0).setAltitude(0);
         populate();
         testView.getGlobalView(mCam, 500, 1.5f);
@@ -273,7 +274,7 @@ public class AllGlyphsTest {
     
 }
 
-class TestEventHandler extends ViewAdapter {
+class TestEventHandler extends ViewAdapter implements PickerListener {
     
     static float ZOOM_SPEED_COEF = 1.0f/50.0f;
     static double PAN_SPEED_COEF = 50.0;

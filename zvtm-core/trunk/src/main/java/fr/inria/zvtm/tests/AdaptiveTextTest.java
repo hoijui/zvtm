@@ -1,14 +1,15 @@
 /*   AUTHOR : Romain Primet (romain.primet@inria.fr)
  *
- *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2011.
+ *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2011-2015.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id:$
+ * $Id$
  */ 
 package fr.inria.zvtm.tests;
 
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.event.ViewAdapter;
+import fr.inria.zvtm.event.PickerListener;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.VirtualSpace;
@@ -41,8 +42,9 @@ public class AdaptiveTextTest {
 
         View view = vsm.addFrameView(cameras, "AdaptiveText test",
                 View.STD_VIEW, 800, 600, false, true, true, null);	
-        view.setListener(new AdaptiveTestEventHandler());
-
+        AdaptiveTestEventHandler eh = new AdaptiveTestEventHandler();
+        view.setListener(eh);
+        view.getCursor().getPicker().setListener(eh);
         AdaptiveText adt = new AdaptiveText(0,0,0,Color.BLUE, 
                 "Forty-two is six multiplied by nine.", 100, 27);
         vs.addGlyph(adt);
@@ -56,7 +58,7 @@ public class AdaptiveTextTest {
         new AdaptiveTextTest();
     }
 
-    class AdaptiveTestEventHandler extends ViewAdapter {
+    class AdaptiveTestEventHandler extends ViewAdapter implements PickerListener {
 
         float ZOOM_SPEED_COEF = 1.0f/50.0f;
         double PAN_SPEED_COEF = 50.0;

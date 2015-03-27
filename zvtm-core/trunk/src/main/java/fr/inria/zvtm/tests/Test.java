@@ -1,5 +1,5 @@
 /*
- *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2011-2012.
+ *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2011-2015.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -30,6 +30,7 @@ import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.DefaultTimingHandler;
 import fr.inria.zvtm.animation.interpolation.ConstantAccInterpolator;
 import fr.inria.zvtm.event.ViewAdapter;
+import fr.inria.zvtm.event.PickerListener;
 
 import fr.inria.zvtm.glyphs.*;
 
@@ -78,7 +79,9 @@ public class Test implements Java2DPainter {
             mView = vsm.addFrameView(cameras, View.ANONYMOUS, View.STD_VIEW, VIEW_W, VIEW_H, true);
         }
         mView.setBackgroundColor(Color.LIGHT_GRAY);
-        mView.setListener(new MainListener(this), 0);
+        MainListener eh = new MainListener(this);
+        mView.setListener(eh, 0);
+        mView.getCursor().getPicker().setListener(eh);
         mView.setRefreshRate(1);
         mView.setJava2DPainter(this, Java2DPainter.FOREGROUND);
     }
@@ -175,7 +178,7 @@ public class Test implements Java2DPainter {
 
 }
 
-class MainListener extends ViewAdapter {
+class MainListener extends ViewAdapter implements PickerListener {
 
 	Test application;
 
