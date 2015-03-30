@@ -33,7 +33,4 @@ public class ProjectedCoords {
     /**coordinates in lens buffer space*/
     public int lcx, lcy;
 
-    /**tells whether the mouse was over this glyph or not last time*/
-    public boolean prevMouseIn=false;
-
 }

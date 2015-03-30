@@ -32,12 +32,14 @@ public class AllGlyphsTest {
     Camera mCam;
 
     View testView;
-    
+
     AllGlyphsTest(String vt){
         vsm = VirtualSpaceManager.INSTANCE;
         vsm.setDebug(true);
         initTest(vt);
     }
+
+    PickerVS pvs;
 
     public void initTest(String vt){
         eh = new TestEventHandler(this);
@@ -50,12 +52,15 @@ public class AllGlyphsTest {
         testView.setBackgroundColor(Color.LIGHT_GRAY);
         testView.setListener(eh);
         testView.getCursor().getPicker().setListener(eh);
+        // testView.getCursor().setSensitivity(false);
+        // pvs = new PickerVS();
+        // pvs.setListener(eh);
         vs.getCamera(0).setAltitude(0);
         populate();
         testView.getGlobalView(mCam, 500, 1.5f);
-        testView.setNotifyCursorMoved(true);        
+        testView.setNotifyCursorMoved(true);
     }
-    
+
     void toggleDynaSpot(){
         testView.getCursor().getDynaPicker().activateDynaSpot(!testView.getCursor().getDynaPicker().isDynaSpotActivated());
     }
@@ -236,7 +241,7 @@ public class AllGlyphsTest {
         im.moveTo(200, 360);
         vs.addGlyph(im);
     }
-    
+
     void translate(){
         Point2D.Double translation = new Point2D.Double(400, -200);
         AnimationFactory af = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory();
@@ -245,7 +250,7 @@ public class AllGlyphsTest {
             VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, true);
         }
     }
-    
+
     void rotate(){
         AnimationFactory af = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory();
         for (Glyph g:vs.getAllGlyphs()){
@@ -261,7 +266,7 @@ public class AllGlyphsTest {
         System.out.println("OS type: "+System.getProperty("os.name")+" "+System.getProperty("os.version")+"/"+System.getProperty("os.arch")+" "+System.getProperty("sun.cpu.isalist"));
         System.out.println("-----------------");
         System.out.println("Directory information");
-        System.out.println("Java Classpath: "+System.getProperty("java.class.path"));	
+        System.out.println("Java Classpath: "+System.getProperty("java.class.path"));
         System.out.println("Java directory: "+System.getProperty("java.home"));
         System.out.println("Launching from: "+System.getProperty("user.dir"));
         System.out.println("-----------------");
@@ -271,23 +276,24 @@ public class AllGlyphsTest {
         System.out.println("-----------------");
         new AllGlyphsTest((args.length > 0) ? args[0] : View.STD_VIEW);
     }
-    
+
 }
 
 class TestEventHandler extends ViewAdapter implements PickerListener {
-    
+
     static float ZOOM_SPEED_COEF = 1.0f/50.0f;
     static double PAN_SPEED_COEF = 50.0;
-    
+
     AllGlyphsTest application;
-    
+
     int lastJPX,lastJPY;
-    
+
     TestEventHandler(AllGlyphsTest t){
         this.application = t;
     }
-    
+
     public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+        application.pvs.printList();
         lastJPX = jpx;
         lastJPY = jpy;
         v.setDrawDrag(true);
@@ -298,13 +304,15 @@ class TestEventHandler extends ViewAdapter implements PickerListener {
         application.mCam.setYspeed(0);
         v.setDrawDrag(false);
     }
-    
+
     public void mouseMoved(ViewPanel v, int jpx, int jpy, MouseEvent e){
         if (application.testView.getCursor().getDynaPicker().isDynaSpotActivated()){
-            v.getVCursor().getDynaPicker().dynaPick(application.mCam);            
+            v.getVCursor().getDynaPicker().dynaPick(application.mCam);
         }
+        // application.pvs.setVSCoordinates(v.getVCursor().getVSXCoordinate(), v.getVCursor().getVSYCoordinate());
+        // application.pvs.computePickedGlyphList(application.mCam);
     }
-    
+
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
         if (buttonNumber == 1){
             Camera c = application.mCam;
@@ -313,7 +321,7 @@ class TestEventHandler extends ViewAdapter implements PickerListener {
             application.mCam.setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/PAN_SPEED_COEF)) : (long)((lastJPY-jpy)/(a*PAN_SPEED_COEF)));
         }
     }
-    
+
     public void mouseWheelMoved(ViewPanel v, short wheelDirection, int jpx, int jpy, MouseWheelEvent e){
         Camera c = application.mCam;
         double a = (c.focal+Math.abs(c.altitude)) / c.focal;
@@ -327,24 +335,23 @@ class TestEventHandler extends ViewAdapter implements PickerListener {
             VirtualSpaceManager.INSTANCE.repaint();
         }
     }
-    
+
     public void enterGlyph(Glyph g){
         g.highlight(true, null);
-        System.out.println(g);
     }
 
     public void exitGlyph(Glyph g){
         g.highlight(false, null);
     }
-    
+
     public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
         if (c == 't'){application.translate();}
         else if (c == 'r'){application.rotate();}
-        else if (c == 'd'){application.toggleDynaSpot();}        
+        else if (c == 'd'){application.toggleDynaSpot();}
     }
-    
+
     public void viewClosing(View v){
         System.exit(0);
     }
-    
+
 }

@@ -155,18 +155,6 @@ public class VSegment<T> extends Glyph implements RectangularShape {
     }
 
     @Override
-    public void resetMouseIn(){
-    for (int i=0;i<pc.length;i++){
-        resetMouseIn(i);
-    }
-    }
-
-    @Override
-    public void resetMouseIn(int i){
-    if (pc[i]!=null){pc[i].prevMouseIn=false;}
-    }
-
-    @Override
     public double getOrient(){return orient;}
 
     @Override
@@ -309,8 +297,8 @@ public class VSegment<T> extends Glyph implements RectangularShape {
     }
 
     /** Detects whether the point (x,y) lies on the segment or not.
-     *@param x x-coord in virtual space
-     *@param y y-coord in virtual space
+     *@param cvx x-coord in virtual space
+     *@param cvy y-coord in virtual space
      *@param tolerance the segment's clickable thickness in virtual space units
      */
     public boolean intersectsV(double cvx, double cvy, double tolerance){
@@ -322,11 +310,6 @@ public class VSegment<T> extends Glyph implements RectangularShape {
     @Override
     public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
         return Line2D.ptSegDist(vx-vw/2d, vy-vh/2d, vx+vw/2d, vy+vh/2d, dvx, dvy) <= dvr;
-    }
-
-    @Override
-    public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
-        return Glyph.NO_CURSOR_EVENT;
     }
 
     @Override

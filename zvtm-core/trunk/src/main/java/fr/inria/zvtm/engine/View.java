@@ -4,7 +4,7 @@
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2000-2002. All Rights Reserved
  *   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2014. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2015. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -376,7 +376,7 @@ public abstract class View {
     public void setActiveLayer(int i){
         Camera c = (Camera)cameras.elementAt(i);
         mouse.unProject(c, panel);
-        mouse.getPicker().resetPickedGlyphsList(c.parentSpace, c.getIndex());
+        mouse.getPicker().resetPickedGlyphsList();
         panel.activeLayer=i;
     }
 

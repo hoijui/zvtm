@@ -4,7 +4,7 @@
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2000-2002. All Rights Reserved
  *   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2014. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2015. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -427,7 +427,8 @@ public class VirtualSpace {
      *@see #show(Glyph g)*/
     public void hide(Glyph g){
         removeGlyphFromDrawingList(g);
-        g.resetMouseIn();
+        //XXX: need to find a way to notify Picker that glyph no longer exists...
+        // g.resetMouseIn();
         View v;
         for (int i=0;i<cm.cameraList.length;i++){
             if (cm.cameraList[i] != null && cm.cameraList[i].view != null){

@@ -1,6 +1,6 @@
 /*   AUTHOR : Romain Primet (romain.primet@inria.fr)
  *
- *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2010-2012.
+ *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2010-2015.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  */
@@ -89,31 +89,6 @@ public class Composite<T> extends Glyph {
     @Override
         public boolean fillsView(double w, double h, int camIndex){
             return false; //safe option
-        }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-        public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
-            //XXX implement
-            return NO_CURSOR_EVENT;
-        }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-        public void resetMouseIn(){
-            //XXX ?
-        }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-        public void resetMouseIn(int i){
-            //XXX ?
         }
 
     /**

@@ -256,19 +256,6 @@ public class VRing<T> extends ClosedShape {
     }
 
     @Override
-    public void resetMouseIn(){
-    for (int i=0;i<pr.length;i++){
-        resetMouseIn(i);
-    }
-    }
-
-    @Override
-    public void resetMouseIn(int i){
-    if (pr[i] != null){pr[i].prevMouseIn = false;}
-    borderColor = bColor;
-    }
-
-    @Override
     public void sizeTo(double s){
         size = s;
         computeSliceEdges();
@@ -367,29 +354,6 @@ public class VRing<T> extends ClosedShape {
             return pr[camIndex].ring.intersects(jpx-dpr, jpy-dpr, 2*dpr, 2*dpr);
         }
         return false;
-    }
-
-    @Override
-    public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
-            if (coordInside(jpx, jpy, camIndex, cvx, cvy)){
-                //if the mouse is inside the glyph
-                if (!pr[camIndex].prevMouseIn){
-                    //if it was not inside it last time, mouse has entered the glyph
-                    pr[camIndex].prevMouseIn=true;
-                    return Glyph.ENTERED_GLYPH;
-                }
-                //if it was inside last time, nothing has changed
-                else {return Glyph.NO_CURSOR_EVENT;}
-            }
-            else{
-                //if the mouse is not inside the glyph
-                if (pr[camIndex].prevMouseIn){
-                    //if it was inside it last time, mouse has exited the glyph
-                    pr[camIndex].prevMouseIn=false;
-                    return Glyph.EXITED_GLYPH;
-                }//if it was not inside last time, nothing has changed
-                else {return Glyph.NO_CURSOR_EVENT;}
-            }
     }
 
     @Override

@@ -55,31 +55,6 @@ public class SemZoomGlyph<T> extends Glyph {
      * {@inheritDoc}
      */
     @Override
-        public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
-            //XXX implement
-            return NO_CURSOR_EVENT;
-        }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-        public void resetMouseIn(){
-            //XXX ?
-        }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override 
-        public void resetMouseIn(int i){
-            //XXX ?
-        }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
         // NOT IMPLEMENTED
         return false;

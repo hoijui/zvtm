@@ -118,19 +118,6 @@ public class SIRectangle<T> extends ClosedShape implements RectangularShape {
     }
 
     @Override
-    public void resetMouseIn(){
-    for (int i=0;i<pc.length;i++){
-        resetMouseIn(i);
-    }
-    }
-
-    @Override
-    public void resetMouseIn(int i){
-    if (pc[i]!=null){pc[i].prevMouseIn=false;}
-    borderColor = bColor;
-    }
-
-    @Override
     public double getOrient(){return 0;}
 
     /** Cannot be reoriented. */
@@ -259,29 +246,6 @@ public class SIRectangle<T> extends ClosedShape implements RectangularShape {
         if ((jpx>=(pc[camIndex].cx-pc[camIndex].cw)) && (jpx<=(pc[camIndex].cx+pc[camIndex].cw)) &&
             (jpy>=(pc[camIndex].cy-pc[camIndex].ch)) && (jpy<=(pc[camIndex].cy+pc[camIndex].ch))){return true;}
         else {return false;}
-    }
-
-    @Override
-    public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
-        if (coordInside(jpx, jpy, camIndex, cvx, cvy)){
-            //if the mouse is inside the glyph
-            if (!pc[camIndex].prevMouseIn){
-                //if it was not inside it last time, mouse has entered the glyph
-                pc[camIndex].prevMouseIn=true;
-                return Glyph.ENTERED_GLYPH;
-            }
-            //if it was inside last time, nothing has changed
-            else {return Glyph.NO_CURSOR_EVENT;}
-        }
-        else{
-            //if the mouse is not inside the glyph
-            if (pc[camIndex].prevMouseIn){
-                //if it was inside it last time, mouse has exited the glyph
-                pc[camIndex].prevMouseIn=false;
-                return Glyph.EXITED_GLYPH;
-            }//if it was not inside last time, nothing has changed
-            else {return Glyph.NO_CURSOR_EVENT;}
-        }
     }
 
     @Override

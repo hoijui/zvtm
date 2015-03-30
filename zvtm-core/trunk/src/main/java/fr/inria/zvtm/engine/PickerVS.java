@@ -13,13 +13,37 @@ import java.awt.geom.Line2D;
 
 import java.util.Vector;
 import java.util.Arrays;
+import java.util.HashMap;
 
 import fr.inria.zvtm.event.PickerListener;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.DPath;
 import fr.inria.zvtm.glyphs.VSegment;
 
+/**
+ *<p>A picker that requires VirtualSpace coordinates only.</p>
+ *<p>List of Glyphs that can be picked by PickerVS at this time:</p>
+ *<ul>
+ *<li>AdaptiveText</li>
+ *<li>DPath</li>
+ *<li>FRectangle</li>
+ *<li>MultilineText</li>
+ *<li>PCircle</li>
+ *<li>PRectangle</li>
+ *<li>RImage</li>
+ *<li>VCircle</li>
+ *<li>VImage</li>
+ *<li>VPoint</li>
+ *<li>VRectangle</li>
+ *<li>VRoundRect</li>
+ *<li>VText</li>
+ *<li>VTextLayout</li>
+ *</ul>
+ */
+
 public class PickerVS {
+
+    HashMap<Glyph,Object> prevMouseIn = new HashMap();
 
     /**coord in virtual space*/
     protected double vx,vy;
@@ -59,6 +83,12 @@ public class PickerVS {
 
     public Glyph lastGlyphEntered(){
         return lastGlyphEntered;
+    }
+
+    void resetMouseIn(Glyph g){
+        // if (prevMouseIn.containsKey(g)){
+            prevMouseIn.remove(g);
+        // }
     }
 
     /** Set picker's coordinates  (virtual space coordinates system).
@@ -218,8 +248,29 @@ public class PickerVS {
     }
 
     boolean checkGlyph(Camera c){
-        //XXX: FIXME jpx,jpy should not be 0 as it will return false positives
-        tmpRes = tmpGlyph.mouseInOut(0, 0, c.getIndex(), vx, vy);
+        // Test if cursor inside, and fire entry/exit events for a given glyph
+        //XXX: temporary fix: sending MIN_VALUE for jpx,jpy as we have no idea what those are.
+        // But once all Glyphs implement picking in VirtualSpace coordinates,
+        // we can get rid of projected coordinate parameters.
+        if (tmpGlyph.coordInside(Integer.MIN_VALUE, Integer.MIN_VALUE, c.getIndex(), vx, vy)){
+            //if the mouse is inside the glyph
+            if (!prevMouseIn.containsKey(tmpGlyph)){
+                //if it was not inside it last time, mouse has entered the glyph
+                prevMouseIn.put(tmpGlyph, null);
+                tmpRes = Glyph.ENTERED_GLYPH;
+            }
+            //if it was inside last time, nothing has changed
+            else {tmpRes = Glyph.NO_CURSOR_EVENT;}
+        }
+        else {
+            //if the mouse is not inside the glyph
+            if (prevMouseIn.containsKey(tmpGlyph)){
+                //if it was inside it last time, mouse has exited the glyph
+                prevMouseIn.remove(tmpGlyph);
+                tmpRes = Glyph.EXITED_GLYPH;
+            }//if it was not inside last time, nothing has changed
+            else {tmpRes = Glyph.NO_CURSOR_EVENT;}
+        }
         if (tmpRes == Glyph.ENTERED_GLYPH){
             //we've entered this glyph
             maxIndex = maxIndex + 1;
@@ -257,22 +308,11 @@ public class PickerVS {
     }
 
     /** Reset the list of glyphs under the cursor. */
-    void resetPickedGlyphsList(VirtualSpace vs, int camIndex){
+    void resetPickedGlyphsList(){
         Arrays.fill(pickedGlyphs, null);
         maxIndex = -1;
         lastGlyphEntered = null;
-        Glyph[] gl = vs.getDrawingList();
-        for (int i=0;i<gl.length;i++){
-            try {
-                gl[i].resetMouseIn(camIndex);
-            }
-            catch (NullPointerException ex){
-                if (VirtualSpaceManager.debugModeON()){
-                    System.err.println("Recovered from error when resetting list of glyphs under mouse");
-                    ex.printStackTrace();
-                }
-            }
-        }
+        prevMouseIn.clear();
     }
 
     /** Get the list of glyphs currently picked. Last entry is last glyph entered.

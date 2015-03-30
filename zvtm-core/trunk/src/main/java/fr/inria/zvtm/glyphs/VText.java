@@ -219,18 +219,6 @@ public class VText<T> extends ClosedShape {
     pc[index]=null;
     }
 
-    @Override
-    public void resetMouseIn(){
-    for (int i=0;i<pc.length;i++){
-        resetMouseIn(i);
-    }
-    }
-
-    @Override
-    public void resetMouseIn(int i){
-    if (pc[i]!=null){pc[i].prevMouseIn=false;}
-    }
-
     /** No effect. Use the glyph's scale factor.
      *@see #setScale(float s)
      */
@@ -427,29 +415,6 @@ public class VText<T> extends ClosedShape {
             //TEXT_ANCHOR_END
             return dvs.intersects(vx-pc[camIndex].cw, vy, pc[camIndex].cw, pc[camIndex].ch);
         }
-    }
-
-    @Override
-    public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
-        if (coordInside(jpx, jpy, camIndex, cvx, cvy)){
-             //if the mouse is inside the glyph
-             if (!pc[camIndex].prevMouseIn){
-                 //if it was not inside it last time, mouse has entered the glyph
-                 pc[camIndex].prevMouseIn=true;
-                 return Glyph.ENTERED_GLYPH;
-             }
-             //if it was inside last time, nothing has changed
-             else {return Glyph.NO_CURSOR_EVENT;}
-         }
-         else{
-             //if the mouse is not inside the glyph
-             if (pc[camIndex].prevMouseIn){
-                 //if it was inside it last time, mouse has exited the glyph
-                 pc[camIndex].prevMouseIn=false;
-                 return Glyph.EXITED_GLYPH;
-             }//if it was not inside last time, nothing has changed
-             else {return Glyph.NO_CURSOR_EVENT;}
-         }
     }
 
     @Override

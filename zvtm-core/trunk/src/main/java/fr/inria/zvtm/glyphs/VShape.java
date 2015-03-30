@@ -150,19 +150,6 @@ public class VShape<T> extends ClosedShape {
     }
 
     @Override
-    public void resetMouseIn(){
-    for (int i=0;i<pc.length;i++){
-        resetMouseIn(i);
-    }
-    }
-
-    @Override
-    public void resetMouseIn(int i){
-    if (pc[i]!=null){pc[i].prevMouseIn=false;}
-    borderColor = bColor;
-    }
-
-    @Override
     public double getOrient(){return orient;}
 
     @Override
@@ -214,29 +201,6 @@ public class VShape<T> extends ClosedShape {
     @Override
     public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
         return pc[camIndex].p.intersects(jpx-dpr, jpy-dpr, 2*dpr, 2*dpr);
-    }
-
-    @Override
-    public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
-        if (coordInside(jpx, jpy, camIndex, cvx, cvy)){
-            //if the mouse is inside the glyph
-            if (!pc[camIndex].prevMouseIn){
-                //if it was not inside it last time, mouse has entered the glyph
-                pc[camIndex].prevMouseIn=true;
-                return Glyph.ENTERED_GLYPH;
-            }
-            //if it was inside last time, nothing has changed
-            else {return Glyph.NO_CURSOR_EVENT;}
-        }
-        else{
-            //if the mouse is not inside the glyph
-            if (pc[camIndex].prevMouseIn){
-                //if it was inside it last time, mouse has exited the glyph
-                pc[camIndex].prevMouseIn=false;
-                return Glyph.EXITED_GLYPH;
-            }//if it was not inside last time, nothing has changed
-            else {return Glyph.NO_CURSOR_EVENT;}
-        }
     }
 
     /** Get the list of vertex distances to the shape's center in the [0-1.0] range (relative to bounding circle). Vertices are laid out counter clockwise, with the first vertex placed at the same X coordinate as the shape's center (provided orient=0). */

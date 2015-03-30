@@ -130,19 +130,6 @@ public class VCircle<T> extends ClosedShape {
     }
 
     @Override
-    public void resetMouseIn(){
-    for (int i=0;i<pc.length;i++){
-        resetMouseIn(i);
-    }
-    }
-
-    @Override
-    public void resetMouseIn(int i){
-    if (pc[i]!=null){pc[i].prevMouseIn=false;}
-    borderColor = bColor;
-    }
-
-    @Override
     public double getOrient(){return orient;}
 
     /** Cannot be reoriented (it makes no sense). */
@@ -175,7 +162,7 @@ public class VCircle<T> extends ClosedShape {
 
     @Override
     public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
-        return coordInsideP(jpx, jpy, camIndex);
+        return coordInsideV(cvx, cvy, camIndex);
     }
 
     @Override
@@ -186,29 +173,6 @@ public class VCircle<T> extends ClosedShape {
     @Override
     public boolean coordInsideP(int jpx, int jpy, int camIndex){
         return Math.sqrt((jpx-pc[camIndex].cx)*(jpx-pc[camIndex].cx) + (jpy-pc[camIndex].cy)*(jpy-pc[camIndex].cy)) <= pc[camIndex].cr/2d;
-    }
-
-    @Override
-    public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
-        if (coordInside(jpx, jpy, camIndex, cvx, cvy)){
-            //if the mouse is inside the glyph
-            if (!pc[camIndex].prevMouseIn){
-                //if it was not inside it last time, mouse has entered the glyph
-                pc[camIndex].prevMouseIn=true;
-                return Glyph.ENTERED_GLYPH;
-            }
-            //if it was inside last time, nothing has changed
-            else {return Glyph.NO_CURSOR_EVENT;}
-        }
-        else{
-            //if the mouse is not inside the glyph
-            if (pc[camIndex].prevMouseIn){
-                //if it was inside it last time, mouse has exited the glyph
-                pc[camIndex].prevMouseIn=false;
-                return Glyph.EXITED_GLYPH;
-            }//if it was not inside last time, nothing has changed
-            else {return Glyph.NO_CURSOR_EVENT;}
-        }
     }
 
     @Override

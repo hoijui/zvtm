@@ -19,6 +19,12 @@ import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.DPath;
 import fr.inria.zvtm.glyphs.VSegment;
 
+/**
+ *<p>A picker that requires both VirtualSpace coordinates and View-projected coordinates.</p>
+ *
+ *<p>All glyphs can be picked by this type of picker. It is the default picker associated with VCursor.</p>
+ */
+
 public class Picker extends PickerVS {
 
     /**coords in JPanel*/
@@ -177,7 +183,26 @@ public class Picker extends PickerVS {
     }
 
     boolean checkGlyph(Camera c, int x, int y){
-        tmpRes = tmpGlyph.mouseInOut(x, y, c.getIndex(), vx, vy);
+        // Test if cursor inside, and fire entry/exit events for a given glyph
+        if (tmpGlyph.coordInside(x, y, c.getIndex(), vx, vy)){
+            //if the mouse is inside the glyph
+            if (!prevMouseIn.containsKey(tmpGlyph)){
+                //if it was not inside it last time, mouse has entered the glyph
+                prevMouseIn.put(tmpGlyph, null);
+                tmpRes = Glyph.ENTERED_GLYPH;
+            }
+            //if it was inside last time, nothing has changed
+            else {tmpRes = Glyph.NO_CURSOR_EVENT;}
+        }
+        else {
+            //if the mouse is not inside the glyph
+            if (prevMouseIn.containsKey(tmpGlyph)){
+                //if it was inside it last time, mouse has exited the glyph
+                prevMouseIn.remove(tmpGlyph);
+                tmpRes = Glyph.EXITED_GLYPH;
+            }//if it was not inside last time, nothing has changed
+            else {tmpRes = Glyph.NO_CURSOR_EVENT;}
+        }
         if (tmpRes == Glyph.ENTERED_GLYPH){
             //we've entered this glyph
             maxIndex = maxIndex + 1;

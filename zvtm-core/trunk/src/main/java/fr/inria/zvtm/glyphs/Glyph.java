@@ -640,21 +640,6 @@ public abstract class Glyph<T> implements Cloneable, Translucent {
      */
     public abstract boolean coordInsideP(int jpx, int jpy, int camIndex);
 
-    /** Reset memory of cursor being inside the glyph. */
-    public abstract void resetMouseIn();
-
-    /** Reset memory of cursor being inside the glyph for projected coordinates associated with camera at index i. */
-    public abstract void resetMouseIn(int i);
-
-    /** Method used internally for firing picking-related events.
-     *@param jpx provide projected JPanel coordinates of the associated view, not virtual space coordinates
-     *@param jpy provide projected JPanel coordinates of the associated view, not virtual space coordinates
-     *@param cvx virtual space coordinates
-     *@param cvy virtual space coordinates
-     *@return VCursor.ENTERED_GLYPH if cursor has entered the glyph, VCursor.EXITED_GLYPH if it has exited the glyph, VCursor.NO_CURSOR_EVENT if nothing has changed (meaning the cursor was already inside or outside it)
-     */
-    public abstract short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy);
-
     /** Method used internally to find out if it is necessary to project and draw this glyph for a given camera.
      *@return true if the glyph is currently visible in the region delimited by wb, nb, eb, sb, symbolising the region seen through a camera
      *@param wb west region boundary (virtual space coordinates)
