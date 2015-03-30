@@ -23,6 +23,11 @@ import fr.inria.zvtm.glyphs.VSegment;
  *<p>A picker that requires both VirtualSpace coordinates and View-projected coordinates.</p>
  *
  *<p>All glyphs can be picked by this type of picker. It is the default picker associated with VCursor.</p>
+ *
+ <p>When instantiating a Picker manually, that picker should be registered with the VirtualSpace
+  in which it is going to perform picking operations so that it gets notified whenever glyphs get
+  removed from the VirtualSpace and updates itself accordingly. This is not necessary for the
+  picker associated with a View's VCursor, that gets created automatically.</p>
  */
 
 public class Picker extends PickerVS {

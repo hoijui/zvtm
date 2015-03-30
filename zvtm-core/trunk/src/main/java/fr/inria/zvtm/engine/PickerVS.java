@@ -39,6 +39,10 @@ import fr.inria.zvtm.glyphs.VSegment;
  *<li>VText</li>
  *<li>VTextLayout</li>
  *</ul>
+ <p>When instantiating a Picker manually, that picker should be registered with the VirtualSpace
+  in which it is going to perform picking operations so that it gets notified whenever glyphs get
+  removed from the VirtualSpace and updates itself accordingly. This is not necessary for the
+  picker associated with a View's VCursor, that gets created automatically.</p>
  */
 
 public class PickerVS {
@@ -380,6 +384,7 @@ public class PickerVS {
             if (maxIndex<0){lastGlyphEntered = null;maxIndex = -1;}
             else {lastGlyphEntered = pickedGlyphs[maxIndex];}
         }
+        prevMouseIn.remove(g);
     }
 
     /** Print list of glyphs under cursor on System.err for debugging. */

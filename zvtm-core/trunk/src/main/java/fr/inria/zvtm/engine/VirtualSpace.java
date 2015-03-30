@@ -88,6 +88,9 @@ public class VirtualSpace {
     private Vector<Glyph>[] camera2drawnList;
     //sharing drawnList was causing a problem ; we now have one for each camera
 
+    /* pickers looking for glyphs in this virtual space, instantiated manually (not associated with a VCursor) */
+    Vector<PickerVS> externalPickers;
+
     /**
      *@param n virtual space name
      */
@@ -97,6 +100,8 @@ public class VirtualSpace {
         camera2drawnList=new Vector[0];
         drawingList = new Glyph[0];
         spaceName=n;
+        // unlikely that there will be many pickers for a given VirtualSpace
+        externalPickers = new Vector(5);
     }
 
     /** Get name of this virtual space. */
@@ -340,14 +345,7 @@ public class VirtualSpace {
                     camera2drawnList[i].remove(g);
                 }
             }
-            for (int i=0;i<cm.cameraList.length;i++){
-                if (cm.cameraList[i] != null && cm.cameraList[i].view != null){
-                    cm.cameraList[i].view.mouse.getPicker().removeGlyphFromList(g);
-                }
-            }
-            for (Picker p:externalPickers){
-                p.removeGlyphFromList(g);
-            }
+            notifyPickersAboutGlyphRemoval(g);
             visualEnts.remove(g);
             removeGlyphFromDrawingList(g);
             if (repaint){
@@ -384,14 +382,7 @@ public class VirtualSpace {
                     camera2drawnList[j].remove(g);
                 }
             }
-            for (int k=0;k<cm.cameraList.length;k++){
-                if (cm.cameraList[k] != null && cm.cameraList[k].view != null){
-                    cm.cameraList[k].view.mouse.getPicker().removeGlyphFromList(g);
-                }
-            }
-            for (Picker p:externalPickers){
-                p.removeGlyphFromList(g);
-            }
+            notifyPickersAboutGlyphRemoval(g);
             visualEnts.remove(g);
         }
         removeGlyphsFromDrawingList(gs);
@@ -427,18 +418,19 @@ public class VirtualSpace {
      *@see #show(Glyph g)*/
     public void hide(Glyph g){
         removeGlyphFromDrawingList(g);
-        //XXX: need to find a way to notify Picker that glyph no longer exists...
-        // g.resetMouseIn();
-        View v;
-        for (int i=0;i<cm.cameraList.length;i++){
-            if (cm.cameraList[i] != null && cm.cameraList[i].view != null){
-                cm.cameraList[i].view.mouse.getPicker().removeGlyphFromList(g);
+        notifyPickersAboutGlyphRemoval(g);
+        VirtualSpaceManager.INSTANCE.repaint();
+    }
+
+    void notifyPickersAboutGlyphRemoval(Glyph g){
+        for (int k=0;k<cm.cameraList.length;k++){
+            if (cm.cameraList[k] != null && cm.cameraList[k].view != null){
+                cm.cameraList[k].view.mouse.getPicker().removeGlyphFromList(g);
             }
         }
-        for (Picker p:externalPickers){
+        for (PickerVS p:externalPickers){
             p.removeGlyphFromList(g);
         }
-        VirtualSpaceManager.INSTANCE.repaint();
     }
 
     /** Put this glyph on top of the drawing list (will be drawn last).
@@ -620,13 +612,11 @@ public class VirtualSpace {
         }
     }
 
-    Vector<Picker> externalPickers = new Vector(0);
-
     /** Register an external picker with this view.
      *  The picker is said to be <em>external</em> because it is not associated with a VCursor.
      *@return true if the picker was not already registered with this view, false if it was.
      */
-    public boolean registerPicker(Picker p){
+    public boolean registerPicker(PickerVS p){
         if (!externalPickers.contains(p)){
             externalPickers.add(p);
             return true;
@@ -640,7 +630,7 @@ public class VirtualSpace {
      *  The picker is said to be <em>external</em> because it is not associated with a VCursor.
      *@return true if the picker was registered with this view and did get unregistered, false if it was not.
      */
-    public boolean unregisterPicker(Picker p){
+    public boolean unregisterPicker(PickerVS p){
         return externalPickers.remove(p);
     }
 
