@@ -13,7 +13,6 @@ import java.util.ListIterator;
  * 
  * @author Jean-Daniel Fekete
  * 
- * @infovis.factory TreemapFactory Squarified
  */
 public class Squarified {
     /** Instance. */
