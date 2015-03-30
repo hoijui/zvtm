@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2010-2015. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id: Navigation.java 2769 2010-01-15 10:17:58Z epietrig $
@@ -26,24 +26,24 @@ class Navigation {
     static final short MOVE_DOWN = 1;
     static final short MOVE_LEFT = 2;
     static final short MOVE_RIGHT = 3;
-        
+
     Viewer application;
-    
+
     VirtualSpaceManager vsm;
     Camera mCamera;
     Camera ovCamera;
-    
+
     Navigation(Viewer app){
         this.application = app;
         vsm = VirtualSpaceManager.INSTANCE;
     }
-    
+
     void setCamera(Camera c){
         this.mCamera = c;
     }
-    
+
     /*-------------     Navigation       -------------*/
-    
+
     void getGlobalView(){
 		application.mView.getGlobalView(mCamera, Config.ANIM_MOVE_LENGTH, 1.05f);
     }
@@ -89,11 +89,11 @@ class Navigation {
             trans, true, SlowInSlowOutInterpolator.getInstance(), null);
         vsm.getAnimationManager().startAnimation(a, false);
     }
-    
+
     /* -------------- Overview ------------------- */
-	
+
 	OverviewPortal ovPortal;
-	
+
 	void createOverview(){
 		ovPortal = new OverviewPortal(application.panelWidth-Config.OVERVIEW_WIDTH-1, application.panelHeight-Config.OVERVIEW_HEIGHT-1,
 		                              Config.OVERVIEW_WIDTH, Config.OVERVIEW_HEIGHT, ovCamera, mCamera);
@@ -105,13 +105,13 @@ class Navigation {
 		ovPortal.setBorder(Color.GREEN);
 		updateOverview();
 	}
-	
+
 	void updateOverview(){
 		if (ovPortal != null){
 		    ovCamera.setLocation(ovPortal.getGlobalView());
 		}
 	}
-	
+
 	void updateOverviewLocation(){
 	    if (ovPortal != null){
 	        ovPortal.moveTo(application.panelWidth-Config.OVERVIEW_WIDTH-1, application.panelHeight-Config.OVERVIEW_HEIGHT-1);
@@ -122,5 +122,5 @@ class Navigation {
         ovPortal.setVisible(!ovPortal.isVisible());
         vsm.repaint(application.mView);
     }
-    
+
 }

@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2010-2015. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id: MainEventHandler.java 2769 2010-01-15 10:17:58Z epietrig $
@@ -22,35 +22,36 @@ import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.engine.portals.Portal;
 import fr.inria.zvtm.engine.portals.OverviewPortal;
 import fr.inria.zvtm.event.PortalListener;
+import fr.inria.zvtm.event.PickerListener;
 
-class MainEventHandler implements ViewListener, ComponentListener, PortalListener {
+class MainEventHandler implements ViewListener, ComponentListener, PortalListener, PickerListener {
 
     static float ZOOM_SPEED_COEF = 1.0f/50.0f;
     static double PAN_SPEED_COEF = 50.0;
     static final float WHEEL_ZOOMIN_COEF = 21.0f;
     static final float WHEEL_ZOOMOUT_COEF = 22.0f;
     static float WHEEL_MM_STEP = 1.0f;
-    
+
     //remember last mouse coords
     int lastJPX,lastJPY;
     long lastVX, lastVY;
-    
+
     Viewer application;
-    
+
     boolean pcameraStickedToMouse = false;
     boolean regionStickedToMouse = false;
     boolean inPortal = false;
-    
+
     boolean panning = false;
-    
+
     // region selection
 	boolean selectingRegion = false;
 	double x1, y1, x2, y2;
-	
+
 	boolean cursorNearBorder = false;
-    
+
     Glyph sticked = null;
-    
+
     MainEventHandler(Viewer app){
         this.application = app;
     }
@@ -115,10 +116,10 @@ class MainEventHandler implements ViewListener, ComponentListener, PortalListene
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
         if (v.lastGlyphEntered() != null){
-    		application.mView.centerOnGlyph(v.lastGlyphEntered(), v.cams[0], Config.ANIM_MOVE_LENGTH, true, 1.0f);				
+    		application.mView.centerOnGlyph(v.lastGlyphEntered(), v.cams[0], Config.ANIM_MOVE_LENGTH, true, 1.0f);
 		}
     }
-        
+
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){}
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
@@ -147,7 +148,7 @@ class MainEventHandler implements ViewListener, ComponentListener, PortalListene
                 application.nm.mCamera.setXspeed((long)((jpx-lastJPX)*(a/PAN_SPEED_COEF)));
                 application.nm.mCamera.setYspeed((long)((lastJPY-jpy)*(a/PAN_SPEED_COEF)));
                 application.nm.mCamera.setZspeed(0);
-            }		    
+            }
 		}
     }
 
@@ -162,7 +163,7 @@ class MainEventHandler implements ViewListener, ComponentListener, PortalListene
             //wheelDirection == WHEEL_DOWN, zooming out
             application.nm.mCamera.altitudeOffset(-a*WHEEL_ZOOMIN_COEF);
             VirtualSpaceManager.INSTANCE.repaint();
-        }            
+        }
     }
 
 	public void enterGlyph(Glyph g){
@@ -188,7 +189,7 @@ class MainEventHandler implements ViewListener, ComponentListener, PortalListene
     public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 
     public void viewActivated(View v){}
-    
+
     public void viewDeactivated(View v){}
 
     public void viewIconified(View v){}
@@ -205,7 +206,7 @@ class MainEventHandler implements ViewListener, ComponentListener, PortalListene
     public void componentResized(ComponentEvent e){
         application.updatePanelSize();
     }
-    public void componentShown(ComponentEvent e){}    
+    public void componentShown(ComponentEvent e){}
 
 	/* Overview Portal */
 	public void enterPortal(Portal p){
@@ -219,5 +220,5 @@ class MainEventHandler implements ViewListener, ComponentListener, PortalListene
 		((OverviewPortal)p).setBorder(Config.OV_BORDER_COLOR);
 		VirtualSpaceManager.INSTANCE.repaint();
 	}
-	
+
 }
