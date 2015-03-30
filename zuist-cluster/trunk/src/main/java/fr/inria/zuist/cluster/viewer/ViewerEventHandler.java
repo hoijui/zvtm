@@ -29,13 +29,14 @@ import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.event.CameraListener;
+import fr.inria.zvtm.event.PickerListener;
 
 import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zuist.engine.Region;
 import fr.inria.zuist.engine.ObjectDescription;
 import fr.inria.zuist.engine.TextDescription;
 
-class ViewerEventHandler implements ViewListener, ComponentListener, CameraListener {
+class ViewerEventHandler implements ViewListener, ComponentListener, CameraListener, PickerListener {
 
     static float ZOOM_SPEED_COEF = 1.0f/50.0f;
     static double PAN_SPEED_COEF = 50.0;

@@ -15,4 +15,4 @@ JARS=$JARS":target/args4j-2.0.29.jar"
 JARS=$JARS":target/javaSmarties-1.2.0.jar"
 JARS=$JARS":target/zuist-cluster-0.3.0-SNAPSHOT.jar"
 
-java -Djava.net.preferIPv4Stack=true -Djgroups.bind_addr="192.168.1.23" -Xmx1g -cp $JARS fr.inria.zuist.cluster.viewer.Viewer -r 1 -c 1 -bw 800 -bh 600 "$@"
+java -Djava.net.preferIPv4Stack=true -Djgroups.bind_addr="129.175.5.16" -Xmx1g -cp $JARS fr.inria.zuist.cluster.viewer.Viewer -r 1 -c 1 -bw 800 -bh 600 "$@"

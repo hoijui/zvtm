@@ -1,7 +1,14 @@
 #!/bin/bash
 
-# usage example: ./cluster_run.sh -n AnimCircles will run slaves for
-# each cluster screen, joining the application named 'AnimCircles'
+JARS="target/commons-logging-1.1.jar"
+JARS=$JARS":target/args4j-2.0.29.jar"
+JARS=$JARS":target/aspectjrt-1.6.5.jar"
+JARS=$JARS":target/jgroups-2.7.0.GA.jar"
+JARS=$JARS":target/log4j-1.2.17.jar"
+JARS=$JARS":target/slf4j-api-1.7.10.jar"
+JARS=$JARS":target/slf4j-log4j12-1.7.10.jar"
+JARS=$JARS":target/timingframework-1.0.jar"
+JARS=$JARS":target/zraildar-0.2.jar"
 
 function colNum {
   case "$1" in
@@ -15,17 +22,15 @@ function colNum {
 #start client nodes
 for col in {a..d}
 do
-        for row in {1..4}
-      do
-                  colNum $col
-                  SLAVENUM1=`expr $? \* 8 + $row - 1`
-                  SLAVENUM2=`expr $SLAVENUM1 + 4`
-                  ssh wild@$col$row.wild.lri.fr -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "sudo sysctl -w kern.ipc.maxsockbuf=80000000"
-                  ssh wild@$col$row.wild.lri.fr -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "sudo sysctl -w net.inet.tcp.recvspace=40000000"
-                  ssh wild@$col$row.wild.lri.fr -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "sudo sysctl -w net.inet.tcp.sendspace=40000000"
-                  ssh wild@$col$row.wild.lri.fr -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "cd /Users/wild/sandboxes/romain/zvtm-zuist && java -server -XX:+DoEscapeAnalysis -Xmx4g -cp target/commons-logging-1.1.jar:target/args4j-2.0.12.jar:target/aspectjrt-1.6.2.jar:target/jgroups-2.7.0.GA.jar:target/log4j-1.2.14.jar:target/slf4j-api-1.5.9-RC0.jar:target/slf4j-log4j12-1.5.9-RC0.jar:target/timingframework-1.0.jar:target/zvtm-cluster-0.2.8-SNAPSHOT.jar:target/zuist-cluster-0.2.1-SNAPSHOT.jar fr.inria.zvtm.cluster.SlaveApp -b $SLAVENUM1 -f -d "'\\Display0' $* &
-
-                  ssh wild@$col$row.wild.lri.fr -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "cd /Users/wild/sandboxes/romain/zvtm-zuist && java -server -XX:+DoEscapeAnalysis -Xmx4g -cp target/commons-logging-1.1.jar:target/args4j-2.0.12.jar:target/aspectjrt-1.6.2.jar:target/jgroups-2.7.0.GA.jar:target/log4j-1.2.14.jar:target/slf4j-api-1.5.9-RC0.jar:target/slf4j-log4j12-1.5.9-RC0.jar:target/timingframework-1.0.jar:target/zvtm-cluster-0.2.8-SNAPSHOT.jar:target/zuist-cluster-0.2.1-SNAPSHOT.jar fr.inria.zvtm.cluster.SlaveApp -b $SLAVENUM2 -f -d "'\\Display1' $* &
-      done
+  for row in {1..4}
+    do
+      colNum $col
+      SLAVENUM1=`expr $? \* 8 + $row - 1`
+      SLAVENUM2=`expr $SLAVENUM1 + 4`
+      colNum $col
+      IP=`expr 32 + $? \* 4 + $row - 1`
+      ssh wild@$col$row.wild.lri.fr -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "export DISPLAY=:0.0 && cd /opt/zuist-cluster/zraildar/ && java -XX:+DoEscapeAnalysis -XX:+UseConcMarkSweepGC -Djava.net.preferIPv4Stack=true -Djgroups.bind_addr="192.168.0.$IP"  -Xmx4g -cp $JARS fr.inria.zvtm.cluster.SlaveApp -n WallZRaildar -b $SLAVENUM1 -f -a -o -d :0.0 $*" &
+      sleep 1
+      ssh wild@$col$row.wild.lri.fr -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no "export DISPLAY=:0.1 && cd /opt/zuist-cluster/zraildar/ && java -XX:+DoEscapeAnalysis -XX:+UseConcMarkSweepGC -Djava.net.preferIPv4Stack=true -Djgroups.bind_addr="192.168.0.$IP"  -Xmx4g -cp $JARS fr.inria.zvtm.cluster.SlaveApp -n WallZRaildar -b $SLAVENUM2 -f -a -o -d :0.1 $*" &
+    done
 done
-
