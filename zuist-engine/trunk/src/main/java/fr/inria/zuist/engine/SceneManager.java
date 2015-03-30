@@ -223,7 +223,7 @@ public class SceneManager implements CameraListener {
      *@param vss virtual spaces in which the scene will be loaded
      *@param cs cameras associated to those virtual spaces, through which the scene will be observed
      *@param properties properties that can be set on this scene manager.
-     *@see #setProperties(HashMap<String,Object> properties)
+     *@see #setProperties(HashMap properties)
      */
     public SceneManager(VirtualSpace[] vss, Camera[] cs, HashMap<String,String> properties){
         this.sceneLayers = vss;
