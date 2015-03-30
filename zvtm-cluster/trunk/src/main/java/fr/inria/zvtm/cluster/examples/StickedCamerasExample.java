@@ -1,6 +1,6 @@
 /*   AUTHOR : Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *
- *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2010.
+ *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2010-2015.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  */
@@ -215,12 +215,6 @@ public class StickedCamerasExample {
             cam2.setAltitude(cam1.getAltitude());
             cam2.moveTo(cam1.vx, cam1.vy);
         }
-
-		public void enterGlyph(Glyph g){
-		}
-
-		public void exitGlyph(Glyph g){
-		}
 
 		public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 

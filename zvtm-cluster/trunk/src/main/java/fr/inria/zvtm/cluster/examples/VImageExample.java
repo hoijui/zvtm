@@ -1,6 +1,6 @@
 /*   AUTHOR : Romain Primet (romain.primet@inria.fr)
  *
- *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2010.
+ *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2010-2015.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  */
@@ -139,12 +139,6 @@ public class VImageExample {
 		}
 
 		public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){}
-
-		public void enterGlyph(Glyph g){
-		}
-
-		public void exitGlyph(Glyph g){
-		}
 
 		public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 
