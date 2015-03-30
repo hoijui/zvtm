@@ -9,7 +9,7 @@ The source code is available in each zvtm-sources release on SourceForge.net\fre
 
 The core zvtm module is now named \cd{zvtm-core}. See section \ref{sec:modules} for a list and short description of all modules.
   
-\subsection{Building with Maven 2.x or 3.x}
+\subsection{Building with Maven}
  
 Maven is a very powerful management system. Visit the Maven web site to get more information\fref{http://maven.apache.org/guides/index.html}.
     
@@ -29,7 +29,7 @@ To build ZVTM's JAR file, issue the following command.
 
 \codebox{mvn package}
 
-If necessary, Maven will go through the compilation goal and all other intermediate goals before packaging. The resulting JAR file is put in directory \cd{target/}. As opposed to builds in earlier releases managed with Ant, the JAR file name now contains the version number, such as \cd{zvtm-0.10.0.jar} or \cd{zvtm-0.11.0-SNAPSHOT.jar}.
+If necessary, Maven will go through the compilation goal and all other intermediate goals before packaging. The resulting JAR file is put in directory \cd{target/}. As opposed to builds in earlier releases managed with Ant, the JAR file name now contains the version number, such as \cd{zvtm-0.10.0.jar} or \cd{zvtm-0.12.0-SNAPSHOT.jar}.
 
 \subsubsection{Install ZVTM in local repository}
 
@@ -73,7 +73,7 @@ and add the following dependency in your own \cd{pom.xml} file:
 <dependency>
   <groupId>fr.inria.zvtm</groupId>
   <artifactId>zvtm</artifactId>
-  <version>0.11.0-SNAPSHOT</version>
+  <version>0.11.2</version>
 </dependency>
 \end{SaveVerbatim}
 \fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
@@ -86,10 +86,12 @@ If using the SVG import/export capabilities of ZVTM, you must also declare the f
 <dependency>
   <groupId>fr.inria.zvtm</groupId>
   <artifactId>zvtm-svg</artifactId>
-  <version>0.2.1-SNAPSHOT</version>
+  <version>0.2.1</version>
 </dependency>
 \end{SaveVerbatim}
 \fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+
+\newpage
 
 \subsection{Available Modules}
 \label{sec:modules}
@@ -102,7 +104,7 @@ Module Name & Name in SVN/Maven & Description & Section \\
 \hline
 ZVTM & \cd{zvtm-core} & Core ZVTM module with engine, glyphs, etc. & \ref{sec:basic}, \ref{sec:animations}, \ref{sec:nav}, \ref{sec:advanced} \\
 \hline
-ZVTM Cluster & \cd{zvtm-cluster} & Run ZVTM applications on clusters of computers driving high-resolution large displays such as the WILD wall-sized display \url{http://insitu.lri.fr/Projects/WILD} & \ref{sec:clustering} \\
+ZVTM Cluster & \cd{zvtm-cluster} & Run ZVTM applications on clusters of computers driving high-resolution large displays such as the WILD \surl{http://insitu.lri.fr/Projects/WILD} or ANDES \surl{http://www.inria.cl/?page_id=2727\&amp;lang=en} wall-sized displays & \ref{sec:clustering} \\
 \hline
 ZVTM Agile2D & \cd{zvtm-agile2d} & Rendering ZVTM views using the Agile2D OpenGL-backed Java2D implementation & \ref{sec:agile2d} \\
 \hline

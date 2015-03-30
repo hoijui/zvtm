@@ -31,7 +31,7 @@ Dependency on \cd{zvtm-cluster} is declared as follows:
 <dependency>
   <groupId>fr.inria.zvtm</groupId>
   <artifactId>zvtm-cluster</artifactId>
-  <version>0.2.6</version> <!-- or any newer version -->
+  <version>0.2.8</version> <!-- or any newer version -->
 </dependency>
 \end{SaveVerbatim}
 \fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
@@ -113,6 +113,8 @@ This will generate \cd{zvtm-cluster-x.y.z-jar-with-dependencies.jar}
   Multiple views and cameras
 \item
   Animation framework
+\item
+  Portals (CameraPortal only for now)
 \end{itemize}
 
 
@@ -120,14 +122,12 @@ This will generate \cd{zvtm-cluster-x.y.z-jar-with-dependencies.jar}
 
 \begin{itemize}
 \item
-  Portals (portal support is planned, for CameraPortal only at first)
+  Lenses (coming soon)
 \item
-  Lenses (due to their implementation, supporting lenses on large
-  display would be too memory-intensive)
-\item
-  VCursor (we are investigating VCursor support, or a suitable
-  replacement; the externalization of picking now enables testing what glyphs are under the cursor {\em for a given view/slave}, but we still have to offer a mechanism that would make this transparent cluster-wide)
+  VCursor (but a \cd{PickerVS} can be instantiated in the application and perform picking operations anywhere in the \cd{VirtualSpace}.)
 \end{itemize}
+
+
 \subsection{Porting an application to zvtm-cluster}
 
 Porting an existing zvtm application is done in three steps:
@@ -192,7 +192,7 @@ on zvtm-cluster in the following manner (notice the \cd{exclusion}):
 <dependency>
    <groupId>fr.inria.zvtm</groupId>
    <artifactId>zvtm-cluster</artifactId>
-   <version>0.2.7-SNAPSHOT</version>
+   <version>0.2.8</version>
    <exclusions>
       <exclusion>
          <groupId>fr.inria.zvtm</groupId> 

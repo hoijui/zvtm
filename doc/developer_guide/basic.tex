@@ -257,16 +257,38 @@ Various portals ship with \cd{zvtm-core}, including portals that implement an in
 \label{sec:input}
 
 %%%%%%%%%%
-\subsubsection{Views, Glyph, Mouse and Keyboard Events}
+\subsubsection{View, Mouse and Keyboard Events}
 
 It is possible to associated the same event listener with all layers in a view, or to associate different event listeners with each layer of the view. The input event handling interface works in a way similar to conventional AWT/Swing event listeners (using callbacks). There is a single interface for all ZVTM events: \cl{fr.inria.zvtm.event.ViewListener}. A convenience (default) implementation, which does nothing, is available for subclassing: \cl{ViewAdapter}.
 
 \cd{ViewListener} features callbacks for conventional pointing device events (move, drag, button press/release/click, mouse wheel) and keyboard events. Additional events are triggered when the cursor enters or exits a glyph, unless this glyph has been declared as not sensitive \cl{Glyph.setSensitivity(boolean b)}.
 
 %%%%%%%%%%
-\subsubsection{Picking}
+\subsubsection{Picking and Glyph Events}
 
-\cd{VCursor.getPicker()} \ldots{}
+\cd{VCursor.getPicker()} gives access to the picker associated with a \cd{View}'s \cd{VCursor}. A picker holds a list of all \cd{Glyph}s that are below the cursor, as an ordered stack. By default, this list is ordered according to the time the cursor entered the glyphs (last \cd{Glyph} entered has the highest index in the array returned by \cl{Picker.getPickedGlyphList()}). An alternative method returns those glyphs ordered according to their index in the VirtualSpace's drawing stack:\\ \cl{Picker.getDrawOrderedPickedGlyphList(VirtualSpace v)}.
+
+As of v0.12.0, Glyph-related events (a cursor entering or exiting a Glyph) have their own event callback interface:\\\cl{fr.inria.zvtm.event.PickerListener}.
+
+The interface consists of two methods: \cl{enterGlyph(Glyph g)} and \cl{exitGlyph(Glyph g)}, which get called whenever the picker this listener is associated with enters/exits a glyph.
+
+Registering a \cd{PickerListener} with the default picker associated with a \cd{View}'s \cd{VCursor} is done as follows:\\
+\begin{small}
+\begin{SaveVerbatim}{CodeVerb}
+View v = ...;
+PickerListener pl = ...;
+v.getCursor().getPicker().setListener(pl);
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+\end{small}
+
+For developers migrating from v0.11.2 or earlier, the changes required are very minor: methods \cl{enterGlyph(Glyph g)} and \cl{exitGlyph(Glyph g)} are now part of this interface instead of being part of the\\ \cl{fr.inria.zvtm.event.ViewListener} interface. The PickerListener still has to be  registered with the corresponding picker, as detailed above. The same class might very well implement \cd{ViewListener} and \cd{PickerListener}, in which case the event callback code is almost identical as what would have been written for zvtm v0.11.2 and earlier.
+
+A \cd{PickerListener} can be registered with any picker, including a \cl{fr.inria.zvtm.engine.PickerVS} as typically instantiated through \cd{zvtm-cluster} for applications running on wall displays.
+
+The default type of picker instantiated by zvtm-core is \cl{fr.inria.zvtm.engine.Picker}, which performs picking operations on any type of \cd{Glyph}, but required to be provided with the coordinates of the cursor/picker in both VirtualSpace and projected coordinates (in the view). This is because some glyphs perform picking tests in the View's projected coordinates system, whereas others perform this test in the VirtualSpace coordinate system. We are gradually transitioning to an implementation of picking that works entirely in the VirtualSpace coordinate system, but until this effort is completed, this is the default behavior.
+
+This, however, does not work well in some situations, such as when trying to perform picking in a \cd{zvtm-cluster} scene (application running on a cluster-driven wall-sized display) as there is no easy way to access the projected coordinates of a picker across instances of \cl{SlaveApp} running on different computers. In this case, we provide \cl{PickerVS}, that works with VirtualSpace coordinates only. \cl{PickerVS} will eventually become the default picker, but this will not happen until all Glyphs can be picked using VirtualSpace coordinates. For an up-to-date list of which classes of \cl{Glyph} can be picked by \cl{PickerVS}, see the JavaDoc associated with your release.
 
 %%%%%%%%%%
 \subsubsection{Portal Events}
