@@ -290,6 +290,19 @@ The default type of picker instantiated by zvtm-core is \cl{fr.inria.zvtm.engine
 
 This, however, does not work well in some situations, such as when trying to perform picking in a \cd{zvtm-cluster} scene (application running on a cluster-driven wall-sized display) as there is no easy way to access the projected coordinates of a picker across instances of \cl{SlaveApp} running on different computers. In this case, we provide \cl{PickerVS}, that works with VirtualSpace coordinates only. \cl{PickerVS} will eventually become the default picker, but this will not happen until all Glyphs can be picked using VirtualSpace coordinates. For an up-to-date list of which classes of \cl{Glyph} can be picked by \cl{PickerVS}, see the JavaDoc associated with your release.
 
+When instantiating a Picker manually, that picker should be registered with the VirtualSpace in which it is going to perform picking operations so that it gets notified whenever glyphs get removed from the VirtualSpace and updates itself accordingly.
+
+\begin{small}
+\begin{SaveVerbatim}{CodeVerb}
+VirtualSpace vs = ...;
+PickerVS pvs = ...;
+vs.registerPicker(pvs);
+\end{SaveVerbatim}
+\fbox{\BUseVerbatim[boxwidth=0.99\columnwidth]{CodeVerb}}
+\end{small}
+
+This is not necessary for the picker associated with a \cd{View}'s \cd{VCursor}, that gets created automatically.
+
 %%%%%%%%%%
 \subsubsection{Portal Events}
 
