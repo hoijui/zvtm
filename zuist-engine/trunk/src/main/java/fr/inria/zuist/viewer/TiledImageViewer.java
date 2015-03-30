@@ -168,6 +168,7 @@ public class TiledImageViewer {
         eh = new TIVEventHandler(this);
         mView.setListener(eh, 0);
         mView.setListener(ovm, 1);
+        mView.getCursor().getPicker().setListener(eh);
         mView.setBackgroundColor(BACKGROUND_COLOR);
         mView.setAntialiasing(!options.noaa);
         mView.getPanel().getComponent().addComponentListener(eh);

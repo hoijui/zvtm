@@ -32,6 +32,7 @@ import fr.inria.zvtm.event.CameraListener;
 import fr.inria.zvtm.engine.portals.Portal;
 import fr.inria.zvtm.engine.portals.OverviewPortal;
 import fr.inria.zvtm.event.PortalListener;
+import fr.inria.zvtm.event.PickerListener;
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.EndAction;
 
@@ -39,7 +40,7 @@ import fr.inria.zuist.engine.Region;
 import fr.inria.zuist.engine.ObjectDescription;
 import fr.inria.zuist.engine.TextDescription;
 
-class TIVEventHandler implements ViewListener, ComponentListener, PortalListener, CameraListener {
+class TIVEventHandler implements ViewListener, ComponentListener, PortalListener, CameraListener, PickerListener {
 
     static final float WHEEL_ZOOMIN_FACTOR = 21.0f;
     static final float WHEEL_ZOOMOUT_FACTOR = 22.0f;

@@ -182,6 +182,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener, Obj
         mView.setListener(eh, 0);
         mView.setListener(eh, 1);
         mView.setListener(ovm, 2);
+        mView.getCursor().getPicker().setListener(eh);
         mCamera.addListener(eh);
         mView.setBackgroundColor(Color.WHITE);
         mView.setAntialiasing(!options.noaa);
