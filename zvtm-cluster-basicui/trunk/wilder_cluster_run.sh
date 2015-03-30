@@ -8,8 +8,8 @@ JARS=$JARS":target/slf4j-api-1.7.10.jar"
 JARS=$JARS":target/slf4j-log4j12-1.7.10.jar"
 JARS=$JARS":target/timingframework-1.0.jar"
 JARS=$JARS":target/commons-logging-1.1.jar"
-JARS=$JARS":target/zvtm-cluster-0.2.8.jar"
-JARS=$JARS":target/zvtm-cluster-basicui-0.2.8.jar"
+JARS=$JARS":target/zvtm-cluster-0.2.9-SNAPSHOT.jar"
+JARS=$JARS":target/zvtm-cluster-basicui-0.2.9-SNAPSHOT.jar"
 
 function colNum {
   case "$1" in
