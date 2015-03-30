@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2011. All Rights Reserved
+ *   Copyright (c) INRIA, 2011-2015. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -86,6 +86,7 @@ import fr.inria.zvtm.glyphs.RImage;
 import fr.inria.zvtm.engine.portals.Portal;
 import fr.inria.zvtm.engine.portals.OverviewPortal;
 import fr.inria.zvtm.event.PortalListener;
+import fr.inria.zvtm.event.PickerListener;
 
 public class Viewer {
 
@@ -98,29 +99,29 @@ public class Viewer {
     int VIEW_X, VIEW_Y;
     /* dimensions of zoomable panel */
     int panelWidth, panelHeight;
-    
+
     VirtualSpaceManager vsm;
     VirtualSpace svgSpace, aboutSpace;
     EView mView;
-    
+
     MainEventHandler eh;
     Navigation nm;
     Overlay ovm;
-    
+
     VWGlassPane gp;
-    
+
     File SCENE_FILE, SCENE_FILE_DIR;
-    
+
     /* --------------- init ------------------*/
 
     public Viewer(File svgF, boolean fullscreen, boolean opengl, boolean antialiased){
         init();
         initGUI(fullscreen, opengl, antialiased);
         if (svgF != null){
-            loadSVG(svgF);            
+            loadSVG(svgF);
         }
     }
-    
+
     void init(){
         // parse properties
         Scanner sc = new Scanner(Viewer.class.getResourceAsStream("/properties")).useDelimiter("\\s*=\\s*");
@@ -131,13 +132,13 @@ public class Viewer {
             }
         }
     }
-        
+
     void initGUI(boolean fullscreen, boolean opengl, boolean antialiased){
         windowLayout();
-        
+
         try{UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());}
         catch(Exception ex){}
-        
+
         Glyph.setDefaultCursorInsideHighlightColor(Config.HIGHLIGHT_COLOR);
         vsm = VirtualSpaceManager.INSTANCE;
         ovm = new Overlay(this);
@@ -167,7 +168,7 @@ public class Viewer {
         eh = new MainEventHandler(this);
         mView.setListener(eh, 0);
         mView.setListener(ovm, 1);
-        mView.setNotifyCursorMoved(true);
+        mView.getCursor().getPicker().setListener(eh);
         mView.setAntialiasing(antialiased);
         mView.setBackgroundColor(Config.BACKGROUND_COLOR);
 		mView.getPanel().getComponent().addComponentListener(eh);
@@ -191,20 +192,20 @@ public class Viewer {
         VIEW_W = (SCREEN_WIDTH <= VIEW_MAX_W) ? SCREEN_WIDTH : VIEW_MAX_W;
         VIEW_H = (SCREEN_HEIGHT <= VIEW_MAX_H) ? SCREEN_HEIGHT : VIEW_MAX_H;
     }
-    
+
     void updatePanelSize(){
         Dimension d = mView.getPanel().getComponent().getSize();
         panelWidth = d.width;
 		panelHeight = d.height;
 		nm.updateOverviewLocation();
 	}
-    
+
     /* --------------- SVG Parsing ------------------*/
-    
+
 	void reset(){
 		svgSpace.removeAllGlyphs();
 	}
-	
+
 	void openFile(){
 		if(SCENE_FILE_DIR == null){
 			try{
@@ -213,7 +214,7 @@ public class Viewer {
 				SCENE_FILE_DIR = (File)reader.readObject();
 			}catch(Exception ex){ex.printStackTrace();}
 		}
-		
+
 		final JFileChooser fc = new JFileChooser(SCENE_FILE_DIR);
 		fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		fc.setDialogTitle("Find SVG File");
@@ -223,7 +224,7 @@ public class Viewer {
 			    public Object construct(){
 					reset();
 					loadSVG(fc.getSelectedFile());
-					return null; 
+					return null;
 			    }
 			};
 		    worker.start();
@@ -236,14 +237,14 @@ public class Viewer {
 		    public Object construct(){
 				reset();
 				loadSVG(SCENE_FILE);
-				return null; 
+				return null;
 		    }
 		};
 	    worker.start();
 	}
-    
+
     static final String LOAD_EXTERNAL_DTD_URL = "http://apache.org/xml/features/nonvalidating/load-external-dtd";
-    
+
     void loadSVG(File svgF){
         gp.setVisible(true);
         gp.setValue(20);
@@ -270,7 +271,7 @@ public class Viewer {
 	    SCENE_FILE_DIR = SCENE_FILE.getParentFile();
 	    mView.setTitle(Messages.mViewName + " - " + SCENE_FILE.getName());
         gp.setVisible(false);
-        
+
         try{
         	FileOutputStream file = new FileOutputStream("config.txt");
 			ObjectOutputStream writter = new ObjectOutputStream(file);
@@ -281,11 +282,11 @@ public class Viewer {
 			e.printStackTrace();
 		}
     }
-    
+
     /* --------------- SVG exporting ------------------*/
-    
+
     static final String SVG_OUTPUT_ENCODING = "UTF-8";
-    
+
     void export(){
         final JFileChooser fc = new JFileChooser(SCENE_FILE_DIR);
         fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -295,13 +296,13 @@ public class Viewer {
             final SwingWorker worker = new SwingWorker(){
                 public Object construct(){
                     exportSVG(fc.getSelectedFile());
-                    return null; 
+                    return null;
                 }
             };
             worker.start();
         }
     }
-    
+
     void exportSVG(File f){
         SVGWriter sw = new SVGWriter();
 	    if (f.exists()){f.delete();}
@@ -317,11 +318,11 @@ public class Viewer {
     }
 
     /* --------------- Main/exit ------------------*/
-    
+
     void exit(){
         System.exit(0);
     }
-    
+
     public static void main(String[] args){
 		boolean fs = false;
 		boolean ogl = false;
@@ -348,29 +349,29 @@ public class Viewer {
         System.out.println(Messages.H_4_HELP);
         new Viewer(svgF, fs, ogl, aa);
     }
-    
+
 }
 
 class VWGlassPane extends JComponent {
-    
+
     static final int BAR_WIDTH = 200;
     static final int BAR_HEIGHT = 10;
 
-    static final AlphaComposite GLASS_ALPHA = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.65f);    
+    static final AlphaComposite GLASS_ALPHA = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.65f);
     static final Color MSG_COLOR = Color.DARK_GRAY;
     GradientPaint PROGRESS_GRADIENT = new GradientPaint(0, 0, Color.ORANGE, 0, BAR_HEIGHT, Color.BLUE);
 
     String msg = Messages.EMPTY_STRING;
     int msgX = 0;
     int msgY = 0;
-    
+
     int completion = 0;
     int prX = 0;
     int prY = 0;
     int prW = 0;
-    
+
     Viewer application;
-    
+
     VWGlassPane(Viewer app){
         super();
         this.application = app;
@@ -378,7 +379,7 @@ class VWGlassPane extends JComponent {
         addMouseMotionListener(new MouseMotionAdapter(){});
         addKeyListener(new KeyAdapter(){});
     }
-    
+
     public void setValue(int c){
         completion = c;
         prX = application.panelWidth/2-BAR_WIDTH/2;
@@ -387,14 +388,14 @@ class VWGlassPane extends JComponent {
         PROGRESS_GRADIENT = new GradientPaint(0, prY, Color.LIGHT_GRAY, 0, prY+BAR_HEIGHT, Color.DARK_GRAY);
         repaint(prX, prY, BAR_WIDTH, BAR_HEIGHT);
     }
-    
+
     public void setLabel(String m){
         msg = m;
         msgX = application.panelWidth/2-BAR_WIDTH/2;
         msgY = application.panelHeight/2-BAR_HEIGHT/2 - 10;
         repaint(msgX, msgY-50, 400, 70);
     }
-    
+
     protected void paintComponent(Graphics g){
         Graphics2D g2 = (Graphics2D)g;
         Rectangle clip = g.getClipBounds();
@@ -412,11 +413,11 @@ class VWGlassPane extends JComponent {
         g2.setColor(MSG_COLOR);
         g2.drawRect(prX, prY, BAR_WIDTH, BAR_HEIGHT);
     }
-    
+
 }
 
 class Overlay implements ViewListener {
-    
+
     Viewer application;
 
     boolean showingAbout = false;
@@ -440,7 +441,7 @@ class Overlay implements ViewListener {
         application.aboutSpace.addGlyph(sayGlyph);
         sayGlyph.setVisible(false);
     }
-    
+
     void showAbout(){
         if (!showingAbout){
             fadeAbout = new VRectangle(0, 0, 0, Math.round(application.panelWidth/1.05), Math.round(application.panelHeight/1.5),
@@ -458,7 +459,7 @@ class Overlay implements ViewListener {
             application.aboutSpace.addGlyph(inriaLogo);
             application.aboutSpace.addGlyph(insituLogo);
 			for (int i=0;i<aboutLines.length;i++){
-	            application.aboutSpace.addGlyph(aboutLines[i]);				
+	            application.aboutSpace.addGlyph(aboutLines[i]);
 			}
             showingAbout = true;
         }
@@ -485,7 +486,7 @@ class Overlay implements ViewListener {
 	            if (aboutLines[i] != null){
 	                application.aboutSpace.removeGlyph(aboutLines[i]);
 	                aboutLines[i] = null;
-	            }				
+	            }
 			}
 		}
 		application.mView.setActiveLayer(0);
@@ -573,34 +574,34 @@ class Overlay implements ViewListener {
 	}
 }
 
-class MainEventHandler implements ViewListener, ComponentListener, PortalListener {
+class MainEventHandler implements ViewListener, ComponentListener, PortalListener, PickerListener {
 
     static float ZOOM_SPEED_COEF = 1.0f/50.0f;
     static double PAN_SPEED_COEF = 50.0;
     static final float WHEEL_ZOOMIN_COEF = 21.0f;
     static final float WHEEL_ZOOMOUT_COEF = 22.0f;
     static float WHEEL_MM_STEP = 1.0f;
-    
+
     //remember last mouse coords
     int lastJPX,lastJPY;
     long lastVX, lastVY;
-    
+
     Viewer application;
-    
+
     boolean pcameraStickedToMouse = false;
     boolean regionStickedToMouse = false;
     boolean inPortal = false;
-    
+
     boolean panning = false;
-    
+
     // region selection
 	boolean selectingRegion = false;
 	double x1, y1, x2, y2;
-	
+
 	boolean cursorNearBorder = false;
-    
+
     Glyph sticked = null;
-    
+
     MainEventHandler(Viewer app){
         this.application = app;
     }
@@ -643,7 +644,7 @@ class MainEventHandler implements ViewListener, ComponentListener, PortalListene
 			}
 			selectingRegion = false;
 		}
-        else if (panning){	    
+        else if (panning){
             application.nm.mCamera.setXspeed(0);
             application.nm.mCamera.setYspeed(0);
             application.nm.mCamera.setZspeed(0);
@@ -654,7 +655,7 @@ class MainEventHandler implements ViewListener, ComponentListener, PortalListene
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
         if (v.lastGlyphEntered() != null){
-    		application.mView.centerOnGlyph(v.lastGlyphEntered(), v.cams[0], Config.ANIM_MOVE_LENGTH, true, 1.0f);				
+    		application.mView.centerOnGlyph(v.lastGlyphEntered(), v.cams[0], Config.ANIM_MOVE_LENGTH, true, 1.0f);
 		}
     }
 
@@ -669,7 +670,7 @@ class MainEventHandler implements ViewListener, ComponentListener, PortalListene
 	public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
-        
+
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){}
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
@@ -698,7 +699,7 @@ class MainEventHandler implements ViewListener, ComponentListener, PortalListene
                 application.nm.mCamera.setXspeed((long)((jpx-lastJPX)*(a/PAN_SPEED_COEF)));
                 application.nm.mCamera.setYspeed((long)((lastJPY-jpy)*(a/PAN_SPEED_COEF)));
                 application.nm.mCamera.setZspeed(0);
-            }		    
+            }
 		}
     }
 
@@ -713,7 +714,7 @@ class MainEventHandler implements ViewListener, ComponentListener, PortalListene
             //wheelDirection == WHEEL_DOWN, zooming out
             application.nm.mCamera.altitudeOffset(-a*WHEEL_ZOOMIN_COEF);
             VirtualSpaceManager.INSTANCE.repaint();
-        }            
+        }
     }
 
 	public void enterGlyph(Glyph g){
@@ -739,7 +740,7 @@ class MainEventHandler implements ViewListener, ComponentListener, PortalListene
     public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 
     public void viewActivated(View v){}
-    
+
     public void viewDeactivated(View v){}
 
     public void viewIconified(View v){}
@@ -756,7 +757,7 @@ class MainEventHandler implements ViewListener, ComponentListener, PortalListene
     public void componentResized(ComponentEvent e){
         application.updatePanelSize();
     }
-    public void componentShown(ComponentEvent e){}    
+    public void componentShown(ComponentEvent e){}
 
 	/* Overview Portal */
 	public void enterPortal(Portal p){
@@ -770,7 +771,7 @@ class MainEventHandler implements ViewListener, ComponentListener, PortalListene
 		((OverviewPortal)p).setBorder(Config.OV_BORDER_COLOR);
 		VirtualSpaceManager.INSTANCE.repaint();
 	}
-	
+
 }
 
 class Navigation {
@@ -781,24 +782,24 @@ class Navigation {
     static final short MOVE_DOWN = 1;
     static final short MOVE_LEFT = 2;
     static final short MOVE_RIGHT = 3;
-        
+
     Viewer application;
-    
+
     VirtualSpaceManager vsm;
     Camera mCamera;
     Camera ovCamera;
-    
+
     Navigation(Viewer app){
         this.application = app;
         vsm = VirtualSpaceManager.INSTANCE;
     }
-    
+
     void setCamera(Camera c){
         this.mCamera = c;
     }
-    
+
     /*-------------     Navigation       -------------*/
-    
+
     void getGlobalView(){
 		application.mView.getGlobalView(mCamera, Config.ANIM_MOVE_LENGTH, 1.05f);
     }
@@ -844,11 +845,11 @@ class Navigation {
             trans, true, SlowInSlowOutInterpolator.getInstance(), null);
         vsm.getAnimationManager().startAnimation(a, false);
     }
-    
+
     /* -------------- Overview ------------------- */
-	
+
 	OverviewPortal ovPortal;
-	
+
 	void createOverview(){
 		ovPortal = new OverviewPortal(application.panelWidth-Config.OVERVIEW_WIDTH-1, application.panelHeight-Config.OVERVIEW_HEIGHT-1,
 		                              Config.OVERVIEW_WIDTH, Config.OVERVIEW_HEIGHT, ovCamera, mCamera);
@@ -860,13 +861,13 @@ class Navigation {
 		ovPortal.setBorder(Color.GREEN);
 		updateOverview();
 	}
-	
+
 	void updateOverview(){
 		if (ovPortal != null){
 		    ovCamera.setLocation(ovPortal.getGlobalView());
 		}
 	}
-	
+
 	void updateOverviewLocation(){
 	    if (ovPortal != null){
 	        ovPortal.moveTo(application.panelWidth-Config.OVERVIEW_WIDTH-1, application.panelHeight-Config.OVERVIEW_HEIGHT-1);
@@ -877,7 +878,7 @@ class Navigation {
         ovPortal.setVisible(!ovPortal.isVisible());
         vsm.repaint(application.mView);
     }
-    
+
 }
 
 class Messages {
@@ -892,40 +893,40 @@ class Messages {
     static final String ABOUT_DEPENDENCIES = "Based upon: ZVTM (http://zvtm.sf.net)";
 
     static final String H_4_HELP = "--help for command line options";
-    
+
     static final String LOAD_FILE = "Load file";
     static final String LOADING = "Loading ";
-    
+
     static final String PROCESSING = "Processing ";
-    
+
     static final String svgSpaceName = "SVG";
     static final String aboutSpaceName = "About layer";
     static final String mViewName = "SVG Viewer";
-    
+
     protected static void printCmdLineHelp(){
 		System.out.println("Usage:\n\tjava -jar target/zvtm-svg-"+VERSION+".jar <path_to_file> [options]");
         System.out.println("Options:\n\t-fs: fullscreen mode");
         System.out.println("\t-noaa: no antialiasing");
 		System.out.println("\t-opengl: use Java2D OpenGL rendering pipeline (Java 6+Linux/Windows), requires that -Dsun.java2d.opengl=true be set on cmd line");
     }
-    
+
 }
 
 class Config {
-    
+
     /* Fonts */
 	static final Font DEFAULT_FONT = new Font("Dialog", Font.PLAIN, 12);
     static final Font GLASSPANE_FONT = new Font("Arial", Font.PLAIN, 12);
     static final Font SAY_MSG_FONT = new Font("Arial", Font.PLAIN, 24);
     static final Font MONOSPACE_ABOUT_FONT = new Font("Courier", Font.PLAIN, 8);
-    
+
     /* Other colors */
     static final Color SAY_MSG_COLOR = Color.LIGHT_GRAY;
     static Color BACKGROUND_COLOR  = Color.WHITE;
     static final Color FADE_REGION_FILL = Color.BLACK;
     static final Color FADE_REGION_STROKE = Color.WHITE;
     static final Color HIGHLIGHT_COLOR = Color.RED;
-    
+
     /* Overview */
     static final int OVERVIEW_WIDTH = 200;
 	static final int OVERVIEW_HEIGHT = 200;
@@ -933,7 +934,7 @@ class Config {
 	static final float OBSERVED_REGION_ALPHA = 0.5f;
 	static final Color OV_BORDER_COLOR = Color.BLACK;
 	static final Color OV_INSIDE_BORDER_COLOR = Color.BLACK;
-    
+
     /* Durations/Animations */
     static final int ANIM_MOVE_LENGTH = 300;
     static final int SAY_DURATION = 500;
@@ -941,7 +942,7 @@ class Config {
     /* External resources */
     static final String INSITU_LOGO_PATH = "/images/insitu.png";
     static final String INRIA_LOGO_PATH = "/images/inria.png";
- 
+
  	static JMenuBar initMenu(final Viewer app){
 		final JMenuItem exitMI = new JMenuItem("Exit");
 		exitMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
@@ -980,5 +981,5 @@ class Config {
 		aboutMI.addActionListener(a0);
 		return jmb;
 	}
-	
+
 }
