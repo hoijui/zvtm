@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2007-2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2007-2015. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -32,6 +32,7 @@ import javax.swing.ImageIcon;
 import java.awt.geom.Point2D;
 
 import java.util.Vector;
+import java.util.HashMap;
 
 import java.io.File;
 
@@ -124,7 +125,7 @@ public class WorldExplorer implements Java2DPainter {
         gp.setVisible(true);
         VirtualSpace[]  sceneSpaces = {mSpace};
         Camera[] sceneCameras = {mCamera};
-        sm = new SceneManager(sceneSpaces, sceneCameras);
+        sm = new SceneManager(sceneSpaces, sceneCameras, new HashMap(1,1));
         if (xmlSceneFile != null){
             gp.setLabel("Loading "+xmlSceneFile.getName());
             sm.loadScene(parseXML(xmlSceneFile), xmlSceneFile.getParentFile(), true, gp);
@@ -172,6 +173,7 @@ public class WorldExplorer implements Java2DPainter {
         mCamera.addListener(eh);
         mView.setListener(eh, 0);
         mView.setListener(eh, 1);
+        mView.getCursor().getPicker().setListener(eh);
         mView.setBackgroundColor(BACKGROUND_COLOR);
         mView.getCursor().setColor(Color.WHITE);
         mView.getCursor().setHintColor(Color.WHITE);

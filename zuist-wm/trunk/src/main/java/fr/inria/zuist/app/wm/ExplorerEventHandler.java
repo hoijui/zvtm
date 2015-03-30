@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2007-2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2007-2015. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -31,6 +31,7 @@ import fr.inria.zvtm.event.CameraListener;
 import fr.inria.zvtm.engine.portals.Portal;
 import fr.inria.zvtm.engine.portals.OverviewPortal;
 import fr.inria.zvtm.event.PortalListener;
+import fr.inria.zvtm.event.PickerListener;
 
 import fr.inria.zuist.engine.Region;
 import fr.inria.zuist.engine.ObjectDescription;
@@ -38,7 +39,7 @@ import fr.inria.zuist.engine.TextDescription;
 
 import org.geonames.Toponym;
 
-class ExplorerEventHandler implements ViewListener, CameraListener, ComponentListener, PortalListener {
+class ExplorerEventHandler implements ViewListener, CameraListener, ComponentListener, PortalListener, PickerListener {
 
     static final float MAIN_SPEED_FACTOR = 50.0f;
 
