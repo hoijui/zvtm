@@ -1,7 +1,7 @@
 /*   FILE: ZgrvEvtHdlr.java
  *   DATE OF CREATION:   Thu Jan 09 15:18:48 2003
  *   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2013. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2015. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  *   $Id$

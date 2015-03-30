@@ -1,7 +1,7 @@
 /*   FILE: ZgrAppletEvtHdlr.java
  *   DATE OF CREATION:   Fri May 09 09:54:03 2003
  *   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2013. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2015. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  *$Id$
@@ -403,6 +403,7 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewListener {
         }
     }
 
+    @Override
     public void enterGlyph(Glyph g){
         grMngr.mainView.setStatusBarText(Messages.SPACE_STRING);
         if (g == grMngr.magWindow){
@@ -429,6 +430,7 @@ public class ZgrAppletEvtHdlr extends BaseEventHandler implements ViewListener {
         }
     }
 
+    @Override
     public void exitGlyph(Glyph g){
         if (g == grMngr.magWindow){
             inMagWindow = false;

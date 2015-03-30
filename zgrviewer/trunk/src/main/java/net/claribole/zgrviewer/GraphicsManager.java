@@ -1,6 +1,6 @@
 /*   FILE: GraphicsManager.java
  *   DATE OF CREATION:   Mon Nov 27 08:30:31 2006
- *   Copyright (c) INRIA, 2006-2013. All Rights Reserved
+ *   Copyright (c) INRIA, 2006-2015. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  *   $Id$
@@ -304,6 +304,7 @@ public class GraphicsManager implements ComponentListener, CameraListener, Java2
     mainView.setListener((ViewListener)eh, 0);
     mainView.setListener((ViewListener)eh, 1);
     mainView.setListener((ViewListener)eh, 2);
+    mainView.getCursor().getPicker().setListener(eh);
     mainView.setNotifyCursorMoved(true);
     mainCamera.addListener(this);
 

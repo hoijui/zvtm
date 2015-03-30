@@ -1,6 +1,6 @@
 /*   FILE: RadarEvtHdlr.java
  *   DATE OF CREATION:  Wed Nov 24 09:41:02 2004
- *   Copyright (c) INRIA, 2004-2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2015. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -100,10 +100,6 @@ public class RadarEvtHdlr implements ViewListener {
         grMngr.cameraMoved(null, null, 0);
     }
     }
-
-    public void enterGlyph(Glyph g){}
-
-    public void exitGlyph(Glyph g){}
 
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 

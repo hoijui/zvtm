@@ -1,6 +1,6 @@
 /*   FILE: BaseEventHandler.java
  *   DATE OF CREATION:   Mon Nov 27 08:30:31 2006
- *   Copyright (c) INRIA, 2006-2011. All Rights Reserved
+ *   Copyright (c) INRIA, 2006-2015. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  *   $Id$
@@ -18,6 +18,7 @@ import fr.inria.zvtm.engine.VCursor;
 import fr.inria.zvtm.engine.portals.Portal;
 import fr.inria.zvtm.event.PortalListener;
 import fr.inria.zvtm.event.ViewListener;
+import fr.inria.zvtm.event.PickerListener;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.ClosedShape;
 import fr.inria.zvtm.glyphs.VText;
@@ -25,7 +26,7 @@ import fr.inria.zvtm.glyphs.VSegment;
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
 
-public abstract class BaseEventHandler implements PortalListener {
+public abstract class BaseEventHandler implements PortalListener, PickerListener {
 
     protected static final float WHEEL_ZOOMOUT_FACTOR = 21.0f;
     protected static final float WHEEL_ZOOMIN_FACTOR = 22.0f;
@@ -78,6 +79,10 @@ public abstract class BaseEventHandler implements PortalListener {
     boolean editingSpline = false;
     boolean movingEdgeLabelOrBox = false;
     boolean movingNode = false;
+
+    public void enterGlyph(Glyph g){}
+
+    public void exitGlyph(Glyph g){}
 
     /**cursor enters portal*/
     public void enterPortal(Portal p){
