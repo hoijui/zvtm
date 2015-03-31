@@ -29,7 +29,7 @@ import net.sf.ehcache.constructs.blocking.SelfPopulatingCache;
  */
 
 public class PDFResourceHandler implements ResourceHandler {
-    
+
 	/** Resource of type PDF document. */
     public static final String RESOURCE_TYPE_PDF = "pdf";
     /** Custom parameter names for this type of resource */
@@ -39,28 +39,28 @@ public class PDFResourceHandler implements ResourceHandler {
     public static final String _sc = "sc=";
     /** Detail factor */
     public static final String _df = "df=";
-    
+
     /** Memory Cache*/
     static CacheManager cacheManager = new CacheManager();
     static SelfPopulatingCache documentCache = new SelfPopulatingCache(cacheManager.getCache("zuistPDFCache"), new CachedDocumentFactory());
-    
+
     /** Reset memory cache*/
     public static void resetCache(){
         cacheManager.clearAll();
     }
-    
+
     /** Get a PDF Document (IcePDF Document instance) given its URL.
      * The document gets stored in a cache the first time it is fetched, for faster access later.
      */
     public static Document getDocument(URL pdfURL){
         return (Document)documentCache.get(pdfURL).getObjectValue();
     }
-    
+
     /* PDF Resource Handler */
 
     public PDFResourceHandler(){}
-    
-    public PDFPageDescription createResourceDescription(double x, double y, String id, int zindex, Region region, 
+
+    public PDFPageDescription createResourceDescription(double x, double y, String id, int zindex, Region region,
                                                         URL resourceURL, boolean sensitivity, Color stroke, String params){
         Object im = RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
         int page = 1;
@@ -84,18 +84,18 @@ public class PDFResourceHandler implements ResourceHandler {
                 else {
                     System.err.println("Uknown type of resource parameter: "+paramTokens[i]);
                 }
-            }            
+            }
         }
         PDFPageDescription pdfd = new PDFPageDescription(id, x, y, zindex, detail, scale, resourceURL, page, stroke, im, region);
         pdfd.setSensitive(sensitivity);
         region.addObject(pdfd);
         return pdfd;
     }
-    
+
 }
 
 class CachedDocumentFactory implements CacheEntryFactory {
-    
+
     public Object createEntry(Object key){
         URL pdfURL = (URL)key;
         Document document = new Document();
@@ -110,5 +110,5 @@ class CachedDocumentFactory implements CacheEntryFactory {
         }
         return document;
     }
-    
+
 }
