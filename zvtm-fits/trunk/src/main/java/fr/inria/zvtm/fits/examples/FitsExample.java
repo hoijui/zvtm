@@ -200,7 +200,7 @@ public class FitsExample{
         mView.setListener(eh, LAYER_FITS);
         mView.setListener(eh, LAYER_DATA);
         mView.setListener(menu, LAYER_MENU);
-
+        mView.getCursor().getPicker().setListener(menu);
         mView.setBackgroundColor(BACKGROUND_COLOR);
 
         //mView.setActiveLayer(2);

@@ -10,6 +10,7 @@ import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.event.ViewListener;
+import fr.inria.zvtm.event.PickerListener;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
@@ -160,7 +161,7 @@ public class JSkyFitsExample{
         mView.setListener(eh, LAYER_FITS);
         mView.setListener(eh, LAYER_DATA);
         mView.setListener(menu, LAYER_MENU);
-
+        mView.getCursor().getPicker().setListener(menu);
 
 
     }

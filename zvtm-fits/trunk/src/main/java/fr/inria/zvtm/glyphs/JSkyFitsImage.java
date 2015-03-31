@@ -358,34 +358,27 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
      * {@inheritDoc}
      */
     @Override
-        public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
-            //XXX implement
-            return NO_CURSOR_EVENT;
-        }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-        public void resetMouseIn(){
-            //XXX ?
-        }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-        public void resetMouseIn(int i){
-            //XXX ?
-        }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
         public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
             //XXX implement
-            return true;
+            return false;
+        }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+        public boolean coordInsideV(double cvx, double cvy, int camIndex){
+            //XXX implement
+            return false;
+        }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+        public boolean coordInsideP(int jpx, int jpy, int camIndex){
+            //XXX implement
+            return false;
         }
 
     @Override

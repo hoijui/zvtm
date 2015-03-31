@@ -21,6 +21,7 @@ import fr.inria.zvtm.glyphs.PRectangle;
 
 //event
 import fr.inria.zvtm.event.ViewListener;
+import fr.inria.zvtm.event.PickerListener;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.Camera;
@@ -56,7 +57,7 @@ import fr.inria.zvtm.glyphs.JSkyFitsImage;
 
 
 
-public class JSkyFitsMenu implements ViewListener{
+public class JSkyFitsMenu implements ViewListener, PickerListener {
 
 
     public static final int WIDTH_MENU = 200;

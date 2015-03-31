@@ -108,7 +108,7 @@ class PanZoomEventHandler implements ViewListener {
         }
 
         //System.out.println("panzoomEH release1");
-        
+
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
@@ -122,7 +122,7 @@ class PanZoomEventHandler implements ViewListener {
         Point2D.Double wcs = ((FitsExample)app).hi.pix2wcs( x, y );
         System.out.println("pix2wcs("+ x+", "+y+" )");
         System.out.println("wcs: (" + wcs.getX() + ", " + wcs.getY() + ")");
-            
+
     }
 
     public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
@@ -168,7 +168,7 @@ class PanZoomEventHandler implements ViewListener {
 
         if(app instanceof FitsExample){
             if((jpx < ((FitsExample)app).menu.WIDTH_MENU && jpy > ((FitsExample)app).menu.BORDER_BOTTON_FILTER && jpy < ((FitsExample)app).menu.BORDER_TOP_FILTER) ||
-                        (jpy > ((FitsExample)app).menu.BORDER_TOP_HISTOGRAM && jpy < ((FitsExample)app).menu.BORDER_BOTTON_HISTOGRAM && jpx > ((FitsExample)app).menu.BORDER_LEFT_HISTOGRAM && 
+                        (jpy > ((FitsExample)app).menu.BORDER_TOP_HISTOGRAM && jpy < ((FitsExample)app).menu.BORDER_BOTTON_HISTOGRAM && jpx > ((FitsExample)app).menu.BORDER_LEFT_HISTOGRAM &&
                         jpx < ((FitsExample)app).menu.BORDER_RIGHT_HISTOGRAM )){
                 v.parent.setActiveLayer(((FitsExample)app).LAYER_MENU);
                 v.parent.setCursorIcon(Cursor.DEFAULT_CURSOR);
@@ -194,16 +194,16 @@ class PanZoomEventHandler implements ViewListener {
         else if(app instanceof JSkyFitsExample){
             //System.out.println(jpx + " < " + ((JSkyFitsExample)app).menu.WIDTH_MENU + " " + ((JSkyFitsExample)app).menu.BORDER_BOTTON_FILTER + " < " + jpy + " < " + ((JSkyFitsExample)app).menu.BORDER_TOP_FILTER);
             if((jpx < ((JSkyFitsExample)app).menu.WIDTH_MENU && jpy < ((JSkyFitsExample)app).menu.BORDER_BOTTON_FILTER  && jpy > ((JSkyFitsExample)app).menu.BORDER_TOP_FILTER) ||
-                        (jpy > ((JSkyFitsExample)app).menu.BORDER_TOP_HISTOGRAM && jpy < ((JSkyFitsExample)app).menu.BORDER_BOTTON_HISTOGRAM && jpx > ((JSkyFitsExample)app).menu.BORDER_LEFT_HISTOGRAM && 
+                        (jpy > ((JSkyFitsExample)app).menu.BORDER_TOP_HISTOGRAM && jpy < ((JSkyFitsExample)app).menu.BORDER_BOTTON_HISTOGRAM && jpx > ((JSkyFitsExample)app).menu.BORDER_LEFT_HISTOGRAM &&
                         jpx < ((JSkyFitsExample)app).menu.BORDER_RIGHT_HISTOGRAM )){
                 v.parent.setActiveLayer(((JSkyFitsExample)app).LAYER_MENU);
                 v.parent.setCursorIcon(Cursor.DEFAULT_CURSOR);
             } else {
                 v.parent.setActiveLayer(((JSkyFitsExample)app).LAYER_FITS);
-                v.parent.setCursorIcon(Cursor.CUSTOM_CURSOR);     
+                v.parent.setCursorIcon(Cursor.CUSTOM_CURSOR);
             }
         }
-        
+
 
     }
 
@@ -341,12 +341,6 @@ class PanZoomEventHandler implements ViewListener {
         */
     }
 
-    public void enterGlyph(Glyph g){
-    }
-
-    public void exitGlyph(Glyph g){
-    }
-
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){
         //System.out.println("Ktype:" + c);
         if(app instanceof FitsExample){
@@ -364,7 +358,7 @@ class PanZoomEventHandler implements ViewListener {
                 Grid grid = Grid.makeGrid( ((FitsExample)app).hi, 100 );
                 ((FitsExample)app).hi.setGrid(grid);
                 ((FitsExample)app).mSpace.addGlyph(grid);
-                
+
             } else if(c == 'r'){
                 ((FitsExample)app).hi.orientTo(angle);
                 angle+=Math.PI/5;
@@ -378,7 +372,7 @@ class PanZoomEventHandler implements ViewListener {
                 //((JSkyFitsExample)app).img.rescale(((JSkyFitsExample)app).scaleBounds[0], ((JSkyFitsExample)app).scaleBounds[1], 1);
             }
         }
-        
+
     }
 
     public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
