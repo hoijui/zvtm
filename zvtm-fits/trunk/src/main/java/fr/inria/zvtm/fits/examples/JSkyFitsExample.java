@@ -137,13 +137,13 @@ public class JSkyFitsExample{
     Camera mCamera, bCamera, mnCamera;
 
     JSkyFitsImage img;
-    double[] scaleBounds;
+    // double[] scaleBounds;
     //private boolean dragLeft = false, dragRight = false;
 
     View mView;
-    private JSFEEventHandler eh;
+    JSFEEventHandler eh;
 
-    public JSkyFitsMenu menu;
+    JSkyFitsMenu menu;
 
     static final String mSpaceName = "FITS Layer";
     static final String bSpaceName = "Data Layer";
@@ -154,41 +154,15 @@ public class JSkyFitsExample{
     static final int LAYER_MENU = 2;
 
 
-    JSkyFitsExample(FitsOptions options) throws IOException {
-
+    JSkyFitsExample(FitsOptions options){
         initGUI(options);
-
-        if(options.url != null){
-            img = new JSkyFitsImage(new URL(options.url) );
-
-        } else if(options.file != null){
-            String path = new File ( options.file ).getAbsolutePath ();
-            if ( File.separatorChar != '/' )
-            {
-                path = path.replace ( File.separatorChar, '/' );
-            }
-            if ( !path.startsWith ( "/" ) )
-            {
-                path = "/" + path;
-            }
-            String retVal =  "file:" + path;
-            img = new JSkyFitsImage(new URL(retVal));
-
-        } else {
-            System.err.println("usage: JSkyFitsExample -file image_File or -url image_URL");
-            System.exit(0);
-            return;
+        try {
+            loadFITSImage(options);
         }
-
-        /* DEFAULT */
-        img.setColorLookupTable("Standard");
-        img.setScaleAlgorithm(JSkyFitsImage.ScaleAlgorithm.LINEAR);
-
-        mSpace.addGlyph(img);
-
-        menu.drawHistogram();
-
-
+        catch (IOException ex){
+            System.err.println("Error while loading FITS image");
+            ex.printStackTrace();
+        }
     }
 
     void initGUI(FitsOptions options){
@@ -204,55 +178,56 @@ public class JSkyFitsExample{
         cameras.add(mCamera);
         cameras.add(bCamera);
         cameras.add(mnCamera);
-
-
         mView = vsm.addFrameView(cameras, APP_TITLE, View.STD_VIEW, VIEW_W, VIEW_H, false, false, !options.fullscreen, null);
-        // fullscreen or not
         if (options.fullscreen && GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().isFullScreenSupported()){
             GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow((JFrame)mView.getFrame());
         }
         else {
             mView.setVisible(true);
         }
-
-
         mView.setBackgroundColor(Color.GRAY);
-
         menu = new JSkyFitsMenu(this);
-
         eh = new JSFEEventHandler(this);
         mView.setListener(eh, LAYER_FITS);
         mView.setListener(eh, LAYER_DATA);
         mView.setListener(menu, LAYER_MENU);
         mView.getCursor().getPicker().setListener(menu);
-
-
     }
 
     void windowLayout(){
-
-        VIEW_X = 80;
-        SCREEN_WIDTH -= 80;
-
-        /*
-        if (Utils.osIsWindows()){
-            VIEW_X = VIEW_Y = 0;
-        }
-        else if (Utils.osIsMacOS()){
-            VIEW_X = 80;
-            SCREEN_WIDTH -= 80;
-        }
-        */
         VIEW_W = (SCREEN_WIDTH <= VIEW_MAX_W) ? SCREEN_WIDTH : VIEW_MAX_W;
         VIEW_H = (SCREEN_HEIGHT <= VIEW_MAX_H) ? SCREEN_HEIGHT : VIEW_MAX_H;
     }
 
+    void loadFITSImage(FitsOptions options) throws IOException {
+        if(options.url != null){
+            img = new JSkyFitsImage(new URL(options.url) );
+        }
+        else if(options.file != null){
+            String path = new File ( options.file ).getAbsolutePath ();
+            if ( File.separatorChar != '/' )
+            {
+                path = path.replace ( File.separatorChar, '/' );
+            }
+            if ( !path.startsWith ( "/" ) )
+            {
+                path = "/" + path;
+            }
+            String retVal =  "file:" + path;
+            img = new JSkyFitsImage(new URL(retVal));
+
+        }
+        if (img != null){
+            img.setColorLookupTable("Standard");
+            img.setScaleAlgorithm(JSkyFitsImage.ScaleAlgorithm.LINEAR);
+            mSpace.addGlyph(img);
+            menu.drawHistogram();
+        }
+    }
 
     public static void main(String[] args) throws IOException{
-
         FitsOptions options = new FitsOptions();
         CmdLineParser parser = new CmdLineParser(options);
-
         try {
             parser.parseArgument(args);
         } catch(CmdLineException ex){
@@ -260,7 +235,6 @@ public class JSkyFitsExample{
             parser.printUsage(System.err);
             return;
         }
-
         new JSkyFitsExample(options);
     }
 
@@ -275,7 +249,6 @@ class JSFEEventHandler implements ViewListener {
     static final float WHEEL_ZOOMIN_FACTOR = 21.0f;
     static final float WHEEL_ZOOMOUT_FACTOR = 22.0f;
 
-    //FitsExample app;
     JSkyFitsExample app;
 
     //private double[] scaleBounds;
@@ -286,8 +259,6 @@ class JSFEEventHandler implements ViewListener {
     private int lastJPY;
 
     boolean panning = false;
-
-    double angle = 0;
 
     JSFEEventHandler(JSkyFitsExample app){
         this.app = app;
@@ -337,7 +308,6 @@ class JSFEEventHandler implements ViewListener {
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
-
         /*
         app.setCursorCoords(v.getVCursor().getVSXCoordinate(), v.getVCursor().getVSYCoordinate());
         VirtualSpaceManager.INSTANCE.repaint();
@@ -357,18 +327,14 @@ class JSFEEventHandler implements ViewListener {
             v.parent.setActiveLayer(app.LAYER_FITS);
             v.parent.setCursorIcon(Cursor.CUSTOM_CURSOR);
         }
-
     }
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
         if (panning){
             Camera c = app.mCamera;
-            double a = (c.focal+Math.abs(c.altitude)) / c.focal;
-            synchronized(c){
-                c.move(a*(lastJPX-jpx), a*(jpy-lastJPY));
-                lastJPX = jpx;
-                lastJPY = jpy;
-            }
+            pan(c, lastJPX-jpx, jpy-lastJPY);
+            lastJPX = jpx;
+            lastJPY = jpy;
         }
         /*
 
@@ -381,70 +347,14 @@ class JSFEEventHandler implements ViewListener {
             }
             *
         }
-
-        if (buttonNumber == 3 || ((mod == META_MOD || mod == META_SHIFT_MOD) && buttonNumber == 1)){
-            Camera c = app.vsm.getActiveCamera();
-            double a = (c.focal+Math.abs(c.altitude))/c.focal;
-            if (mod == META_SHIFT_MOD) {
-                v.cams[0].setXspeed(0);
-                v.cams[0].setYspeed(0);
-                v.cams[0].setZspeed((c.altitude>0) ? (lastJPY-jpy)*(a/4.0) : (lastJPY-jpy)/(a*4));
-
-            }
-            else {
-                v.cams[0].setXspeed((c.altitude>0) ? (jpx-lastJPX)*(a/4.0) : (jpx-lastJPX)/(a*4));
-                v.cams[0].setYspeed((c.altitude>0) ? (lastJPY-jpy)*(a/4.0) : (lastJPY-jpy)/(a*4));
-                v.cams[0].setZspeed(0);
-            }
-        }
         */
     }
 
     public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
         Camera c = app.mCamera;
-        double a = (c.focal+Math.abs(c.altitude)) / c.focal;
         double mvx = v.getVCursor().getVSXCoordinate();
         double mvy = v.getVCursor().getVSYCoordinate();
-        if (wheelDirection  == WHEEL_UP){
-            // zooming out
-            c.move(-((mvx - c.vx) * WHEEL_ZOOMOUT_FACTOR / c.focal),
-                   -((mvy - c.vy) * WHEEL_ZOOMOUT_FACTOR / c.focal));
-            c.altitudeOffset(a*WHEEL_ZOOMOUT_FACTOR);
-        }
-        else {
-            //wheelDirection == WHEEL_DOWN, zooming in
-            if (c.getAltitude()-a*WHEEL_ZOOMIN_FACTOR >= c.getZoomFloor()){
-                // this test to prevent translation when camera is not actually zoming in
-                c.move((mvx - c.vx) * WHEEL_ZOOMIN_FACTOR / c.focal,
-                       ((mvy - c.vy) * WHEEL_ZOOMIN_FACTOR / c.focal));
-            }
-            c.altitudeOffset(-a*WHEEL_ZOOMIN_FACTOR);
-        }
-        /*
-        Camera c = (app instanceof FitsExample) ? ((FitsExample)app).mCamera : app.mCamera;
-        double a = (c.focal+Math.abs(c.altitude)) / c.focal;
-        double mvx = v.getVCursor().getVSXCoordinate();
-        double mvy = v.getVCursor().getVSYCoordinate();
-        if (wheelDirection  == WHEEL_UP){
-            // zooming out
-            c.move(-((mvx - c.vx) * WHEEL_ZOOMOUT_FACTOR / c.focal),
-                                     -((mvy - c.vy) * WHEEL_ZOOMOUT_FACTOR / c.focal));
-            c.altitudeOffset(a*WHEEL_ZOOMOUT_FACTOR);
-            if(app instanceof FitsExample) ((FitsExample)app).vsm.repaint();
-            else app.vsm.repaint();
-        }
-        else {
-            //wheelDirection == WHEEL_DOWN, zooming in
-            if (c.getAltitude()-a*WHEEL_ZOOMIN_FACTOR >= c.getZoomFloor()){
-                // this test to prevent translation when camera is not actually zoming in
-                c.move((mvx - c.vx) * WHEEL_ZOOMIN_FACTOR / c.focal,
-                                         ((mvy - c.vy) * WHEEL_ZOOMIN_FACTOR / c.focal));
-            }
-            c.altitudeOffset(-a*WHEEL_ZOOMIN_FACTOR);
-            if(app instanceof FitsExample) ((FitsExample)app).vsm.repaint();
-            else app.vsm.repaint();
-        }
-        */
+        zoom(c, mvx, mvy, wheelDirection);
     }
 
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){
@@ -470,6 +380,32 @@ class JSFEEventHandler implements ViewListener {
     public void viewDeiconified(View v){}
 
     public void viewClosing(View v){System.exit(0);}
+
+    void pan(Camera c, int dx, int dy){
+        synchronized(c){
+            double a = (c.focal+Math.abs(c.altitude)) / c.focal;
+            c.move(a*dx, a*dy);
+        }
+    }
+
+    void zoom(Camera c, double vx, double vy, short direction){
+        double a = (c.focal+Math.abs(c.altitude)) / c.focal;
+        if (direction  == WHEEL_UP){
+            // zooming out
+            c.move(-((vx - c.vx) * WHEEL_ZOOMOUT_FACTOR / c.focal),
+                   -((vy - c.vy) * WHEEL_ZOOMOUT_FACTOR / c.focal));
+            c.altitudeOffset(a*WHEEL_ZOOMOUT_FACTOR);
+        }
+        else {
+            // direction == WHEEL_DOWN, zooming in
+            if (c.getAltitude()-a*WHEEL_ZOOMIN_FACTOR >= c.getZoomFloor()){
+                // this test to prevent translation when camera is not actually zoming in
+                c.move((vx - c.vx) * WHEEL_ZOOMIN_FACTOR / c.focal,
+                       ((vy - c.vy) * WHEEL_ZOOMIN_FACTOR / c.focal));
+            }
+            c.altitudeOffset(-a*WHEEL_ZOOMIN_FACTOR);
+        }
+    }
 
 }
 
@@ -562,6 +498,8 @@ class JSkyFitsMenu implements ViewListener, PickerListener {
     boolean press3_scroll = false;
     boolean press1 = false;
 
+    Glyph lastGlyph = null;
+
     JSkyFitsMenu(JSkyFitsExample app){
         this.app = app;
         mnSpace = app.mnSpace;
@@ -615,8 +553,6 @@ class JSkyFitsMenu implements ViewListener, PickerListener {
         }
         BORDER_BOTTON_FILTER = COLOR_GRADIENT.length * ( HEIGHT_BTN + BORDER*2 ) + SCALE_METHOD.length * ( HEIGHT_BTN + BORDER*2 ) + HEIGHT_BTN + BORDER;
     }
-
-
 
     public void drawHistogram(){
 
@@ -825,8 +761,6 @@ class JSkyFitsMenu implements ViewListener, PickerListener {
 
     }
 
-    Glyph lastGlyph = null;
-
     public void enterGlyph(Glyph g){
         //System.out.println("enter: " + g.getType());
         if(g.getType().equals(T_FILTER)){
@@ -870,11 +804,9 @@ class JSkyFitsMenu implements ViewListener, PickerListener {
         }
     }
 
-    public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){
-    }
+    public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 
-    public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
-    }
+    public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 
     public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 
@@ -888,10 +820,10 @@ class JSkyFitsMenu implements ViewListener, PickerListener {
 
     public void viewClosing(View v){System.exit(0);}
 
-
 }
 
 class JSkyFitsHistogram extends Composite {
+
     public static final double DEFAULT_BIN_WIDTH = 6;
     public static final Color DEFAULT_FILL_COLOR = new Color(0,0,255,127);
     public static final Color SELECTED_FILL_COLOR = new Color(0,0,255,210);
@@ -1012,15 +944,9 @@ class JSkyFitsHistogram extends Composite {
             }
         }
 
-
-
-
-
         /*
         for(int i=0; i<HISTOGRAM_SIZE; ++i){
             //data[i/(hist.getCounts().length / data.length)] += hist.getCounts()[i];
-
-
         }
         int min = Integer.MAX_VALUE;
         int max = Integer.MIN_VALUE;
@@ -1044,10 +970,8 @@ class JSkyFitsHistogram extends Composite {
         return width;
     }
 
-
     public static JSkyFitsHistogram fromFitsImage(JSkyFitsImage image){
         return fromFitsImage(image, DEFAULT_FILL_COLOR);
     }
-
 
 }
