@@ -9,6 +9,6 @@ JARS="target/jsky-3.0.jar"
 JARS=$JARS":target/args4j-2.0.29.jar"
 JARS=$JARS":target/hcompress-0.52.jar"
 JARS=$JARS":target/zvtm-core-0.11.2.jar"
-JARS=$JARS":target/zvtm-fits-0.1.4-SNAPSHOT.jar"
+JARS=$JARS":target/zvtm-fits-0.1.4.jar"
 
 java -Xmx2048M -Xms512M -Dcom.sun.media.jai.disableMediaLib=true -cp $JARS fr.inria.zvtm.fits.examples.JSkyFitsExample "$@"
