@@ -6,6 +6,37 @@
 
 package fr.inria.zvtm.fits.examples;
 
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.GradientPaint;
+import java.awt.LinearGradientPaint;
+import java.awt.MultipleGradientPaint;
+import java.awt.GraphicsEnvironment;
+import javax.swing.JFrame;
+import java.awt.Cursor;
+import java.awt.BasicStroke;
+import java.awt.Stroke;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
+
+import java.awt.image.ImageFilter;
+import java.awt.image.RGBImageFilter;
+import java.awt.image.DataBuffer;
+
+import java.io.IOException;
+import java.io.File;
+
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import java.util.Vector;
+
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.engine.View;
@@ -15,122 +46,74 @@ import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
+import fr.inria.zvtm.glyphs.VText;
+import fr.inria.zvtm.glyphs.VRectangle;
+import fr.inria.zvtm.glyphs.PRectangle;
+import fr.inria.zvtm.glyphs.Composite;
 import fr.inria.zvtm.glyphs.JSkyFitsImage;
+// import fr.inria.zvtm.glyphs.FitsImage;
+
 import fr.inria.zvtm.fits.RangeSelection;
 import fr.inria.zvtm.fits.Utils;
+import fr.inria.zvtm.fits.filters.Aips0Filter;
+import fr.inria.zvtm.fits.filters.BackgrFilter;
+import fr.inria.zvtm.fits.filters.BlueFilter;
+import fr.inria.zvtm.fits.filters.BlulutFilter;
+import fr.inria.zvtm.fits.filters.ColorFilter;
+import fr.inria.zvtm.fits.filters.GreenFilter;
+import fr.inria.zvtm.fits.filters.HeatFilter;
+import fr.inria.zvtm.fits.filters.Idl11Filter;
+import fr.inria.zvtm.fits.filters.Idl12Filter;
+import fr.inria.zvtm.fits.filters.Idl14Filter;
+import fr.inria.zvtm.fits.filters.Idl15Filter;
+import fr.inria.zvtm.fits.filters.Idl2Filter;
+import fr.inria.zvtm.fits.filters.Idl4Filter;
+import fr.inria.zvtm.fits.filters.Idl5Filter;
+import fr.inria.zvtm.fits.filters.Idl6Filter;
+import fr.inria.zvtm.fits.filters.IsophotFilter;
+import fr.inria.zvtm.fits.filters.LightFilter;
+import fr.inria.zvtm.fits.filters.ManycolFilter;
+import fr.inria.zvtm.fits.filters.PastelFilter;
+import fr.inria.zvtm.fits.filters.RainbowFilter;
+import fr.inria.zvtm.fits.filters.Rainbow1Filter;
+import fr.inria.zvtm.fits.filters.Rainbow2Filter;
+import fr.inria.zvtm.fits.filters.Rainbow3Filter;
+import fr.inria.zvtm.fits.filters.Rainbow4Filter;
+import fr.inria.zvtm.fits.filters.RampFilter;
+import fr.inria.zvtm.fits.filters.RandomFilter;
+import fr.inria.zvtm.fits.filters.Random1Filter;
+import fr.inria.zvtm.fits.filters.Random2Filter;
+import fr.inria.zvtm.fits.filters.Random3Filter;
+import fr.inria.zvtm.fits.filters.Random4Filter;
+// import fr.inria.zvtm.fits.filters.Random5Filter;
+// import fr.inria.zvtm.fits.filters.Random6Filter;
+import fr.inria.zvtm.fits.filters.RealFilter;
+import fr.inria.zvtm.fits.filters.RedFilter;
+import fr.inria.zvtm.fits.filters.SmoothFilter;
+// import fr.inria.zvtm.fits.filters.Smooth1Filter;
+// import fr.inria.zvtm.fits.filters.Smooth2Filter;
+// import fr.inria.zvtm.fits.filters.Smooth3Filter;
+import fr.inria.zvtm.fits.filters.StaircaseFilter;
+import fr.inria.zvtm.fits.filters.Stairs8Filter;
+import fr.inria.zvtm.fits.filters.Stairs9Filter;
+import fr.inria.zvtm.fits.filters.StandardFilter;
+import fr.inria.zvtm.fits.filters.ColorGradient;
 
-import fr.inria.zvtm.glyphs.VRectangle;
+import jsky.image.ImageLookup;
+import jsky.image.ImageProcessor;
+import jsky.image.BasicImageReadableProcessor;
+import jsky.image.ImageChangeEvent;
+import jsky.image.ImageProcessor;
 
-import fr.inria.zvtm.glyphs.PRectangle;
-
-import java.awt.GradientPaint;
-import java.awt.LinearGradientPaint;
-import java.awt.MultipleGradientPaint;
-
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.geom.Point2D;
-
-import java.io.IOException;
-import java.util.Vector;
-import java.io.File;
-
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
-
-import java.net.MalformedURLException;
-import java.net.URL;
+import javax.media.jai.Histogram;
+//import javax.media.jai.ROI;
+//import javax.media.jai.ROIShape;
 
 // Options
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import java.awt.Toolkit;
 
-import java.awt.GraphicsEnvironment;
-import javax.swing.JFrame;
-import java.awt.Cursor;
-
-
-
-
-
-
-////////////////////////////
-import java.awt.MultipleGradientPaint;
-import java.awt.Color;
-
-//import fr.inria.zvtm.fits.filters.HeatFilter;
-//import fr.inria.zvtm.fits.filters.NopFilter;
-import fr.inria.zvtm.fits.filters.*;
-import fr.inria.zvtm.fits.Utils;
-
-import fr.inria.zvtm.engine.VirtualSpace;
-import fr.inria.zvtm.glyphs.PRectangle;
-
-
-//event
-import fr.inria.zvtm.event.ViewListener;
-import fr.inria.zvtm.event.PickerListener;
-import fr.inria.zvtm.engine.ViewPanel;
-import fr.inria.zvtm.engine.View;
-import fr.inria.zvtm.engine.Camera;
-import fr.inria.zvtm.glyphs.Glyph;
-import fr.inria.zvtm.glyphs.FitsImage;
-import fr.inria.zvtm.glyphs.VText;
-import fr.inria.zvtm.glyphs.VRectangle;
-
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Cursor;
-import java.awt.image.ImageFilter;
-import java.awt.image.RGBImageFilter;
-import java.awt.geom.Point2D;
-
-import java.awt.BasicStroke;
-import java.awt.Stroke;
-
-//import edu.jhu.pha.sdss.fits.FITSImage;
-
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
-
-import java.util.Vector;
-
-import jsky.image.ImageLookup;
-import jsky.image.ImageProcessor;
-
-import fr.inria.zvtm.glyphs.JSkyFitsImage;
-
-
-
-
-
-
-
-
-
-
-import java.awt.Color;
-import java.awt.image.DataBuffer;
-import java.awt.geom.Rectangle2D;
-
-import fr.inria.zvtm.glyphs.Composite;
-import fr.inria.zvtm.glyphs.Glyph;
-import fr.inria.zvtm.glyphs.JSkyFitsImage;
-import fr.inria.zvtm.glyphs.VRectangle;
-
-import fr.inria.zvtm.fits.examples.JSkyFitsMenu;
-
-import javax.media.jai.Histogram;
-//import javax.media.jai.ROI;
-//import javax.media.jai.ROIShape;
-
-import jsky.image.BasicImageReadableProcessor;
-import jsky.image.ImageChangeEvent;
-import jsky.image.ImageProcessor;
 
 /**
  * Sample FITS application.
@@ -627,7 +610,7 @@ class JSkyFitsMenu implements ViewListener, PickerListener {
 
     public static final float WHEEL_FACTOR = 15.0f;
 
-    public static final ColorGradient[] COLOR_GRADIANT = {new Aips0Filter(), new BackgrFilter(),
+    public static final ColorGradient[] COLOR_GRADIENT = {new Aips0Filter(), new BackgrFilter(),
         new BlueFilter(), new BlulutFilter(), new ColorFilter(), new GreenFilter(),
         new HeatFilter(), new Idl11Filter(), new Idl12Filter(),new Idl14Filter(),new Idl15Filter(),
         new Idl2Filter(),new Idl4Filter(), new Idl5Filter(), new Idl6Filter(), new IsophotFilter(),new LightFilter(),
@@ -696,8 +679,8 @@ class JSkyFitsMenu implements ViewListener, PickerListener {
 
         int py = app.VIEW_H/2 - 2*HEIGHT_BTN - BORDER;
 
-        for(int i = 0; i < COLOR_GRADIANT.length; i++){
-            MultipleGradientPaint grad = Utils.makeGradient((RGBImageFilter)COLOR_GRADIANT[i]);
+        for(int i = 0; i < COLOR_GRADIENT.length; i++){
+            MultipleGradientPaint grad = Utils.makeGradient((RGBImageFilter)COLOR_GRADIENT[i]);
             PRectangle filter = new PRectangle(-app.VIEW_W/2 + WIDTH_MENU/2, py, Z_BTN, WIDTH_MENU - BORDER, HEIGHT_BTN, grad, BORDER_COLOR_BTN);
             filter.setType(T_FILTER);
             filter.setOwner(COLOR_NAME[i]);
@@ -735,7 +718,7 @@ class JSkyFitsMenu implements ViewListener, PickerListener {
             //mnSpace.addGlyph(ln);
             py -= (HEIGHT_BTN + BORDER);
         }
-        BORDER_BOTTON_FILTER = COLOR_GRADIANT.length * ( HEIGHT_BTN + BORDER*2 ) + SCALE_METHOD.length * ( HEIGHT_BTN + BORDER*2 ) + HEIGHT_BTN + BORDER;
+        BORDER_BOTTON_FILTER = COLOR_GRADIENT.length * ( HEIGHT_BTN + BORDER*2 ) + SCALE_METHOD.length * ( HEIGHT_BTN + BORDER*2 ) + HEIGHT_BTN + BORDER;
     }
 
 

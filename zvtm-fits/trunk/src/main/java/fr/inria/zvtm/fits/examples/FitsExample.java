@@ -7,131 +7,78 @@
 package fr.inria.zvtm.fits.examples;
 
 import java.awt.Toolkit;
+import java.awt.GradientPaint;
+import java.awt.Cursor;
+import java.awt.BasicStroke;
+import java.awt.Stroke;
+import java.awt.LinearGradientPaint;
+import java.awt.MultipleGradientPaint;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.geom.Point2D;
+import java.awt.GraphicsEnvironment;
+import java.awt.GraphicsDevice;
+import javax.swing.JFrame;
+
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
+
+import java.awt.image.RGBImageFilter;
+import java.awt.image.ImageFilter;
+
+import java.io.IOException;
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.Vector;
 
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.event.ViewListener;
+import fr.inria.zvtm.event.PickerListener;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.FitsImage;
-import fr.inria.zvtm.fits.filters.HeatFilter;
-import fr.inria.zvtm.fits.filters.NopFilter;
-import fr.inria.zvtm.fits.filters.RainbowFilter;
+import fr.inria.zvtm.glyphs.PRectangle;
+import fr.inria.zvtm.glyphs.VText;
+import fr.inria.zvtm.glyphs.VRectangle;
+import fr.inria.zvtm.glyphs.Composite;
+
+import fr.inria.zvtm.fits.Utils;
 import fr.inria.zvtm.fits.RangeSelection;
 import fr.inria.zvtm.fits.Utils;
 import fr.inria.zvtm.fits.ZScale;
-
-import java.awt.image.ImageFilter;
+import fr.inria.zvtm.fits.Grid;
+import fr.inria.zvtm.fits.filters.NopFilter;
+import fr.inria.zvtm.fits.filters.HeatFilter;
+import fr.inria.zvtm.fits.filters.RainbowFilter;
+import fr.inria.zvtm.fits.filters.MousseFilter;
+import fr.inria.zvtm.fits.filters.StandardFilter;
+import fr.inria.zvtm.fits.filters.RandomFilter;
+import fr.inria.zvtm.fits.filters.HazeFilter;
+import fr.inria.zvtm.fits.filters.BlulutFilter;
+import fr.inria.zvtm.fits.filters.Idl4Filter;
+import fr.inria.zvtm.fits.filters.ColorGradient;
 
 import edu.jhu.pha.sdss.fits.FITSImage;
-
-import fr.inria.zvtm.glyphs.PRectangle;
-
-import java.awt.GradientPaint;
-import java.awt.LinearGradientPaint;
-import java.awt.MultipleGradientPaint;
-
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.geom.Point2D;
-
-import java.io.IOException;
-import java.io.File;
-
-import java.util.Vector;
-
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
-
-import java.awt.GraphicsEnvironment;
-import java.awt.GraphicsDevice;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-
-import javax.swing.JFrame;
-
-import fr.inria.zvtm.fits.Grid;
+import edu.jhu.pha.sdss.fits.Histogram;
 
 // Options
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
-//Menu
-import java.awt.Cursor;
-
-
-
-
-
-/////////////////////////////////////
-
-
-import java.awt.MultipleGradientPaint;
-import java.awt.Color;
-
-//import fr.inria.zvtm.fits.filters.HeatFilter;
-//import fr.inria.zvtm.fits.filters.NopFilter;
-import fr.inria.zvtm.fits.filters.*;
-import fr.inria.zvtm.fits.Utils;
-
-import fr.inria.zvtm.glyphs.FitsImage;
-
-import fr.inria.zvtm.engine.VirtualSpace;
-import fr.inria.zvtm.glyphs.PRectangle;
-
-
-//event
-import fr.inria.zvtm.event.ViewListener;
-import fr.inria.zvtm.event.PickerListener;
-import fr.inria.zvtm.engine.ViewPanel;
-import fr.inria.zvtm.engine.View;
-import fr.inria.zvtm.engine.Camera;
-import fr.inria.zvtm.glyphs.Glyph;
-import fr.inria.zvtm.glyphs.FitsImage;
-import fr.inria.zvtm.glyphs.VText;
-import fr.inria.zvtm.glyphs.VRectangle;
-
-import java.awt.Font;
-import java.awt.Cursor;
-import java.awt.image.ImageFilter;
-import java.awt.image.RGBImageFilter;
-import java.awt.geom.Point2D;
-
-import java.awt.BasicStroke;
-import java.awt.Stroke;
-
-import edu.jhu.pha.sdss.fits.FITSImage;
-
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseWheelEvent;
-
-import java.util.Vector;
-
-
-import java.awt.Color;
-import java.util.Arrays;
-import java.util.List;
-import fr.inria.zvtm.glyphs.Composite;
-import fr.inria.zvtm.glyphs.Glyph;
-import fr.inria.zvtm.glyphs.FitsImage;
-import fr.inria.zvtm.glyphs.VRectangle;
-
-
-import fr.inria.zvtm.fits.examples.FitsMenu;
-
-import edu.jhu.pha.sdss.fits.FITSImage;
-import edu.jhu.pha.sdss.fits.Histogram;
-
 /**
- * Sample FITS application.
+ * Example application loading FITS images using SDSS IVOA FITS.
  */
+
 public class FitsExample {
 
 
@@ -723,10 +670,16 @@ class FitsMenu implements ViewListener, PickerListener {
     public static final float WHEEL_FACTOR = 15.0f;
 
 
-    public static final ColorGradient[] COLOR_GRADIANT = {new NopFilter(), new HeatFilter(), new RainbowFilter(), new MousseFilter(), new StandardFilter(), new RandomFilter(), new HazeFilter(), new BlulutFilter(), new Idl4Filter()};
+    public static final ColorGradient[] COLOR_GRADIENT = {new NopFilter(),
+        new HeatFilter(), new RainbowFilter(),
+        new MousseFilter(), new StandardFilter(),
+        new RandomFilter(), new HazeFilter(),
+        new BlulutFilter(), new Idl4Filter()};
 
     //public static final int[] SCALE_METHOD = {FITSImage.SCALE_ASINH, FITSImage.SCALE_HISTOGRAM_EQUALIZATION, FITSImage.SCALE_LINEAR, FITSImage.SCALE_LOG, FITSImage.SCALE_SQUARE, FITSImage.SCALE_SQUARE_ROOT};
-    public static final FitsImage.ScaleMethod[] SCALE_METHOD = {FitsImage.ScaleMethod.LINEAR, FitsImage.ScaleMethod.LOG, FitsImage.ScaleMethod.HISTOGRAM_EQUALIZATION, FitsImage.ScaleMethod.SQUARE, FitsImage.ScaleMethod.SQUARE_ROOT, FitsImage.ScaleMethod.ASINH};
+    public static final FitsImage.ScaleMethod[] SCALE_METHOD = {FitsImage.ScaleMethod.LINEAR, FitsImage.ScaleMethod.LOG,
+                                                                FitsImage.ScaleMethod.HISTOGRAM_EQUALIZATION, FitsImage.ScaleMethod.SQUARE,
+                                                                FitsImage.ScaleMethod.SQUARE_ROOT, FitsImage.ScaleMethod.ASINH};
     public static final String[] SCALE_NAME = {"LINEAR", "LOG", "HISTOGRAM_EQUALIZATION", "SQUARE", "SQUARE_ROOT", "ASINH"};
 
 
@@ -773,11 +726,11 @@ class FitsMenu implements ViewListener, PickerListener {
 
         int py = app.VIEW_H/2 - 2*HEIGHT_BTN - BORDER;
 
-        for(int i = 0; i < COLOR_GRADIANT.length; i++){
-            MultipleGradientPaint grad = Utils.makeGradient((RGBImageFilter)COLOR_GRADIANT[i]);
+        for(int i = 0; i < COLOR_GRADIENT.length; i++){
+            MultipleGradientPaint grad = Utils.makeGradient((RGBImageFilter)COLOR_GRADIENT[i]);
             PRectangle filter = new PRectangle(-app.VIEW_W/2 + WIDTH_MENU/2, py, Z_BTN, WIDTH_MENU - BORDER, HEIGHT_BTN, grad, BORDER_COLOR_BTN);
             filter.setType(T_FILTER);
-            filter.setOwner(COLOR_GRADIANT[i]);
+            filter.setOwner(COLOR_GRADIENT[i]);
             mnSpace.addGlyph(filter);
             py -= (HEIGHT_BTN + 2*BORDER);
         }
