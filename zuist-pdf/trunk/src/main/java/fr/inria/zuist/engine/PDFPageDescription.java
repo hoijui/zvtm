@@ -39,7 +39,7 @@ import org.icepdf.core.pobjects.Document;
  */
 
 public class PDFPageDescription extends ResourceDescription {
-	
+
     /* necessary info about an image for instantiation */
     float scale = 1f;
     float detail = 1f;
@@ -57,13 +57,13 @@ public class PDFPageDescription extends ResourceDescription {
     private static int MAX_THREADS = 10;
     private static int CAPACITY = 2000;
 
-    static {   
-        pageLoader = new ThreadPoolExecutor(CORE_THREADS, MAX_THREADS, 
-                10000L, TimeUnit.MILLISECONDS, 
+    static {
+        pageLoader = new ThreadPoolExecutor(CORE_THREADS, MAX_THREADS,
+                10000L, TimeUnit.MILLISECONDS,
                 new LinkedBlockingQueue<Runnable>(CAPACITY));
         pageLoader.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-        pageUnloader = new ThreadPoolExecutor(CORE_THREADS, MAX_THREADS, 
-                10000L, TimeUnit.MILLISECONDS, 
+        pageUnloader = new ThreadPoolExecutor(CORE_THREADS, MAX_THREADS,
+                10000L, TimeUnit.MILLISECONDS,
                 new LinkedBlockingQueue<Runnable>(CAPACITY));
         pageUnloader.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
     }
@@ -90,23 +90,23 @@ public class PDFPageDescription extends ResourceDescription {
             }
         }
     }
-    
+
     private class PageUnloadTask implements Runnable {
         private final SceneManager sm;
         private final VirtualSpace vs;
         private final boolean fadeOut;
-        
+
         PageUnloadTask(SceneManager sm, VirtualSpace vs, boolean fadeOut){
             this.sm = sm;
             this.vs = vs;
             this.fadeOut = fadeOut;
         }
-        
+
         public void run(){
             display = false;
             try {
                 loadTask.get();
-            } 
+            }
             catch(InterruptedException ie){ /* swallow */ }
             catch(ExecutionException ee){ /* swallow */ }
             if (pi != null){
@@ -153,7 +153,7 @@ public class PDFPageDescription extends ResourceDescription {
     PDFPageDescription(String id, double x, double y, int z, float df, float sf, URL p, int pg, Color sc, Region pr){
         this(id,x,y,z,df,sf,p,pg,sc,null,pr);
     }
-    
+
     /** Constructs the description of an image (VImageST).
         *@param id ID of object in scene
         *@param x x-coordinate in scene
@@ -180,7 +180,7 @@ public class PDFPageDescription extends ResourceDescription {
         this.interpolationMethod = (im != null) ? im : RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
         this.parentRegion = pr;
     }
-    
+
     @Override
 	public String getType(){
 	    return PDFResourceHandler.RESOURCE_TYPE_PDF;
@@ -191,9 +191,9 @@ public class PDFPageDescription extends ResourceDescription {
         display = true;
         loadTask = pageLoader.submit(new PageLoadTask(sm, vs, fadeIn));
     }
-    
+
     private void finishCreatingObject(final SceneManager sm, final VirtualSpace vs, final Document doc, boolean fadeIn){
-        glyph = new IcePDFPageImg(vx, vy, zindex, doc, page, detail, scale);        
+        glyph = new IcePDFPageImg(vx, vy, zindex, doc, page, detail, scale);
         if(!display){
             glyph.setVisible(false);
         }
@@ -219,7 +219,7 @@ public class PDFPageDescription extends ResourceDescription {
                 // remove visual feedback about loading (smoothly)
                 Animation a2 = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, pi,
                     1.0f, false, IdentityInterpolator.getInstance(), new FeedbackHideAction(vs));
-                VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a2, false);                    
+                VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a2, false);
             }
             // smoothly fade glyph in
             Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_IN_DURATION, glyph,
@@ -244,7 +244,7 @@ public class PDFPageDescription extends ResourceDescription {
         }
         glyph.setOwner(this);
     }
-    
+
     @Override
     public void destroyObject(final SceneManager sm, final VirtualSpace vs, boolean fadeOut){
         pageUnloader.submit(new PageUnloadTask(sm, vs, fadeOut));
@@ -254,7 +254,7 @@ public class PDFPageDescription extends ResourceDescription {
     public Glyph getGlyph(){
 	    return glyph;
     }
-    
+
     @Override
     public void moveTo(double x, double y){
         super.moveTo(x, y);
@@ -262,19 +262,19 @@ public class PDFPageDescription extends ResourceDescription {
             glyph.moveTo(vx, vy);
         }
     }
-    
+
 }
 
 class PDFPageHideAction implements EndAction {
-    
+
     SceneManager sm;
     VirtualSpace vs;
-    
+
     PDFPageHideAction(SceneManager sm, VirtualSpace vs){
         this.sm = sm;
 	    this.vs = vs;
     }
-    
+
     public void execute(Object subject, Animation.Dimension dimension){
         try {
             vs.removeGlyph((Glyph)subject);
@@ -295,7 +295,7 @@ class PDFPageHideAction implements EndAction {
         }
         catch(ArrayIndexOutOfBoundsException ex){
             if (SceneManager.getDebugMode()){System.err.println("Warning: attempt at destroying image " + ((Glyph)subject).hashCode() + " failed. Giving up.");}
-        }	
+        }
     }
 
 }
