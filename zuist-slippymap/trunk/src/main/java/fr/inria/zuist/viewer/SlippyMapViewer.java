@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.FilenameFilter;
 
 import java.util.Vector;
+import java.util.HashMap;
 
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
@@ -90,13 +91,24 @@ public class SlippyMapViewer implements Java2DPainter {
 
     boolean antialiasing = false;
 
+    static HashMap<String,String> parseSceneOptions(SMVOptions options){
+        HashMap<String,String> res = new HashMap(2,1);
+        if (options.httpUser != null){
+            res.put(SceneManager.HTTP_AUTH_USER, options.httpUser);
+        }
+        if (options.httpPassword != null){
+            res.put(SceneManager.HTTP_AUTH_PASSWORD, options.httpPassword);
+        }
+        return res;
+    }
+
     public SlippyMapViewer(SMVOptions options){
         VirtualSpaceManager.INSTANCE.getAnimationManager().setResolution(80);
         nm = new NavigationManager(this);
         initGUI(options);
         VirtualSpace[]  sceneSpaces = {mSpace};
         Camera[] sceneCameras = {mCamera};
-        sm = new SceneManager(sceneSpaces, sceneCameras);
+        sm = new SceneManager(sceneSpaces, sceneCameras, parseSceneOptions(options));
         initScene();
         // if (xmlSceneFile != null){
         //     System.out.println("Loading ZUIST map "+xmlSceneFile.getName());

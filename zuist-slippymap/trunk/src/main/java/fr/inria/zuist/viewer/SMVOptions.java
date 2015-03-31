@@ -43,6 +43,12 @@ public class SMVOptions {
     @Option(name = "-map", aliases = {"--zuist-map"}, usage = "background ZUIST map")
     public String path_to_zuist_map = null;
 
+    @Option(name = "-user", usage = "HTTPS user name")
+    public String httpUser = null;
+
+    @Option(name = "-password", usage = "HTTPS password")
+    public String httpPassword = null;
+
     @Argument
     List<String> arguments = new ArrayList<String>();
 
