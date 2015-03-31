@@ -359,8 +359,7 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
      */
     @Override
         public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
-            //XXX implement
-            return false;
+            return coordInsideV(cvx, cvy, camIndex);
         }
 
     /**
@@ -368,8 +367,8 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
      */
     @Override
         public boolean coordInsideV(double cvx, double cvy, int camIndex){
-            //XXX implement
-            return false;
+            return (cvx>=(vx-vw/2d)) && (cvx<=(vx+vw/2d)) &&
+               (cvy>=(vy-vh/2d)) && (cvy<=(vy+vh/2d));
         }
 
     /**
@@ -377,8 +376,8 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
      */
     @Override
         public boolean coordInsideP(int jpx, int jpy, int camIndex){
-            //XXX implement
-            return false;
+            return (jpx>=(pc[camIndex].cx-pc[camIndex].cw)) && (jpx<=(pc[camIndex].cx+pc[camIndex].cw)) &&
+               (jpy>=(pc[camIndex].cy-pc[camIndex].ch)) && (jpy<=(pc[camIndex].cy+pc[camIndex].ch));
         }
 
     @Override
