@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2009-2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2009-2015. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -514,10 +514,6 @@ class PDFViewerEventHandler implements ViewListener, ComponentListener {
 			VirtualSpaceManager.INSTANCE.repaint();
 		}
 	}
-
-	public void enterGlyph(Glyph g){}
-
-	public void exitGlyph(Glyph g){}
 
     public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
         if (code==KeyEvent.VK_PAGE_UP){application.getHigherView();}
