@@ -1,3 +1,8 @@
+/*  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2010-2015.
+ *  Licensed under the GNU LGPL. For full terms see the file COPYING.
+ *
+ * $Id:$
+ */
 
 package fr.inria.zvtm.glyphs;
 
@@ -17,7 +22,7 @@ public class ExFITSImage extends FITSImage{
         super(imgFile);
     }
 
-    public double[] getScaleParams(){ 
+    public double[] getScaleParams(){
         return new double[]{ _min, _max };
     }
 

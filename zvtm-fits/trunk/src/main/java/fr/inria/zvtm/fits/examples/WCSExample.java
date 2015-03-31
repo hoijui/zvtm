@@ -1,13 +1,12 @@
-/*   AUTHOR : Romain Primet (romain.primet@inria.fr)
- *
- *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2010.
+/*  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2010.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id:$
  */
+
 package fr.inria.zvtm.fits.examples;
 
-import edu.jhu.pha.sdss.fits.FITSImage;  
+import edu.jhu.pha.sdss.fits.FITSImage;
 import java.net.URL;
 import jsky.coords.WCSTransform;
 import jsky.coords.WorldCoords;
@@ -27,7 +26,7 @@ class WCSExample {
         }
         FitsImage img = new FitsImage(0,0,0,new URL(args[0]),1);
         FITSImage fImg = img.getUnderlyingImage();
-        NomWcsKeywordProvider provider = new NomWcsKeywordProvider(fImg.getFits().getHDU(0).getHeader());        
+        NomWcsKeywordProvider provider = new NomWcsKeywordProvider(fImg.getFits().getHDU(0).getHeader());
         WCSTransform transform = new WCSTransform(provider);
         System.out.println(new WorldCoords(transform.pix2wcs(Double.parseDouble(args[1]), Double.parseDouble(args[2]))));
     }

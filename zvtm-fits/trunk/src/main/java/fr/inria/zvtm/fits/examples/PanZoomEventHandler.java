@@ -1,4 +1,8 @@
-
+/*  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2010-2015.
+ *  Licensed under the GNU LGPL. For full terms see the file COPYING.
+ *
+ * $Id:$
+ */
 
 package fr.inria.zvtm.fits.examples;
 
@@ -39,8 +43,8 @@ class PanZoomEventHandler implements ViewListener {
     //private boolean dragLeft = false, dragRight = false;
     //private RangeSelection rs;
 
-	private int lastJPX;
-	private int lastJPY;
+    private int lastJPX;
+    private int lastJPY;
 
     boolean zero_order_dragging = false;
     boolean first_order_dragging = false;
@@ -59,7 +63,7 @@ class PanZoomEventHandler implements ViewListener {
         this.app = (Object)app;
     }
 
-	public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+    public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
         /*
         Point2D.Double cursorPos = viewToSpace(vsm.getActiveCamera(), jpx, jpy);
         if(app.rs.overLeftTick(cursorPos.x, cursorPos.y)){
@@ -81,7 +85,7 @@ class PanZoomEventHandler implements ViewListener {
         }
     }
 
-	public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+    public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
         /*
         dragLeft = false;
         dragRight = false;
@@ -107,7 +111,7 @@ class PanZoomEventHandler implements ViewListener {
         
     }
 
-	public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
+    public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
 
         Point2D.Double cur = new Point2D.Double(v.getVCursor().getVSXCoordinate(), v.getVCursor().getVSYCoordinate());
         Point2D.Double fi = new Point2D.Double(0,0);
@@ -121,38 +125,38 @@ class PanZoomEventHandler implements ViewListener {
             
     }
 
-	public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+    public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
-	public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+    public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
-	public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
+    public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
-	public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+    public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
         //v.parent.setActiveLayer(2);
         /*
-		lastJPX=jpx;
-		lastJPY=jpy;
-		v.setDrawDrag(true);
-		app.vsm.getActiveView().mouse.setSensitivity(false);
+        lastJPX=jpx;
+        lastJPY=jpy;
+        v.setDrawDrag(true);
+        app.vsm.getActiveView().mouse.setSensitivity(false);
         */
-		//because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
-	}
+        //because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
+    }
 
-	public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+    public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
         /*
-		v.cams[0].setXspeed(0);
-		v.cams[0].setYspeed(0);
-		v.cams[0].setZspeed(0);
-		v.setDrawDrag(false);
-		app.vsm.getActiveView().mouse.setSensitivity(true);
+        v.cams[0].setXspeed(0);
+        v.cams[0].setYspeed(0);
+        v.cams[0].setZspeed(0);
+        v.setDrawDrag(false);
+        app.vsm.getActiveView().mouse.setSensitivity(true);
         */
         //v.parent.setActiveLayer(0);
         //System.out.println("panzoomEH release3");
-	}
+    }
 
-	public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
+    public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
-	public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
+    public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
 
         /*
         app.setCursorCoords(v.getVCursor().getVSXCoordinate(), v.getVCursor().getVSYCoordinate());
@@ -203,7 +207,7 @@ class PanZoomEventHandler implements ViewListener {
 
     }
 
-	public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
+    public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
 
         Camera c = (app instanceof FitsExample) ? ((FitsExample)app).mCamera : ((JSkyFitsExample)app).mCamera;
         double a = (c.focal+Math.abs(c.altitude)) / c.focal;
@@ -228,7 +232,7 @@ class PanZoomEventHandler implements ViewListener {
         /*
 
         if(buttonNumber == 1){
-        	/*
+            /*
             if(dragLeft) {
                 //rs.setLeftTickPos(viewToSpace(vsm.getActiveCamera(), jpx, jpy).x);
             } else if(dragRight){
@@ -237,25 +241,25 @@ class PanZoomEventHandler implements ViewListener {
             *
         }
 
-		if (buttonNumber == 3 || ((mod == META_MOD || mod == META_SHIFT_MOD) && buttonNumber == 1)){
-			Camera c = app.vsm.getActiveCamera();
-			double a = (c.focal+Math.abs(c.altitude))/c.focal;
-			if (mod == META_SHIFT_MOD) {
-				v.cams[0].setXspeed(0);
-				v.cams[0].setYspeed(0);
-				v.cams[0].setZspeed((c.altitude>0) ? (lastJPY-jpy)*(a/4.0) : (lastJPY-jpy)/(a*4));
+        if (buttonNumber == 3 || ((mod == META_MOD || mod == META_SHIFT_MOD) && buttonNumber == 1)){
+            Camera c = app.vsm.getActiveCamera();
+            double a = (c.focal+Math.abs(c.altitude))/c.focal;
+            if (mod == META_SHIFT_MOD) {
+                v.cams[0].setXspeed(0);
+                v.cams[0].setYspeed(0);
+                v.cams[0].setZspeed((c.altitude>0) ? (lastJPY-jpy)*(a/4.0) : (lastJPY-jpy)/(a*4));
 
-			}
-			else {
-				v.cams[0].setXspeed((c.altitude>0) ? (jpx-lastJPX)*(a/4.0) : (jpx-lastJPX)/(a*4));
-				v.cams[0].setYspeed((c.altitude>0) ? (lastJPY-jpy)*(a/4.0) : (lastJPY-jpy)/(a*4));
-				v.cams[0].setZspeed(0);
-			}
-		}
+            }
+            else {
+                v.cams[0].setXspeed((c.altitude>0) ? (jpx-lastJPX)*(a/4.0) : (jpx-lastJPX)/(a*4));
+                v.cams[0].setYspeed((c.altitude>0) ? (lastJPY-jpy)*(a/4.0) : (lastJPY-jpy)/(a*4));
+                v.cams[0].setZspeed(0);
+            }
+        }
         */
-	}
+    }
 
-	public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
+    public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
 
         if(app instanceof FitsExample){
             Camera c = ((FitsExample)app).mCamera;
@@ -337,13 +341,13 @@ class PanZoomEventHandler implements ViewListener {
         */
     }
 
-	public void enterGlyph(Glyph g){
+    public void enterGlyph(Glyph g){
     }
 
-	public void exitGlyph(Glyph g){
+    public void exitGlyph(Glyph g){
     }
 
-	public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){
+    public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){
         //System.out.println("Ktype:" + c);
         if(app instanceof FitsExample){
             if(c == '-'){
@@ -377,20 +381,20 @@ class PanZoomEventHandler implements ViewListener {
         
     }
 
-	public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
-	}
+    public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
+    }
 
-	public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
+    public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 
-	public void viewActivated(View v){}
+    public void viewActivated(View v){}
 
-	public void viewDeactivated(View v){}
+    public void viewDeactivated(View v){}
 
-	public void viewIconified(View v){}
+    public void viewIconified(View v){}
 
-	public void viewDeiconified(View v){}
+    public void viewDeiconified(View v){}
 
-	public void viewClosing(View v){System.exit(0);}
+    public void viewClosing(View v){System.exit(0);}
 
     void toggleNavMode(){
         switch(navMode){

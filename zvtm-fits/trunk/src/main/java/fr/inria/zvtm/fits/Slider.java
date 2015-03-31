@@ -1,9 +1,9 @@
-/*   AUTHOR :          Romain Primet (romain.primet@inria.fr) 
- *   Copyright (c) INRIA, 2010. All Rights Reserved
- *   Licensed under the GNU LGPL. For full terms see the file COPYING.
+/*  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2010-2015.
+ *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id:$
  */
+
 package fr.inria.zvtm.fits;
 
 import fr.inria.zvtm.glyphs.Composite;
@@ -59,11 +59,11 @@ public class Slider extends Composite {
         //approximate tick by the lower, rectangular part
         Point2D.Double[] tickCoords = tick.getAbsoluteVertices();
         return (xPos >= tickCoords[2].x) && (xPos <= tickCoords[4].x) &&
-            (yPos <= tickCoords[2].y) && (yPos >= tickCoords[4].y); 
+            (yPos <= tickCoords[2].y) && (yPos >= tickCoords[4].y);
     }
 
     private static final double[] tickCoordsX = {0, 0, -25, -25, 25, 25, 0};
-    private static final double[] tickCoordsY = {0, -BAR_HEIGHT, -BAR_HEIGHT-5, 
+    private static final double[] tickCoordsY = {0, -BAR_HEIGHT, -BAR_HEIGHT-5,
         -BAR_HEIGHT-5-22, -BAR_HEIGHT-5-22, -BAR_HEIGHT-5, -BAR_HEIGHT};
 
     private static final Point2D.Double[] getTickCoords(double[] yCoords){
@@ -75,7 +75,7 @@ public class Slider extends Composite {
     }
 
     private static final VPolygon makeTick(){
-        VPolygon retval = new VPolygon(getTickCoords(tickCoordsY), 0, 
+        VPolygon retval = new VPolygon(getTickCoords(tickCoordsY), 0,
                 new Color(200, 0, 0, 120),
                 Color.RED);
         retval.setStroke(new BasicStroke(2));

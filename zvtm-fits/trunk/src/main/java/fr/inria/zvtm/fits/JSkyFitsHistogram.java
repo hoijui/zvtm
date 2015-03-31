@@ -1,4 +1,8 @@
-
+/*  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2010-2015.
+ *  Licensed under the GNU LGPL. For full terms see the file COPYING.
+ *
+ * $Id:$
+ */
 
 package fr.inria.zvtm.fits;
 
@@ -39,7 +43,7 @@ public class JSkyFitsHistogram extends Composite {
 
 
     public JSkyFitsHistogram(int[] data, int min, int max, Color fillColor){
-        
+
         width = DEFAULT_BIN_WIDTH*data.length;
         VRectangle backgrown = new VRectangle(width/2, height/2, JSkyFitsMenu.Z_BTN, width, height, Color.GRAY, Color.BLACK, 0.2f);
         addChild(backgrown);
@@ -57,7 +61,7 @@ public class JSkyFitsHistogram extends Composite {
             bars[j] = bar;
             i += DEFAULT_BIN_WIDTH;
         }
-        
+
     }
 
     public VRectangle[] getBars(){
@@ -129,7 +133,7 @@ public class JSkyFitsHistogram extends Composite {
             yValues[i] = 0;
         }
         if (factor >= 0.0) {
-            
+
             Histogram histogram = image.getHistogram(numValues);
             yValues = histogram.getBins(0);
             //chart.getXYPlot().setDataset(new SimpleDataset(xValues, yValues));
@@ -149,7 +153,7 @@ public class JSkyFitsHistogram extends Composite {
 
 
 
-        
+
         /*
         for(int i=0; i<HISTOGRAM_SIZE; ++i){
             //data[i/(hist.getCounts().length / data.length)] += hist.getCounts()[i];

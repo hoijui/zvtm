@@ -1,6 +1,4 @@
-/*   AUTHOR : Romain Primet (romain.primet@inria.fr)
- *
- *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009.
+/*  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009-2015.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id:$
@@ -29,7 +27,7 @@ import fr.inria.zvtm.fits.ZScale;
 
 import java.awt.image.ImageFilter;
 
-import edu.jhu.pha.sdss.fits.FITSImage;  
+import edu.jhu.pha.sdss.fits.FITSImage;
 
 import fr.inria.zvtm.glyphs.PRectangle;
 
@@ -117,10 +115,10 @@ public class FitsExample{
 		VirtualSpace vs = vsm.addVirtualSpace("testSpace");
 		Camera cam = vs.addCamera();
 		Vector<Camera> cameras = new Vector<Camera>();
-		cameras.add(cam);	
-        
+		cameras.add(cam);
+
         mView = vsm.addFrameView(cameras, "Master View",
-                View.STD_VIEW, options.blockWidth, options.blockHeight, false, true, !options.fullscreen, null);	
+                View.STD_VIEW, options.blockWidth, options.blockHeight, false, true, !options.fullscreen, null);
         mView.setBackgroundColor(BACKGROUND_COLOR);
         mView.setListener(new PanZoomEventHandler());
 */
@@ -129,7 +127,7 @@ public class FitsExample{
 
         if(options.url != null){
             hi = new FitsImage(0,0,0,new URL(options.url));
-            
+
         } else if(options.file != null){
             hi = new FitsImage(0,0,0,new File(options.file));
 
@@ -141,19 +139,19 @@ public class FitsExample{
 
         //hi.setScaleMethod(FitsImage.ScaleMethod.LINEAR);//ASINH);
         //hi.setColorFilter(FitsImage.ColorFilter.RAINBOW);
-        mSpace.addGlyph(hi, false); 
+        mSpace.addGlyph(hi, false);
 
-        
+
 /*
         scaleBounds = ZScale.computeScale(hi.getUnderlyingImage());
         hi.rescale(scaleBounds[0], scaleBounds[1], 1);
         //System.out.println(scaleBounds[0] + ", " + scaleBounds[1]);
 */
-        
+
         menu.drawHistogram();
 
         //FitsHistogram hist = FitsHistogram.fromFitsImage(hi);
-        
+
         //hist.reSize(0.8f);
         //mnSpace.addGlyph(hist);
         /*
@@ -164,13 +162,13 @@ public class FitsExample{
 
         mSpace.addGlyph(rs);
         rs.move(0, -30);
-        
+
         // example fake gradient
         Point2D start = new Point2D.Float(0,0);
         Point2D end = new Point2D.Float(200,0);
         */
 
-        
+
     }
 
     void initGUI(FitsOptions options){
@@ -196,7 +194,7 @@ public class FitsExample{
         }
 
         menu = new FitsMenu(this);
-        
+
         eh = new PanZoomEventHandler(this);
         //mCamera.addListener(eh);
         mView.setListener(eh, LAYER_FITS);
@@ -341,8 +339,8 @@ public class FitsExample{
         new FitsExample(options);
 	}
 
-	
-    
+
+
 }
 
 

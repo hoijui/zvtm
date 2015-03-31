@@ -1,9 +1,9 @@
-/*   AUTHOR :          Romain Primet (romain.primet@inria.fr) 
- *   Copyright (c) INRIA, 2010. All Rights Reserved
- *   Licensed under the GNU LGPL. For full terms see the file COPYING.
+/*  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2010-2015.
+ *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id:$
  */
+
 package fr.inria.zvtm.fits;
 
 import fr.inria.zvtm.glyphs.Composite;
@@ -60,7 +60,7 @@ public class RangeSelection extends Composite {
 
     //should be an internal method that reacts to mouse events
     public void setLeftTickPos(double xPos){
-        //constrained by left end and right tick 
+        //constrained by left end and right tick
         double finalPos = Math.max(xPos, vx-(bar.getWidth()/2));
         finalPos = Math.min(finalPos, rightTick.vx);
         leftTick.moveTo(finalPos, leftTick.vy);
@@ -82,7 +82,7 @@ public class RangeSelection extends Composite {
         //approximate tick by the lower, rectangular part
         Point2D.Double[] tickCoords = leftTick.getAbsoluteVertices();
         return (xPos >= tickCoords[2].x) && (xPos <= tickCoords[4].x) &&
-            (yPos <= tickCoords[2].y) && (yPos >= tickCoords[4].y); 
+            (yPos <= tickCoords[2].y) && (yPos >= tickCoords[4].y);
     }
 
     //See above method
@@ -91,13 +91,13 @@ public class RangeSelection extends Composite {
         //approximate tick by the lower, rectangular part
         Point2D.Double[] tickCoords = rightTick.getAbsoluteVertices();
         return (xPos >= tickCoords[2].x) && (xPos <= tickCoords[4].x) &&
-            (yPos >= tickCoords[2].y) && (yPos <= tickCoords[4].y); 
+            (yPos >= tickCoords[2].y) && (yPos <= tickCoords[4].y);
     }
 
     private static final double[] tickCoordsX = {0, 0, -25, -25, 25, 25, 0};
-    private static final double[] tickCoordsLY = {0, -BAR_HEIGHT, -BAR_HEIGHT-5, 
+    private static final double[] tickCoordsLY = {0, -BAR_HEIGHT, -BAR_HEIGHT-5,
         -BAR_HEIGHT-5-22, -BAR_HEIGHT-5-22, -BAR_HEIGHT-5, -BAR_HEIGHT};
-    private static final double[] tickCoordsRY = {-BAR_HEIGHT, 0, 5, 
+    private static final double[] tickCoordsRY = {-BAR_HEIGHT, 0, 5,
         5+22, 5+22, 5, 0};
 
     private static final Point2D.Double[] getTickCoords(double[] yCoords){
@@ -109,7 +109,7 @@ public class RangeSelection extends Composite {
     }
 
     private static final VPolygon makeLeftTick(){
-        VPolygon retval = new VPolygon(getTickCoords(tickCoordsLY), 0, 
+        VPolygon retval = new VPolygon(getTickCoords(tickCoordsLY), 0,
                 new Color(200, 0, 0, 120),
                 Color.RED);
         retval.setStroke(new BasicStroke(2));
@@ -117,7 +117,7 @@ public class RangeSelection extends Composite {
     }
 
     private static final VPolygon makeRightTick(){
-        VPolygon retval = new VPolygon(getTickCoords(tickCoordsRY), 0, 
+        VPolygon retval = new VPolygon(getTickCoords(tickCoordsRY), 0,
                 new Color(200, 200, 0, 120),
                 Color.YELLOW);
         retval.setStroke(new BasicStroke(2));

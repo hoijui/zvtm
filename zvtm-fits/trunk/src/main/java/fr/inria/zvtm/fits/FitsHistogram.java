@@ -1,9 +1,9 @@
-/*   AUTHOR :          Romain Primet (romain.primet@inria.fr) 
- *   Copyright (c) INRIA, 2010. All Rights Reserved
- *   Licensed under the GNU LGPL. For full terms see the file COPYING.
+/*  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2010-2015.
+ *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id:$
  */
+
 package fr.inria.zvtm.fits;
 
 import java.awt.Color;
@@ -17,7 +17,7 @@ import fr.inria.zvtm.glyphs.VRectangle;
 
 import fr.inria.zvtm.fits.examples.FitsMenu;
 
-import edu.jhu.pha.sdss.fits.FITSImage; 
+import edu.jhu.pha.sdss.fits.FITSImage;
 import edu.jhu.pha.sdss.fits.Histogram;
 
 //import jsky.image.fits.codec.FITSImage;
@@ -33,10 +33,10 @@ public class FitsHistogram extends Composite {
 
     double width;
     double height = 100;
-    VRectangle[] bars = new VRectangle[128]; 
+    VRectangle[] bars = new VRectangle[128];
 
     public FitsHistogram(int[] data, int min, int max, Color fillColor){
-        
+
         width = DEFAULT_BIN_WIDTH*data.length;
         VRectangle backgrown = new VRectangle(width/2, height/2, FitsMenu.Z_BTN, width, height, Color.GRAY, Color.BLACK, 0.2f);
         addChild(backgrown);
@@ -54,7 +54,7 @@ public class FitsHistogram extends Composite {
             bars[j] = bar;
             i += DEFAULT_BIN_WIDTH;
         }
-        
+
     }
 
     public VRectangle[] getBars(){
@@ -69,7 +69,7 @@ public class FitsHistogram extends Composite {
     public static FitsHistogram fromFitsImage(FitsImage image, Color fillColor){
         Histogram hist = image.getUnderlyingImage().getHistogram();
         int[] data = new int[128];
-        
+
         for(int i=0; i<hist.getCounts().length; ++i){
             data[i/(hist.getCounts().length / data.length)] += hist.getCounts()[i];
         }
@@ -90,7 +90,7 @@ public class FitsHistogram extends Composite {
     public static FitsHistogram fromJSkyFitsImage(FitsImage image, Color fillColor){
         Histogram hist = image.getUnderlyingImage().getHistogram();
         int[] data = new int[128];
-        
+
         for(int i=0; i<hist.getCounts().length; ++i){
             data[i/(hist.getCounts().length / data.length)] += hist.getCounts()[i];
         }

@@ -1,10 +1,9 @@
-/*   AUTHOR : Romain Primet (romain.primet@inria.fr)
- *
- *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2010.
- *  Licensed under the GNU GPL. For full terms see the file COPYING.
+/*  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2010-2015.
+ *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id:$
- */ 
+ */
+
 package fr.inria.zvtm.glyphs;
 
 import java.awt.Color;
@@ -146,7 +145,7 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
 
             this.file = file;
             String strfile = file.toString();
-            
+
             if(strfile.indexOf("file:") == 0){
                 fitsImage = new FITSImage(strfile.substring(strfile.indexOf(":")+1));
             } else {
@@ -157,7 +156,7 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
             //fitsImage = new FITSImage(file.toString());
 
             //fitsImage = new FITSImage("/home/fdelcampo/zuist-scenes-local/fits/Einstein.fits");
-            
+
             vw = fitsImage.getWidth() * scale;
             vh = fitsImage.getHeight() * scale;
             RenderedImageAdapter ria = new RenderedImageAdapter(fitsImage);
@@ -182,7 +181,7 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
                 throw new Error("Could not create ImageProcesor: " + ie);
             }
 
-            
+
             NomWcsKeywordProvider wcsKeyProvider;
             try{
                 wcsKeyProvider = new NomWcsKeywordProvider(fitsImage.getFits().getHDU(0).getHeader());
@@ -194,14 +193,14 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
             } catch(Exception e){
                 throw new Error("Could not create wcsTransform: " + e);
             }
-            
+
 
         } catch (Exception e){
             throw new Error("Could not create FitsImage: " + e);
         }
         scaleFactor = scale;
         setTranslucencyValue(alpha);
-   
+
     }
 
 
@@ -235,7 +234,7 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
     public double getMinValue(){
         return proc.getMinValue();
     }
-    
+
     public double getMaxValue(){
         return proc.getMaxValue();
     }
@@ -262,7 +261,7 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
         proc.update();
         VirtualSpaceManager.INSTANCE.repaint();
     }
-    
+
 
 
     /*
@@ -301,7 +300,7 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
     }
 
     /**
-     * Sets the image cut levels automatically using median filtering. 
+     * Sets the image cut levels automatically using median filtering.
      */
     public void autoSetCutLevels(){
         autoSetCutLevels(new Rectangle2D.Double(0,0,fitsImage.getWidth(),fitsImage.getHeight()));
@@ -317,7 +316,7 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
         return proc.getHistogram(numValues, roi);
     }
 
-    
+
     /* Converts pixel coordinates to World Coordinates. Returns null if the WCSTransform is not valid.
      * @param x x-coordinates, in the FITS system: (0,0) lower left, x axis increases to the right, y axis increases upwards
      * @param y y-coordinates, in the FITS system: (0,0) lower left, x axis increases to the right, y axis increases upwards
@@ -325,7 +324,7 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
     public Point2D.Double pix2wcs(double x, double y){
         return wcsTransform.pix2wcs(x, y);
     }
-    
+
 
 
     /*
@@ -334,10 +333,10 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
     public Point2D.Double wcs2pix(double ra, double dec){
         return wcsTransform.wcs2pix(ra, dec);
     }
-    
 
 
-    /** 
+
+    /**
      * Gets the bounding box of this Glyph in virtual space coordinates.
      * @return west, north, east and south bounds in virtual space.
      */
@@ -375,7 +374,7 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
     /**
      * {@inheritDoc}
      */
-    @Override 
+    @Override
         public void resetMouseIn(int i){
             //XXX ?
         }
@@ -389,12 +388,12 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
             return true;
         }
 
-    @Override 
+    @Override
         public void removeCamera(int index){
             pc[index]=null;
         }
 
-    @Override 
+    @Override
         public void addCamera(int verifIndex){
             if (pc!=null){
                 if (verifIndex==pc.length){
@@ -579,7 +578,7 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
                 float lensMag,
                 double lensx,
                 double lensy){
-           //XXX 
+           //XXX
         }
 
     @Override
@@ -605,7 +604,7 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
     @Override
         public void highlight(boolean b,
                 Color selectedColor){
-            
+
         }
 
     @Override
@@ -617,13 +616,13 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
             return 0f;
         }
 
-    @Override 
+    @Override
         public void reSize(double factor){
         }
 
     @Override
         public void sizeTo(double newSize){
-            reSize(newSize/getSize()); 
+            reSize(newSize/getSize());
         }
 
     @Override
@@ -631,7 +630,7 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
            return true;
         }
 
-    @Override 
+    @Override
         public double getSize(){
             return Math.sqrt(getWidth() * getWidth() + getHeight() * getHeight());
         }
@@ -669,7 +668,7 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
      * Rescales the image.
      * @param min minimum value - image values below the minimum will be shown
      * in black.
-     * @param max maximum value - image values above the maximum will be 
+     * @param max maximum value - image values above the maximum will be
      * saturated.
      */
     /*

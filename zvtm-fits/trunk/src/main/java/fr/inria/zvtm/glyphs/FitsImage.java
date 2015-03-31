@@ -1,9 +1,9 @@
-/*   AUTHOR :          Romain Primet (romain.primet@inria.fr) 
- *   Copyright (c) INRIA, 2010. All Rights Reserved
- *   Licensed under the GNU LGPL. For full terms see the file COPYING.
+/*  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2010-2015.
+ *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id:$
  */
+
 package fr.inria.zvtm.glyphs;
 
 import java.awt.Color;
@@ -23,7 +23,7 @@ import java.net.URL;
 import javax.imageio.ImageIO;
 import javax.imageio.spi.IIORegistry;
 
-import edu.jhu.pha.sdss.fits.FITSImage;  
+import edu.jhu.pha.sdss.fits.FITSImage;
 import edu.jhu.pha.sdss.fits.imageio.FITSReaderSpi;
 
 import jsky.coords.WCSTransform;
@@ -98,7 +98,7 @@ public class FitsImage extends VImageOr {
         abstract int toIvoaValue();
     }
 
-    /** 
+    /**
      * Default color filters. For more control use
      * FitsImage.setColorFilter(ImageFilter).
      */
@@ -194,20 +194,20 @@ public class FitsImage extends VImageOr {
             }
             if (wcsKeyProvider != null)
                 objectName = wcsKeyProvider.getStringValue("OBJECT");
-            //wcsTransform = new WCSTransform(double cra, double cdec, double xsecpix, double ysecpix, double xrpix, double yrpix, int nxpix, int nypix, double rotate, int equinox, double epoch, java.lang.String proj) 
+            //wcsTransform = new WCSTransform(double cra, double cdec, double xsecpix, double ysecpix, double xrpix, double yrpix, int nxpix, int nypix, double rotate, int equinox, double epoch, java.lang.String proj)
         } catch(Exception e){
             throw new Error(e);
             //e.printStackTrace(System.out);
         }
         //System.out.println("scaleMethod.toIvoaValue(): "+scaleMethod.toIvoaValue());
-        
+
         fitsImage.setScaleMethod(scaleMethod.toIvoaValue());
         try{
-            fitsImage.rescale(min, max, min/2. + max/2.); 
+            fitsImage.rescale(min, max, min/2. + max/2.);
         } catch (Exception fe){
             System.err.println("image rescale failed: " + fe);
         }
-        
+
         recreateDisplayImage();
     }
 
@@ -245,7 +245,7 @@ public class FitsImage extends VImageOr {
             }
             if (wcsKeyProvider != null)
                 objectName = wcsKeyProvider.getStringValue("OBJECT");
-            //wcsTransform = new WCSTransform(double cra, double cdec, double xsecpix, double ysecpix, double xrpix, double yrpix, int nxpix, int nypix, double rotate, int equinox, double epoch, java.lang.String proj) 
+            //wcsTransform = new WCSTransform(double cra, double cdec, double xsecpix, double ysecpix, double xrpix, double yrpix, int nxpix, int nypix, double rotate, int equinox, double epoch, java.lang.String proj)
         } catch(Exception e){
             throw new Error(e);
             //e.printStackTrace(System.out);
@@ -256,7 +256,7 @@ public class FitsImage extends VImageOr {
             try{
                 double min = fitsImage.getImageHDU().getMinimumValue();
                 double max = fitsImage.getImageHDU().getMaximumValue();
-                fitsImage.rescale(min, max, min/2. + max/2.); 
+                fitsImage.rescale(min, max, min/2. + max/2.);
             } catch (Exception fe){
                 System.err.println("image rescale failed: " + fe);
             }
@@ -298,7 +298,7 @@ public class FitsImage extends VImageOr {
             }
             if (wcsKeyProvider != null)
                 objectName = wcsKeyProvider.getStringValue("OBJECT");
-            //wcsTransform = new WCSTransform(double cra, double cdec, double xsecpix, double ysecpix, double xrpix, double yrpix, int nxpix, int nypix, double rotate, int equinox, double epoch, java.lang.String proj) 
+            //wcsTransform = new WCSTransform(double cra, double cdec, double xsecpix, double ysecpix, double xrpix, double yrpix, int nxpix, int nypix, double rotate, int equinox, double epoch, java.lang.String proj)
         } catch(Exception e){
             throw new Error(e);
             //e.printStackTrace(System.out);
@@ -310,7 +310,7 @@ public class FitsImage extends VImageOr {
             try{
                 double min = fitsImage.getImageHDU().getMinimumValue();
                 double max = fitsImage.getImageHDU().getMaximumValue();
-                fitsImage.rescale(min, max, min/2. + max/2.); 
+                fitsImage.rescale(min, max, min/2. + max/2.);
             } catch (Exception fe){
                 System.err.println("image rescale failed: " + fe);
             }
@@ -371,7 +371,7 @@ public class FitsImage extends VImageOr {
      * Gets the scale method used by this FitsImage
      */
     public ScaleMethod getScaleMethod(){
-        return scaleMethod; 
+        return scaleMethod;
     }
 
     /**
@@ -405,7 +405,7 @@ public class FitsImage extends VImageOr {
      * Rescales the image.
      * @param min minimum value - image values below the minimum will be shown
      * in black.
-     * @param max maximum value - image values above the maximum will be 
+     * @param max maximum value - image values above the maximum will be
      * saturated.
      */
     public void rescale(double min, double max, double sigma){
@@ -443,7 +443,7 @@ public class FitsImage extends VImageOr {
         setColorFilter(filter.getFilter());
     }
 
-    /** 
+    /**
      * Returns the color filter used by this FitsImage
      */
     public ImageFilter getColorFilter(){

@@ -1,20 +1,20 @@
-/*   AUTHOR :          Romain Primet (romain.primet@inria.fr) 
- *   Copyright (c) INRIA, 2010. All Rights Reserved
- *   Licensed under the GNU LGPL. For full terms see the file COPYING.
+/*  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2010-2015.
+ *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id:$
  */
+
 package fr.inria.zvtm.fits;
 
 import java.util.Arrays;
 import java.io.IOException;
 import nom.tam.fits.FitsException;
-import edu.jhu.pha.sdss.fits.FITSImage; 
+import edu.jhu.pha.sdss.fits.FITSImage;
 
 /**
  * Implements a partial version of z-scaling.
  * Iterative refinement is not implemented.
- * A FAQ entry about zscale can be found here: 
+ * A FAQ entry about zscale can be found here:
  * http://iraf.net/article.php/20051205162333315
  */
 public class ZScale {
@@ -26,7 +26,7 @@ public class ZScale {
      * or null if it could not compute cut values.
      */
     public static double[] computeScale(Sampler sampler){
-        double contrast = 0.6; //default 1 
+        double contrast = 0.6; //default 1
 
         double sample[] = sampler.getSample(2000);
         if(sample.length < 2){
@@ -41,7 +41,7 @@ public class ZScale {
         double median = sample[centerIdx];
         int minPix = (int)Math.max(MIN_NPIXELS, sample.length * MAX_REJECT);
 
-        //chop off sample ends 
+        //chop off sample ends
         int istart = (int)((sample.length - 1) * 0.05);
         int iend = (int)((sample.length - 1) * 0.95);
         int npoints = iend - istart + 1;
@@ -52,14 +52,14 @@ public class ZScale {
 
         //fit a line
         double[] lineParms = fitLine(iota(0,1,sample.length), sample);
-        
-        //Normally, we should iteratively exclude points from the 
+
+        //Normally, we should iteratively exclude points from the
         //data set and test if the fitting is correct
-        
+
         //compute lowCut and highCut
         double lowCut = median + (lineParms[0]/contrast)*(1-centerIdx);
         double highCut = median + (lineParms[0]/contrast)*((npoints)-centerIdx);
-        
+
         System.err.println("zscale: lowCut = " + lowCut + ", highCut = " + highCut);
 
         return new double[]{lowCut, highCut};
@@ -112,7 +112,7 @@ public class ZScale {
 
     private void testLinReg(){
         double[] xdata = {1, 2, 3, 3.9, 4, 4.5, 5, 6.2};
-        double[] ydata = {5, 3.1, 0.8, 0.1, -1.2, -2.8, -3, -5};  
+        double[] ydata = {5, 3.1, 0.8, 0.1, -1.2, -2.8, -3, -5};
         double[] lineParms = fitLine(xdata, ydata);
         System.out.println("y = " + lineParms[0] + " * x + " + lineParms[1]);
         //we expect something like y = -2x + 7

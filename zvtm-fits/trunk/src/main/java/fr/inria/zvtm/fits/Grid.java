@@ -1,9 +1,9 @@
-/*   AUTHOR :          Romain Primet (romain.primet@inria.fr) 
- *   Copyright (c) INRIA, 2010. All Rights Reserved
- *   Licensed under the GNU LGPL. For full terms see the file COPYING.
+/*  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2010-2015.
+ *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id:$
  */
+
 package fr.inria.zvtm.fits;
 
 import java.awt.BasicStroke;
@@ -49,16 +49,16 @@ public class Grid extends Composite {
 
        Point2D.Double oppWcs = image.pix2wcs(image.getWidth(), image.getHeight());
 
-       for(int i=0; i<raDivs; i++){  
+       for(int i=0; i<raDivs; i++){
            //draw constant ra "line" ("vertical")
            double ra = origWcs.x + (i*raDiff);
            double decStep = (oppWcs.y - origWcs.y)/NSTEPS;
            for(int j=1; j<NSTEPS; j++){
-               Point2D from = fits2vs.transform(image.wcs2pix(ra, 
+               Point2D from = fits2vs.transform(image.wcs2pix(ra,
                            origWcs.y + (j-1) * decStep), null);
-               Point2D to = fits2vs.transform(image.wcs2pix(ra, 
+               Point2D to = fits2vs.transform(image.wcs2pix(ra,
                            origWcs.y + j*decStep), null);
-               VSegment segment = new VSegment(from.getX(), from.getY(), 
+               VSegment segment = new VSegment(from.getX(), from.getY(),
                            to.getX(), to.getY(), 0, DEFAULT_COLOR);
                    segment.setStroke(new BasicStroke(2));
                addChild(segment);
@@ -74,7 +74,7 @@ public class Grid extends Composite {
            for(int j=1; j<NSTEPS; j++){
                Point2D from = fits2vs.transform(image.wcs2pix(origWcs.x + ((j-1)*raStep), dec), null);
                Point2D to = fits2vs.transform(image.wcs2pix(origWcs.x + j*raStep, dec), null);
-               VSegment segment = new VSegment(from.getX(), from.getY(), 
+               VSegment segment = new VSegment(from.getX(), from.getY(),
                            to.getX(), to.getY(), 0, DEFAULT_COLOR);
                segment.setStroke(new BasicStroke(2));
                addChild(segment);
@@ -122,7 +122,7 @@ public class Grid extends Composite {
     System.out.println("decDiff: " + decDiff);
     raDiff = Math.ceil(raDiff*10000.d)/10000.d;
     decDiff = Math.ceil(decDiff*10000.d)/10000.d;
-    
+
     if(raDiff < 0.001) raDiff = 0.001;
     if(decDiff < 0.001) decDiff = 0.001;
 
@@ -169,9 +169,9 @@ public class Grid extends Composite {
         if(to.getY() < image.vy - height/2){
           outline_to = true;
         }
-        
+
         if(!outline_from && !outline_to){
-          VSegment segment = new VSegment(from.getX(), from.getY(), 
+          VSegment segment = new VSegment(from.getX(), from.getY(),
           to.getX(), to.getY(), 0, DEFAULT_COLOR);
           segment.setStroke(new BasicStroke(2));
           addChild(segment);
@@ -184,15 +184,15 @@ public class Grid extends Composite {
           } else if(outline_to){
 
             cutLine(to, from, image.vx, image.vy, width, height);
-            
+
           }
 
-          VSegment segment = new VSegment(from.getX(), from.getY(), 
+          VSegment segment = new VSegment(from.getX(), from.getY(),
           to.getX(), to.getY(), 0, DEFAULT_COLOR);
           segment.setStroke(new BasicStroke(2));
           addChild(segment);
         }
-        
+
       }
       ii += raDiff;
     }
@@ -241,9 +241,9 @@ public class Grid extends Composite {
           outline_to = true;
           //to.setLocation(to.getX(), min.y);
         }
-        
+
         if(!outline_from && !outline_to){
-          VSegment segment = new VSegment(from.getX(), from.getY(), 
+          VSegment segment = new VSegment(from.getX(), from.getY(),
           to.getX(), to.getY(), 0, DEFAULT_COLOR);
           segment.setStroke(new BasicStroke(2));
           addChild(segment);
@@ -256,7 +256,7 @@ public class Grid extends Composite {
             cutLine(to, from, image.vx, image.vy, width, height);
           }
 
-          VSegment segment = new VSegment(from.getX(), from.getY(), 
+          VSegment segment = new VSegment(from.getX(), from.getY(),
           to.getX(), to.getY(), 0, DEFAULT_COLOR);
           segment.setStroke(new BasicStroke(2));
           addChild(segment);
@@ -288,32 +288,32 @@ public class Grid extends Composite {
 
     if(outline.getX() < vx - width/2 && outline.getY() < vy + height/2 && outline.getY() > vy - height/2){  // west
 
-      Point2D intersection = getIntersectionPoint( new Point2D.Double(vx - width/2, vy - height/2), 
+      Point2D intersection = getIntersectionPoint( new Point2D.Double(vx - width/2, vy - height/2),
                                               new Point2D.Double(vx - width/2, vy + height/2), outline, inline);
       outline.setLocation(intersection.getX(), intersection.getY());
 
     }else if(outline.getX() > vx + width/2 && outline.getY() < vy + height/2 && outline.getY() > vy - height/2){  // east
 
-      Point2D intersection = getIntersectionPoint( new Point2D.Double(vx + width/2, vy - height/2), 
+      Point2D intersection = getIntersectionPoint( new Point2D.Double(vx + width/2, vy - height/2),
                                               new Point2D.Double(vx + width/2, vy + height/2), outline, inline);
       outline.setLocation(intersection.getX(), intersection.getY());
 
     }else if(outline.getY() < vy + height/2 && outline.getX() < vx + width/2 && outline.getX() > vx - width/2){  // south
 
-      Point2D intersection = getIntersectionPoint( new Point2D.Double(vx - width/2, vy - height/2), 
+      Point2D intersection = getIntersectionPoint( new Point2D.Double(vx - width/2, vy - height/2),
                                               new Point2D.Double(vx + width/2, vy - height/2), outline, inline);
       outline.setLocation(intersection.getX(), intersection.getY());
 
     }else if(outline.getY() > vy - height/2 && outline.getX() < vx + width/2 && outline.getX() > vx - width/2){  // north
-      Point2D intersection = getIntersectionPoint( new Point2D.Double(vx - width/2, vy + height/2), 
+      Point2D intersection = getIntersectionPoint( new Point2D.Double(vx - width/2, vy + height/2),
                                               new Point2D.Double(vx + width/2, vy + height/2), outline, inline);
       outline.setLocation(intersection.getX(), intersection.getY());
 
     }else if(outline.getX() < vx - width/2 && outline.getY() > vy + height/2){  // south-west
 
-      Point2D intersection1 = getIntersectionPoint( new Point2D.Double(vx - width/2, vy - height/2), 
+      Point2D intersection1 = getIntersectionPoint( new Point2D.Double(vx - width/2, vy - height/2),
                                               new Point2D.Double(vx - width/2, vy + height/2), outline, inline);
-      Point2D intersection2 = getIntersectionPoint( new Point2D.Double(vx - width/2, vy + height/2), 
+      Point2D intersection2 = getIntersectionPoint( new Point2D.Double(vx - width/2, vy + height/2),
                                               new Point2D.Double(vx + width/2, vy + height/2), outline, inline);
 
       double d1 = intersection1.distance(vx, vy);
@@ -325,12 +325,12 @@ public class Grid extends Composite {
 
     }else if(outline.getX() < vx - width/2 && outline.getY() < vy - height/2){  // north-west
 
-      Point2D intersection1 = getIntersectionPoint( new Point2D.Double(vx - width/2, vy - height/2), 
+      Point2D intersection1 = getIntersectionPoint( new Point2D.Double(vx - width/2, vy - height/2),
                                               new Point2D.Double(vx - width/2, vy + height/2), outline, inline);
 
-      Point2D intersection2 = getIntersectionPoint( new Point2D.Double(vx - width/2, vy - height/2), 
+      Point2D intersection2 = getIntersectionPoint( new Point2D.Double(vx - width/2, vy - height/2),
                                               new Point2D.Double(vx + width/2, vy - height/2), outline, inline);
-      
+
       double d1 = intersection1.distance(vx, vy);
       double d2 = intersection2.distance(vx, vy);
       if(d1 < d2)
@@ -340,9 +340,9 @@ public class Grid extends Composite {
 
     }else if(outline.getX() > vx + width/2 && outline.getY() > vy + height/2){  // south-east
 
-      Point2D intersection1 = getIntersectionPoint( new Point2D.Double(vx + width/2, vy - height/2), 
+      Point2D intersection1 = getIntersectionPoint( new Point2D.Double(vx + width/2, vy - height/2),
                                               new Point2D.Double(vx + width/2, vy + height/2), outline, inline);
-      Point2D intersection2 = getIntersectionPoint( new Point2D.Double(vx - width/2, vy + height/2), 
+      Point2D intersection2 = getIntersectionPoint( new Point2D.Double(vx - width/2, vy + height/2),
                                               new Point2D.Double(vx + width/2, vy + height/2), outline, inline);
 
       double d1 = intersection1.distance(vx, vy);
@@ -355,11 +355,11 @@ public class Grid extends Composite {
 
     }else if(outline.getX() > vx + width/2 && outline.getY() < vy - height/2){  // north-east
 
-      Point2D intersection1 = getIntersectionPoint( new Point2D.Double(vx + width/2, vy - height/2), 
+      Point2D intersection1 = getIntersectionPoint( new Point2D.Double(vx + width/2, vy - height/2),
                                               new Point2D.Double(vx + width/2, vy + height/2), outline, inline);
-      Point2D intersection2 = getIntersectionPoint( new Point2D.Double(vx - width/2, vy - height/2), 
+      Point2D intersection2 = getIntersectionPoint( new Point2D.Double(vx - width/2, vy - height/2),
                                               new Point2D.Double(vx + width/2, vy - height/2), outline, inline);
-      
+
       double d1 = intersection1.distance(vx, vy);
       double d2 = intersection2.distance(vx, vy);
       if(d1 < d2)

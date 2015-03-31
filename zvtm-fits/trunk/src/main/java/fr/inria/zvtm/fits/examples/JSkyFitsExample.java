@@ -1,10 +1,9 @@
-/*   AUTHOR : Romain Primet (romain.primet@inria.fr)
- *
- *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2010.
+/*  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2010-2015.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id:$
- */ 
+ */
+
 package fr.inria.zvtm.fits.examples;
 
 import fr.inria.zvtm.engine.Camera;
@@ -57,7 +56,7 @@ import javax.swing.JFrame;
  */
 public class JSkyFitsExample{
 
-	/* screen dimensions, actual dimensions of windows */
+    /* screen dimensions, actual dimensions of windows */
     static int SCREEN_WIDTH =  Toolkit.getDefaultToolkit().getScreenSize().width;
     static int SCREEN_HEIGHT =  Toolkit.getDefaultToolkit().getScreenSize().height;
     static int VIEW_MAX_W = 1280;
@@ -67,11 +66,11 @@ public class JSkyFitsExample{
 
     String APP_TITLE = "JSkyFitsImage viewer";
 
-	//shortcut
-	VirtualSpaceManager vsm; 
+    //shortcut
+    VirtualSpaceManager vsm;
 
-	VirtualSpace mSpace, bSpace, mnSpace;
-	Camera mCamera, bCamera, mnCamera;
+    VirtualSpace mSpace, bSpace, mnSpace;
+    Camera mCamera, bCamera, mnCamera;
 
     JSkyFitsImage img;
     double[] scaleBounds;
@@ -84,19 +83,19 @@ public class JSkyFitsExample{
 
     static final String mSpaceName = "FITS Layer";
     static final String bSpaceName = "Data Layer";
-	static final String mnSpaceName = "Menu Layer";
+    static final String mnSpaceName = "Menu Layer";
 
-	static final int LAYER_FITS = 0;
-	static final int LAYER_DATA = 1;
-	static final int LAYER_MENU = 2;
+    static final int LAYER_FITS = 0;
+    static final int LAYER_DATA = 1;
+    static final int LAYER_MENU = 2;
 
 
-	JSkyFitsExample(FitsOptions options) throws IOException {
-		
-		initGUI(options);
+    JSkyFitsExample(FitsOptions options) throws IOException {
 
-		if(options.url != null){
-			img = new JSkyFitsImage(new URL(options.url) );
+        initGUI(options);
+
+        if(options.url != null){
+            img = new JSkyFitsImage(new URL(options.url) );
 
         } else if(options.file != null){
             String path = new File ( options.file ).getAbsolutePath ();
@@ -129,18 +128,18 @@ public class JSkyFitsExample{
     }
 
     void initGUI(FitsOptions options){
-    	windowLayout();
-    	vsm = VirtualSpaceManager.INSTANCE;
-    	mSpace = vsm.addVirtualSpace(mSpaceName);
-    	bSpace = vsm.addVirtualSpace(bSpaceName);
-    	mnSpace = vsm.addVirtualSpace(mnSpaceName);
-		mCamera = mSpace.addCamera();
-		bCamera = bSpace.addCamera();
-		mnCamera = mnSpace.addCamera();
-		Vector<Camera> cameras = new Vector<Camera>();
-		cameras.add(mCamera);
-		cameras.add(bCamera);
-		cameras.add(mnCamera);
+        windowLayout();
+        vsm = VirtualSpaceManager.INSTANCE;
+        mSpace = vsm.addVirtualSpace(mSpaceName);
+        bSpace = vsm.addVirtualSpace(bSpaceName);
+        mnSpace = vsm.addVirtualSpace(mnSpaceName);
+        mCamera = mSpace.addCamera();
+        bCamera = bSpace.addCamera();
+        mnCamera = mnSpace.addCamera();
+        Vector<Camera> cameras = new Vector<Camera>();
+        cameras.add(mCamera);
+        cameras.add(bCamera);
+        cameras.add(mnCamera);
 
 
         mView = vsm.addFrameView(cameras, APP_TITLE, View.STD_VIEW, VIEW_W, VIEW_H, false, false, !options.fullscreen, null);
@@ -162,8 +161,8 @@ public class JSkyFitsExample{
         mView.setListener(eh, LAYER_DATA);
         mView.setListener(menu, LAYER_MENU);
 
-        
-        
+
+
     }
 
     public Point2D.Double viewToSpace(Camera cam, int jpx, int jpy){
@@ -182,31 +181,31 @@ public class JSkyFitsExample{
     }
 
     public VirtualSpace getMSpace(){
-    	return mSpace;
+        return mSpace;
     }
-	public VirtualSpace getMnSpace(){
-		return mnSpace;
-	}
+    public VirtualSpace getMnSpace(){
+        return mnSpace;
+    }
 
-	public JSkyFitsMenu getMenu(){
-		return menu;
-	}
+    public JSkyFitsMenu getMenu(){
+        return menu;
+    }
 
-	public int getViewW(){
-		return VIEW_W;
-	}
-	public int getViewH(){
-		return VIEW_H;
-	}
+    public int getViewW(){
+        return VIEW_W;
+    }
+    public int getViewH(){
+        return VIEW_H;
+    }
 
-	public Camera getMCamera(){
-		return mCamera;
-	}
-	public Camera getMnCamera(){
-		return mnCamera;
-	}
+    public Camera getMCamera(){
+        return mCamera;
+    }
+    public Camera getMnCamera(){
+        return mnCamera;
+    }
 
-	void windowLayout(){
+    void windowLayout(){
 
         VIEW_X = 80;
         SCREEN_WIDTH -= 80;
@@ -225,7 +224,7 @@ public class JSkyFitsExample{
     }
 
 
-	public static void main(String[] args) throws IOException{
+    public static void main(String[] args) throws IOException{
 
         FitsOptions options = new FitsOptions();
         CmdLineParser parser = new CmdLineParser(options);
@@ -238,8 +237,8 @@ public class JSkyFitsExample{
             return;
         }
 
-		new JSkyFitsExample(options);
-	}
+        new JSkyFitsExample(options);
+    }
 
 }
 

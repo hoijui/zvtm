@@ -1,9 +1,9 @@
-/*   AUTHOR :          Romain Primet (romain.primet@inria.fr) 
- *   Copyright (c) INRIA, 2010. All Rights Reserved
- *   Licensed under the GNU LGPL. For full terms see the file COPYING.
+/*  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2010-2015.
+ *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id:$
  */
+
 package fr.inria.zvtm.fits;
 
 import java.awt.Color;
@@ -22,15 +22,15 @@ public class Utils {
 
     public static String VERSION;
 
-	static {
-	    Scanner sc = new Scanner(Utils.class.getResourceAsStream("/properties")).useDelimiter("\\s*=\\s*");
+    static {
+        Scanner sc = new Scanner(Utils.class.getResourceAsStream("/properties")).useDelimiter("\\s*=\\s*");
         while (sc.hasNext()){
             String token = sc.next();
             if (token.equals("version")){
                 Utils.VERSION = sc.next().trim();
             }
         }
-	}
+    }
 
     private Utils(){}
 
