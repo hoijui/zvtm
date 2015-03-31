@@ -81,7 +81,7 @@ import org.icepdf.core.pobjects.PDimension;
  */
 
 public class PDFViewer {
-        
+
     /* screen dimensions, actual dimensions of windows */
     static int SCREEN_WIDTH =  Toolkit.getDefaultToolkit().getScreenSize().width;
     static int SCREEN_HEIGHT =  Toolkit.getDefaultToolkit().getScreenSize().height;
@@ -91,16 +91,16 @@ public class PDFViewer {
     int VIEW_X, VIEW_Y;
     /* dimensions of zoomable panel */
     int panelWidth, panelHeight;
-    
+
     /* Navigation constants */
     static final int ANIM_MOVE_LENGTH = 300;
     static final short MOVE_UP = 0;
     static final short MOVE_DOWN = 1;
     static final short MOVE_LEFT = 2;
     static final short MOVE_RIGHT = 3;
-    
+
     static final String PDF_EXT = ".pdf";
-    
+
     /* ZVTM objects */
     VirtualSpaceManager vsm;
     static final String mSpaceName = "Scene Space";
@@ -113,16 +113,16 @@ public class PDFViewer {
     SceneManager sm;
 
 	VWGlassPane gp;
-    
+
     public PDFViewer(boolean fullscreen, boolean opengl, File inputFile){
 		initGUI(fullscreen, opengl);
         VirtualSpace[]  sceneSpaces = {mSpace};
         Camera[] sceneCameras = {mCamera};
-        sm = new SceneManager(sceneSpaces, sceneCameras);
+        sm = new SceneManager(sceneSpaces, sceneCameras, new HashMap(1,1));
         sm.setResourceHandler(PDFResourceHandler.RESOURCE_TYPE_PDF, new PDFResourceHandler());
 		if (inputFile != null){
 		    if (inputFile.getName().endsWith(PDF_EXT)){
-    			loadPDF(inputFile);		        
+    			loadPDF(inputFile);
 		    }
 		    else {
 		        loadScene(inputFile);
@@ -135,7 +135,7 @@ public class PDFViewer {
                }
            });
     }
-    
+
     void finish(){
         getGlobalView(new EndAction(){
                public void execute(Object subject, Animation.Dimension dimension){
@@ -171,7 +171,7 @@ public class PDFViewer {
 				updatePanelSize();
 			}
 		};
-		mView.getFrame().addComponentListener(ca0);		
+		mView.getFrame().addComponentListener(ca0);
     }
 
     void windowLayout(){
@@ -187,10 +187,10 @@ public class PDFViewer {
     }
 
 	/*-------------  Scene management    -------------*/
-	
+
 	//static final short[] TRANSITIONS = {Region.APPEAR, Region.APPEAR, Region.DISAPPEAR, Region.DISAPPEAR};
 	static final short[] TRANSITIONS = {Region.FADE_IN, Region.FADE_IN, Region.FADE_OUT, Region.FADE_OUT};
-	
+
 	void loadPDF(File pdfFile){
 		try {
 			mView.setTitle(mViewName + " - " + pdfFile.getCanonicalPath());
@@ -236,7 +236,7 @@ public class PDFViewer {
                 r.addContainedRegion(prevRegion);
                 prevRegion.setContainingRegion(r);
             }
-            //pf.dispose();               
+            //pf.dispose();
 		}
 		catch (java.net.MalformedURLException ex){ex.printStackTrace();}
 		// important SM init calls
@@ -244,7 +244,7 @@ public class PDFViewer {
 	    gp.setLabel(VWGlassPane.EMPTY_STRING);
         mCamera.setAltitude(0.0f);
 	}
-	
+
 	void loadScene(File xmlFile){
 	    try {
 			mView.setTitle(mViewName + " - " + xmlFile.getCanonicalPath());
@@ -259,9 +259,9 @@ public class PDFViewer {
 	    }
         mCamera.setAltitude(0.0f);
 	}
-    
+
     /*-------------     Navigation       -------------*/
-    
+
     void getGlobalView(EndAction ea){
 		int l = 0;
 		while (sm.getRegionsAtLevel(l) == null){
@@ -273,7 +273,7 @@ public class PDFViewer {
 		}
 		if (l > -1){
 			double[] wnes = sm.getLevel(l).getBounds();
-	        mCamera.getOwningView().centerOnRegion(mCamera, PDFViewer.ANIM_MOVE_LENGTH, wnes[0], wnes[1], wnes[2], wnes[3], ea);		
+	        mCamera.getOwningView().centerOnRegion(mCamera, PDFViewer.ANIM_MOVE_LENGTH, wnes[0], wnes[1], wnes[2], wnes[3], ea);
 		}
     }
 
@@ -319,9 +319,9 @@ public class PDFViewer {
             trans, true, SlowInSlowOutInterpolator.getInstance(), null);
         vsm.getAnimationManager().startAnimation(a, false);
     }
-	
+
     void altitudeChanged(){ }
-    
+
     void updatePanelSize(){
         Dimension d = mView.getPanel().getComponent().getSize();
         panelWidth = d.width;
@@ -329,7 +329,7 @@ public class PDFViewer {
 	}
 
     /* ----- Misc  ------*/
-    
+
     void exit(){
         System.exit(0);
     }
@@ -344,7 +344,7 @@ public class PDFViewer {
         System.getProperties().put("org.icepdf.core.screen.interpolation", RenderingHints.VALUE_INTERPOLATION_BICUBIC);
         System.getProperties().put("org.icepdf.core.screen.render", RenderingHints.VALUE_RENDER_QUALITY);
         System.getProperties().put("org.icepdf.core.screen.stroke", RenderingHints.VALUE_STROKE_PURE);
-	    
+
         File inputFile = null;
 		boolean fs = false;
 		boolean ogl = false;
@@ -359,7 +359,7 @@ public class PDFViewer {
                 // the only other thing allowed as a cmd line param is a scene file
                 File f = new File(args[i]);
                 if (f.exists()){
-                    inputFile = f;                        
+                    inputFile = f;
                 }
             }
 		}
@@ -369,21 +369,21 @@ public class PDFViewer {
         System.out.println("--help for command line options");
         new PDFViewer(fs, ogl, inputFile);
     }
-    
+
     private static void printCmdLineHelp(){
         System.out.println("Usage:\n\tjava -Xmx1024M -Xms512M -jar target/zuist-pdf-X.X.X.jar <path_to_pdf> [options]");
         System.out.println("Options:\n\t-fs: fullscreen mode");
         System.out.println("Options:\n\t-opengl: OpenGL pipeline");
     }
-    
+
 }
 
 class VWGlassPane extends JComponent implements ProgressListener {
-    
+
     static final int BAR_WIDTH = 200;
     static final int BAR_HEIGHT = 10;
 
-    static final AlphaComposite GLASS_ALPHA = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.65f);    
+    static final AlphaComposite GLASS_ALPHA = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.65f);
     static final Color MSG_COLOR = Color.DARK_GRAY;
     GradientPaint PROGRESS_GRADIENT = new GradientPaint(0, 0, Color.ORANGE, 0, BAR_HEIGHT, Color.BLUE);
 
@@ -391,14 +391,14 @@ class VWGlassPane extends JComponent implements ProgressListener {
     String msg = EMPTY_STRING;
     int msgX = 0;
     int msgY = 0;
-    
+
     int completion = 0;
     int prX = 0;
     int prY = 0;
     int prW = 0;
-    
+
     PDFViewer application;
-    
+
     VWGlassPane(PDFViewer app){
         super();
         this.application = app;
@@ -406,7 +406,7 @@ class VWGlassPane extends JComponent implements ProgressListener {
         addMouseMotionListener(new MouseMotionAdapter(){});
         addKeyListener(new KeyAdapter(){});
     }
-    
+
     public void setValue(int c){
         completion = c;
         prX = application.panelWidth/2-BAR_WIDTH/2;
@@ -415,14 +415,14 @@ class VWGlassPane extends JComponent implements ProgressListener {
         PROGRESS_GRADIENT = new GradientPaint(0, prY, Color.LIGHT_GRAY, 0, prY+BAR_HEIGHT, Color.DARK_GRAY);
         repaint(prX, prY, BAR_WIDTH, BAR_HEIGHT);
     }
-    
+
     public void setLabel(String m){
         msg = m;
         msgX = application.panelWidth/2-BAR_WIDTH/2;
         msgY = application.panelHeight/2-BAR_HEIGHT/2 - 10;
         repaint(msgX, msgY-50, 400, 70);
     }
-    
+
     protected void paintComponent(Graphics g){
         Graphics2D g2 = (Graphics2D)g;
         Rectangle clip = g.getClipBounds();
@@ -440,7 +440,7 @@ class VWGlassPane extends JComponent implements ProgressListener {
         g2.setColor(MSG_COLOR);
         g2.drawRect(prX, prY, BAR_WIDTH, BAR_HEIGHT);
     }
-    
+
 }
 
 class ConfigManager {
@@ -457,9 +457,9 @@ class PDFViewerEventHandler implements ViewListener, ComponentListener {
 
     static final float WHEEL_ZOOMIN_FACTOR = 21.0f;
     static final float WHEEL_ZOOMOUT_FACTOR = 22.0f;
-    
+
     static float WHEEL_MM_STEP = 1.0f;
-    
+
     int lastJPX,lastJPY;    //remember last mouse coords to compute translation  (dragging)
     double lastVX, lastVY;
     int currentJPX, currentJPY;
@@ -469,7 +469,7 @@ class PDFViewerEventHandler implements ViewListener, ComponentListener {
     double oldCameraAltitude;
 
     PDFViewer application;
-    
+
     PDFViewerEventHandler(PDFViewer app){
         this.application = app;
         oldCameraAltitude = this.application.mCamera.getAltitude();
@@ -481,7 +481,7 @@ class PDFViewerEventHandler implements ViewListener, ComponentListener {
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
 		if (v.lastGlyphEntered() != null){
-    		application.mView.centerOnGlyph(v.lastGlyphEntered(), v.cams[0], PDFViewer.ANIM_MOVE_LENGTH, true, 1.0f);				
+    		application.mView.centerOnGlyph(v.lastGlyphEntered(), v.cams[0], PDFViewer.ANIM_MOVE_LENGTH, true, 1.0f);
 		}
     }
 
@@ -496,7 +496,7 @@ class PDFViewerEventHandler implements ViewListener, ComponentListener {
 	public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
-        
+
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){}
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){}
@@ -534,7 +534,7 @@ class PDFViewerEventHandler implements ViewListener, ComponentListener {
     public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 
     public void viewActivated(View v){}
-    
+
     public void viewDeactivated(View v){}
 
     public void viewIconified(View v){}
@@ -552,5 +552,5 @@ class PDFViewerEventHandler implements ViewListener, ComponentListener {
         application.updatePanelSize();
     }
     public void componentShown(ComponentEvent e){}
-    
+
 }
