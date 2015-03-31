@@ -59,7 +59,7 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
 	<dependency>
       <groupId>fr.inria.zvtm</groupId>
       <artifactId>zvtm-core</artifactId>
-      <version>[0.11.0,)</version>
+      <version>[0.12.0-SNAPSHOT,)</version>
     </dependency>
 
 	<dependency>

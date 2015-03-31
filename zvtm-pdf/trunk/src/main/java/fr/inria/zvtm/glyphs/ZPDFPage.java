@@ -136,9 +136,19 @@ public abstract class ZPDFPage extends ClosedShape implements RectangularShape {
 
 	@Override
 	public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
-		if ((jpx>=(pc[camIndex].cx-pc[camIndex].cw)) && (jpx<=(pc[camIndex].cx+pc[camIndex].cw)) &&
-		    (jpy>=(pc[camIndex].cy-pc[camIndex].ch)) && (jpy<=(pc[camIndex].cy+pc[camIndex].ch))){return true;}
-		else {return false;}
+		return coordInsideP(jpx, jpy, camIndex);
+	}
+
+	@Override
+	public boolean coordInsideV(double cvx, double cvy, int camIndex){
+        return (cvx>=(vx-vw/2d)) && (cvx<=(vx+vw/2d)) &&
+               (cvy>=(vy-vh/2d)) && (cvy<=(vy+vh/2d));
+	}
+
+	@Override
+	public boolean coordInsideP(int jpx, int jpy, int camIndex){
+		return ((jpx>=(pc[camIndex].cx-pc[camIndex].cw)) && (jpx<=(pc[camIndex].cx+pc[camIndex].cw)) &&
+		    (jpy>=(pc[camIndex].cy-pc[camIndex].ch)) && (jpy<=(pc[camIndex].cy+pc[camIndex].ch)));
 	}
 
 	@Override
@@ -159,47 +169,6 @@ public abstract class ZPDFPage extends ClosedShape implements RectangularShape {
 	@Override
 	public boolean visibleInDisc(double dvx, double dvy, double dvr, Shape dvs, int camIndex, int jpx, int jpy, int dpr){
 		return dvs.intersects(vx-vw/2d, vy-vh/2d, vw, vh);
-	}
-
-	@Override
-	public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
-		if (coordInside(jpx, jpy, camIndex, cvx, cvy)){
-			//if the mouse is inside the glyph
-			if (!pc[camIndex].prevMouseIn){
-				//if it was not inside it last time, mouse has entered the glyph
-				pc[camIndex].prevMouseIn=true;
-				return Glyph.ENTERED_GLYPH;
-			}
-			else {
-				//if it was inside last time, nothing has changed
-				return Glyph.NO_CURSOR_EVENT;
-			}
-		}
-		else{
-			//if the mouse is not inside the glyph
-			if (pc[camIndex].prevMouseIn){
-				//if it was inside it last time, mouse has exited the glyph
-				pc[camIndex].prevMouseIn=false;
-				return Glyph.EXITED_GLYPH;
-			}
-			else {
-				//if it was not inside last time, nothing has changed
-				return Glyph.NO_CURSOR_EVENT;
-			}
-		}
-	}
-
-	@Override
-	public void resetMouseIn(){
-		for (int i=0;i<pc.length;i++){
-			resetMouseIn(i);
-		}
-	}
-
-	@Override
-	public void resetMouseIn(int i){
-		if (pc[i]!=null){pc[i].prevMouseIn=false;}
-		borderColor = bColor;
 	}
 
 	@Override

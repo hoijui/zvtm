@@ -1,5 +1,5 @@
 /*   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2008-2011. All Rights Reserved
+ *   Copyright (c) INRIA, 2008-2015. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -52,6 +52,7 @@ import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.event.RepaintListener;
 import fr.inria.zvtm.event.ViewListener;
+// import fr.inria.zvtm.event.PickerListener;
 import fr.inria.zvtm.glyphs.IcePDFPageImg;
 import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VText;
@@ -124,6 +125,7 @@ public class PDFViewer {
 		((JFrame)pdfView.getFrame()).setGlassPane(gp);
 		eh = new PDFViewerEventHandler(this);
 		pdfView.setListener(eh);
+        // pdfView.getCursor().getPicker().setListener(eh);
 		pdfView.setAntialiasing(true);
 		mCamera.setAltitude(0);
 		VirtualSpaceManager.INSTANCE.repaint();
@@ -518,11 +520,6 @@ class PDFViewerEventHandler implements ViewListener {
 		}
 	}
 
-	public void enterGlyph(Glyph g){
-	}
-
-	public void exitGlyph(Glyph g){
-	}
 	public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){	}
 
 	public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
