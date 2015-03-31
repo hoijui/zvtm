@@ -51,7 +51,6 @@ import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.PRectangle;
 import fr.inria.zvtm.glyphs.Composite;
 import fr.inria.zvtm.glyphs.JSkyFitsImage;
-// import fr.inria.zvtm.glyphs.FitsImage;
 
 import fr.inria.zvtm.fits.RangeSelection;
 import fr.inria.zvtm.fits.Utils;
@@ -116,8 +115,9 @@ import java.awt.Toolkit;
 
 
 /**
- * Sample FITS application.
+ * Example application loading FITS images using JSky.
  */
+
 public class JSkyFitsExample{
 
     /* screen dimensions, actual dimensions of windows */
@@ -140,7 +140,7 @@ public class JSkyFitsExample{
     double[] scaleBounds;
     //private boolean dragLeft = false, dragRight = false;
 
-    private View mView;
+    View mView;
     private JSFEEventHandler eh;
 
     public JSkyFitsMenu menu;
@@ -229,46 +229,6 @@ public class JSkyFitsExample{
 
     }
 
-    public Point2D.Double viewToSpace(Camera cam, int jpx, int jpy){
-        Location camLoc = cam.getLocation();
-        double focal = cam.getFocal();
-        double altCoef = (focal + camLoc.alt) / focal;
-        Dimension viewSize = mView.getPanelSize();
-
-        //find coords of view origin in the virtual space
-        double viewOrigX = camLoc.vx - (0.5*viewSize.width*altCoef);
-        double viewOrigY = camLoc.vy + (0.5*viewSize.height*altCoef);
-
-        return new Point2D.Double(
-                viewOrigX + (altCoef*jpx),
-                viewOrigY - (altCoef*jpy));
-    }
-
-    public VirtualSpace getMSpace(){
-        return mSpace;
-    }
-    public VirtualSpace getMnSpace(){
-        return mnSpace;
-    }
-
-    public JSkyFitsMenu getMenu(){
-        return menu;
-    }
-
-    public int getViewW(){
-        return VIEW_W;
-    }
-    public int getViewH(){
-        return VIEW_H;
-    }
-
-    public Camera getMCamera(){
-        return mCamera;
-    }
-    public Camera getMnCamera(){
-        return mnCamera;
-    }
-
     void windowLayout(){
 
         VIEW_X = 80;
@@ -315,10 +275,8 @@ class JSFEEventHandler implements ViewListener {
     static final float WHEEL_ZOOMIN_FACTOR = 21.0f;
     static final float WHEEL_ZOOMOUT_FACTOR = 22.0f;
 
-
     //FitsExample app;
     JSkyFitsExample app;
-
 
     //private double[] scaleBounds;
     //private boolean dragLeft = false, dragRight = false;
@@ -327,11 +285,7 @@ class JSFEEventHandler implements ViewListener {
     private int lastJPX;
     private int lastJPY;
 
-    boolean zero_order_dragging = false;
-    boolean first_order_dragging = false;
-    static final short ZERO_ORDER = 0;
-    static final short FIRST_ORDER = 1;
-    short navMode = ZERO_ORDER;
+    boolean panning = false;
 
     double angle = 0;
 
@@ -348,17 +302,9 @@ class JSFEEventHandler implements ViewListener {
             dragRight = true;
         }
         */
-
         lastJPX = jpx;
         lastJPY = jpy;
-        if (navMode == FIRST_ORDER){
-            first_order_dragging = true;
-            v.setDrawDrag(true);
-        }
-        else {
-            // ZERO_ORDER
-            zero_order_dragging = true;
-        }
+        panning = true;
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
@@ -373,18 +319,7 @@ class JSFEEventHandler implements ViewListener {
         */
         //v.parent.setActiveLayer(0);
 
-        zero_order_dragging = false;
-        if (first_order_dragging){
-            Camera c = app.mCamera;
-            c.setXspeed(0);
-            c.setYspeed(0);
-            c.setZspeed(0);
-            v.setDrawDrag(false);
-            first_order_dragging = false;
-        }
-
-        //System.out.println("panzoomEH release1");
-
+        panning = false;
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
@@ -395,28 +330,9 @@ class JSFEEventHandler implements ViewListener {
 
     public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
-    public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-        //v.parent.setActiveLayer(2);
-        /*
-        lastJPX=jpx;
-        lastJPY=jpy;
-        v.setDrawDrag(true);
-        app.vsm.getActiveView().mouse.setSensitivity(false);
-        */
-        //because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
-    }
+    public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
-    public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-        /*
-        v.cams[0].setXspeed(0);
-        v.cams[0].setYspeed(0);
-        v.cams[0].setZspeed(0);
-        v.setDrawDrag(false);
-        app.vsm.getActiveView().mouse.setSensitivity(true);
-        */
-        //v.parent.setActiveLayer(0);
-        //System.out.println("panzoomEH release3");
-    }
+    public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
@@ -445,27 +361,15 @@ class JSFEEventHandler implements ViewListener {
     }
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
-
-        Camera c = app.mCamera;
-        double a = (c.focal+Math.abs(c.altitude)) / c.focal;
-        if (zero_order_dragging){
-            c.move(a*(lastJPX-jpx), a*(jpy-lastJPY));
-            lastJPX = jpx;
-            lastJPY = jpy;
-        }
-        else if (first_order_dragging){
-            if (mod == SHIFT_MOD){
-                c.setXspeed(0);
-                c.setYspeed(0);
-                c.setZspeed( (c.altitude>0) ? ((lastJPY-jpy)*(ZOOM_SPEED_COEF)) : ((lastJPY-jpy)/(ZOOM_SPEED_COEF)));
-            }
-            else {
-                c.setXspeed((c.altitude>0) ? (jpx-lastJPX)*(a/PAN_SPEED_COEF) : (jpx-lastJPX)/(a*PAN_SPEED_COEF));
-                c.setYspeed((c.altitude>0) ? (lastJPY-jpy)*(a/PAN_SPEED_COEF) : (lastJPY-jpy)/(a*PAN_SPEED_COEF));
-                c.setZspeed(0);
+        if (panning){
+            Camera c = app.mCamera;
+            double a = (c.focal+Math.abs(c.altitude)) / c.focal;
+            synchronized(c){
+                c.move(a*(lastJPX-jpx), a*(jpy-lastJPY));
+                lastJPX = jpx;
+                lastJPY = jpy;
             }
         }
-
         /*
 
         if(buttonNumber == 1){
@@ -504,19 +408,17 @@ class JSFEEventHandler implements ViewListener {
         if (wheelDirection  == WHEEL_UP){
             // zooming out
             c.move(-((mvx - c.vx) * WHEEL_ZOOMOUT_FACTOR / c.focal),
-                                     -((mvy - c.vy) * WHEEL_ZOOMOUT_FACTOR / c.focal));
+                   -((mvy - c.vy) * WHEEL_ZOOMOUT_FACTOR / c.focal));
             c.altitudeOffset(a*WHEEL_ZOOMOUT_FACTOR);
-            app.vsm.repaint();
         }
         else {
             //wheelDirection == WHEEL_DOWN, zooming in
             if (c.getAltitude()-a*WHEEL_ZOOMIN_FACTOR >= c.getZoomFloor()){
                 // this test to prevent translation when camera is not actually zoming in
                 c.move((mvx - c.vx) * WHEEL_ZOOMIN_FACTOR / c.focal,
-                                         ((mvy - c.vy) * WHEEL_ZOOMIN_FACTOR / c.focal));
+                       ((mvy - c.vy) * WHEEL_ZOOMIN_FACTOR / c.focal));
             }
             c.altitudeOffset(-a*WHEEL_ZOOMIN_FACTOR);
-            app.vsm.repaint();
         }
         /*
         Camera c = (app instanceof FitsExample) ? ((FitsExample)app).mCamera : app.mCamera;
@@ -568,13 +470,6 @@ class JSFEEventHandler implements ViewListener {
     public void viewDeiconified(View v){}
 
     public void viewClosing(View v){System.exit(0);}
-
-    void toggleNavMode(){
-        switch(navMode){
-            case FIRST_ORDER:{navMode = ZERO_ORDER;break;}
-            case ZERO_ORDER:{navMode = FIRST_ORDER;break;}
-        }
-    }
 
 }
 
@@ -895,11 +790,9 @@ class JSkyFitsMenu implements ViewListener, PickerListener {
         }
         if(press1){
             if(shadow != null){
-
                 if(jpx > BORDER_RIGHT_HISTOGRAM) jpx = BORDER_RIGHT_HISTOGRAM;
                 if(jpx < BORDER_LEFT_HISTOGRAM) jpx = BORDER_LEFT_HISTOGRAM;
-
-                Point2D.Double point = app.viewToSpace(app.mnCamera, jpx, jpy);
+                Point2D.Double point = app.mView.fromPanelToVSCoordinates(jpx, jpy, app.mnCamera, new Point2D.Double());
                 drawShadow(shadow_vx, point.getX());
                 //scroll = false;
             }

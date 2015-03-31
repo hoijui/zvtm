@@ -273,65 +273,11 @@ public class FitsExample {
     }
 
     void windowLayout(){
-
         VIEW_X = 80;
         SCREEN_WIDTH -= 80;
 
-        /*
-        if (Utils.osIsWindows()){
-            VIEW_X = VIEW_Y = 0;
-        }
-        else if (Utils.osIsMacOS()){
-            VIEW_X = 80;
-            SCREEN_WIDTH -= 80;
-        }
-        */
         VIEW_W = (SCREEN_WIDTH <= VIEW_MAX_W) ? SCREEN_WIDTH : VIEW_MAX_W;
         VIEW_H = (SCREEN_HEIGHT <= VIEW_MAX_H) ? SCREEN_HEIGHT : VIEW_MAX_H;
-    }
-
-
-
-    private Point2D.Double viewToSpace(Camera cam, int jpx, int jpy){
-        Location camLoc = cam.getLocation();
-        double focal = cam.getFocal();
-        double altCoef = (focal + camLoc.alt) / focal;
-        Dimension viewSize = mView.getPanelSize();
-
-        //find coords of view origin in the virtual space
-        double viewOrigX = camLoc.vx - (0.5*viewSize.width*altCoef);
-        double viewOrigY = camLoc.vy + (0.5*viewSize.height*altCoef);
-
-        return new Point2D.Double(
-                viewOrigX + (altCoef*jpx),
-                viewOrigY - (altCoef*jpy));
-    }
-
-    public VirtualSpace getMSpace(){
-        return mSpace;
-    }
-    public VirtualSpace getMnSpace(){
-        return mnSpace;
-    }
-    public FitsMenu getMenu(){
-        return menu;
-    }
-
-    public int getViewW(){
-        return VIEW_W;
-    }
-    public int getViewH(){
-        return VIEW_H;
-    }
-
-    public Camera getMCamera(){
-        return mCamera;
-    }
-    public Camera getMnCamera(){
-        return mnCamera;
-    }
-    public FitsImage getImage(){
-        return hi;
     }
 
 	public static void main(String[] args) throws IOException{
