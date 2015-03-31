@@ -68,27 +68,27 @@ import org.icepdf.core.pobjects.graphics.text.*;
 
 public class PDFViewer {
 
-	static final int NAV_ANIM_DURATION = 300;
+    static final int NAV_ANIM_DURATION = 300;
 
-	static final short DIRECT_G2D_RENDERING = 0;
-	static final short OFFSCREEN_IMAGE_RENDERING = 1;
-	short rendering_technique = OFFSCREEN_IMAGE_RENDERING;
+    static final short DIRECT_G2D_RENDERING = 0;
+    static final short OFFSCREEN_IMAGE_RENDERING = 1;
+    short rendering_technique = OFFSCREEN_IMAGE_RENDERING;
 
-	VirtualSpace vs ;
-	static final String spaceName = "pdfSpace";
-	ViewListener eh;
-	Camera mCamera;
+    VirtualSpace vs ;
+    static final String spaceName = "pdfSpace";
+    ViewListener eh;
+    Camera mCamera;
 
-	class RectFloat{
-		public double x , y , width , height;
-		RectFloat(double x, double y , double height , double width){
-			this.x = x; this.y= y; this.height = height; this.width = width;
-		}
-	}
+    class RectFloat{
+        public double x , y , width , height;
+        RectFloat(double x, double y , double height , double width){
+            this.x = x; this.y= y; this.height = height; this.width = width;
+        }
+    }
 
-	View pdfView;
-	VWGlassPane gp;
-	private Document document;
+    View pdfView;
+    VWGlassPane gp;
+    private Document document;
     int panelWidth, panelHeight;
     private Vector<Glyph> lastSearchAdded = new Vector<Glyph>();
     private Vector<Glyph> annotationAdded = new Vector<Glyph>();
@@ -99,36 +99,36 @@ public class PDFViewer {
     boolean showAnnotation = false;
     float scaleFactor;
 
-	PDFViewer(String pdfFilePath, float df, float sf){
-		VirtualSpaceManager.INSTANCE.setDebug(true);
-		initGUI();
-		load(new File(pdfFilePath), df, sf);
-		scaleFactor = sf;
-	}
+    PDFViewer(String pdfFilePath, float df, float sf){
+        VirtualSpaceManager.INSTANCE.setDebug(true);
+        initGUI();
+        load(new File(pdfFilePath), df, sf);
+        scaleFactor = sf;
+    }
 
-	public void initGUI(){
-		vs = VirtualSpaceManager.INSTANCE.addVirtualSpace(spaceName);
-		mCamera = vs.addCamera();
-		Vector<Camera> cameras= new Vector<Camera>();
-		cameras.add(mCamera);
-		pdfView = VirtualSpaceManager.INSTANCE.addFrameView(cameras, "ZVTM PDF Viewer", View.STD_VIEW, 1024, 768, false, true, true, null);
-		pdfView.setBackgroundColor(Color.WHITE);
-		pdfView.setNotifyCursorMoved(false);
-		updatePanelSize();
-    	ComponentAdapter ca0 = new ComponentAdapter(){
-    		public void componentResized(ComponentEvent e){
-    			updatePanelSize();
-    		}
-    	};
-    	pdfView.getFrame().addComponentListener(ca0);
-		gp = new VWGlassPane(this);
-		((JFrame)pdfView.getFrame()).setGlassPane(gp);
-		eh = new PDFViewerEventHandler(this);
-		pdfView.setListener(eh);
+    public void initGUI(){
+        vs = VirtualSpaceManager.INSTANCE.addVirtualSpace(spaceName);
+        mCamera = vs.addCamera();
+        Vector<Camera> cameras= new Vector<Camera>();
+        cameras.add(mCamera);
+        pdfView = VirtualSpaceManager.INSTANCE.addFrameView(cameras, "ZVTM PDF Viewer", View.STD_VIEW, 1024, 768, false, true, true, null);
+        pdfView.setBackgroundColor(Color.WHITE);
+        pdfView.setNotifyCursorMoved(false);
+        updatePanelSize();
+        ComponentAdapter ca0 = new ComponentAdapter(){
+            public void componentResized(ComponentEvent e){
+                updatePanelSize();
+            }
+        };
+        pdfView.getFrame().addComponentListener(ca0);
+        gp = new VWGlassPane(this);
+        ((JFrame)pdfView.getFrame()).setGlassPane(gp);
+        eh = new PDFViewerEventHandler(this);
+        pdfView.setListener(eh);
         // pdfView.getCursor().getPicker().setListener(eh);
-		pdfView.setAntialiasing(true);
-		mCamera.setAltitude(0);
-		VirtualSpaceManager.INSTANCE.repaint();
+        pdfView.setAntialiasing(true);
+        mCamera.setAltitude(0);
+        VirtualSpaceManager.INSTANCE.repaint();
     }
 
     void updatePanelSize(){
@@ -138,146 +138,146 @@ public class PDFViewer {
     }
 
     RectFloat convertRect(RectFloat r, PDimension pageSize , int pageNumber ){
-    	r.x*=scaleFactor;r.y*=scaleFactor;r.width*=scaleFactor;r.height*=scaleFactor;
-    	r.x -=  scaleFactor*(pageSize.getWidth()/2) - r.width/2;
-    	r.x +=  pageNumber*(pageSize.getWidth() + 60)*scaleFactor; // TO:DO add the Difference between the pages
-    	r.y -= scaleFactor*(pageSize.getHeight()/2) - r.height/2;
-    	return r;
+        r.x*=scaleFactor;r.y*=scaleFactor;r.width*=scaleFactor;r.height*=scaleFactor;
+        r.x -=  scaleFactor*(pageSize.getWidth()/2) - r.width/2;
+        r.x +=  pageNumber*(pageSize.getWidth() + 60)*scaleFactor; // TO:DO add the Difference between the pages
+        r.y -= scaleFactor*(pageSize.getHeight()/2) - r.height/2;
+        return r;
     }
 
     void highlightPage(ArrayList<RectFloat> rects){
-    	Color c = new Color(255,255,0,100);
-    	for( RectFloat r : rects){
-    		VRectangle v = new VRectangle(r.x , r.y ,0 , r.width , r.height ,c );
-    		v.setBorderColor(new Color(0,0,0,0));
-    		vs.addGlyph(v);
-    		lastSearchAdded.add(v);
-    	}
-    	pdfView.centerOnGlyph(lastSearchAdded.elementAt(0), mCamera, 400 , true , 0.9f);
+        Color c = new Color(255,255,0,100);
+        for( RectFloat r : rects){
+            VRectangle v = new VRectangle(r.x , r.y ,0 , r.width , r.height ,c );
+            v.setBorderColor(new Color(0,0,0,0));
+            vs.addGlyph(v);
+            lastSearchAdded.add(v);
+        }
+        pdfView.centerOnGlyph(lastSearchAdded.elementAt(0), mCamera, 400 , true , 0.9f);
     }
 
    void removeLastSearch(){
-   	 for(Glyph lastgly:lastSearchAdded){
-   		 vs.removeGlyph(lastgly);
-   	 }
-   	 lastSearchAdded.clear();
+     for(Glyph lastgly:lastSearchAdded){
+         vs.removeGlyph(lastgly);
+     }
+     lastSearchAdded.clear();
    }
 
    void highlightAnnotation(){
-	   	 for(Glyph lastgly:annotationAdded){
-	   		 vs.addGlyph(lastgly);
-	   	 }
-	}
+         for(Glyph lastgly:annotationAdded){
+             vs.addGlyph(lastgly);
+         }
+    }
 
     void removeAnnotation(){
-   	 for(Glyph lastgly:annotationAdded){
-   		 vs.removeGlyph(lastgly);
-   	 }
+     for(Glyph lastgly:annotationAdded){
+         vs.removeGlyph(lastgly);
+     }
    }
 
     void previousWord(){
-    	if(lastSearchAdded.size() ==0 )return ;
-    	glphyIndex--;
-    	if(glphyIndex == -1)
-    		glphyIndex = lastSearchAdded.size() -1;
-       	pdfView.centerOnGlyph(lastSearchAdded.elementAt(glphyIndex), mCamera, 400 , true , 0.9f);
+        if(lastSearchAdded.size() ==0 )return ;
+        glphyIndex--;
+        if(glphyIndex == -1)
+            glphyIndex = lastSearchAdded.size() -1;
+        pdfView.centerOnGlyph(lastSearchAdded.elementAt(glphyIndex), mCamera, 400 , true , 0.9f);
 
     }
 
     void nextWord(){
-    	if(lastSearchAdded.size() ==0 )return ;
-    	glphyIndex++;
-    	if(glphyIndex == lastSearchAdded.size())
-    		glphyIndex = 0 ;
-    	pdfView.centerOnGlyph(lastSearchAdded.elementAt(glphyIndex), mCamera, 400 , true , 0.9f);
+        if(lastSearchAdded.size() ==0 )return ;
+        glphyIndex++;
+        if(glphyIndex == lastSearchAdded.size())
+            glphyIndex = 0 ;
+        pdfView.centerOnGlyph(lastSearchAdded.elementAt(glphyIndex), mCamera, 400 , true , 0.9f);
     }
 
-	void findWord(String search){
-		if(search.equals(lastSearch)) return;
-		lastSearch = search;
-		glphyIndex =0;
-		removeLastSearch();
-		int wordsFound =0;
-    	ArrayList<RectFloat> r = new ArrayList<RectFloat>();
-    	PDimension pp = document.getPageDimension(0, 0);
+    void findWord(String search){
+        if(search.equals(lastSearch)) return;
+        lastSearch = search;
+        glphyIndex =0;
+        removeLastSearch();
+        int wordsFound =0;
+        ArrayList<RectFloat> r = new ArrayList<RectFloat>();
+        PDimension pp = document.getPageDimension(0, 0);
         for(int i = 0 ; i< pagesInDocument ; i++){
-	    	PageText pageText = document.getPageText(i);
-	    	if(pageText==null) return ;
-	         // start iteration over words.
-	        ArrayList<LineText> pageLines = pageText.getPageLines();
-	        for (LineText pageLine : pageLines) {
-	            ArrayList<WordText> lineWords = pageLine.getWords();
-	            // compare words against search terms.
-	            for (WordText word : lineWords) {
-	            	if(word.toString().toUpperCase().compareTo(search.toUpperCase())==0){
-	            		wordsFound++;
-	            		java.awt.geom.Rectangle2D.Float f=  word.getBounds();
+            PageText pageText = document.getPageText(i);
+            if(pageText==null) return ;
+             // start iteration over words.
+            ArrayList<LineText> pageLines = pageText.getPageLines();
+            for (LineText pageLine : pageLines) {
+                ArrayList<WordText> lineWords = pageLine.getWords();
+                // compare words against search terms.
+                for (WordText word : lineWords) {
+                    if(word.toString().toUpperCase().compareTo(search.toUpperCase())==0){
+                        wordsFound++;
+                        java.awt.geom.Rectangle2D.Float f=  word.getBounds();
 
-	            		// convert it into the page dimension and then add.
-	            		r.add(convertRect(new RectFloat(f.x,f.y,f.height,f.width) , pp , i));
-	            	}
-	             }
-	         }
-	     }
+                        // convert it into the page dimension and then add.
+                        r.add(convertRect(new RectFloat(f.x,f.y,f.height,f.width) , pp , i));
+                    }
+                 }
+             }
+         }
 
          if(wordsFound>0){
-        	 highlightPage(r);
+             highlightPage(r);
          }
     }
 
-	void showAnnotations(){
-		if(annotationAdded.size()!=0)
-		{
-			highlightAnnotation();
-			return;
-		}
-		final ArrayList<MultilineText> mi = new ArrayList<MultilineText>();
-		final ArrayList<VRectangle> vi = new ArrayList<VRectangle>();
-		PDimension pp = document.getPageDimension(0, 0);
-		for(int i = 0 ; i < pagesInDocument; i++){
-			Page page = document.getPageTree().getPage(i, pagesInDocument);
-			ArrayList<Annotation>	annotations = page.getAnnotations();
-			if(annotations != null){
-				for( int j =0 ;j<annotations.size() ; j+=2){
-					Annotation annotationP = annotations.get(j);
-					if(annotationP != null && annotationP.getObject("Contents") != null){
-						java.awt.geom.Rectangle2D.Float r = annotationP.getUserSpaceRectangle();
-						RectFloat f = convertRect(new RectFloat(r.x,r.y,r.height,r.width),pp,i);
-						MultilineText m  = new MultilineText(annotationP.getObject("Contents").toString());
-						m.setWidthConstraint(100);
-						m.setScale(2);
-						VRectangle vr = new VRectangle(f.x , f.y,0, 100, 100 ,annotationP.getColor()   );
-						vi.add(vr);
-						mi.add(m);
+    void showAnnotations(){
+        if(annotationAdded.size()!=0)
+        {
+            highlightAnnotation();
+            return;
+        }
+        final ArrayList<MultilineText> mi = new ArrayList<MultilineText>();
+        final ArrayList<VRectangle> vi = new ArrayList<VRectangle>();
+        PDimension pp = document.getPageDimension(0, 0);
+        for(int i = 0 ; i < pagesInDocument; i++){
+            Page page = document.getPageTree().getPage(i, pagesInDocument);
+            ArrayList<Annotation>   annotations = page.getAnnotations();
+            if(annotations != null){
+                for( int j =0 ;j<annotations.size() ; j+=2){
+                    Annotation annotationP = annotations.get(j);
+                    if(annotationP != null && annotationP.getObject("Contents") != null){
+                        java.awt.geom.Rectangle2D.Float r = annotationP.getUserSpaceRectangle();
+                        RectFloat f = convertRect(new RectFloat(r.x,r.y,r.height,r.width),pp,i);
+                        MultilineText m  = new MultilineText(annotationP.getObject("Contents").toString());
+                        m.setWidthConstraint(100);
+                        m.setScale(2);
+                        VRectangle vr = new VRectangle(f.x , f.y,0, 100, 100 ,annotationP.getColor()   );
+                        vi.add(vr);
+                        mi.add(m);
 
-						pdfView.repaint(new RepaintListener(){
-							public void viewRepainted(View v){
-								for(int i =0 ;i<vi.size() ;i++){
-									vi.get(i).setVisible(true);
-									double width =mi.get(i).getBounds(mCamera.getIndex()).getX(), height=mi.get(i).getBounds(mCamera.getIndex()).getY();
-									vi.get(i).setWidth(width);
-									vi.get(i).setHeight(height);
-									mi.get(i).moveTo(vi.get(i).vx -width/2, vi.get(i).vy +height/2);
-									vi.get(i).setDrawBorder(false);
-									mi.get(i).setType(ANNOTATION);
-									mi.get(i).setColor(Color.BLACK);
-									mi.get(i).stick(vi.get(i));
-								}
-								pdfView.removeRepaintListener();
-							}
-						});
+                        pdfView.repaint(new RepaintListener(){
+                            public void viewRepainted(View v){
+                                for(int i =0 ;i<vi.size() ;i++){
+                                    vi.get(i).setVisible(true);
+                                    double width =mi.get(i).getBounds(mCamera.getIndex()).getX(), height=mi.get(i).getBounds(mCamera.getIndex()).getY();
+                                    vi.get(i).setWidth(width);
+                                    vi.get(i).setHeight(height);
+                                    mi.get(i).moveTo(vi.get(i).vx -width/2, vi.get(i).vy +height/2);
+                                    vi.get(i).setDrawBorder(false);
+                                    mi.get(i).setType(ANNOTATION);
+                                    mi.get(i).setColor(Color.BLACK);
+                                    mi.get(i).stick(vi.get(i));
+                                }
+                                pdfView.removeRepaintListener();
+                            }
+                        });
 
-						vr.setVisible(false);
-						Color c = new Color(255 , 255 , 255 , 0);
-						m.setColor(c);
-						annotationAdded.add(vr);
-						annotationAdded.add(m);
-					}
-				}
-			}
-		}
-		highlightAnnotation();
-	}
+                        vr.setVisible(false);
+                        Color c = new Color(255 , 255 , 255 , 0);
+                        m.setColor(c);
+                        annotationAdded.add(vr);
+                        annotationAdded.add(m);
+                    }
+                }
+            }
+        }
+        highlightAnnotation();
+    }
     /*------------------ PDF loading ------------------ */
 
     static final String ANNOTATION = "a";
@@ -327,8 +327,8 @@ public class PDFViewer {
         return "PDFViewer";
     }
 
-	public static void main(String[] args){
-	    System.getProperties().put("org.icepdf.core.screen.alphaInterpolation", RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
+    public static void main(String[] args){
+        System.getProperties().put("org.icepdf.core.screen.alphaInterpolation", RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
         System.getProperties().put("org.icepdf.core.screen.antiAliasing", RenderingHints.VALUE_ANTIALIAS_ON);
         System.getProperties().put("org.icepdf.core.screen.textAntiAliasing", RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         System.getProperties().put("org.icepdf.core.screen.colorRender", RenderingHints.VALUE_COLOR_RENDER_QUALITY);
@@ -337,24 +337,24 @@ public class PDFViewer {
         System.getProperties().put("org.icepdf.core.screen.interpolation", RenderingHints.VALUE_INTERPOLATION_BICUBIC);
         System.getProperties().put("org.icepdf.core.screen.render", RenderingHints.VALUE_RENDER_QUALITY);
         System.getProperties().put("org.icepdf.core.screen.stroke", RenderingHints.VALUE_STROKE_PURE);
-		System.out.println("-----------------");
-	    System.out.print(getVersion());
-		System.out.println("-----------------");
-		System.out.println("General information");
-		System.out.println("JVM version: "+System.getProperty("java.vm.vendor")+" "+System.getProperty("java.vm.name")+" "+System.getProperty("java.vm.version"));
-		System.out.println("OS type: "+System.getProperty("os.name")+" "+System.getProperty("os.version")+"/"+System.getProperty("os.arch")+" "+System.getProperty("sun.cpu.isalist"));
-		System.out.println("-----------------");
-		System.out.println("Directory information");
-		System.out.println("Java Classpath: "+System.getProperty("java.class.path"));
-		System.out.println("Java directory: "+System.getProperty("java.home"));
-		System.out.println("Launching from: "+System.getProperty("user.dir"));
-		System.out.println("-----------------");
-		System.out.println("User informations");
-		System.out.println("User name: "+System.getProperty("user.name"));
-		System.out.println("User home directory: "+System.getProperty("user.home"));
-		System.out.println("-----------------");
-		new PDFViewer((args.length > 0) ? args[0] : null, (args.length > 1) ? Float.parseFloat(args[1]) : 1, (args.length > 2) ? Float.parseFloat(args[2]) : 1);
-	}
+        System.out.println("-----------------");
+        System.out.print(getVersion());
+        System.out.println("-----------------");
+        System.out.println("General information");
+        System.out.println("JVM version: "+System.getProperty("java.vm.vendor")+" "+System.getProperty("java.vm.name")+" "+System.getProperty("java.vm.version"));
+        System.out.println("OS type: "+System.getProperty("os.name")+" "+System.getProperty("os.version")+"/"+System.getProperty("os.arch")+" "+System.getProperty("sun.cpu.isalist"));
+        System.out.println("-----------------");
+        System.out.println("Directory information");
+        System.out.println("Java Classpath: "+System.getProperty("java.class.path"));
+        System.out.println("Java directory: "+System.getProperty("java.home"));
+        System.out.println("Launching from: "+System.getProperty("user.dir"));
+        System.out.println("-----------------");
+        System.out.println("User informations");
+        System.out.println("User name: "+System.getProperty("user.name"));
+        System.out.println("User home directory: "+System.getProperty("user.home"));
+        System.out.println("-----------------");
+        new PDFViewer((args.length > 0) ? args[0] : null, (args.length > 1) ? Float.parseFloat(args[1]) : 1, (args.length > 2) ? Float.parseFloat(args[2]) : 1);
+    }
 
 }
 
@@ -425,181 +425,181 @@ class VWGlassPane extends JComponent {
 
 class PDFViewerEventHandler implements ViewListener {
 
-	PDFViewer application;
+    PDFViewer application;
 
-	long lastJPX,lastJPY;
+    long lastJPX,lastJPY;
 
-	PDFViewerEventHandler(PDFViewer appli){
-		application = appli;
-	}
+    PDFViewerEventHandler(PDFViewer appli){
+        application = appli;
+    }
 
-	boolean panning = false;
-	boolean rectDrag = false;
-	int initialX , initialY;
-	int finalY , finalX;
-	public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-		lastJPX=jpx;
-		lastJPY=jpy;
-		Glyph g = v.lastGlyphEntered();
-		if (g != null && g.getType()!=null &&g.getType().equals(PDFViewer.ANNOTATION)){
-		    v.getVCursor().stickGlyph(g);
-		}
-		else {
-		    panning = true;
-    		//v.setDrawDrag(true);
-			v.showFirstOrderPanWidget(jpx, jpy);
-    		VirtualSpaceManager.INSTANCE.getActiveView().mouse.setSensitivity(false);
-		}
-	}
+    boolean panning = false;
+    boolean rectDrag = false;
+    int initialX , initialY;
+    int finalY , finalX;
+    public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+        lastJPX=jpx;
+        lastJPY=jpy;
+        Glyph g = v.lastGlyphEntered();
+        if (g != null && g.getType()!=null &&g.getType().equals(PDFViewer.ANNOTATION)){
+            v.getVCursor().stickGlyph(g);
+        }
+        else {
+            panning = true;
+            //v.setDrawDrag(true);
+            v.showFirstOrderPanWidget(jpx, jpy);
+            VirtualSpaceManager.INSTANCE.getActiveView().mouse.setSensitivity(false);
+        }
+    }
 
-	public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	    panning = false;
-	    v.getVCursor().unstickLastGlyph();
-		Camera c = VirtualSpaceManager.INSTANCE.getActiveView().getActiveCamera();
-		c.setXspeed(0);
+    public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+        panning = false;
+        v.getVCursor().unstickLastGlyph();
+        Camera c = VirtualSpaceManager.INSTANCE.getActiveView().getActiveCamera();
+        c.setXspeed(0);
         c.setYspeed(0);
         c.setZspeed(0);
-    	v.hideFirstOrderPanWidget();
-		//v.setDrawDrag(false);
-		VirtualSpaceManager.INSTANCE.getActiveView().mouse.setSensitivity(true);
-	}
+        v.hideFirstOrderPanWidget();
+        //v.setDrawDrag(false);
+        VirtualSpaceManager.INSTANCE.getActiveView().mouse.setSensitivity(true);
+    }
 
-	public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-		Glyph g = v.lastGlyphEntered();
-		if (g != null){
-			application.pdfView.centerOnGlyph(g, application.mCamera, PDFViewer.NAV_ANIM_DURATION);
-		}
-		else {
-			application.pdfView.getGlobalView(application.mCamera, PDFViewer.NAV_ANIM_DURATION);
-		}
-	}
+    public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
+        Glyph g = v.lastGlyphEntered();
+        if (g != null){
+            application.pdfView.centerOnGlyph(g, application.mCamera, PDFViewer.NAV_ANIM_DURATION);
+        }
+        else {
+            application.pdfView.getGlobalView(application.mCamera, PDFViewer.NAV_ANIM_DURATION);
+        }
+    }
 
-	public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+    public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
-	public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+    public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
-	public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
+    public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
-	public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+    public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
-	public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+    public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
-	public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
+    public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
-	public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){}
+    public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){}
 
-	public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
-		if (panning == true){
-			Camera c = VirtualSpaceManager.INSTANCE.getActiveCamera();
-			double a = (c.focal+Math.abs(c.altitude))/c.focal;
-			if (mod == SHIFT_MOD) {
-			    c.setXspeed(0);
+    public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
+        if (panning == true){
+            Camera c = VirtualSpaceManager.INSTANCE.getActiveCamera();
+            double a = (c.focal+Math.abs(c.altitude))/c.focal;
+            if (mod == SHIFT_MOD) {
+                c.setXspeed(0);
                 c.setYspeed(0);
                 c.setZspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
-				//50 is just a speed factor (too fast otherwise)
-			}
-			else {
-			    c.setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/50.0f)) : (long)((jpx-lastJPX)/(a*50)));
+                //50 is just a speed factor (too fast otherwise)
+            }
+            else {
+                c.setXspeed((c.altitude>0) ? (long)((jpx-lastJPX)*(a/50.0f)) : (long)((jpx-lastJPX)/(a*50)));
                 c.setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/50.0f)) : (long)((lastJPY-jpy)/(a*50)));
                 c.setZspeed(0);
-			}
-		}
-	}
+            }
+        }
+    }
 
-	public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
-		Camera c = VirtualSpaceManager.INSTANCE.getActiveCamera();
-		double a = (c.focal+Math.abs(c.altitude))/c.focal;
-		if (wheelDirection == WHEEL_UP){
-			c.altitudeOffset(-a*5);
-			VirtualSpaceManager.INSTANCE.repaint();
-		}
-		else {
-			//wheelDirection == WHEEL_DOWN
-			c.altitudeOffset(a*5);
-			VirtualSpaceManager.INSTANCE.repaint();
-		}
-	}
+    public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
+        Camera c = VirtualSpaceManager.INSTANCE.getActiveCamera();
+        double a = (c.focal+Math.abs(c.altitude))/c.focal;
+        if (wheelDirection == WHEEL_UP){
+            c.altitudeOffset(-a*5);
+            VirtualSpaceManager.INSTANCE.repaint();
+        }
+        else {
+            //wheelDirection == WHEEL_DOWN
+            c.altitudeOffset(a*5);
+            VirtualSpaceManager.INSTANCE.repaint();
+        }
+    }
 
-	public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){	}
+    public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){ }
 
-	public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
-		if (code == KeyEvent.VK_F && (mod==CTRL_MOD || mod==META_MOD)){
-			JFrame searchBox = new SearchBox();
-			searchBox.setVisible(true);
-		}
-		else if(code == KeyEvent.VK_A){
-			if(application.showAnnotation == false){
-				application.showAnnotations();
-				application.showAnnotation =true;
-			}
-			else{
-				application.removeAnnotation();
-				application.showAnnotation = false;
-			}
-		}
-	}
+    public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
+        if (code == KeyEvent.VK_F && (mod==CTRL_MOD || mod==META_MOD)){
+            JFrame searchBox = new SearchBox();
+            searchBox.setVisible(true);
+        }
+        else if(code == KeyEvent.VK_A){
+            if(application.showAnnotation == false){
+                application.showAnnotations();
+                application.showAnnotation =true;
+            }
+            else{
+                application.removeAnnotation();
+                application.showAnnotation = false;
+            }
+        }
+    }
 
-	public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
+    public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 
-	public void viewActivated(View v){}
+    public void viewActivated(View v){}
 
-	public void viewDeactivated(View v){}
+    public void viewDeactivated(View v){}
 
-	public void viewIconified(View v){}
+    public void viewIconified(View v){}
 
-	public void viewDeiconified(View v){}
+    public void viewDeiconified(View v){}
 
-	public void viewClosing(View v){System.exit(0);}
+    public void viewClosing(View v){System.exit(0);}
 
-	class SearchBox extends JFrame {
+    class SearchBox extends JFrame {
 
-		private JTextField textField;
+        private JTextField textField;
 
-			public SearchBox(){
-				setTitle("Search ");
-		        textField = new JTextField(10);
-		        add(textField,BorderLayout.NORTH);
-		        setSize(180,80);
-		        JButton previous = new JButton("Previous");
-		        add(previous,BorderLayout.WEST);
-		        JButton next = new JButton("Next");
-		        add(next,BorderLayout.EAST);
-		        previous.addActionListener(new ButtonListener());
-		        next.addActionListener(new ButtonListener());
-		        textField.addKeyListener(new TextFieldListner());
-		        this.addWindowListener(new Closer());
-			}
+            public SearchBox(){
+                setTitle("Search ");
+                textField = new JTextField(10);
+                add(textField,BorderLayout.NORTH);
+                setSize(180,80);
+                JButton previous = new JButton("Previous");
+                add(previous,BorderLayout.WEST);
+                JButton next = new JButton("Next");
+                add(next,BorderLayout.EAST);
+                previous.addActionListener(new ButtonListener());
+                next.addActionListener(new ButtonListener());
+                textField.addKeyListener(new TextFieldListner());
+                this.addWindowListener(new Closer());
+            }
 
-			class TextFieldListner implements KeyListener{
-				public void keyTyped(KeyEvent e) {}
+            class TextFieldListner implements KeyListener{
+                public void keyTyped(KeyEvent e) {}
 
-				    public void keyPressed(KeyEvent e) {
-				    	if(e.getKeyCode()==10){
-						String text = textField.getText();
-						application.findWord(text);
-				    	}
-				    }
+                    public void keyPressed(KeyEvent e) {
+                        if(e.getKeyCode()==10){
+                        String text = textField.getText();
+                        application.findWord(text);
+                        }
+                    }
 
-				    public void keyReleased(KeyEvent e) {}
+                    public void keyReleased(KeyEvent e) {}
 
-			}
-			class ButtonListener implements ActionListener{
-				public void actionPerformed(ActionEvent e) {
-					if(e.getActionCommand().equals("Next")){
-						application.nextWord();
-					}
-					else if (e.getActionCommand().equals("Previous")){
-						application.previousWord();
-					}
+            }
+            class ButtonListener implements ActionListener{
+                public void actionPerformed(ActionEvent e) {
+                    if(e.getActionCommand().equals("Next")){
+                        application.nextWord();
+                    }
+                    else if (e.getActionCommand().equals("Previous")){
+                        application.previousWord();
+                    }
 
-				}
-			}
-			class Closer extends WindowAdapter {
-			    public void windowClosing (WindowEvent event) {
-			    	application.removeLastSearch();
-			    	application.lastSearch ="";
-			    }
-			}
-	}
+                }
+            }
+            class Closer extends WindowAdapter {
+                public void windowClosing (WindowEvent event) {
+                    application.removeLastSearch();
+                    application.lastSearch ="";
+                }
+            }
+    }
 
 }

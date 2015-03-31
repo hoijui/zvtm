@@ -46,40 +46,40 @@ public class BrowsableDocument extends IcePDFPageImg {
     float detailFactor = 1f;
 
     /** Instantiate a PDF page as a ZVTM glyph, rendered at a resolution that matches the default scale for that page.
-	 *@param pdfDoc the PDF document from ICEpdf
-	 *@param currentPage page number starting from 0 (for page 1)
-	 */
-	public BrowsableDocument(Document pdfDoc, int currentPage){
-		this(0, 0, 0, pdfDoc, currentPage, 1f, 1f);
-	}
+     *@param pdfDoc the PDF document from ICEpdf
+     *@param currentPage page number starting from 0 (for page 1)
+     */
+    public BrowsableDocument(Document pdfDoc, int currentPage){
+        this(0, 0, 0, pdfDoc, currentPage, 1f, 1f);
+    }
 
     /** Instantiate a PDF page as a ZVTM glyph, rendered at a resolution that matches the default scale for that page.
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
      *@param z z-index (pass 0 if you do not use z-ordering)
-	 *@param pdfDoc the PDF document from ICEpdf
-	 *@param currentPage page number starting from 0 (for page 1)
-	 */
-	public BrowsableDocument(double x, double y, int z, Document pdfDoc, int currentPage){
-		this(x, y, z, pdfDoc, currentPage, 1f, 1f);
-	}
+     *@param pdfDoc the PDF document from ICEpdf
+     *@param currentPage page number starting from 0 (for page 1)
+     */
+    public BrowsableDocument(double x, double y, int z, Document pdfDoc, int currentPage){
+        this(x, y, z, pdfDoc, currentPage, 1f, 1f);
+    }
 
-	/** Instantiate a PDF page as a ZVTM glyph, rendered at a resolution that matches the default scale for that page multiplied by detailFactor.
+    /** Instantiate a PDF page as a ZVTM glyph, rendered at a resolution that matches the default scale for that page multiplied by detailFactor.
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
      *@param z z-index (pass 0 if you do not use z-ordering)
-	 *@param pdfDoc the PDF document from ICEpdf
-	 *@param currentPage page number starting from 0 (for page 1)
-	 *@param detailFactor Multiplication factor applied to compute the actual width and height of the bitmap image in which to render the page, taking the default rendering scale as a basis (1.0f).
-	                      This has a direct impact of the PDF page rendering quality. &gt; 1.0 will create higher quality renderings, &lt; will create lower quality renderings.
+     *@param pdfDoc the PDF document from ICEpdf
+     *@param currentPage page number starting from 0 (for page 1)
+     *@param detailFactor Multiplication factor applied to compute the actual width and height of the bitmap image in which to render the page, taking the default rendering scale as a basis (1.0f).
+                          This has a direct impact of the PDF page rendering quality. &gt; 1.0 will create higher quality renderings, &lt; will create lower quality renderings.
      *@param scaleFactor glyph size multiplication factor in virtual space w.r.t specified image size (default is 1.0). This has not impact on the PDF page rendering quality (a posteriori rescaling in ZVTM).
-	 */
-	public BrowsableDocument(double x, double y, int z, Document pdfDoc, int currentPage, float detailFactor, double scaleFactor){
+     */
+    public BrowsableDocument(double x, double y, int z, Document pdfDoc, int currentPage, float detailFactor, double scaleFactor){
         super(x, y, z, scaleFactor);
         this.doc = pdfDoc;
         this.detailFactor = detailFactor;
         setPage(currentPage);
-	}
+    }
 
     public void setPage(int pageNumber){
         if (pageNumber < 0 || pageNumber > doc.getNumberOfPages()-1){return;}
@@ -104,10 +104,10 @@ public class BrowsableDocument extends IcePDFPageImg {
     /** Cloning this PDF page glyph. Uses the same bitmap resource as the original.
      *
      */
-	@Override
-	public Object clone(){
-	    BrowsableDocument res = new BrowsableDocument(vx, vy, vz, doc, currentPage, detailFactor, scaleFactor);
-		return res;
-	}
+    @Override
+    public Object clone(){
+        BrowsableDocument res = new BrowsableDocument(vx, vy, vz, doc, currentPage, detailFactor, scaleFactor);
+        return res;
+    }
 
 }

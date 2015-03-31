@@ -41,7 +41,7 @@ import org.icepdf.core.util.GraphicsRenderingHints;
 
 public class IcePDFPageImg extends ZPDFPage {
 
-	BufferedImage pageImage;
+    BufferedImage pageImage;
 
     /** For internal use. Made public for easier outside package subclassing. */
     public double trueCoef = 1.0f;
@@ -50,52 +50,52 @@ public class IcePDFPageImg extends ZPDFPage {
     public AffineTransform at;
 
     /** Instantiate a PDF page as a ZVTM glyph, rendered at a resolution that matches the default scale for that page.
-	 *@param pdfDoc the PDF document from ICEpdf
-	 *@param pageNumber page number starting from 0 (for page 1)
-	 */
-	public IcePDFPageImg(Document pdfDoc, int pageNumber){
-		this(0, 0, 0, pdfDoc, pageNumber, 1f, 1f);
-	}
+     *@param pdfDoc the PDF document from ICEpdf
+     *@param pageNumber page number starting from 0 (for page 1)
+     */
+    public IcePDFPageImg(Document pdfDoc, int pageNumber){
+        this(0, 0, 0, pdfDoc, pageNumber, 1f, 1f);
+    }
 
     /** Instantiate a PDF page as a ZVTM glyph, rendered at a resolution that matches the default scale for that page.
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
      *@param z z-index (pass 0 if you do not use z-ordering)
-	 *@param pdfDoc the PDF document from ICEpdf
-	 *@param pageNumber page number starting from 0 (for page 1)
-	 */
-	public IcePDFPageImg(double x, double y, int z, Document pdfDoc, int pageNumber){
-		this(x, y, z, pdfDoc, pageNumber, 1f, 1f);
-	}
+     *@param pdfDoc the PDF document from ICEpdf
+     *@param pageNumber page number starting from 0 (for page 1)
+     */
+    public IcePDFPageImg(double x, double y, int z, Document pdfDoc, int pageNumber){
+        this(x, y, z, pdfDoc, pageNumber, 1f, 1f);
+    }
 
-	/** Instantiate a PDF page as a ZVTM glyph, rendered at a resolution that matches the default scale for that page multiplied by detailFactor.
+    /** Instantiate a PDF page as a ZVTM glyph, rendered at a resolution that matches the default scale for that page multiplied by detailFactor.
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
      *@param z z-index (pass 0 if you do not use z-ordering)
-	 *@param pdfDoc the PDF document from ICEpdf
-	 *@param pageNumber page number starting from 0 (for page 1)
-	 *@param detailFactor Multiplication factor applied to compute the actual width and height of the bitmap image in which to render the page, taking the default rendering scale as a basis (1.0f).
-	                      This has a direct impact of the PDF page rendering quality. &gt; 1.0 will create higher quality renderings, &lt; will create lower quality renderings.
+     *@param pdfDoc the PDF document from ICEpdf
+     *@param pageNumber page number starting from 0 (for page 1)
+     *@param detailFactor Multiplication factor applied to compute the actual width and height of the bitmap image in which to render the page, taking the default rendering scale as a basis (1.0f).
+                          This has a direct impact of the PDF page rendering quality. &gt; 1.0 will create higher quality renderings, &lt; will create lower quality renderings.
      *@param scaleFactor glyph size multiplication factor in virtual space w.r.t specified image size (default is 1.0). This has not impact on the PDF page rendering quality (a posteriori rescaling in ZVTM).
-	 */
-	public IcePDFPageImg(double x, double y, int z, Document pdfDoc, int pageNumber, float detailFactor, double scaleFactor){
-		this.vx = x;
-		this.vy = y;
-		this.vz = z;
-		this.scaleFactor = scaleFactor;
-		synchronized(pdfDoc){
+     */
+    public IcePDFPageImg(double x, double y, int z, Document pdfDoc, int pageNumber, float detailFactor, double scaleFactor){
+        this.vx = x;
+        this.vy = y;
+        this.vz = z;
+        this.scaleFactor = scaleFactor;
+        synchronized(pdfDoc){
             setPageImage((BufferedImage)pdfDoc.getPageImage(pageNumber, GraphicsRenderingHints.SCREEN, Page.BOUNDARY_CROPBOX, 0f, detailFactor));
-		}
-	}
+        }
+    }
 
-	IcePDFPageImg(double x, double y, int z, double scaleFactor){
-	    this.vx = x;
-		this.vy = y;
-		this.vz = z;
-		this.scaleFactor = scaleFactor;
-	}
+    IcePDFPageImg(double x, double y, int z, double scaleFactor){
+        this.vx = x;
+        this.vy = y;
+        this.vz = z;
+        this.scaleFactor = scaleFactor;
+    }
 
-	/** For internal use. Made public for easier outside package subclassing. */
+    /** For internal use. Made public for easier outside package subclassing. */
     public Object interpolationMethod = RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
 
     /** Specify how image should be interpolated when drawn at a scale different from its original scale.
@@ -115,33 +115,33 @@ public class IcePDFPageImg extends ZPDFPage {
     void setPageImage(BufferedImage img){
         this.pageImage = img;
         this.vw = this.pageImage.getWidth() * scaleFactor;
-		this.vh = this.pageImage.getHeight() * scaleFactor;
-		if (this.vw==0 && this.vh==0){this.ar = 1.0f;}
-		else {this.ar = this.vw / this.vh;}
-		computeSize();
+        this.vh = this.pageImage.getHeight() * scaleFactor;
+        if (this.vw==0 && this.vh==0){this.ar = 1.0f;}
+        else {this.ar = this.vw / this.vh;}
+        computeSize();
     }
 
-	@Override
-	public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-	    if (alphaC != null && alphaC.getAlpha()==0){return;}
-		if ((pc[i].cw>1) && (pc[i].ch>1)){
-			if (zoomSensitive){
-				trueCoef = scaleFactor*coef;
-			}
-			else{
-				trueCoef = scaleFactor;
-			}
-			//a threshold greater than 0.01 causes jolts when zooming-unzooming around the 1.0 scale region
-			if (Math.abs(trueCoef-1.0f)<0.01f){trueCoef=1.0f;}
-			if (trueCoef!=1.0f){
-				// translate
-				at = AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw, dy+pc[i].cy-pc[i].ch);
-				g.setTransform(at);
-				if (alphaC != null){
+    @Override
+    public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
+        if (alphaC != null && alphaC.getAlpha()==0){return;}
+        if ((pc[i].cw>1) && (pc[i].ch>1)){
+            if (zoomSensitive){
+                trueCoef = scaleFactor*coef;
+            }
+            else{
+                trueCoef = scaleFactor;
+            }
+            //a threshold greater than 0.01 causes jolts when zooming-unzooming around the 1.0 scale region
+            if (Math.abs(trueCoef-1.0f)<0.01f){trueCoef=1.0f;}
+            if (trueCoef!=1.0f){
+                // translate
+                at = AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw, dy+pc[i].cy-pc[i].ch);
+                g.setTransform(at);
+                if (alphaC != null){
                     // translucent
                     g.setComposite(alphaC);
-    				// rescale and draw
-    				if (interpolationMethod != RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR){
+                    // rescale and draw
+                    if (interpolationMethod != RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR){
                         g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, interpolationMethod);
                         g.drawImage(pageImage,AffineTransform.getScaleInstance(trueCoef,trueCoef),null);
                         g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, java.awt.RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
@@ -149,7 +149,7 @@ public class IcePDFPageImg extends ZPDFPage {
                     else {
                         g.drawImage(pageImage,AffineTransform.getScaleInstance(trueCoef,trueCoef),null);
                     }
-    				g.setTransform(stdT);
+                    g.setTransform(stdT);
                     if (paintBorder){
                         g.setColor(borderColor);
                         if (stroke!=null) {
@@ -165,8 +165,8 @@ public class IcePDFPageImg extends ZPDFPage {
                 }
                 else {
                     // opaque
-    				// rescale and draw
-    				if (interpolationMethod != RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR){
+                    // rescale and draw
+                    if (interpolationMethod != RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR){
                         g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, interpolationMethod);
                         g.drawImage(pageImage,AffineTransform.getScaleInstance(trueCoef,trueCoef),null);
                         g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, java.awt.RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
@@ -174,7 +174,7 @@ public class IcePDFPageImg extends ZPDFPage {
                     else {
                         g.drawImage(pageImage,AffineTransform.getScaleInstance(trueCoef,trueCoef),null);
                     }
-    				g.setTransform(stdT);
+                    g.setTransform(stdT);
                     if (paintBorder){
                         g.setColor(borderColor);
                         if (stroke!=null) {
@@ -188,11 +188,11 @@ public class IcePDFPageImg extends ZPDFPage {
                     }
                 }
             }
-			else {
-			    if (alphaC != null){
+            else {
+                if (alphaC != null){
                     // translucent
                     g.setComposite(alphaC);
-    			    if (interpolationMethod != RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR){
+                    if (interpolationMethod != RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR){
                         g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, interpolationMethod);
                         g.drawImage(pageImage, dx+pc[i].cx-pc[i].cw, dy+pc[i].cy-pc[i].ch, null);
                         g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, java.awt.RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
@@ -215,7 +215,7 @@ public class IcePDFPageImg extends ZPDFPage {
                 }
                 else {
                     // opaque
-    			    if (interpolationMethod != RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR){
+                    if (interpolationMethod != RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR){
                         g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, interpolationMethod);
                         g.drawImage(pageImage, dx+pc[i].cx-pc[i].cw, dy+pc[i].cy-pc[i].ch, null);
                         g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, java.awt.RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
@@ -235,150 +235,150 @@ public class IcePDFPageImg extends ZPDFPage {
                         }
                     }
                 }
-			}
-		}
-		else {
-			g.setColor(this.borderColor);
-			g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
-		}
-	}
+            }
+        }
+        else {
+            g.setColor(this.borderColor);
+            g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
+        }
+    }
 
-	@Override
-	public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
-		if ((pc[i].lcw > 1) && (pc[i].lch > 1)){
-			if (zoomSensitive){trueCoef=scaleFactor*coef;}
-			else {trueCoef=scaleFactor;}
-			if (Math.abs(trueCoef-1.0f)<0.01f){
-				//a threshold greater than 0.01 causes jolts when zooming-unzooming around the 1.0 scale region
-				trueCoef=1.0f;
-			}
-			if (trueCoef!=1.0f){
-				g.setTransform(AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch));
+    @Override
+    public void drawForLens(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
+        if ((pc[i].lcw > 1) && (pc[i].lch > 1)){
+            if (zoomSensitive){trueCoef=scaleFactor*coef;}
+            else {trueCoef=scaleFactor;}
+            if (Math.abs(trueCoef-1.0f)<0.01f){
+                //a threshold greater than 0.01 causes jolts when zooming-unzooming around the 1.0 scale region
+                trueCoef=1.0f;
+            }
+            if (trueCoef!=1.0f){
+                g.setTransform(AffineTransform.getTranslateInstance(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch));
 
-				if (alphaC != null){
-                    // translucent
-                    g.setComposite(alphaC);
-                	if (interpolationMethod != RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR){
-                        g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, interpolationMethod);
-                        g.drawImage(pageImage, AffineTransform.getScaleInstance(trueCoef,trueCoef), null);
-                        g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, java.awt.RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
-                    }
-                    else {
-                        g.drawImage(pageImage, AffineTransform.getScaleInstance(trueCoef,trueCoef), null);
-                    }
-    				g.setTransform(stdT);
-    				if (paintBorder){
-                        g.setColor(borderColor);
-                        if (stroke!=null) {
-                            g.setStroke(stroke);
-        					g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw, 2*pc[i].lch);
-                            g.setStroke(stdS);
-                        }
-                        else {
-        					g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw, 2*pc[i].lch);
-                        }
-                    }
-                    g.setComposite(acO);
-                }
-                else {
-                 	if (interpolationMethod != RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR){
-                        g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, interpolationMethod);
-                        g.drawImage(pageImage, AffineTransform.getScaleInstance(trueCoef,trueCoef), null);
-                        g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, java.awt.RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
-                    }
-                    else {
-                        g.drawImage(pageImage, AffineTransform.getScaleInstance(trueCoef,trueCoef), null);
-                    }
-    				g.setTransform(stdT);
-    				if (paintBorder){
-                        g.setColor(borderColor);
-                        if (stroke!=null) {
-                            g.setStroke(stroke);
-        					g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw, 2*pc[i].lch);
-                            g.setStroke(stdS);
-                        }
-                        else {
-        					g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw, 2*pc[i].lch);
-                        }
-                    }
-                }
-			}
-			else {
-			    if (alphaC != null){
+                if (alphaC != null){
                     // translucent
                     g.setComposite(alphaC);
                     if (interpolationMethod != RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR){
                         g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, interpolationMethod);
-        				g.drawImage(pageImage, dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, null);
+                        g.drawImage(pageImage, AffineTransform.getScaleInstance(trueCoef,trueCoef), null);
                         g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, java.awt.RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
                     }
                     else {
-        				g.drawImage(pageImage, dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, null);
+                        g.drawImage(pageImage, AffineTransform.getScaleInstance(trueCoef,trueCoef), null);
                     }
-    				if (paintBorder){
+                    g.setTransform(stdT);
+                    if (paintBorder){
                         g.setColor(borderColor);
                         if (stroke!=null) {
                             g.setStroke(stroke);
-        					g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw, 2*pc[i].lch);
+                            g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw, 2*pc[i].lch);
                             g.setStroke(stdS);
                         }
                         else {
-        					g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw, 2*pc[i].lch);
+                            g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw, 2*pc[i].lch);
                         }
                     }
                     g.setComposite(acO);
                 }
                 else {
-    			    if (interpolationMethod != RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR){
+                    if (interpolationMethod != RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR){
                         g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, interpolationMethod);
-        				g.drawImage(pageImage, dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, null);
+                        g.drawImage(pageImage, AffineTransform.getScaleInstance(trueCoef,trueCoef), null);
                         g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, java.awt.RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
                     }
                     else {
-        				g.drawImage(pageImage, dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, null);
+                        g.drawImage(pageImage, AffineTransform.getScaleInstance(trueCoef,trueCoef), null);
                     }
-    				if (paintBorder){
+                    g.setTransform(stdT);
+                    if (paintBorder){
                         g.setColor(borderColor);
                         if (stroke!=null) {
                             g.setStroke(stroke);
-        					g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw, 2*pc[i].lch);
+                            g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw, 2*pc[i].lch);
                             g.setStroke(stdS);
                         }
                         else {
-        					g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw, 2*pc[i].lch);
+                            g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw, 2*pc[i].lch);
                         }
                     }
                 }
-			}
-		}
-		else {
-			g.setColor(this.borderColor);
-			g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
-		}
-	}
+            }
+            else {
+                if (alphaC != null){
+                    // translucent
+                    g.setComposite(alphaC);
+                    if (interpolationMethod != RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR){
+                        g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, interpolationMethod);
+                        g.drawImage(pageImage, dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, null);
+                        g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, java.awt.RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+                    }
+                    else {
+                        g.drawImage(pageImage, dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, null);
+                    }
+                    if (paintBorder){
+                        g.setColor(borderColor);
+                        if (stroke!=null) {
+                            g.setStroke(stroke);
+                            g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw, 2*pc[i].lch);
+                            g.setStroke(stdS);
+                        }
+                        else {
+                            g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw, 2*pc[i].lch);
+                        }
+                    }
+                    g.setComposite(acO);
+                }
+                else {
+                    if (interpolationMethod != RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR){
+                        g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, interpolationMethod);
+                        g.drawImage(pageImage, dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, null);
+                        g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, java.awt.RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+                    }
+                    else {
+                        g.drawImage(pageImage, dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, null);
+                    }
+                    if (paintBorder){
+                        g.setColor(borderColor);
+                        if (stroke!=null) {
+                            g.setStroke(stroke);
+                            g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw, 2*pc[i].lch);
+                            g.setStroke(stdS);
+                        }
+                        else {
+                            g.drawRect(dx+pc[i].lcx-pc[i].lcw, dy+pc[i].lcy-pc[i].lch, 2*pc[i].lcw, 2*pc[i].lch);
+                        }
+                    }
+                }
+            }
+        }
+        else {
+            g.setColor(this.borderColor);
+            g.fillRect(dx+pc[i].lcx,dy+pc[i].lcy,1,1);
+        }
+    }
 
     /** Cloning this PDF page glyph. Uses the same bitmap resource as the original.
      *
      */
-	@Override
-	public Object clone(){
-	    IcePDFPageImg res = new IcePDFPageImg(vx, vy, vz, scaleFactor);
-	    res.setPageImage(pageImage);
-		return res;
-	}
+    @Override
+    public Object clone(){
+        IcePDFPageImg res = new IcePDFPageImg(vx, vy, vz, scaleFactor);
+        res.setPageImage(pageImage);
+        return res;
+    }
 
     @Override
-	public void flush(){
-	    if (pageImage != null){
-	        pageImage.flush();
-	        pageImage = null;
-	    }
-	}
+    public void flush(){
+        if (pageImage != null){
+            pageImage.flush();
+            pageImage = null;
+        }
+    }
 
     /** Get rasterized rendering of this page.
      */
-	public BufferedImage getPageImage() {
-		return pageImage;
-	}
+    public BufferedImage getPageImage() {
+        return pageImage;
+    }
 
 }
