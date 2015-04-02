@@ -8,13 +8,20 @@ package fr.inria.zvtm.fits;
 
 import jsky.coords.WCSKeywordProvider;
 import nom.tam.fits.Header;
-import nom.tam.fits.HeaderCard;
+// import nom.tam.fits.HeaderCard;
+
+// import java.util.Iterator;
 
 public class NomWcsKeywordProvider implements WCSKeywordProvider{
     private final Header header;
 
     public NomWcsKeywordProvider(Header hdr){
         this.header = hdr;
+        // Iterator it = hdr.iterator();
+        // while (it.hasNext()){
+        //     Object o = it.next();
+        //     System.out.println(o);
+        // }
         /*
         HeaderCard it = hdr.nextCard();
         while(it != null){

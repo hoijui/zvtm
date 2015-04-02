@@ -6,6 +6,7 @@
 
 package fr.inria.zvtm.fits.examples;
 
+import java.awt.Toolkit;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -36,10 +37,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import java.util.Vector;
+import java.util.List;
 
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.engine.View;
+import fr.inria.zvtm.engine.SwingWorker;
 import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.event.PickerListener;
 import fr.inria.zvtm.engine.ViewPanel;
@@ -47,6 +50,7 @@ import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VText;
+import fr.inria.zvtm.glyphs.VCircle;
 import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.PRectangle;
 import fr.inria.zvtm.glyphs.Composite;
@@ -97,12 +101,15 @@ import fr.inria.zvtm.fits.filters.Stairs8Filter;
 import fr.inria.zvtm.fits.filters.Stairs9Filter;
 import fr.inria.zvtm.fits.filters.StandardFilter;
 import fr.inria.zvtm.fits.filters.ColorGradient;
+import fr.inria.zvtm.fits.simbad.AstroObject;
+import fr.inria.zvtm.fits.simbad.SimbadCatQuery;
 
 import jsky.image.ImageLookup;
 import jsky.image.ImageProcessor;
 import jsky.image.BasicImageReadableProcessor;
 import jsky.image.ImageChangeEvent;
 import jsky.image.ImageProcessor;
+import jsky.coords.WorldCoords;
 
 import javax.media.jai.Histogram;
 //import javax.media.jai.ROI;
@@ -111,8 +118,6 @@ import javax.media.jai.Histogram;
 // Options
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
-import java.awt.Toolkit;
-
 
 /**
  * Example application loading FITS images using JSky.
@@ -225,6 +230,54 @@ public class JSkyFitsExample{
         }
     }
 
+    void toggleMenu(){
+        mnCamera.setEnabled(!mnCamera.isEnabled());
+    }
+
+    void querySimbad(Point2D.Double qp){
+        // Point2D.Double vsCenter = selMan.getVsCenter();
+        // Point2D.Double wcsCenter = selectedImage.pix2wcs(vsCenter.x, vsCenter.y);
+
+
+
+
+        //compute radius in arcmin
+        Point2D.Double vsExt = new Point2D.Double(qp.x+10, qp.y);
+        Point2D.Double wcsExt = img.pix2wcs(vsExt.x, vsExt.y);
+        final WorldCoords wc = new WorldCoords(qp.getX(), qp.getY());
+        //WorldCoords wcDummy = new WorldCoords(wcsExt.getX(), wcsExt.getY());
+        final int distArcMin = 1;//(int)(wc.dist(wcDummy)+1);//make sure the query radius is at least 1arcmin
+        //perform catalog query
+        System.err.println("Querying Simbad at " + wc + " with a radius of " + distArcMin + " arcminutes");
+        // symbolSpace.removeAllGlyphs();
+
+        new SwingWorker(){
+            @Override public List<AstroObject> construct(){
+                List<AstroObject> objs = null;
+                try{
+                    objs = SimbadCatQuery.makeSimbadCoordQuery(wc.getRaDeg(), wc.getDecDeg(), distArcMin);
+                } catch(IOException ioe){
+                    ioe.printStackTrace();
+                } finally {
+                    return objs;
+                }
+            }
+            @Override public void finished(){
+                List<AstroObject> objs = (List<AstroObject>)get();
+                System.err.println("Result size: " + objs.size());
+                drawSymbols(objs);
+            }
+        }.start();
+
+    }
+
+    void drawSymbols(List<AstroObject> objs){
+        for(AstroObject obj: objs){
+            Point2D.Double p = img.wcs2vs(obj.getRa(), obj.getDec());
+            mSpace.addGlyph(new VCircle(p.x, p.y, 100, 10, Color.RED));
+        }
+    }
+
     public static void main(String[] args) throws IOException{
         FitsOptions options = new FitsOptions();
         CmdLineParser parser = new CmdLineParser(options);
@@ -301,7 +354,14 @@ class JSFEEventHandler implements ViewListener {
 
     public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
-    public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+    public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+        // get coordinates in FITS image space
+        Point2D.Double vp = v.getVCursor().getVSCoordinates(app.mCamera);
+        // get WCS coordinates
+        Point2D.Double wcsp = app.img.vs2wcs(vp.x, vp.y);
+        // make query
+        app.querySimbad(wcsp);
+    }
 
     public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
@@ -357,17 +417,21 @@ class JSFEEventHandler implements ViewListener {
         zoom(c, mvx, mvy, wheelDirection);
     }
 
-    public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){
-        if(c == '-'){
-            //app.scaleBounds[1] -= 100;
-            //app.img.rescale(app.scaleBounds[0], app.scaleBounds[1], 1);
-        } else if (c == '+'){
-            //app.scaleBounds[1] += 100;
-            //app.img.rescale(app.scaleBounds[0], app.scaleBounds[1], 1);
-        }
-    }
+    public void Ktype(ViewPanel v, char c, int code, int mod, KeyEvent e){}
 
-    public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){}
+    public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
+        if (code == KeyEvent.VK_M){
+            app.toggleMenu();
+        }
+        // else if (code == KeyEvent.VK_MINUS){
+        //     //app.scaleBounds[1] -= 100;
+        //     //app.img.rescale(app.scaleBounds[0], app.scaleBounds[1], 1);
+        // }
+        // else if (code == KeyEvent.VK_PLUS){
+        //     //app.scaleBounds[1] += 100;
+        //     //app.img.rescale(app.scaleBounds[0], app.scaleBounds[1], 1);
+        // }
+    }
 
     public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 
@@ -806,7 +870,11 @@ class JSkyFitsMenu implements ViewListener, PickerListener {
 
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 
-    public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){}
+    public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
+        if (code == KeyEvent.VK_M){
+            app.toggleMenu();
+        }
+    }
 
     public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 

@@ -317,24 +317,56 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
     }
 
 
-    /* Converts pixel coordinates to World Coordinates. Returns null if the WCSTransform is not valid.
+    /* Converts pixel coordinates to World Coordinates.
      * @param x x-coordinates, in the FITS system: (0,0) lower left, x axis increases to the right, y axis increases upwards
      * @param y y-coordinates, in the FITS system: (0,0) lower left, x axis increases to the right, y axis increases upwards
+     *@return null if coords are outside the image
      */
     public Point2D.Double pix2wcs(double x, double y){
+        if (wcsTransform == null ||
+            x < 0 || y < 0 ||
+            x > fitsImage.getWidth() || y > fitsImage.getHeight()){
+            return null;
+        }
         return wcsTransform.pix2wcs(x, y);
     }
 
-
+    /* Converts virtual space coordinates to World Coordinates. Returns null if the WCSTransform is not valid.
+     * @param x x-coord in virtual space
+     * @param y y-coord in virtual space
+     *@return null if coords are outside the image
+     */
+    public Point2D.Double vs2wcs(double pvx, double pvy){
+        // convert to FITS image coords
+        if (wcsTransform == null ||
+            pvx < vx-vw/2d || pvx > vx+vw/2d ||
+            pvy < vy-vh/2d || pvy > vy+vh/2d){
+            return null;
+        }
+        return wcsTransform.pix2wcs(pvx-vx+vw/2d, pvy-vy+vh/2d);
+    }
 
     /*
-     * Converts World Coordinates to pixel coordinates. Returns null if the WCSTransform is invalid, or if the WCS position does not fall within the image.
+     * Converts World Coordinates to pixel coordinates.
+     *@return null if the WCSTransform is invalid, or if the WCS position does not fall within the image.
      */
     public Point2D.Double wcs2pix(double ra, double dec){
+        if (wcsTransform == null){return null;}
         return wcsTransform.wcs2pix(ra, dec);
     }
 
-
+    /* Converts World Coordinates to virtual space coordinates. Returns null if the WCSTransform is not valid.
+     * @param x x-coord in virtual space
+     * @param y y-coord in virtual space
+     *@return null if coords are outside the image
+     */
+    public Point2D.Double wcs2vs(double ra, double dec){
+        if (wcsTransform == null){return null;}
+        Point2D.Double res = wcsTransform.wcs2pix(ra,dec);
+        // got FITS image coords, convert to virtual space coords
+        res.setLocation(res.x+vx-vw/2d, res.y+vy-vh/2d);
+        return res;
+    }
 
     /**
      * Gets the bounding box of this Glyph in virtual space coordinates.
