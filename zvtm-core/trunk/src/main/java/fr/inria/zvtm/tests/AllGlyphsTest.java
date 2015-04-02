@@ -15,6 +15,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import javax.swing.ImageIcon;
 import java.awt.geom.Point2D;
+import java.awt.BasicStroke;
 
 import java.util.Vector;
 
@@ -103,12 +104,20 @@ public class AllGlyphsTest {
         or.setWidth(40);
         or.setHeight(20);
         vs.addGlyph(or);
-        // path
+        // paths and crosses
         DPath d = new DPath(0, 80, 0, Color.WHITE);
         d.addSegment(20, 20, false);
         d.addQdCurve(0, -40, -20, -20, false);
         d.addCbCurve(-40, 20, -40, 0, 0, 20, false);
         vs.addGlyph(d);
+        VCross cr = new VCross(40, 80, 0, 20, 20, Color.WHITE);
+        vs.addGlyph(cr);
+        cr = new VCross(80, 80, 0, 20, 20, Color.WHITE, Color.WHITE, 1f);
+        cr.setStroke(new BasicStroke(3f));
+        vs.addGlyph(cr);
+        cr = new VCross(120, 80, 0, 20, 20, Color.WHITE, Color.WHITE, 1f);
+        cr.setDrawBorder(true);
+        vs.addGlyph(cr);
         // polygons
         Point2D.Double[] vertices = {new Point2D.Double(-20,120), new Point2D.Double(0,140), new Point2D.Double(20,120), new Point2D.Double(0,100)};
         FPolygon fp = new FPolygon(vertices, 0, Color.WHITE);
@@ -293,7 +302,6 @@ class TestEventHandler extends ViewAdapter implements PickerListener {
     }
 
     public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-        application.pvs.printList();
         lastJPX = jpx;
         lastJPY = jpy;
         v.setDrawDrag(true);
