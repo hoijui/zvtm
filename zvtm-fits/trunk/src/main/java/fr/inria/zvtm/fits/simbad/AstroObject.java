@@ -6,9 +6,13 @@
 
 package fr.inria.zvtm.fits.simbad;
 
+import java.awt.BasicStroke;
+
 import jsky.science.Coordinates;
 
 public class AstroObject {
+
+    public static final BasicStroke AO_STROKE = new BasicStroke(2f);
 
     private String identifier;
     private Coordinates coords;

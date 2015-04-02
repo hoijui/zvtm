@@ -51,6 +51,7 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.glyphs.VCircle;
+import fr.inria.zvtm.glyphs.VCross;
 import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.PRectangle;
 import fr.inria.zvtm.glyphs.Composite;
@@ -158,7 +159,6 @@ public class JSkyFitsExample{
     static final int LAYER_DATA = 1;
     static final int LAYER_MENU = 2;
 
-
     JSkyFitsExample(FitsOptions options){
         initGUI(options);
         try {
@@ -237,10 +237,6 @@ public class JSkyFitsExample{
     void querySimbad(Point2D.Double qp){
         // Point2D.Double vsCenter = selMan.getVsCenter();
         // Point2D.Double wcsCenter = selectedImage.pix2wcs(vsCenter.x, vsCenter.y);
-
-
-
-
         //compute radius in arcmin
         Point2D.Double vsExt = new Point2D.Double(qp.x+10, qp.y);
         Point2D.Double wcsExt = img.pix2wcs(vsExt.x, vsExt.y);
@@ -250,7 +246,6 @@ public class JSkyFitsExample{
         //perform catalog query
         System.err.println("Querying Simbad at " + wc + " with a radius of " + distArcMin + " arcminutes");
         // symbolSpace.removeAllGlyphs();
-
         new SwingWorker(){
             @Override public List<AstroObject> construct(){
                 List<AstroObject> objs = null;
@@ -264,17 +259,19 @@ public class JSkyFitsExample{
             }
             @Override public void finished(){
                 List<AstroObject> objs = (List<AstroObject>)get();
-                System.err.println("Result size: " + objs.size());
                 drawSymbols(objs);
             }
         }.start();
-
     }
 
     void drawSymbols(List<AstroObject> objs){
         for(AstroObject obj: objs){
             Point2D.Double p = img.wcs2vs(obj.getRa(), obj.getDec());
-            mSpace.addGlyph(new VCircle(p.x, p.y, 100, 10, Color.RED));
+            VCross cr = new VCross(p.x, p.y, 100, 10, 10, Color.RED, Color.WHITE, .8f);
+            cr.setStroke(AstroObject.AO_STROKE);
+            VText lb = new VText(p.x+10, p.y+10, 101, Color.RED, obj.getIdentifier(), VText.TEXT_ANCHOR_START);
+            mSpace.addGlyph(cr);
+            mSpace.addGlyph(lb);
         }
     }
 
@@ -368,24 +365,9 @@ class JSFEEventHandler implements ViewListener {
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
-        /*
-        app.setCursorCoords(v.getVCursor().getVSXCoordinate(), v.getVCursor().getVSYCoordinate());
-        VirtualSpaceManager.INSTANCE.repaint();
-        */
-
-        //System.out.println(app.menu.BORDER_BOTTON_HISTOGRAM + " > " + jpy + " > " + app.menu.BORDER_TOP_HISTOGRAM);
-        //System.out.println(app.menu.BORDER_LEFT_HISTOGRAM + " < " + jpx + " < " + app.menu.BORDER_RIGHT_HISTOGRAM);
-
-            //System.out.println(jpx + " < " + app.menu.WIDTH_MENU + " " + app.menu.BORDER_BOTTON_FILTER + " < " + jpy + " < " + app.menu.BORDER_TOP_FILTER);
-
-        if((jpx < app.menu.WIDTH_MENU && jpy < app.menu.BORDER_BOTTON_FILTER  && jpy > app.menu.BORDER_TOP_FILTER) ||
-                    (jpy > app.menu.BORDER_TOP_HISTOGRAM && jpy < app.menu.BORDER_BOTTON_HISTOGRAM && jpx > app.menu.BORDER_LEFT_HISTOGRAM &&
-                    jpx < app.menu.BORDER_RIGHT_HISTOGRAM )){
+        if (app.mnCamera.isEnabled() && app.menu.cursorInside(jpx, jpy)){
             v.parent.setActiveLayer(app.LAYER_MENU);
             v.parent.setCursorIcon(Cursor.DEFAULT_CURSOR);
-        } else {
-            v.parent.setActiveLayer(app.LAYER_FITS);
-            v.parent.setCursorIcon(Cursor.CUSTOM_CURSOR);
         }
     }
 
@@ -527,11 +509,11 @@ class JSkyFitsMenu implements ViewListener, PickerListener {
     public static final JSkyFitsImage.ScaleAlgorithm[] SCALE_METHOD = {JSkyFitsImage.ScaleAlgorithm.LINEAR, JSkyFitsImage.ScaleAlgorithm.LOG, JSkyFitsImage.ScaleAlgorithm.HIST_EQ, JSkyFitsImage.ScaleAlgorithm.SQRT};
     public static final String[] SCALE_NAME = {"LINEAR SCALE", "LOGARITHMIC", "HISTOGRAM EQUALIZATION", "SQUARE ROOT"};
 
-    public int BORDER_BOTTON_FILTER;
+    public int BORDER_BOTTOM_FILTER;
     public int BORDER_TOP_FILTER;
 
     public int BORDER_TOP_HISTOGRAM;
-    public int BORDER_BOTTON_HISTOGRAM;
+    public int BORDER_BOTTOM_HISTOGRAM;
     public int BORDER_LEFT_HISTOGRAM;
     public int BORDER_RIGHT_HISTOGRAM;
 
@@ -615,7 +597,7 @@ class JSkyFitsMenu implements ViewListener, PickerListener {
             //mnSpace.addGlyph(ln);
             py -= (HEIGHT_BTN + BORDER);
         }
-        BORDER_BOTTON_FILTER = COLOR_GRADIENT.length * ( HEIGHT_BTN + BORDER*2 ) + SCALE_METHOD.length * ( HEIGHT_BTN + BORDER*2 ) + HEIGHT_BTN + BORDER;
+        BORDER_BOTTOM_FILTER = COLOR_GRADIENT.length * ( HEIGHT_BTN + BORDER*2 ) + SCALE_METHOD.length * ( HEIGHT_BTN + BORDER*2 ) + HEIGHT_BTN + BORDER;
     }
 
     public void drawHistogram(){
@@ -625,11 +607,11 @@ class JSkyFitsMenu implements ViewListener, PickerListener {
             hist.moveTo(-app.VIEW_W/2 + (app.VIEW_W - hist.getWidth())/2 , -app.VIEW_H/2 + 50);
 
             BORDER_TOP_HISTOGRAM = (int)(app.VIEW_H - hist.getHeight() - 65 );
-            BORDER_BOTTON_HISTOGRAM = app.VIEW_H - 65;
+            BORDER_BOTTOM_HISTOGRAM = app.VIEW_H - 65;
             BORDER_LEFT_HISTOGRAM = (int)( (app.VIEW_W - hist.getWidth())/2 - JSkyFitsHistogram.DEFAULT_BIN_WIDTH) ;
             BORDER_RIGHT_HISTOGRAM = (int)( (app.VIEW_W + hist.getWidth())/2 + JSkyFitsHistogram.DEFAULT_BIN_WIDTH) ;
 
-            VRectangle board = new VRectangle(hist.vx+hist.getWidth()/2, hist.vy+hist.getHeight()/2, Z_BTN, BORDER_RIGHT_HISTOGRAM-BORDER_LEFT_HISTOGRAM, BORDER_BOTTON_HISTOGRAM-BORDER_TOP_HISTOGRAM+10, Color.WHITE, Color.WHITE, 0.8f);
+            VRectangle board = new VRectangle(hist.vx+hist.getWidth()/2, hist.vy+hist.getHeight()/2, Z_BTN, BORDER_RIGHT_HISTOGRAM-BORDER_LEFT_HISTOGRAM, BORDER_BOTTOM_HISTOGRAM-BORDER_TOP_HISTOGRAM+10, Color.WHITE, Color.WHITE, 0.8f);
 
             mnSpace.addGlyph(board);
             mnSpace.addGlyph(hist);
@@ -657,8 +639,13 @@ class JSkyFitsMenu implements ViewListener, PickerListener {
         }
     }
 
+    boolean cursorInside(int jpx, int jpy){
+        return (jpx < WIDTH_MENU && jpy < BORDER_BOTTOM_FILTER && jpy > BORDER_TOP_FILTER) ||
+               (jpy > BORDER_TOP_HISTOGRAM && jpy < BORDER_BOTTOM_HISTOGRAM && jpx > BORDER_LEFT_HISTOGRAM && jpx < BORDER_RIGHT_HISTOGRAM);
+    }
+
     public void press1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){
-        if(jpy > app.menu.BORDER_TOP_HISTOGRAM && jpy < app.menu.BORDER_BOTTON_HISTOGRAM){
+        if(jpy > app.menu.BORDER_TOP_HISTOGRAM && jpy < app.menu.BORDER_BOTTOM_HISTOGRAM){
             lastJPX = jpx;
             if(shadow != null)
                 app.mnSpace.removeGlyph(shadow);
@@ -682,7 +669,7 @@ class JSkyFitsMenu implements ViewListener, PickerListener {
     }
 
     public void release1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){
-        if(jpy > app.menu.BORDER_TOP_HISTOGRAM && jpy < app.menu.BORDER_BOTTON_HISTOGRAM){
+        if(jpy > app.menu.BORDER_TOP_HISTOGRAM && jpy < app.menu.BORDER_BOTTOM_HISTOGRAM){
 
             double left = ( ((lastJPX < jpx)? lastJPX : jpx) - app.VIEW_W/2 + hist.getWidth()/2) / hist.getWidth();
             double right = ( ((lastJPX < jpx)? jpx : lastJPX) - app.VIEW_W/2 + hist.getWidth()/2) / hist.getWidth();
@@ -741,21 +728,9 @@ class JSkyFitsMenu implements ViewListener, PickerListener {
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
-        //System.out.println(app.menu.BORDER_BOTTON_HISTOGRAM + " > " + jpy + " > " + app.menu.BORDER_TOP_HISTOGRAM);
-        //System.out.println(hist.vx + " " + hist.vy + " " + hist.getWidth() + " " + hist.getHeight());
-        //System.out.println(BORDER_LEFT_HISTOGRAM + " < " + jpx + " < " + BORDER_RIGHT_HISTOGRAM);
-        //System.out.println(jpx + " < " + app.menu.WIDTH_MENU + " " + app.menu.BORDER_BOTTON_FILTER + " < " + jpy + " < " + app.menu.BORDER_TOP_FILTER);
-        if((jpx < app.menu.WIDTH_MENU && jpy < app.menu.BORDER_BOTTON_FILTER && jpy > app.menu.BORDER_TOP_FILTER) ||
-          (jpy > app.menu.BORDER_TOP_HISTOGRAM && jpy < app.menu.BORDER_BOTTON_HISTOGRAM && jpx > app.menu.BORDER_LEFT_HISTOGRAM && jpx < app.menu.BORDER_RIGHT_HISTOGRAM )){
-            if(v.parent.getActiveLayer() != app.LAYER_MENU){
-                v.parent.setActiveLayer(app.LAYER_MENU);
-                v.parent.setCursorIcon(Cursor.DEFAULT_CURSOR);
-            }
-        } else {
-            if(v.parent.getActiveLayer() != app.LAYER_FITS){
-                v.parent.setActiveLayer(app.LAYER_FITS);
-                v.parent.setCursorIcon(Cursor.CUSTOM_CURSOR);
-            }
+        if (!cursorInside(jpx, jpy)){
+            v.parent.setActiveLayer(app.LAYER_FITS);
+            v.parent.setCursorIcon(Cursor.CUSTOM_CURSOR);
         }
     }
 
