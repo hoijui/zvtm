@@ -40,6 +40,7 @@ import java.util.Vector;
 import java.util.List;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.Location;
@@ -284,6 +285,7 @@ public class JSkyFitsExample{
     }
 
     public static void main(String[] args) throws IOException{
+        Locale.setDefault(new Locale("en", "US"));
         FitsOptions options = new FitsOptions();
         CmdLineParser parser = new CmdLineParser(options);
         try {

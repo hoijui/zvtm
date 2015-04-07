@@ -16,6 +16,8 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
+import java.text.DecimalFormat;
 
 import jsky.science.Coordinates;
 
@@ -24,7 +26,10 @@ import jsky.science.Coordinates;
  */
 public class SimbadCatQuery {
 
+    static final DecimalFormat ARCMIN_FORMATTER = new DecimalFormat("#0.0000");
+
     public static void main(String[] args) throws Exception{
+        Locale.setDefault(new Locale("en", "US"));
         //attempt to retrieve objects from the Simbad catalog
         List<AstroObject> objs = makeSimbadCoordQuery(1, 4, 12);
         for(AstroObject obj: objs){
@@ -48,14 +53,17 @@ public class SimbadCatQuery {
             Coordinates coords = new Coordinates(ra, dec);
             // look at http://simbad.u-strasbg.fr/simbad/sim-help?Page=sim-url
             // for more information about possible parameters
-            //XXX the 'replace' operation is ugly, should be improved
             String script = String.format(
                     "output console=off script=off\n" +
                     "format object \"%%IDLIST(1)|%%COO(d;A)|%%COO(d;D)\"\n" +
                     "query coo %s %s radius=%sm",
-                    coords.raToString().replace(',', '.'),
-                    coords.decToString().replace(',','.'),
-                    String.valueOf(radMin).replace(',','.'));
+                    //XXX the 'replace' operation is ugly, should be improved
+                    // coords.raToString().replace(',', '.'),
+                    // coords.decToString().replace(',','.'),
+                    // fixed by forcing the Locale to en/US
+                    coords.raToString(),
+                    coords.decToString(),
+                    ARCMIN_FORMATTER.format(radMin));
             return makeSimbadScriptQueryUrl(script);
         } catch (MalformedURLException ex){
             //we are supposed to create well-formed URLs here...
