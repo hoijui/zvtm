@@ -272,10 +272,14 @@ public class JSkyFitsExample{
             VCross cr = new VCross(p.x, p.y, 100, 10, 10, Color.RED, Color.WHITE, .8f);
             cr.setStroke(AstroObject.AO_STROKE);
             VText lb = new VText(p.x+10, p.y+10, 101, Color.RED, obj.getIdentifier(), VText.TEXT_ANCHOR_START);
+            lb.setBorderColor(Color.BLACK);
+            lb.setTranslucencyValue(.5f);
             mSpace.addGlyph(cr);
             mSpace.addGlyph(lb);
             cr.setOwner(obj);
             lb.setOwner(obj);
+            cr.setType(JSkyFitsMenu.T_ASTRO_OBJ);
+            lb.setType(JSkyFitsMenu.T_ASTRO_OBJ);
         }
     }
 
@@ -295,8 +299,6 @@ public class JSkyFitsExample{
 }
 
 class JSFEEventHandler implements ViewListener {
-
-    public static final String T_FILTER = "Fltr";
 
     static float ZOOM_SPEED_COEF = 1.0f/50.0f;
     static double PAN_SPEED_COEF = 50.0;
@@ -853,7 +855,6 @@ class JSkyFitsMenu implements ViewListener, PickerListener {
     }
 
     public void enterGlyph(Glyph g){
-        //System.out.println("enter: " + g.getType());
         if(g.getType().equals(T_FILTER)){
             if (selected_colorG != g){
                 selectColorMapping((PRectangle)g);
