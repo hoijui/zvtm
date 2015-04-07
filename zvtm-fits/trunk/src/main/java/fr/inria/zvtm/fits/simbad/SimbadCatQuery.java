@@ -32,14 +32,14 @@ public class SimbadCatQuery {
         }
     }
 
-    public static List<AstroObject> makeSimbadCoordQuery(double ra, double dec, int radmin) throws IOException{
+    public static List<AstroObject> makeSimbadCoordQuery(double ra, double dec, double radmin) throws IOException{
         List<AstroObject> retval = new ArrayList<AstroObject>();
         URL queryUrl = makeSimbadCoordQueryUrl(ra, dec, radmin);
         return parseObjectList(readLines(queryUrl));
     }
 
     private static URL makeSimbadCoordQueryUrl(double ra, double dec,
-            int radMin){
+            double radMin){
         try{
             // Coordinates query script example:
             // format object "%IDLIST(1)|%COO(d;A)|%COO(d;D)"
@@ -52,11 +52,10 @@ public class SimbadCatQuery {
             String script = String.format(
                     "output console=off script=off\n" +
                     "format object \"%%IDLIST(1)|%%COO(d;A)|%%COO(d;D)\"\n" +
-                    "query coo %s %s radius=%dm",
+                    "query coo %s %s radius=%sm",
                     coords.raToString().replace(',', '.'),
                     coords.decToString().replace(',','.'),
-                    radMin);
-
+                    String.valueOf(radMin).replace(',','.'));
             return makeSimbadScriptQueryUrl(script);
         } catch (MalformedURLException ex){
             //we are supposed to create well-formed URLs here...

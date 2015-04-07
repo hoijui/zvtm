@@ -236,15 +236,15 @@ public class JSkyFitsExample{
         mnCamera.setEnabled(!mnCamera.isEnabled());
     }
 
-    void querySimbad(Point2D.Double qp){
-        // Point2D.Double vsCenter = selMan.getVsCenter();
-        // Point2D.Double wcsCenter = selectedImage.pix2wcs(vsCenter.x, vsCenter.y);
+    void querySimbad(Point2D.Double center, Point2D.Double onCircle){
+
+        Point2D.Double centerWCS = img.vs2wcs(center.x, center.y);
+        Point2D.Double onCircleWCS = img.vs2wcs(onCircle.x, onCircle.y);
+
         //compute radius in arcmin
-        Point2D.Double vsExt = new Point2D.Double(qp.x+10, qp.y);
-        Point2D.Double wcsExt = img.pix2wcs(vsExt.x, vsExt.y);
-        final WorldCoords wc = new WorldCoords(qp.getX(), qp.getY());
-        //WorldCoords wcDummy = new WorldCoords(wcsExt.getX(), wcsExt.getY());
-        final int distArcMin = 1;//(int)(wc.dist(wcDummy)+1);//make sure the query radius is at least 1arcmin
+        final WorldCoords wc = new WorldCoords(centerWCS.getX(), centerWCS.getY());
+        WorldCoords wcDummy = new WorldCoords(onCircleWCS.getX(), onCircleWCS.getY());
+        final double distArcMin = wc.dist(wcDummy);
         //perform catalog query
         System.err.println("Querying Simbad at " + wc + " with a radius of " + distArcMin + " arcminutes");
         // symbolSpace.removeAllGlyphs();
@@ -273,7 +273,7 @@ public class JSkyFitsExample{
             cr.setStroke(AstroObject.AO_STROKE);
             VText lb = new VText(p.x+10, p.y+10, 101, Color.RED, obj.getIdentifier(), VText.TEXT_ANCHOR_START);
             lb.setBorderColor(Color.BLACK);
-            lb.setTranslucencyValue(.5f);
+            lb.setTranslucencyValue(.6f);
             mSpace.addGlyph(cr);
             mSpace.addGlyph(lb);
             cr.setOwner(obj);
@@ -300,6 +300,8 @@ public class JSkyFitsExample{
 
 class JSFEEventHandler implements ViewListener {
 
+    static final BasicStroke SEL_STROKE = new BasicStroke(2f);
+
     static float ZOOM_SPEED_COEF = 1.0f/50.0f;
     static double PAN_SPEED_COEF = 50.0;
     static final float WHEEL_ZOOMIN_FACTOR = 21.0f;
@@ -314,10 +316,16 @@ class JSFEEventHandler implements ViewListener {
     private int lastJPX;
     private int lastJPY;
 
+    Point2D.Double rightClickPress;
+    VCircle rightClickSelectionG = new VCircle(0, 0, 1000, 1, Color.BLACK, Color.RED, .5f);
+
     boolean panning = false;
+    boolean selectingForQuery = false;
 
     JSFEEventHandler(JSkyFitsExample app){
         this.app = app;
+        rightClickSelectionG.setFilled(false);
+        rightClickSelectionG.setStroke(SEL_STROKE);
     }
 
     public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
@@ -358,15 +366,22 @@ class JSFEEventHandler implements ViewListener {
     public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
     public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-        // get coordinates in FITS image space
-        Point2D.Double vp = v.getVCursor().getVSCoordinates(app.mCamera);
-        // get WCS coordinates
-        Point2D.Double wcsp = app.img.vs2wcs(vp.x, vp.y);
-        // make query
-        app.querySimbad(wcsp);
+        selectingForQuery = true;
+        // first point (start dragging) defines the center of the query zone
+        rightClickPress = v.getVCursor().getVSCoordinates(app.mCamera);
+        rightClickSelectionG.moveTo(rightClickPress.x, rightClickPress.y);
+        rightClickSelectionG.sizeTo(1);
+        app.mSpace.addGlyph(rightClickSelectionG);
     }
 
-    public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+    public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+        // second point (end dragging) defines the radius of the query zone
+        Point2D.Double rightClickRelease = v.getVCursor().getVSCoordinates(app.mCamera);
+        app.mSpace.removeGlyph(rightClickSelectionG);
+        // make query
+        app.querySimbad(rightClickPress, rightClickRelease);
+        selectingForQuery = false;
+    }
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
@@ -383,6 +398,10 @@ class JSFEEventHandler implements ViewListener {
             pan(c, lastJPX-jpx, jpy-lastJPY);
             lastJPX = jpx;
             lastJPY = jpy;
+        }
+        else if (selectingForQuery){
+            Point2D.Double p = v.getVCursor().getVSCoordinates(app.mCamera);
+            rightClickSelectionG.sizeTo(2*Math.sqrt((p.x-rightClickPress.x)*(p.x-rightClickPress.x)+(p.y-rightClickPress.y)*(p.y-rightClickPress.y)));
         }
         /*
 
