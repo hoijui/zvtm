@@ -245,7 +245,7 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
 
     /**
      * Sets the color lookup table.
-     * Currently, accepted values are: "Background", "Blue", "Heat", "Isophot", "Light", "Pastel", "Ramp", "Real", "Smooth", "Staircase", "Standard".
+     * Currently accepted values include: "Background", "Blue", "Heat", "Isophot", "Light", "Pastel", "Ramp", "Real", "Smooth", "Staircase", "Standard".
      */
     public void setColorLookupTable(String tableName){
         proc.setColorLookupTable(tableName);

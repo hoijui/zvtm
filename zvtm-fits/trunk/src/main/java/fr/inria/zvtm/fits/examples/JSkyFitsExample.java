@@ -38,6 +38,8 @@ import java.net.URL;
 
 import java.util.Vector;
 import java.util.List;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.Location;
@@ -226,7 +228,7 @@ public class JSkyFitsExample{
             img.setColorLookupTable("Standard");
             img.setScaleAlgorithm(JSkyFitsImage.ScaleAlgorithm.LINEAR);
             mSpace.addGlyph(img);
-            menu.drawHistogram();
+            menu.buildHistogram();
         }
     }
 
@@ -272,6 +274,8 @@ public class JSkyFitsExample{
             VText lb = new VText(p.x+10, p.y+10, 101, Color.RED, obj.getIdentifier(), VText.TEXT_ANCHOR_START);
             mSpace.addGlyph(cr);
             mSpace.addGlyph(lb);
+            cr.setOwner(obj);
+            lb.setOwner(obj);
         }
     }
 
@@ -405,6 +409,18 @@ class JSFEEventHandler implements ViewListener {
         if (code == KeyEvent.VK_M){
             app.toggleMenu();
         }
+        else if (code == KeyEvent.VK_F1){
+            app.menu.selectPreviousColorMapping();
+        }
+        else if (code == KeyEvent.VK_F2){
+            app.menu.selectNextColorMapping();
+        }
+        else if (code == KeyEvent.VK_F3){
+            app.menu.selectPreviousScale();
+        }
+        else if (code == KeyEvent.VK_F4){
+            app.menu.selectNextScale();
+        }
         // else if (code == KeyEvent.VK_MINUS){
         //     //app.scaleBounds[1] -= 100;
         //     //app.img.rescale(app.scaleBounds[0], app.scaleBounds[1], 1);
@@ -457,7 +473,6 @@ class JSFEEventHandler implements ViewListener {
 
 class JSkyFitsMenu implements ViewListener, PickerListener {
 
-
     public static final int WIDTH_MENU = 200;
 
     private static final String SCALE_DEFAULT = "LINEAR SCALE";
@@ -484,31 +499,73 @@ class JSkyFitsMenu implements ViewListener, PickerListener {
     public static final String T_SCALE = "Scl";
     public static final String T_SCROLL = "Scrll";
     public static final String T_SCROLL_BAR = "ScrllBr";
+    public static final String T_ASTRO_OBJ = "AO";
 
     public static final float WHEEL_FACTOR = 15.0f;
 
-    public static final ColorGradient[] COLOR_GRADIENT = {new Aips0Filter(), new BackgrFilter(),
-        new BlueFilter(), new BlulutFilter(), new ColorFilter(), new GreenFilter(),
-        new HeatFilter(), new Idl11Filter(), new Idl12Filter(),new Idl14Filter(),new Idl15Filter(),
-        new Idl2Filter(),new Idl4Filter(), new Idl5Filter(), new Idl6Filter(), new IsophotFilter(),new LightFilter(),
-        new ManycolFilter(), new PastelFilter(), new RainbowFilter(), new Rainbow1Filter(),
-        new Rainbow2Filter(),new Rainbow3Filter(), new Rainbow4Filter(), new RampFilter(),
-        new RandomFilter(), new Random1Filter(), new Random2Filter(), new Random3Filter(),new Random4Filter(),
-        /*new Random5Filter(), new Random6Filter(),*/ new RealFilter(), new RedFilter(), new SmoothFilter(),
-        /*new Smooth1Filter(),new Smooth2Filter(),new Smooth3Filter(),*/ new StaircaseFilter(), new Stairs8Filter(), new Stairs9Filter(),
-        new StandardFilter()};
+    static LinkedHashMap<String,RGBImageFilter> COLOR_MAPPINGS = new LinkedHashMap();
+    static {
+        COLOR_MAPPINGS.put("Aips0", new Aips0Filter());
+        COLOR_MAPPINGS.put("Background", new BackgrFilter());
+        COLOR_MAPPINGS.put("Blue", new BlueFilter());
+        COLOR_MAPPINGS.put("Blulut", new BlulutFilter());
+        COLOR_MAPPINGS.put("Color", new ColorFilter());
+        COLOR_MAPPINGS.put("Green", new GreenFilter());
+        COLOR_MAPPINGS.put("Heat",  new HeatFilter());
+        COLOR_MAPPINGS.put("Idl11", new Idl11Filter());
+        COLOR_MAPPINGS.put("Idl12", new Idl12Filter());
+        COLOR_MAPPINGS.put("Idl14", new Idl14Filter());
+        COLOR_MAPPINGS.put("Idl15", new Idl15Filter());
+        COLOR_MAPPINGS.put("Idl2", new Idl2Filter());
+        COLOR_MAPPINGS.put("Idl4", new Idl4Filter());
+        COLOR_MAPPINGS.put("Idl5", new Idl5Filter());
+        COLOR_MAPPINGS.put("Idl6", new Idl6Filter());
+        COLOR_MAPPINGS.put("Isophot", new IsophotFilter());
+        COLOR_MAPPINGS.put("Light", new LightFilter());
+        COLOR_MAPPINGS.put("Manycolor", new ManycolFilter());
+        COLOR_MAPPINGS.put("Pastel", new PastelFilter());
+        COLOR_MAPPINGS.put("Rainbow", new RainbowFilter());
+        COLOR_MAPPINGS.put("Rainbow1", new Rainbow1Filter());
+        COLOR_MAPPINGS.put("Rainbow2", new Rainbow2Filter());
+        COLOR_MAPPINGS.put("Rainbow3", new Rainbow3Filter());
+        COLOR_MAPPINGS.put("Rainbow4", new Rainbow4Filter());
+        COLOR_MAPPINGS.put("Ramp", new RampFilter());
+        COLOR_MAPPINGS.put("Random", new RandomFilter());
+        COLOR_MAPPINGS.put("Random1", new Random1Filter());
+        COLOR_MAPPINGS.put("Random2", new Random2Filter());
+        COLOR_MAPPINGS.put("Random3", new Random3Filter());
+        COLOR_MAPPINGS.put("Random4", new Random4Filter());
+        //COLOR_MAPPINGS.put("Random5", new Random5Filter());
+        //COLOR_MAPPINGS.put("Random6", new Random6Filter());
+        COLOR_MAPPINGS.put("Real", new RealFilter());
+        COLOR_MAPPINGS.put("Red", new RedFilter());
+        COLOR_MAPPINGS.put("Smooth", new SmoothFilter());
+        //COLOR_MAPPINGS.put("Smooth1", new Smooth1Filter());
+        //COLOR_MAPPINGS.put("Smooth2", new Smooth2Filter());
+        //COLOR_MAPPINGS.put("Smooth3", new Smooth3Filter());
+        COLOR_MAPPINGS.put("Staircase", new StaircaseFilter());
+        COLOR_MAPPINGS.put("Stairs8", new Stairs8Filter());
+        COLOR_MAPPINGS.put("Stairs9", new Stairs9Filter());
+        COLOR_MAPPINGS.put("Standard", new StandardFilter());
+    }
 
-    public static final String[] COLOR_NAME = {"Aips0", "Background", "Blue", "Blulut", "Color", "Green",
-        "Heat", "Idl11", "Idl12","Idl14","Idl15",
-        "Idl2","Idl4","Idl5","Idl6","Isophot","Light","Manycolor",
-        "Pastel","Rainbow","Rainbow1","Rainbow2","Rainbow3","Rainbow4","Ramp","Random","Random1","Random2",
-        "Random3","Random4",/*"Random5","Random6",*/"Real","Red","Smooth",/*"Smooth1","Smooth2","Smooth3",*/
-        "Staircase", "Stairs8", "Stairs9", "Standard"};
+    static HashMap<String,PRectangle> COLOR_MAPPING2GLYPH = new HashMap(COLOR_MAPPINGS.size(),1);
 
-    //public static final int[] SCALE_METHOD = {ImageLookup.LINEAR_SCALE, ImageLookup.LOG_SCALE, ImageLookup.HIST_EQ, ImageLookup.SQRT_SCALE};
-    public static final JSkyFitsImage.ScaleAlgorithm[] SCALE_METHOD = {JSkyFitsImage.ScaleAlgorithm.LINEAR, JSkyFitsImage.ScaleAlgorithm.LOG, JSkyFitsImage.ScaleAlgorithm.HIST_EQ, JSkyFitsImage.ScaleAlgorithm.SQRT};
-    public static final String[] SCALE_NAME = {"LINEAR SCALE", "LOGARITHMIC", "HISTOGRAM EQUALIZATION", "SQUARE ROOT"};
+    static final Vector<String> ORDERED_COLOR_MAPPINGS = new Vector(COLOR_MAPPINGS.keySet());
 
+    static LinkedHashMap<String,JSkyFitsImage.ScaleAlgorithm> SCALES = new LinkedHashMap(4,1);
+    static {
+        SCALES.put("LINEAR SCALE", JSkyFitsImage.ScaleAlgorithm.LINEAR);
+        SCALES.put("LOGARITHMIC", JSkyFitsImage.ScaleAlgorithm.LOG);
+        SCALES.put("HISTOGRAM EQUALIZATION", JSkyFitsImage.ScaleAlgorithm.HIST_EQ);
+        SCALES.put("SQUARE ROOT", JSkyFitsImage.ScaleAlgorithm.SQRT);
+    };
+
+    static HashMap<String,PRectangle> SCALE2GLYPH = new HashMap(SCALES.size(),1);
+
+    static final Vector<String> ORDERED_SCALES = new Vector(SCALES.keySet());
+
+    // ********************************************
     public int BORDER_BOTTOM_FILTER;
     public int BORDER_TOP_FILTER;
 
@@ -517,8 +574,8 @@ class JSkyFitsMenu implements ViewListener, PickerListener {
     public int BORDER_LEFT_HISTOGRAM;
     public int BORDER_RIGHT_HISTOGRAM;
 
-    PRectangle scale_selected;
-    PRectangle color_selected;
+    PRectangle selected_scaleG;
+    PRectangle selected_colorG;
 
 //  int CONST = 636;
 
@@ -544,63 +601,58 @@ class JSkyFitsMenu implements ViewListener, PickerListener {
     boolean press3_scroll = false;
     boolean press1 = false;
 
-    Glyph lastGlyph = null;
-
     JSkyFitsMenu(JSkyFitsExample app){
         this.app = app;
         mnSpace = app.mnSpace;
-        drawFiltersColor();
+        buildColorMappingMenu();
     }
 
-    private void drawFiltersColor(){
+    private void buildColorMappingMenu(){
 
         BORDER_TOP_FILTER =  0;//app.VIEW_H/2;
 
         int py = app.VIEW_H/2 - 2*HEIGHT_BTN - BORDER;
-
-        for(int i = 0; i < COLOR_GRADIENT.length; i++){
-            MultipleGradientPaint grad = Utils.makeGradient((RGBImageFilter)COLOR_GRADIENT[i]);
-            PRectangle filter = new PRectangle(-app.VIEW_W/2 + WIDTH_MENU/2, py, Z_BTN, WIDTH_MENU - BORDER, HEIGHT_BTN, grad, BORDER_COLOR_BTN);
-            filter.setType(T_FILTER);
-            filter.setOwner(COLOR_NAME[i]);
-
-            if(COLOR_DEFAULT.equals(COLOR_NAME[i])){
-                color_selected = filter;
-                color_selected.setWidth(color_selected.getWidth()+DISPLACE*2);
-                color_selected.move(DISPLACE, 0);
+        for(String cm:COLOR_MAPPINGS.keySet()){
+            RGBImageFilter f = COLOR_MAPPINGS.get(cm);
+            MultipleGradientPaint grad = Utils.makeGradient(f);
+            PRectangle filterG = new PRectangle(-app.VIEW_W/2 + WIDTH_MENU/2, py, Z_BTN, WIDTH_MENU - BORDER, HEIGHT_BTN, grad, BORDER_COLOR_BTN);
+            filterG.setType(T_FILTER);
+            filterG.setOwner(cm);
+            COLOR_MAPPING2GLYPH.put(cm, filterG);
+            if(COLOR_DEFAULT.equals(cm)){
+                selected_colorG = filterG;
+                selected_colorG.setWidth(selected_colorG.getWidth()+DISPLACE*2);
+                selected_colorG.move(DISPLACE, 0);
             }
-
-            mnSpace.addGlyph(filter);
+            mnSpace.addGlyph(filterG);
             py -= (HEIGHT_BTN + BORDER);
         }
 
-        for(int i = 0; i < SCALE_METHOD.length; i++){
-            PRectangle filter = new PRectangle(-app.VIEW_W/2 + WIDTH_MENU/2, py, Z_BTN, WIDTH_MENU - BORDER, HEIGHT_BTN, BACKGROUND_COLOR_BTN, BORDER_COLOR_BTN);
-            filter.setType(T_SCALE);
-            filter.setOwner(SCALE_METHOD[i]);
-            mnSpace.addGlyph(filter);
-
-            VText scaleText = new VText(-app.VIEW_W/2 + WIDTH_MENU/2, py - DISPLACE_TEXT_BTN, Z_BTN, TEXT_COLOR_BTN, SCALE_NAME[i], VText.TEXT_ANCHOR_MIDDLE);
-            scaleText.setFont(FONT_BTN);
-            scaleText.setSensitivity(false);
-            mnSpace.addGlyph(scaleText);
-            filter.stick(scaleText);
-
-            if(SCALE_DEFAULT.equals(SCALE_NAME[i])){
-                scale_selected = filter;
-                scale_selected.setWidth(scale_selected.getWidth()+DISPLACE*2);
-                scale_selected.move(DISPLACE, 0);
+        for(String sc:SCALES.keySet()){
+            PRectangle scaleG = new PRectangle(-app.VIEW_W/2 + WIDTH_MENU/2, py, Z_BTN, WIDTH_MENU - BORDER, HEIGHT_BTN, BACKGROUND_COLOR_BTN, BORDER_COLOR_BTN);
+            scaleG.setType(T_SCALE);
+            scaleG.setOwner(sc);
+            mnSpace.addGlyph(scaleG);
+            VText scaleLb = new VText(-app.VIEW_W/2 + WIDTH_MENU/2, py - DISPLACE_TEXT_BTN, Z_BTN, TEXT_COLOR_BTN, sc, VText.TEXT_ANCHOR_MIDDLE);
+            scaleLb.setFont(FONT_BTN);
+            scaleLb.setSensitivity(false);
+            mnSpace.addGlyph(scaleLb);
+            scaleG.stick(scaleLb);
+            SCALE2GLYPH.put(sc, scaleG);
+            if(SCALE_DEFAULT.equals(sc)){
+                selected_scaleG = scaleG;
+                selected_scaleG.setWidth(selected_scaleG.getWidth()+DISPLACE*2);
+                selected_scaleG.move(DISPLACE, 0);
             }
-
-            //Glyph ln = drawMethod(SCALE_METHOD[i]);
+            //Glyph ln = drawMethod(sc);
             //ln.moveTo(-app.VIEW_W/2 + WIDTH_MENU/2 + BORDER , py);
             //mnSpace.addGlyph(ln);
             py -= (HEIGHT_BTN + BORDER);
         }
-        BORDER_BOTTOM_FILTER = COLOR_GRADIENT.length * ( HEIGHT_BTN + BORDER*2 ) + SCALE_METHOD.length * ( HEIGHT_BTN + BORDER*2 ) + HEIGHT_BTN + BORDER;
+        BORDER_BOTTOM_FILTER = COLOR_MAPPINGS.size() * ( HEIGHT_BTN + BORDER*2 ) + SCALES.size() * ( HEIGHT_BTN + BORDER*2 ) + HEIGHT_BTN + BORDER;
     }
 
-    public void drawHistogram(){
+    public void buildHistogram(){
 
         if(app.img != null){
             hist = JSkyFitsHistogram.fromFitsImage(app.img);
@@ -803,36 +855,19 @@ class JSkyFitsMenu implements ViewListener, PickerListener {
     public void enterGlyph(Glyph g){
         //System.out.println("enter: " + g.getType());
         if(g.getType().equals(T_FILTER)){
-
-            if(color_selected != ((PRectangle)g)){
-                app.img.setColorLookupTable((String)g.getOwner());
-                if(color_selected != null){
-                    color_selected.setWidth(color_selected.getWidth()-DISPLACE*2);
-                    color_selected.move(-DISPLACE,0);
-                }
-                ((PRectangle)g).setWidth(((PRectangle)g).getWidth()+DISPLACE*2);
-                g.move(DISPLACE, 0);
-                color_selected = (PRectangle)g;
-                //redrawHistogram();
+            if (selected_colorG != g){
+                selectColorMapping((PRectangle)g);
+                //rebuildHistogram();
             }
         } else if(g.getType().equals(T_SCALE)){
-            lastGlyph = g;
-            if(scale_selected != (PRectangle)g){
-                app.img.setScaleAlgorithm((JSkyFitsImage.ScaleAlgorithm)g.getOwner());
-                if(scale_selected != null){
-                    scale_selected.setWidth(scale_selected.getWidth()-DISPLACE*2);
-                    scale_selected.move(-DISPLACE,0);
-                }
-                ((PRectangle)g).setWidth(((PRectangle)g).getWidth()+DISPLACE*2);
-                g.move(DISPLACE,0);
-                scale_selected = (PRectangle)g;
-                //redrawHistogram();
+            if(selected_scaleG != (PRectangle)g){
+                selectScale((PRectangle)g);
+                //rebuildHistogram();
             }
         } else if(g.getType().equals(T_SCROLL) && !scroll){
             scroll = true;
             //v.parent.setCursorIcon(Cursor.);
         }
-        lastGlyph = g;
     }
 
     public void exitGlyph(Glyph g){
@@ -849,6 +884,18 @@ class JSkyFitsMenu implements ViewListener, PickerListener {
         if (code == KeyEvent.VK_M){
             app.toggleMenu();
         }
+        else if (code == KeyEvent.VK_F1){
+            selectPreviousColorMapping();
+        }
+        else if (code == KeyEvent.VK_F2){
+            selectNextColorMapping();
+        }
+        else if (code == KeyEvent.VK_F3){
+            selectPreviousScale();
+        }
+        else if (code == KeyEvent.VK_F4){
+            selectNextScale();
+        }
     }
 
     public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
@@ -862,6 +909,84 @@ class JSkyFitsMenu implements ViewListener, PickerListener {
     public void viewDeiconified(View v){}
 
     public void viewClosing(View v){System.exit(0);}
+
+    void selectColorMapping(PRectangle cm){
+        app.img.setColorLookupTable((String)cm.getOwner());
+        if(selected_colorG != null){
+            selected_colorG.setWidth(selected_colorG.getWidth()-DISPLACE*2);
+            selected_colorG.move(-DISPLACE,0);
+        }
+        cm.setWidth(cm.getWidth()+DISPLACE*2);
+        cm.move(DISPLACE, 0);
+        selected_colorG = cm;
+    }
+
+    void selectNextColorMapping(){
+        int scmIndex = ORDERED_COLOR_MAPPINGS.indexOf(selected_colorG.getOwner());
+        int newIndex = 0;
+        if (scmIndex != -1){
+            if (scmIndex == ORDERED_COLOR_MAPPINGS.size()-1){
+                newIndex = 0;
+            }
+            else {
+                newIndex = scmIndex + 1;
+            }
+        }
+        selectColorMapping(COLOR_MAPPING2GLYPH.get(ORDERED_COLOR_MAPPINGS.elementAt(newIndex)));
+    }
+
+    void selectPreviousColorMapping(){
+        int scmIndex = ORDERED_COLOR_MAPPINGS.indexOf(selected_colorG.getOwner());
+        int newIndex = 0;
+        if (scmIndex != -1){
+            if (scmIndex == 0){
+                newIndex = ORDERED_COLOR_MAPPINGS.size()-1;
+            }
+            else {
+                newIndex = scmIndex - 1;
+            }
+        }
+        selectColorMapping(COLOR_MAPPING2GLYPH.get(ORDERED_COLOR_MAPPINGS.elementAt(newIndex)));
+    }
+
+    void selectScale(PRectangle sc){
+        app.img.setScaleAlgorithm(SCALES.get(sc.getOwner()));
+        if(selected_scaleG != null){
+            selected_scaleG.setWidth(selected_scaleG.getWidth()-DISPLACE*2);
+            selected_scaleG.move(-DISPLACE,0);
+        }
+        sc.setWidth(sc.getWidth()+DISPLACE*2);
+        sc.move(DISPLACE,0);
+        selected_scaleG = sc;
+    }
+
+    void selectNextScale(){
+        int scIndex = ORDERED_SCALES.indexOf(selected_scaleG.getOwner());
+        int newIndex = 0;
+        if (scIndex != -1){
+            if (scIndex == ORDERED_SCALES.size()-1){
+                newIndex = 0;
+            }
+            else {
+                newIndex = scIndex + 1;
+            }
+        }
+        selectScale(SCALE2GLYPH.get(ORDERED_SCALES.elementAt(newIndex)));
+    }
+
+    void selectPreviousScale(){
+        int scIndex = ORDERED_SCALES.indexOf(selected_scaleG.getOwner());
+        int newIndex = 0;
+        if (scIndex != -1){
+            if (scIndex == 0){
+                newIndex = ORDERED_SCALES.size()-1;
+            }
+            else {
+                newIndex = scIndex - 1;
+            }
+        }
+        selectScale(SCALE2GLYPH.get(ORDERED_SCALES.elementAt(newIndex)));
+    }
 
 }
 

@@ -46,6 +46,8 @@ public class SimbadCatQuery {
             // query coo 12 30 +10 20 radius=6m
 
             Coordinates coords = new Coordinates(ra, dec);
+            // look at http://simbad.u-strasbg.fr/simbad/sim-help?Page=sim-url
+            // for more information about possible parameters
             //XXX the 'replace' operation is ugly, should be improved
             String script = String.format(
                     "output console=off script=off\n" +
