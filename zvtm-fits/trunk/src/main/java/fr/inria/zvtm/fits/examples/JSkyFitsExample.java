@@ -59,6 +59,10 @@ import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.PRectangle;
 import fr.inria.zvtm.glyphs.Composite;
 import fr.inria.zvtm.glyphs.JSkyFitsImage;
+import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
+import fr.inria.zvtm.animation.Animation;
+import fr.inria.zvtm.animation.AnimationManager;
+import fr.inria.zvtm.animation.EndAction;
 
 import fr.inria.zvtm.fits.RangeSelection;
 import fr.inria.zvtm.fits.Utils;
@@ -263,6 +267,7 @@ public class JSkyFitsExample{
             @Override public void finished(){
                 List<AstroObject> objs = (List<AstroObject>)get();
                 drawSymbols(objs);
+                eh.fadeOutRightClickSelection();
             }
         }.start();
     }
@@ -285,6 +290,7 @@ public class JSkyFitsExample{
     }
 
     public static void main(String[] args) throws IOException{
+        // forcing Locale so that DecimalFormat.format() uses "." as a separator regardless of actual locale
         Locale.setDefault(new Locale("en", "US"));
         FitsOptions options = new FitsOptions();
         CmdLineParser parser = new CmdLineParser(options);
@@ -303,6 +309,7 @@ public class JSkyFitsExample{
 class JSFEEventHandler implements ViewListener {
 
     static final BasicStroke SEL_STROKE = new BasicStroke(2f);
+    static final float SEL_ALPHA = .5f;
 
     static float ZOOM_SPEED_COEF = 1.0f/50.0f;
     static double PAN_SPEED_COEF = 50.0;
@@ -310,6 +317,7 @@ class JSFEEventHandler implements ViewListener {
     static final float WHEEL_ZOOMOUT_FACTOR = 22.0f;
 
     JSkyFitsExample app;
+    AnimationManager am = VirtualSpaceManager.INSTANCE.getAnimationManager();
 
     //private double[] scaleBounds;
     //private boolean dragLeft = false, dragRight = false;
@@ -319,7 +327,7 @@ class JSFEEventHandler implements ViewListener {
     private int lastJPY;
 
     Point2D.Double rightClickPress;
-    VCircle rightClickSelectionG = new VCircle(0, 0, 1000, 1, Color.BLACK, Color.RED, .5f);
+    VCircle rightClickSelectionG = new VCircle(0, 0, 1000, 1, Color.BLACK, Color.RED, SEL_ALPHA);
 
     boolean panning = false;
     boolean selectingForQuery = false;
@@ -379,7 +387,6 @@ class JSFEEventHandler implements ViewListener {
     public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
         // second point (end dragging) defines the radius of the query zone
         Point2D.Double rightClickRelease = v.getVCursor().getVSCoordinates(app.mCamera);
-        app.mSpace.removeGlyph(rightClickSelectionG);
         // make query
         app.querySimbad(rightClickPress, rightClickRelease);
         selectingForQuery = false;
@@ -490,6 +497,19 @@ class JSFEEventHandler implements ViewListener {
             }
             c.altitudeOffset(-a*WHEEL_ZOOMIN_FACTOR);
         }
+    }
+
+
+    void fadeOutRightClickSelection(){
+        Animation a = am.getAnimationFactory().createTranslucencyAnim(500,
+                            rightClickSelectionG, 0f, false, IdentityInterpolator.getInstance(),
+                            new EndAction(){
+                                public void execute(Object subject, Animation.Dimension dimension){
+                                    app.mSpace.removeGlyph(rightClickSelectionG);
+                                    rightClickSelectionG.setTranslucencyValue(SEL_ALPHA);
+                                }
+                            });
+        am.startAnimation(a, true);
     }
 
 }
