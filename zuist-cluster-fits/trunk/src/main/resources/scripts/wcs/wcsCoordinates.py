@@ -50,9 +50,11 @@ def header(src_path):
 		hdulist.close()
 		return
 
+	print wcsdata.printwcs()
+
 	hdulist.close()
 	#print "RESOURCE: %.2f" % (memory_usage_resource())
-	return {'header': header, 'wcsdata': wcsdata, 'size': size}
+	return {'header': header, 'wcsdata': wcsdata, 'size': size, 'ctype': wcsdata.wcs.ctype}
 
 def pix2world(wcsdata, x, y):
 	return wcsdata.wcs_pix2world(x, y, 1)
@@ -65,13 +67,19 @@ def icrs2galactic(ra, dec):
 	print ecuatorial
 	galactic = ecuatorial.galactic
 	print galactic
-	print galactic.l.deg
-	print galactic.b.deg
 	return [galactic.l.deg, galactic.b.deg]
 
-def worldgalactic(ra, dec):
-	ecuatorial = SkyCoord(ra=ra, dec=dec, frame='icrs', unit='deg')
-	galactic = ecuatorial.galactic
+def galactic2icrs(l, b):
+	print "l: %f - b: %f" % (l, b)
+	galactic = SkyCoord(l=l, b=b, frame='galactic', unit='deg')
+	print galactic
+	ecuatorial = galactic.icrs
+	print ecuatorial
+	return [ecuatorial.ra.deg, ecuatorial.dec.deg]
+
+
+def worldgalactic(l, b):
+	galactic = SkyCoord(l=l, b=b, frame='galactic', unit='deg')
 	return galactic.to_string('dms')
 
 def worldecuatorial(ra, dec):
@@ -104,3 +112,14 @@ def main(argv):
 
 if __name__ == "__main__":
 	main(argv=sys.argv)
+
+	'''
+	print "icrs2galactic"
+	print "pix2world"
+	[ra, dec] = pix2world(REFERENCE['wcsdata'], 0,0)
+	print "ra: %f - dec: %f" % (ra, dec)
+	[l, b] = icrs2galactic(ra, dec)
+	print "l: %f, b: %f" % (l, b)
+	[ra2, dec2] = galactic2icrs(l, b)
+	print "ra: %f - dec: %f" % (ra2, dec2)
+	'''

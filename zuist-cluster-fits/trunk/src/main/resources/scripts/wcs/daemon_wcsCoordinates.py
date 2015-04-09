@@ -46,15 +46,33 @@ def consumer():
 
 		data = json.loads(body)
 		print data['name']
+		#data['name'] = 'test'
 
 		if data['name'] != 'end':
 			methodToCall = getattr(wcsCoordinates, data['name'])
-			p_x, p_y = methodToCall(wcsCoordinates.REFERENCE['wcsdata'], data['x'], data['y'])
-			lat, lon = wcsCoordinates.icrs2galactic(p_x, p_y)
-			galactic = wcsCoordinates.worldgalactic(p_x, p_y)
-			ecuatorial = wcsCoordinates.worldecuatorial(p_x, p_y)
-			obj = {'name': data['name'], 'x': float(p_x), 'y': float(p_y), 'lat': float(lat), 'lon': float(lon), 'ecuatorial': ecuatorial, 'galactic': galactic}
+			
+			ctype_x, ctype_y = wcsCoordinates.REFERENCE['ctype']
+			print ctype_x, ctype_y
 
+			p_x, p_y = methodToCall(wcsCoordinates.REFERENCE['wcsdata'], data['x'], data['y'])
+			if "GLON" in ctype_x and "GLAT" in ctype_y:
+				l = p_x
+				b = p_y
+				ra, dec = wcsCoordinates.galactic2icrs(l, b)
+
+			elif "RA" in ctype_x and "DEC" in ctype_y:
+				ra = p_x
+				dec = p_y
+				l, b = wcsCoordinates.icrs2galactic(ra, dec)
+			else:
+				print "ctype not correctly"
+				c.close()
+				p.close()
+				return 0
+
+			galactic = wcsCoordinates.worldgalactic(l, b)
+			ecuatorial = wcsCoordinates.worldecuatorial(ra, dec)
+			obj = {'name': data['name'], 'ra': float(ra), 'dec': float(dec), 'l': float(l), 'b': float(b), 'ecuatorial': ecuatorial, 'galactic': galactic}
 			p.publish( json.dumps(obj) , 'python')
 
 		else:
