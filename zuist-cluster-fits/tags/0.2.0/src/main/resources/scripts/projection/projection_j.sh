@@ -12,7 +12,7 @@ PROC=J
 ./projection.py $PATH/$PROC/v20100411_00884_st_tl.fit $PATH/$PROC/v20110508_00424_st_tl.fit 0884_0424.fits noproc 
 
 
-./projection.py 0956_0992.fits 0920_1028.fits 0956_0992_0920_1028.fits nopro
+./projection.py 0956_0992.fits 0920_1028.fits 0956_0992_0920_1028.fits noproc
 
 ./projection.py 0956_0992_0920_1028.fits 0382_1064.fits 0956_0992_0920_1028_0382_1064.fits noproc
 
