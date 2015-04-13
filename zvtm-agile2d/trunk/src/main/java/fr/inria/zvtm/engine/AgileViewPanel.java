@@ -137,7 +137,7 @@ public abstract class AgileViewPanel extends ViewPanel implements GLEventListene
                             //we project the mouse cursor wrt the appropriate coord sys
                             parent.mouse.unProject(cams[activeLayer], this);
                             if (parent.mouse.isSensitive()){
-                                parent.mouse.getPicker().computePickedGlyphList(evHs[activeLayer], cams[activeLayer]);
+                                parent.mouse.getPicker().computePickedGlyphList(cams[activeLayer], this);
                             }
                         }
                         catch (NullPointerException ex) {if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.drawdrag "+ex);}}
