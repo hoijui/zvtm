@@ -21,6 +21,7 @@ import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.event.ViewAdapter;
 import fr.inria.zvtm.event.ViewListener;
+import fr.inria.zvtm.event.PickerListener;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.PRectangle;
 import fr.inria.zvtm.glyphs.AdaptiveText;
@@ -49,12 +50,14 @@ class NamesDemo {
         view = vsm.addFrameView(new Vector(Arrays.asList(new Camera[]{cam})),
                 "Treemap demo", View.STD_VIEW, 800, 600, true);
         view.getCursor().setColor(Color.GREEN);
+        view.getCursor().getPicker().setListener(new CellHighlighter());
+
 
         Tree<ZMapItem> tree = buildTree();
         tree.sum(); //XXX
         Squarified.INSTANCE.computeShapesResize(new Rect(-200, 300, 1024, 768), tree, 20, 12);
         makeRepr(tree, demoSpace);
-        view.getGlobalView(cam, 500); 
+        view.getGlobalView(cam, 500);
         ((JFrame)view.getFrame()).setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
@@ -75,13 +78,13 @@ class NamesDemo {
                 rect.setBorderColor(Color.BLACK);
                 rect.setCursorInsidePaint(TreemapUtils.makeDiagGradient((float)rect.getWidth(), (float)rect.getHeight(), HIGHLIGHT_FILL));
                 String txt = item.getUserObject().toString();
-                AdaptiveText text = new AdaptiveText(rect.vx, rect.vy+rect.getHeight()*0.5, 0, 
-                    Color.BLACK, txt, 
+                AdaptiveText text = new AdaptiveText(rect.vx, rect.vy+rect.getHeight()*0.5, 0,
+                    Color.BLACK, txt,
                     rect.getWidth(), 11);
                 text.move(0, -TreemapUtils.getVTextHeight(text));
                 if(t.isLeaf()){
                     text.moveTo(rect.vx, rect.vy);
-                } 
+                }
                 item.putGraphicalObject("RECT", rect);
                 item.putGraphicalObject("TEXT", text);
                 vs.addGlyph(rect);
@@ -103,20 +106,12 @@ class NamesDemo {
     }
 
     public static void main(String[] args){
-        NamesDemo demo = new NamesDemo(); 
+        NamesDemo demo = new NamesDemo();
         demo.setListener(new ViewAdapter(){
                double lastJPX = 0;
                double lastJPY = 0;
                final float ZOOM_SPEED_COEF = 1.0f/50.0f;
                final double PAN_SPEED_COEF = 50.0;
-
-            @Override public void enterGlyph(Glyph g){
-                g.highlight(true, null);
-            }
-
-            @Override public void exitGlyph(Glyph g){
-                g.highlight(false, null);
-            }
 
             @Override public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
                 if (buttonNumber == 3 || ((mod == META_MOD || mod == META_SHIFT_MOD) && buttonNumber == 1)){
@@ -169,3 +164,14 @@ class NamesDemo {
     }
 }
 
+class CellHighlighter implements PickerListener {
+
+    @Override public void enterGlyph(Glyph g){
+        g.highlight(true, null);
+    }
+
+    @Override public void exitGlyph(Glyph g){
+        g.highlight(false, null);
+    }
+
+}
