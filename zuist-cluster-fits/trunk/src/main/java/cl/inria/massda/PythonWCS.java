@@ -30,7 +30,7 @@ public class PythonWCS {
     static String VIRTUAL_HOST = "/";
     static String USER_ID = "guest";
     static String PASSWORD = "guest";
-    static String CONSUMER_TAG = "consumerTag";
+    static String CONSUMER_TAG = "consumer";
 
     MyCursor myCursor;
 
@@ -60,10 +60,10 @@ public class PythonWCS {
                 String coordinate;
                 if(!galacticSystem){
                     sexagesimal = "Ecuatorial: " + json.getString("ecuatorial");
-                    coordinate = "Ra: " + json.getDouble("x") + " - Dec: " + json.getDouble("y");
+                    coordinate = "Ra: " + json.getDouble("ra") + " - Dec: " + json.getDouble("dec");
                 } else {
                     sexagesimal = "Galactic: " + json.getString("galactic");
-                    coordinate = "Lat: " + json.getDouble("lat") + " - Lon: " + json.getDouble("lon");
+                    coordinate = "Lat: " + json.getDouble("l") + " - Lon: " + json.getDouble("b");
                 }
                  
                 

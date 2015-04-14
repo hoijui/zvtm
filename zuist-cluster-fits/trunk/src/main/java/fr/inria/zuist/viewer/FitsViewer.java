@@ -160,12 +160,12 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     public VirtualSpace mSpace;
     VirtualSpace ovSpace;
     VirtualSpace mSpaceKs, mSpaceH, mSpaceJ;
-    VirtualSpace menuSpace;
+    VirtualSpace mnSpace; //menuSpace;
     public VirtualSpace cursorSpace;
     
     public Camera mCamera;
     Camera mCameraKs, mCameraH, mCameraJ;
-    Camera menuCamera;
+    Camera mnCamera; // menuCamera;
     public Camera cursorCamera;
 
     String mCameraAltStr = Messages.ALTITUDE + "0";
@@ -205,6 +205,17 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     //JSONArray readed;
     //Vector<SavedPosition> savedPositions;
 
+    static HashMap<String,String> parseSceneOptions(Options options){
+        HashMap<String,String> res = new HashMap(2,1);
+        if (options.httpUser != null){
+            res.put(SceneManager.HTTP_AUTH_USER, options.httpUser);
+        }
+        if (options.httpPassword != null){
+            res.put(SceneManager.HTTP_AUTH_PASSWORD, options.httpPassword);
+        }
+        return res;
+    }
+
     //public FitsViewer(boolean fullscreen, boolean opengl, boolean antialiased, File xmlSceneFile){
     public FitsViewer(Options options){
 		ovm = new FitsOverlayManager(this);
@@ -212,7 +223,8 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 		initGUI(options);
         VirtualSpace[]  sceneSpaces = {mSpace, mSpaceKs, mSpaceH, mSpaceJ};
         Camera[] sceneCameras = {mCamera, mCameraKs, mCameraH, mCameraJ};
-        sm = new SceneManager(sceneSpaces, sceneCameras);
+
+        sm = new SceneManager(sceneSpaces, sceneCameras, parseSceneOptions(options));
         sm.setRegionListener(this);
         sm.setLevelListener(this);
 		previousLocations = new Vector();
@@ -277,8 +289,8 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         ovSpace = vsm.addVirtualSpace(ovSpaceName);
 		ovSpace.addCamera();
 
-		menuSpace = vsm.addVirtualSpace(menuSpaceName);
-		menuCamera = menuSpace.addCamera();
+		mnSpace = vsm.addVirtualSpace(mnSpaceName);
+		mnCamera = mnSpace.addCamera();
 
         Vector cameras = new Vector();
 
@@ -288,7 +300,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         cameras.add(mCameraJ);
 		cameras.add(vsm.getVirtualSpace(mnSpaceName).getCamera(0));
 		cameras.add(vsm.getVirtualSpace(ovSpaceName).getCamera(0));
-		cameras.add(menuCamera);
+		cameras.add(mnCamera);
         cameras.add(cursorCamera);
 
         mView = vsm.addFrameView(cameras, mViewName, (options.opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, !options.fullscreen, initMenu());
@@ -347,6 +359,10 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 		};
 		mView.getFrame().addComponentListener(ca0);
 		
+    }
+
+    public void setColorFilter(ImageFilter filter){
+        //hi.setColorFilter(filter);
     }
 
     public int getDisplayWidth(){

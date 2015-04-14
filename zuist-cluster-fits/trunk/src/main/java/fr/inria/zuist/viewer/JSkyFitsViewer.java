@@ -205,8 +205,8 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
         ovSpace = vsm.addVirtualSpace(ovSpaceName);
 		ovSpace.addCamera();
 
-		menuSpace = vsm.addVirtualSpace(menuSpaceName);
-		menuCamera = menuSpace.addCamera();
+		mnSpace = vsm.addVirtualSpace(mnSpaceName);
+		mnCamera = mnSpace.addCamera();
 
         Vector cameras = new Vector();
 
@@ -216,7 +216,7 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
         cameras.add(mCameraJ);
 		cameras.add(vsm.getVirtualSpace(mnSpaceName).getCamera(0));
 		cameras.add(vsm.getVirtualSpace(ovSpaceName).getCamera(0));
-		cameras.add(menuCamera);
+		cameras.add(mnCamera);
         cameras.add(cursorCamera);
 
         mView = vsm.addFrameView(cameras, mViewName, (options.opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, !options.fullscreen, initMenu());
@@ -292,6 +292,10 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
                 viewOrigY - (altCoef*jpy));
     }
 
+    void toggleMenu(){
+        mnCamera.setEnabled(!mnCamera.isEnabled());
+    }
+
     int ordinal = 0;
 	@Override
     void toggleColorFilter(){
@@ -324,7 +328,7 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
 
     //@Override
     //public void setColorFilter(JSkyFitsImage.ColorFilter filter){
-    public void setColorFilter(String filter){
+    public void setColorLookupTable(String filter){
         for(ObjectDescription desc: sm.getObjectDescriptions()){
             if(desc instanceof JSkyFitsImageDescription){
                 ((JSkyFitsImageDescription)desc).setColorLookupTable(filter);
@@ -333,7 +337,7 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
     }
 
     //@Override
-    public void setScaleMethod(JSkyFitsImage.ScaleAlgorithm method){
+    public void setScaleAlgorithm(JSkyFitsImage.ScaleAlgorithm method){
     	for(ObjectDescription desc: sm.getObjectDescriptions()){
             if(desc instanceof JSkyFitsImageDescription){
                 ((JSkyFitsImageDescription)desc).setScaleAlgorithm(method);

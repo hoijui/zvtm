@@ -174,8 +174,8 @@ class JSkyFitsViewerEventHandler implements ViewListener, ComponentListener, Cam
 
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
 
-        if((jpx < application.menu.WIDTH_MENU && jpy < application.menu.BORDER_BOTTON_FILTER && jpy > application.menu.BORDER_TOP_FILTER) ||
-          (jpy > application.menu.BORDER_TOP_HISTOGRAM && jpy < application.menu.BORDER_BOTTON_HISTOGRAM && jpx > application.menu.BORDER_LEFT_HISTOGRAM && jpx < application.menu.BORDER_RIGHT_HISTOGRAM )){
+        if((jpx < application.menu.WIDTH_MENU && jpy < application.menu.BORDER_BOTTOM_FILTER && jpy > application.menu.BORDER_TOP_FILTER) ||
+          (jpy > application.menu.BORDER_TOP_HISTOGRAM && jpy < application.menu.BORDER_BOTTOM_HISTOGRAM && jpx > application.menu.BORDER_LEFT_HISTOGRAM && jpx < application.menu.BORDER_RIGHT_HISTOGRAM )){
             v.parent.setActiveLayer(application.LAYER_MENU);
             v.parent.setCursorIcon(Cursor.DEFAULT_CURSOR);
         }

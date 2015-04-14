@@ -50,6 +50,12 @@ public class Options {
     @Option(name = "-ref", usage = "reference to fits image")
     public String reference = null;
 
+    @Option(name = "-user", usage = "HTTPS user name")
+    public String httpUser = null;
+
+    @Option(name = "-password", usage = "HTTPS password")
+    public String httpPassword = null;
+
     @Argument
     List<String> arguments = new ArrayList<String>();
 
