@@ -1034,7 +1034,8 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 		if (returnVal == JFileChooser.APPROVE_OPTION){
 		    final SwingWorker worker = new SwingWorker(){
 			    public Object construct(){
-					reset();
+					/*
+                    reset();
 					sm.setUpdateLevel(false);
 					sm.enableRegionUpdater(false);
 					loadScene(fc.getSelectedFile());
@@ -1046,6 +1047,8 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
                            }
                        };
 					getGlobalView(ea);
+                    */
+                    openScene(fc.getSelectedFile());
 					return null; 
 			    }
 			};
@@ -1064,6 +1067,20 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 		};
 	    worker.start();
 	}
+
+    public void openScene(File xmlSceneFile) {
+        reset();
+        sm.setUpdateLevel(false);
+        sm.enableRegionUpdater(false);
+        loadScene(xmlSceneFile);
+        EndAction ea  = new EndAction(){
+               public void execute(Object subject, Animation.Dimension dimension){
+                   sm.setUpdateLevel(true);
+                   sm.enableRegionUpdater(true);
+               }
+           };
+        getGlobalView(ea);
+    }
 
 	void loadScene(File xmlSceneFile){
         System.out.print("this instanceof FitsViewer: ");

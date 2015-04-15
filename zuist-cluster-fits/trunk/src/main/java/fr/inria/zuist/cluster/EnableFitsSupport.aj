@@ -12,20 +12,23 @@ import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VirtualSpace;
 
+import java.util.HashMap;
+
+
 //set a resource handler for FITS files whenever a SceneManager is
 //instantiated
 aspect EnableZuistSupport {
     pointcut sceneManagerCreation(SceneManager sceneManager,
-            VirtualSpace[] spaces, Camera[] cameras) :
-        execution(public SceneManager.new(VirtualSpace[], Camera[])) &&
+            VirtualSpace[] spaces, Camera[] cameras , HashMap<String,String> properties) :
+        execution(public SceneManager.new(VirtualSpace[], Camera[], HashMap<String,String>)) &&
         this(sceneManager) &&
-        args(spaces, cameras);
+        args(spaces, cameras, properties);
 
     after(SceneManager sceneManager,
             VirtualSpace[] spaces,
-            Camera[] cameras) returning():
+            Camera[] cameras, HashMap<String,String> properties) returning():
         sceneManagerCreation(sceneManager,
-                spaces, cameras){
+                spaces, cameras, properties){
         sceneManager.setResourceHandler(
                 JSkyFitsResourceHandler.RESOURCE_TYPE_FITS,
                 new JSkyFitsResourceHandler()

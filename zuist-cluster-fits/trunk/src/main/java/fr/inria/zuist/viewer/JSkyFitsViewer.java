@@ -186,7 +186,8 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
         mSpaceJ = vsm.addVirtualSpace(mSpaceJName);
         cursorSpace = vsm.addVirtualSpace(cursorSpaceName);
 
-        VirtualSpace mnSpace = vsm.addVirtualSpace(mnSpaceName);
+        //VirtualSpace mnSpace = vsm.addVirtualSpace(mnSpaceName);
+        mnSpace = vsm.addVirtualSpace(mnSpaceName);
 
         mCamera = mSpace.addCamera();
 
