@@ -503,6 +503,7 @@ class JSkyFitsMenu implements ViewListener, PickerListener {
     public void viewClosing(View v){System.exit(0);}
 
     void selectColorMapping(PRectangle cm){
+        System.out.println("selectColorMapping()");
         //app.img.setColorLookupTable((String)cm.getOwner());
         app.setColorLookupTable((String)cm.getOwner());
         if(selected_colorG != null){

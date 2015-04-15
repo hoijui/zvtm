@@ -38,6 +38,8 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 
+
+import java.util.List;
 import java.util.Vector;
 import java.util.HashMap;
 
@@ -61,6 +63,7 @@ import fr.inria.zvtm.engine.SwingWorker;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.glyphs.VCircle;
+import fr.inria.zvtm.glyphs.VCross;
 import fr.inria.zvtm.glyphs.Translucent;
 import fr.inria.zvtm.glyphs.JSkyFitsImage;
 
@@ -108,6 +111,10 @@ import fr.inria.zvtm.fits.NomWcsKeywordProvider;
 import cl.inria.massda.PythonWCS;
 import cl.inria.massda.SmartiesManager.MyCursor;
 
+import fr.inria.zvtm.fits.simbad.SimbadCatQuery;
+import fr.inria.zvtm.fits.simbad.AstroObject;
+
+import jsky.coords.WorldCoords;
 
 /**
  * @author Emmanuel Pietriga, Fernando del Campo
@@ -261,20 +268,20 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
         mView.setListener(ovm, LAYER_OVERLAY);
         mView.setListener(menu, LAYER_MENU);
         
-		mCamera.addListener(eh);
+		//mCamera.addListener(eh);
 
         //mView.setNotifyMouseMoved(true);
         mView.setBackgroundColor(Color.WHITE);
 		mView.setAntialiasing(!options.noaa);//antialiased);
 		mView.setJava2DPainter(this, Java2DPainter.AFTER_PORTALS);
 		//mView.getPanel().addComponentListener(eh);
-		mView.getPanel().getComponent().addComponentListener(eh);
+		//mView.getPanel().getComponent().addComponentListener(eh);
 		ComponentAdapter ca0 = new ComponentAdapter(){
 			public void componentResized(ComponentEvent e){
 				updatePanelSize();
 			}
 		};
-		mView.getFrame().addComponentListener(ca0);
+		//mView.getFrame().addComponentListener(ca0);
 		
     }
 
@@ -330,6 +337,7 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
     //@Override
     //public void setColorFilter(JSkyFitsImage.ColorFilter filter){
     public void setColorLookupTable(String filter){
+        System.out.println("app.setColorLookupTable(" + filter + ")");
         for(ObjectDescription desc: sm.getObjectDescriptions()){
             if(desc instanceof JSkyFitsImageDescription){
                 ((JSkyFitsImageDescription)desc).setColorLookupTable(filter);
@@ -581,6 +589,56 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
         
         
         System.out.println("loaded JSky Fits Reference");
+    }
+
+    void querySimbad(Point2D.Double center, Point2D.Double onCircle){
+
+        // XXX
+        Point2D.Double centerWCS = new Point2D.Double();//img.vs2wcs(center.x, center.y);
+        Point2D.Double onCircleWCS = new Point2D.Double();//img.vs2wcs(onCircle.x, onCircle.y);
+
+        //compute radius in arcmin
+        final WorldCoords wc = new WorldCoords(centerWCS.getX(), centerWCS.getY());
+        WorldCoords wcDummy = new WorldCoords(onCircleWCS.getX(), onCircleWCS.getY());
+        final double distArcMin = wc.dist(wcDummy);
+        //perform catalog query
+        System.err.println("Querying Simbad at " + wc + " with a radius of " + distArcMin + " arcminutes");
+        // symbolSpace.removeAllGlyphs();
+        new SwingWorker(){
+            @Override public List<AstroObject> construct(){
+                List<AstroObject> objs = null;
+                try{
+                    objs = SimbadCatQuery.makeSimbadCoordQuery(wc.getRaDeg(), wc.getDecDeg(), distArcMin);
+                } catch(IOException ioe){
+                    ioe.printStackTrace();
+                } finally {
+                    return objs;
+                }
+            }
+            @Override public void finished(){
+                List<AstroObject> objs = (List<AstroObject>)get();
+                drawSymbols(objs);
+                eh.fadeOutRightClickSelection();
+            }
+        }.start();
+    }
+
+    void drawSymbols(List<AstroObject> objs){
+        for(AstroObject obj: objs){
+            // XXX
+            Point2D.Double p = new Point2D.Double();//img.wcs2vs(obj.getRa(), obj.getDec());
+            VCross cr = new VCross(p.x, p.y, 100, 10, 10, Color.RED, Color.WHITE, .8f);
+            cr.setStroke(AstroObject.AO_STROKE);
+            VText lb = new VText(p.x+10, p.y+10, 101, Color.RED, obj.getIdentifier(), VText.TEXT_ANCHOR_START);
+            lb.setBorderColor(Color.BLACK);
+            lb.setTranslucencyValue(.6f);
+            mSpace.addGlyph(cr);
+            mSpace.addGlyph(lb);
+            cr.setOwner(obj);
+            lb.setOwner(obj);
+            cr.setType(JSkyFitsMenu.T_ASTRO_OBJ);
+            lb.setType(JSkyFitsMenu.T_ASTRO_OBJ);
+        }
     }
 
 

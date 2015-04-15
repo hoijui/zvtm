@@ -19,6 +19,9 @@ import java.util.TimerTask;
 import fr.inria.zvtm.engine.VCursor;
 
 import java.awt.Cursor;
+import java.awt.Color;
+import java.awt.BasicStroke;
+import java.awt.Stroke;
 
 //import fr.inria.zvtm.engine.LongPoint;
 import java.awt.geom.Point2D;
@@ -34,6 +37,7 @@ import fr.inria.zvtm.engine.Utils;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VText;
+import fr.inria.zvtm.glyphs.VCircle;
 
 //import fr.inria.zvtm.engine.ViewEventHandler;
 import fr.inria.zvtm.event.ViewListener;
@@ -49,7 +53,222 @@ import fr.inria.zuist.engine.TextDescription;
 
 import fr.inria.zvtm.glyphs.JSkyFitsImage;
 
+import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
+import fr.inria.zvtm.animation.Animation;
+import fr.inria.zvtm.animation.AnimationManager;
+import fr.inria.zvtm.animation.EndAction;
+
 //class FitsViewerEventHandler implements ViewEventHandler, ComponentListener, CameraListener {
+class JSkyFitsViewerEventHandler implements ViewListener {
+
+    static final BasicStroke SEL_STROKE = new BasicStroke(2f);
+    static final float SEL_ALPHA = .5f;
+
+    static float ZOOM_SPEED_COEF = 1.0f/50.0f;
+    static double PAN_SPEED_COEF = 50.0;
+    static final float WHEEL_ZOOMIN_FACTOR = 21.0f;
+    static final float WHEEL_ZOOMOUT_FACTOR = 22.0f;
+
+    JSkyFitsViewer app;
+    AnimationManager am = VirtualSpaceManager.INSTANCE.getAnimationManager();
+
+    //private double[] scaleBounds;
+    //private boolean dragLeft = false, dragRight = false;
+    //private RangeSelection rs;
+
+    private int lastJPX;
+    private int lastJPY;
+
+    Point2D.Double rightClickPress;
+    VCircle rightClickSelectionG = new VCircle(0, 0, 1000, 1, Color.BLACK, Color.RED, SEL_ALPHA);
+
+    boolean panning = false;
+    boolean selectingForQuery = false;
+
+    JSkyFitsViewerEventHandler(JSkyFitsViewer app){
+        this.app = app;
+        rightClickSelectionG.setFilled(false);
+        rightClickSelectionG.setStroke(SEL_STROKE);
+    }
+
+    public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+        /*
+        Point2D.Double cursorPos = viewToSpace(vsm.getActiveCamera(), jpx, jpy);
+        if(app.rs.overLeftTick(cursorPos.x, cursorPos.y)){
+            dragLeft = true;
+        } else if(app.rs.overRightTick(cursorPos.x, cursorPos.y)){
+            dragRight = true;
+        }
+        */
+        lastJPX = jpx;
+        lastJPY = jpy;
+        panning = true;
+    }
+
+    public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+        /*
+        dragLeft = false;
+        dragRight = false;
+        double min = hi.getUnderlyingImage().getHistogram().getMin();
+        double max = hi.getUnderlyingImage().getHistogram().getMax();
+        app.hi.rescale(min + app.rs.getLeftValue()*(max - min),
+                min + app.rs.getRightValue()*(max - min),
+                1);
+        */
+        //v.parent.setActiveLayer(0);
+
+        panning = false;
+    }
+
+    public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
+
+    public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+
+    public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
+
+    public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
+
+    public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+        selectingForQuery = true;
+        // first point (start dragging) defines the center of the query zone
+        rightClickPress = v.getVCursor().getVSCoordinates(app.mCamera);
+        rightClickSelectionG.moveTo(rightClickPress.x, rightClickPress.y);
+        rightClickSelectionG.sizeTo(1);
+        app.mSpace.addGlyph(rightClickSelectionG);
+    }
+
+    public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+        // second point (end dragging) defines the radius of the query zone
+        Point2D.Double rightClickRelease = v.getVCursor().getVSCoordinates(app.mCamera);
+        // make query
+        app.querySimbad(rightClickPress, rightClickRelease);
+        selectingForQuery = false;
+    }
+
+    public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
+
+    public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
+        if (app.mnCamera.isEnabled() && app.menu.cursorInside(jpx, jpy)){
+            v.parent.setActiveLayer(app.LAYER_MENU);
+            v.parent.setCursorIcon(Cursor.DEFAULT_CURSOR);
+        }
+    }
+
+    public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
+        if (panning){
+            Camera c = app.mCamera;
+            pan(c, lastJPX-jpx, jpy-lastJPY);
+            lastJPX = jpx;
+            lastJPY = jpy;
+        }
+        else if (selectingForQuery){
+            Point2D.Double p = v.getVCursor().getVSCoordinates(app.mCamera);
+            rightClickSelectionG.sizeTo(2*Math.sqrt((p.x-rightClickPress.x)*(p.x-rightClickPress.x)+(p.y-rightClickPress.y)*(p.y-rightClickPress.y)));
+        }
+        /*
+
+        if(buttonNumber == 1){
+            /*
+            if(dragLeft) {
+                //rs.setLeftTickPos(viewToSpace(vsm.getActiveCamera(), jpx, jpy).x);
+            } else if(dragRight){
+                //rs.setRightTickPos(viewToSpace(vsm.getActiveCamera(), jpx, jpy).x);
+            }
+            *
+        }
+        */
+    }
+
+    public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
+        Camera c = app.mCamera;
+        double mvx = v.getVCursor().getVSXCoordinate();
+        double mvy = v.getVCursor().getVSYCoordinate();
+        zoom(c, mvx, mvy, wheelDirection);
+    }
+
+    public void Ktype(ViewPanel v, char c, int code, int mod, KeyEvent e){}
+
+    public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
+        if (code == KeyEvent.VK_M){
+            app.toggleMenu();
+        }
+        else if (code == KeyEvent.VK_F1){
+            app.menu.selectPreviousColorMapping();
+        }
+        else if (code == KeyEvent.VK_F2){
+            app.menu.selectNextColorMapping();
+        }
+        else if (code == KeyEvent.VK_F3){
+            app.menu.selectPreviousScale();
+        }
+        else if (code == KeyEvent.VK_F4){
+            app.menu.selectNextScale();
+        }
+        // else if (code == KeyEvent.VK_MINUS){
+        //     //app.scaleBounds[1] -= 100;
+        //     //app.img.rescale(app.scaleBounds[0], app.scaleBounds[1], 1);
+        // }
+        // else if (code == KeyEvent.VK_PLUS){
+        //     //app.scaleBounds[1] += 100;
+        //     //app.img.rescale(app.scaleBounds[0], app.scaleBounds[1], 1);
+        // }
+    }
+
+    public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
+
+    public void viewActivated(View v){}
+
+    public void viewDeactivated(View v){}
+
+    public void viewIconified(View v){}
+
+    public void viewDeiconified(View v){}
+
+    public void viewClosing(View v){System.exit(0);}
+
+    void pan(Camera c, int dx, int dy){
+        synchronized(c){
+            double a = (c.focal+Math.abs(c.altitude)) / c.focal;
+            c.move(a*dx, a*dy);
+        }
+    }
+
+    void zoom(Camera c, double vx, double vy, short direction){
+        double a = (c.focal+Math.abs(c.altitude)) / c.focal;
+        if (direction  == WHEEL_UP){
+            // zooming out
+            c.move(-((vx - c.vx) * WHEEL_ZOOMOUT_FACTOR / c.focal),
+                   -((vy - c.vy) * WHEEL_ZOOMOUT_FACTOR / c.focal));
+            c.altitudeOffset(a*WHEEL_ZOOMOUT_FACTOR);
+        }
+        else {
+            // direction == WHEEL_DOWN, zooming in
+            if (c.getAltitude()-a*WHEEL_ZOOMIN_FACTOR >= c.getZoomFloor()){
+                // this test to prevent translation when camera is not actually zoming in
+                c.move((vx - c.vx) * WHEEL_ZOOMIN_FACTOR / c.focal,
+                       ((vy - c.vy) * WHEEL_ZOOMIN_FACTOR / c.focal));
+            }
+            c.altitudeOffset(-a*WHEEL_ZOOMIN_FACTOR);
+        }
+    }
+
+
+    void fadeOutRightClickSelection(){
+        Animation a = am.getAnimationFactory().createTranslucencyAnim(500,
+                            rightClickSelectionG, 0f, false, IdentityInterpolator.getInstance(),
+                            new EndAction(){
+                                public void execute(Object subject, Animation.Dimension dimension){
+                                    app.mSpace.removeGlyph(rightClickSelectionG);
+                                    rightClickSelectionG.setTranslucencyValue(SEL_ALPHA);
+                                }
+                            });
+        am.startAnimation(a, true);
+    }
+
+}
+
+
+/*
 class JSkyFitsViewerEventHandler implements ViewListener, ComponentListener, CameraListener {
 
     static float ZOOM_SPEED_COEF = 1.0f/50.0f;
@@ -116,7 +335,7 @@ class JSkyFitsViewerEventHandler implements ViewListener, ComponentListener, Cam
 			return;
 		}
 		Glyph g = (Glyph)gum.lastElement();
-        */
+        *
         System.out.println("click1: ");
         System.out.println(v.viewToSpaceCoords(application.mCamera, jpx, jpy));
 
@@ -174,11 +393,17 @@ class JSkyFitsViewerEventHandler implements ViewListener, ComponentListener, Cam
 
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
 
+        if (app.mnCamera.isEnabled() && app.menu.cursorInside(jpx, jpy)){
+            v.parent.setActiveLayer(app.LAYER_MENU);
+            v.parent.setCursorIcon(Cursor.DEFAULT_CURSOR);
+        }
+        /*
         if((jpx < application.menu.WIDTH_MENU && jpy < application.menu.BORDER_BOTTOM_FILTER && jpy > application.menu.BORDER_TOP_FILTER) ||
           (jpy > application.menu.BORDER_TOP_HISTOGRAM && jpy < application.menu.BORDER_BOTTOM_HISTOGRAM && jpx > application.menu.BORDER_LEFT_HISTOGRAM && jpx < application.menu.BORDER_RIGHT_HISTOGRAM )){
             v.parent.setActiveLayer(application.LAYER_MENU);
             v.parent.setCursorIcon(Cursor.DEFAULT_CURSOR);
         }
+        */
 
 /*
         Camera c = application.mCamera;
@@ -205,7 +430,7 @@ class JSkyFitsViewerEventHandler implements ViewListener, ComponentListener, Cam
         System.out.println(wcs);
         //System.out.println(wcs2);
         //System.out.println(wcs3);
-*/
+*
         
     }
 
@@ -343,7 +568,7 @@ class JSkyFitsViewerEventHandler implements ViewListener, ComponentListener, Cam
         application.exit();
     }
 
-    /*ComponentListener*/
+    /*ComponentListener*
     public void componentHidden(ComponentEvent e){}
     public void componentMoved(ComponentEvent e){}
     public void componentResized(ComponentEvent e){
@@ -356,7 +581,7 @@ class JSkyFitsViewerEventHandler implements ViewListener, ComponentListener, Cam
     public void cameraMoved(Camera cam, Point2D.Double coord, float alt){
         application.altitudeChanged();
     }
-    */
+    *
 
     public void cameraMoved(Camera cam, Point2D.Double coord, double a){
         //application.bCamera.setAltitude(cam.getAltitude());
@@ -385,3 +610,4 @@ class JSkyFitsViewerEventHandler implements ViewListener, ComponentListener, Cam
     }
 
 }
+*/

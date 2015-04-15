@@ -38,6 +38,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 
+import java.util.List;
 import java.util.Vector;
 import java.util.HashMap;
 
@@ -107,6 +108,7 @@ import fr.inria.zvtm.fits.NomWcsKeywordProvider;
 
 import cl.inria.massda.PythonWCS;
 import cl.inria.massda.SmartiesManager.MyCursor;
+
 
 
 /**
@@ -254,7 +256,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 
         reference = options.reference;
 
-        pythonWCS = new PythonWCS();
+        //pythonWCS = new PythonWCS();
         //pythonWCS.sendCoordinate(0,0, null);
 
     }
@@ -1505,6 +1507,8 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     void exit(){
         System.exit(0);
     }
+
+
 
     /*
     public static void main(String[] args){
