@@ -716,36 +716,5 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
         abstract int toJSkyValue();
     }
 
-    /**
-     * Rescales the image.
-     * @param min minimum value - image values below the minimum will be shown
-     * in black.
-     * @param max maximum value - image values above the maximum will be
-     * saturated.
-     */
-    /*
-    public void rescale(double min, double max, double sigma){
-        try{
-            fitsImage.rescale(min, max, sigma);
-            recreateDisplayImage();
-        } catch(Exception ex){
-            throw new Error(ex);
-        }
-    }
-    private void recreateDisplayImage(){
-        ImageProducer producer = fitsImage.getSource();
-        producer = new FilteredImageSource(producer, filter);
-        Image filteredImage = Toolkit.getDefaultToolkit().createImage(producer);
-        GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().
-            getDefaultScreenDevice().getDefaultConfiguration();
-        BufferedImage compatibleImage = gc.createCompatibleImage(fitsImage.getWidth(),
-                fitsImage.getHeight(), fitsImage.getTransparency());
-        Graphics g = compatibleImage.getGraphics();
-        g.drawImage(filteredImage,0,0,null);
-        g.dispose();
-        setImage(compatibleImage);
-    }
-    */
-
 }
 
