@@ -15,6 +15,11 @@ import java.awt.RenderingHints;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsEnvironment;
+import java.awt.Transparency;
+
 import java.net.URL;
 
 import fr.inria.zvtm.glyphs.projection.RProjectedCoordsP;
@@ -49,24 +54,25 @@ import java.net.MalformedURLException;
 
 public class JSkyFitsImage extends ClosedShape implements RectangularShape {
 
-    private FITSImage fitsImage;
+    FITSImage fitsImage;
+    BufferedImage cImage;
 
-    private URL file;
-    private WCSTransform wcsTransform;
-    private final ImageProcessor proc;
+    URL file;
+    WCSTransform wcsTransform;
+    final ImageProcessor proc;
 
     /** Width in virtual space */
-    private double vw;
+    double vw;
     /** Height in virtual space */
-    private double vh;
+    double vh;
 
-    private double scale = 1;
+    double scale = 1;
 
     /** For internal use. Made public for easier outside package subclassing. */
     public boolean zoomSensitive = true;
 
     /** For internal use. Made public for easier outside package subclassing. */
-    private RProjectedCoordsP[] pc;
+    RProjectedCoordsP[] pc;
 
     /** For internal use. Made public for easier outside package subclassing. */
     public AffineTransform at;
@@ -82,9 +88,9 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
     /** For internal use. Made public for easier outside package subclassing. */
     public Object interpolationMethod = RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
 
-    private double originLowCut;
+    double originLowCut;
 
-    private double originHighCut;
+    double originHighCut;
 
     public static final String[] COLORFILTER = { "Background", "Blue", "Heat", "Isophot", "Light", "Pastel", "Ramp", "Real",
                                     "Smooth", "Staircase", "Standard" };
@@ -175,6 +181,7 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
                 //System.out.println("originLowCut: " + originLowCut);
                 originHighCut = proc.getHighCut();
                 //System.out.println("originHighCut: " + originHighCut);
+                updateDisplayedImage();
 
             } catch(java.lang.IllegalArgumentException ie){
 
@@ -243,23 +250,38 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
         return fitsImage.getScale();
     }
 
+    public void updateDisplayedImage(){
+        GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
+        cImage = gc.createCompatibleImage(fitsImage.getWidth(), fitsImage.getHeight(), Transparency.TRANSLUCENT);
+        Graphics2D g2 = cImage.createGraphics();
+        g2.drawRenderedImage(proc.getDisplayImage(), AffineTransform.getTranslateInstance(0, 0));
+        g2.dispose();
+        cImage.setAccelerationPriority(1);
+    }
+
     /**
      * Sets the color lookup table.
      * Currently accepted values include: "Background", "Blue", "Heat", "Isophot", "Light", "Pastel", "Ramp", "Real", "Smooth", "Staircase", "Standard".
      */
-    public void setColorLookupTable(String tableName){
+    public void setColorLookupTable(String tableName, boolean updateDisplay){
         proc.setColorLookupTable(tableName);
         proc.update();
-        VirtualSpaceManager.INSTANCE.repaint();
+        if (updateDisplay){
+            updateDisplayedImage();
+            VirtualSpaceManager.INSTANCE.repaint();
+        }
     }
 
     /**
      * Sets the scale algorithm.
      */
-    public void setScaleAlgorithm(ScaleAlgorithm algorithm){
+    public void setScaleAlgorithm(ScaleAlgorithm algorithm, boolean updateDisplay){
         proc.setScaleAlgorithm(algorithm.toJSkyValue());
         proc.update();
-        VirtualSpaceManager.INSTANCE.repaint();
+        if (updateDisplay){
+            updateDisplayedImage();
+            VirtualSpaceManager.INSTANCE.repaint();
+        }
     }
 
 
@@ -273,10 +295,13 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
     /**
      * Sets the cut levels for this image.
      */
-    public void setCutLevels(double lowCut, double highCut){
+    public void setCutLevels(double lowCut, double highCut, boolean updateDisplay){
         proc.setCutLevels(lowCut, highCut);
         proc.update();
-        VirtualSpaceManager.INSTANCE.repaint();
+        if (updateDisplay){
+            updateDisplayedImage();
+            VirtualSpaceManager.INSTANCE.repaint();
+        }
     }
 
     /**
@@ -293,17 +318,20 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
     /**
      * Sets the image cut levels automatically using median filtering on the given area of the image.
      */
-    public void autoSetCutLevels(Rectangle2D.Double rect){
+    public void autoSetCutLevels(Rectangle2D.Double rect, boolean updateDisplay){
         proc.autoSetCutLevels(rect);
         proc.update();
-        VirtualSpaceManager.INSTANCE.repaint();
+        if (updateDisplay){
+            updateDisplayedImage();
+            VirtualSpaceManager.INSTANCE.repaint();
+        }
     }
 
     /**
      * Sets the image cut levels automatically using median filtering.
      */
-    public void autoSetCutLevels(){
-        autoSetCutLevels(new Rectangle2D.Double(0,0,fitsImage.getWidth(),fitsImage.getHeight()));
+    public void autoSetCutLevels(boolean updateDisplayedImage){
+        autoSetCutLevels(new Rectangle2D.Double(0,0,fitsImage.getWidth(),fitsImage.getHeight()), updateDisplayedImage);
     }
 
     public int getDataType(){
@@ -503,13 +531,13 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
                         g.setComposite(alphaC);
                         if (interpolationMethod != RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR){
                             g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, interpolationMethod);
-                            //g.drawImage(image,AffineTransform.getScaleInstance(trueCoef,trueCoef),null);
-                            g.drawRenderedImage(proc.getDisplayImage(), AffineTransform.getScaleInstance(trueCoef,trueCoef));
+                            g.drawImage(cImage,AffineTransform.getScaleInstance(trueCoef,trueCoef),null);
+                            //g.drawRenderedImage(proc.getDisplayImage(), AffineTransform.getScaleInstance(trueCoef,trueCoef));
                             g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, java.awt.RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
                         }
                         else {
-                            //g.drawImage(image,AffineTransform.getScaleInstance(trueCoef,trueCoef),null);
-                            g.drawRenderedImage(proc.getDisplayImage(), AffineTransform.getScaleInstance(trueCoef,trueCoef));
+                            g.drawImage(cImage,AffineTransform.getScaleInstance(trueCoef,trueCoef),null);
+                            //g.drawRenderedImage(proc.getDisplayImage(), AffineTransform.getScaleInstance(trueCoef,trueCoef));
                         }
                         g.setTransform(stdT);
                         if (paintBorder){
@@ -529,13 +557,13 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
                         // opaque
                         if (interpolationMethod != RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR){
                             g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, interpolationMethod);
-                            //g.drawImage(image,AffineTransform.getScaleInstance(trueCoef,trueCoef),null);
-                            g.drawRenderedImage(proc.getDisplayImage(), AffineTransform.getScaleInstance(trueCoef,trueCoef));
+                            g.drawImage(cImage,AffineTransform.getScaleInstance(trueCoef,trueCoef),null);
+                            //g.drawRenderedImage(proc.getDisplayImage(), AffineTransform.getScaleInstance(trueCoef,trueCoef));
                             g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, java.awt.RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
                         }
                         else {
-                            //g.drawImage(image,AffineTransform.getScaleInstance(trueCoef,trueCoef),null);
-                            g.drawRenderedImage(proc.getDisplayImage(), AffineTransform.getScaleInstance(trueCoef,trueCoef));
+                            g.drawImage(cImage,AffineTransform.getScaleInstance(trueCoef,trueCoef),null);
+                            //g.drawRenderedImage(proc.getDisplayImage(), AffineTransform.getScaleInstance(trueCoef,trueCoef));
                         }
                         g.setTransform(stdT);
                         if (paintBorder){
@@ -555,8 +583,8 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
                     if (alphaC != null){
                         // translucent
                         g.setComposite(alphaC);
-                        //g.drawImage(image,dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,null);
-                        g.drawRenderedImage(proc.getDisplayImage(), AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw, dy+pc[i].cy-pc[i].ch));
+                        g.drawImage(cImage,dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,null);
+                        //g.drawRenderedImage(proc.getDisplayImage(), AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw, dy+pc[i].cy-pc[i].ch));
                         if (paintBorder){
                             g.setColor(borderColor);
                             if (stroke!=null) {
@@ -572,8 +600,8 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
                     }
                     else {
                         // opaque
-                        //g.drawImage(image,dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,null);
-                        g.drawRenderedImage(proc.getDisplayImage(), AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw, dy+pc[i].cy-pc[i].ch));
+                        g.drawImage(cImage,dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,null);
+                        //g.drawRenderedImage(proc.getDisplayImage(), AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw, dy+pc[i].cy-pc[i].ch));
                         if (paintBorder){
                             g.setColor(borderColor);
                             if (stroke!=null) {

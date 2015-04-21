@@ -197,7 +197,9 @@ public class JSkyFitsExample{
         else {
             mView.setVisible(true);
         }
-        mView.setBackgroundColor(Color.GRAY);
+        mView.setBackgroundColor(Color.BLACK);
+        mView.getCursor().setColor(Color.WHITE);
+        mView.setAntialiasing(true);
         menu = new JSkyFitsMenu(this);
         eh = new JSFEEventHandler(this);
         mView.setListener(eh, LAYER_FITS);
@@ -230,8 +232,9 @@ public class JSkyFitsExample{
 
         }
         if (img != null){
-            img.setColorLookupTable("Standard");
-            img.setScaleAlgorithm(JSkyFitsImage.ScaleAlgorithm.LINEAR);
+            img.setColorLookupTable("Standard", false);
+            img.setScaleAlgorithm(JSkyFitsImage.ScaleAlgorithm.LINEAR, false);
+            img.updateDisplayedImage();
             mSpace.addGlyph(img);
             menu.buildHistogram();
         }
@@ -501,7 +504,7 @@ class JSFEEventHandler implements ViewListener {
 
 
     void fadeOutRightClickSelection(){
-        Animation a = am.getAnimationFactory().createTranslucencyAnim(500,
+        Animation a = am.getAnimationFactory().createTranslucencyAnim(1000,
                             rightClickSelectionG, 0f, false, IdentityInterpolator.getInstance(),
                             new EndAction(){
                                 public void execute(Object subject, Animation.Dimension dimension){
@@ -721,7 +724,7 @@ class JSkyFitsMenu implements ViewListener, PickerListener {
         left = (left < 0) ? 0 : left;
         right = (right > 1) ? 1 : right;
 
-        app.img.setCutLevels(min + left*(max - min), min + right*(max - min));
+        app.img.setCutLevels(min + left*(max - min), min + right*(max - min), true);
 
     }
 
@@ -953,7 +956,7 @@ class JSkyFitsMenu implements ViewListener, PickerListener {
     public void viewClosing(View v){System.exit(0);}
 
     void selectColorMapping(PRectangle cm){
-        app.img.setColorLookupTable((String)cm.getOwner());
+        app.img.setColorLookupTable((String)cm.getOwner(), true);
         if(selected_colorG != null){
             selected_colorG.setWidth(selected_colorG.getWidth()-DISPLACE*2);
             selected_colorG.move(-DISPLACE,0);
@@ -992,7 +995,7 @@ class JSkyFitsMenu implements ViewListener, PickerListener {
     }
 
     void selectScale(PRectangle sc){
-        app.img.setScaleAlgorithm(SCALES.get(sc.getOwner()));
+        app.img.setScaleAlgorithm(SCALES.get(sc.getOwner()), true);
         if(selected_scaleG != null){
             selected_scaleG.setWidth(selected_scaleG.getWidth()-DISPLACE*2);
             selected_scaleG.move(-DISPLACE,0);
