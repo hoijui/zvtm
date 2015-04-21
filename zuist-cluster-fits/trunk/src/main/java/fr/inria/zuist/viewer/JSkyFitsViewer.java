@@ -174,10 +174,12 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
 
         reference = options.reference;
 
-        pythonWCS = new PythonWCS();
+        
         
         //pythonWCS.sendCoordinate(0,0, null);
         */
+
+        pythonWCS = new PythonWCS();
 
     }
     //void initGUI(boolean fullscreen, boolean opengl, boolean antialiased){
@@ -186,35 +188,31 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
         windowLayout();
         vsm = VirtualSpaceManager.INSTANCE;
         vsm.setMaster("JSkyFitsViewer");
-        mSpace = vsm.addVirtualSpace(mSpaceName);
 
+        mSpace = vsm.addVirtualSpace(mSpaceName);
         mSpaceKs = vsm.addVirtualSpace(mSpaceKsName);
         mSpaceH = vsm.addVirtualSpace(mSpaceHName);
         mSpaceJ = vsm.addVirtualSpace(mSpaceJName);
-        cursorSpace = vsm.addVirtualSpace(cursorSpaceName);
-
-        //VirtualSpace mnSpace = vsm.addVirtualSpace(mnSpaceName);
+        pMnSpace = vsm.addVirtualSpace(pMnSpaceName);
         mnSpace = vsm.addVirtualSpace(mnSpaceName);
+        cursorSpace = vsm.addVirtualSpace(cursorSpaceName);
+        ovSpace = vsm.addVirtualSpace(ovSpaceName);
+        
 
         mCamera = mSpace.addCamera();
-
         mCameraKs = mSpaceKs.addCamera();
         mCameraH = mSpaceH.addCamera();
         mCameraJ = mSpaceJ.addCamera();
-        cursorCamera = cursorSpace.addCamera();
 
         mCamera.stick(mCameraKs);
         mCamera.stick(mCameraH);
         mCamera.stick(mCameraJ);
         //mCamera.stick(cursorCamera);
 
-		mnSpace.addCamera().setAltitude(10);
-
-        ovSpace = vsm.addVirtualSpace(ovSpaceName);
-		ovSpace.addCamera();
-
-		mnSpace = vsm.addVirtualSpace(mnSpaceName);
-		mnCamera = mnSpace.addCamera();
+        pMnSpace.addCamera().setAltitude(10);
+        mnCamera = mnSpace.addCamera();
+        cursorCamera = cursorSpace.addCamera();
+        ovSpace.addCamera();
 
         Vector cameras = new Vector();
 
@@ -222,10 +220,10 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
         cameras.add(mCameraKs);
         cameras.add(mCameraH);
         cameras.add(mCameraJ);
-		cameras.add(vsm.getVirtualSpace(mnSpaceName).getCamera(0));
-		cameras.add(vsm.getVirtualSpace(ovSpaceName).getCamera(0));
-		cameras.add(mnCamera);
+        cameras.add(vsm.getVirtualSpace(pMnSpaceName).getCamera(0));
+        cameras.add(mnCamera);
         cameras.add(cursorCamera);
+        cameras.add(vsm.getVirtualSpace(ovSpaceName).getCamera(0));
 
         mView = vsm.addFrameView(cameras, mViewName, (options.opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, !options.fullscreen, initMenu());
         Vector<Camera> sceneCam = new Vector<Camera>();
@@ -264,9 +262,15 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
         mView.setEventHandler(ovm, 2);
         */
         mView.setListener(eh, LAYER_SCENE);
+        mView.setListener(eh, LAYER_SCENE_KS);
+        mView.setListener(eh, LAYER_SCENE_H);
+        mView.setListener(eh, LAYER_SCENE_J);
         mView.setListener(eh, LAYER_PIEMENU);
-        mView.setListener(ovm, LAYER_OVERLAY);
         mView.setListener(menu, LAYER_MENU);
+        mView.setListener(eh, LAYER_CURSOR);
+        mView.setListener(ovm, LAYER_OVERLAY);
+
+        mView.getCursor().getPicker().setListener(menu);
         
 		//mCamera.addListener(eh);
 
@@ -366,7 +370,7 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
 
     @Override
     public void rescaleGlobal(boolean global){
-        //System.out.println("rescaleGlobal("+global+")");
+        System.out.println("rescaleGlobal("+global+")");
 
         boolean globalData = false;
         if(!globalData)
@@ -511,9 +515,11 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
 
            
 
-            double x = (coord[0] - fitsImageDescRef.getX())/fitsImageDescRef.getFactor() + fitsImageDescRef.getWidth()/fitsImageDescRef.getFactor()/2 ;
-            double y = (coord[1] - fitsImageDescRef.getY())/fitsImageDescRef.getFactor() + fitsImageDescRef.getHeight()/fitsImageDescRef.getFactor()/2 ;
+            //double x = (coord[0] - fitsImageDescRef.getX())/fitsImageDescRef.getFactor() + fitsImageDescRef.getWidth()/fitsImageDescRef.getFactor()/2 ;
+            //double y = (coord[1] - fitsImageDescRef.getY())/fitsImageDescRef.getFactor() + fitsImageDescRef.getHeight()/fitsImageDescRef.getFactor()/2 ;
 
+            double x = (coord[0] - fitsImageDescRef.getX()) + fitsImageDescRef.getWidth()/2 ;
+            double y = (coord[1] - fitsImageDescRef.getY()) + fitsImageDescRef.getHeight()/2 ;
 
             System.out.println( "(" + x + ", " + y + ")");
 
@@ -539,6 +545,7 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
                         System.out.println(desc);
 
                         fitsImageDescRef = (JSkyFitsImageDescription)desc;
+
                         /*
                         try{
                             fitsImageDescRef = (FitsImageDescription)desc;

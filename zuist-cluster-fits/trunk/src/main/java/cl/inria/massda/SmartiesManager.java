@@ -396,6 +396,7 @@ public class SmartiesManager implements Observer {
 
         public void updateWCS(){
             Point2D.Double pWCS = new Point2D.Double(wc.getX(), wc.getY());
+            System.out.println(pWCS);
             if(labelVisible){
                 application.coordinateWCS(pWCS, this);
                 //updateLabel(application.getRaDec(), application.getGalactic());//+" - Object: "+application.getObjectName(pWCS));

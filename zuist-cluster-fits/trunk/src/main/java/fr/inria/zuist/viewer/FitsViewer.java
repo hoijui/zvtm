@@ -145,25 +145,28 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     static final String mSpaceKsName = "SceneKsSpace";
     static final String mSpaceHName = "SceneHSpace";
     static final String mSpaceJName = "SceneJSpace";
-    static final String mnSpaceName = "PieMenu Space";
-    static final String ovSpaceName = "Overlay Space";
-    static final String menuSpaceName = "Menu Space";
+    static final String pMnSpaceName = "PieMenu Space";
+    static final String mnSpaceName = "Menu Space";
     static final String cursorSpaceName = "CursorSpace";
+    static final String ovSpaceName = "Overlay Space";
 
     static final int LAYER_SCENE = 0;
     static final int LAYER_SCENE_KS = 1;
     static final int LAYER_SCENE_H = 2;
     static final int LAYER_SCENE_J = 3;
     static final int LAYER_PIEMENU = 4;
-    static final int LAYER_OVERLAY = 5;
-    static final int LAYER_MENU = 6;
-    static final int LAYER_CURSOR = 7;
+    static final int LAYER_MENU = 5;
+    static final int LAYER_CURSOR = 6;
+    static final int LAYER_OVERLAY = 7;
+
+    //static final int LAYER_CURSOR = 7;
 
     public VirtualSpace mSpace;
-    VirtualSpace ovSpace;
     VirtualSpace mSpaceKs, mSpaceH, mSpaceJ;
-    VirtualSpace mnSpace; //menuSpace;
+    VirtualSpace pMnSpace; //menuSpace;
+    VirtualSpace mnSpace;
     public VirtualSpace cursorSpace;
+    VirtualSpace ovSpace;
     
     public Camera mCamera;
     Camera mCameraKs, mCameraH, mCameraJ;
@@ -254,9 +257,9 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         smartiesMngr = new SmartiesManager(this);
         teh = new TuioEventHandler(this);
 
-        reference = options.reference;
+        //reference = options.reference;
 
-        //pythonWCS = new PythonWCS();
+        pythonWCS = new PythonWCS();
         //pythonWCS.sendCoordinate(0,0, null);
 
     }
@@ -265,34 +268,31 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         windowLayout();
         vsm = VirtualSpaceManager.INSTANCE;
         vsm.setMaster("FitsViewer");
-        mSpace = vsm.addVirtualSpace(mSpaceName);
 
+        mSpace = vsm.addVirtualSpace(mSpaceName);
         mSpaceKs = vsm.addVirtualSpace(mSpaceKsName);
         mSpaceH = vsm.addVirtualSpace(mSpaceHName);
         mSpaceJ = vsm.addVirtualSpace(mSpaceJName);
+        pMnSpace = vsm.addVirtualSpace(pMnSpaceName);
+        mnSpace = vsm.addVirtualSpace(mnSpaceName);
         cursorSpace = vsm.addVirtualSpace(cursorSpaceName);
-
-        VirtualSpace mnSpace = vsm.addVirtualSpace(mnSpaceName);
+        ovSpace = vsm.addVirtualSpace(ovSpaceName);
+        
 
         mCamera = mSpace.addCamera();
-
         mCameraKs = mSpaceKs.addCamera();
         mCameraH = mSpaceH.addCamera();
         mCameraJ = mSpaceJ.addCamera();
-        cursorCamera = cursorSpace.addCamera();
 
         mCamera.stick(mCameraKs);
         mCamera.stick(mCameraH);
         mCamera.stick(mCameraJ);
         //mCamera.stick(cursorCamera);
 
-		mnSpace.addCamera().setAltitude(10);
-
-        ovSpace = vsm.addVirtualSpace(ovSpaceName);
+		pMnSpace.addCamera().setAltitude(10);
+        mnCamera = mnSpace.addCamera();
+        cursorCamera = cursorSpace.addCamera();
 		ovSpace.addCamera();
-
-		mnSpace = vsm.addVirtualSpace(mnSpaceName);
-		mnCamera = mnSpace.addCamera();
 
         Vector cameras = new Vector();
 
@@ -300,10 +300,10 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         cameras.add(mCameraKs);
         cameras.add(mCameraH);
         cameras.add(mCameraJ);
-		cameras.add(vsm.getVirtualSpace(mnSpaceName).getCamera(0));
-		cameras.add(vsm.getVirtualSpace(ovSpaceName).getCamera(0));
+		cameras.add(vsm.getVirtualSpace(pMnSpaceName).getCamera(0));
 		cameras.add(mnCamera);
         cameras.add(cursorCamera);
+        cameras.add(vsm.getVirtualSpace(ovSpaceName).getCamera(0));
 
         mView = vsm.addFrameView(cameras, mViewName, (options.opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, !options.fullscreen, initMenu());
         Vector<Camera> sceneCam = new Vector<Camera>();
@@ -342,9 +342,13 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         mView.setEventHandler(ovm, 2);
         */
         mView.setListener(eh, LAYER_SCENE);
+        mView.setListener(eh, LAYER_SCENE_KS);
+        mView.setListener(eh, LAYER_SCENE_H);
+        mView.setListener(eh, LAYER_SCENE_J);
         mView.setListener(eh, LAYER_PIEMENU);
-        mView.setListener(ovm, LAYER_OVERLAY);
         mView.setListener(menu, LAYER_MENU);
+        mView.setListener(eh, LAYER_CURSOR);
+        mView.setListener(ovm, LAYER_OVERLAY);
         
 		mCamera.addListener(eh);
 
@@ -385,11 +389,11 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 		final JMenuItem exitMI = new JMenuItem("Exit");
 		exitMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
 		infoMI = new JMenuItem(Messages.INFO_SHOW);
-		infoMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F1, 0));
+		infoMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F11, 0));
 		consoleMI = new JMenuItem(Messages.CONSOLE_HIDE);
-		consoleMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F2, 0));
+		consoleMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F12, 0));
 		final JMenuItem gcMI = new JMenuItem("Run Garbage Collector");
-		gcMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F7, 0));
+		gcMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F10, 0));
 		final JMenuItem aboutMI = new JMenuItem("About...");
 		ActionListener a0 = new ActionListener(){
 			public void actionPerformed(ActionEvent e){
@@ -1297,6 +1301,8 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 
         double xx = l.getX()+ lc.getX() + a*x;//x/a;//a*x;
         double yy = l.getY()+ lc.getY() + a*y;//y/a;//a*y;
+
+        System.out.println("xx: "+ xx + " - yy: " + yy);
 
         double[] r = new double[2];
         r[0] = xx;

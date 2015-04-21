@@ -204,6 +204,12 @@ class JSkyFitsViewerEventHandler implements ViewListener {
         else if (code == KeyEvent.VK_F4){
             app.menu.selectNextScale();
         }
+        else if (code==KeyEvent.VK_L){
+            app.rescaleGlobal(false);
+        }
+        else if (code==KeyEvent.VK_G){
+            app.rescaleGlobal(true);
+        }
         // else if (code == KeyEvent.VK_MINUS){
         //     //app.scaleBounds[1] -= 100;
         //     //app.img.rescale(app.scaleBounds[0], app.scaleBounds[1], 1);
@@ -225,6 +231,14 @@ class JSkyFitsViewerEventHandler implements ViewListener {
     public void viewDeiconified(View v){}
 
     public void viewClosing(View v){System.exit(0);}
+
+    public void enterGlyph(Glyph g){
+        System.out.println("enterGlyph: JSkyFitsViewerEventHandler");
+    }
+
+    public void exitGlyph(Glyph g){
+    }
+
 
     void pan(Camera c, int dx, int dy){
         synchronized(c){

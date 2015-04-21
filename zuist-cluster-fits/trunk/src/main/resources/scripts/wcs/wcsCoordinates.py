@@ -22,6 +22,8 @@ try:
 except ImportError:
 	SUCCEEDED_IMPORTING_ASTROPY = False
 
+SRC_PATH = ""
+
 
 def memory_usage_resource():
 	import resource
@@ -59,17 +61,17 @@ def header(src_path):
 def set_reference(src_path):
 	global REFERENCE, SRC_PATH
 
-	if(src_path != SRC_PATH):
+	if not src_path is SRC_PATH:
 
 		if os.path.isfile(src_path):
 			REFERENCE = header(src_path)
 			SRC_PATH = src_path
-			return true
+			return True
 		else:
 			print "The file not exist"
-			return false
+			return False
 	else:
-		return true
+		return True
 
 
 def pix2world(wcsdata, x, y):
@@ -117,7 +119,7 @@ def main(argv):
 		print "You need library Astropy and Numpy"
 		return
 	else:
-		if !set_reference(SRC_PATH):
+		if not set_reference(SRC_PATH):
 			return
 		
 

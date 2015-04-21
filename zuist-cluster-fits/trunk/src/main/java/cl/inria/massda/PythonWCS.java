@@ -19,11 +19,6 @@ import cl.inria.massda.SmartiesManager.MyCursor;
 
 public class PythonWCS {
 
-    Producer producer;
-    //Point2D.Double coordinate;
-    //String galactic = "";
-
-
     static String PRODUCER_ROUTINGKEY = "java";
     static String CONSUMER_ROUTINGKEY = "python";
     static String HOST_NAME = "192.168.1.213";
@@ -32,8 +27,8 @@ public class PythonWCS {
     static String PASSWORD = "guest";
     static String CONSUMER_TAG = "consumer";
 
+    Producer producer;
     MyCursor myCursor;
-
     boolean galacticSystem = false;
 
 
@@ -63,10 +58,9 @@ public class PythonWCS {
                     coordinate = "Ra: " + json.getDouble("ra") + " - Dec: " + json.getDouble("dec");
                 } else {
                     sexagesimal = "Galactic: " + json.getString("galactic");
-                    coordinate = "Lat: " + json.getDouble("l") + " - Lon: " + json.getDouble("b");
+                    coordinate = "L: " + json.getDouble("l") + " - B: " + json.getDouble("b");
                 }
                  
-                
                 //notify();
                 if(myCursor != null){
                     myCursor.updateLabel(coordinate, sexagesimal);
@@ -100,16 +94,6 @@ public class PythonWCS {
             e.printStackTrace(System.out);
         }
     }
-
-    /*
-    public Point2D.Double getCoordinate(){
-        return coordinate;
-    }
-
-    public String getGalactic(){
-        return galactic;
-    }
-    */
 
     public void changeCoordinateSystem(boolean galactic){
         galacticSystem = galactic;
@@ -146,6 +130,27 @@ public class PythonWCS {
                 System.out.println("Error IO");
             }
         //}
+        
+    }
+
+    public void setReference(String src_path){
+
+        try{
+        
+            JSONObject json = new JSONObject();
+            json.put("name", "set_reference");
+            json.put("src_path", src_path);
+
+            producer.publish(json.toString(), PRODUCER_ROUTINGKEY);
+            System.out.println("Message " + json.toString() + " sent.");
+
+        } catch (JSONException e){
+            e.printStackTrace(System.out);
+            System.out.println("Error send a JSON");
+        } catch (IOException e){
+            e.printStackTrace(System.out);
+            System.out.println("Error IO");
+        }
         
     }
 
