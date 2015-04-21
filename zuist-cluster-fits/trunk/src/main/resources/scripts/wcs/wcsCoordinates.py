@@ -56,6 +56,22 @@ def header(src_path):
 	#print "RESOURCE: %.2f" % (memory_usage_resource())
 	return {'header': header, 'wcsdata': wcsdata, 'size': size, 'ctype': wcsdata.wcs.ctype}
 
+def set_reference(src_path):
+	global REFERENCE, SRC_PATH
+
+	if(src_path != SRC_PATH):
+
+		if os.path.isfile(src_path):
+			REFERENCE = header(src_path)
+			SRC_PATH = src_path
+			return true
+		else:
+			print "The file not exist"
+			return false
+	else:
+		return true
+
+
 def pix2world(wcsdata, x, y):
 	return wcsdata.wcs_pix2world(x, y, 1)
 def world2pix(wcsdata, ra, dec):
@@ -101,12 +117,9 @@ def main(argv):
 		print "You need library Astropy and Numpy"
 		return
 	else:
-		if os.path.isfile(SRC_PATH):
-			REFERENCE = header(SRC_PATH)
-
-		else:
-			print "The file not exist"
+		if !set_reference(SRC_PATH):
 			return
+		
 
 
 

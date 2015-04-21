@@ -26,16 +26,27 @@ def producer(name, x, y):
 
 '''
 
+PRODUCER_ROUTINGKEY = 'python'
+HOST = '192.168.1.213'
+VIRTUAL_HOST = '/'
+USER_ID = 'guest'
+PASSWORD = 'guest'
+CONSUMER_ROUTINGKEY = 'java'
+
 
 def consumer():
 
 	import producer
-	p = producer.Producer(exchange_name='python', host='192.168.1.213', virtual_host='/', userid='guest', password='guest')
+	#p = producer.Producer(exchange_name='python', host='192.168.1.213', virtual_host='/', userid='guest', password='guest')
+	p = producer.Producer(exchange_name=PRODUCER_ROUTINGKEY, host=HOST, virtual_host=VIRTUAL_HOST, userid=USER_ID, password=PASSWORD)
 
 	import consumer
-	c = consumer.Consumer(host='192.168.1.213', virtual_host='/', userid='guest', password='guest')
-	c.declare_exchange(exchange_name='java')
-	c.declare_queue(queue_name=('%ss')%('java'), routing_key='java')
+	#c = consumer.Consumer(host='192.168.1.213', virtual_host='/', userid='guest', password='guest')
+	c = consumer.Consumer(host=HOST, virtual_host=VIRTUAL_HOST, userid=USER_ID, password=PASSWORD)
+	#c.declare_exchange(exchange_name='java')
+	c.declare_exchange(exchange_name=CONSUMER_ROUTINGKEY)
+	#c.declare_queue(queue_name=('%ss')%('java'), routing_key='java')
+	c.declare_queue(queue_name=('%ss')%(CONSUMER_ROUTINGKEY), routing_key=CONSUMER_ROUTINGKEY)
 
 	kill = False
 
@@ -73,7 +84,8 @@ def consumer():
 			galactic = wcsCoordinates.worldgalactic(l, b)
 			ecuatorial = wcsCoordinates.worldecuatorial(ra, dec)
 			obj = {'name': data['name'], 'ra': float(ra), 'dec': float(dec), 'l': float(l), 'b': float(b), 'ecuatorial': ecuatorial, 'galactic': galactic}
-			p.publish( json.dumps(obj) , 'python')
+			#p.publish( json.dumps(obj) , 'python')
+			p.publish( json.dumps(obj) , PRODUCER_ROUTINGKEY)
 
 		else:
 			kill = True

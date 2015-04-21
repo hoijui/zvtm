@@ -218,7 +218,12 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
     # generate image tile
     # generate image except for level 0 where we use original image
     tileFileName = "%s%s.%s" % (TILE_FILE_PREFIX, tileIDstr, OUTPUT_FILE_EXT)
-    tilePath = "%s/%s" % (TGT_DIR, tileFileName)
+    tilePath = "%s/%s/%s" % (TGT_DIR, level, tileFileName)
+
+    if not os.path.exists("%s/%s" % (TGT_DIR, level) ):
+        log("Creating target directory %s/%s" % (TGT_DIR, level), 2)
+        os.mkdir("%s/%s" % (TGT_DIR, level))
+
     aw = ah = TILE_SIZE*scale
     if x + TILE_SIZE*scale > src_sz[0]:
         aw = int(src_sz[0] - x)
@@ -309,14 +314,17 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
 
                 '''
 
-                ra, dec = WCSDATA.wcs_pix2world(x+aw/2, SIZE[1]-y-ah/2, 0)
-
                 header = HEADER.copy()
 
-                header.set('CRVAL1', (float)(ra) )
-                header.set('CRVAL2', (float)(dec) )
-                header.set('CRPIX1', (float)(aw/scale/2) )
-                header.set('CRPIX2', (float)(ah/scale/2) )
+                '''
+
+                ra, dec = WCSDATA.wcs_pix2world(x+aw/2, SIZE[1]-y-ah/2, 0)
+
+
+                #header.set('CRVAL1', #(float)(ra) )
+                #header.set('CRVAL2', #(float)(dec) )
+                header.set('CRPIX1', float(x) )#(float)(aw/scale/2) )
+                header.set('CRPIX2', float(SIZE[1]-y) )#(float)(ah/scale/2) )
                 if WCSDATA.wcs.has_cd():
                     cd = WCSDATA.wcs.cd
                     header.set('CD1_1', cd[0,0]*scale )
@@ -333,6 +341,7 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
                     header.set('CDELT1', cdelt[0]*scale)
                     header.set('CDELT2', cdelt[1]*scale)
 
+                '''
 
                 #header['CD1_1'] = header['CD1_1']*scale
                 #header['CD1_2'] = header['CD1_2']*scale
@@ -436,11 +445,17 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
     objectEL.set("w", str(int(aw)))
     objectEL.set("h", str(int(ah)))
     if USE_ASTROPY:
-        if MINVALUE and MAXVALUE:
-            objectEL.set("params", str("sc=%f;minvalue=%f;maxvalue=%f" % (scale, MINVALUE, MAXVALUE) ))
+        if parentRegionID is None:
+            if MINVALUE and MAXVALUE:
+                objectEL.set("params", str("reference;sc=%d;minvalue=%f;maxvalue=%f" % (scale, MINVALUE, MAXVALUE) ))
+            else:
+                objectEL.set("params", str("reference;sc=%d" % (scale) ))
         else:
-            objectEL.set("params", str("sc=%f" % (scale) ))
-    objectEL.set("src", tileFileName)
+            if MINVALUE and MAXVALUE:
+                objectEL.set("params", str("sc=%d;minvalue=%f;maxvalue=%f" % (scale, MINVALUE, MAXVALUE) ))
+            else:
+                objectEL.set("params", str("sc=%d" % (scale) ))
+    objectEL.set("src", "%d/%s" % (level, tileFileName) )
     if USE_ASTROPY:
         objectEL.set("sensitive", "true")    
     else:
