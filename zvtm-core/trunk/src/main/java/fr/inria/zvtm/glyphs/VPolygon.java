@@ -133,14 +133,14 @@ public class VPolygon<T> extends ClosedShape {
     }
 
     @Override
-        public double getOrient(){return orient;}
+    public double getOrient(){return orient;}
 
     /** Cannot be reoriented. */
     @Override
-        public void orientTo(double angle){}
+    public void orientTo(double angle){}
 
     @Override
-        public double getSize(){return size;}
+    public double getSize(){return size;}
 
     void computeSize(){
         size = 0;
@@ -155,17 +155,7 @@ public class VPolygon<T> extends ClosedShape {
 
     @Override
     public synchronized void sizeTo(double s){
-        double ratio = s / size;
-        size = 0;
-        double f;
-        for (int i=0;i<xcoords.length;i++){
-            xcoords[i] = xcoords[i] * ratio;
-            ycoords[i] = ycoords[i] * ratio;
-            f = Math.sqrt(xcoords[i]*xcoords[i] + ycoords[i]*ycoords[i]);
-            if (f > size){size = f;}
-        }
-        size *= 2;
-        VirtualSpaceManager.INSTANCE.repaint();
+        reSize(s / size);
     }
 
     @Override

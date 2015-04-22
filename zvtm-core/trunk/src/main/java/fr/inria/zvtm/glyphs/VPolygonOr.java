@@ -1,4 +1,4 @@
-/*   Copyright (c) INRIA, 2012. All Rights Reserved
+/*   Copyright (c) INRIA, 2012-2015. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -81,11 +81,30 @@ public class VPolygonOr<T> extends VPolygon {
     @Override
     public void orientTo(double angle){
         this.orient = angle;
+        updateOrient();
+    	VirtualSpaceManager.INSTANCE.repaint();
+    }
+
+    void updateOrient(){
         for (int i=0;i<xcoords.length;i++){
             xcoords[i] = oxcoords[i]*Math.cos(orient) - oycoords[i]*Math.sin(orient);
             ycoords[i] = oxcoords[i]*Math.sin(orient) + oycoords[i]*Math.cos(orient);
         }
-    	VirtualSpaceManager.INSTANCE.repaint();
+    }
+
+    @Override
+    public synchronized void reSize(double factor){
+        size = 0;
+        double f;
+        for (int i=0;i<oxcoords.length;i++){
+            oxcoords[i] = oxcoords[i] * factor;
+            oycoords[i] = oycoords[i] * factor;
+            f = Math.sqrt(oxcoords[i]*oxcoords[i] + oycoords[i]*oycoords[i]);
+            if (f > size){size = f;}
+        }
+        size *= 2;
+        updateOrient();
+        VirtualSpaceManager.INSTANCE.repaint();
     }
 
     @Override
