@@ -109,7 +109,13 @@ import nom.tam.fits.FitsException;
 import fr.inria.zvtm.fits.NomWcsKeywordProvider;
 
 import cl.inria.massda.PythonWCS;
-import cl.inria.massda.SmartiesManager.MyCursor;
+//import cl.inria.massda.SmartiesManager.MyCursor;
+
+import java.util.Observer;
+import java.util.Observable;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import fr.inria.zvtm.fits.simbad.SimbadCatQuery;
 import fr.inria.zvtm.fits.simbad.AstroObject;
@@ -178,8 +184,6 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
         
         //pythonWCS.sendCoordinate(0,0, null);
         */
-
-        pythonWCS = new PythonWCS();
 
     }
     //void initGUI(boolean fullscreen, boolean opengl, boolean antialiased){
@@ -488,17 +492,20 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
         loadFitsReference();
     }
 
-    @Override
-    public void coordinateWCS(Point2D.Double xy, MyCursor mc){
+    public void coordinateWCS(Point2D.Double xy, String id, Observer obs){
 
         try {
 
-            System.out.println("coordinateWCS(" + xy.getX() + ", " + xy.getY() + ")");
             double[] coord = windowToViewCoordinateFromSmarties(xy.getX(), xy.getY());
+            double a = (mCamera.focal + mCamera.getAltitude()) / mCamera.focal;
+
+            /*
+            System.out.println("coordinateWCS(" + xy.getX() + ", " + xy.getY() + ")");
+            
             System.out.println("windowToViewCoordinateFromSmarties: (" + coord[0] + ", " + coord[1] + ")");
             System.out.println("windowToViewCoordinateFromSmarties Ref: (" + fitsImageDescRef.getX() + ", " + fitsImageDescRef.getY() + ")");
 
-            double a = (mCamera.focal + mCamera.getAltitude()) / mCamera.focal;
+            
 
             System.out.println("coordinateWCS("+coord[0]+", "+coord[1]+")");
             System.out.println("reference("+fitsImageDescRef.getX()+", "+fitsImageDescRef.getY()+")");
@@ -518,6 +525,8 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
             //double x = (coord[0] - fitsImageDescRef.getX())/fitsImageDescRef.getFactor() + fitsImageDescRef.getWidth()/fitsImageDescRef.getFactor()/2 ;
             //double y = (coord[1] - fitsImageDescRef.getY())/fitsImageDescRef.getFactor() + fitsImageDescRef.getHeight()/fitsImageDescRef.getFactor()/2 ;
 
+            */
+
             double x = (coord[0] - fitsImageDescRef.getX()) + fitsImageDescRef.getWidth()/2 ;
             double y = (coord[1] - fitsImageDescRef.getY()) + fitsImageDescRef.getHeight()/2 ;
 
@@ -525,8 +534,9 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
 
             System.out.println("size: " + fitsImageDescRef.getWidthWithFactor() + ", " +  fitsImageDescRef.getHeightWithFactor());
 
-            pythonWCS.changeCoordinateSystem(galacticalSystem);
-            pythonWCS.sendCoordinate(x, y, mc);
+            //pythonWCS.changeCoordinateSystem(galacticalSystem);
+            //pythonWCS.sendCoordinate(x, y, mc);
+            pythonWCS.sendCoordinate(x, y, id, obs);
 
         } catch (NullPointerException e){
             e.printStackTrace(System.out);
@@ -598,36 +608,112 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
         System.out.println("loaded JSky Fits Reference");
     }
 
-    void querySimbad(Point2D.Double center, Point2D.Double onCircle){
-
-        // XXX
-        Point2D.Double centerWCS = new Point2D.Double();//img.vs2wcs(center.x, center.y);
-        Point2D.Double onCircleWCS = new Point2D.Double();//img.vs2wcs(onCircle.x, onCircle.y);
-
-        //compute radius in arcmin
-        final WorldCoords wc = new WorldCoords(centerWCS.getX(), centerWCS.getY());
-        WorldCoords wcDummy = new WorldCoords(onCircleWCS.getX(), onCircleWCS.getY());
-        final double distArcMin = wc.dist(wcDummy);
-        //perform catalog query
-        System.err.println("Querying Simbad at " + wc + " with a radius of " + distArcMin + " arcminutes");
-        // symbolSpace.removeAllGlyphs();
-        new SwingWorker(){
-            @Override public List<AstroObject> construct(){
-                List<AstroObject> objs = null;
+    
+    class Query implements Observer{
+        public static final String T_QUERY = "Query";
+        Point2D.Double center;
+        Point2D.Double onCircle;
+        public Query(Point2D.Double center, Point2D.Double onCircle){
+            //pythonWCS.addObserver(this);
+            pythonWCS.sendCoordinate(center.x, center.y, T_QUERY+"_CENTER", this);
+            pythonWCS.sendCoordinate(onCircle.x, onCircle.y, T_QUERY+"_ONCIRCLE", this);
+        }
+        @Override
+        public void update(Observable obs, Object obj){
+            if(obj instanceof JSONObject){
                 try{
-                    objs = SimbadCatQuery.makeSimbadCoordQuery(wc.getRaDeg(), wc.getDecDeg(), distArcMin);
-                } catch(IOException ioe){
-                    ioe.printStackTrace();
-                } finally {
-                    return objs;
+
+                    System.out.println(obj);
+
+                    JSONObject json = (JSONObject) obj;
+
+                    String id = json.getString("id");
+                    double ra = json.getDouble("ra");
+                    double dec = json.getDouble("dec");
+
+                    if(id.equals(T_QUERY+"_CENTER")){
+                        center = new Point2D.Double(ra, dec);
+                    } else if(id.equals(T_QUERY+"_ONCIRCLE")) {
+                        onCircle = new Point2D.Double(ra, dec);
+                    }
+
+                    if(isDone()){
+
+                        //compute radius in arcmin
+                        final WorldCoords wc = new WorldCoords(center.getX(), center.getY());
+                        WorldCoords wcDummy = new WorldCoords(onCircle.getX(), onCircle.getY());
+                        final double distArcMin = wc.dist(wcDummy);
+                        //perform catalog query
+                        System.err.println("Querying Simbad at " + wc + " with a radius of " + distArcMin + " arcminutes");
+                        // symbolSpace.removeAllGlyphs();
+                        new SwingWorker(){
+                            @Override public List<AstroObject> construct(){
+                                List<AstroObject> objs = null;
+                                try{
+                                    objs = SimbadCatQuery.makeSimbadCoordQuery(wc.getRaDeg(), wc.getDecDeg(), distArcMin);
+                                } catch(IOException ioe){
+                                    ioe.printStackTrace();
+                                } finally {
+                                    return objs;
+                                }
+                            }
+                            @Override public void finished(){
+                                List<AstroObject> objs = (List<AstroObject>)get();
+                                drawSymbols(objs);
+                                eh.fadeOutRightClickSelection();
+                            }
+                        }.start();
+
+                        center = null;
+                        onCircle = null;
+
+                    }
+                    
+
+                    System.out.println("updateQuery()");
+                } catch(JSONException e){
+                    System.out.println(e);
                 }
             }
-            @Override public void finished(){
-                List<AstroObject> objs = (List<AstroObject>)get();
-                drawSymbols(objs);
-                eh.fadeOutRightClickSelection();
-            }
-        }.start();
+        }
+
+        public boolean isDone(){
+            return center != null && onCircle != null;
+        }
+    }
+
+
+
+
+    void querySimbad(Point2D.Double center, Point2D.Double onCircle){
+
+        System.out.println("center");
+        System.out.println(center);
+        System.out.println("onCircle");
+        System.out.println(onCircle);
+
+        double x = (center.x - fitsImageDescRef.getX()) + fitsImageDescRef.getWidth()/2 ;
+        double y = (center.y - fitsImageDescRef.getY()) + fitsImageDescRef.getHeight()/2 ;
+
+        System.out.println( "(" + center.x + " - " + fitsImageDescRef.getX() + ") + " + fitsImageDescRef.getWidth() + "/2 = " + x  );
+        System.out.println( "(" + center.y + " - " + fitsImageDescRef.getY() + ") + " + fitsImageDescRef.getHeight() + "/2 = " + y );
+
+        center.x = x;
+        center.y = y;
+
+        x = (onCircle.x - fitsImageDescRef.getX()) + fitsImageDescRef.getWidth()/2 ;
+        y = (onCircle.y - fitsImageDescRef.getY()) + fitsImageDescRef.getHeight()/2 ;
+
+        onCircle.x = x;
+        onCircle.y = y;
+
+        new Query(center, onCircle);
+
+        // XXX
+        //Point2D.Double centerWCS = coordinateWCS(xy); //new Point2D.Double();//img.vs2wcs(center.x, center.y);
+        //Point2D.Double onCircleWCS = new Point2D.Double();//img.vs2wcs(onCircle.x, onCircle.y);
+
+        
     }
 
     void drawSymbols(List<AstroObject> objs){
@@ -671,6 +757,9 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
 
     
 }
+
+
+
 /*
 class VWGlassPane extends JComponent implements ProgressListener {
     

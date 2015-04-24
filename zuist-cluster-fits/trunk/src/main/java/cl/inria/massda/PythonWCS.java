@@ -16,8 +16,12 @@ import java.awt.geom.Point2D;
 
 import cl.inria.massda.SmartiesManager.MyCursor;
 
+import java.util.Observer;
+import java.util.Observable;
 
-public class PythonWCS {
+
+
+public class PythonWCS extends Observable{
 
     static String PRODUCER_ROUTINGKEY = "java";
     static String CONSUMER_ROUTINGKEY = "python";
@@ -28,16 +32,23 @@ public class PythonWCS {
     static String CONSUMER_TAG = "consumer";
 
     Producer producer;
-    MyCursor myCursor;
-    boolean galacticSystem = false;
+
+
+    //MyCursor myCursor;
+
+    //boolean galacticSystem = false;
+
+    //public Vector<Observer> ;
 
 
     public class LocalConsumer extends DefaultConsumer{
         Channel channel;
+
         public LocalConsumer(Channel ch){
             super(ch);
             channel = ch;
         }
+
         @Override
         public void handleDelivery(String consumerTag, Envelope envelope, 
                 BasicProperties properties, byte[] body) throws IOException{
@@ -46,27 +57,12 @@ public class PythonWCS {
             long deliveryTag = envelope.getDeliveryTag();
 
             String str = new String(body, "UTF-8");
-            System.out.println("Consumer " + CONSUMER_ROUTINGKEY);
+            System.out.println("Consumer: " + CONSUMER_ROUTINGKEY);
             System.out.println(str);
 
             try{
                 JSONObject json = new JSONObject(str);
-                String sexagesimal;
-                String coordinate;
-                if(!galacticSystem){
-                    sexagesimal = "Ecuatorial: " + json.getString("ecuatorial");
-                    coordinate = "Ra: " + json.getDouble("ra") + " - Dec: " + json.getDouble("dec");
-                } else {
-                    sexagesimal = "Galactic: " + json.getString("galactic");
-                    coordinate = "L: " + json.getDouble("l") + " - B: " + json.getDouble("b");
-                }
-                 
-                //notify();
-                if(myCursor != null){
-                    myCursor.updateLabel(coordinate, sexagesimal);
-                } else {
-                    System.out.println("cursor null");
-                }
+                notifyObs(json);
 
             } catch (JSONException e){
                 e.printStackTrace(System.out);
@@ -76,6 +72,35 @@ public class PythonWCS {
         }
 
     }
+
+    /*
+    @Override
+    public void notifyObservers(Object arg){
+        System.out.println("notifyObservers(Object arg)");
+    }
+    */
+
+    
+    public void notifyObs(JSONObject json){
+        System.out.println("--- notifyObs ---");
+        try{
+            System.out.println(json.getString("id"));
+        } catch (JSONException e){
+            e.printStackTrace(System.out);
+        }
+        
+        System.out.println("hasChanged(): " +  hasChanged() );
+        setChanged();
+        System.out.println("hasChanged(): " +  hasChanged() );
+        System.out.println("setChanged()");
+
+        System.out.println("countObservers(): " + countObservers());
+        notifyObservers(json);
+        System.out.println("countObservers(): " + countObservers());
+        System.out.println("notifyObservers(json)");
+
+    }
+    
 
     public PythonWCS(){
         try{
@@ -90,26 +115,35 @@ public class PythonWCS {
 
             c.startConsuming(CONSUMER_TAG, new LocalConsumer(ch));
 
+           // wcs = new MsgWCS();
+            System.out.println("new PythonWCS() -- countObservers(): " + countObservers());
+
         } catch (IOException e){
             e.printStackTrace(System.out);
         }
     }
 
+    /*
     public void changeCoordinateSystem(boolean galactic){
         galacticSystem = galactic;
     }
+    */
 
-    public void sendCoordinate(double x, double y, MyCursor mc){
+
+    public void sendCoordinate(double x, double y, String id, Observer obs){
 
         //synchronized(this) {
             try{
-
-                myCursor = mc;
             
                 JSONObject json = new JSONObject();
+                json.put("id", id);
                 json.put("name", "pix2world");
                 json.put("x", x);
                 json.put("y", y);
+
+                System.out.println("wcs.countObservers(): " + countObservers());
+                addObserver(obs);
+                System.out.println("wcs.countObservers(): " + countObservers());
 
                 producer.publish(json.toString(), PRODUCER_ROUTINGKEY);
                 System.out.println("Message " + json.toString() + " sent.");

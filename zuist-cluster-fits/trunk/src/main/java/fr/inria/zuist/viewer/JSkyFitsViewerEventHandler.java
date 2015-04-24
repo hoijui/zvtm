@@ -81,6 +81,7 @@ class JSkyFitsViewerEventHandler implements ViewListener {
 
     Point2D.Double rightClickPress;
     VCircle rightClickSelectionG = new VCircle(0, 0, 1000, 1, Color.BLACK, Color.RED, SEL_ALPHA);
+    Point2D.Double coordClickPress;
 
     boolean panning = false;
     boolean selectingForQuery = false;
@@ -130,18 +131,28 @@ class JSkyFitsViewerEventHandler implements ViewListener {
 
     public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
         selectingForQuery = true;
+
+        coordClickPress = v.getVCursor().getVSCoordinates(app.mCamera);
+
         // first point (start dragging) defines the center of the query zone
-        rightClickPress = v.getVCursor().getVSCoordinates(app.mCamera);
+        rightClickPress = v.getVCursor().getVSCoordinates(app.cursorCamera);
         rightClickSelectionG.moveTo(rightClickPress.x, rightClickPress.y);
         rightClickSelectionG.sizeTo(1);
-        app.mSpace.addGlyph(rightClickSelectionG);
+        app.cursorSpace.addGlyph(rightClickSelectionG);
+
+
+        //VCircle test = new VCircle(v.getVCursor().getVSCoordinates(app.mnCamera).x, v.getVCursor().getVSCoordinates(app.mnCamera).y, 1000, 100, Color.BLACK, Color.RED);
+        //app.mnSpace.addGlyph(test);
     }
 
     public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+
         // second point (end dragging) defines the radius of the query zone
-        Point2D.Double rightClickRelease = v.getVCursor().getVSCoordinates(app.mCamera);
+        //Point2D.Double rightClickRelease = v.getVCursor().getVSCoordinates(app.cursorCamera);
+        Point2D.Double coordClickRelease = v.getVCursor().getVSCoordinates(app.cursorCamera);
+
         // make query
-        app.querySimbad(rightClickPress, rightClickRelease);
+        app.querySimbad(coordClickPress, coordClickRelease);
         selectingForQuery = false;
     }
 
@@ -162,7 +173,7 @@ class JSkyFitsViewerEventHandler implements ViewListener {
             lastJPY = jpy;
         }
         else if (selectingForQuery){
-            Point2D.Double p = v.getVCursor().getVSCoordinates(app.mCamera);
+            Point2D.Double p = v.getVCursor().getVSCoordinates(app.mnCamera);
             rightClickSelectionG.sizeTo(2*Math.sqrt((p.x-rightClickPress.x)*(p.x-rightClickPress.x)+(p.y-rightClickPress.y)*(p.y-rightClickPress.y)));
         }
         /*
@@ -232,12 +243,6 @@ class JSkyFitsViewerEventHandler implements ViewListener {
 
     public void viewClosing(View v){System.exit(0);}
 
-    public void enterGlyph(Glyph g){
-        System.out.println("enterGlyph: JSkyFitsViewerEventHandler");
-    }
-
-    public void exitGlyph(Glyph g){
-    }
 
 
     void pan(Camera c, int dx, int dy){
@@ -268,11 +273,11 @@ class JSkyFitsViewerEventHandler implements ViewListener {
 
 
     void fadeOutRightClickSelection(){
-        Animation a = am.getAnimationFactory().createTranslucencyAnim(500,
+        Animation a = am.getAnimationFactory().createTranslucencyAnim(300,
                             rightClickSelectionG, 0f, false, IdentityInterpolator.getInstance(),
                             new EndAction(){
                                 public void execute(Object subject, Animation.Dimension dimension){
-                                    app.mSpace.removeGlyph(rightClickSelectionG);
+                                    app.cursorSpace.removeGlyph(rightClickSelectionG);
                                     rightClickSelectionG.setTranslucencyValue(SEL_ALPHA);
                                 }
                             });

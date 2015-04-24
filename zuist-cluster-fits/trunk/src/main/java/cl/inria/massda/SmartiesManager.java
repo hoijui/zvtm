@@ -27,6 +27,9 @@ import fr.lri.smarties.libserver.SmartiesWidgetHandler;
 import java.util.Observer;
 import java.util.Observable;
 
+import org.json.JSONObject;
+import org.json.JSONException;
+
 import fr.inria.zvtm.glyphs.VText;
 import java.awt.Font;
 
@@ -140,7 +143,11 @@ public class SmartiesManager implements Observer {
                     System.out.println("Create Puck: " + se.id);
                     se.p.app_data = new MyCursor(se.p.id, se.p.x, se.p.y);
                     MyCursor c = (MyCursor)se.p.app_data;
-                    c.wc.setVisible(true);
+                    c.setVisible(true);
+                    c.updateWCS();
+                    if(swWCS.on){
+                        c.labelSetVisible(true);
+                    }
                     break;
                 }
                 case SmartiesEvent.SMARTIE_EVENTS_TYPE_SELECT:{
@@ -152,7 +159,7 @@ public class SmartiesManager implements Observer {
                     //repaint();
                     if (se.p != null){
                         MyCursor c = (MyCursor)se.p.app_data;
-                        c.wc.setVisible(false);
+                        c.setVisible(false);
                         //_repaintCursor(c);
                     }
                     break;  
@@ -161,13 +168,14 @@ public class SmartiesManager implements Observer {
                     if (se.p != null){
                         MyCursor c = (MyCursor)se.p.app_data;
                         c.move(se.p.x, se.p.y);
-                        c.wc.setVisible(true);
+                        c.setVisible(true);
                     }
                     break;
                 }
                 case SmartiesEvent.SMARTIE_EVENTS_TYPE_DELETE:{
                     MyCursor c = (MyCursor)se.p.app_data;
-                    c.wc.dispose();
+                    c.dispose();
+                    
                     smarties.deletePuck(se.p.id);
                     break;
                 }
@@ -278,6 +286,7 @@ public class SmartiesManager implements Observer {
                     if (se.p != null){
                         MyCursor c = (MyCursor)se.p.app_data;
                         c.updateWCS();
+                        se.p.app_data = c; // CHECK
                     }
                
                     break;
@@ -339,7 +348,9 @@ public class SmartiesManager implements Observer {
     }
 
 
-    public class MyCursor{
+    public class MyCursor implements Observer {
+
+        public static final String T_SMARTIES = "Smarties";
 
         public int id;
         public double x, y;
@@ -348,8 +359,21 @@ public class SmartiesManager implements Observer {
         public Point2D.Double delta;
         public VText labelfst;
         public VText labelsnd;
+        public final String TYPE = "MyCursor";
         
-        boolean labelVisible = false;
+        boolean isLabelVisible = false;
+        boolean isGalactical = false;
+
+        String sexagesimal;
+        String coordinate;
+
+        String ecuatorial;
+        String galactical;
+        double ra;
+        double dec;
+        double l;
+        double b;
+
 
         Font FONT = new Font("default", Font.PLAIN, 16);
         
@@ -366,18 +390,31 @@ public class SmartiesManager implements Observer {
             labelsnd = new VText(0.0, 0.0, 0, color, Color.BLACK, "", VText.TEXT_ANCHOR_START, 1f, 1f);
             labelsnd.setFont(FONT);
 
-            labelsnd.setVisible(labelVisible);
+            labelsnd.setVisible(isLabelVisible);
             application.cursorSpace.addGlyph(labelsnd);
             application.cursorSpace.onTop(labelsnd);
 
             labelfst = new VText(0.0, 0.0, 0, color, Color.BLACK, "", VText.TEXT_ANCHOR_START, 1f, 1f);
             labelfst.setFont(FONT);
 
-            labelfst.setVisible(labelVisible);
+            labelfst.setVisible(isLabelVisible);
             application.cursorSpace.addGlyph(labelfst);
             application.cursorSpace.onTop(labelfst);
 
             move(x, y);
+
+        }
+
+        public void dispose(){
+            wc.dispose();
+            application.pythonWCS.deleteObserver(this);
+        }
+
+        public void setVisible(boolean b){
+            wc.setVisible(b);
+            if(isLabelVisible){
+                labelSetVisible(b);
+            }
         }
 
         public void move(double x, double y){
@@ -389,28 +426,108 @@ public class SmartiesManager implements Observer {
         }
 
         public void labelSetVisible(boolean b){
-            labelVisible = b;
-            labelsnd.setVisible(b);
-            labelfst.setVisible(b);
-        }
-
-        public void updateWCS(){
-            Point2D.Double pWCS = new Point2D.Double(wc.getX(), wc.getY());
-            System.out.println(pWCS);
-            if(labelVisible){
-                application.coordinateWCS(pWCS, this);
-                //updateLabel(application.getRaDec(), application.getGalactic());//+" - Object: "+application.getObjectName(pWCS));
+            /*
+            if(!isLabelVisible && b){
+                isLabelVisible = b;
+                labelsnd.setVisible(b);
+                labelfst.setVisible(b);
+                updateWCS();
+            }
+            */
+            if(isLabelVisible != b){
+                isLabelVisible = b;
+                labelsnd.setVisible(b);
+                labelfst.setVisible(b);
             }
         }
 
-        public void updateLabel(String text){
-            labelsnd.setText(text);
+        public boolean isGalactical(){
+            return isGalactical;
         }
 
-        public void updateLabel(String text1, String text2){
+        public void setGalactical(boolean galactical){
+            if(isGalactical != galactical){
+                isGalactical = galactical;
+                updateLabel();
+            }
+        }
 
-            labelsnd.setText(text1);
-            labelfst.setText(text2);
+        public boolean isLabelVisible(){
+            return isLabelVisible;
+        }
+
+        public void updateWCS(){
+            System.out.println("updateWCS()");
+            Point2D.Double pWCS = new Point2D.Double(wc.getX(), wc.getY());
+            //System.out.println(pWCS);
+            application.coordinateWCS(pWCS, T_SMARTIES+"_"+id, this);
+            /*
+            if(isLabelVisible){
+                application.coordinateWCS(pWCS);
+                //application.coordinateWCS(pWCS, this);
+                //updateLabel(application.getRaDec(), application.getGalactic());//+" - Object: "+application.getObjectName(pWCS));
+            }
+            */
+        }
+
+
+        public void updateLabel(){
+
+            if(!isGalactical){
+                sexagesimal = "Ecuatorial: " + ecuatorial;
+                coordinate = "Ra: " + ra + " -- Dec: " + dec;
+            } else {
+                sexagesimal = "Galactic: " + galactical;
+                coordinate = "L: " + l+ " -- B: " + b;
+            }
+
+            labelsnd.setText(coordinate);
+            labelfst.setText(sexagesimal);
+        }
+
+        @Override
+        public void update(Observable obs, Object obj){
+            System.out.println("update Observable");
+            System.out.println(obj);
+
+            /*
+            if( obs instanceof PythonWCS){
+                if( ( (((PythonWCS)obs).json).toString()).equals( ((JSONObject)obj).toString() ) ){
+                    System.out.println("--- EQUALS ---");
+                }
+            }
+            */
+            
+
+            if( obj instanceof JSONObject){
+                try{
+                    JSONObject json = (JSONObject) obj;
+
+                    String id = json.getString("id");
+
+                    System.out.println(id + " == " + T_SMARTIES+"_"+this.id);
+
+                    if(id.equals(T_SMARTIES+"_"+this.id)){
+
+                        ecuatorial = json.getString("ecuatorial");
+                        galactical = json.getString("galactic");
+                        ra = json.getDouble("ra");
+                        dec = json.getDouble("dec");
+                        l = json.getDouble("l");
+                        b = json.getDouble("b");
+                        
+                        updateLabel();
+                        System.out.println("updateLabel()");
+
+                        //addObserver();
+
+                    }
+                    
+                } catch(JSONException e){
+                    System.out.println(e);
+                }
+            }
+            
         }
 
     } // class MyCursor
@@ -466,18 +583,7 @@ public class SmartiesManager implements Observer {
             System.out.println("EventWCS");
             if(se.p != null){
                 MyCursor c = (MyCursor)se.p.app_data;
-                double focal = application.cursorCamera.getFocal();;
-                double altitude = application.cursorCamera.getAltitude();
-                double px = c.wc.getX() * (focal + altitude)/focal;
-                double py = c.wc.getY()* (focal + altitude)/focal;
-                Point2D.Double pWCS = new Point2D.Double(c.wc.getX(), c.wc.getY());
-                application.coordinateWCS(pWCS, c);
-
-                if(!c.labelVisible)
-                    c.labelSetVisible(true);
-                else
-                    c.labelSetVisible(false);
-                
+                c.labelSetVisible(sw.on);
             } else {
                 System.out.println("WCS without Puck");
                 smarties.sendWidgetLabel(ui_swwcs, "WCS: Off", se.device);
@@ -493,12 +599,7 @@ public class SmartiesManager implements Observer {
             if(se.p != null){
 
                 MyCursor c = (MyCursor)se.p.app_data;
-                double focal = application.cursorCamera.getFocal();;
-                double altitude = application.cursorCamera.getAltitude();
-                double px = c.wc.getX() * (focal + altitude)/focal;
-                double py = c.wc.getY()* (focal + altitude)/focal;
-                Point2D.Double pWCS = new Point2D.Double(c.wc.getX(), c.wc.getY());
-                application.changeCoordinateSystem(pWCS, c);
+                c.setGalactical(sw.on);
 
             } else {
                 System.out.println("Coordinate System without Puck");

@@ -87,7 +87,7 @@ def consumer():
 
 				galactic = wcsCoordinates.worldgalactic(l, b)
 				ecuatorial = wcsCoordinates.worldecuatorial(ra, dec)
-				obj = {'name': data['name'], 'ra': float(ra), 'dec': float(dec), 'l': float(l), 'b': float(b), 'ecuatorial': ecuatorial, 'galactic': galactic}
+				obj = {'name': data['name'], 'ra': float(ra), 'dec': float(dec), 'l': float(l), 'b': float(b), 'ecuatorial': ecuatorial, 'galactic': galactic, 'id': data['id']}
 				#p.publish( json.dumps(obj) , 'python')
 				p.publish( json.dumps(obj) , PRODUCER_ROUTINGKEY)
 

@@ -109,6 +109,10 @@ import fr.inria.zvtm.fits.NomWcsKeywordProvider;
 import cl.inria.massda.PythonWCS;
 import cl.inria.massda.SmartiesManager.MyCursor;
 
+import java.util.Observer;
+import java.util.Observable;
+
+
 
 
 /**
@@ -164,7 +168,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     public VirtualSpace mSpace;
     VirtualSpace mSpaceKs, mSpaceH, mSpaceJ;
     VirtualSpace pMnSpace; //menuSpace;
-    VirtualSpace mnSpace;
+    public VirtualSpace mnSpace;
     public VirtualSpace cursorSpace;
     VirtualSpace ovSpace;
     
@@ -204,7 +208,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 
     String reference;
 
-    PythonWCS pythonWCS;
+    public PythonWCS pythonWCS;
     boolean galacticalSystem = false;
     
     //JSONArray readed;
@@ -844,6 +848,8 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     }
     */
 
+
+    /*
     public void changeCoordinateSystem(Point2D.Double xy, MyCursor mc){
 
         if(galacticalSystem)
@@ -852,18 +858,25 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
             galacticalSystem = true;
         coordinateWCS(xy, mc);
     }
+    */
 
     
-    public void coordinateWCS(Point2D.Double xy, MyCursor mc){
+    
+    public void coordinateWCS(Point2D.Double xy, String id, Observer obs){
 
         try {
 
-            System.out.println("coordinateWCS(" + xy.getX() + ", " + xy.getY() + ")");
+
             double[] coord = windowToViewCoordinateFromSmarties(xy.getX(), xy.getY());
+            double a = (mCamera.focal + mCamera.getAltitude()) / mCamera.focal;
+
+            /*
+            System.out.println("coordinateWCS(" + xy.getX() + ", " + xy.getY() + ")");
+            
             System.out.println("windowToViewCoordinateFromSmarties: (" + coord[0] + ", " + coord[1] + ")");
             System.out.println("windowToViewCoordinateFromSmarties Ref: (" + fitsImageDescRef.getX() + ", " + fitsImageDescRef.getY() + ")");
 
-            double a = (mCamera.focal + mCamera.getAltitude()) / mCamera.focal;
+            
 
             System.out.println("coordinateWCS("+coord[0]+", "+coord[1]+")");
             System.out.println("reference("+fitsImageDescRef.getX()+", "+fitsImageDescRef.getY()+")");
@@ -878,7 +891,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 
             System.out.println( "width/factor: " +(fitsImageDescRef.getWidth()/fitsImageDescRef.getFactor() ) + " height/a:" + (fitsImageDescRef.getHeight()/fitsImageDescRef.getFactor()) ) ;
 
-           
+           */
 
             double x = (coord[0] - fitsImageDescRef.getX())/fitsImageDescRef.getFactor() + fitsImageDescRef.getWidth()/fitsImageDescRef.getFactor()/2 ;
             double y = (coord[1] - fitsImageDescRef.getY())/fitsImageDescRef.getFactor() + fitsImageDescRef.getHeight()/fitsImageDescRef.getFactor()/2 ;
@@ -888,8 +901,9 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 
             System.out.println("size: " + fitsImageDescRef.getWidthWithFactor() + ", " +  fitsImageDescRef.getHeightWithFactor());
 
-            pythonWCS.changeCoordinateSystem(galacticalSystem);
-            pythonWCS.sendCoordinate(x, y, mc);
+            //pythonWCS.changeCoordinateSystem(galacticalSystem);
+            //pythonWCS.sendCoordinate(x, y, mc);
+            pythonWCS.sendCoordinate(x, y, id, obs);
 
         } catch (NullPointerException e){
             e.printStackTrace(System.out);
@@ -897,6 +911,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 
         
     }
+    
 
     /*
     public String getGalactic(){
@@ -1259,11 +1274,11 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 
     public double[] windowToViewCoordinate(double x, double y){
         Location l = mCamera.getLocation();
-        System.out.println("mCamera.getLocation(): " + l.getX() + " " + l.getY());
+        //System.out.println("mCamera.getLocation(): " + l.getX() + " " + l.getY());
         double a = (mCamera.focal + mCamera.getAltitude()) / mCamera.focal;
 
         Location lc = cursorCamera.getLocation();
-        System.out.println("cursorCamera.getLocation(): " + lc.getX() + " " + lc.getY());
+        //System.out.println("cursorCamera.getLocation(): " + lc.getX() + " " + lc.getY());
 
         //
         //double xx = (long)((double)x - ((double)getDisplayWidth()/2.0));
@@ -1285,11 +1300,11 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 
     public double[] windowToViewCoordinateFromSmarties(double x, double y){
         Location l = mCamera.getLocation();
-        System.out.println("mCamera.getLocation(): " + l.getX() + " " + l.getY());
+        //System.out.println("mCamera.getLocation(): " + l.getX() + " " + l.getY());
         double a = (mCamera.focal + mCamera.getAltitude()) / mCamera.focal;
 
         Location lc = cursorCamera.getLocation();
-        System.out.println("cursorCamera.getLocation(): " + lc.getX() + " " + lc.getY());
+        //System.out.println("cursorCamera.getLocation(): " + lc.getX() + " " + lc.getY());
 
         //double xx = (long)((double)x - ((double)getDisplayWidth()/2.0));
         //double yy = (long)(-(double)y + ((double)getDisplayHeight()/2.0));
@@ -1302,7 +1317,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         double xx = l.getX()+ lc.getX() + a*x;//x/a;//a*x;
         double yy = l.getY()+ lc.getY() + a*y;//y/a;//a*y;
 
-        System.out.println("xx: "+ xx + " - yy: " + yy);
+        //System.out.println("xx: "+ xx + " - yy: " + yy);
 
         double[] r = new double[2];
         r[0] = xx;
