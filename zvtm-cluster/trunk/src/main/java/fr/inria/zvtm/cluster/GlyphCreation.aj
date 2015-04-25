@@ -1,8 +1,9 @@
 /*   AUTHOR : Romain Primet (romain.primet@inria.fr)
  *
- *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009-2013.
+ *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009-2015.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
+ * $Id$
  */
 
 package fr.inria.zvtm.cluster;
@@ -35,6 +36,7 @@ import fr.inria.zvtm.glyphs.VImage;
 import fr.inria.zvtm.glyphs.VImageOr;
 import fr.inria.zvtm.glyphs.VPoint;
 import fr.inria.zvtm.glyphs.VPolygon;
+import fr.inria.zvtm.glyphs.VPolygonOr;
 import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VRectangleOr;
 import fr.inria.zvtm.glyphs.VRing;
@@ -203,6 +205,10 @@ public aspect GlyphCreation {
 
     @Override public GlyphReplicator VPolygon.getReplicator(){
         return new VPolygonReplicator(this);
+    }
+
+    @Override public GlyphReplicator VPolygonOr.getReplicator(){
+        return new VPolygonOrReplicator(this);
     }
 
     @Override public GlyphReplicator Composite.getReplicator(){
@@ -596,7 +602,7 @@ public aspect GlyphCreation {
     }
 
     private static class VPolygonReplicator extends ClosedShapeReplicator {
-        private final Point2D.Double[] coords;
+        final Point2D.Double[] coords;
 
         VPolygonReplicator(VPolygon source){
             super(source);
@@ -605,6 +611,23 @@ public aspect GlyphCreation {
 
         public Glyph doCreateGlyph(){
             return new VPolygon(coords, 0, Color.BLACK);
+        }
+    }
+
+    private static class VPolygonOrReplicator extends VPolygonReplicator {
+        final double orient;
+
+        VPolygonOrReplicator(VPolygonOr source){
+            super(source);
+            orient = source.getOrient();
+        }
+
+        public Glyph doCreateGlyph(){
+            return new VPolygonOr(coords, 0, Color.BLACK, orient);
+        }
+
+        @Override public String toString(){
+            return "VPolygonOrReplicator";
         }
     }
 
