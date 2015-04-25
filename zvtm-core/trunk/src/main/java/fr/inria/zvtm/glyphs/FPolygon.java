@@ -28,7 +28,6 @@ import fr.inria.zvtm.engine.Camera;
  * Fast Polygon. Can neither be resized nor reoriented (for now).
  * This is the old implementation of VPolygon, as found in ZVTM 0.8.2.<br>
  * The new version of VPolygon can be resized, but at some cost from an efficiency point of view, so the old version is still provided here and can be used by people who do not intend to resize their Polygon instances.<br>
- * This implementation uses doubles instead of doubles for its internal representation of the vertices, see VPolygon for more details.
  *@author Emmanuel Pietriga
  *@see fr.inria.zvtm.glyphs.VPolygon
  **/
