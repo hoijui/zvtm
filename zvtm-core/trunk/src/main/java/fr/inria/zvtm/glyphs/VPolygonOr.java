@@ -82,7 +82,12 @@ public class VPolygonOr<T> extends VPolygon {
     public void orientTo(double angle){
         this.orient = angle;
         updateOrient();
+        System.out.println(orient);
     	VirtualSpaceManager.INSTANCE.repaint();
+        System.out.println(xcoords[0]+" "+xcoords[1]+" "+xcoords[2]);
+        System.out.println(ycoords[0]+" "+ycoords[1]+" "+ycoords[2]);
+        System.out.println(oxcoords[0]+" "+oxcoords[1]+" "+oxcoords[2]);
+        System.out.println(oycoords[0]+" "+oycoords[1]+" "+oycoords[2]);
     }
 
     void updateOrient(){
@@ -90,6 +95,15 @@ public class VPolygonOr<T> extends VPolygon {
             xcoords[i] = oxcoords[i]*Math.cos(orient) - oycoords[i]*Math.sin(orient);
             ycoords[i] = oxcoords[i]*Math.sin(orient) + oycoords[i]*Math.cos(orient);
         }
+    }
+
+    /** Vertex coordinates w.r.t centroid, not taking Glyph orientation into account.*/
+    public Point2D.Double[] getAbsoluteVerticesNO(){
+        Point2D.Double[] res = new Point2D.Double[oxcoords.length];
+        for (int i = 0;i < oxcoords.length;i++){
+            res[i] = new Point2D.Double(Math.round(oxcoords[i]+vx), Math.round(oycoords[i]+vy));
+        }
+        return res;
     }
 
     @Override
