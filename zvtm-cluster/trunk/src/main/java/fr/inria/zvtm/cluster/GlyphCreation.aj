@@ -602,7 +602,7 @@ public aspect GlyphCreation {
     }
 
     private static class VPolygonReplicator extends ClosedShapeReplicator {
-        final Point2D.Double[] coords;
+        Point2D.Double[] coords;
 
         VPolygonReplicator(VPolygon source){
             super(source);
@@ -615,15 +615,14 @@ public aspect GlyphCreation {
     }
 
     private static class VPolygonOrReplicator extends VPolygonReplicator {
-        final double orient;
 
         VPolygonOrReplicator(VPolygonOr source){
             super(source);
-            orient = source.getOrient();
+            this.coords = source.getAbsoluteVerticesNO();
         }
 
         public Glyph doCreateGlyph(){
-            return new VPolygonOr(coords, 0, Color.BLACK, orient);
+            return new VPolygonOr(coords, 0, Color.BLACK, 0);
         }
 
         @Override public String toString(){
