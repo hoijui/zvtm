@@ -82,7 +82,6 @@ public class VPolygonOr<T> extends VPolygon {
     public void orientTo(double angle){
         this.orient = angle;
         updateOrient();
-        System.out.println(orient);
     	VirtualSpaceManager.INSTANCE.repaint();
     }
 
