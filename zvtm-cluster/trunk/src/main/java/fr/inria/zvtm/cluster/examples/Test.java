@@ -1,6 +1,4 @@
-/*   AUTHOR : Romain Primet (romain.primet@inria.fr)
- *
- *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009-2015.
+/*  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2015.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
