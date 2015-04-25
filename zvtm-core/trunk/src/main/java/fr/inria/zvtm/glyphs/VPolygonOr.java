@@ -84,10 +84,6 @@ public class VPolygonOr<T> extends VPolygon {
         updateOrient();
         System.out.println(orient);
     	VirtualSpaceManager.INSTANCE.repaint();
-        System.out.println(xcoords[0]+" "+xcoords[1]+" "+xcoords[2]);
-        System.out.println(ycoords[0]+" "+ycoords[1]+" "+ycoords[2]);
-        System.out.println(oxcoords[0]+" "+oxcoords[1]+" "+oxcoords[2]);
-        System.out.println(oycoords[0]+" "+oycoords[1]+" "+oycoords[2]);
     }
 
     void updateOrient(){
