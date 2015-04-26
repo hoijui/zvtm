@@ -23,7 +23,7 @@ import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
-import fr.inria.zvtm.glyphs.VPolygonOr;
+import fr.inria.zvtm.glyphs.VShape;
 import fr.inria.zvtm.glyphs.VRectangleOr;
 import fr.inria.zvtm.glyphs.VCircle;
 
@@ -77,26 +77,20 @@ public class Test {
         populate();
     }
 
-    VPolygonOr p;
     VRectangleOr r;
 
     void populate(){
-        Point2D.Double[] vertices = {new Point2D.Double(-100,0),
-                                     new Point2D.Double(100,0),
-                                     new Point2D.Double(0,100)};
-        p = new VPolygonOr(vertices, 0, Color.RED, 0.707);
-        vs.addGlyph(p);
         r = new VRectangleOr(0,0,0,100,40,Color.GREEN,0.707);
         vs.addGlyph(r);
     }
 
     void rotate(){
-        p.orientTo(p.getOrient()+Math.PI/12d);
+        r.orientTo(r.getOrient()+Math.PI/12d);
     }
 
 
     void rescale(){
-        p.sizeTo(p.getSize()*1.2);
+        r.sizeTo(r.getSize()*1.2);
     }
 
     public static void main(String[] args){
