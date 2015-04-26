@@ -19,6 +19,7 @@ import fr.inria.zvtm.glyphs.VRoundRect;
 import fr.inria.zvtm.glyphs.VSegment;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.glyphs.VImage;
+import fr.inria.zvtm.glyphs.VEclipse;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -80,6 +81,7 @@ public aspect AutoReplay extends AbstractAutoReplay {
          execution(public void VRoundRect.setArcWidth(double)) ||
          execution(public void VRoundRect.setArcHeight(double)) ||
          execution(public void VImage.setZoomSensitive(boolean)) ||
+         execution(public void VEclipse.setFraction(float)) ||
          execution(public void VirtualSpace.show(Glyph)) ||
          execution(public void VirtualSpace.hide(Glyph)) ||
 

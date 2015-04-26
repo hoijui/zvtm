@@ -32,6 +32,7 @@ import fr.inria.zvtm.glyphs.PRectangle;
 import fr.inria.zvtm.glyphs.SIRectangle;
 import fr.inria.zvtm.glyphs.VCircle;
 import fr.inria.zvtm.glyphs.VEllipse;
+import fr.inria.zvtm.glyphs.VEclipse;
 import fr.inria.zvtm.glyphs.VImage;
 import fr.inria.zvtm.glyphs.VImageOr;
 import fr.inria.zvtm.glyphs.VPoint;
@@ -200,6 +201,10 @@ public aspect GlyphCreation {
 
     @Override public GlyphReplicator VEllipse.getReplicator(){
         return new VEllipseReplicator(this);
+    }
+
+    @Override public GlyphReplicator VEclipse.getReplicator(){
+        return new VEclipseReplicator(this);
     }
 
     @Override public GlyphReplicator VPoint.getReplicator(){
@@ -638,6 +643,21 @@ public aspect GlyphCreation {
         public Glyph doCreateGlyph(){
             return new VRing(0d,0d,0,arcDiameter,arcAngle,irRad,sliceOrient,
                     Color.BLACK, Color.BLACK);
+        }
+    }
+
+    private static class VEclipseReplicator extends ClosedShapeReplicator {
+        private final float fraction;
+        private final double diameter;
+
+        VEclipseReplicator(VEclipse source){
+            super(source);
+            this.diameter = source.getSize();
+            this.fraction = (float)source.getFraction();
+        }
+
+        public Glyph doCreateGlyph(){
+            return new VEclipse(0d, 0d, 0, diameter, fraction, Color.BLACK, Color.BLACK, 1);
         }
     }
 
