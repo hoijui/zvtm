@@ -35,12 +35,14 @@ import fr.inria.zvtm.glyphs.VEllipse;
 import fr.inria.zvtm.glyphs.VImage;
 import fr.inria.zvtm.glyphs.VImageOr;
 import fr.inria.zvtm.glyphs.VPoint;
+import fr.inria.zvtm.glyphs.FPolygon;
 import fr.inria.zvtm.glyphs.VPolygon;
 import fr.inria.zvtm.glyphs.VPolygonOr;
 import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VRectangleOr;
 import fr.inria.zvtm.glyphs.VRing;
 import fr.inria.zvtm.glyphs.VSegment;
+import fr.inria.zvtm.glyphs.VShape;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.glyphs.VTextOr;
 
@@ -203,12 +205,20 @@ public aspect GlyphCreation {
         return new VRingReplicator(this);
     }
 
+    @Override public GlyphReplicator VShape.getReplicator(){
+        return new VShapeReplicator(this);
+    }
+
     @Override public GlyphReplicator VPolygon.getReplicator(){
         return new VPolygonReplicator(this);
     }
 
     @Override public GlyphReplicator VPolygonOr.getReplicator(){
         return new VPolygonOrReplicator(this);
+    }
+
+    @Override public GlyphReplicator FPolygon.getReplicator(){
+        return new FPolygonReplicator(this);
     }
 
     @Override public GlyphReplicator Composite.getReplicator(){
@@ -601,6 +611,21 @@ public aspect GlyphCreation {
         }
     }
 
+    private static class VShapeReplicator extends ClosedShapeReplicator {
+        private float[] vertices;
+        private final double size;
+
+        VShapeReplicator(VShape source){
+            super(source);
+            this.size = source.getSize();
+            this.vertices = source.getVertices();
+        }
+
+        public Glyph doCreateGlyph(){
+            return new VShape(0, 0, 0, size, vertices, Color.BLACK, 0);
+        }
+    }
+
     private static class VPolygonReplicator extends ClosedShapeReplicator {
         Point2D.Double[] coords;
 
@@ -627,6 +652,19 @@ public aspect GlyphCreation {
 
         @Override public String toString(){
             return "VPolygonOrReplicator";
+        }
+    }
+
+    private static class FPolygonReplicator extends ClosedShapeReplicator {
+        Point2D.Double[] coords;
+
+        FPolygonReplicator(FPolygon source){
+            super(source);
+            this.coords = source.getAbsoluteVertices();
+        }
+
+        public Glyph doCreateGlyph(){
+            return new FPolygon(coords, 0, Color.BLACK);
         }
     }
 
