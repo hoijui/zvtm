@@ -261,45 +261,38 @@ public class PickerVS {
             if (!prevMouseIn.containsKey(tmpGlyph)){
                 //if it was not inside it last time, mouse has entered the glyph
                 prevMouseIn.put(tmpGlyph, null);
-                tmpRes = Glyph.ENTERED_GLYPH;
+                //we've entered this glyph
+                maxIndex = maxIndex + 1;
+                if (maxIndex >= pickedGlyphs.length){doubleCapacity();}
+                pickedGlyphs[maxIndex] = tmpGlyph;
+                lastGlyphEntered = tmpGlyph;
+                if (pl != null){pl.enterGlyph(tmpGlyph);}
+                return true;
             }
             //if it was inside last time, nothing has changed
-            else {tmpRes = Glyph.NO_CURSOR_EVENT;}
         }
         else {
             //if the mouse is not inside the glyph
             if (prevMouseIn.containsKey(tmpGlyph)){
                 //if it was inside it last time, mouse has exited the glyph
                 prevMouseIn.remove(tmpGlyph);
-                tmpRes = Glyph.EXITED_GLYPH;
-            }//if it was not inside last time, nothing has changed
-            else {tmpRes = Glyph.NO_CURSOR_EVENT;}
-        }
-        if (tmpRes == Glyph.ENTERED_GLYPH){
-            //we've entered this glyph
-            maxIndex = maxIndex + 1;
-            if (maxIndex >= pickedGlyphs.length){doubleCapacity();}
-            pickedGlyphs[maxIndex] = tmpGlyph;
-            lastGlyphEntered = tmpGlyph;
-            if (pl != null){pl.enterGlyph(tmpGlyph);}
-            return true;
-        }
-        else if (tmpRes == Glyph.EXITED_GLYPH){
-            //we've exited it
-            int j = 0;
-            while (j <= maxIndex){
-                if (pickedGlyphs[j++] == tmpGlyph){break;}
+                //we've exited it
+                int j = 0;
+                while (j <= maxIndex){
+                    if (pickedGlyphs[j++] == tmpGlyph){break;}
+                }
+                while (j <= maxIndex){
+                    pickedGlyphs[j-1] = pickedGlyphs[j];
+                    j++;
+                }
+                maxIndex = maxIndex - 1;
+                /*required because list can be reset because we change layer and then we exit a glyph*/
+                if (maxIndex<0){lastGlyphEntered = null;maxIndex = -1;}
+                else {lastGlyphEntered = pickedGlyphs[maxIndex];}
+                if (pl != null){pl.exitGlyph(tmpGlyph);}
+                return true;
             }
-            while (j <= maxIndex){
-                pickedGlyphs[j-1] = pickedGlyphs[j];
-                j++;
-            }
-            maxIndex = maxIndex - 1;
-            /*required because list can be reset because we change layer and then we exit a glyph*/
-            if (maxIndex<0){lastGlyphEntered = null;maxIndex = -1;}
-            else {lastGlyphEntered = pickedGlyphs[maxIndex];}
-            if (pl != null){pl.exitGlyph(tmpGlyph);}
-            return true;
+            //if it was not inside last time, nothing has changed
         }
         return false;
     }
