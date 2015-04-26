@@ -40,6 +40,7 @@ import fr.inria.zvtm.glyphs.VPolygon;
 import fr.inria.zvtm.glyphs.VPolygonOr;
 import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VRectangleOr;
+import fr.inria.zvtm.glyphs.VRoundRect;
 import fr.inria.zvtm.glyphs.VRing;
 import fr.inria.zvtm.glyphs.VSegment;
 import fr.inria.zvtm.glyphs.VShape;
@@ -151,6 +152,10 @@ public aspect GlyphCreation {
 
     @Override public GlyphReplicator VRectangleOr.getReplicator(){
         return new VRectangleOrReplicator(this);
+    }
+
+    @Override public GlyphReplicator VRoundRect.getReplicator(){
+        return new VRoundRectReplicator(this);
     }
 
     @Override public GlyphReplicator VCircle.getReplicator(){
@@ -373,6 +378,31 @@ public aspect GlyphCreation {
                 + ", height=" + height;
         }
     }
+
+    private static class VRoundRectReplicator extends ClosedShapeReplicator {
+        protected final double width;
+        protected final double height;
+        protected final double aw;
+        protected final double ah;
+
+        VRoundRectReplicator(VRoundRect source){
+            super(source);
+            this.width = source.getWidth();
+            this.height = source.getHeight();
+            this.aw = source.getArcWidth();
+            this.ah = source.getArcHeight();
+        }
+
+        public Glyph doCreateGlyph(){
+            return new VRoundRect(0d,0d,0,width,height,Color.BLACK,aw,ah);
+        }
+
+        @Override public String toString(){
+            return "VRoundRectReplicator, width=" + width
+                + ", height=" + height;
+        }
+    }
+
 
     private static class VCircleReplicator extends ClosedShapeReplicator {
         private final double size;

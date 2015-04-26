@@ -1,9 +1,11 @@
 /*   AUTHOR : Romain Primet (romain.primet@inria.fr)
  *
- *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009-2010.
+ *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009-2015.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
+ * $Id$
  */
+
 package fr.inria.zvtm.cluster;
 
 import fr.inria.zvtm.engine.Camera;
@@ -13,6 +15,7 @@ import fr.inria.zvtm.glyphs.ClosedShape;
 import fr.inria.zvtm.glyphs.DPath;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.RectangularShape;
+import fr.inria.zvtm.glyphs.VRoundRect;
 import fr.inria.zvtm.glyphs.VSegment;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.glyphs.VImage;
@@ -74,6 +77,8 @@ public aspect AutoReplay extends AbstractAutoReplay {
          //execution(public void DPath.edit(Point2D.Double[], boolean)) ||
          execution(public void RectangularShape.setHeight(double)) ||
          execution(public void RectangularShape.setWidth(double)) ||
+         execution(public void VRoundRect.setArcWidth(double)) ||
+         execution(public void VRoundRect.setArcHeight(double)) ||
          execution(public void VImage.setZoomSensitive(boolean)) ||
          execution(public void VirtualSpace.show(Glyph)) ||
          execution(public void VirtualSpace.hide(Glyph)) ||
