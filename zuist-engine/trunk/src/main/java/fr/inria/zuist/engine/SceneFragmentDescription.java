@@ -90,4 +90,10 @@ public class SceneFragmentDescription extends ResourceDescription {
         return null;
     }
 
+    /** Will always return false in the case of a scene fragment.*/
+    @Override
+    public boolean coordInside(double vx, double vy){
+        return false;
+    }
+
 }

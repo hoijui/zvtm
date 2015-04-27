@@ -324,6 +324,11 @@ public class ImageDescription extends ResourceDescription {
         return alpha;
     }
 
+    @Override
+    public boolean coordInside(double pvx, double pvy){
+        return (vx >= pvx-vw/2d && vx <= pvx+vw/2d && vy >= pvy-vw/2d && vy <= pvy+vw/2d);
+    }
+
 }
 
 class ImageHideAction implements EndAction {

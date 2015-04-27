@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2007-2011. All Rights Reserved
+ *   Copyright (c) INRIA, 2007-2015. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -112,5 +112,10 @@ public abstract class ObjectDescription {
     public abstract double getY();
 
     public abstract void moveTo(double x, double y);
+
+    /** Are the supplied coordinates inside the object described.
+     *@return true if the supplied coordinates are inside the object descrived.
+     */
+    public abstract boolean coordInside(double pvx, double pvy);
 
 }

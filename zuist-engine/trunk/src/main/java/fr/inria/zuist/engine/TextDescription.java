@@ -197,6 +197,16 @@ public class TextDescription extends ObjectDescription {
         return alpha;
     }
 
+    /** Are the supplied coordinates inside the object described.
+     * Assumes that picking is happening for camIndex 0.
+     * If this is not the case, the result will likely be wrong.
+     *@return true if the supplied coordinates are inside the object descrived.
+     */
+    @Override
+    public boolean coordInside(double pvx, double pvy){
+        return this.glyph.coordInsideV(pvx, pvy, 0);
+    }
+
 }
 
 class TextHideAction implements EndAction {

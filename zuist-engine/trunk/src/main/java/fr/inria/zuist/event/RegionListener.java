@@ -15,12 +15,12 @@ import fr.inria.zuist.engine.Region;
 
 public interface RegionListener {
 
-    /**Fired when a camera declared in SceneManager enters Region r.
+    /**Fired when a RegionPicker enters Region r, or when a camera declared in SceneManager enters it.
        In other words, when the region becomes visible in the view
        (camera being in the corresponding altitude range).*/
     public void enteredRegion(Region r);
 
-    /**Fired when a camera declared in SceneManager leaves Region r.
+    /**Fired when a RegionPicker leaves Region r, or when a camera declared in SceneManager leaves it.
        In other words, when the region is no longer visible in the view
        (either offscreen or camera not in the corresponding altitude range).*/
     public void exitedRegion(Region r);

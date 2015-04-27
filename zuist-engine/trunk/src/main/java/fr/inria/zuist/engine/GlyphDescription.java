@@ -45,5 +45,18 @@ public class GlyphDescription extends ObjectDescription {
   @Override public void moveTo(double x, double y){
     glyph.moveTo(x, y);
   }
+
+  /** Are the supplied coordinates inside the object described.
+   * In this particular case, assumes that picking is happening for camIndex 0.
+   * This will no matter usually, unless camIndex is not 0 for this particular picking,
+   * and the Glyph actually makes use of the camIndex (usually not the case).
+   * The conjunction of these two conditions is exceptional.
+   *@return true if the supplied coordinates are inside the object descrived.
+   */
+  @Override
+  public boolean coordInside(double pvx, double pvy){
+      return this.glyph.coordInsideV(pvx, pvy, 0);
+  }
+
 }
 
