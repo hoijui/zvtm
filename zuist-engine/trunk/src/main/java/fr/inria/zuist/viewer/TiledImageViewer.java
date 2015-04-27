@@ -69,7 +69,7 @@ import fr.inria.zvtm.event.RepaintListener;
 
 import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zuist.engine.Region;
-import fr.inria.zuist.engine.ProgressListener;
+import fr.inria.zuist.event.ProgressListener;
 
 import org.w3c.dom.Document;
 

@@ -12,9 +12,26 @@ import java.util.Vector;
 
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 
+import fr.inria.zuist.event.RegionListener;
+
 /**
- *<p>A region picker that tells what regions overlap the corresponding coordinates.
- *   The picker will only test for regions that are visible in the given level range.</p>
+ <p>A region picker that tells what regions overlap the corresponding coordinates.
+    The picker will only test for regions that are visible in the given level range.</p>
+ <p> A RegionPicker is instantiated as follows:</p>
+<pre>
+SceneManager sm = ...;
+// create a picker that will only consider regions visible at ZUIST levels 3 through 5 (any of these levels or all of them)
+RegionPicker rPicker = sm.createRegionPicker(3,5);
+rPicker.setListener(aListener);
+</pre>
+<p>with aListener a RegionListener that gets notified whenever the picker enters or exits a Region.</p>
+<p>A RegionPicker is moved programmatically using setVSCoordinates(). Any VirtualSpace coordinates can be given to it.</p>
+<p>One way to tie it to a VCursor is simply to call setVSCoordinates() in the mouseMoved listener associated with the corresponding ViewListener.</p>
+<pre>
+public void mouseMoved(ViewPanel v, int jpx, int jpy, MouseEvent e){
+  rPicker.setVSCoordinates(v.getVCursor().getVSXCoordinate(), v.getVCursor().getVSYCoordinate());
+}
+</pre>
  */
 
 public class RegionPicker extends ZuistPicker {

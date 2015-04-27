@@ -52,6 +52,11 @@ import fr.inria.zvtm.animation.EndAction;
 import fr.inria.zvtm.svg.SVGReader;
 import fr.inria.zvtm.engine.Location;
 
+import fr.inria.zuist.event.LevelListener;
+import fr.inria.zuist.event.RegionListener;
+import fr.inria.zuist.event.ObjectListener;
+import fr.inria.zuist.event.ProgressListener;
+
 /** <strong>Multi-scale scene manager: main ZUIST class instantiated by client application.</strong>
  * Used to parse XML descriptions of multi-scale scene configurations and manage them once instantiated.
  *@author Emmanuel Pietriga

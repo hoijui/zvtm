@@ -14,6 +14,8 @@ import java.util.Vector;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VRectangle;
 
+import fr.inria.zuist.event.RegionListener;
+
 /** A region in the scene. Regions contain objects. Regions belong to levels, and can span one or more contiguous level(s).
  *@author Emmanuel Pietriga
  */
