@@ -81,9 +81,9 @@ import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zuist.engine.Region;
 import fr.inria.zuist.engine.Level;
-import fr.inria.zuist.engine.RegionListener;
-import fr.inria.zuist.engine.LevelListener;
-import fr.inria.zuist.engine.ProgressListener;
+import fr.inria.zuist.event.RegionListener;
+import fr.inria.zuist.event.LevelListener;
+import fr.inria.zuist.event.ProgressListener;
 import fr.inria.zuist.engine.ObjectDescription;
 import fr.inria.zuist.engine.JSkyFitsImageDescription;
 
@@ -325,7 +325,7 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
         cfilter = next;
         for(ObjectDescription desc: sm.getObjectDescriptions()){
             if(desc instanceof JSkyFitsImageDescription){
-                ((JSkyFitsImageDescription)desc).setColorLookupTable(next);
+                ((JSkyFitsImageDescription)desc).setColorLookupTable(next, true);
             }
         } 
     }
@@ -337,7 +337,7 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
         scaleMethod = next;
         for(ObjectDescription desc: sm.getObjectDescriptions()){
             if(desc instanceof JSkyFitsImageDescription){
-                ((JSkyFitsImageDescription)desc).setScaleAlgorithm(next);
+                ((JSkyFitsImageDescription)desc).setScaleAlgorithm(next, true);
             }
         } 
     }
@@ -348,7 +348,7 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
         System.out.println("app.setColorLookupTable(" + filter + ")");
         for(ObjectDescription desc: sm.getObjectDescriptions()){
             if(desc instanceof JSkyFitsImageDescription){
-                ((JSkyFitsImageDescription)desc).setColorLookupTable(filter);
+                ((JSkyFitsImageDescription)desc).setColorLookupTable(filter, true);
             }
         } 
     }
@@ -357,7 +357,7 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
     public void setScaleAlgorithm(JSkyFitsImage.ScaleAlgorithm method){
     	for(ObjectDescription desc: sm.getObjectDescriptions()){
             if(desc instanceof JSkyFitsImageDescription){
-                ((JSkyFitsImageDescription)desc).setScaleAlgorithm(method);
+                ((JSkyFitsImageDescription)desc).setScaleAlgorithm(method, true);
             }
         } 
     }
@@ -367,7 +367,7 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
     	//System.out.println("rescale");
     	for(ObjectDescription desc: sm.getObjectDescriptions()){
             if(desc instanceof JSkyFitsImageDescription){
-                ((JSkyFitsImageDescription)desc).rescale(min, max);
+                ((JSkyFitsImageDescription)desc).rescale(min, max, true);
             }
         }
     }

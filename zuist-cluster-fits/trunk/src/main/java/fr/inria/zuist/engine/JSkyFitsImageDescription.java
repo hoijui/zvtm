@@ -216,18 +216,18 @@ public class JSkyFitsImageDescription extends ResourceDescription {
         return JSkyFitsResourceHandler.RESOURCE_TYPE_FITS;
     }
 
-    public void setColorLookupTable(String colorLookupTable){
+    public void setColorLookupTable(String colorLookupTable, boolean updateDisplay){
         this.colorLookupTable = colorLookupTable;
         if(glyph != null){
-            glyph.setColorLookupTable(colorLookupTable);
+            glyph.setColorLookupTable(colorLookupTable, updateDisplay);
         }
     }
 
 
-    public void setScaleAlgorithm(JSkyFitsImage.ScaleAlgorithm algorithm){
+    public void setScaleAlgorithm(JSkyFitsImage.ScaleAlgorithm algorithm, boolean updateDisplay){
         this.scaleMethod = algorithm;
         if(glyph != null){
-            glyph.setScaleAlgorithm(algorithm);
+            glyph.setScaleAlgorithm(algorithm, updateDisplay);
         }
     }
 
@@ -240,16 +240,16 @@ public class JSkyFitsImageDescription extends ResourceDescription {
         isRescaleGlobal = isGlobal;
     }
 
-    public void rescale(double min, double max){
-        if(glyph != null) glyph.setCutLevels(min, max);
+    public void rescale(double min, double max, boolean updateDisplay){
+        if(glyph != null) glyph.setCutLevels(min, max, updateDisplay);
     }
 
     public void rescaleGlobal(){
-        if(glyph != null) glyph.setCutLevels(gmin, gmax);
+        if(glyph != null) glyph.setCutLevels(gmin, gmax, true);
     }
 
     public void rescaleLocal(){
-        if(glyph != null) glyph.setCutLevels(lmin, lmax);
+        if(glyph != null) glyph.setCutLevels(lmin, lmax, true);
     }
 
     public double[] getLocalScaleParams(){
@@ -282,11 +282,11 @@ public class JSkyFitsImageDescription extends ResourceDescription {
         //glyph.setDrawBorder(false);
         glyph.setTranslucencyValue(alpha);
 
-        glyph.setScaleAlgorithm(scaleMethod);
-        glyph.setColorLookupTable(colorLookupTable);
+        glyph.setScaleAlgorithm(scaleMethod, false);
+        glyph.setColorLookupTable(colorLookupTable, false);
 
-        if(isRescaleGlobal) glyph.setCutLevels(gmin, gmax);
-        else glyph.setCutLevels(lmin, lmax);
+        if(isRescaleGlobal) glyph.setCutLevels(gmin, gmax, true);
+        else glyph.setCutLevels(lmin, lmax, true);
 
         //System.out.println("localmin: " + lmin + " localmax: " + lmax);
         //System.out.println("globalmin: " + gmin + " globalmax: " + gmax);
