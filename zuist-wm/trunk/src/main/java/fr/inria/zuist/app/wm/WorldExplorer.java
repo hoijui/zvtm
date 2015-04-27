@@ -51,7 +51,7 @@ import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.EndAction;
 
 import fr.inria.zuist.engine.SceneManager;
-import fr.inria.zuist.engine.ProgressListener;
+import fr.inria.zuist.event.ProgressListener;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
