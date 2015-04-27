@@ -472,6 +472,10 @@ public class Region {
         return res;
     }
 
+    public boolean coordInside(double vx, double vy){
+        return (vx >= wnes[0] && vx <= wnes[2] && vy >= wnes[3] && vy <= wnes[1]);
+    }
+
     public String toString(){
         String res = "Region " + id + " contained in " + ((containingRegion != null) ? containingRegion.id : "NO REGION") + " and containing regions [";
         for (int i=0;i<containedRegions.length;i++){

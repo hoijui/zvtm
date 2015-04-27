@@ -412,6 +412,14 @@ public class SceneManager implements CameraListener {
 
     /* ----------- ZUIST events ----------- */
 
+    public RegionPicker createRegionPicker(int tl, int bl){
+        return new RegionPicker(this, tl, bl);
+    }
+
+    // public ObjectPicker createObjectPicker(){
+    //     return new ObjectPicker(this);
+    // }
+
     public void setLevelListener(LevelListener ll){
         levelListener = ll;
     }
