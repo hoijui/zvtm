@@ -46,7 +46,7 @@ import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.EndAction;
 
 import fr.inria.zuist.engine.SceneManager;
-import fr.inria.zuist.engine.ProgressListener;
+import fr.inria.zuist.event.ProgressListener;
 
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
