@@ -47,19 +47,17 @@ public class RegionPicker extends ZuistPicker {
     public void updateCandidateRegions(){
         synchronized(candidateRegions){
             Vector<Region> v = new Vector();
-            try {
-                for (int i=topLevel;i<=bottomLevel;i++){
+            for (int i=topLevel;i<=bottomLevel;i++){
+                if (i < sm.levels.length){
+                    // we know that i >= 0 as topLevel is checked accordingly
                     for (Region r:sm.levels[i].regions){
                         if (!v.contains(r)){
                             v.add(r);
                         }
                     }
                 }
-                candidateRegions = v.toArray(new Region[v.size()]);
             }
-            catch (ArrayIndexOutOfBoundsException ex){
-                ex.printStackTrace();
-            }
+            candidateRegions = v.toArray(new Region[v.size()]);
         }
     }
 
@@ -71,9 +69,16 @@ public class RegionPicker extends ZuistPicker {
         return this.rl;
     }
 
+    @Override
     public void setVSCoordinates(double x, double y){
         super.setVSCoordinates(x, y);
         computePickedRegionList();
+    }
+
+    @Override
+    public void setLevelRange(int tl, int bl){
+        super.setLevelRange(tl, bl);
+        updateCandidateRegions();
     }
 
     /** Double capacity of array containing regions picked.
