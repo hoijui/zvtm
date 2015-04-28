@@ -67,9 +67,9 @@ import fr.inria.zvtm.glyphs.IcePDFPageImg;
 import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zuist.engine.Region;
 import fr.inria.zuist.engine.Level;
-import fr.inria.zuist.engine.RegionListener;
-import fr.inria.zuist.engine.LevelListener;
-import fr.inria.zuist.engine.ProgressListener;
+import fr.inria.zuist.event.RegionListener;
+import fr.inria.zuist.event.LevelListener;
+import fr.inria.zuist.event.ProgressListener;
 import fr.inria.zuist.engine.ObjectDescription;
 import fr.inria.zuist.engine.PDFResourceHandler;
 

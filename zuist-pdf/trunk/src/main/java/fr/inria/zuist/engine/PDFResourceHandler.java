@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2009-2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2009-2015. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -41,8 +41,12 @@ public class PDFResourceHandler implements ResourceHandler {
     public static final String _df = "df=";
 
     /** Memory Cache*/
-    static CacheManager cacheManager = new CacheManager();
-    static SelfPopulatingCache documentCache = new SelfPopulatingCache(cacheManager.getCache("zuistPDFCache"), new CachedDocumentFactory());
+    static final String PDF_CACHE_NAME = "zuistPDFCache";
+    static CacheManager cacheManager = CacheManager.create();
+    static {
+        cacheManager.addCache(PDF_CACHE_NAME);
+    }
+    static SelfPopulatingCache documentCache = new SelfPopulatingCache(cacheManager.getCache(PDF_CACHE_NAME), new CachedDocumentFactory());
 
     /** Reset memory cache*/
     public static void resetCache(){
