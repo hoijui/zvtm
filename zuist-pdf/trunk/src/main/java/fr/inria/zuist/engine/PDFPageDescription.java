@@ -263,6 +263,13 @@ public class PDFPageDescription extends ResourceDescription {
         }
     }
 
+    /**Always returns false in the case of a PDF page because we do not have
+     any information about the page's width and height before actually loading it.*/
+    @Override
+    public boolean coordInside(double pvx, double pvy){
+        return false;
+    }
+
 }
 
 class PDFPageHideAction implements EndAction {
