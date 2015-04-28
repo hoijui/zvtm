@@ -29,6 +29,7 @@ import java.awt.Polygon;
 import java.awt.Stroke;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Path2D;
 
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
@@ -48,6 +49,8 @@ public class VRectangleOr<T> extends VRectangle {
     int[] xcoords = new int[4];
     /*vertex y coords*/
     int[] ycoords = new int[4];
+
+    Path2D.Double p;
 
     public VRectangleOr(){
         this(0, 0, 0, 10, 10, Color.WHITE, Color.BLACK, 0, 1.0f);
@@ -94,7 +97,33 @@ public class VRectangleOr<T> extends VRectangle {
     public VRectangleOr(double x, double y, int z, double w, double h, Color c, Color bc, double or, float alpha){
         super(x, y, z, w, h, c);
         orient = or;
+        updateVSPolygon();
         setTranslucencyValue(alpha);
+    }
+
+    void updateVSPolygon(){
+        double x1 = -vw/2d;
+        double y1 = -vh/2d;
+        double x2 = vw/2d;
+        double y2 = vh/2d;
+        p = new Path2D.Double(Path2D.WIND_EVEN_ODD, 4);
+        p.moveTo((x2*Math.cos(orient)-y2*Math.sin(orient))+vx, (x2*Math.sin(orient)+y2*Math.cos(orient))+vy);
+        p.lineTo((x1*Math.cos(orient)-y2*Math.sin(orient))+vx, (x1*Math.sin(orient)+y2*Math.cos(orient))+vy);
+        p.lineTo((x1*Math.cos(orient)-y1*Math.sin(orient))+vx, (x1*Math.sin(orient)+y1*Math.cos(orient))+vy);
+        p.lineTo((x2*Math.cos(orient)-y1*Math.sin(orient))+vx, (x2*Math.sin(orient)+y1*Math.cos(orient))+vy);
+        p.closePath();
+    }
+
+    @Override
+    public void moveTo(double x, double y){
+        super.moveTo(x, y);
+        updateVSPolygon();
+    }
+
+    @Override
+    public void move(double x, double y){
+        super.move(x, y);
+        updateVSPolygon();
     }
 
     @Override
@@ -105,8 +134,33 @@ public class VRectangleOr<T> extends VRectangle {
      */
      @Override
     public void orientTo(double angle){
-    orient=angle;
-    VirtualSpaceManager.INSTANCE.repaint();
+        orient = angle;
+        updateVSPolygon();
+        VirtualSpaceManager.INSTANCE.repaint();
+    }
+
+    @Override
+    public void sizeTo(double s){
+        super.sizeTo(s);
+        updateVSPolygon();
+    }
+
+    @Override
+    public void setWidth(double w){
+        super.setWidth(w);
+        updateVSPolygon();
+    }
+
+    @Override
+    public void setHeight(double h){
+        super.setHeight(h);
+        updateVSPolygon();
+    }
+
+    @Override
+    public void reSize(double factor){ //resizing factor
+        super.reSize(factor);
+        updateVSPolygon();
     }
 
     @Override
@@ -149,13 +203,12 @@ public class VRectangleOr<T> extends VRectangle {
 
     @Override
     public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
-        return coordInsideP(jpx, jpy, camIndex);
+        return coordInsideV(cvx, cvy, camIndex);
     }
 
     @Override
     public boolean coordInsideV(double cvx, double cvy, int camIndex){
-        // NOT IMPLEMENTED
-        return false;
+        return p.contains(cvx, cvy);
     }
 
     @Override
