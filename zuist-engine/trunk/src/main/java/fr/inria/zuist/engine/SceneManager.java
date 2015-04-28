@@ -421,9 +421,9 @@ public class SceneManager implements CameraListener {
         return new RegionPicker(this, tl, bl);
     }
 
-    // public ObjectPicker createObjectPicker(){
-    //     return new ObjectPicker(this);
-    // }
+    public ObjectPicker createObjectPicker(int tl, int bl){
+        return new ObjectPicker(this, tl, bl);
+    }
 
     public void setLevelListener(LevelListener ll){
         levelListener = ll;
