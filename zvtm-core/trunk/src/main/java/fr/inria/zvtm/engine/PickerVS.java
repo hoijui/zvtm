@@ -255,10 +255,7 @@ public class PickerVS {
 
     boolean checkGlyph(Camera c){
         // Test if cursor inside, and fire entry/exit events for a given glyph
-        //XXX: temporary fix: sending MIN_VALUE for jpx,jpy as we have no idea what those are.
-        // But once all Glyphs implement picking in VirtualSpace coordinates,
-        // we can get rid of projected coordinate parameters.
-        if (tmpGlyph.coordInside(Integer.MIN_VALUE, Integer.MIN_VALUE, c.getIndex(), vx, vy)){
+        if (tmpGlyph.coordInsideV(vx, vy, c.getIndex())){
             //if the mouse is inside the glyph
             if (!prevMouseIn.containsKey(tmpGlyph)){
                 //if it was not inside it last time, mouse has entered the glyph
