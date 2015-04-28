@@ -39,7 +39,6 @@ public class VCross<T> extends VRectangle {
         *@param w width in virtual space
         *@param h height in virtual space
         *@param c cross color
-        *@param bc border color
         */
     public VCross(double x, double y, int z, double w, double h, Color c){
         this(x, y, z, w, h, c, Color.BLACK, 1f);
