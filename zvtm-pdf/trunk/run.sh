@@ -1,3 +1,2 @@
 #!/bin/sh
-java -Xmx2048M -Xms512M -jar target/zvtm-pdf-0.3.0-SNAPSHOT.jar "$@" 
-
+java -Xmx1024M -Xms256M -jar target/zvtm-pdf-0.3.1-SNAPSHOT.jar "$@"
