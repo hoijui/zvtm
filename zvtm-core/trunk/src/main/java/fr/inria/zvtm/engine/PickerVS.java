@@ -45,6 +45,16 @@ import fr.inria.zvtm.glyphs.VSegment;
   in which it is going to perform picking operations so that it gets notified whenever glyphs get
   removed from the VirtualSpace and updates itself accordingly. This is not necessary for the
   picker associated with a View's VCursor, that gets created automatically.</p>
+<pre>
+PickerVS pvs = new PickerVS();
+...
+pvs.setVSCoordinates(vx, vy);
+// setting new VS coordinates does not trigger the update of the list of picked glyphs
+// one also needs to call computePickedGlyphList(Camera c)
+// where c is the camera through which the candidate glyphs are observed
+pvs.computePickedGlyphList(c);
+</pre>
+<p>cam only matters when picking VText instances (or instances of subclasses).</p>
  */
 
 public class PickerVS {
