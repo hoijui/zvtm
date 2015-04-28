@@ -14,6 +14,7 @@ import java.awt.Stroke;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.awt.geom.Path2D;
 
 import fr.inria.zvtm.glyphs.projection.ProjPolygon;
 
@@ -33,7 +34,7 @@ public class VPolygonOr<T> extends VPolygon {
     ProjPolygon[] pc;
 
     /*store x,y vertex coords as relative coordinates w.r.t polygon's centroid*/
-    // original coords (not reoriented) - {x,y,lx,ly}coords contain the oriented coords
+    // original coords (not reoriented) ; {x,y,lx,ly}coords contain the oriented coords
     double[] oxcoords;
     double[] oycoords;
 
@@ -73,6 +74,7 @@ public class VPolygonOr<T> extends VPolygon {
         System.arraycopy(xcoords, 0, oxcoords, 0, xcoords.length);
         System.arraycopy(ycoords, 0, oycoords, 0, ycoords.length);
         orientTo(or);
+        updateVSPolygon();
     }
 
     @Override
@@ -82,6 +84,7 @@ public class VPolygonOr<T> extends VPolygon {
     public void orientTo(double angle){
         this.orient = angle;
         updateOrient();
+        updateVSPolygon();
     	VirtualSpaceManager.INSTANCE.repaint();
     }
 
@@ -113,7 +116,17 @@ public class VPolygonOr<T> extends VPolygon {
         }
         size *= 2;
         updateOrient();
+        updateVSPolygon();
         VirtualSpaceManager.INSTANCE.repaint();
+    }
+
+    void updateVSPolygon(){
+        p = new Path2D.Double(Path2D.WIND_EVEN_ODD, xcoords.length);
+        p.moveTo(xcoords[0]+vx, ycoords[0]+vy);
+        for (int i=1;i<xcoords.length;i++) {
+            p.lineTo(xcoords[i]+vx, ycoords[i]+vy);
+        }
+        p.closePath();
     }
 
     @Override

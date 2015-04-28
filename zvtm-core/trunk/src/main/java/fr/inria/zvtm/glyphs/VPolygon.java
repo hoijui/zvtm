@@ -19,6 +19,7 @@ import java.awt.Stroke;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.awt.geom.Path2D;
 
 import fr.inria.zvtm.glyphs.projection.ProjPolygon;
 
@@ -41,6 +42,8 @@ public class VPolygon<T> extends ClosedShape {
     double[] ycoords;
     double[] lxcoords;
     double[] lycoords;
+
+    Path2D.Double p;
 
     /**
         *@param v list of x,y vertices ABSOLUTE coordinates in virtual space
@@ -91,6 +94,7 @@ public class VPolygon<T> extends ClosedShape {
             xcoords[i] -= vx;
             ycoords[i] -= vy;
         }
+        updateVSPolygon();
         computeSize();
         setColor(c);
         setBorderColor(bc);
@@ -142,6 +146,15 @@ public class VPolygon<T> extends ClosedShape {
     @Override
     public double getSize(){return size;}
 
+    void updateVSPolygon(){
+        p = new Path2D.Double(Path2D.WIND_EVEN_ODD, xcoords.length);
+        p.moveTo(xcoords[0]+vx, ycoords[0]+vy);
+        for (int i=1;i<xcoords.length;i++) {
+            p.lineTo(xcoords[i]+vx, ycoords[i]+vy);
+        }
+        p.closePath();
+    }
+
     void computeSize(){
         size = 0;
         double f;
@@ -169,6 +182,7 @@ public class VPolygon<T> extends ClosedShape {
             if (f > size){size = f;}
         }
         size *= 2;
+        updateVSPolygon();
         VirtualSpaceManager.INSTANCE.repaint();
     }
 
@@ -181,13 +195,12 @@ public class VPolygon<T> extends ClosedShape {
 
     @Override
     public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
-        return coordInsideP(jpx, jpy, camIndex);
+        return coordInsideV(cvx, cvy, camIndex);
     }
 
     @Override
     public boolean coordInsideV(double cvx, double cvy, int camIndex){
-        // NOT IMPLEMENTED
-        return false;
+        return p.contains(cvx, cvy);
     }
 
     @Override
