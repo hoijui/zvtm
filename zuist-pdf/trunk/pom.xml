@@ -89,8 +89,8 @@ $Id: pom.xml 2427 2009-09-29 07:29:08Z epietrig $
 
 	<dependency>
 	  <groupId>net.sf.ehcache</groupId>
-	  <artifactId>ehcache-core</artifactId>
-	  <version>2.4.7</version>
+	  <artifactId>ehcache</artifactId>
+	  <version>2.9.0</version>
 	</dependency>
 
 </dependencies>
