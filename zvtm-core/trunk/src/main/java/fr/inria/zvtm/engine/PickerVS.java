@@ -54,7 +54,6 @@ pvs.setVSCoordinates(vx, vy);
 // where c is the camera through which the candidate glyphs are observed
 pvs.computePickedGlyphList(c);
 </pre>
-<p>cam only matters when picking VText instances (or instances of subclasses).</p>
  */
 
 public class PickerVS {
