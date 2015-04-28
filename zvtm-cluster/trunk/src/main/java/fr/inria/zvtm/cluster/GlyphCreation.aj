@@ -31,6 +31,7 @@ import fr.inria.zvtm.glyphs.MultilineText;
 import fr.inria.zvtm.glyphs.PRectangle;
 import fr.inria.zvtm.glyphs.SIRectangle;
 import fr.inria.zvtm.glyphs.VCircle;
+import fr.inria.zvtm.glyphs.VCross;
 import fr.inria.zvtm.glyphs.VEllipse;
 import fr.inria.zvtm.glyphs.VEclipse;
 import fr.inria.zvtm.glyphs.VImage;
@@ -153,6 +154,10 @@ public aspect GlyphCreation {
 
     @Override public GlyphReplicator VRectangleOr.getReplicator(){
         return new VRectangleOrReplicator(this);
+    }
+
+    @Override public GlyphReplicator VCross.getReplicator(){
+        return new VCrossReplicator(this);
     }
 
     @Override public GlyphReplicator VRoundRect.getReplicator(){
@@ -380,6 +385,22 @@ public aspect GlyphCreation {
 
         @Override public String toString(){
             return "VRectangleOrReplicator, width=" + width
+                + ", height=" + height;
+        }
+    }
+
+    private static class VCrossReplicator extends VRectangleReplicator {
+
+        VCrossReplicator(VCross source){
+            super(source);
+        }
+
+        public Glyph doCreateGlyph(){
+            return new VCross(0d,0d,0,width,height,Color.BLACK);
+        }
+
+        @Override public String toString(){
+            return "VCrossReplicator, width=" + width
                 + ", height=" + height;
         }
     }
@@ -741,4 +762,3 @@ public aspect GlyphCreation {
         }
     }
 }
-
