@@ -146,6 +146,18 @@ public class VPolygon<T> extends ClosedShape {
     @Override
     public double getSize(){return size;}
 
+    @Override
+    public void moveTo(double x, double y){
+        super.moveTo(x, y);
+        updateVSPolygon();
+    }
+
+    @Override
+    public void move(double x, double y){
+        super.move(x, y);
+        updateVSPolygon();
+    }
+
     void updateVSPolygon(){
         p = new Path2D.Double(Path2D.WIND_EVEN_ODD, xcoords.length);
         p.moveTo(xcoords[0]+vx, ycoords[0]+vy);
