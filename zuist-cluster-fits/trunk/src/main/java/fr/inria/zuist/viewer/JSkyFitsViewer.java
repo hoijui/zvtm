@@ -122,6 +122,8 @@ import fr.inria.zvtm.fits.simbad.AstroObject;
 
 import jsky.coords.WorldCoords;
 
+import java.awt.BasicStroke;
+
 /**
  * @author Emmanuel Pietriga, Fernando del Campo
  */
@@ -181,8 +183,6 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
         reference = options.reference;
 
         
-        
-        //pythonWCS.sendCoordinate(0,0, null);
         */
 
     }
@@ -197,6 +197,7 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
         mSpaceKs = vsm.addVirtualSpace(mSpaceKsName);
         mSpaceH = vsm.addVirtualSpace(mSpaceHName);
         mSpaceJ = vsm.addVirtualSpace(mSpaceJName);
+        mSpace = vsm.addVirtualSpace(mSpaceName);
         pMnSpace = vsm.addVirtualSpace(pMnSpaceName);
         mnSpace = vsm.addVirtualSpace(mnSpaceName);
         cursorSpace = vsm.addVirtualSpace(cursorSpaceName);
@@ -207,6 +208,7 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
         mCameraKs = mSpaceKs.addCamera();
         mCameraH = mSpaceH.addCamera();
         mCameraJ = mSpaceJ.addCamera();
+        mCamera = mSpace.addCamera();
 
         mCamera.stick(mCameraKs);
         mCamera.stick(mCameraH);
@@ -224,6 +226,7 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
         cameras.add(mCameraKs);
         cameras.add(mCameraH);
         cameras.add(mCameraJ);
+        cameras.add(mCamera);
         cameras.add(vsm.getVirtualSpace(pMnSpaceName).getCamera(0));
         cameras.add(mnCamera);
         cameras.add(cursorCamera);
@@ -236,6 +239,7 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
         sceneCam.add(mCameraKs);
         sceneCam.add(mCameraH);
         sceneCam.add(mCameraJ);
+        sceneCam.add(mCamera);
         sceneCam.add(cursorCamera);
 
         ClusterGeometry clGeom = new ClusterGeometry(options.blockWidth, options.blockHeight, options.numCols, options.numRows);
@@ -265,10 +269,11 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
         mView.setEventHandler(eh, 1);
         mView.setEventHandler(ovm, 2);
         */
-        mView.setListener(eh, LAYER_SCENE);
+
         mView.setListener(eh, LAYER_SCENE_KS);
         mView.setListener(eh, LAYER_SCENE_H);
         mView.setListener(eh, LAYER_SCENE_J);
+        mView.setListener(eh, LAYER_SCENE);
         mView.setListener(eh, LAYER_PIEMENU);
         mView.setListener(menu, LAYER_MENU);
         mView.setListener(eh, LAYER_CURSOR);
@@ -492,7 +497,7 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
         loadFitsReference();
     }
 
-    public void coordinateWCS(Point2D.Double xy, String id, Observer obs){
+    public void coordinateWCS(Point2D.Double xy, String id){
 
         try {
 
@@ -527,6 +532,10 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
 
             */
 
+            System.out.print("xy: ");
+            System.out.print(xy);
+            System.out.print(" -- coord: ");
+            System.out.print(coord);
             double x = (coord[0] - fitsImageDescRef.getX()) + fitsImageDescRef.getWidth()/2 ;
             double y = (coord[1] - fitsImageDescRef.getY()) + fitsImageDescRef.getHeight()/2 ;
 
@@ -536,7 +545,7 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
 
             //pythonWCS.changeCoordinateSystem(galacticalSystem);
             //pythonWCS.sendCoordinate(x, y, mc);
-            pythonWCS.sendCoordinate(x, y, id, obs);
+            pythonWCS.sendPix2World(x, y, id);
 
         } catch (NullPointerException e){
             e.printStackTrace(System.out);
@@ -544,6 +553,44 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
 
         
     }
+
+    public double[] windowToViewCoordinateFromCoordinateWCS(double x, double y){
+
+        double a = (mCamera.focal + mCamera.getAltitude()) / mCamera.focal;
+
+        Location lc = cursorCamera.getLocation();
+
+        Location l = mCamera.getLocation();
+
+        System.out.println("cursorCamera.getLocation(): " + lc.getX() + " " + lc.getY());
+        System.out.println("mCamera.getLocation(): " + l.getX() + " " + l.getY());
+        System.out.println("fromCoordinateWCS: " + x + " " + y);
+        System.out.println("fitsReference: " + fitsImageDescRef.getX() + " " + fitsImageDescRef.getY() + " -- " + (fitsImageDescRef.getWidth()/2) + " " + (fitsImageDescRef.getHeight()/2) );
+
+        x = x + fitsImageDescRef.getX() - fitsImageDescRef.getWidth()/2;
+        y = y + fitsImageDescRef.getY() - fitsImageDescRef.getHeight()/2;
+
+        System.out.println(x + ", " + y);
+
+        //double xx = (long)((double)x - ((double)getDisplayWidth()/2.0));
+        //double yy = (long)(-(double)y + ((double)getDisplayHeight()/2.0));
+        //double xx = (long)((double)x - ((double)SCENE_W/2.0));
+        //double yy = (long)(-(double)y + ((double)SCENE_H/2.0));
+        
+        //xx = l.getX()+ a*xx;
+        //yy = l.getY()+ a*yy;
+
+        double xx = x;//x;//l.getX() + a*x;//x/a;//a*x;
+        double yy = y;//y;//l.getY() + a*y;//y/a;//a*y;
+
+        //System.out.println("xx: "+ xx + " - yy: " + yy);
+
+        double[] r = new double[2];
+        r[0] = xx;
+        r[1] = yy;
+        return r;
+    }
+
 
     @Override
     public void loadFitsReference(){
@@ -614,9 +661,9 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
         Point2D.Double center;
         Point2D.Double onCircle;
         public Query(Point2D.Double center, Point2D.Double onCircle){
-            //pythonWCS.addObserver(this);
-            pythonWCS.sendCoordinate(center.x, center.y, T_QUERY+"_CENTER", this);
-            pythonWCS.sendCoordinate(onCircle.x, onCircle.y, T_QUERY+"_ONCIRCLE", this);
+            pythonWCS.addObserver(this);
+            pythonWCS.sendPix2World(center.x, center.y, T_QUERY+"_CENTER");
+            pythonWCS.sendPix2World(onCircle.x, onCircle.y, T_QUERY+"_ONCIRCLE");
         }
         @Override
         public void update(Observable obs, Object obj){
@@ -627,48 +674,61 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
 
                     JSONObject json = (JSONObject) obj;
 
-                    String id = json.getString("id");
-                    double ra = json.getDouble("ra");
-                    double dec = json.getDouble("dec");
+                    String name = json.getString("name");
 
-                    if(id.equals(T_QUERY+"_CENTER")){
-                        center = new Point2D.Double(ra, dec);
-                    } else if(id.equals(T_QUERY+"_ONCIRCLE")) {
-                        onCircle = new Point2D.Double(ra, dec);
-                    }
+                    if(name.equals("pix2world")){
 
-                    if(isDone()){
+                        String id = json.getString("id");
+                        final double ra = json.getDouble("ra");
+                        final double dec = json.getDouble("dec");
 
-                        //compute radius in arcmin
-                        final WorldCoords wc = new WorldCoords(center.getX(), center.getY());
-                        WorldCoords wcDummy = new WorldCoords(onCircle.getX(), onCircle.getY());
-                        final double distArcMin = wc.dist(wcDummy);
-                        //perform catalog query
-                        System.err.println("Querying Simbad at " + wc + " with a radius of " + distArcMin + " arcminutes");
-                        // symbolSpace.removeAllGlyphs();
-                        new SwingWorker(){
-                            @Override public List<AstroObject> construct(){
-                                List<AstroObject> objs = null;
-                                try{
-                                    objs = SimbadCatQuery.makeSimbadCoordQuery(wc.getRaDeg(), wc.getDecDeg(), distArcMin);
-                                } catch(IOException ioe){
-                                    ioe.printStackTrace();
-                                } finally {
-                                    return objs;
+                        if(id.equals(T_QUERY+"_CENTER")){
+                            center = new Point2D.Double(ra, dec);
+                        } else if(id.equals(T_QUERY+"_ONCIRCLE")) {
+                            onCircle = new Point2D.Double(ra, dec);
+                        }
+
+                        if(isDone()){
+
+                            //compute radius in arcmin
+                            final WorldCoords wc = new WorldCoords(center.getX(), center.getY());
+                            System.out.println("center: ("+center.getX()+", "+center.getY()+")");
+                            WorldCoords wcDummy = new WorldCoords(onCircle.getX(), onCircle.getY());
+                            System.out.println("onCircle: ("+onCircle.getX()+", "+onCircle.getY()+")");
+
+
+                            final double distArcMin = wc.dist(wcDummy);
+                            //perform catalog query
+                            System.err.println("Querying Simbad at " + wc + " with a radius of " + distArcMin + " arcminutes");
+                            // symbolSpace.removeAllGlyphs();
+                            new SwingWorker(){
+                                @Override public List<AstroObject> construct(){
+                                    List<AstroObject> objs = null;
+                                    try{
+                                        //objs = SimbadCatQuery.makeSimbadCoordQuery(wc.getRaDeg(), wc.getDecDeg(), distArcMin);
+                                        System.out.println("SimbadCatQuery.makeSimbadCoordQuery("+ra+", "+dec+", "+distArcMin+")");
+                                        objs = SimbadCatQuery.makeSimbadCoordQuery(ra, dec, distArcMin);
+                                    } catch(IOException ioe){
+                                        ioe.printStackTrace();
+                                    } finally {
+                                        return objs;
+                                    }
                                 }
-                            }
-                            @Override public void finished(){
-                                List<AstroObject> objs = (List<AstroObject>)get();
-                                drawSymbols(objs);
-                                eh.fadeOutRightClickSelection();
-                            }
-                        }.start();
+                                @Override public void finished(){
+                                    List<AstroObject> objs = (List<AstroObject>)get();
+                                    System.out.println("drawSymbols("+objs+")");
+                                    drawSymbols(objs);
+                                    eh.fadeOutRightClickSelection();
 
-                        center = null;
-                        onCircle = null;
+                                }
+                            }.start();
 
+                            center = null;
+                            onCircle = null;
+                            pythonWCS.deleteObserver(this);
+
+                        }
                     }
-                    
 
                     System.out.println("updateQuery()");
                 } catch(JSONException e){
@@ -692,8 +752,9 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
         System.out.println("onCircle");
         System.out.println(onCircle);
 
-        double x = (center.x - fitsImageDescRef.getX()) + fitsImageDescRef.getWidth()/2 ;
-        double y = (center.y - fitsImageDescRef.getY()) + fitsImageDescRef.getHeight()/2 ;
+        /*
+        double x = (center.x); //+ fitsImageDescRef.getX()) - fitsImageDescRef.getWidth()/2 ;
+        double y = (center.y);// + fitsImageDescRef.getY()) - fitsImageDescRef.getHeight()/2 ;
 
         System.out.println( "(" + center.x + " - " + fitsImageDescRef.getX() + ") + " + fitsImageDescRef.getWidth() + "/2 = " + x  );
         System.out.println( "(" + center.y + " - " + fitsImageDescRef.getY() + ") + " + fitsImageDescRef.getHeight() + "/2 = " + y );
@@ -701,11 +762,60 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
         center.x = x;
         center.y = y;
 
-        x = (onCircle.x - fitsImageDescRef.getX()) + fitsImageDescRef.getWidth()/2 ;
-        y = (onCircle.y - fitsImageDescRef.getY()) + fitsImageDescRef.getHeight()/2 ;
+        VCross cr = new VCross(x, y, 1000, 200, 200, Color.RED, Color.WHITE, .8f);
+        cr.setStroke(new BasicStroke(2f));
+        mSpace.addGlyph(cr);
+
+        x = (onCircle.x + fitsImageDescRef.getX()) - fitsImageDescRef.getWidth()/2 ;
+        y = (onCircle.y + fitsImageDescRef.getY()) - fitsImageDescRef.getHeight()/2 ;
+
+        System.out.println( "(" + onCircle.x + " - " + fitsImageDescRef.getX() + ") + " + fitsImageDescRef.getWidth() + "/2 = " + x  );
+        System.out.println( "(" + onCircle.y + " - " + fitsImageDescRef.getY() + ") + " + fitsImageDescRef.getHeight() + "/2 = " + y );
 
         onCircle.x = x;
         onCircle.y = y;
+
+        */
+
+        VCross cr;
+
+
+        /*
+        VCross cr = new VCross(center.x, center.y, 1000, 400, 400, Color.RED, Color.WHITE, .8f);
+        cr.setStroke(new BasicStroke(2f));
+        mSpace.addGlyph(cr);
+
+        cr = new VCross(onCircle.x, onCircle.y, 1000, 400, 400, Color.BLUE, Color.WHITE, .8f);
+        cr.setStroke(new BasicStroke(2f));
+        mSpace.addGlyph(cr);
+
+
+        cr = new VCross(onCircle.x, onCircle.y, 1000, 200, 200, Color.BLUE, Color.WHITE, .8f);
+        cr.setStroke(new BasicStroke(2f));
+        mSpace.addGlyph(cr);
+        */
+
+        center.x = center.x - fitsImageDescRef.getX() + fitsImageDescRef.getWidth()/2;
+        center.y = center.y - fitsImageDescRef.getY() + fitsImageDescRef.getHeight()/2;
+
+        onCircle.x = onCircle.x - fitsImageDescRef.getX() + fitsImageDescRef.getWidth()/2;
+        onCircle.y = onCircle.y - fitsImageDescRef.getY() + fitsImageDescRef.getHeight()/2;
+
+
+        cr = new VCross(center.x, center.y, 1000, 200, 200, Color.RED, Color.WHITE, .8f);
+        cr.setStroke(new BasicStroke(2f));
+        mSpace.addGlyph(cr);
+
+
+        cr = new VCross(fitsImageDescRef.getX(), fitsImageDescRef.getY(), 1000, fitsImageDescRef.getWidth(), fitsImageDescRef.getHeight(), Color.GRAY, Color.WHITE, .8f);
+        cr.setStroke(new BasicStroke(2f));
+        mSpace.addGlyph(cr);
+
+        cr = new VCross(0, 0, 1000, 1000000, 1000000, Color.BLACK, Color.WHITE, .8f);
+        cr.setStroke(new BasicStroke(2f));
+        mSpace.addGlyph(cr);
+
+        double a = (mCamera.focal + mCamera.getAltitude()) / mCamera.focal;
 
         new Query(center, onCircle);
 
@@ -716,9 +826,128 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
         
     }
 
+
+    class DrawSymbol implements Observer{
+
+        //String id;
+        //AstroObject obj;
+
+        public DrawSymbol(){
+            pythonWCS.addObserver(this);
+        }
+
+        public void drawSymbol(double ra, double dec, String id){
+            pythonWCS.sendWorld2Pix(ra, dec, id);
+        }
+
+        /*
+        public DrawSymbol(double[] ras, double[] decs, String[] ids){
+            pythonWCS.addObserver(this);
+            pythonWCS.sendWorld2Pix(ras, decs, ids);
+        }
+        */
+
+        @Override
+        public void update(Observable obs, Object obj){
+            if(obj instanceof JSONObject){
+                try{
+
+                    System.out.println(obj);
+
+                    JSONObject json = (JSONObject) obj;
+
+                    String name = json.getString("name");
+                    
+
+                    if(name.equals("world2pix")){
+
+                        System.out.println("Draw Symbols: update");
+                        System.out.println(json);
+                        String id = json.getString("id");
+                        //double x = (json.getDouble("x") + fitsImageDescRef.getX()) - fitsImageDescRef.getWidth()/2 ;
+                        //double y = (json.getDouble("y") + fitsImageDescRef.getY()) - fitsImageDescRef.getHeight()/2 ;
+                        double[] l = windowToViewCoordinateFromCoordinateWCS(json.getDouble("x"), json.getDouble("y"));
+                        System.out.println("location: " + l[0] + ", " + l[1]);
+                        VCross cr = new VCross(l[0], l[1], 100, 20, 20, Color.YELLOW, Color.WHITE, .8f);
+                        cr.setStroke(AstroObject.AO_STROKE);
+                        VText lb = new VText(l[0]+10, l[1]+10, 101, Color.YELLOW, id, VText.TEXT_ANCHOR_START);
+                        lb.setBorderColor(Color.BLACK);
+                        lb.setTranslucencyValue(.6f);
+                        mSpace.addGlyph(cr);
+                        mSpace.addGlyph(lb);
+                        //cr.setOwner(this.obj);
+                        //lb.setOwner(this.obj);
+                        cr.setType(JSkyFitsMenu.T_ASTRO_OBJ);
+                        lb.setType(JSkyFitsMenu.T_ASTRO_OBJ);
+
+                        /*
+                        JSONArray arr = json.getJSONArray();
+
+                        for(int i = 0; arr.length(); i++ ){
+
+                            JSONObject iter = arr.getJSONObject(i);
+                            String id = iter.getString("id");
+                            double x = (iter.getDouble("x") + fitsImageDescRef.getX()) - fitsImageDescRef.getWidth()/2 ;
+                            double y = (iter.getDouble("y") + fitsImageDescRef.getY()) - fitsImageDescRef.getHeight()/2 ;
+
+                            VCross cr = new VCross(x, y, 100, 10, 10, Color.RED, Color.WHITE, .8f);
+                            cr.setStroke(AstroObject.AO_STROKE);
+                            VText lb = new VText(x+10, y+10, 101, Color.RED, id, VText.TEXT_ANCHOR_START);
+                            lb.setBorderColor(Color.BLACK);
+                            lb.setTranslucencyValue(.6f);
+                            mSpace.addGlyph(cr);
+                            mSpace.addGlyph(lb);
+                            //cr.setOwner(this.obj);
+                            //lb.setOwner(this.obj);
+                            cr.setType(JSkyFitsMenu.T_ASTRO_OBJ);
+                            lb.setType(JSkyFitsMenu.T_ASTRO_OBJ);
+                        }
+                        */
+                        
+
+                        //pythonWCS.deleteObserver(this);
+
+                    }
+                }catch(JSONException e){
+                    System.out.println(e);
+                }
+            }
+        }
+    }
+
     void drawSymbols(List<AstroObject> objs){
+
+        System.out.println("drawSymbols: size:" + objs.size());
+
+        /*
+
+        double[] ras = new double[objs.size()];
+        double[] decs = new double[objs.size()];
+        String[] ids = new String[objs.size()];
+
+        AstroObject ao;
+        for(int i = 0; i <  objs.size(); i++){
+            ao = objs.get(i);
+            ras[i] = ao.getRa();
+            decs[i] = ao.getDec();
+            ids[i] = ao.getIdentifier();
+        }
+
+        new DrawSymbol(ras, decs, ids);
+
+        */
+
+        DrawSymbol draw = new DrawSymbol();
+        
         for(AstroObject obj: objs){
+
+            System.out.print("AstroObject: ");
+            System.out.println(obj);
+            
+            draw.drawSymbol(obj.getRa(), obj.getDec(), obj.getIdentifier());
+
             // XXX
+            /*
             Point2D.Double p = new Point2D.Double();//img.wcs2vs(obj.getRa(), obj.getDec());
             VCross cr = new VCross(p.x, p.y, 100, 10, 10, Color.RED, Color.WHITE, .8f);
             cr.setStroke(AstroObject.AO_STROKE);
@@ -731,7 +960,9 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
             lb.setOwner(obj);
             cr.setType(JSkyFitsMenu.T_ASTRO_OBJ);
             lb.setType(JSkyFitsMenu.T_ASTRO_OBJ);
+            */
         }
+        
     }
 
 

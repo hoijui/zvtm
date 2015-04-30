@@ -63,7 +63,7 @@ def consumer():
 			print data['name']
 			#data['name'] = 'test'
 
-			if data['name'] != 'end':
+			if data['name'] != 'end' and data['name'] == 'pix2world':
 				methodToCall = getattr(wcsCoordinates, data['name'])
 				
 				ctype_x, ctype_y = wcsCoordinates.REFERENCE['ctype']
@@ -87,8 +87,18 @@ def consumer():
 
 				galactic = wcsCoordinates.worldgalactic(l, b)
 				ecuatorial = wcsCoordinates.worldecuatorial(ra, dec)
-				obj = {'name': data['name'], 'ra': float(ra), 'dec': float(dec), 'l': float(l), 'b': float(b), 'ecuatorial': ecuatorial, 'galactic': galactic, 'id': data['id']}
+				obj = {'name': data['name'], 'ra': float(ra), 'dec': float(dec), 'l': float(l), 'b': float(b), 'ecuatorial': ecuatorial, 'galactic': galactic, 'id': data['id'], 'x': data['x'], 'y': data['y']}
 				#p.publish( json.dumps(obj) , 'python')
+				p.publish( json.dumps(obj) , PRODUCER_ROUTINGKEY)
+
+			elif data['name'] != 'end' and data['name'] == 'world2pix':
+
+				methodToCall = getattr(wcsCoordinates, data['name'])
+
+				p_x, p_y = methodToCall(wcsCoordinates.REFERENCE['wcsdata'], data['ra'], data['dec'])
+
+
+				obj = {'name': data['name'], 'x': float(p_x), 'y': float(p_y), 'id': data['id'], 'ra': data['ra'], 'dec': data['dec']}
 				p.publish( json.dumps(obj) , PRODUCER_ROUTINGKEY)
 
 			else:

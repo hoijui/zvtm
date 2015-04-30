@@ -401,6 +401,8 @@ public class SmartiesManager implements Observer {
             application.cursorSpace.addGlyph(labelfst);
             application.cursorSpace.onTop(labelfst);
 
+            application.pythonWCS.addObserver(this);
+
             move(x, y);
 
         }
@@ -459,8 +461,9 @@ public class SmartiesManager implements Observer {
         public void updateWCS(){
             System.out.println("updateWCS()");
             Point2D.Double pWCS = new Point2D.Double(wc.getX(), wc.getY());
-            //System.out.println(pWCS);
-            application.coordinateWCS(pWCS, T_SMARTIES+"_"+id, this);
+            System.out.println("WallCursor: ");
+            System.out.println(pWCS);
+            application.coordinateWCS(pWCS, T_SMARTIES+"_"+id);
             /*
             if(isLabelVisible){
                 application.coordinateWCS(pWCS);
@@ -573,6 +576,7 @@ public class SmartiesManager implements Observer {
                 smarties.movePuck(se.p.id, 0.5f, 0.5f);
                 MyCursor c = (MyCursor)se.p.app_data;
                 c.move(se.p.x, se.p.y);
+                c.updateWCS();
             }
             return true;
         }

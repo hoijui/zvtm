@@ -149,7 +149,7 @@ class JSkyFitsViewerEventHandler implements ViewListener {
 
         // second point (end dragging) defines the radius of the query zone
         //Point2D.Double rightClickRelease = v.getVCursor().getVSCoordinates(app.cursorCamera);
-        Point2D.Double coordClickRelease = v.getVCursor().getVSCoordinates(app.cursorCamera);
+        Point2D.Double coordClickRelease = v.getVCursor().getVSCoordinates(app.mCamera);
 
         // make query
         app.querySimbad(coordClickPress, coordClickRelease);
@@ -163,6 +163,7 @@ class JSkyFitsViewerEventHandler implements ViewListener {
             v.parent.setActiveLayer(app.LAYER_MENU);
             v.parent.setCursorIcon(Cursor.DEFAULT_CURSOR);
         }
+        app.rPicker.setVSCoordinates(v.getVCursor().getVSXCoordinate(), v.getVCursor().getVSYCoordinate());
     }
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){

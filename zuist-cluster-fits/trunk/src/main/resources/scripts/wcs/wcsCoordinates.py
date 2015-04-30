@@ -75,9 +75,31 @@ def set_reference(src_path):
 
 
 def pix2world(wcsdata, x, y):
+	print "pix2world"
+	print "x: %f -- y: %f" % (x, y)
+	ra, dec = wcsdata.wcs_pix2world(x, y, 1)
+	print "ra: %f -- dec: %f" % (ra, dec)
+	xx, yy = wcsdata.wcs_world2pix(ra, dec, 0)
+	print "xx: %f -- yy: %f" % (xx, yy)
 	return wcsdata.wcs_pix2world(x, y, 1)
+
 def world2pix(wcsdata, ra, dec):
-	return wcsdata.wcs_world2pix(ra, dec, 0)
+	print "world2pix"
+	print "ra: %f -- dec: %f" % (ra, dec)
+	ctype_x, ctype_y = wcsdata.wcs.ctype
+	print wcsdata.wcs.ctype
+	
+	if "GLON" in ctype_x and "GLAT" in ctype_y:
+		l, b = icrs2galactic(ra, dec)
+		px, py = wcsdata.wcs_world2pix(l, b, 0)
+	elif "RA" in ctype_x and "DEC" in ctype_y:
+		px, py = wcsdata.wcs_world2pix(ra, dec, 0)
+
+	print "x: %f -- y: %f" % (px, py)
+	rara, decdec = wcsdata.wcs_pix2world(px, py, 1)
+	print "rara: %f -- decdec: %f" % (rara, decdec)
+
+	return [px, py]
 
 def icrs2galactic(ra, dec):
 	print "ra: %f - dec: %f" % (ra, dec)

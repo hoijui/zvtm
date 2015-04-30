@@ -11,6 +11,7 @@ import com.rabbitmq.client.Channel;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONArray;
 
 import java.awt.geom.Point2D;
 
@@ -115,7 +116,6 @@ public class PythonWCS extends Observable{
 
             c.startConsuming(CONSUMER_TAG, new LocalConsumer(ch));
 
-           // wcs = new MsgWCS();
             System.out.println("new PythonWCS() -- countObservers(): " + countObservers());
 
         } catch (IOException e){
@@ -130,7 +130,7 @@ public class PythonWCS extends Observable{
     */
 
 
-    public void sendCoordinate(double x, double y, String id, Observer obs){
+    public void sendPix2World(double x, double y, String id){
 
         //synchronized(this) {
             try{
@@ -142,7 +142,7 @@ public class PythonWCS extends Observable{
                 json.put("y", y);
 
                 System.out.println("wcs.countObservers(): " + countObservers());
-                addObserver(obs);
+                //addObserver(obs);
                 System.out.println("wcs.countObservers(): " + countObservers());
 
                 producer.publish(json.toString(), PRODUCER_ROUTINGKEY);
@@ -166,6 +166,88 @@ public class PythonWCS extends Observable{
         //}
         
     }
+
+    public void sendWorld2Pix(double ra, double dec, String id){
+
+        //synchronized(this) {
+            try{
+            
+                JSONObject json = new JSONObject();
+                json.put("id", id);
+                json.put("name", "world2pix");
+                json.put("ra", ra);
+                json.put("dec", dec);
+
+                //System.out.println("wcs.countObservers(): " + countObservers());
+                //addObserver(obs);
+                System.out.println("wcs.countObservers(): " + countObservers());
+
+                producer.publish(json.toString(), PRODUCER_ROUTINGKEY);
+                System.out.println("Message " + json.toString() + " sent.");
+
+                //wait();
+            
+            /*
+            } catch (InterruptedException e){
+
+                e.printStackTrace(System.out);
+                System.out.println("Interrupted");
+            */
+            } catch (JSONException e){
+                e.printStackTrace(System.out);
+                System.out.println("Error send a JSON");
+            } catch (IOException e){
+                e.printStackTrace(System.out);
+                System.out.println("Error IO");
+            }
+        //}
+        
+    }
+
+    /*
+    public void sendWorld2Pix(double[] ra, double[] dec, String[] id){
+
+        //synchronized(this) {
+            try{
+            
+                JSONObject json = new JSONObject();
+                
+                json.put("name", "world2pix");
+                JSONArray arr = new JSONArray();
+                for(int i = 0; i < ra.length; i++){
+                    JSONObject coor = new JSONObject();
+                    coor.put("id", id[i]);
+                    coor.put("ra", ra[i]);
+                    coor.put("dec", dec[i]);
+                    arr.put(coor);
+                }
+                json.put("coords", arr);
+                System.out.println("wcs.countObservers(): " + countObservers());
+                //addObserver(obs);
+                //System.out.println("wcs.countObservers(): " + countObservers());
+
+                producer.publish(json.toString(), PRODUCER_ROUTINGKEY);
+                System.out.println("Message " + json.toString() + " sent.");
+
+                //wait();
+            
+            /*
+            } catch (InterruptedException e){
+
+                e.printStackTrace(System.out);
+                System.out.println("Interrupted");
+            *
+            } catch (JSONException e){
+                e.printStackTrace(System.out);
+                System.out.println("Error send a JSON");
+            } catch (IOException e){
+                e.printStackTrace(System.out);
+                System.out.println("Error IO");
+            }
+        //}
+        
+    }
+    */
 
     public void setReference(String src_path){
 

@@ -79,11 +79,15 @@ import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zuist.engine.Region;
 import fr.inria.zuist.engine.Level;
+import fr.inria.zuist.engine.RegionPicker;
 import fr.inria.zuist.event.RegionListener;
 import fr.inria.zuist.event.LevelListener;
 import fr.inria.zuist.event.ProgressListener;
 import fr.inria.zuist.engine.ObjectDescription;
 import fr.inria.zuist.engine.FitsImageDescription;
+
+import fr.inria.zvtm.engine.ViewPanel;
+import java.awt.event.MouseEvent;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -145,19 +149,21 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     
     /* ZVTM objects */
     VirtualSpaceManager vsm;
-    static final String mSpaceName = "Scene Space";
+    
     static final String mSpaceKsName = "SceneKsSpace";
     static final String mSpaceHName = "SceneHSpace";
     static final String mSpaceJName = "SceneJSpace";
-    static final String pMnSpaceName = "PieMenu Space";
-    static final String mnSpaceName = "Menu Space";
+    static final String mSpaceName = "SceneSpace";
+    static final String pMnSpaceName = "PieMenuSpace";
+    static final String mnSpaceName = "MenuSpace";
     static final String cursorSpaceName = "CursorSpace";
-    static final String ovSpaceName = "Overlay Space";
+    static final String ovSpaceName = "OverlaySpace";
 
-    static final int LAYER_SCENE = 0;
-    static final int LAYER_SCENE_KS = 1;
-    static final int LAYER_SCENE_H = 2;
-    static final int LAYER_SCENE_J = 3;
+    
+    static final int LAYER_SCENE_KS = 0;
+    static final int LAYER_SCENE_H = 1;
+    static final int LAYER_SCENE_J = 2;
+    static final int LAYER_SCENE = 3;
     static final int LAYER_PIEMENU = 4;
     static final int LAYER_MENU = 5;
     static final int LAYER_CURSOR = 6;
@@ -199,6 +205,8 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     SmartiesManager smartiesMngr;
     TuioEventHandler teh;
 
+    public RegionPicker rPicker;
+
     public FitsImageDescription fitsImageDescRef;
     //public Object fitsImageDescRef;
     //NomWcsKeywordProvider wcsKeyProviderRef;
@@ -209,7 +217,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     String reference;
 
     public PythonWCS pythonWCS;
-    boolean galacticalSystem = false;
+    //boolean galacticalSystem = false;
     
     //JSONArray readed;
     //Vector<SavedPosition> savedPositions;
@@ -236,6 +244,11 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         sm = new SceneManager(sceneSpaces, sceneCameras, parseSceneOptions(options));
         sm.setRegionListener(this);
         sm.setLevelListener(this);
+
+        // create a picker that will only consider regions visible at ZUIST levels 3 through 5 (any of these levels or all of them)
+        rPicker = sm.createRegionPicker(0,8);
+        rPicker.setListener(this);
+
 		previousLocations = new Vector();
 		ovm.initConsole();
         if (options.xmlSceneFile != null){
@@ -273,20 +286,22 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         vsm = VirtualSpaceManager.INSTANCE;
         vsm.setMaster("FitsViewer");
 
-        mSpace = vsm.addVirtualSpace(mSpaceName);
+        
         mSpaceKs = vsm.addVirtualSpace(mSpaceKsName);
         mSpaceH = vsm.addVirtualSpace(mSpaceHName);
         mSpaceJ = vsm.addVirtualSpace(mSpaceJName);
+        mSpace = vsm.addVirtualSpace(mSpaceName);
         pMnSpace = vsm.addVirtualSpace(pMnSpaceName);
         mnSpace = vsm.addVirtualSpace(mnSpaceName);
         cursorSpace = vsm.addVirtualSpace(cursorSpaceName);
         ovSpace = vsm.addVirtualSpace(ovSpaceName);
         
 
-        mCamera = mSpace.addCamera();
+        
         mCameraKs = mSpaceKs.addCamera();
         mCameraH = mSpaceH.addCamera();
         mCameraJ = mSpaceJ.addCamera();
+        mCamera = mSpace.addCamera();
 
         mCamera.stick(mCameraKs);
         mCamera.stick(mCameraH);
@@ -300,10 +315,11 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 
         Vector cameras = new Vector();
 
-        cameras.add(mCamera);
+        
         cameras.add(mCameraKs);
         cameras.add(mCameraH);
         cameras.add(mCameraJ);
+        cameras.add(mCamera);
 		cameras.add(vsm.getVirtualSpace(pMnSpaceName).getCamera(0));
 		cameras.add(mnCamera);
         cameras.add(cursorCamera);
@@ -312,10 +328,11 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         mView = vsm.addFrameView(cameras, mViewName, (options.opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, !options.fullscreen, initMenu());
         Vector<Camera> sceneCam = new Vector<Camera>();
 
-        sceneCam.add(mCamera);
+        
         sceneCam.add(mCameraKs);
         sceneCam.add(mCameraH);
         sceneCam.add(mCameraJ);
+        sceneCam.add(mCamera);
         sceneCam.add(cursorCamera);
 
         ClusterGeometry clGeom = new ClusterGeometry(options.blockWidth, options.blockHeight, options.numCols, options.numRows);
@@ -345,10 +362,11 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         mView.setEventHandler(eh, 1);
         mView.setEventHandler(ovm, 2);
         */
-        mView.setListener(eh, LAYER_SCENE);
+        
         mView.setListener(eh, LAYER_SCENE_KS);
         mView.setListener(eh, LAYER_SCENE_H);
         mView.setListener(eh, LAYER_SCENE_J);
+        mView.setListener(eh, LAYER_SCENE);
         mView.setListener(eh, LAYER_PIEMENU);
         mView.setListener(menu, LAYER_MENU);
         mView.setListener(eh, LAYER_CURSOR);
@@ -862,7 +880,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 
     
     
-    public void coordinateWCS(Point2D.Double xy, String id, Observer obs){
+    public void coordinateWCS(Point2D.Double xy, String id){
 
         try {
 
@@ -903,7 +921,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 
             //pythonWCS.changeCoordinateSystem(galacticalSystem);
             //pythonWCS.sendCoordinate(x, y, mc);
-            pythonWCS.sendCoordinate(x, y, id, obs);
+            pythonWCS.sendPix2World(x, y, id);
 
         } catch (NullPointerException e){
             e.printStackTrace(System.out);
@@ -1324,6 +1342,8 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         r[1] = yy;
         return r;
     }
+
+    
 
 
 	public void centerOnObject(String id){
