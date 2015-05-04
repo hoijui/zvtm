@@ -101,6 +101,13 @@ def consumer():
 				obj = {'name': data['name'], 'x': float(p_x), 'y': float(p_y), 'id': data['id'], 'ra': data['ra'], 'dec': data['dec']}
 				p.publish( json.dumps(obj) , PRODUCER_ROUTINGKEY)
 
+			elif data['name'] != 'end' and data['name'] == 'set_reference':
+				print "call set_reference()"
+				methodToCall = getattr(wcsCoordinates, data['name'])
+
+				wcsCoordinates.set_reference(data['src_path'])
+
+
 			else:
 				kill = True
 
@@ -129,9 +136,10 @@ def main(argv=sys.argv):
 	ini = time.time()
 
 	wcsCoordinates.main(argv)
-
+	print "wcsCoordinates"
 
 	consumer()
+
 	
 
 	end = time.time()

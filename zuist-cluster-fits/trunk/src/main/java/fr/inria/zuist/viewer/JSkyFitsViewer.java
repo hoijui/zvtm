@@ -149,6 +149,7 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
 
     
     public JSkyFitsViewer(Options options){
+
         super(options);
         /*
 		ovm = new FitsOverlayManager(this);
@@ -188,6 +189,7 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
 
         
         */
+
 
         draw = new DrawSymbol();
         query = new Query();
@@ -610,6 +612,14 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
 
                         fitsImageDescRef = (JSkyFitsImageDescription)desc;
 
+                        if(pythonWCS != null){
+                            System.out.println("pythonWCS.setReference("+fitsImageDescRef.getSrc().getPath()+")");
+
+                            pythonWCS.setReference(fitsImageDescRef.getSrc().getPath());
+                        } else {
+                            System.out.println("pythonWCS == null. setReference() failed");
+                        }
+
                         /*
                         try{
                             fitsImageDescRef = (FitsImageDescription)desc;
@@ -844,6 +854,8 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
 
         //String id;
         //AstroObject obj;
+
+        public static final String T_DRAW = "Draw";
 
         public DrawSymbol(){
             pythonWCS.addObserver(this);

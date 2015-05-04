@@ -75,8 +75,8 @@ CMD_LINE_HELP = "ZUIST Image Tiling Script\n\nUsage:\n\n" + \
     "\t-f\t\tforce tile generation\n"+\
     "\t-tl=N\t\ttrace level (N in [0:3])\n"+\
     "\t-idprefix=p\tcustom prefix for all region and objects IDs\n"+\
-    "\t-dx=y\t\tx offset for all regions and objects\n"+\
-    "\t-dy=x\t\ty offset for all regions and objects\n"+\
+    "\t-dx=x\t\tx offset for all regions and objects\n"+\
+    "\t-dy=y\t\ty offset for all regions and objects\n"+\
     "\t-dl=l\t\tlevel offset for all regions and objects\n"+\
     "\t-scale=s\ts scale factor w.r.t default size for PDF input\n"+\
     "\t-layer=name\tname layer from the zuist\n"+\

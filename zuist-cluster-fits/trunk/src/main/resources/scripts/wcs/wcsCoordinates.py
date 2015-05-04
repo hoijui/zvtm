@@ -131,18 +131,15 @@ def worldecuatorial(ra, dec):
 def main(argv):
 	global REFERENCE
 
-	if len(argv) > 1:
-		SRC_PATH = os.path.realpath(argv[1])
-	else:
-		print "You need parameter of Fits image reference"
-		return
-
 	if not SUCCEEDED_IMPORTING_ASTROPY and not SUCCEEDED_IMPORTING_NUMPY:
 		print "You need library Astropy and Numpy"
 		return
 	else:
-		if not set_reference(SRC_PATH):
-			return
+		if len(argv) > 1:
+			SRC_PATH = os.path.realpath(argv[1])
+			set_reference(SRC_PATH)
+		else:
+			SRC_PATH = ""
 		
 
 

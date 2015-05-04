@@ -249,6 +249,8 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         rPicker = sm.createRegionPicker(0,8);
         rPicker.setListener(this);
 
+        pythonWCS = new PythonWCS();
+
 		previousLocations = new Vector();
 		ovm.initConsole();
         if (options.xmlSceneFile != null){
@@ -276,7 +278,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 
         //reference = options.reference;
 
-        pythonWCS = new PythonWCS();
+        
         //pythonWCS.sendCoordinate(0,0, null);
 
     }
@@ -577,6 +579,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 
     public void loadFitsReference(){
         if(reference == null){
+            
             for(ObjectDescription desc: sm.getObjectDescriptions()){
                 if(desc instanceof FitsImageDescription){
                     if( ((FitsImageDescription)desc).isReference()){
