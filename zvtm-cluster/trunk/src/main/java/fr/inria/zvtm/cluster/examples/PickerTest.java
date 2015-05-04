@@ -23,9 +23,9 @@ import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
-import fr.inria.zvtm.glyphs.VShape;
 import fr.inria.zvtm.glyphs.VRectangleOr;
-import fr.inria.zvtm.glyphs.VCircle;
+import fr.inria.zvtm.event.PickerListener;
+import fr.inria.zvtm.engine.PickerVS;
 
 import java.awt.Color;
 import java.awt.geom.Point2D;
@@ -41,14 +41,16 @@ import org.jdesktop.animation.timing.interpolation.*;
 /**
  * Sample master application.
  */
-public class Test {
+public class PickerTest {
     //shortcut
     private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE;
 
     VirtualSpace vs;
 
-    Test(TestOptions options){
-        vsm.setMaster("Test");
+    PickerVS pvs = new PickerVS();
+
+    PickerTest(TestOptions options){
+        vsm.setMaster("PickerTest");
         vs = vsm.addVirtualSpace("testSpace");
         Camera cam = vs.addCamera();
         Vector<Camera> cameras = new Vector<Camera>();
@@ -72,25 +74,23 @@ public class Test {
         //that lets an user navigate the scene
         View view = vsm.addFrameView(cameras, "Master View",
                 View.STD_VIEW, 800, 600, false, true, true, null);
-        view.setListener(new PanZoomEventHandler());
+        PanZoomEventHandler eh = new PanZoomEventHandler();
+        view.setListener(eh);
+        pvs.setListener(eh);
         view.setBackgroundColor(Color.LIGHT_GRAY);
         populate();
     }
 
-    VRectangleOr r;
-
     void populate(){
-        r = new VRectangleOr(0,0,0,100,40,Color.GREEN,0.707);
-        vs.addGlyph(r);
-    }
-
-    void rotate(){
-        r.orientTo(r.getOrient()+Math.PI/12d);
-    }
-
-
-    void rescale(){
-        r.sizeTo(r.getSize()*1.2);
+        vs.addGlyph(new VRectangleOr(200,100,0,300,200,Color.RED, 0.707));
+        Point2D.Double[] vertices = new Point2D.Double[]{
+            new Point2D.Double(-100,-100),
+            new Point2D.Double(0,-100),
+            new Point2D.Double(50,0),
+            new Point2D.Double(0,100),
+            new Point2D.Double(-100,100)
+        };
+        vs.addGlyph(new VPolygonOr(vertices, 0, Color.CYAN, 0.4));
     }
 
     public static void main(String[] args){
@@ -109,10 +109,10 @@ public class Test {
             parser.printUsage(System.err);
             return;
         }
-        new Test(options);
+        new PickerTest(options);
     }
 
-    private class PanZoomEventHandler implements ViewListener{
+    private class PanZoomEventHandler implements ViewListener, PickerListener {
         private int lastJPX;
         private int lastJPY;
 
@@ -147,7 +147,10 @@ public class Test {
 
         public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
-        public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){}
+        public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
+            pvs.setVSCoordinates(v.getVCursor().getVSXCoordinate(), v.getVCursor().getVSYCoordinate());
+            pvs.computePickedGlyphList(v.cams[0]);
+        }
 
         public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
             if (buttonNumber == 1){
@@ -189,6 +192,17 @@ public class Test {
             vsm.stop();
             System.exit(0);
         }
+
+        public void enterGlyph(Glyph g){
+            g.highlight(true, null);
+            System.out.println("Entered " + g);
+        }
+
+        public void exitGlyph(Glyph g){
+            g.highlight(false, null);
+            System.out.println("Exited " + g);
+        }
+
     }
 }
 
