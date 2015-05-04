@@ -143,6 +143,10 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
     
     //@Override
     public JSkyFitsImageDescription fitsImageDescRef;
+
+    private DrawSymbol draw;
+    private Query query;
+
     
     public JSkyFitsViewer(Options options){
         super(options);
@@ -184,6 +188,9 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
 
         
         */
+
+        draw = new DrawSymbol();
+        query = new Query();
 
     }
     //void initGUI(boolean fullscreen, boolean opengl, boolean antialiased){
@@ -660,11 +667,17 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
         public static final String T_QUERY = "Query";
         Point2D.Double center;
         Point2D.Double onCircle;
-        public Query(Point2D.Double center, Point2D.Double onCircle){
+        public Query(){
             pythonWCS.addObserver(this);
+        }
+
+        public void callQuery(Point2D.Double center, Point2D.Double onCircle){
+            this.center = null;
+            this.onCircle = null;
             pythonWCS.sendPix2World(center.x, center.y, T_QUERY+"_CENTER");
             pythonWCS.sendPix2World(onCircle.x, onCircle.y, T_QUERY+"_ONCIRCLE");
         }
+
         @Override
         public void update(Observable obs, Object obj){
             if(obj instanceof JSONObject){
@@ -706,8 +719,8 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
                                     List<AstroObject> objs = null;
                                     try{
                                         //objs = SimbadCatQuery.makeSimbadCoordQuery(wc.getRaDeg(), wc.getDecDeg(), distArcMin);
-                                        System.out.println("SimbadCatQuery.makeSimbadCoordQuery("+ra+", "+dec+", "+distArcMin+")");
-                                        objs = SimbadCatQuery.makeSimbadCoordQuery(ra, dec, distArcMin);
+                                        System.out.println("SimbadCatQuery.makeSimbadCoordQuery("+wc.getRaDeg()+", "+wc.getDecDeg()+", "+distArcMin+")");
+                                        objs = SimbadCatQuery.makeSimbadCoordQuery(wc.getRaDeg(), wc.getDecDeg(), distArcMin);
                                     } catch(IOException ioe){
                                         ioe.printStackTrace();
                                     } finally {
@@ -725,7 +738,7 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
 
                             center = null;
                             onCircle = null;
-                            pythonWCS.deleteObserver(this);
+                            //pythonWCS.deleteObserver(this);
 
                         }
                     }
@@ -817,7 +830,7 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
 
         double a = (mCamera.focal + mCamera.getAltitude()) / mCamera.focal;
 
-        new Query(center, onCircle);
+        query.callQuery(center, onCircle);
 
         // XXX
         //Point2D.Double centerWCS = coordinateWCS(xy); //new Point2D.Double();//img.vs2wcs(center.x, center.y);
@@ -936,8 +949,6 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
         new DrawSymbol(ras, decs, ids);
 
         */
-
-        DrawSymbol draw = new DrawSymbol();
         
         for(AstroObject obj: objs){
 
