@@ -30,6 +30,7 @@ import java.awt.Stroke;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.awt.geom.Path2D;
 
 import fr.inria.zvtm.glyphs.projection.BProjectedCoordsP;
 
@@ -52,6 +53,8 @@ public class VShape<T> extends ClosedShape {
     int[] ycoords;
     int[] lxcoords;
     int[] lycoords;
+
+    Path2D.Double p;
 
     /**
      *@param v Vertex distances to the shape's center in the [0-1.0] range (relative to bounding circle). Vertices are laid out counter clockwise, with the first vertex placed at the same X coordinate as the shape's center (provided orient=0).
@@ -109,6 +112,7 @@ public class VShape<T> extends ClosedShape {
         lxcoords = new int[vertices.length];
         lycoords = new int[vertices.length];
         orient = or;
+        updateVSPolygon();
         setColor(c);
         setBorderColor(bc);
         setTranslucencyValue(alpha);
@@ -150,11 +154,24 @@ public class VShape<T> extends ClosedShape {
     }
 
     @Override
+    public void moveTo(double x, double y){
+        super.moveTo(x, y);
+        updateVSPolygon();
+    }
+
+    @Override
+    public void move(double x, double y){
+        super.move(x, y);
+        updateVSPolygon();
+    }
+
+    @Override
     public double getOrient(){return orient;}
 
     @Override
     public void orientTo(double angle){
         orient=angle;
+        updateVSPolygon();
         VirtualSpaceManager.INSTANCE.repaint();
     }
 
@@ -164,13 +181,28 @@ public class VShape<T> extends ClosedShape {
     @Override
     public void sizeTo(double s){
         size = s;
+        updateVSPolygon();
         VirtualSpaceManager.INSTANCE.repaint();
     }
 
     @Override
     public void reSize(double factor){
         size *= factor;
+        updateVSPolygon();
         VirtualSpaceManager.INSTANCE.repaint();
+    }
+
+    void updateVSPolygon(){
+        p = new Path2D.Double(Path2D.WIND_EVEN_ODD, vertices.length);
+        double vertexAngle = orient;
+        double da = 2 * Math.PI / vertices.length;
+        double r = size / 2d;
+        p.moveTo(vx + r*Math.cos(vertexAngle)*vertices[0], vy+r*Math.sin(vertexAngle)*vertices[0]);
+        for (int j=1;j<vertices.length;j++){
+            vertexAngle += da;
+            p.lineTo(vx + r*Math.cos(vertexAngle)*vertices[j], vy+r*Math.sin(vertexAngle)*vertices[j]);
+        }
+        p.closePath();
     }
 
     @Override
@@ -182,19 +214,17 @@ public class VShape<T> extends ClosedShape {
 
     @Override
     public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
-        return coordInsideP(jpx, jpy, camIndex);
+        return coordInsideV(cvx, cvy, camIndex);
     }
 
     @Override
     public boolean coordInsideV(double cvx, double cvy, int camIndex){
-        // NOT IMPLEMENTED
-        return false;
+        return p.contains(cvx, cvy);
     }
 
     @Override
     public boolean coordInsideP(int jpx, int jpy, int camIndex){
-        if (pc[camIndex].p.contains(jpx, jpy)){return true;}
-        else {return false;}
+        return pc[camIndex].p.contains(jpx, jpy);
     }
 
     /** The disc is actually approximated to its bounding box here. Precise intersection computation would be too costly. */

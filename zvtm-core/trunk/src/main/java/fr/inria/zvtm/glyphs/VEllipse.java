@@ -52,6 +52,8 @@ public class VEllipse<T> extends ClosedShape implements RectangularShape {
     /*array of projected coordinates - index of camera in virtual space is equal to index of projected coords in this array*/
     ProjEllipse[] pc;
 
+    Ellipse2D ve;
+
     /**
      *creates a new default white ellipse
      */
@@ -104,6 +106,7 @@ public class VEllipse<T> extends ClosedShape implements RectangularShape {
         setColor(c);
         setBorderColor(bc);
         computeSize();
+        updateVSEllipse();
         setTranslucencyValue(alpha);
     }
 
@@ -142,10 +145,23 @@ public class VEllipse<T> extends ClosedShape implements RectangularShape {
     pc[index]=null;
     }
 
+    @Override
+    public void moveTo(double x, double y){
+        super.moveTo(x, y);
+        updateVSEllipse();
+    }
+
+    @Override
+    public void move(double x, double y){
+        super.move(x, y);
+        updateVSEllipse();
+    }
+
     /** Cannot be reoriented. */
     @Override
     public double getOrient(){return 0;}
 
+    /** Cannot be reoriented. */
     @Override
     public void orientTo(double angle){}
 
@@ -168,18 +184,21 @@ public class VEllipse<T> extends ClosedShape implements RectangularShape {
             vh = size;
             vw = vh * ar;
         }
+        updateVSEllipse();
         VirtualSpaceManager.INSTANCE.repaint();
     }
 
     public void setWidth(double w){
         vw = w;
         computeSize();
+        updateVSEllipse();
         VirtualSpaceManager.INSTANCE.repaint();
     }
 
     public void setHeight(double h){
         vh = h;
         computeSize();
+        updateVSEllipse();
         VirtualSpaceManager.INSTANCE.repaint();
     }
 
@@ -198,7 +217,17 @@ public class VEllipse<T> extends ClosedShape implements RectangularShape {
             vh = size;
             vw = vh*ar;
         }
+        updateVSEllipse();
         VirtualSpaceManager.INSTANCE.repaint();
+    }
+
+    void updateVSEllipse(){
+        if (ve != null){
+            ve.setFrame(vx-vw/2d, vy-vh/2d, vw, vh);
+        }
+        else {
+            ve = new Ellipse2D.Double(vx-vw/2d, vy-vh/2d, vw, vh);
+        }
     }
 
     /** Get the bounding box of this Glyph in virtual space coordinates.
@@ -217,19 +246,17 @@ public class VEllipse<T> extends ClosedShape implements RectangularShape {
 
     @Override
     public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
-        return coordInsideP(jpx, jpy, camIndex);
+        return coordInsideV(cvx, cvy, camIndex);
     }
 
     @Override
     public boolean coordInsideV(double cvx, double cvy, int camIndex){
-        // NOT IMPLEMENTED
-        return false;
+        return ve.contains(cvx, cvy);
     }
 
     @Override
     public boolean coordInsideP(int jpx, int jpy, int camIndex){
-        if (pc[camIndex].ellipse.contains(jpx, jpy)){return true;}
-        else {return false;}
+        return pc[camIndex].ellipse.contains(jpx, jpy);
     }
 
     /** The disc is actually approximated to its bounding box here. Precise intersection computation would be too costly. */

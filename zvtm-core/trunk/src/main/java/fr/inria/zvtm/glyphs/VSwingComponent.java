@@ -16,6 +16,7 @@ import java.awt.Shape;
 import java.awt.Polygon;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Path2D;
 import javax.swing.JComponent;
 
 import fr.inria.zvtm.glyphs.projection.RProjectedCoordsP;
@@ -66,6 +67,8 @@ public class VSwingComponent<T> extends ClosedShape implements RectangularShape 
 
     /** For internal use. Made public for easier outside package subclassing. */
     public double trueCoef = 1.0f;
+
+    Path2D.Double p;
 
     /** Instantiate a Swing component at (0, 0) with original scale.
      *@param c Swing component to be displayed
@@ -129,6 +132,7 @@ public class VSwingComponent<T> extends ClosedShape implements RectangularShape 
         computeSize();
         orient = or;
         scaleFactor = scale;
+        updateVSPolygon();
         setTranslucencyValue(alpha);
         setDrawBorder(false);
     }
@@ -169,6 +173,18 @@ public class VSwingComponent<T> extends ClosedShape implements RectangularShape 
     }
 
     @Override
+    public void moveTo(double x, double y){
+        super.moveTo(x, y);
+        updateVSPolygon();
+    }
+
+    @Override
+    public void move(double x, double y){
+        super.move(x, y);
+        updateVSPolygon();
+    }
+
+    @Override
     public double getOrient(){return orient;}
 
     /** Set the glyph's absolute orientation.
@@ -177,6 +193,7 @@ public class VSwingComponent<T> extends ClosedShape implements RectangularShape 
     @Override
     public void orientTo(double angle){
         orient = angle;
+        updateVSPolygon();
         VirtualSpaceManager.INSTANCE.repaint();
     }
 
@@ -193,6 +210,7 @@ public class VSwingComponent<T> extends ClosedShape implements RectangularShape 
         vh = vw / ar;
         computeSize();
         scaleFactor = size / Math.sqrt(Math.pow(sc.getWidth(),2)+Math.pow(sc.getHeight(),2));
+        updateVSPolygon();
         VirtualSpaceManager.INSTANCE.repaint();
     }
 
@@ -201,6 +219,7 @@ public class VSwingComponent<T> extends ClosedShape implements RectangularShape 
         vw = vh * ar;
         computeSize();
         scaleFactor = size / Math.sqrt(Math.pow(sc.getWidth(),2)+Math.pow(sc.getHeight(),2));
+        updateVSPolygon();
         VirtualSpaceManager.INSTANCE.repaint();
     }
 
@@ -214,6 +233,7 @@ public class VSwingComponent<T> extends ClosedShape implements RectangularShape 
         vw = (size*ar) / (Math.sqrt(ar*ar+1));
         vh = size / (Math.sqrt(ar*ar+1));
         scaleFactor = size / Math.sqrt(Math.pow(sc.getWidth(),2)+Math.pow(sc.getHeight(),2));
+        updateVSPolygon();
         VirtualSpaceManager.INSTANCE.repaint();
     }
 
@@ -223,7 +243,21 @@ public class VSwingComponent<T> extends ClosedShape implements RectangularShape 
         vw = (size*ar) / (Math.sqrt(ar*ar+1));
         vh = size / (Math.sqrt(ar*ar+1));
         scaleFactor = size / Math.sqrt(Math.pow(sc.getWidth(),2)+Math.pow(sc.getHeight(),2));
+        updateVSPolygon();
         VirtualSpaceManager.INSTANCE.repaint();
+    }
+
+    void updateVSPolygon(){
+        double x1 = -vw/2d;
+        double y1 = -vh/2d;
+        double x2 = vw/2d;
+        double y2 = vh/2d;
+        p = new Path2D.Double(Path2D.WIND_EVEN_ODD, 4);
+        p.moveTo((x2*Math.cos(orient)-y2*Math.sin(orient))+vx, (x2*Math.sin(orient)+y2*Math.cos(orient))+vy);
+        p.lineTo((x1*Math.cos(orient)-y2*Math.sin(orient))+vx, (x1*Math.sin(orient)+y2*Math.cos(orient))+vy);
+        p.lineTo((x1*Math.cos(orient)-y1*Math.sin(orient))+vx, (x1*Math.sin(orient)+y1*Math.cos(orient))+vy);
+        p.lineTo((x2*Math.cos(orient)-y1*Math.sin(orient))+vx, (x2*Math.sin(orient)+y1*Math.cos(orient))+vy);
+        p.closePath();
     }
 
     /** Get the bounding box of this Glyph in virtual space coordinates.
@@ -243,6 +277,7 @@ public class VSwingComponent<T> extends ClosedShape implements RectangularShape 
         vh = sc.getHeight() * scaleFactor;
         ar = vw / vh;
         computeSize();
+        updateVSPolygon();
         VirtualSpaceManager.INSTANCE.repaint();
     }
 
@@ -278,19 +313,17 @@ public class VSwingComponent<T> extends ClosedShape implements RectangularShape 
 
     @Override
     public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
-        return coordInsideP(jpx, jpy, camIndex);
+        return coordInsideV(cvx, cvy, camIndex);
     }
 
     @Override
     public boolean coordInsideV(double cvx, double cvy, int camIndex){
-        // NOT IMPLEMENTED
-        return false;
+        return p.contains(cvx, cvy);
     }
 
     @Override
     public boolean coordInsideP(int jpx, int jpy, int camIndex){
-        if (pc[camIndex].p.contains(jpx, jpy)){return true;}
-        else {return false;}
+        return pc[camIndex].p.contains(jpx, jpy);
     }
 
     @Override

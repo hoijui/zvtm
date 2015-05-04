@@ -33,6 +33,7 @@ import fr.inria.zvtm.glyphs.VSegment;
  *<li>RImage</li>
  *<li>VCircle</li>
  *<li>VCross</li>
+ *<li>VEllipse</li>
  *<li>VImage</li>
  *<li>VImageOr</li>
  *<li>VPoint</li>
@@ -41,6 +42,8 @@ import fr.inria.zvtm.glyphs.VSegment;
  *<li>VRectangle</li>
  *<li>VRectangleOr</li>
  *<li>VRoundRect</li>
+ *<li>VShape</li>
+ *<li>VSwingComponent</li>
  *<li>VText</li>
  *<li>VTextLayout</li>
  *</ul>
