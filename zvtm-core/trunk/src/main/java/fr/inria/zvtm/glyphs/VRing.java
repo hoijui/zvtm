@@ -29,11 +29,6 @@ import fr.inria.zvtm.glyphs.projection.ProjRing;
 
 public class VRing<T> extends ClosedShape {
 
-    /*vertex x coords*/
-    public int[] xpcoords;
-    /*vertex y coords*/
-    public int[] ypcoords;
-
     public static final double RAD2DEG_FACTOR = 360 / Utils.TWO_PI;
     public static final double DEG2RAD_FACTOR = Utils.TWO_PI / 360.0;
 
@@ -56,12 +51,19 @@ public class VRing<T> extends ClosedShape {
     /** Radius of inner ring, as a percentage of outer radius (from center of ring).*/
     float irr_p;
 
+    Arc2D outerSlice = new Arc2D.Double(Arc2D.PIE);
+    Ellipse2D innerSlice = new Ellipse2D.Double();
+    Area subring;
+
+    /** Used for picking in VirtualSpace. */
+    Area vsh;
+
     /** Construct a slice by giving its size, angle and orientation
         *@param x x-coordinate in virtual space of vertex that is not an arc endpoint
         *@param y y-coordinate in virtual space of vertex that is not an arc endpoint
         *@param z z-index (pass 0 if you do not use z-ordering)
         *@param vs arc radius in virtual space
-        *@param ag arc angle in virtual space (in rad)
+        *@param ag arc angle (in rad)
         *@param irr inner ring radius as a percentage of outer ring radius (from center of ring); 0 to create a pie slice
         *@param or slice orientation in virtual space (interpreted as the orientation of the segment linking the vertex that is not an arc endpoint to the middle of the arc) (in rad)
         *@param c fill color
@@ -76,14 +78,14 @@ public class VRing<T> extends ClosedShape {
         *@param y y-coordinate in virtual space of vertex that is not an arc endpoint
         *@param z z-index (pass 0 if you do not use z-ordering)
         *@param vs arc radius in virtual space
-        *@param ag arc angle in virtual space (in rad)
+        *@param ag arc angle (in rad)
         *@param irr inner ring radius as a percentage of outer ring radius (from center of ring); 0 to create a pie slice        *@param or slice orientation in virtual space (interpreted as the orientation of the segment linking the vertex that is not an arc endpoint to the middle of the arc) (in rad)
         *@param c fill color
         *@param bc border color
         *@param alpha alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
         */
     public VRing(double x, double y, int z, double vs, double ag, float irr, double or, Color c, Color bc, float alpha){
-        initCoordArray(4);
+        // initCoordArray(4);
         vx = x;
         vy = y;
         vz = z;
@@ -93,6 +95,7 @@ public class VRing<T> extends ClosedShape {
         orientDeg = (int)Math.round(orient * RAD2DEG_FACTOR);
         angle = ag;
         angleDeg = (int)Math.round(angle * RAD2DEG_FACTOR);
+        updateVSShape();
         setColor(c);
         setBorderColor(bc);
         setTranslucencyValue(alpha);
@@ -103,7 +106,7 @@ public class VRing<T> extends ClosedShape {
         *@param y y-coordinate in virtual space of vertex that is not an arc endpoint
         *@param z z-index (pass 0 if you do not use z-ordering)
         *@param vs arc radius in virtual space
-        *@param ag arc angle in virtual space (in degrees)
+        *@param ag arc angle (in rad)
         *@param irr inner ring radius as a percentage of outer ring radius (from center of ring); 0 to create a pie slice        *@param or slice orientation in virtual space (interpreted as the orientation of the segment linking the vertex that is not an arc endpoint to the middle of the arc)  (in degrees)
         *@param c fill color
         *@param bc border color
@@ -117,7 +120,7 @@ public class VRing<T> extends ClosedShape {
         *@param y y-coordinate in virtual space of vertex that is not an arc endpoint
         *@param z z-index (pass 0 if you do not use z-ordering)
         *@param vs arc radius in virtual space
-        *@param ag arc angle in virtual space (in degrees)
+        *@param ag arc angle (in degrees)
         *@param irr inner ring radius as a percentage of outer ring radius (from center of ring); 0 to create a pie slice
         *@param or slice orientation in virtual space (interpreted as the orientation of the segment linking the vertex that is not an arc endpoint to the middle of the arc)  (in degrees)
         *@param c fill color
@@ -125,7 +128,7 @@ public class VRing<T> extends ClosedShape {
         *@param alpha alpha channel value in [0;1.0] 0 is fully transparent, 1 is opaque
         */
     public VRing(double x, double y, int z, double vs, int ag, float irr, int or, Color c, Color bc, float alpha){
-        initCoordArray(4);
+        // initCoordArray(4);
         vx = x;
         vy = y;
         vz = z;
@@ -135,16 +138,10 @@ public class VRing<T> extends ClosedShape {
         orientDeg = or;
         angle = ag * DEG2RAD_FACTOR;
         angleDeg = ag;
+        updateVSShape();
         setColor(c);
         setBorderColor(bc);
         setTranslucencyValue(alpha);
-    }
-
-
-    /** FOR INTERNAL USE ONLY */
-    public void initCoordArray(int n){
-        xpcoords = new int[n];
-        ypcoords = new int[n];
     }
 
     @Override
@@ -164,6 +161,15 @@ public class VRing<T> extends ClosedShape {
         return irr_p;
     }
 
+    void updateVSShape(){
+        Arc2D vouterSlice = new Arc2D.Double(vx-size, vy-size, 2*size, 2*size,
+                                             (int)-Math.round(orientDeg-angleDeg/2.0), -angleDeg, Arc2D.PIE);
+        Ellipse2D vinnerSlice = new Ellipse2D.Double(vx-size*irr_p, vy-size*irr_p, 2*size*irr_p, 2*size*irr_p);
+        vsh = new Area(vouterSlice);
+        if (size*irr_p > 0){
+            vsh.subtract(new Area(vinnerSlice));
+        }
+    }
 
     void computeSize(){
         size = Math.sqrt((p1.x-vx)*(p1.x-vx) + (p1.y-vy)*(p1.y-vy));
@@ -256,10 +262,23 @@ public class VRing<T> extends ClosedShape {
     }
 
     @Override
+    public void moveTo(double x, double y){
+        super.moveTo(x, y);
+        updateVSShape();
+    }
+
+    @Override
+    public void move(double x, double y){
+        super.move(x, y);
+        updateVSShape();
+    }
+
+    @Override
     public void sizeTo(double s){
         size = s;
         computeSliceEdges();
         computePolygonEdges();
+        updateVSShape();
         VirtualSpaceManager.INSTANCE.repaint();
     }
 
@@ -268,6 +287,7 @@ public class VRing<T> extends ClosedShape {
         size *= factor;
         computeSliceEdges();
         computePolygonEdges();
+        updateVSShape();
         VirtualSpaceManager.INSTANCE.repaint();
     }
 
@@ -280,6 +300,7 @@ public class VRing<T> extends ClosedShape {
         orientDeg = (int)Math.round(orient * RAD2DEG_FACTOR);
         computeSliceEdges();
         computePolygonEdges();
+        updateVSShape();
         VirtualSpaceManager.INSTANCE.repaint();
     }
 
@@ -291,6 +312,7 @@ public class VRing<T> extends ClosedShape {
         angleDeg = (int)Math.round(angle * RAD2DEG_FACTOR);
         computeSliceEdges();
         computePolygonEdges();
+        updateVSShape();
         VirtualSpaceManager.INSTANCE.repaint();
     }
 
@@ -306,35 +328,34 @@ public class VRing<T> extends ClosedShape {
     return size;
     }
 
-    public boolean coordInsideHemisphere(int x, int y, int camIndex){
-    if (orient == 0){
-        return (x >= pr[camIndex].cx) ? true : false;
-    }
-    else if (orient == Math.PI){
-        return (x <= pr[camIndex].cx) ? true : false;
-    }
-    else {
-        double a = (pr[camIndex].p2y-pr[camIndex].p1y) / (pr[camIndex].p2x-pr[camIndex].p1x);
-        double b = (pr[camIndex].p1y*pr[camIndex].p2x - pr[camIndex].p2y*pr[camIndex].p1x) / (pr[camIndex].p2x-pr[camIndex].p1x);
-        if (orient < Math.PI && y <= a*x+b ||
-        orient > Math.PI && y >= a*x+b){
-        return true;
-        }
-        else {
-        return false;
-        }
-    }
-    }
+    // public boolean coordInsideHemisphere(int x, int y, int camIndex){
+    // if (orient == 0){
+    //     return (x >= pr[camIndex].cx) ? true : false;
+    // }
+    // else if (orient == Math.PI){
+    //     return (x <= pr[camIndex].cx) ? true : false;
+    // }
+    // else {
+    //     double a = (pr[camIndex].p2y-pr[camIndex].p1y) / (pr[camIndex].p2x-pr[camIndex].p1x);
+    //     double b = (pr[camIndex].p1y*pr[camIndex].p2x - pr[camIndex].p2y*pr[camIndex].p1x) / (pr[camIndex].p2x-pr[camIndex].p1x);
+    //     if (orient < Math.PI && y <= a*x+b ||
+    //     orient > Math.PI && y >= a*x+b){
+    //     return true;
+    //     }
+    //     else {
+    //     return false;
+    //     }
+    // }
+    // }
 
     @Override
     public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
-        return coordInsideP(jpx, jpy, camIndex);
+        return coordInsideV(cvx, cvy, camIndex);
     }
 
     @Override
     public boolean coordInsideV(double cvx, double cvy, int camIndex){
-        // NOT IMPLEMENTED
-        return false;
+        return vsh.contains(cvx, cvy);
     }
 
     @Override
@@ -383,10 +404,6 @@ public class VRing<T> extends ClosedShape {
         pr[i].louterCircleRadius = (int)Math.round(size * coef);
         pr[i].linnerRingRadius = (int)Math.round(size * irr_p * coef);
     }
-
-    Arc2D outerSlice = new Arc2D.Double(Arc2D.PIE);
-    Ellipse2D innerSlice = new Ellipse2D.Double();
-    Area subring;
 
     @Override
     public void draw(Graphics2D g, int vW, int vH, int i, Stroke stdS, AffineTransform stdT, int dx, int dy){
