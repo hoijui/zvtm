@@ -24,6 +24,7 @@ import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VRectangleOr;
+import fr.inria.zvtm.glyphs.VPolygonOr;
 import fr.inria.zvtm.event.PickerListener;
 import fr.inria.zvtm.engine.PickerVS;
 
@@ -173,10 +174,7 @@ public class PickerTest {
 
         public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 
-        public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
-            if (code==KeyEvent.VK_O){rotate();}
-            else if (code==KeyEvent.VK_S){rescale();}
-        }
+        public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 
         public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 
