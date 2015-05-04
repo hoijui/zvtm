@@ -83,7 +83,7 @@ public class PickerTest {
     }
 
     void populate(){
-        vs.addGlyph(new VRectangleOr(200,100,0,300,200,Color.RED, 0.707));
+        vs.addGlyph(new VRectangleOr(150,75,0,300,200,Color.RED, 0.707));
         Point2D.Double[] vertices = new Point2D.Double[]{
             new Point2D.Double(-100,-100),
             new Point2D.Double(0,-100),
@@ -134,7 +134,9 @@ public class PickerTest {
             vsm.getActiveView().mouse.setSensitivity(true);
         }
 
-        public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
+        public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
+            pvs.printList();
+        }
 
         public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
