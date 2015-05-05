@@ -202,7 +202,6 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
         vsm = VirtualSpaceManager.INSTANCE;
         vsm.setMaster("JSkyFitsViewer");
 
-        mSpace = vsm.addVirtualSpace(mSpaceName);
         mSpaceKs = vsm.addVirtualSpace(mSpaceKsName);
         mSpaceH = vsm.addVirtualSpace(mSpaceHName);
         mSpaceJ = vsm.addVirtualSpace(mSpaceJName);
@@ -213,7 +212,6 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
         ovSpace = vsm.addVirtualSpace(ovSpaceName);
         
 
-        mCamera = mSpace.addCamera();
         mCameraKs = mSpaceKs.addCamera();
         mCameraH = mSpaceH.addCamera();
         mCameraJ = mSpaceJ.addCamera();
@@ -231,7 +229,6 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
 
         Vector cameras = new Vector();
 
-        cameras.add(mCamera);
         cameras.add(mCameraKs);
         cameras.add(mCameraH);
         cameras.add(mCameraJ);
@@ -244,7 +241,6 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
         mView = vsm.addFrameView(cameras, mViewName, (options.opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, !options.fullscreen, initMenu());
         Vector<Camera> sceneCam = new Vector<Camera>();
 
-        sceneCam.add(mCamera);
         sceneCam.add(mCameraKs);
         sceneCam.add(mCameraH);
         sceneCam.add(mCameraJ);

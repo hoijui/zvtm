@@ -446,6 +446,7 @@ class JSkyFitsMenu implements ViewListener, PickerListener {
     }
 
     public void enterGlyph(Glyph g){
+        System.out.println("enterGlyph");
         if(g.getType().equals(T_FILTER)){
             if (selected_colorG != g){
                 selectColorMapping((PRectangle)g);
