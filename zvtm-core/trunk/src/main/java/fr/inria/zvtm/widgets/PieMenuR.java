@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
-*   Copyright (c) INRIA, 2008-2010. All Rights Reserved
+*   Copyright (c) INRIA, 2008-2015. All Rights Reserved
 *   Licensed under the GNU LGPL. For full terms see the file COPYING.
 *
 * $Id$
@@ -13,6 +13,7 @@ import java.awt.geom.Point2D;
 
 import fr.inria.zvtm.engine.Utils;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
+import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.glyphs.VCircle;
 import fr.inria.zvtm.glyphs.VRing;
 import fr.inria.zvtm.glyphs.VText;
@@ -25,13 +26,12 @@ import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
 
 public class PieMenuR extends PieMenu {
 
-	public static final int animStartSize = 5;
-	
+    public static final int animStartSize = 5;
+
     /**Pie Menu constructor - should not be used directly
         *@param stringLabels text label of each menu item
         *@param menuCenterCoordinates (mouse cursor's coordinates in virtual space as a Point2D.Double)
-        *@param vsName name of the virtual space in which to create the pie menu
-        *@param vsm instance of VirtualSpaceManager
+        *@param vs virtual space in which to create the pie menu
         *@param radius radius of pie menu
         *@param irr Inner ring boundary radius as a percentage of outer ring boundary radius
         *@param startAngle first menu item will have an offset of startAngle interpreted relative to the X horizontal axis (counter clockwise)
@@ -45,12 +45,12 @@ public class PieMenuR extends PieMenu {
         *@param font font used for menu labels
         *@param labelOffsets x,y offset of each menu label w.r.t their default posisition, in virtual space units<br>(this array should have the same length as the labels array)
         */
-    public PieMenuR(String[] stringLabels, Point2D.Double menuCenterCoordinates, 
-                    String vsName, VirtualSpaceManager vsm,
+    public PieMenuR(String[] stringLabels, Point2D.Double menuCenterCoordinates,
+                    VirtualSpace vs,
                     double radius, float irr, double startAngle, double angleWidth,
                     Color[] fillColors, Color[] borderColors, Color[] fillSColors, Color[] borderSColors, Color[] labelColors, float alphaT,
                     int animDuration, double sensitRadius, Font font, Point2D.Double[] labelOffsets){
-        this.vs = vsm.getVirtualSpace(vsName);
+        this.vs = vs;
         double vx = menuCenterCoordinates.x;
         double vy = menuCenterCoordinates.y;
         items = new VRing[stringLabels.length];
@@ -91,13 +91,13 @@ public class PieMenuR extends PieMenu {
         }
         if (animDuration > 0){
             for (int i=0;i<items.length;i++){
-		Animation sizeAnim = vsm.getAnimationManager().getAnimationFactory()
-		    .createGlyphSizeAnim(animDuration, items[i],
-					 (float)pieMenuRadius,
-					 false,
-					 IdentityInterpolator.getInstance(),
-					 null);
-		vsm.getAnimationManager().startAnimation(sizeAnim, false);
+        Animation sizeAnim = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory()
+            .createGlyphSizeAnim(animDuration, items[i],
+                     (float)pieMenuRadius,
+                     false,
+                     IdentityInterpolator.getInstance(),
+                     null);
+        VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(sizeAnim, false);
             }
         }
         boundary = new VCircle(vx, vy, 0, pieMenuRadius*sensitRadius*2, Color.white);

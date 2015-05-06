@@ -2,11 +2,11 @@
  *   DATE OF CREATION:  Thu Aug 25 14:14:50 2005
  *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2004-2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2015. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
- */ 
+ */
 
 package fr.inria.zvtm.widgets;
 
@@ -16,6 +16,7 @@ import java.awt.geom.Point2D;
 
 import fr.inria.zvtm.engine.Utils;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
+import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.glyphs.VCircle;
 import fr.inria.zvtm.glyphs.VPolygon;
 import fr.inria.zvtm.glyphs.VText;
@@ -28,8 +29,7 @@ public class PieMenuP extends PieMenu {
     /**Pie Menu constructor - should not be used directly
         *@param stringLabels text label of each menu item
         *@param menuCenterCoordinates (mouse cursor's coordinates in virtual space as a Point2D.Double)
-        *@param vsName name of the virtual space in which to create the pie menu
-        *@param vsm instance of VirtualSpaceManager
+        *@param vs virtual space in which to create the pie menu
         *@param radius radius of pie menu
         *@param startAngle first menu item will have an offset of startAngle interpreted relative to the X horizontal axis (counter clockwise)
         *@param fillColor menu items' fill color
@@ -41,12 +41,12 @@ public class PieMenuP extends PieMenu {
         *@param sensitRadius sensitivity radius (as a percentage of the menu's actual radius)
         *@param font font used for menu labels
         */
-    public PieMenuP(String[] stringLabels, Point2D.Double menuCenterCoordinates, 
-                    String vsName, VirtualSpaceManager vsm,
+    public PieMenuP(String[] stringLabels, Point2D.Double menuCenterCoordinates,
+                    VirtualSpace vs,
                     double radius, double startAngle,
                     Color fillColor, Color borderColor, Color fillSColor, Color borderSColor, Color labelColor, float alphaT,
                     double sensitRadius, Font font){
-        this.vs = vsm.getVirtualSpace(vsName);
+        this.vs = vs;
         double vx = menuCenterCoordinates.x;
         double vy = menuCenterCoordinates.y;
         Point2D.Double[] coords;
@@ -106,8 +106,7 @@ public class PieMenuP extends PieMenu {
     /**Pie Menu constructor - should not be used directly
         *@param stringLabels text label of each menu item
         *@param menuCenterCoordinates (mouse cursor's coordinates in virtual space as a Point2D.Double)
-        *@param vsName name of the virtual space in which to create the pie menu
-        *@param vsm instance of VirtualSpaceManager
+        *@param vs virtual space in which to create the pie menu
         *@param radius radius of pie menu
         *@param startAngle first menu item will have an offset of startAngle interpreted relative to the X horizontal axis (counter clockwise)
         *@param fillColors menu items' fill colors (this array should have the same length as the stringLabels array)
@@ -119,12 +118,12 @@ public class PieMenuP extends PieMenu {
         *@param sensitRadius sensitivity radius (as a percentage of the menu's actual radius)
         *@param font font used for menu labels
         */
-    public PieMenuP(String[] stringLabels, Point2D.Double menuCenterCoordinates, 
-                    String vsName, VirtualSpaceManager vsm,
+    public PieMenuP(String[] stringLabels, Point2D.Double menuCenterCoordinates,
+                    VirtualSpace vs,
                     double radius, double startAngle,
                     Color[] fillColors, Color[] borderColors, Color[] fillSColors, Color[] borderSColors, Color[] labelColors, float alphaT,
                     double sensitRadius, Font font){
-        this.vs = vsm.getVirtualSpace(vsName);
+        this.vs = vs;
         double vx = menuCenterCoordinates.x;
         double vy = menuCenterCoordinates.y;
         Point2D.Double[] coords;
@@ -177,8 +176,7 @@ public class PieMenuP extends PieMenu {
     /**Pie Menu constructor - should not be used directly
         *@param stringLabels text label of each menu item
         *@param menuCenterCoordinates (mouse cursor's coordinates in virtual space as a Point2D.Double)
-        *@param vsName name of the virtual space in which to create the pie menu
-        *@param vsm instance of VirtualSpaceManager
+        *@param vs virtual space in which to create the pie menu
         *@param radius radius of pie menu
         *@param startAngle first menu item will have an offset of startAngle interpreted relative to the X horizontal axis (counter clockwise)
         *@param fillColor menu items' fill color
@@ -191,12 +189,12 @@ public class PieMenuP extends PieMenu {
         *@param font font used for menu labels
         *@param labelOffsets x,y offset of each menu label w.r.t their default posisition, in virtual space units<br>(this array should have the same length as the labels array)
         */
-    public PieMenuP(String[] stringLabels, Point2D.Double menuCenterCoordinates, 
-                    String vsName, VirtualSpaceManager vsm,
+    public PieMenuP(String[] stringLabels, Point2D.Double menuCenterCoordinates,
+                    VirtualSpace vs,
                     double radius, double startAngle,
                     Color fillColor, Color borderColor, Color fillSColor, Color borderSColor, Color labelColor, float alphaT,
                     double sensitRadius, Font font, Point2D.Double[] labelOffsets){
-        this.vs = vsm.getVirtualSpace(vsName);
+        this.vs = vs;
         double vx = menuCenterCoordinates.x;
         double vy = menuCenterCoordinates.y;
         Point2D.Double[] coords;
@@ -256,8 +254,7 @@ public class PieMenuP extends PieMenu {
     /**Pie Menu constructor - should not be used directly
         *@param stringLabels text label of each menu item
         *@param menuCenterCoordinates (mouse cursor's coordinates in virtual space as a Point2D.Double)
-        *@param vsName name of the virtual space in which to create the pie menu
-        *@param vsm instance of VirtualSpaceManager
+        *@param vs virtual space in which to create the pie menu
         *@param radius radius of pie menu
         *@param startAngle first menu item will have an offset of startAngle interpreted relative to the X horizontal axis (counter clockwise)
         *@param fillColors menu items' fill colors (this array should have the same length as the stringLabels array)
@@ -270,12 +267,12 @@ public class PieMenuP extends PieMenu {
         *@param font font used for menu labels
         *@param labelOffsets x,y offset of each menu label w.r.t their default posisition, in virtual space units<br>(this array should have the same length as the labels array)
         */
-    public PieMenuP(String[] stringLabels, Point2D.Double menuCenterCoordinates, 
-                    String vsName, VirtualSpaceManager vsm,
+    public PieMenuP(String[] stringLabels, Point2D.Double menuCenterCoordinates,
+                    VirtualSpace vs,
                     double radius, double startAngle,
                     Color[] fillColors, Color[] borderColors, Color[] fillSColors, Color[] borderSColors, Color[] labelColors, float alphaT,
                     double sensitRadius, Font font, Point2D.Double[] labelOffsets){
-        this.vs = vsm.getVirtualSpace(vsName);
+        this.vs = vs;
         double vx = menuCenterCoordinates.x;
         double vy = menuCenterCoordinates.y;
         Point2D.Double[] coords;
@@ -314,7 +311,7 @@ public class PieMenuP extends PieMenu {
                         0, labelColors[i], stringLabels[i], 0, VText.TEXT_ANCHOR_MIDDLE);
                 }
                 labels[i].setBorderColor(borderColors[i]);
-                labels[i].setFont(font);                
+                labels[i].setFont(font);
                 labels[i].setSensitivity(false);
                 vs.addGlyph(labels[i]);
             }

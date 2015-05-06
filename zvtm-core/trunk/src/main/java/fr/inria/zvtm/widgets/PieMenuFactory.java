@@ -17,6 +17,7 @@ import java.util.Arrays;
 
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
+import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.glyphs.VText;
 
 public abstract class PieMenuFactory {
@@ -53,11 +54,10 @@ public abstract class PieMenuFactory {
      *@param labels text label of each menu item
      *@param animLength duration in ms of menu expansion animation
      *@param v View in which the pie menu will appear
-     *@param vsm instance of VirtualSpaceManager
      */
-    public static PieMenu createPieMenu(String[] labels, int animLength, View v, VirtualSpaceManager vsm){
+    public static PieMenu createPieMenu(String[] labels, int animLength, View v){
         return new PieMenuR(labels, new Point2D.Double(v.mouse.getVSXCoordinate(), v.mouse.getVSYCoordinate()),
-            v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, RING_INNER_RATIO, ANGLE, ANGLE_WITDH,
+            v.getActiveCamera().getOwningSpace(), RADIUS, RING_INNER_RATIO, ANGLE, ANGLE_WITDH,
             nCopies(ITEM_FILLCOLOR, labels.length),
             nCopies(ITEM_BORDERCOLOR, labels.length),
             nCopies(ITEM_SFILLCOLOR, labels.length),
@@ -69,23 +69,44 @@ public abstract class PieMenuFactory {
 
     /**Standard pie menu creation method.
      *
-     * When calling this method, the layer associated with the
-     * camera showing the pie menu in the view must already have been made active.
      *@param labels text label of each menu item
      *@param animLength duration in ms of menu expansion animation
-     *@param v View in which the pie menu will appear
-     *@param vsm instance of VirtualSpaceManager
+     *@param vs virtual space in which to create the pie menu
+     *@param coords menu center coordinates (in virtual space as a Point2D.Double)
      *@param itemColors color of each menu item (this array should have the same length as the labels array)
      *@param itembColors border color of each menu item (this array should have the same length as the labels array)
      *@param itemSColors color of each menu item when selected (this array should have the same length as the labels array)
      *@param itembSColors border color of each menu item when selected (this array should have the same length as the labels array)
      *@param labelColors  color of each menu item label (this array should have the same length as the labels array)
      */
-    public static PieMenu createPieMenu(String[] labels, int animLength, View v, VirtualSpaceManager vsm,
+    public static PieMenu createPieMenu(String[] labels, int animLength, VirtualSpace vs, Point2D.Double coords,
+                    Color[] itemColors, Color[] itembColors, Color[] itemSColors,
+                    Color[] itembSColors, Color[] labelColors){
+        return new PieMenuR(labels, coords, vs,
+            RADIUS, RING_INNER_RATIO, ANGLE, ANGLE_WITDH,
+            itemColors, itembColors, itemSColors, itembSColors, labelColors, TRANSLUCENCY,
+            animLength, SENSIT_BOUNDING_RADIUS, FONT, nCopies(new Point2D.Double(0, 0), labels.length));
+    }
+
+
+    /**Standard pie menu creation method.
+     *
+     * When calling this method, the layer associated with the
+     * camera showing the pie menu in the view must already have been made active.
+     *@param labels text label of each menu item
+     *@param animLength duration in ms of menu expansion animation
+     *@param v View in which the pie menu will appear
+     *@param itemColors color of each menu item (this array should have the same length as the labels array)
+     *@param itembColors border color of each menu item (this array should have the same length as the labels array)
+     *@param itemSColors color of each menu item when selected (this array should have the same length as the labels array)
+     *@param itembSColors border color of each menu item when selected (this array should have the same length as the labels array)
+     *@param labelColors  color of each menu item label (this array should have the same length as the labels array)
+     */
+    public static PieMenu createPieMenu(String[] labels, int animLength, View v,
                     Color[] itemColors, Color[] itembColors, Color[] itemSColors,
                     Color[] itembSColors, Color[] labelColors){
         return new PieMenuR(labels, new Point2D.Double(v.mouse.getVSXCoordinate(), v.mouse.getVSYCoordinate()),
-            v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, RING_INNER_RATIO, ANGLE, ANGLE_WITDH,
+            v.getActiveCamera().getOwningSpace(), RADIUS, RING_INNER_RATIO, ANGLE, ANGLE_WITDH,
             itemColors, itembColors, itemSColors, itembSColors, labelColors, TRANSLUCENCY,
             animLength, SENSIT_BOUNDING_RADIUS, FONT, nCopies(new Point2D.Double(0, 0), labels.length));
     }
@@ -98,11 +119,10 @@ public abstract class PieMenuFactory {
      *@param labelOffsets x,y offset of each menu label w.r.t their default posisition, in virtual space units<br>(this array should have the same length as the labels array)
      *@param animLength duration in ms of menu expansion animation
      *@param v View in which the pie menu will appear
-     *@param vsm instance of VirtualSpaceManager
      */
-    public static PieMenu createPieMenu(String[] labels, Point2D.Double[] labelOffsets, int animLength, View v, VirtualSpaceManager vsm){
+    public static PieMenu createPieMenu(String[] labels, Point2D.Double[] labelOffsets, int animLength, View v){
         return new PieMenuR(labels, new Point2D.Double(v.mouse.getVSXCoordinate(), v.mouse.getVSYCoordinate()),
-                    v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, RING_INNER_RATIO, ANGLE, ANGLE_WITDH,
+                    v.getActiveCamera().getOwningSpace(), RADIUS, RING_INNER_RATIO, ANGLE, ANGLE_WITDH,
                     nCopies(ITEM_FILLCOLOR, labels.length),
                     nCopies(ITEM_BORDERCOLOR, labels.length),
                     nCopies(ITEM_SFILLCOLOR, labels.length),
@@ -119,18 +139,38 @@ public abstract class PieMenuFactory {
      *@param labelOffsets x,y offset of each menu label w.r.t their default posisition, in virtual space units<br>(this array should have the same length as the labels array)
      *@param animLength duration in ms of menu expansion animation
      *@param v View in which the pie menu will appear
-     *@param vsm instance of VirtualSpaceManager
      *@param itemColors color of each menu item (this array should have the same length as the labels array)
      *@param itembColors border color of each menu item (this array should have the same length as the labels array)
      *@param itemSColors color of each menu item when selected (this array should have the same length as the labels array)
      *@param itembSColors border color of each menu item when selected (this array should have the same length as the labels array)
      *@param labelColors  color of each menu item label (this array should have the same length as the labels array)
      */
-    public static PieMenu createPieMenu(String[] labels, Point2D.Double[] labelOffsets, int animLength, View v, VirtualSpaceManager vsm,
+    public static PieMenu createPieMenu(String[] labels, Point2D.Double[] labelOffsets, int animLength, View v,
                     Color[] itemColors, Color[] itembColors, Color[] itemSColors,
                     Color[] itembSColors, Color[] labelColors){
         return new PieMenuR(labels, new Point2D.Double(v.mouse.getVSXCoordinate(), v.mouse.getVSYCoordinate()),
-                    v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, RING_INNER_RATIO, ANGLE, ANGLE_WITDH,
+                    v.getActiveCamera().getOwningSpace(), RADIUS, RING_INNER_RATIO, ANGLE, ANGLE_WITDH,
+                    itemColors, itembColors, itemSColors, itembSColors,labelColors, TRANSLUCENCY,
+                    animLength, SENSIT_BOUNDING_RADIUS, FONT, labelOffsets);
+    }
+
+    /**Standard pie menu creation method.
+     *@param labels text label of each menu item
+     *@param labelOffsets x,y offset of each menu label w.r.t their default posisition, in virtual space units<br>(this array should have the same length as the labels array)
+     *@param animLength duration in ms of menu expansion animation
+     *@param vs virtual space in which to create the pie menu
+     *@param coords menu center coordinates (in virtual space as a Point2D.Double)
+     *@param itemColors color of each menu item (this array should have the same length as the labels array)
+     *@param itembColors border color of each menu item (this array should have the same length as the labels array)
+     *@param itemSColors color of each menu item when selected (this array should have the same length as the labels array)
+     *@param itembSColors border color of each menu item when selected (this array should have the same length as the labels array)
+     *@param labelColors  color of each menu item label (this array should have the same length as the labels array)
+     */
+    public static PieMenu createPieMenu(String[] labels, Point2D.Double[] labelOffsets, int animLength, VirtualSpace vs, Point2D.Double coords,
+                    Color[] itemColors, Color[] itembColors, Color[] itemSColors,
+                    Color[] itembSColors, Color[] labelColors){
+        return new PieMenuR(labels, coords,
+                    vs, RADIUS, RING_INNER_RATIO, ANGLE, ANGLE_WITDH,
                     itemColors, itembColors, itemSColors, itembSColors,labelColors, TRANSLUCENCY,
                     animLength, SENSIT_BOUNDING_RADIUS, FONT, labelOffsets);
     }
@@ -142,11 +182,10 @@ public abstract class PieMenuFactory {
      * camera showing the pie menu in the view must already have been made active.
      *@param labels text label of each menu item
      *@param v View in which the pie menu will appear
-     *@param vsm instance of VirtualSpaceManager
      */
-    public static PieMenu createPolygonalPieMenu(String[] labels, View v, VirtualSpaceManager vsm){
+    public static PieMenu createPolygonalPieMenu(String[] labels, View v){
         return new PieMenuP(labels, new Point2D.Double(v.mouse.getVSXCoordinate(), v.mouse.getVSYCoordinate()),
-                    v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, ANGLE,
+                    v.getActiveCamera().getOwningSpace(), RADIUS, ANGLE,
                     ITEM_FILLCOLOR, ITEM_BORDERCOLOR, ITEM_SFILLCOLOR, ITEM_SBORDERCOLOR, LABEL_COLOR, TRANSLUCENCY,
                     SENSIT_BOUNDING_RADIUS, FONT);
     }
@@ -157,18 +196,17 @@ public abstract class PieMenuFactory {
      * camera showing the pie menu in the view must already have been made active.
      *@param labels text label of each menu item
      *@param v View in which the pie menu will appear
-     *@param vsm instance of VirtualSpaceManager
      *@param itemColors color of each menu item (this array should have the same length as the labels array)
      *@param itembColors border color of each menu item (this array should have the same length as the labels array)
      *@param itemSColors color of each menu item when selected (this array should have the same length as the labels array)
      *@param itembSColors border color of each menu item when selected (this array should have the same length as the labels array)
      *@param labelColors  color of each menu item label (this array should have the same length as the labels array)
      */
-    public static PieMenu createPolygonalPieMenu(String[] labels, View v, VirtualSpaceManager vsm,
+    public static PieMenu createPolygonalPieMenu(String[] labels, View v,
                          Color[] itemColors, Color[] itembColors, Color[] itemSColors,
                          Color[] itembSColors, Color[] labelColors){
         return new PieMenuP(labels, new Point2D.Double(v.mouse.getVSXCoordinate(), v.mouse.getVSYCoordinate()),
-                    v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, ANGLE,
+                    v.getActiveCamera().getOwningSpace(), RADIUS, ANGLE,
                     itemColors, itembColors, itemSColors, itembSColors, labelColors, TRANSLUCENCY,
                     SENSIT_BOUNDING_RADIUS, FONT);
     }
@@ -180,11 +218,10 @@ public abstract class PieMenuFactory {
      *@param labels text label of each menu item
      *@param labelOffsets x,y offset of each menu label w.r.t their default posisition, in virtual space units<br>(this array should have the same length as the labels array)
      *@param v View in which the pie menu will appear
-     *@param vsm instance of VirtualSpaceManager
      */
-    public static PieMenu createPolygonalPieMenu(String[] labels, Point2D.Double[] labelOffsets, View v, VirtualSpaceManager vsm){
+    public static PieMenu createPolygonalPieMenu(String[] labels, Point2D.Double[] labelOffsets, View v){
         return new PieMenuP(labels, new Point2D.Double(v.mouse.getVSXCoordinate(), v.mouse.getVSYCoordinate()),
-                    v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, ANGLE,
+                    v.getActiveCamera().getOwningSpace(), RADIUS, ANGLE,
                     ITEM_FILLCOLOR, ITEM_BORDERCOLOR, ITEM_SFILLCOLOR, ITEM_SBORDERCOLOR, LABEL_COLOR, TRANSLUCENCY,
                     SENSIT_BOUNDING_RADIUS, FONT, labelOffsets);
     }
@@ -196,18 +233,17 @@ public abstract class PieMenuFactory {
      *@param labels text label of each menu item
      *@param labelOffsets x,y offset of each menu label w.r.t their default posisition, in virtual space units<br>(this array should have the same length as the labels array)
      *@param v View in which the pie menu will appear
-     *@param vsm instance of VirtualSpaceManager
      *@param itemColors color of each menu item (this array should have the same length as the labels array)
      *@param itembColors border color of each menu item (this array should have the same length as the labels array)
      *@param itemSColors color of each menu item when selected (this array should have the same length as the labels array)
      *@param itembSColors border color of each menu item when selected (this array should have the same length as the labels array)
      *@param labelColors  color of each menu item label (this array should have the same length as the labels array)
      */
-    public static PieMenu createPolygonalPieMenu(String[] labels, Point2D.Double[] labelOffsets, View v, VirtualSpaceManager vsm,
+    public static PieMenu createPolygonalPieMenu(String[] labels, Point2D.Double[] labelOffsets, View v,
                          Color[] itemColors, Color[] itembColors, Color[] itemSColors,
                          Color[] itembSColors, Color[] labelColors){
         return new PieMenuP(labels, new Point2D.Double(v.mouse.getVSXCoordinate(), v.mouse.getVSYCoordinate()),
-                    v.getActiveCamera().getOwningSpace().getName(), vsm, RADIUS, ANGLE,
+                    v.getActiveCamera().getOwningSpace(), RADIUS, ANGLE,
                     itemColors, itembColors, itemSColors, itembSColors, labelColors, TRANSLUCENCY,
                     SENSIT_BOUNDING_RADIUS, FONT, labelOffsets);
     }
