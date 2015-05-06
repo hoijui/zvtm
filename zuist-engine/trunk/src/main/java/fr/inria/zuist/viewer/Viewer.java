@@ -128,8 +128,6 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener, Obj
     VWGlassPane gp;
     PieMenu mainPieMenu;
 
-    RegionPicker rPicker;
-
     public Viewer(ViewerOptions options){
         ovm = new OverlayManager(this);
         initGUI(options);
@@ -139,8 +137,6 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener, Obj
         sm.setRegionListener(this);
         sm.setLevelListener(this);
         sm.setObjectListener(this);
-        rPicker = sm.createRegionPicker(0,0);
-        rPicker.setListener(new Foo());
         previousLocations = new Vector();
         ovm.initConsole();
         if (options.smooth){
@@ -153,7 +149,6 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener, Obj
                    public void execute(Object subject, Animation.Dimension dimension){
                        sm.setUpdateLevel(true);
                        sm.enableRegionUpdater(true);
-                       rPicker.updateCandidateRegions();
                    }
                };
             getGlobalView(ea);
@@ -636,7 +631,6 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener, Obj
 
     void setCursorCoords(double x, double y){
         ccStr = String.valueOf(x) + Messages.COORD_SEP + String.valueOf(y);
-        rPicker.setVSCoordinates(x, y);
     }
 
     void showAltitude(Graphics2D g2d, int viewWidth, int viewHeight){
@@ -795,17 +789,5 @@ class ConfigManager {
     static final Font PIEMENU_FONT = DEFAULT_FONT;
 
     static final Font GLASSPANE_FONT = new Font("Arial", Font.PLAIN, 12);
-
-}
-
-class Foo implements RegionListener {
-
-    public void enteredRegion(Region r){
-        System.out.println("ENTER "+r.getID());
-    }
-
-    public void exitedRegion(Region r){
-        System.out.println("EXIT "+r.getID());
-    }
 
 }
