@@ -145,7 +145,10 @@ public class PythonWCS extends Observable{
                 //addObserver(obs);
                 System.out.println("wcs.countObservers(): " + countObservers());
 
-                producer.publish(json.toString(), PRODUCER_ROUTINGKEY);
+                if(producer != null)
+                    producer.publish(json.toString(), PRODUCER_ROUTINGKEY);
+                else
+                    System.out.println("Problem with RabbitMQ");
                 System.out.println("Message " + json.toString() + " sent.");
 
                 //wait();
@@ -182,7 +185,11 @@ public class PythonWCS extends Observable{
                 //addObserver(obs);
                 System.out.println("wcs.countObservers(): " + countObservers());
 
-                producer.publish(json.toString(), PRODUCER_ROUTINGKEY);
+
+                if(producer != null)
+                    producer.publish(json.toString(), PRODUCER_ROUTINGKEY);
+                else
+                    System.out.println("Problem with RabbitMQ");
                 System.out.println("Message " + json.toString() + " sent.");
 
                 //wait();
@@ -257,7 +264,10 @@ public class PythonWCS extends Observable{
             json.put("name", "set_reference");
             json.put("src_path", src_path);
 
-            producer.publish(json.toString(), PRODUCER_ROUTINGKEY);
+            if(producer != null)
+                producer.publish(json.toString(), PRODUCER_ROUTINGKEY);
+            else
+                System.out.println("Problem with RabbitMQ");
             System.out.println("Message " + json.toString() + " sent.");
 
         } catch (JSONException e){
