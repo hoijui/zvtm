@@ -110,19 +110,6 @@ public class VChart extends ClosedShape implements RectangularShape {
         }
 
     @Override
-        public void resetMouseIn(){
-            for (int i=0;i<pc.length;i++){
-                resetMouseIn(i);
-            }
-        }
-
-    @Override
-        public void resetMouseIn(int i){
-            if (pc[i]!=null){pc[i].prevMouseIn=false;}
-            borderColor = bColor;
-        }
-
-    @Override
         public double getOrient(){return orient;}
 
     /** Cannot be reoriented. */
@@ -136,8 +123,8 @@ public class VChart extends ClosedShape implements RectangularShape {
 
     public double getHeight(){return vh;}
 
-    public ChartRenderingInfo getRenderingInfo(){ 
-        return chartRenderingInfo; 
+    public ChartRenderingInfo getRenderingInfo(){
+        return chartRenderingInfo;
     }
 
     void computeSize(){
@@ -153,7 +140,7 @@ public class VChart extends ClosedShape implements RectangularShape {
             VirtualSpaceManager.INSTANCE.repaint();
         }
 
-    public void setWidth(double w){ 
+    public void setWidth(double w){
         vw = w;
         ar = vw / vh;
         computeSize();
@@ -183,10 +170,22 @@ public class VChart extends ClosedShape implements RectangularShape {
         }
 
     @Override
-        public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
-            return ((jpx>=(pc[camIndex].cx-pc[camIndex].cw)) && (jpx<=(pc[camIndex].cx+pc[camIndex].cw)) &&
-                    (jpy>=(pc[camIndex].cy-pc[camIndex].ch)) && (jpy<=(pc[camIndex].cy+pc[camIndex].ch)));
-        }
+    public boolean coordInside(int jpx, int jpy, Camera c, double cvx, double cvy){
+        return coordInsideV(cvx, cvy, c);
+    }
+
+    @Override
+    public boolean coordInsideV(double cvx, double cvy, Camera c){
+        return (cvx>=(vx-vw/2d)) && (cvx<=(vx+vw/2d)) &&
+               (cvy>=(vy-vh/2d)) && (cvy<=(vy+vh/2d));
+    }
+
+    @Override
+    public boolean coordInsideP(int jpx, int jpy, Camera c){
+        int i = c.getIndex();
+        return (jpx>=(pc[i].cx-pc[i].cw)) && (jpx<=(pc[i].cx+pc[i].cw)) &&
+               (jpy>=(pc[i].cy-pc[i].ch)) && (jpy<=(pc[i].cy+pc[i].ch));
+    }
 
     @Override
         public boolean visibleInRegion(double wb, double nb, double eb, double sb, int i){
@@ -215,29 +214,6 @@ public class VChart extends ClosedShape implements RectangularShape {
         public double[] getBounds(){
             double[] res = {vx-vw/2d,vy+vh/2d,vx+vw/2d,vy-vh/2d};
             return res;
-        }
-
-    @Override
-        public short mouseInOut(int jpx, int jpy, int camIndex, double cvx, double cvy){
-            if (coordInside(jpx, jpy, camIndex, cvx, cvy)){
-                //if the mouse is inside the glyph
-                if (!pc[camIndex].prevMouseIn){
-                    //if it was not inside it last time, mouse has entered the glyph
-                    pc[camIndex].prevMouseIn=true;
-                    return Glyph.ENTERED_GLYPH;
-                }
-                //if it was inside last time, nothing has changed
-                else {return Glyph.NO_CURSOR_EVENT;}  
-            }
-            else{
-                //if the mouse is not inside the glyph
-                if (pc[camIndex].prevMouseIn){
-                    //if it was inside it last time, mouse has exited the glyph
-                    pc[camIndex].prevMouseIn=false;
-                    return Glyph.EXITED_GLYPH;
-                }//if it was not inside last time, nothing has changed
-                else {return Glyph.NO_CURSOR_EVENT;}
-            }
         }
 
     @Override
