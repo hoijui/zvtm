@@ -198,13 +198,11 @@ public class TextDescription extends ObjectDescription {
     }
 
     /** Are the supplied coordinates inside the object described.
-     * Assumes that picking is happening for camIndex 0.
-     * If this is not the case, the result will likely be wrong.
-     *@return true if the supplied coordinates are inside the object descrived.
+     * Does not work for VText.
      */
     @Override
     public boolean coordInside(double pvx, double pvy){
-        return this.glyph.coordInsideV(pvx, pvy, 0);
+        return false; //this.glyph.coordInsideV(pvx, pvy, null);
     }
 
 }

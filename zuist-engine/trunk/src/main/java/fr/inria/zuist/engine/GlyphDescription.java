@@ -46,16 +46,13 @@ public class GlyphDescription extends ObjectDescription {
     glyph.moveTo(x, y);
   }
 
-  /** Are the supplied coordinates inside the object described.
-   * In this particular case, assumes that picking is happening for camIndex 0.
-   * This will no matter usually, unless camIndex is not 0 for this particular picking,
-   * and the Glyph actually makes use of the camIndex (usually not the case).
-   * The conjunction of these two conditions is exceptional.
-   *@return true if the supplied coordinates are inside the object descrived.
-   */
+    /** Are the supplied coordinates inside the object described.
+     * This will not work for objects that need to know which camera is observing them (SIRectangle, SICircle, VText).
+     *@return true if the supplied coordinates are inside the object described.
+     */
   @Override
   public boolean coordInside(double pvx, double pvy){
-      return this.glyph.coordInsideV(pvx, pvy, 0);
+      return this.glyph.coordInsideV(pvx, pvy, null);
   }
 
 }
