@@ -821,6 +821,7 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
         onCircle.y = onCircle.y - fitsImageDescRef.getY() + fitsImageDescRef.getHeight()/2;
 
 
+        /*
         cr = new VCross(center.x, center.y, 1000, 200, 200, Color.RED, Color.WHITE, .8f);
         cr.setStroke(new BasicStroke(2f));
         mSpace.addGlyph(cr);
@@ -836,6 +837,8 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
 
         double a = (mCamera.focal + mCamera.getAltitude()) / mCamera.focal;
 
+        */
+        
         query.callQuery(center, onCircle);
 
         // XXX

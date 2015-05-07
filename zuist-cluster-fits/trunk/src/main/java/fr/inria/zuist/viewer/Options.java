@@ -56,6 +56,19 @@ public class Options {
     @Option(name = "-password", usage = "HTTPS password")
     public String httpPassword = null;
 
+    @Option(name = "-hostmq", usage = "Host of the RabbitMQ")
+    public static String HOST_NAME_MQ = "192.168.1.213";
+
+    public static String PRODUCER_ROUTINGKEY_MQ = "java";
+    public static String CONSUMER_ROUTINGKEY_MQ = "python";
+
+    
+    public static String VIRTUAL_HOST_MQ = "/";
+    public static String USER_ID_MQ = "guest";
+    public static String PASSWORD_MQ = "guest";
+    public static String CONSUMER_TAG_MQ = "consumer";
+
+
     @Argument
     List<String> arguments = new ArrayList<String>();
 

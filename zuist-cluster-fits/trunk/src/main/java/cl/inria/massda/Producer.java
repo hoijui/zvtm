@@ -13,6 +13,8 @@ class Producer{
 	String exchangeName;
 	Connection connection;
 	Channel channel;
+	String queueName;
+	String routingKey;
 
 	public Producer(String exchangeName, String hostName, String virtualHost, String userId, String password)  throws IOException  {
 		this.exchangeName = exchangeName;
@@ -24,6 +26,15 @@ class Producer{
 		factory.setPort(5672);
 		connection = factory.newConnection();
 		channel = connection.createChannel();
+		channel.exchangeDeclare(exchangeName, "direct", true);
+
+	}
+
+	public void declareQueue(String queueName, String routingKey) throws IOException {
+		this.queueName = queueName;
+		this.routingKey = routingKey;
+		channel.queueDeclare(queueName, true, false, false, null);
+		channel.queueBind(queueName, exchangeName, routingKey);
 
 	}
 

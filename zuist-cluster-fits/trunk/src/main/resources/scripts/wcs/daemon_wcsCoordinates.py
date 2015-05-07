@@ -29,7 +29,8 @@ def producer(name, x, y):
 '''
 
 PRODUCER_ROUTINGKEY = 'python'
-HOST = '192.168.1.213'
+#HOST = '192.168.1.213'
+HOST = '127.0.0.1'
 VIRTUAL_HOST = '/'
 USER_ID = 'guest'
 PASSWORD = 'guest'

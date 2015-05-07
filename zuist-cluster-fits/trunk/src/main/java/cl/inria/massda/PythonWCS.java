@@ -20,10 +20,11 @@ import cl.inria.massda.SmartiesManager.MyCursor;
 import java.util.Observer;
 import java.util.Observable;
 
-
+import fr.inria.zuist.viewer.Options;
 
 public class PythonWCS extends Observable{
 
+    /*
     static String PRODUCER_ROUTINGKEY = "java";
     static String CONSUMER_ROUTINGKEY = "python";
     static String HOST_NAME = "192.168.1.213";
@@ -31,6 +32,7 @@ public class PythonWCS extends Observable{
     static String USER_ID = "guest";
     static String PASSWORD = "guest";
     static String CONSUMER_TAG = "consumer";
+    */
 
     Producer producer;
 
@@ -58,7 +60,7 @@ public class PythonWCS extends Observable{
             long deliveryTag = envelope.getDeliveryTag();
 
             String str = new String(body, "UTF-8");
-            System.out.println("Consumer: " + CONSUMER_ROUTINGKEY);
+            System.out.println("Consumer: " + Options.CONSUMER_ROUTINGKEY_MQ);
             System.out.println(str);
 
             try{
@@ -106,15 +108,16 @@ public class PythonWCS extends Observable{
     public PythonWCS(){
         try{
 
-            producer = new Producer(PRODUCER_ROUTINGKEY, HOST_NAME, VIRTUAL_HOST, USER_ID, PASSWORD);
+            producer = new Producer(Options.PRODUCER_ROUTINGKEY_MQ, Options.HOST_NAME_MQ, Options.VIRTUAL_HOST_MQ, Options.USER_ID_MQ, Options.PASSWORD_MQ);
+            producer.declareQueue(Options.PRODUCER_ROUTINGKEY_MQ+"s", Options.PRODUCER_ROUTINGKEY_MQ);
 
-            Consumer c = new Consumer(HOST_NAME, VIRTUAL_HOST, USER_ID, PASSWORD);
-            c.declareExchange(CONSUMER_ROUTINGKEY);
-            c.declareQueue(CONSUMER_ROUTINGKEY + "s", CONSUMER_ROUTINGKEY);
+            Consumer c = new Consumer(Options.HOST_NAME_MQ, Options.VIRTUAL_HOST_MQ, Options.USER_ID_MQ, Options.PASSWORD_MQ);
+            c.declareExchange(Options.CONSUMER_ROUTINGKEY_MQ);
+            c.declareQueue(Options.CONSUMER_ROUTINGKEY_MQ + "s", Options.CONSUMER_ROUTINGKEY_MQ);
 
             Channel ch = c.getChannel();
 
-            c.startConsuming(CONSUMER_TAG, new LocalConsumer(ch));
+            c.startConsuming(Options.CONSUMER_TAG_MQ, new LocalConsumer(ch));
 
             System.out.println("new PythonWCS() -- countObservers(): " + countObservers());
 
@@ -146,9 +149,9 @@ public class PythonWCS extends Observable{
                 System.out.println("wcs.countObservers(): " + countObservers());
 
                 if(producer != null)
-                    producer.publish(json.toString(), PRODUCER_ROUTINGKEY);
+                    producer.publish(json.toString(), Options.PRODUCER_ROUTINGKEY_MQ);
                 else
-                    System.out.println("Problem with RabbitMQ");
+                    System.out.println("Problem with the connection to RabbitMQ");
                 System.out.println("Message " + json.toString() + " sent.");
 
                 //wait();
@@ -187,9 +190,9 @@ public class PythonWCS extends Observable{
 
 
                 if(producer != null)
-                    producer.publish(json.toString(), PRODUCER_ROUTINGKEY);
+                    producer.publish(json.toString(), Options.PRODUCER_ROUTINGKEY_MQ);
                 else
-                    System.out.println("Problem with RabbitMQ");
+                    System.out.println("Problem with the connection to RabbitMQ");
                 System.out.println("Message " + json.toString() + " sent.");
 
                 //wait();
@@ -265,9 +268,9 @@ public class PythonWCS extends Observable{
             json.put("src_path", src_path);
 
             if(producer != null)
-                producer.publish(json.toString(), PRODUCER_ROUTINGKEY);
+                producer.publish(json.toString(), Options.PRODUCER_ROUTINGKEY_MQ);
             else
-                System.out.println("Problem with RabbitMQ");
+                System.out.println("Problem with the connection to RabbitMQ");
             System.out.println("Message " + json.toString() + " sent.");
 
         } catch (JSONException e){

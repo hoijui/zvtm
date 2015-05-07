@@ -42,7 +42,7 @@ class Consumer{
 
 	public void declareExchange(String exchangeName) throws IOException {
 		this.exchangeName = exchangeName;
-		channel.exchangeDeclare(exchangeName, "direct", true);
+		channel.exchangeDeclare(exchangeName, "direct", false);//true);
 	}
 
 	public void declareQueue(String queueName, String routingKey) throws IOException {
