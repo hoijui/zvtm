@@ -141,7 +141,6 @@ def main(argv=sys.argv):
 
 	consumer()
 
-	
 
 	end = time.time()
 
