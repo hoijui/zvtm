@@ -215,7 +215,7 @@ public class Viewer implements Java2DPainter {
 			PieMenuFactory.setSensitivityRadius(0.5);
 			PieMenuFactory.setAngle(-Math.PI/2.0);
 			PieMenuFactory.setRadius(ConfigManager.PIEMENU_MAIN_RADIUS);
-			mainPieMenu = PieMenuFactory.createPieMenu(Messages.MAIN_MENU_LABELS, Messages.MAIN_MENU_LABEL_OFFSETS, 0, mView, vsm);
+			mainPieMenu = PieMenuFactory.createPieMenu(Messages.MAIN_MENU_LABELS, Messages.MAIN_MENU_LABEL_OFFSETS, 0, mView);
 			Glyph[] items = mainPieMenu.getItems();
 			items[0].setType(Messages.PM_ENTRY);
 			items[1].setType(Messages.PM_SUBMN);
@@ -246,7 +246,7 @@ public class Viewer implements Java2DPainter {
 				PieMenuFactory.setRadius(ConfigManager.PIEMENU_SUB_RADIUS);
 				Glyph[] items;
 				if (label == Messages.PM_LAYOUT){
-					subPieMenu = PieMenuFactory.createPieMenu(Messages.LAYOUT_MENU_LABELS, Messages.LAYOUT_MENU_LABEL_OFFSETS, 0 , mView, vsm);
+					subPieMenu = PieMenuFactory.createPieMenu(Messages.LAYOUT_MENU_LABELS, Messages.LAYOUT_MENU_LABEL_OFFSETS, 0 , mView);
 					items = subPieMenu.getItems();
 					for (int i=0;i<items.length;i++){
 						items[i].setType(Messages.PM_ENTRY);
