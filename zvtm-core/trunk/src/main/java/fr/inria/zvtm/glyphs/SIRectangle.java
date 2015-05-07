@@ -232,13 +232,19 @@ public class SIRectangle<T> extends ClosedShape implements RectangularShape {
 
     @Override
     public boolean coordInside(int jpx, int jpy, Camera c, double cvx, double cvy){
-        return coordInsideP(jpx, jpy, c);
+        return coordInsideV(cvx, cvy, c);
     }
 
     @Override
     public boolean coordInsideV(double cvx, double cvy, Camera c){
-        // NOT IMPLEMENTED
-        return false;
+        // ((c.focal+c.altitude) / c.focal) unprojects the circle's diameter in VirtualSpace
+        // (which is required at the circle is scale independent and thus changes absolute size
+        //  in VirtualSpace depending on a given camera's altitude)
+        double ucoef = ((c.focal+c.altitude) / c.focal);
+        double upvw = ucoef * vw/2d;
+        double upvh = ucoef * vh/2d;
+        return (cvx>=(vx-upvw)) && (cvx<=(vx+upvw)) &&
+               (cvy>=(vy-upvh)) && (cvy<=(vy+upvh));
     }
 
     @Override

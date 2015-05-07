@@ -31,6 +31,8 @@ import fr.inria.zvtm.glyphs.VSegment;
  *<li>PCircle</li>
  *<li>PRectangle</li>
  *<li>RImage</li>
+ *<li>SICircle</li>
+ *<li>SIRectangle</li>
  *<li>VCircle</li>
  *<li>VCross</li>
  *<li>VEllipse</li>

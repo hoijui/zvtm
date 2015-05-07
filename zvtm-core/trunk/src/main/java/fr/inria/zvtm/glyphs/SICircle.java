@@ -54,10 +54,13 @@ public class SICircle<T> extends VCircle {
         super(x, y, z, d, c, bc, alpha);
     }
 
-    // @Override
-    // public boolean coordInsideV(double cvx, double cvy, Camera c){
-    //     return Math.sqrt((cvx-vx)*(cvx-vx) + (cvy-vy)*(cvy-vy)) <= size/2d;
-    // }
+    @Override
+    public boolean coordInsideV(double cvx, double cvy, Camera c){
+        // ((c.focal+c.altitude) / c.focal) unprojects the circle's diameter in VirtualSpace
+        // (which is required at the circle is scale independent and thus changes absolute size
+        //  in VirtualSpace depending on a given camera's altitude)
+        return Math.sqrt((cvx-vx)*(cvx-vx) + (cvy-vy)*(cvy-vy)) <= ((c.focal+c.altitude) / c.focal) * size / 2d;
+    }
 
     @Override
     public boolean visibleInViewport(double wb, double nb, double eb, double sb, Camera c){
