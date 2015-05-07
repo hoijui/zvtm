@@ -54,6 +54,11 @@ public class SICircle<T> extends VCircle {
         super(x, y, z, d, c, bc, alpha);
     }
 
+    // @Override
+    // public boolean coordInsideV(double cvx, double cvy, Camera c){
+    //     return Math.sqrt((cvx-vx)*(cvx-vx) + (cvy-vy)*(cvy-vy)) <= size/2d;
+    // }
+
     @Override
     public boolean visibleInViewport(double wb, double nb, double eb, double sb, Camera c){
         if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){

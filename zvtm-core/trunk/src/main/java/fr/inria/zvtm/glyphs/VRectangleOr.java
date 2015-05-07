@@ -202,24 +202,25 @@ public class VRectangleOr<T> extends VRectangle {
     }
 
     @Override
-    public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
-        return coordInsideV(cvx, cvy, camIndex);
+    public boolean coordInside(int jpx, int jpy, Camera c, double cvx, double cvy){
+        return coordInsideV(cvx, cvy, c);
     }
 
     @Override
-    public boolean coordInsideV(double cvx, double cvy, int camIndex){
+    public boolean coordInsideV(double cvx, double cvy, Camera c){
         return p.contains(cvx, cvy);
     }
 
     @Override
-    public boolean coordInsideP(int jpx, int jpy, int camIndex){
+    public boolean coordInsideP(int jpx, int jpy, Camera c){
         if (orient==0){
-            if ((jpx>=(pc[camIndex].cx-pc[camIndex].cw)) && (jpx<=(pc[camIndex].cx+pc[camIndex].cw)) &&
-                (jpy>=(pc[camIndex].cy-pc[camIndex].ch)) && (jpy<=(pc[camIndex].cy+pc[camIndex].ch))){return true;}
+            int i = c.getIndex();
+            if ((jpx>=(pc[i].cx-pc[i].cw)) && (jpx<=(pc[i].cx+pc[i].cw)) &&
+                (jpy>=(pc[i].cy-pc[i].ch)) && (jpy<=(pc[i].cy+pc[i].ch))){return true;}
             else {return false;}
         }
         else {
-            if (pc[camIndex].p.contains(jpx, jpy)){return true;}
+            if (pc[c.getIndex()].p.contains(jpx, jpy)){return true;}
             else {return false;}
         }
     }

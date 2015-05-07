@@ -231,20 +231,21 @@ public class SIRectangle<T> extends ClosedShape implements RectangularShape {
 
 
     @Override
-    public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
-        return coordInsideP(jpx, jpy, camIndex);
+    public boolean coordInside(int jpx, int jpy, Camera c, double cvx, double cvy){
+        return coordInsideP(jpx, jpy, c);
     }
 
     @Override
-    public boolean coordInsideV(double cvx, double cvy, int camIndex){
+    public boolean coordInsideV(double cvx, double cvy, Camera c){
         // NOT IMPLEMENTED
         return false;
     }
 
     @Override
-    public boolean coordInsideP(int jpx, int jpy, int camIndex){
-        if ((jpx>=(pc[camIndex].cx-pc[camIndex].cw)) && (jpx<=(pc[camIndex].cx+pc[camIndex].cw)) &&
-            (jpy>=(pc[camIndex].cy-pc[camIndex].ch)) && (jpy<=(pc[camIndex].cy+pc[camIndex].ch))){return true;}
+    public boolean coordInsideP(int jpx, int jpy, Camera c){
+        int i = c.getIndex();
+        if ((jpx>=(pc[i].cx-pc[i].cw)) && (jpx<=(pc[i].cx+pc[i].cw)) &&
+            (jpy>=(pc[i].cy-pc[i].ch)) && (jpy<=(pc[i].cy+pc[i].ch))){return true;}
         else {return false;}
     }
 

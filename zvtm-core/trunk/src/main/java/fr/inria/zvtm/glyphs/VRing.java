@@ -349,19 +349,20 @@ public class VRing<T> extends ClosedShape {
     // }
 
     @Override
-    public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
-        return coordInsideV(cvx, cvy, camIndex);
+    public boolean coordInside(int jpx, int jpy, Camera c, double cvx, double cvy){
+        return coordInsideV(cvx, cvy, c);
     }
 
     @Override
-    public boolean coordInsideV(double cvx, double cvy, int camIndex){
+    public boolean coordInsideV(double cvx, double cvy, Camera c){
         return vsh.contains(cvx, cvy);
     }
 
     @Override
-    public boolean coordInsideP(int jpx, int jpy, int camIndex){
-        if (Math.sqrt((jpx-pr[camIndex].cx)*(jpx-pr[camIndex].cx) + (jpy-pr[camIndex].cy)*(jpy-pr[camIndex].cy)) <= pr[camIndex].outerCircleRadius){
-            if (pr[camIndex].ring.contains(jpx, jpy)){
+    public boolean coordInsideP(int jpx, int jpy, Camera c){
+        int i = c.getIndex();
+        if (Math.sqrt((jpx-pr[i].cx)*(jpx-pr[i].cx) + (jpy-pr[i].cy)*(jpy-pr[i].cy)) <= pr[i].outerCircleRadius){
+            if (pr[i].ring.contains(jpx, jpy)){
                 return true;
             }
         }

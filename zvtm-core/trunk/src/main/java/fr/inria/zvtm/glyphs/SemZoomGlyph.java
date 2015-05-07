@@ -51,35 +51,35 @@ public class SemZoomGlyph<T> extends Glyph {
             return false; //safe option
         }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** Not supported in SemZoomGlyph.*/
     @Override
-    public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
+    public boolean coordInside(int jpx, int jpy, Camera c, double cvx, double cvy){
+        // NOT IMPLEMENTED
+        return false;
+    }
+
+    /** Not supported in SemZoomGlyph.*/
+    @Override
+    public boolean coordInsideV(double cvx, double cvy, Camera c){
+        // NOT IMPLEMENTED
+        return false;
+    }
+
+    /** Not supported in SemZoomGlyph.*/
+    @Override
+    public boolean coordInsideP(int jpx, int jpy, Camera c){
         // NOT IMPLEMENTED
         return false;
     }
 
     @Override
-    public boolean coordInsideV(double cvx, double cvy, int camIndex){
-        // NOT IMPLEMENTED
-        return false;
-    }
-
-    @Override
-    public boolean coordInsideP(int jpx, int jpy, int camIndex){
-        // NOT IMPLEMENTED
-        return false;
-    }
-
-    @Override 
         public void removeCamera(int index){
             for(Glyph glyph: glyphs){
                 glyph.removeCamera(index);
             }
         }
 
-    @Override 
+    @Override
         public void addCamera(int index){
             for(Glyph glyph: glyphs){
                 glyph.addCamera(index);
@@ -90,7 +90,7 @@ public class SemZoomGlyph<T> extends Glyph {
         public void initCams(int nbCam){
             for(Glyph glyph: glyphs){
                 glyph.initCams(nbCam);
-            } 
+            }
         }
 
    @Override
@@ -102,7 +102,7 @@ public class SemZoomGlyph<T> extends Glyph {
                 AffineTransform stdT,
                 int dx,
                 int dy){
-            Glyph glyph = selectChild(i); 
+            Glyph glyph = selectChild(i);
             glyph.drawForLens(g, vW, vH, i, stdS, stdT, dx, dy);
         }
 
@@ -153,7 +153,7 @@ public class SemZoomGlyph<T> extends Glyph {
             return 0f;
         }
 
-    @Override 
+    @Override
         public void reSize(double factor){
             //XXX implement
         }
@@ -163,7 +163,7 @@ public class SemZoomGlyph<T> extends Glyph {
             //XXX implement
         }
 
-    @Override 
+    @Override
         public void move(double dx, double dy){
         }
 
@@ -171,7 +171,7 @@ public class SemZoomGlyph<T> extends Glyph {
         public void moveTo(double x, double y){
         }
 
-    @Override 
+    @Override
         public double getSize(){
             return 10;// XXX implement
         }

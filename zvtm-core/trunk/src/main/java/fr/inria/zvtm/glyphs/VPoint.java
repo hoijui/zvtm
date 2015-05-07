@@ -142,18 +142,19 @@ public class VPoint<T> extends Glyph {
     }
 
     @Override
-    public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
-        return coordInsideV(cvx, cvy, camIndex);
+    public boolean coordInside(int jpx, int jpy, Camera c, double cvx, double cvy){
+        return coordInsideV(cvx, cvy, c);
     }
 
     @Override
-    public boolean coordInsideV(double cvx, double cvy, int camIndex){
+    public boolean coordInsideV(double cvx, double cvy, Camera c){
         return (cvx==vx) && (cvy==vy);
     }
 
     @Override
-    public boolean coordInsideP(int jpx, int jpy, int camIndex){
-        return (jpx==pc[camIndex].cx) && (jpy==pc[camIndex].cy);
+    public boolean coordInsideP(int jpx, int jpy, Camera c){
+        int i = c.getIndex();
+        return (jpx==pc[i].cx) && (jpy==pc[i].cy);
     }
 
     @Override

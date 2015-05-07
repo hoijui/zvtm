@@ -20,6 +20,8 @@ import java.text.AttributedString;
 
 import java.util.Vector;
 
+import fr.inria.zvtm.engine.Camera;
+
 /**
  * Multiline text.
  * By default, text will be rendered on one line. Specifiy a width
@@ -174,31 +176,32 @@ public class MultilineText<T> extends VText {
     }
 
     @Override
-    public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
-        return coordInsideV(cvx, cvy, camIndex);
+    public boolean coordInside(int jpx, int jpy, Camera c, double cvx, double cvy){
+        return coordInsideV(cvx, cvy, c);
     }
 
     @Override
-    public boolean coordInsideV(double cvx, double cvy, int camIndex){
+    public boolean coordInsideV(double cvx, double cvy, Camera c){
         boolean res=false;
+        int i = c.getIndex();
         switch (text_anchor){
             case VText.TEXT_ANCHOR_START:{
-                if ((cvx>=vx) && (cvy<=vy) && (cvx<=(vx+pc[camIndex].cw)) && (cvy >= vy-pc[camIndex].ch)){res=true;}
+                if ((cvx>=vx) && (cvy<=vy) && (cvx<=(vx+pc[i].cw)) && (cvy >= vy-pc[i].ch)){res=true;}
                 break;
             }
             case VText.TEXT_ANCHOR_MIDDLE:{
-                if ((cvx>=vx-pc[camIndex].cw/2) && (cvy<=vy) && (cvx<=(vx+pc[camIndex].cw/2)) && (cvy >= vy-pc[camIndex].ch)){res=true;}
+                if ((cvx>=vx-pc[i].cw/2) && (cvy<=vy) && (cvx<=(vx+pc[i].cw/2)) && (cvy >= vy-pc[i].ch)){res=true;}
                 break;
             }
             default:{
-                if ((cvx<=vx) && (cvy<=vy) && (cvx>=(vx-pc[camIndex].cw)) && (cvy >= vy-pc[camIndex].ch)){res=true;}
+                if ((cvx<=vx) && (cvy<=vy) && (cvx>=(vx-pc[i].cw)) && (cvy >= vy-pc[i].ch)){res=true;}
             }
         }
         return res;
     }
 
     @Override
-    public boolean coordInsideP(int jpx, int jpy, int camIndex){
+    public boolean coordInsideP(int jpx, int jpy, Camera c){
         // NOT IMPLEMENTED
         return false;
     }

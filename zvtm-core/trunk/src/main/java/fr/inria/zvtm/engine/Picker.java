@@ -111,7 +111,7 @@ public class Picker extends PickerVS {
     }
 
     /** Tells whether the picker is hovering a particular VSegment or not.
-     *@param camIndex indes of camera observing the segments of interest (available through Camera.getIndex())
+     *@param camIndex index of camera observing the segments of interest (available through Camera.getIndex())
      *@param tolerance the segment's abstract thickness (w.r.t picking) in pixels, not virtual space units (we consider a narrow rectangular region, not an actual segment)
      *@see #intersectsSegment(VSegment s, int tolerance, int camIndex)
      *@see #getIntersectingSegments(Camera c, int jpx, int jpy, int tolerance)
@@ -131,7 +131,7 @@ public class Picker extends PickerVS {
             glyph = (Glyph)glyphs.elementAt(i);
             // ignore glyphs of other types than the one specified (if set)
             if (type != null && !glyph.getType().equals(type)){continue;}
-            if (glyph.coordInside(jpx, jpy, c.getIndex(), vx, vy)){
+            if (glyph.coordInside(jpx, jpy, c, vx, vy)){
                 res.add(glyph);
             }
             else if (glyph instanceof VSegment && intersectsSegment((VSegment)glyph, 2, c.getIndex())){
@@ -189,7 +189,7 @@ public class Picker extends PickerVS {
 
     boolean checkGlyph(Camera c, int x, int y){
         // Test if cursor inside, and fire entry/exit events for a given glyph
-        if (tmpGlyph.coordInside(x, y, c.getIndex(), vx, vy)){
+        if (tmpGlyph.coordInside(x, y, c, vx, vy)){
             //if the mouse is inside the glyph
             if (!prevMouseIn.containsKey(tmpGlyph)){
                 //if it was not inside it last time, mouse has entered the glyph

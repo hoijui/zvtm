@@ -312,18 +312,18 @@ public class VSwingComponent<T> extends ClosedShape implements RectangularShape 
     }
 
     @Override
-    public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
-        return coordInsideV(cvx, cvy, camIndex);
+    public boolean coordInside(int jpx, int jpy, Camera c, double cvx, double cvy){
+        return coordInsideV(cvx, cvy, c);
     }
 
     @Override
-    public boolean coordInsideV(double cvx, double cvy, int camIndex){
+    public boolean coordInsideV(double cvx, double cvy, Camera c){
         return p.contains(cvx, cvy);
     }
 
     @Override
-    public boolean coordInsideP(int jpx, int jpy, int camIndex){
-        return pc[camIndex].p.contains(jpx, jpy);
+    public boolean coordInsideP(int jpx, int jpy, Camera c){
+        return pc[c.getIndex()].p.contains(jpx, jpy);
     }
 
     @Override

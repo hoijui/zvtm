@@ -619,26 +619,29 @@ public abstract class Glyph<T> implements Cloneable, Translucent {
      *@param jpy provide projected JPanel coordinates of the associated view, not virtual space coordinates
      *@param cvx virtual space coordinates
      *@param cvy virtual space coordinates
-     *@see #coordInsideV(double cvx, double cvy, int camIndex)
-     *@see #coordInsideP(int jpx, int jpy, int camIndex)
+     *@param c camera through which the glyph is observed (only a few types of Glyph actually require this information: SICircle, SIRectangle, VText)
+     *@see #coordInsideV(double cvx, double cvy, Camera c)
+     *@see #coordInsideP(int jpx, int jpy, Camera c)
      */
-    public abstract boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy);
+    public abstract boolean coordInside(int jpx, int jpy, Camera c, double cvx, double cvy);
 
     /** Detect whether the given point is inside this glyph or not. Uses VirtualSpace coordinates.
      *@param cvx virtual space coordinates
      *@param cvy virtual space coordinates
-     *@see #coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy)
-     *@see #coordInsideP(int jpx, int jpy, int camIndex)
+     *@param c camera through which the glyph is observed (only a few types of Glyph actually require this information: SICircle, SIRectangle, VText)
+     *@see #coordInside(int jpx, int jpy, Camera c, double cvx, double cvy)
+     *@see #coordInsideP(int jpx, int jpy, Camera c)
      */
-    public abstract boolean coordInsideV(double cvx, double cvy, int camIndex);
+    public abstract boolean coordInsideV(double cvx, double cvy, Camera c);
 
     /** Detect whether the given point is inside this glyph or not. Uses projected coordinates in View.
      *@param jpx provide projected JPanel coordinates of the associated view, not virtual space coordinates
      *@param jpy provide projected JPanel coordinates of the associated view, not virtual space coordinates
-     *@see #coordInsideV(double cvx, double cvy, int camIndex)
-     *@see #coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy)
+     *@param c camera through which the glyph is observed
+     *@see #coordInsideV(double cvx, double cvy, Camera c)
+     *@see #coordInside(int jpx, int jpy, Camera c, double cvx, double cvy)
      */
-    public abstract boolean coordInsideP(int jpx, int jpy, int camIndex);
+    public abstract boolean coordInsideP(int jpx, int jpy, Camera c);
 
     /** Method used internally to find out if it is necessary to project and draw this glyph for a given camera.
      *@return true if the glyph is currently visible in the region delimited by wb, nb, eb, sb, symbolising the region seen through a camera

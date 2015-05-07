@@ -95,19 +95,25 @@ public class Composite<T> extends Glyph {
      * {@inheritDoc}
      */
     @Override
-    public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
+    public boolean coordInside(int jpx, int jpy, Camera c, double cvx, double cvy){
         // NOT IMPLEMENTED
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public boolean coordInsideV(double cvx, double cvy, int camIndex){
+    public boolean coordInsideV(double cvx, double cvy, Camera c){
         // NOT IMPLEMENTED
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public boolean coordInsideP(int jpx, int jpy, int camIndex){
+    public boolean coordInsideP(int jpx, int jpy, Camera c){
         // NOT IMPLEMENTED
         return false;
     }

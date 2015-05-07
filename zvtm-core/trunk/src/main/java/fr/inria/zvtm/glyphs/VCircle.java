@@ -161,18 +161,19 @@ public class VCircle<T> extends ClosedShape {
     }
 
     @Override
-    public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
-        return coordInsideV(cvx, cvy, camIndex);
+    public boolean coordInside(int jpx, int jpy, Camera c, double cvx, double cvy){
+        return coordInsideV(cvx, cvy, c);
     }
 
     @Override
-    public boolean coordInsideV(double cvx, double cvy, int camIndex){
+    public boolean coordInsideV(double cvx, double cvy, Camera c){
         return Math.sqrt((cvx-vx)*(cvx-vx) + (cvy-vy)*(cvy-vy)) <= size/2d;
     }
 
     @Override
-    public boolean coordInsideP(int jpx, int jpy, int camIndex){
-        return Math.sqrt((jpx-pc[camIndex].cx)*(jpx-pc[camIndex].cx) + (jpy-pc[camIndex].cy)*(jpy-pc[camIndex].cy)) <= pc[camIndex].cr/2d;
+    public boolean coordInsideP(int jpx, int jpy, Camera c){
+        int i = c.getIndex();
+        return Math.sqrt((jpx-pc[i].cx)*(jpx-pc[i].cx) + (jpy-pc[i].cy)*(jpy-pc[i].cy)) <= pc[i].cr/2d;
     }
 
     @Override

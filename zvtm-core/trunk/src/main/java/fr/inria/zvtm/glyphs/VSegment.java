@@ -260,18 +260,21 @@ public class VSegment<T> extends Glyph implements RectangularShape {
         vh = size * Math.sin(orient);
     }
 
+    /** Not implemented for VSegment.*/
     @Override
-    public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
+    public boolean coordInside(int jpx, int jpy, Camera c, double cvx, double cvy){
         return false;
     }
 
+    /** Not implemented for VSegment.*/
     @Override
-    public boolean coordInsideV(double cvx, double cvy, int camIndex){
+    public boolean coordInsideV(double cvx, double cvy, Camera c){
         return false;
     }
 
+    /** Not implemented for VSegment.*/
     @Override
-    public boolean coordInsideP(int jpx, int jpy, int camIndex){
+    public boolean coordInsideP(int jpx, int jpy, Camera c){
         return false;
     }
 

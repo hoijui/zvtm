@@ -270,20 +270,21 @@ public class VImage<T> extends ClosedShape implements RectangularShape {
     }
 
     @Override
-    public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
-        return coordInsideV(cvx, cvy, camIndex);
+    public boolean coordInside(int jpx, int jpy, Camera c, double cvx, double cvy){
+        return coordInsideV(cvx, cvy, c);
     }
 
     @Override
-    public boolean coordInsideV(double cvx, double cvy, int camIndex){
+    public boolean coordInsideV(double cvx, double cvy, Camera c){
         return (cvx>=(vx-vw/2d)) && (cvx<=(vx+vw/2d)) &&
                (cvy>=(vy-vh/2d)) && (cvy<=(vy+vh/2d));
     }
 
     @Override
-    public boolean coordInsideP(int jpx, int jpy, int camIndex){
-        return (jpx>=(pc[camIndex].cx-pc[camIndex].cw)) && (jpx<=(pc[camIndex].cx+pc[camIndex].cw)) &&
-               (jpy>=(pc[camIndex].cy-pc[camIndex].ch)) && (jpy<=(pc[camIndex].cy+pc[camIndex].ch));
+    public boolean coordInsideP(int jpx, int jpy, Camera c){
+        int i = c.getIndex();
+        return (jpx>=(pc[i].cx-pc[i].cw)) && (jpx<=(pc[i].cx+pc[i].cw)) &&
+               (jpy>=(pc[i].cy-pc[i].ch)) && (jpy<=(pc[i].cy+pc[i].ch));
     }
 
     @Override

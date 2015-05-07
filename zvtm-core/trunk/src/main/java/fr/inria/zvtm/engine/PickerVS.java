@@ -213,7 +213,7 @@ public class PickerVS {
             glyph = (Glyph)glyphs.elementAt(i);
             // ignore glyphs of other types than the one specified (if set)
             if (type != null && !glyph.getType().equals(type)){continue;}
-            if (glyph.coordInsideV(vx, vy, c.getIndex())){
+            if (glyph.coordInsideV(vx, vy, c)){
                 res.add(glyph);
             }
             // else if (glyph instanceof VSegment && intersectsSegment((VSegment)glyph, 2, c.getIndex())){
@@ -271,7 +271,7 @@ public class PickerVS {
 
     boolean checkGlyph(Camera c){
         // Test if cursor inside, and fire entry/exit events for a given glyph
-        if (tmpGlyph.coordInsideV(vx, vy, c.getIndex())){
+        if (tmpGlyph.coordInsideV(vx, vy, c)){
             //if the mouse is inside the glyph
             if (!prevMouseIn.containsKey(tmpGlyph)){
                 //if it was not inside it last time, mouse has entered the glyph

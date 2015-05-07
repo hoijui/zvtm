@@ -373,32 +373,34 @@ public class VText<T> extends ClosedShape {
     }
 
     @Override
-    public boolean coordInside(int jpx, int jpy, int camIndex, double cvx, double cvy){
-        return coordInsideV(cvx, cvy, camIndex);
+    public boolean coordInside(int jpx, int jpy, Camera c, double cvx, double cvy){
+        return coordInsideV(cvx, cvy, c);
     }
 
     @Override
-    public boolean coordInsideV(double cvx, double cvy, int camIndex){
+    public boolean coordInsideV(double cvx, double cvy, Camera c){
         boolean res=false;
+        int i = c.getIndex();
         switch (text_anchor){
             // cw and ch actually hold width and height of text *in virtual space*
             case VText.TEXT_ANCHOR_START:{
-                if ((cvx>=vx) && (cvy>=vy) && (cvx<=(vx+pc[camIndex].cw)) && (cvy<=(vy+pc[camIndex].ch))){res=true;}
+                if ((cvx>=vx) && (cvy>=vy) && (cvx<=(vx+pc[i].cw)) && (cvy<=(vy+pc[i].ch))){res=true;}
                 break;
             }
             case VText.TEXT_ANCHOR_MIDDLE:{
-                if ((cvx>=vx-pc[camIndex].cw/2) && (cvy>=vy) && (cvx<=(vx+pc[camIndex].cw/2)) && (cvy<=(vy+pc[camIndex].ch))){res=true;}
+                if ((cvx>=vx-pc[i].cw/2) && (cvy>=vy) && (cvx<=(vx+pc[i].cw/2)) && (cvy<=(vy+pc[i].ch))){res=true;}
                 break;
             }
             default:{
-                if ((cvx<=vx) && (cvy>=vy) && (cvx>=(vx-pc[camIndex].cw)) && (cvy<=(vy+pc[camIndex].ch))){res=true;}
+                if ((cvx<=vx) && (cvy>=vy) && (cvx>=(vx-pc[i].cw)) && (cvy<=(vy+pc[i].ch))){res=true;}
             }
         }
         return res;
     }
 
+    /** not implemented for VText.*/
     @Override
-    public boolean coordInsideP(int jpx, int jpy, int camIndex){
+    public boolean coordInsideP(int jpx, int jpy, Camera c){
         // NOT IMPLEMENTED
         return false;
     }
