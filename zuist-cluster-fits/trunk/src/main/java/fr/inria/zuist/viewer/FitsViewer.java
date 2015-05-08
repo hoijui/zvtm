@@ -116,6 +116,7 @@ import cl.inria.massda.SmartiesManager.MyCursor;
 import java.util.Observer;
 import java.util.Observable;
 
+import fr.inria.zuist.engine.JSkyFitsImageDescription;
 
 
 
@@ -245,9 +246,8 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         sm.setRegionListener(this);
         sm.setLevelListener(this);
 
-        // create a picker that will only consider regions visible at ZUIST levels 3 through 5 (any of these levels or all of them)
-        rPicker = sm.createRegionPicker(0,8);
-        rPicker.setListener(this);
+        
+        
 
         pythonWCS = new PythonWCS();
 
@@ -268,6 +268,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 			getGlobalView(ea);
 		}
 		ovm.toggleConsole();
+
         //System.out.println("setActiveLayer(LAYER_SCENE)");
         //mView.setActiveLayer(LAYER_SCENE);
         
@@ -1154,7 +1155,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 	    //gp.setLabel(VWGlassPane.EMPTY_STRING);
         mCamera.setAltitude(0.0f);
 
-        loadFitsReference();
+        //loadFitsReference();
 	}
     
     /*-------------     Navigation       -------------*/
@@ -1706,3 +1707,6 @@ class ConfigManager {
     static final Font GLASSPANE_FONT = new Font("Arial", Font.PLAIN, 12);
 
 }
+
+
+

@@ -186,10 +186,12 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
         teh = new TuioEventHandler(this);
 
         reference = options.reference;
-
-        
         */
 
+        // create a picker that will only consider regions visible at ZUIST levels 3 through 5 (any of these levels or all of them)
+        System.out.println("levelCount: " + sm.getLevelCount());
+        rPicker = sm.createRegionPicker(0, sm.getLevelCount());
+        rPicker.setListener(new RegionPickerListener(this));
 
         draw = new DrawSymbol();
         query = new Query();
@@ -499,7 +501,7 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
         //gp.setLabel(VWGlassPane.EMPTY_STRING);
         mCamera.setAltitude(0.0f);
 
-        loadFitsReference();
+        //loadFitsReference();
     }
 
     public void coordinateWCS(Point2D.Double xy, String id){
@@ -667,6 +669,8 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
         
         System.out.println("loaded JSky Fits Reference");
     }
+
+    
 
     
     class Query implements Observer{
@@ -1093,3 +1097,42 @@ class ConfigManager {
 
 }
 */
+
+
+class RegionPickerListener implements RegionListener{
+
+
+    JSkyFitsViewer app;
+
+    public RegionPickerListener(JSkyFitsViewer app){
+        this.app = app;
+    }
+
+    @Override
+    public void enteredRegion(Region r){
+
+        ObjectDescription[] objects = r.getObjectsInRegion();
+        for( ObjectDescription desc : objects){
+            if(desc instanceof JSkyFitsImageDescription){
+                JSkyFitsImageDescription obj = (JSkyFitsImageDescription)desc;
+                if( obj.isReference() ){
+                    if( !obj.equals(app.fitsImageDescRef) ){
+                        app.fitsImageDescRef = obj;
+                        if(app.pythonWCS != null){
+                            System.out.println("enteredRegion: " + r.getID());
+                            System.out.println("pythonWCS.setReference("+app.fitsImageDescRef.getSrc().getPath()+")");
+                            app.pythonWCS.setReference(app.fitsImageDescRef.getSrc().getPath());
+                        } else {
+                            System.out.println("pythonWCS == null. setReference() failed");
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public void exitedRegion(Region r){
+        //System.out.println("exitedRegion");
+    }
+}

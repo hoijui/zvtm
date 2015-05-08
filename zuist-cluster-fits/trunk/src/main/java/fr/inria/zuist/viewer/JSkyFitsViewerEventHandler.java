@@ -163,8 +163,10 @@ class JSkyFitsViewerEventHandler implements ViewListener {
             v.parent.setActiveLayer(app.LAYER_MENU);
             v.parent.setCursorIcon(Cursor.DEFAULT_CURSOR);
         }
-        if(app.rPicker != null)
+        if(app.rPicker != null){
+            //System.out.println("rPicker.setVSCoordinates");
             app.rPicker.setVSCoordinates(v.getVCursor().getVSXCoordinate(), v.getVCursor().getVSYCoordinate());
+        }
     }
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
