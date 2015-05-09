@@ -47,6 +47,8 @@ public class VCircle<T> extends ClosedShape {
     /*array of projected coordinates - index of camera in virtual space is equal to index of projected coords in this array*/
     public BProjectedCoords[] pc;
 
+    /** Instantiate a VCircle in 0,0, with z-index 0, 10 units in diameter, white fill, black stroke, opaque.
+     */
     public VCircle(){
         this(0, 0, 0, 10, Color.WHITE, Color.BLACK, 1);
     }
