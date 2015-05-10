@@ -26,6 +26,7 @@ import fr.inria.zvtm.glyphs.VSegment;
  *<ul>
  *<li>AdaptiveText</li>
  *<li>DPath</li>
+ *<li>FPolygon</li>
  *<li>FRectangle</li>
  *<li>MultilineText</li>
  *<li>PCircle</li>

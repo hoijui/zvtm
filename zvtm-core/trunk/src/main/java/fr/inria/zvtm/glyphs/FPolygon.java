@@ -138,10 +138,10 @@ public class FPolygon<T> extends ClosedShape {
 
     void updateVSPolygon(){
         p = new Path2D.Double(Path2D.WIND_EVEN_ODD, xcoords.length);
-        // p.moveTo(xcoords[0]+vx, ycoords[0]+vy);
-        // for (int i=1;i<xcoords.length;i++) {
-        //     p.lineTo(xcoords[i]+vx, ycoords[i]+vy);
-        // }
+        p.moveTo(xcoords[0]+vx, ycoords[0]+vy);
+        for (int i=1;i<xcoords.length;i++) {
+            p.lineTo(xcoords[i]+vx, ycoords[i]+vy);
+        }
         p.closePath();
     }
 
