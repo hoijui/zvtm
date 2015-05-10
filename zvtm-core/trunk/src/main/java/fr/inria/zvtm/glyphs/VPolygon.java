@@ -505,18 +505,10 @@ public class VPolygon<T> extends ClosedShape {
         return new Point2D.Double(cx,cy);
     }
 
-    /** Get the Java2D Shape corresponding to this Glyph. Virtual Space coordinates.
-     * <strong>Warning:</strong> the polygon's coordinates are converted to 32-bit integers for now (we use a java.awt.Polygon)
-     */
+    /** Get the Java2D Shape corresponding to this Glyph. Virtual Space coordinates.*/
     @Override
     public Shape getJava2DShape(){
-        int[] xc = new int[xcoords.length];
-        int[] yc = new int[xcoords.length];
-        for (int i=0;i<xcoords.length;i++){
-            xc[i] = (int)Math.round(xcoords[i] + vx);
-            yc[i] = (int)Math.round(ycoords[i] + vy);
-        }
-        return new Polygon(xc, yc, xc.length);
+        return (Path2D)p.clone();
     }
 
     @Override

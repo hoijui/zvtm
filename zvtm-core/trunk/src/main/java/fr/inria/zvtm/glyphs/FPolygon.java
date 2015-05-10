@@ -19,6 +19,7 @@ import java.awt.Stroke;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.awt.geom.Path2D;
 
 import fr.inria.zvtm.glyphs.projection.ProjPolygon;
 
@@ -40,6 +41,8 @@ public class FPolygon<T> extends ClosedShape {
     /*store x,y vertex coords as relative coordinates w.r.t polygon's centroid*/
     double[] xcoords;
     double[] ycoords;
+
+    Path2D.Double p;
 
     /**
      *@param v list of x,y vertices ABSOLUTE coordinates
@@ -79,6 +82,7 @@ public class FPolygon<T> extends ClosedShape {
             xcoords[i]-=vx;
             ycoords[i]-=vy;
         }
+        updateVSPolygon();
         computeSize();
         setColor(c);
         setBorderColor(bc);
@@ -121,6 +125,27 @@ public class FPolygon<T> extends ClosedShape {
     }
 
     @Override
+    public void moveTo(double x, double y){
+        super.moveTo(x, y);
+        updateVSPolygon();
+    }
+
+    @Override
+    public void move(double x, double y){
+        super.move(x, y);
+        updateVSPolygon();
+    }
+
+    void updateVSPolygon(){
+        p = new Path2D.Double(Path2D.WIND_EVEN_ODD, xcoords.length);
+        // p.moveTo(xcoords[0]+vx, ycoords[0]+vy);
+        // for (int i=1;i<xcoords.length;i++) {
+        //     p.lineTo(xcoords[i]+vx, ycoords[i]+vy);
+        // }
+        p.closePath();
+    }
+
+    @Override
     public double getOrient(){return orient;}
 
     /** Cannot be reoriented. */
@@ -159,13 +184,12 @@ public class FPolygon<T> extends ClosedShape {
 
     @Override
     public boolean coordInside(int jpx, int jpy, Camera c, double cvx, double cvy){
-        return coordInsideP(jpx, jpy, c);
+        return coordInsideV(cvx, cvy, c);
     }
 
     @Override
     public boolean coordInsideV(double cvx, double cvy, Camera c){
-        // NOT IMPLEMENTED
-        return false;
+        return p.contains(cvx, cvy);
     }
 
     @Override
@@ -463,13 +487,7 @@ public class FPolygon<T> extends ClosedShape {
      */
     @Override
     public Shape getJava2DShape(){
-        int[] xc = new int[xcoords.length];
-        int[] yc = new int[xcoords.length];
-        for (int i=0;i<xcoords.length;i++){
-            xc[i] = (int)Math.round(xcoords[i] + vx);
-            yc[i] = (int)Math.round(ycoords[i] + vy);
-        }
-        return new Polygon(xc, yc, xc.length);
+        return (Path2D)p.clone();
     }
 
     @Override
