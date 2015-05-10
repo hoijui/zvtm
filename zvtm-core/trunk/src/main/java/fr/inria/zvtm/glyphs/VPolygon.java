@@ -40,8 +40,6 @@ public class VPolygon<T> extends ClosedShape {
     /*store x,y vertex coords as relative coordinates w.r.t polygon's centroid*/
     double[] xcoords;
     double[] ycoords;
-    double[] lxcoords;
-    double[] lycoords;
 
     Path2D.Double p;
 
@@ -79,8 +77,6 @@ public class VPolygon<T> extends ClosedShape {
         vz = z;
         xcoords = new double[v.length];
         ycoords = new double[v.length];
-        lxcoords = new double[v.length];
-        lycoords = new double[v.length];
         for (int i=0;i<v.length;i++){
             xcoords[i] = v[i].x;
             ycoords[i] = v[i].y;
