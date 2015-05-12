@@ -42,14 +42,6 @@ $Id$
     </repository>
   </repositories>
 
-  <!-- Deployment -->
-  <distributionManagement>
-	<repository>
-      <id>zvtm.sf.net</id>
-      <url>scp://shell.sourceforge.net/home/project-web/zvtm/htdocs/maven</url>
-    </repository>
-  </distributionManagement>
-
   <!-- Dependencies -->
   <dependencies>
     <dependency>
@@ -73,12 +65,17 @@ $Id$
   <!-- Build -->
   <build>
       <extensions>
-            <extension>
-              <groupId>org.apache.maven.wagon</groupId>
-               <artifactId>wagon-ssh</artifactId>
-               <version>2.8</version>
-            </extension>
-          </extensions>
+        <extension>
+          <groupId>org.apache.maven.wagon</groupId>
+          <artifactId>wagon-ssh</artifactId>
+          <version>2.8</version>
+        </extension>
+        <extension>
+          <groupId>org.apache.maven.wagon</groupId>
+          <artifactId>wagon-ssh-external</artifactId>
+          <version>2.8</version>
+        </extension>
+      </extensions>
 	<resources>
 	  <resource>
         <directory>src/main/resources</directory>
@@ -144,5 +141,30 @@ $Id$
       </plugin>
     </plugins>
   </build>
+  <profiles>
+    <profile>
+      <!-- mvn -P main ... -->
+      <id>main</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <distributionManagement>
+        <repository>
+          <id>zvtm.sf.net</id>
+          <url>scp://shell.sourceforge.net/home/project-web/zvtm/htdocs/maven</url>
+        </repository>
+      </distributionManagement>
+    </profile>
 
+    <profile>
+      <!-- mvn -P gforge ... -->
+      <id>gforge</id>
+      <distributionManagement>
+        <repository>
+          <id>gforge</id>
+          <url>scpexe://scm.gforge.inria.fr/home/groups/isteam/htdocs/maven</url>
+        </repository>
+      </distributionManagement>
+    </profile> 
+  </profiles>
 </project>
