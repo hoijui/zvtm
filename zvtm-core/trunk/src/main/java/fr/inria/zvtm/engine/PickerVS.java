@@ -56,8 +56,8 @@ import fr.inria.zvtm.glyphs.VSegment;
   removed from the VirtualSpace and updates itself accordingly. This is not necessary for the
   picker associated with a View's VCursor, that gets created automatically.</p>
 <pre>
-PickerVS pvs = new PickerVS();
 VirtualSpace vs = ...;
+PickerVS pvs = new PickerVS();
 vs.registerPicker(pvs);
 ...
 pvs.setVSCoordinates(vx, vy);
@@ -164,7 +164,7 @@ public class PickerVS {
     /** Get a list of all DPaths picked at the picker's current coordinates.
      *@param c should be the active camera (can be obtained by VirtualSpaceManager.getActiveCamera())
   	 *@return an empty vector if none
-     *@see #getIntersectingPaths(Camera c, int tolerance, double cursorX, double cursorY)
+     *@see #getIntersectingPaths(Camera c, int tolerance, double cursorX, double cursorY, boolean onlyGlyphsInViewport)
      */
     public Vector<DPath> getIntersectingPaths(Camera c){
 	    return getIntersectingPaths(c, 5, vx, vy, true);
@@ -174,7 +174,7 @@ public class PickerVS {
      *@param c should be the active camera (can be obtained by VirtualSpaceManager.getActiveCamera())
      *@param tolerance the rectangular area's half width/height considered as the cursor intersecting region, in virtual space units (default tolerance is 5)
   	 *@return an empty vector if none
-     *@see #getIntersectingPaths(Camera c, int tolerance, double cursorX, double cursorY)
+     *@see #getIntersectingPaths(Camera c, int tolerance, double cursorX, double cursorY, boolean onlyGlyphsInViewport)
      */
     public Vector<DPath> getIntersectingPaths(Camera c, int tolerance){
 		return getIntersectingPaths(c, tolerance, vx, vy, true);
@@ -352,7 +352,7 @@ public class PickerVS {
      *@return an empty array if the picker is not over any object.
      *@see #getPickedGlyphList(String type)
 	 *@see #getIntersectingGlyphs(Camera c)
-     *@see #getIntersectingGlyphs(Camera c, String type)
+     *@see #getIntersectingGlyphs(Camera c, boolean onlyGlyphsInViewport, String type)
      */
     public Glyph[] getPickedGlyphList(){
         if (maxIndex >= 0){
@@ -370,7 +370,7 @@ public class PickerVS {
      *@return an empty array if the picker is not over any object.
      *@see #getPickedGlyphList()
      *@see #getIntersectingGlyphs(Camera c)
-     *@see #getIntersectingGlyphs(Camera c, String type)
+     *@see #getIntersectingGlyphs(Camera c, boolean onlyGlyphsInViewport, String type)
      */
     public Glyph[] getPickedGlyphList(String type){
         if (maxIndex >= 0){
