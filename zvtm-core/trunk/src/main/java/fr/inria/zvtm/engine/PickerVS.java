@@ -57,12 +57,17 @@ import fr.inria.zvtm.glyphs.VSegment;
   picker associated with a View's VCursor, that gets created automatically.</p>
 <pre>
 PickerVS pvs = new PickerVS();
+VirtualSpace vs = ...;
+vs.registerPicker(pvs);
 ...
 pvs.setVSCoordinates(vx, vy);
 // setting new VS coordinates does not trigger the update of the list of picked glyphs
 // one also needs to call computePickedGlyphList(Camera c)
 // where c is the camera through which the candidate glyphs are observed
 pvs.computePickedGlyphList(c);
+// or, if all glyphs should be considered, not only those that are visible within the camera's current viewport:
+pvs.computePickedGlyphList(c, false);
+// this can be useful, e.g, when picking in a VirtualSpace managed with zvtm-cluster.
 </pre>
  */
 
@@ -140,16 +145,17 @@ public class PickerVS {
      *@param tolerance the rectangular area's half width/height considered as the cursor intersecting region, in virtual space units (default tolerance is 5)
      *@param x picker x-coordinate, in virtual space coordinates system
      *@param y picker y-coordinate, in virtual space coordinates system
+     *@param onlyGlyphsInViewport only perform picking test on glyphs that are drawn. Default value is true, as it limits the number of Glyphs to consider to those that fall within the camera's viewport.
   	 *@return an empty vector if none
      *@see #getIntersectingPaths(Camera c)
 	 */
-    public static Vector<DPath> getIntersectingPaths(Camera c, int tolerance, double x, double y){
+    public static Vector<DPath> getIntersectingPaths(Camera c, int tolerance, double x, double y, boolean onlyGlyphsInViewport){
         Vector res = new Vector();
-        Vector glyphs = c.getOwningSpace().getDrawnGlyphs(c.getIndex());
+        Vector<Glyph> pickableGlyphs = (onlyGlyphsInViewport) ? c.getOwningSpace().getDrawnGlyphs(c.getIndex()) : c.getOwningSpace().getAllGlyphs();
         Object glyph;
         Graphics2D g2d = c.getOwningView().getGraphicsContext();
-        for (int i=0;i<glyphs.size();i++){
-            glyph = glyphs.elementAt(i);
+        for (int i=0;i<pickableGlyphs.size();i++){
+            glyph = pickableGlyphs.elementAt(i);
             if ((glyph instanceof DPath) && intersectsPath((DPath)glyph, tolerance, x, y, g2d)){res.add(glyph);}
         }
         return res;
@@ -161,7 +167,7 @@ public class PickerVS {
      *@see #getIntersectingPaths(Camera c, int tolerance, double cursorX, double cursorY)
      */
     public Vector<DPath> getIntersectingPaths(Camera c){
-	    return getIntersectingPaths(c, 5, vx, vy);
+	    return getIntersectingPaths(c, 5, vx, vy, true);
     }
 
     /** Get a list of all DPaths picked at the picker's current coordinates.
@@ -171,7 +177,7 @@ public class PickerVS {
      *@see #getIntersectingPaths(Camera c, int tolerance, double cursorX, double cursorY)
      */
     public Vector<DPath> getIntersectingPaths(Camera c, int tolerance){
-		return getIntersectingPaths(c, tolerance, vx, vy);
+		return getIntersectingPaths(c, tolerance, vx, vy, true);
     }
 
     static final Rectangle pickingWindow = new Rectangle(0,0,1,1);
@@ -203,17 +209,18 @@ public class PickerVS {
      * Beware of the fact that this method returns glyphs of any kind, not just ClosedShape instances.
      * It can thus be much more computationaly expensive than getpickedGlyphList()
      *@param c a camera (the active camera can be obtained by VirtualSpaceManager.getActiveCamera())
+     *@param onlyGlyphsInViewport only perform picking test on glyphs that are drawn. Default value is true, as it limits the number of Glyphs to consider to those that fall within the camera's viewport.
      *@param type the type of glyph to look for (pass null to look for any type of glyph). Type of glyph as specified with Glyph.setType().
      *@return a list of glyphs under the mouse cursor, sorted by drawing order.
      *@see #getIntersectingGlyphs(Camera c)
      *@see #getPickedGlyphList()
      */
-    public Vector<Glyph> getIntersectingGlyphs(Camera c, String type){
+    public Vector<Glyph> getIntersectingGlyphs(Camera c, boolean onlyGlyphsInViewport, String type){
         Vector res = new Vector();
-        Vector glyphs = c.getOwningSpace().getDrawnGlyphs(c.getIndex());
+        Vector<Glyph> pickableGlyphs = (onlyGlyphsInViewport) ? c.getOwningSpace().getDrawnGlyphs(c.getIndex()) : c.getOwningSpace().getAllGlyphs();
         Glyph glyph;
-        for (int i=0;i<glyphs.size();i++){
-            glyph = (Glyph)glyphs.elementAt(i);
+        for (int i=0;i<pickableGlyphs.size();i++){
+            glyph = pickableGlyphs.elementAt(i);
             // ignore glyphs of other types than the one specified (if set)
             if (type != null && !glyph.getType().equals(type)){continue;}
             if (glyph.coordInsideV(vx, vy, c)){
@@ -235,22 +242,31 @@ public class PickerVS {
      * It can thus be much more computationaly expensive than getpickedGlyphList()
      *@param c a camera (the active camera can be obtained by VirtualSpaceManager.getActiveCamera())
      *@return a list of glyphs under the mouse cursor, sorted by drawing order; null if no object under the cursor.
-     *@see #getIntersectingGlyphs(Camera c, String type)
+     *@see #getIntersectingGlyphs(Camera c, boolean onlyGlyphsInViewport, String type)
      *@see #getPickedGlyphList()
      */
     public Vector<Glyph> getIntersectingGlyphs(Camera c){
-        return getIntersectingGlyphs(c, null);
+        return getIntersectingGlyphs(c, true, null);
     }
+
 
     /** Compute the list of glyphs currently picked.
      *@param c camera observing the glyphs of potential interest in the View.
      */
     public boolean computePickedGlyphList(Camera c){
+        return computePickedGlyphList(c, true);
+    }
+
+    /** Compute the list of glyphs currently picked.
+     *@param c camera observing the glyphs of potential interest in the View.
+     *@param onlyGlyphsInViewport only perform picking test on glyphs that are drawn. Default value is true, as it limits the number of Glyphs to consider to those that fall within the camera's viewport.
+     */
+    public boolean computePickedGlyphList(Camera c, boolean onlyGlyphsInViewport){
         boolean res = false;
-        Vector<Glyph> drawnGlyphs = c.getOwningSpace().getDrawnGlyphs(c.getIndex());
+        Vector<Glyph> pickableGlyphs = (onlyGlyphsInViewport) ? c.getOwningSpace().getDrawnGlyphs(c.getIndex()) : c.getOwningSpace().getAllGlyphs();
         try {
-            for (int i=0;i<drawnGlyphs.size();i++){
-                tmpGlyph = drawnGlyphs.elementAt(i);
+            for (int i=0;i<pickableGlyphs.size();i++){
+                tmpGlyph = pickableGlyphs.elementAt(i);
                 if (tmpGlyph.isSensitive() && checkGlyph(c)){
                     res = true;
                 }

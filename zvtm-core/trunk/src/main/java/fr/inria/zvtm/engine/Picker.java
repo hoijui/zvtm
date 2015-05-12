@@ -123,7 +123,7 @@ public class Picker extends PickerVS {
     }
 
     @Override
-	public Vector<Glyph> getIntersectingGlyphs(Camera c, String type){
+	public Vector<Glyph> getIntersectingGlyphs(Camera c, boolean onlyGlyphsInViewport, String type){
         Vector res = new Vector();
         Vector glyphs = c.getOwningSpace().getDrawnGlyphs(c.getIndex());
         Glyph glyph;
