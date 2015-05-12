@@ -170,7 +170,6 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
         </repository>
       </distributionManagement>
     </profile>
-
     <profile>
       <!-- mvn -P gforge ... -->
       <id>gforge</id>
