@@ -226,39 +226,33 @@ class JSkyFitsViewerEventHandler implements ViewListener {
             app.rescaleGlobal(true);
         }
         else if(code==KeyEvent.VK_1){
-            System.out.println(1);
             app.showLayer(FitsViewer.LAYER_SCENE_KS, 1.f);
             app.hideLayer(FitsViewer.LAYER_SCENE_H);
             app.hideLayer(FitsViewer.LAYER_SCENE_J);
         }
         else if(code==KeyEvent.VK_2){
-            System.out.println(2);
             app.showLayer(FitsViewer.LAYER_SCENE_KS, 1.f);
             app.showLayer(FitsViewer.LAYER_SCENE_H, 0.5f);
             app.hideLayer(FitsViewer.LAYER_SCENE_J);
         }
         else if(code==KeyEvent.VK_3){
-            System.out.println(3);
             app.hideLayer(FitsViewer.LAYER_SCENE_KS);
             app.showLayer(FitsViewer.LAYER_SCENE_H, 1.f);
             app.hideLayer(FitsViewer.LAYER_SCENE_J);
         }
         else if(code==KeyEvent.VK_4){
-            System.out.println(4);
             app.hideLayer(FitsViewer.LAYER_SCENE_KS);
             app.showLayer(FitsViewer.LAYER_SCENE_H, 1.f);
             app.showLayer(FitsViewer.LAYER_SCENE_J, 0.5f);
         }
         else if(code==KeyEvent.VK_5){
-            System.out.println(5);
             app.hideLayer(FitsViewer.LAYER_SCENE_KS);
             app.hideLayer(FitsViewer.LAYER_SCENE_H);
             app.showLayer(FitsViewer.LAYER_SCENE_J, 1.f);
         }
         else if(code==KeyEvent.VK_6){
-            System.out.println(6);
             app.showLayer(FitsViewer.LAYER_SCENE_KS, 1.f);
-            app.showLayer(FitsViewer.LAYER_SCENE_H, 0.33f);
+            app.showLayer(FitsViewer.LAYER_SCENE_H, 0.66f);
             app.showLayer(FitsViewer.LAYER_SCENE_J, 0.33f);
         }
         // else if (code == KeyEvent.VK_MINUS){
