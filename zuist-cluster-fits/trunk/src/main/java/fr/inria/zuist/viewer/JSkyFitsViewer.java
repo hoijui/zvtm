@@ -433,6 +433,7 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
     public void hideLayer(int layerIndex){
         for(ObjectDescription desc: sm.getObjectDescriptions()){
             if(desc instanceof JSkyFitsImageDescription){
+                //System.out.println("getLayerIndex: " + ((JSkyFitsImageDescription)desc).getLayerIndex() + " layerIndex: " + layerIndex);
                 if( ((JSkyFitsImageDescription)desc).getLayerIndex() == layerIndex){
                     ((JSkyFitsImageDescription)desc).setVisible(false);
                 }
@@ -447,6 +448,7 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
     public void showLayer(int layerIndex, float alpha){
         for(ObjectDescription desc: sm.getObjectDescriptions()){
             if(desc instanceof JSkyFitsImageDescription){
+                //System.out.println("getLayerIndex: " + ((JSkyFitsImageDescription)desc).getLayerIndex() + " layerIndex: " + layerIndex);
                 if( ((JSkyFitsImageDescription)desc).getLayerIndex() == layerIndex){
                     ((JSkyFitsImageDescription)desc).setVisible(true);
                     ((JSkyFitsImageDescription)desc).setTranslucencyValue(alpha);

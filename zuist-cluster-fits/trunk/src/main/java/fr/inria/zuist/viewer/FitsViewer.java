@@ -246,9 +246,6 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         sm.setRegionListener(this);
         sm.setLevelListener(this);
 
-        
-        
-
         pythonWCS = new PythonWCS();
 
 		previousLocations = new Vector();
@@ -542,6 +539,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     public void hideLayer(int layerIndex){
         for(ObjectDescription desc: sm.getObjectDescriptions()){
             if(desc instanceof FitsImageDescription){
+               // System.out.println("getLayerIndex: " + ((FitsImageDescription)desc).getLayerIndex() + " layerIndex: " + layerIndex);
                 if( ((FitsImageDescription)desc).getLayerIndex() == layerIndex){
                     ((FitsImageDescription)desc).setVisible(false);
                 }
@@ -555,6 +553,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     public void showLayer(int layerIndex, float alpha){
         for(ObjectDescription desc: sm.getObjectDescriptions()){
             if(desc instanceof FitsImageDescription){
+                //System.out.println("getLayerIndex: " + ((FitsImageDescription)desc).getLayerIndex() + " layerIndex: " + layerIndex);
                 if( ((FitsImageDescription)desc).getLayerIndex() == layerIndex){
                     ((FitsImageDescription)desc).setVisible(true);
                     ((FitsImageDescription)desc).setTranslucencyValue(alpha);

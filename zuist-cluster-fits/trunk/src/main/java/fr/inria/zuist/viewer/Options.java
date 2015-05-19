@@ -57,7 +57,7 @@ public class Options {
     public String httpPassword = null;
 
     @Option(name = "-hostmq", usage = "Host of the RabbitMQ")
-    public static String HOST_NAME_MQ = "192.168.1.213";
+    public static String HOST_NAME_MQ = "127.0.0.1";
 
     public static String PRODUCER_ROUTINGKEY_MQ = "java";
     public static String CONSUMER_ROUTINGKEY_MQ = "python";

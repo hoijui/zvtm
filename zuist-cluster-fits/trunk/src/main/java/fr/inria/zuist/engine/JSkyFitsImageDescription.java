@@ -93,7 +93,7 @@ public class JSkyFitsImageDescription extends ResourceDescription {
 
         isVisible = true;
 
-        layerIndex = parentRegion.getLayerIndex();
+        layerIndex = parentRegion.getLayerIndex()-1;
 
         this.parentRegion = parentRegion;
 
@@ -146,7 +146,7 @@ public class JSkyFitsImageDescription extends ResourceDescription {
 
         isVisible = true;
 
-        layerIndex = parentRegion.getLayerIndex();
+        layerIndex = parentRegion.getLayerIndex()-1;
 
         this.parentRegion = parentRegion;
 
