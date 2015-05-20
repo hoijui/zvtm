@@ -389,5 +389,10 @@ public class FitsImageDescription extends ResourceDescription {
         return isVisible;
     }
 
+    @Override
+    public boolean coordInside(double pvx, double pvy){
+        return (vx >= pvx-w/2d && vx <= pvx+w/2d && vy >= pvy-h/2d && vy <= pvy+h/2d);
+    }
+
 }
 

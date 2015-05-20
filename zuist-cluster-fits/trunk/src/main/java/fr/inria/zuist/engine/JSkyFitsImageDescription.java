@@ -387,5 +387,10 @@ public class JSkyFitsImageDescription extends ResourceDescription {
         return isVisible;
     }
 
+    @Override
+    public boolean coordInside(double pvx, double pvy){
+        return (vx >= pvx-vw/2d && vx <= pvx+vw/2d && vy >= pvy-vw/2d && vy <= pvy+vw/2d);
+    }
+    
 }
 
