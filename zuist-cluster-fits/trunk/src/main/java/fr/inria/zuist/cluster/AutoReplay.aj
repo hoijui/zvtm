@@ -57,12 +57,12 @@ aspect AutoReplay extends AbstractAutoReplay {
          execution(public void FitsImageDescription.moveTo(double, double)) ||
          execution(public void FitsImageDescription.orientTo(double)) ||
          execution(public void FitsImageDescription.setVisible(boolean)) ||
-         execution(public void JSkyFitsImageDescription.setScaleAlgorithm(JSkyFitsImage.ScaleAlgorithm)) ||
-         execution(public void JSkyFitsImageDescription.setColorLookupTable(String)) ||
+         execution(public void JSkyFitsImageDescription.setScaleAlgorithm(JSkyFitsImage.ScaleAlgorithm, boolean)) ||
+         execution(public void JSkyFitsImageDescription.setColorLookupTable(String, boolean)) ||
          execution(public VirtualSpace JSkyFitsImageDescription.getVirtualSpace()) ||
          execution(public void JSkyFitsImageDescription.setRescaleGlobal(double, double)) ||
          execution(public void JSkyFitsImageDescription.setRescaleGlobal(boolean)) || 
-         execution(public void JSkyFitsImageDescription.rescale(double, double)) ||
+         execution(public void JSkyFitsImageDescription.rescale(double, double, boolean)) ||
          execution(public void JSkyFitsImageDescription.rescaleGlobal()) ||
          execution(public void JSkyFitsImageDescription.rescaleLocal()) ||
          execution(public double[] JSkyFitsImageDescription.getLocalScaleParams()) ||

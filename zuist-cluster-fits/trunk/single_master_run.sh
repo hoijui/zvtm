@@ -13,7 +13,7 @@ LIB=$LIB":target/zvtm-svg-0.2.2-SNAPSHOT.jar"
 
 JAR="target/zuist-cluster-fits-0.2.0-SNAPSHOT.jar"
 
-rm target/zvtm-core-0.11.2.jar
+rm target/zvtm-core-0.12.0-SNAPSHOT.jar
 
 IP=`ifconfig eth0 2>/dev/null|awk '/inet addr:/ {print $2}'|sed 's/addr://'`
 

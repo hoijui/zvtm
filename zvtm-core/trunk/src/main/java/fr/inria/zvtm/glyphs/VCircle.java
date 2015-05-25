@@ -128,7 +128,7 @@ public class VCircle<T> extends ClosedShape {
 
     @Override
     public void removeCamera(int index){
-    pc[index]=null;
+        pc[index]=null;
     }
 
     @Override

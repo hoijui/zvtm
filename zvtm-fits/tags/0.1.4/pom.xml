@@ -86,12 +86,13 @@ $Id$
 
     jsky is supplied in the 'libs' directory
 -->
+  
 	  <dependency>
       <groupId>ivoa.fits</groupId>
       <artifactId>fits</artifactId>
       <version>0.3.0</version>
     </dependency>
-
+  
 
     <dependency>
       <groupId>jsky</groupId>

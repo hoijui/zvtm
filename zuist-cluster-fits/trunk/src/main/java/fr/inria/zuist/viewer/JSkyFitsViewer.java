@@ -905,6 +905,8 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
                         lb.setTranslucencyValue(.6f);
                         mSpace.addGlyph(cr);
                         mSpace.addGlyph(lb);
+                        VCircle circle = new VCircle(l[0], l[1], 100, 20, Color.YELLOW, Color.WHITE, .8f);
+                        mSpace.addGlyph(circle);
                         //cr.setOwner(this.obj);
                         //lb.setOwner(this.obj);
                         cr.setType(JSkyFitsMenu.T_ASTRO_OBJ);
