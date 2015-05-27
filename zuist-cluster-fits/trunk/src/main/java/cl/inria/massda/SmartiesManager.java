@@ -12,6 +12,7 @@ import java.awt.Color;
 
 //import fr.inria.zuist.cluster.viewer.WallCursor;
 import java.util.Vector;
+import java.util.Map;
 
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.EndAction;
@@ -47,6 +48,7 @@ public class SmartiesManager implements Observer {
     SmartiesDevice dragDevice;
 
     SmartiesWidget swWCS;
+    SmartiesWidget swDist;
 
     float prevMFPinchD = 0;
     float prevMFMoveX = 0;
@@ -55,6 +57,7 @@ public class SmartiesManager implements Observer {
 
     int countWidget;
     int ui_swwcs;
+    int ui_swdist;
     int ui_swsystem;
     int ui_swrescale;
 
@@ -98,6 +101,13 @@ public class SmartiesManager implements Observer {
         sw.labelOn = new String("Galactical");
         sw.handler = new EventCoordinateSystem();
         ui_swsystem = countWidget;
+        countWidget++;
+
+        swDist = smarties.addWidget(
+                               SmartiesWidget.SMARTIES_WIDGET_TYPE_TOGGLE_BUTTON, "Distance: Off", 6, 2, 1, 1);
+        swDist.labelOn = new String("Distance: On");
+        swDist.handler = new EventDistance();
+        ui_swdist = countWidget;
         countWidget++;
 
 /*
@@ -488,6 +498,20 @@ public class SmartiesManager implements Observer {
             labelfst.setText(sexagesimal);
         }
 
+        public void distance(MyCursor c){
+            //Draw line
+            //Draw distance
+            if(isGalactical){
+                double dl = l - c.l;
+                double db = b - c.b;
+                System.out.println(dl + " -- " + db);
+            } else {
+                double dra = ra - c.ra;
+                double ddec = dec - c.dec;
+                System.out.println(dra + " -- " + ddec);
+            }
+        }
+
         @Override
         public void update(Observable obs, Object obj){
             System.out.println("update Observable");
@@ -586,8 +610,15 @@ public class SmartiesManager implements Observer {
         public boolean callback(SmartiesWidget sw, SmartiesEvent se, Object user_data){
             System.out.println("EventWCS");
             if(se.p != null){
+                /*
                 MyCursor c = (MyCursor)se.p.app_data;
                 c.labelSetVisible(sw.on);
+                */
+                Map<Integer,SmartiesPuck> pucks = smarties.getPuckMapping();
+                for (Map.Entry<Integer,SmartiesPuck> puck : pucks.entrySet() ) {
+                    MyCursor c = (MyCursor)(puck.getValue().app_data);
+                    c.labelSetVisible(sw.on);
+                }
             } else {
                 System.out.println("WCS without Puck");
                 smarties.sendWidgetLabel(ui_swwcs, "WCS: Off", se.device);
@@ -602,8 +633,16 @@ public class SmartiesManager implements Observer {
             System.out.println("EventCoordinateSystem");
             if(se.p != null){
 
+                /*
                 MyCursor c = (MyCursor)se.p.app_data;
                 c.setGalactical(sw.on);
+                */
+                Map<Integer,SmartiesPuck> pucks = smarties.getPuckMapping();
+                for (Map.Entry<Integer,SmartiesPuck> puck : pucks.entrySet() ) {
+                    MyCursor c = (MyCursor)(puck.getValue().app_data);
+                    c.setGalactical(sw.on);
+                }
+
 
             } else {
                 System.out.println("Coordinate System without Puck");
@@ -619,6 +658,33 @@ public class SmartiesManager implements Observer {
             System.out.println("EventRescale");
             application.rescaleGlobal(!sw.on);
             
+            return true;
+        }
+    }
+
+    class EventDistance implements SmartiesWidgetHandler{
+        public boolean callback(SmartiesWidget sw, SmartiesEvent se, Object user_data){
+            System.out.println("EventDistance");
+            if(sw.on){
+                Map<Integer,SmartiesPuck> pucks = smarties.getPuckMapping();
+                for (Map.Entry<Integer,SmartiesPuck> puck_a : pucks.entrySet() ) {
+                    //System.out.println(puck_a.getKey() + " - " + puck_a.getValue());
+                    for (Map.Entry<Integer,SmartiesPuck> puck_b : pucks.entrySet() ) {
+                        //System.out.println(puck_b.getKey() + " - " + puck_b.getValue());
+                        if(puck_a.getKey() != puck_b.getKey()){
+                            System.out.println("distance");
+                            System.out.println(puck_a.getKey() + " - " + puck_a.getValue().app_data);
+                            System.out.println(puck_b.getKey() + " - " + puck_b.getValue().app_data);
+                            MyCursor a = (MyCursor)(puck_a.getValue().app_data);
+                            MyCursor b = (MyCursor)(puck_b.getValue().app_data);
+                            a.distance(b);
+                            //(MyCursor)(puck_a.getValue().app_data).distance( (MyCursor)(puck_b.getValue().app_data) );
+                            
+                        }
+                    }
+                }
+            } 
+
             return true;
         }
     }

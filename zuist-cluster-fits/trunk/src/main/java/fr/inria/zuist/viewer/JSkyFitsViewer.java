@@ -541,20 +541,22 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
 
             */
 
-            System.out.print("xy: ");
-            System.out.print(xy);
-            System.out.print(" -- coord: ");
-            System.out.print(coord);
-            double x = (coord[0] - fitsImageDescRef.getX()) + fitsImageDescRef.getWidth()/2 ;
-            double y = (coord[1] - fitsImageDescRef.getY()) + fitsImageDescRef.getHeight()/2 ;
+            if(fitsImageDescRef != null){
+                System.out.print("xy: ");
+                System.out.print(xy);
+                System.out.print(" -- coord: ");
+                System.out.print(coord);
+                double x = (coord[0] - fitsImageDescRef.getX()) + fitsImageDescRef.getWidth()/2 ;
+                double y = (coord[1] - fitsImageDescRef.getY()) + fitsImageDescRef.getHeight()/2 ;
 
-            System.out.println( "(" + x + ", " + y + ")");
+                System.out.println( "(" + x + ", " + y + ")");
 
-            System.out.println("size: " + fitsImageDescRef.getWidthWithFactor() + ", " +  fitsImageDescRef.getHeightWithFactor());
+                System.out.println("size: " + fitsImageDescRef.getWidthWithFactor() + ", " +  fitsImageDescRef.getHeightWithFactor());
 
-            //pythonWCS.changeCoordinateSystem(galacticalSystem);
-            //pythonWCS.sendCoordinate(x, y, mc);
-            pythonWCS.sendPix2World(x, y, id);
+                //pythonWCS.changeCoordinateSystem(galacticalSystem);
+                //pythonWCS.sendCoordinate(x, y, mc);
+                pythonWCS.sendPix2World(x, y, id);
+            }
 
         } catch (NullPointerException e){
             e.printStackTrace(System.out);

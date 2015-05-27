@@ -87,6 +87,7 @@ CMD_LINE_HELP = "ZUIST Image Tiling Script\n\nUsage:\n\n" + \
     "\t-notnewfile \tif exist file, not create new file\n"+\
     "\t-withbackground\tWithout the image of the level 0\n"+\
     "\t-maxneighborhood=N\tMaximum neighborhood\n"
+    
 
 
 TRACE_LEVEL = 1
