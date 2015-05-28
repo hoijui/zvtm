@@ -13,6 +13,8 @@ import java.awt.Color;
 //import fr.inria.zuist.cluster.viewer.WallCursor;
 import java.util.Vector;
 import java.util.Map;
+import java.util.HashMap;
+import java.awt.geom.Point2D;
 
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.EndAction;
@@ -31,6 +33,8 @@ import java.util.Observable;
 import org.json.JSONObject;
 import org.json.JSONException;
 
+//import fr.inria.zvtm.engine.Location;
+import fr.inria.zvtm.glyphs.VSegment;
 import fr.inria.zvtm.glyphs.VText;
 import java.awt.Font;
 
@@ -60,6 +64,9 @@ public class SmartiesManager implements Observer {
     int ui_swdist;
     int ui_swsystem;
     int ui_swrescale;
+
+    Map<String, VSegment> linesDist;
+    Map<String, VText> labelsDist;
 
 
     public SmartiesManager(FitsViewer app){
@@ -137,6 +144,9 @@ public class SmartiesManager implements Observer {
         countWidget++;
 
         smarties.addObserver(this);
+
+        linesDist = new HashMap<String, VSegment>();
+        labelsDist = new HashMap<String, VText>();
 
         smarties.Run();
     }
@@ -271,6 +281,7 @@ public class SmartiesManager implements Observer {
                     if (se.p != null){
                         MyCursor c = (MyCursor)se.p.app_data;
                         c.move(se.p.x, se.p.y);
+                        setMoving(true);
 
                         if (se.mode == SmartiesEvent.SMARTIE_GESTUREMOD_DRAG && dragDevice == se.device ){//&& !modeDrawRect){
                             // this is the device that lock the drag, e.p should be == dragPuck
@@ -296,6 +307,8 @@ public class SmartiesManager implements Observer {
                     if (se.p != null){
                         MyCursor c = (MyCursor)se.p.app_data;
                         c.updateWCS();
+                        setMoving(false);
+                        updateDistance();
                         se.p.app_data = c; // CHECK
                     }
                
@@ -357,6 +370,68 @@ public class SmartiesManager implements Observer {
 
     }
 
+    public void updateDistance(){
+        if(swDist.on){
+            Map<Integer,SmartiesPuck> pucks = smarties.getPuckMapping();
+            for (Map.Entry<Integer,SmartiesPuck> puck_a : pucks.entrySet() ) {
+                for (Map.Entry<Integer,SmartiesPuck> puck_b : pucks.entrySet() ) {
+                    if( !puck_a.getKey().equals(puck_b.getKey()) ){
+                        MyCursor a = (MyCursor)(puck_a.getValue().app_data);
+                        MyCursor b = (MyCursor)(puck_b.getValue().app_data);
+                        if(a != null && b != null){
+                            a.distanceLine(b);
+                            a.distanceLabel(b);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public void updateDistance(MyCursor c){
+         if(swDist.on){
+            Map<Integer,SmartiesPuck> pucks = smarties.getPuckMapping();
+            for (Map.Entry<Integer,SmartiesPuck> puck_a : pucks.entrySet() ) {
+                for (Map.Entry<Integer,SmartiesPuck> puck_b : pucks.entrySet() ) {
+                    if( !puck_a.getKey().equals(puck_b.getKey()) ){
+                        MyCursor a = (MyCursor)(puck_a.getValue().app_data);
+                        MyCursor b = (MyCursor)(puck_b.getValue().app_data);
+                        if(a != null && b != null && (a.equals(c) || b.equals(c)) ){
+                            a.distanceLine(b);
+                            a.distanceLabel(b);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public void removeDistance(){
+        if(linesDist!= null){
+            Map<String,VSegment> lines = new HashMap<String,VSegment>(linesDist);
+            for (Map.Entry<String,VSegment> line : lines.entrySet()) {
+                application.cursorSpace.removeGlyph(line.getValue());
+                linesDist.remove(line.getKey());
+            }
+        }
+        if(labelsDist != null){
+            Map<String,VText> labels = new HashMap<String,VText>(labelsDist);
+            for (Map.Entry<String,VText> label : labels.entrySet()) {
+                application.cursorSpace.removeGlyph(label.getValue());
+                labelsDist.remove(label.getKey());
+            }
+        }
+    }
+
+    public void setMoving(boolean b){
+        if(labelsDist != null){
+            Map<String,VText> labels = new HashMap<String,VText>(labelsDist);
+            for (Map.Entry<String,VText> label : labels.entrySet()) {
+                label.getValue().setVisible(!b);
+            }
+        }
+    }
+
 
     public class MyCursor implements Observer {
 
@@ -373,6 +448,7 @@ public class SmartiesManager implements Observer {
         
         boolean isLabelVisible = false;
         boolean isGalactical = false;
+        boolean isMoving = false;
 
         String sexagesimal;
         String coordinate;
@@ -415,11 +491,14 @@ public class SmartiesManager implements Observer {
 
             move(x, y);
 
+            
+
         }
 
         public void dispose(){
             wc.dispose();
             application.pythonWCS.deleteObserver(this);
+            //removeDistance();
         }
 
         public void setVisible(boolean b){
@@ -431,11 +510,14 @@ public class SmartiesManager implements Observer {
 
         public void move(double x, double y){
             this.x = x; this.y = y;
-            //wc.moveTo((long)(x*application.getDisplayWidth() - application.getDisplayWidth()/2.0), (long)(application.getDisplayHeight()/2.0 - y*application.getDisplayHeight()));
-            wc.moveTo((long)(x*application.SCENE_W - application.SCENE_W/2.0), (long)(application.SCENE_H/2.0 - y*application.SCENE_H));
-            labelsnd.moveTo((long)(x*application.SCENE_W - application.SCENE_W/2.0+50), (long)(application.SCENE_H/2.0 - y*application.SCENE_H+50));
-            labelfst.moveTo((long)(x*application.SCENE_W - application.SCENE_W/2.0+50), (long)(application.SCENE_H/2.0 - y*application.SCENE_H+70));
+            Point2D.Double point = getLocation();
+            wc.moveTo((long)(point.getX()), (long)(point.getY()));
+            labelsnd.moveTo((long)(point.getX()+50), (long)(point.getY()+50));
+            labelfst.moveTo((long)(point.getX()+50), (long)(point.getY()+70));
+            updateDistance(this);
         }
+
+        
 
         public void labelSetVisible(boolean b){
             /*
@@ -483,6 +565,10 @@ public class SmartiesManager implements Observer {
             */
         }
 
+        public Point2D.Double getLocation(){
+            return new Point2D.Double(x*application.SCENE_W - application.SCENE_W/2.0, application.SCENE_H/2.0 - y*application.SCENE_H);
+        }
+
 
         public void updateLabel(){
 
@@ -498,19 +584,61 @@ public class SmartiesManager implements Observer {
             labelfst.setText(sexagesimal);
         }
 
-        public void distance(MyCursor c){
-            //Draw line
-            //Draw distance
+        public void distanceLine(MyCursor c){
+            String parid = (id < c.id) ? id+"-"+c.id : c.id + "-" + id;
+
+            Point2D.Double coord1 = getLocation();
+            Point2D.Double coord2 = c.getLocation();
+
+            if(!linesDist.containsKey(parid)){
+                //System.out.println("!linesDist.containsKey(parid)");
+                VSegment line = new VSegment(coord1.getX(), coord1.getY(), coord2.getX(), coord2.getY(), 1, color);
+                application.cursorSpace.addGlyph(line);
+                linesDist.put(parid, line);
+            } else {
+                VSegment line = linesDist.get(parid);
+                if(line != null){
+                    line.setEndPoints(coord1.getX(), coord1.getY(), coord2.getX(), coord2.getY());
+                }
+            }
+        }
+
+        public void distanceLabel(MyCursor c){
+            String parid = (id < c.id) ? id+"-"+c.id : c.id + "-" + id;
+            String text;
             if(isGalactical){
                 double dl = l - c.l;
                 double db = b - c.b;
-                System.out.println(dl + " -- " + db);
+                System.out.println(dl + " -- " + db); 
+                text = Math.sqrt(dl*dl) + " L -- " +Math.sqrt(db*db) + " B";
             } else {
                 double dra = ra - c.ra;
                 double ddec = dec - c.dec;
                 System.out.println(dra + " -- " + ddec);
+                text = Math.sqrt(dra*dra) + " RA -- " +Math.sqrt(ddec*ddec) + " DEC";
             }
+
+            Point2D.Double coord1 = getLocation();
+            Point2D.Double coord2 = c.getLocation();
+
+            double x = (coord1.getX() + coord2.getX())/2;
+            double y = (coord1.getY() + coord2.getY())/2;
+
+            if(!labelsDist.containsKey(parid)){
+                VText label = new VText(x, y, 1, color, Color.BLACK, text, VText.TEXT_ANCHOR_START, 1f, 1f);
+                application.cursorSpace.addGlyph(label);
+                labelsDist.put(parid, label);
+            } else {
+                VText label = labelsDist.get(parid);
+                if(label != null){
+                    label.moveTo(x, y);
+                    label.setText(text);
+                }
+            }
+            
         }
+
+        
 
         @Override
         public void update(Observable obs, Object obj){
@@ -677,13 +805,23 @@ public class SmartiesManager implements Observer {
                             System.out.println(puck_b.getKey() + " - " + puck_b.getValue().app_data);
                             MyCursor a = (MyCursor)(puck_a.getValue().app_data);
                             MyCursor b = (MyCursor)(puck_b.getValue().app_data);
-                            a.distance(b);
+                            a.distanceLine(b);
+                            a.distanceLabel(b);
                             //(MyCursor)(puck_a.getValue().app_data).distance( (MyCursor)(puck_b.getValue().app_data) );
                             
                         }
                     }
                 }
-            } 
+            } else {
+                removeDistance();
+                /*
+                Map<Integer,SmartiesPuck> pucks = smarties.getPuckMapping();
+                for (Map.Entry<Integer,SmartiesPuck> puck : pucks.entrySet() ) {
+                    MyCursor c = (MyCursor)(puck.getValue().app_data);
+                    c.removeDistance();
+                }
+                */
+            }
 
             return true;
         }
