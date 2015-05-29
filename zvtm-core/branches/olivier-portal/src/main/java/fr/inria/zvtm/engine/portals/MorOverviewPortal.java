@@ -29,12 +29,12 @@ import fr.inria.zvtm.event.ObservedRegionListener;
 
 public class MorOverviewPortal extends CameraPortal
 {
-    Camera[] observedRegionCameras;
+    Camera[] observedRegionsCameras;
     View observedRegionView;  // only one valide view !!!
     double[][] observedRegions;
     double orcoef;
 
-    Color[] observedRegionColors;
+    Color[] observedRegionsColors;
 
     /** For translucency of the rectangle representing the region observed through the main viewport (default is 0.5)*/
     AlphaComposite acST;
@@ -56,21 +56,21 @@ public class MorOverviewPortal extends CameraPortal
     public MorOverviewPortal(int x, int y, int w, int h, Camera pc, Camera[] orcs, Color[] colors)
     {
 	    super(x, y, w, h, pc);
-	    this.observedRegionCameras = new Camera[orcs.length];
+	    this.observedRegionsCameras = new Camera[orcs.length];
 	    this.observedRegionView = orcs[0].getOwningView();
 	    this.observedRegions = new double[orcs.length][];
-	    this.observedRegionColors = new Color[orcs.length];
+	    this.observedRegionsColors = new Color[orcs.length];
 	    for(int i = 0; i < orcs.length; i++)
 	    {
-		    this.observedRegionCameras[i] = orcs[i];
+		    this.observedRegionsCameras[i] = orcs[i];
 		    this.observedRegions[i] = new double[4];
 		    if (colors != null &&  colors.length > i)
 		    {
-			    this.observedRegionColors[i] = colors[i];
+			    this.observedRegionsColors[i] = colors[i];
 		    }
 		    else
 		    {
-			    this.observedRegionColors[i] = Color.GREEN;
+			    this.observedRegionsColors[i] = Color.GREEN;
 		    }
 	    }
 	    // find a valid view !!
@@ -80,10 +80,11 @@ public class MorOverviewPortal extends CameraPortal
 		    if (observedRegionView != null)
 		    {
 			    observedRegions[i] =
-				    observedRegionView.getVisibleRegion(observedRegionCameras[i], observedRegions[i]);
+				    observedRegionView.getVisibleRegion(
+					    observedRegionsCameras[i], observedRegions[i]);
 			    if (observedRegions[i] != null)
 			    {
-				    borderColor = observedRegionColors[i];
+				    borderColor = observedRegionsColors[i];
 			    }
 			    break;
 		    }
@@ -125,9 +126,14 @@ public class MorOverviewPortal extends CameraPortal
 /*     } */
 
 
-    public Camera[] getObservedRegionCameras() {
-	    return observedRegionCameras;
+    public Camera[] getObservedRegionsCameras() {
+	    return observedRegionsCameras;
     }
+
+    public Color[] getObservedRegionsColors() {
+	    return observedRegionsColors;
+    }
+
     public void drawObservedRegionLocator(boolean b){
         drawObservedRegionLocator = b;
     }
@@ -147,14 +153,26 @@ public class MorOverviewPortal extends CameraPortal
 		cy <= y+h/2 + Math.round((camera.vy-observedRegions[i][3])*orcoef));
     }
     
-    /** Set color of rectangle depicting what is seen through the main camera for the i th OR. */
-    public void setObservedRegionColor(Color c, int i){
-	    observedRegionColors[i] = c;
+    /** Set color of rectangle depicting what is seen through the main camera for the ith OR. */
+     public void setObservedRegionColor(Color c, int i)
+    {
+	    if (i >= 0 && observedRegionsColors.length > i)
+	    {
+		    observedRegionsColors[i] = c;
+	    }
+    }
+
+    public void setObservedRegionsColors(Color[] cs)
+    {
+	    for (int i = 0; i < observedRegionsColors.length && i < cs.length; i++)
+	    {
+		    observedRegionsColors[i] = cs[i];
+	    }
     }
 
     /** Get color of rectangle depicting what is seen through the main camera. */
     public Color getObservedRegionColor(int i){
-	    return observedRegionColors[i];
+	    return observedRegionsColors[i];
     }
 
     public void setObservedRegionTranslucency(float a){
@@ -235,27 +253,28 @@ public class MorOverviewPortal extends CameraPortal
             }
         }
 
-        // paint region observed through observedRegionCamera
+        // paint region observed through observedRegionsCameras
 	orcoef = (float)(camera.focal/(camera.focal+camera.altitude));
 	g2d.setStroke(standardStroke);
 	double uncoef;
 	Dimension panelSize = observedRegionView.getPanel().getComponent().getSize();
-	for(int i = 0; i < observedRegionCameras.length; i++)
+	for(int i = 0; i < observedRegionsCameras.length; i++)
 	{
-		//System.out.println("PAINT " + i + " " + observedRegionCameras.length);
+		//System.out.println("PAINT " + i + " " + observedRegionsCameras.length);
 
-		//observedRegions[i] = observedRegionViews[i].getVisibleRegion(observedRegionCameras[i], observedRegions[i]);
-		uncoef = (observedRegionCameras[i].focal+observedRegionCameras[i].altitude) / observedRegionCameras[i].focal;
-		observedRegions[i][0] = observedRegionCameras[i].vx-(panelSize.width/2-0)*uncoef;
-		observedRegions[i][1] = observedRegionCameras[i].vy+(panelSize.height/2-0)*uncoef;
-		observedRegions[i][2] = observedRegionCameras[i].vx+(panelSize.width/2-0)*uncoef;
-		observedRegions[i][3] = observedRegionCameras[i].vy-(panelSize.height/2-0)*uncoef;
+		//observedRegions[i] = observedRegionViews[i].getVisibleRegion(observedRegionsCameras[i], observedRegions[i]);
+		uncoef = (observedRegionsCameras[i].focal+observedRegionsCameras[i].altitude) 
+			/ observedRegionsCameras[i].focal;
+		observedRegions[i][0] = observedRegionsCameras[i].vx-(panelSize.width/2-0)*uncoef;
+		observedRegions[i][1] = observedRegionsCameras[i].vy+(panelSize.height/2-0)*uncoef;
+		observedRegions[i][2] = observedRegionsCameras[i].vx+(panelSize.width/2-0)*uncoef;
+		observedRegions[i][3] = observedRegionsCameras[i].vy-(panelSize.height/2-0)*uncoef;
 		//System.out.println(
 		//	" observedRegions("+i+"):" +
 		//	observedRegions[i][0]+" "+observedRegions[i][1]+" "+
 		//	observedRegions[i][2]+" "+observedRegions[i][3]);
 
-		g2d.setColor(observedRegionColors[i]);
+		g2d.setColor(observedRegionsColors[i]);
        
 		int nwx = (int)(x+w/2d + Math.round((observedRegions[i][0]-camera.vx)*orcoef));
 		int nwy = (int)(y+h/2d - Math.round((observedRegions[i][1]-camera.vy)*orcoef));
