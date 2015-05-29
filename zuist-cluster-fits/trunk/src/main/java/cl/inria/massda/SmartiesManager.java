@@ -42,6 +42,9 @@ import fr.inria.zuist.viewer.FitsViewer;
 
 public class SmartiesManager implements Observer {
 
+    static final Font FONT_CURSOR = new Font("default", Font.PLAIN, 16);
+    static final Font FONT_DIST = new Font("default", Font.PLAIN, 13);
+
     FitsViewer application;
 
     Smarties smarties;
@@ -195,8 +198,8 @@ public class SmartiesManager implements Observer {
                 case SmartiesEvent.SMARTIE_EVENTS_TYPE_DELETE:{
                     MyCursor c = (MyCursor)se.p.app_data;
                     c.dispose();
-                    
                     smarties.deletePuck(se.p.id);
+                    updateDistance();
                     break;
                 }
 
@@ -282,7 +285,7 @@ public class SmartiesManager implements Observer {
                         MyCursor c = (MyCursor)se.p.app_data;
                         c.move(se.p.x, se.p.y);
                         setMoving(true);
-
+                        if(swWCS.on) c.labelSetVisible(false);
                         if (se.mode == SmartiesEvent.SMARTIE_GESTUREMOD_DRAG && dragDevice == se.device ){//&& !modeDrawRect){
                             // this is the device that lock the drag, e.p should be == dragPuck
                             float dx = (se.x - prevMFMoveX)*(float)application.getDisplayWidth();
@@ -309,6 +312,7 @@ public class SmartiesManager implements Observer {
                         c.updateWCS();
                         setMoving(false);
                         updateDistance();
+                        if(swWCS.on) c.labelSetVisible(true);
                         se.p.app_data = c; // CHECK
                     }
                
@@ -448,7 +452,6 @@ public class SmartiesManager implements Observer {
         
         boolean isLabelVisible = false;
         boolean isGalactical = false;
-        boolean isMoving = false;
 
         String sexagesimal;
         String coordinate;
@@ -459,9 +462,7 @@ public class SmartiesManager implements Observer {
         double dec;
         double l;
         double b;
-
-
-        Font FONT = new Font("default", Font.PLAIN, 16);
+        
         
         public MyCursor(int id, double x, double y){
             this.id = id;
@@ -474,14 +475,14 @@ public class SmartiesManager implements Observer {
                 (true) ? 10 : 2, (true) ? 100 : 20,
                 this.color);
             labelsnd = new VText(0.0, 0.0, 0, color, Color.BLACK, "", VText.TEXT_ANCHOR_START, 1f, 1f);
-            labelsnd.setFont(FONT);
+            labelsnd.setFont(SmartiesManager.FONT_CURSOR);
 
             labelsnd.setVisible(isLabelVisible);
             application.cursorSpace.addGlyph(labelsnd);
             application.cursorSpace.onTop(labelsnd);
 
             labelfst = new VText(0.0, 0.0, 0, color, Color.BLACK, "", VText.TEXT_ANCHOR_START, 1f, 1f);
-            labelfst.setFont(FONT);
+            labelfst.setFont(SmartiesManager.FONT_CURSOR);
 
             labelfst.setVisible(isLabelVisible);
             application.cursorSpace.addGlyph(labelfst);
@@ -491,14 +492,12 @@ public class SmartiesManager implements Observer {
 
             move(x, y);
 
-            
-
         }
 
         public void dispose(){
             wc.dispose();
             application.pythonWCS.deleteObserver(this);
-            //removeDistance();
+            removeDistance();
         }
 
         public void setVisible(boolean b){
@@ -626,6 +625,7 @@ public class SmartiesManager implements Observer {
 
             if(!labelsDist.containsKey(parid)){
                 VText label = new VText(x, y, 1, color, Color.BLACK, text, VText.TEXT_ANCHOR_START, 1f, 1f);
+                label.setFont(SmartiesManager.FONT_DIST);
                 application.cursorSpace.addGlyph(label);
                 labelsDist.put(parid, label);
             } else {
