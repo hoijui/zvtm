@@ -13,6 +13,7 @@ package fr.inria.zvtm.engine.portals;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.BasicStroke;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -35,6 +36,10 @@ public class OverviewPortal extends CameraPortal {
 
     /** For translucency of the rectangle representing the region observed through the main viewport (default is 0.5)*/
     AlphaComposite acST;
+    float orBorderWidth = 1;
+    float orHalfBorderWidth = 0.5f;
+    BasicStroke orStroke = null;
+
     /** Alpha channel value. */
     float alpha = 0.5f;
 
@@ -94,10 +99,10 @@ public class OverviewPortal extends CameraPortal {
      *@param cy cursor y-coordinate (JPanel coordinates system)
      */
     public boolean coordInsideObservedRegion(int cx, int cy){
-	return (cx >= x+w/2 + Math.round((observedRegion[0]-camera.vx)*orcoef) &&
-		cy >= y+h/2 + Math.round((camera.vy-observedRegion[1])*orcoef) &&
-		cx <= x+w/2 + Math.round((observedRegion[2]-camera.vx)*orcoef) &&
-		cy <= y+h/2 + Math.round((camera.vy-observedRegion[3])*orcoef));
+	return (cx >= x-orHalfBorderWidth+w/2 + Math.round((observedRegion[0]-camera.vx)*orcoef) &&
+		cy >= y-orHalfBorderWidth+h/2 + Math.round((camera.vy-observedRegion[1])*orcoef) &&
+		cx <= x+orHalfBorderWidth+w/2 + Math.round((observedRegion[2]-camera.vx)*orcoef) &&
+		cy <= y+orHalfBorderWidth+h/2 + Math.round((camera.vy-observedRegion[3])*orcoef));
     }
 
     /** Set color of rectangle depicting what is seen through the main camera. */
@@ -117,6 +122,24 @@ public class OverviewPortal extends CameraPortal {
         else {
             acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, a);
         }
+    }
+
+    /** Set the border width of the rectangle depicting what is seen through the main camera. **/
+    public void setObservedRegionBorderWidth(float bw){
+        if (bw <= 0.0f){
+            orStroke=null;
+            orHalfBorderWidth = 0.5f; orBorderWidth = 1.0f;
+        }
+        else{
+            orStroke = new BasicStroke(bw);
+            orBorderWidth = bw;
+            orHalfBorderWidth = bw/2;
+        }
+    }
+
+    /** Get the border width of the rectangle depicting what is seen through the main camera. **/
+    public float setObservedRegionBorderWidth(){
+        return orBorderWidth;
     }
 
     public double getObservedRegionX() {
@@ -149,9 +172,24 @@ public class OverviewPortal extends CameraPortal {
 	    return acST;
     }
 
+    public Camera getObservedRegionCamera(){
+        return observedRegionCamera;
+    }
+
     @Override
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
         if (!visible){return;}
+        //Check if the portal is out of the view
+        if (x+w+halfBorderWidth < 0 || y+h+halfBorderWidth < 0 ||
+            x-halfBorderWidth >= viewWidth || y-halfBorderWidth >= viewHeight){
+            return;
+        }
+        if (alphaC != null){
+            if (alphaC.getAlpha() == 0){
+                return;
+            }
+            g2d.setComposite(alphaC);
+        }
         g2d.setClip(x, y, w, h);
         if (bkgColor != null){
             g2d.setColor(bkgColor);
@@ -198,9 +236,19 @@ public class OverviewPortal extends CameraPortal {
         if (acST != null){
             g2d.setComposite(acST);
             g2d.fillRect(nwx, nwy, orw, orh);
-            g2d.setComposite(Translucent.acO);
+            if (alphaC != null){
+                g2d.setComposite(alphaC);
+            }
+            else{
+                g2d.setComposite(Translucent.acO);
+            }
         }
-        g2d.setStroke(standardStroke);
+        if (orStroke!=null){
+            g2d.setStroke(orStroke);
+        }
+        else{
+            g2d.setStroke(standardStroke);
+        }
         g2d.drawRect(nwx, nwy, orw, orh);
         if (drawObservedRegionLocator){
             // west
@@ -213,10 +261,18 @@ public class OverviewPortal extends CameraPortal {
             g2d.drawRect(nwx+orw/2, nwy+orh, 1, y+h-(nwy+orh));
         }
         // reset Graphics2D
+        g2d.setStroke(standardStroke);
         g2d.setClip(0, 0, viewWidth, viewHeight);
         if (borderColor != null){
             g2d.setColor(borderColor);
+            if (stroke != null){
+                g2d.setStroke(stroke);
+            }
             g2d.drawRect(x, y, w, h);
+            g2d.setStroke(standardStroke);
+        }
+        if (alphaC != null){
+            g2d.setComposite(Translucent.acO);
         }
     }
 

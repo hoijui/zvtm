@@ -21,7 +21,7 @@ import fr.inria.zvtm.glyphs.Translucent;
 
 public class RoundCameraPortal extends CameraPortal {
 
-    Ellipse2D clippingShape;
+    Ellipse2D clippingShape, borderShape;
 
     /** Builds a new portal displaying what is seen through a camera
      *@param x top-left horizontal coordinate of portal, in parent's JPanel coordinates
@@ -44,7 +44,17 @@ public class RoundCameraPortal extends CameraPortal {
      */
     public RoundCameraPortal(int x, int y, int w, int h, Camera c, float a){
         super(x, y, w, h, c);
-        clippingShape = new Ellipse2D.Float(x, y, w, h);
+        createShape();
+    }
+
+    private void createShape() {
+        clippingShape = new Ellipse2D.Float(x+halfBorderWidth, y+halfBorderWidth, w-borderWidth, h-borderWidth);
+        borderShape = new Ellipse2D.Float(x-halfBorderWidth, y-halfBorderWidth, w+borderWidth, h+borderWidth);
+    }
+
+    private void doSetFrame() {
+        clippingShape.setFrame(x+halfBorderWidth, y+halfBorderWidth, w-borderWidth, h-borderWidth);
+        borderShape.setFrame(x-halfBorderWidth, y-halfBorderWidth, w+borderWidth, h+borderWidth);
     }
 
     /** Get bounds of rectangular region of the VirtualSpace seen through this camera portal.
@@ -58,7 +68,12 @@ public class RoundCameraPortal extends CameraPortal {
 
     @Override
     public boolean coordInside(int cx, int cy){
-	    return clippingShape.contains(cx, cy);
+	    return borderShape.contains(cx, cy);
+    }
+
+    @Override
+    public boolean coordInsideBorder(int cx, int cy){
+        return (borderShape.contains(cx, cy) && !clippingShape.contains(cx, cy));
     }
 
     /** Move the portal inside the view (relative).
@@ -68,7 +83,7 @@ public class RoundCameraPortal extends CameraPortal {
     @Override
     public void move(int dx, int dy){
         super.move(dx, dy);
-        clippingShape.setFrame(x, y, w, h);
+        doSetFrame();
     }
 
     /** Move the portal inside the view (absolute).
@@ -78,19 +93,30 @@ public class RoundCameraPortal extends CameraPortal {
     @Override
     public void moveTo(int x, int y){
         super.moveTo(x, y);
-        clippingShape.setFrame(x, y, w, h);
+        doSetFrame();
     }
 
     @Override
     public void updateDimensions(){
         size.setSize(w, h);
-        if (clippingShape != null){clippingShape.setFrame(x, y, w, h);}
-        else {clippingShape = new Ellipse2D.Float(x, y, w, h);}
+        if (clippingShape != null){ doSetFrame(); }
+        else { createShape();}
+    }
+
+    @Override
+    public void setBorderWidth(float w){
+        super.setBorderWidth(w);
+        doSetFrame();
     }
 
     @Override
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
 		if (!visible){return;}
+        //Check if the portal is out of the view
+        if (x+w+borderWidth < 0 || y+h+borderWidth < 0 ||
+            x-borderWidth >= viewWidth || y-borderWidth >= viewHeight){
+            return;
+        }
 		if (alphaC != null){
             // portal is not is not opaque
             if (alphaC.getAlpha() == 0){
@@ -137,7 +163,11 @@ public class RoundCameraPortal extends CameraPortal {
         g2d.setClip(0, 0, viewWidth, viewHeight);
         if (borderColor != null){
             g2d.setColor(borderColor);
+            if (stroke != null){
+                g2d.setStroke(stroke);
+            }
             g2d.draw(clippingShape);
+            g2d.setStroke(standardStroke);
         }
         if (alphaC != null){
             g2d.setComposite(Translucent.acO);

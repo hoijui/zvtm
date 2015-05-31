@@ -98,6 +98,10 @@ public class TrailingOverview extends TrailingCameraPortal {
     @Override
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
         g2d.setClip(x, y, w, h);
+        if (x+w+halfBorderWidth < 0 || y+h+halfBorderWidth < 0 ||
+            x-halfBorderWidth >= viewWidth || y-halfBorderWidth >= viewHeight){
+            return;
+        }
         g2d.setComposite(alphaC);
         if (bkgColor != null){
             g2d.setColor(bkgColor);
@@ -151,7 +155,11 @@ public class TrailingOverview extends TrailingCameraPortal {
         g2d.setClip(0, 0, viewWidth, viewHeight);
         if (borderColor != null){
             g2d.setColor(borderColor);
+            if (stroke != null){
+                g2d.setStroke(stroke);
+            }
             g2d.drawRect(x, y, w, h);
+            g2d.setStroke(standardStroke);
         }
         g2d.setComposite(Translucent.acO);
     }

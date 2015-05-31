@@ -13,6 +13,7 @@ package fr.inria.zvtm.engine.portals;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
+import java.awt.BasicStroke;
 import java.awt.AlphaComposite;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
@@ -148,6 +149,35 @@ public class CameraPortal extends Portal {
      *@return color of the portal's border (null if none)*/
     public Color getBorder(){
 	    return borderColor;
+    }
+
+     /** For internal use. Dot not tamper with. */
+    protected BasicStroke stroke = null;
+    /** For internal use. Dot not tamper with. */
+    protected float halfBorderWidth = 0;
+    /** For internal use. Dot not tamper with. */
+    protected float borderWidth = 0;
+
+    /** Set the border width of the portal (use SetBorder to draw the border)
+     *@param w  width of the border
+     */
+    public void setBorderWidth(float bw){
+        if (bw <= 0.0f){
+            stroke=null;
+            halfBorderWidth = 0.5f; borderWidth = 1.0f;
+        }
+        else{
+            stroke = new BasicStroke(bw);
+            borderWidth = bw;
+            halfBorderWidth = bw/2;
+        }
+    }
+
+    /** get the border width of the portal
+     *@return null if default 1px-thick solid stroke
+     */
+    public float getBorderWidth(){
+        return borderWidth;
     }
 
     /**Fill background with a color.
@@ -314,25 +344,38 @@ public class CameraPortal extends Portal {
 
     @Override
     public boolean coordInside(int cx, int cy){
-	return ((cx >= x) && (cx <= x+w) &&
-		(cy >= y) && (cy <= y+h));
+	   //return ((cx >= x) && (cx <= x+w) && (cy >= y) && (cy <= y+h));
+        return ((cx >= x-halfBorderWidth) && (cx <= x+w+halfBorderWidth) &&
+            (cy >= y-halfBorderWidth) && (cy <= y+h+halfBorderWidth));
+    }
+
+    public boolean coordInsideBorder(int cx, int cy){
+    return (((cx >= x-halfBorderWidth) && (cx <= x+halfBorderWidth) &&
+             (cy >= y-halfBorderWidth) && (cy <= y+h+halfBorderWidth)) ||
+            ((cx >= x-halfBorderWidth) && (cx <= x+w+halfBorderWidth) &&
+             (cy >= y-halfBorderWidth) && (cy <= y+halfBorderWidth)) ||
+            ((cx >= x+w-halfBorderWidth) && (cx <= x+w+halfBorderWidth) &&
+             (cy >= y-halfBorderWidth) && (cy <= y+h+halfBorderWidth)) ||
+            ((cx >= x-halfBorderWidth) && (cx <= x+w+halfBorderWidth) &&
+             (cy >= y+h-halfBorderWidth) && (cy <= y+h+halfBorderWidth)));
     }
 
     @Override
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
         if (!visible){return;}
+        //Check if the portal is out of the view
+        if (x+w+halfBorderWidth < 0 || y+h+halfBorderWidth < 0 ||
+            x-halfBorderWidth >= viewWidth || y-halfBorderWidth >= viewHeight){
+            return;
+        }
         if (alphaC != null){
-            // portal is not is not opaque
+            // portal is not opaque
             if (alphaC.getAlpha() == 0){
                 // portal is totally transparent
                 return;
             }
             g2d.setComposite(alphaC);
         }
-        
-        //Check if the portal is out of the view
-        if (x+w < 0 || y+h < 0 || x >= viewWidth || y >= viewHeight)
-            return;
                 
         g2d.setClip(x, y, w, h);
         if (bkgColor != null){
@@ -372,7 +415,11 @@ public class CameraPortal extends Portal {
         g2d.setClip(0, 0, viewWidth, viewHeight);
         if (borderColor != null){
             g2d.setColor(borderColor);
+            if (stroke != null){
+                g2d.setStroke(stroke);
+            }
             g2d.drawRect(x, y, w, h);
+            g2d.setStroke(standardStroke);
         }
         if (alphaC != null){
             g2d.setComposite(Translucent.acO);
