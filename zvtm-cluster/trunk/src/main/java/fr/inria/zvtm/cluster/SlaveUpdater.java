@@ -10,7 +10,8 @@ import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.portals.Portal;
-
+import fr.inria.zvtm.engine.portals.CameraPortal;
+import fr.inria.zvtm.engine.Location;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -143,9 +144,10 @@ public class SlaveUpdater {
         appDelegate.setPortalLocation(slavePortal, x, y, w, h);
     }
 
-    void setPortalVisible(Portal slavePortal, boolean isVisible)
+    void portalCameraUpdate(Portal slavePortal, double vx, double vy, double alt)
     {
-        slavePortal.setVisible(isVisible);
+        CameraPortal cp = (CameraPortal)slavePortal;
+        cp.getCamera().setLocation(new Location(vx, vy, alt));
     }
 
     void setBackgroundColor(ClusteredView cv, Color bgColor){

@@ -13,6 +13,7 @@ import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.engine.portals.Portal;
+import fr.inria.zvtm.engine.portals.CameraPortal;
 
 import java.awt.Color;
 import java.awt.GraphicsDevice;

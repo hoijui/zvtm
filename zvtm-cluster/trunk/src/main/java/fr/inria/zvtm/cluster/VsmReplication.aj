@@ -11,7 +11,12 @@ import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.portals.Portal;
 import fr.inria.zvtm.engine.portals.CameraPortal;
+import fr.inria.zvtm.engine.portals.DraggableCameraPortal;
+import fr.inria.zvtm.engine.portals.RoundCameraPortal;
+import fr.inria.zvtm.engine.portals.OverviewPortal;
+import fr.inria.zvtm.engine.Location;
 
+import java.awt.Color;
 
 /**
  * Replicates 'interesting' calls made on the Virtual Space Manager
@@ -93,10 +98,26 @@ aspect VsmReplication {
     }
     
 
-   private static class CameraPortalReplicator implements PortalReplicator {
+   /** Add a portal to a clustered view. Only subclasses of CameraPortal (e.g.,
+    * DraggableCameraPortal, RoundCameraPortal, OverviewPortal) are supported.
+    *@param p Portal to be added
+    *@param v owning View
+    */
+    public void VirtualSpaceManager.addClusteredPortal(Portal p, ClusteredView v) {
+        if (!(p instanceof CameraPortal)) {
+            System.out.println("Only subclasses of CameraPortal are supported");
+        }
+        else {
+            Delta createDelta = new  PortalCreateDelta(p.getReplicator(),  p.getObjId());
+            VirtualSpaceManager.INSTANCE.sendDelta(createDelta);
+            p.setReplicated(true);  
+        }
+    }
+
+    private static class CameraPortalReplicator implements PortalReplicator {
         protected final int x,y,w,h;
         protected float a;
-        private final ObjId<Camera> camId;
+        protected final ObjId<Camera> camId;
 
         CameraPortalReplicator(CameraPortal source){
             this.x = source.x;
@@ -108,30 +129,77 @@ aspect VsmReplication {
         }
 
         public Portal createPortal(SlaveUpdater updater) {
-            Camera overviewCam = updater.getSlaveObject(this.camId);
-            Portal p = new CameraPortal(x, y, w, h, overviewCam,a);
+            Camera cam = updater.getSlaveObject(this.camId);
+            Portal p = new CameraPortal(x, y, w, h, cam,a);
             updater.setPortalLocation(p,x, y, w, h);
             return p;
         }
     }
 
+    private static class DraggableCameraPortalReplicator extends CameraPortalReplicator {
 
-   /** Add a portal to a clustered view. Only CameraPortal are supported for now.
-    *@param p Portal to be added
-    *@param v owning View
-    */
-   
-    public void VirtualSpaceManager.addClusteredPortal(Portal p, ClusteredView v) {
-        if (!(p instanceof CameraPortal)) {
-            System.out.println("Only CameraPortal are supported");
+        DraggableCameraPortalReplicator(DraggableCameraPortal source){
+           super(source);
         }
-        else {
-            CameraPortalReplicator replicator = new CameraPortalReplicator((CameraPortal)p);
-            VirtualSpaceManager.INSTANCE.sendDelta(new PortalCreateDelta(replicator,p.getObjId()));    
+
+        public Portal createPortal(SlaveUpdater updater) {
+            Camera cam = updater.getSlaveObject(this.camId);
+            Portal p = new DraggableCameraPortal(x, y, w, h, cam);
+            updater.setPortalLocation(p,x, y, w, h);
+            return p;
         }
     }
 
+    private static class RoundCameraPortalReplicator extends CameraPortalReplicator {
 
+        RoundCameraPortalReplicator(RoundCameraPortal source){
+           super(source);
+        }
+
+        public Portal createPortal(SlaveUpdater updater) {
+            Camera cam = updater.getSlaveObject(this.camId);
+            Portal p = new RoundCameraPortal(x, y, w, h, cam);
+            updater.setPortalLocation(p,x, y, w, h);
+            return p;
+        }
+    }
+
+    private static class OverviewPortalReplicator extends CameraPortalReplicator {
+        protected final ObjId<Camera> obscamId;
+
+        OverviewPortalReplicator(OverviewPortal source){
+           super(source);
+           obscamId = source.getObservedRegionCamera().getObjId();
+        }
+
+        public Portal createPortal(SlaveUpdater updater) {
+            Camera cam = updater.getSlaveObject(this.camId);
+            Camera obsCam = updater.getSlaveObject(this.obscamId);
+            Portal p = new OverviewPortal(x, y, w, h, cam, obsCam);
+            updater.setPortalLocation(p,x, y, w, h);
+            return p;
+        }
+    }
+
+    public PortalReplicator Portal.getReplicator(){
+        return null;
+    }
+
+    public PortalReplicator CameraPortal.getReplicator(){
+        return new CameraPortalReplicator(this);
+    }
+
+    @Override public PortalReplicator DraggableCameraPortal.getReplicator(){
+        return new DraggableCameraPortalReplicator(this);
+    }
+
+    @Override public PortalReplicator RoundCameraPortal.getReplicator(){
+        return new RoundCameraPortalReplicator(this);
+    }
+
+    @Override public PortalReplicator OverviewPortal.getReplicator(){
+        return new OverviewPortalReplicator(this);
+    }
 
     private static class PortalCreateDelta implements Delta{
         private final PortalReplicator replicator;
@@ -145,10 +213,7 @@ aspect VsmReplication {
         public void apply(SlaveUpdater updater){
             //Create Portal Camera
             Portal p = replicator.createPortal(updater);
-            
             VirtualSpaceManager.INSTANCE.addPortal(p, updater.getLocalView());
-           
-
             updater.putSlaveObject(portalId, p);
         }
 
@@ -156,7 +221,6 @@ aspect VsmReplication {
             return "PortalCreateDelta";
         }
     }
-
 
     pointcut portalMoved(Portal portal) :
     this(portal) &&
@@ -183,7 +247,6 @@ aspect VsmReplication {
         private final ObjId<Portal> portalId;
         private final int x,y,w,h;
 
-
         PortalLocationDelta(ObjId<Portal> portalId, int x, int y, int w, int h){
             this.portalId = portalId;
             this.x = x;
@@ -202,39 +265,33 @@ aspect VsmReplication {
         }
     }    
 
-    pointcut portalsetVisible(Portal portal) :
-    this(portal) &&
-    if(VirtualSpaceManager.INSTANCE.isMaster()) &&
-    (
-     execution(public void Portal.setVisible(boolean))
-    )
-    ;
+    // see AutoReplay.aj for setVisible, setColor, setBackgroundColor, etc.
 
-    after(Portal portal) :
-        portalsetVisible(portal) {
-            Delta delta = new PortalVisibleDelta(portal.getObjId(), 
-                portal.isVisible());
-            VirtualSpaceManager.INSTANCE.sendDelta(delta);
-        }
+    /** Remove a portal to a clustered view.
+    * @param p Portal to be removed
+    */
+    public void VirtualSpaceManager.destroyClusteredPortal(Portal p) {
+        Delta destroyDelta = new  PortalDestroyDelta(p.getObjId());
+        VirtualSpaceManager.INSTANCE.sendDelta(destroyDelta);
+        p.setReplicated(false);
+    }
 
-    private static class PortalVisibleDelta implements Delta{
+    private static class PortalDestroyDelta implements Delta{
         private final ObjId<Portal> portalId;
-        private final boolean isVisible;
 
-        PortalVisibleDelta(ObjId<Portal> portalId, boolean isVisible){
+        PortalDestroyDelta(ObjId<Portal> portalId){
             this.portalId = portalId;
-            this.isVisible = isVisible;
         }
 
         public void apply(SlaveUpdater updater){
             Portal p = updater.getSlaveObject(portalId);
-            updater.setPortalVisible(p,isVisible);
+            VirtualSpaceManager.INSTANCE.destroyPortal(p);
+            updater.removeSlaveObject(portalId); 
         }
 
         @Override public String toString(){
-            return "PortalVisibleDelta";
+            return "PortalDestroyDelta";
         }
-    }   
-
+    }
 } 
 

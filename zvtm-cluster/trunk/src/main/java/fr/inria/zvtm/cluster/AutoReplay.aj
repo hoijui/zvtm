@@ -21,9 +21,14 @@ import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.glyphs.VImage;
 import fr.inria.zvtm.glyphs.VEclipse;
 
+import fr.inria.zvtm.engine.portals.CameraPortal;
+import fr.inria.zvtm.engine.portals.DraggableCameraPortal;
+import fr.inria.zvtm.engine.portals.OverviewPortal;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Stroke;
+import java.awt.BasicStroke;
 import java.awt.geom.Point2D;
 
 /**
@@ -86,7 +91,20 @@ public aspect AutoReplay extends AbstractAutoReplay {
          execution(public void VirtualSpace.hide(Glyph)) ||
 
         //Camera methods
-         execution(public void Camera.setZoomFloor(double))
+         execution(public void Camera.setZoomFloor(double)) ||
+
+         // Portal
+         execution(public void Portal.setVisible(boolean)) ||
+         execution(public void CameraPortal.setTranslucencyValue(float)) ||
+         execution(public void CameraPortal.setBorder(Color)) ||
+         execution(public void CameraPortal.setBackgroundColor(Color)) ||
+         execution(public void CameraPortal.setBorderWidth(float)) ||
+         execution(public void DraggableCameraPortal.setDragBarHeight(int)) ||
+         execution(public void DraggableCameraPortal.setDragBarColor(Color)) ||
+         execution(public void OverviewPortal.drawObservedRegionLocator(boolean)) ||
+         execution(public void OverviewPortal.setObservedRegionColor(Color)) ||
+         execution(public void OverviewPortal.setObservedRegionTranslucency(float)) ||
+         execution(public void OverviewPortal.setObservedRegionBorderWidth(float))
         );
     }
 
