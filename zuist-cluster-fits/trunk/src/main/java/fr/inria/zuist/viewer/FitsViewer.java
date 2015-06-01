@@ -271,7 +271,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         
 
 		//menu.drawHistogram();
-        smartiesMngr = new SmartiesManager(this);
+        //smartiesMngr = new SmartiesManager(this);
         teh = new TuioEventHandler(this);
 
         //reference = options.reference;

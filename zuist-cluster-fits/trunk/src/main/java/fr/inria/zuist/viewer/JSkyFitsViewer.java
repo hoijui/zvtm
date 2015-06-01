@@ -182,11 +182,11 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
         
 
 		//menu.drawHistogram();
-        smartiesMngr = new SmartiesManager(this);
         teh = new TuioEventHandler(this);
 
         reference = options.reference;
         */
+        smartiesMngr = new SmartiesManager(this);
 
         // create a picker that will only consider regions visible at ZUIST levels 3 through 5 (any of these levels or all of them)
         System.out.println("levelCount: " + sm.getLevelCount());

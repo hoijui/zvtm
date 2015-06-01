@@ -49,7 +49,7 @@ import java.util.Vector;
 
 
 
-class FitsMenu implements ViewListener, PickerListener {
+public class FitsMenu implements ViewListener, PickerListener {
 
 
     public static final int WIDTH_MENU = 200;
@@ -477,6 +477,11 @@ class FitsMenu implements ViewListener, PickerListener {
     public void viewDeiconified(View v){}
 
     public void viewClosing(View v){System.exit(0);}
+
+    public void selectNextColorMapping(){}
+    public void selectPreviousColorMapping(){}
+    public void selectNextScale(){}
+    public void selectPreviousScale(){}
 
 
 }

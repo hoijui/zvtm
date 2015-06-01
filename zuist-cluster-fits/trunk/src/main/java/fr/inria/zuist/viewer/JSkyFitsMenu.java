@@ -59,12 +59,12 @@ import jsky.image.fits.codec.FITSImage;
 import javax.media.jai.Histogram;
 
 
-class JSkyFitsMenu implements ViewListener, PickerListener {
+public class JSkyFitsMenu implements ViewListener, PickerListener {
 
     public static final int WIDTH_MENU = 200;
 
     private static final String SCALE_DEFAULT = "LINEAR SCALE";
-    private static final String COLOR_DEFAULT = "Standard";
+    private static final String COLOR_DEFAULT = "Heat";
 
     public static final int HEIGHT_BTN = 15;
     public static final Color BORDER_COLOR_BTN = Color.BLACK;
@@ -93,6 +93,15 @@ class JSkyFitsMenu implements ViewListener, PickerListener {
 
     static LinkedHashMap<String,RGBImageFilter> COLOR_MAPPINGS = new LinkedHashMap();
     static {
+        COLOR_MAPPINGS.put("Ramp", new RampFilter());
+        COLOR_MAPPINGS.put("Heat",  new HeatFilter());
+        COLOR_MAPPINGS.put("Blulut", new BlulutFilter());
+        COLOR_MAPPINGS.put("Idl12", new Idl12Filter());
+        COLOR_MAPPINGS.put("Rainbow1", new Rainbow1Filter());
+        COLOR_MAPPINGS.put("Standard", new StandardFilter());
+        COLOR_MAPPINGS.put("Idl4", new Idl4Filter());
+        COLOR_MAPPINGS.put("Stairs8", new Stairs8Filter());
+        /*
         COLOR_MAPPINGS.put("Aips0", new Aips0Filter());
         COLOR_MAPPINGS.put("Background", new BackgrFilter());
         COLOR_MAPPINGS.put("Blue", new BlueFilter());
@@ -135,6 +144,7 @@ class JSkyFitsMenu implements ViewListener, PickerListener {
         COLOR_MAPPINGS.put("Stairs8", new Stairs8Filter());
         COLOR_MAPPINGS.put("Stairs9", new Stairs9Filter());
         COLOR_MAPPINGS.put("Standard", new StandardFilter());
+        */
     }
 
     static HashMap<String,PRectangle> COLOR_MAPPING2GLYPH = new HashMap(COLOR_MAPPINGS.size(),1);
@@ -197,9 +207,12 @@ class JSkyFitsMenu implements ViewListener, PickerListener {
 
     private void buildColorMappingMenu(){
 
-        BORDER_TOP_FILTER =  0;//app.VIEW_H/2;
+        //BORDER_TOP_FILTER =  0;//app.VIEW_H/2;
+        //int py = app.VIEW_H/2 - 2*HEIGHT_BTN - BORDER;
 
-        int py = app.VIEW_H/2 - 2*HEIGHT_BTN - BORDER;
+        BORDER_TOP_FILTER =  50;//app.VIEW_H/2;
+        int py = app.VIEW_H/2 - (HEIGHT_BTN + 2*BORDER) - BORDER_TOP_FILTER;
+
         for(String cm:COLOR_MAPPINGS.keySet()){
             RGBImageFilter f = COLOR_MAPPINGS.get(cm);
             MultipleGradientPaint grad = Utils.makeGradient(f);
@@ -213,7 +226,7 @@ class JSkyFitsMenu implements ViewListener, PickerListener {
                 selected_colorG.move(DISPLACE, 0);
             }
             mnSpace.addGlyph(filterG);
-            py -= (HEIGHT_BTN + BORDER);
+            py -= (HEIGHT_BTN + 2*BORDER);
         }
 
         for(String sc:SCALES.keySet()){
@@ -235,9 +248,10 @@ class JSkyFitsMenu implements ViewListener, PickerListener {
             //Glyph ln = drawMethod(sc);
             //ln.moveTo(-app.VIEW_W/2 + WIDTH_MENU/2 + BORDER , py);
             //mnSpace.addGlyph(ln);
-            py -= (HEIGHT_BTN + BORDER);
+            py -= (HEIGHT_BTN + 2*BORDER);
         }
-        BORDER_BOTTOM_FILTER = COLOR_MAPPINGS.size() * ( HEIGHT_BTN + BORDER*2 ) + SCALES.size() * ( HEIGHT_BTN + BORDER*2 ) + HEIGHT_BTN + BORDER;
+        //BORDER_BOTTOM_FILTER = COLOR_MAPPINGS.size() * ( HEIGHT_BTN + BORDER*2 ) + SCALES.size() * ( HEIGHT_BTN + BORDER*2 ) + HEIGHT_BTN + BORDER;
+        BORDER_BOTTOM_FILTER = app.VIEW_H/2 - py - (HEIGHT_BTN + 2*BORDER);
     }
 
     public void buildHistogram(){
@@ -515,7 +529,7 @@ class JSkyFitsMenu implements ViewListener, PickerListener {
         selected_colorG = cm;
     }
 
-    void selectNextColorMapping(){
+    public void selectNextColorMapping(){
         int scmIndex = ORDERED_COLOR_MAPPINGS.indexOf(selected_colorG.getOwner());
         int newIndex = 0;
         if (scmIndex != -1){
@@ -529,7 +543,7 @@ class JSkyFitsMenu implements ViewListener, PickerListener {
         selectColorMapping(COLOR_MAPPING2GLYPH.get(ORDERED_COLOR_MAPPINGS.elementAt(newIndex)));
     }
 
-    void selectPreviousColorMapping(){
+    public void selectPreviousColorMapping(){
         int scmIndex = ORDERED_COLOR_MAPPINGS.indexOf(selected_colorG.getOwner());
         int newIndex = 0;
         if (scmIndex != -1){
@@ -555,7 +569,7 @@ class JSkyFitsMenu implements ViewListener, PickerListener {
         selected_scaleG = sc;
     }
 
-    void selectNextScale(){
+    public void selectNextScale(){
         int scIndex = ORDERED_SCALES.indexOf(selected_scaleG.getOwner());
         int newIndex = 0;
         if (scIndex != -1){
@@ -569,7 +583,7 @@ class JSkyFitsMenu implements ViewListener, PickerListener {
         selectScale(SCALE2GLYPH.get(ORDERED_SCALES.elementAt(newIndex)));
     }
 
-    void selectPreviousScale(){
+    public void selectPreviousScale(){
         int scIndex = ORDERED_SCALES.indexOf(selected_scaleG.getOwner());
         int newIndex = 0;
         if (scIndex != -1){
