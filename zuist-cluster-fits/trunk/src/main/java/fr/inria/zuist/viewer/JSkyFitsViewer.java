@@ -336,7 +336,8 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
         }
         cfilter = next;
         for(ObjectDescription desc: sm.getObjectDescriptions()){
-            if(desc instanceof JSkyFitsImageDescription){
+            System.out.println(getLayerScene() + " == " + ((JSkyFitsImageDescription)desc).getLayerIndex());
+            if(desc instanceof JSkyFitsImageDescription && (getLayerScene() == ((JSkyFitsImageDescription)desc).getLayerIndex() || getLayerScene() == LAYER_SCENE)){
                 ((JSkyFitsImageDescription)desc).setColorLookupTable(next, true);
             }
         } 
@@ -348,7 +349,8 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
             scaleMethod.ordinal() == (JSkyFitsImage.ScaleAlgorithm.values().length - 1) ? JSkyFitsImage.ScaleAlgorithm.values()[0] : JSkyFitsImage.ScaleAlgorithm.values()[scaleMethod.ordinal() + 1];
         scaleMethod = next;
         for(ObjectDescription desc: sm.getObjectDescriptions()){
-            if(desc instanceof JSkyFitsImageDescription){
+            System.out.println(getLayerScene() + " == " + ((JSkyFitsImageDescription)desc).getLayerIndex());
+            if(desc instanceof JSkyFitsImageDescription && (getLayerScene() == ((JSkyFitsImageDescription)desc).getLayerIndex() || getLayerScene() == LAYER_SCENE)){
                 ((JSkyFitsImageDescription)desc).setScaleAlgorithm(next, true);
             }
         } 
@@ -359,7 +361,8 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
     public void setColorLookupTable(String filter){
         System.out.println("app.setColorLookupTable(" + filter + ")");
         for(ObjectDescription desc: sm.getObjectDescriptions()){
-            if(desc instanceof JSkyFitsImageDescription){
+            System.out.println(getLayerScene() + " == " + ((JSkyFitsImageDescription)desc).getLayerIndex());
+            if(desc instanceof JSkyFitsImageDescription && (getLayerScene() == ((JSkyFitsImageDescription)desc).getLayerIndex() || getLayerScene() == LAYER_SCENE)){
                 ((JSkyFitsImageDescription)desc).setColorLookupTable(filter, true);
             }
         } 
@@ -368,7 +371,8 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
     //@Override
     public void setScaleAlgorithm(JSkyFitsImage.ScaleAlgorithm method){
     	for(ObjectDescription desc: sm.getObjectDescriptions()){
-            if(desc instanceof JSkyFitsImageDescription){
+            System.out.println(getLayerScene() + " == " + ((JSkyFitsImageDescription)desc).getLayerIndex());
+            if(desc instanceof JSkyFitsImageDescription && (getLayerScene() == ((JSkyFitsImageDescription)desc).getLayerIndex() || getLayerScene() == LAYER_SCENE)){
                 ((JSkyFitsImageDescription)desc).setScaleAlgorithm(method, true);
             }
         } 
@@ -378,7 +382,8 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
     public void rescale(double min, double max){
     	//System.out.println("rescale");
     	for(ObjectDescription desc: sm.getObjectDescriptions()){
-            if(desc instanceof JSkyFitsImageDescription){
+            System.out.println(getLayerScene() + " == " + ((JSkyFitsImageDescription)desc).getLayerIndex());
+            if(desc instanceof JSkyFitsImageDescription && (getLayerScene() == ((JSkyFitsImageDescription)desc).getLayerIndex() || getLayerScene() == LAYER_SCENE)){
                 ((JSkyFitsImageDescription)desc).rescale(min, max, true);
             }
         }
@@ -391,7 +396,8 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
         boolean globalData = false;
         if(!globalData)
     	for(ObjectDescription desc: sm.getObjectDescriptions()){
-            if(desc instanceof JSkyFitsImageDescription){
+            System.out.println(getLayerScene() + " == " + ((JSkyFitsImageDescription)desc).getLayerIndex());
+            if(desc instanceof JSkyFitsImageDescription && (getLayerScene() == ((JSkyFitsImageDescription)desc).getLayerIndex() || getLayerScene() == LAYER_SCENE) ){
                 if(((JSkyFitsImageDescription)desc).isCreatedWithGlobalData()){
                     globalData = true;
                     //break;
@@ -403,7 +409,8 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
         }
         if(globalData)
         for(ObjectDescription desc: sm.getObjectDescriptions()){
-            if(desc instanceof JSkyFitsImageDescription){ 
+            System.out.println(getLayerScene() + " == " + ((JSkyFitsImageDescription)desc).getLayerIndex());
+            if(desc instanceof JSkyFitsImageDescription && (getLayerScene() == ((JSkyFitsImageDescription)desc).getLayerIndex() || getLayerScene() == LAYER_SCENE)){ 
                 ((JSkyFitsImageDescription)desc).setRescaleGlobal(globalScaleParams[0], globalScaleParams[1]);
                 ((JSkyFitsImageDescription)desc).setRescaleGlobal(global);
                 if(global) ((JSkyFitsImageDescription)desc).rescaleGlobal();

@@ -229,31 +229,43 @@ class JSkyFitsViewerEventHandler implements ViewListener {
             app.showLayer(FitsViewer.LAYER_SCENE_KS, 1.f);
             app.hideLayer(FitsViewer.LAYER_SCENE_H);
             app.hideLayer(FitsViewer.LAYER_SCENE_J);
+            System.out.println("setActiveLayer: " + FitsViewer.LAYER_SCENE_KS);
+            if(app.getLayerScene() != FitsViewer.LAYER_SCENE_KS) app.setLayerScene(FitsViewer.LAYER_SCENE_KS);
         }
         else if(code==KeyEvent.VK_2){
             app.showLayer(FitsViewer.LAYER_SCENE_KS, 1.f);
             app.showLayer(FitsViewer.LAYER_SCENE_H, 0.5f);
             app.hideLayer(FitsViewer.LAYER_SCENE_J);
+            System.out.println("setActiveLayer: " + FitsViewer.LAYER_SCENE_KS);
+            if(app.getLayerScene() != FitsViewer.LAYER_SCENE_KS) app.setLayerScene(FitsViewer.LAYER_SCENE_KS);
         }
         else if(code==KeyEvent.VK_3){
             app.hideLayer(FitsViewer.LAYER_SCENE_KS);
             app.showLayer(FitsViewer.LAYER_SCENE_H, 1.f);
             app.hideLayer(FitsViewer.LAYER_SCENE_J);
+            System.out.println("setActiveLayer: " + FitsViewer.LAYER_SCENE_H);
+            if(app.getLayerScene() != FitsViewer.LAYER_SCENE_H) app.setLayerScene(FitsViewer.LAYER_SCENE_H);
         }
         else if(code==KeyEvent.VK_4){
             app.hideLayer(FitsViewer.LAYER_SCENE_KS);
             app.showLayer(FitsViewer.LAYER_SCENE_H, 1.f);
             app.showLayer(FitsViewer.LAYER_SCENE_J, 0.5f);
+            System.out.println("setActiveLayer: " + FitsViewer.LAYER_SCENE_H);
+            if(app.getLayerScene() != FitsViewer.LAYER_SCENE_H) app.setLayerScene(FitsViewer.LAYER_SCENE_H);
         }
         else if(code==KeyEvent.VK_5){
             app.hideLayer(FitsViewer.LAYER_SCENE_KS);
             app.hideLayer(FitsViewer.LAYER_SCENE_H);
             app.showLayer(FitsViewer.LAYER_SCENE_J, 1.f);
+            System.out.println("setActiveLayer: " + FitsViewer.LAYER_SCENE_J);
+            if(app.getLayerScene() != FitsViewer.LAYER_SCENE_J) app.setLayerScene(FitsViewer.LAYER_SCENE_J);
         }
         else if(code==KeyEvent.VK_6){
             app.showLayer(FitsViewer.LAYER_SCENE_KS, 1.f);
             app.showLayer(FitsViewer.LAYER_SCENE_H, 0.66f);
             app.showLayer(FitsViewer.LAYER_SCENE_J, 0.33f);
+            System.out.println("setActiveLayer: " + FitsViewer.LAYER_SCENE);
+            if(app.getLayerScene() != FitsViewer.LAYER_SCENE) app.setLayerScene(FitsViewer.LAYER_SCENE);
         }
         // else if (code == KeyEvent.VK_MINUS){
         //     //app.scaleBounds[1] -= 100;

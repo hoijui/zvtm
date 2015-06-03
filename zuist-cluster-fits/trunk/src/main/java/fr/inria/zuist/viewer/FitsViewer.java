@@ -118,6 +118,10 @@ import java.util.Observable;
 
 import fr.inria.zuist.engine.JSkyFitsImageDescription;
 
+import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
+import fr.inria.zvtm.animation.Animation;
+import fr.inria.zvtm.animation.AnimationManager;
+import fr.inria.zvtm.animation.EndAction;
 
 
 /**
@@ -170,6 +174,11 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     static final int LAYER_CURSOR = 6;
     static final int LAYER_OVERLAY = 7;
 
+    int layerScene = LAYER_SCENE;
+    static final String[] layerSceneName = {"Ks", "H", "J", "all"};
+
+    public static final Font FONT_LAYER_SCENE = new Font("Bold", Font.PLAIN, 36);
+
     //static final int LAYER_CURSOR = 7;
 
     public VirtualSpace mSpace;
@@ -214,10 +223,13 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     //WCSTransform wcsTransformRef;
 
     VText wcsLabel;
+    VText layerSceneLabel;
 
     String reference;
 
     public PythonWCS pythonWCS;
+
+    AnimationManager am = VirtualSpaceManager.INSTANCE.getAnimationManager();
     //boolean galacticalSystem = false;
     
     //JSONArray readed;
@@ -273,6 +285,10 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 		//menu.drawHistogram();
         //smartiesMngr = new SmartiesManager(this);
         teh = new TuioEventHandler(this);
+
+        layerSceneLabel = new VText(0d, 0d, 1, Color.RED, "");
+        layerSceneLabel.setFont(FONT_LAYER_SCENE);
+        layerSceneLabel.setTranslucencyValue(0.9f);
 
         //reference = options.reference;
 
@@ -386,8 +402,11 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 			}
 		};
 		mView.getFrame().addComponentListener(ca0);
+
+        mView.setActiveLayer(LAYER_SCENE);
 		
     }
+
 
     public void setColorFilter(ImageFilter filter){
         //hi.setColorFilter(filter);
@@ -452,13 +471,37 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 		aboutMI.addActionListener(a0);
 		return jmb;
 	}
+
+    public int getLayerScene(){
+        return layerScene;
+    }
+
+    public void setLayerScene(int l){
+        layerScene = l;
+        layerSceneLabel.setText(layerSceneName[layerScene]);
+        //cursorSpace.addGlyph(layerSceneLabel);
+        
+        cursorSpace.addGlyph(layerSceneLabel);
+        //layerSceneLabel.setTranslucencyValue(0f);
+
+        Animation a = am.getAnimationFactory().createTranslucencyAnim(800,
+            layerSceneLabel, 0f, false, IdentityInterpolator.getInstance(),
+            new EndAction(){
+                public void execute(Object subject, Animation.Dimension dimension){
+
+                    cursorSpace.removeGlyph(layerSceneLabel);
+                    layerSceneLabel.setTranslucencyValue(0.9f);
+                }
+            });
+        am.startAnimation(a, true);
+    }
 	
     void toggleColorFilter(){
         FitsImage.ColorFilter next = 
             cfilter.ordinal() == (FitsImage.ColorFilter.values().length - 1) ? FitsImage.ColorFilter.values()[0] : FitsImage.ColorFilter.values()[cfilter.ordinal() + 1];
         cfilter = next;
         for(ObjectDescription desc: sm.getObjectDescriptions()){
-            if(desc instanceof FitsImageDescription){
+            if(desc instanceof FitsImageDescription && (getLayerScene() == ((FitsImageDescription)desc).getLayerIndex() || getLayerScene() == LAYER_SCENE)){
                 ((FitsImageDescription)desc).setColorFilter(next);
             }
         } 
@@ -469,7 +512,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
             scaleMethod.ordinal() == (FitsImage.ScaleMethod.values().length - 1) ? FitsImage.ScaleMethod.values()[0] : FitsImage.ScaleMethod.values()[scaleMethod.ordinal() + 1];
         scaleMethod = next;
         for(ObjectDescription desc: sm.getObjectDescriptions()){
-            if(desc instanceof FitsImageDescription){
+            if(desc instanceof FitsImageDescription && (getLayerScene() == ((FitsImageDescription)desc).getLayerIndex() || getLayerScene() == LAYER_SCENE)){
                 ((FitsImageDescription)desc).setScaleMethod(next);
             }
         } 
@@ -477,7 +520,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 
     public void setColorFilter(FitsImage.ColorFilter filter){
         for(ObjectDescription desc: sm.getObjectDescriptions()){
-            if(desc instanceof FitsImageDescription){
+            if(desc instanceof FitsImageDescription && (getLayerScene() == ((FitsImageDescription)desc).getLayerIndex() || getLayerScene() == LAYER_SCENE)){
                 ((FitsImageDescription)desc).setColorFilter(filter);
             }
         } 
@@ -485,7 +528,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 
     public void setScaleMethod(FitsImage.ScaleMethod method){
     	for(ObjectDescription desc: sm.getObjectDescriptions()){
-            if(desc instanceof FitsImageDescription){
+            if(desc instanceof FitsImageDescription && (getLayerScene() == ((FitsImageDescription)desc).getLayerIndex() || getLayerScene() == LAYER_SCENE)){
                 ((FitsImageDescription)desc).setScaleMethod(method);
             }
         } 
@@ -494,7 +537,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     public void rescale(double min, double max, double sigma){
     	//System.out.println("rescale");
     	for(ObjectDescription desc: sm.getObjectDescriptions()){
-            if(desc instanceof FitsImageDescription){
+            if(desc instanceof FitsImageDescription && (getLayerScene() == ((FitsImageDescription)desc).getLayerIndex() || getLayerScene() == LAYER_SCENE) ){
                 ((FitsImageDescription)desc).rescale(min, max, sigma);
             }
         }
@@ -506,7 +549,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         boolean globalData = false;
         if(!globalData)
     	for(ObjectDescription desc: sm.getObjectDescriptions()){
-            if(desc instanceof FitsImageDescription){
+            if(desc instanceof FitsImageDescription && (getLayerScene() == ((FitsImageDescription)desc).getLayerIndex() || getLayerScene() == LAYER_SCENE)){
                 if(((FitsImageDescription)desc).isCreatedWithGlobalData()){
                     globalData = true;
                     //break;
@@ -518,7 +561,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         }
         if(globalData)
         for(ObjectDescription desc: sm.getObjectDescriptions()){
-            if(desc instanceof FitsImageDescription){ 
+            if(desc instanceof FitsImageDescription && (getLayerScene() == ((FitsImageDescription)desc).getLayerIndex() || getLayerScene() == LAYER_SCENE)){ 
                 ((FitsImageDescription)desc).setRescaleGlobal(globalScaleParams[0], globalScaleParams[1]);
                 ((FitsImageDescription)desc).setRescaleGlobal(global);
                 if(global) ((FitsImageDescription)desc).rescaleGlobal();
