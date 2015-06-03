@@ -89,9 +89,6 @@ public class VCursor {
     Picker picker;
     DynaPicker dynaPicker;
 
-    /**glyphs sticked to the mouse cursor*/
-    Glyph[] stickedGlyphs;
-
     /**view to which this cursor belongs*/
     View owningView;
 
@@ -110,7 +107,6 @@ public class VCursor {
         jpy=0;
         color=Color.black;
         hcolor = Color.black;
-        stickedGlyphs = new Glyph[0];
         sync=true;
     }
 
@@ -150,6 +146,11 @@ public class VCursor {
         this.hcolor = c;
     }
 
+    /** Propagate picker movements to sticked glyphs. */
+    public void propagateMove(){
+        picker.propagateMove(vx-pvx, vy-pvy);
+    }
+
     /** Move mouse cursor (JPanel coordinates).
      *@param x x-coordinate, in JPanel coordinates system
      *@param y y-coordinate, in JPanel coordinates system
@@ -160,69 +161,6 @@ public class VCursor {
             jpy = y;
             picker.setJPanelCoordinates(jpx, jpy);
         }
-    }
-
-    /** Propagate cursor movements to sticked glyphs. */
-    public void propagateMove(){
-        for (int i=0;i<stickedGlyphs.length;i++){
-            stickedGlyphs[i].move(vx-pvx, vy-pvy);
-        }
-    }
-
-    /** Attach glyph g to cursor. */
-    public void stickGlyph(Glyph g){
-        if (g==null){return;}
-        //make it unsensitive (was automatically disabled when glyph was sticked to mouse)
-        //because false enter/exit events can be generated when moving the mouse too fast
-        //in small glyphs   (I did not find a way to correct this bug yet)
-        g.setSensitivity(false);
-        Glyph[] newStickList = new Glyph[stickedGlyphs.length + 1];
-        System.arraycopy(stickedGlyphs, 0, newStickList, 0, stickedGlyphs.length);
-        newStickList[stickedGlyphs.length] = g;
-        stickedGlyphs = newStickList;
-        g.stickedTo = this;
-    }
-
-    /** Unstick glyph that was last sticked to mouse.
-     * The glyph is automatically made sensitive to mouse events.
-     * The number of glyphs sticked to the mouse can be obtained by calling VCursor.getStickedGlyphsNumber().
-     */
-    public Glyph unstickLastGlyph(){
-        if (stickedGlyphs.length>0){
-            Glyph g = stickedGlyphs[stickedGlyphs.length - 1];
-            g.setSensitivity(true);  //make it sensitive again (was automatically disabled when glyph was sticked to mouse)
-            g.stickedTo = null;
-            Glyph[] newStickList = new Glyph[stickedGlyphs.length - 1];
-            System.arraycopy(stickedGlyphs, 0, newStickList, 0, stickedGlyphs.length - 1);
-            stickedGlyphs = newStickList;
-            return g;
-        }
-        return null;
-    }
-
-    /** Get the number of glyphs sticked to the cursor. */
-    public int getStickedGlyphsNumber(){return stickedGlyphs.length;}
-
-    /** Unstick glyph from cursor. */
-    public void unstickGlyph(Glyph g){
-        for (int i=0;i<stickedGlyphs.length;i++){
-            if (stickedGlyphs[i] == g){
-                g.stickedTo = null;
-                g.setSensitivity(true);
-                Glyph[] newStickList = new Glyph[stickedGlyphs.length - 1];
-                System.arraycopy(stickedGlyphs, 0, newStickList, 0, i);
-                System.arraycopy(stickedGlyphs, i+1, newStickList, i, stickedGlyphs.length-i-1);
-                stickedGlyphs = newStickList;
-                break;
-            }
-        }
-    }
-
-    /** Get list of glyphs sticked to cursor.
-     *@return the actual list, not a copy.
-     */
-    public Glyph[] getStickedGlyphArray(){
-        return stickedGlyphs;
     }
 
     /** Should the cursor glyph be drawn or not. */
@@ -333,6 +271,34 @@ public class VCursor {
             g.fillOval(jpx-dynaPicker.dynaSpotRadius, jpy-dynaPicker.dynaSpotRadius, 2*dynaPicker.dynaSpotRadius, 2*dynaPicker.dynaSpotRadius);
             g.setComposite(Translucent.acO);
         }
+    }
+
+    /** Attach glyph g to this cursor. */
+    public void stickGlyph(Glyph g){
+        picker.stickGlyph(g);
+    }
+
+    /** Unstick glyph that was last sticked to this cursor.
+     * The glyph is automatically made sensitive to mouse events.
+     * The number of glyphs sticked to the cursor can be obtained by calling getStickedGlyphsNumber().
+     */
+    public Glyph unstickLastGlyph(){
+        return picker.unstickLastGlyph();
+    }
+
+    /** Get the number of glyphs sticked to the cursor. */
+    public int getStickedGlyphsNumber(){return picker.getStickedGlyphsNumber();}
+
+    /** Unstick glyph from cursor. */
+    public void unstickGlyph(Glyph g){
+        picker.unstickGlyph(g);
+    }
+
+    /** Get list of glyphs sticked to cursor.
+     *@return the actual list, not a copy.
+     */
+    public Glyph[] getStickedGlyphArray(){
+        return picker.getStickedGlyphArray();
     }
 
 }

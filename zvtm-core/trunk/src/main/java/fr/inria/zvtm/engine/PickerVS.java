@@ -77,6 +77,7 @@ public class PickerVS {
 
     /**coord in virtual space*/
     protected double vx,vy;
+    protected double pvx, pvy;
 
     //used in computeMouseOverGlyph
     protected Glyph tmpGlyph;
@@ -97,6 +98,10 @@ public class PickerVS {
     // listen to glyph enter/exit events
     PickerListener pl;
 
+
+    /** Glyphs sticked to this picker. */
+    Glyph[] stickedGlyphs;
+
     /** Picker constructor.
      * Instantiated with a default stack size of 50.
      */
@@ -109,6 +114,7 @@ public class PickerVS {
      */
     public PickerVS(int stackSize){
        pickedGlyphs = new Glyph[stackSize];
+       stickedGlyphs = new Glyph[0];
     }
 
     /** Get the last Glyph this picker entered. */
@@ -127,8 +133,11 @@ public class PickerVS {
      *@param y y-coordinate, in virtual space coordinates system
      */
     public void setVSCoordinates(double x, double y){
+        pvx = vx;
+        pvy = vy;
         vx = x;
         vy = y;
+        propagateMove(vx-pvx, vy-pvy);
     }
 
     public void setListener(PickerListener pl){
@@ -457,5 +466,68 @@ public class PickerVS {
 		}
 		return false;
 	}
+
+    /** Propagate picker movements to sticked glyphs. */
+    public void propagateMove(double dx, double dy){
+        for (int i=0;i<stickedGlyphs.length;i++){
+            stickedGlyphs[i].move(dx, dy);
+        }
+    }
+
+    /** Attach glyph g to picker. */
+    public void stickGlyph(Glyph g){
+        if (g==null){return;}
+        //make it unsensitive (was automatically disabled when glyph was sticked to mouse)
+        //because false enter/exit events can be generated when moving the mouse too fast
+        //in small glyphs   (I did not find a way to correct this bug yet)
+        g.setSensitivity(false);
+        Glyph[] newStickList = new Glyph[stickedGlyphs.length + 1];
+        System.arraycopy(stickedGlyphs, 0, newStickList, 0, stickedGlyphs.length);
+        newStickList[stickedGlyphs.length] = g;
+        stickedGlyphs = newStickList;
+        g.stickedTo = this;
+    }
+
+    /** Unstick glyph that was last sticked to this picker.
+     * The glyph is automatically made sensitive to mouse events.
+     * The number of glyphs sticked to this picker can be obtained by calling getStickedGlyphsNumber().
+     */
+    public Glyph unstickLastGlyph(){
+        if (stickedGlyphs.length>0){
+            Glyph g = stickedGlyphs[stickedGlyphs.length - 1];
+            g.setSensitivity(true);  //make it sensitive again (was automatically disabled when glyph was sticked to mouse)
+            g.stickedTo = null;
+            Glyph[] newStickList = new Glyph[stickedGlyphs.length - 1];
+            System.arraycopy(stickedGlyphs, 0, newStickList, 0, stickedGlyphs.length - 1);
+            stickedGlyphs = newStickList;
+            return g;
+        }
+        return null;
+    }
+
+    /** Get the number of glyphs sticked to the picker. */
+    public int getStickedGlyphsNumber(){return stickedGlyphs.length;}
+
+    /** Unstick glyph from picker. */
+    public void unstickGlyph(Glyph g){
+        for (int i=0;i<stickedGlyphs.length;i++){
+            if (stickedGlyphs[i] == g){
+                g.stickedTo = null;
+                g.setSensitivity(true);
+                Glyph[] newStickList = new Glyph[stickedGlyphs.length - 1];
+                System.arraycopy(stickedGlyphs, 0, newStickList, 0, i);
+                System.arraycopy(stickedGlyphs, i+1, newStickList, i, stickedGlyphs.length-i-1);
+                stickedGlyphs = newStickList;
+                break;
+            }
+        }
+    }
+
+    /** Get list of glyphs sticked to picker.
+     *@return the actual list, not a copy.
+     */
+    public Glyph[] getStickedGlyphArray(){
+        return stickedGlyphs;
+    }
 
 }
