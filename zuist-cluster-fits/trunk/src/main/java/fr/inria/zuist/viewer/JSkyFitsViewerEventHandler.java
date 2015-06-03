@@ -246,7 +246,7 @@ class JSkyFitsViewerEventHandler implements ViewListener {
             System.out.println("setActiveLayer: " + FitsViewer.LAYER_SCENE_H);
             if(app.getLayerScene() != FitsViewer.LAYER_SCENE_H) app.setLayerScene(FitsViewer.LAYER_SCENE_H);
         }
-        else if(code==KeyEvent.VK_4){123
+        else if(code==KeyEvent.VK_4){
             app.hideLayer(FitsViewer.LAYER_SCENE_KS);
             app.showLayer(FitsViewer.LAYER_SCENE_H, 1.f);
             app.showLayer(FitsViewer.LAYER_SCENE_J, 0.5f);
