@@ -372,17 +372,23 @@ public class VRectangleOr<T> extends VRectangle {
                     g.setComposite(alphaC);
                     if (filled){
                         g.setColor(this.color);
+                        g.translate(dx, dy);
                         g.fillPolygon(pc[i].p);
+                        g.translate(-dx, -dy);
                     }
                     if (paintBorder){
                         g.setColor(borderColor);
                         if (stroke!=null) {
                             g.setStroke(stroke);
+                            g.translate(dx, dy);
                             g.drawPolygon(pc[i].p);
+                            g.translate(-dx, -dy);
                             g.setStroke(stdS);
                         }
                         else {
+                            g.translate(dx, dy);
                             g.drawPolygon(pc[i].p);
+                            g.translate(-dx, -dy);
                         }
                     }
                     g.setComposite(acO);
@@ -390,17 +396,23 @@ public class VRectangleOr<T> extends VRectangle {
                 else {
                     if (filled){
                         g.setColor(this.color);
+                        g.translate(dx, dy);
                         g.fillPolygon(pc[i].p);
+                        g.translate(-dx, -dy);
                     }
                     if (paintBorder){
                         g.setColor(borderColor);
                         if (stroke!=null) {
                             g.setStroke(stroke);
+                            g.translate(dx, dy);
                             g.drawPolygon(pc[i].p);
+                            g.translate(-dx, -dy);
                             g.setStroke(stdS);
                         }
                         else {
+                            g.translate(dx, dy);
                             g.drawPolygon(pc[i].p);
+                            g.translate(-dx, -dy);
                         }
                     }
                 }
