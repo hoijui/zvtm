@@ -111,6 +111,7 @@ public class PickerVS {
        pickedGlyphs = new Glyph[stackSize];
     }
 
+    /** Get the last Glyph this picker entered. */
     public Glyph lastGlyphEntered(){
         return lastGlyphEntered;
     }
