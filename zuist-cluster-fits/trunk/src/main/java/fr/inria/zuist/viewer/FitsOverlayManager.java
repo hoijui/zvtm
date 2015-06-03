@@ -101,6 +101,7 @@ class FitsOverlayManager implements ViewListener {
 	}
 
     boolean showingAbout = false;
+    boolean showingShortcut = false;
     VRectangle fadeAbout;
     VImage insituLogo, inriaLogo;
     VText[] aboutLines;
@@ -110,7 +111,7 @@ class FitsOverlayManager implements ViewListener {
             fadeAbout = new VRectangle(0, 0, 0, 600, 400,
                 FADE_REGION_FILL, FADE_REGION_STROKE, 0.85f);
             aboutLines = new VText[5];
-			aboutLines[0] = new VText(0, 100, 0, Color.WHITE, "ZUIST FITS Image Viewer", VText.TEXT_ANCHOR_MIDDLE, 4.0f);
+            aboutLines[0] = new VText(0, 100, 0, Color.WHITE, "ZUIST FITS Image Viewer", VText.TEXT_ANCHOR_MIDDLE, 4.0f);
             aboutLines[1] = new VText(0, 40, 0, Color.WHITE, "v"+VERSION, VText.TEXT_ANCHOR_MIDDLE, 2.0f);
             aboutLines[2] = new VText(0, 0, 0, Color.WHITE, "Romain Primet, Fernando del Campo, Emmanuel Pietriga", VText.TEXT_ANCHOR_MIDDLE, 2.0f);
             aboutLines[3] = new VText(0, -120, 0, Color.WHITE, "Based on the ZVTM toolkit", VText.TEXT_ANCHOR_MIDDLE, 2.0f);
@@ -149,6 +150,72 @@ class FitsOverlayManager implements ViewListener {
 		application.mView.setActiveLayer(application.LAYER_SCENE);
 	}
 
+	void showShortcut(){
+        if (!showingShortcut){
+            fadeAbout = new VRectangle(0, 0, 0, 600, 400,
+                FADE_REGION_FILL, FADE_REGION_STROKE, 0.85f);
+            aboutLines = new VText[27];
+			aboutLines[0] = new VText(-290, 175, 0, Color.WHITE, "ZUIST FITS Image Viewer", VText.TEXT_ANCHOR_START, 2.0f);
+            aboutLines[1] = new VText(-285+50, 140, 0, Color.WHITE, "Key", VText.TEXT_ANCHOR_START, 1.5f);
+            aboutLines[2] = new VText(-185+50, 140, 0, Color.WHITE, "Description", VText.TEXT_ANCHOR_START, 1.5f);
+            aboutLines[3] = new VText(-275+50, 120, 0, Color.WHITE, "F1", VText.TEXT_ANCHOR_START, 1.3f);
+            aboutLines[4] = new VText(-175+50, 120, 0, Color.WHITE, "Set previous color mapping", VText.TEXT_ANCHOR_START, 1.3f);
+            aboutLines[5] = new VText(-275+50, 100, 0, Color.WHITE, "F2", VText.TEXT_ANCHOR_START, 1.3f);
+            aboutLines[6] = new VText(-175+50, 100, 0, Color.WHITE, "Set next color mapping", VText.TEXT_ANCHOR_START, 1.3f);
+            aboutLines[7] = new VText(-275+50, 80, 0, Color.WHITE, "F3", VText.TEXT_ANCHOR_START, 1.3f);
+            aboutLines[8] = new VText(-175+50, 80, 0, Color.WHITE, "Set previous scale method", VText.TEXT_ANCHOR_START, 1.3f);
+            aboutLines[9] = new VText(-275+50, 60, 0, Color.WHITE, "F4", VText.TEXT_ANCHOR_START, 1.3f);
+            aboutLines[10] = new VText(-175+50, 60, 0, Color.WHITE, "Set next scale method", VText.TEXT_ANCHOR_START, 1.3f);
+            aboutLines[11] = new VText(-275+50, 40, 0, Color.WHITE, "L", VText.TEXT_ANCHOR_START, 1.3f);
+            aboutLines[12] = new VText(-175+50, 40, 0, Color.WHITE, "Set scale method with local values", VText.TEXT_ANCHOR_START, 1.3f);
+            aboutLines[13] = new VText(-275+50, 20, 0, Color.WHITE, "G", VText.TEXT_ANCHOR_START, 1.3f);
+            aboutLines[14] = new VText(-175+50, 20, 0, Color.WHITE, "Set scale method with global values", VText.TEXT_ANCHOR_START, 1.3f);
+             aboutLines[15] = new VText(-275+50, 0, 0, Color.WHITE, "1", VText.TEXT_ANCHOR_START, 1.3f);
+            aboutLines[16] = new VText(-175+50, 0, 0, Color.WHITE, "Set Ks layer", VText.TEXT_ANCHOR_START, 1.3f);
+             aboutLines[17] = new VText(-275+50, -20, 0, Color.WHITE, "2", VText.TEXT_ANCHOR_START, 1.3f);
+            aboutLines[18] = new VText(-175+50, -20, 0, Color.WHITE, "Set Ks/H layer", VText.TEXT_ANCHOR_START, 1.3f);
+             aboutLines[19] = new VText(-275+50, -40, 0, Color.WHITE, "3", VText.TEXT_ANCHOR_START, 1.3f);
+            aboutLines[20] = new VText(-175+50, -40, 0, Color.WHITE, "Set H layer", VText.TEXT_ANCHOR_START, 1.3f);
+             aboutLines[21] = new VText(-275+50, -60, 0, Color.WHITE, "4", VText.TEXT_ANCHOR_START, 1.3f);
+            aboutLines[22] = new VText(-175+50, -60, 0, Color.WHITE, "Set H/J layer", VText.TEXT_ANCHOR_START, 1.3f);
+             aboutLines[23] = new VText(-275+50, -80, 0, Color.WHITE, "5", VText.TEXT_ANCHOR_START, 1.3f);
+            aboutLines[24] = new VText(-175+50, -80, 0, Color.WHITE, "Set J layer", VText.TEXT_ANCHOR_START, 1.3f);
+             aboutLines[25] = new VText(-275+50, -100, 0, Color.WHITE, "6", VText.TEXT_ANCHOR_START, 1.3f);
+            aboutLines[26] = new VText(-175+50, -100, 0, Color.WHITE, "Set Ks/H/J layer", VText.TEXT_ANCHOR_START, 1.3f);
+            application.ovSpace.addGlyph(fadeAbout);
+			for (int i=0;i<aboutLines.length;i++){
+	            application.ovSpace.addGlyph(aboutLines[i]);
+			}
+            showingShortcut = true;
+        }
+		application.mView.setActiveLayer(application.LAYER_OVERLAY);
+    }
+
+    void hideShortcut(){
+        if (showingShortcut){
+            showingShortcut = false;
+            if (insituLogo != null){
+                application.ovSpace.removeGlyph(insituLogo);
+                insituLogo = null;
+            }
+            if (inriaLogo != null){
+                application.ovSpace.removeGlyph(inriaLogo);
+                inriaLogo = null;
+            }
+            if (fadeAbout != null){
+                application.ovSpace.removeGlyph(fadeAbout);
+                fadeAbout = null;
+            }
+			for (int i=0;i<aboutLines.length;i++){
+	            if (aboutLines[i] != null){
+	                application.ovSpace.removeGlyph(aboutLines[i]);
+	                aboutLines[i] = null;
+	            }
+			}
+		}
+		application.mView.setActiveLayer(application.LAYER_SCENE);
+	}
+
 	public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
 	}
 
@@ -156,6 +223,7 @@ class FitsOverlayManager implements ViewListener {
 
 	public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
 		hideAbout();
+		hideShortcut();
 	}
 
 	public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
@@ -182,6 +250,7 @@ class FitsOverlayManager implements ViewListener {
 
 	public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
 		hideAbout();
+		hideShortcut();
 	}
 
 	public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}

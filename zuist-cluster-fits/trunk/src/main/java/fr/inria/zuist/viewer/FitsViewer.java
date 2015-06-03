@@ -436,6 +436,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 		final JMenuItem gcMI = new JMenuItem("Run Garbage Collector");
 		gcMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F10, 0));
 		final JMenuItem aboutMI = new JMenuItem("About...");
+        final JMenuItem shortcutMI = new JMenuItem("Shortcut");
 		ActionListener a0 = new ActionListener(){
 			public void actionPerformed(ActionEvent e){
 				if (e.getSource()==openMI){openFile();}
@@ -445,6 +446,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 				else if (e.getSource()==gcMI){gc();}
 				else if (e.getSource()==consoleMI){ovm.toggleConsole();}
 				else if (e.getSource()==aboutMI){about();}
+                else if (e.getSource()==shortcutMI){shortCut();}
 			}
 		};
 		JMenuBar jmb = new JMenuBar();
@@ -459,6 +461,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 		viewM.add(gcMI);
 		viewM.add(consoleMI);
 		helpM.add(aboutMI);
+        helpM.add(shortcutMI);
 		jmb.add(fileM);
 		jmb.add(viewM);
 		jmb.add(helpM);
@@ -469,6 +472,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 		consoleMI.addActionListener(a0);
 		gcMI.addActionListener(a0);
 		aboutMI.addActionListener(a0);
+        shortcutMI.addActionListener(a0);
 		return jmb;
 	}
 
@@ -1581,6 +1585,10 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     
     void about(){
         ovm.showAbout();
+    }
+
+    void shortCut(){
+        ovm.showShortcut();
     }
 
 	void gc(){
