@@ -92,10 +92,6 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
 
     double originHighCut;
 
-    public static final String[] COLORFILTER = { "Background", "Blue", "Heat", "Isophot", "Light", "Pastel", "Ramp", "Real",
-                                    "Smooth", "Staircase", "Standard" };
-
-
     public JSkyFitsImage(String file) throws MalformedURLException {
         this(new URL(file));
         /*try{
@@ -270,6 +266,13 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
             updateDisplayedImage();
             VirtualSpaceManager.INSTANCE.repaint();
         }
+    }
+
+    /** Get the color lookup table currently set for this image.
+     *@return the color looktup table's name
+     */
+    public String getColorLookupTable(){
+        return proc.getColorLookupTableName();
     }
 
     /**
@@ -718,4 +721,3 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
     }
 
 }
-
