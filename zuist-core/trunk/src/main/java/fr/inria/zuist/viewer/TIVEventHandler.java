@@ -323,6 +323,7 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
         else if (code == KeyEvent.VK_Q && Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() == e.getModifiers()){application.exit();}
         else if (c == '?'){application.ovm.showAbout();}
         else if (code == KeyEvent.VK_A){application.toggleBenchAnim();}
+        // else if (code == KeyEvent.VK_C){application.mCamera.moveTo(-292.94947052782845, -97.44501151914207);}
     }
 
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}

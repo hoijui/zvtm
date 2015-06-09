@@ -68,7 +68,7 @@ ACCESS_TOKEN = ""
 def getTMSURL():
     ######################### OSM
     ## EXT: png
-    return "http://%s.tile.openstreetmap.org/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*3))]
+    #return "http://%s.tile.openstreetmap.org/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*3))]
     ######################### ArcGIS orthoimagery, use with -yx
     ## EXT: jpg
     #return "http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/"
@@ -85,7 +85,7 @@ def getTMSURL():
     ## EXT: jpg
     #return "http://otile%d.mqcdn.com/tiles/1.0.0/sat/" % math.ceil(random.random()*4)
     ## EXT: jpg
-    #return "http://otile%d.mqcdn.com/tiles/1.0.0/osm/" % math.ceil(random.random()*4)
+    return "http://otile%d.mqcdn.com/tiles/1.0.0/osm/" % math.ceil(random.random()*4)
     ######################### Mapbox
     # Woodcut
     ## EXT: jpg
