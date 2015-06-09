@@ -26,6 +26,8 @@ import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
 
 public class TextDescription extends ObjectDescription {
 
+    public static final String OBJECT_TYPE_TEXT = "zc-txt";
+
     public static final String _start = "start";
     public static final String _middle = "middle";
     public static final String _end = "end";
@@ -79,6 +81,14 @@ public class TextDescription extends ObjectDescription {
         this.alpha = alpha;
         this.parentRegion = pr;
         this.anchor = ta;
+    }
+
+    /** Type of object.
+     *@return type of object.
+     */
+    @Override
+    public String getType(){
+        return OBJECT_TYPE_TEXT;
     }
 
     @Override

@@ -39,6 +39,11 @@ public abstract class ObjectDescription {
     this.sensitive = sensitive;
     }
 
+    /** Type of object.
+     *@return type of object.
+     */
+    public abstract String getType();
+
     /** Called automatically by scene manager. Can be called by client application to force loading of objects not actually visible. */
     public abstract void createObject(SceneManager sm, final VirtualSpace vs, boolean fadeIn);
 

@@ -59,11 +59,6 @@ public abstract class ResourceDescription extends ObjectDescription {
         this.vy = y;
     }
 
-    /** Type of resource.
-     *@return type of resource.
-     */
-    public abstract String getType();
-
     /** Set URL of this resource. */
     public void setURL(URL url){
         this.src = url;
