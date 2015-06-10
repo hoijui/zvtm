@@ -1,3 +1,8 @@
+/*
+ *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009-2014.
+ *  Licensed under the GNU LGPL. For full terms see the file COPYING.
+ *
+ */
 package fr.inria.zvtm.cluster;
 
 import fr.inria.zvtm.engine.Camera;
@@ -7,7 +12,8 @@ import fr.inria.zvtm.event.ViewAdapter;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
-import fr.inria.zvtm.engine.portals.MorOverviewPortal;
+import fr.inria.zvtm.engine.portals.Portal;
+import fr.inria.zvtm.engine.portals.CameraPortal;
 
 import java.awt.Color;
 import java.awt.GraphicsDevice;
@@ -68,6 +74,10 @@ public class SlaveApp {
         updater.startOperation();
     }
 
+    public View getView() {
+        return view;
+    }
+
     protected String getViewType(){
         return options.openGl ? View.OPENGL_VIEW : View.STD_VIEW;
     }
@@ -93,8 +103,8 @@ public class SlaveApp {
         view = vsm.addFrameView(cv.getCameras(),
                 "slaveView " + options.blockNumber,
                 getViewType(),
-                cv.getClusterGeometry().getBlockWidth(),
-                cv.getClusterGeometry().getBlockHeight(),
+                cv.getClusterGeometry().getBlockWidth()*options.width,
+                cv.getClusterGeometry().getBlockHeight()*options.height,
                 false, false, !options.undecorated, null);
         view.setBackgroundColor(cv.getBackgroundColor());
         view.setListener(new SlaveEventHandler());
@@ -146,19 +156,6 @@ public class SlaveApp {
         }
     }
 
-    void addPortal(MorOverviewPortal portal, ClusteredView cv)
-    {
-	    //System.out.println("addPortal called " + portal + " " + cv);
-	    if(!cv.ownsBlock(options.blockNumber)){
-		    return;
-	    }
-		
-	    //System.out.println(
-	    //	    "Yes addPortal !!! " + portal.getObservedRegionsCameras().length + " " +
-	    //	    portal.x + " " + portal.y + " " + portal.w + " " + portal.h + " ");
-	    vsm.addPortal(portal, view);
-    }
-
     void setCameraLocation(Location masterLoc,
             Camera slaveCamera){
         if(clusteredView == null || (!clusteredView.ownsCamera(slaveCamera))){
@@ -179,13 +176,24 @@ public class SlaveApp {
         int row = clusteredView.rowNum(options.blockNumber) - clusteredView.rowNum(clusteredView.getOrigin());
         int col = clusteredView.colNum(options.blockNumber) - clusteredView.colNum(clusteredView.getOrigin());
 
-        double xOffset = -((viewCols-1)*virtBlockWidth)/2;
-        double yOffset = ((viewRows-1)*virtBlockHeight)/2;
+        double xOffset = -((viewCols-1)*virtBlockWidth)/2 + ((options.width-1)*virtBlockWidth/2);
+        double yOffset = ((viewRows-1)*virtBlockHeight)/2 + ((options.height-1)*virtBlockHeight/2);
 
         double newX = xOffset + masterLoc.vx + col*virtBlockWidth;
         double newY = -yOffset + masterLoc.vy - row*virtBlockHeight;
 
         slaveCamera.setLocation(new Location(newX, newY, masterLoc.alt));
+    }
+
+    void setPortalLocation(Portal p, int x, int y, int w, int h) {
+        int virtBlockWidth = clusteredView.getClusterGeometry().getBlockWidth();
+        int virtBlockHeight = clusteredView.getClusterGeometry().getBlockHeight();
+
+        int row = clusteredView.rowNum(options.blockNumber) ;
+        int col = clusteredView.colNum(options.blockNumber) ;
+
+        p.moveTo(x-col*virtBlockWidth,y-row*virtBlockHeight);
+        p.sizeTo(w,h);
     }
 
     void stop(){
@@ -247,5 +255,11 @@ class SlaveOptions {
 
     @Option(name = "-r", aliases = {"--refresh-period"}, usage = "time between two scene repaints (milliseconds)")
         int refreshPeriod = 25;
+    
+    @Option(name = "-wb", aliases = {"--w-block"}, usage = "width in block (default 1)")
+    	int width = 1;
+
+    @Option(name = "-hb", aliases = {"--h-block"}, usage = "height in block (default 1)")
+		int height = 1;
 }
 
