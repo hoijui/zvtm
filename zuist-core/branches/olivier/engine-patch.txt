@@ -1,0 +1,882 @@
+Index: src/main/java/fr/inria/zuist/engine/Region.java
+===================================================================
+--- src/main/java/fr/inria/zuist/engine/Region.java	(révision 5567)
++++ src/main/java/fr/inria/zuist/engine/Region.java	(copie de travail)
+@@ -10,6 +10,7 @@
+ import java.util.Arrays;
+ import java.util.Comparator;
+ import java.util.Vector;
++import java.util.HashMap;
+ 
+ import fr.inria.zvtm.glyphs.Glyph;
+ import fr.inria.zvtm.glyphs.VRectangle;
+@@ -118,7 +119,7 @@
+     ObjectDescription[] objects = new ObjectDescription[0];
+ 
+     // was visible in viewport
+-    boolean wviv = false;
++    HashMap<PseudoView, Boolean> WViV = new HashMap<PseudoView, Boolean>();
+ 
+     SceneManager sm;
+ 
+@@ -329,17 +330,19 @@
+     }
+ 
+     /*rl can be null*/
+-    void updateVisibility(double[] viewportBounds, int atDepth, short transition, RegionListener rl){
++    void updateVisibility(PseudoView pv, double[] viewportBounds, int atDepth, short transition, RegionListener rl){
+         // is visible in viewport
+         boolean iviv = (wnes[0] < viewportBounds[2] && wnes[2] > viewportBounds[0]
+             && wnes[3] < viewportBounds[1] && wnes[1] > viewportBounds[3]);
++        Boolean wviv = WViV.get(pv);
++        if (wviv==null)  {WViV.put(pv, false); wviv = false; }
+         if (iviv){
+             if (wviv){
+                 // was visible last time we checked, is still visible
+                 // visibility status of contained regions might have changed
+                 // we have to compute intersections to find out
+                 for (int i=0;i<containedRegions.length;i++){
+-                    containedRegions[i].updateVisibility(viewportBounds, atDepth, transition, rl);
++                    containedRegions[i].updateVisibility(pv, viewportBounds, atDepth, transition, rl);
+                 }
+             }
+             else {
+@@ -347,10 +350,10 @@
+                 // visibility status of contained regions might have changed
+                 // we have to compute intersections to find out
+                 for (int i=0;i<containedRegions.length;i++){
+-                    containedRegions[i].updateVisibility(viewportBounds, atDepth, transition, rl);
++                    containedRegions[i].updateVisibility(pv, viewportBounds, atDepth, transition, rl);
+                 }
+                 if (atDepth >= hli && atDepth <= lli){
+-                    forceShow(transition, (wnes[2]+wnes[0])/2, (wnes[1]+wnes[3])/2);
++                    forceShow(pv, transition, (wnes[2]+wnes[0])/2, (wnes[1]+wnes[3])/2);
+                     if (rl != null){
+                         rl.enteredRegion(this);
+                     }
+@@ -362,10 +365,10 @@
+                 // was visible last time we checked, is no longer visible
+                 // contained regions are necessarily invisible
+                 for (int i=0;i<containedRegions.length;i++){
+-                    containedRegions[i].updateVisibility(false, viewportBounds, atDepth, transition, rl);
++                    containedRegions[i].updateVisibility(pv, false, viewportBounds, atDepth, transition, rl);
+                 }
+                 if (atDepth >= hli && atDepth <= lli){
+-                    forceHide(transition, (wnes[2]+wnes[0])/2, (wnes[1]+wnes[3])/2);
++                    forceHide(pv, transition, (wnes[2]+wnes[0])/2, (wnes[1]+wnes[3])/2);
+                     if (rl != null){
+                         rl.exitedRegion(this);
+                     }
+@@ -378,14 +381,16 @@
+     }
+ 
+     /*rl can be null*/
+-    void updateVisibility(boolean visible, double[] viewportBounds, int atDepth, short transition, RegionListener rl){
++    void updateVisibility(PseudoView pv, boolean visible, double[] viewportBounds, int atDepth, short transition, RegionListener rl){
++        Boolean wviv = WViV.get(pv);
++        if (wviv==null)  {WViV.put(pv, false); wviv = false; }
+         if (visible){
+             if (wviv){
+                 // was visible last time we checked, is still visible
+                 // visibility status of contained regions might have changed
+                 // we have to compute intersections to find out
+                 for (int i=0;i<containedRegions.length;i++){
+-                    containedRegions[i].updateVisibility(viewportBounds, atDepth, transition, rl);
++                    containedRegions[i].updateVisibility(pv, viewportBounds, atDepth, transition, rl);
+                 }
+             }
+             else {
+@@ -393,10 +398,10 @@
+                 // visibility status of contained regions might have changed
+                 // we have to compute intersections to find out
+                 for (int i=0;i<containedRegions.length;i++){
+-                    containedRegions[i].updateVisibility(viewportBounds, atDepth, transition, rl);
++                    containedRegions[i].updateVisibility(pv, viewportBounds, atDepth, transition, rl);
+                 }
+                 if (atDepth >= hli && atDepth <= lli){
+-                    forceShow(transition, (wnes[2]+wnes[0])/2, (wnes[1]+wnes[3])/2);
++                    forceShow(pv, transition, (wnes[2]+wnes[0])/2, (wnes[1]+wnes[3])/2);
+                     if (rl != null){
+                         rl.enteredRegion(this);
+                     }
+@@ -409,10 +414,10 @@
+                 // was visible last time we checked, is no longer visible
+                 // contained regions are necessarily invisible
+                 for (int i=0;i<containedRegions.length;i++){
+-                    containedRegions[i].updateVisibility(false, viewportBounds, atDepth, transition, rl);
++                    containedRegions[i].updateVisibility(pv, false, viewportBounds, atDepth, transition, rl);
+                 }
+                 if (atDepth >= hli && atDepth <= lli){
+-                    forceHide(transition, (wnes[2]+wnes[0])/2, (wnes[1]+wnes[3])/2);
++                    forceHide(pv, transition, (wnes[2]+wnes[0])/2, (wnes[1]+wnes[3])/2);
+                     if (rl != null){
+                         rl.exitedRegion(this);
+                     }
+@@ -423,38 +428,42 @@
+         }
+     }
+ 
+-    void show(short transition, double  x, double y){
++    void show(PseudoView pv, short transition, double  x, double y){
++        Boolean wviv = WViV.get(pv);
++        if (wviv==null)  { WViV.put(pv, false); wviv = false; }
+         if (!wviv){
+-            forceShow(transition, x, y);
++            forceShow(pv, transition, x, y);
+         }
+     }
+ 
+-    void forceShow(short transition, double x, double y){
++    void forceShow(PseudoView pv, short transition, double x, double y){
+         if (requestOrder == ORDERING_DISTANCE){
+             Arrays.sort(objects, new DistanceComparator(x, y));
+         }
+         boolean fade = (transition == TASL) ? false : transitions[transition] == FADE_IN;
+         for (int i=0;i<objects.length;i++){
+-            sm.glyphLoader.addLoadRequest(li, objects[i], fade);
++            sm.glyphLoader.addLoadRequest(pv, objects[i], fade);
+         }
+-        wviv = true;
++        WViV.put(pv, true);
+     }
+ 
+-    void hide(short transition, double x, double y){
++    void hide(PseudoView pv, short transition, double x, double y){
++        Boolean wviv = WViV.get(pv);
++        if (wviv==null)  {WViV.put(pv, false); wviv = false; }
+         if (wviv){
+-            forceHide(transition, x, y);
++            forceHide(pv, transition, x, y);
+         }
+     }
+ 
+-    void forceHide(short transition, double x, double y){
++    void forceHide(PseudoView pv, short transition, double x, double y){
+         if (requestOrder == ORDERING_DISTANCE){
+             Arrays.sort(objects, new DistanceComparator(x, y));
+         }
+         boolean fade = (transition == TASL) ? false : transitions[transition] == FADE_OUT;
+         for (int i=0;i<objects.length;i++){
+-            sm.glyphLoader.addUnloadRequest(li, objects[i], fade);
++            sm.glyphLoader.addUnloadRequest(pv, objects[i], fade);
+         }
+-        wviv = false;
++        WViV.put(pv, false);
+     }
+ 
+     int getClosestObjectIndex(double x, double y){
+Index: src/main/java/fr/inria/zuist/engine/ImageDescription.java
+===================================================================
+--- src/main/java/fr/inria/zuist/engine/ImageDescription.java	(révision 5567)
++++ src/main/java/fr/inria/zuist/engine/ImageDescription.java	(copie de travail)
+@@ -91,7 +91,21 @@
+         }
+ 
+         public void run(){
+-            if (glyph == null){
++            if (glyph != null) {
++                assert(!SwingUtilities.isEventDispatchThread());
++                try{
++                    SwingUtilities.invokeAndWait(new Runnable(){
++                        public void run(){
++                            loadCount++;
++                            vs.addGlyph(glyph);
++                            glyph.setOwner(ImageDescription.this);
++                            sm.objectCreated(ImageDescription.this);
++                        }
++                    });
++                } catch(InterruptedException ie){ /*ie.printStackTrace();*/}
++                catch(InvocationTargetException ite){ /*ite.printStackTrace();*/}
++            }
++            else {
+                 String protocol = src.getProtocol();
+                 if (protocol.startsWith(ImageDescription.HTTP_PROTOCOL) || protocol.startsWith(ImageDescription.HTTPS_PROTOCOL)){
+                     Glyph vrp = null;
+@@ -168,11 +182,14 @@
+             catch(InterruptedException ie){ /*ie.printStackTrace();*/ }
+             catch(ExecutionException ee){ /*ee.printStackTrace();*/ }
+             if (glyph != null){
+-                if (fadeOut){
++                if (fadeOut && loadCount == 1){  // FIXME loadCount !
++                    loadCount--;
+                     Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, glyph,
+-                        0.0f, false, IdentityInterpolator.getInstance(), new ImageHideAction(sm, vs));
++                        0.0f, false, IdentityInterpolator.getInstance(), new ImageHideAction(sm, vs, loadCount));
+                     VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
+-                    glyph = null;
++                    if (loadCount < 1) { // true
++                        glyph = null;
++                    }
+                 }
+                 else {
+                     assert(!SwingUtilities.isEventDispatchThread());
+@@ -180,8 +197,11 @@
+                         SwingUtilities.invokeAndWait(new Runnable(){
+                         public void run(){
+                             vs.removeGlyph(glyph);
+-                            glyph.getImage().flush();
+-                            glyph = null;
++                            loadCount--;
++                            if (loadCount < 1) {
++                                glyph.getImage().flush();
++                                glyph = null;
++                            }
+                             sm.objectDestroyed(ImageDescription.this);
+                         }
+                         });
+@@ -246,6 +266,7 @@
+     }
+ 
+     private void finishCreatingObject(final SceneManager sm, final VirtualSpace vs, Image i, Glyph vrp, boolean fadeIn){
++        loadCount++;  // = 1
+         // fit image in declared "bounding box"
+         double sf = Math.min(vw / ((double)i.getWidth(null)), vh / ((double)i.getHeight(null)));
+         if (fadeIn){
+@@ -335,16 +356,20 @@
+ 
+     SceneManager sm;
+     VirtualSpace vs;
++    int loadCount;
+ 
+-    ImageHideAction(SceneManager sm, VirtualSpace vs){
++    ImageHideAction(SceneManager sm, VirtualSpace vs, int lc){
+         this.sm = sm;
+         this.vs = vs;
++        this.loadCount = lc;
+     }
+ 
+     public void execute(Object subject, Animation.Dimension dimension){
+         try {
+             vs.removeGlyph((Glyph)subject);
+-            ((VImage)subject).getImage().flush();
++            if (loadCount < 1){
++                ((VImage)subject).getImage().flush();
++            }
+             sm.objectDestroyed((ImageDescription)((Glyph)subject).getOwner());
+         }
+         catch(ArrayIndexOutOfBoundsException ex){
+@@ -356,7 +381,9 @@
+     public void recoverFailingAnimationEnded(Object subject, Animation.Dimension dimension){
+         try {
+             vs.removeGlyph((Glyph)subject);
+-            ((VImage)subject).getImage().flush();
++            if (loadCount < 1){
++                ((VImage)subject).getImage().flush();
++            }
+             sm.objectDestroyed((ImageDescription)((Glyph)subject).getOwner());
+         }
+         catch(ArrayIndexOutOfBoundsException ex){
+Index: src/main/java/fr/inria/zuist/engine/SceneManager.java
+===================================================================
+--- src/main/java/fr/inria/zuist/engine/SceneManager.java	(révision 5567)
++++ src/main/java/fr/inria/zuist/engine/SceneManager.java	(copie de travail)
+@@ -62,7 +62,7 @@
+  *@author Emmanuel Pietriga
+  */
+ 
+-public class SceneManager implements CameraListener {
++public class SceneManager implements CameraListener, PseudoViewListener {
+ 
+     public static final String _none = "none";
+     public static final String _level = "level";
+@@ -137,9 +137,6 @@
+ 
+     Level[] levels = new Level[0];
+ 
+-    final VirtualSpace[] sceneLayers;
+-    final Camera[] sceneCameras;
+-    final double[] prevAlts; //previous altitudes
+     private final RegionUpdater regUpdater;
+ 
+     /** Contains a mapping from region IDs to actual Region objects. */
+@@ -167,7 +164,7 @@
+         private boolean enabled = true;
+ 
+         RegionUpdater(){
+-            toUpdate = new HashMap<Camera, Location>(sceneCameras.length,1);
++            toUpdate = new HashMap<Camera, Location>(); //sceneCameras.length,1);
+             active = false;
+             period = DEFAULT_PERIOD;
+         }
+@@ -198,18 +195,18 @@
+                     for(Map.Entry<Camera, Location> entry: toUpdate.entrySet()){
+                         Camera cam = entry.getKey();
+                         double alt = entry.getValue().alt;
+-                        int layerIndex = getLayerIndex(cam);
+-                        if(layerIndex == -1){
++                        PseudoView pv = getPseudoViewByCamera(cam);
++                        if(pv == null){
+                             if (DEBUG_MODE){System.err.println("Camera " + cam + "is not tracked by ZUIST");}
+                             return;
+                         }
+-                        double[] cameraBounds = cam.getOwningView().getVisibleRegion(cam);
++                        double[] cameraBounds = pv.getVisibleRegion();
+                         //update regions
+-                        if(alt != prevAlts[layerIndex]){
+-                            prevAlts[layerIndex] = alt;
+-                            updateLevel(layerIndex, cameraBounds, alt);
++                        if(alt != pv.prevAlt){
++                            pv.prevAlt = alt;
++                            updateLevel(pv, cameraBounds, alt);
+                         } else {
+-                            updateVisibleRegions(layerIndex, cameraBounds);
++                            updateVisibleRegions(pv, cameraBounds);
+                         }
+ 
+                     }
+@@ -231,21 +228,57 @@
+      *@see #setProperties(HashMap properties)
+      */
+     public SceneManager(VirtualSpace[] vss, Camera[] cs, HashMap<String,String> properties){
+-        this.sceneLayers = vss;
+-        this.sceneCameras = cs;
++        for(int i = 0; i < vss.length; i++){
++            addPseudoView(new PseudoView(vss[i], cs[i], i));
++        }
+         this.setProperties(properties);
+         regUpdater = new RegionUpdater();
+-        prevAlts = new double[sceneCameras.length];
+         glyphLoader = new GlyphLoader(this);
+         id2region = new Hashtable<String,Region>();
+         id2object = new Hashtable<String,ObjectDescription>();
+         sceneAttrs = new HashMap(5,1);
+         RESOURCE_HANDLERS = new HashMap<String, ResourceHandler>(5);
+-        for(Camera cam: sceneCameras){
+-            cam.addListener(this);
++    }
++
++
++    /* --------- the "views" on the scene -------------------- */
++
++    Vector<PseudoView> pseudoViews = new Vector<PseudoView>();
++
++    public boolean addPseudoView(PseudoView pv){
++        pseudoViews.add(pv);
++        pv.c.addListener(this);
++        pv.addListener(this);
++        // 
++        return true;
++    }
++
++    public boolean removePseudoView(PseudoView pv){
++        // unload stuff...
++        if (pv.currentLevel >= 0 && pv.currentLevel < levels.length)
++        {
++            Region[] ral = getRegionsAtLevel(pv.currentLevel);
++            for (int i=0;i<ral.length;i++){
++                if (ral[i].li != pv.layerIndex) continue; // not really needed, but...
++                ral[i].hide(pv, Region.DISAPPEAR, ral[i].x, ral[i].y);
++                if (ral[i].getBounds() != null){  // should we do that
++                    pv.vs.removeGlyph(ral[i].getBounds());
++                }
+         }
++        }
++        pv.c.removeListener(this);
++        pv.removeListener(this);
++        return pseudoViews.removeElement(pv);
+     }
+ 
++    public PseudoView getPseudoViewByCamera(Camera cam)
++    {
++        for (PseudoView pv : pseudoViews){
++            if (pv.c == cam) return pv;
++        }
++        return null;
++    }
++
+     /* -------------- Properties -------------------- */
+ 
+     public static final String HTTP_AUTH_USER = "user";
+@@ -659,7 +692,9 @@
+         }
+         if (fill != null || stroke != null || sensitivity){
+             // add the rectangle representing the region only if it is visible or sensitive
+-            sceneLayers[li].addGlyph(r);
++            for (PseudoView pv : pseudoViews){
++                if (li == pv.layerIndex) { pv.vs.addGlyph(r); }
++            }
+         }
+         region.setGlyph(r);
+         r.setOwner(region);
+@@ -730,7 +765,9 @@
+      *@param r region to be destroyed
+      */
+     public void destroyRegion(Region r){
+-        r.forceHide(Region.DISAPPEAR, r.x, r.y);
++        for(PseudoView pv : pseudoViews){
++            r.forceHide(pv, Region.DISAPPEAR, r.x, r.y);
++        }
+         ObjectDescription[] ods = r.getObjectsInRegion();
+         for (int i=0;i<ods.length;i++){
+             id2object.remove(ods[i].getID());
+@@ -740,7 +777,9 @@
+             levels[i].removeRegion(r);
+         }
+         if (r.getBounds() != null){
+-            sceneLayers[r.li].removeGlyph(r.getBounds());
++            for(PseudoView pv : pseudoViews){
++                pv.vs.removeGlyph(r.getBounds());
++            }
+         }
+     }
+ 
+@@ -1021,8 +1060,6 @@
+         regUpdater.setEnabled(b);
+     }
+ 
+-    int previousLevel = -2;
+-    int currentLevel = -1;
+     boolean updateLevel = false;
+ 
+     /** Enable/disable level updating.
+@@ -1030,40 +1067,39 @@
+      *@see #updateLevel(int layerIndex, double[] cameraBounds, double altitude)
+      */
+     public void setUpdateLevel(boolean b){
+-    updateLevel = b;
+-    //update level for every camera
+-    if(updateLevel){
+-        for(Camera cam: sceneCameras){
+-            updateLevel(getLayerIndex(cam),
+-                    cam.getOwningView().getVisibleRegion(cam),
+-                    cam.getAltitude());
++        updateLevel = b;
++        //update level for every camera
++        if(updateLevel){
++            for(PseudoView pv : pseudoViews){
++                double[] cameraBounds = pv.getVisibleRegion(); 
++                updateLevel(pv, cameraBounds, pv.c.getAltitude());
++            }
+         }
+     }
+-    }
+ 
+     /** Notify altitude changes.
+      *@param altitude the new camera's altitude
+      */
+-    private void updateLevel(int layerIndex, double[] cameraBounds, double altitude){
++    private void updateLevel(PseudoView pv, double[] cameraBounds, double altitude){
+         if (!updateLevel){return;}
+         // find out new level
+         for (int i=0;i<levels.length;i++){
+-            if (levels[i].inRange(altitude)){currentLevel = i;break;}
++            if (levels[i].inRange(altitude)){pv.currentLevel = i;break;}
+         }
+         // compare to current level
+-        if (previousLevel != currentLevel){
++        if (pv.previousLevel != pv.currentLevel){
+             // it is important that exitLevel() gets called before enterLevel()
+             // because of regions spanning multiple levels that get checked in exitLevel()
+-            if (previousLevel >= 0){
+-                exitLevel(previousLevel, currentLevel);
++            if (pv.previousLevel >= 0){
++                exitLevel(pv, pv.previousLevel, pv.currentLevel);
+             }
+-            enterLevel(layerIndex, cameraBounds, currentLevel, previousLevel);
+-            previousLevel = currentLevel;
++            enterLevel(pv, cameraBounds, pv.currentLevel, pv.previousLevel);
++            pv.previousLevel = pv.currentLevel;
+         }
+         else {
+             // if level hasn't changed, it is still necessary to update
+             // visible regions as some of them might have become (in)visible
+-            updateVisibleRegions(layerIndex, cameraBounds);
++            updateVisibleRegions(pv, cameraBounds);
+         }
+     }
+ 
+@@ -1071,25 +1107,35 @@
+      *@return index of level at which camera is right now (highest level is 0)
+      */
+     public int getCurrentLevel(){
+-        return currentLevel;
++        if (pseudoViews.size() > 0){
++            return pseudoViews.get(0).currentLevel;
++        }
++        return -1;
+     }
+ 
+-    private void enterLevel(int layerIndex, double[] cameraBounds, int depth, int prev_depth){
++    public int getCurrentLevel(PseudoView pv){
++        return pv.currentLevel;
++    }
++
++    private void enterLevel(PseudoView pv, double[] cameraBounds, int depth, int prev_depth){
+         boolean arrivingFromHigherAltLevel = depth > prev_depth;
+-        updateVisibleRegions(layerIndex, cameraBounds, depth, (arrivingFromHigherAltLevel) ? Region.TFUL : Region.TFLL);
++        updateVisibleRegions(pv, cameraBounds, depth, (arrivingFromHigherAltLevel) ? Region.TFUL : Region.TFLL);
+         if (levelListener != null){
+             levelListener.enteredLevel(depth);
+         }
+     }
+ 
+-    private void exitLevel(int depth, int new_depth){
++    private void exitLevel(PseudoView pv, int depth, int new_depth){
+         boolean goingToLowerAltLevel = new_depth > depth;
+         for (int i=0;i<levels[depth].regions.length;i++){
+             // hide only if region does not span the level where we are going
+-            if ((goingToLowerAltLevel && !levels[new_depth].contains(levels[depth].regions[i]))
+-                || (!goingToLowerAltLevel && !levels[new_depth].contains(levels[depth].regions[i]))){
+-                    levels[depth].regions[i].hide((goingToLowerAltLevel) ? Region.TTLL : Region.TTUL,
+-                        sceneCameras[levels[depth].regions[i].li].vx, sceneCameras[levels[depth].regions[i].li].vy);
++            if ((levels[depth].regions[i].li == pv.layerIndex) && (
++                (goingToLowerAltLevel && !levels[new_depth].contains(levels[depth].regions[i]))
++                || 
++                (!goingToLowerAltLevel && !levels[new_depth].contains(levels[depth].regions[i]))
++                )){
++                    levels[depth].regions[i].hide(pv, (goingToLowerAltLevel) ? Region.TTLL : Region.TTUL,
++                        pv.c.vx, pv.c.vy);
+             }
+         }
+         if (levelListener != null){
+@@ -1099,25 +1145,41 @@
+ 
+     /** Get region whose center is closest to a given location at the current level. */
+     public Region getClosestRegionAtCurrentLevel(Point2D.Double lp){
+-        return levels[currentLevel].getClosestRegion(lp);
++        if (pseudoViews.size() > 0 && pseudoViews.get(0).currentLevel >= 0){
++            return levels[pseudoViews.get(0).currentLevel].getClosestRegion(lp);
++        }
++        return null;
+     }
++    /** Get region whose center is closest to a given location at the current level. */
++    public Region getClosestRegionAtCurrentLevel(Point2D.Double lp, int layerIndex){
++        if (pseudoViews.size() > layerIndex && pseudoViews.get(layerIndex).currentLevel >= 0){
++            return levels[pseudoViews.get(layerIndex).currentLevel].getClosestRegion(lp);
++        }
++        return null;
++    }
++    /** Get region whose center is closest to a given location at the current level. */
++    public Region getClosestRegionAtCurrentLevel(Point2D.Double lp, PseudoView pv){
++        if (pv.currentLevel >= 0){
++            return levels[pv.currentLevel].getClosestRegion(lp);
++        }
++        return null;
++    }
+ 
+     /** Notify camera translations. It is up to the client application to notify the scene manager each time the position of the camera used to observe the scene changes.
+      *
+      */
+-    private void updateVisibleRegions(int layerIndex, double[] cameraBounds){
++    private void updateVisibleRegions(PseudoView pv, double[] cameraBounds){
+         //called when an x-y movement occurs but no altitude change
+-        updateVisibleRegions(layerIndex, cameraBounds, currentLevel, Region.TASL);
++        updateVisibleRegions(pv, cameraBounds, pv.currentLevel, Region.TASL);
+     }
+ 
+-
+-    private void updateVisibleRegions(int layerIndex, double[] cameraBounds, int level, short transition){
++    private void updateVisibleRegions(PseudoView pv, double[] cameraBounds, int level, short transition){
+         try {
+             for (int i=0;i<levels[level].regions.length;i++){
+-                if(layerIndex != levels[level].regions[i].li){
++                if(pv.layerIndex != levels[level].regions[i].li){
+                     continue;
+                 }
+-                levels[level].regions[i].updateVisibility(cameraBounds, currentLevel, transition, regionListener);
++                levels[level].regions[i].updateVisibility(pv, cameraBounds, pv.currentLevel, transition, regionListener);
+             }
+         }
+         catch ( Exception e) {
+@@ -1130,8 +1192,9 @@
+ 
+     /** Update visible regions for all cameras. */
+     public void updateVisibleRegions(){
+-        for (Camera cam:sceneCameras){
+-            updateVisibleRegions(getLayerIndex(cam), cam.getOwningView().getVisibleRegion(cam));
++        for(PseudoView pv : pseudoViews){
++            double[] cameraBounds = pv.getVisibleRegion();
++            updateVisibleRegions(pv, cameraBounds);
+         }
+     }
+ 
+@@ -1144,19 +1207,21 @@
+     }
+ 
+     int getLayerIndex(String spaceName){
+-        for (int i=0;i<sceneLayers.length;i++){
+-            if (sceneLayers[i].getName().equals(spaceName)){
+-                return i;
++        for(PseudoView pv : pseudoViews){
++            if (pv.vs.getName().equals(spaceName)){
++                return pv.layerIndex;
+             }
+         }
+         return -1;
+     }
+ 
++    // FIXME: remove ?
+     public VirtualSpace getSpaceByIndex(int layerIndex){
+-        if ((layerIndex < 0) || (layerIndex > sceneLayers.length)){
++        if ((layerIndex < 0) || (layerIndex > pseudoViews.size())){
+             return null;
+         }
+-        return sceneLayers[layerIndex];
++        PseudoView pv = pseudoViews.get(layerIndex);
++        return pv.vs;
+     }
+ 
+     // debug
+@@ -1204,6 +1269,7 @@
+      */
+     public double[] getGlobalView(Camera c, int d, EndAction ea){
+         double[] wnes = findFarmostRegionCoords();
++        //FIXME portal !
+         c.getOwningView().centerOnRegion(c, d, wnes[0], wnes[1], wnes[2], wnes[3], ea);
+         return wnes;
+     }
+@@ -1253,19 +1319,27 @@
+         regUpdater.addEntry(cam, new Location(loc.x, loc.y, alt));
+     }
+ 
++    /* PseudoView  events handling */
++    public void pseudoViewSizeChanged(PseudoView pv, int w, int h){
++        //double[] cameraBounds = pv.getVisibleRegion();
++        //updateVisibleRegions(pv, cameraBounds);
++        // use regUpdater
++        regUpdater.addEntry(pv.c, pv.c.getLocation());
++    }
++
+     /**
+      * returns the layer index (0-based)
+      * of camera 'cam', or -1 if 'cam' does not belong
+      * to cameras tracked by this ZUIST instance.
+      */
+-    private int getLayerIndex(Camera cam){
+-        for(int i=0; i<sceneCameras.length; ++i){
+-            if(sceneCameras[i] == cam){
+-                return i;
+-            }
+-        }
+-        return -1;
+-    }
++    //private int getLayerIndex(Camera cam){
++    //    for(int i=0; i<sceneCameras.length; ++i){
++    //        if(sceneCameras[i] == cam){
++    //            return i;
++    //        }
++    //    }
++    //    return -1;
++    //}
+ 
+     /* ------------------ DEBUGGING --------------------- */
+     private static boolean DEBUG_MODE = false;
+Index: src/main/java/fr/inria/zuist/engine/TextDescription.java
+===================================================================
+--- src/main/java/fr/inria/zuist/engine/TextDescription.java	(révision 5567)
++++ src/main/java/fr/inria/zuist/engine/TextDescription.java	(copie de travail)
+@@ -83,7 +83,24 @@
+ 
+     @Override
+     public void createObject(final SceneManager sm, final VirtualSpace vs, boolean fadeIn){
+-        if (glyph == null){
++        if (glyph != null){
++            try {
++                assert(!SwingUtilities.isEventDispatchThread());
++                SwingUtilities.invokeAndWait(new Runnable(){
++                    public void run(){
++                        loadCount++;
++                        vs.addGlyph(glyph);
++                        glyph.setOwner(TextDescription.this);
++                        sm.objectCreated(TextDescription.this);
++                    }
++                });
++            } catch(InterruptedException ie) {
++                /* swallowed */
++            } catch(InvocationTargetException ite) {
++                /* swallowed */
++            }
++        }
++        else{ //(glyph == null)
+             if (fadeIn){
+                 glyph = new VText(vx, vy, zindex, fillColor, text, anchor, scale, 0.0f);
+                 if (font != null){((VText)glyph).setFont(font);}
+@@ -101,6 +118,7 @@
+                 assert(!SwingUtilities.isEventDispatchThread());
+                 SwingUtilities.invokeAndWait(new Runnable(){
+                     public void run(){
++                        loadCount++;
+                         vs.addGlyph(glyph);
+                         glyph.setOwner(TextDescription.this);
+                         sm.objectCreated(TextDescription.this);
+@@ -117,19 +135,25 @@
+     @Override
+     public void destroyObject(final SceneManager sm, final VirtualSpace vs, boolean fadeOut){
+         if (glyph != null){
+-            if (fadeOut){
++            if (fadeOut && loadCount == 1){
++                loadCount--;
+                 Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, glyph,
+                     0.0f, false, IdentityInterpolator.getInstance(), new TextHideAction(sm, vs));
+                 VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
+-                glyph = null;
++                if (loadCount < 1){
++                    glyph = null;
++                }
+             }
+             else {
+                 try {
+                     assert(!SwingUtilities.isEventDispatchThread());
+                     SwingUtilities.invokeAndWait(new Runnable(){
+                         public void run(){
++                            loadCount--;
+                             vs.removeGlyph(glyph);
+-                            glyph = null;
++                            if (loadCount < 1){
++                                glyph = null;
++                            }
+                             sm.objectDestroyed(TextDescription.this);
+                         }
+                     });
+Index: src/main/java/fr/inria/zuist/engine/GlyphLoader.java
+===================================================================
+--- src/main/java/fr/inria/zuist/engine/GlyphLoader.java	(révision 5567)
++++ src/main/java/fr/inria/zuist/engine/GlyphLoader.java	(copie de travail)
+@@ -13,6 +13,8 @@
+ import java.util.concurrent.ExecutorService;
+ import java.util.concurrent.ThreadFactory;
+ 
++import java.util.concurrent.ConcurrentLinkedQueue;
++
+ /**
+  * Thread safety: GlyphLoader public methods should be invoked
+  * from the same thread, normally the Swing EDT.
+@@ -21,8 +23,9 @@
+ 
+ class GlyphLoader {
+ 
++    
+     private final SceneManager sceneManager;
+-    private final ConcurrentHashMap<ObjectDescription, LoadAction> tasks;
++    private final ConcurrentLinkedQueue<GlyphLoaderAction> tasks;
+     private final ExecutorService loader;
+ 
+     private enum LoadAction {LOAD, UNLOAD};
+@@ -30,10 +33,20 @@
+     static int FADE_IN_DURATION = 300; //milliseconds
+     static int FADE_OUT_DURATION = 300; //milliseconds
+ 
++    class GlyphLoaderAction {
++        ObjectDescription od;
++        PseudoView pv;
++        LoadAction loadAction;
++        GlyphLoaderAction(ObjectDescription od, PseudoView pv, LoadAction loadAction) {
++            this.od = od; this.pv = pv; this.loadAction = loadAction;
++        }
++    }
++
+     GlyphLoader(SceneManager sm){
+         this.sceneManager = sm;
+         loader = Executors.newSingleThreadExecutor(new LoaderThreadFactory());
+-        tasks = new ConcurrentHashMap<ObjectDescription, LoadAction>();
++        //tasks = new ConcurrentHashMap<ObjectDescription, LoadAction>();
++        tasks = new ConcurrentLinkedQueue<GlyphLoaderAction>();
+     }
+ 
+     int getPendingRequestQueueSize(){
+@@ -44,15 +57,27 @@
+      *@param od description of object to be loaded.
+      *@param transition one of Region.{APPEAR,FADE_IN}
+      */
+-    public void addLoadRequest(int layerIndex, ObjectDescription od, boolean transition){
+-        if(tasks.remove(od, LoadAction.UNLOAD)){
+-            return;
++    public void addLoadRequest(PseudoView pv, ObjectDescription od, boolean transition){
++        //if(tasks.remove(od, LoadAction.UNLOAD)){
++        //    return;
++        //}
++        //tasks.put(od, LoadAction.LOAD);
++        for (GlyphLoaderAction gfa : tasks) {
++            if (gfa.od == od && gfa.pv == pv){
++                if (gfa.loadAction == LoadAction.UNLOAD){
++                    tasks.remove(gfa);
++                    return;
++                }
++                else{ // already in the queue
++                    return;
++                }
++            }
+         }
+-        tasks.put(od, LoadAction.LOAD);
++        tasks.add(new GlyphLoaderAction(od, pv, LoadAction.LOAD));
+ 
+-        final VirtualSpace target = sceneManager.getSpaceByIndex(layerIndex);
++        final VirtualSpace target = pv.vs; //sceneManager.getSpaceByIndex(layerIndex);
+         if(target == null){
+-            if (SceneManager.getDebugMode()){System.err.println("addLoadRequest: could not retrieve virtual space "+layerIndex);}
++            if (SceneManager.getDebugMode()){System.err.println("addLoadRequest: could not retrieve virtual space ");}
+             return;
+         }
+         loader.submit(new Request(this.sceneManager, target, od, transition));
+@@ -69,16 +94,27 @@
+      *@param od description of object to be loaded.
+      *@param transition one of Region.{DISAPPEAR,FADE_OUT}
+      */
+-    public void addUnloadRequest(int layerIndex, ObjectDescription od, boolean transition){
+-        if(tasks.remove(od, LoadAction.LOAD)){
+-            return;
++    public void addUnloadRequest(PseudoView pv, ObjectDescription od, boolean transition){
++        //if(tasks.remove(od, LoadAction.LOAD)){
++        //    return;
++        //}
++        //tasks.put(od, LoadAction.UNLOAD);
++        for (GlyphLoaderAction gfa : tasks) {
++            if (gfa.od == od && gfa.pv == pv){
++                if(gfa.loadAction == LoadAction.LOAD){
++                    tasks.remove(gfa);
++                    return;
++                }
++                else{// already in the queue
++                    return;
++                }
++            }
+         }
++        tasks.add(new GlyphLoaderAction(od, pv, LoadAction.UNLOAD));
+ 
+-        tasks.put(od, LoadAction.UNLOAD);
+-
+-        final VirtualSpace target = sceneManager.getSpaceByIndex(layerIndex);
++        final VirtualSpace target = pv.vs;
+         if(target == null){
+-            if (SceneManager.getDebugMode()){System.err.println("addLoadRequest: could not retrieve virtual space"+layerIndex);}
++            if (SceneManager.getDebugMode()){System.err.println("addUnLoadRequest: could not retrieve virtual space");}
+             return;
+         }
+         loader.submit(new Request(this.sceneManager, target, od, transition));
+@@ -98,10 +134,11 @@
+         }
+ 
+         public void run(){
+-            LoadAction action = tasks.remove(od);
++            //GlyphLoaderAction action = tasks.remove(od);
++            GlyphLoaderAction action = tasks.poll();
+            if(action == null){
+                return;
+-           } else if(action.equals(LoadAction.LOAD)){
++           } else if(action.loadAction.equals(LoadAction.LOAD)){
+                od.createObject(sm, target, transition);
+            } else {
+                od.destroyObject(sm, target, transition);
+Index: src/main/java/fr/inria/zuist/engine/ObjectDescription.java
+===================================================================
+--- src/main/java/fr/inria/zuist/engine/ObjectDescription.java	(révision 5567)
++++ src/main/java/fr/inria/zuist/engine/ObjectDescription.java	(copie de travail)
+@@ -28,6 +28,8 @@
+     protected String takesTo;
+     protected short takesToType;
+ 
++    protected int loadCount = 0;
++
+     //should we deprecate this ctor?
+     ObjectDescription(){}
+ 
+@@ -105,6 +107,10 @@
+         return id;
+     }
+ 
++    public int getLoadCount(){
++        return loadCount;
++    }
++
+     /** Get x-coordinate of object in virtual space. */
+     public abstract double getX();
