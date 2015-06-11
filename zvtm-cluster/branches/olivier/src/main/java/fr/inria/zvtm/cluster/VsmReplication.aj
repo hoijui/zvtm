@@ -99,7 +99,27 @@ aspect VsmReplication {
         sendDelta(new ClusteredViewDestroyDelta(cv));
     }
     
+    /** */
+    public void VirtualSpaceManager.setClusteredOverlayCamera(Camera cov, ClusteredView cv){
+        sendDelta(new SetClusteredOverlayDelta(cov.getObjId()));
+    }
 
+    private static class SetClusteredOverlayDelta implements Delta {
+        private final ObjId<Camera> camId;
+
+        SetClusteredOverlayDelta(ObjId<Camera> camId){
+            this.camId = camId;
+        }
+
+        public void apply(SlaveUpdater su){
+            Camera c = su.getSlaveObject(this.camId);
+            VirtualSpaceManager.INSTANCE.setOverlayCamera(c, su.getLocalView());
+        }
+
+        @Override public String toString(){
+            return String.format("SetClusteredOverlayDelta");
+        }
+    }
    /** Add a portal to a clustered view. Only subclasses of CameraPortal (e.g.,
     * DraggableCameraPortal, RoundCameraPortal, OverviewPortal) are supported.
     *@param p Portal to be added
