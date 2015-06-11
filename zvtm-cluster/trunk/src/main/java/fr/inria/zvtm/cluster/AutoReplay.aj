@@ -21,6 +21,7 @@ import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.glyphs.VImage;
 import fr.inria.zvtm.glyphs.VEclipse;
 
+import fr.inria.zvtm.engine.portals.Portal;
 import fr.inria.zvtm.engine.portals.CameraPortal;
 import fr.inria.zvtm.engine.portals.DraggableCameraPortal;
 import fr.inria.zvtm.engine.portals.OverviewPortal;
@@ -107,4 +108,3 @@ public aspect AutoReplay extends AbstractAutoReplay {
          execution(public void OverviewPortal.setObservedRegionBorderWidth(float))
         );
     }
-
