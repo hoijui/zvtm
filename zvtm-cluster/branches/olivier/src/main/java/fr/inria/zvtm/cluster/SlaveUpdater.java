@@ -140,6 +140,10 @@ public class SlaveUpdater {
         appDelegate.setCameraLocation(masterLoc, slaveCamera);
     }
 
+    void setOverlayCamera(Camera c){
+        appDelegate.setOverlayCamera(c);
+    }
+
     void setPortalLocation(Portal slavePortal, int x, int y, int w, int h){
         appDelegate.setPortalLocation(slavePortal, x, y, w, h);
     }

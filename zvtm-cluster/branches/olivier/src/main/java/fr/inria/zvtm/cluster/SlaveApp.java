@@ -156,6 +156,12 @@ public class SlaveApp {
         }
     }
 
+    void setOverlayCamera(Camera c){
+        if (clusteredView == null) { return; }
+        clusteredView.setOverlayCamera(c);
+        VirtualSpaceManager.INSTANCE.setOverlayCamera(c, view);
+    }
+
     void setCameraLocation(Location masterLoc,
             Camera slaveCamera){
         if(clusteredView == null || (!clusteredView.ownsCamera(slaveCamera))){

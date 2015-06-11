@@ -27,6 +27,7 @@ public class ClusteredView extends DefaultIdentifiable {
     private ClusterGeometry clGeom;
     private final ArrayList<Camera> cameras;
     private Color bgColor;
+    private Camera overlayCamera;
 
     /**
      * Constructs a new ClusteredView.
@@ -157,6 +158,10 @@ public class ClusteredView extends DefaultIdentifiable {
         return new Vector(cameras);
     }
 
+    void setOverlayCamera(Camera c){
+        overlayCamera = c;
+    }
+
     /**
      * Tests whether the block 'blockNumber' belongs
      * to this ClusteredView.
@@ -222,7 +227,7 @@ public class ClusteredView extends DefaultIdentifiable {
    // }
 
     boolean ownsCamera(Camera cam){
-        return cameras.contains(cam);
+        return (cameras.contains(cam) || (overlayCamera != null && cam == overlayCamera));
     }
 
     List<Camera> peekCameras(){

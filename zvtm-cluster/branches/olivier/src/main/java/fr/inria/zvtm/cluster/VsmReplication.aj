@@ -113,7 +113,7 @@ aspect VsmReplication {
 
         public void apply(SlaveUpdater su){
             Camera c = su.getSlaveObject(this.camId);
-            VirtualSpaceManager.INSTANCE.setOverlayCamera(c, su.getLocalView());
+            su.setOverlayCamera(c);
         }
 
         @Override public String toString(){
