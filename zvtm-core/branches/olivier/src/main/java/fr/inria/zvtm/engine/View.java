@@ -225,6 +225,18 @@ public abstract class View {
         panel.resetCursorInsidePortals();
     }
 
+    /**the overlay camaera used in this view*/
+    Camera overlayCamera;
+
+    void setOverlayCamera(Camera c){
+        overlayCamera = c;
+        overlayCamera.setOwningView(this);
+    }
+
+    public void destroyOverlayCamera(){
+        overlayCamera = null;
+    }
+
     /**mouse glyph*/
     public VCursor mouse;
 

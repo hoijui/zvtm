@@ -216,6 +216,17 @@ public class VirtualSpaceManager implements AWTEventListener {
     public int stackPortalAtIndex(int pindex, int index, View v){
         return v.stackPortalAtIndex(pindex, index);
     }
+    
+    /* ----------------- Overlay Camera ---------------- */
+    /** set the overlay camera of the view v */
+    public void setOverlayCamera(Camera oc, View v){
+        v.setOverlayCamera(oc);
+    }
+
+    /** destroy the overlay camera of the view v */
+    public void destroyOverlayCamera(View v){
+        v.destroyOverlayCamera();
+    }
 
     /* ----------------- VIEWS ---------------- */
 

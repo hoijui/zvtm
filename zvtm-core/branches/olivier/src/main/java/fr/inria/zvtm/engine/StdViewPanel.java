@@ -301,6 +301,41 @@ public class StdViewPanel extends ViewPanel {
         }
     }
 
+    private void drawOverlayCam(){
+        Camera overlayCamera = parent.overlayCamera;
+        if ((overlayCamera!=null) && (overlayCamera.enabled) && ((overlayCamera.eager) || (overlayCamera.shouldRepaint()))){
+            camIndex=overlayCamera.getIndex();
+            drawnGlyphs=overlayCamera.parentSpace.getDrawnGlyphs(camIndex);
+            drawnGlyphs.removeAllElements();
+            double uncoef = (overlayCamera.focal+overlayCamera.altitude) / overlayCamera.focal;
+            //compute region seen from this view through camera
+            double viewW = size.width;
+            double viewH = size.height;
+            double viewWC = overlayCamera.vx - (viewW/2) * uncoef;
+            double viewNC = overlayCamera.vy + (viewH/2) * uncoef;
+            double viewEC = overlayCamera.vx + (viewW/2) * uncoef;
+            double viewSC = overlayCamera.vy - (viewH/2) * uncoef;
+            gll = overlayCamera.parentSpace.getDrawingList();
+            for (int i=0;i<gll.length;i++){
+                if (gll[i] != null){
+                    if (gll[i].visibleInViewport(viewWC, viewNC, viewEC, viewSC, overlayCamera)){
+                        /* if glyph is at least partially visible in the reg. seen from this view,
+                           compute in which buffer it should be rendered: */
+                        /* always draw in the main buffer */
+                            gll[i].project(overlayCamera, size);
+                            if (gll[i].isVisible()){
+                                gll[i].draw(stableRefToBackBufferGraphics, size.width, size.height, overlayCamera.getIndex(),
+                                        standardStroke, standardTransform, 0, 0);
+                            }
+                        /* notifying outside of above test because glyph sensitivity is not
+                           affected by glyph visibility when managed through Glyph.setVisible() */
+                        overlayCamera.parentSpace.drewGlyph(gll[i], camIndex);
+                    }
+                }
+            }
+        }
+    }
+
     private void drawCursor(){
         stableRefToBackBufferGraphics.setColor(parent.mouse.hcolor);
         if (drawDrag){stableRefToBackBufferGraphics.drawLine(origDragx,origDragy,parent.mouse.jpx,parent.mouse.jpy);}
@@ -370,6 +405,7 @@ public class StdViewPanel extends ViewPanel {
                         afterLensHook();
                         drawPortals();
                         portalsHook();
+                        drawOverlayCam();
                         if (cursor_inside){
                             //deal with mouse glyph only if mouse cursor is inside this window
                             doCursorPicking();
