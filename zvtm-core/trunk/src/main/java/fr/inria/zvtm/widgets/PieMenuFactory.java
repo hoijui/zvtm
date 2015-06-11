@@ -138,6 +138,28 @@ public abstract class PieMenuFactory {
      *@param labels text label of each menu item
      *@param labelOffsets x,y offset of each menu label w.r.t their default posisition, in virtual space units<br>(this array should have the same length as the labels array)
      *@param animLength duration in ms of menu expansion animation
+     *@param vs virtual space in which to create the pie menu
+     *@param coords menu center coordinates (in virtual space as a Point2D.Double)
+     */
+    public static PieMenu createPieMenu(String[] labels, Point2D.Double[] labelOffsets, int animLength,
+                                        VirtualSpace vs, Point2D.Double coords){
+        return new PieMenuR(labels, coords,
+                    vs, RADIUS, RING_INNER_RATIO, ANGLE, ANGLE_WITDH,
+                    nCopies(ITEM_FILLCOLOR, labels.length),
+                    nCopies(ITEM_BORDERCOLOR, labels.length),
+                    nCopies(ITEM_SFILLCOLOR, labels.length),
+                    nCopies(ITEM_SBORDERCOLOR, labels.length),
+                    nCopies(LABEL_COLOR, labels.length), TRANSLUCENCY,
+                    animLength, SENSIT_BOUNDING_RADIUS, FONT, labelOffsets);
+    }
+
+    /**Standard pie menu creation method.
+     *
+     * When calling this method, the layer associated with the
+     * camera showing the pie menu in the view must already have been made active.
+     *@param labels text label of each menu item
+     *@param labelOffsets x,y offset of each menu label w.r.t their default posisition, in virtual space units<br>(this array should have the same length as the labels array)
+     *@param animLength duration in ms of menu expansion animation
      *@param v View in which the pie menu will appear
      *@param itemColors color of each menu item (this array should have the same length as the labels array)
      *@param itembColors border color of each menu item (this array should have the same length as the labels array)
@@ -146,8 +168,8 @@ public abstract class PieMenuFactory {
      *@param labelColors  color of each menu item label (this array should have the same length as the labels array)
      */
     public static PieMenu createPieMenu(String[] labels, Point2D.Double[] labelOffsets, int animLength, View v,
-                    Color[] itemColors, Color[] itembColors, Color[] itemSColors,
-                    Color[] itembSColors, Color[] labelColors){
+                                        Color[] itemColors, Color[] itembColors, Color[] itemSColors,
+                                        Color[] itembSColors, Color[] labelColors){
         return new PieMenuR(labels, new Point2D.Double(v.mouse.getVSXCoordinate(), v.mouse.getVSYCoordinate()),
                     v.getActiveCamera().getOwningSpace(), RADIUS, RING_INNER_RATIO, ANGLE, ANGLE_WITDH,
                     itemColors, itembColors, itemSColors, itembSColors,labelColors, TRANSLUCENCY,
@@ -166,87 +188,88 @@ public abstract class PieMenuFactory {
      *@param itembSColors border color of each menu item when selected (this array should have the same length as the labels array)
      *@param labelColors  color of each menu item label (this array should have the same length as the labels array)
      */
-    public static PieMenu createPieMenu(String[] labels, Point2D.Double[] labelOffsets, int animLength, VirtualSpace vs, Point2D.Double coords,
-                    Color[] itemColors, Color[] itembColors, Color[] itemSColors,
-                    Color[] itembSColors, Color[] labelColors){
+    public static PieMenu createPieMenu(String[] labels, Point2D.Double[] labelOffsets, int animLength,
+                                        VirtualSpace vs, Point2D.Double coords,
+                                        Color[] itemColors, Color[] itembColors, Color[] itemSColors,
+                                        Color[] itembSColors, Color[] labelColors){
         return new PieMenuR(labels, coords,
                     vs, RADIUS, RING_INNER_RATIO, ANGLE, ANGLE_WITDH,
                     itemColors, itembColors, itemSColors, itembSColors,labelColors, TRANSLUCENCY,
                     animLength, SENSIT_BOUNDING_RADIUS, FONT, labelOffsets);
     }
 
-
-    /**Polygonal pie menu creation method.
-     *
-     * When calling this method, the layer associated with the
-     * camera showing the pie menu in the view must already have been made active.
-     *@param labels text label of each menu item
-     *@param v View in which the pie menu will appear
-     */
-    public static PieMenu createPolygonalPieMenu(String[] labels, View v){
-        return new PieMenuP(labels, new Point2D.Double(v.mouse.getVSXCoordinate(), v.mouse.getVSYCoordinate()),
-                    v.getActiveCamera().getOwningSpace(), RADIUS, ANGLE,
-                    ITEM_FILLCOLOR, ITEM_BORDERCOLOR, ITEM_SFILLCOLOR, ITEM_SBORDERCOLOR, LABEL_COLOR, TRANSLUCENCY,
-                    SENSIT_BOUNDING_RADIUS, FONT);
-    }
-
-    /**Polygonal pie menu creation method.
-     *
-     * When calling this method, the layer associated with the
-     * camera showing the pie menu in the view must already have been made active.
-     *@param labels text label of each menu item
-     *@param v View in which the pie menu will appear
-     *@param itemColors color of each menu item (this array should have the same length as the labels array)
-     *@param itembColors border color of each menu item (this array should have the same length as the labels array)
-     *@param itemSColors color of each menu item when selected (this array should have the same length as the labels array)
-     *@param itembSColors border color of each menu item when selected (this array should have the same length as the labels array)
-     *@param labelColors  color of each menu item label (this array should have the same length as the labels array)
-     */
-    public static PieMenu createPolygonalPieMenu(String[] labels, View v,
-                         Color[] itemColors, Color[] itembColors, Color[] itemSColors,
-                         Color[] itembSColors, Color[] labelColors){
-        return new PieMenuP(labels, new Point2D.Double(v.mouse.getVSXCoordinate(), v.mouse.getVSYCoordinate()),
-                    v.getActiveCamera().getOwningSpace(), RADIUS, ANGLE,
-                    itemColors, itembColors, itemSColors, itembSColors, labelColors, TRANSLUCENCY,
-                    SENSIT_BOUNDING_RADIUS, FONT);
-    }
-
-    /**Polygonal pie menu creation method.
-     *
-     * When calling this method, the layer associated with the
-     * camera showing the pie menu in the view must already have been made active.
-     *@param labels text label of each menu item
-     *@param labelOffsets x,y offset of each menu label w.r.t their default posisition, in virtual space units<br>(this array should have the same length as the labels array)
-     *@param v View in which the pie menu will appear
-     */
-    public static PieMenu createPolygonalPieMenu(String[] labels, Point2D.Double[] labelOffsets, View v){
-        return new PieMenuP(labels, new Point2D.Double(v.mouse.getVSXCoordinate(), v.mouse.getVSYCoordinate()),
-                    v.getActiveCamera().getOwningSpace(), RADIUS, ANGLE,
-                    ITEM_FILLCOLOR, ITEM_BORDERCOLOR, ITEM_SFILLCOLOR, ITEM_SBORDERCOLOR, LABEL_COLOR, TRANSLUCENCY,
-                    SENSIT_BOUNDING_RADIUS, FONT, labelOffsets);
-    }
-
-    /**Polygonal pie menu creation method.
-     *
-     * When calling this method, the layer associated with the
-     * camera showing the pie menu in the view must already have been made active.
-     *@param labels text label of each menu item
-     *@param labelOffsets x,y offset of each menu label w.r.t their default posisition, in virtual space units<br>(this array should have the same length as the labels array)
-     *@param v View in which the pie menu will appear
-     *@param itemColors color of each menu item (this array should have the same length as the labels array)
-     *@param itembColors border color of each menu item (this array should have the same length as the labels array)
-     *@param itemSColors color of each menu item when selected (this array should have the same length as the labels array)
-     *@param itembSColors border color of each menu item when selected (this array should have the same length as the labels array)
-     *@param labelColors  color of each menu item label (this array should have the same length as the labels array)
-     */
-    public static PieMenu createPolygonalPieMenu(String[] labels, Point2D.Double[] labelOffsets, View v,
-                         Color[] itemColors, Color[] itembColors, Color[] itemSColors,
-                         Color[] itembSColors, Color[] labelColors){
-        return new PieMenuP(labels, new Point2D.Double(v.mouse.getVSXCoordinate(), v.mouse.getVSYCoordinate()),
-                    v.getActiveCamera().getOwningSpace(), RADIUS, ANGLE,
-                    itemColors, itembColors, itemSColors, itembSColors, labelColors, TRANSLUCENCY,
-                    SENSIT_BOUNDING_RADIUS, FONT, labelOffsets);
-    }
+    //
+    // /**Polygonal pie menu creation method.
+    //  *
+    //  * When calling this method, the layer associated with the
+    //  * camera showing the pie menu in the view must already have been made active.
+    //  *@param labels text label of each menu item
+    //  *@param v View in which the pie menu will appear
+    //  */
+    // public static PieMenu createPolygonalPieMenu(String[] labels, View v){
+    //     return new PieMenuP(labels, new Point2D.Double(v.mouse.getVSXCoordinate(), v.mouse.getVSYCoordinate()),
+    //                 v.getActiveCamera().getOwningSpace(), RADIUS, ANGLE,
+    //                 ITEM_FILLCOLOR, ITEM_BORDERCOLOR, ITEM_SFILLCOLOR, ITEM_SBORDERCOLOR, LABEL_COLOR, TRANSLUCENCY,
+    //                 SENSIT_BOUNDING_RADIUS, FONT);
+    // }
+    //
+    // /**Polygonal pie menu creation method.
+    //  *
+    //  * When calling this method, the layer associated with the
+    //  * camera showing the pie menu in the view must already have been made active.
+    //  *@param labels text label of each menu item
+    //  *@param v View in which the pie menu will appear
+    //  *@param itemColors color of each menu item (this array should have the same length as the labels array)
+    //  *@param itembColors border color of each menu item (this array should have the same length as the labels array)
+    //  *@param itemSColors color of each menu item when selected (this array should have the same length as the labels array)
+    //  *@param itembSColors border color of each menu item when selected (this array should have the same length as the labels array)
+    //  *@param labelColors  color of each menu item label (this array should have the same length as the labels array)
+    //  */
+    // public static PieMenu createPolygonalPieMenu(String[] labels, View v,
+    //                      Color[] itemColors, Color[] itembColors, Color[] itemSColors,
+    //                      Color[] itembSColors, Color[] labelColors){
+    //     return new PieMenuP(labels, new Point2D.Double(v.mouse.getVSXCoordinate(), v.mouse.getVSYCoordinate()),
+    //                 v.getActiveCamera().getOwningSpace(), RADIUS, ANGLE,
+    //                 itemColors, itembColors, itemSColors, itembSColors, labelColors, TRANSLUCENCY,
+    //                 SENSIT_BOUNDING_RADIUS, FONT);
+    // }
+    //
+    // /**Polygonal pie menu creation method.
+    //  *
+    //  * When calling this method, the layer associated with the
+    //  * camera showing the pie menu in the view must already have been made active.
+    //  *@param labels text label of each menu item
+    //  *@param labelOffsets x,y offset of each menu label w.r.t their default posisition, in virtual space units<br>(this array should have the same length as the labels array)
+    //  *@param v View in which the pie menu will appear
+    //  */
+    // public static PieMenu createPolygonalPieMenu(String[] labels, Point2D.Double[] labelOffsets, View v){
+    //     return new PieMenuP(labels, new Point2D.Double(v.mouse.getVSXCoordinate(), v.mouse.getVSYCoordinate()),
+    //                 v.getActiveCamera().getOwningSpace(), RADIUS, ANGLE,
+    //                 ITEM_FILLCOLOR, ITEM_BORDERCOLOR, ITEM_SFILLCOLOR, ITEM_SBORDERCOLOR, LABEL_COLOR, TRANSLUCENCY,
+    //                 SENSIT_BOUNDING_RADIUS, FONT, labelOffsets);
+    // }
+    //
+    // /**Polygonal pie menu creation method.
+    //  *
+    //  * When calling this method, the layer associated with the
+    //  * camera showing the pie menu in the view must already have been made active.
+    //  *@param labels text label of each menu item
+    //  *@param labelOffsets x,y offset of each menu label w.r.t their default posisition, in virtual space units<br>(this array should have the same length as the labels array)
+    //  *@param v View in which the pie menu will appear
+    //  *@param itemColors color of each menu item (this array should have the same length as the labels array)
+    //  *@param itembColors border color of each menu item (this array should have the same length as the labels array)
+    //  *@param itemSColors color of each menu item when selected (this array should have the same length as the labels array)
+    //  *@param itembSColors border color of each menu item when selected (this array should have the same length as the labels array)
+    //  *@param labelColors  color of each menu item label (this array should have the same length as the labels array)
+    //  */
+    // public static PieMenu createPolygonalPieMenu(String[] labels, Point2D.Double[] labelOffsets, View v,
+    //                      Color[] itemColors, Color[] itembColors, Color[] itemSColors,
+    //                      Color[] itembSColors, Color[] labelColors){
+    //     return new PieMenuP(labels, new Point2D.Double(v.mouse.getVSXCoordinate(), v.mouse.getVSYCoordinate()),
+    //                 v.getActiveCamera().getOwningSpace(), RADIUS, ANGLE,
+    //                 itemColors, itembColors, itemSColors, itembSColors, labelColors, TRANSLUCENCY,
+    //                 SENSIT_BOUNDING_RADIUS, FONT, labelOffsets);
+    // }
 
     /** Set the radius (in virtual space units) of pie menus that will be created by calls to create*PieMenu(). */
     public static void setRadius(long r){
