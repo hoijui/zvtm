@@ -334,38 +334,6 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
         mnCamera.setEnabled(!mnCamera.isEnabled());
     }
 
-    int ordinal = 0;
-	@Override
-    void toggleColorFilter(){
-        String next;
-        if(ordinal == (JSkyFitsImage.COLORFILTER.length - 1)){
-            next = JSkyFitsImage.COLORFILTER[0];
-            ordinal = 0;
-        } else {
-            next = JSkyFitsImage.COLORFILTER[ordinal++];
-        }
-        cfilter = next;
-        for(ObjectDescription desc: sm.getObjectDescriptions()){
-            //System.out.println(getLayerScene() + " == " + ((JSkyFitsImageDescription)desc).getLayerIndex());
-            if(desc instanceof JSkyFitsImageDescription && (getLayerScene() == ((JSkyFitsImageDescription)desc).getLayerIndex() || getLayerScene() == LAYER_SCENE)){
-                ((JSkyFitsImageDescription)desc).setColorLookupTable(next, true);
-            }
-        } 
-    }
-
-    @Override
-    void toggleTransferFun(){
-        JSkyFitsImage.ScaleAlgorithm next = 
-            scaleMethod.ordinal() == (JSkyFitsImage.ScaleAlgorithm.values().length - 1) ? JSkyFitsImage.ScaleAlgorithm.values()[0] : JSkyFitsImage.ScaleAlgorithm.values()[scaleMethod.ordinal() + 1];
-        scaleMethod = next;
-        for(ObjectDescription desc: sm.getObjectDescriptions()){
-           // System.out.println(getLayerScene() + " == " + ((JSkyFitsImageDescription)desc).getLayerIndex());
-            if(desc instanceof JSkyFitsImageDescription && (getLayerScene() == ((JSkyFitsImageDescription)desc).getLayerIndex() || getLayerScene() == LAYER_SCENE)){
-                ((JSkyFitsImageDescription)desc).setScaleAlgorithm(next, true);
-            }
-        } 
-    }
-
     //@Override
     //public void setColorFilter(JSkyFitsImage.ColorFilter filter){
     public void setColorLookupTable(String filter){
@@ -642,7 +610,7 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
                     for(int i = 0; i < len; i++){
                         JSONObject hist = jsonHistogram.getJSONObject(i);
                         System.out.println(hist);
-                        data[i] = hist.getInt("count");
+                        data[i] = hist.getInt("count/width");
                         if(data[i] > max) max = data[i];
                         if(data[i] < min) min = data[i];
                     }
