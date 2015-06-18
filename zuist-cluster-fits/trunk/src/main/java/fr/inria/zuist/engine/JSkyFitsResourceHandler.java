@@ -19,6 +19,7 @@ public class JSkyFitsResourceHandler implements ResourceHandler {
     private static final String MIN_VAL_ID = "minvalue="; //min value for rescale in params
     private static final String MAX_VAL_ID = "maxvalue="; //max value for rescale in params
     private static final String REF_ID = "reference"; // fits reference for wcs coordinates
+    private static final String HIST_ID = "hist="; // histogram file
 
     public ResourceDescription createResourceDescription(
             double x, double y, String id, int zindex, Region region,
@@ -33,6 +34,8 @@ public class JSkyFitsResourceHandler implements ResourceHandler {
         double max = Double.MIN_VALUE;
 
         boolean reference = false;
+
+        String hist = "";
 
         if (params != null){
             String[] paramTokens = params.split(SceneManager.PARAM_SEPARATOR);
@@ -71,6 +74,9 @@ public class JSkyFitsResourceHandler implements ResourceHandler {
                 else if(paramTokens[i].startsWith(REF_ID)){
                     reference = true;
                 }
+                else if(paramTokens[i].startsWith(HIST_ID) ){
+                    hist = paramTokens[i].substring(HIST_ID.length());
+                }
                 else {
                     System.err.println("Unknown type of resource parameter: "+paramTokens[i]);
                 }
@@ -92,6 +98,8 @@ public class JSkyFitsResourceHandler implements ResourceHandler {
         if(reference){
             desc.setReference(reference);
         }
+
+        desc.setHistogram(hist);
         
         region.addObject(desc);
         return desc;

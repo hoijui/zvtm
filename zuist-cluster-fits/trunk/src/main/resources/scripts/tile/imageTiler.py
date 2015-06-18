@@ -16,6 +16,7 @@
 # before calling this script
 ###############################################################################
 
+
 import os, sys, math
 from copy import copy
 
@@ -48,6 +49,14 @@ try:
 except ImportError:
     SUCCEEDED_IMPORTING_ASTROPY = False
 
+try:
+    import json
+except ImportError:
+    import simplejson as json
+
+
+from decimal import Decimal
+
 
 # Tile IDs are generated following this pattern:
 # ---------
@@ -70,7 +79,7 @@ CMD_LINE_HELP = "ZUIST Image Tiling Script\n\nUsage:\n\n" + \
     "\t-cg\t\tprocessing pipeline: CoreGraphics (Mac only)\n"+\
     "\t-im\t\tprocessing pipeline: PIL and ImageMagick (default)\n"+\
     "\t-gm\t\tprocessing pipeline: GraphicsMagick\n"+\
-    "\t-fits\t\tprocessing fits image with astropy library\n"+\
+    "\t-astropy\t\tprocessing fits image with astropy library\n"+\
     "\t-ts=N\t\ttile size (N in pixels)\n"+\
     "\t-f\t\tforce tile generation\n"+\
     "\t-tl=N\t\ttrace level (N in [0:3])\n"+\
@@ -84,6 +93,8 @@ CMD_LINE_HELP = "ZUIST Image Tiling Script\n\nUsage:\n\n" + \
     "\t-maxvalue\tvalue maximum on fits images\n"+\
     "\t-onlyxml \tcreate only xml from the tiles\n"+\
     "\t-shrink \tdefault use natural neighbor. change set to shrink\n"+\
+    "\t-neighborhood \tdefault use natural neighborhood.\n"+\
+    "\t-flatneighbor \tdefault use natural neighborhood.\n"+\
     "\t-notnewfile \tif exist file, not create new file\n"+\
     "\t-withbackground\tWithout the image of the level 0\n"+\
     "\t-maxneighborhood=N\tMaximum neighborhood\n"
@@ -130,15 +141,56 @@ USE_GRAPHICSMAGICK = False
 USE_ASTROPY = False
 
 ONLYXML = False
-NATURAL_NEIGBOR = True
+
+NATURAL_NEIGBOR = False
+FLAT_NEIGBOR = False
+SHRINK = True
+
 NEWFILE = True
 BACKGROUND = False
-MAX_NEIGBORHOOD = 2
+MAX_NEIGBORHOOD = 16
 
 WCSDATA = ""
 OBJECT = ""
 HEADER = ""
 SIZE = [0, 0]
+HISTOGRAM_SIZE = 128
+
+
+
+################################################################
+# Class 
+################################################################
+class NumpyEncoder(json.JSONEncoder):
+    def default(self, obj):
+        """
+        if input object is a ndarray it will be converted into a dict holding dtype, shape and the data base64 encoded
+        """
+        if isinstance(obj, np.ndarray):
+            data_b64 = base64.b64encode(obj.data)
+            return dict(__ndarray__=data_b64,
+                        dtype=str(obj.dtype),
+                        shape=obj.shape)
+        # Let the base class default method raise the TypeError
+        return json.JSONEncoder(self, obj)
+
+
+
+
+def json_numpy_obj_hook(dct):
+    """
+    Decodes a previously encoded numpy ndarray
+    with proper shape and dtype
+    :param dct: (dict) json encoded ndarray
+    :return: (ndarray) if input was an encoded ndarray
+    """
+    if isinstance(dct, dict) and '__ndarray__' in dct:
+        data = base64.b64decode(dct['__ndarray__'])
+        return np.frombuffer(data, dct['dtype']).reshape(dct['shape'])
+    return dct
+
+
+
 
 ################################################################################
 # Create target directory if it does not exist yet
@@ -221,6 +273,9 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
     tileFileName = "%s%s.%s" % (TILE_FILE_PREFIX, tileIDstr, OUTPUT_FILE_EXT)
     tilePath = "%s/%s/%s" % (TGT_DIR, level, tileFileName)
 
+    tileFileNameHist = "%s%s.%s" % (TILE_FILE_PREFIX, tileIDstr, "json")
+    tilePathHist = "%s/%s/%s" % (TGT_DIR, level, tileFileNameHist)
+
     if not os.path.exists("%s/%s" % (TGT_DIR, level) ):
         log("Creating target directory %s/%s" % (TGT_DIR, level), 2)
         os.mkdir("%s/%s" % (TGT_DIR, level))
@@ -263,6 +318,28 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
                 #data = im[SIZE[1]-y-ah/2: SIZE[1]-y+ah/2, x:x+aw]
                 data = im[SIZE[1]-y-ah: SIZE[1]-y, x:x+aw]
 
+                f = open(tilePathHist, "w")
+
+                dmin = data.min()
+                dmax = data.max()
+
+                bins = np.linspace(dmin, dmax, HISTOGRAM_SIZE+1)
+                width = bins[1] - bins[0]
+                hist = np.histogram(a=data, bins=bins )
+                dat = []
+                jsoneable = zip(hist[0], hist[1])
+                for js in jsoneable:
+                    frec = dict()
+                    frec['bin'] = js[1]
+                    frec['count'] = js[0]
+                    frec['width'] = width
+                    frec['count/width'] = js[0]/width
+                    dat.append(frec)
+                json.dump(dat, f)
+
+
+                f.close()
+
                 log(data.shape)
                 
                 if scale > 1.:
@@ -270,7 +347,9 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
                     
                     if NATURAL_NEIGBOR:
                         resizedata = natural_neighbor(data, ah, aw, ah/scale, aw/scale)
-                    else:
+                    elif FLAT_NEIGBOR:
+                        resizedata = flat_neighbor(data, ah, aw, ah/scale, aw/scale)
+                    elif SHRINK:
                         resizedata = shrink(data, ah, aw, ah/scale, aw/scale)
                     
                     log(resizedata.shape)
@@ -445,8 +524,21 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
     objectEL.set("y", str(int(DY-y-ah/2)))
     objectEL.set("w", str(int(aw)))
     objectEL.set("h", str(int(ah)))
+    #objectEL.set("hist", "%d/%s" % (level, tileFileNameHist) )
     if USE_ASTROPY:
+        params = ""
         if parentRegionID is None:
+            params = params + "reference;"
+        
+        params = params + "sc=%d;" % scale
+
+        if MINVALUE and MAXVALUE:
+            params = params + "minvalue=%f;maxvalue=%f;" % (MINVALUE, MAXVALUE)
+
+        params = params + "hist=%d/%s;" % (level, tileFileNameHist)
+        objectEL.set("params", str(params) )
+
+        '''
             if MINVALUE and MAXVALUE:
                 objectEL.set("params", str("reference;sc=%d;minvalue=%f;maxvalue=%f" % (scale, MINVALUE, MAXVALUE) ))
             else:
@@ -456,6 +548,8 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
                 objectEL.set("params", str("sc=%d;minvalue=%f;maxvalue=%f" % (scale, MINVALUE, MAXVALUE) ))
             else:
                 objectEL.set("params", str("sc=%d" % (scale) ))
+        '''
+
     objectEL.set("src", "%d/%s" % (level, tileFileName) )
     if USE_ASTROPY:
         objectEL.set("sensitive", "true")    
@@ -615,6 +709,7 @@ def resizeBilinear(data, w, h, aw, ah):
     return newdata
 
 def shrink(data, w, h, aw, ah):
+    log("shrink")
     w2 = (int)(aw)
     h2 = (int)(ah)
     newdata = np.zeros((w2, h2), dtype=data.dtype )
@@ -688,6 +783,36 @@ def neighborhood(i, j, aw, ah, scale):
             result.append(ls[l])
     return result
 
+def flat_neighbor(data, w, h, aw, ah):
+    log("flat_neighbor")
+    w2 = (int)(aw)
+    h2 = (int)(ah)
+    newdata = np.zeros((w2, h2), dtype=data.dtype )
+    log("newdata: (%f, %f)" % (newdata.shape) )
+    log("data: (%f, %f)" % (data.shape) )
+    log("scale: %f" % (aw/w) )
+    scale = (int)((w/w2 + h/h2)/2)
+    log("scale: %d" % scale)
+    for i in range(w2):
+        for j in range(h2):
+            idi = i * (w-1)/ w2
+            idj = j * (h-1)/ h2
+            #log("idx1: %f idx2: %f" % (idx1, idx2))
+            try:
+                total = 0
+                count = 0
+                for ii in range( (int)(idi-scale/2), (int)(idi+scale/2+1) ):
+                    if ii >= 0 and ii < w:
+                        for jj in range( (int)(idj-scale/2), (int)(idj+scale/2+1) ):
+                            if jj >= 0 and jj < h:
+                                total = total + data[ii, jj]
+                                count = count + 1
+                log("total= %f -- count= %d" % (total, count))
+                if count != 0: 
+                    newdata[i, j] = total / count
+            except IndexError:
+                log("IndexError:  i: %d - j: %d - idi: %d - idj: %d" % (i, j, idi, idj))
+    return newdata
 
 
 
@@ -752,8 +877,18 @@ if len(sys.argv) > 2:
                 MAXVALUE = float(arg[len("-maxvalue="):])
             elif arg.startswith("-onlyxml"):
                 ONLYXML = True
+            elif arg.startswith("-neighborhood"):
+                NATURAL_NEIGBOR = True
+                SHRINK = False
+                FLAT_NEIGBOR = False
             elif arg.startswith("-shrink"):
                 NATURAL_NEIGBOR = False
+                SHRINK = True
+                FLAT_NEIGBOR = False
+            elif arg.startswith("-flatneighbor"):
+                NATURAL_NEIGBOR = False
+                SHRINK = False
+                FLAT_NEIGBOR = True
             elif arg.startswith("-notnewfile"):
                 NEWFILE = False
             elif arg.startswith("-withbackground"):
@@ -782,4 +917,3 @@ log("Tile Size: %dx%d" % (TILE_SIZE, TILE_SIZE), 1)
 createTargetDir()
 processSrcImg()
 log("--------------------")
-

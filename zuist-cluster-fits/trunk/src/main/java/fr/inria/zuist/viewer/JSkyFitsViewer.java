@@ -47,6 +47,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.FilenameFilter;
 
+import java.io.FileInputStream;
+import java.io.InputStream;
+import org.apache.commons.io.IOUtils;
+
+import org.json.JSONObject;
+
 import fr.inria.zvtm.cluster.ClusterGeometry;
 import fr.inria.zvtm.cluster.ClusteredView;
 import fr.inria.zvtm.engine.Camera;
@@ -116,6 +122,7 @@ import java.util.Observable;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONArray;
 
 import fr.inria.zvtm.fits.simbad.SimbadCatQuery;
 import fr.inria.zvtm.fits.simbad.AstroObject;
@@ -301,7 +308,10 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
 				updatePanelSize();
 			}
 		};
-		//mView.getFrame().addComponentListener(ca0);
+		
+        mView.getFrame().addComponentListener(ca0);
+
+        mView.setActiveLayer(LAYER_SCENE);
 		
     }
 
@@ -336,7 +346,7 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
         }
         cfilter = next;
         for(ObjectDescription desc: sm.getObjectDescriptions()){
-            System.out.println(getLayerScene() + " == " + ((JSkyFitsImageDescription)desc).getLayerIndex());
+            //System.out.println(getLayerScene() + " == " + ((JSkyFitsImageDescription)desc).getLayerIndex());
             if(desc instanceof JSkyFitsImageDescription && (getLayerScene() == ((JSkyFitsImageDescription)desc).getLayerIndex() || getLayerScene() == LAYER_SCENE)){
                 ((JSkyFitsImageDescription)desc).setColorLookupTable(next, true);
             }
@@ -349,7 +359,7 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
             scaleMethod.ordinal() == (JSkyFitsImage.ScaleAlgorithm.values().length - 1) ? JSkyFitsImage.ScaleAlgorithm.values()[0] : JSkyFitsImage.ScaleAlgorithm.values()[scaleMethod.ordinal() + 1];
         scaleMethod = next;
         for(ObjectDescription desc: sm.getObjectDescriptions()){
-            System.out.println(getLayerScene() + " == " + ((JSkyFitsImageDescription)desc).getLayerIndex());
+           // System.out.println(getLayerScene() + " == " + ((JSkyFitsImageDescription)desc).getLayerIndex());
             if(desc instanceof JSkyFitsImageDescription && (getLayerScene() == ((JSkyFitsImageDescription)desc).getLayerIndex() || getLayerScene() == LAYER_SCENE)){
                 ((JSkyFitsImageDescription)desc).setScaleAlgorithm(next, true);
             }
@@ -361,7 +371,7 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
     public void setColorLookupTable(String filter){
         System.out.println("app.setColorLookupTable(" + filter + ")");
         for(ObjectDescription desc: sm.getObjectDescriptions()){
-            System.out.println(getLayerScene() + " == " + ((JSkyFitsImageDescription)desc).getLayerIndex());
+           // System.out.println(getLayerScene() + " == " + ((JSkyFitsImageDescription)desc).getLayerIndex());
             if(desc instanceof JSkyFitsImageDescription && (getLayerScene() == ((JSkyFitsImageDescription)desc).getLayerIndex() || getLayerScene() == LAYER_SCENE)){
                 ((JSkyFitsImageDescription)desc).setColorLookupTable(filter, true);
             }
@@ -371,7 +381,7 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
     //@Override
     public void setScaleAlgorithm(JSkyFitsImage.ScaleAlgorithm method){
     	for(ObjectDescription desc: sm.getObjectDescriptions()){
-            System.out.println(getLayerScene() + " == " + ((JSkyFitsImageDescription)desc).getLayerIndex());
+            //System.out.println(getLayerScene() + " == " + ((JSkyFitsImageDescription)desc).getLayerIndex());
             if(desc instanceof JSkyFitsImageDescription && (getLayerScene() == ((JSkyFitsImageDescription)desc).getLayerIndex() || getLayerScene() == LAYER_SCENE)){
                 ((JSkyFitsImageDescription)desc).setScaleAlgorithm(method, true);
             }
@@ -382,7 +392,7 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
     public void rescale(double min, double max){
     	//System.out.println("rescale");
     	for(ObjectDescription desc: sm.getObjectDescriptions()){
-            System.out.println(getLayerScene() + " == " + ((JSkyFitsImageDescription)desc).getLayerIndex());
+            //System.out.println(getLayerScene() + " == " + ((JSkyFitsImageDescription)desc).getLayerIndex());
             if(desc instanceof JSkyFitsImageDescription && (getLayerScene() == ((JSkyFitsImageDescription)desc).getLayerIndex() || getLayerScene() == LAYER_SCENE)){
                 ((JSkyFitsImageDescription)desc).rescale(min, max, true);
             }
@@ -396,7 +406,7 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
         boolean globalData = false;
         if(!globalData)
     	for(ObjectDescription desc: sm.getObjectDescriptions()){
-            System.out.println(getLayerScene() + " == " + ((JSkyFitsImageDescription)desc).getLayerIndex());
+            //System.out.println(getLayerScene() + " == " + ((JSkyFitsImageDescription)desc).getLayerIndex());
             if(desc instanceof JSkyFitsImageDescription && (getLayerScene() == ((JSkyFitsImageDescription)desc).getLayerIndex() || getLayerScene() == LAYER_SCENE) ){
                 if(((JSkyFitsImageDescription)desc).isCreatedWithGlobalData()){
                     globalData = true;
@@ -409,7 +419,7 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
         }
         if(globalData)
         for(ObjectDescription desc: sm.getObjectDescriptions()){
-            System.out.println(getLayerScene() + " == " + ((JSkyFitsImageDescription)desc).getLayerIndex());
+            //System.out.println(getLayerScene() + " == " + ((JSkyFitsImageDescription)desc).getLayerIndex());
             if(desc instanceof JSkyFitsImageDescription && (getLayerScene() == ((JSkyFitsImageDescription)desc).getLayerIndex() || getLayerScene() == LAYER_SCENE)){ 
                 ((JSkyFitsImageDescription)desc).setRescaleGlobal(globalScaleParams[0], globalScaleParams[1]);
                 ((JSkyFitsImageDescription)desc).setRescaleGlobal(global);
@@ -610,21 +620,63 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
     }
 
 
+    public void loadHistogram(){
+
+        System.out.println("loadHistogram()");
+
+        if(fitsImageDescRef != null){
+            try{
+                System.out.println(SCENE_FILE_DIR + "/" + fitsImageDescRef.getHistogram());
+                File f = new File(SCENE_FILE_DIR + "/" + fitsImageDescRef.getHistogram());
+                if (f.exists()){
+                    InputStream is = new FileInputStream(f);
+                    String jsonTxt = IOUtils.toString(is);
+                    //System.out.println(jsonTxt);
+                    JSONArray jsonHistogram = new JSONArray(jsonTxt);
+                    //System.out.println(json);
+                    int len = jsonHistogram.length();
+                    System.out.println("len: " + len);
+                    int[] data = new int[len];
+                    int max = 0;
+                    int min = Integer.MAX_VALUE;
+                    for(int i = 0; i < len; i++){
+                        JSONObject hist = jsonHistogram.getJSONObject(i);
+                        System.out.println(hist);
+                        data[i] = hist.getInt("count");
+                        if(data[i] > max) max = data[i];
+                        if(data[i] < min) min = data[i];
+                    }
+                    menu.buildHistogram(new JSkyFitsHistogram(data, min, max));
+
+                }
+            } catch (IOException ioe){
+
+            } catch (JSONException je){
+
+            }
+            
+        }
+    }
+
+
     @Override
     public void loadFitsReference(){
         if(reference == null){
             for(ObjectDescription desc: sm.getObjectDescriptions()){
                 if(desc instanceof JSkyFitsImageDescription){
-                    if( ((JSkyFitsImageDescription)desc).isReference()){
+                    if( ((JSkyFitsImageDescription)desc).isReference() && ((JSkyFitsImageDescription)desc).getLayerIndex() == getLayerScene()){
                         System.out.println("Reference");
                         System.out.println(desc);
 
                         fitsImageDescRef = (JSkyFitsImageDescription)desc;
 
+                        loadHistogram();
+
                         if(pythonWCS != null){
                             System.out.println("pythonWCS.setReference("+fitsImageDescRef.getSrc().getPath()+")");
-
                             pythonWCS.setReference(fitsImageDescRef.getSrc().getPath());
+
+
                         } else {
                             System.out.println("pythonWCS == null. setReference() failed");
                         }
@@ -914,8 +966,8 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
                         lb.setTranslucencyValue(.6f);
                         mSpace.addGlyph(cr);
                         mSpace.addGlyph(lb);
-                        VCircle circle = new VCircle(l[0], l[1], 100, 20, Color.YELLOW, Color.WHITE, .8f);
-                        mSpace.addGlyph(circle);
+                        //VCircle circle = new VCircle(l[0], l[1], 100, 20, Color.YELLOW, Color.WHITE, .8f);
+                        //mSpace.addGlyph(circle);
                         //cr.setOwner(this.obj);
                         //lb.setOwner(this.obj);
                         cr.setType(JSkyFitsMenu.T_ASTRO_OBJ);
@@ -1128,9 +1180,10 @@ class RegionPickerListener implements RegionListener{
         for( ObjectDescription desc : objects){
             if(desc instanceof JSkyFitsImageDescription){
                 JSkyFitsImageDescription obj = (JSkyFitsImageDescription)desc;
-                if( obj.isReference() ){
+                if( obj.isReference() && app.getLayerScene() == obj.getLayerIndex()){
                     if( !obj.equals(app.fitsImageDescRef) ){
                         app.fitsImageDescRef = obj;
+                        app.loadHistogram();
                         if(app.pythonWCS != null){
                             System.out.println("enteredRegion: " + r.getID());
                             System.out.println("pythonWCS.setReference("+app.fitsImageDescRef.getSrc().getPath()+")");

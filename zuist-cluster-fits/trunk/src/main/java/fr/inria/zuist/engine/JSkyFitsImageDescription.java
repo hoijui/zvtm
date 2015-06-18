@@ -67,6 +67,8 @@ public class JSkyFitsImageDescription extends ResourceDescription {
 
     private boolean isReference = false;
 
+    private String hist;
+
     private double angle = 0;
 
     private int layerIndex;
@@ -171,6 +173,14 @@ public class JSkyFitsImageDescription extends ResourceDescription {
         }
         */
 
+    }
+
+    public void setHistogram(String file){
+        hist = file;
+    }
+
+    public String getHistogram(){
+        return hist;
     }
 
     public boolean isReference(){

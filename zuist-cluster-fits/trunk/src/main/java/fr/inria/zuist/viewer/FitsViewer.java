@@ -177,7 +177,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     int layerScene = LAYER_SCENE;
     static final String[] layerSceneName = {"Ks", "H", "J", "all"};
 
-    public static final Font FONT_LAYER_SCENE = new Font("Bold", Font.PLAIN, 36);
+    public static final Font FONT_LAYER_SCENE = new Font("Bold", Font.PLAIN, 46);
 
     //static final int LAYER_CURSOR = 7;
 
@@ -406,6 +406,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         mView.setActiveLayer(LAYER_SCENE);
 		
     }
+
 
 
     public void setColorFilter(ImageFilter filter){
