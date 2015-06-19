@@ -1346,7 +1346,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         //System.out.println("mCamera.getLocation(): " + l.getX() + " " + l.getY());
         double a = (mCamera.focal + mCamera.getAltitude()) / mCamera.focal;
 
-        Location lc = cursorCamera.getLocation();
+        //Location lc = cursorCamera.getLocation();
         //System.out.println("cursorCamera.getLocation(): " + lc.getX() + " " + lc.getY());
 
         //

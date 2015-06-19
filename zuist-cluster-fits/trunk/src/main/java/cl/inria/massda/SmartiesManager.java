@@ -303,6 +303,7 @@ public class SmartiesManager implements Observer {
                         MyCursor c = (MyCursor)se.p.app_data;
                         c.move(se.p.x, se.p.y);
                         setMoving(true);
+
                         if(swWCS.on) c.labelSetVisible(false);
                         if (se.mode == SmartiesEvent.SMARTIE_GESTUREMOD_DRAG && dragDevice == se.device ){//&& !modeDrawRect){
                             // this is the device that lock the drag, e.p should be == dragPuck
@@ -529,9 +530,17 @@ public class SmartiesManager implements Observer {
             this.x = x; this.y = y;
             Point2D.Double point = getLocation();
             wc.moveTo((long)(point.getX()), (long)(point.getY()));
+            wc.moveTo(point.getX(), point.getY());
             labelsnd.moveTo((long)(point.getX()+50), (long)(point.getY()+50));
             labelfst.moveTo((long)(point.getX()+50), (long)(point.getY()+70));
             updateDistance(this);
+
+            if(app.rPicker != null){
+                double[] loc = app.coordinateTransform(app.cursorCamera, app.mCamera, point.getX(), point.getY());
+                //System.out.println(loc[0]+", "+loc[1]);
+                app.rPicker.setVSCoordinates(loc[0], loc[1]);
+
+            }
         }
 
         
@@ -568,11 +577,13 @@ public class SmartiesManager implements Observer {
         }
 
         public void updateWCS(){
-            System.out.println("updateWCS()");
-            Point2D.Double pWCS = new Point2D.Double(wc.getX(), wc.getY());
-            System.out.println("WallCursor: ");
-            System.out.println(pWCS);
-            app.coordinateWCS(pWCS, T_SMARTIES+"_"+id);
+            //System.out.println("updateWCS()");
+            //Point2D.Double pWCS = new Point2D.Double(wc.getX(), wc.getY());
+            //System.out.println("WallCursor: ");
+            //System.out.println(pWCS);
+            //System.out.println(getLocation());
+            //app.coordinateWCS(pWCS, T_SMARTIES+"_"+id);
+            app.coordinateWCS(getLocation(), T_SMARTIES+"_"+id);
             /*
             if(isLabelVisible){
                 app.coordinateWCS(pWCS);
@@ -583,7 +594,14 @@ public class SmartiesManager implements Observer {
         }
 
         public Point2D.Double getLocation(){
+            /*
+            System.out.println("getLocation()");
+            System.out.println(wc.getLocation());
+            System.out.println( new Point2D.Double(x*app.SCENE_W - app.SCENE_W/2.0, app.SCENE_H/2.0 - y*app.SCENE_H) );
+            */
             return new Point2D.Double(x*app.SCENE_W - app.SCENE_W/2.0, app.SCENE_H/2.0 - y*app.SCENE_H);
+            
+            //return (Point2D.Double)wc.getLocation();
         }
 
 

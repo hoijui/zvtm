@@ -550,6 +550,23 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
         
     }
 
+    public double[] coordinateTransform(Camera from, Camera to, double x_from, double y_from){
+
+        Location l = to.getLocation();
+        double a = (to.focal + to.getAltitude()) / to.focal;
+
+        Location lc = from.getLocation();
+
+        double xx = l.getX()+ lc.getX() + a*x_from;
+        double yy = l.getY()+ lc.getY() + a*y_from;
+
+        double[] r = new double[2];
+        r[0] = xx;
+        r[1] = yy;
+
+        return r;
+    }
+
     public double[] windowToViewCoordinateFromCoordinateWCS(double x, double y){
 
         double a = (mCamera.focal + mCamera.getAltitude()) / mCamera.focal;
@@ -561,10 +578,13 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
         System.out.println("cursorCamera.getLocation(): " + lc.getX() + " " + lc.getY());
         System.out.println("mCamera.getLocation(): " + l.getX() + " " + l.getY());
         System.out.println("fromCoordinateWCS: " + x + " " + y);
-        System.out.println("fitsReference: " + fitsImageDescRef.getX() + " " + fitsImageDescRef.getY() + " -- " + (fitsImageDescRef.getWidth()/2) + " " + (fitsImageDescRef.getHeight()/2) );
+        if(fitsImageDescRef != null){
+            System.out.println("fitsReference: " + fitsImageDescRef.getX() + " " + fitsImageDescRef.getY() + " -- " + (fitsImageDescRef.getWidth()/2) + " " + (fitsImageDescRef.getHeight()/2) );
+            x = x + fitsImageDescRef.getX() - fitsImageDescRef.getWidth()/2;
+            y = y + fitsImageDescRef.getY() - fitsImageDescRef.getHeight()/2;
+        }
 
-        x = x + fitsImageDescRef.getX() - fitsImageDescRef.getWidth()/2;
-        y = y + fitsImageDescRef.getY() - fitsImageDescRef.getHeight()/2;
+        
 
         System.out.println(x + ", " + y);
 
