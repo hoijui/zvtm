@@ -400,10 +400,9 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
      * @return west, north, east and south bounds in virtual space.
      */
     @Override
-        public double[] getBounds(){
-            double[] res = {vx-vw/2d,vy+vh/2d,vx+vw/2d,vy-vh/2d};
-            return res;
-        }
+    public double[] getBounds(){
+        return new double[]{vx-vw/2d,vy+vh/2d,vx+vw/2d,vy-vh/2d};
+    }
 
     /**
      * {@inheritDoc}
@@ -654,12 +653,6 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
         }
 
     @Override
-        public void highlight(boolean b,
-                Color selectedColor){
-
-        }
-
-    @Override
         public void orientTo(double angle){
         }
 
@@ -678,9 +671,19 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
         }
 
     @Override
-        public boolean visibleInRegion(double wb, double nb, double eb, double sb, int i){
-           return true;
+    public boolean visibleInRegion(double wb, double nb, double eb, double sb, int i){
+        if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
+            /* Glyph hotspot is in the region. The glyph is obviously visible */
+            return true;
         }
+        else if (((vx-vw)<=eb) && ((vx+vw)>=wb) && ((vy-vh)<=nb) && ((vy+vh)>=sb)){
+            /* Glyph is at least partially in region.
+            We approximate using the glyph bounding box, meaning that some glyphs not
+            actually visible can be projected and drawn (but they won't be displayed)) */
+            return true;
+        }
+        return false;
+    }
 
     @Override
         public double getSize(){
