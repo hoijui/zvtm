@@ -227,8 +227,7 @@ public class VImage<T> extends ClosedShape implements RectangularShape {
      */
     @Override
     public double[] getBounds(){
-        double[] res = {vx-vw/2d,vy+vh/2d,vx+vw/2d,vy-vh/2d};
-        return res;
+        return new double[]{vx-vw/2d,vy+vh/2d,vx+vw/2d,vy-vh/2d};
     }
 
     /** Set bitmap image to be displayed. */
