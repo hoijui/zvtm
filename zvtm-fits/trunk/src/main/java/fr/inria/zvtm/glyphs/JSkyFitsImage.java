@@ -66,8 +66,6 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
     /** Height in virtual space */
     double vh;
 
-    double scale = 1;
-
     /** For internal use. Made public for easier outside package subclassing. */
     public boolean zoomSensitive = true;
 
@@ -82,8 +80,6 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
 
     /** For internal use. Made public for easier outside package subclassing. */
     public double trueCoef = 1.0f;
-
-    public boolean paintBorder = false;
 
     /** For internal use. Made public for easier outside package subclassing. */
     public Object interpolationMethod = RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
@@ -690,6 +686,21 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
         public double getSize(){
             return Math.sqrt(getWidth() * getWidth() + getHeight() * getHeight());
         }
+
+
+    /** Specify how image should be interpolated when drawn at a scale different from its original scale.
+     *@param im one of java.awt.RenderingHints.{VALUE_INTERPOLATION_NEAREST_NEIGHBOR,VALUE_INTERPOLATION_BILINEAR,VALUE_INTERPOLATION_BICUBIC} ; default is VALUE_INTERPOLATION_NEAREST_NEIGHBOR
+     */
+    public void setInterpolationMethod(Object im){
+        interpolationMethod = im;
+    }
+
+    /** Get information about how image should be interpolated when drawn at a scale different from its original scale.
+     *@return one of java.awt.RenderingHints.{VALUE_INTERPOLATION_NEAREST_NEIGHBOR,VALUE_INTERPOLATION_BILINEAR,VALUE_INTERPOLATION_BICUBIC} ; default is VALUE_INTERPOLATION_NEAREST_NEIGHBOR
+     */
+    public Object getInterpolationMethod(){
+        return interpolationMethod;
+    }
 
    	@Override
    	public Shape getJava2DShape(){
