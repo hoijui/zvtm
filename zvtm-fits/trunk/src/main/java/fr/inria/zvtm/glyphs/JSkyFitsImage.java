@@ -324,7 +324,7 @@ public class JSkyFitsImage extends VImage {
             pvy < vy-vh/2d || pvy > vy+vh/2d){
             return null;
         }
-        return wcsTransform.pix2wcs(pvx-vx+vw/2d, pvy-vy+vh/2d);
+        return wcsTransform.pix2wcs((pvx-vx+vw/2d)/scaleFactor, (pvy-vy+vh/2d)/scaleFactor);
     }
 
     /** Converts from World Coordinates to FITS image coordinates.
@@ -346,7 +346,7 @@ public class JSkyFitsImage extends VImage {
         if (wcsTransform == null){return null;}
         Point2D.Double res = wcsTransform.wcs2pix(ra,dec);
         // got FITS image coords, convert to virtual space coords
-        res.setLocation(res.x+vx-vw/2d, res.y+vy-vh/2d);
+        res.setLocation(res.x*scaleFactor+vx-vw/2d, res.y*scaleFactor+vy-vh/2d);
         return res;
     }
 
