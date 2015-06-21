@@ -298,10 +298,10 @@ public class JSkyFitsImage extends VImage {
     }
 
 
-    /* Converts pixel coordinates to World Coordinates.
-     * @param x x-coordinates, in the FITS system: (0,0) lower left, x axis increases to the right, y axis increases upwards
-     * @param y y-coordinates, in the FITS system: (0,0) lower left, x axis increases to the right, y axis increases upwards
-     *@return null if coords are outside the image
+    /** Converts from FITS image coordinates to World Coordinates.
+     *@param x x-coordinate, in the FITS system: (0,0) lower left, x-axis oriented to the right.
+     *@param y y-coordinate, in the FITS system: (0,0) lower left, y-axis oriented upward.
+     *@return null if coords are outside the image, ra/dec otherwise (in degrees).
      */
     public Point2D.Double pix2wcs(double x, double y){
         if (wcsTransform == null ||
@@ -312,10 +312,10 @@ public class JSkyFitsImage extends VImage {
         return wcsTransform.pix2wcs(x, y);
     }
 
-    /* Converts virtual space coordinates to World Coordinates. Returns null if the WCSTransform is not valid.
-     * @param x x-coord in virtual space
-     * @param y y-coord in virtual space
-     *@return null if coords are outside the image
+    /** Converts from VirtualSpace coordinates to World Coordinates.
+     *@param pvx x-coord in virtual space.
+     *@param pvy y-coord in virtual space.
+     *@return null if coords are outside the image, ra/dec otherwise (in degrees).
      */
     public Point2D.Double vs2wcs(double pvx, double pvy){
         // convert to FITS image coords
@@ -327,8 +327,9 @@ public class JSkyFitsImage extends VImage {
         return wcsTransform.pix2wcs(pvx-vx+vw/2d, pvy-vy+vh/2d);
     }
 
-    /*
-     * Converts World Coordinates to pixel coordinates.
+    /** Converts from World Coordinates to FITS image coordinates.
+     *@param ra right ascension (in degrees).
+     *@param dec declination (in degrees).
      *@return null if the WCSTransform is invalid, or if the WCS position does not fall within the image.
      */
     public Point2D.Double wcs2pix(double ra, double dec){
@@ -336,9 +337,9 @@ public class JSkyFitsImage extends VImage {
         return wcsTransform.wcs2pix(ra, dec);
     }
 
-    /* Converts World Coordinates to virtual space coordinates. Returns null if the WCSTransform is not valid.
-     * @param x x-coord in virtual space
-     * @param y y-coord in virtual space
+    /** Converts from World Coordinates to VirtualSpace coordinates.
+     *@param ra right ascension (in degrees).
+     *@param dec declination (in degrees).
      *@return null if coords are outside the image
      */
     public Point2D.Double wcs2vs(double ra, double dec){
