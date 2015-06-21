@@ -382,8 +382,7 @@ public class Grid extends Composite {
   }
 
   /**
-   * @param pixDistX approximate horizontal grid spacing
-   * @param pixDistY approximate vertical grid spacing
+   * @param pixDist approximate spacing
    */
   public static Grid makeGrid(FitsImage image, int pixDist){
       return new Grid(image, pixDist);
@@ -399,4 +398,3 @@ public class Grid extends Composite {
 
     //setVisible? (test)
 }
-

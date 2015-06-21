@@ -283,8 +283,8 @@ public class JSkyFitsImage extends VImage {
      * Sets the image cut levels automatically using median filtering.
      *@param updateDisplay true if the ZVTM views observing this image should be repainted at once.
      */
-    public void autoSetCutLevels(boolean updateDisplayedImage){
-        autoSetCutLevels(new Rectangle2D.Double(0,0,fitsImage.getWidth(),fitsImage.getHeight()), updateDisplayedImage);
+    public void autoSetCutLevels(boolean updateDisplay){
+        autoSetCutLevels(new Rectangle2D.Double(0,0,fitsImage.getWidth(),fitsImage.getHeight()), updateDisplay);
     }
 
     public int getDataType(){
