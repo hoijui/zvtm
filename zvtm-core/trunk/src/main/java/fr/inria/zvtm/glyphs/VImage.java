@@ -111,8 +111,8 @@ public class VImage<T> extends ClosedShape implements RectangularShape {
         vy = y;
         vz = z;
         image = img;
-        vw = image.getWidth(null) * scale;
-        vh = image.getHeight(null) * scale;
+        vw = (image != null) ? image.getWidth(null) * scale : 0;
+        vh = (image != null) ? image.getHeight(null) * scale : 0;
         if (vw==0 && vh==0){ar = 1.0f;}
         else {ar = vw/vh;}
         computeSize();
