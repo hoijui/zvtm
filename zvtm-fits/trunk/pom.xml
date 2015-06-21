@@ -200,6 +200,21 @@ $Id$
           </archive>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+   	    <version>2.10.3</version>
+        <configuration>
+          <code>javadoc:aggregate</code>
+          <overview>${basedir}/overview.html</overview>
+          <doctitle><![CDATA[<h1>ZVTM API documentation</h1>]]></doctitle>
+          <bottom><![CDATA[<i>Copyright &#169; 2000-2002 Xerox Corporation. All Rights Reserved<br />Copyright &#169; 2003 World Wide Web Consortium. All Rights Reserved<br />Copyright &#169; 2004-2015 INRIA. All Rights Reserved<br />Licensed under the GNU LGPL. For full terms see the file COPYING.</i>]]></bottom>
+          <excludePackageNames>fr.inria.zvtm.fits.examples:fr.inria.zvtm.fits.simbad</excludePackageNames>
+          <links>
+            <link>http://docs.oracle.com/javase/6/docs/api/</link>
+          </links>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 
