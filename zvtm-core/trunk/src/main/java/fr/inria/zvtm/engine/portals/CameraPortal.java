@@ -159,7 +159,7 @@ public class CameraPortal extends Portal {
     protected float borderWidth = 0;
 
     /** Set the border width of the portal (use SetBorder to draw the border)
-     *@param w  width of the border
+     *@param bw portal border width
      */
     public void setBorderWidth(float bw){
         if (bw <= 0.0f){
@@ -376,7 +376,7 @@ public class CameraPortal extends Portal {
             }
             g2d.setComposite(alphaC);
         }
-                
+
         g2d.setClip(x, y, w, h);
         if (bkgColor != null){
             g2d.setColor(bkgColor);
