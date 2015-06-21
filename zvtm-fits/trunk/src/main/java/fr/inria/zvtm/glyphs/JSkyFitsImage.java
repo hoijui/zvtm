@@ -9,6 +9,7 @@ package fr.inria.zvtm.glyphs;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.Stroke;
 import java.awt.Shape;
 import java.awt.RenderingHints;
@@ -22,10 +23,13 @@ import java.awt.Transparency;
 
 import java.net.URL;
 
+import java.util.Vector;
+
 import fr.inria.zvtm.glyphs.projection.RProjectedCoordsP;
 
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
+import fr.inria.zvtm.glyphs.VImageOr;
 
 import jsky.coords.WCSTransform;
 import jsky.image.fits.FITSKeywordProvider;
@@ -52,53 +56,26 @@ import java.net.MalformedURLException;
 //Fits support provided by JSky instead of IVOA FITS
 //Note: JSkyFitsImage requires JAI (Java Advanced Imaging)
 
-public class JSkyFitsImage extends ClosedShape implements RectangularShape {
+public class JSkyFitsImage extends VImage {
 
     FITSImage fitsImage;
-    BufferedImage cImage;
 
     URL file;
     WCSTransform wcsTransform;
     final ImageProcessor proc;
 
-    /** Width in virtual space */
-    double vw;
-    /** Height in virtual space */
-    double vh;
-
-    /** For internal use. Made public for easier outside package subclassing. */
-    public boolean zoomSensitive = true;
-
-    /** For internal use. Made public for easier outside package subclassing. */
-    RProjectedCoordsP[] pc;
-
-    /** For internal use. Made public for easier outside package subclassing. */
-    public AffineTransform at;
-
-    /** For internal use. Made public for easier outside package subclassing. */
-    public double scaleFactor = 1.0f;
-
-    /** For internal use. Made public for easier outside package subclassing. */
-    public double trueCoef = 1.0f;
-
-    /** For internal use. Made public for easier outside package subclassing. */
-    public Object interpolationMethod = RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
-
     double originLowCut;
-
     double originHighCut;
 
+    /** Construct an image at (0, 0) with original scale.
+     *@param file path to FITS file
+     */
     public JSkyFitsImage(String file) throws MalformedURLException {
         this(new URL(file));
-        /*try{
-            this(new URL(file));
-        } catch(MalformedURLException e){
-            throw new Error("Could not create JSkyFitsImage, URL incorrect: " + e);
-        }
-        */
     }
+
     /** Construct an image at (0, 0) with original scale.
-     *@param img image to be displayed
+     *@param file FITS file URL
      */
     public JSkyFitsImage(URL file){
         this(0, 0, 0, file, 1.0, 1.0f);
@@ -108,9 +85,9 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
      *@param z z-index (pass 0 if you do not use z-ordering)
-     *@param img image to be displayed
+     *@param file FITS file URL
      */
-    public JSkyFitsImage(double x,double y, int z, URL file){
+    public JSkyFitsImage(double x, double y, int z, URL file){
         this(x, y, z, file, 1.0, 1.0f);
     }
 
@@ -118,7 +95,7 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
      *@param z z-index (pass 0 if you do not use z-ordering)
-     *@param img image to be displayed
+     *@param file FITS file URL
      *@param scale scaleFactor w.r.t original image size
      */
     public JSkyFitsImage(double x, double y, int z, URL file, double scale){
@@ -129,58 +106,33 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
      *@param z z-index (pass 0 if you do not use z-ordering)
-     *@param img image to be displayed
+     *@param file FITS file URL
      *@param scale scaleFactor w.r.t original image size
       *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
      */
     public JSkyFitsImage(double x, double y, int z, URL file, double scale, float alpha){
-        vx = x;
-        vy = y;
-        vz = z;
-
-        try{
-            //imageLocation = file
-
-            this.file = file;
+        super(x, y, z, null, scale, alpha);
+        try {
             String strfile = file.toString();
-
             if(strfile.indexOf("file:") == 0){
                 fitsImage = new FITSImage(strfile.substring(strfile.indexOf(":")+1));
-            } else {
+            }
+            else {
                 fitsImage = new FITSImage(file.toString());
             }
-
-            //this.file = "/home/fdelcampo/zuist-scenes-local/fits/Einstein.fits";
-            //fitsImage = new FITSImage(file.toString());
-
-            //fitsImage = new FITSImage("/home/fdelcampo/zuist-scenes-local/fits/Einstein.fits");
-
-            vw = fitsImage.getWidth() * scale;
-            vh = fitsImage.getHeight() * scale;
             RenderedImageAdapter ria = new RenderedImageAdapter(fitsImage);
             Rectangle2D.Double region = new Rectangle2D.Double(0,0, fitsImage.getWidth(), fitsImage.getHeight());
-            //System.out.print("ria: ");
-            //System.out.println(ria);
-            //System.out.print("sampleModel: ");
-            //System.out.println(ria.getSampleModel());
-
-            //System.out.print("region: ");
-            //System.out.println(region);
             try{
                 proc = new ImageProcessor(ria, region);
-                //System.out.println("proc created");
                 originLowCut = proc.getLowCut();
-                //System.out.println("originLowCut: " + originLowCut);
                 originHighCut = proc.getHighCut();
-                //System.out.println("originHighCut: " + originHighCut);
                 updateDisplayedImage();
-
-            } catch(java.lang.IllegalArgumentException ie){
-
+                vw = image.getWidth(null) * scale;
+                vh = image.getHeight(null) * scale;
+            }
+            catch(java.lang.IllegalArgumentException ie){
                 throw new Error("Could not create ImageProcesor: " + ie);
             }
-
-
             NomWcsKeywordProvider wcsKeyProvider;
             try{
                 wcsKeyProvider = new NomWcsKeywordProvider(fitsImage.getFits().getHDU(0).getHeader());
@@ -192,68 +144,73 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
             } catch(Exception e){
                 throw new Error("Could not create wcsTransform: " + e);
             }
-
-
-        } catch (Exception e){
+        }
+        catch (Exception e){
             throw new Error("Could not create FitsImage: " + e);
         }
-        scaleFactor = scale;
-        setTranslucencyValue(alpha);
-
     }
 
-
     /**
-     * Returns the underlying FITSImage
+     * Get the underlying JSky FITSImage instance.
      */
-    public FITSImage getUnderlyingImage(){
+    public FITSImage getRawFITSImage(){
         return fitsImage;
     }
 
-    @Override public double getWidth(){
-        return vw;
-    }
-
-    @Override public double getHeight(){
-        return vh;
-    }
-
-    @Override public void setWidth(double w){
-        //vw = w;
-    }
-
-    @Override public void setHeight(double h){
-        //vh = h;
-    }
-
-    public URL getImageLocation(){
+    /**
+     * Get URL of underlying FITS Image.
+     */
+    public URL getFITSImageURL(){
         return file;
     }
 
+    /**
+     * Get min cut level.
+     */
     public double getMinValue(){
         return proc.getMinValue();
     }
 
+    /**
+     * Get max cut level.
+     */
     public double getMaxValue(){
         return proc.getMaxValue();
     }
 
-    public float getScale(){
+    /**
+     * Get the scale algorithm used to render this FITS image.
+     */
+    public float getScaleAlgorithm(){
         return fitsImage.getScale();
     }
 
+    /**
+     * Does nothing on purpose.
+     * The BufferedImage should only be updated from the FITS image through #updateDisplayedImage()
+     */
+    @Override
+    public void setImage(Image i){
+        //
+        return;
+    }
+
+    /**
+     * Update the image to be rendered on screen. This method is called whenever the FITS image's content changes, or when the scale algorithm or color lookup table is changed.
+     */
     public void updateDisplayedImage(){
         GraphicsConfiguration gc = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
-        cImage = gc.createCompatibleImage(fitsImage.getWidth(), fitsImage.getHeight(), Transparency.TRANSLUCENT);
-        Graphics2D g2 = cImage.createGraphics();
-        g2.drawRenderedImage(proc.getDisplayImage(), AffineTransform.getTranslateInstance(0, 0));
+        image = gc.createCompatibleImage(fitsImage.getWidth(), fitsImage.getHeight(), Transparency.TRANSLUCENT);
+        Graphics2D g2 = ((BufferedImage)image).createGraphics();
+        g2.drawRenderedImage(proc.getDisplayImage(), AffineTransform.getScaleInstance(1,1));
         g2.dispose();
-        cImage.setAccelerationPriority(1);
+        image.setAccelerationPriority(1);
     }
 
     /**
      * Sets the color lookup table.
-     * Currently accepted values include: "Background", "Blue", "Heat", "Isophot", "Light", "Pastel", "Ramp", "Real", "Smooth", "Staircase", "Standard".
+     *@param tableName Name of color lookup table to be used to render this FITS image. Currently accepted values include: "Standard", "Aips0", "Background", "Color", "Red", "Green", "Blue", "Blulut", "Ramp", "Real", "Heat", "Light", "Pastel", "Smooth", "Idl2", "Idl4", "Idl5", "Idl6", "Idl11", "Idl12", "Idl14", "Idl15", "Isophot", "Manycolor", "Stairs8", "Stairs9", "Random", "Random1", "Random2", "Random3", "Random4", "Rainbow", "Rainbow1", "Rainbow2", "Rainbow3", "Rainbow4".
+     *@param updateDisplay true if the ZVTM views observing this image should be repainted at once.
      */
     public void setColorLookupTable(String tableName, boolean updateDisplay){
         proc.setColorLookupTable(tableName);
@@ -272,7 +229,8 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
     }
 
     /**
-     * Sets the scale algorithm.
+     * Sets the scale algorithm used to render this FITS image.
+     *@param updateDisplay true if the ZVTM views observing this image should be repainted at once.
      */
     public void setScaleAlgorithm(ScaleAlgorithm algorithm, boolean updateDisplay){
         proc.setScaleAlgorithm(algorithm.toJSkyValue());
@@ -283,16 +241,9 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
         }
     }
 
-
-
-    /*
-    public ImageProcessor getImageProcessor(){
-        return proc;
-    }
-    */
-
     /**
      * Sets the cut levels for this image.
+     *@param updateDisplay true if the ZVTM views observing this image should be repainted at once.
      */
     public void setCutLevels(double lowCut, double highCut, boolean updateDisplay){
         proc.setCutLevels(lowCut, highCut);
@@ -316,6 +267,7 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
 
     /**
      * Sets the image cut levels automatically using median filtering on the given area of the image.
+     *@param updateDisplay true if the ZVTM views observing this image should be repainted at once.
      */
     public void autoSetCutLevels(Rectangle2D.Double rect, boolean updateDisplay){
         proc.autoSetCutLevels(rect);
@@ -328,6 +280,7 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
 
     /**
      * Sets the image cut levels automatically using median filtering.
+     *@param updateDisplay true if the ZVTM views observing this image should be repainted at once.
      */
     public void autoSetCutLevels(boolean updateDisplayedImage){
         autoSetCutLevels(new Rectangle2D.Double(0,0,fitsImage.getWidth(),fitsImage.getHeight()), updateDisplayedImage);
@@ -394,321 +347,6 @@ public class JSkyFitsImage extends ClosedShape implements RectangularShape {
         res.setLocation(res.x+vx-vw/2d, res.y+vy-vh/2d);
         return res;
     }
-
-    /**
-     * Gets the bounding box of this Glyph in virtual space coordinates.
-     * @return west, north, east and south bounds in virtual space.
-     */
-    @Override
-    public double[] getBounds(){
-        return new double[]{vx-vw/2d,vy+vh/2d,vx+vw/2d,vy-vh/2d};
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-        public boolean fillsView(double w, double h, int camIndex){
-            return false; //safe option
-        }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-        public boolean coordInside(int jpx, int jpy, Camera c, double cvx, double cvy){
-            return coordInsideV(cvx, cvy, c);
-        }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-        public boolean coordInsideV(double cvx, double cvy, Camera c){
-            return (cvx>=(vx-vw/2d)) && (cvx<=(vx+vw/2d)) &&
-               (cvy>=(vy-vh/2d)) && (cvy<=(vy+vh/2d));
-        }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-        public boolean coordInsideP(int jpx, int jpy, Camera c){
-            int i = c.getIndex();
-            return (jpx>=(pc[i].cx-pc[i].cw)) && (jpx<=(pc[i].cx+pc[i].cw)) &&
-               (jpy>=(pc[i].cy-pc[i].ch)) && (jpy<=(pc[i].cy+pc[i].ch));
-        }
-
-    @Override
-        public void removeCamera(int index){
-            pc[index]=null;
-        }
-
-    @Override
-        public void addCamera(int verifIndex){
-            if (pc!=null){
-                if (verifIndex==pc.length){
-                    RProjectedCoordsP[] ta=pc;
-                    pc=new RProjectedCoordsP[ta.length+1];
-                    for (int i=0;i<ta.length;i++){
-                        pc[i]=ta[i];
-                    }
-                    pc[pc.length-1]=new RProjectedCoordsP();
-                }
-                else {System.err.println("JSkyFitsImage:Error while adding camera "+verifIndex);}
-            }
-            else {
-                if (verifIndex==0){
-                    pc=new RProjectedCoordsP[1];
-                    pc[0]=new RProjectedCoordsP();
-                }
-                else {System.err.println("JSkyFitsImage:Error while adding camera "+verifIndex);}
-            }
-        }
-
-    @Override
-        public void initCams(int nbCam){
-            pc=new RProjectedCoordsP[nbCam];
-            for (int i=0;i<nbCam;i++){
-                pc[i]=new RProjectedCoordsP();
-            }
-        }
-
-    @Override
-        public void drawForLens(Graphics2D g,
-                int vW,
-                int vH,
-                int i,
-                Stroke stdS,
-                AffineTransform stdT,
-                int dx,
-                int dy){
-            draw(g, vW, vH, i, stdS, stdT, dx, dy);
-        }
-
-    @Override
-        public void draw(Graphics2D g,
-                int vW,
-                int vH,
-                int i,
-                Stroke stdS,
-                AffineTransform stdT,
-                int dx,
-                int dy){
-            //XXX change to make image zoomable
-            /*
-            double trueCoef = 1; //scaleFactor * coef
-            AffineTransform at = AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch);
-            g.setTransform(at);
-            if(alphaC != null){
-                g.setComposite(alphaC);
-            }
-            g.drawRenderedImage(proc.getDisplayImage(), AffineTransform.getScaleInstance(trueCoef,trueCoef));
-            g.setComposite(acO);
-            g.setTransform(stdT);
-            */
-            //XXX
-
-            // draw from the VImage
-            if (alphaC != null && alphaC.getAlpha()==0){return;}
-            if ((pc[i].cw>=1) || (pc[i].ch>=1)){
-                if (zoomSensitive){
-                    trueCoef = scaleFactor*coef;
-                }
-                else{
-                    trueCoef = scaleFactor;
-                }
-                //a threshold greater than 0.01 causes jolts when zooming-unzooming around the 1.0 scale region
-                if (Math.abs(trueCoef-1.0f)<0.01f){trueCoef=1.0f;}
-                if (trueCoef!=1.0f){
-                    // translate
-                    at = AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch);
-                    g.setTransform(at);
-                    // rescale and draw
-                    if (alphaC != null){
-                        // translucent
-                        g.setComposite(alphaC);
-                        if (interpolationMethod != RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR){
-                            g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, interpolationMethod);
-                            g.drawImage(cImage,AffineTransform.getScaleInstance(trueCoef,trueCoef),null);
-                            //g.drawRenderedImage(proc.getDisplayImage(), AffineTransform.getScaleInstance(trueCoef,trueCoef));
-                            g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, java.awt.RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
-                        }
-                        else {
-                            g.drawImage(cImage,AffineTransform.getScaleInstance(trueCoef,trueCoef),null);
-                            //g.drawRenderedImage(proc.getDisplayImage(), AffineTransform.getScaleInstance(trueCoef,trueCoef));
-                        }
-                        g.setTransform(stdT);
-                        if (paintBorder){
-                            g.setColor(borderColor);
-                            if (stroke!=null) {
-                                g.setStroke(stroke);
-                                g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
-                                g.setStroke(stdS);
-                            }
-                            else {
-                                g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
-                            }
-                        }
-                        g.setComposite(acO);
-                    }
-                    else {
-                        // opaque
-                        if (interpolationMethod != RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR){
-                            g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, interpolationMethod);
-                            g.drawImage(cImage,AffineTransform.getScaleInstance(trueCoef,trueCoef),null);
-                            //g.drawRenderedImage(proc.getDisplayImage(), AffineTransform.getScaleInstance(trueCoef,trueCoef));
-                            g.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION, java.awt.RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
-                        }
-                        else {
-                            g.drawImage(cImage,AffineTransform.getScaleInstance(trueCoef,trueCoef),null);
-                            //g.drawRenderedImage(proc.getDisplayImage(), AffineTransform.getScaleInstance(trueCoef,trueCoef));
-                        }
-                        g.setTransform(stdT);
-                        if (paintBorder){
-                            g.setColor(borderColor);
-                            if (stroke!=null) {
-                                g.setStroke(stroke);
-                                g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
-                                g.setStroke(stdS);
-                            }
-                            else {
-                                g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
-                            }
-                        }
-                    }
-                }
-                else {
-                    if (alphaC != null){
-                        // translucent
-                        g.setComposite(alphaC);
-                        g.drawImage(cImage,dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,null);
-                        //g.drawRenderedImage(proc.getDisplayImage(), AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw, dy+pc[i].cy-pc[i].ch));
-                        if (paintBorder){
-                            g.setColor(borderColor);
-                            if (stroke!=null) {
-                                g.setStroke(stroke);
-                                g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
-                                g.setStroke(stdS);
-                            }
-                            else {
-                                g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
-                            }
-                        }
-                        g.setComposite(acO);
-                    }
-                    else {
-                        // opaque
-                        g.drawImage(cImage,dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,null);
-                        //g.drawRenderedImage(proc.getDisplayImage(), AffineTransform.getTranslateInstance(dx+pc[i].cx-pc[i].cw, dy+pc[i].cy-pc[i].ch));
-                        if (paintBorder){
-                            g.setColor(borderColor);
-                            if (stroke!=null) {
-                                g.setStroke(stroke);
-                                g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
-                                g.setStroke(stdS);
-                            }
-                            else {
-                                g.drawRect(dx+pc[i].cx-pc[i].cw,dy+pc[i].cy-pc[i].ch,2*pc[i].cw-1,2*pc[i].ch-1);
-                            }
-                        }
-                    }
-                }
-            }
-            else {
-                g.setColor(this.borderColor);
-                g.fillRect(dx+pc[i].cx,dy+pc[i].cy,1,1);
-            }
-
-        }
-
-    @Override
-        public void projectForLens(Camera c,
-                int lensWidth,
-                int lensHeight,
-                float lensMag,
-                double lensx,
-                double lensy){
-           //XXX
-        }
-
-    @Override
-        public void project(Camera c, Dimension d){
-            int i=c.getIndex();
-            coef = c.focal/(c.focal+c.altitude);
-            //find coordinates of object's geom center wrt to camera center and project
-            //translate in JPanel coords
-            pc[i].cx = (int)Math.round((d.width/2d)+(vx-c.vx)*coef);
-            pc[i].cy = (int)Math.round((d.height/2d)-(vy-c.vy)*coef);
-
-            //project width and height
-            if (zoomSensitive){
-            pc[i].cw = (int)Math.round(vw/2d*coef);
-            pc[i].ch = (int)Math.round(vh/2d*coef);
-            }
-            else{
-                pc[i].cw = (int)Math.round(vw/2d);
-                pc[i].ch = (int)Math.round(vh/2d);
-            }
-        }
-
-    @Override
-        public void orientTo(double angle){
-        }
-
-    @Override
-        public double getOrient(){
-            return 0f;
-        }
-
-    @Override
-        public void reSize(double factor){
-        }
-
-    @Override
-        public void sizeTo(double newSize){
-            reSize(newSize/getSize());
-        }
-
-    @Override
-    public boolean visibleInRegion(double wb, double nb, double eb, double sb, int i){
-        if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
-            /* Glyph hotspot is in the region. The glyph is obviously visible */
-            return true;
-        }
-        else if (((vx-vw)<=eb) && ((vx+vw)>=wb) && ((vy-vh)<=nb) && ((vy+vh)>=sb)){
-            /* Glyph is at least partially in region.
-            We approximate using the glyph bounding box, meaning that some glyphs not
-            actually visible can be projected and drawn (but they won't be displayed)) */
-            return true;
-        }
-        return false;
-    }
-
-    @Override
-        public double getSize(){
-            return Math.sqrt(getWidth() * getWidth() + getHeight() * getHeight());
-        }
-
-
-    /** Specify how image should be interpolated when drawn at a scale different from its original scale.
-     *@param im one of java.awt.RenderingHints.{VALUE_INTERPOLATION_NEAREST_NEIGHBOR,VALUE_INTERPOLATION_BILINEAR,VALUE_INTERPOLATION_BICUBIC} ; default is VALUE_INTERPOLATION_NEAREST_NEIGHBOR
-     */
-    public void setInterpolationMethod(Object im){
-        interpolationMethod = im;
-    }
-
-    /** Get information about how image should be interpolated when drawn at a scale different from its original scale.
-     *@return one of java.awt.RenderingHints.{VALUE_INTERPOLATION_NEAREST_NEIGHBOR,VALUE_INTERPOLATION_BILINEAR,VALUE_INTERPOLATION_BICUBIC} ; default is VALUE_INTERPOLATION_NEAREST_NEIGHBOR
-     */
-    public Object getInterpolationMethod(){
-        return interpolationMethod;
-    }
-
-   	@Override
-   	public Shape getJava2DShape(){
-   		return new Rectangle2D.Double(vx-vw/2.0, vy-vh/2.0, vw, vh);
-   	}
 
     public enum ScaleAlgorithm {
         LINEAR{

@@ -228,7 +228,7 @@ public class JSkyFitsExample{
                 path = "/" + path;
             }
             String retVal =  "file:" + path;
-            img = new JSkyFitsImage(new URL(retVal));
+            img = new JSkyFitsImage(0, 0, 0, new URL(retVal), 1, 1);
 
         }
         if (img != null){
