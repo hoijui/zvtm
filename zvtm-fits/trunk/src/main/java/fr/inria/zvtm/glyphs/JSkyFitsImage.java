@@ -60,7 +60,7 @@ public class JSkyFitsImage extends VImage {
 
     FITSImage fitsImage;
 
-    URL file;
+    URL furl;
     WCSTransform wcsTransform;
     final ImageProcessor proc;
 
@@ -75,50 +75,51 @@ public class JSkyFitsImage extends VImage {
     }
 
     /** Construct an image at (0, 0) with original scale.
-     *@param file FITS file URL
+     *@param fitsURL FITS file URL
      */
-    public JSkyFitsImage(URL file){
-        this(0, 0, 0, file, 1.0, 1.0f);
+    public JSkyFitsImage(URL fitsURL){
+        this(0, 0, 0, fitsURL, 1.0, 1.0f);
     }
 
     /** Construct an image at (x, y) with original scale.
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
      *@param z z-index (pass 0 if you do not use z-ordering)
-     *@param file FITS file URL
+     *@param fitsURL FITS file URL
      */
-    public JSkyFitsImage(double x, double y, int z, URL file){
-        this(x, y, z, file, 1.0, 1.0f);
+    public JSkyFitsImage(double x, double y, int z, URL fitsURL){
+        this(x, y, z, fitsURL, 1.0, 1.0f);
     }
 
     /** Construct an image at (x, y) with a custom scale.
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
      *@param z z-index (pass 0 if you do not use z-ordering)
-     *@param file FITS file URL
+     *@param fitsURL FITS file URL
      *@param scale scaleFactor w.r.t original image size
      */
-    public JSkyFitsImage(double x, double y, int z, URL file, double scale){
-        this(x, y, z, file, scale, 1.0f);
+    public JSkyFitsImage(double x, double y, int z, URL fitsURL, double scale){
+        this(x, y, z, fitsURL, scale, 1.0f);
     }
 
     /** Construct an image at (x, y) with a custom scale.
      *@param x coordinate in virtual space
      *@param y coordinate in virtual space
      *@param z z-index (pass 0 if you do not use z-ordering)
-     *@param file FITS file URL
+     *@param fitsURL FITS file URL
      *@param scale scaleFactor w.r.t original image size
       *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
      */
-    public JSkyFitsImage(double x, double y, int z, URL file, double scale, float alpha){
+    public JSkyFitsImage(double x, double y, int z, URL fitsURL, double scale, float alpha){
         super(x, y, z, null, scale, alpha);
+        this.furl = fitsURL;
         try {
-            String strfile = file.toString();
-            if(strfile.indexOf("file:") == 0){
-                fitsImage = new FITSImage(strfile.substring(strfile.indexOf(":")+1));
+            String urlStr = furl.toString();
+            if(urlStr.indexOf("file:") == 0){
+                fitsImage = new FITSImage(urlStr.substring(urlStr.indexOf(":")+1));
             }
             else {
-                fitsImage = new FITSImage(file.toString());
+                fitsImage = new FITSImage(urlStr);
             }
             RenderedImageAdapter ria = new RenderedImageAdapter(fitsImage);
             Rectangle2D.Double region = new Rectangle2D.Double(0,0, fitsImage.getWidth(), fitsImage.getHeight());
@@ -161,7 +162,7 @@ public class JSkyFitsImage extends VImage {
      * Get URL of underlying FITS Image.
      */
     public URL getFITSImageURL(){
-        return file;
+        return furl;
     }
 
     /**
