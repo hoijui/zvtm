@@ -59,6 +59,7 @@ public aspect AutoReplay extends AbstractAutoReplay {
          execution(public void Glyph.sizeTo(double))	||
          execution(public void Glyph.setBorderColor(Color))	||
          execution(public void Glyph.setColor(Color))	||
+         execution(public void Glyph.highlight(boolean, Color))	||
          execution(public void Glyph.setTranslucencyValue(float)) ||
          execution(public void Glyph.setMouseInsideHighlightColor(Color)) ||
          execution(public void Glyph.setVisible(boolean)) ||
