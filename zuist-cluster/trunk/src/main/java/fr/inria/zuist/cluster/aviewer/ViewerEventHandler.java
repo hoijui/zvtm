@@ -7,7 +7,6 @@
 
 package fr.inria.zuist.cluster.aviewer;
 
-import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
@@ -32,19 +31,13 @@ import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.event.CameraListener;
 import fr.inria.zvtm.event.PickerListener;
 import fr.inria.zvtm.event.ViewAdapter;
-//
-import fr.inria.zvtm.engine.portals.Portal;
-import fr.inria.zvtm.engine.portals.OverviewPortal;
-import fr.inria.zvtm.engine.portals.CameraPortal;
-import fr.inria.zvtm.engine.portals.DraggableCameraPortal;
-import fr.inria.zvtm.event.PortalListener;
 
 import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zuist.engine.Region;
 import fr.inria.zuist.engine.ObjectDescription;
 import fr.inria.zuist.engine.TextDescription;
 
-class ViewerEventHandler implements ViewListener, ComponentListener, CameraListener, PickerListener, PortalListener  {
+class ViewerEventHandler implements ViewListener, ComponentListener, CameraListener, PickerListener {
     
     static float ZOOM_SPEED_COEF = 1.0f/50.0f;
     static double PAN_SPEED_COEF = 50.0;
@@ -67,15 +60,7 @@ class ViewerEventHandler implements ViewListener, ComponentListener, CameraListe
 	short navMode = ZERO_ORDER;
 
 	Glyph objectJustSelected = null;
-
-	boolean inPortal = false;
-    OverviewPortal currentOP = null;
-    DragMag currentDragMag = null;
-    boolean dragging_dragmag = false;
-    boolean dragging_dragmag_in = false;
-    boolean resizeing_dragmag = false;
-    boolean dragging_dragmag_vis = false;
-    boolean do_force_exit_portal = false;
+	
 	
     ViewerEventHandler(Viewer app){
         this.application = app;
@@ -84,50 +69,18 @@ class ViewerEventHandler implements ViewListener, ComponentListener, CameraListe
     public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
         lastJPX = jpx;
         lastJPY = jpy;
-        if (currentDragMag != null){
-            if(mod == SHIFT_MOD) { //d currentDragMag.coordInsideBar(jpx, jpy)){
-                dragging_dragmag = true;
-            }
-            else{
-                if (currentDragMag.isManatthan()){
-                    dragging_dragmag = true;
-                }
-                else {
-                    dragging_dragmag_in = true;
-                }
-            }
+        if (navMode == FIRST_ORDER){
+            first_order_dragging = true;
+            v.setDrawDrag(true);
         }
         else {
-            if (application.dmm != null)
-            {
-                currentDragMag = application.dmm.checkVis(jpx,jpy);
-                if (currentDragMag != null){
-                    dragging_dragmag_vis = true;
-                }
-            }
-            if (currentDragMag == null){
-                if (navMode == FIRST_ORDER){
-                    first_order_dragging = true;
-                    v.setDrawDrag(true);
-                }
-                else {
-                    // ZERO_ORDER
-                    zero_order_dragging = true;
-                }
-            }
+            // ZERO_ORDER
+            zero_order_dragging = true;
         }
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
         zero_order_dragging = false;
-        dragging_dragmag = false;
-        dragging_dragmag_in = false;
-        resizeing_dragmag = false;
-        if (do_force_exit_portal && currentDragMag != null) {
-            exitPortal(currentDragMag);
-        }
-        if (dragging_dragmag_vis){ currentDragMag = null; }
-        dragging_dragmag_vis = false;
         if (first_order_dragging){
             Camera c = application.mCamera;
             c.setXspeed(0);
@@ -139,7 +92,6 @@ class ViewerEventHandler implements ViewListener, ComponentListener, CameraListe
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-        if (inPortal || resizeing_dragmag) { return; }
 		Vector gum = v.getVCursor().getPicker().getIntersectingGlyphs(v.cams[0]);
 		if (gum == null){
 			return;
@@ -175,20 +127,11 @@ class ViewerEventHandler implements ViewListener, ComponentListener, CameraListe
 	public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
 	public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-        if (currentDragMag != null){
-            resizeing_dragmag = true;
-        }
-        else{
-		  v.parent.setActiveLayer(1);
-		  application.displayMainPieMenu(true);
-        }
+		v.parent.setActiveLayer(1);
+		application.displayMainPieMenu(true);
 	}
 
 	public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-        if (resizeing_dragmag){
-            resizeing_dragmag = true;
-            return;
-        }
 		Glyph g = v.lastGlyphEntered();
 		if (g != null && g.getType() == Messages.PM_ENTRY){
 			application.pieMenuEvent(g);
@@ -199,9 +142,7 @@ class ViewerEventHandler implements ViewListener, ComponentListener, CameraListe
 		v.parent.setActiveLayer(0);
 	}
 
-    public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-        if (resizeing_dragmag){ return; }
-    }
+    public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
         
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){}
 
@@ -225,88 +166,18 @@ class ViewerEventHandler implements ViewListener, ComponentListener, CameraListe
                 c.setZspeed(0);
             }
         }
-        else if (dragging_dragmag){
-            currentDragMag.move(jpx-lastJPX, jpy-lastJPY);
-            if (currentDragMag.isManatthan())
-            {
-                Camera dmc = currentDragMag.getCamera();
-                double aa = (c.focal+Math.abs(c.altitude)) / c.focal;
-                dmc.move(aa*(jpx-lastJPX), aa*(lastJPY-jpy));
-            }
-            lastJPX = jpx;
-            lastJPY = jpy;
-        }
-        else if (dragging_dragmag_vis){
-            //currentDragMag.move(jpx-lastJPX, jpy-lastJPY);
-            Camera dmc = currentDragMag.getCamera();
-            double aa = (c.focal+Math.abs(c.altitude)) / c.focal;
-            dmc.move(aa*(jpx-lastJPX), a*(lastJPY-jpy));
-            currentDragMag.updateVis();
-            lastJPX = jpx;
-            lastJPY = jpy;
-        }
-        else if (dragging_dragmag_in){
-            Camera dmc = currentDragMag.getCamera();
-            double aa = (dmc.focal+Math.abs(dmc.altitude)) / dmc.focal;
-            if (mod == SHIFT_MOD)  aa = (c.focal+Math.abs(c.altitude)) / c.focal;
-            dmc.move(-aa*(jpx-lastJPX), -aa*(lastJPY-jpy));
-            currentDragMag.updateVis();
-            lastJPX = jpx;
-            lastJPY = jpy;
-        }
-        else if (resizeing_dragmag){
-            currentDragMag.resize(jpx-lastJPX, jpy-lastJPY);
-            application.dmm.dragMagResized(currentDragMag);
-            lastJPX = jpx;
-            lastJPY = jpy;
-        }
     }
 
 	public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
-		//double a = (application.mCamera.focal+Math.abs(application.mCamera.altitude)) / application.mCamera.focal;
-        if (currentDragMag != null && !currentDragMag.isManatthan())
-        {
-            Camera c = currentDragMag.getCamera();
-            double a = (c.focal+Math.abs(c.altitude)) / c.focal;
-            double mvx = c.vx;
-            double mvy = c.vy;
-            if (currentDragMag.getType() == DragMag.DM_TYPE_INDEPENDANT){ // centered zoom
-                // FIXME... this does not work !!!
-                System.out.print("center zoom "+mvx+" "+mvy+" ");
-                mvx = mvx+ a*(lastJPX - currentDragMag.x - (double)currentDragMag.w/2.0);
-                mvy = mvy+ a*(-lastJPY + currentDragMag.y + (double)currentDragMag.h/2.0);
-                System.out.println("/ "+mvx+" "+mvy+" ");
-            } 
-            if (wheelDirection == WHEEL_UP){
-                c.move(-((mvx - c.vx) * WHEEL_ZOOMOUT_FACTOR / c.focal),
-                        -((mvy - c.vy) * WHEEL_ZOOMOUT_FACTOR / c.focal));
-                c.altitudeOffset(a*WHEEL_ZOOMOUT_FACTOR);
-            }
-            else{
-                if (c.getAltitude()-a*WHEEL_ZOOMIN_FACTOR >= 0){
-                    c.move((mvx - c.vx) * WHEEL_ZOOMIN_FACTOR / c.focal,
-                            (mvy - c.vy) * WHEEL_ZOOMIN_FACTOR / c.focal);
-                    c.altitudeOffset(-a*WHEEL_ZOOMIN_FACTOR);
-                }
-            }
-            currentDragMag.updateVis();
-            application.vsm.repaint();
-        }
-        else {
-            if (currentDragMag != null && currentDragMag.isManatthan()){
-                // zoom at the center of the dragmag
-                jpx = currentDragMag.x + currentDragMag.w/2;
-                jpy = currentDragMag.y + currentDragMag.h/2; 
-            }
-		  if (wheelDirection  == WHEEL_UP){
-			 application.centredZoom(WHEEL_ZOOMIN_FACTOR, jpx, jpy);
-			 application.vsm.repaint();
-		  }
-		  else {
-			 application.centredZoom(WHEEL_ZOOMOUT_FACTOR, jpx, jpy);
-			 application.vsm.repaint();
-		  }
-        }
+		double a = (application.mCamera.focal+Math.abs(application.mCamera.altitude)) / application.mCamera.focal;
+		if (wheelDirection  == WHEEL_UP){
+			application.centredZoom(WHEEL_ZOOMIN_FACTOR, jpx, jpy);
+			application.vsm.repaint();
+		}
+		else {
+			application.centredZoom(WHEEL_ZOOMOUT_FACTOR, jpx, jpy);
+			application.vsm.repaint();
+		}
 	}
 
 	public void enterGlyph(Glyph g){
@@ -340,33 +211,6 @@ class ViewerEventHandler implements ViewListener, ComponentListener, CameraListe
 	    else if (code==KeyEvent.VK_LEFT){application.translateView(Viewer.MOVE_LEFT);}
 	    else if (code==KeyEvent.VK_RIGHT){application.translateView(Viewer.MOVE_RIGHT);}
 	    else if (code==KeyEvent.VK_N){toggleNavMode();}
-        else if (code == KeyEvent.VK_D) {
-            if (currentDragMag != null) {
-                currentDragMag.setType(DragMag.DM_TYPE_DRAGMAG);
-                application.vsm.repaint();
-            }
-            else { 
-                application.dmm.addDragMag(DragMag.DM_TYPE_DRAGMAG);
-            }
-        }
-        else if (code == KeyEvent.VK_M) {
-            if (currentDragMag != null) {
-                currentDragMag.setType(DragMag.DM_TYPE_MANATTHAN);
-                application.vsm.repaint();
-            }
-            else { 
-                application.dmm.addDragMag(DragMag.DM_TYPE_MANATTHAN);
-            }
-        }
-        else if (code == KeyEvent.VK_I) {
-            if (currentDragMag != null) {
-                currentDragMag.setType(DragMag.DM_TYPE_INDEPENDANT);
-                application.vsm.repaint();
-            }
-            else { 
-                application.dmm.addDragMag(DragMag.DM_TYPE_INDEPENDANT);
-            }
-        }
 //		else if (code == KeyEvent.VK_F1){application.toggleMiscInfoDisplay();}
 //        else if (code == KeyEvent.VK_F7){application.gc();}
 //        else if (code == KeyEvent.VK_F2){application.ovm.toggleConsole();}
@@ -406,45 +250,5 @@ class ViewerEventHandler implements ViewListener, ComponentListener, CameraListe
             case ZERO_ORDER:{navMode = FIRST_ORDER;break;}
         }
     }
-
-    /* Overview Portal & DragMag */
-     static final Color OV_BORDER_COLOR = Color.WHITE;
-    static final Color OV_INSIDE_BORDER_COLOR = Color.WHITE;
-
-    public void enterPortal(Portal p){
-        if (dragging_dragmag || resizeing_dragmag || dragging_dragmag_vis || dragging_dragmag_in) {
-            if (p == currentDragMag) { 
-                do_force_exit_portal = false;
-            }
-            return; 
-        }
-        inPortal = true;
-        if (p instanceof OverviewPortal){
-            currentOP = (OverviewPortal)p;
-            currentOP.setBorder(OV_INSIDE_BORDER_COLOR);
-        }
-        else if (p instanceof DragMag){
-            currentDragMag = (DragMag)p;
-            //d currentDragMag.setDragBarColor(TIVDragMagsManager.DDM_INSIDE_BAR_COLOR);
-        }
-        VirtualSpaceManager.INSTANCE.repaint();
-    }
-
-    public void exitPortal(Portal p){
-        if (dragging_dragmag || resizeing_dragmag || dragging_dragmag_vis || dragging_dragmag_in) {
-            if (p == currentDragMag) { 
-                do_force_exit_portal = true;
-            }
-            return;
-        }
-        inPortal = false;
-        if (currentOP != null){
-            currentOP.setBorder(OV_BORDER_COLOR);
-        }
-        else if (currentDragMag != null){
-            //d currentDragMag.setDragBarColor(TIVDragMagsManager.DDM_BAR_COLOR);
-        }
-        VirtualSpaceManager.INSTANCE.repaint();
-        currentOP = null; currentDragMag = null;
-    }
+    
 }

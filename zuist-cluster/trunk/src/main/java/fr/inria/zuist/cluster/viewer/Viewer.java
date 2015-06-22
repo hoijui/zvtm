@@ -384,6 +384,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
             PieMenuFactory.setTranslucency(0.7f);
             PieMenuFactory.setSensitivityRadius(0.5);
             PieMenuFactory.setAngle(-Math.PI/2.0);
+            PieMenuFactory.setRadius(150);
             mainPieMenu = PieMenuFactory.createPieMenu(Messages.mainMenuLabels, Messages.mainMenuLabelOffsets, 0, mView);
             Glyph[] items = mainPieMenu.getItems();
             items[0].setType(Messages.PM_ENTRY);
