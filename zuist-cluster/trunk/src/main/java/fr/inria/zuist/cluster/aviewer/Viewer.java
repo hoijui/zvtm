@@ -122,7 +122,8 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     static final String mSpaceName = "Scene Space";
     static final String mnSpaceName = "PieMenu Space";
     static final String ovSpaceName = "Overlay Space";
-    VirtualSpace mSpace, ovSpace, cursorSpace;
+    static final String dmsGlyphsSpaceName = "DragMag Glyphs Space";
+    VirtualSpace mSpace, ovSpace, cursorSpace, dmsGlyphsSpace;
     Camera mCamera;
     Camera cursorCamera;
     String mCameraAltStr = Messages.ALTITUDE + "0";
@@ -132,9 +133,11 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     ViewerEventHandler eh;
 
     SceneManager sm;
+    
+    TIVDragMagsManager dmm;
 
     private Vector<Camera> sceneCam;
-    private ClusteredView clusteredView;
+    public ClusteredView clusteredView;
     private ClusterGeometry withoutBezels;
     private ClusterGeometry withBezels;
     private boolean sceneUnderBezels = true;
@@ -195,6 +198,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 	    sm = new SceneManager(sceneSpaces, sceneCameras, parseSceneOptions(options));
 	    sm.setRegionListener(this);
 	    sm.setLevelListener(this);
+	    dmm = new TIVDragMagsManager(this);
 	    previousLocations = new Vector();
 	    ovm.initConsole();
 	    if (xmlSceneFile != null){
@@ -221,18 +225,21 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         vsm = VirtualSpaceManager.INSTANCE;
         vsm.setMaster("ZuistCluster");
         mSpace = vsm.addVirtualSpace(mSpaceName);
+        dmsGlyphsSpace = vsm.addVirtualSpace(dmsGlyphsSpaceName);
         VirtualSpace mnSpace = vsm.addVirtualSpace(mnSpaceName);
         mCamera = mSpace.addCamera();
-	mnSpace.addCamera().setAltitude(10);
+        Camera dmsCamera = dmsGlyphsSpace.addCamera();
+		mnSpace.addCamera().setAltitude(10);
         ovSpace = vsm.addVirtualSpace(ovSpaceName);
-	ovSpace.addCamera();
+		ovSpace.addCamera();
         cursorSpace = vsm.addVirtualSpace("cursorSpace");
         cursorCamera = cursorSpace.addCamera();
         Vector cameras = new Vector();
         cameras.add(mCamera);
+        cameras.add(dmsCamera);
         cameras.add(cursorCamera);
-	cameras.add(vsm.getVirtualSpace(mnSpaceName).getCamera(0));
-	cameras.add(vsm.getVirtualSpace(ovSpaceName).getCamera(0));
+		cameras.add(vsm.getVirtualSpace(mnSpaceName).getCamera(0));
+		cameras.add(vsm.getVirtualSpace(ovSpaceName).getCamera(0));
         if(options.standalone){
             mView = vsm.addFrameView(
 		    cameras, mViewName,
@@ -245,6 +252,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         }
         sceneCam = new Vector<Camera>();
         sceneCam.add(mCamera);
+        sceneCam.add(dmsCamera);
         sceneCam.add(cursorCamera);
 	numCols = options.numCols;
 	numRows = options.numRows;
@@ -451,6 +459,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 			PieMenuFactory.setSensitivityRadius(0.5);
 			PieMenuFactory.setAngle(-Math.PI/2.0);
 			PieMenuFactory.setRadius(150);
+
 			mainPieMenu = PieMenuFactory.createPieMenu(Messages.mainMenuLabels, Messages.mainMenuLabelOffsets, 0, mView);
 			Glyph[] items = mainPieMenu.getItems();
 			items[0].setType(Messages.PM_ENTRY);
