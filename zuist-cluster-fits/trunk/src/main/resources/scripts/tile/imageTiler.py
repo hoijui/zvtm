@@ -98,7 +98,7 @@ CMD_LINE_HELP = "ZUIST Image Tiling Script\n\nUsage:\n\n" + \
     "\t-notnewfile \tif exist file, not create new file\n"+\
     "\t-withbackground\tWithout the image of the level 0\n"+\
     "\t-maxneighborhood=N\tMaximum neighborhood\n"
-    
+
 
 
 TRACE_LEVEL = 1
@@ -159,7 +159,7 @@ HISTOGRAM_SIZE = 128
 
 
 ################################################################
-# Class 
+# Class
 ################################################################
 class NumpyEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -303,7 +303,7 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
             bitmap.drawImage(rect, cim)
             bitmap.writeToFile(tilePath, kCGImageFormatPNG)
         elif USE_ASTROPY:
-            
+
             if NEWFILE or (not os.path.exists(tilePath) and not NEWFILE):
 
                 #wcsdata = wcs.WCS(IMG_SRC_PATH)
@@ -341,19 +341,19 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
                 f.close()
 
                 log(data.shape)
-                
+
                 if scale > 1.:
                     log("Resizing to (%d, %d)" % (aw/scale, ah/scale), 3)
-                    
+
                     if NATURAL_NEIGBOR:
                         resizedata = natural_neighbor(data, ah, aw, ah/scale, aw/scale)
                     elif FLAT_NEIGBOR:
                         resizedata = flat_neighbor(data, ah, aw, ah/scale, aw/scale)
                     elif SHRINK:
                         resizedata = shrink(data, ah, aw, ah/scale, aw/scale)
-                    
+
                     log(resizedata.shape)
-                
+
 
                 '''
                 #header = WCSDATA.to_header()
@@ -367,7 +367,7 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
                 #'
 
                 ra, dec = WCSDATA.wcs_pix2world(x+aw/2, SIZE[1]-y-ah/2, 0)
-                
+
                 w.wcs.crval = [ra, dec]
                 w.wcs.ctype = WCSDATA.wcs.ctype
                 w.wcs.equinox = WCSDATA.wcs.equinox
@@ -448,10 +448,10 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
 
                 #w.wcs.pc = [[0,0],[0,0]]
                 #w.wcs.cdelt = [0,0]
-                
+
                 #w.wcs.print_contents()
 
-                
+
                 #header = w.to_header(relax=True)
                 #header['OBJECT'] = OBJECT
 
@@ -467,13 +467,13 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
                     tileFileNamen = "%s(%d)" % (tileFileName, n)
                     n = n+1
                 #hdu.writeto(tilePathn)
-                
+
                 if scale > 1.0 and not os.path.exists(tilePathn):
                     fits.writeto(tilePathn, resizedata, header)
                 elif not os.path.exists(tilePathn):
                     fits.writeto(tilePathn, data, header)
 
-                
+
                 tileFileName = tileFileNamen
                 tilePath = tilePathn
 
@@ -529,7 +529,7 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
         params = ""
         if parentRegionID is None:
             params = params + "reference;"
-        
+
         params = params + "sc=%d;" % scale
 
         if MINVALUE != None and MAXVALUE != None:
@@ -552,7 +552,7 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
 
     objectEL.set("src", "%d/%s" % (level, tileFileName) )
     if USE_ASTROPY:
-        objectEL.set("sensitive", "true")    
+        objectEL.set("sensitive", "true")
     else:
         objectEL.set("sensitive", "false")
     log("Image in scene: scale=%.4f, w=%d, h=%d" % (scale, aw, ah))
@@ -628,14 +628,16 @@ def processSrcImg():
                 im = hdulist[0].data
                 WCSDATA = wcs.WCS(hdulist[0].header)
                 HEADER = hdulist[0].header
-                OBJECT = hdulist[0].header['OBJECT']
+                if 'OBJECT' in hdulist[0].header:
+                    OBJECT = hdulist[0].header['OBJECT']
                 SIZE = src_sz
             elif hdulist[1].header['NAXIS'] == 2:
                 src_sz = (hdulist[1].header['NAXIS1'], hdulist[1].header['NAXIS2'])
                 im = hdulist[1].data
                 WCSDATA = wcs.WCS(hdulist[1].header)
                 HEADER = hdulist[1].header
-                OBJECT = hdulist[1].header['OBJECT']
+                if 'OBJECT' in hdulist[1].header:
+                    OBJECT = hdulist[1].header['OBJECT']
                 SIZE = src_sz
             else:
                 log("Naxis == %d" % (hdulist[0].header['NAXIS']) )
@@ -694,7 +696,7 @@ def resizeBilinear(data, w, h, aw, ah):
             b = data[x + 1, y]
             c = data[x, y + 1]
             d = data[x + 1, y + 1]
-            newdata[i, j] = a * ( 1 - x_diff) * (1 - y_diff) + b * (x_diff) * (1 - y_diff) + x * (y_diff) * (1 - x_diff) + d * (x_diff * y_diff) 
+            newdata[i, j] = a * ( 1 - x_diff) * (1 - y_diff) + b * (x_diff) * (1 - y_diff) + x * (y_diff) * (1 - x_diff) + d * (x_diff * y_diff)
 
     return newdata
 
@@ -798,7 +800,7 @@ def flat_neighbor(data, w, h, aw, ah):
                                 total = total + data[ii, jj]
                                 count = count + 1
                 log("total= %f -- count= %d" % (total, count))
-                if count != 0: 
+                if count != 0:
                     newdata[i, j] = total / count
             except IndexError:
                 log("IndexError:  i: %d - j: %d - idi: %d - idj: %d" % (i, j, idi, idj))
@@ -889,7 +891,7 @@ if len(sys.argv) > 2:
                 log("Parameters incorrect");
                 log(CMD_LINE_HELP);
 		sys.exit(0);
-            
+
 
 else:
     log(CMD_LINE_HELP)
