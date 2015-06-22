@@ -532,7 +532,7 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
         
         params = params + "sc=%d;" % scale
 
-        if MINVALUE and MAXVALUE:
+        if MINVALUE != None and MAXVALUE != None:
             params = params + "minvalue=%f;maxvalue=%f;" % (MINVALUE, MAXVALUE)
 
         params = params + "hist=%d/%s;" % (level, tileFileNameHist)
@@ -643,20 +643,10 @@ def processSrcImg():
 
             hdulist.close()
 
-            #print im
-            #print im.dtype
-            #print im.dtype.name
-
             if im.dtype.name == "float64":
                 log("Changed data type to float32")
                 im = im.astype(np.float32)
 
-            minvalue = np.amin(im)
-            maxvalue = np.amax(im)
-            if MINVALUE > minvalue:
-                MINVALUE = minvalue
-            if MAXVALUE < maxvalue:
-                MAXVALUE = maxvalue
 
             OUTPUT_FILE_EXT = "fits"
         else:
