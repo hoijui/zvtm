@@ -89,7 +89,7 @@
                   <weaveDependencies>
                     <weaveDependency>
                       <groupId>fr.inria.zvtm</groupId>
-                      <artifactId>zuist-engine</artifactId>
+                      <artifactId>zuist-core</artifactId>
                     </weaveDependency>
                     <weaveDependency>
                       <groupId>fr.inria.zvtm</groupId>
