@@ -165,8 +165,11 @@ class JSkyFitsViewerEventHandler implements ViewListener {
         }
         if(app.rPicker != null){
             //System.out.println("rPicker.setVSCoordinates");
-            app.rPicker.setVSCoordinates(v.getVCursor().getVSXCoordinate(), v.getVCursor().getVSYCoordinate());
-            //System.out.println(v.getVCursor().getVSXCoordinate() + ", " + v.getVCursor().getVSYCoordinate());
+            double cursorVSX = v.getVCursor().getVSXCoordinate();
+            double cursorVSY = v.getVCursor().getVSYCoordinate();
+            app.rPicker.setVSCoordinates(cursorVSX, cursorVSY);
+            //System.out.println("rPicker.setVSCoordinates");
+            //System.out.println(cursorVSX + ", " + cursorVSY);
                
         }
     }

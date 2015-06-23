@@ -303,7 +303,7 @@ public class JSkyFitsImageDescription extends ResourceDescription {
         //System.out.println(glyph);
         glyph.orientTo(angle);
 
-        vs.addGlyph(glyph,false);
+        vs.addGlyph(glyph, false);
 
     }
 

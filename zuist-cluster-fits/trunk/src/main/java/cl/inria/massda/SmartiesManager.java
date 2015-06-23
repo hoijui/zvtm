@@ -537,6 +537,7 @@ public class SmartiesManager implements Observer {
 
             if(app.rPicker != null){
                 double[] loc = app.coordinateTransform(app.cursorCamera, app.mCamera, point.getX(), point.getY());
+                //System.out.println("rPicker.setVSCoordinates");
                 //System.out.println(loc[0]+", "+loc[1]);
                 app.rPicker.setVSCoordinates(loc[0], loc[1]);
 
