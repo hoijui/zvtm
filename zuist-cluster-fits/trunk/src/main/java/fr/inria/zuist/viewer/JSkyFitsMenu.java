@@ -259,7 +259,7 @@ public class JSkyFitsMenu implements ViewListener, PickerListener {
 
 //        if(app.img != null){
 //            hist = JSkyFitsHistogram.fromFitsImage(app.img);
-		if(app.fitsImageDescRef != null && app.fitsImageDescRef.getGlyph() != null && ((JSkyFitsImage)(app.fitsImageDescRef.getGlyph())).getUnderlyingImage() != null){
+		if(app.fitsImageDescRef != null && app.fitsImageDescRef.getGlyph() != null ){// && ((JSkyFitsImage)(app.fitsImageDescRef.getGlyph())).getRawFITSImage() != null){
 			hist = JSkyFitsHistogram.fromFitsImage( (JSkyFitsImage)(app.fitsImageDescRef.getGlyph()) );
 
             hist.moveTo(-app.VIEW_W/2 + (app.VIEW_W - hist.getWidth())/2 , -app.VIEW_H/2 + 50);
