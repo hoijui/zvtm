@@ -181,10 +181,15 @@ public class JSkyFitsImage extends VImage {
 
     /**
      * Get the scale algorithm used to render this FITS image.
-     *@return one of jsky.image.ImageLookup.*_SCALE
      */
-    public int getScaleAlgorithm(){
-        return proc.getScaleAlgorithm();
+    public ScaleAlgorithm getScaleAlgorithm(){
+        switch (proc.getScaleAlgorithm()){
+            case ImageLookup.HIST_EQ:{return ScaleAlgorithm.HIST_EQ;}
+            case ImageLookup.LINEAR_SCALE:{return ScaleAlgorithm.LINEAR;}
+            case ImageLookup.LOG_SCALE:{return ScaleAlgorithm.LOG;}
+            case ImageLookup.SQRT_SCALE:{return ScaleAlgorithm.SQRT;}
+            default:{return ScaleAlgorithm.HIST_EQ;}
+        }
     }
 
     /**
