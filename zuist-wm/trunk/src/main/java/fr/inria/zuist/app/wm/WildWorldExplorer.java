@@ -51,7 +51,7 @@ import fr.inria.zvtm.animation.EndAction;
 import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 
 import fr.inria.zuist.engine.SceneManager;
-import fr.inria.zuist.engine.ProgressListener;
+import fr.inria.zuist.event.ProgressListener;
 
 import fr.inria.zvtm.cluster.ClusterGeometry;
 import fr.inria.zvtm.cluster.ClusteredView;
