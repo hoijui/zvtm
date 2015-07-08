@@ -44,7 +44,6 @@ import fr.inria.zvtm.glyphs.VImage;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.glyphs.ClosedShape;
-import fr.inria.zvtm.event.CameraListener;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.Camera;
@@ -62,7 +61,7 @@ import fr.inria.zuist.event.ProgressListener;
  *@author Emmanuel Pietriga
  */
 
-public class SceneManager implements CameraListener {
+public class SceneManager {
 
     public static final String _none = "none";
     public static final String _level = "level";
@@ -138,9 +137,9 @@ public class SceneManager implements CameraListener {
     Level[] levels = new Level[0];
 
     final VirtualSpace[] sceneLayers;
-    final Camera[] sceneCameras;
-    final double[] prevAlts; //previous altitudes
-    private final RegionUpdater regUpdater;
+    final SceneObserver[] sceneObservers;
+    // final double[] prevAlts; //previous altitudes
+    final RegionUpdater regUpdater;
 
     /** Contains a mapping from region IDs to actual Region objects. */
     Hashtable<String,Region> id2region;
@@ -158,8 +157,8 @@ public class SceneManager implements CameraListener {
 
     HashMap<String, ResourceHandler> RESOURCE_HANDLERS;
 
-    private class RegionUpdater {
-        private final HashMap<Camera, Location> toUpdate;
+    class RegionUpdater {
+        private final HashMap<SceneObserver, Location> toUpdate;
         private boolean active;
         private static final int DEFAULT_PERIOD = 200; //milliseconds
         private int period;
@@ -167,7 +166,7 @@ public class SceneManager implements CameraListener {
         private boolean enabled = true;
 
         RegionUpdater(){
-            toUpdate = new HashMap<Camera, Location>(sceneCameras.length,1);
+            toUpdate = new HashMap<SceneObserver, Location>(sceneObservers.length,1);
             active = false;
             period = DEFAULT_PERIOD;
         }
@@ -186,30 +185,31 @@ public class SceneManager implements CameraListener {
             enabled = b;
         }
 
-        void addEntry(Camera cam, Location loc){
+        void addEntry(SceneObserver so, Location loc){
             if (!enabled){return;}
             //add or overwrite update target
-            toUpdate.put(cam, loc);
+            toUpdate.put(so, loc);
 
             //if not active, create timer task and start it
             if(active) return;
             ActionListener action = new ActionListener(){
                 public void actionPerformed(ActionEvent event){
-                    for(Map.Entry<Camera, Location> entry: toUpdate.entrySet()){
-                        Camera cam = entry.getKey();
+                    for(Map.Entry<SceneObserver, Location> entry: toUpdate.entrySet()){
+                        // Camera cam = entry.getKey();
+                        SceneObserver so = entry.getKey();
                         double alt = entry.getValue().alt;
-                        int layerIndex = getLayerIndex(cam);
+                        int layerIndex = so.getLayerIndex();
                         if(layerIndex == -1){
-                            if (DEBUG_MODE){System.err.println("Camera " + cam + "is not tracked by ZUIST");}
+                            if (DEBUG_MODE){System.err.println("SceneObserver " + so + "is not tracked by ZUIST");}
                             return;
                         }
-                        double[] cameraBounds = cam.getOwningView().getVisibleRegion(cam);
+                        double[] vr = so.getVisibleRegion();
                         //update regions
-                        if(alt != prevAlts[layerIndex]){
-                            prevAlts[layerIndex] = alt;
-                            updateLevel(layerIndex, cameraBounds, alt);
+                        if(alt != so.getPreviousAltitude()){
+                            so.setPreviousAltitude(alt);
+                            updateLevel(layerIndex, vr, alt);
                         } else {
-                            updateVisibleRegions(layerIndex, cameraBounds);
+                            updateVisibleRegions(layerIndex, vr);
                         }
 
                     }
@@ -225,24 +225,25 @@ public class SceneManager implements CameraListener {
 }
 
     /** Scene Manager: Main ZUIST class instantiated by client application.
-     *@param vss virtual spaces in which the scene will be loaded
-     *@param cs cameras associated to those virtual spaces, through which the scene will be observed
+     *@param sos scene observers through which the scene will be observed.
      *@param properties properties that can be set on this scene manager.
      *@see #setProperties(HashMap properties)
      */
-    public SceneManager(VirtualSpace[] vss, Camera[] cs, HashMap<String,String> properties){
-        this.sceneLayers = vss;
-        this.sceneCameras = cs;
+    public SceneManager(SceneObserver[] sos, HashMap<String,String> properties){
+        this.sceneObservers = sos;
+        this.sceneLayers = new VirtualSpace[sos.length];
+        for (int i=0;i<sceneLayers.length;i++){
+            this.sceneLayers[i] = sceneObservers[i].getTargetVirtualSpace();
+        }
         this.setProperties(properties);
         regUpdater = new RegionUpdater();
-        prevAlts = new double[sceneCameras.length];
         glyphLoader = new GlyphLoader(this);
         id2region = new Hashtable<String,Region>();
         id2object = new Hashtable<String,ObjectDescription>();
         sceneAttrs = new HashMap(5,1);
         RESOURCE_HANDLERS = new HashMap<String, ResourceHandler>(5);
-        for(Camera cam: sceneCameras){
-            cam.addListener(this);
+        for(SceneObserver so:sceneObservers){
+            so.setSceneManager(this);
         }
     }
 
@@ -1033,22 +1034,23 @@ public class SceneManager implements CameraListener {
     updateLevel = b;
     //update level for every camera
     if(updateLevel){
-        for(Camera cam: sceneCameras){
-            updateLevel(getLayerIndex(cam),
-                    cam.getOwningView().getVisibleRegion(cam),
-                    cam.getAltitude());
+        for(SceneObserver so: sceneObservers){
+            updateLevel(getLayerIndex(so),
+                    so.getVisibleRegion(),
+                    so.getAltitude());
         }
     }
     }
 
     /** Notify altitude changes.
-     *@param altitude the new camera's altitude
+     *@param vr region visible through a SceneObserver
+     *@param altitude the new SceneObserver's altitude
      */
-    private void updateLevel(int layerIndex, double[] cameraBounds, double altitude){
+    private void updateLevel(int layerIndex, double[] vr, double soa){
         if (!updateLevel){return;}
         // find out new level
         for (int i=0;i<levels.length;i++){
-            if (levels[i].inRange(altitude)){currentLevel = i;break;}
+            if (levels[i].inRange(soa)){currentLevel = i;break;}
         }
         // compare to current level
         if (previousLevel != currentLevel){
@@ -1057,13 +1059,13 @@ public class SceneManager implements CameraListener {
             if (previousLevel >= 0){
                 exitLevel(previousLevel, currentLevel);
             }
-            enterLevel(layerIndex, cameraBounds, currentLevel, previousLevel);
+            enterLevel(layerIndex, vr, currentLevel, previousLevel);
             previousLevel = currentLevel;
         }
         else {
             // if level hasn't changed, it is still necessary to update
             // visible regions as some of them might have become (in)visible
-            updateVisibleRegions(layerIndex, cameraBounds);
+            updateVisibleRegions(layerIndex, vr);
         }
     }
 
@@ -1074,9 +1076,9 @@ public class SceneManager implements CameraListener {
         return currentLevel;
     }
 
-    private void enterLevel(int layerIndex, double[] cameraBounds, int depth, int prev_depth){
+    private void enterLevel(int layerIndex, double[] vr, int depth, int prev_depth){
         boolean arrivingFromHigherAltLevel = depth > prev_depth;
-        updateVisibleRegions(layerIndex, cameraBounds, depth, (arrivingFromHigherAltLevel) ? Region.TFUL : Region.TFLL);
+        updateVisibleRegions(layerIndex, vr, depth, (arrivingFromHigherAltLevel) ? Region.TFUL : Region.TFLL);
         if (levelListener != null){
             levelListener.enteredLevel(depth);
         }
@@ -1084,12 +1086,15 @@ public class SceneManager implements CameraListener {
 
     private void exitLevel(int depth, int new_depth){
         boolean goingToLowerAltLevel = new_depth > depth;
+        Region r;
         for (int i=0;i<levels[depth].regions.length;i++){
+            r = levels[depth].regions[i];
             // hide only if region does not span the level where we are going
-            if ((goingToLowerAltLevel && !levels[new_depth].contains(levels[depth].regions[i]))
-                || (!goingToLowerAltLevel && !levels[new_depth].contains(levels[depth].regions[i]))){
-                    levels[depth].regions[i].hide((goingToLowerAltLevel) ? Region.TTLL : Region.TTUL,
-                        sceneCameras[levels[depth].regions[i].li].vx, sceneCameras[levels[depth].regions[i].li].vy);
+            if ((goingToLowerAltLevel && !levels[new_depth].contains(r))
+                || (!goingToLowerAltLevel && !levels[new_depth].contains(r))){
+                    r.hide((goingToLowerAltLevel) ? Region.TTLL : Region.TTUL,
+                           sceneObservers[r.li].getX(),
+                           sceneObservers[r.li].getY());
             }
         }
         if (levelListener != null){
@@ -1105,19 +1110,19 @@ public class SceneManager implements CameraListener {
     /** Notify camera translations. It is up to the client application to notify the scene manager each time the position of the camera used to observe the scene changes.
      *
      */
-    private void updateVisibleRegions(int layerIndex, double[] cameraBounds){
+    private void updateVisibleRegions(int layerIndex, double[] vr){
         //called when an x-y movement occurs but no altitude change
-        updateVisibleRegions(layerIndex, cameraBounds, currentLevel, Region.TASL);
+        updateVisibleRegions(layerIndex, vr, currentLevel, Region.TASL);
     }
 
 
-    private void updateVisibleRegions(int layerIndex, double[] cameraBounds, int level, short transition){
+    private void updateVisibleRegions(int layerIndex, double[] vr, int level, short transition){
         try {
             for (int i=0;i<levels[level].regions.length;i++){
                 if(layerIndex != levels[level].regions[i].li){
                     continue;
                 }
-                levels[level].regions[i].updateVisibility(cameraBounds, currentLevel, transition, regionListener);
+                levels[level].regions[i].updateVisibility(vr, currentLevel, transition, regionListener);
             }
         }
         catch ( Exception e) {
@@ -1130,8 +1135,8 @@ public class SceneManager implements CameraListener {
 
     /** Update visible regions for all cameras. */
     public void updateVisibleRegions(){
-        for (Camera cam:sceneCameras){
-            updateVisibleRegions(getLayerIndex(cam), cam.getOwningView().getVisibleRegion(cam));
+        for (SceneObserver so:sceneObservers){
+            updateVisibleRegions(getLayerIndex(so), so.getVisibleRegion());
         }
     }
 
@@ -1157,6 +1162,20 @@ public class SceneManager implements CameraListener {
             return null;
         }
         return sceneLayers[layerIndex];
+    }
+
+    /**
+     * returns the layer index (0-based)
+     * of SceneObserver 'so', or -1 if 'so' does not belong
+     * to the scene observers tracked by this ZUIST instance.
+     */
+    private int getLayerIndex(SceneObserver so){
+        for(int i=0; i<sceneObservers.length; ++i){
+            if(sceneObservers[i] == so){
+                return i;
+            }
+        }
+        return -1;
     }
 
     // debug
@@ -1246,25 +1265,6 @@ public class SceneManager implements CameraListener {
             catch(IOException ex){if (DEBUG_MODE){System.err.println("Error: unable to make URL from path to: "+src);ex.printStackTrace();}}
         }
         return null;
-    }
-
-    /* Camera events handling */
-    public void cameraMoved(Camera cam, Point2D.Double loc, double alt){
-        regUpdater.addEntry(cam, new Location(loc.x, loc.y, alt));
-    }
-
-    /**
-     * returns the layer index (0-based)
-     * of camera 'cam', or -1 if 'cam' does not belong
-     * to cameras tracked by this ZUIST instance.
-     */
-    private int getLayerIndex(Camera cam){
-        for(int i=0; i<sceneCameras.length; ++i){
-            if(sceneCameras[i] == cam){
-                return i;
-            }
-        }
-        return -1;
     }
 
     /* ------------------ DEBUGGING --------------------- */

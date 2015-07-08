@@ -64,6 +64,8 @@ import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 import fr.inria.zvtm.animation.DefaultTimingHandler;
 
 import fr.inria.zuist.engine.SceneManager;
+import fr.inria.zuist.engine.SceneObserver;
+import fr.inria.zuist.engine.ViewSceneObserver;
 import fr.inria.zuist.engine.Region;
 import fr.inria.zuist.engine.Level;
 import fr.inria.zuist.event.RegionListener;
@@ -131,9 +133,10 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener, Obj
     public Viewer(ViewerOptions options){
         ovm = new OverlayManager(this);
         initGUI(options);
-        VirtualSpace[]  sceneSpaces = {mSpace};
-        Camera[] sceneCameras = {mCamera};
-        sm = new SceneManager(sceneSpaces, sceneCameras, Launcher.parseSceneOptions(options));
+        // VirtualSpace[]  sceneSpaces = {mSpace};
+        // Camera[] sceneCameras = {mCamera};
+        SceneObserver[] sceneObservers = {new ViewSceneObserver(mView, mCamera, mSpace)};
+        sm = new SceneManager(sceneObservers, Launcher.parseSceneOptions(options));
         sm.setRegionListener(this);
         sm.setLevelListener(this);
         sm.setObjectListener(this);

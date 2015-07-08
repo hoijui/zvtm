@@ -68,6 +68,8 @@ import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 import fr.inria.zvtm.event.RepaintListener;
 
 import fr.inria.zuist.engine.SceneManager;
+import fr.inria.zuist.engine.SceneObserver;
+import fr.inria.zuist.engine.ViewSceneObserver;
 import fr.inria.zuist.engine.Region;
 import fr.inria.zuist.event.ProgressListener;
 
@@ -122,9 +124,10 @@ public class TiledImageViewer {
         eh.nm = this.nm;
         gp = new WEGlassPane(this);
         ((JFrame)mView.getFrame()).setGlassPane(gp);
-        VirtualSpace[]  sceneSpaces = {mSpace};
-        Camera[] sceneCameras = {mCamera};
-        sm = new SceneManager(sceneSpaces, sceneCameras, Launcher.parseSceneOptions(options));
+        // VirtualSpace[]  sceneSpaces = {mSpace};
+        // Camera[] sceneCameras = {mCamera};
+        SceneObserver[] sceneObservers = {new ViewSceneObserver(mView, mCamera, mSpace)};
+        sm = new SceneManager(sceneObservers, Launcher.parseSceneOptions(options));
         if (options.smooth){
             Region.setDefaultTransitions(Region.FADE_IN, Region.FADE_OUT);
         }
