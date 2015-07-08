@@ -557,12 +557,12 @@ public abstract class FixedSizeLens extends Lens {
     /**returns bounds of rectangle representing virtual space's region seen through focus of lens and camera c [west,north,east,south]
      *@param c camera
      *@param res array which will contain the result */
-    public long[] getVisibleRegionInFocus(Camera c, long[] res){
+    public double[] getVisibleRegionInFocus(Camera c, double[] res){
         float uncoef = (float)((c.focal+c.altitude)/c.focal);
-        res[0] = (long)(c.vx + (lx-LR2/MM)*uncoef);
-        res[1] = (long)(c.vy + (-ly+LR2/MM)*uncoef);
-        res[2] = (long)(c.vx + (lx+LR2/MM)*uncoef);
-        res[3] = (long)(c.vy + (-ly-LR2/MM)*uncoef);
+        res[0] = c.vx + (lx-LR2/MM)*uncoef;
+        res[1] = c.vy + (-ly+LR2/MM)*uncoef;
+        res[2] = c.vx + (lx+LR2/MM)*uncoef;
+        res[3] = c.vy + (-ly-LR2/MM)*uncoef;
         return res;
     }
 
