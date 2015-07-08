@@ -41,6 +41,7 @@ import org.antlr.runtime.ANTLRFileStream;
 import org.antlr.runtime.CommonTokenStream;
 import org.antlr.runtime.RecognitionException;
 import org.antlr.runtime.tree.CommonTree;
+import org.antlr.runtime.tree.Tree;
 
 class AirTrafficManager {
 
@@ -116,9 +117,10 @@ class AirTrafficManager {
             GMLParser parser = new GMLParser(tokens);
             GMLParser.gmlgr_return parserResult = parser.gmlgr();
             CommonTree ast = (CommonTree) parserResult.getTree();
-            List<CommonTree> nodes = ast.getChildren();
+            // List<CommonTree> nodes = ast.getChildren();
             HashMap<String,LNode> id2node = new HashMap();
-            for (CommonTree node:nodes){
+            for (int i=0;i<ast.getChildCount();i++){
+                Tree node = ast.getChild(i);
                 if (node.getType() == GMLParser.NODE){
                     createAirportNode(node, id2node, iata2airport);
                 }
@@ -126,7 +128,8 @@ class AirTrafficManager {
             Vector<LNode> ans = new Vector(id2node.values());
             allNodes = (LNode[])ans.toArray(new LNode[ans.size()]);
             Vector<LEdge> aes = new Vector();
-            for (CommonTree node:nodes){
+            for (int i=0;i<ast.getChildCount();i++){
+                Tree node = ast.getChild(i);
                 if (node.getType() == GMLParser.EDGE){
                     LEdge e = createFlightEdge(node, id2node);
                     if (e != null){
@@ -158,12 +161,13 @@ class AirTrafficManager {
     static final String _source = "source";
     static final String _target = "target";
 
-    void createAirportNode(CommonTree node, HashMap<String,LNode> id2node, HashMap<String,Airport> iata2airport){
+    void createAirportNode(Tree node, HashMap<String,LNode> id2node, HashMap<String,Airport> iata2airport){
         String iataCode = null;
         String id = null;
         // get IATA code
-        List<CommonTree> nodes = node.getChildren();
-        for (CommonTree child:nodes){
+        // List<CommonTree> nodes = node.getChildren();
+        for (int i=0;i<node.getChildCount();i++){
+            Tree child = node.getChild(i);
             if (child.getText().equals(_id)){
                 id = child.getChild(0).getText();
             }
@@ -187,13 +191,15 @@ class AirTrafficManager {
         id2node.put(id, new LNode(iataCode, ap.name, ap.lat, ap.lng, shape, label));
     }
 
-    LEdge createFlightEdge(CommonTree node, HashMap<String,LNode> id2node){
+    LEdge createFlightEdge(Tree node, HashMap<String,LNode> id2node){
         LEdge res = null;
         int weight = 0;
         String src = null;
         String tgt= null;
-        List<CommonTree> nodes = node.getChildren();
-        for (CommonTree child:nodes){
+        // List<CommonTree> nodes = node.getChildren();
+        // for (CommonTree child:nodes){
+        for (int i=0;i<node.getChildCount();i++){
+            Tree child = node.getChild(i);
             if (child.getText().equals(_source)){
                 src = child.getChild(0).getText();
             }

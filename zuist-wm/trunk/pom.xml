@@ -78,7 +78,7 @@ $Id$
     <dependency>
           <groupId>org.antlr</groupId>
           <artifactId>antlr-runtime</artifactId>
-          <version>3.2</version>
+          <version>3.5.2</version>
         </dependency>
   </dependencies>
 
@@ -105,8 +105,8 @@ $Id$
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.3</version>
                 <configuration>
-                  <source>1.6</source>
-                  <target>1.6</target>
+                  <source>1.7</source>
+                  <target>1.7</target>
                   <excludes>
                     <exclude>**/*Wild*.java</exclude>
                   </excludes>
@@ -149,10 +149,11 @@ $Id$
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>aspectj-maven-plugin</artifactId>
-                    <version>1.2</version>
+                    <version>1.7</version>
                     <configuration>
-                        <source>1.6</source>
-                        <target>1.6</target>
+                        <source>1.7</source>
+                        <target>1.7</target>
+                        <complianceLevel>1.7</complianceLevel>
                         <showWeaveInfo>true</showWeaveInfo>
     <!--                    <aspectLibraries>
                             <aspectLibrary>
@@ -162,13 +163,21 @@ $Id$
                         </aspectLibraries> -->
                     </configuration>
                     <executions>
-                        <execution>
-                            <goals>
-                                <goal>compile</goal>
-                                <goal>test-compile</goal>
-                            </goals>
-                        </execution>
+                      <execution>
+                        <phase>process-sources</phase>
+                        <goals>
+                          <goal>compile</goal>
+                          <goal>test-compile</goal>
+                        </goals>
+                      </execution>
                     </executions>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.aspectj</groupId>
+                            <artifactId>aspectjtools</artifactId>
+                            <version>1.8.6</version>
+                        </dependency>
+                    </dependencies>
                 </plugin>
 
               <plugin>
@@ -176,8 +185,8 @@ $Id$
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.3</version>
                 <configuration>
-                  <source>1.6</source>
-                  <target>1.6</target>
+                  <source>1.7</source>
+                  <target>1.7</target>
                 </configuration>
               </plugin>
              <plugin>
@@ -218,7 +227,7 @@ $Id$
         <plugin>
         <groupId>org.antlr</groupId>
         <artifactId>antlr3-maven-plugin</artifactId>
-        <version>3.2</version>
+        <version>3.5.2</version>
         <configuration>
           <report>true</report>
         </configuration>

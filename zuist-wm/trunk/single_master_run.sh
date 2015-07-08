@@ -1,8 +1,8 @@
 #!/bin/bash
 
-IP="192.168.1.23"
+IP="172.20.10.2"
 
-JARS="target/aspectjrt-1.6.5.jar"
+JARS="target/aspectjrt-1.8.6.jar"
 JARS=$JARS":target/jgroups-2.7.0.GA.jar"
 JARS=$JARS":target/log4j-1.2.17.jar"
 JARS=$JARS":target/slf4j-api-1.7.10.jar"
