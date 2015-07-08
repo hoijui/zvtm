@@ -247,6 +247,18 @@ public class SceneManager {
         }
     }
 
+    public static SceneObserver[] buildObservers(VirtualSpace[] spaces, Camera[] cameras){
+        ViewSceneObserver[] sos = new ViewSceneObserver[cameras.length];
+        for (int i=0;i<cameras.length;i++){
+            sos[i] = new ViewSceneObserver(cameras[i].getOwningView(), cameras[i], spaces[i]);
+        }
+        return sos;
+    }
+
+    public SceneManager(VirtualSpace[] spaces, Camera[] cameras, HashMap<String,String> properties){
+        this(buildObservers(spaces, cameras), properties);
+    }
+
     /* -------------- Properties -------------------- */
 
     public static final String HTTP_AUTH_USER = "user";
