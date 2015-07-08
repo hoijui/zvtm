@@ -77,6 +77,8 @@ import fr.inria.zuist.event.RegionListener;
 import fr.inria.zuist.event.LevelListener;
 import fr.inria.zuist.event.ProgressListener;
 import fr.inria.zuist.engine.ObjectDescription;
+import fr.inria.zuist.engine.SceneObserver;
+import fr.inria.zuist.engine.ViewSceneObserver;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -190,9 +192,8 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 	    this.desktoponly =  options.desktop;
 	    ovm = new OverlayManager(this);
 	    initGUI(options);
-	    VirtualSpace[]  sceneSpaces = {mSpace};
-	    Camera[] sceneCameras = {mCamera};
-	    sm = new SceneManager(sceneSpaces, sceneCameras, parseSceneOptions(options));
+        SceneObserver[] sceneObservers = {new ViewSceneObserver(mView, mCamera, mSpace)};
+	    sm = new SceneManager(sceneObservers, parseSceneOptions(options));
 	    sm.setRegionListener(this);
 	    sm.setLevelListener(this);
 	    previousLocations = new Vector();

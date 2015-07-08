@@ -35,6 +35,7 @@ import fr.inria.zuist.engine.TextDescription;
 import fr.inria.zuist.engine.Level;
 import fr.inria.zuist.engine.Region;
 import fr.inria.zuist.engine.SceneManager;
+import fr.inria.zuist.engine.SceneObserver;
 
 aspect SceneManagerReplication {
     //instrument *createLevel, *createRegion, *destroyRegion,
@@ -49,21 +50,24 @@ aspect SceneManagerReplication {
         }
 
     pointcut sceneManagerCreation(SceneManager sceneManager,
-            VirtualSpace[] spaces, Camera[] cameras, HashMap<String,String> properties) :
-        execution(public SceneManager.new(VirtualSpace[], Camera[], HashMap<String,String>)) &&
+            SceneObserver[] observers, HashMap<String,String> properties) :
+        execution(public SceneManager.new(SceneObserver[], HashMap<String,String>)) &&
         if(VirtualSpaceManager.INSTANCE.isMaster()) &&
         this(sceneManager) &&
-        args(spaces, cameras, properties);
+        args(observers, properties);
 
     after(SceneManager sceneManager,
-            VirtualSpace[] spaces,
-            Camera cameras[],
+            SceneObserver[] observers,
             HashMap<String,String> properties)
         returning() :
-        sceneManagerCreation(sceneManager, spaces, cameras, properties) &&
-        !cflowbelow(sceneManagerCreation(SceneManager, VirtualSpace[], Camera[], HashMap<String,String>)){
-            for(VirtualSpace vs: spaces){
-                vs.setZuistOwned(true);
+        sceneManagerCreation(sceneManager, observers, properties) &&
+        !cflowbelow(sceneManagerCreation(SceneManager, SceneObserver[], HashMap<String,String>)){
+            VirtualSpace[] spaces = new VirtualSpace[observers.length];
+            Camera[] cameras = new Camera[observers.length];
+            for(int i=0;i<observers.length;i++){
+                observers[i].getTargetVirtualSpace().setZuistOwned(true);
+                spaces[i] = observers[i].getTargetVirtualSpace();
+                cameras[i] = observers[i].getCamera();
             }
 
             sceneManager.setReplicated(true);
