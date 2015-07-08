@@ -1,6 +1,6 @@
 #!/bin/bash
 
-LIB="target/aspectjrt-1.6.5.jar"
+LIB="target/aspectjrt-1.8.6.jar"
 LIB=$LIB":target/args4j-2.0.29.jar"
 LIB=$LIB":target/jgroups-2.7.0.GA.jar"
 LIB=$LIB":target/log4j-1.2.17.jar"
@@ -15,13 +15,12 @@ JAR="target/zuist-cluster-fits-0.2.0-SNAPSHOT.jar"
 
 rm target/zvtm-core-0.12.0-SNAPSHOT.jar
 
-IP=`ifconfig eth0 2>/dev/null|awk '/inet addr:/ {print $2}'|sed 's/addr://'`
+#IP=`ifconfig eth0 2>/dev/null|awk '/inet addr:/ {print $2}'|sed 's/addr://'`
+IP="172.18.43.41"
 
-python src/main/resources/scripts/wcs/daemon_wcsCoordinates.py &
+#python src/main/resources/scripts/wcs/daemon_wcsCoordinates.py &
 
 java -Djava.net.preferIPv4Stack=true -Djgroups.bind_addr="$IP" -Xmx4096M -Xms2048M -Dcom.sun.media.jai.disableMediaLib=true -cp $LIB:$JAR fr.inria.zuist.viewer.JSkyFitsViewer -r 1 -c 1 -bw 800 -bh 600 "$@"
 
-echo "killall -9 python"
-killall -9 python
-
-
+#echo "killall -9 python"
+#killall -9 python

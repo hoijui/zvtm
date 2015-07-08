@@ -1,6 +1,6 @@
 #!/bin/bash
 
-LIB="target/aspectjrt-1.6.5.jar"
+LIB="target/aspectjrt-1.8.6.jar"
 LIB=$LIB":target/args4j-2.0.29.jar"
 LIB=$LIB":target/jgroups-2.7.0.GA.jar"
 LIB=$LIB":target/log4j-1.2.17.jar"
@@ -23,4 +23,3 @@ java -Djava.net.preferIPv4Stack=true -Djgroups.bind_addr="$IP" -Xmx4096M -Xms204
 
 echo "killall -9 python"
 killall -9 python
-

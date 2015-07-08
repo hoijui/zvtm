@@ -612,72 +612,72 @@ aspect SceneManagerReplication {
 
 
 
-    pointcut createFitsImageDescription(SceneManager sceneManager, double x,
-            double y, String id, int zindex, Region region, URL resourceURL,
-            String type, boolean sensitivity, Color stroke, String params) :
-        execution(public ResourceDescription
-                SceneManager.createResourceDescription(double,
-                    double, String, int, Region,
-                    URL, String, boolean, Color, String)) &&
-        if(VirtualSpaceManager.INSTANCE.isMaster()) &&
-        if(type.equals(FitsResourceHandler.RESOURCE_TYPE_FITS)) &&
-        this(sceneManager) &&
-        args(x, y, id, zindex, region, resourceURL, type,
-                sensitivity, stroke, params);
-
-    after(SceneManager sceneManager,
-            double x, double y,
-            String id, int zindex, Region region,
-            URL imageURL, String type, boolean sensitivity,
-            Color stroke, String params)
-        returning(ResourceDescription rdesc):
-            createFitsImageDescription(sceneManager, x, y, id,
-                    zindex, region, imageURL, type, sensitivity,
-                    stroke, params) &&
-            !cflowbelow(createFitsImageDescription(SceneManager, double, double,
-                        String, int, Region, URL, String,
-                        boolean, Color, String)){
-                rdesc.setReplicated(true);
-
-                FitsImageCreateDelta delta = new FitsImageCreateDelta(
-                        id, sceneManager.getObjId(), rdesc.getObjId(),
-                        x,y,zindex,region.getObjId(), imageURL, params);
-                VirtualSpaceManager.INSTANCE.sendDelta(delta);
-            }
-
-    private static class FitsImageCreateDelta implements Delta {
-        private final String id;
-        private final ObjId<SceneManager> smId;
-        private final ObjId<Region> regionId;
-        private final ObjId<ResourceDescription> descId;
-        private final double x;
-        private final double y;
-        private final int z;
-        private final URL location;
-        private final String params;
-
-        FitsImageCreateDelta(String id, ObjId<SceneManager> smId,
-                ObjId<ResourceDescription> descId, double x, double y,
-                int z, ObjId<Region> regionId, URL location, String params){
-            this.id = id;
-            this.smId = smId;
-            this.regionId = regionId;
-            this.descId = descId;
-            this.x = x;
-            this.y = y;
-            this.z = z;
-            this.location = location;
-            this.params = params;
-        }
-
-        public void apply(SlaveUpdater su){
-            SceneManager sm = su.getSlaveObject(smId);
-            Region region = su.getSlaveObject(regionId);
-            ResourceDescription desc = sm.createResourceDescription(x,y,id,z,region,
-                    location,FitsResourceHandler.RESOURCE_TYPE_FITS,true,Color.BLACK,params);
-            su.putSlaveObject(descId, desc);
-        }
-    }
+    // pointcut createFitsImageDescription(SceneManager sceneManager, double x,
+    //         double y, String id, int zindex, Region region, URL resourceURL,
+    //         String type, boolean sensitivity, Color stroke, String params) :
+    //     execution(public ResourceDescription
+    //             SceneManager.createResourceDescription(double,
+    //                 double, String, int, Region,
+    //                 URL, String, boolean, Color, String)) &&
+    //     if(VirtualSpaceManager.INSTANCE.isMaster()) &&
+    //     if(type.equals(FitsResourceHandler.RESOURCE_TYPE_FITS)) &&
+    //     this(sceneManager) &&
+    //     args(x, y, id, zindex, region, resourceURL, type,
+    //             sensitivity, stroke, params);
+    //
+    // after(SceneManager sceneManager,
+    //         double x, double y,
+    //         String id, int zindex, Region region,
+    //         URL imageURL, String type, boolean sensitivity,
+    //         Color stroke, String params)
+    //     returning(ResourceDescription rdesc):
+    //         createFitsImageDescription(sceneManager, x, y, id,
+    //                 zindex, region, imageURL, type, sensitivity,
+    //                 stroke, params) &&
+    //         !cflowbelow(createFitsImageDescription(SceneManager, double, double,
+    //                     String, int, Region, URL, String,
+    //                     boolean, Color, String)){
+    //             rdesc.setReplicated(true);
+    //
+    //             FitsImageCreateDelta delta = new FitsImageCreateDelta(
+    //                     id, sceneManager.getObjId(), rdesc.getObjId(),
+    //                     x,y,zindex,region.getObjId(), imageURL, params);
+    //             VirtualSpaceManager.INSTANCE.sendDelta(delta);
+    //         }
+    //
+    // private static class FitsImageCreateDelta implements Delta {
+    //     private final String id;
+    //     private final ObjId<SceneManager> smId;
+    //     private final ObjId<Region> regionId;
+    //     private final ObjId<ResourceDescription> descId;
+    //     private final double x;
+    //     private final double y;
+    //     private final int z;
+    //     private final URL location;
+    //     private final String params;
+    //
+    //     FitsImageCreateDelta(String id, ObjId<SceneManager> smId,
+    //             ObjId<ResourceDescription> descId, double x, double y,
+    //             int z, ObjId<Region> regionId, URL location, String params){
+    //         this.id = id;
+    //         this.smId = smId;
+    //         this.regionId = regionId;
+    //         this.descId = descId;
+    //         this.x = x;
+    //         this.y = y;
+    //         this.z = z;
+    //         this.location = location;
+    //         this.params = params;
+    //     }
+    //
+    //     public void apply(SlaveUpdater su){
+    //         SceneManager sm = su.getSlaveObject(smId);
+    //         Region region = su.getSlaveObject(regionId);
+    //         ResourceDescription desc = sm.createResourceDescription(x,y,id,z,region,
+    //                 location,FitsResourceHandler.RESOURCE_TYPE_FITS,true,Color.BLACK,params);
+    //         su.putSlaveObject(descId, desc);
+    //     }
+    // }
 
 
 
