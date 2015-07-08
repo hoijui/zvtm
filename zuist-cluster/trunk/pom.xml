@@ -84,7 +84,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>aspectj-maven-plugin</artifactId>
-                <version>1.2</version>
+                <version>1.7</version>
                 <configuration>
                   <weaveDependencies>
                     <weaveDependency>
@@ -96,8 +96,9 @@
                       <artifactId>zvtm-cluster</artifactId>
                   </weaveDependency>
                   </weaveDependencies>
-                  <source>1.6</source>
-                  <target>1.6</target>
+                  <source>1.7</source>
+                  <target>1.7</target>
+                  <complianceLevel>1.7</complianceLevel>
                   <!--<showWeaveInfo>true</showWeaveInfo>-->
                   <aspectLibraries>
                     <aspectLibrary>
@@ -108,12 +109,20 @@
                 </configuration>
                 <executions>
                     <execution>
+                        <phase>process-sources</phase>
                         <goals>
                             <goal>compile</goal>
                             <goal>test-compile</goal>
                         </goals>
                     </execution>
                 </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.aspectj</groupId>
+                        <artifactId>aspectjtools</artifactId>
+                        <version>1.8.6</version>
+                    </dependency>
+                </dependencies>
             </plugin>
             <plugin>
               <groupId>org.apache.maven.plugins</groupId>
@@ -136,10 +145,10 @@
             <plugin>
               <groupId>org.apache.maven.plugins</groupId>
               <artifactId>maven-compiler-plugin</artifactId>
-              <version>2.3.2</version>
+              <version>3.3</version>
               <configuration>
-                <source>1.6</source>
-                <target>1.6</target>
+                <source>1.7</source>
+                <target>1.7</target>
               </configuration>
             </plugin>
             <plugin>
