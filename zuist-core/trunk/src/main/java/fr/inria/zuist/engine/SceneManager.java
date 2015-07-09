@@ -216,13 +216,13 @@ public class SceneManager {
                     active = false;
                     toUpdate.clear();
                  }
-        };
-        active = true;
-        Timer t = new Timer(period, action);
-        t.setRepeats(false);
-        t.start();
+            };
+            active = true;
+            Timer t = new Timer(period, action);
+            t.setRepeats(false);
+            t.start();
+        }
     }
-}
 
     /** Scene Manager: Main ZUIST class instantiated by client application.
      *@param sos scene observers through which the scene will be observed.
@@ -1161,13 +1161,6 @@ public class SceneManager {
     public void setFadeOutDuration(int d){
         glyphLoader.FADE_OUT_DURATION = d;
     }
-
-    // public VirtualSpace getSpaceByIndex(int layerIndex){
-    //     if ((layerIndex < 0) || (layerIndex > sceneLayers.length)){
-    //         return null;
-    //     }
-    //     return sceneLayers[layerIndex];
-    // }
 
     /**
      * returns the layer index (0-based)
