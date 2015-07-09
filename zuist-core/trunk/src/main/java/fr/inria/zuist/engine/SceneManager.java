@@ -138,7 +138,7 @@ public class SceneManager {
     Level[] levels = new Level[0];
 
     final LinkedHashMap<String,VirtualSpace> layers = new LinkedHashMap(5, .8f, false);
-    final SceneObserver[] sceneObservers;
+    SceneObserver[] sceneObservers;
     // final double[] prevAlts; //previous altitudes
     final RegionUpdater regUpdater;
 
@@ -302,6 +302,63 @@ public class SceneManager {
 
     public static String getHTTPPassword(){
         return SceneManager.httpPassword;
+    }
+
+    /* ------------------- Observers   -------------------- */
+
+    public void addSceneObserver(SceneObserver so){
+        // check that so is not already registered
+        for (int i=0;i<sceneObservers.length;i++){
+            if (so == sceneObservers[i]){
+                return;
+            }
+        }
+        // if not, register it
+        VirtualSpace vs = so.getTargetVirtualSpace();
+        if (!layers.containsKey(vs.getName())){
+            layers.put(vs.getName(), vs);
+        }
+        so.setSceneManager(this);
+        SceneObserver[] nsos = new SceneObserver[sceneObservers.length+1];
+        synchronized(sceneObservers){
+            System.arraycopy(sceneObservers, 0, nsos, 0, sceneObservers.length);
+            nsos[sceneObservers.length] = so;
+            sceneObservers = nsos;
+        }
+    }
+
+    public void removeSceneObserver(SceneObserver so){
+        // remove layer declaration if not observed by any other SceneObserver
+        String layer = so.getTargetVirtualSpace().getName();
+        if (layers.containsKey(layer)){
+            boolean layerObservedByAnotherSO = false;
+            for (SceneObserver so2:sceneObservers){
+                if (so2 != so && so2.getTargetVirtualSpace().getName().equals(layer)){
+                    layerObservedByAnotherSO = true;
+                    break;
+                }
+            }
+            if (!layerObservedByAnotherSO){
+                layers.remove(layer);
+            }
+        }
+        // find SceneObserver index
+        int soIndex = -1;
+        for (int i=0;i<sceneObservers.length;i++){
+            if (so == sceneObservers[i]){
+                soIndex = i;
+                break;
+            }
+        }
+        // remove from list of SceneObservers
+        if (soIndex != -1){
+            SceneObserver[] nsos = new SceneObserver[sceneObservers.length-1];
+            synchronized(sceneObservers){
+                System.arraycopy(sceneObservers, 0, nsos, 0, soIndex);
+                System.arraycopy(sceneObservers, soIndex+1, nsos, 0, sceneObservers.length - soIndex - 1);
+                sceneObservers = nsos;
+            }
+        }
     }
 
     /* -------------- Scene Management -------------------- */
@@ -1048,8 +1105,10 @@ public class SceneManager {
     updateLevel = b;
     //update level for every camera
     if(updateLevel){
-        for(SceneObserver so: sceneObservers){
-            updateLevel(so);
+        synchronized(sceneObservers){
+            for(SceneObserver so: sceneObservers){
+                updateLevel(so);
+            }
         }
     }
     }
@@ -1149,8 +1208,10 @@ public class SceneManager {
 
     /** Update visible regions for all cameras. */
     public void updateVisibleRegions(){
-        for (SceneObserver so:sceneObservers){
-            updateVisibleRegions(so.getTargetVirtualSpace(), so.getVisibleRegion());
+        synchronized(sceneObservers){
+            for (SceneObserver so:sceneObservers){
+                updateVisibleRegions(so.getTargetVirtualSpace(), so.getVisibleRegion());
+            }
         }
     }
 
@@ -1160,20 +1221,6 @@ public class SceneManager {
 
     public void setFadeOutDuration(int d){
         glyphLoader.FADE_OUT_DURATION = d;
-    }
-
-    /**
-     * returns the layer index (0-based)
-     * of SceneObserver 'so', or -1 if 'so' does not belong
-     * to the scene observers tracked by this ZUIST instance.
-     */
-    private int getLayerIndex(SceneObserver so){
-        for(int i=0; i<sceneObservers.length; ++i){
-            if(sceneObservers[i] == so){
-                return i;
-            }
-        }
-        return -1;
     }
 
     // debug
