@@ -60,12 +60,12 @@ public class SceneFragmentDescription extends ResourceDescription {
             try {
                 File sceneFile = new File(src.toURI());
                 File sceneFileDirectory = sceneFile.getParentFile();
-                Document scene = SceneManager.parseXML(sceneFile);
-                NodeList nl = scene.getDocumentElement().getElementsByTagName(SceneManager._region);
+                Document scene = SceneBuilder.parseXML(sceneFile);
+                NodeList nl = scene.getDocumentElement().getElementsByTagName(SceneBuilder._region);
                 HashMap<String,String> regionName2containerRegionName = new HashMap<String,String>(nl.getLength(),1);
                 regions = new Vector<Region>(nl.getLength());
                 for (int i=0;i<nl.getLength();i++){
-                    regions.add(sm.processRegion((Element)nl.item(i), regionName2containerRegionName, sceneFileDirectory));
+                    regions.add(sm.getSceneBuilder().processRegion((Element)nl.item(i), regionName2containerRegionName, sceneFileDirectory));
                 }
                 sm.updateVisibleRegions();
             }
@@ -77,11 +77,11 @@ public class SceneFragmentDescription extends ResourceDescription {
     public void destroyObject(SceneManager sm, VirtualSpace vs, boolean fadeOut){
         if (regions != null){
             for (Region region:regions){
-                sm.destroyRegion(region);
+                sm.getSceneBuilder().destroyRegion(region);
             }
             regions = null;
         }
-        sm.destroySceneFragment(this);
+        sm.getSceneBuilder().destroySceneFragment(this);
     }
 
     /** Does not return anything since this is a scene fragment. */

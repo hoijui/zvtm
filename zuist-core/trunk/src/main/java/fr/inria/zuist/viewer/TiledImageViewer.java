@@ -68,6 +68,7 @@ import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 import fr.inria.zvtm.event.RepaintListener;
 
 import fr.inria.zuist.engine.SceneManager;
+import fr.inria.zuist.engine.SceneBuilder;
 import fr.inria.zuist.engine.SceneObserver;
 import fr.inria.zuist.engine.ViewSceneObserver;
 import fr.inria.zuist.engine.Region;
@@ -134,8 +135,8 @@ public class TiledImageViewer {
         if (options.zuistScenePath != null){
             loadScene(new File(options.zuistScenePath));
             HashMap sa = sm.getSceneAttributes();
-            if (sa.containsKey(SceneManager._background)){
-                BACKGROUND_COLOR = (Color)sa.get(SceneManager._background);
+            if (sa.containsKey(SceneBuilder._background)){
+                BACKGROUND_COLOR = (Color)sa.get(SceneBuilder._background);
             }
         }
         if (BACKGROUND_COLOR.getRGB() == -1){
@@ -278,10 +279,10 @@ public class TiledImageViewer {
         gp.setVisible(true);
         SCENE_FILE = xmlSceneFile;
         SCENE_FILE_DIR = SCENE_FILE.getParentFile();
-        sm.loadScene(SceneManager.parseXML(SCENE_FILE), SCENE_FILE_DIR, true, gp);
+        sm.loadScene(SceneBuilder.parseXML(SCENE_FILE), SCENE_FILE_DIR, true, gp);
         HashMap sceneAttributes = sm.getSceneAttributes();
-        if (sceneAttributes.containsKey(SceneManager._background)){
-            mView.setBackgroundColor((Color)sceneAttributes.get(SceneManager._background));
+        if (sceneAttributes.containsKey(SceneBuilder._background)){
+            mView.setBackgroundColor((Color)sceneAttributes.get(SceneBuilder._background));
         }
         gp.setVisible(false);
         gp.setLabel(WEGlassPane.EMPTY_STRING);
