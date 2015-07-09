@@ -30,7 +30,6 @@ aspect AutoReplay extends AbstractAutoReplay {
          execution(public void SceneManager.setOrigin(Point2D.Double)) ||
          execution(public void SceneManager.enableRegionUpdater(boolean)) ||
          execution(public void SceneManager.updateVisibleRegions()) ||
-         execution(public void SceneBuilder.foo()) ||
          execution(public void Region.setContainingRegion(Region)) ||
          execution(public void Region.addContainedRegion(Region))
         );
