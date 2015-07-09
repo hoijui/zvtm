@@ -71,6 +71,7 @@ import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 
 import fr.inria.zuist.engine.SceneManager;
+import fr.inria.zuist.engine.SceneBuilder;
 import fr.inria.zuist.engine.Region;
 import fr.inria.zuist.engine.Level;
 import fr.inria.zuist.event.RegionListener;
@@ -532,7 +533,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		sm.enableRegionUpdater(false);
 		for (int l = 0; l < sm.getLevelCount(); l++)
 		{
-			sm.destroyRegionsAtLevel(l);
+			sm.getSceneBuilder().destroyRegionsAtLevel(l);
 		}
 		sm.shutdown();
 		sm = null;
@@ -597,11 +598,11 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		gp.setVisible(true);
 		SCENE_FILE = xmlSceneFile;
 		SCENE_FILE_DIR = SCENE_FILE.getParentFile();
-		sm.loadScene(SceneManager.parseXML(SCENE_FILE), SCENE_FILE_DIR, true, gp);
+		sm.loadScene(SceneBuilder.parseXML(SCENE_FILE), SCENE_FILE_DIR, true, gp);
 		HashMap sceneAttributes = sm.getSceneAttributes();
-		if (sceneAttributes.containsKey(SceneManager._background)){
-			mView.setBackgroundColor((Color)sceneAttributes.get(SceneManager._background));
-			clusteredView.setBackgroundColor((Color)sceneAttributes.get(SceneManager._background));
+		if (sceneAttributes.containsKey(SceneBuilder._background)){
+			mView.setBackgroundColor((Color)sceneAttributes.get(SceneBuilder._background));
+			clusteredView.setBackgroundColor((Color)sceneAttributes.get(SceneBuilder._background));
 		}
 		MAX_NB_REQUESTS = sm.getObjectCount() / 100;
 		gp.setVisible(false);
