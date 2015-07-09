@@ -656,10 +656,6 @@ public class SceneBuilder {
         sm.setOrigin(new Point2D.Double(0, 0));
     }
 
-    public void foo(){
-
-    }
-
     /* -------------- Utils ------------------- */
 
     public static Document parseXML(File f){
