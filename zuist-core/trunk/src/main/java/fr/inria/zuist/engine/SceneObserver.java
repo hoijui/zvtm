@@ -17,10 +17,6 @@ public interface SceneObserver {
 
     public double getAltitude();
 
-    void setLayerIndex(int li);
-
-    public int getLayerIndex();
-
     void setPreviousAltitude(double a);
 
     double getPreviousAltitude();

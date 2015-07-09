@@ -25,7 +25,6 @@ public class PortalSceneObserver implements SceneObserver, CameraListener {
     CameraPortal cp;
     Camera c;
     VirtualSpace vs;
-    int layerIndex;
 
     /**
      *@param observingPortal portal that observes the scene
@@ -61,14 +60,6 @@ public class PortalSceneObserver implements SceneObserver, CameraListener {
 
     public VirtualSpace getTargetVirtualSpace(){
         return vs;
-    }
-
-    public int getLayerIndex(){
-        return layerIndex;
-    }
-
-    public void setLayerIndex(int li){
-        this.layerIndex = li;
     }
 
     /* Camera events handling */

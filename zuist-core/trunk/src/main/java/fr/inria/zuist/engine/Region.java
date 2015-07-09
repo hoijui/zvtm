@@ -173,16 +173,6 @@ public class Region {
         return title;
     }
 
-    /** Set this region's layer. */
-    public void setLayer(VirtualSpace l){
-        layer = l;
-    }
-
-    /** Get this region's layer. */
-    public VirtualSpace getLayerIndex(){
-        return layer;
-    }
-
     /** Get index of highest and lowest levels this region belongs to.
      */
     public int getHighestLevel(){

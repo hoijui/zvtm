@@ -27,7 +27,6 @@ public class LensSceneObserver implements SceneObserver, CameraListener {
     Camera c;
     Lens l;
     VirtualSpace vs;
-    int layerIndex;
 
     /**
      *@param observingView view that observes the scene
@@ -73,14 +72,6 @@ public class LensSceneObserver implements SceneObserver, CameraListener {
 
     public VirtualSpace getTargetVirtualSpace(){
         return vs;
-    }
-
-    public int getLayerIndex(){
-        return layerIndex;
-    }
-
-    public void setLayerIndex(int li){
-        this.layerIndex = li;
     }
 
     /* Camera events handling */
