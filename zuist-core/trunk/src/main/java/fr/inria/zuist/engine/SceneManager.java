@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.Vector;
 import java.util.Hashtable;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -136,7 +137,7 @@ public class SceneManager {
 
     Level[] levels = new Level[0];
 
-    final VirtualSpace[] sceneLayers;
+    final LinkedHashMap<String,VirtualSpace> layers = new LinkedHashMap(5, .8f, false);
     final SceneObserver[] sceneObservers;
     // final double[] prevAlts; //previous altitudes
     final RegionUpdater regUpdater;
@@ -198,18 +199,17 @@ public class SceneManager {
                         // Camera cam = entry.getKey();
                         SceneObserver so = entry.getKey();
                         double alt = entry.getValue().alt;
-                        int layerIndex = so.getLayerIndex();
-                        if(layerIndex == -1){
+                        VirtualSpace layer = so.getTargetVirtualSpace();
+                        if(!layers.containsKey(layer.getName())){
                             if (DEBUG_MODE){System.err.println("SceneObserver " + so + "is not tracked by ZUIST");}
                             return;
                         }
-                        double[] vr = so.getVisibleRegion();
                         //update regions
                         if(alt != so.getPreviousAltitude()){
                             so.setPreviousAltitude(alt);
-                            updateLevel(layerIndex, vr, alt);
+                            updateLevel(so);
                         } else {
-                            updateVisibleRegions(layerIndex, vr);
+                            updateVisibleRegions(layer, so.getVisibleRegion());
                         }
 
                     }
@@ -231,9 +231,9 @@ public class SceneManager {
      */
     public SceneManager(SceneObserver[] sos, HashMap<String,String> properties){
         this.sceneObservers = sos;
-        this.sceneLayers = new VirtualSpace[sos.length];
-        for (int i=0;i<sceneLayers.length;i++){
-            this.sceneLayers[i] = sceneObservers[i].getTargetVirtualSpace();
+        for (int i=0;i<sceneObservers.length;i++){
+            VirtualSpace vs = sceneObservers[i].getTargetVirtualSpace();
+            layers.put(vs.getName(), vs);
         }
         this.setProperties(properties);
         regUpdater = new RegionUpdater();
@@ -255,8 +255,8 @@ public class SceneManager {
         return sos;
     }
 
-    public SceneManager(VirtualSpace[] spaces, Camera[] cameras, HashMap<String,String> properties){
-        this(buildObservers(spaces, cameras), properties);
+    public SceneManager(VirtualSpace[] targetSpaces, Camera[] observingCameras, HashMap<String,String> properties){
+        this(buildObservers(targetSpaces, observingCameras), properties);
     }
 
     /* -------------- Properties -------------------- */
@@ -628,7 +628,7 @@ public class SceneManager {
      *@param lowestLevel index of lowest level in level span for this region (highestLevel <= lowestLevel)
      *@param id region ID
      *@param title region's title (metadata)
-     *@param li layer index (information layer/space in which objects will be put)
+     *@param layer name of VirtualSpace in which objects will be put
      *@param transitions a 4-element array with values in Region.{FADE_IN, FADE_OUT, APPEAR, DISAPPEAR}, corresponding to
                          transitions from upper level, from lower level, to upper level, to lower level.
      *@param requestOrdering how requests for loading / unloading objects should be ordered when
@@ -640,9 +640,10 @@ public class SceneManager {
      *@see Region#addContainedRegion(Region r)
      */
     public Region createRegion(double x, double y, double w, double h, int highestLevel, int lowestLevel,
-                               String id, String title, int li, short[] transitions, short requestOrdering,
+                               String id, String title, String layer, short[] transitions, short requestOrdering,
                                boolean sensitivity, Color fill, Color stroke){
-        Region region = new Region(x+origin.x, y+origin.y, w, h, highestLevel, lowestLevel, id, li, transitions, requestOrdering, this);
+        VirtualSpace vs = layers.get(layer);
+        Region region = new Region(x+origin.x, y+origin.y, w, h, highestLevel, lowestLevel, id, vs, transitions, requestOrdering, this);
         if (!id2region.containsKey(id)){
             id2region.put(id, region);
         }
@@ -672,7 +673,7 @@ public class SceneManager {
         }
         if (fill != null || stroke != null || sensitivity){
             // add the rectangle representing the region only if it is visible or sensitive
-            sceneLayers[li].addGlyph(r);
+            layers.get(layer).addGlyph(r);
         }
         region.setGlyph(r);
         r.setOwner(region);
@@ -691,10 +692,11 @@ public class SceneManager {
             regionEL.hasAttribute(_tfll) ? Region.parseTransition(regionEL.getAttribute(_tfll)) : Region.DEFAULT_F_TRANSITION,
             regionEL.hasAttribute(_ttul) ? Region.parseTransition(regionEL.getAttribute(_ttul)) : Region.DEFAULT_T_TRANSITION,
             regionEL.hasAttribute(_ttll) ? Region.parseTransition(regionEL.getAttribute(_ttll)) : Region.DEFAULT_T_TRANSITION};
-        int li = getLayerIndex(regionEL.getAttribute(_layer));
-        if (li == -1){
-            // put region in first virtual space (assumed to be the only one if yields -1) corresponding to a layer
-            li = 0;
+        String layer = regionEL.getAttribute(_layer);
+        if (!layers.containsKey(layer)){
+            // if no layer information is provided,
+            // put the region in the first layer that was declared to the SceneManager
+            layer = layers.keySet().iterator().next();
         }
         boolean sensitivity = (regionEL.hasAttribute(_sensitive)) ? Boolean.parseBoolean(regionEL.getAttribute(_sensitive)) : false;
         String title = regionEL.getAttribute(_title);
@@ -709,7 +711,7 @@ public class SceneManager {
         else {// level information given as, e.g., 2, short for 2;2 (single level)
             lowestLevel = highestLevel = Integer.parseInt(levelStr);
         }
-        Region region = createRegion(x, y, w, h, highestLevel, lowestLevel, id, title, li, transitions,
+        Region region = createRegion(x, y, w, h, highestLevel, lowestLevel, id, title, layer, transitions,
                                      (regionEL.hasAttribute(_ro)) ? Region.parseOrdering(regionEL.getAttribute(_ro)) : Region.ORDERING_DISTANCE,
                                      sensitivity, fill, stroke);
         String containerID = (regionEL.hasAttribute(_containedIn)) ? regionEL.getAttribute(_containedIn) : null;
@@ -753,7 +755,7 @@ public class SceneManager {
             levels[i].removeRegion(r);
         }
         if (r.getBounds() != null){
-            sceneLayers[r.li].removeGlyph(r.getBounds());
+            layers.get(r.layer).removeGlyph(r.getBounds());
         }
     }
 
@@ -1047,9 +1049,7 @@ public class SceneManager {
     //update level for every camera
     if(updateLevel){
         for(SceneObserver so: sceneObservers){
-            updateLevel(getLayerIndex(so),
-                    so.getVisibleRegion(),
-                    so.getAltitude());
+            updateLevel(so);
         }
     }
     }
@@ -1058,26 +1058,28 @@ public class SceneManager {
      *@param vr region visible through a SceneObserver
      *@param altitude the new SceneObserver's altitude
      */
-    private void updateLevel(int layerIndex, double[] vr, double soa){
+    private void updateLevel(SceneObserver so){
         if (!updateLevel){return;}
+        double soa = so.getAltitude();
         // find out new level
         for (int i=0;i<levels.length;i++){
             if (levels[i].inRange(soa)){currentLevel = i;break;}
         }
+        double[] vr = so.getVisibleRegion();
         // compare to current level
         if (previousLevel != currentLevel){
             // it is important that exitLevel() gets called before enterLevel()
             // because of regions spanning multiple levels that get checked in exitLevel()
             if (previousLevel >= 0){
-                exitLevel(previousLevel, currentLevel);
+                exitLevel(so, previousLevel, currentLevel);
             }
-            enterLevel(layerIndex, vr, currentLevel, previousLevel);
+            enterLevel(so.getTargetVirtualSpace(), vr, currentLevel, previousLevel);
             previousLevel = currentLevel;
         }
         else {
             // if level hasn't changed, it is still necessary to update
             // visible regions as some of them might have become (in)visible
-            updateVisibleRegions(layerIndex, vr);
+            updateVisibleRegions(so.getTargetVirtualSpace(), vr);
         }
     }
 
@@ -1088,15 +1090,15 @@ public class SceneManager {
         return currentLevel;
     }
 
-    private void enterLevel(int layerIndex, double[] vr, int depth, int prev_depth){
+    private void enterLevel(VirtualSpace layer, double[] vr, int depth, int prev_depth){
         boolean arrivingFromHigherAltLevel = depth > prev_depth;
-        updateVisibleRegions(layerIndex, vr, depth, (arrivingFromHigherAltLevel) ? Region.TFUL : Region.TFLL);
+        updateVisibleRegions(layer, vr, depth, (arrivingFromHigherAltLevel) ? Region.TFUL : Region.TFLL);
         if (levelListener != null){
             levelListener.enteredLevel(depth);
         }
     }
 
-    private void exitLevel(int depth, int new_depth){
+    private void exitLevel(SceneObserver so, int depth, int new_depth){
         boolean goingToLowerAltLevel = new_depth > depth;
         Region r;
         for (int i=0;i<levels[depth].regions.length;i++){
@@ -1105,8 +1107,8 @@ public class SceneManager {
             if ((goingToLowerAltLevel && !levels[new_depth].contains(r))
                 || (!goingToLowerAltLevel && !levels[new_depth].contains(r))){
                     r.hide((goingToLowerAltLevel) ? Region.TTLL : Region.TTUL,
-                           sceneObservers[r.li].getX(),
-                           sceneObservers[r.li].getY());
+                           so.getX(),
+                           so.getY());
             }
         }
         if (levelListener != null){
@@ -1122,16 +1124,16 @@ public class SceneManager {
     /** Notify camera translations. It is up to the client application to notify the scene manager each time the position of the camera used to observe the scene changes.
      *
      */
-    private void updateVisibleRegions(int layerIndex, double[] vr){
+    private void updateVisibleRegions(VirtualSpace layer, double[] vr){
         //called when an x-y movement occurs but no altitude change
-        updateVisibleRegions(layerIndex, vr, currentLevel, Region.TASL);
+        updateVisibleRegions(layer, vr, currentLevel, Region.TASL);
     }
 
 
-    private void updateVisibleRegions(int layerIndex, double[] vr, int level, short transition){
+    private void updateVisibleRegions(VirtualSpace layer, double[] vr, int level, short transition){
         try {
             for (int i=0;i<levels[level].regions.length;i++){
-                if(layerIndex != levels[level].regions[i].li){
+                if(layer != levels[level].regions[i].layer){
                     continue;
                 }
                 levels[level].regions[i].updateVisibility(vr, currentLevel, transition, regionListener);
@@ -1148,7 +1150,7 @@ public class SceneManager {
     /** Update visible regions for all cameras. */
     public void updateVisibleRegions(){
         for (SceneObserver so:sceneObservers){
-            updateVisibleRegions(getLayerIndex(so), so.getVisibleRegion());
+            updateVisibleRegions(so.getTargetVirtualSpace(), so.getVisibleRegion());
         }
     }
 
@@ -1160,21 +1162,12 @@ public class SceneManager {
         glyphLoader.FADE_OUT_DURATION = d;
     }
 
-    int getLayerIndex(String spaceName){
-        for (int i=0;i<sceneLayers.length;i++){
-            if (sceneLayers[i].getName().equals(spaceName)){
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    public VirtualSpace getSpaceByIndex(int layerIndex){
-        if ((layerIndex < 0) || (layerIndex > sceneLayers.length)){
-            return null;
-        }
-        return sceneLayers[layerIndex];
-    }
+    // public VirtualSpace getSpaceByIndex(int layerIndex){
+    //     if ((layerIndex < 0) || (layerIndex > sceneLayers.length)){
+    //         return null;
+    //     }
+    //     return sceneLayers[layerIndex];
+    // }
 
     /**
      * returns the layer index (0-based)

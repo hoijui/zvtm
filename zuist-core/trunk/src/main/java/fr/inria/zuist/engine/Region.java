@@ -13,6 +13,7 @@ import java.util.Vector;
 
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VRectangle;
+import fr.inria.zvtm.engine.VirtualSpace;
 
 import fr.inria.zuist.event.RegionListener;
 
@@ -106,8 +107,8 @@ public class Region {
     String id;
     String title;
 
-    // virtual space/layer index (in SceneManager)
-    int li = 0;
+    // virtual space/layer
+    VirtualSpace layer;
 
     Region containingRegion = null;
     Region[] containedRegions = new Region[0];
@@ -136,19 +137,19 @@ public class Region {
      *@param highestLevel index of highest level in level span for this region (highestLevel <= lowestLevel)
      *@param lowestLevel index of lowest level in level span for this region (highestLevel <= lowestLevel)
      *@param id region ID
-     *@param li layer index (information layer/space in which objects will be put)
+     *@param layer VirtualSpace in which objects will be put
      *@param transitions a 4-element array with values in Region.{FADE_IN, FADE_OUT, APPEAR, DISAPPEAR}, corresponding to
                          transitions from upper level, from lower level, to upper level, to lower level.
      */
     Region(double x, double y, double w, double h, int highestLevel, int lowestLevel,
-           String id, int li, short[] trans, short ro, SceneManager sm){
+           String id, VirtualSpace layer, short[] trans, short ro, SceneManager sm){
         this.x = x;
         this.y = y;
         this.w = w;
         this.h = h;
         this.hli = highestLevel;
         this.lli = lowestLevel;
-        this.li = li;
+        this.layer = layer;
         wnes = new double[4];
         setGeometry(x, y, w, h);
         this.id = id;
@@ -172,14 +173,14 @@ public class Region {
         return title;
     }
 
-    /** Set this region's layer index. */
-    public void setLayerIndex(int i){
-        li = i;
+    /** Set this region's layer. */
+    public void setLayer(VirtualSpace l){
+        layer = l;
     }
 
-    /** Get this region's layer index. */
-    public int getLayerIndex(){
-        return li;
+    /** Get this region's layer. */
+    public VirtualSpace getLayerIndex(){
+        return layer;
     }
 
     /** Get index of highest and lowest levels this region belongs to.
@@ -435,7 +436,7 @@ public class Region {
         }
         boolean fade = (transition == TASL) ? false : transitions[transition] == FADE_IN;
         for (int i=0;i<objects.length;i++){
-            sm.glyphLoader.addLoadRequest(li, objects[i], fade);
+            sm.glyphLoader.addLoadRequest(layer, objects[i], fade);
         }
         wviv = true;
     }
@@ -452,7 +453,7 @@ public class Region {
         }
         boolean fade = (transition == TASL) ? false : transitions[transition] == FADE_OUT;
         for (int i=0;i<objects.length;i++){
-            sm.glyphLoader.addUnloadRequest(li, objects[i], fade);
+            sm.glyphLoader.addUnloadRequest(layer, objects[i], fade);
         }
         wviv = false;
     }

@@ -44,18 +44,17 @@ class GlyphLoader {
      *@param od description of object to be loaded.
      *@param transition one of Region.{APPEAR,FADE_IN}
      */
-    public void addLoadRequest(int layerIndex, ObjectDescription od, boolean transition){
+    public void addLoadRequest(VirtualSpace targetLayer, ObjectDescription od, boolean transition){
         if(tasks.remove(od, LoadAction.UNLOAD)){
             return;
         }
         tasks.put(od, LoadAction.LOAD);
 
-        final VirtualSpace target = sceneManager.getSpaceByIndex(layerIndex);
-        if(target == null){
-            if (SceneManager.getDebugMode()){System.err.println("addLoadRequest: could not retrieve virtual space "+layerIndex);}
+        if(targetLayer == null){
+            if (SceneManager.getDebugMode()){System.err.println("addLoadRequest: could not retrieve virtual space "+targetLayer);}
             return;
         }
-        loader.submit(new Request(this.sceneManager, target, od, transition));
+        loader.submit(new Request(this.sceneManager, targetLayer, od, transition));
     }
 
     /**
@@ -69,19 +68,18 @@ class GlyphLoader {
      *@param od description of object to be loaded.
      *@param transition one of Region.{DISAPPEAR,FADE_OUT}
      */
-    public void addUnloadRequest(int layerIndex, ObjectDescription od, boolean transition){
+    public void addUnloadRequest(VirtualSpace targetLayer, ObjectDescription od, boolean transition){
         if(tasks.remove(od, LoadAction.LOAD)){
             return;
         }
 
         tasks.put(od, LoadAction.UNLOAD);
 
-        final VirtualSpace target = sceneManager.getSpaceByIndex(layerIndex);
-        if(target == null){
-            if (SceneManager.getDebugMode()){System.err.println("addLoadRequest: could not retrieve virtual space"+layerIndex);}
+        if(targetLayer == null){
+            if (SceneManager.getDebugMode()){System.err.println("addLoadRequest: could not retrieve virtual space"+targetLayer);}
             return;
         }
-        loader.submit(new Request(this.sceneManager, target, od, transition));
+        loader.submit(new Request(this.sceneManager, targetLayer, od, transition));
     }
 
     private class Request implements Runnable {
@@ -117,4 +115,3 @@ class GlyphLoader {
         }
     }
 }
-
