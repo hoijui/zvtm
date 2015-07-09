@@ -43,6 +43,10 @@ public class LensSceneObserver implements SceneObserver, CameraListener {
         this.vs = targetVirtualSpace;
     }
 
+    public Camera getCamera(){
+        return c;
+    }
+
     public double[] getVisibleRegion(){
         return l.getVisibleRegion(c, new double[4]);
     }

@@ -8,6 +8,7 @@
 package fr.inria.zuist.engine;
 
 import fr.inria.zvtm.engine.VirtualSpace;
+import fr.inria.zvtm.engine.Camera;
 import fr.inria.zuist.engine.SceneManager;
 
 public interface SceneObserver {
@@ -31,5 +32,7 @@ public interface SceneObserver {
     public VirtualSpace getTargetVirtualSpace();
 
     void setSceneManager(SceneManager sm);
+
+    public Camera getCamera();
 
 }

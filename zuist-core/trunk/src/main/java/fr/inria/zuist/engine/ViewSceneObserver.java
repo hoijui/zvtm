@@ -38,6 +38,10 @@ public class ViewSceneObserver implements SceneObserver, CameraListener {
         this.vs = targetVirtualSpace;
     }
 
+    public Camera getCamera(){
+        return c;
+    }
+
     public double[] getVisibleRegion(){
         return v.getVisibleRegion(c);
     }
