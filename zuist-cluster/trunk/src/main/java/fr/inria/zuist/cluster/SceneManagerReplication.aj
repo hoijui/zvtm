@@ -147,32 +147,32 @@ aspect SceneManagerReplication {
     pointcut createRegion(SceneManager sceneManager,
             double x, double y, double w, double h,
             int highestLevel, int lowestLevel,
-            String id, String title, int li, short[] transitions,
+            String id, String title, String layer, short[] transitions,
             short requestOrdering, boolean sensitivity, Color fill,
             Color stroke) :
         execution(public Region SceneManager.createRegion(double, double, double, double,
-                    int, int, String, String, int, short[], short, boolean,
+                    int, int, String, String, String, short[], short, boolean,
                     Color, Color)) &&
         if(VirtualSpaceManager.INSTANCE.isMaster()) &&
         this(sceneManager) &&
         args(x, y, w, h,
             highestLevel, lowestLevel,
-            id, title, li, transitions,
+            id, title, layer, transitions,
             requestOrdering, sensitivity, fill,
             stroke);
 
     after(SceneManager sceneManager, double x, double y, double w, double h,
             int highestLevel, int lowestLevel,
-            String id, String title, int li, short[] transitions,
+            String id, String title, String layer, short[] transitions,
             short requestOrdering, boolean sensitivity, Color fill,
             Color stroke) returning(Region region):
         createRegion(sceneManager, x, y, w, h, highestLevel, lowestLevel,
-                id, title, li, transitions,
+                id, title, layer, transitions,
                 requestOrdering, sensitivity, fill,
                 stroke) &&
         if(VirtualSpaceManager.INSTANCE.isMaster()) &&
         !cflowbelow(createRegion(SceneManager, double, double, double, double, int, int,
-                String, String, int, short[], short, boolean, Color, Color)){
+                String, String, String, short[], short, boolean, Color, Color)){
             region.setReplicated(true);
 
             RegionCreateDelta delta = new RegionCreateDelta(
@@ -180,7 +180,7 @@ aspect SceneManagerReplication {
                     region.getObjId(),
                     x, y, w, h,
                     highestLevel, lowestLevel,
-                    id, title, li, transitions,
+                    id, title, layer, transitions,
                     requestOrdering, sensitivity, fill,
                     stroke);
             VirtualSpaceManager.INSTANCE.sendDelta(delta);
@@ -197,7 +197,7 @@ aspect SceneManagerReplication {
         private final int lowestLevel;
         private final String id;
         private final String title;
-        private final int li;
+        private final String layer;
         private final short[] transitions;
         private final short requestOrdering;
         private final boolean sensitivity;
@@ -207,7 +207,7 @@ aspect SceneManagerReplication {
         RegionCreateDelta(ObjId<SceneManager> smId, ObjId<Region> regionId,
                 double x, double y, double w, double h,
                 int highestLevel, int lowestLevel,
-                String id, String title, int li, short[] transitions,
+                String id, String title, String layer, short[] transitions,
                 short requestOrdering, boolean sensitivity, Color fill,
                 Color stroke){
             this.smId = smId;
@@ -220,7 +220,7 @@ aspect SceneManagerReplication {
             this.lowestLevel = lowestLevel;
             this.id = id;
             this.title = title;
-            this.li = li;
+            this.layer = layer;
             this.transitions = transitions;
             this.requestOrdering = requestOrdering;
             this.sensitivity = sensitivity;
@@ -232,7 +232,7 @@ aspect SceneManagerReplication {
             SceneManager sm = su.getSlaveObject(smId);
             Region region = sm.createRegion(x, y, w, h,
                     highestLevel, lowestLevel,
-                    id, title, li, transitions,
+                    id, title, layer, transitions,
                     requestOrdering, sensitivity, fill,
                     stroke);
             su.putSlaveObject(regionId, region);
