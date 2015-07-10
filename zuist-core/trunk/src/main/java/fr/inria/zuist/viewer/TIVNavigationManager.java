@@ -8,6 +8,8 @@
 package fr.inria.zuist.viewer;
 
 import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.Container;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
@@ -20,17 +22,21 @@ import java.util.TimerTask;
 import java.util.Vector;
 
 import fr.inria.zvtm.engine.VirtualSpaceManager;
+import fr.inria.zvtm.engine.Java2DPainter;
 import fr.inria.zvtm.engine.Camera;
+import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.lens.*;
 import fr.inria.zvtm.engine.portals.OverviewPortal;
 import fr.inria.zvtm.animation.EndAction;
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
 import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
-
+import fr.inria.zvtm.engine.portals.DraggableCameraPortal;
+import fr.inria.zvtm.event.PortalListener;
+import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zuist.engine.Region;
 
-class TIVNavigationManager {
+class TIVNavigationManager implements Java2DPainter {
 
     /* Navigation constants */
     static final int ANIM_MOVE_DURATION = 300;
@@ -65,6 +71,38 @@ class TIVNavigationManager {
 
     static final float FLOOR_ALTITUDE = 100.0f;
 
+    /* ---------------- overview -----------------------*/
+
+    static final int MAX_OVERVIEW_WIDTH = 200;
+    static final int MAX_OVERVIEW_HEIGHT = 200;
+    static final Color OBSERVED_REGION_COLOR = Color.GREEN;
+    static final float OBSERVED_REGION_ALPHA = 0.5f;
+    static final Color OV_BORDER_COLOR = Color.WHITE;
+    static final Color OV_INSIDE_BORDER_COLOR = Color.WHITE;
+
+    OverviewPortal ovPortal;
+
+    double[] scene_bounds = {0, 0, 0, 0};
+
+    /* ---------------- dragmag -----------------------*/
+
+    public static final int DM_PORTAL_WIDTH = 200;
+    public static final int DM_PORTAL_HEIGHT = 200;
+    public static final int DM_PORTAL_INITIAL_X_OFFSET = 150;
+    public static final int DM_PORTAL_INITIAL_Y_OFFSET = 150;
+    public static final int DM_PORTAL_ANIM_TIME = 150;
+    public static final Color DM_COLOR = Color.RED;
+    public static final double DEFAULT_DM_MAG_FACTOR = 4.0;
+
+    Camera dmCamera;
+    DraggableCameraPortal dmPortal;
+    VRectangle magWindow;
+    int magWindowW, magWindowN, magWindowE, magWindowS;
+    boolean paintDMLinks = false;
+    double[] dmwnes = new double[4];
+
+    /* ---------------- misc -----------------------*/
+
     TiledImageViewer application;
 
     Camera mCamera;
@@ -74,6 +112,7 @@ class TIVNavigationManager {
         this.application = app;
         this.vsm = VirtualSpaceManager.INSTANCE;
         mCamera = app.mCamera;
+        dmCamera = app.dmCamera;
         ss = new ScreenSaver(this);
         ssTimer = new Timer();
         ssTimer.scheduleAtFixedRate(ss, SCREEN_SAVER_INTERVAL, SCREEN_SAVER_INTERVAL);
@@ -134,17 +173,6 @@ class TIVNavigationManager {
 
     /* -------------- Overview ------------------- */
 
-    static final int MAX_OVERVIEW_WIDTH = 200;
-    static final int MAX_OVERVIEW_HEIGHT = 200;
-    static final Color OBSERVED_REGION_COLOR = Color.GREEN;
-    static final float OBSERVED_REGION_ALPHA = 0.5f;
-    static final Color OV_BORDER_COLOR = Color.WHITE;
-    static final Color OV_INSIDE_BORDER_COLOR = Color.WHITE;
-
-    OverviewPortal ovPortal;
-
-    double[] scene_bounds = {0, 0, 0, 0};
-
     void createOverview(Region rootRegion){
         int ow, oh;
         float ar = (float) (rootRegion.getWidth() / (float)rootRegion.getHeight());
@@ -189,6 +217,91 @@ class TIVNavigationManager {
         if (b == ovPortal.isVisible()){return;}
         ovPortal.setVisible(b);
         vsm.repaint(application.mView);
+    }
+
+    /* ------------------ DragMag ----------------*/
+
+    void initDM(){
+        magWindow = new VRectangle(0, 0, 1000, 1, 1, DM_COLOR);
+        magWindow.setFilled(false);
+        magWindow.setBorderColor(DM_COLOR);
+        application.mSpace.addGlyph(magWindow);
+        application.mSpace.hide(magWindow);
+    }
+
+    void toggleDM(int x, int y, PortalListener pl){
+        if (dmPortal != null){
+            // portal is active, destroy it
+            killDM();
+        }
+        else {
+            // portal not active, create it
+            createDM(x, y, pl);
+        }
+    }
+
+    void createDM(int x, int y, PortalListener pl){
+        dmPortal = new DraggableCameraPortal(x, y, DM_PORTAL_WIDTH, DM_PORTAL_HEIGHT, dmCamera);
+        dmPortal.setPortalListener(pl);
+        dmPortal.setBackgroundColor(application.mView.getBackgroundColor());
+        vsm.addPortal(dmPortal, application.mView);
+        dmPortal.setBorder(DM_COLOR);
+        Location l = dmPortal.getSeamlessView(mCamera);
+        dmCamera.moveTo(l.vx, l.vy);
+        dmCamera.setAltitude(((mCamera.getAltitude()+mCamera.getFocal())/(DEFAULT_DM_MAG_FACTOR)-mCamera.getFocal()));
+        updateMagWindow();
+        int w = (int)Math.round(magWindow.getWidth() * mCamera.getFocal() / ((float)(mCamera.getFocal()+mCamera.getAltitude())));
+        int h = (int)Math.round(magWindow.getHeight() * mCamera.getFocal() / ((float)(mCamera.getFocal()+mCamera.getAltitude())));
+        dmPortal.sizeTo(w, h);
+        application.mSpace.onTop(magWindow);
+        application.mSpace.show(magWindow);
+        paintDMLinks = true;
+        Animation as = vsm.getAnimationManager().getAnimationFactory().createPortalSizeAnim(DM_PORTAL_ANIM_TIME, dmPortal,
+            DM_PORTAL_WIDTH-w, DM_PORTAL_HEIGHT-h, true,
+            IdentityInterpolator.getInstance(), null);
+        Animation at = vsm.getAnimationManager().getAnimationFactory().createPortalTranslation(DM_PORTAL_ANIM_TIME, dmPortal,
+            new Point(DM_PORTAL_INITIAL_X_OFFSET-w/2, DM_PORTAL_INITIAL_Y_OFFSET-h/2), true,
+            IdentityInterpolator.getInstance(), null);
+        vsm.getAnimationManager().startAnimation(as, false);
+        vsm.getAnimationManager().startAnimation(at, false);
+    }
+
+    void killDM(){
+        if (dmPortal != null){
+            vsm.destroyPortal(dmPortal);
+            dmPortal = null;
+            application.mSpace.hide(magWindow);
+            paintDMLinks = false;
+        }
+        application.eh.resetDragMagInteraction();
+    }
+
+    void updateMagWindow(){
+        if (dmPortal == null){return;}
+        dmPortal.getVisibleRegion(dmwnes);
+        magWindow.moveTo(dmCamera.vx, dmCamera.vy);
+        magWindow.setWidth((dmwnes[2]-dmwnes[0]) + 1);
+        magWindow.setHeight((dmwnes[1]-dmwnes[3]) + 1);
+    }
+
+    void updateZoomWindow(){
+        dmCamera.moveTo(magWindow.vx, magWindow.vy);
+    }
+
+    /*Java2DPainter interface*/
+    public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
+        if (paintDMLinks){
+            double coef = mCamera.focal/(mCamera.focal+mCamera.altitude);
+            int magWindowX = (int)Math.round((viewWidth/2) + (magWindow.vx-mCamera.vx)*coef);
+            int magWindowY = (int)Math.round((viewHeight/2) - (magWindow.vy-mCamera.vy)*coef);
+            int magWindowW = (int)Math.round(magWindow.getWidth()*coef/2);
+            int magWindowH = (int)Math.round(magWindow.getHeight()*coef/2);
+            g2d.setColor(DM_COLOR);
+            g2d.drawLine(magWindowX-magWindowW, magWindowY-magWindowH, dmPortal.x, dmPortal.y);
+            g2d.drawLine(magWindowX+magWindowW, magWindowY-magWindowH, dmPortal.x+dmPortal.w, dmPortal.y);
+            g2d.drawLine(magWindowX-magWindowW, magWindowY+magWindowH, dmPortal.x, dmPortal.y+dmPortal.h);
+            g2d.drawLine(magWindowX+magWindowW, magWindowY+magWindowH, dmPortal.x+dmPortal.w, dmPortal.y+dmPortal.h);
+        }
     }
 
     /* -------------- Sigma Lenses ------------------- */

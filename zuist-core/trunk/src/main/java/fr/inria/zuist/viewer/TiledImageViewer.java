@@ -51,6 +51,7 @@ import java.io.File;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.VirtualSpace;
+import fr.inria.zvtm.engine.Java2DPainter;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.Utils;
@@ -106,7 +107,7 @@ public class TiledImageViewer {
     static final String mSpaceName = "Image Layer";
     static final String aboutSpaceName = "About layer";
     VirtualSpace mSpace, aboutSpace;
-    Camera mCamera, ovCamera;
+    Camera mCamera, ovCamera, dmCamera;
     static final String mViewName = "ZUIST Tiled Image Viewer";
     View mView;
     TIVEventHandler eh;
@@ -121,6 +122,7 @@ public class TiledImageViewer {
         ovm = new Overlay(this);
         initGUI(options);
         nm = new TIVNavigationManager(this);
+        mView.setJava2DPainter(nm, Java2DPainter.FOREGROUND);
         ovm.init();
         eh.nm = this.nm;
         gp = new WEGlassPane(this);
@@ -149,6 +151,7 @@ public class TiledImageViewer {
         }
         nm.createOverview(sm.getRegionsAtLevel(0)[0]);
         nm.updateOverview();
+        nm.initDM();
     }
 
     void initGUI(ViewerOptions options){
@@ -157,6 +160,7 @@ public class TiledImageViewer {
         mSpace = vsm.addVirtualSpace(mSpaceName);
         mCamera = mSpace.addCamera();
         ovCamera = mSpace.addCamera();
+        dmCamera = mSpace.addCamera();
         aboutSpace = vsm.addVirtualSpace(aboutSpaceName);
         aboutSpace.addCamera();
         Vector cameras = new Vector();

@@ -56,7 +56,7 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
 
     boolean mCamStickedToMouse = false;
     boolean regionStickedToMouse = false;
-    boolean inPortal = false;
+    boolean inOVPortal = false;
 
     TiledImageViewer application;
     TIVNavigationManager nm;
@@ -74,9 +74,18 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
     boolean selectingRegion = false;
     double x1, y1, x2, y2;
 
+    double tfactor;
+
     static final int DELAYED_UPDATE_FREQUENCY = 400;
 
     DelayedUpdateTimer dut;
+
+    /* DragMag interaction */
+    protected boolean inZoomWindow = false;
+    protected boolean inMagWindow = false;
+    protected boolean draggingMagWindow = false;
+    protected boolean draggingZoomWindow = false;
+    protected boolean draggingZoomWindowContent = false;
 
     TIVEventHandler(TiledImageViewer app){
         this.application = app;
@@ -94,7 +103,19 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
         lastJPY = jpy;
         lastVX = v.getVCursor().getVSXCoordinate();
         lastVY = v.getVCursor().getVSYCoordinate();
-        if (inPortal){
+        if (inZoomWindow){
+            if (application.nm.dmPortal.coordInsideBar(jpx, jpy)){
+                draggingZoomWindow = true;
+            }
+            else {
+                draggingZoomWindowContent = true;
+            }
+        }
+        else if (inMagWindow){
+            v.getVCursor().stickGlyph(application.nm.magWindow);
+            draggingMagWindow = true;
+        }
+        else if (inOVPortal){
             if (application.nm.ovPortal.coordInsideObservedRegion(jpx, jpy)){
                 regionStickedToMouse = true;
             }
@@ -132,6 +153,8 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
         regionStickedToMouse = false;
         zero_order_dragging = false;
+        draggingZoomWindow = false;
+        draggingZoomWindowContent = false;
         if (translating){
             translating = false;
             application.sm.enableRegionUpdater(true);
@@ -143,6 +166,10 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
             c.setZspeed(0);
             v.setDrawDrag(false);
             first_order_dragging = false;
+        }
+        if (draggingMagWindow){
+            draggingMagWindow = false;
+            v.getVCursor().unstickLastGlyph();
         }
         if (selectingRegion){
             v.setDrawRect(false);
@@ -161,16 +188,21 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
         lastVX = v.getVCursor().getVSXCoordinate();
         lastVY = v.getVCursor().getVSYCoordinate();
-        if (!inPortal){
-            if (nm.lensType != TIVNavigationManager.NO_LENS){
-                nm.zoomInPhase2(lastVX, lastVY);
+        if (!inOVPortal){
+            if (mod == SHIFT_MOD){
+                application.nm.toggleDM(jpx, jpy, this);
             }
             else {
-                if (cursorNearBorder){
-                    // do not activate the lens when cursor is near the border
-                    return;
+                if (nm.lensType != TIVNavigationManager.NO_LENS){
+                    nm.zoomInPhase2(lastVX, lastVY);
                 }
-                nm.zoomInPhase1(jpx, jpy);
+                else {
+                    if (cursorNearBorder){
+                        // do not activate the lens when cursor is near the border
+                        return;
+                    }
+                    nm.zoomInPhase1(jpx, jpy);
+                }
             }
         }
     }
@@ -262,6 +294,25 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
             lastJPX = jpx;
             lastJPY = jpy;
         }
+        else if (draggingZoomWindow){
+            application.nm.dmPortal.move(jpx-lastJPX, jpy-lastJPY);
+            lastJPX = jpx;
+            lastJPY = jpy;
+            application.vsm.repaint();
+        }
+        else if (draggingZoomWindowContent){
+            tfactor = (application.nm.dmCamera.focal+(application.nm.dmCamera.altitude))/application.nm.dmCamera.focal;
+            synchronized(application.nm.dmCamera){
+                application.nm.dmCamera.move(Math.round(tfactor*(lastJPX-jpx)),
+                    Math.round(tfactor*(jpy-lastJPY)));
+                lastJPX = jpx;
+                lastJPY = jpy;
+                application.nm.updateMagWindow();
+            }
+        }
+        else if (draggingMagWindow){
+            application.nm.updateZoomWindow();
+        }
     }
 
     public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
@@ -272,6 +323,19 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
             else {
                 nm.magnifyFocus(-TIVNavigationManager.WHEEL_MM_STEP, nm.lensType, application.mCamera);
             }
+        }
+        else if (inZoomWindow){
+            tfactor = (application.nm.dmCamera.focal+Math.abs(application.nm.dmCamera.altitude))/application.nm.dmCamera.focal;
+            if (wheelDirection  == WHEEL_UP){
+                // zooming in
+                application.nm.dmCamera.altitudeOffset(-tfactor*WHEEL_ZOOMOUT_FACTOR);
+            }
+            else {
+                // wheelDirection == WHEEL_DOWN, zooming out
+                application.nm.dmCamera.altitudeOffset(tfactor*WHEEL_ZOOMIN_FACTOR);
+            }
+            application.nm.updateMagWindow();
+            application.vsm.repaint();
         }
         else {
             double a = (application.mCamera.focal+Math.abs(application.mCamera.altitude)) / application.mCamera.focal;
@@ -298,11 +362,17 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
     }
 
     public void enterGlyph(Glyph g){
-//        g.highlight(true, null);
+        if (g == application.nm.magWindow){
+            inMagWindow = true;
+            return;
+        }
     }
 
     public void exitGlyph(Glyph g){
-//        g.highlight(false, null);
+        if (g == application.nm.magWindow){
+            inMagWindow = false;
+            return;
+        }
     }
 
     int ci = 1180;
@@ -352,15 +422,32 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
 
     /* Overview Portal */
     public void enterPortal(Portal p){
-        inPortal = true;
-        ((OverviewPortal)p).setBorder(TIVNavigationManager.OV_INSIDE_BORDER_COLOR);
-        VirtualSpaceManager.INSTANCE.repaint();
+        if (p == application.nm.ovPortal){
+            inOVPortal = true;
+            ((OverviewPortal)p).setBorder(TIVNavigationManager.OV_INSIDE_BORDER_COLOR);
+            VirtualSpaceManager.INSTANCE.repaint();
+        }
+        else if (p == application.nm.dmPortal){
+            inZoomWindow = true;
+        }
     }
 
     public void exitPortal(Portal p){
-        inPortal = false;
-        ((OverviewPortal)p).setBorder(TIVNavigationManager.OV_BORDER_COLOR);
-        VirtualSpaceManager.INSTANCE.repaint();
+        if (p == application.nm.ovPortal){
+            inOVPortal = false;
+            ((OverviewPortal)p).setBorder(TIVNavigationManager.OV_BORDER_COLOR);
+            VirtualSpaceManager.INSTANCE.repaint();
+        }
+        else if (p == application.nm.dmPortal){
+            inZoomWindow = false;
+        }
+    }
+
+    protected void resetDragMagInteraction(){
+        inMagWindow = false;
+        inZoomWindow = false;
+        draggingZoomWindow = false;
+        draggingZoomWindowContent = false;
     }
 
     void toggleNavMode(){
