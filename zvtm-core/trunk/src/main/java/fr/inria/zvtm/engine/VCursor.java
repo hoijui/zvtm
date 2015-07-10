@@ -146,11 +146,6 @@ public class VCursor {
         this.hcolor = c;
     }
 
-    /** Propagate picker movements to sticked glyphs. */
-    public void propagateMove(){
-        picker.propagateMove(vx-pvx, vy-pvy);
-    }
-
     /** Move mouse cursor (JPanel coordinates).
      *@param x x-coordinate, in JPanel coordinates system
      *@param y y-coordinate, in JPanel coordinates system
