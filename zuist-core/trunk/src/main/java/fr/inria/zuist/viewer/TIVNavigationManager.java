@@ -35,6 +35,7 @@ import fr.inria.zvtm.engine.portals.DraggableCameraPortal;
 import fr.inria.zvtm.event.PortalListener;
 import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zuist.engine.Region;
+import fr.inria.zuist.engine.PortalSceneObserver;
 
 class TIVNavigationManager implements Java2DPainter {
 
@@ -86,10 +87,10 @@ class TIVNavigationManager implements Java2DPainter {
 
     /* ---------------- dragmag -----------------------*/
 
-    public static final int DM_PORTAL_WIDTH = 200;
-    public static final int DM_PORTAL_HEIGHT = 200;
-    public static final int DM_PORTAL_INITIAL_X_OFFSET = 150;
-    public static final int DM_PORTAL_INITIAL_Y_OFFSET = 150;
+    public static final int DM_PORTAL_WIDTH = 300;
+    public static final int DM_PORTAL_HEIGHT = 300;
+    public static final int DM_PORTAL_INITIAL_X_OFFSET = 200;
+    public static final int DM_PORTAL_INITIAL_Y_OFFSET = 200;
     public static final int DM_PORTAL_ANIM_TIME = 150;
     public static final Color DM_COLOR = Color.RED;
     public static final double DEFAULT_DM_MAG_FACTOR = 4.0;
@@ -100,6 +101,7 @@ class TIVNavigationManager implements Java2DPainter {
     int magWindowW, magWindowN, magWindowE, magWindowS;
     boolean paintDMLinks = false;
     double[] dmwnes = new double[4];
+    PortalSceneObserver pso;
 
     /* ---------------- misc -----------------------*/
 
@@ -242,10 +244,12 @@ class TIVNavigationManager implements Java2DPainter {
 
     void createDM(int x, int y, PortalListener pl){
         dmPortal = new DraggableCameraPortal(x, y, DM_PORTAL_WIDTH, DM_PORTAL_HEIGHT, dmCamera);
+        pso = new PortalSceneObserver(dmPortal, dmCamera, application.mSpace);
         dmPortal.setPortalListener(pl);
         dmPortal.setBackgroundColor(application.mView.getBackgroundColor());
         vsm.addPortal(dmPortal, application.mView);
         dmPortal.setBorder(DM_COLOR);
+        application.sm.addSceneObserver(pso);
         Location l = dmPortal.getSeamlessView(mCamera);
         dmCamera.moveTo(l.vx, l.vy);
         dmCamera.setAltitude(((mCamera.getAltitude()+mCamera.getFocal())/(DEFAULT_DM_MAG_FACTOR)-mCamera.getFocal()));
@@ -267,12 +271,12 @@ class TIVNavigationManager implements Java2DPainter {
     }
 
     void killDM(){
-        if (dmPortal != null){
-            vsm.destroyPortal(dmPortal);
-            dmPortal = null;
-            application.mSpace.hide(magWindow);
-            paintDMLinks = false;
-        }
+        application.sm.removeSceneObserver(pso);
+        pso = null;
+        vsm.destroyPortal(dmPortal);
+        dmPortal = null;
+        application.mSpace.hide(magWindow);
+        paintDMLinks = false;
         application.eh.resetDragMagInteraction();
     }
 

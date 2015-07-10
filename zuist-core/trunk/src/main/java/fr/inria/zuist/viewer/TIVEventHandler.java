@@ -326,7 +326,7 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
         }
         else if (inZoomWindow){
             tfactor = (application.nm.dmCamera.focal+Math.abs(application.nm.dmCamera.altitude))/application.nm.dmCamera.focal;
-            if (wheelDirection  == WHEEL_UP){
+            if (wheelDirection  == WHEEL_DOWN){
                 // zooming in
                 application.nm.dmCamera.altitudeOffset(-tfactor*WHEEL_ZOOMOUT_FACTOR);
             }
