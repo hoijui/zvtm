@@ -40,7 +40,6 @@ import fr.inria.zuist.event.ObjectListener;
 import org.w3c.dom.Document;
 
 /** <strong>Multi-scale scene manager: main ZUIST class instantiated by client application.</strong>
- * Used to parse XML descriptions of multi-scale scene configurations and manage them once instantiated.
  *@author Emmanuel Pietriga
  */
 
@@ -502,7 +501,7 @@ public class SceneManager {
 
     /** Enable/disable level updating.
      * Calls to updateLevel(altitude) have no effect if level updating is disabled.
-     *@see #updateLevel(int layerIndex, double[] cameraBounds, double altitude)
+     *@see #updateLevel(SceneObserver so)
      */
     public void setUpdateLevel(boolean b){
     updateLevel = b;

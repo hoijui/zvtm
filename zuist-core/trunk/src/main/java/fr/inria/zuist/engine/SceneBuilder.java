@@ -42,6 +42,13 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.FactoryConfigurationError;
 import javax.xml.parsers.ParserConfigurationException;
 
+/** Scene Builder.
+ * Provides the API to build a scene: levels, regions, object descriptions.
+ * Also Used to parse XML descriptions of ZUIST scenes and manage them once instantiated.
+ * Each SceneManager instantiates one SceneBuilder.
+ *@see SceneManager#getSceneBuilder()
+ *@author Emmanuel Pietriga
+ */
 
 public class SceneBuilder {
 
