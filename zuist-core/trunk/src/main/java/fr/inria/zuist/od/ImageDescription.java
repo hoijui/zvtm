@@ -5,7 +5,7 @@
  * $Id$
  */
 
-package fr.inria.zuist.engine;
+package fr.inria.zuist.od;
 
 import java.awt.Image;
 import java.awt.Color;
@@ -34,6 +34,10 @@ import fr.inria.zvtm.animation.EndAction;
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
 import fr.inria.zvtm.glyphs.VRectProgress;
+
+import fr.inria.zuist.engine.Region;
+import fr.inria.zuist.engine.SceneManager;
+import fr.inria.zuist.engine.GlyphLoader;
 
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -220,7 +224,7 @@ public class ImageDescription extends ResourceDescription {
         *@param im one of java.awt.RenderingHints.{VALUE_INTERPOLATION_NEAREST_NEIGHBOR,VALUE_INTERPOLATION_BILINEAR,VALUE_INTERPOLATION_BICUBIC} ; default is VALUE_INTERPOLATION_NEAREST_NEIGHBOR
         *@param pr parent Region in scene
         */
-    ImageDescription(String id, double x, double y, int z, double w, double h, URL p, Color sc, float alpha, Object im, Region pr){
+    public ImageDescription(String id, double x, double y, int z, double w, double h, URL p, Color sc, float alpha, Object im, Region pr){
         this.id = id;
         this.vx = x;
         this.vy = y;

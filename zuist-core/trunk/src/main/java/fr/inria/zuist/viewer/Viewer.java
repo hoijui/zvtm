@@ -74,8 +74,8 @@ import fr.inria.zuist.engine.RegionPicker;
 import fr.inria.zuist.event.LevelListener;
 import fr.inria.zuist.event.ObjectListener;
 import fr.inria.zuist.event.ProgressListener;
-import fr.inria.zuist.engine.ObjectDescription;
-import fr.inria.zuist.engine.ResourceDescription;
+import fr.inria.zuist.od.ObjectDescription;
+import fr.inria.zuist.od.ResourceDescription;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;

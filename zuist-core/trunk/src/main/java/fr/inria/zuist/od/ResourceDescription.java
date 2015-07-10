@@ -5,7 +5,7 @@
  * $Id$
  */
 
-package fr.inria.zuist.engine;
+package fr.inria.zuist.od;
 
 import java.awt.Image;
 import java.awt.Color;
@@ -23,6 +23,9 @@ import fr.inria.zvtm.glyphs.VImage;
 import fr.inria.zvtm.animation.EndAction;
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
+
+import fr.inria.zuist.engine.Region;
+import fr.inria.zuist.engine.SceneManager;
 
 /** Description of external resource objects to be loaded/unloaded in the scene.
  * Supports URL with the following protocols: file, http, jar (syntax jar:file:!/path/to/resource/in/jar)

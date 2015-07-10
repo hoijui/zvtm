@@ -11,8 +11,8 @@ import java.util.HashMap;
 import java.util.Vector;
 
 import fr.inria.zvtm.engine.VirtualSpaceManager;
-
 import fr.inria.zuist.event.PickedObjectListener;
+import fr.inria.zuist.od.ObjectDescription;
 
 /**
  <p>An object picker that tells what objects overlap the corresponding coordinates.

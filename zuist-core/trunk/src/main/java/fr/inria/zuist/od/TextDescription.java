@@ -5,7 +5,7 @@
  * $Id$
  */
 
-package fr.inria.zuist.engine;
+package fr.inria.zuist.od;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -19,6 +19,10 @@ import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.animation.EndAction;
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
+
+import fr.inria.zuist.engine.Region;
+import fr.inria.zuist.engine.SceneManager;
+import fr.inria.zuist.engine.GlyphLoader;
 
 /** Description of text objects to be loaded/unloaded in the scene.
  *@author Emmanuel Pietriga
@@ -70,7 +74,7 @@ public class TextDescription extends ObjectDescription {
         *@param ta text alignment, one of VText.TEXT_ANCHOR_*
         *@param pr parent Region in scene
         */
-    TextDescription(String id, double x, double y, int z, float s, String tx, Color c, float alpha, short ta, Region pr){
+    public TextDescription(String id, double x, double y, int z, float s, String tx, Color c, float alpha, short ta, Region pr){
         this.id = id;
         this.vx = x;
         this.vy = y;

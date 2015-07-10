@@ -36,6 +36,11 @@ import fr.inria.zuist.event.ProgressListener;
 import fr.inria.zuist.event.LevelListener;
 import fr.inria.zuist.event.RegionListener;
 import fr.inria.zuist.event.ObjectListener;
+import fr.inria.zuist.od.ObjectDescription;
+import fr.inria.zuist.od.TextDescription;
+import fr.inria.zuist.od.ImageDescription;
+import fr.inria.zuist.od.GlyphDescription;
+import fr.inria.zuist.od.ClosedShapeDescription;
 
 import org.w3c.dom.Document;
 

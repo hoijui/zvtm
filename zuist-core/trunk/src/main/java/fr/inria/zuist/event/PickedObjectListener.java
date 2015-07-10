@@ -6,7 +6,7 @@
 
 package fr.inria.zuist.event;
 
-import fr.inria.zuist.engine.ObjectDescription;
+import fr.inria.zuist.od.ObjectDescription;
 
 /** Listen to object description picking events.
  *@author Emmanuel PIetriga

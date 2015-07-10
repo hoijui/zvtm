@@ -16,6 +16,7 @@ import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.engine.VirtualSpace;
 
 import fr.inria.zuist.event.RegionListener;
+import fr.inria.zuist.od.ObjectDescription;
 
 /** A region in the scene. Regions contain objects. Regions belong to levels, and can span one or more contiguous level(s).
  *@author Emmanuel Pietriga

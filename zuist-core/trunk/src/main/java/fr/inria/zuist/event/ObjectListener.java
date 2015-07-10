@@ -7,7 +7,7 @@
 
 package fr.inria.zuist.event;
 
-import fr.inria.zuist.engine.ObjectDescription;
+import fr.inria.zuist.od.ObjectDescription;
 
 /** Listen to object-related events.
  *@author Emmanuel PIetriga

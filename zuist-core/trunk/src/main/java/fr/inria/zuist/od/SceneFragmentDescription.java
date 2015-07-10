@@ -5,7 +5,7 @@
  * $Id$
  */
 
-package fr.inria.zuist.engine;
+package fr.inria.zuist.od;
 
 import java.io.File;
 import java.net.URL;
@@ -16,6 +16,10 @@ import java.util.HashMap;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VRectProgress;
+
+import fr.inria.zuist.engine.Region;
+import fr.inria.zuist.engine.SceneManager;
+import fr.inria.zuist.engine.SceneBuilder;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -40,7 +44,7 @@ public class SceneFragmentDescription extends ResourceDescription {
     *@param p path to bitmap resource (any valid absolute URL)
     *@param pr parent Region in scene
     */
-    SceneFragmentDescription(String id, double x, double y, URL p, Region pr, SceneManager sm){
+    public SceneFragmentDescription(String id, double x, double y, URL p, Region pr, SceneManager sm){
         this.id = id;
         this.vx = x;
         this.vy = y;

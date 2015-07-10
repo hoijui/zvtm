@@ -5,10 +5,13 @@
  * $Id$
  */
 
-package fr.inria.zuist.engine;
+package fr.inria.zuist.od;
 
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.glyphs.Glyph;
+
+import fr.inria.zuist.engine.Region;
+import fr.inria.zuist.engine.SceneManager;
 
 /**
  * ZUIST description of a Glyph.

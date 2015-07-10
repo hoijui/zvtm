@@ -13,13 +13,15 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadFactory;
 
+import fr.inria.zuist.od.ObjectDescription;
+
 /**
  * Thread safety: GlyphLoader public methods should be invoked
  * from the same thread, normally the Swing EDT.
  *@author Romain Primet, Emmanuel Pietriga
  */
 
-class GlyphLoader {
+public class GlyphLoader {
 
     private final SceneManager sceneManager;
     private final ConcurrentHashMap<ObjectDescription, LoadAction> tasks;
@@ -27,8 +29,8 @@ class GlyphLoader {
 
     private enum LoadAction {LOAD, UNLOAD};
 
-    static int FADE_IN_DURATION = 300; //milliseconds
-    static int FADE_OUT_DURATION = 300; //milliseconds
+    public static int FADE_IN_DURATION = 300; //milliseconds
+    public static int FADE_OUT_DURATION = 300; //milliseconds
 
     GlyphLoader(SceneManager sm){
         this.sceneManager = sm;

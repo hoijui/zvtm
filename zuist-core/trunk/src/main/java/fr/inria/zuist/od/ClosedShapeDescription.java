@@ -5,7 +5,7 @@
  * $Id$
  */
 
-package fr.inria.zuist.engine;
+package fr.inria.zuist.od;
 
 import java.awt.Color;
 import javax.swing.SwingUtilities;
@@ -18,6 +18,10 @@ import fr.inria.zvtm.glyphs.ClosedShape;
 import fr.inria.zvtm.animation.EndAction;
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
+
+import fr.inria.zuist.engine.Region;
+import fr.inria.zuist.engine.SceneManager;
+import fr.inria.zuist.engine.GlyphLoader;
 
 /** Description of any ZVTM glyph sibclass of ClosedShape to be loaded/unloaded in the scene.
  *@author Emmanuel Pietriga
@@ -37,7 +41,7 @@ public class ClosedShapeDescription extends ObjectDescription {
         *@param pr parent Region in scene.
         *@param sensitive should the glyph be made sensitive to cursor events or not.
         */
-    ClosedShapeDescription(String id, ClosedShape g, int z, Region pr, boolean sensitive){
+    public ClosedShapeDescription(String id, ClosedShape g, int z, Region pr, boolean sensitive){
         this.id = id;
         this.glyph = g;
         this.zindex = z;

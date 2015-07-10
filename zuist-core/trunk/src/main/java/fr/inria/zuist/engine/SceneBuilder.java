@@ -32,6 +32,14 @@ import fr.inria.zvtm.glyphs.ClosedShape;
 import fr.inria.zvtm.svg.SVGReader;
 import fr.inria.zuist.event.ProgressListener;
 
+import fr.inria.zuist.od.ResourceDescription;
+import fr.inria.zuist.od.ObjectDescription;
+import fr.inria.zuist.od.SceneFragmentDescription;
+import fr.inria.zuist.od.TextDescription;
+import fr.inria.zuist.od.ImageDescription;
+import fr.inria.zuist.od.GlyphDescription;
+import fr.inria.zuist.od.ClosedShapeDescription;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Node;
@@ -314,7 +322,7 @@ public class SceneBuilder {
         return region;
     }
 
-    Region processRegion(Element regionEL, HashMap<String,String> rn2crn, File sceneFileDirectory){
+    public Region processRegion(Element regionEL, HashMap<String,String> rn2crn, File sceneFileDirectory){
         double x = Double.parseDouble(regionEL.getAttribute(_x));
         double y = Double.parseDouble(regionEL.getAttribute(_y));
         double w = Double.parseDouble(regionEL.getAttribute(_w));

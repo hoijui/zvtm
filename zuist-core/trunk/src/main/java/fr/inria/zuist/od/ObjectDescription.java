@@ -5,11 +5,14 @@
  * $Id$
  */
 
-package fr.inria.zuist.engine;
+package fr.inria.zuist.od;
 
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.glyphs.Glyph;
+
+import fr.inria.zuist.engine.Region;
+import fr.inria.zuist.engine.SceneManager;
 
 /** Description of objects to be loaded/unloaded in the scene.
  *@author Emmanuel Pietriga
@@ -31,7 +34,7 @@ public abstract class ObjectDescription {
     //should we deprecate this ctor?
     ObjectDescription(){}
 
-    protected ObjectDescription(String id, int z, Region pr, boolean sensitive){
+    public ObjectDescription(String id, int z, Region pr, boolean sensitive){
     this.id = id;
     this.zindex = z;
     this.parentRegion = pr;

@@ -37,8 +37,8 @@ import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.EndAction;
 
 import fr.inria.zuist.engine.Region;
-import fr.inria.zuist.engine.ObjectDescription;
-import fr.inria.zuist.engine.TextDescription;
+import fr.inria.zuist.od.ObjectDescription;
+import fr.inria.zuist.od.TextDescription;
 
 class TIVEventHandler implements ViewListener, ComponentListener, PortalListener, CameraListener, PickerListener {
 

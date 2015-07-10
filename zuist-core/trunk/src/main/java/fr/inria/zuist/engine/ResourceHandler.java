@@ -11,6 +11,8 @@ import java.awt.Color;
 
 import java.net.URL;
 
+import fr.inria.zuist.od.ResourceDescription;
+
 /** Interface implemented by handlers of the various resource types.
  * Resource types include PDF documents, FITS images, as well as scene fragments (scenes dynamically loaded within a master scene).
  *@author Emmanuel Pietriga
