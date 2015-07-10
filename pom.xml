@@ -73,7 +73,7 @@ $Id$
 <excludePackageNames>fr.inria.zvtm.tests:fr.inria.zvtm.glyphs.projection:fr.inria.zvtm.animation.examples:fr.inria.zvtm.demo:fr.inria.zuist.viewer:fr.inria.zuist.viewer:fr.inria.zvtm.cluster.examples:fr.inria.zvtm.fits.example:fr.inria.zvtm.fits.simbad:fr.inria.zvtm.treemap.demo</excludePackageNames>
           <links>
             <link>http://docs.oracle.com/javase/6/docs/api</link>
-            <link>http://download.java.net/media/jogl/jogl-2.x-docs/</link>
+            <link>http://jogamp.org/deployment/jogamp-next/javadoc/jogl/javadoc</link>
             <link>http://jung.sourceforge.net/doc/api</link>
             <link>http://res.icesoft.org/docs/icepdf/v4_4_0/core</link>
             <link>https://hc.apache.org/httpcomponents-core-ga/httpcore/apidocs</link>
