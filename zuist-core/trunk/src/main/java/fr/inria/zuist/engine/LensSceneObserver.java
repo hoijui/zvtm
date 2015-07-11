@@ -79,10 +79,10 @@ public class LensSceneObserver implements SceneObserver, CameraListener {
         sm.regUpdater.addEntry(this, new Location(getX(), getY(), getAltitude()));
     }
 
-    /* This method has to be called whenever the lens moves within the view.
+    /** This method has to be called whenever the lens moves within the view.
        We have no way to detect such changes currently, so the application
        has to trigger such calls. */
-    public void lensMoved(Lens l){
+    public void lensMoved(){
         sm.regUpdater.addEntry(this, new Location(getX(), getY(), getAltitude()));
     }
 

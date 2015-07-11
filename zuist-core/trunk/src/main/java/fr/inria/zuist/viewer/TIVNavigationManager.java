@@ -36,6 +36,7 @@ import fr.inria.zvtm.event.PortalListener;
 import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zuist.engine.Region;
 import fr.inria.zuist.engine.PortalSceneObserver;
+import fr.inria.zuist.engine.LensSceneObserver;
 
 class TIVNavigationManager implements Java2DPainter {
 
@@ -71,6 +72,8 @@ class TIVNavigationManager implements Java2DPainter {
     short lensFamily = L2_Gaussian;
 
     static final float FLOOR_ALTITUDE = 100.0f;
+
+    LensSceneObserver lso;
 
     /* ---------------- overview -----------------------*/
 
@@ -323,6 +326,13 @@ class TIVNavigationManager implements Java2DPainter {
 
     void setLens(int t){
         lensType = t;
+        if (lens == null){
+            application.sm.removeSceneObserver(lso);
+        }
+        else {
+            lso = new LensSceneObserver(application.mView, application.mCamera, lens, application.mSpace);
+            application.sm.addSceneObserver(lso);
+        }
     }
 
     void moveLens(int x, int y, long absTime){
@@ -331,6 +341,9 @@ class TIVNavigationManager implements Java2DPainter {
         }
         else {
             lens.setAbsolutePosition(x, y);
+        }
+        if (lso != null){
+            lso.lensMoved();
         }
         VirtualSpaceManager.INSTANCE.repaint();
     }
