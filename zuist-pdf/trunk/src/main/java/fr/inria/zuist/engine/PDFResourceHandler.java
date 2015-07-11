@@ -24,6 +24,9 @@ import net.sf.ehcache.Cache;
 import net.sf.ehcache.constructs.blocking.CacheEntryFactory;
 import net.sf.ehcache.constructs.blocking.SelfPopulatingCache;
 
+import fr.inria.zuist.od.PDFPageDescription;
+import fr.inria.zuist.engine.SceneBuilder;
+
 /** ResourceHandler implementation for PDF documents.
  *@author Emmanuel Pietriga
  */
@@ -71,7 +74,7 @@ public class PDFResourceHandler implements ResourceHandler {
         float scale = 1f;
         float detail = 1f;
         if (params != null){
-            String[] paramTokens = params.split(SceneManager.PARAM_SEPARATOR);
+            String[] paramTokens = params.split(SceneBuilder.PARAM_SEPARATOR);
             for (int i=0;i<paramTokens.length;i++) {
                 if (paramTokens[i].startsWith(PDFResourceHandler._pg)){
                     page = Integer.parseInt(paramTokens[i].substring(3));
@@ -82,8 +85,8 @@ public class PDFResourceHandler implements ResourceHandler {
                 else if (paramTokens[i].startsWith(PDFResourceHandler._df)){
                     detail = Float.parseFloat(paramTokens[i].substring(3));
                 }
-                else if (paramTokens[i].startsWith(SceneManager._im)){
-                    im = SceneManager.parseInterpolation(params.substring(3));
+                else if (paramTokens[i].startsWith(SceneBuilder._im)){
+                    im = SceneBuilder.parseInterpolation(params.substring(3));
                 }
                 else {
                     System.err.println("Uknown type of resource parameter: "+paramTokens[i]);
