@@ -585,7 +585,6 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
                 }
             }
         }
-        System.out.print("D2");
         repaintASAP = true;
     }
 
