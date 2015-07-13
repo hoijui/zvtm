@@ -1,6 +1,6 @@
 <!--
 Author: Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
-ZUIST DTD, for v0.3.0 and above.
+ZUIST DTD, for v0.5.0 and above.
 -->
 
 <!-- $Id$ -->
@@ -41,15 +41,12 @@ ZUIST DTD, for v0.3.0 and above.
                  %y;
                  %width; #REQUIRED
                  %height; #REQUIRED
-                 %stroke;
-                 %fill;
                  tful (appear|disappear|fadein|fadeout) "appear"
                  tfll (appear|disappear|fadein|fadeout) "appear"
                  ttul (appear|disappear|fadein|fadeout) "disappear"
                  ttll (appear|disappear|fadein|fadeout) "disappear"
-                 %sensitive; "false"
                  requestOrdering (decl|dist) "dist"
-                 layer CDATA #IMPLIED>
+                 tags CDATA #IMPLIED>
 
 <!ELEMENT text ANY>
 <!ATTLIST text %ID;

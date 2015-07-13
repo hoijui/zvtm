@@ -46,17 +46,17 @@ public class GlyphLoader {
      *@param od description of object to be loaded.
      *@param transition one of Region.{APPEAR,FADE_IN}
      */
-    public void addLoadRequest(VirtualSpace targetLayer, ObjectDescription od, boolean transition){
+    public void addLoadRequest(VirtualSpace tvs, ObjectDescription od, boolean transition){
         if(tasks.remove(od, LoadAction.UNLOAD)){
             return;
         }
         tasks.put(od, LoadAction.LOAD);
 
-        if(targetLayer == null){
-            if (SceneManager.getDebugMode()){System.err.println("addLoadRequest: could not retrieve virtual space "+targetLayer);}
+        if(tvs == null){
+            if (SceneManager.getDebugMode()){System.err.println("addLoadRequest: could not retrieve virtual space "+tvs);}
             return;
         }
-        loader.submit(new Request(this.sceneManager, targetLayer, od, transition));
+        loader.submit(new Request(this.sceneManager, tvs, od, transition));
     }
 
     /**
@@ -70,18 +70,18 @@ public class GlyphLoader {
      *@param od description of object to be loaded.
      *@param transition one of Region.{DISAPPEAR,FADE_OUT}
      */
-    public void addUnloadRequest(VirtualSpace targetLayer, ObjectDescription od, boolean transition){
+    public void addUnloadRequest(VirtualSpace tvs, ObjectDescription od, boolean transition){
         if(tasks.remove(od, LoadAction.LOAD)){
             return;
         }
 
         tasks.put(od, LoadAction.UNLOAD);
 
-        if(targetLayer == null){
-            if (SceneManager.getDebugMode()){System.err.println("addLoadRequest: could not retrieve virtual space"+targetLayer);}
+        if(tvs == null){
+            if (SceneManager.getDebugMode()){System.err.println("addLoadRequest: could not retrieve virtual space"+tvs);}
             return;
         }
-        loader.submit(new Request(this.sceneManager, targetLayer, od, transition));
+        loader.submit(new Request(this.sceneManager, tvs, od, transition));
     }
 
     private class Request implements Runnable {

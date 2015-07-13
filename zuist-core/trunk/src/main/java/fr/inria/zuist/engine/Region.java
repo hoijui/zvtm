@@ -108,16 +108,12 @@ public class Region {
     String id;
     String title;
 
-    // virtual space/layer
-    VirtualSpace layer;
-
     Region containingRegion = null;
     Region[] containedRegions = new Region[0];
 
-    // rectangle representing region
-    VRectangle bounds;
-
     ObjectDescription[] objects = new ObjectDescription[0];
+
+    String[] tags;
 
     // was visible in viewport
     boolean wviv = false;
@@ -138,22 +134,21 @@ public class Region {
      *@param highestLevel index of highest level in level span for this region (highestLevel <= lowestLevel)
      *@param lowestLevel index of lowest level in level span for this region (highestLevel <= lowestLevel)
      *@param id region ID
-     *@param layer VirtualSpace in which objects will be put
      *@param transitions a 4-element array with values in Region.{FADE_IN, FADE_OUT, APPEAR, DISAPPEAR}, corresponding to
                          transitions from upper level, from lower level, to upper level, to lower level.
      */
     Region(double x, double y, double w, double h, int highestLevel, int lowestLevel,
-           String id, VirtualSpace layer, short[] trans, short ro, SceneManager sm){
+           String id, String[] tags, short[] trans, short ro, SceneManager sm){
         this.x = x;
         this.y = y;
         this.w = w;
         this.h = h;
         this.hli = highestLevel;
         this.lli = lowestLevel;
-        this.layer = layer;
         wnes = new double[4];
         setGeometry(x, y, w, h);
         this.id = id;
+        this.tags = tags;
         this.sm = sm;
         transitions = trans;
         requestOrder = ro;
@@ -162,6 +157,52 @@ public class Region {
     /** Get Region ID. */
     public String getID(){
         return id;
+    }
+
+    public boolean hasTag(String tag){
+        if (tags == null){return false;}
+        for (int i=0;i<tags.length;i++){
+            if (tags[i].equals(tag)){return true;}
+        }
+        return false;
+    }
+
+    public void addTag(String tag){
+        if (tags == null){
+            tags = new String[]{tag};
+        }
+        else if (!hasTag(tag)){
+            String[] nta = new String[tags.length+1];
+            System.arraycopy(tags, 0, nta, 0, tags.length);
+            nta[tags.length] = tag;
+            tags = nta;
+        }
+    }
+
+    public void removeTag(String tag){
+        if (tags == null){return;}
+        // find tag index
+        int tagIndex = -1;
+        for (int i=0;i<tags.length;i++){
+            if (tags[i].equals(tag)){
+                tagIndex = i;
+                break;
+            }
+        }
+        // remove from list of tags
+        if (tagIndex != -1){
+            String[] nta = new String[tags.length-1];
+            System.arraycopy(tags, 0, nta, 0, tagIndex);
+            System.arraycopy(tags, tagIndex+1, nta, 0, tags.length - tagIndex - 1);
+            tags = nta;
+        }
+    }
+
+    /**
+     *@return null if no tags attached
+     */
+    public String[] getTags(){
+        return tags;
     }
 
     /** Set Region title. */
@@ -212,18 +253,6 @@ public class Region {
      */
     public ObjectDescription[] getObjectsInRegion(){
         return objects;
-    }
-
-    void setGlyph(VRectangle r){
-        bounds = r;
-        bounds.setSensitivity(isSensitive);
-    }
-
-    /** Get the region's bounds as a VRectangle.
-     *@return the actual rectangle, not a clone. Do not temper with.
-     */
-    public VRectangle getBounds(){
-        return bounds;
     }
 
     /** Get this region's center x-coordinate.
@@ -283,22 +312,6 @@ public class Region {
         wnes[1] = y + h/2;
         wnes[2] = x + w/2;
         wnes[3] = y - h/2;
-        if (bounds != null){
-            bounds.moveTo(x, y);
-            bounds.setWidth(w);
-            bounds.setHeight(h);
-        }
-    }
-
-    /** Should the rectangle representing the region's bounds be sensitive to cursor entry/exit. */
-    public void setSensitive(boolean b){
-        isSensitive = b;
-        if (bounds != null){bounds.setSensitivity(b);}
-    }
-
-    /** Is the rectangle representing the region's bounds sensitive to cursor entry/exit. */
-    public boolean isSensitive(){
-        return isSensitive;
     }
 
     /** For internal use. Outside-package subclassing. */
@@ -321,7 +334,7 @@ public class Region {
     }
 
     /*rl can be null*/
-    void updateVisibility(double[] viewportBounds, int atDepth, short transition, RegionListener rl){
+    void updateVisibility(VirtualSpace tvs, double[] viewportBounds, int atDepth, short transition, RegionListener rl){
         // is visible in viewport
         boolean iviv = (wnes[0] < viewportBounds[2] && wnes[2] > viewportBounds[0]
             && wnes[3] < viewportBounds[1] && wnes[1] > viewportBounds[3]);
@@ -331,7 +344,7 @@ public class Region {
                 // visibility status of contained regions might have changed
                 // we have to compute intersections to find out
                 for (int i=0;i<containedRegions.length;i++){
-                    containedRegions[i].updateVisibility(viewportBounds, atDepth, transition, rl);
+                    containedRegions[i].updateVisibility(tvs, viewportBounds, atDepth, transition, rl);
                 }
             }
             else {
@@ -339,10 +352,10 @@ public class Region {
                 // visibility status of contained regions might have changed
                 // we have to compute intersections to find out
                 for (int i=0;i<containedRegions.length;i++){
-                    containedRegions[i].updateVisibility(viewportBounds, atDepth, transition, rl);
+                    containedRegions[i].updateVisibility(tvs, viewportBounds, atDepth, transition, rl);
                 }
                 if (atDepth >= hli && atDepth <= lli){
-                    forceShow(transition, (wnes[2]+wnes[0])/2, (wnes[1]+wnes[3])/2);
+                    forceShow(tvs, transition, (wnes[2]+wnes[0])/2, (wnes[1]+wnes[3])/2);
                     if (rl != null){
                         rl.enteredRegion(this);
                     }
@@ -354,10 +367,10 @@ public class Region {
                 // was visible last time we checked, is no longer visible
                 // contained regions are necessarily invisible
                 for (int i=0;i<containedRegions.length;i++){
-                    containedRegions[i].updateVisibility(false, viewportBounds, atDepth, transition, rl);
+                    containedRegions[i].updateVisibility(tvs, false, viewportBounds, atDepth, transition, rl);
                 }
                 if (atDepth >= hli && atDepth <= lli){
-                    forceHide(transition, (wnes[2]+wnes[0])/2, (wnes[1]+wnes[3])/2);
+                    forceHide(tvs, transition, (wnes[2]+wnes[0])/2, (wnes[1]+wnes[3])/2);
                     if (rl != null){
                         rl.exitedRegion(this);
                     }
@@ -370,14 +383,14 @@ public class Region {
     }
 
     /*rl can be null*/
-    void updateVisibility(boolean visible, double[] viewportBounds, int atDepth, short transition, RegionListener rl){
+    void updateVisibility(VirtualSpace tvs, boolean visible, double[] viewportBounds, int atDepth, short transition, RegionListener rl){
         if (visible){
             if (wviv){
                 // was visible last time we checked, is still visible
                 // visibility status of contained regions might have changed
                 // we have to compute intersections to find out
                 for (int i=0;i<containedRegions.length;i++){
-                    containedRegions[i].updateVisibility(viewportBounds, atDepth, transition, rl);
+                    containedRegions[i].updateVisibility(tvs, viewportBounds, atDepth, transition, rl);
                 }
             }
             else {
@@ -385,10 +398,10 @@ public class Region {
                 // visibility status of contained regions might have changed
                 // we have to compute intersections to find out
                 for (int i=0;i<containedRegions.length;i++){
-                    containedRegions[i].updateVisibility(viewportBounds, atDepth, transition, rl);
+                    containedRegions[i].updateVisibility(tvs, viewportBounds, atDepth, transition, rl);
                 }
                 if (atDepth >= hli && atDepth <= lli){
-                    forceShow(transition, (wnes[2]+wnes[0])/2, (wnes[1]+wnes[3])/2);
+                    forceShow(tvs, transition, (wnes[2]+wnes[0])/2, (wnes[1]+wnes[3])/2);
                     if (rl != null){
                         rl.enteredRegion(this);
                     }
@@ -401,10 +414,10 @@ public class Region {
                 // was visible last time we checked, is no longer visible
                 // contained regions are necessarily invisible
                 for (int i=0;i<containedRegions.length;i++){
-                    containedRegions[i].updateVisibility(false, viewportBounds, atDepth, transition, rl);
+                    containedRegions[i].updateVisibility(tvs, false, viewportBounds, atDepth, transition, rl);
                 }
                 if (atDepth >= hli && atDepth <= lli){
-                    forceHide(transition, (wnes[2]+wnes[0])/2, (wnes[1]+wnes[3])/2);
+                    forceHide(tvs, transition, (wnes[2]+wnes[0])/2, (wnes[1]+wnes[3])/2);
                     if (rl != null){
                         rl.exitedRegion(this);
                     }
@@ -415,36 +428,36 @@ public class Region {
         }
     }
 
-    void show(short transition, double  x, double y){
+    void show(VirtualSpace tvs, short transition, double  x, double y){
         if (!wviv){
-            forceShow(transition, x, y);
+            forceShow(tvs, transition, x, y);
         }
     }
 
-    void forceShow(short transition, double x, double y){
+    void forceShow(VirtualSpace tvs, short transition, double x, double y){
         if (requestOrder == ORDERING_DISTANCE){
             Arrays.sort(objects, new DistanceComparator(x, y));
         }
         boolean fade = (transition == TASL) ? false : transitions[transition] == FADE_IN;
         for (int i=0;i<objects.length;i++){
-            sm.glyphLoader.addLoadRequest(layer, objects[i], fade);
+            sm.glyphLoader.addLoadRequest(tvs, objects[i], fade);
         }
         wviv = true;
     }
 
-    void hide(short transition, double x, double y){
+    void hide(VirtualSpace tvs, short transition, double x, double y){
         if (wviv){
-            forceHide(transition, x, y);
+            forceHide(tvs, transition, x, y);
         }
     }
 
-    void forceHide(short transition, double x, double y){
+    void forceHide(VirtualSpace tvs, short transition, double x, double y){
         if (requestOrder == ORDERING_DISTANCE){
             Arrays.sort(objects, new DistanceComparator(x, y));
         }
         boolean fade = (transition == TASL) ? false : transitions[transition] == FADE_OUT;
         for (int i=0;i<objects.length;i++){
-            sm.glyphLoader.addUnloadRequest(layer, objects[i], fade);
+            sm.glyphLoader.addUnloadRequest(tvs, objects[i], fade);
         }
         wviv = false;
     }

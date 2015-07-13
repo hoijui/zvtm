@@ -103,7 +103,7 @@ public class SceneBuilder {
     public static final String _takesToO = "tto";
     public static final String _sensitive = "sensitive";
     public static final String _anchor = "anchor";
-    public static final String _layer = "layer";
+    public static final String _tags = "tags";
     public static final String _zindex = "z-index";
     public static final String _params = "params";
     public static final String _im = "im=";
@@ -120,6 +120,7 @@ public class SceneBuilder {
 
     public static final String PARAM_SEPARATOR = ";";
     public static final String COORD_SEPARATOR = ",";
+    public static final String TAG_SEPARATOR = ",";
 
     static final String URL_PROTOCOL_SEQ = ":/";
     static final String JAR_PROTOCOL_SEQ = ":!/";
@@ -270,22 +271,18 @@ public class SceneBuilder {
      *@param lowestLevel index of lowest level in level span for this region (highestLevel <= lowestLevel)
      *@param id region ID
      *@param title region's title (metadata)
-     *@param layer name of VirtualSpace in which objects will be put
+     *@param tags tags associated with region (can be used to filter regions in SceneObservers)
      *@param transitions a 4-element array with values in Region.{FADE_IN, FADE_OUT, APPEAR, DISAPPEAR}, corresponding to
                          transitions from upper level, from lower level, to upper level, to lower level.
      *@param requestOrdering how requests for loading / unloading objects should be ordered when
                              entering / leaving this region; one of Region.{ORDERING_ARRAY, ORDERING_DISTANCE}.
-     *@param sensitivity should the rectangle symbolizing the region itself be sensitive to mouse events or not.
-     *@param fill fill color of the rectangle symbolizing the region itself
-     *@param stroke border color of the rectangle symbolizing the region itself
      *@see Region#setContainingRegion(Region r)
      *@see Region#addContainedRegion(Region r)
      */
     public Region createRegion(double x, double y, double w, double h, int highestLevel, int lowestLevel,
-                               String id, String title, String layer, short[] transitions, short requestOrdering,
-                               boolean sensitivity, Color fill, Color stroke){
-        VirtualSpace vs = sm.layers.get(layer);
-        Region region = new Region(x+sm.origin.x, y+sm.origin.y, w, h, highestLevel, lowestLevel, id, vs, transitions, requestOrdering, sm);
+                               String id, String title, String[] tags,
+                               short[] transitions, short requestOrdering){
+        Region region = new Region(x+sm.origin.x, y+sm.origin.y, w, h, highestLevel, lowestLevel, id, tags, transitions, requestOrdering, sm);
         if (!sm.id2region.containsKey(id)){
             sm.id2region.put(id, region);
         }
@@ -296,29 +293,9 @@ public class SceneBuilder {
         for (int i=highestLevel;i<=lowestLevel;i++){
             sm.levels[i].addRegion(region);
         }
-        if (sensitivity){region.setSensitive(true);}
         if (title != null && title.length() > 0){
             region.setTitle(title);
         }
-        VRectangle r = new VRectangle(x+sm.origin.x, y+sm.origin.y, 0, w, h, Color.WHITE, Color.BLACK);
-        if (fill != null){
-            r.setColor(fill);
-        }
-        else {
-            r.setFilled(false);
-        }
-        if (stroke != null){
-            r.setBorderColor(stroke);
-        }
-        else {
-            r.setDrawBorder(false);
-        }
-        if (fill != null || stroke != null || sensitivity){
-            // add the rectangle representing the region only if it is visible or sensitive
-            sm.layers.get(layer).addGlyph(r);
-        }
-        region.setGlyph(r);
-        r.setOwner(region);
         return region;
     }
 
@@ -334,13 +311,6 @@ public class SceneBuilder {
             regionEL.hasAttribute(_tfll) ? Region.parseTransition(regionEL.getAttribute(_tfll)) : Region.DEFAULT_F_TRANSITION,
             regionEL.hasAttribute(_ttul) ? Region.parseTransition(regionEL.getAttribute(_ttul)) : Region.DEFAULT_T_TRANSITION,
             regionEL.hasAttribute(_ttll) ? Region.parseTransition(regionEL.getAttribute(_ttll)) : Region.DEFAULT_T_TRANSITION};
-        String layer = regionEL.getAttribute(_layer);
-        if (!sm.layers.containsKey(layer)){
-            // if no layer information is provided,
-            // put the region in the first layer that was declared to the SceneManager
-            layer = sm.layers.keySet().iterator().next();
-        }
-        boolean sensitivity = (regionEL.hasAttribute(_sensitive)) ? Boolean.parseBoolean(regionEL.getAttribute(_sensitive)) : false;
         String title = regionEL.getAttribute(_title);
         int lowestLevel = 0;
         int highestLevel = 0;
@@ -353,9 +323,13 @@ public class SceneBuilder {
         else {// level information given as, e.g., 2, short for 2;2 (single level)
             lowestLevel = highestLevel = Integer.parseInt(levelStr);
         }
-        Region region = createRegion(x, y, w, h, highestLevel, lowestLevel, id, title, layer, transitions,
-                                     (regionEL.hasAttribute(_ro)) ? Region.parseOrdering(regionEL.getAttribute(_ro)) : Region.ORDERING_DISTANCE,
-                                     sensitivity, fill, stroke);
+        String[] tags = null;
+        if (regionEL.hasAttribute(_tags)){
+            tags = regionEL.getAttribute(_tags).split(TAG_SEPARATOR);
+        }
+        Region region = createRegion(x, y, w, h, highestLevel, lowestLevel, id, title,
+                                     tags, transitions,
+                                     (regionEL.hasAttribute(_ro)) ? Region.parseOrdering(regionEL.getAttribute(_ro)) : Region.ORDERING_DISTANCE);
         String containerID = (regionEL.hasAttribute(_containedIn)) ? regionEL.getAttribute(_containedIn) : null;
         if (containerID != null){
             rn2crn.put(id, containerID);
@@ -387,7 +361,8 @@ public class SceneBuilder {
      *@param r region to be destroyed
      */
     public void destroyRegion(Region r){
-        r.forceHide(Region.DISAPPEAR, r.x, r.y);
+        //XXX should reinstate commented out code, calling it for all VirtualSpace involved
+        //r.forceHide(Region.DISAPPEAR, r.x, r.y);
         ObjectDescription[] ods = r.getObjectsInRegion();
         for (int i=0;i<ods.length;i++){
             sm.id2object.remove(ods[i].getID());
@@ -395,9 +370,6 @@ public class SceneBuilder {
         sm.id2region.remove(r.getID());
         for (int i=r.getLowestLevel();i<=r.getHighestLevel();i++){
             sm.levels[i].removeRegion(r);
-        }
-        if (r.getBounds() != null){
-            sm.layers.get(r.layer).removeGlyph(r.getBounds());
         }
     }
 
@@ -465,7 +437,7 @@ public class SceneBuilder {
         *@param id ID of object in scene
         *@param x x-coordinate in scene
         *@param y y-coordinate in scene
-        *@param zindex z-index (layer)
+        *@param zindex z-index
         *@param resourceURL path to resource (should be absolute)
         *@param type resource type ("img", "pdf", ...)
         *@param sensitivity should the object be sensitive to mouse events or not.
@@ -496,7 +468,7 @@ public class SceneBuilder {
         *@param id ID of object in scene
         *@param x x-coordinate in scene
         *@param y y-coordinate in scene
-        *@param zindex z-index (layer)
+        *@param zindex z-index
         *@param w width in scene
         *@param h height in scene
         *@param imageURL path to bitmap resource (should be absolute)

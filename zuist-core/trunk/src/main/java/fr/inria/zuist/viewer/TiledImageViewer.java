@@ -106,8 +106,8 @@ public class TiledImageViewer {
     VirtualSpaceManager vsm;
     static final String mSpaceName = "Image Layer";
     static final String aboutSpaceName = "About layer";
-    VirtualSpace mSpace, aboutSpace;
-    Camera mCamera, ovCamera, dmCamera;
+    VirtualSpace mSpace, dmSpace, lensSpace, aboutSpace;
+    Camera mCamera, ovCamera, dmCamera, lensCamera;
     static final String mViewName = "ZUIST Tiled Image Viewer";
     View mView;
     TIVEventHandler eh;
@@ -158,14 +158,19 @@ public class TiledImageViewer {
         windowLayout();
         vsm = VirtualSpaceManager.INSTANCE;
         mSpace = vsm.addVirtualSpace(mSpaceName);
+        dmSpace = vsm.addVirtualSpace(VirtualSpace.ANONYMOUS);
+        lensSpace = vsm.addVirtualSpace(VirtualSpace.ANONYMOUS);
         mCamera = mSpace.addCamera();
         ovCamera = mSpace.addCamera();
-        dmCamera = mSpace.addCamera();
+        dmCamera = dmSpace.addCamera();
+        lensCamera = lensSpace.addCamera();
         aboutSpace = vsm.addVirtualSpace(aboutSpaceName);
         aboutSpace.addCamera();
         Vector cameras = new Vector();
         cameras.add(mCamera);
+        cameras.add(lensCamera);
         cameras.add(aboutSpace.getCamera(0));
+        mCamera.stick(lensCamera);
         mView = vsm.addFrameView(cameras, mViewName, (options.opengl) ? View.OPENGL_VIEW : View.STD_VIEW, VIEW_W, VIEW_H, false, false, !options.fullscreen, (!options.fullscreen) ? initMenu() : null);
         if (options.fullscreen && GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().isFullScreenSupported()){
             GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().setFullScreenWindow((JFrame)mView.getFrame());
@@ -173,9 +178,10 @@ public class TiledImageViewer {
         else {
             mView.setVisible(true);
         }
+        mView.setLayerVisibility(new boolean[]{true, false, true}, new boolean[]{false, true, false});
         eh = new TIVEventHandler(this);
         mView.setListener(eh, 0);
-        mView.setListener(ovm, 1);
+        mView.setListener(ovm, 2);
         mView.getCursor().getPicker().setListener(eh);
         mView.setBackgroundColor(BACKGROUND_COLOR);
         mView.setAntialiasing(!options.noaa);
@@ -497,7 +503,7 @@ class Overlay implements ViewListener {
             }
             showingAbout = true;
         }
-        application.mView.setActiveLayer(1);
+        application.mView.setActiveLayer(2);
     }
 
     void hideAbout(){

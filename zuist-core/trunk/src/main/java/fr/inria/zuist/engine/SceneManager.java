@@ -59,7 +59,6 @@ public class SceneManager {
 
     Level[] levels = new Level[0];
 
-    final LinkedHashMap<String,VirtualSpace> layers = new LinkedHashMap(5, .8f, false);
     SceneObserver[] sceneObservers;
     // final double[] prevAlts; //previous altitudes
     final RegionUpdater regUpdater;
@@ -121,17 +120,13 @@ public class SceneManager {
                         // Camera cam = entry.getKey();
                         SceneObserver so = entry.getKey();
                         double alt = entry.getValue().alt;
-                        VirtualSpace layer = so.getTargetVirtualSpace();
-                        if(!layers.containsKey(layer.getName())){
-                            if (DEBUG_MODE){System.err.println("SceneObserver " + so + "is not tracked by ZUIST");}
-                            return;
-                        }
+                        VirtualSpace tvs = so.getTargetVirtualSpace();
                         //update regions
                         if(alt != so.getPreviousAltitude()){
                             so.setPreviousAltitude(alt);
                             updateLevel(so);
                         } else {
-                            updateVisibleRegions(layer, so.getVisibleRegion());
+                            updateVisibleRegions(tvs, so.getVisibleRegion());
                         }
 
                     }
@@ -154,10 +149,6 @@ public class SceneManager {
     public SceneManager(SceneObserver[] sos, HashMap<String,String> properties){
         sb = new SceneBuilder(this);
         this.sceneObservers = sos;
-        for (int i=0;i<sceneObservers.length;i++){
-            VirtualSpace vs = sceneObservers[i].getTargetVirtualSpace();
-            layers.put(vs.getName(), vs);
-        }
         this.setProperties(properties);
         regUpdater = new RegionUpdater();
         glyphLoader = new GlyphLoader(this);
@@ -241,10 +232,6 @@ public class SceneManager {
             }
         }
         // if not, register it
-        VirtualSpace vs = so.getTargetVirtualSpace();
-        if (!layers.containsKey(vs.getName())){
-            layers.put(vs.getName(), vs);
-        }
         so.setSceneManager(this);
         SceneObserver[] nsos = new SceneObserver[sceneObservers.length+1];
         synchronized(sceneObservers){
@@ -255,20 +242,6 @@ public class SceneManager {
     }
 
     public void removeSceneObserver(SceneObserver so){
-        // remove layer declaration if not observed by any other SceneObserver
-        String layer = so.getTargetVirtualSpace().getName();
-        if (layers.containsKey(layer)){
-            boolean layerObservedByAnotherSO = false;
-            for (SceneObserver so2:sceneObservers){
-                if (so2 != so && so2.getTargetVirtualSpace().getName().equals(layer)){
-                    layerObservedByAnotherSO = true;
-                    break;
-                }
-            }
-            if (!layerObservedByAnotherSO){
-                layers.remove(layer);
-            }
-        }
         // find SceneObserver index
         int soIndex = -1;
         for (int i=0;i<sceneObservers.length;i++){
@@ -556,9 +529,9 @@ public class SceneManager {
         return currentLevel;
     }
 
-    private void enterLevel(VirtualSpace layer, double[] vr, int depth, int prev_depth){
+    private void enterLevel(VirtualSpace tvs, double[] vr, int depth, int prev_depth){
         boolean arrivingFromHigherAltLevel = depth > prev_depth;
-        updateVisibleRegions(layer, vr, depth, (arrivingFromHigherAltLevel) ? Region.TFUL : Region.TFLL);
+        updateVisibleRegions(tvs, vr, depth, (arrivingFromHigherAltLevel) ? Region.TFUL : Region.TFLL);
         if (levelListener != null){
             levelListener.enteredLevel(depth);
         }
@@ -572,7 +545,8 @@ public class SceneManager {
             // hide only if region does not span the level where we are going
             if ((goingToLowerAltLevel && !levels[new_depth].contains(r))
                 || (!goingToLowerAltLevel && !levels[new_depth].contains(r))){
-                    r.hide((goingToLowerAltLevel) ? Region.TTLL : Region.TTUL,
+                    r.hide(so.getTargetVirtualSpace(),
+                           (goingToLowerAltLevel) ? Region.TTLL : Region.TTUL,
                            so.getX(),
                            so.getY());
             }
@@ -590,19 +564,16 @@ public class SceneManager {
     /** Notify camera translations. It is up to the client application to notify the scene manager each time the position of the camera used to observe the scene changes.
      *
      */
-    private void updateVisibleRegions(VirtualSpace layer, double[] vr){
+    private void updateVisibleRegions(VirtualSpace tvs, double[] vr){
         //called when an x-y movement occurs but no altitude change
-        updateVisibleRegions(layer, vr, currentLevel, Region.TASL);
+        updateVisibleRegions(tvs, vr, currentLevel, Region.TASL);
     }
 
 
-    private void updateVisibleRegions(VirtualSpace layer, double[] vr, int level, short transition){
+    private void updateVisibleRegions(VirtualSpace tvs, double[] vr, int level, short transition){
         try {
             for (int i=0;i<levels[level].regions.length;i++){
-                if(layer != levels[level].regions[i].layer){
-                    continue;
-                }
-                levels[level].regions[i].updateVisibility(vr, currentLevel, transition, regionListener);
+                levels[level].regions[i].updateVisibility(tvs, vr, currentLevel, transition, regionListener);
             }
         }
         catch ( Exception e) {

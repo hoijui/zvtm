@@ -444,11 +444,10 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener, Obj
         ovm.sayInConsole("Centering on region "+id+"\n");
         Region r = sm.getRegion(id);
         if (r != null){
-            Glyph g = r.getBounds();
-            if (g != null){
-                rememberLocation(mCamera.getLocation());
-                mCamera.getOwningView().centerOnGlyph(g, mCamera, Viewer.ANIM_MOVE_LENGTH, true, 1.2f);
-            }
+            rememberLocation(mCamera.getLocation());
+            mCamera.getOwningView().centerOnRegion(mCamera, Viewer.ANIM_MOVE_LENGTH,
+                r.getX()-r.getWidth()/2d, r.getY()-r.getHeight()/2d,
+                r.getX()+r.getWidth()/2d, r.getY()+r.getHeight()/2d);
         }
     }
 

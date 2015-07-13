@@ -247,7 +247,7 @@ class TIVNavigationManager implements Java2DPainter {
 
     void createDM(int x, int y, PortalListener pl){
         dmPortal = new DraggableCameraPortal(x, y, DM_PORTAL_WIDTH, DM_PORTAL_HEIGHT, dmCamera);
-        pso = new PortalSceneObserver(dmPortal, dmCamera, application.mSpace);
+        pso = new PortalSceneObserver(dmPortal, dmCamera, application.dmSpace);
         dmPortal.setPortalListener(pl);
         dmPortal.setBackgroundColor(application.mView.getBackgroundColor());
         vsm.addPortal(dmPortal, application.mView);
@@ -330,7 +330,7 @@ class TIVNavigationManager implements Java2DPainter {
             application.sm.removeSceneObserver(lso);
         }
         else {
-            lso = new LensSceneObserver(application.mView, application.mCamera, lens, application.mSpace);
+            lso = new LensSceneObserver(application.mView, application.lensCamera, lens, application.lensSpace);
             application.sm.addSceneObserver(lso);
         }
     }
