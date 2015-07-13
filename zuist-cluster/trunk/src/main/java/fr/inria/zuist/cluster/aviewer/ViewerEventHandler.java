@@ -34,25 +34,25 @@ import fr.inria.zvtm.event.ViewAdapter;
 
 import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zuist.engine.Region;
-import fr.inria.zuist.engine.ObjectDescription;
-import fr.inria.zuist.engine.TextDescription;
+import fr.inria.zuist.od.ObjectDescription;
+import fr.inria.zuist.od.TextDescription;
 
 class ViewerEventHandler implements ViewListener, ComponentListener, CameraListener, PickerListener {
-    
+
     static float ZOOM_SPEED_COEF = 1.0f/50.0f;
     static double PAN_SPEED_COEF = 50.0;
-    
+
     static final float WHEEL_ZOOMIN_FACTOR = 1.1f;
     static final float WHEEL_ZOOMOUT_FACTOR = 1/1.1f;
-            
+
     //remember last mouse coords to compute translation  (dragging)
     int lastJPX,lastJPY;
     long lastVX, lastVY;
 
     Viewer application;
-    
+
     Glyph g;
-    
+
     boolean zero_order_dragging = false;
     boolean first_order_dragging = false;
 	static final short ZERO_ORDER = 0;
@@ -60,8 +60,8 @@ class ViewerEventHandler implements ViewListener, ComponentListener, CameraListe
 	short navMode = ZERO_ORDER;
 
 	Glyph objectJustSelected = null;
-	
-	
+
+
     ViewerEventHandler(Viewer app){
         this.application = app;
     }
@@ -110,12 +110,12 @@ class ViewerEventHandler implements ViewListener, ComponentListener, CameraListe
 						case SceneManager.TAKES_TO_REGION:{application.centerOnRegion(takesToID);break;}
 					}
 				}
-			}				
+			}
 		}
 		else {
 			// last click was not on this object, center on it
 			application.rememberLocation(application.mCamera.getLocation());
-			v.cams[0].getOwningView().centerOnGlyph(g, v.cams[0], Viewer.ANIM_MOVE_LENGTH, true, 1.2f);				
+			v.cams[0].getOwningView().centerOnGlyph(g, v.cams[0], Viewer.ANIM_MOVE_LENGTH, true, 1.2f);
 			objectJustSelected = g;
 		}
     }
@@ -143,7 +143,7 @@ class ViewerEventHandler implements ViewListener, ComponentListener, CameraListe
 	}
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
-        
+
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){}
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
@@ -221,7 +221,7 @@ class ViewerEventHandler implements ViewListener, ComponentListener, CameraListe
     public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 
     public void viewActivated(View v){}
-    
+
     public void viewDeactivated(View v){}
 
     public void viewIconified(View v){}
@@ -239,16 +239,16 @@ class ViewerEventHandler implements ViewListener, ComponentListener, CameraListe
         application.updatePanelSize();
     }
     public void componentShown(ComponentEvent e){}
-    
+
     public void cameraMoved(Camera cam, Point2D.Double coord, double alt){
         application.altitudeChanged();
     }
-    
+
     void toggleNavMode(){
         switch(navMode){
             case FIRST_ORDER:{navMode = ZERO_ORDER;break;}
             case ZERO_ORDER:{navMode = FIRST_ORDER;break;}
         }
     }
-    
+
 }

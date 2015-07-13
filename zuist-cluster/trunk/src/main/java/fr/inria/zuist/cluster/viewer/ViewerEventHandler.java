@@ -33,8 +33,8 @@ import fr.inria.zvtm.event.PickerListener;
 
 import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zuist.engine.Region;
-import fr.inria.zuist.engine.ObjectDescription;
-import fr.inria.zuist.engine.TextDescription;
+import fr.inria.zuist.od.ObjectDescription;
+import fr.inria.zuist.od.TextDescription;
 
 class ViewerEventHandler implements ViewListener, ComponentListener, CameraListener, PickerListener {
 
