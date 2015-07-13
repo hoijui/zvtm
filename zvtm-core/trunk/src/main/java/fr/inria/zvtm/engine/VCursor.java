@@ -194,7 +194,11 @@ public class VCursor {
             pvy = vy;
             vx = (cx*ucoef) + c.vx;
             vy = (cy*ucoef) + c.vy;
-            picker.setVSCoordinates(vx, vy);
+            if (pvx != vx || pvy != vy){
+                // set coordinates only if they have changed
+                // (as this will trigger a repaint)
+                picker.setVSCoordinates(vx, vy);
+            }
         }
     }
 
