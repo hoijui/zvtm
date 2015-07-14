@@ -126,6 +126,7 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener, Obj
     ViewerEventHandler eh;
 
     SceneManager sm;
+    ViewSceneObserver mso;
 
     OverlayManager ovm;
     VWGlassPane gp;
@@ -134,12 +135,11 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener, Obj
     public Viewer(ViewerOptions options){
         ovm = new OverlayManager(this);
         initGUI(options);
-        // VirtualSpace[]  sceneSpaces = {mSpace};
-        // Camera[] sceneCameras = {mCamera};
-        SceneObserver[] sceneObservers = {new ViewSceneObserver(mView, mCamera, mSpace)};
+        mso = new ViewSceneObserver(mView, mCamera, mSpace);
+        SceneObserver[] sceneObservers = {mso};
         sm = new SceneManager(sceneObservers, Launcher.parseSceneOptions(options));
-        sm.setRegionListener(this);
-        sm.setLevelListener(this);
+        mso.setRegionListener(this);
+        mso.setLevelListener(this);
         sm.setObjectListener(this);
         previousLocations = new Vector();
         ovm.initConsole();

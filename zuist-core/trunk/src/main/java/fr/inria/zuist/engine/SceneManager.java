@@ -33,8 +33,6 @@ import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.animation.EndAction;
 import fr.inria.zvtm.engine.Location;
 import fr.inria.zuist.event.ProgressListener;
-import fr.inria.zuist.event.LevelListener;
-import fr.inria.zuist.event.RegionListener;
 import fr.inria.zuist.event.ObjectListener;
 import fr.inria.zuist.od.ObjectDescription;
 import fr.inria.zuist.od.TextDescription;
@@ -63,14 +61,12 @@ public class SceneManager {
     // final double[] prevAlts; //previous altitudes
     final RegionUpdater regUpdater;
 
+    ObjectListener objectListener;
+
     /** Contains a mapping from region IDs to actual Region objects. */
     Hashtable<String,Region> id2region;
     /** Contains a mapping from object IDs to actual objects. */
     Hashtable<String,ObjectDescription> id2object;
-
-    LevelListener levelListener;
-    RegionListener regionListener;
-    ObjectListener objectListener;
 
     /** Set to something else than 0,0 to translate a scene to another location than that defined originally. */
     Point2D.Double origin = new Point2D.Double(0, 0);
@@ -169,7 +165,8 @@ public class SceneManager {
         return sos;
     }
 
-    public SceneManager(VirtualSpace[] targetSpaces, Camera[] observingCameras, HashMap<String,String> properties){
+    public SceneManager(VirtualSpace[] targetSpaces, Camera[] observingCameras,
+                        HashMap<String,String> properties){
         this(buildObservers(targetSpaces, observingCameras), properties);
     }
 
@@ -415,22 +412,6 @@ public class SceneManager {
         return new ObjectPicker(this, tl, bl);
     }
 
-    public void setLevelListener(LevelListener ll){
-        levelListener = ll;
-    }
-
-    public LevelListener getLevelListener(){
-        return levelListener;
-    }
-
-    public void setRegionListener(RegionListener rl){
-        regionListener = rl;
-    }
-
-    public RegionListener getRegionListener(){
-        return regionListener;
-    }
-
     public int getPendingRequestQueueSize(){
         return glyphLoader.getPendingRequestQueueSize();
     }
@@ -521,8 +502,8 @@ public class SceneManager {
     private void enterLevel(SceneObserver so, int depth, int prev_depth){
         boolean arrivingFromHigherAltLevel = depth > prev_depth;
         updateVisibleRegions(so, (arrivingFromHigherAltLevel) ? Region.TFUL : Region.TFLL);
-        if (levelListener != null){
-            levelListener.enteredLevel(depth);
+        if (so.getLevelListener() != null){
+            so.getLevelListener().enteredLevel(depth);
         }
     }
 
@@ -540,8 +521,8 @@ public class SceneManager {
                            so.getY());
             }
         }
-        if (levelListener != null){
-            levelListener.exitedLevel(depth);
+        if (so.getLevelListener() != null){
+            so.getLevelListener().exitedLevel(depth);
         }
     }
 
@@ -565,7 +546,7 @@ public class SceneManager {
         int level = so.getCurrentLevel();
         try {
             for (int i=0;i<levels[level].regions.length;i++){
-                levels[level].regions[i].updateVisibility(tvs, vr, level, transition, regionListener);
+                levels[level].regions[i].updateVisibility(tvs, vr, level, transition, so.getRegionListener());
             }
         }
         catch ( Exception e) {

@@ -10,6 +10,8 @@ package fr.inria.zuist.engine;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zuist.engine.SceneManager;
+import fr.inria.zuist.event.LevelListener;
+import fr.inria.zuist.event.RegionListener;
 
 public abstract class SceneObserver {
 
@@ -21,6 +23,9 @@ public abstract class SceneObserver {
     double prevAlt;
     int previousLevel = -2;
     int currentLevel = -1;
+
+    LevelListener levelListener;
+    RegionListener regionListener;
 
     public abstract double[] getVisibleRegion();
 
@@ -55,6 +60,22 @@ public abstract class SceneObserver {
      */
     public int getCurrentLevel(){
         return currentLevel;
+    }
+
+    public void setLevelListener(LevelListener ll){
+        levelListener = ll;
+    }
+
+    public LevelListener getLevelListener(){
+        return levelListener;
+    }
+
+    public void setRegionListener(RegionListener rl){
+        regionListener = rl;
+    }
+
+    public RegionListener getRegionListener(){
+        return regionListener;
     }
 
 }
