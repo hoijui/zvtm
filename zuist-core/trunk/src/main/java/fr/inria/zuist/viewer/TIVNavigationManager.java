@@ -362,7 +362,12 @@ class TIVNavigationManager implements Java2DPainter {
             lens.setBufferThreshold(1.5f);
         }
         Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createLensMagAnim(LENS_ANIM_TIME, (FixedSizeLens)lens,
-            new Float(MAG_FACTOR-1), true, IdentityInterpolator.getInstance(), null);
+            new Float(MAG_FACTOR-1), true, IdentityInterpolator.getInstance(),
+            new EndAction(){
+                public void execute(Object subject, Animation.Dimension dimension){
+                    lso.lensMagnified();
+                }
+            });
         VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
         setLens(ZOOMIN_LENS);
     }
@@ -436,6 +441,7 @@ class TIVNavigationManager implements Java2DPainter {
     void setMagFactor(double m){
         MAG_FACTOR = m;
         INV_MAG_FACTOR = 1 / MAG_FACTOR;
+        lso.lensMagnified();
     }
 
     void magnifyFocus(double magOffset, int zooming, Camera ca){

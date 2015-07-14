@@ -73,7 +73,11 @@ public class LensSceneObserver extends SceneObserver implements CameraListener {
         sm.regUpdater.addEntry(this, new Location(getX(), getY(), getAltitude()));
     }
 
-    // XXX
-    // probably have to do something about mag factor in relation with altitude
+    /** This method has to be called whenever the lens' magnification factor changes.
+       We have no way to detect such changes currently, so the application
+       has to trigger such calls. */
+    public void lensMagnified(){
+        sm.regUpdater.addEntry(this, new Location(getX(), getY(), getAltitude()));
+    }
 
 }
