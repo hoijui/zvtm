@@ -482,7 +482,6 @@ public class SceneManager {
         }
         double[] vr = so.getVisibleRegion();
         // compare to current level
-        // System.out.println(so.previousLevel+" "+so.currentLevel);
         if (so.previousLevel != so.currentLevel){
             // it is important that exitLevel() gets called before enterLevel()
             // because of regions spanning multiple levels that get checked in exitLevel()
