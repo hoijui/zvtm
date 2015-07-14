@@ -7,6 +7,8 @@
 
 package fr.inria.zuist.engine;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zuist.engine.SceneManager;
@@ -16,6 +18,9 @@ import fr.inria.zuist.event.RegionListener;
 public abstract class SceneObserver {
 
     SceneManager sm;
+
+    static final Short DUMMY_SHORT = new Short((short)0);
+    ConcurrentHashMap<Region,Short> observedRegions = new ConcurrentHashMap(20, .75f, 4);
 
     VirtualSpace vs;
     Camera c;

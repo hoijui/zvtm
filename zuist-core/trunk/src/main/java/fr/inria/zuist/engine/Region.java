@@ -115,9 +115,6 @@ public class Region {
 
     String[] tags;
 
-    // was visible in viewport
-    boolean wviv = false;
-
     SceneManager sm;
 
     boolean isSensitive = false;
@@ -314,7 +311,6 @@ public class Region {
         wnes[3] = y - h/2;
     }
 
-    /** For internal use. Outside-package subclassing. */
     public void addObject(ObjectDescription od){
         ObjectDescription[] newObjects = new ObjectDescription[objects.length+1];
         System.arraycopy(objects, 0, newObjects, 0, objects.length);
@@ -334,17 +330,18 @@ public class Region {
     }
 
     /*rl can be null*/
-    void updateVisibility(VirtualSpace tvs, double[] viewportBounds, int atDepth, short transition, RegionListener rl){
+    void updateVisibility(SceneObserver so, double[] viewportBounds, int atDepth,
+                          short transition, RegionListener rl){
         // is visible in viewport
         boolean iviv = (wnes[0] < viewportBounds[2] && wnes[2] > viewportBounds[0]
             && wnes[3] < viewportBounds[1] && wnes[1] > viewportBounds[3]);
         if (iviv){
-            if (wviv){
+            if (so.observedRegions.containsKey(this)){
                 // was visible last time we checked, is still visible
                 // visibility status of contained regions might have changed
                 // we have to compute intersections to find out
                 for (int i=0;i<containedRegions.length;i++){
-                    containedRegions[i].updateVisibility(tvs, viewportBounds, atDepth, transition, rl);
+                    containedRegions[i].updateVisibility(so, viewportBounds, atDepth, transition, rl);
                 }
             }
             else {
@@ -352,10 +349,10 @@ public class Region {
                 // visibility status of contained regions might have changed
                 // we have to compute intersections to find out
                 for (int i=0;i<containedRegions.length;i++){
-                    containedRegions[i].updateVisibility(tvs, viewportBounds, atDepth, transition, rl);
+                    containedRegions[i].updateVisibility(so, viewportBounds, atDepth, transition, rl);
                 }
                 if (atDepth >= hli && atDepth <= lli){
-                    forceShow(tvs, transition, (wnes[2]+wnes[0])/2, (wnes[1]+wnes[3])/2);
+                    forceShow(so, transition, (wnes[2]+wnes[0])/2, (wnes[1]+wnes[3])/2);
                     if (rl != null){
                         rl.enteredRegion(this);
                     }
@@ -363,19 +360,18 @@ public class Region {
             }
         }
         else {
-            if (wviv){
+            if (so.observedRegions.containsKey(this)){
                 // was visible last time we checked, is no longer visible
                 // contained regions are necessarily invisible
                 for (int i=0;i<containedRegions.length;i++){
-                    containedRegions[i].updateVisibility(tvs, false, viewportBounds, atDepth, transition, rl);
+                    containedRegions[i].updateVisibility(so, false, viewportBounds, atDepth, transition, rl);
                 }
                 if (atDepth >= hli && atDepth <= lli){
-                    forceHide(tvs, transition, (wnes[2]+wnes[0])/2, (wnes[1]+wnes[3])/2);
+                    forceHide(so, transition, (wnes[2]+wnes[0])/2, (wnes[1]+wnes[3])/2);
                     if (rl != null){
                         rl.exitedRegion(this);
                     }
                 }
-
             }
             // else nothing to do: was not visible last time we checked, is still invisible
             // contained regions were not visible, and are still not visible
@@ -383,14 +379,15 @@ public class Region {
     }
 
     /*rl can be null*/
-    void updateVisibility(VirtualSpace tvs, boolean visible, double[] viewportBounds, int atDepth, short transition, RegionListener rl){
+    void updateVisibility(SceneObserver so, boolean visible, double[] viewportBounds, int atDepth,
+                          short transition, RegionListener rl){
         if (visible){
-            if (wviv){
+            if (so.observedRegions.containsKey(this)){
                 // was visible last time we checked, is still visible
                 // visibility status of contained regions might have changed
                 // we have to compute intersections to find out
                 for (int i=0;i<containedRegions.length;i++){
-                    containedRegions[i].updateVisibility(tvs, viewportBounds, atDepth, transition, rl);
+                    containedRegions[i].updateVisibility(so, viewportBounds, atDepth, transition, rl);
                 }
             }
             else {
@@ -398,26 +395,25 @@ public class Region {
                 // visibility status of contained regions might have changed
                 // we have to compute intersections to find out
                 for (int i=0;i<containedRegions.length;i++){
-                    containedRegions[i].updateVisibility(tvs, viewportBounds, atDepth, transition, rl);
+                    containedRegions[i].updateVisibility(so, viewportBounds, atDepth, transition, rl);
                 }
                 if (atDepth >= hli && atDepth <= lli){
-                    forceShow(tvs, transition, (wnes[2]+wnes[0])/2, (wnes[1]+wnes[3])/2);
+                    forceShow(so, transition, (wnes[2]+wnes[0])/2, (wnes[1]+wnes[3])/2);
                     if (rl != null){
                         rl.enteredRegion(this);
                     }
                 }
-
             }
         }
         else {
-            if (wviv){
+            if (so.observedRegions.containsKey(this)){
                 // was visible last time we checked, is no longer visible
                 // contained regions are necessarily invisible
                 for (int i=0;i<containedRegions.length;i++){
-                    containedRegions[i].updateVisibility(tvs, false, viewportBounds, atDepth, transition, rl);
+                    containedRegions[i].updateVisibility(so, false, viewportBounds, atDepth, transition, rl);
                 }
                 if (atDepth >= hli && atDepth <= lli){
-                    forceHide(tvs, transition, (wnes[2]+wnes[0])/2, (wnes[1]+wnes[3])/2);
+                    forceHide(so, transition, (wnes[2]+wnes[0])/2, (wnes[1]+wnes[3])/2);
                     if (rl != null){
                         rl.exitedRegion(this);
                     }
@@ -428,38 +424,38 @@ public class Region {
         }
     }
 
-    void show(VirtualSpace tvs, short transition, double  x, double y){
-        if (!wviv){
-            forceShow(tvs, transition, x, y);
+    void show(SceneObserver so, short transition, double  x, double y){
+        if (!so.observedRegions.containsKey(this)){
+            forceShow(so, transition, x, y);
         }
     }
 
-    void forceShow(VirtualSpace tvs, short transition, double x, double y){
+    void forceShow(SceneObserver so, short transition, double x, double y){
         if (requestOrder == ORDERING_DISTANCE){
             Arrays.sort(objects, new DistanceComparator(x, y));
         }
         boolean fade = (transition == TASL) ? false : transitions[transition] == FADE_IN;
         for (int i=0;i<objects.length;i++){
-            sm.glyphLoader.addLoadRequest(tvs, objects[i], fade);
+            sm.glyphLoader.addLoadRequest(so.getTargetVirtualSpace(), objects[i], fade);
         }
-        wviv = true;
+        so.observedRegions.put(this, SceneObserver.DUMMY_SHORT);
     }
 
-    void hide(VirtualSpace tvs, short transition, double x, double y){
-        if (wviv){
-            forceHide(tvs, transition, x, y);
+    void hide(SceneObserver so, short transition, double x, double y){
+        if (so.observedRegions.containsKey(this)){
+            forceHide(so, transition, x, y);
         }
     }
 
-    void forceHide(VirtualSpace tvs, short transition, double x, double y){
+    void forceHide(SceneObserver so, short transition, double x, double y){
         if (requestOrder == ORDERING_DISTANCE){
             Arrays.sort(objects, new DistanceComparator(x, y));
         }
         boolean fade = (transition == TASL) ? false : transitions[transition] == FADE_OUT;
         for (int i=0;i<objects.length;i++){
-            sm.glyphLoader.addUnloadRequest(tvs, objects[i], fade);
+            sm.glyphLoader.addUnloadRequest(so.getTargetVirtualSpace(), objects[i], fade);
         }
-        wviv = false;
+        so.observedRegions.remove(this);
     }
 
     int getClosestObjectIndex(double x, double y){

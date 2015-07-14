@@ -482,6 +482,7 @@ public class SceneManager {
         }
         double[] vr = so.getVisibleRegion();
         // compare to current level
+        // System.out.println(so.previousLevel+" "+so.currentLevel);
         if (so.previousLevel != so.currentLevel){
             // it is important that exitLevel() gets called before enterLevel()
             // because of regions spanning multiple levels that get checked in exitLevel()
@@ -515,7 +516,7 @@ public class SceneManager {
             // hide only if region does not span the level where we are going
             if ((goingToLowerAltLevel && !levels[new_depth].contains(r))
                 || (!goingToLowerAltLevel && !levels[new_depth].contains(r))){
-                    r.hide(so.getTargetVirtualSpace(),
+                    r.hide(so,
                            (goingToLowerAltLevel) ? Region.TTLL : Region.TTUL,
                            so.getX(),
                            so.getY());
@@ -541,12 +542,11 @@ public class SceneManager {
 
 
     private void updateVisibleRegions(SceneObserver so, short transition){
-        VirtualSpace tvs = so.getTargetVirtualSpace();
         double[] vr = so.getVisibleRegion();
         int level = so.getCurrentLevel();
         try {
             for (int i=0;i<levels[level].regions.length;i++){
-                levels[level].regions[i].updateVisibility(tvs, vr, level, transition, so.getRegionListener());
+                levels[level].regions[i].updateVisibility(so, vr, level, transition, so.getRegionListener());
             }
         }
         catch ( Exception e) {
