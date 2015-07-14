@@ -11,24 +11,41 @@ import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zuist.engine.SceneManager;
 
-public interface SceneObserver {
+public abstract class SceneObserver {
 
-    public double[] getVisibleRegion();
+    SceneManager sm;
 
-    public double getAltitude();
+    VirtualSpace vs;
+    Camera c;
 
-    void setPreviousAltitude(double a);
+    double prevAlt;
 
-    double getPreviousAltitude();
+    public abstract double[] getVisibleRegion();
 
-    public double getX();
+    public abstract double getAltitude();
 
-    public double getY();
+    abstract public double getX();
 
-    public VirtualSpace getTargetVirtualSpace();
+    abstract public double getY();
 
-    void setSceneManager(SceneManager sm);
+    public VirtualSpace getTargetVirtualSpace(){
+        return vs;
+    }
 
-    public Camera getCamera();
+    void setSceneManager(SceneManager sm){
+        this.sm = sm;
+    }
+
+    public Camera getCamera(){
+        return c;
+    }
+
+    public void setPreviousAltitude(double a){
+        this.prevAlt = a;
+    }
+
+    public double getPreviousAltitude(){
+        return this.prevAlt;
+    }
 
 }

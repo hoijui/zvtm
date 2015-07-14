@@ -17,14 +17,9 @@ import fr.inria.zvtm.engine.portals.CameraPortal;
 import fr.inria.zvtm.event.CameraListener;
 import fr.inria.zuist.engine.SceneManager;
 
-public class PortalSceneObserver implements SceneObserver, CameraListener {
-
-    SceneManager sm;
-    double prevAlt;
+public class PortalSceneObserver extends SceneObserver implements CameraListener {
 
     CameraPortal cp;
-    Camera c;
-    VirtualSpace vs;
 
     /**
      *@param observingPortal portal that observes the scene
@@ -36,10 +31,6 @@ public class PortalSceneObserver implements SceneObserver, CameraListener {
         this.c = observingCamera;
         this.c.addListener(this);
         this.vs = targetVirtualSpace;
-    }
-
-    public Camera getCamera(){
-        return c;
     }
 
     public double[] getVisibleRegion(){
@@ -58,25 +49,13 @@ public class PortalSceneObserver implements SceneObserver, CameraListener {
         return c.getAltitude();
     }
 
-    public VirtualSpace getTargetVirtualSpace(){
-        return vs;
+    public void cameraMoved(){
+        sm.regUpdater.addEntry(this, new Location(c.vx, c.vy, c.altitude));
     }
 
     /* Camera events handling */
     public void cameraMoved(Camera cam, Point2D.Double loc, double alt){
-        sm.regUpdater.addEntry(this, new Location(loc.x, loc.y, alt));
-    }
-
-    public void setSceneManager(SceneManager sm){
-        this.sm = sm;
-    }
-
-    public void setPreviousAltitude(double a){
-        this.prevAlt = a;
-    }
-
-    public double getPreviousAltitude(){
-        return this.prevAlt;
+        cameraMoved();
     }
 
 }

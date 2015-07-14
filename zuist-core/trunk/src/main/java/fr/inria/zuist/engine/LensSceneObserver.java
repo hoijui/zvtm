@@ -18,15 +18,10 @@ import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.event.CameraListener;
 import fr.inria.zuist.engine.SceneManager;
 
-public class LensSceneObserver implements SceneObserver, CameraListener {
-
-    SceneManager sm;
-    double prevAlt;
+public class LensSceneObserver extends SceneObserver implements CameraListener {
 
     View v;
-    Camera c;
     Lens l;
-    VirtualSpace vs;
 
     /**
      *@param observingView view that observes the scene
@@ -40,10 +35,6 @@ public class LensSceneObserver implements SceneObserver, CameraListener {
         this.l = observingLens;
         this.c.addListener(this);
         this.vs = targetVirtualSpace;
-    }
-
-    public Camera getCamera(){
-        return c;
     }
 
     public double[] getVisibleRegion(){
@@ -70,10 +61,6 @@ public class LensSceneObserver implements SceneObserver, CameraListener {
         return c.getAltitude() + deltAlt;
     }
 
-    public VirtualSpace getTargetVirtualSpace(){
-        return vs;
-    }
-
     /* Camera events handling */
     public void cameraMoved(Camera cam, Point2D.Double loc, double alt){
         sm.regUpdater.addEntry(this, new Location(getX(), getY(), getAltitude()));
@@ -84,18 +71,6 @@ public class LensSceneObserver implements SceneObserver, CameraListener {
        has to trigger such calls. */
     public void lensMoved(){
         sm.regUpdater.addEntry(this, new Location(getX(), getY(), getAltitude()));
-    }
-
-    public void setSceneManager(SceneManager sm){
-        this.sm = sm;
-    }
-
-    public void setPreviousAltitude(double a){
-        this.prevAlt = a;
-    }
-
-    public double getPreviousAltitude(){
-        return this.prevAlt;
     }
 
     // XXX
