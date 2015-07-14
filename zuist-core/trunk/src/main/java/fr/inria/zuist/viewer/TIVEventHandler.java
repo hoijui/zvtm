@@ -318,10 +318,10 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
     public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
         if (nm.lensType != 0 && nm.lens != null){
             if (wheelDirection  == ViewListener.WHEEL_UP){
-                nm.magnifyFocus(TIVNavigationManager.WHEEL_MM_STEP, nm.lensType, application.mCamera);
+                nm.magnifyFocus(-TIVNavigationManager.WHEEL_MM_STEP, nm.lensType, application.mCamera);
             }
             else {
-                nm.magnifyFocus(-TIVNavigationManager.WHEEL_MM_STEP, nm.lensType, application.mCamera);
+                nm.magnifyFocus(TIVNavigationManager.WHEEL_MM_STEP, nm.lensType, application.mCamera);
             }
         }
         else if (inZoomWindow){
