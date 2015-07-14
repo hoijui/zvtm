@@ -126,7 +126,7 @@ public class SceneManager {
                             so.setPreviousAltitude(alt);
                             updateLevel(so);
                         } else {
-                            updateVisibleRegions(tvs, so.getVisibleRegion());
+                            updateVisibleRegions(so);
                         }
 
                     }
@@ -473,8 +473,6 @@ public class SceneManager {
         regUpdater.setEnabled(b);
     }
 
-    int previousLevel = -2;
-    int currentLevel = -1;
     boolean updateLevel = false;
 
     /** Enable/disable level updating.
@@ -482,56 +480,47 @@ public class SceneManager {
      *@see #updateLevel(SceneObserver so)
      */
     public void setUpdateLevel(boolean b){
-    updateLevel = b;
-    //update level for every camera
-    if(updateLevel){
-        synchronized(sceneObservers){
-            for(SceneObserver so: sceneObservers){
-                updateLevel(so);
+        updateLevel = b;
+        //update level for every camera
+        if (updateLevel){
+            synchronized(sceneObservers){
+                for(SceneObserver so: sceneObservers){
+                    updateLevel(so);
+                }
             }
         }
     }
-    }
 
-    /** Notify altitude changes.
-     *@param vr region visible through a SceneObserver
-     *@param altitude the new SceneObserver's altitude
-     */
+    /** Compute altitude/level changes. */
     private void updateLevel(SceneObserver so){
         if (!updateLevel){return;}
         double soa = so.getAltitude();
         // find out new level
         for (int i=0;i<levels.length;i++){
-            if (levels[i].inRange(soa)){currentLevel = i;break;}
+            if (levels[i].inRange(soa)){so.currentLevel = i;break;}
         }
         double[] vr = so.getVisibleRegion();
         // compare to current level
-        if (previousLevel != currentLevel){
+        if (so.previousLevel != so.currentLevel){
             // it is important that exitLevel() gets called before enterLevel()
             // because of regions spanning multiple levels that get checked in exitLevel()
-            if (previousLevel >= 0){
-                exitLevel(so, previousLevel, currentLevel);
+            if (so.previousLevel >= 0){
+                exitLevel(so, so.previousLevel, so.currentLevel);
             }
-            enterLevel(so.getTargetVirtualSpace(), vr, currentLevel, previousLevel);
-            previousLevel = currentLevel;
+            enterLevel(so, so.currentLevel, so.previousLevel);
+            so.previousLevel = so.currentLevel;
         }
         else {
             // if level hasn't changed, it is still necessary to update
             // visible regions as some of them might have become (in)visible
-            updateVisibleRegions(so.getTargetVirtualSpace(), vr);
+            updateVisibleRegions(so);
         }
     }
 
-    /** Get the current level.
-     *@return index of level at which camera is right now (highest level is 0)
-     */
-    public int getCurrentLevel(){
-        return currentLevel;
-    }
 
-    private void enterLevel(VirtualSpace tvs, double[] vr, int depth, int prev_depth){
+    private void enterLevel(SceneObserver so, int depth, int prev_depth){
         boolean arrivingFromHigherAltLevel = depth > prev_depth;
-        updateVisibleRegions(tvs, vr, depth, (arrivingFromHigherAltLevel) ? Region.TFUL : Region.TFLL);
+        updateVisibleRegions(so, (arrivingFromHigherAltLevel) ? Region.TFUL : Region.TFLL);
         if (levelListener != null){
             levelListener.enteredLevel(depth);
         }
@@ -556,24 +545,27 @@ public class SceneManager {
         }
     }
 
-    /** Get region whose center is closest to a given location at the current level. */
-    public Region getClosestRegionAtCurrentLevel(Point2D.Double lp){
-        return levels[currentLevel].getClosestRegion(lp);
+    /** Get region whose center is closest to a given location at level l. */
+    public Region getClosestRegionAtCurrentLevel(Point2D.Double lp, int level){
+        return levels[level].getClosestRegion(lp);
     }
 
     /** Notify camera translations. It is up to the client application to notify the scene manager each time the position of the camera used to observe the scene changes.
      *
      */
-    private void updateVisibleRegions(VirtualSpace tvs, double[] vr){
+    private void updateVisibleRegions(SceneObserver so){
         //called when an x-y movement occurs but no altitude change
-        updateVisibleRegions(tvs, vr, currentLevel, Region.TASL);
+        updateVisibleRegions(so, Region.TASL);
     }
 
 
-    private void updateVisibleRegions(VirtualSpace tvs, double[] vr, int level, short transition){
+    private void updateVisibleRegions(SceneObserver so, short transition){
+        VirtualSpace tvs = so.getTargetVirtualSpace();
+        double[] vr = so.getVisibleRegion();
+        int level = so.getCurrentLevel();
         try {
             for (int i=0;i<levels[level].regions.length;i++){
-                levels[level].regions[i].updateVisibility(tvs, vr, currentLevel, transition, regionListener);
+                levels[level].regions[i].updateVisibility(tvs, vr, level, transition, regionListener);
             }
         }
         catch ( Exception e) {
@@ -588,7 +580,7 @@ public class SceneManager {
     public void updateVisibleRegions(){
         synchronized(sceneObservers){
             for (SceneObserver so:sceneObservers){
-                updateVisibleRegions(so.getTargetVirtualSpace(), so.getVisibleRegion());
+                updateVisibleRegions(so);
             }
         }
     }
@@ -637,19 +629,6 @@ public class SceneManager {
         }
         else return new double[]{0,0,0,0};
     }
-
-    /** Get a global view of the scene.
-     *@param c camera that should show a global view
-     *@param d duration of animation from current location to global view
-     *@param ea action to be perfomed after camera has reached its new position (can be null)
-     @return bounds in virtual space
-     */
-    public double[] getGlobalView(Camera c, int d, EndAction ea){
-        double[] wnes = findFarmostRegionCoords();
-        c.getOwningView().centerOnRegion(c, d, wnes[0], wnes[1], wnes[2], wnes[3], ea);
-        return wnes;
-    }
-
 
     /* ------------------ DEBUGGING --------------------- */
     private static boolean DEBUG_MODE = true;

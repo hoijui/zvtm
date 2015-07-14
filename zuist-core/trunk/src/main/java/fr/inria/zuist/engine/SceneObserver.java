@@ -19,6 +19,8 @@ public abstract class SceneObserver {
     Camera c;
 
     double prevAlt;
+    int previousLevel = -2;
+    int currentLevel = -1;
 
     public abstract double[] getVisibleRegion();
 
@@ -46,6 +48,13 @@ public abstract class SceneObserver {
 
     public double getPreviousAltitude(){
         return this.prevAlt;
+    }
+
+    /** Get the current level.
+     *@return index of level at which camera is right now (highest level is 0)
+     */
+    public int getCurrentLevel(){
+        return currentLevel;
     }
 
 }

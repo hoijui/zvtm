@@ -118,6 +118,8 @@ public class TiledImageViewer {
 
     WEGlassPane gp;
 
+    ViewSceneObserver mso;
+
     public TiledImageViewer(ViewerOptions options){
         ovm = new Overlay(this);
         initGUI(options);
@@ -129,7 +131,8 @@ public class TiledImageViewer {
         ((JFrame)mView.getFrame()).setGlassPane(gp);
         // VirtualSpace[]  sceneSpaces = {mSpace};
         // Camera[] sceneCameras = {mCamera};
-        SceneObserver[] sceneObservers = {new ViewSceneObserver(mView, mCamera, mSpace)};
+        mso = new ViewSceneObserver(mView, mCamera, mSpace);
+        SceneObserver[] sceneObservers = {mso};
         sm = new SceneManager(sceneObservers, Launcher.parseSceneOptions(options));
         if (options.smooth){
             Region.setDefaultTransitions(Region.FADE_IN, Region.FADE_OUT);

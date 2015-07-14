@@ -124,7 +124,7 @@ class TIVNavigationManager implements Java2DPainter {
     }
 
     void getGlobalView(EndAction ea){
-        application.sm.getGlobalView(mCamera, TIVNavigationManager.ANIM_MOVE_DURATION, ea);
+        application.mso.getGlobalView(TIVNavigationManager.ANIM_MOVE_DURATION, ea);
     }
 
     /* Higher view */
@@ -263,12 +263,19 @@ class TIVNavigationManager implements Java2DPainter {
         application.mSpace.onTop(magWindow);
         application.mSpace.show(magWindow);
         paintDMLinks = true;
-        Animation as = vsm.getAnimationManager().getAnimationFactory().createPortalSizeAnim(DM_PORTAL_ANIM_TIME, dmPortal,
+        Animation as = vsm.getAnimationManager().getAnimationFactory().createPortalSizeAnim(
+            DM_PORTAL_ANIM_TIME, dmPortal,
             DM_PORTAL_WIDTH-w, DM_PORTAL_HEIGHT-h, true,
-            IdentityInterpolator.getInstance(), null);
-        Animation at = vsm.getAnimationManager().getAnimationFactory().createPortalTranslation(DM_PORTAL_ANIM_TIME, dmPortal,
-            new Point(DM_PORTAL_INITIAL_X_OFFSET-w/2, DM_PORTAL_INITIAL_Y_OFFSET-h/2), true,
-            IdentityInterpolator.getInstance(), null);
+            IdentityInterpolator.getInstance(),
+            new EndAction(){
+                public void execute(Object subject, Animation.Dimension dimension){
+                    pso.cameraMoved();
+                }
+            });
+        Animation at = vsm.getAnimationManager().getAnimationFactory().createPortalTranslation(
+            DM_PORTAL_ANIM_TIME, dmPortal,
+            new Point(DM_PORTAL_INITIAL_X_OFFSET-w/2, DM_PORTAL_INITIAL_Y_OFFSET-h/2),
+            true, IdentityInterpolator.getInstance(), null);
         vsm.getAnimationManager().startAnimation(as, false);
         vsm.getAnimationManager().startAnimation(at, false);
     }
