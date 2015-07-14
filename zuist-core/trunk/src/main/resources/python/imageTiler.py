@@ -176,7 +176,12 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
     # generate image tile
     # generate image except for level 0 where we use original image
     tileFileName = "%s%s.%s" % (TILE_FILE_PREFIX, tileIDstr, OUTPUT_FILE_EXT)
-    tilePath = "%s/%s" % (TGT_DIR, tileFileName)
+    levelTilePath = "%s/%s" % (TGT_DIR, level)
+    relTilePath = "%s/%s" % (level, tileFileName)
+    fullTilePath = "%s/%s" % (levelTilePath, tileFileName)
+    if not os.path.exists(levelTilePath):
+        log("Creating dir %s" % levelTilePath, 2)
+        os.mkdir(levelTilePath)
     aw = ah = TILE_SIZE*scale
     if x + TILE_SIZE*scale > src_sz[0]:
         aw = int(src_sz[0] - x)
@@ -184,10 +189,10 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
         ah = int(src_sz[1] - y)
     if aw == 0 or ah == 0:
         return
-    if os.path.exists(tilePath) and not FORCE_GENERATE_TILES:
-        log("---- %.2f%%\n%s already exists (skipped)" % (PROGRESS/float(maxTileCount)*100, tilePath), 2)
+    if os.path.exists(fullTilePath) and not FORCE_GENERATE_TILES:
+        log("---- %.2f%%\n%s already exists (skipped)" % (PROGRESS/float(maxTileCount)*100, fullTilePath), 1)
     else:
-        log("---- %.2f%%\nGenerating tile %s" % (PROGRESS/float(maxTileCount)*100, tileIDstr), 2)
+        log("---- %.2f%%\nGenerating tile %s" % (PROGRESS/float(maxTileCount)*100, tileIDstr), 1)
         if USE_CG:
             # this will work only with a Mac
             w = h = int(TILE_SIZE)
@@ -198,15 +203,15 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
             bitmap.setInterpolationQuality(kCGInterpolationHigh)
             rect = CGRectMake(0, 0, int(aw/scale), int(ah/scale))
             bitmap.drawImage(rect, cim)
-            bitmap.writeToFile(tilePath, kCGImageFormatPNG)
+            bitmap.writeToFile(fullTilePath, kCGImageFormatPNG)
         else:
-            ccl = "convert %s -crop %dx%d+%d+%d -quality 95 %s" % (SRC_PATH, aw, ah, x, y, tilePath)
+            ccl = "convert %s -crop %dx%d+%d+%d -quality 95 %s" % (SRC_PATH, aw, ah, x, y, fullTilePath)
             if USE_GRAPHICSMAGICK:
                 ccl = "%s %s" % ("gm", ccl)
             os.system(ccl)
             log("Cropping: %s" % ccl, 3)
             if scale > 1.0:
-                ccl = "convert %s -resize %dx%d -quality 95 %s" % (tilePath, aw/scale, ah/scale, tilePath)
+                ccl = "convert %s -resize %dx%d -quality 95 %s" % (fullTilePath, aw/scale, ah/scale, fullTilePath)
                 if USE_GRAPHICSMAGICK:
                     ccl = "%s %s" % ("gm", ccl)
                 os.system(ccl)
@@ -234,9 +239,9 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
     objectEL.set("y", str(int(DY-y-ah/2)))
     objectEL.set("w", str(int(aw)))
     objectEL.set("h", str(int(ah)))
-    objectEL.set("src", tileFileName)
+    objectEL.set("src", relTilePath)
     objectEL.set("sensitive", "false")
-    log("Image in scene: scale=%.4f, w=%d, h=%d" % (scale, aw, ah))
+    log("Image in scene: scale=%.4f, w=%d, h=%d" % (scale, aw, ah), 2)
     # call to lower level, top left
     buildTiles(tileID, TL, level+1, levelCount, x, y, src_sz, rootEL, im, regionEL.get("id"))
     # call to lower level, top right
