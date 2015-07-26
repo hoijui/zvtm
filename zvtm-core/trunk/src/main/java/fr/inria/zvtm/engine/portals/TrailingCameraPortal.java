@@ -119,7 +119,7 @@ public class TrailingCameraPortal extends CameraPortal {
         }
     }
 
-    /** Enable/disable update of trailing widget position when cursor does not move at all. 
+    /** Enable/disable update of trailing widget position when cursor does not move at all.
      *@param b true to enable. Default is true.
      */
     public void setNoUpdateWhenMouseStill(boolean b){

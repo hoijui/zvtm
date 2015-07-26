@@ -2,7 +2,7 @@
  *   DATE OF CREATION:  Sat Jun 17 07:19:59 2006
  *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2004-2014. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2015. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -40,44 +40,34 @@ public class CameraPortal extends Portal {
 
     /**Draw a border delimiting the portal (null if no border).*/
     Color borderColor;
-
     /**Portal's background fill color (null if transparent).*/
     Color bkgColor;
+    /** For internal use. Dot not tamper with. */
+    protected BasicStroke stroke = null;
+    /** For internal use. Dot not tamper with. */
+    protected float halfBorderWidth = 0;
+    /** For internal use. Dot not tamper with. */
+    protected float borderWidth = 0;
+    /** AlphaComposite used to paint glyph if not opaque. Set to null if glyph is opaque. */
+    AlphaComposite alphaC;
 
-    // Camera used to render the portal
-    Camera camera;
+    // Cameras used to render the portal
+    Camera[] cameras;
     // space owning camera (optimization)
-    VirtualSpace cameraSpace;
-
-    // Region of virtual space seen through camera
-    double viewWC, viewNC, viewEC, viewSC;
-
-    // inverse of projection coef
-    double duncoef;
-
-    Vector drawnGlyphs;
-    Glyph[] gll;
-    // camera's index in parent virtual space
-    int camIndex;
+    VirtualSpace[] cameraSpaces;
 
     // picking in camera portal
     Picker picker = new Picker();
-
-    /*Graphics2d's original stroke. Passed to each glyph in case it needs to modifiy the stroke when painting itself*/
-    Stroke standardStroke;
-
-    /*Graphics2d's original affine transform. Passed to each glyph in case it needs to modifiy the affine transform when painting itself*/
-    AffineTransform standardTransform;
 
     /** Builds a new portal displaying what is seen through a camera
      *@param x top-left horizontal coordinate of portal, in parent's JPanel coordinates
      *@param y top-left vertical coordinate of portal, in parent's JPanel coordinates
      *@param w portal width
      *@param h portal height
-     *@param c camera associated with the portal
+     *@param cam camera associated with the portal
      */
-    public CameraPortal(int x, int y, int w, int h, Camera c){
-        this(x, y, w, h, c, 1f);
+    public CameraPortal(int x, int y, int w, int h, Camera cam){
+        this(x, y, w, h, new Camera[]{cam}, 1f);
     }
 
     /** Builds a new possibly translucent portal displaying what is seen through a camera
@@ -85,23 +75,34 @@ public class CameraPortal extends Portal {
      *@param y top-left vertical coordinate of portal, in parent's JPanel coordinates
      *@param w portal width
      *@param h portal height
-     *@param c camera associated with the portal
+     *@param cam camera associated with the portal
      *@param a alpha channel value (translucency). alpha ranges between 0.0 (fully transparent) and 1.0 (fully opaque)
      */
-    public CameraPortal(int x, int y, int w, int h, Camera c, float a){
+    public CameraPortal(int x, int y, int w, int h, Camera cam, float a){
+        this(x, y, w, h, new Camera[]{cam}, a);
+    }
+
+    /** Builds a new possibly translucent portal displaying what is seen through a camera
+     *@param x top-left horizontal coordinate of portal, in parent's JPanel coordinates
+     *@param y top-left vertical coordinate of portal, in parent's JPanel coordinates
+     *@param w portal width
+     *@param h portal height
+     *@param cams cameras associated with the portal
+     *@param a alpha channel value (translucency). alpha ranges between 0.0 (fully transparent) and 1.0 (fully opaque)
+     */
+    public CameraPortal(int x, int y, int w, int h, Camera[] cams, float a){
         this.x = x;
         this.y = y;
         this.w = w;
         this.h = h;
         updateDimensions();
-        this.camera = c;
-        this.cameraSpace = this.camera.getOwningSpace();
-        this.camIndex = this.camera.getIndex();
+        this.cameras = cams;
+        this.cameraSpaces = new VirtualSpace[this.cameras.length];
+        for (int i=0;i<cameras.length;i++){
+            this.cameraSpaces[i] = this.cameras[i].getOwningSpace();
+        }
         setTranslucencyValue(a);
     }
-
-    /** AlphaComposite used to paint glyph if not opaque. Set to null if glyph is opaque. */
-    AlphaComposite alphaC;
 
     /**
      * Set alpha channel value (translucency).
@@ -124,8 +125,14 @@ public class CameraPortal extends Portal {
         return (alphaC != null) ? alphaC.getAlpha() : 1.0f;
     }
 
+    /** Get the main camera (at index 0). */
     public Camera getCamera(){
-        return camera;
+        return cameras[0];
+    }
+
+    /** Get all cameras through which this portal is observing. */
+    public Camera[] getCameras(){
+        return cameras;
     }
 
     /** Get picker associated with this camera portal.*/
@@ -136,7 +143,9 @@ public class CameraPortal extends Portal {
     /**CALLED INTERNALLY - NOT FOR PUBLIC USE*/
     public void setOwningView(View v){
         super.setOwningView(v);
-        camera.setOwningView(v);
+        for (Camera c:cameras){
+            c.setOwningView(v);
+        }
     }
 
     /**Draw a border delimiting the portal.
@@ -150,13 +159,6 @@ public class CameraPortal extends Portal {
     public Color getBorder(){
 	    return borderColor;
     }
-
-     /** For internal use. Dot not tamper with. */
-    protected BasicStroke stroke = null;
-    /** For internal use. Dot not tamper with. */
-    protected float halfBorderWidth = 0;
-    /** For internal use. Dot not tamper with. */
-    protected float borderWidth = 0;
 
     /** Set the border width of the portal (use SetBorder to draw the border)
      *@param bw portal border width
@@ -192,13 +194,38 @@ public class CameraPortal extends Portal {
 	    return bkgColor;
     }
 
-    /** Get the (unprojected) coordinates of point (jpx,jpy) in the virtual space to which the camera associated with this portal belongs.
+    /** Get the (unprojected) coordinates of point (jpx,jpy) in the virtual space
+        to which the first camera associated with this portal belongs.
      *@param cx cursor x-coordinate (JPanel coordinates system)
      *@param cy cursor y-coordinate (JPanel coordinates system)
      */
     public Point2D.Double getVSCoordinates(int cx, int cy){
-        double uncoef = (camera.focal+camera.altitude) / camera.focal;
-        return new Point2D.Double((camera.vx + (cx-x-w/2d)*uncoef), (camera.vy - (cy-y-h/2d)*uncoef));
+        return getVSCoordinates(cx, cy, cameras[0]);
+    }
+
+    /** Get the (unprojected) coordinates of point (jpx,jpy) in the virtual space
+        to which the indicated camera associated with this portal belongs.
+     *@param cx cursor x-coordinate (JPanel coordinates system)
+     *@param cy cursor y-coordinate (JPanel coordinates system)
+     *@param c camera to be considered
+     */
+    public Point2D.Double getVSCoordinates(int cx, int cy, Camera c){
+        double uncoef = (c.focal+c.altitude) / c.focal;
+        return new Point2D.Double((c.vx + (cx-x-w/2d)*uncoef), (c.vy - (cy-y-h/2d)*uncoef));
+    }
+
+    /** Get bounds of rectangular region of the VirtualSpace seen through this camera portal.
+     *@param res array which will contain the result
+     *@param c camera to be considered
+     *@return boundaries in VirtualSpace coordinates {west,north,east,south}
+     */
+    public double[] getVisibleRegion(double[] res, Camera c){
+        double uncoef = (c.focal+c.altitude) / c.focal;
+        res[0] = c.vx - (w/2d)*uncoef;
+        res[1] = c.vy + (h/2d)*uncoef;
+        res[2] = c.vx + (w/2d)*uncoef;
+        res[3] = c.vy - (h/2d)*uncoef;
+        return res;
     }
 
     /** Get bounds of rectangular region of the VirtualSpace seen through this camera portal.
@@ -206,34 +233,29 @@ public class CameraPortal extends Portal {
      *@return boundaries in VirtualSpace coordinates {west,north,east,south}
      */
     public double[] getVisibleRegion(double[] res){
-        double uncoef = (camera.focal+camera.altitude) / camera.focal;
-        res[0] = camera.vx - (w/2d)*uncoef;
-        res[1] = camera.vy + (h/2d)*uncoef;
-        res[2] = camera.vx + (w/2d)*uncoef;
-        res[3] = camera.vy - (h/2d)*uncoef;
-        return res;
+        return getVisibleRegion(res, cameras[0]);
     }
 
     /** Get bounds of rectangular region of the VirtualSpace seen through this camera portal.
      *@return boundaries in VirtualSpace coordinates {west,north,east,south}
      */
     public double[] getVisibleRegion(){
-	    return getVisibleRegion(new double[4]);
+	    return getVisibleRegion(new double[4], cameras[0]);
     }
 
-    /** Get the location from which this portal's camera will see all glyphs visible in the associated virtual space.
+    /** Get the location from which a Camera in this Portal will see all glyphs visible in the associated virtual space.
      *@return the location to which the camera should go
      */
-    public Location getGlobalView(){
-        double[] wnes = cameraSpace.findFarmostGlyphCoords();
+    public Location getGlobalView(Camera c){
+        double[] wnes = c.getOwningSpace().findFarmostGlyphCoords();
         double dx = (wnes[2]+wnes[0])/2d;  //new coords where camera should go
         double dy = (wnes[1]+wnes[3])/2d;
-        double[] regBounds = getVisibleRegion();
+        double[] regBounds = getVisibleRegion(new double[4], c);
         /*region that will be visible after translation, but before zoom/unzoom (need to
         compute zoom) ; we only take left and down because we only need horizontal and
         vertical ratios, which are equals for left and right, up and down*/
-        double[] trRegBounds = {regBounds[0]+dx-camera.vx, regBounds[3]+dy-camera.vy};
-        double currentAlt = camera.getAltitude()+camera.getFocal();
+        double[] trRegBounds = {regBounds[0]+dx-c.vx, regBounds[3]+dy-c.vy};
+        double currentAlt = c.getAltitude()+c.getFocal();
         double ratio = 0;
         //compute the mult factor for altitude to see all stuff on X
         if (trRegBounds[0]!=0){ratio = (dx-wnes[0])/((dx-trRegBounds[0]));}
@@ -245,20 +267,35 @@ public class CameraPortal extends Portal {
         return new Location(dx, dy, currentAlt*Math.abs(ratio));
     }
 
+    /** Get the location from which the Camera in this Portal will see all glyphs visible in the associated virtual space.
+     *@return the location to which the camera should go
+     */
+    public Location getGlobalView(){
+        return getGlobalView(cameras[0]);
+    }
+
     /** Translates and (un)zooms this portal's camera in order to see everything visible in the associated virtual space.
      *@param d duration of the animation in ms
      *@return the final camera location
      */
     public Location getGlobalView(int d){
-        Location l = getGlobalView();
+        return getGlobalView(d, cameras[0]);
+    }
+
+    /** Translates and (un)zooms this portal's camera in order to see everything visible in the associated virtual space.
+     *@param d duration of the animation in ms
+     *@return the final camera location
+     */
+    public Location getGlobalView(int d, Camera c){
+        Location l = getGlobalView(c);
         Animation trans =
             VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory()
-            .createCameraTranslation(d, camera, new Point2D.Double(l.vx, l.vy), false,
+            .createCameraTranslation(d, c, new Point2D.Double(l.vx, l.vy), false,
             IdentityInterpolator.getInstance(),
             null);
         Animation altAnim =
             VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory()
-            .createCameraAltAnim(d, camera, l.alt, false,
+            .createCameraAltAnim(d, c, l.alt, false,
             IdentityInterpolator.getInstance(),
             null);
         VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(trans, false);
@@ -266,26 +303,26 @@ public class CameraPortal extends Portal {
         return l;
     }
 
-    /** Position this portal's camera so that it seamlessly integrates with the surrounding context.
-     *@param c camera observing the context (associated with the View containing the portal)
-     *@return the final camera location
+    /** Position one of this portal's cameras so that it seamlessly integrates with the surrounding context.
+     *@param contextCam camera observing the context (associated with the View containing the portal)
+     *@return the final location of portalCam
      */
-    public Location getSeamlessView(Camera c){
-        int hvw = c.getOwningView().getFrame().getWidth() / 2;
-        int hvh = c.getOwningView().getFrame().getHeight() / 2;
+    public Location getSeamlessView(Camera contextCam){
+        int hvw = contextCam.getOwningView().getFrame().getWidth() / 2;
+        int hvh = contextCam.getOwningView().getFrame().getHeight() / 2;
         // get the region seen through the portal from the View's camera
-        double uncoef = (c.focal+c.altitude) / (float)c.focal;
+        double uncoef = (contextCam.focal+contextCam.altitude) / (float)contextCam.focal;
         //XXX: FIXME works only when portal right under mouse cursor
         //     fix by taking the portal's visible region bounds in virtual space
-        double[] wnes = {(c.getOwningView().mouse.getVSXCoordinate() - w/2d*uncoef),
-            c.getOwningView().mouse.getVSYCoordinate() + h/2d*uncoef,
-            c.getOwningView().mouse.getVSXCoordinate() + w/2d*uncoef,
-            c.getOwningView().mouse.getVSYCoordinate() - h/2d*uncoef};
+        double[] wnes = {(contextCam.getOwningView().mouse.getVSXCoordinate() - w/2d*uncoef),
+            contextCam.getOwningView().mouse.getVSYCoordinate() + h/2d*uncoef,
+            contextCam.getOwningView().mouse.getVSXCoordinate() + w/2d*uncoef,
+            contextCam.getOwningView().mouse.getVSYCoordinate() - h/2d*uncoef};
         // compute the portal camera's new (x,y) coordinates and altitude
-        return new Location((wnes[2]+wnes[0]) / 2d, (wnes[1]+wnes[3]) / 2d, camera.focal * ((wnes[2]-wnes[0])/w));
+        return new Location((wnes[2]+wnes[0]) / 2d, (wnes[1]+wnes[3]) / 2d, contextCam.focal * ((wnes[2]-wnes[0])/w));
     }
 
-	/** Get the location from which this portal's camera will focus on a specific rectangular region.
+    /** Get the location from which this portal's camera will focus on a specific rectangular region.
 	 *@param x1 x coord of first point
 	 *@param y1 y coord of first point
 	 *@param x2 x coord of opposite point
@@ -293,6 +330,18 @@ public class CameraPortal extends Portal {
 	 *@return the final camera location
 	 */
     public Location centerOnRegion(double x1, double y1, double x2, double y2){
+        return centerOnRegion(x1, y1, x2, y2, cameras[0]);
+    }
+
+	/** Get the location from which this portal's camera will focus on a specific rectangular region.
+	 *@param x1 x coord of first point
+	 *@param y1 y coord of first point
+	 *@param x2 x coord of opposite point
+	 *@param y2 y coord of opposite point
+     *@param c camera to be considered
+	 *@return the final camera location
+	 */
+    public Location centerOnRegion(double x1, double y1, double x2, double y2, Camera c){
         double minX = Math.min(x1,x2);
 		double minY = Math.min(y1,y2);
 		double maxX = Math.max(x1,x2);
@@ -300,11 +349,11 @@ public class CameraPortal extends Portal {
 		double[] wnes = {minX,maxY,maxX,minY};  //wnes = west north east south
 		double dx = (wnes[2]+wnes[0])/2d;  //new coords where camera should go
 		double dy = (wnes[1]+wnes[3])/2d;
-		double[] regBounds = getVisibleRegion();
+		double[] regBounds = getVisibleRegion(new double[4], c);
 		// region that will be visible after translation, but before zoom/unzoom  (need to compute zoom) ;
 		// we only take left and down because we only need horizontal and vertical ratios, which are equals for left and right, up and down
-		double[] trRegBounds = {regBounds[0]+dx-camera.vx, regBounds[3]+dy-camera.vy};
-		double currentAlt = camera.getAltitude() + camera.getFocal();
+		double[] trRegBounds = {regBounds[0]+dx-c.vx, regBounds[3]+dy-c.vy};
+		double currentAlt = c.getAltitude() + c.getFocal();
 		double ratio = 0;
 		//compute the mult factor for altitude to see all stuff on X
 		if (trRegBounds[0] != 0){ratio = (dx-wnes[0]) / (dx-trRegBounds[0]);}
@@ -317,7 +366,7 @@ public class CameraPortal extends Portal {
 		return new Location(dx, dy, newAlt);
     }
 
-	/** Translates and (un)zooms this portal's camera in order to focus on a specific rectangular region
+    /** Translates and (un)zooms this portal's camera in order to focus on a specific rectangular region
 	 *@param d duration of the animation in ms (pass 0 to go there instantanesouly)
 	 *@param x1 x coord of first point
 	 *@param y1 y coord of first point
@@ -326,15 +375,27 @@ public class CameraPortal extends Portal {
 	 *@return the final camera location
 	 */
     public Location centerOnRegion(int d, double x1, double y1, double x2, double y2){
-        Location l = centerOnRegion(x1, y1, x2, y2);
+        return centerOnRegion(d, x1, y1, x2, y2, cameras[0]);
+    }
+
+	/** Translates and (un)zooms this portal's camera in order to focus on a specific rectangular region
+	 *@param d duration of the animation in ms (pass 0 to go there instantanesouly)
+	 *@param x1 x coord of first point
+	 *@param y1 y coord of first point
+	 *@param x2 x coord of opposite point
+	 *@param y2 y coord of opposite point
+	 *@return the final camera location
+	 */
+    public Location centerOnRegion(int d, double x1, double y1, double x2, double y2, Camera c){
+        Location l = centerOnRegion(x1, y1, x2, y2, c);
 		Animation trans =
 		    VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().
-		    createCameraTranslation(d, camera, l.getPosition(), false,
+		    createCameraTranslation(d, c, l.getPosition(), false,
 					    SlowInSlowOutInterpolator.getInstance(),
 					    null);
 		Animation altAnim =
 		    VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().
-		    createCameraAltAnim(d, camera, l.getAltitude(), false,
+		    createCameraAltAnim(d, c, l.getAltitude(), false,
 					SlowInSlowOutInterpolator.getInstance(),
 					null);
 		VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(trans, false);
@@ -376,43 +437,54 @@ public class CameraPortal extends Portal {
             }
             g2d.setComposite(alphaC);
         }
-
         g2d.setClip(x, y, w, h);
         if (bkgColor != null){
             g2d.setColor(bkgColor);
             g2d.fillRect(x, y, w, h);
         }
-        standardStroke = g2d.getStroke();
+        /*Graphics2d's original stroke. Passed to each glyph in case it needs to modifiy the stroke when painting itself*/
+        Stroke standardStroke = g2d.getStroke();
+        /*Graphics2d's original affine transform. Passed to each glyph in case it needs to modifiy the affine transform when painting itself*/
+        AffineTransform standardTransform= g2d.getTransform();
         // be sure to call the translate instruction before getting the standard transform
         // as the latter's matrix is preconcatenated to the translation matrix of glyphs
         // that use AffineTransforms for translation
-        standardTransform = g2d.getTransform();
-        drawnGlyphs = cameraSpace.getDrawnGlyphs(camIndex);
-        synchronized(drawnGlyphs){
-            drawnGlyphs.removeAllElements();
-            duncoef = (camera.focal+camera.altitude) / camera.focal;
-            //compute region seen from this view through camera
-            viewWC = camera.vx - (w/2d) * duncoef;
-            viewNC = camera.vy + (h/2d) * duncoef;
-            viewEC = camera.vx + (w/2d) * duncoef;
-            viewSC = camera.vy - (h/2d) * duncoef;
-            gll = cameraSpace.getDrawingList();
-            for (int i=0;i<gll.length;i++){
-                if (gll[i] != null){
-                    synchronized(gll[i]){
-                        if (gll[i].visibleInViewport(viewWC, viewNC, viewEC, viewSC, camera)){
-                            //if glyph is at least partially visible in the reg. seen from this view, display
-                            gll[i].project(camera, size); // an invisible glyph should still be projected
-                            if (gll[i].isVisible()){      // as it can be sensitive
-                                gll[i].draw(g2d, w, h, camIndex, standardStroke, standardTransform, x, y);
+        double[] wnes;
+        double duncoef;
+        for (int j=0;j<cameras.length;j++){
+            Camera c = cameras[j];
+            VirtualSpace vs = cameraSpaces[j];
+            Vector<Glyph> drawnGlyphs = vs.getDrawnGlyphs(c.getIndex());
+            synchronized(drawnGlyphs){
+                drawnGlyphs.removeAllElements();
+                duncoef = (c.focal+c.altitude) / c.focal;
+                //compute region seen from this view through camera
+                wnes = new double[]{c.vx - (w/2d) * duncoef,
+                                    c.vy + (h/2d) * duncoef,
+                                    c.vx + (w/2d) * duncoef,
+                                    c.vy - (h/2d) * duncoef};
+                Glyph[] gll = vs.getDrawingList();
+                for (int i=0;i<gll.length;i++){
+                    if (gll[i] != null){
+                        synchronized(gll[i]){
+                            if (gll[i].visibleInViewport(wnes[0], wnes[1], wnes[2], wnes[3], c)){
+                                //if glyph is at least partially visible in the reg. seen from this view, display
+                                gll[i].project(c, size); // an invisible glyph should still be projected
+                                if (gll[i].isVisible()){      // as it can be sensitive
+                                    gll[i].draw(g2d, w, h, c.getIndex(), standardStroke, standardTransform, x, y);
+                                }
+                                vs.drewGlyph(gll[i], c.getIndex());
                             }
-                            cameraSpace.drewGlyph(gll[i], camIndex);
                         }
                     }
                 }
             }
         }
         g2d.setClip(0, 0, viewWidth, viewHeight);
+        paintPortalFrame(g2d, standardStroke);
+    }
+
+    void paintPortalFrame(Graphics2D g2d, Stroke standardStroke){
         if (borderColor != null){
             g2d.setColor(borderColor);
             if (stroke != null){
@@ -428,11 +500,11 @@ public class CameraPortal extends Portal {
 
     public void pick(int cx, int cy){
         picker.setJPanelCoordinates(cx-x, cy-y);
-        double uncoef = (camera.focal+camera.altitude) / camera.focal;
-        double pvx = (camera.vx + (cx-x-w/2d)*uncoef);
-        double pvy = (camera.vy - (cy-y-h/2d)*uncoef);
+        double uncoef = (cameras[0].focal+cameras[0].altitude) / cameras[0].focal;
+        double pvx = (cameras[0].vx + (cx-x-w/2d)*uncoef);
+        double pvy = (cameras[0].vy - (cy-y-h/2d)*uncoef);
         picker.setVSCoordinates(pvx, pvy);
-        picker.computePickedGlyphList(camera);
+        picker.computePickedGlyphList(cameras[0]);
     }
 
 }

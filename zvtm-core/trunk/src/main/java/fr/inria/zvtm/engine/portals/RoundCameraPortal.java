@@ -2,7 +2,7 @@
  *   DATE OF CREATION:  Sun Jun 18 16:44:59 2006
  *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2004-2014. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2015. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -10,11 +10,22 @@
 
 package fr.inria.zvtm.engine.portals;
 
+import java.awt.AlphaComposite;
+import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.BasicStroke;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.awt.Stroke;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 
+import java.util.Vector;
+
+import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.glyphs.Translucent;
+import fr.inria.zvtm.glyphs.Glyph;
 
 /**A portal showing what is seen through a camera. Shape: circular.
    The Camera should not be used in any other View or Portal.*/
@@ -130,31 +141,39 @@ public class RoundCameraPortal extends CameraPortal {
             g2d.setColor(bkgColor);
             g2d.fill(clippingShape);
         }
-        standardStroke = g2d.getStroke();
+        /*Graphics2d's original stroke. Passed to each glyph in case it needs to modifiy the stroke when painting itself*/
+        Stroke standardStroke = g2d.getStroke();
+        /*Graphics2d's original affine transform. Passed to each glyph in case it needs to modifiy the affine transform when painting itself*/
+        AffineTransform standardTransform= g2d.getTransform();
         // be sure to call the translate instruction before getting the standard transform
         // as the latter's matrix is preconcatenated to the translation matrix of glyphs
         // that use AffineTransforms for translation
-        standardTransform = g2d.getTransform();
-        drawnGlyphs = cameraSpace.getDrawnGlyphs(camIndex);
-        synchronized(drawnGlyphs){
-            drawnGlyphs.removeAllElements();
-            duncoef = (camera.focal+camera.altitude) / camera.focal;
-            //compute region seen from this view through camera
-            viewWC = camera.vx - (w/2d)*duncoef;
-            viewNC = camera.vy + (h/2d)*duncoef;
-            viewEC = camera.vx + (w/2d)*duncoef;
-            viewSC = camera.vy - (h/2d)*duncoef;
-            gll = cameraSpace.getDrawingList();
-            for (int i=0;i<gll.length;i++){
-                if (gll[i] != null){
-                    synchronized(gll[i]){
-                        if (gll[i].visibleInViewport(viewWC, viewNC, viewEC, viewSC, camera)){
-                            //if glyph is at least partially visible in the reg. seen from this view, display
-                            gll[i].project(camera, size); // an invisible glyph should still be projected
-                            if (gll[i].isVisible()){      // as it can be sensitive
-                                gll[i].draw(g2d, w, h, camIndex, standardStroke, standardTransform, x, y);
+        double[] wnes;
+        double duncoef;
+        for (int j=0;j<cameras.length;j++){
+            Camera c = cameras[j];
+            VirtualSpace vs = cameraSpaces[j];
+            Vector<Glyph> drawnGlyphs = vs.getDrawnGlyphs(c.getIndex());
+            synchronized(drawnGlyphs){
+                drawnGlyphs.removeAllElements();
+                duncoef = (c.focal+c.altitude) / c.focal;
+                //compute region seen from this view through camera
+                wnes = new double[]{c.vx - (w/2d) * duncoef,
+                                    c.vy + (h/2d) * duncoef,
+                                    c.vx + (w/2d) * duncoef,
+                                    c.vy - (h/2d) * duncoef};
+                Glyph[] gll = vs.getDrawingList();
+                for (int i=0;i<gll.length;i++){
+                    if (gll[i] != null){
+                        synchronized(gll[i]){
+                            if (gll[i].visibleInViewport(wnes[0], wnes[1], wnes[2], wnes[3], c)){
+                                //if glyph is at least partially visible in the reg. seen from this view, display
+                                gll[i].project(c, size); // an invisible glyph should still be projected
+                                if (gll[i].isVisible()){      // as it can be sensitive
+                                    gll[i].draw(g2d, w, h, c.getIndex(), standardStroke, standardTransform, x, y);
+                                }
+                                vs.drewGlyph(gll[i], c.getIndex());
                             }
-                            cameraSpace.drewGlyph(gll[i], camIndex);
                         }
                     }
                 }

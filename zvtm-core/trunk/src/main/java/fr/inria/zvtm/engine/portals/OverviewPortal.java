@@ -16,10 +16,16 @@ import java.awt.Graphics2D;
 import java.awt.BasicStroke;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.awt.Stroke;
+import java.awt.geom.AffineTransform;
 
+import java.util.Vector;
+
+import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.glyphs.Translucent;
+import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.event.ObservedRegionListener;
 
 /**A portal showing what is seen through a camera that serves as an overview. Shape: rectangular.
@@ -99,10 +105,10 @@ public class OverviewPortal extends CameraPortal {
      *@param cy cursor y-coordinate (JPanel coordinates system)
      */
     public boolean coordInsideObservedRegion(int cx, int cy){
-	return (cx >= x-orHalfBorderWidth+w/2 + Math.round((observedRegion[0]-camera.vx)*orcoef) &&
-		cy >= y-orHalfBorderWidth+h/2 + Math.round((camera.vy-observedRegion[1])*orcoef) &&
-		cx <= x+orHalfBorderWidth+w/2 + Math.round((observedRegion[2]-camera.vx)*orcoef) &&
-		cy <= y+orHalfBorderWidth+h/2 + Math.round((camera.vy-observedRegion[3])*orcoef));
+	return (cx >= x-orHalfBorderWidth+w/2 + Math.round((observedRegion[0]-cameras[0].vx)*orcoef) &&
+		cy >= y-orHalfBorderWidth+h/2 + Math.round((cameras[0].vy-observedRegion[1])*orcoef) &&
+		cx <= x+orHalfBorderWidth+w/2 + Math.round((observedRegion[2]-cameras[0].vx)*orcoef) &&
+		cy <= y+orHalfBorderWidth+h/2 + Math.round((cameras[0].vy-observedRegion[3])*orcoef));
     }
 
     /** Set color of rectangle depicting what is seen through the main camera. */
@@ -143,19 +149,19 @@ public class OverviewPortal extends CameraPortal {
     }
 
     public double getObservedRegionX() {
-        orcoef = camera.focal/(camera.focal+camera.altitude);
-        return x+ (double)w/2.0 + (observedRegion[0]-camera.vx)*orcoef;
+        orcoef = cameras[0].focal/(cameras[0].focal+cameras[0].altitude);
+        return x+ (double)w/2.0 + (observedRegion[0]-cameras[0].vx)*orcoef;
     }
     public double getObservedRegionY() {
-        orcoef = camera.focal/(camera.focal+camera.altitude);
-        return y+ h/2.0 - (observedRegion[1]-camera.vy)*orcoef;
+        orcoef = cameras[0].focal/(cameras[0].focal+cameras[0].altitude);
+        return y+ h/2.0 - (observedRegion[1]-cameras[0].vy)*orcoef;
     }
     public double getObservedRegionW() {
-        orcoef = camera.focal/(camera.focal+camera.altitude);
+        orcoef = cameras[0].focal/(cameras[0].focal+cameras[0].altitude);
         return (observedRegion[2]-observedRegion[0])*orcoef;
     }
     public double getObservedRegionH() {
-        orcoef = camera.focal/(camera.focal+camera.altitude);
+        orcoef = cameras[0].focal/(cameras[0].focal+cameras[0].altitude);
         return (observedRegion[1]-observedRegion[3])*orcoef;
     }
     public double getObservedRegionCX() {
@@ -195,31 +201,37 @@ public class OverviewPortal extends CameraPortal {
             g2d.setColor(bkgColor);
             g2d.fillRect(x, y, w, h);
         }
-        standardStroke = g2d.getStroke();
+        /*Graphics2d's original stroke. Passed to each glyph in case it needs to modifiy the stroke when painting itself*/
+        Stroke standardStroke = g2d.getStroke();
+        /*Graphics2d's original affine transform. Passed to each glyph in case it needs to modifiy the affine transform when painting itself*/
+        AffineTransform standardTransform= g2d.getTransform();
         // be sure to call the translate instruction before getting the standard transform
         // as the latter's matrix is preconcatenated to the translation matrix of glyphs
         // that use AffineTransforms for translation
-        standardTransform = g2d.getTransform();
-        drawnGlyphs = cameraSpace.getDrawnGlyphs(camIndex);
+        double[] wnes;
+        double duncoef;
+        Camera camera = cameras[0];
+        VirtualSpace vs = cameraSpaces[0];
+        Vector<Glyph> drawnGlyphs = vs.getDrawnGlyphs(camera.getIndex());
         synchronized(drawnGlyphs){
             drawnGlyphs.removeAllElements();
             duncoef = (camera.focal+camera.altitude) / camera.focal;
             //compute region seen from this view through camera
-            viewWC = camera.vx - (w/2d)*duncoef;
-            viewNC = camera.vy + (h/2d)*duncoef;
-            viewEC = camera.vx + (w/2d)*duncoef;
-            viewSC = camera.vy - (h/2d)*duncoef;
-            gll = cameraSpace.getDrawingList();
+            wnes = new double[]{camera.vx - (w/2d) * duncoef,
+                                camera.vy + (h/2d) * duncoef,
+                                camera.vx + (w/2d) * duncoef,
+                                camera.vy - (h/2d) * duncoef};
+            Glyph[] gll = vs.getDrawingList();
             for (int i=0;i<gll.length;i++){
                 if (gll[i] != null){
                     synchronized(gll[i]){
-                        if (gll[i].visibleInViewport(viewWC, viewNC, viewEC, viewSC, camera)){
+                        if (gll[i].visibleInViewport(wnes[0], wnes[1], wnes[2], wnes[3], camera)){
                             //if glyph is at least partially visible in the reg. seen from this view, display
                             gll[i].project(camera, size); // an invisible glyph should still be projected
                             if (gll[i].isVisible()){      // as it can be sensitive
-                                gll[i].draw(g2d, w, h, camIndex, standardStroke, standardTransform, x, y);
+                                gll[i].draw(g2d, w, h, camera.getIndex(), standardStroke, standardTransform, x, y);
                             }
-                            cameraSpace.drewGlyph(gll[i], camIndex);
+                            vs.drewGlyph(gll[i], camera.getIndex());
                         }
                     }
                 }
