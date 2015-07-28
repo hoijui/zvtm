@@ -58,7 +58,6 @@ $Id: pom.xml 2427 2009-09-29 07:29:08Z epietrig $
 
 	<!-- ICEpdf Pro 4.2 (if available) -->
 	<!--
-
 		ICEpdf Pro is not available in any Maven repository for now.
 		Get icepdf-pro*.jar from http://www.icepdf.org/downloads.html
 		Install the JAR files in your local repository using the following command line:
@@ -66,7 +65,8 @@ $Id: pom.xml 2427 2009-09-29 07:29:08Z epietrig $
 	        mvn install:install-file -Dfile=icepdf-pro-intl.jar -DgroupId=org.icepdf -DartifactId=icepdf-pro-intl -Dversion=4.2.0 -Dpackaging=jar
 	-->
 
-	<!--
+
+    <!--
 	<dependency>
 		<groupId>org.icepdf</groupId>
 		<artifactId>icepdf-pro</artifactId>
@@ -78,6 +78,7 @@ $Id: pom.xml 2427 2009-09-29 07:29:08Z epietrig $
 		<version>${icepdfVersion}</version>
 	</dependency>
     -->
+
 
 	<dependency>
 	  <groupId>net.sf.ehcache</groupId>
@@ -133,8 +134,8 @@ $Id: pom.xml 2427 2009-09-29 07:29:08Z epietrig $
         <artifactId>maven-compiler-plugin</artifactId>
     	<version>3.3</version>
         <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
+          <source>1.7</source>
+          <target>1.7</target>
 		  <showDeprecation>true</showDeprecation>
         </configuration>
       </plugin>
