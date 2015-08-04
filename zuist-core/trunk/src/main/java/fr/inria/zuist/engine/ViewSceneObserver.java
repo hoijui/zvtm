@@ -20,7 +20,7 @@ import fr.inria.zuist.engine.SceneManager;
 public class ViewSceneObserver extends SceneObserver implements CameraListener {
 
     View v;
-    Camera c;
+    //Camera c; // XXX this exist in class parent
 
     /**
      *@param observingView view that observes the scene
