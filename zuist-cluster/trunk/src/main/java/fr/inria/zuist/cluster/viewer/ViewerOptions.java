@@ -25,7 +25,7 @@ public class ViewerOptions {
     @Option(name = "-mh", aliases = {"--mullion-height"}, usage = "mullions height")
     public int mullionHeight = 0;
 
-    @Option(name = "-f", aliases = {"--fullscreen"}, usage = "full-screen")
+    @Option(name = "-fs", aliases = {"--fullscreen"}, usage = "full-screen")
     public boolean fullscreen = false;
 
     @Option(name = "-g", aliases = {"--opengl"}, usage = "enable java2d OpenGL pipeline")

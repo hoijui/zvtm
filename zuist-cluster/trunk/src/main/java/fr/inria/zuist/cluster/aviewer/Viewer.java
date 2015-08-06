@@ -99,7 +99,7 @@ import org.kohsuke.args4j.CmdLineParser;
  * @author Olivier Chapuis
  */
 
-public class Viewer implements Java2DPainter, RegionListener, LevelListener {
+public class Viewer implements Java2DPainter {
 
     File SCENE_FILE, SCENE_FILE_DIR;
 
@@ -195,8 +195,6 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 	    initGUI(options);
         SceneObserver[] sceneObservers = {new ViewSceneObserver(mView, mCamera, mSpace)};
 	    sm = new SceneManager(sceneObservers, parseSceneOptions(options));
-	    sm.setRegionListener(this);
-	    sm.setLevelListener(this);
 	    previousLocations = new Vector();
 	    ovm.initConsole();
 	    if (xmlSceneFile != null){
@@ -537,8 +535,8 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		}
 		sm.shutdown();
 		sm = null;
-		VirtualSpace[]  sceneSpaces = {mSpace};
-		Camera[] sceneCameras = {mCamera};
+		// VirtualSpace[]  sceneSpaces = {mSpace};
+		// Camera[] sceneCameras = {mCamera};
 		HashMap<String,String> properties = new HashMap(2,1);
 		if (SceneManager.getHTTPUser() != null){
 		    properties.put(SceneManager.HTTP_AUTH_USER, SceneManager.getHTTPUser());
@@ -546,9 +544,8 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 		if (SceneManager.getHTTPPassword() != null){
 		    properties.put(SceneManager.HTTP_AUTH_PASSWORD, SceneManager.getHTTPPassword());
 		}
-		sm = new SceneManager(sceneSpaces, sceneCameras, properties);
-		sm.setRegionListener(this);
-		sm.setLevelListener(this);
+        SceneObserver[] sceneObservers = {new ViewSceneObserver(mView, mCamera, mSpace)};
+        sm = new SceneManager(sceneObservers, properties);
 		if(sceneUnderBezels)
 		{
 			clusteredView = new ClusteredView(
@@ -807,23 +804,6 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
 	}
 
 	/* ---- Debug information ----*/
-
-	public void enteredRegion(Region r){
-	    ovm.sayInConsole("Entered region "+r.getID()+"\n");
-	}
-
-	public void exitedRegion(Region r){
-	    ovm.sayInConsole("Exited region "+r.getID()+"\n");
-	}
-
-	public void enteredLevel(int depth){
-	    ovm.sayInConsole("Entered level "+depth+"\n");
-	    levelStr = Messages.LEVEL + String.valueOf(depth);
-	}
-
-	public void exitedLevel(int depth){
-	    ovm.sayInConsole("Exited level "+depth+"\n");
-	}
 
     long maxMem = Runtime.getRuntime().maxMemory();
     int totalMemRatio, usedMemRatio;

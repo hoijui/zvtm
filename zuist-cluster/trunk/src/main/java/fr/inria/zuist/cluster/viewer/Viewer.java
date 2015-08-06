@@ -93,7 +93,7 @@ import org.kohsuke.args4j.CmdLineParser;
  * @author Romain Primet
  */
 
-public class Viewer implements Java2DPainter, RegionListener, LevelListener {
+public class Viewer implements Java2DPainter {
 
     File SCENE_FILE, SCENE_FILE_DIR;
 
@@ -184,8 +184,6 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
         initGUI(options);
         SceneObserver[] sceneObservers = {new ViewSceneObserver(mView, mCamera, mSpace)};
         sm = new SceneManager(sceneObservers, parseSceneOptions(options));
-        sm.setRegionListener(this);
-        sm.setLevelListener(this);
         previousLocations = new Vector();
         ovm.initConsole();
         if (xmlSceneFile != null){
@@ -637,23 +635,6 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener {
     }
 
     /* ---- Debug information ----*/
-
-    public void enteredRegion(Region r){
-        ovm.sayInConsole("Entered region "+r.getID()+"\n");
-    }
-
-    public void exitedRegion(Region r){
-        ovm.sayInConsole("Exited region "+r.getID()+"\n");
-    }
-
-    public void enteredLevel(int depth){
-        ovm.sayInConsole("Entered level "+depth+"\n");
-        levelStr = Messages.LEVEL + String.valueOf(depth);
-    }
-
-    public void exitedLevel(int depth){
-        ovm.sayInConsole("Exited level "+depth+"\n");
-    }
 
     long maxMem = Runtime.getRuntime().maxMemory();
     int totalMemRatio, usedMemRatio;
