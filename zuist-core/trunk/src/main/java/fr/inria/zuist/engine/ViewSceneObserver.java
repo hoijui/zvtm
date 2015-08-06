@@ -24,7 +24,7 @@ public class ViewSceneObserver extends SceneObserver implements CameraListener {
     /**
      *@param observingView view that observes the scene
      *@param observingCamera camera in view that observes the scene
-     *param targetVirtualSpace virtual space in which the scene objects should be put
+     *@param targetVirtualSpace virtual space in which the scene objects should be put
      */
     public ViewSceneObserver(View observingView, Camera observingCamera, VirtualSpace targetVirtualSpace){
         this.v = observingView;

@@ -24,7 +24,7 @@ public class PortalSceneObserver extends SceneObserver implements CameraListener
     /**
      *@param observingPortal portal that observes the scene
      *@param observingCamera camera in portal that observes the scene
-     *param targetVirtualSpace virtual space in which the scene objects should be put
+     *@param targetVirtualSpace virtual space in which the scene objects should be put
      */
     public PortalSceneObserver(CameraPortal observingPortal, Camera observingCamera, VirtualSpace targetVirtualSpace){
         this.cp = observingPortal;
