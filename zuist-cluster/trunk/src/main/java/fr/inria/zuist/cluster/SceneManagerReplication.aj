@@ -37,6 +37,7 @@ import fr.inria.zuist.engine.Region;
 import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zuist.engine.SceneBuilder;
 import fr.inria.zuist.engine.SceneObserver;
+import fr.inria.zuist.engine.TaggedViewSceneObserver;
 
 aspect SceneManagerReplication {
     //instrument *createLevel, *createRegion, *destroyRegion,
@@ -63,43 +64,92 @@ aspect SceneManagerReplication {
         returning() :
         sceneManagerCreation(sceneManager, observers, properties) &&
         !cflowbelow(sceneManagerCreation(SceneManager, SceneObserver[], HashMap<String,String>)){
-            VirtualSpace[] spaces = new VirtualSpace[observers.length];
-            Camera[] cameras = new Camera[observers.length];
+            HashMap<String,Object>[] soDescriptions = new HashMap[observers.length];
             for(int i=0;i<observers.length;i++){
-                observers[i].getTargetVirtualSpace().setZuistOwned(true);
-                spaces[i] = observers[i].getTargetVirtualSpace();
-                cameras[i] = observers[i].getCamera();
+                for (VirtualSpace vs:observers[i].getTargetVirtualSpaces()){
+                    vs.setZuistOwned(true);
+                }
+                soDescriptions[i] = new HashMap(4,1);
+                if (observers[i] instanceof TaggedViewSceneObserver){
+                    soDescriptions[i].put(SceneManager.SO_TYPE, new Short(SceneManager.SO_TYPE_TVSO));
+                    HashMap<String,VirtualSpace> t2s =
+                        ((TaggedViewSceneObserver)observers[i]).getTagVirtualSpaceMapping();
+                    String[] tags = new String[t2s.size()];
+                    VirtualSpace[] vss = new VirtualSpace[t2s.size()];
+                    int k = 0;
+                    for (String tag:t2s.keySet()){
+                        tags[k] = tag;
+                        vss[k] = t2s.get(tag);
+                        k++;
+                    }
+                    soDescriptions[i].put(SceneManager.SO_PARAMS, tags);
+                    soDescriptions[i].put(SceneManager.SO_VIRTUAL_SPACES, vss);
+                }
+                else {
+                    soDescriptions[i].put(SceneManager.SO_TYPE, new Short(SceneManager.SO_TYPE_VSO));
+                    soDescriptions[i].put(SceneManager.SO_VIRTUAL_SPACES, observers[i].getTargetVirtualSpaces());
+                }
+                soDescriptions[i].put(SceneManager.SO_CAMERA, observers[i].getCamera());
             }
 
             sceneManager.setReplicated(true);
 
             SceneManagerCreateDelta delta =
                 new SceneManagerCreateDelta(sceneManager.getObjId(), sceneManager.getSceneBuilder().getObjId(),
-                        Arrays.asList(spaces), Arrays.asList(cameras), properties);
+                        soDescriptions, properties);
             VirtualSpaceManager.INSTANCE.sendDelta(delta);
         }
 
     private static class SceneManagerCreateDelta implements Delta {
         private final ObjId<SceneManager> smId;
         private final ObjId<SceneBuilder> sbId;
-        private final ArrayList<ObjId<VirtualSpace>> spaceRefs;
-        private final ArrayList<ObjId<Camera>> cameraRefs;
+        private final HashMap<String,Object>[] soDescriptionRefs;
         private final HashMap<String,String> properties;
 
         SceneManagerCreateDelta(ObjId<SceneManager> smId, ObjId<SceneBuilder> sbId,
-                                List<VirtualSpace> spaces, List<Camera> cameras,
+                                HashMap<String,Object>[] sods,
                                 HashMap<String,String> props){
             this.smId = smId;
             this.sbId = sbId;
-            this.spaceRefs = Identifiables.getRefList(spaces);
-            this.cameraRefs = Identifiables.getRefList(cameras);
+            soDescriptionRefs = new HashMap[sods.length];
+            int i = 0;
+            for (HashMap<String,Object> sod:sods){
+                soDescriptionRefs[i] = new HashMap(4,1);
+                Short type = (Short)sod.get(SceneManager.SO_TYPE);
+                soDescriptionRefs[i].put(SceneManager.SO_TYPE, type);
+                soDescriptionRefs[i].put(SceneManager.SO_CAMERA, ((Camera)sod.get(SceneManager.SO_CAMERA)).getObjId());
+                VirtualSpace[] vss = (VirtualSpace[])sod.get(SceneManager.SO_VIRTUAL_SPACES);
+                ArrayList<ObjId<VirtualSpace>> spaceRefs = Identifiables.getRefList(Arrays.asList(vss));
+                soDescriptionRefs[i].put(SceneManager.SO_VIRTUAL_SPACES, spaceRefs);
+                if (type.shortValue() == SceneManager.SO_TYPE_TVSO){
+                    soDescriptionRefs[i].put(SceneManager.SO_PARAMS, sod.get(SceneManager.SO_PARAMS));
+                }
+                i++;
+            }
             this.properties = props;
         }
 
         public void apply(SlaveUpdater su){
+            HashMap<String,Object>[] soDescriptions = new HashMap[soDescriptionRefs.length];
+            int i = 0;
+            for (HashMap<String,Object> sod:soDescriptionRefs){
+                soDescriptions[i] = new HashMap(4,1);
+                Short type = (Short)sod.get(SceneManager.SO_TYPE);
+                soDescriptions[i].put(SceneManager.SO_TYPE, type);
+                soDescriptions[i].put(SceneManager.SO_CAMERA,
+                                      ((Camera)su.getSlaveObject((ObjId<Camera>)sod.get(SceneManager.SO_CAMERA))));
+                VirtualSpace[] vss =
+                    su.getSlaveObjectArrayList((ArrayList<ObjId<VirtualSpace>>)sod.get(SceneManager.SO_VIRTUAL_SPACES)).toArray(new VirtualSpace[0]);
+                soDescriptions[i].put(SceneManager.SO_VIRTUAL_SPACES, vss);
+                if (type.shortValue() == SceneManager.SO_TYPE_TVSO){
+                    soDescriptions[i].put(SceneManager.SO_PARAMS, sod.get(SceneManager.SO_PARAMS));
+                }
+                i++;
+            }
             SceneManager sm =
-                new SceneManager(su.getSlaveObjectArrayList(spaceRefs).toArray(new VirtualSpace[0]),
-                        su.getSlaveObjectArrayList(cameraRefs).toArray(new Camera[0]), properties);
+                new SceneManager(soDescriptions, properties);
+                // new SceneManager(su.getSlaveObjectArrayList(spaceRefs).toArray(new VirtualSpace[0]),
+                        // su.getSlaveObjectArrayList(cameraRefs).toArray(new Camera[0]), properties);
             su.putSlaveObject(smId, sm);
             su.putSlaveObject(sbId, sm.getSceneBuilder());
         }
