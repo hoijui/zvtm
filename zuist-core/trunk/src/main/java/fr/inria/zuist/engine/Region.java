@@ -352,9 +352,12 @@ public class Region {
                     containedRegions[i].updateVisibility(so, viewportBounds, atDepth, transition, rl);
                 }
                 if (atDepth >= hli && atDepth <= lli){
-                    forceShow(so, transition, (wnes[2]+wnes[0])/2, (wnes[1]+wnes[3])/2);
-                    if (rl != null){
-                        rl.enteredRegion(this);
+                    if (so.isOfInterest(this)){
+                        forceShow(so, transition, (wnes[2]+wnes[0])/2, (wnes[1]+wnes[3])/2);
+                        so.observedRegions.put(this, SceneObserver.DUMMY_SHORT);
+                        if (rl != null){
+                            rl.enteredRegion(this);
+                        }
                     }
                 }
             }
@@ -367,10 +370,15 @@ public class Region {
                     containedRegions[i].updateVisibility(so, false, viewportBounds, atDepth, transition, rl);
                 }
                 if (atDepth >= hli && atDepth <= lli){
-                    forceHide(so, transition, (wnes[2]+wnes[0])/2, (wnes[1]+wnes[3])/2);
-                    if (rl != null){
-                        rl.exitedRegion(this);
+                    if (so.isOfInterest(this)){
+                        forceHide(so, transition, (wnes[2]+wnes[0])/2, (wnes[1]+wnes[3])/2);
+                        if (rl != null){
+                            rl.exitedRegion(this);
+                        }
                     }
+                    // Remove it even if supposed not to be of interest.
+                    // Should not have been in there in the first place.
+                    so.observedRegions.remove(this);
                 }
             }
             // else nothing to do: was not visible last time we checked, is still invisible
@@ -398,9 +406,12 @@ public class Region {
                     containedRegions[i].updateVisibility(so, viewportBounds, atDepth, transition, rl);
                 }
                 if (atDepth >= hli && atDepth <= lli){
-                    forceShow(so, transition, (wnes[2]+wnes[0])/2, (wnes[1]+wnes[3])/2);
-                    if (rl != null){
-                        rl.enteredRegion(this);
+                    if (so.isOfInterest(this)){
+                        forceShow(so, transition, (wnes[2]+wnes[0])/2, (wnes[1]+wnes[3])/2);
+                        so.observedRegions.put(this, SceneObserver.DUMMY_SHORT);
+                        if (rl != null){
+                            rl.enteredRegion(this);
+                        }
                     }
                 }
             }
@@ -413,10 +424,15 @@ public class Region {
                     containedRegions[i].updateVisibility(so, false, viewportBounds, atDepth, transition, rl);
                 }
                 if (atDepth >= hli && atDepth <= lli){
-                    forceHide(so, transition, (wnes[2]+wnes[0])/2, (wnes[1]+wnes[3])/2);
-                    if (rl != null){
-                        rl.exitedRegion(this);
+                    if (so.isOfInterest(this)){
+                        forceHide(so, transition, (wnes[2]+wnes[0])/2, (wnes[1]+wnes[3])/2);
+                        if (rl != null){
+                            rl.exitedRegion(this);
+                        }
                     }
+                    // Remove it even if supposed not to be of interest.
+                    // Should not have been in there in the first place.
+                    so.observedRegions.remove(this);
                 }
             }
             // else nothing to do: was not visible last time we checked, is still invisible
@@ -427,6 +443,7 @@ public class Region {
     void show(SceneObserver so, short transition, double  x, double y){
         if (!so.observedRegions.containsKey(this)){
             forceShow(so, transition, x, y);
+            so.observedRegions.put(this, SceneObserver.DUMMY_SHORT);
         }
     }
 
@@ -436,14 +453,14 @@ public class Region {
         }
         boolean fade = (transition == TASL) ? false : transitions[transition] == FADE_IN;
         for (int i=0;i<objects.length;i++){
-            sm.glyphLoader.addLoadRequest(so.getTargetVirtualSpace(), objects[i], fade);
+            sm.glyphLoader.addLoadRequest(so.getTargetVirtualSpace(this), objects[i], fade);
         }
-        so.observedRegions.put(this, SceneObserver.DUMMY_SHORT);
     }
 
     void hide(SceneObserver so, short transition, double x, double y){
         if (so.observedRegions.containsKey(this)){
             forceHide(so, transition, x, y);
+            so.observedRegions.remove(this);
         }
     }
 
@@ -453,9 +470,8 @@ public class Region {
         }
         boolean fade = (transition == TASL) ? false : transitions[transition] == FADE_OUT;
         for (int i=0;i<objects.length;i++){
-            sm.glyphLoader.addUnloadRequest(so.getTargetVirtualSpace(), objects[i], fade);
+            sm.glyphLoader.addUnloadRequest(so.getTargetVirtualSpace(this), objects[i], fade);
         }
-        so.observedRegions.remove(this);
     }
 
     int getClosestObjectIndex(double x, double y){

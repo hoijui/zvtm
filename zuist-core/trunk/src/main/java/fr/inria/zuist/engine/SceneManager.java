@@ -116,7 +116,6 @@ public class SceneManager {
                         // Camera cam = entry.getKey();
                         SceneObserver so = entry.getKey();
                         double alt = entry.getValue().alt;
-                        VirtualSpace tvs = so.getTargetVirtualSpace();
                         //update regions
                         if(alt != so.getPreviousAltitude()){
                             so.setPreviousAltitude(alt);
@@ -560,7 +559,7 @@ public class SceneManager {
     public void updateVisibleRegions(){
         synchronized(sceneObservers){
             for (SceneObserver so:sceneObservers){
-                updateVisibleRegions(so);
+                updateVisibleRegions(so, Region.TASL);
             }
         }
     }

@@ -40,8 +40,18 @@ public abstract class SceneObserver {
 
     abstract public double getY();
 
-    public VirtualSpace getTargetVirtualSpace(){
+    public VirtualSpace getTargetVirtualSpace(Region r){
         return vs;
+    }
+
+    /** Tells the SceneManager whether a given region is of interest to this particular SceneObserver.
+     * If it is, the SceneObserver crossing this region will trigger the loading of the ObjectDescriptions it contains.
+     * If it is not, the Region will be ignored.
+     * The default behaviour is to return true. Application-specific subclasses of SceneObserver can override this method
+     * to return true/false based, e.g., on the tags declared for the region.
+     */
+    public boolean isOfInterest(Region r){
+        return true;
     }
 
     void setSceneManager(SceneManager sm){
