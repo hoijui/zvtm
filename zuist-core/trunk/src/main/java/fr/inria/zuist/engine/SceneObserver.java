@@ -40,8 +40,15 @@ public abstract class SceneObserver {
 
     abstract public double getY();
 
+    /** Region is irrelevant for basic SceneObservers. It matters only when a decision has to be made about which VirtualSpace
+        to return depending on the region's properties. For instance, it matters for TagggedViewSceneObserver, but it does not matter for ViewSceneObserver.*/
     public VirtualSpace getTargetVirtualSpace(Region r){
         return vs;
+    }
+
+    /** This is overridden by more elaborate SceneObservers such as TagggedViewSceneObserver. */
+    public VirtualSpace[] getTargetVirtualSpaces(){
+        return new VirtualSpace[]{vs};
     }
 
     /** Tells the SceneManager whether a given region is of interest to this particular SceneObserver.

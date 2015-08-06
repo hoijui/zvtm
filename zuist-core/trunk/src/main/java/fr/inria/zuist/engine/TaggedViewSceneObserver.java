@@ -40,6 +40,11 @@ public class TaggedViewSceneObserver extends ViewSceneObserver {
         tag2space = t2s;
     }
 
+    @Override
+    public VirtualSpace[] getTargetVirtualSpaces(){
+        return tag2space.values().toArray(new VirtualSpace[tag2space.size()]);
+    }
+
     /** Returns the VirtualSpace corresponding to the first tag that matches.
         If multiple tags in the Region match those declared in this SceneObserver,
         there is no guarantee as to which one will be returned.*/
@@ -77,6 +82,10 @@ public class TaggedViewSceneObserver extends ViewSceneObserver {
             }
             return false;
         }
+    }
+
+    public HashMap<String,VirtualSpace> getTagVirtualSpaceMapping(){
+        return tag2space;
     }
 
 }

@@ -156,17 +156,50 @@ public class SceneManager {
         }
     }
 
-    public static SceneObserver[] buildObservers(VirtualSpace[] spaces, Camera[] cameras){
-        ViewSceneObserver[] sos = new ViewSceneObserver[cameras.length];
-        for (int i=0;i<cameras.length;i++){
-            sos[i] = new ViewSceneObserver(cameras[i].getOwningView(), cameras[i], spaces[i]);
+    public static final String SO_TYPE = "t";
+    public static final String SO_CAMERA = "c";
+    public static final String SO_VIRTUAL_SPACES = "v";
+    public static final String SO_PARAMS = "p";
+
+    // ViewSceneObserver
+    public static final short SO_TYPE_VSO = 0;
+    // TaggedViewSceneObserver
+    public static final short SO_TYPE_TVSO = 1;
+
+    // Expects a list of HashMaps that each contains:
+    // SO_TYPE -> one of SO_TYPE_*
+    // SO_CAMERA -> a Camera
+    // SO_VIRTUAL_SPACES -> an array of VirtualSpace[]
+    // SO_PARAMS -> a list of String[] representing tags associated with each VirtualSpace, only for SO_TYPE_TVSO
+    public static SceneObserver[] buildObservers(HashMap<String,Object>[] soDescriptions){
+        SceneObserver[] sos = new SceneObserver[soDescriptions.length];
+        for (int i=0;i<sos.length;i++){
+            short soType = ((Short)soDescriptions[i].get(SO_TYPE)).shortValue();
+            Camera c = (Camera)soDescriptions[i].get(SO_CAMERA);
+            switch(soType){
+                case SO_TYPE_VSO:{
+                    sos[i] = new ViewSceneObserver(c.getOwningView(), c,
+                                                   ((VirtualSpace[])soDescriptions[i].get(SO_VIRTUAL_SPACES))[0]);
+                    break;
+                }
+                case SO_TYPE_TVSO:{
+                    String[] tags = (String[])soDescriptions[i].get(SO_PARAMS);
+                    VirtualSpace[] spaces = (VirtualSpace[])soDescriptions[i].get(SO_VIRTUAL_SPACES);
+                    HashMap<String,VirtualSpace> t2s = new HashMap(tags.length,1);
+                    for (int j=0;j<tags.length;j++){
+                        t2s.put(tags[j], spaces[j]);
+                    }
+                    sos[i] = new TaggedViewSceneObserver(c.getOwningView(), c, t2s);
+                    break;
+                }
+            }
         }
         return sos;
     }
 
-    public SceneManager(VirtualSpace[] targetSpaces, Camera[] observingCameras,
+    public SceneManager(HashMap<String,Object>[] soDescriptions,
                         HashMap<String,String> properties){
-        this(buildObservers(targetSpaces, observingCameras), properties);
+        this(buildObservers(soDescriptions), properties);
     }
 
     public SceneBuilder getSceneBuilder(){
