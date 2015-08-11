@@ -73,7 +73,7 @@ class NavigationManager {
     /* -------------- pan-zoom ------------------- */
 
     void getGlobalView(EndAction ea){
-        application.sm.getGlobalView(application.mCamera, NavigationManager.ANIM_MOVE_DURATION, ea);
+        application.mso.getGlobalView(NavigationManager.ANIM_MOVE_DURATION, ea);
     }
 
     /* Higher view */

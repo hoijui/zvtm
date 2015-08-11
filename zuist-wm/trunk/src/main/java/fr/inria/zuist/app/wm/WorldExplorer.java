@@ -51,6 +51,8 @@ import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.EndAction;
 
 import fr.inria.zuist.engine.SceneManager;
+import fr.inria.zuist.engine.SceneObserver;
+import fr.inria.zuist.engine.ViewSceneObserver;
 import fr.inria.zuist.event.ProgressListener;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -107,6 +109,7 @@ public class WorldExplorer implements Java2DPainter {
     SceneManager sm;
     GeoToolsManager gm;
     NavigationManager nm;
+    ViewSceneObserver mso;
     AirTrafficManager ga;
 
     WEGlassPane gp;
@@ -123,9 +126,8 @@ public class WorldExplorer implements Java2DPainter {
         ((JFrame)mView.getFrame()).setGlassPane(gp);
         gp.setValue(0);
         gp.setVisible(true);
-        VirtualSpace[]  sceneSpaces = {mSpace};
-        Camera[] sceneCameras = {mCamera};
-        sm = new SceneManager(sceneSpaces, sceneCameras, new HashMap(1,1));
+        mso = new ViewSceneObserver(mView, mCamera, mSpace);
+        sm = new SceneManager(new SceneObserver[]{mso}, new HashMap(1,1));
         if (xmlSceneFile != null){
             gp.setLabel("Loading "+xmlSceneFile.getName());
             sm.loadScene(parseXML(xmlSceneFile), xmlSceneFile.getParentFile(), true, gp);
