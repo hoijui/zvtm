@@ -46,6 +46,8 @@ import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.EndAction;
 
 import fr.inria.zuist.engine.SceneManager;
+import fr.inria.zuist.engine.SceneObserver;
+import fr.inria.zuist.engine.ViewSceneObserver;
 import fr.inria.zuist.event.ProgressListener;
 
 import org.kohsuke.args4j.CmdLineException;
@@ -88,6 +90,7 @@ public class SlippyMapViewer implements Java2DPainter {
 
     SceneManager sm;
     NavigationManager nm;
+    ViewSceneObserver mso;
 
     boolean antialiasing = false;
 
@@ -106,9 +109,8 @@ public class SlippyMapViewer implements Java2DPainter {
         VirtualSpaceManager.INSTANCE.getAnimationManager().setResolution(80);
         nm = new NavigationManager(this);
         initGUI(options);
-        VirtualSpace[]  sceneSpaces = {mSpace};
-        Camera[] sceneCameras = {mCamera};
-        sm = new SceneManager(sceneSpaces, sceneCameras, parseSceneOptions(options));
+        mso = new ViewSceneObserver(mView, mCamera, mSpace);
+        sm = new SceneManager(new SceneObserver[]{mso}, parseSceneOptions(options));
         initScene();
         // if (xmlSceneFile != null){
         //     System.out.println("Loading ZUIST map "+xmlSceneFile.getName());

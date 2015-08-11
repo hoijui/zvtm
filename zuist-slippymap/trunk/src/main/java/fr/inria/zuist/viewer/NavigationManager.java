@@ -72,7 +72,7 @@ class NavigationManager {
 
     void getGlobalView(EndAction ea){
         // application.mView.getGlobalView(application.mCamera, NavigationManager.ANIM_MOVE_DURATION);
-        application.sm.getGlobalView(application.mCamera, NavigationManager.ANIM_MOVE_DURATION, ea);
+        application.mso.getGlobalView(NavigationManager.ANIM_MOVE_DURATION, ea);
     }
 
     /* Higher view */
