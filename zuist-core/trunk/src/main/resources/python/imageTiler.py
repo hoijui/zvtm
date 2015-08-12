@@ -61,7 +61,8 @@ CMD_LINE_HELP = "ZUIST Image Tiling Script\n\nUsage:\n\n" + \
     "\t-dx=y\t\tx offset for all regions and objects\n"+\
     "\t-dy=x\t\ty offset for all regions and objects\n"+\
     "\t-dl=l\t\tlevel offset for all regions and objects\n"+\
-    "\t-scale=s\ts scale factor w.r.t default size for PDF input\n"
+    "\t-scale=s\ts scale factor w.r.t default size for PDF input\n"+\
+    "\t-format=t\tt output tiles in PNG (png), JPEG (jpg) or TIFF (tiff)\n"
 
 TRACE_LEVEL = 1
 
@@ -69,7 +70,16 @@ FORCE_GENERATE_TILES = False
 
 TILE_SIZE = 512
 
-OUTPUT_FILE_EXT = "png"
+OUTPUT_TYPE_PNG = "png"
+OUTPUT_TYPE_JPEG = "jpg"
+OUTPUT_TYPE_TIFF = "tiff"
+OUTPUT_TYPE = OUTPUT_TYPE_PNG
+
+OUTPUT_TYPE2CG = {
+    OUTPUT_TYPE_PNG: kCGImageFormatPNG,
+    OUTPUT_TYPE_JPEG: kCGImageFormatJPEG,
+    OUTPUT_TYPE_TIFF: kCGImageFormatTIFF
+}
 
 # camera focal distance
 F = 100.0
@@ -175,7 +185,7 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
     scale = math.pow(2, levelCount-level-1)
     # generate image tile
     # generate image except for level 0 where we use original image
-    tileFileName = "%s%s.%s" % (TILE_FILE_PREFIX, tileIDstr, OUTPUT_FILE_EXT)
+    tileFileName = "%s%s.%s" % (TILE_FILE_PREFIX, tileIDstr, OUTPUT_TYPE)
     levelTilePath = "%s/%s" % (TGT_DIR, level)
     relTilePath = "%s/%s" % (level, tileFileName)
     fullTilePath = "%s/%s" % (levelTilePath, tileFileName)
@@ -203,7 +213,7 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
             bitmap.setInterpolationQuality(kCGInterpolationHigh)
             rect = CGRectMake(0, 0, int(aw/scale), int(ah/scale))
             bitmap.drawImage(rect, cim)
-            bitmap.writeToFile(fullTilePath, kCGImageFormatPNG)
+            bitmap.writeToFile(fullTilePath, OUTPUT_TYPE2CG[OUTPUT_TYPE])
         else:
             ccl = "convert %s -crop %dx%d+%d+%d -quality 95 %s" % (SRC_PATH, aw, ah, x, y, fullTilePath)
             if USE_GRAPHICSMAGICK:
@@ -279,7 +289,7 @@ def processSrcImg():
             log("\tDrawing PDF to bitmap", 3)
             bitmap.drawPDFDocument(page_rect, pdf_document, 1)
             log("\tWriting bitmap to temp file", 3)
-            bitmap.writeToFile(IMG_SRC_PATH, kCGImageFormatPNG)
+            bitmap.writeToFile(IMG_SRC_PATH, OUTPUT_TYPE2CG[OUTPUT_TYPE])
             deleteTmpFile = True
             return
         else:
@@ -347,7 +357,9 @@ if len(sys.argv) > 2:
                 DY = int(arg[len("-dy="):])
             elif arg.startswith("-dl"):
                 DL = int(arg[len("-dl="):])
-            elif arg.startswith("-scale"):
+            elif arg.startswith("-format"):
+                OUTPUT_TYPE = arg[len("-format="):]
+            elif arg.startswith("-scale="):
                 PDF_SCALE_FACTOR = float(arg[len("-scale="):])
 else:
     log(CMD_LINE_HELP)
