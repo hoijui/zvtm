@@ -2,19 +2,10 @@
 # -*- coding: UTF-8 -*-
 
 # AUTHOR : Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
-# Copyright (c) INRIA, 2009. All Rights Reserved
+# Copyright (c) INRIA, 2009-2015. All Rights Reserved
 # Licensed under the GNU LGPL. For full terms see the file COPYING.
 
 # $Id$
-
-###############################################################################
-# Only 32-bit Python will work with CG bindings on Mac OS X 10.6 Snow Leopard
-# make sure you
-
-#    export VERSIONER_PYTHON_PREFER_32_BIT=yes
-
-# before calling this script
-###############################################################################
 
 import os, sys, math
 from copy import copy
