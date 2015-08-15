@@ -47,9 +47,6 @@ import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.EndAction;
 import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 
-import fr.inria.zuist.engine.SceneManager;
-import fr.inria.zuist.engine.ProgressListener;
-
 import fr.inria.zvtm.cluster.ClusterGeometry;
 import fr.inria.zvtm.cluster.ClusteredView;
 
@@ -68,6 +65,7 @@ public class WallSlippyMapViewer extends SlippyMapViewer {
         super(options);
     }
 
+    @Override
     void initGUI(SMVOptions options){
         windowLayout();
         vsm = VirtualSpaceManager.INSTANCE;
@@ -141,12 +139,11 @@ public class WallSlippyMapViewer extends SlippyMapViewer {
             parser.printUsage(System.err);
             return;
         }
-        File xmlSceneFile = (options.path_to_zuist_map != null) ? new File(options.path_to_zuist_map) : null;
         if (!options.fullscreen && Utils.osIsMacOS()){
             System.setProperty("apple.laf.useScreenMenuBar", "true");
         }
         System.out.println("--help for command line options");
-        new WallSlippyMapViewer(options, xmlSceneFile);
+        new WallSlippyMapViewer(options);
     }
 
 }
