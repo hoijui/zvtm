@@ -57,18 +57,18 @@ $Id$
         </activation>
         <build>
             <plugins>
-              <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
-                <configuration>
-                  <source>1.6</source>
-                  <target>1.6</target>
-                  <excludes>
-                    <exclude>**/*Wall*.java</exclude>
-                  </excludes>
-                </configuration>
-              </plugin>
+                <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-compiler-plugin</artifactId>
+                  <version>3.3</version>
+                  <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                    <excludes>
+                      <exclude>**/*Wall*.java</exclude>
+                    </excludes>
+                  </configuration>
+                </plugin>
              <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -106,7 +106,7 @@ $Id$
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>aspectj-maven-plugin</artifactId>
-                    <version>1.2</version>
+                    <version>1.7</version>
                     <configuration>
                       <weaveDependencies>
                         <weaveDependency>
@@ -118,8 +118,9 @@ $Id$
                           <artifactId>zvtm-cluster</artifactId>
                       </weaveDependency>
                       </weaveDependencies>
-                      <source>1.6</source>
-                      <target>1.6</target>
+                      <source>1.7</source>
+                      <target>1.7</target>
+                      <complianceLevel>1.7</complianceLevel>
                       <!--<showWeaveInfo>true</showWeaveInfo>-->
                       <aspectLibraries>
                         <aspectLibrary>
@@ -130,20 +131,30 @@ $Id$
                     </configuration>
                     <executions>
                         <execution>
+                            <phase>process-sources</phase>
                             <goals>
                                 <goal>compile</goal>
                                 <goal>test-compile</goal>
                             </goals>
                         </execution>
                     </executions>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.aspectj</groupId>
+                            <artifactId>aspectjtools</artifactId>
+                            <version>1.8.6</version>
+                        </dependency>
+                    </dependencies>
                 </plugin>
                 <plugin>
                   <groupId>org.apache.maven.plugins</groupId>
                   <artifactId>maven-compiler-plugin</artifactId>
+                  <!-- WARNING: when moving to a more recent version such as 3.3, custom glyphs
+                       such as TrainDetailG are no longer displayed in SlaveApp -->
                   <version>2.3.2</version>
                   <configuration>
-                    <source>1.6</source>
-                    <target>1.6</target>
+                    <source>1.7</source>
+                    <target>1.7</target>
                   </configuration>
                 </plugin>
                 <plugin>
@@ -174,28 +185,29 @@ $Id$
     <resources>
       <resource>
         <directory>src/main/resources</directory>
-        <filtering>true</filtering>
+          <excludes>
+            <exclude>images/*.py</exclude>
+          </excludes>
       </resource>
     </resources>
     <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <version>2.10</version>
-        <executions>
-          <execution>
-            <id>copy-dependencies</id>
-            <phase>package</phase>
-            <goals>
-              <goal>copy-dependencies</goal>
-            </goals>
-            <configuration>
-              <excludeScope>provided</excludeScope>
-              <outputDirectory>${project.build.directory}</outputDirectory>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>dependency-maven-plugin</artifactId>
+          <version>1.0</version>
+          <executions>
+            <execution>
+              <id>copy-dependencies</id>
+              <phase>package</phase>
+              <goals>
+                <goal>copy-dependencies</goal>
+              </goals>
+              <configuration>
+                <outputDirectory>${project.build.directory}</outputDirectory>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
     </plugins>
   </build>
 
