@@ -14,18 +14,36 @@ from copy import copy
 # http://effbot.org/zone/element-index.htm
 import xml.etree.ElementTree as ET
 
+################################################################################
+# USAGE EXAMPLES
+#
+#  slippyMapTiler.py mymapdir -ts=256 -ext=png -rt=3-2-4 -zd=4 -im=bilinear -dt=3-5
+#   - will save result in mymapdir
+#   - root tile is at zoom level 3, x-y coords 2-4 (part of South America)
+#   - tile format:PNG
+#   - generates a quadtree with 4 levels (the map spans slippy map levels 3 to 6)
+#   - tiles for zoom levels 3 to 5 are downloaded from the Web now and will be referenced locally
+#     lower levels (6 in this case) will be downloaded dynamically from the Web when the scene is viewed in ZUIST
+#
+# IMPORTANT: DO NOT FORGET TO SELECT THE RIGHT URL in getTMSURL()
+#            by uncommenting the right return statement
+#            Do not forget to set -ext=... accordingly
+#            as well as -yx if need be
+################################################################################
+
+
 CMD_LINE_HELP = "Slippy Map Tiling Script\n\nUsage:\n\n" + \
     " \tslippyMapTiler <target_dir> [options]\n\n" + \
     "Options:\n\n"+\
     "\t-ts=S\t\ttile size (S in pixels)\n"+\
     "\t-ext=<ext>\t<ext> one of {png,jpg}\n"+\
     "\t-rt=z-x-y\troot tile (zoom-x-y) for this scene\n"+\
-    "\t-zd=N\t\tzoom depth from root (N in [0,19])\n"+\
-    "\t-mfd=N\t\tmaximum depth of scene fragments (0 to generate a single scene no matter the total depth)\n"+\
-    "\t-dt=N-N\t\tdownload and save tiles for levels in the specified range (N in [0,19])\n"+\
-    "\t-yx\t\tinvert x and y in slippy tile URL coordinates system\n"+\
-    "\t-im=<i>\t\t<i> one of {bilinear,bicubic,nearestNeighbor}\n"+\
-    "\t-tl=N\t\ttrace level (N in [0:2])\n"
+    "\t-zd=N\t\tzoom depth from root tile specified in -rt (N in [0,19])\n"+\
+    "\t-mfd=N\t\tmaximum depth of scene fragments (0 to generate a single scene no matter the total depth) <optional>\n"+\
+    "\t-dt=N-N\t\tdownload and save tiles for levels in the specified range (N in [0,19]) <optional>\n"+\
+    "\t-yx\t\tinvert x and y in slippy tile URL coordinates system <optional>\n"+\
+    "\t-im=<i>\t\t<i> one of {bilinear,bicubic,nearestNeighbor} <optional>\n"+\
+    "\t-tl=N\t\ttrace level (N in [0:2]) <optional>\n"
 
 TRACE_LEVEL = 0
 
@@ -68,7 +86,7 @@ ACCESS_TOKEN = ""
 def getTMSURL():
     ######################### OSM
     ## EXT: png
-    #return "http://%s.tile.openstreetmap.org/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*3))]
+    return "http://%s.tile.openstreetmap.org/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*3))]
     ######################### ArcGIS orthoimagery, use with -yx
     ## EXT: jpg
     #return "http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/"
@@ -85,7 +103,7 @@ def getTMSURL():
     ## EXT: jpg
     #return "http://otile%d.mqcdn.com/tiles/1.0.0/sat/" % math.ceil(random.random()*4)
     ## EXT: jpg
-    return "http://otile%d.mqcdn.com/tiles/1.0.0/osm/" % math.ceil(random.random()*4)
+    #return "http://otile%d.mqcdn.com/tiles/1.0.0/osm/" % math.ceil(random.random()*4)
     ######################### Mapbox
     # Woodcut
     ## EXT: jpg
