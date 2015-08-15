@@ -186,7 +186,7 @@ $Id$
       <resource>
         <directory>src/main/resources</directory>
           <excludes>
-            <exclude>images/*.py</exclude>
+		    <exclude>python/**</exclude>
           </excludes>
       </resource>
     </resources>
