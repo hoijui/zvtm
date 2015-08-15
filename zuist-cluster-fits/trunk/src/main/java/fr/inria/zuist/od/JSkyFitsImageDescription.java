@@ -1,49 +1,52 @@
 /*   Copyright (c) INRIA, 2010-2014. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id$
+ * $Id: FitsImageDescription.java 5249 2014-12-11 19:33:30Z fdelcampo $
  */
 
-package fr.inria.zuist.engine;
+package fr.inria.zuist.od;
 
 import java.io.IOException;
 import java.net.URL;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zuist.engine.SceneManager;
-import fr.inria.zvtm.glyphs.FitsImage;
+import fr.inria.zuist.engine.Region;
+import fr.inria.zvtm.glyphs.JSkyFitsImage;
 import fr.inria.zvtm.glyphs.Glyph;
 
 import java.awt.image.ImageFilter;
 
+import fr.inria.zuist.engine.JSkyFitsResourceHandler;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jsky.coords.WCSTransform;
+//import jsky.coords.WCSTransform;
 import fr.inria.zvtm.fits.NomWcsKeywordProvider;
-import edu.jhu.pha.sdss.fits.FITSImage; 
+//import edu.jhu.pha.sdss.fits.FITSImage; 
 import java.awt.geom.Point2D;
-import nom.tam.fits.FitsException;
+//import nom.tam.fits.FitsException;
 
 /**
  * Describes a FITS images and creates / releases the corresponding
  * ZVTM glyph on demand.
  */
-public class FitsImageDescription extends ResourceDescription {
+public class JSkyFitsImageDescription extends ResourceDescription {
 
-    private static final Logger logger = LoggerFactory.getLogger(FitsImageDescription.class);
+    private static final Logger logger = LoggerFactory.getLogger(JSkyFitsImageDescription.class);
 
     private float scaleFactor = 1;
-    private FitsImage.ScaleMethod scaleMethod;
-    private FitsImage.ColorFilter colorFilter;
+    private JSkyFitsImage.ScaleAlgorithm scaleMethod;
+    private String colorLookupTable;
     private URL src;
     private String id;
-    private double vx;
-    private double vy;
+    //private double vx;
+    //private double vy;
     private int zindex;
-    private double w;
-    private double h;
+    private double vw;
+    private double vh;
 
-    private WCSTransform wcsTransform;
+    //private WCSTransform wcsTransform;
     private String objectName; 
 
     private float alpha = 1f;
@@ -52,20 +55,22 @@ public class FitsImageDescription extends ResourceDescription {
 
     private double gmin = Double.MAX_VALUE;
     private double gmax = Double.MIN_VALUE;
-    private double gsigma;
+    //private double gsigma;
 
     private boolean isRescaleGlobal = false;
 
     private double lmin = Double.MAX_VALUE;
     private double lmax = Double.MIN_VALUE;
-    private double lsigma;
+    //private double lsigma;
 
     private volatile boolean display = true;
     //private Color strokeColor = null;
 
-    private FitsImage glyph; //the actual FITS image
+    private JSkyFitsImage glyph;
 
     private boolean isReference = false;
+
+    private String hist;
 
     private double angle = 0;
 
@@ -75,25 +80,25 @@ public class FitsImageDescription extends ResourceDescription {
 
     private Region parentRegion;
 
-    public FitsImageDescription(String id, double x, double y, int z, URL src,
-            Region parentRegion, float scaleFactor, FitsImage.ScaleMethod scaleMethod,
-            FitsImage.ColorFilter colorFilter){
+    public JSkyFitsImageDescription(String id, double x, double y, int z, URL src,
+            Region parentRegion, float scaleFactor, JSkyFitsImage.ScaleAlgorithm scaleMethod,
+            String colorLookupTable){
         this.id = id;
         this.vx = x;
         this.vy = y;
         this.zindex = z;
         this.src = src;
 
-        w = parentRegion.getWidth();
-        h = parentRegion.getHeight();
+        this.vw = parentRegion.getWidth();
+        this.vh = parentRegion.getHeight();
 
         this.scaleFactor = scaleFactor;
         this.scaleMethod = scaleMethod;
-        this.colorFilter = colorFilter;
+        this.colorLookupTable = colorLookupTable;
 
         isVisible = true;
 
-        layerIndex = parentRegion.getLayerIndex();
+        layerIndex = 1; //parentRegion.getLayerIndex()-1;  XXX: change layer to tag
 
         this.parentRegion = parentRegion;
 
@@ -120,31 +125,33 @@ public class FitsImageDescription extends ResourceDescription {
 
     }
 
-    public FitsImageDescription(String id, double x, double y, int z, URL src,
-            Region parentRegion, float scaleFactor, FitsImage.ScaleMethod scaleMethod,
-            FitsImage.ColorFilter colorFilter, double min, double max){
+    public JSkyFitsImageDescription(String id, double x, double y, int z, URL src,
+            Region parentRegion, float scaleFactor, JSkyFitsImage.ScaleAlgorithm scaleMethod,
+            String colorLookupTable, double min, double max){
         this.id = id;
         this.vx = x;
         this.vy = y;
         this.zindex = z;
         this.src = src;
 
-        w = parentRegion.getWidth();
-        h = parentRegion.getHeight();
+        this.vw = parentRegion.getWidth();
+        this.vh = parentRegion.getHeight();
+
 
         this.scaleFactor = scaleFactor;
         this.scaleMethod = scaleMethod;
-        this.colorFilter = colorFilter;
+        this.colorLookupTable = colorLookupTable;
+
         gmin = min;
         gmax = max;
-        gsigma = min/2. + max/2.;
+        //gsigma = min/2. + max/2.;
 
         isRescaleGlobal = true;
         createdWithGlobalData = true;
 
         isVisible = true;
 
-        layerIndex = parentRegion.getLayerIndex();
+        layerIndex = 1;//parentRegion.getLayerIndex()-1; XXX: Layer Index to Tag
 
         this.parentRegion = parentRegion;
 
@@ -169,6 +176,14 @@ public class FitsImageDescription extends ResourceDescription {
         }
         */
 
+    }
+
+    public void setHistogram(String file){
+        hist = file;
+    }
+
+    public String getHistogram(){
+        return hist;
     }
 
     public boolean isReference(){
@@ -211,67 +226,62 @@ public class FitsImageDescription extends ResourceDescription {
     */
 
     public String getType(){
-        return FitsResourceHandler.RESOURCE_TYPE_FITS;
+        return JSkyFitsResourceHandler.RESOURCE_TYPE_FITS;
     }
 
-    public void setColorFilter(FitsImage.ColorFilter colorFilter){
-        this.colorFilter = colorFilter;
+    public void setColorLookupTable(String colorLookupTable, boolean updateDisplay){
+        this.colorLookupTable = colorLookupTable;
         if(glyph != null){
-            glyph.setColorFilter(colorFilter);
+            glyph.setColorLookupTable(colorLookupTable, updateDisplay);
         }
     }
 
 
-    public void setScaleMethod(FitsImage.ScaleMethod scaleMethod){
-        this.scaleMethod = scaleMethod;
+    public void setScaleAlgorithm(JSkyFitsImage.ScaleAlgorithm algorithm, boolean updateDisplay){
+        this.scaleMethod = algorithm;
         if(glyph != null){
-            glyph.setScaleMethod(scaleMethod);
+            glyph.setScaleAlgorithm(algorithm, updateDisplay);
         }
     }
 
     public void setRescaleGlobal(double min, double max){
         gmin = (min < gmin) ? min : gmin;
         gmax = (max > gmax) ? max : gmax;
-        gsigma = gmin/2. + gmax/2.;
     }
 
     public void setRescaleGlobal(boolean isGlobal){
         isRescaleGlobal = isGlobal;
     }
 
-    public void rescale(double min, double max, double sigma){
-        if(glyph != null) glyph.rescale(min, max, sigma);
+    public void rescale(double min, double max, boolean updateDisplay){
+        if(glyph != null) glyph.setCutLevels(min, max, updateDisplay);
     }
 
     public void rescaleGlobal(){
-        //System.out.println("rescaleGlobal()");
-        //System.out.println("glyph.rescale("+gmax+", "+gmin+", "+gsigma+")");
-        if(glyph != null) glyph.rescale(gmin, gmax, gsigma);
+        if(glyph != null) glyph.setCutLevels(gmin, gmax, true);
     }
 
     public void rescaleLocal(){
-        //System.out.println("rescaleLocal()");
-        //System.out.println("glyph.rescale("+lmax+", "+lmin+", "+lsigma+")");
-        if(glyph != null) glyph.rescale(lmin, lmax, lsigma);
+        if(glyph != null) glyph.setCutLevels(lmin, lmax, true);
     }
 
     public double[] getLocalScaleParams(){
         return new double[]{lmin, lmax};
     }
 
+    public double[] getGlobalScaleParams(){
+        return new double[]{gmin, gmax};
+    }
+
     //public void createObject(final VirtualSpace vs, final boolean fadeIn){
     public void createObject(final SceneManager sm, final VirtualSpace vs, final boolean fadeIn){
         //System.out.println("createObject");
         try{
-            //if(isRescaleGlobal) glyph = new FitsImage(vx,vy,zindex,src,scaleFactor,gmin, gmax);
-            //else glyph = new FitsImage(vx,vy,zindex,src,scaleFactor);
-            glyph = new FitsImage(vx,vy,zindex,src,scaleFactor);
-            //if(gmin == Double.MAX_VALUE && gmax == Double.MIN_VALUE) glyph = new FitsImage(vx,vy,zindex,src,scaleFactor,false);
-            //else glyph = new FitsImage(vx,vy,zindex,src,scaleFactor,gmin, gmax);
-            //if(lmin == Double.MAX_VALUE) 
-            lmin = glyph.getScaleParams()[0];
-            //if(lmax == Double.MIN_VALUE) 
-            lmax = glyph.getScaleParams()[1];
+
+            glyph = new JSkyFitsImage(vx,vy,zindex,src,scaleFactor);
+
+            lmin = glyph.getCutLevels()[0];
+            lmax = glyph.getCutLevels()[1];
             
         } catch(Exception ioe){
             System.out.println("Could not create FitsImage");
@@ -282,21 +292,21 @@ public class FitsImageDescription extends ResourceDescription {
         //glyph.setSensitivity(isSensitive);
         //System.out.println("glyph.setSensitivity("+isSensitive+")");
         glyph.setVisible(isVisible);
-        glyph.setDrawBorder(false);
+        //glyph.setDrawBorder(false);
         glyph.setTranslucencyValue(alpha);
 
-        glyph.setScaleMethod(scaleMethod);
-        glyph.setColorFilter(colorFilter);
+        glyph.setScaleAlgorithm(scaleMethod, false);
+        glyph.setColorLookupTable(colorLookupTable, false);
 
-        if(isRescaleGlobal) glyph.rescale(gmin, gmax, gsigma);
-        else glyph.rescale(lmin, lmax, lsigma);
+        if(isRescaleGlobal) glyph.setCutLevels(gmin, gmax, true);
+        else glyph.setCutLevels(lmin, lmax, true);
 
         //System.out.println("localmin: " + lmin + " localmax: " + lmax);
         //System.out.println("globalmin: " + gmin + " globalmax: " + gmax);
         //System.out.println(glyph);
         glyph.orientTo(angle);
 
-        vs.addGlyph(glyph,false);
+        vs.addGlyph(glyph, false);
 
     }
 
@@ -307,19 +317,19 @@ public class FitsImageDescription extends ResourceDescription {
     }
 
     public double getWidth(){
-        return w;
+        return vw;
     }
 
     public double getHeight(){
-        return h;
+        return vh;
     }
 
     public double getWidthWithFactor(){
-        return w/scaleFactor;
+        return vw/scaleFactor;
     }
 
     public double getHeightWithFactor(){
-        return h/scaleFactor;
+        return vh/scaleFactor;
     }
 
     public double getFactor(){
@@ -369,10 +379,11 @@ public class FitsImageDescription extends ResourceDescription {
 
     @Override
     public void moveTo(double x, double y){
+        super.moveTo(x,y);
         if(glyph != null) glyph.moveTo(x, y);
-        vx = x;
-        vy = y;
-        parentRegion.moveTo(x,y);
+        //vx = x;
+        //vy = y;
+        //parentRegion.moveTo(x,y);
     }
 
     public void setTranslucencyValue(float alpha){
@@ -391,8 +402,8 @@ public class FitsImageDescription extends ResourceDescription {
 
     @Override
     public boolean coordInside(double pvx, double pvy){
-        return (vx >= pvx-w/2d && vx <= pvx+w/2d && vy >= pvy-h/2d && vy <= pvy+h/2d);
+        return (vx >= pvx-vw/2d && vx <= pvx+vw/2d && vy >= pvy-vw/2d && vy <= pvy+vw/2d);
     }
-
+    
 }
 

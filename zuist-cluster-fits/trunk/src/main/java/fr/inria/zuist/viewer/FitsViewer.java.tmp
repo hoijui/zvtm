@@ -2,7 +2,7 @@
  *   Copyright (c) INRIA, 2010. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id$
+ * $Id: FitsViewer.java 5615 2015-06-19 22:09:48Z fdelcampo $
  */
 
 package fr.inria.zuist.viewer;
@@ -77,14 +77,15 @@ import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
 
 import fr.inria.zuist.engine.SceneManager;
+import fr.inria.zuist.engine.SceneBuilder;
 import fr.inria.zuist.engine.Region;
 import fr.inria.zuist.engine.Level;
 import fr.inria.zuist.engine.RegionPicker;
 import fr.inria.zuist.event.RegionListener;
 import fr.inria.zuist.event.LevelListener;
 import fr.inria.zuist.event.ProgressListener;
-import fr.inria.zuist.engine.ObjectDescription;
-import fr.inria.zuist.engine.FitsImageDescription;
+import fr.inria.zuist.od.ObjectDescription;
+//import fr.inria.zuist.engine.FitsImageDescription;
 
 import fr.inria.zvtm.engine.ViewPanel;
 import java.awt.event.MouseEvent;
@@ -116,7 +117,7 @@ import cl.inria.massda.SmartiesManager.MyCursor;
 import java.util.Observer;
 import java.util.Observable;
 
-import fr.inria.zuist.engine.JSkyFitsImageDescription;
+import fr.inria.zuist.od.JSkyFitsImageDescription;
 
 import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
 import fr.inria.zvtm.animation.Animation;
@@ -198,7 +199,8 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     static final String mViewName = "ZUIST Viewer";
     View mView;
     ClusteredView clusteredView;
-    FitsViewerEventHandler eh;
+    
+    JSkyFitsViewerEventHandler eh;
 
     SceneManager sm;
 
@@ -206,10 +208,10 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 	//VWGlassPane gp;
 	PieMenu mainPieMenu;
 
-    FitsImage.ColorFilter cfilter = FitsImage.ColorFilter.RAINBOW;
-    FitsImage.ScaleMethod scaleMethod = FitsImage.ScaleMethod.LINEAR;
+    //FitsImage.ColorFilter cfilter = FitsImage.ColorFilter.RAINBOW;
+    //FitsImage.ScaleMethod scaleMethod = FitsImage.ScaleMethod.LINEAR;
 
-    public FitsMenu menu;
+    //public FitsMenu menu;
     double[] globalScaleParams = {Double.MAX_VALUE, Double.MIN_VALUE};
     
     SmartiesManager smartiesMngr;
@@ -217,7 +219,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 
     public RegionPicker rPicker;
 
-    public FitsImageDescription fitsImageDescRef;
+    //public FitsImageDescription fitsImageDescRef;
     //public Object fitsImageDescRef;
     //NomWcsKeywordProvider wcsKeyProviderRef;
     //WCSTransform wcsTransformRef;
@@ -228,6 +230,9 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     String reference;
 
     public PythonWCS pythonWCS;
+
+    double[] sceneBounds = null;
+    double sceneWidth = 0, sceneHeight= 0;
 
     AnimationManager am = VirtualSpaceManager.INSTANCE.getAnimationManager();
     //boolean galacticalSystem = false;
@@ -369,9 +374,9 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         //if(options.xmlSceneFile != null) gp.setVisible(true);
         //else gp.setVisible(false);
 
-        eh = new FitsViewerEventHandler(this);
+        eh = new JSkyFitsViewerEventHandler(this);
 
-        menu = new FitsMenu(this);
+        //menu = new FitsMenu(this);
         
         /*
         mView.setEventHandler(eh, 0);
@@ -501,6 +506,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         am.startAnimation(a, true);
     }
 	
+    /*
     void toggleColorFilter(){
         FitsImage.ColorFilter next = 
             cfilter.ordinal() == (FitsImage.ColorFilter.values().length - 1) ? FitsImage.ColorFilter.values()[0] : FitsImage.ColorFilter.values()[cfilter.ordinal() + 1];
@@ -581,7 +587,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
                 else ((FitsImageDescription)desc).rescaleLocal();
             }
         }
-        */
+        *
     }
 
     public void hideLayer(int layerIndex){
@@ -595,7 +601,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         }
         /*for(Glyph g:vs.getAllGlyphs()){
             vs.hide(g);
-        }*/
+        }*
     }
 
     public void showLayer(int layerIndex, float alpha){
@@ -612,10 +618,12 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
             vs.show(g);
             g.setTranslucencyValue(alpha);
         }
-        */
+        *
     }
 
-    
+    */
+
+    /*
     public void orientTo(double angle){
         System.out.println("angle: "+angle);
         for(ObjectDescription desc: sm.getObjectDescriptions()){
@@ -624,7 +632,9 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
             }
         }
     }
+    */
 
+    /*
     public void loadFitsReference(){
         if(reference == null){
             
@@ -651,7 +661,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
                         } catch(FITSImage.DataTypeNotSupportedException dtnse) {
                             wcsTransformRef = null;
                         }
-                        */
+                        *
 
                         break;
                     }
@@ -679,7 +689,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
             } catch(FITSImage.DataTypeNotSupportedException dtnse) {
                 wcsTransformRef = null;
             }
-            */
+            *
 
         }
         
@@ -687,7 +697,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         System.out.println("loaded IVO Fits Reference");
     }
 
-    
+    */
 
     /*
     public void moveToCoordinatesWCS(){
@@ -930,7 +940,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
     */
 
     
-    
+    /*
     public void coordinateWCS(Point2D.Double xy, String id){
 
         try {
@@ -960,7 +970,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 
             System.out.println( "width/factor: " +(fitsImageDescRef.getWidth()/fitsImageDescRef.getFactor() ) + " height/a:" + (fitsImageDescRef.getHeight()/fitsImageDescRef.getFactor()) ) ;
 
-           */
+           *
 
             double x = (coord[0] - fitsImageDescRef.getX())/fitsImageDescRef.getFactor() + fitsImageDescRef.getWidth()/fitsImageDescRef.getFactor()/2 ;
             double y = (coord[1] - fitsImageDescRef.getY())/fitsImageDescRef.getFactor() + fitsImageDescRef.getHeight()/fitsImageDescRef.getFactor()/2 ;
@@ -980,6 +990,7 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 
         
     }
+    */
     
 
     /*
@@ -1164,14 +1175,16 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
         sm.enableRegionUpdater(false);
         loadScene(xmlSceneFile);
         EndAction ea  = new EndAction(){
-               public void execute(Object subject, Animation.Dimension dimension){
-                   sm.setUpdateLevel(true);
-                   sm.enableRegionUpdater(true);
-               }
-           };
+           public void execute(Object subject, Animation.Dimension dimension){
+               sm.setUpdateLevel(true);
+               sm.enableRegionUpdater(true);
+           }
+        };
+        setupSceneBounds();
         getGlobalView(ea);
     }
 
+    /*
 	void loadScene(File xmlSceneFile){
         System.out.print("this instanceof FitsViewer: ");
         System.out.println( this instanceof FitsViewer );
@@ -1204,9 +1217,10 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 
         //loadFitsReference();
 	}
+    */
     
     /*-------------     Navigation       -------------*/
-
+    /*
     public void getGlobalView(EndAction ea){
 		int l = 0;
 		while (sm.getRegionsAtLevel(l) == null){
@@ -1223,6 +1237,48 @@ public class FitsViewer implements Java2DPainter, RegionListener, LevelListener 
 	        mCamera.getOwningView().centerOnRegion(mCamera, FitsViewer.ANIM_MOVE_LENGTH, wnes[0], wnes[1], wnes[2], wnes[3], ea);
 
 		}
+    }
+    */
+
+    void setupSceneBounds()
+    {
+        int l = 0;
+        while (sm.getRegionsAtLevel(l) == null){
+            l++;
+            if (l > sm.getLevelCount()){
+                l = -1;
+                break;
+            }
+        }
+        if (l > -1){
+            sceneBounds = sm.getLevel(l).getBounds();
+            System.out.println(
+                "Bounds ("+ l+ ") WNES: "
+                + sceneBounds[0] +" "+ sceneBounds[1] +" "+  sceneBounds[2] +" "+ sceneBounds[3]);
+            sceneWidth = - sceneBounds[0] +  sceneBounds[2];
+            sceneHeight = sceneBounds[1]  - sceneBounds[3];
+        }
+    }
+
+    public void getGlobalView(EndAction ea){
+        if (sceneBounds == null) {return;}
+
+        mCamera.moveTo(
+            (sceneBounds[0] +  sceneBounds[2])/2, (sceneBounds[1] + sceneBounds[3])/2);
+        double fw = sceneWidth /  getDisplayWidth();
+        double fh = sceneHeight / getDisplayHeight();
+        double f = fw;
+        //System.out.println("fw: " + fw + ", fh: " + fh);
+        if (fh > fw) f = fh;
+        double a = (mCamera.focal + mCamera.altitude) / mCamera.focal;
+        double newz = mCamera.focal * a * f - mCamera.focal;
+        mCamera.setAltitude(newz);
+
+        //Location l =  mView.centerOnRegion(zfCamera,0,sceneBounds[0], sceneBounds[1],sceneBounds[2], sceneBounds[3]);
+        //zfCamera.setLocation(l);
+        if (ea != null) {
+            ea.execute(null,null);
+        }
     }
 
     /* Higher view */

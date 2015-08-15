@@ -9,14 +9,13 @@ package fr.inria.zuist.cluster;
 
 import java.awt.geom.Point2D;
 
+import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.cluster.AbstractAutoReplay;
 import fr.inria.zvtm.cluster.Identifiable;
 import fr.inria.zuist.engine.Region;
 import fr.inria.zuist.engine.SceneManager;
-import fr.inria.zvtm.glyphs.FitsImage;
-import fr.inria.zuist.engine.FitsImageDescription;
 import fr.inria.zvtm.glyphs.JSkyFitsImage;
-import fr.inria.zuist.engine.JSkyFitsImageDescription;
+import fr.inria.zuist.od.JSkyFitsImageDescription;
 
 import java.net.URL;
 
@@ -37,37 +36,17 @@ aspect AutoReplay extends AbstractAutoReplay {
          execution(public void SceneManager.updateVisibleRegions()) ||
          execution(public void Region.setContainingRegion(Region)) ||
          execution(public void Region.addContainedRegion(Region)) ||
-         execution(public void FitsImageDescription.setScaleMethod(FitsImage.ScaleMethod)) ||
-         execution(public void FitsImageDescription.setColorFilter(FitsImage.ColorFilter)) ||
-         execution(public VirtualSpace FitsImageDescription.getVirtualSpace()) ||
-         execution(public void FitsImageDescription.setRescaleGlobal(double, double)) ||
-         execution(public void FitsImageDescription.setRescaleGlobal(boolean)) || 
-         execution(public void FitsImageDescription.rescale(double, double, double)) ||
-         execution(public void FitsImageDescription.rescaleGlobal()) ||
-         execution(public void FitsImageDescription.rescaleLocal()) ||
-         execution(public double[] FitsImageDescription.getLocalScaleParams()) ||
-         execution(public void FitsImageDescription.setTranslucency(float)) ||
-         execution(public String FitsImageDescription.getObjectName()) ||
-         execution(public double FitsImageDescription.getWidth()) ||
-         execution(public double FitsImageDescription.getHeight()) ||
-         execution(public double FitsImageDescription.getX()) ||
-         execution(public double FitsImageDescription.getY()) ||
-         execution(public boolean FitsImageDescription.isVisible()) ||
-         execution(public URL FitsImageDescription.getSrc()) ||
-         execution(public void FitsImageDescription.moveTo(double, double)) ||
-         execution(public void FitsImageDescription.orientTo(double)) ||
-         execution(public void FitsImageDescription.setVisible(boolean)) ||
          execution(public void JSkyFitsImageDescription.setScaleAlgorithm(JSkyFitsImage.ScaleAlgorithm, boolean)) ||
          execution(public void JSkyFitsImageDescription.setColorLookupTable(String, boolean)) ||
          execution(public VirtualSpace JSkyFitsImageDescription.getVirtualSpace()) ||
          execution(public void JSkyFitsImageDescription.setRescaleGlobal(double, double)) ||
-         execution(public void JSkyFitsImageDescription.setRescaleGlobal(boolean)) || 
+         execution(public void JSkyFitsImageDescription.setRescaleGlobal(boolean)) ||
          execution(public void JSkyFitsImageDescription.rescale(double, double, boolean)) ||
          execution(public void JSkyFitsImageDescription.rescaleGlobal()) ||
          execution(public void JSkyFitsImageDescription.rescaleLocal()) ||
          execution(public double[] JSkyFitsImageDescription.getLocalScaleParams()) ||
          execution(public double[] JSkyFitsImageDescription.getGlobalScaleParams()) ||
-         execution(public void JSkyFitsImageDescription.setTranslucencyValue(float)) ||
+         execution(public void JSkyFitsImageDescription.setTranslucency(float)) ||
          execution(public double JSkyFitsImageDescription.getWidth()) ||
          execution(public double JSkyFitsImageDescription.getHeight()) ||
          execution(public double JSkyFitsImageDescription.getX()) ||
@@ -79,4 +58,3 @@ aspect AutoReplay extends AbstractAutoReplay {
          execution(public void JSkyFitsImageDescription.setVisible(boolean))
         );
 }
-

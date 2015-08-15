@@ -58,7 +58,7 @@ class FitsOverlayManager implements ViewListener {
     static final Color FADE_REGION_FILL = Color.BLACK;
     static final Color FADE_REGION_STROKE = Color.WHITE;
 
-    FitsViewer application;
+    JSkyFitsViewer application;
 
 	TranslucentTextArea console;
 
@@ -67,7 +67,7 @@ class FitsOverlayManager implements ViewListener {
 
 	int[] consolePaddingWNES = {5, 5, 5, 5};
 
-    FitsOverlayManager(FitsViewer app){
+    FitsOverlayManager(JSkyFitsViewer app){
         this.application = app;
     }
 

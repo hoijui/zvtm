@@ -10,6 +10,8 @@ import java.net.URL;
 import java.awt.Color;
 import fr.inria.zvtm.glyphs.JSkyFitsImage;
 import fr.inria.zuist.engine.SceneManager;
+import fr.inria.zuist.od.JSkyFitsImageDescription;
+import fr.inria.zuist.od.ResourceDescription;
 
 public class JSkyFitsResourceHandler implements ResourceHandler {
     public static final String RESOURCE_TYPE_FITS = "skyfits";
@@ -38,7 +40,7 @@ public class JSkyFitsResourceHandler implements ResourceHandler {
         String hist = "";
 
         if (params != null){
-            String[] paramTokens = params.split(SceneManager.PARAM_SEPARATOR);
+            String[] paramTokens = params.split(SceneBuilder.PARAM_SEPARATOR);
             for (int i=0;i<paramTokens.length;i++) {
                 if (paramTokens[i].startsWith(SC_ID)){
                     scaleFactor = Float.parseFloat(paramTokens[i].substring(SC_ID.length()));

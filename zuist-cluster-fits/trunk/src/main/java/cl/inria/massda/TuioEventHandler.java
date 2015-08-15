@@ -15,12 +15,12 @@ import fr.inria.zvtm.engine.Camera;
 
 import java.util.Vector;
 
-import fr.inria.zuist.viewer.FitsViewer;
+import fr.inria.zuist.viewer.JSkyFitsViewer;
 
 
 public class TuioEventHandler implements TuioListener{
 
-	FitsViewer application;
+	JSkyFitsViewer application;
 
     WallTuioCursor[] cursors;
     int[] countCorrect;
@@ -33,11 +33,11 @@ public class TuioEventHandler implements TuioListener{
     double lastDistance = 0.0;
 
 
-	public TuioEventHandler(FitsViewer app){
+	public TuioEventHandler(JSkyFitsViewer app){
         this(app, 3333);
     }
 
-	public TuioEventHandler(FitsViewer app, int port){
+	public TuioEventHandler(JSkyFitsViewer app, int port){
 		application = app;
 		initTUIO(port);
         cursors = new WallTuioCursor[40];
@@ -88,7 +88,7 @@ public class TuioEventHandler implements TuioListener{
                     distance = ( cursors[touchs.get(countTouch-1)].getDistance(cursors[touchs.get(countTouch-2)]));
                     double x =  (cursors[touchs.get(countTouch-1)].getX() + cursors[touchs.get(countTouch-2)].getX() )/2;
                     double y =  (cursors[touchs.get(countTouch-1)].getY() + cursors[touchs.get(countTouch-2)].getY() )/2;
-                    application.centeredZoom( (lastDistance / distance), x+application.SCENE_W/2, -y+application.SCENE_H/2);
+                    application.centeredZoom( (lastDistance / distance), x+JSkyFitsViewer.SCENE_W/2, -y+JSkyFitsViewer.SCENE_H/2);
                 }
                 zoom = true;
                 pan = false;
@@ -116,8 +116,8 @@ public class TuioEventHandler implements TuioListener{
         double y = tcur.getY();
         long time = tcur.getTuioTime().getTotalMilliseconds();
 
-        double xx = x*application.SCENE_W-application.SCENE_W/2;
-        double yy = (1-y)*application.SCENE_H-application.SCENE_H/2;
+        double xx = x*JSkyFitsViewer.SCENE_W-JSkyFitsViewer.SCENE_W/2;
+        double yy = (1-y)*JSkyFitsViewer.SCENE_H-JSkyFitsViewer.SCENE_H/2;
 
         if(cursorID >= 0 && cursorID < cursors.length && x >= 0 && x <=1 && y >= 0 && y <= 1){
             if(cursors[cursorID] == null){
@@ -135,8 +135,8 @@ public class TuioEventHandler implements TuioListener{
         double y = tcur.getY();
         long time = tcur.getTuioTime().getTotalMilliseconds();
 
-        double xx = x*application.SCENE_W-application.SCENE_W/2;
-        double yy = (1-y)*application.SCENE_H-application.SCENE_H/2;
+        double xx = x*JSkyFitsViewer.SCENE_W-JSkyFitsViewer.SCENE_W/2;
+        double yy = (1-y)*JSkyFitsViewer.SCENE_H-JSkyFitsViewer.SCENE_H/2;
         if(cursorID >= 0 && cursorID < cursors.length && x >= 0 && x <=1 && y >= 0 && y <= 1){
             if(cursors[cursorID] == null){
                 WallTuioCursor wtc = new WallTuioCursor(application.cursorSpace, cursorID, xx, yy, time);

@@ -38,7 +38,6 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
 
-
 import java.util.List;
 import java.util.Vector;
 import java.util.HashMap;
@@ -59,6 +58,9 @@ import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.View;
+import fr.inria.zuist.engine.SceneObserver;
+import fr.inria.zuist.engine.ViewSceneObserver;
+
 
 //import fr.inria.zvtm.engine.LongPoint;
 //import fr.inria.zvtm.engine.Utilities;
@@ -83,15 +85,20 @@ import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.animation.EndAction;
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
+import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
+import fr.inria.zvtm.animation.AnimationManager;
 
 import fr.inria.zuist.engine.SceneManager;
+import fr.inria.zuist.engine.SceneBuilder;
 import fr.inria.zuist.engine.Region;
 import fr.inria.zuist.engine.Level;
 import fr.inria.zuist.event.RegionListener;
+import fr.inria.zuist.engine.RegionPicker;
 import fr.inria.zuist.event.LevelListener;
 import fr.inria.zuist.event.ProgressListener;
-import fr.inria.zuist.engine.ObjectDescription;
-import fr.inria.zuist.engine.JSkyFitsImageDescription;
+import fr.inria.zuist.od.ObjectDescription;
+import fr.inria.zuist.od.JSkyFitsImageDescription;
+import fr.inria.zuist.engine.JSkyFitsResourceHandler;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -135,10 +142,108 @@ import java.awt.BasicStroke;
  * @author Emmanuel Pietriga, Fernando del Campo
  */
 
-public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionListener, LevelListener {
+//public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionListener, LevelListener {
+public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionListener, 
     
-    //@Override
+    File SCENE_FILE, SCENE_FILE_DIR;
+        
+    /* screen dimensions, actual dimensions of windows */
+    static int SCREEN_WIDTH =  Toolkit.getDefaultToolkit().getScreenSize().width;
+    static int SCREEN_HEIGHT =  Toolkit.getDefaultToolkit().getScreenSize().height;
+    static int VIEW_MAX_W = 1024;  // 1400
+    static int VIEW_MAX_H = 768;   // 1050
+    int VIEW_W, VIEW_H;
+    int VIEW_X, VIEW_Y;
+    /* dimensions of zoomable panel */
+    int panelWidth, panelHeight;
+
+    public static double SCENE_W = 12000;//11520;//12000;
+    public static double SCENE_H = 4500;//4320;//4500;
+    
+    /* Navigation constants */
+    static final int ANIM_MOVE_LENGTH = 300;
+    static final short MOVE_UP = 0;
+    static final short MOVE_DOWN = 1;
+    static final short MOVE_LEFT = 2;
+    static final short MOVE_RIGHT = 3;
+    
+    /* ZVTM objects */
+    VirtualSpaceManager vsm;
+    
+    static final String mSpaceKsName = "SceneKsSpace";
+    static final String mSpaceHName = "SceneHSpace";
+    static final String mSpaceJName = "SceneJSpace";
+    static final String mSpaceName = "SceneSpace";
+    static final String pMnSpaceName = "PieMenuSpace";
+    static final String mnSpaceName = "MenuSpace";
+    static final String cursorSpaceName = "CursorSpace";
+    static final String ovSpaceName = "OverlaySpace";
+
+    
+    static final int LAYER_SCENE_KS = 0;
+    static final int LAYER_SCENE_H = 1;
+    static final int LAYER_SCENE_J = 2;
+    static final int LAYER_SCENE = 3;
+    static final int LAYER_PIEMENU = 4;
+    static final int LAYER_MENU = 5;
+    static final int LAYER_CURSOR = 6;
+    static final int LAYER_OVERLAY = 7;
+
+    int layerScene = LAYER_SCENE;
+    static final String[] layerSceneName = {"Ks", "H", "J", "all"};
+
+    public static final Font FONT_LAYER_SCENE = new Font("Bold", Font.PLAIN, 46);
+
+    //static final int LAYER_CURSOR = 7;
+
+    public VirtualSpace mSpace;
+    VirtualSpace mSpaceKs, mSpaceH, mSpaceJ;
+    VirtualSpace pMnSpace; //menuSpace;
+    public VirtualSpace mnSpace;
+    public VirtualSpace cursorSpace;
+    VirtualSpace ovSpace;
+    
+    public Camera mCamera;
+    Camera mCameraKs, mCameraH, mCameraJ;
+    Camera mnCamera; // menuCamera;
+    public Camera cursorCamera;
+
+    String mCameraAltStr = Messages.ALTITUDE + "0";
+    String levelStr = Messages.LEVEL + "0";
+    static final String mViewName = "ZUIST Viewer";
+    View mView;
+    ClusteredView clusteredView;
+    
     JSkyFitsViewerEventHandler eh;
+
+    SceneManager sm;
+
+    FitsOverlayManager ovm;
+    //VWGlassPane gp;
+    PieMenu mainPieMenu;
+
+    //FitsImage.ColorFilter cfilter = FitsImage.ColorFilter.RAINBOW;
+    //FitsImage.ScaleMethod scaleMethod = FitsImage.ScaleMethod.LINEAR;
+
+    //public FitsMenu menu;
+    double[] globalScaleParams = {Double.MAX_VALUE, Double.MIN_VALUE};
+    
+    SmartiesManager smartiesMngr;
+    TuioEventHandler teh;
+
+    public RegionPicker rPicker;
+
+    VText wcsLabel;
+    VText layerSceneLabel;
+
+    String reference;
+
+    public PythonWCS pythonWCS;
+
+    double[] sceneBounds = null;
+    double sceneWidth = 0, sceneHeight= 0;
+
+    AnimationManager am = VirtualSpaceManager.INSTANCE.getAnimationManager();
 
     //@Override
     String cfilter = "Standard";
@@ -155,44 +260,72 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
     private Query query;
 
     
+
+    static HashMap<String,String> parseSceneOptions(Options options){
+        HashMap<String,String> res = new HashMap(2,1);
+        if (options.httpUser != null){
+            res.put(SceneManager.HTTP_AUTH_USER, options.httpUser);
+        }
+        if (options.httpPassword != null){
+            res.put(SceneManager.HTTP_AUTH_PASSWORD, options.httpPassword);
+        }
+        return res;
+    }
+
+    
     public JSkyFitsViewer(Options options){
 
-        super(options);
-        /*
-		ovm = new FitsOverlayManager(this);
-		//initGUI(fullscreen, opengl, antialiased);
-		initGUI(options);
+        ovm = new FitsOverlayManager(this);
+        //initGUI(fullscreen, opengl, antialiased);
+        initGUI(options);
         VirtualSpace[]  sceneSpaces = {mSpace, mSpaceKs, mSpaceH, mSpaceJ};
         Camera[] sceneCameras = {mCamera, mCameraKs, mCameraH, mCameraJ};
-        sm = new SceneManager(sceneSpaces, sceneCameras);
-        sm.setRegionListener(this);
-        sm.setLevelListener(this);
-		previousLocations = new Vector();
-		ovm.initConsole();
+
+        //sm = new SceneManager(sceneSpaces, sceneCameras, parseSceneOptions(options));
+        //sm.setRegionListener(this);
+        //sm.setLevelListener(this);
+
+        SceneObserver[] observers = new SceneObserver[]{new ViewSceneObserver(
+            mCamera.getOwningView(), mCamera, mSpace)};
+        sm = new SceneManager(observers, new HashMap<String,String>(1,1));
+        sm.setResourceHandler(JSkyFitsResourceHandler.RESOURCE_TYPE_FITS,
+                              new JSkyFitsResourceHandler());
+
+        pythonWCS = new PythonWCS();
+
+        previousLocations = new Vector();
+        ovm.initConsole();
         if (options.xmlSceneFile != null){
             sm.enableRegionUpdater(false);
             File xmlSceneFile = new File(options.xmlSceneFile);
             System.out.println("load scene: " + options.xmlSceneFile);
-			loadScene(xmlSceneFile);
-			EndAction ea  = new EndAction(){
+            loadScene(xmlSceneFile);
+            EndAction ea  = new EndAction(){
                    public void execute(Object subject, Animation.Dimension dimension){
                        sm.setUpdateLevel(true);
                        sm.enableRegionUpdater(true);
                        
                    }
                };
-			getGlobalView(ea);
-		}
-		ovm.toggleConsole();
+            getGlobalView(ea);
+        }
+        ovm.toggleConsole();
+
         //System.out.println("setActiveLayer(LAYER_SCENE)");
         //mView.setActiveLayer(LAYER_SCENE);
         
 
-		//menu.drawHistogram();
+        //menu.drawHistogram();
+        //smartiesMngr = new SmartiesManager(this);
         teh = new TuioEventHandler(this);
 
-        reference = options.reference;
-        */
+        layerSceneLabel = new VText(0d, 0d, 1, Color.RED, "");
+        layerSceneLabel.setFont(FONT_LAYER_SCENE);
+        layerSceneLabel.setTranslucencyValue(0.9f);
+
+
+        //super(options);
+       
         smartiesMngr = new SmartiesManager(this);
 
         // create a picker that will only consider regions visible at ZUIST levels 3 through 5 (any of these levels or all of them)
@@ -204,8 +337,7 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
         query = new Query();
 
     }
-    //void initGUI(boolean fullscreen, boolean opengl, boolean antialiased){
-    @Override
+
     void initGUI(Options options){
         windowLayout();
         vsm = VirtualSpaceManager.INSTANCE;
@@ -315,6 +447,371 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
 		
     }
 
+    public void setColorFilter(ImageFilter filter){
+        //hi.setColorFilter(filter);
+    }
+
+    public int getDisplayWidth(){
+        return SCREEN_WIDTH;
+    }
+
+    public int getDisplayHeight(){
+        return SCREEN_HEIGHT;
+    }
+
+    JMenuItem infoMI, consoleMI;
+
+    public JMenuBar initMenu(){
+        final JMenuItem openMI = new JMenuItem("Open...");
+        openMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        final JMenuItem reloadMI = new JMenuItem("Reload");
+        reloadMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        final JMenuItem exitMI = new JMenuItem("Exit");
+        exitMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_Q, Toolkit.getDefaultToolkit().getMenuShortcutKeyMask()));
+        infoMI = new JMenuItem(Messages.INFO_SHOW);
+        infoMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F11, 0));
+        consoleMI = new JMenuItem(Messages.CONSOLE_HIDE);
+        consoleMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F12, 0));
+        final JMenuItem gcMI = new JMenuItem("Run Garbage Collector");
+        gcMI.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F10, 0));
+        final JMenuItem aboutMI = new JMenuItem("About...");
+        final JMenuItem shortcutMI = new JMenuItem("Shortcut");
+        ActionListener a0 = new ActionListener(){
+            public void actionPerformed(ActionEvent e){
+                if (e.getSource()==openMI){openFile();}
+                else if (e.getSource()==reloadMI){reload();}
+                else if (e.getSource()==exitMI){exit();}
+                else if (e.getSource()==infoMI){toggleMiscInfoDisplay();}
+                else if (e.getSource()==gcMI){gc();}
+                else if (e.getSource()==consoleMI){ovm.toggleConsole();}
+                else if (e.getSource()==aboutMI){about();}
+                else if (e.getSource()==shortcutMI){shortCut();}
+            }
+        };
+        JMenuBar jmb = new JMenuBar();
+        JMenu fileM = new JMenu("File");
+        JMenu viewM = new JMenu("View");
+        JMenu helpM = new JMenu("Help");
+        fileM.add(openMI);
+        fileM.add(reloadMI);
+        fileM.addSeparator();
+        fileM.add(exitMI);
+        viewM.add(infoMI);
+        viewM.add(gcMI);
+        viewM.add(consoleMI);
+        helpM.add(aboutMI);
+        helpM.add(shortcutMI);
+        jmb.add(fileM);
+        jmb.add(viewM);
+        jmb.add(helpM);
+        openMI.addActionListener(a0);
+        reloadMI.addActionListener(a0);
+        exitMI.addActionListener(a0);
+        infoMI.addActionListener(a0);
+        consoleMI.addActionListener(a0);
+        gcMI.addActionListener(a0);
+        aboutMI.addActionListener(a0);
+        shortcutMI.addActionListener(a0);
+        return jmb;
+    }
+
+    public int getLayerScene(){
+        return layerScene;
+    }
+
+    public void setLayerScene(int l){
+        layerScene = l;
+        layerSceneLabel.setText(layerSceneName[layerScene]);
+        //cursorSpace.addGlyph(layerSceneLabel);
+        
+        cursorSpace.addGlyph(layerSceneLabel);
+        //layerSceneLabel.setTranslucencyValue(0f);
+
+        Animation a = am.getAnimationFactory().createTranslucencyAnim(800,
+            layerSceneLabel, 0f, false, IdentityInterpolator.getInstance(),
+            new EndAction(){
+                public void execute(Object subject, Animation.Dimension dimension){
+
+                    cursorSpace.removeGlyph(layerSceneLabel);
+                    layerSceneLabel.setTranslucencyValue(0.9f);
+                }
+            });
+        am.startAnimation(a, true);
+    }
+
+    void displayMainPieMenu(boolean b){
+        if (b){
+            PieMenuFactory.setItemFillColor(ConfigManager.PIEMENU_FILL_COLOR);
+            PieMenuFactory.setItemBorderColor(ConfigManager.PIEMENU_BORDER_COLOR);
+            PieMenuFactory.setSelectedItemFillColor(ConfigManager.PIEMENU_INSIDE_COLOR);
+            PieMenuFactory.setSelectedItemBorderColor(null);
+            PieMenuFactory.setLabelColor(ConfigManager.PIEMENU_BORDER_COLOR);
+            PieMenuFactory.setFont(ConfigManager.PIEMENU_FONT);
+            PieMenuFactory.setTranslucency(0.7f);
+            PieMenuFactory.setSensitivityRadius(0.5);
+            PieMenuFactory.setAngle(-Math.PI/2.0);
+            PieMenuFactory.setRadius(150);
+            mainPieMenu = PieMenuFactory.createPieMenu(Messages.mainMenuLabels, Messages.mainMenuLabelOffsets, 0, mView);
+            Glyph[] items = mainPieMenu.getItems();
+            items[0].setType(Messages.PM_ENTRY);
+            items[1].setType(Messages.PM_ENTRY);
+            items[2].setType(Messages.PM_ENTRY);
+            items[3].setType(Messages.PM_ENTRY);
+        }
+        else {
+            mainPieMenu.destroy(0);
+            mainPieMenu = null;
+        }
+    }
+
+    void pieMenuEvent(Glyph menuItem){
+        int index = mainPieMenu.getItemIndex(menuItem);
+        if (index != -1){
+            String label = mainPieMenu.getLabels()[index].getText();
+            if (label == Messages.PM_BACK){moveBack();}
+            else if (label == Messages.PM_GLOBALVIEW){getGlobalView(null);}
+            else if (label == Messages.PM_OPEN){openFile();}
+            else if (label == Messages.PM_RELOAD){reload();}
+        }
+    }
+
+    void windowLayout(){    
+        if (Utils.osIsWindows()){
+            VIEW_X = VIEW_Y = 0;
+        }
+        else if (Utils.osIsMacOS()){
+            VIEW_X = 80;
+            SCREEN_WIDTH -= 80;
+        } else{
+            VIEW_X = 80;
+            SCREEN_WIDTH -= 80;
+        }
+        VIEW_W = (SCREEN_WIDTH <= VIEW_MAX_W) ? SCREEN_WIDTH : VIEW_MAX_W;
+        VIEW_H = (SCREEN_HEIGHT <= VIEW_MAX_H) ? SCREEN_HEIGHT : VIEW_MAX_H;
+    }
+
+    /*-------------  Scene management    -------------*/
+    
+    void reset(){
+        sm.reset();
+        mSpace.removeAllGlyphs();
+    }
+    
+    void openFile(){
+        final JFileChooser fc = new JFileChooser(SCENE_FILE_DIR);
+        fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        fc.setDialogTitle("Find ZUIST Scene File");
+        int returnVal= fc.showOpenDialog(mView.getFrame());
+        if (returnVal == JFileChooser.APPROVE_OPTION){
+            final SwingWorker worker = new SwingWorker(){
+                public Object construct(){
+                    /*
+                    reset();
+                    sm.setUpdateLevel(false);
+                    sm.enableRegionUpdater(false);
+                    loadScene(fc.getSelectedFile());
+                    EndAction ea  = new EndAction(){
+                           public void execute(Object subject, Animation.Dimension dimension){
+                               sm.setUpdateLevel(true);
+                               sm.enableRegionUpdater(true);
+                               
+                           }
+                       };
+                    getGlobalView(ea);
+                    */
+                    openScene(fc.getSelectedFile());
+                    return null; 
+                }
+            };
+            worker.start();
+        }
+    }
+
+    void setupSceneBounds()
+    {
+        int l = 0;
+        while (sm.getRegionsAtLevel(l) == null){
+            l++;
+            if (l > sm.getLevelCount()){
+                l = -1;
+                break;
+            }
+        }
+        if (l > -1){
+            sceneBounds = sm.getLevel(l).getBounds();
+            System.out.println(
+                "Bounds ("+ l+ ") WNES: "
+                + sceneBounds[0] +" "+ sceneBounds[1] +" "+  sceneBounds[2] +" "+ sceneBounds[3]);
+            sceneWidth = - sceneBounds[0] +  sceneBounds[2];
+            sceneHeight = sceneBounds[1]  - sceneBounds[3];
+        }
+    }
+
+    public void getGlobalView(EndAction ea){
+        if (sceneBounds == null) {return;}
+
+        mCamera.moveTo(
+            (sceneBounds[0] +  sceneBounds[2])/2, (sceneBounds[1] + sceneBounds[3])/2);
+        double fw = sceneWidth /  getDisplayWidth();
+        double fh = sceneHeight / getDisplayHeight();
+        double f = fw;
+        //System.out.println("fw: " + fw + ", fh: " + fh);
+        if (fh > fw) f = fh;
+        double a = (mCamera.focal + mCamera.altitude) / mCamera.focal;
+        double newz = mCamera.focal * a * f - mCamera.focal;
+        mCamera.setAltitude(newz);
+
+        //Location l =  mView.centerOnRegion(zfCamera,0,sceneBounds[0], sceneBounds[1],sceneBounds[2], sceneBounds[3]);
+        //zfCamera.setLocation(l);
+        if (ea != null) {
+            ea.execute(null,null);
+        }
+    }
+
+    /* Higher view */
+    public void getHigherView(){
+        rememberLocation(mCamera.getLocation());
+        Float alt = new Float(mCamera.getAltitude() + mCamera.getFocal());
+//        vsm.animator.createCameraAnimation(JSkyFitsViewer.ANIM_MOVE_LENGTH, AnimManager.CA_ALT_SIG, alt, mCamera.getID());
+        Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(JSkyFitsViewer.ANIM_MOVE_LENGTH, mCamera,
+            alt, true, SlowInSlowOutInterpolator.getInstance(), null);
+        vsm.getAnimationManager().startAnimation(a, false);
+    }
+
+    /* Higher view */
+    public void getLowerView(){
+        rememberLocation(mCamera.getLocation());
+        Float alt=new Float(-(mCamera.getAltitude() + mCamera.getFocal())/2.0f);
+//        vsm.animator.createCameraAnimation(FitsViewer.ANIM_MOVE_LENGTH, AnimManager.CA_ALT_SIG, alt, mCamera.getID());
+        Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(JSkyFitsViewer.ANIM_MOVE_LENGTH, mCamera,
+            alt, true, SlowInSlowOutInterpolator.getInstance(), null);
+        vsm.getAnimationManager().startAnimation(a, false);
+    }
+
+    /* Direction should be one of FitsViewer.MOVE_* */
+    public void translateView(short direction){
+        //LongPoint trans;
+        Point2D.Double trans;
+        //long[] rb = mView.getVisibleRegion(mCamera);
+        double[] rb = mView.getVisibleRegion(mCamera);
+        if (direction==MOVE_UP){
+            //long qt = Math.round((rb[1]-rb[3])/4.0);
+            double qt = (rb[1]-rb[3])/4.0;
+            //trans = new LongPoint(0,qt);
+            trans = new Point2D.Double(0,qt);
+        }
+        else if (direction==MOVE_DOWN){
+            double qt = (rb[3]-rb[1])/4.0;
+            //trans = new LongPoint(0,qt);
+            trans = new Point2D.Double(0,qt);
+        }
+        else if (direction==MOVE_RIGHT){
+            double qt = (rb[2]-rb[0])/4.0;
+            //trans = new LongPoint(qt,0);
+            trans = new Point2D.Double(qt,0);
+        }
+        else {
+            // direction==MOVE_LEFT
+            double qt = (rb[0]-rb[2])/4.0;
+            //trans = new LongPoint(qt,0);
+            trans = new Point2D.Double(qt,0);
+        }
+//        vsm.animator.createCameraAnimation(JSkyFitsViewer.ANIM_MOVE_LENGTH, AnimManager.CA_TRANS_SIG, trans, mCamera.getID());
+        Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(JSkyFitsViewer.ANIM_MOVE_LENGTH, mCamera,
+            trans, true, SlowInSlowOutInterpolator.getInstance(), null);
+        vsm.getAnimationManager().startAnimation(a, false);
+        
+    }
+
+    /* x,y in (X Window) screen coordinate */
+    public void directTranslate(double x, double y){
+        double a = (mCamera.focal+Math.abs(mCamera.altitude)) / mCamera.focal;
+        Location l = mCamera.getLocation();
+        double newx = l.getX() + a*x;
+        double newy = l.getY() + a*y;
+        mCamera.setLocation(new Location(newx, newy, l.getAltitude()));
+    }
+
+    public void zoomAnimated(double f, EndAction ea){
+        Float alt = new Float(f);
+        //f.out.println(" f: " + f);
+        //vsm.animator.createCameraAnimation(NavigationManager.ANIM_MOVE_DURATION, AnimManager.CA_ALT_SIG, alt, mCamera.getID());
+        Animation a = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(Viewer.ANIM_MOVE_LENGTH, mSpace.getCamera(0),
+            alt, true, SlowInSlowOutInterpolator.getInstance(), ea);
+        vsm.getAnimationManager().startAnimation(a, false);
+    }
+
+    public void centeredZoom(double f, double x, double y){
+        Location l = mCamera.getLocation();
+        double a = (mCamera.focal+Math.abs(mCamera.altitude)) / mCamera.focal;
+        double newz = mCamera.focal * a * f - mCamera.focal;
+        if (newz < 0){
+            newz = 0;
+            f = mCamera.focal / (a*mCamera.focal);
+        }
+
+        System.out.println("x: " + x + " - y: " + y);
+
+        double xx = (long)((double)x - (SCENE_W/2.0))*a + l.getX();
+        double yy = (long)(-(double)y + (SCENE_H/2.0))*a + l.getY();
+
+        System.out.println("xx: " + xx + " - yy: " + yy);
+
+        double dx = l.getX() - xx;
+        double dy = l.getY() - yy;
+
+        System.out.println("dx: " + dx + " - dy: " + dy);
+
+        double newx = l.getX() + (f*dx - dx); // *a/(mCamera.altitude+ mCamera.focal));
+        double newy = l.getY() + (f*dy - dy);
+
+        System.out.println("newx: " + newx + " - newy: " + newy + " - newz: " + newz);
+
+        mCamera.setLocation(new Location(newx, newy, newz));
+    }
+
+    public void traslateAnimated(double x, double y, EndAction ea){
+        Location l = mCamera.getLocation();
+        double a = (mCamera.focal+Math.abs(mCamera.altitude)) / mCamera.focal;
+        double[] r = windowToViewCoordinate(x, y);
+        double dx = l.getX() - r[0];
+        double dy = l.getY() - r[1];
+
+        Point2D.Double trans = new Point2D.Double(-dx,-dy);
+
+        Animation ani = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(Viewer.ANIM_MOVE_LENGTH, mCamera,
+            trans, true, SlowInSlowOutInterpolator.getInstance(), ea);
+        vsm.getAnimationManager().startAnimation(ani, false);
+    }
+
+
+    void reload(){
+        if (SCENE_FILE==null){return;}
+        final SwingWorker worker = new SwingWorker(){
+            public Object construct(){
+                reset();
+                loadScene(SCENE_FILE);
+                return null; 
+            }
+        };
+        worker.start();
+    }
+
+    public void openScene(File xmlSceneFile) {
+        reset();
+        sm.setUpdateLevel(false);
+        sm.enableRegionUpdater(false);
+        loadScene(xmlSceneFile);
+        EndAction ea  = new EndAction(){
+           public void execute(Object subject, Animation.Dimension dimension){
+               sm.setUpdateLevel(true);
+               sm.enableRegionUpdater(true);
+           }
+        };
+        setupSceneBounds();
+        getGlobalView(ea);
+    }
+
     public Point2D.Double viewToSpace(Camera cam, int jpx, int jpy){
         Location camLoc = cam.getLocation();
         double focal = cam.getFocal();
@@ -367,7 +864,6 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
         }
     }
 
-    @Override
     public void rescaleGlobal(boolean global){
         System.out.println("rescaleGlobal("+global+")");
 
@@ -414,7 +910,6 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
             return new double[2];
     }
 
-    @Override
     public void hideLayer(int layerIndex){
         for(ObjectDescription desc: sm.getObjectDescriptions()){
             if(desc instanceof JSkyFitsImageDescription){
@@ -429,7 +924,6 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
         }*/
     }
 
-    @Override
     public void showLayer(int layerIndex, float alpha){
         for(ObjectDescription desc: sm.getObjectDescriptions()){
             if(desc instanceof JSkyFitsImageDescription){
@@ -447,7 +941,7 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
         */
     }
 
-    @Override
+    /*
     public void orientTo(double angle){
         System.out.println("angle: "+angle);
         for(ObjectDescription desc: sm.getObjectDescriptions()){
@@ -456,11 +950,277 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
             }
         }
     }
+    */
 
-    @Override
+
+    public double[] windowToViewCoordinate(double x, double y){
+        Location l = mCamera.getLocation();
+        //System.out.println("mCamera.getLocation(): " + l.getX() + " " + l.getY());
+        double a = (mCamera.focal + mCamera.getAltitude()) / mCamera.focal;
+
+        //Location lc = cursorCamera.getLocation();
+        //System.out.println("cursorCamera.getLocation(): " + lc.getX() + " " + lc.getY());
+
+        //
+        //double xx = (long)((double)x - ((double)getDisplayWidth()/2.0));
+        //double yy = (long)(-(double)y + ((double)getDisplayHeight()/2.0));
+        double xx = (long)((double)x - ((double)SCENE_W/2.0));
+        double yy = (long)(-(double)y + ((double)SCENE_H/2.0));
+        
+        xx = l.getX()+ a*xx;
+        yy = l.getY()+ a*yy;
+
+        //double xx = l.getX()+ a*x;
+        //double yy = l.getY()+ a*y;
+
+        double[] r = new double[2];
+        r[0] = xx;
+        r[1] = yy;
+        return r;
+    }
+
+    public double[] windowToViewCoordinateFromSmarties(double x, double y){
+        Location l = mCamera.getLocation();
+        //System.out.println("mCamera.getLocation(): " + l.getX() + " " + l.getY());
+        double a = (mCamera.focal + mCamera.getAltitude()) / mCamera.focal;
+
+        Location lc = cursorCamera.getLocation();
+        //System.out.println("cursorCamera.getLocation(): " + lc.getX() + " " + lc.getY());
+
+        //double xx = (long)((double)x - ((double)getDisplayWidth()/2.0));
+        //double yy = (long)(-(double)y + ((double)getDisplayHeight()/2.0));
+        //double xx = (long)((double)x - ((double)SCENE_W/2.0));
+        //double yy = (long)(-(double)y + ((double)SCENE_H/2.0));
+        
+        //xx = l.getX()+ a*xx;
+        //yy = l.getY()+ a*yy;
+
+        double xx = l.getX()+ lc.getX() + a*x;//x/a;//a*x;
+        double yy = l.getY()+ lc.getY() + a*y;//y/a;//a*y;
+
+        //System.out.println("xx: "+ xx + " - yy: " + yy);
+
+        double[] r = new double[2];
+        r[0] = xx;
+        r[1] = yy;
+        return r;
+    }
+
+    
+
+
+    public void centerOnObject(String id){
+        ovm.sayInConsole("Centering on object "+id+"\n");
+        ObjectDescription od = sm.getObject(id);
+        if (od != null){
+            Glyph g = od.getGlyph();
+            if (g != null){
+                rememberLocation(mCamera.getLocation());
+                mCamera.getOwningView().centerOnGlyph(g, mCamera, JSkyFitsViewer.ANIM_MOVE_LENGTH, true, 1.2f);             
+            }
+        }
+    }
+
+    /*
+    public void centerOnRegion(String id){
+        ovm.sayInConsole("Centering on region "+id+"\n");
+        Region r = sm.getRegion(id);
+        if (r != null){
+            Glyph g = r.getBounds();
+            if (g != null){
+                rememberLocation(mCamera.getLocation());
+                mCamera.getOwningView().centerOnGlyph(g, mCamera, JSkyFitsViewer.ANIM_MOVE_LENGTH, true, 1.2f);             
+            }
+        }       
+    }
+    */
+
+    Vector previousLocations;
+    static final int MAX_PREV_LOC = 100;
+    
+    public void rememberLocation(){
+        rememberLocation(mCamera.getLocation());
+    }
+    
+    public void rememberLocation(Location l){
+        if (previousLocations.size() >= MAX_PREV_LOC){
+            // as a result of release/click being undifferentiated)
+            previousLocations.removeElementAt(0);
+        }
+        if (previousLocations.size()>0){
+            if (!Location.equals((Location)previousLocations.lastElement(),l)){
+                previousLocations.add(l);
+            }
+        }
+        else {previousLocations.add(l);}
+    }
+    
+    public void moveBack(){
+        if (previousLocations.size()>0){
+            Vector animParams = Location.getDifference(mSpace.getCamera(0).getLocation(), (Location)previousLocations.lastElement());
+            sm.setUpdateLevel(false);
+            class LevelUpdater implements EndAction {
+                public void execute(Object subject, Animation.Dimension dimension){
+                    sm.setUpdateLevel(true);
+                }
+            }
+            Animation at = vsm.getAnimationManager().getAnimationFactory().createCameraTranslation(JSkyFitsViewer.ANIM_MOVE_LENGTH, mSpace.getCamera(0),
+                (Point2D.Double)animParams.elementAt(1), true, SlowInSlowOutInterpolator.getInstance(), null);
+            Animation aa = vsm.getAnimationManager().getAnimationFactory().createCameraAltAnim(JSkyFitsViewer.ANIM_MOVE_LENGTH, mSpace.getCamera(0),
+                (Double)animParams.elementAt(0), true, SlowInSlowOutInterpolator.getInstance(), new LevelUpdater());
+            vsm.getAnimationManager().startAnimation(at, false);
+            vsm.getAnimationManager().startAnimation(aa, false);
+            previousLocations.removeElementAt(previousLocations.size()-1);
+        }
+    }
+    
+    void altitudeChanged(){
+        mCameraAltStr = Messages.ALTITUDE + String.valueOf(mCamera.altitude);
+    }
+    
+    void updatePanelSize(){
+        //Dimension d = mView.getPanel().getSize();
+        Dimension d = mView.getPanel().getComponent().getSize();
+        panelWidth = d.width;
+        panelHeight = d.height;
+        if (ovm.console != null){
+            ovm.updateConsoleBounds();
+        }
+    }
+
+    /* ---- Debug information ----*/
+    
+    public void enteredRegion(Region r){
+        ovm.sayInConsole("Entered region "+r.getID()+"\n");
+    }
+
+    public void exitedRegion(Region r){
+        ovm.sayInConsole("Exited region "+r.getID()+"\n");
+    }
+
+    public void enteredLevel(int depth){
+        ovm.sayInConsole("Entered level "+depth+"\n");
+        levelStr = Messages.LEVEL + String.valueOf(depth);
+    }
+
+    public void exitedLevel(int depth){
+        ovm.sayInConsole("Exited level "+depth+"\n");
+    }
+    
+    long maxMem = Runtime.getRuntime().maxMemory();
+    int totalMemRatio, usedMemRatio;    
+    boolean SHOW_MISC_INFO = true;
+
+    void toggleMiscInfoDisplay(){
+        SHOW_MISC_INFO = !SHOW_MISC_INFO;
+        if (SHOW_MISC_INFO){
+            infoMI.setText(Messages.INFO_HIDE);
+        }
+        else {
+            infoMI.setText(Messages.INFO_SHOW);
+        }
+        //vsm.repaintNow();
+        vsm.repaint();
+    }
+
+    static final AlphaComposite acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.7f);
+    static final Color MID_DARK_GRAY = new Color(64,64,64);
+
+    void showMemoryUsage(Graphics2D g2d, int viewWidth, int viewHeight){
+        totalMemRatio = (int)(Runtime.getRuntime().totalMemory() * 100 / maxMem);
+        usedMemRatio = (int)((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) * 100 / maxMem);
+        g2d.setColor(Color.LIGHT_GRAY);
+        g2d.fillRect(20,
+            3,
+            200,
+            13);
+        g2d.setColor(JSkyFitsViewer.MID_DARK_GRAY);
+        g2d.fillRect(20,
+            3,
+            totalMemRatio * 2,
+            13);
+        g2d.setColor(Color.DARK_GRAY);
+        g2d.fillRect(20,
+            3,
+            usedMemRatio * 2,
+            13);
+        g2d.setColor(Color.WHITE);
+        g2d.drawRect(20,
+            3,
+            200,
+            13);
+        g2d.drawString(usedMemRatio + "%", 50, 14);
+        g2d.drawString(totalMemRatio + "%", 100, 14);
+        g2d.drawString(maxMem/1048576 + " Mb", 160, 14);    
+    }
+
+    // consider 1000 as the maximum number of requests that can be in the queue at any given time
+    // 1000 is the default value ; adapt for each scene depending on the number of objects
+    // as this could vary dramatically from one scene to another - see loadScene()
+    float MAX_NB_REQUESTS = 1000;
+    static final int REQ_QUEUE_BAR_WIDTH = 100;
+    static final int REQ_QUEUE_BAR_HEIGHT = 6;
+    
+    void showReqQueueStatus(Graphics2D g2d, int viewWidth, int viewHeight){
+        float ratio = sm.getPendingRequestQueueSize()/(MAX_NB_REQUESTS);
+        if (ratio > 1.0f){
+            // do not go over gauge boundary, even if actual number of requests goes beyond MAX_NB_REQUESTS
+            ratio = 1.0f;
+        }
+        g2d.setColor(Color.GRAY);
+        g2d.fillRect(viewWidth-Math.round(REQ_QUEUE_BAR_WIDTH * ratio)-10, 7, Math.round(REQ_QUEUE_BAR_WIDTH * ratio), REQ_QUEUE_BAR_HEIGHT);
+        g2d.drawRect(viewWidth-REQ_QUEUE_BAR_WIDTH-10, 7, REQ_QUEUE_BAR_WIDTH, REQ_QUEUE_BAR_HEIGHT);
+    }
+    
+    void showAltitude(Graphics2D g2d, int viewWidth, int viewHeight){        
+        g2d.setColor(Color.DARK_GRAY);
+        g2d.fillRect(240,
+            3,
+            190,
+            13);
+        g2d.setColor(Color.WHITE);
+        g2d.drawRect(240,
+            3,
+            190,
+            13);
+        g2d.drawString(levelStr, 250, 14);
+        g2d.drawString(mCameraAltStr, 310, 14);
+    }
+
+    public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
+        if (!SHOW_MISC_INFO){return;}
+        g2d.setComposite(acST);
+        showMemoryUsage(g2d, viewWidth, viewHeight);
+        showReqQueueStatus(g2d, viewWidth, viewHeight);
+        showAltitude(g2d, viewWidth, viewHeight);
+        g2d.setComposite(Translucent.acO);
+    }
+
+    /* ----- Misc  ------*/
+    
+    void about(){
+        ovm.showAbout();
+    }
+
+    void shortCut(){
+        ovm.showShortcut();
+    }
+
+    void gc(){
+        System.gc();
+        if (SHOW_MISC_INFO){
+            //vsm.repaintNow();
+            vsm.repaint();
+        }
+    }
+    
+    void exit(){
+        System.exit(0);
+    }
+
+
+    
     void loadScene(File xmlSceneFile){
-        System.out.print("this instanceof FitsViewer: ");
-        System.out.println( this instanceof FitsViewer );
         try {
             ovm.sayInConsole("Loading "+xmlSceneFile.getCanonicalPath()+"\n");
             System.out.println("Loading "+xmlSceneFile.getCanonicalPath()+"\n");
@@ -475,11 +1235,11 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
         System.out.println("dir: "+SCENE_FILE_DIR + " - file: " + SCENE_FILE);
         System.out.println("loadScene...");
         //sm.loadScene(SceneManager.parseXML(SCENE_FILE), SCENE_FILE_DIR, true, gp);
-        sm.loadScene(SceneManager.parseXML(SCENE_FILE), SCENE_FILE_DIR, true);
+        sm.loadScene(SceneBuilder.parseXML(SCENE_FILE), SCENE_FILE_DIR, true);
         HashMap sceneAttributes = sm.getSceneAttributes();
-        if (sceneAttributes.containsKey(SceneManager._background)){
-            mView.setBackgroundColor((Color)sceneAttributes.get(SceneManager._background));
-            clusteredView.setBackgroundColor((Color)sceneAttributes.get(SceneManager._background));
+        if (sceneAttributes.containsKey(SceneBuilder._background)){
+            mView.setBackgroundColor((Color)sceneAttributes.get(SceneBuilder._background));
+            clusteredView.setBackgroundColor((Color)sceneAttributes.get(SceneBuilder._background));
         }
 
 
@@ -647,7 +1407,6 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
     }
 
 
-    @Override
     public void loadFitsReference(){
         if(reference == null){
             for(ObjectDescription desc: sm.getObjectDescriptions()){
@@ -1070,7 +1829,7 @@ public class JSkyFitsViewer extends FitsViewer implements Java2DPainter, RegionL
 
 
 
-/*
+
 class VWGlassPane extends JComponent implements ProgressListener {
     
     static final int BAR_WIDTH = 200;
@@ -1090,9 +1849,9 @@ class VWGlassPane extends JComponent implements ProgressListener {
     int prY = 0;
     int prW = 0;
     
-    FitsViewer application;
+    JSkyFitsViewer application;
     
-    VWGlassPane(FitsViewer app){
+    VWGlassPane(JSkyFitsViewer app){
         super();
         this.application = app;
         addMouseListener(new MouseAdapter(){});
@@ -1149,7 +1908,7 @@ class ConfigManager {
     static final Font GLASSPANE_FONT = new Font("Arial", Font.PLAIN, 12);
 
 }
-*/
+
 
 
 class RegionPickerListener implements RegionListener{

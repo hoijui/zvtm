@@ -8,10 +8,10 @@ LIB=$LIB":target/slf4j-api-1.7.10.jar"
 LIB=$LIB":target/slf4j-log4j12-1.7.10.jar"
 LIB=$LIB":target/timingframework-1.0.jar"
 LIB=$LIB":target/commons-logging-1.1.jar"
-LIB=$LIB":target/zvtm-fits-0.1.5-SNAPSHOT.jar"
-LIB=$LIB":target/zvtm-svg-0.2.2-SNAPSHOT.jar"
+LIB=$LIB":target/zvtm-fits-0.2.0-SNAPSHOT.jar"
+LIB=$LIB":target/zvtm-svg-0.2.1.jar"
 
-JAR="target/zuist-cluster-fits-0.2.0-SNAPSHOT.jar"
+JAR="target/zuist-cluster-fits-0.2.2-SNAPSHOT.jar"
 
 rm target/zvtm-core-0.12.0-SNAPSHOT.jar
 
