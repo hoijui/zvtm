@@ -14,6 +14,19 @@ from copy import copy
 # http://effbot.org/zone/element-index.htm
 import xml.etree.ElementTree as ET
 
+################################################################################
+# USAGE EXAMPLES
+#
+#  ./ignMapTiler.py ign -ts=256 -ext=jpg -im=bilinear -rt=7-66-45 -zd=6 -dt=7-10 -tl=2 -user=xxx -password=xxx -key=xxx
+#   - will save result in ign
+#   - root tile is at zoom level 7, x-y coords 66-45
+#   - tile format:JPG
+#   - generates a quadtree with 6 levels (the map spans slippy map levels 7 to 12)
+#   - tiles for zoom levels 7 to 10 are downloaded from the Web now and will be referenced locally
+#     lower levels (11 and 12 in this case) will be downloaded dynamically from the Web when the scene is viewed in ZUIST
+#
+################################################################################
+
 CMD_LINE_HELP = "IGN Map Tiling Script\n\nUsage:\n\n" + \
     " \tignMapTiler <target_dir> [options]\n\n" + \
     "Options:\n\n"+\
