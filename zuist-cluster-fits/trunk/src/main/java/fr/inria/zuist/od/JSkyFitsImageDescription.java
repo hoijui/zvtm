@@ -46,6 +46,10 @@ public class JSkyFitsImageDescription extends ResourceDescription {
     private double vw;
     private double vh;
 
+    public static short GLOBAL = 0;
+    public static short LOCAL = 1;
+    public static short CUSTOM = 2;
+
     //private WCSTransform wcsTransform;
     private String objectName; 
 
@@ -57,10 +61,16 @@ public class JSkyFitsImageDescription extends ResourceDescription {
     private double gmax = Double.MIN_VALUE;
     //private double gsigma;
 
-    private boolean isRescaleGlobal = false;
+    private double min = Double.MAX_VALUE;
+    private double max = Double.MIN_VALUE;
+
+    //private boolean isRescaleGlobal = false;
+    //private boolean isRescaleLocal = false;
 
     private double lmin = Double.MAX_VALUE;
     private double lmax = Double.MIN_VALUE;
+
+    private short mode;
     //private double lsigma;
 
     private volatile boolean display = true;
@@ -74,7 +84,7 @@ public class JSkyFitsImageDescription extends ResourceDescription {
 
     private double angle = 0;
 
-    private int layerIndex;
+    //private String[] tags;
 
     private boolean createdWithGlobalData = false;
 
@@ -96,9 +106,11 @@ public class JSkyFitsImageDescription extends ResourceDescription {
         this.scaleMethod = scaleMethod;
         this.colorLookupTable = colorLookupTable;
 
+        mode = LOCAL;
+
         isVisible = true;
 
-        layerIndex = 1; //parentRegion.getLayerIndex()-1;  XXX: change layer to tag
+        //tags = parentRegion.getTags(); //parentRegion.getLayerIndex()-1;  XXX: change layer to tag
 
         this.parentRegion = parentRegion;
 
@@ -144,14 +156,19 @@ public class JSkyFitsImageDescription extends ResourceDescription {
 
         gmin = min;
         gmax = max;
+
+        this.min = min;
+        this.max = max;
         //gsigma = min/2. + max/2.;
 
-        isRescaleGlobal = true;
+        //isRescaleGlobal = true;
+        
         createdWithGlobalData = true;
+        mode = GLOBAL;
 
         isVisible = true;
 
-        layerIndex = 1;//parentRegion.getLayerIndex()-1; XXX: Layer Index to Tag
+        //tags; //layerIndex = 1;//parentRegion.getLayerIndex()-1; XXX: Layer Index to Tag
 
         this.parentRegion = parentRegion;
 
@@ -176,6 +193,10 @@ public class JSkyFitsImageDescription extends ResourceDescription {
         }
         */
 
+    }
+
+    public boolean hasTag(String tag){
+        return parentRegion.hasTag(tag);
     }
 
     public void setHistogram(String file){
@@ -206,9 +227,11 @@ public class JSkyFitsImageDescription extends ResourceDescription {
         return id;
     }
 
+    /*
     public int getLayerIndex(){
         return layerIndex;
     }
+    */
 
     public boolean isCreatedWithGlobalData(){
         return createdWithGlobalData;
@@ -249,19 +272,36 @@ public class JSkyFitsImageDescription extends ResourceDescription {
         gmax = (max > gmax) ? max : gmax;
     }
 
+    /*
     public void setRescaleGlobal(boolean isGlobal){
         isRescaleGlobal = isGlobal;
+        if(isGlobal)
+            mode = GLOBAL;
+    }
+
+    public void setRescaleLocal(boolean isLocal){
+        isRescaleLocal = isLocal;
+    }
+    */
+
+    public void changeMode(short mode){
+        this.mode = mode;
     }
 
     public void rescale(double min, double max, boolean updateDisplay){
+        mode = CUSTOM;
+        this.min = min;
+        this.max = max;
         if(glyph != null) glyph.setCutLevels(min, max, updateDisplay);
     }
 
     public void rescaleGlobal(){
+        mode = GLOBAL;
         if(glyph != null) glyph.setCutLevels(gmin, gmax, true);
     }
 
     public void rescaleLocal(){
+        mode = LOCAL;
         if(glyph != null) glyph.setCutLevels(lmin, lmax, true);
     }
 
@@ -298,8 +338,9 @@ public class JSkyFitsImageDescription extends ResourceDescription {
         glyph.setScaleAlgorithm(scaleMethod, false);
         glyph.setColorLookupTable(colorLookupTable, false);
 
-        if(isRescaleGlobal) glyph.setCutLevels(gmin, gmax, true);
-        else glyph.setCutLevels(lmin, lmax, true);
+        if(mode == GLOBAL) glyph.setCutLevels(gmin, gmax, true);
+        else if(mode == LOCAL) glyph.setCutLevels(lmin, lmax, true);
+        else glyph.setCutLevels(min, max, true);
 
         //System.out.println("localmin: " + lmin + " localmax: " + lmax);
         //System.out.println("globalmin: " + gmin + " globalmax: " + gmax);

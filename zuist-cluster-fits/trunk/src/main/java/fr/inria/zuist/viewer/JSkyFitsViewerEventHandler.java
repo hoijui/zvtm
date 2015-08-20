@@ -232,46 +232,46 @@ class JSkyFitsViewerEventHandler implements ViewListener {
             app.rescaleGlobal(true);
         }
         else if(code==KeyEvent.VK_1){
-            app.showLayer(JSkyFitsViewer.LAYER_SCENE_KS, 1.f);
-            app.hideLayer(JSkyFitsViewer.LAYER_SCENE_H);
-            app.hideLayer(JSkyFitsViewer.LAYER_SCENE_J);
-            System.out.println("setActiveLayer: " + JSkyFitsViewer.LAYER_SCENE_KS);
-            if(app.getLayerScene() != JSkyFitsViewer.LAYER_SCENE_KS) app.setLayerScene(JSkyFitsViewer.LAYER_SCENE_KS);
+            app.showTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_KS], 1.f);
+            app.hideTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_H]);
+            app.hideTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_J]);
+            System.out.println("setActiveLayer: " + JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_KS]);
+            if(app.getTagScene() != JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_KS]) app.setTagScene(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_KS]);
         }
         else if(code==KeyEvent.VK_2){
-            app.showLayer(JSkyFitsViewer.LAYER_SCENE_KS, 1.f);
-            app.showLayer(JSkyFitsViewer.LAYER_SCENE_H, 0.5f);
-            app.hideLayer(JSkyFitsViewer.LAYER_SCENE_J);
-            System.out.println("setActiveLayer: " + JSkyFitsViewer.LAYER_SCENE_KS);
-            if(app.getLayerScene() != JSkyFitsViewer.LAYER_SCENE_KS) app.setLayerScene(JSkyFitsViewer.LAYER_SCENE_KS);
+            app.showTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_KS], 1.f);
+            app.showTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_H], 0.5f);
+            app.hideTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_J]);
+            System.out.println("setActiveLayer: " + JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_KS]);
+            if(app.getTagScene() != JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_KS]) app.setTagScene(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_KS]);
         }
         else if(code==KeyEvent.VK_3){
-            app.hideLayer(JSkyFitsViewer.LAYER_SCENE_KS);
-            app.showLayer(JSkyFitsViewer.LAYER_SCENE_H, 1.f);
-            app.hideLayer(JSkyFitsViewer.LAYER_SCENE_J);
-            System.out.println("setActiveLayer: " + JSkyFitsViewer.LAYER_SCENE_H);
-            if(app.getLayerScene() != JSkyFitsViewer.LAYER_SCENE_H) app.setLayerScene(JSkyFitsViewer.LAYER_SCENE_H);
+            app.hideTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_KS]);
+            app.showTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_H], 1.f);
+            app.hideTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_J]);
+            System.out.println("setActiveLayer: " + JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_H]);
+            if(app.getTagScene() != JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_H]) app.setTagScene(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_H]);
         }
         else if(code==KeyEvent.VK_4){
-            app.hideLayer(JSkyFitsViewer.LAYER_SCENE_KS);
-            app.showLayer(JSkyFitsViewer.LAYER_SCENE_H, 1.f);
-            app.showLayer(JSkyFitsViewer.LAYER_SCENE_J, 0.5f);
-            System.out.println("setActiveLayer: " + JSkyFitsViewer.LAYER_SCENE_H);
-            if(app.getLayerScene() != JSkyFitsViewer.LAYER_SCENE_H) app.setLayerScene(JSkyFitsViewer.LAYER_SCENE_H);
+            app.hideTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_KS]);
+            app.showTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_H], 1.f);
+            app.showTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_J], 0.5f);
+            System.out.println("setActiveLayer: " + JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_H]);
+            if(app.getTagScene() != JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_H]) app.setTagScene(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_H]);
         }
         else if(code==KeyEvent.VK_5){
-            app.hideLayer(JSkyFitsViewer.LAYER_SCENE_KS);
-            app.hideLayer(JSkyFitsViewer.LAYER_SCENE_H);
-            app.showLayer(JSkyFitsViewer.LAYER_SCENE_J, 1.f);
-            System.out.println("setActiveLayer: " + JSkyFitsViewer.LAYER_SCENE_J);
-            if(app.getLayerScene() != JSkyFitsViewer.LAYER_SCENE_J) app.setLayerScene(JSkyFitsViewer.LAYER_SCENE_J);
+            app.hideTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_KS]);
+            app.hideTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_H]);
+            app.showTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_J], 1.f);
+            System.out.println("setActiveLayer: " + JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_J]);
+            if(app.getTagScene() != JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_J]) app.setTagScene(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_J]);
         }
         else if(code==KeyEvent.VK_6){
-            app.showLayer(JSkyFitsViewer.LAYER_SCENE_KS, 1.f);
-            app.showLayer(JSkyFitsViewer.LAYER_SCENE_H, 0.66f);
-            app.showLayer(JSkyFitsViewer.LAYER_SCENE_J, 0.33f);
-            System.out.println("setActiveLayer: " + JSkyFitsViewer.LAYER_SCENE);
-            if(app.getLayerScene() != JSkyFitsViewer.LAYER_SCENE) app.setLayerScene(JSkyFitsViewer.LAYER_SCENE);
+            app.showTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_KS], 1.f);
+            app.showTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_H], 0.66f);
+            app.showTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_J], 0.33f);
+            //System.out.println("setActiveLayer: " + JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE]);
+            //if(app.getLayerScene() != JSkyFitsViewer.LAYER_SCENE) app.setLayerScene(JSkyFitsViewer.LAYER_SCENE);
         }
         // else if (code == KeyEvent.VK_MINUS){
         //     //app.scaleBounds[1] -= 100;
@@ -579,11 +579,11 @@ class JSkyFitsViewerEventHandler implements ViewListener, ComponentListener, Cam
     	else if (code==KeyEvent.VK_RIGHT){application.translateView(FitsViewer.MOVE_RIGHT);}
         else if (code==KeyEvent.VK_L){ application.rescaleGlobal(false);}
         else if (code==KeyEvent.VK_G){ application.rescaleGlobal(true);}
-        else if (code==KeyEvent.VK_1){  application.showLayer(application.LAYER_SCENE_KS, 1f);application.hideLayer(application.LAYER_SCENE_J); application.hideLayer(application.LAYER_SCENE_H);}
-        else if (code==KeyEvent.VK_2){  application.showLayer(application.LAYER_SCENE_H, 0.5f);application.showLayer(application.LAYER_SCENE_KS, 1f);application.hideLayer(application.LAYER_SCENE_J);}
-        else if (code==KeyEvent.VK_3){  application.showLayer(application.LAYER_SCENE_H, 1f);application.hideLayer(application.LAYER_SCENE_J); application.hideLayer(application.LAYER_SCENE_KS);}
-        else if (code==KeyEvent.VK_4){  application.showLayer(application.LAYER_SCENE_H, 1f);application.showLayer(application.LAYER_SCENE_J, 0.5f);application.hideLayer(application.LAYER_SCENE_KS);}
-        else if (code==KeyEvent.VK_5){  application.showLayer(application.LAYER_SCENE_J, 1f);application.hideLayer(application.LAYER_SCENE_KS); application.hideLayer(application.LAYER_SCENE_H);}
+        else if (code==KeyEvent.VK_1){  application.showLayer(application.LAYER_SCENE_KS, 1f);application.hideTag(application.LAYER_SCENE_J); application.hideTag(application.LAYER_SCENE_H);}
+        else if (code==KeyEvent.VK_2){  application.showLayer(application.LAYER_SCENE_H, 0.5f);application.showLayer(application.LAYER_SCENE_KS, 1f);application.hideTag(application.LAYER_SCENE_J);}
+        else if (code==KeyEvent.VK_3){  application.showLayer(application.LAYER_SCENE_H, 1f);application.hideTag(application.LAYER_SCENE_J); application.hideTag(application.LAYER_SCENE_KS);}
+        else if (code==KeyEvent.VK_4){  application.showLayer(application.LAYER_SCENE_H, 1f);application.showLayer(application.LAYER_SCENE_J, 0.5f);application.hideTag(application.LAYER_SCENE_KS);}
+        else if (code==KeyEvent.VK_5){  application.showLayer(application.LAYER_SCENE_J, 1f);application.hideTag(application.LAYER_SCENE_KS); application.hideTag(application.LAYER_SCENE_H);}
     	else if (code==KeyEvent.VK_P) {
             System.out.println("change projections");
             //application.moveToCoordinatesWCS();
