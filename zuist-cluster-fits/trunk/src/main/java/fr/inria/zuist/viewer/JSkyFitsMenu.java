@@ -211,8 +211,8 @@ public class JSkyFitsMenu implements ViewListener, PickerListener {
         //BORDER_TOP_FILTER =  0;//app.VIEW_H/2;
         //int py = app.VIEW_H/2 - 2*HEIGHT_BTN - BORDER;
 
-        BORDER_TOP_FILTER =  50;//app.VIEW_H/2;
-        int py = app.VIEW_H/2 - (HEIGHT_BTN + 2*BORDER) - BORDER_TOP_FILTER;
+        BORDER_TOP_FILTER =  50 - (HEIGHT_BTN + 2*BORDER);//app.VIEW_H/2;
+        int py = app.VIEW_H/2 - (HEIGHT_BTN + 2*BORDER) - 50;
 
         for(String cm:COLOR_MAPPINGS.keySet()){
             RGBImageFilter f = COLOR_MAPPINGS.get(cm);
