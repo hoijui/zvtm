@@ -99,6 +99,7 @@ import fr.inria.zuist.event.ProgressListener;
 import fr.inria.zuist.od.ObjectDescription;
 import fr.inria.zuist.od.JSkyFitsImageDescription;
 import fr.inria.zuist.engine.JSkyFitsResourceHandler;
+import fr.inria.zuist.engine.TaggedViewSceneObserver;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -174,6 +175,7 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
     static final String mSpaceHName = "SceneHSpace";
     static final String mSpaceJName = "SceneJSpace";
     static final String mSpaceName = "SceneSpace";
+    static final String catalogSpaceName = "CatalogSpace";
     static final String pMnSpaceName = "PieMenuSpace";
     static final String mnSpaceName = "MenuSpace";
     static final String cursorSpaceName = "CursorSpace";
@@ -184,14 +186,16 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
     static final int LAYER_SCENE_H = 1;
     static final int LAYER_SCENE_J = 2;
     static final int LAYER_SCENE = 3;
-    static final int LAYER_PIEMENU = 4;
-    static final int LAYER_MENU = 5;
-    static final int LAYER_CURSOR = 6;
-    static final int LAYER_OVERLAY = 7;
+    static final int LAYER_CATALOG = 4;
+    static final int LAYER_PIEMENU = 5;
+    static final int LAYER_MENU = 6;
+    static final int LAYER_CURSOR = 7;
+    static final int LAYER_OVERLAY = 8;
+
 
     String tag;
 
-    public static final String[] TAGS = {"Ks", "H", "J"};
+    public static final String[] TAGS = {"mSpaceKs", "mSpaceH", "mSpaceJ"};
 
     public static final Font FONT_LAYER_SCENE = new Font("Bold", Font.PLAIN, 46);
 
@@ -200,6 +204,7 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
     
     VirtualSpace mSpaceKs, mSpaceH, mSpaceJ;
     public VirtualSpace mSpace;
+    VirtualSpace catalogSpace;
     VirtualSpace pMnSpace; //menuSpace;
     public VirtualSpace mnSpace;
     public VirtualSpace cursorSpace;
@@ -208,6 +213,7 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
     
     Camera mCameraKs, mCameraH, mCameraJ;
     public Camera mCamera;
+    Camera catalogCamera;
     Camera mnCamera; // menuCamera;
     public Camera cursorCamera;
 
@@ -283,19 +289,32 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
         ovm = new FitsOverlayManager(this);
         //initGUI(fullscreen, opengl, antialiased);
         initGUI(options);
-        VirtualSpace[]  sceneSpaces = {mSpaceKs, mSpaceH, mSpaceJ, mSpace, cursorSpace};
-        Camera[] sceneCameras = {mCameraKs, mCameraH, mCameraJ, mCamera, cursorCamera};
+        VirtualSpace[]  sceneSpaces = {mSpaceKs, mSpaceH, mSpaceJ, mSpace};
+        Camera[] sceneCameras = {mCameraKs, mCameraH, mCameraJ, mCamera};
 
         //sm = new SceneManager(sceneSpaces, sceneCameras, parseSceneOptions(options));
         //sm.setRegionListener(this);
         //sm.setLevelListener(this);
 
-        SceneObserver[] observers = new SceneObserver[]{ /*new ViewSceneObserver(
+        
+        SceneObserver[] observers = new SceneObserver[]{/*new ViewSceneObserver(
             mCameraKs.getOwningView(), mCameraKs, mSpaceKs), new ViewSceneObserver(
             mCameraH.getOwningView(), mCameraH, mSpaceH),new ViewSceneObserver(
             mCameraJ.getOwningView(), mCameraJ, mSpaceJ), */new ViewSceneObserver(
-            mCamera.getOwningView(), mCamera, mSpace) /*, new ViewSceneObserver(
-            cursorCamera.getOwningView(), cursorCamera, cursorSpace)*/};
+            mCamera.getOwningView(), mCamera, mSpace)/* , new ViewSceneObserver(
+            cursorCamera.getOwningView(), cursorCamera, cursorSpace)*/ };
+        
+
+        HashMap<String, VirtualSpace> t2s = new HashMap<String, VirtualSpace>(4,1);
+        t2s.put("mSpaceKs", mSpaceKs);
+        t2s.put("mSpaceH", mSpaceH);
+        t2s.put("mSpaceJ", mSpaceJ);
+        t2s.put("mSpace", mSpace);
+        
+        SceneObserver[] so = {new TaggedViewSceneObserver(mCamera.getOwningView(), mCamera, t2s)};
+
+        //sm = new SceneManager(so, new HashMap<String,String>(1,1));
+
         sm = new SceneManager(observers, new HashMap<String,String>(1,1));
         sm.setResourceHandler(JSkyFitsResourceHandler.RESOURCE_TYPE_FITS,
                               new JSkyFitsResourceHandler());
@@ -336,12 +355,9 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
         layerSceneLabel.setFont(FONT_LAYER_SCENE);
         layerSceneLabel.setTranslucencyValue(0.9f);
 
-
         //super(options);
        
         smartiesMngr = new SmartiesManager(this);
-
-        
 
         draw = new DrawSymbol();
         query = new Query();
@@ -352,25 +368,27 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
         windowLayout();
         vsm = VirtualSpaceManager.INSTANCE;
         vsm.setMaster("JSkyFitsViewer");
-
+        
         mSpaceKs = vsm.addVirtualSpace(mSpaceKsName);
         mSpaceH = vsm.addVirtualSpace(mSpaceHName);
         mSpaceJ = vsm.addVirtualSpace(mSpaceJName);
         mSpace = vsm.addVirtualSpace(mSpaceName);
+        catalogSpace = vsm.addVirtualSpace(catalogSpaceName);
         pMnSpace = vsm.addVirtualSpace(pMnSpaceName);
         mnSpace = vsm.addVirtualSpace(mnSpaceName);
         cursorSpace = vsm.addVirtualSpace(cursorSpaceName);
         ovSpace = vsm.addVirtualSpace(ovSpaceName);
         
-
         mCameraKs = mSpaceKs.addCamera();
         mCameraH = mSpaceH.addCamera();
         mCameraJ = mSpaceJ.addCamera();
         mCamera = mSpace.addCamera();
-
+        catalogCamera = catalogSpace.addCamera();
+        
         mCamera.stick(mCameraKs);
         mCamera.stick(mCameraH);
         mCamera.stick(mCameraJ);
+        mCamera.stick(catalogCamera);
         //mCamera.stick(cursorCamera);
 
         pMnSpace.addCamera().setAltitude(10);
@@ -379,11 +397,11 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
         ovSpace.addCamera();
 
         Vector cameras = new Vector();
-
         cameras.add(mCameraKs);
         cameras.add(mCameraH);
         cameras.add(mCameraJ);
         cameras.add(mCamera);
+        cameras.add(catalogCamera);
         cameras.add(vsm.getVirtualSpace(pMnSpaceName).getCamera(0));
         cameras.add(mnCamera);
         cameras.add(cursorCamera);
@@ -419,6 +437,7 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
         mView.setListener(eh, LAYER_SCENE_H);
         mView.setListener(eh, LAYER_SCENE_J);
         mView.setListener(eh, LAYER_SCENE);
+        mView.setListener(eh, LAYER_CATALOG);
         mView.setListener(eh, LAYER_PIEMENU);
         mView.setListener(menu, LAYER_MENU);
         mView.setListener(eh, LAYER_CURSOR);
@@ -448,6 +467,7 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
         sceneCam.add(mCameraH);
         sceneCam.add(mCameraJ);
         sceneCam.add(mCamera);
+        sceneCam.add(catalogCamera);
         sceneCam.add(cursorCamera);
 
         clView = new ClusteredView(clGeom, options.numRows-1, options.numCols, options.numRows, sceneCam);
@@ -1265,7 +1285,8 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
         MAX_NB_REQUESTS = sm.getObjectCount() / 100;
         //gp.setVisible(false);
         //gp.setLabel(VWGlassPane.EMPTY_STRING);
-        mCamera.setAltitude(0.0f);
+        
+        //mCamera.setAltitude(0.0f); XXX
 
         //loadFitsReference();
     }
@@ -1725,27 +1746,15 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
                         //double y = (json.getDouble("y") + fitsImageDescRef.getY()) - fitsImageDescRef.getHeight()/2 ;
                         double[] l = windowToViewCoordinateFromCoordinateWCS(json.getDouble("x"), json.getDouble("y"));
                         System.out.println("location: " + l[0] + ", " + l[1]);
-                        VCross cr = new VCross(l[0], l[1], 10000, 20, 20, Color.YELLOW, Color.WHITE, .8f);
+                        VCross cr = new VCross(l[0], l[1], 100, 20, 20, Color.YELLOW, Color.WHITE, .8f);
                         cr.setStroke(AstroObject.AO_STROKE);
-                        VText lb = new VText(l[0]+10, l[1]+10, 10100, Color.YELLOW, id, VText.TEXT_ANCHOR_START);
+                        VText lb = new VText(l[0]+10, l[1]+10, 101, Color.YELLOW, id, VText.TEXT_ANCHOR_START);
                         lb.setBorderColor(Color.BLACK);
                         lb.setTranslucencyValue(.6f);
-                        mSpace.addGlyph(cr);
-                        mSpace.addGlyph(lb);
+                        catalogSpace.addGlyph(cr);
+                        catalogSpace.addGlyph(lb);
                         
-                        VCircle circle = new VCircle(l[0], l[1], 10000, 20, Color.YELLOW, Color.WHITE, .8f);
-                        circle.setVisible(true);
-                        /*
-                        mSpaceKs.addGlyph(circle);
-                        mSpaceKs.onTop(circle);
-                        mSpaceJ.addGlyph(circle);
-                        mSpaceJ.onTop(circle);
-                        mSpaceH.addGlyph(circle);
-                        mSpaceH.onTop(circle);
-                        */
-                        mSpace.addGlyph(circle);
-                        mSpace.onTop(circle);
-                        
+
 
                         //cr.setOwner(this.obj);
                         //lb.setOwner(this.obj);
