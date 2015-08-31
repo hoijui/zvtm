@@ -287,35 +287,34 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
     public JSkyFitsViewer(Options options){
 
         ovm = new FitsOverlayManager(this);
-        //initGUI(fullscreen, opengl, antialiased);
         initGUI(options);
-        VirtualSpace[]  sceneSpaces = {mSpaceKs, mSpaceH, mSpaceJ, mSpace};
-        Camera[] sceneCameras = {mCameraKs, mCameraH, mCameraJ, mCamera};
+        //VirtualSpace[]  sceneSpaces = {mSpaceKs, mSpaceH, mSpaceJ, mSpace};
+        //Camera[] sceneCameras = {mCameraKs, mCameraH, mCameraJ, mCamera};
 
         //sm = new SceneManager(sceneSpaces, sceneCameras, parseSceneOptions(options));
         //sm.setRegionListener(this);
         //sm.setLevelListener(this);
 
         
-        SceneObserver[] observers = new SceneObserver[]{/*new ViewSceneObserver(
-            mCameraKs.getOwningView(), mCameraKs, mSpaceKs), new ViewSceneObserver(
+        //SceneObserver[] observers = new SceneObserver[]{/*new ViewSceneObserver(
+        /*    mCameraKs.getOwningView(), mCameraKs, mSpaceKs), new ViewSceneObserver(
             mCameraH.getOwningView(), mCameraH, mSpaceH),new ViewSceneObserver(
-            mCameraJ.getOwningView(), mCameraJ, mSpaceJ), */new ViewSceneObserver(
-            mCamera.getOwningView(), mCamera, mSpace)/* , new ViewSceneObserver(
-            cursorCamera.getOwningView(), cursorCamera, cursorSpace)*/ };
+            mCameraJ.getOwningView(), mCameraJ, mSpaceJ), *new ViewSceneObserver(
+            mCamera.getOwningView(), mCamera, mSpace)* , new ViewSceneObserver(
+            cursorCamera.getOwningView(), cursorCamera, cursorSpace)*/ // };
         
 
-        HashMap<String, VirtualSpace> t2s = new HashMap<String, VirtualSpace>(4,1);
+        HashMap<String, VirtualSpace> t2s = new HashMap<String, VirtualSpace>(3,1);
         t2s.put("mSpaceKs", mSpaceKs);
         t2s.put("mSpaceH", mSpaceH);
         t2s.put("mSpaceJ", mSpaceJ);
-        t2s.put("mSpace", mSpace);
+        //t2s.put("mSpace", mSpace);
         
         SceneObserver[] so = {new TaggedViewSceneObserver(mCamera.getOwningView(), mCamera, t2s)};
 
-        //sm = new SceneManager(so, new HashMap<String,String>(1,1));
+        sm = new SceneManager(so, new HashMap<String,String>(1,1));
 
-        sm = new SceneManager(observers, new HashMap<String,String>(1,1));
+        //sm = new SceneManager(observers, new HashMap<String,String>(1,1));
         sm.setResourceHandler(JSkyFitsResourceHandler.RESOURCE_TYPE_FITS,
                               new JSkyFitsResourceHandler());
 
