@@ -1,0 +1,55 @@
+/*   Copyright (c) INRIA, 2014. All Rights Reserved
+ *   Licensed under the GNU LGPL. For full terms see the file COPYING.
+ *
+ * $Id: SavedPosition.java 2014-03-04 13:04:22Z fdelcampo $
+ */
+
+package cl.inria.massda;
+
+import org.json.JSONObject;
+import org.json.JSONException;
+
+
+class SavedPosition{
+	String name;
+	double[] region;
+
+	SavedPosition(String name, double x1, double y1, double x2, double y2){
+		this.name = name;
+		region = new double[4];
+		region[0] = x1;
+		region[1] = y1;
+		region[2] = x2;
+		region[3] = y2;
+	}
+
+	public String getName(){
+		return name;
+	}
+
+	public double[] getRegion(){
+		return region;
+	}
+
+	@Override
+	public String toString(){
+		return name + " - [" + region[0] + ", " + region[1] + ", " + region[2] + ", " + region[3] + "]";
+	}
+
+
+	JSONObject toJSON(){
+		JSONObject obj = new JSONObject();
+		try{
+			obj.put("name", name);
+			obj.put("x1", region[0]);
+			obj.put("y1", region[1]);
+			obj.put("x2", region[2]);
+			obj.put("y2", region[3]);
+			return obj;
+		} catch(JSONException e){
+			System.out.println(e);
+			return obj;
+		}
+		
+	}
+}
