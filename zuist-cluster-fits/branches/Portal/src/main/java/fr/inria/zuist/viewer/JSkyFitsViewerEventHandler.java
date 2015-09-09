@@ -63,6 +63,8 @@ import fr.inria.zvtm.engine.portals.Portal;
 import fr.inria.zvtm.event.PortalListener;
 import fr.inria.zvtm.engine.portals.DraggableCameraPortal;
 
+import cl.inria.massda.PortalManager;
+
 
 //class FitsViewerEventHandler implements ViewEventHandler, ComponentListener, CameraListener {
 class JSkyFitsViewerEventHandler implements ViewListener, PortalListener {
@@ -93,6 +95,13 @@ class JSkyFitsViewerEventHandler implements ViewListener, PortalListener {
     boolean selectingForQuery = false;
 
     Portal overPortal = null;
+
+    /* DragMag interaction */
+    protected boolean inZoomWindow = false;
+    protected boolean inMagWindow = false;
+    protected boolean draggingZoomWindow = false;
+    protected boolean draggingZoomWindowContent = false;
+
 
     JSkyFitsViewerEventHandler(JSkyFitsViewer app){
         this.app = app;
@@ -190,7 +199,7 @@ class JSkyFitsViewerEventHandler implements ViewListener, PortalListener {
             lastJPX = jpx;
             lastJPY = jpy;
         }
-        else if (selectingForQuery){
+        else if (selectingForQuery && overPortal == null){
             Point2D.Double p = v.getVCursor().getVSCoordinates(app.mnCamera);
             rightClickSelectionG.sizeTo(2*Math.sqrt((p.x-rightClickPress.x)*(p.x-rightClickPress.x)+(p.y-rightClickPress.y)*(p.y-rightClickPress.y)));
         }
@@ -217,10 +226,17 @@ class JSkyFitsViewerEventHandler implements ViewListener, PortalListener {
     }
 
     public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
-        Camera c = app.mCamera;
         double mvx = v.getVCursor().getVSXCoordinate();
         double mvy = v.getVCursor().getVSYCoordinate();
-        zoom(c, mvx, mvy, wheelDirection);
+        if(overPortal != null && overPortal instanceof DraggableCameraPortal){
+            System.out.println("zoom portal");
+            app.portalMngr.changeZoom(mvx, mvy, wheelDirection);
+        } else {
+            Camera c = app.mCamera;
+            zoom(c, mvx, mvy, wheelDirection);
+        }
+        
+        
     }
 
     public void Ktype(ViewPanel v, char c, int code, int mod, KeyEvent e){}
@@ -289,6 +305,16 @@ class JSkyFitsViewerEventHandler implements ViewListener, PortalListener {
             //System.out.println("setActiveLayer: " + JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE]);
             //if(app.getLayerScene() != JSkyFitsViewer.LAYER_SCENE) app.setLayerScene(JSkyFitsViewer.LAYER_SCENE);
         }
+        else if(code==KeyEvent.VK_P){
+            if(app.portalMngr == null){
+                app.portalMngr = new PortalManager(app, app.mView, app.clView);
+            } else {
+                app.portalMngr.killDM();
+                app.portalMngr = null;
+                overPortal = null;
+            }
+            
+        }
         // else if (code == KeyEvent.VK_MINUS){
         //     //app.scaleBounds[1] -= 100;
         //     //app.img.rescale(app.scaleBounds[0], app.scaleBounds[1], 1);
@@ -312,6 +338,12 @@ class JSkyFitsViewerEventHandler implements ViewListener, PortalListener {
     public void viewClosing(View v){System.exit(0);}
 
 
+    protected void resetDragMagInteraction(){
+        inMagWindow = false;
+        inZoomWindow = false;
+        draggingZoomWindow = false;
+        draggingZoomWindowContent = false;
+    }
 
     void pan(Camera c, int dx, int dy){
         synchronized(c){
