@@ -179,7 +179,7 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
     static final String mSpaceJName = "SceneJSpace";
     static final String mSpaceName = "SceneSpace";
     static final String catalogSpaceName = "CatalogSpace";
-    static final String portalSpaceName = "portalSpace";
+    /*static final String portalSpaceName = "portalSpace";*/
     static final String pMnSpaceName = "PieMenuSpace";
     static final String mnSpaceName = "MenuSpace";
     static final String cursorSpaceName = "CursorSpace";
@@ -210,7 +210,7 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
     VirtualSpace mSpaceKs, mSpaceH, mSpaceJ;
     public VirtualSpace mSpace;
     VirtualSpace catalogSpace;
-    public VirtualSpace portalSpace;
+    /*public VirtualSpace portalSpace;*/
     VirtualSpace pMnSpace; //menuSpace;
     public VirtualSpace mnSpace;
     public VirtualSpace cursorSpace;
@@ -220,7 +220,8 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
     Camera mCameraKs, mCameraH, mCameraJ;
     public Camera mCamera;
     Camera catalogCamera;
-    public Camera portalCamera;
+    /*public Camera portalCamera;
+    public Camera portalCamera2;*/
     Camera mnCamera; // menuCamera;
     public Camera cursorCamera;
 
@@ -383,7 +384,7 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
         mSpaceJ = vsm.addVirtualSpace(mSpaceJName);
         mSpace = vsm.addVirtualSpace(mSpaceName);
         catalogSpace = vsm.addVirtualSpace(catalogSpaceName);
-        portalSpace = vsm.addVirtualSpace(portalSpaceName);
+        /*portalSpace = vsm.addVirtualSpace(portalSpaceName);*/
         pMnSpace = vsm.addVirtualSpace(pMnSpaceName);
         mnSpace = vsm.addVirtualSpace(mnSpaceName);
         cursorSpace = vsm.addVirtualSpace(cursorSpaceName);
@@ -394,7 +395,10 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
         mCameraJ = mSpaceJ.addCamera();
         mCamera = mSpace.addCamera();
         catalogCamera = catalogSpace.addCamera();
+        /*
         portalCamera = portalSpace.addCamera();
+        portalCamera2 = portalSpace.addCamera();
+        */
         
         mCamera.stick(mCameraKs);
         mCamera.stick(mCameraH);
@@ -494,6 +498,28 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
 
 
     }
+
+    public Camera getMainCamera(){
+        return mCamera;
+    }
+
+    public Camera getCursorCamera(){
+        return cursorCamera;
+    }
+
+    public View getMainView(){
+        return mView;
+    }
+
+    public ClusteredView getClusterView(){
+        return clView;
+    }
+
+    /*
+    public VirtualSpace getPortalSpace(){
+        return portalSpace;
+    }
+    */
 
     public VirtualSpace[] getVirtualSpaces(){
         return new VirtualSpace[]{ mSpaceKs, mSpaceH, mSpaceJ, mSpace, catalogSpace, cursorSpace };

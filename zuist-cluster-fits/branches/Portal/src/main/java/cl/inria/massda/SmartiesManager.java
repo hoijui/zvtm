@@ -33,7 +33,7 @@ import java.util.Observable;
 import org.json.JSONObject;
 import org.json.JSONException;
 
-//import fr.inria.zvtm.engine.Location;
+import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.glyphs.VSegment;
 import fr.inria.zvtm.glyphs.VText;
 import java.awt.Font;
@@ -78,7 +78,7 @@ public class SmartiesManager implements Observer {
         this.app = app;
         smarties = new Smarties((int)app.SCENE_W , (int)app.SCENE_H,
                                 8, 4);
-        smarties.initWidgets(6,2);
+        smarties.initWidgets(7,2);
 
         countWidget = 0;
 
@@ -162,6 +162,11 @@ public class SmartiesManager implements Observer {
         sw = smarties.addWidget(
                                 SmartiesWidget.SMARTIES_WIDGET_TYPE_BUTTON, "+", 1, 1, 1, 1);
         sw.handler = new EventLowerView();
+        countWidget++;
+
+        sw = smarties.addWidget(
+                                SmartiesWidget.SMARTIES_WIDGET_TYPE_BUTTON, "Portal", 7, 2, 1, 1);
+        sw.handler = new EventPortal();
         countWidget++;
 
         smarties.addObserver(this);
@@ -482,6 +487,7 @@ public class SmartiesManager implements Observer {
         double l;
         double b;
         
+        PortalManager prtMng;
         
         public MyCursor(int id, double x, double y){
             this.id = id;
@@ -544,7 +550,23 @@ public class SmartiesManager implements Observer {
             }
         }
 
-        
+        public void togglePortal(){
+            if(prtMng == null){
+
+                Point2D.Double point = getLocation();
+                double alt = app.getMainCamera().getAltitude();
+                double[] loc = app.coordinateTransform(app.getCursorCamera(), app.getMainCamera(), point.getX(), point.getY());
+                Location l = new Location(loc[0], loc[1], alt);
+                prtMng = new PortalManager(app, color);
+                prtMng.createDM(0, 0, l);
+                /*double[] coord = app.coordinateTransform(app.cursorCamera, prtMng.getCamera(), point.getX(), point.getY());
+                prtMng.moveTo(coord[0], coord[1]);*/
+            } else {
+                prtMng.killDM();
+                prtMng = null;
+            }
+            
+        }
 
         public void labelSetVisible(boolean b){
             /*
@@ -894,6 +916,17 @@ public class SmartiesManager implements Observer {
         public boolean callback(SmartiesWidget sw, SmartiesEvent se, Object user_data){
             System.out.println("EventNextScale");
             app.menu.selectNextScale();
+            return true;
+        }
+    }
+
+    class EventPortal implements SmartiesWidgetHandler{
+        public boolean callback(SmartiesWidget sw, SmartiesEvent se, Object user_data){
+            System.out .println("EventPortal");
+            if(se.p != null){
+                MyCursor c = (MyCursor)se.p.app_data;
+                c.togglePortal();
+            }
             return true;
         }
     }

@@ -48,6 +48,9 @@ public class PortalManager{
     static final short WHEEL_DOWN = '0';
     static final short WHEEL_UP = '1';
 
+    static final String PORTAL_SPACE_NAME = "portalSpace_";
+    String portalSpaceName;
+
 	public VirtualSpaceManager vsm;
 
 	CameraPortal ovPortal;
@@ -78,14 +81,14 @@ public class PortalManager{
 	public static final int DM_PORTAL_INITIAL_X_OFFSET = 150;
 	public static final int DM_PORTAL_INITIAL_Y_OFFSET = 150;
 	public static final int DM_PORTAL_ANIM_TIME = 150;
-	public static final Color DM_COLOR = Color.RED;
+	//public static final Color DM_COLOR = Color.RED;
+
 
     public Camera portalCamera;
 	DraggableCameraPortal dmPortal;
 	PortalSceneObserver pso;
 	VRectangle magWindow;
     int magWindowW, magWindowN, magWindowE, magWindowS;
-    boolean paintLinks = false;
 
     double[] dmwnes = new double[4];
 
@@ -101,114 +104,85 @@ public class PortalManager{
 
 	PortalListener prtlEvntHndlr;
 
+	Color dmColor;
+
+
+	public PortalManager(JSkyFitsViewer app, Color color){
+		this(app, app.getMainView(), app.getClusterView(), color);
+	}
 
 	public PortalManager(JSkyFitsViewer app, View mView, ClusteredView clView){
+		this(app, mView, clView, Color.RED);
+	}
+
+	/*public PortalManager(JSkyFitsViewer app, View mView, ClusteredView clView, Color color){
+		this(app, mView, clView, color, app.getPanelWidth()/2, app.getPanelHeight()/2);
+		//this(app, mView, clView, color, app.getPanelWidth()/2-DM_PORTAL_WIDTH-1, app.getPanelHeight()/2-DM_PORTAL_HEIGHT-1);
+	}
+	*/
+
+	public PortalManager(JSkyFitsViewer app, View mView, ClusteredView clView, Color color){
 		
 		System.out.println("PortalManager");
 
 		this.app = app;
-		this.mSpace = app.mSpace;
 		this.mView = mView;
 		this.clView = clView;
-		this.portalSpace = app.portalSpace;
-		this.portalCamera = app.portalCamera;
+		this.mSpace = app.mSpace;
 		this.mCamera = app.mCamera;
-
-		//rSpace = vsm.addVirtualSpace(rdRegionVirtualSpaceName);
-        // camera for rectangle representing region seen in main viewport (in overview)
-        //rSpace.addCamera();
-		// DragMag portal camera (camera #2)
-		//dmCamera = portalSpace.addCamera();
-		//dmCamera = vss[0].addCamera();
-		
-		/*
-		cameras = new Camera[vss.length];
-
-		for( int i = 0; i < vss.length; i++ ){
-			cameras[i] = vss[i].addCamera();
-			dmCamera.stick(cameras[i]);
-		}
-		*/
-
-		//ovCamera = mSpace.addCamera();
+		/*this.portalSpace = portalSpace;*/
+		dmColor = color;
 
 		vsm = VirtualSpaceManager.INSTANCE;
+
+		long epoch = System.currentTimeMillis();
+		portalSpaceName = PORTAL_SPACE_NAME+epoch;
+		portalSpace = vsm.addVirtualSpace(portalSpaceName);
+
+		this.portalCamera = portalSpace.addCamera();
+		portalCamera.moveTo(0,0);
 
 		animator = vsm.getAnimationManager();
 
 		prtlEvntHndlr = app.getPortalListener();
 
-		/*
-		dmCamera = mSpace.addCamera();
-
-		DraggableCameraPortal portal = new DraggableCameraPortal(250 ,250, 200, 200, dmCamera);
-
-		vsm.addPortal(portal, mView);
-		vsm.addClusteredPortal(portal, clView);
-
-		portal.setBorder(Color.GREEN);
-		
-		SIRectangle seg1;
-        SIRectangle seg2;
-        observedRegion = new VRectangle(0, 0, 0, 10, 10, OBSERVED_REGION_COLOR, OBSERVED_REGION_CROSSHAIR_COLOR, 0.5f);
-        //500 should be sufficient as the radar window is
-        seg1 = new SIRectangle(0, 0, 0, 0, 500, OBSERVED_REGION_CROSSHAIR_COLOR);
-        //not resizable and is 300x200 (see rdW,rdH below)
-        seg2 = new SIRectangle(0, 0, 0, 500, 0, OBSERVED_REGION_CROSSHAIR_COLOR);
-        space.addGlyph(observedRegion);
-        space.addGlyph(seg1);
-        space.addGlyph(seg2);
-        Glyph.stickToGlyph(seg1, observedRegion);
-        Glyph.stickToGlyph(seg2, observedRegion);
-        observedRegion.setSensitivity(false);
-		*/
-
-        //createOverview();
-
         initDM();
-        createDM(app.getPanelWidth()/2-DM_PORTAL_WIDTH-1, app.getPanelHeight()/2-DM_PORTAL_HEIGHT-1);
-
-	}
-
-	void createOverview(){
-
-		System.out.println("Overview");
-
-		ovPortal = new CameraPortal(app.getPanelWidth()-OV_PORTAL_WIDTH-1, app.getPanelHeight()-OV_PORTAL_HEIGHT-1, OV_PORTAL_WIDTH, OV_PORTAL_HEIGHT, cameras, OBSERVED_REGION_ALPHA);
-		ovPortal.setPortalListener(prtlEvntHndlr);
-		ovPortal.setBackgroundColor(BACKGROUND_COLOR);
-		vsm.addPortal(ovPortal, mView);
-		vsm.addClusteredPortal(ovPortal, clView);
-		ovPortal.setBorder(Color.GREEN);
+        //createDM(dmPosX, dmPosY, l);
 
 	}
 
 	void initDM(){
 		System.out.println("initDM");
-	    magWindow = new VRectangle(0, 0, 0, 1, 1, DM_COLOR);
+	    magWindow = new VRectangle(0, 0, 0, 1, 1, dmColor);
 	    magWindow.setFilled(false);
-	    magWindow.setBorderColor(DM_COLOR);
+	    magWindow.setBorderColor(dmColor);
 	    mSpace.addGlyph(magWindow);
 	    mSpace.hide(magWindow);
     }
 
-	void createDM(int x, int y){
+	public void createDM(int x, int y, Location l){
+		//if(dmPortal != null) killDM();
 		System.out.println("createDM");
 
-		dmPortal = new DraggableCameraPortal(x, y, DM_PORTAL_WIDTH, DM_PORTAL_HEIGHT, portalCamera); //dmCamera); //
+		dmPortal = new DraggableCameraPortal(x, y, DM_PORTAL_WIDTH, DM_PORTAL_HEIGHT, portalCamera);
 		pso = new PortalSceneObserver(dmPortal, portalCamera, portalSpace);
 		dmPortal.setPortalListener(prtlEvntHndlr);
 		
 		vsm.addPortal(dmPortal, mView);
 		vsm.addClusteredPortal(dmPortal, clView);
-		dmPortal.setBorder(DM_COLOR);
-		dmPortal.setBackgroundColor(DM_COLOR);
-		dmPortal.setTranslucencyValue(0.8f);
+		dmPortal.setBorder(dmColor);
+		dmPortal.setDragBarColor(dmColor.darker());
+		dmPortal.setBackgroundColor(dmColor);
+		//dmPortal.setTranslucencyValue(0.8f);
 
 		app.sm.addSceneObserver(pso);
-        Location l = dmPortal.getSeamlessView(mCamera);
+        //Location l = dmPortal.getSeamlessView(mCamera);
+        System.out.println("location: " + l.vx + ", " + l.vy);
         portalCamera.moveTo(l.vx, l.vy);
-        portalCamera.setAltitude(((mCamera.getAltitude()+mCamera.getFocal())/(DEFAULT_MAG_FACTOR)-mCamera.getFocal()));
+        double alt = ((mCamera.getAltitude()+mCamera.getFocal())/(DEFAULT_MAG_FACTOR)-mCamera.getFocal());
+        System.out.println("alt: " + alt);
+        if(alt > 1) portalCamera.setAltitude(alt);
+        else portalCamera.setAltitude(1);
         updateMagWindow();
 
         int w = (int)Math.round(magWindow.getWidth() * mCamera.getFocal() / ((float)(mCamera.getFocal()+mCamera.getAltitude())));
@@ -216,8 +190,10 @@ public class PortalManager{
         dmPortal.sizeTo(w, h);
         mSpace.onTop(magWindow);
         mSpace.show(magWindow);
-        paintLinks = true;
         //animator.createPortalAnimation(GraphicsManager.DM_PORTAL_ANIM_TIME, AnimManager.PT_SZ_TRANS_LIN, data, dmPortal.getID(), null);
+        //Animation as = animator.getAnimationFactory().createPortalSizeAnim(DM_PORTAL_ANIM_TIME, dmPortal,
+        //    0, 0, true,
+
         Animation as = animator.getAnimationFactory().createPortalSizeAnim(DM_PORTAL_ANIM_TIME, dmPortal,
             DM_PORTAL_WIDTH-w, DM_PORTAL_HEIGHT-h, true,
             IdentityInterpolator.getInstance(), new EndAction(){
@@ -228,6 +204,12 @@ public class PortalManager{
         Animation at = animator.getAnimationFactory().createPortalTranslation(DM_PORTAL_ANIM_TIME, dmPortal,
             new Point(DM_PORTAL_INITIAL_X_OFFSET-w/2, DM_PORTAL_INITIAL_Y_OFFSET-h/2), true,
             IdentityInterpolator.getInstance(), null);
+        
+		/*
+		Animation at = animator.getAnimationFactory().createPortalTranslation(DM_PORTAL_ANIM_TIME, dmPortal,
+            new Point(-w/2, -h/2), true,
+            IdentityInterpolator.getInstance(), null);
+		*/
         animator.startAnimation(as, false);
         animator.startAnimation(at, false);
 
@@ -243,12 +225,17 @@ public class PortalManager{
         magWindow.setHeight((dmwnes[1]-dmwnes[3]) + 1);
     }
 
-    public void updateZoomWindow(){
-        System.out.println("updateZoomWindow");
-        portalCamera.moveTo(magWindow.vx, magWindow.vy);
+    public void moveTo(double vx, double vy){
+    	portalCamera.moveTo(vx, vy);
+    	updateMagWindow();
     }
 
-    public void changeZoom(double vx, double vy, short direction){
+    public Camera getCamera(){
+    	return portalCamera;
+    }
+
+    //public void changeZoom(double vx, double vy, short direction){
+    public void changeZoom(short direction){
     	double a = (portalCamera.focal+Math.abs(portalCamera.altitude)) / portalCamera.focal;
     	System.out.println("a: " + a);
     	System.out.println("wheel: " + direction);
@@ -257,16 +244,15 @@ public class PortalManager{
     	{
     		case ViewListener.WHEEL_UP:
 				System.out.println("zoom in");
-	            portalCamera.altitudeOffset(-a*WHEEL_ZOOMIN_FACTOR);
+	            portalCamera.altitudeOffset(a*WHEEL_ZOOMIN_FACTOR);
 	    		break;
 	    	case ViewListener.WHEEL_DOWN:
-	            portalCamera.altitudeOffset(a*WHEEL_ZOOMOUT_FACTOR);
+	            portalCamera.altitudeOffset(-a*WHEEL_ZOOMOUT_FACTOR);
 	    		break;
 	    	default:
 	    		break;
     	}
     	updateMagWindow();
-    	
     	
     }
 
@@ -276,7 +262,8 @@ public class PortalManager{
         vsm.destroyPortal(dmPortal);
         dmPortal = null;
         mSpace.hide(magWindow);
-        paintLinks = false;
+        vsm.destroyVirtualSpace(portalSpaceName);
+        //magWindow = null;
         //prtlEvntHndlr.resetDragMagInteraction();
     }
 

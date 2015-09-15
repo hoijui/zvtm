@@ -12,6 +12,8 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.ComponentEvent;
 
+
+
 import java.util.Vector;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -26,7 +28,10 @@ import java.awt.Stroke;
 //import fr.inria.zvtm.engine.LongPoint;
 import java.awt.geom.Point2D;
 
+import fr.inria.zvtm.engine.VCursor;
+
 import fr.inria.zvtm.engine.Camera;
+import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
@@ -92,7 +97,10 @@ class JSkyFitsViewerEventHandler implements ViewListener, PortalListener {
     Point2D.Double coordClickPress;
 
     boolean panning = false;
+    boolean panningForPortal = false;
     boolean selectingForQuery = false;
+
+    boolean dblClick = false;
 
     Portal overPortal = null;
 
@@ -121,7 +129,15 @@ class JSkyFitsViewerEventHandler implements ViewListener, PortalListener {
         */
         lastJPX = jpx;
         lastJPY = jpy;
-        panning = true;
+
+        if(dblClick && overPortal != null){
+            v.parent.setCursorIcon(Cursor.MOVE_CURSOR);
+            panningForPortal = true;
+            panning = false;
+        } else {
+            panning = true;
+            panningForPortal = false;
+        }
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
@@ -136,10 +152,21 @@ class JSkyFitsViewerEventHandler implements ViewListener, PortalListener {
         */
         //v.parent.setActiveLayer(0);
 
-        panning = false;
+        if(panning)             panning = false;
+        if(dblClick)            dblClick = false;
+        if(panningForPortal)    panningForPortal = false;
+
+        v.parent.setCursorIcon(Cursor.CUSTOM_CURSOR);
     }
 
-    public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
+    public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
+
+        if(clickNumber == 2 && overPortal != null){
+            System.out.println("dblClick");
+            dblClick = true;
+            v.parent.setCursorIcon(Cursor.HAND_CURSOR);
+        }
+    }
 
     public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
@@ -148,16 +175,17 @@ class JSkyFitsViewerEventHandler implements ViewListener, PortalListener {
     public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
     public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-        selectingForQuery = true;
+        if(overPortal == null){
+            selectingForQuery = true;
 
-        coordClickPress = v.getVCursor().getVSCoordinates(app.mCamera);
+            coordClickPress = v.getVCursor().getVSCoordinates(app.mCamera);
 
-        // first point (start dragging) defines the center of the query zone
-        rightClickPress = v.getVCursor().getVSCoordinates(app.cursorCamera);
-        rightClickSelectionG.moveTo(rightClickPress.x, rightClickPress.y);
-        rightClickSelectionG.sizeTo(1);
-        app.cursorSpace.addGlyph(rightClickSelectionG);
-
+            // first point (start dragging) defines the center of the query zone
+            rightClickPress = v.getVCursor().getVSCoordinates(app.cursorCamera);
+            rightClickSelectionG.moveTo(rightClickPress.x, rightClickPress.y);
+            rightClickSelectionG.sizeTo(1);
+            app.cursorSpace.addGlyph(rightClickSelectionG);
+        }
 
         //VCircle test = new VCircle(v.getVCursor().getVSCoordinates(app.mnCamera).x, v.getVCursor().getVSCoordinates(app.mnCamera).y, 1000, 100, Color.BLACK, Color.RED);
         //app.mnSpace.addGlyph(test);
@@ -203,12 +231,17 @@ class JSkyFitsViewerEventHandler implements ViewListener, PortalListener {
             Point2D.Double p = v.getVCursor().getVSCoordinates(app.mnCamera);
             rightClickSelectionG.sizeTo(2*Math.sqrt((p.x-rightClickPress.x)*(p.x-rightClickPress.x)+(p.y-rightClickPress.y)*(p.y-rightClickPress.y)));
         }
-        else if(overPortal != null){
+        else if(overPortal != null && panning){
             if(overPortal instanceof DraggableCameraPortal ){
                 overPortal.move(jpx-lastJPX, jpy-lastJPY);
                 lastJPX = jpx;
                 lastJPY = jpy;
             }
+        } else if(panningForPortal){
+            pan(app.portalMngr.getCamera(), lastJPX-jpx, jpy-lastJPY);
+            app.portalMngr.updateMagWindow();
+            lastJPX = jpx;
+            lastJPY = jpy;
         }
 
         /*
@@ -225,14 +258,15 @@ class JSkyFitsViewerEventHandler implements ViewListener, PortalListener {
         */
     }
 
-    public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
-        double mvx = v.getVCursor().getVSXCoordinate();
-        double mvy = v.getVCursor().getVSYCoordinate();
+    public void mouseWheelMoved(ViewPanel v, short wheelDirection, int jpx, int jpy, MouseWheelEvent e){
+        
         if(overPortal != null && overPortal instanceof DraggableCameraPortal){
             System.out.println("zoom portal");
-            app.portalMngr.changeZoom(mvx, mvy, wheelDirection);
+            app.portalMngr.changeZoom(wheelDirection);
         } else {
             Camera c = app.mCamera;
+            double mvx = v.getVCursor().getVSXCoordinate();
+            double mvy = v.getVCursor().getVSYCoordinate();
             zoom(c, mvx, mvy, wheelDirection);
         }
         
@@ -307,11 +341,31 @@ class JSkyFitsViewerEventHandler implements ViewListener, PortalListener {
         }
         else if(code==KeyEvent.VK_P){
             if(app.portalMngr == null){
+                int x = v.getVCursor().getPanelXCoordinate();
+                int y = v.getVCursor().getPanelYCoordinate();
+                double dx = v.getVCursor().getVSXCoordinate();
+                double dy = v.getVCursor().getVSYCoordinate();
+                Point2D.Double position = v.getVCursor().getLocation();
+                //System.out XXXXX
+                double alt = app.getMainCamera().getAltitude();
+                Location l = new Location(position.getX(), position.getY(), alt);
                 app.portalMngr = new PortalManager(app, app.mView, app.clView);
-            } else {
+                app.portalMngr.createDM(x, y, l);
+
+                /*
+                Point2D.Double point = v.getVCursor().getVSCoordinates(app.portalMngr.getCamera());
+                double[] dist = app.coordinateTransform(app.getMainCamera(), app.portalMngr.getCamera(), v.getVCursor().getVSXCoordinate(), v.getVCursor().getVSYCoordinate());
+                System.out.println("x: " + x + ", y: " + y);
+                System.out.println("dxy: " + dx + ", " + dy + " point.getX(): " + point.getX() + " point.getY(): " + point.getY() );
+                System.out.println(" diff: " + (dx - point.getX()) + ", " + (dy - point.getY()) );
+                System.out.println("dist: " + dist[0] + ", " + dist[1]);
+                */
+                
+            } else {                
                 app.portalMngr.killDM();
                 app.portalMngr = null;
                 overPortal = null;
+                
             }
             
         }
