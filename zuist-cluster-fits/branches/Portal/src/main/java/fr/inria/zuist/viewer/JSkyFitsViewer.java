@@ -492,7 +492,6 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
         clView.setBackgroundColor(Color.GRAY);
         vsm.addClusteredView(clView);
 
-
 		//mView.setActiveLayer(LAYER_SCENE);
         mView.getFrame().addComponentListener(ca0);
 

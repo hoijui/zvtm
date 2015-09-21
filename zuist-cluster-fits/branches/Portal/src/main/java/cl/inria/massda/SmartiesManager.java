@@ -241,9 +241,15 @@ public class SmartiesManager implements Observer {
                         if (se.d > 0){
                             double x = (se.p != null) ? se.p.x : se.x;
                             double y = (se.p != null) ? se.p.y : se.y;
-                            app.centeredZoom(prevMFPinchD/se.d,
+                            MyCursor c = (se.p != null) ? (MyCursor)se.p.app_data : null;
+                            if(c!= null && c.isPortal()){
+                                c.setZoom(prevMFPinchD/se.d);
+                            } else {
+                                app.centeredZoom(prevMFPinchD/se.d,
                                                         x*(float)app.SCENE_W,
                                                         y*(float)app.SCENE_H);
+                            }
+                            
                         }
                         prevMFPinchD = se.d;
                     }
@@ -274,7 +280,12 @@ public class SmartiesManager implements Observer {
                         // this is the device that lock the drag, e.p should be == dragPuck
                         float dx = (se.x - prevMFMoveX)*(float)app.getDisplayWidth();
                         float dy = (se.y - prevMFMoveY)*(float)app.getDisplayHeight();
-                        app.directTranslate(-dx, dy);
+                        MyCursor c = (se.p != null) ? (MyCursor)se.p.app_data : null;
+                        if(c!= null && c.isPortal()){
+                            c.setLocation(-dx, dy);
+                        } else {
+                            app.directTranslate(-dx, dy);
+                        }
                         prevMFMoveX = se.x;
                         prevMFMoveY = se.y;
                     }
@@ -550,6 +561,20 @@ public class SmartiesManager implements Observer {
             }
         }
 
+        public void setLocation(double x, double y){
+            if(isPortal())
+                prtMng.setLocation(x, y);
+        }
+
+        public void setZoom(double f){
+            if(isPortal())
+                prtMng.setZoom(f);
+        }
+
+        public boolean isPortal(){
+            return prtMng != null;
+        }
+
         public void togglePortal(){
             if(prtMng == null){
 
@@ -558,7 +583,9 @@ public class SmartiesManager implements Observer {
                 double[] loc = app.coordinateTransform(app.getCursorCamera(), app.getMainCamera(), point.getX(), point.getY());
                 Location l = new Location(loc[0], loc[1], alt);
                 prtMng = new PortalManager(app, color);
-                prtMng.createDM(0, 0, l);
+                double[] lPortal = app.coordinateTransform(app.getCursorCamera(), prtMng.getCamera(), point.getX(), point.getY());
+                prtMng.createDM((int)(x*app.SCENE_W), (int)(y*app.SCENE_H), l);
+                prtMng.resize(500, 500);
                 /*double[] coord = app.coordinateTransform(app.cursorCamera, prtMng.getCamera(), point.getX(), point.getY());
                 prtMng.moveTo(coord[0], coord[1]);*/
             } else {

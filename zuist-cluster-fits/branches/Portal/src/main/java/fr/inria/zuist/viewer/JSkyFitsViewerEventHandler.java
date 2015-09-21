@@ -345,8 +345,10 @@ class JSkyFitsViewerEventHandler implements ViewListener, PortalListener {
                 int y = v.getVCursor().getPanelYCoordinate();
                 double dx = v.getVCursor().getVSXCoordinate();
                 double dy = v.getVCursor().getVSYCoordinate();
+                Location ml = app.getMainCamera().getLocation();
                 Point2D.Double position = v.getVCursor().getLocation();
-                //System.out XXXXX
+                System.out.println(x + " = " + position.getX() + " - " + ml.getX() + " = " + (ml.getX()-position.getX()) );
+                System.out.println(y + " = " + position.getY() + " - " + ml.getY() + " = " + (ml.getY()-position.getY()));
                 double alt = app.getMainCamera().getAltitude();
                 Location l = new Location(position.getX(), position.getY(), alt);
                 app.portalMngr = new PortalManager(app, app.mView, app.clView);

@@ -215,6 +215,19 @@ public class PortalManager{
 
 	}
 
+	public void killDM(){
+    	app.sm.removeSceneObserver(pso);
+        vsm.destroyPortal(dmPortal);
+        vsm.destroyClusteredPortal(dmPortal);
+        pso = null;
+        dmPortal = null;
+        mSpace.hide(magWindow);
+        vsm.repaint();
+        //vsm.destroyVirtualSpace(portalSpaceName);
+        //magWindow = null;
+        //prtlEvntHndlr.resetDragMagInteraction();
+    }
+
 	public void updateMagWindow(){
         System.out.println("updateMagWindow");
         if (dmPortal == null){return;}
@@ -228,6 +241,16 @@ public class PortalManager{
     public void moveTo(double vx, double vy){
     	portalCamera.moveTo(vx, vy);
     	updateMagWindow();
+    }
+
+    public void resize(int dw, int dh){
+    	if(dmPortal == null) return;
+    	
+    	System.out.println("PortalManager.resize("+dw+", "+dh+")");
+    	System.out.println("dmPortal: " + dmPortal.w+ ", " + dmPortal.h);
+    	dmPortal.resize(dw, dh);
+    	updateMagWindow();
+
     }
 
     public Camera getCamera(){
@@ -253,18 +276,27 @@ public class PortalManager{
 	    		break;
     	}
     	updateMagWindow();
-    	
     }
 
-    public void killDM(){
-    	app.sm.removeSceneObserver(pso);
-        pso = null;
-        vsm.destroyPortal(dmPortal);
-        dmPortal = null;
-        mSpace.hide(magWindow);
-        vsm.destroyVirtualSpace(portalSpaceName);
-        //magWindow = null;
-        //prtlEvntHndlr.resetDragMagInteraction();
+    public void setZoom(double f){
+    	Location l = portalCamera.getLocation();
+    	double a = (portalCamera.focal+Math.abs(portalCamera.altitude)) / portalCamera.focal;
+    	double newz = portalCamera.focal * a * f - portalCamera.focal;
+    	if (newz < 0){
+            newz = 0;
+            f = portalCamera.focal / (a*portalCamera.focal);
+        }
+        portalCamera.setLocation(new Location(l.getX(), l.getY(), newz));
+        updateMagWindow();
+    }
+
+    public void setLocation(double x, double y){
+    	double a = (portalCamera.focal+Math.abs(portalCamera.altitude)) / portalCamera.focal;
+        Location l = portalCamera.getLocation();
+        double newx = l.getX() + a*x;
+        double newy = l.getY() + a*y;
+        portalCamera.setLocation(new Location(newx, newy, l.getAltitude()));
+        updateMagWindow();
     }
 
 
