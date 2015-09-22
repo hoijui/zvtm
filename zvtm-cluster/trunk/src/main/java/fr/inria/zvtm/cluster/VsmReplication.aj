@@ -6,6 +6,7 @@
  */
 package fr.inria.zvtm.cluster;
 
+
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
@@ -15,6 +16,7 @@ import fr.inria.zvtm.engine.portals.DraggableCameraPortal;
 import fr.inria.zvtm.engine.portals.RoundCameraPortal;
 import fr.inria.zvtm.engine.portals.OverviewPortal;
 import fr.inria.zvtm.engine.Location;
+import java.util.ArrayList;
 
 import java.awt.Color;
 
@@ -117,7 +119,7 @@ aspect VsmReplication {
     private static class CameraPortalReplicator implements PortalReplicator {
         protected final int x,y,w,h;
         protected float a;
-        protected final ObjId<Camera> camId;
+        protected final ArrayList<ObjId<Camera>> camIds;
 
         CameraPortalReplicator(CameraPortal source){
             this.x = source.x;
@@ -125,12 +127,19 @@ aspect VsmReplication {
             this.w = source.w;
             this.h = source.h;
             this.a = source.getTranslucencyValue();
-            this.camId = source.getCamera().getObjId();
+            camIds = new ArrayList<ObjId<Camera>>(source.getCameras().length);
+            for (Camera camera : source.getCameras()) {
+            	this.camIds.add((ObjId<Camera>)camera.getObjId());
+    		}
         }
 
         public Portal createPortal(SlaveUpdater updater) {
-            Camera cam = updater.getSlaveObject(this.camId);
-            Portal p = new CameraPortal(x, y, w, h, cam,a);
+            Camera []cams = new Camera[this.camIds.size()];
+            int i=0;
+            for (ObjId<Camera> camId : this.camIds) {
+            	cams[i++] = updater.getSlaveObject(camId);
+            }
+            Portal p = new CameraPortal(x, y, w, h, cams,a);
             updater.setPortalLocation(p,x, y, w, h);
             return p;
         }
@@ -143,8 +152,12 @@ aspect VsmReplication {
         }
 
         public Portal createPortal(SlaveUpdater updater) {
-            Camera cam = updater.getSlaveObject(this.camId);
-            Portal p = new DraggableCameraPortal(x, y, w, h, cam);
+            Camera []cams = new Camera[this.camIds.size()];
+            int i=0;
+            for (ObjId<Camera> camId : this.camIds) {
+            	cams[i++] = updater.getSlaveObject(camId);
+            }
+            Portal p = new DraggableCameraPortal(x, y, w, h, cams);
             updater.setPortalLocation(p,x, y, w, h);
             return p;
         }
@@ -157,7 +170,7 @@ aspect VsmReplication {
         }
 
         public Portal createPortal(SlaveUpdater updater) {
-            Camera cam = updater.getSlaveObject(this.camId);
+            Camera cam = updater.getSlaveObject(this.camIds.get(0));
             Portal p = new RoundCameraPortal(x, y, w, h, cam);
             updater.setPortalLocation(p,x, y, w, h);
             return p;
@@ -173,7 +186,7 @@ aspect VsmReplication {
         }
 
         public Portal createPortal(SlaveUpdater updater) {
-            Camera cam = updater.getSlaveObject(this.camId);
+            Camera cam = updater.getSlaveObject(this.camIds.get(0));
             Camera obsCam = updater.getSlaveObject(this.obscamId);
             Portal p = new OverviewPortal(x, y, w, h, cam, obsCam);
             updater.setPortalLocation(p,x, y, w, h);
