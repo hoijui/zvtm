@@ -17,9 +17,9 @@ rm target/zvtm-core-0.12.0-SNAPSHOT.jar
 
 IP=192.168.1.213
 
-python src/main/resources/scripts/wcs/daemon_wcsCoordinates.py &
+#python src/main/resources/scripts/wcs/daemon_wcsCoordinates.py &
 
 java -Djava.net.preferIPv4Stack=true -Djgroups.bind_addr="$IP" -Xmx4096M -Xms2048M -Dcom.sun.media.jai.disableMediaLib=true -cp $LIB:$JAR fr.inria.zuist.viewer.JSkyFitsViewer -r 4 -c 6 -bw 2020 -bh 1180 "$@"
 
-echo "killall -9 python"
-killall -9 python
+#echo "killall -9 python"
+#killall -9 python

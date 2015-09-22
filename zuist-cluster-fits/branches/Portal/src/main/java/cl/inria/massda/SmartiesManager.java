@@ -282,6 +282,8 @@ public class SmartiesManager implements Observer {
                         float dy = (se.y - prevMFMoveY)*(float)app.getDisplayHeight();
                         MyCursor c = (se.p != null) ? (MyCursor)se.p.app_data : null;
                         if(c!= null && c.isPortal()){
+                            dx = (prevMFMoveX - se.x)*(float)app.getDisplayWidth();
+                            dy = (prevMFMoveY - se.y)*(float)app.getDisplayHeight();
                             c.setLocation(-dx, dy);
                         } else {
                             app.directTranslate(-dx, dy);
@@ -534,6 +536,7 @@ public class SmartiesManager implements Observer {
             wc.dispose();
             app.pythonWCS.deleteObserver(this);
             removeDistance();
+            if(prtMng != null) prtMng.killDM();
         }
 
         public void setVisible(boolean b){
