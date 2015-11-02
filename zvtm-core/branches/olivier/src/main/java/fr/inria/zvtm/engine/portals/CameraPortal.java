@@ -446,7 +446,7 @@ public class CameraPortal extends Portal {
             VirtualSpace spa = cameraSpaces.elementAt(u);
             int idx = camIndexs.elementAt(u);
             drawnGlyphs = spa.getDrawnGlyphs(idx);
-            //synchronized(drawnGlyphs){
+            synchronized(drawnGlyphs){
                 drawnGlyphs.removeAllElements();
                 duncoef = (cam.focal+cam.altitude) / cam.focal;
                 //compute region seen from this view through camera
@@ -458,7 +458,7 @@ public class CameraPortal extends Portal {
                 gll = spa.getDrawingList();
                 for (int i=0;i<gll.length;i++){
                     if (gll[i] != null){
-                        //synchronized(gll[i]){
+                        synchronized(gll[i]){
                             if (gll[i].visibleInViewport(viewWC, viewNC, viewEC, viewSC, cam)){
                                 //if glyph is at least partially visible in the reg. seen from this view, display
                                 gll[i].project(cam, size); // an invisible glyph should still be projected
@@ -467,10 +467,10 @@ public class CameraPortal extends Portal {
                                 }
                                 spa.drewGlyph(gll[i], idx);
                             }
-                        //}
+                        }
                     }
                 }
-            //}
+            }
         }
         g2d.setClip(0, 0, viewWidth, viewHeight);
         if (borderColor != null){
