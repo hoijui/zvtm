@@ -14,12 +14,23 @@ import fr.inria.zvtm.glyphs.Glyph;
  * ZUIST description of a Glyph.
  */
 public class GlyphDescription extends ObjectDescription {
+
+  public static final String OBJECT_TYPE_GLYPH= "zc-g";
+
   private Glyph glyph;
 
   public GlyphDescription(String id, Glyph glyph, int z, Region pr, boolean sensitive){
     super(id, z, pr, sensitive);
     this.glyph = glyph;
     glyph.setZindex(z);
+  }
+
+  /** Type of object.
+   *@return type of object.
+   */
+  @Override
+  public String getType(){
+      return OBJECT_TYPE_GLYPH;
   }
 
   @Override public void createObject(SceneManager sm, VirtualSpace vs, boolean fadeIn){

@@ -25,6 +25,8 @@ import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
 
 public class ClosedShapeDescription extends ObjectDescription {
 
+    public static final String OBJECT_TYPE_CLOSED_SHAPE = "zc-cs";
+
     private volatile ClosedShape glyph;
     boolean inSpace = false;
 
@@ -42,6 +44,14 @@ public class ClosedShapeDescription extends ObjectDescription {
         this.glyph.setZindex(this.zindex);
         this.parentRegion = pr;
         this.sensitive = sensitive;
+    }
+
+    /** Type of object.
+     *@return type of object.
+     */
+    @Override
+    public String getType(){
+        return OBJECT_TYPE_CLOSED_SHAPE;
     }
 
     @Override

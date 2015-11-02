@@ -158,7 +158,7 @@ public class SceneManager implements CameraListener, PseudoViewListener {
     private class RegionUpdater {
         private final HashMap<Camera, Location> toUpdate;
         private boolean active;
-        private static final int DEFAULT_PERIOD = 200; //milliseconds
+        private static final int DEFAULT_PERIOD =  200; //200; //milliseconds
         private int period;
 
         private boolean enabled = true;
@@ -256,6 +256,19 @@ public class SceneManager implements CameraListener, PseudoViewListener {
         return true;
     }
 
+    public boolean addPseudoView(int idx, PseudoView pv){
+        if (idx == -1){
+            pseudoViews.add(pv);
+        }
+        else{
+            pseudoViews.add(idx, pv);
+        }
+        pv.c.addListener(this);
+        pv.addListener(this);
+        // 
+        return true;
+    }
+
     public boolean removePseudoView(PseudoView pv){
         // unload stuff...
         if (pv.currentLevel >= 0 && pv.currentLevel < levels.length)
@@ -274,12 +287,23 @@ public class SceneManager implements CameraListener, PseudoViewListener {
         return pseudoViews.removeElement(pv);
     }
 
+    public boolean removePseudoView(int idx){
+        PseudoView pv = pseudoViews.elementAt(idx);
+        if (pv != null) return removePseudoView(pv);
+        return false;
+    }
+
     public PseudoView getPseudoViewByCamera(Camera cam)
     {
         for (PseudoView pv : pseudoViews){
             if (pv.c == cam) return pv;
         }
         return null;
+    }
+
+    public PseudoView getPseudoView(int index)
+    {
+        return pseudoViews.get(index);
     }
 
     /* -------------- Properties -------------------- */
@@ -1205,7 +1229,7 @@ public class SceneManager implements CameraListener, PseudoViewListener {
         }
         catch ( Exception e) {
             if (DEBUG_MODE){
-                System.err.println("ZUIST: Error: failed to update visible region. Possible causes:\n\t- the camera's current altitude is not in the range of any scene level.");
+                System.err.println("ZUIST: Error: failed to update visible region. Possible causes:\n\t- the camera's current altitude is not in the range of any scene level. "+ pv.c.getAltitude());
                 e.printStackTrace();
             }
         }
