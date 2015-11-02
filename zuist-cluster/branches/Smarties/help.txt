@@ -13,6 +13,10 @@ On peut faire tourner le bouzin tout seul ... comment ?
 scp -r wild@frontal-1.wild.lri.fr:/Users/wild/sandboxes/stuf/ZUIST-scenes/NASA-Curiosity ./
 scp -r wild@frontal-1.wild.lri.fr:/Users/wild/sandboxes/epietrig/zuist-scenes/astronomy/ssc2008-11 ./
 
+
+
+./all_run.sh /usr/local/share/bigimages/zuist/paris26GP/scene_fullL0.xml
+
 # epietrig 
 
 
