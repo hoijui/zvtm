@@ -45,6 +45,8 @@ import java.awt.Font;
 
 import fr.inria.zuist.viewer.JSkyFitsViewer;
 
+import jsky.coords.WorldCoords;
+
 public class SmartiesManager implements Observer {
 
     static final Font FONT_CURSOR = new Font("default", Font.PLAIN, 16);
@@ -755,16 +757,35 @@ public class SmartiesManager implements Observer {
             String parid = (id < c.id) ? id+"-"+c.id : c.id + "-" + id;
             String text;
             if(isGalactical){
-                double dl = l - c.l;
-                double db = b - c.b;
-                System.out.println(dl + " -- " + db); 
-                text = Math.sqrt(dl*dl) + " L -- " +Math.sqrt(db*db) + " B";
+                //double dl = l - c.l;
+                //double db = b - c.b;
+
+                //compute radius in arcmin
+                final WorldCoords w1 = new WorldCoords(l, b);
+                final WorldCoords w2 = new WorldCoords(c.l, c.b);
+
+                final double dist = w1.dist(w2);
+                System.out.println("Distance: " + dist + " arcminutes");
+
+                text = dist + " arcminutes";
+
+                //System.out.println(dl + " -- " + db); 
+                //text = Math.sqrt(dl*dl) + " L -- " +Math.sqrt(db*db) + " B";
             } else {
-                double dra = ra - c.ra;
-                double ddec = dec - c.dec;
-                System.out.println(dra + " -- " + ddec);
-                text = Math.sqrt(dra*dra) + " RA -- " +Math.sqrt(ddec*ddec) + " DEC";
+                //double dra = ra - c.ra;
+                //double ddec = dec - c.dec;
+                //System.out.println(dra + " -- " + ddec);
+                //text = Math.sqrt(dra*dra) + " RA -- " +Math.sqrt(ddec*ddec) + " DEC";
+                //compute radius in arcmin
+                final WorldCoords w1 = new WorldCoords(ra, dec);
+                final WorldCoords w2 = new WorldCoords(c.ra, c.dec);
+
+                final double dist = w1.dist(w2);
+                System.out.println("Distance: " + dist + " arcminutes");
+
+                text = dist + " arcminutes";
             }
+
 
             Point2D.Double coord1 = getLocation();
             Point2D.Double coord2 = c.getLocation();
