@@ -514,6 +514,8 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
     regionEL.set("h", str(int(ah)))
     if LAYER:
         regionEL.set("tags", str(LAYER))
+    else:
+        regionEL.set("tags", "")
     objectEL.set("id", "I%s-%s" % (ID_PREFIX, tileIDstr))
     if USE_ASTROPY:
         #objectEL.set("type", "fits")

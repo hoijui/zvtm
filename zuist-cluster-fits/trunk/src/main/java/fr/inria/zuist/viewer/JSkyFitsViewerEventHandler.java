@@ -12,6 +12,8 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.ComponentEvent;
 
+
+
 import java.util.Vector;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -26,7 +28,10 @@ import java.awt.Stroke;
 //import fr.inria.zvtm.engine.LongPoint;
 import java.awt.geom.Point2D;
 
+import fr.inria.zvtm.engine.VCursor;
+
 import fr.inria.zvtm.engine.Camera;
+import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
@@ -59,11 +64,17 @@ import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.AnimationManager;
 import fr.inria.zvtm.animation.EndAction;
 
-//class FitsViewerEventHandler implements ViewEventHandler, ComponentListener, CameraListener {
-class JSkyFitsViewerEventHandler implements ViewListener {
+import fr.inria.zvtm.engine.portals.Portal;
+import fr.inria.zvtm.event.PortalListener;
+import fr.inria.zvtm.engine.portals.DraggableCameraPortal;
 
-    static final BasicStroke SEL_STROKE = new BasicStroke(2f);
-    static final float SEL_ALPHA = .5f;
+import cl.inria.massda.PortalManager;
+
+
+//class FitsViewerEventHandler implements ViewEventHandler, ComponentListener, CameraListener {
+class JSkyFitsViewerEventHandler implements ViewListener, PortalListener {
+
+    
 
     static float ZOOM_SPEED_COEF = 1.0f/50.0f;
     static double PAN_SPEED_COEF = 50.0;
@@ -81,19 +92,31 @@ class JSkyFitsViewerEventHandler implements ViewListener {
     private int lastJPY;
 
     Point2D.Double rightClickPress;
-    VCircle rightClickSelectionG = new VCircle(0, 0, 1000, 1, Color.BLACK, Color.RED, SEL_ALPHA);
+    //VCircle rightClickSelectionG = new VCircle(0, 0, 1000, 1, Color.BLACK, Color.RED, SEL_ALPHA);
     Point2D.Double coordClickPress;
 
     boolean panning = false;
+    boolean panningForPortal = false;
     boolean selectingForQuery = false;
+
+    boolean dblClick = false;
+
+    Portal overPortal = null;
+
+    /* DragMag interaction */
+    protected boolean inZoomWindow = false;
+    protected boolean inMagWindow = false;
+    protected boolean draggingZoomWindow = false;
+    protected boolean draggingZoomWindowContent = false;
+
 
     JSkyFitsViewerEventHandler(JSkyFitsViewer app){
         this.app = app;
-        rightClickSelectionG.setFilled(false);
-        rightClickSelectionG.setStroke(SEL_STROKE);
+        
     }
 
     public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+        System.out.println("press1");
         /*
         Point2D.Double cursorPos = viewToSpace(vsm.getActiveCamera(), jpx, jpy);
         if(app.rs.overLeftTick(cursorPos.x, cursorPos.y)){
@@ -104,7 +127,15 @@ class JSkyFitsViewerEventHandler implements ViewListener {
         */
         lastJPX = jpx;
         lastJPY = jpy;
-        panning = true;
+
+        if(dblClick && overPortal != null){
+            v.parent.setCursorIcon(Cursor.MOVE_CURSOR);
+            panningForPortal = true;
+            panning = false;
+        } else {
+            panning = true;
+            panningForPortal = false;
+        }
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
@@ -119,10 +150,21 @@ class JSkyFitsViewerEventHandler implements ViewListener {
         */
         //v.parent.setActiveLayer(0);
 
-        panning = false;
+        if(panning)             panning = false;
+        if(dblClick)            dblClick = false;
+        if(panningForPortal)    panningForPortal = false;
+
+        v.parent.setCursorIcon(Cursor.CUSTOM_CURSOR);
     }
 
-    public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
+    public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
+
+        if(clickNumber == 2 && overPortal != null){
+            System.out.println("dblClick");
+            dblClick = true;
+            v.parent.setCursorIcon(Cursor.HAND_CURSOR);
+        }
+    }
 
     public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
@@ -131,16 +173,15 @@ class JSkyFitsViewerEventHandler implements ViewListener {
     public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
     public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-        selectingForQuery = true;
+        if(overPortal == null){
+            selectingForQuery = true;
 
-        coordClickPress = v.getVCursor().getVSCoordinates(app.mCamera);
+            coordClickPress = v.getVCursor().getVSCoordinates(app.mCamera);
 
-        // first point (start dragging) defines the center of the query zone
-        rightClickPress = v.getVCursor().getVSCoordinates(app.cursorCamera);
-        rightClickSelectionG.moveTo(rightClickPress.x, rightClickPress.y);
-        rightClickSelectionG.sizeTo(1);
-        app.cursorSpace.addGlyph(rightClickSelectionG);
-
+            // first point (start dragging) defines the center of the query zone
+            rightClickPress = v.getVCursor().getVSCoordinates(app.cursorCamera);
+            app.initClickSelection(rightClickPress);
+        }
 
         //VCircle test = new VCircle(v.getVCursor().getVSCoordinates(app.mnCamera).x, v.getVCursor().getVSCoordinates(app.mnCamera).y, 1000, 100, Color.BLACK, Color.RED);
         //app.mnSpace.addGlyph(test);
@@ -176,16 +217,29 @@ class JSkyFitsViewerEventHandler implements ViewListener {
     }
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
-        if (panning){
+        if (panning && overPortal == null){
             Camera c = app.mCamera;
             pan(c, lastJPX-jpx, jpy-lastJPY);
             lastJPX = jpx;
             lastJPY = jpy;
         }
-        else if (selectingForQuery){
+        else if (selectingForQuery && overPortal == null){
             Point2D.Double p = v.getVCursor().getVSCoordinates(app.mnCamera);
-            rightClickSelectionG.sizeTo(2*Math.sqrt((p.x-rightClickPress.x)*(p.x-rightClickPress.x)+(p.y-rightClickPress.y)*(p.y-rightClickPress.y)));
+            app.updateClickSelection(rightClickPress, p);
         }
+        else if(overPortal != null && panning){
+            if(overPortal instanceof DraggableCameraPortal ){
+                overPortal.move(jpx-lastJPX, jpy-lastJPY);
+                lastJPX = jpx;
+                lastJPY = jpy;
+            }
+        } else if(panningForPortal){
+            pan(app.portalMngr.getCamera(), lastJPX-jpx, jpy-lastJPY);
+            app.portalMngr.updateMagWindow();
+            lastJPX = jpx;
+            lastJPY = jpy;
+        }
+
         /*
 
         if(buttonNumber == 1){
@@ -200,11 +254,19 @@ class JSkyFitsViewerEventHandler implements ViewListener {
         */
     }
 
-    public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
-        Camera c = app.mCamera;
-        double mvx = v.getVCursor().getVSXCoordinate();
-        double mvy = v.getVCursor().getVSYCoordinate();
-        zoom(c, mvx, mvy, wheelDirection);
+    public void mouseWheelMoved(ViewPanel v, short wheelDirection, int jpx, int jpy, MouseWheelEvent e){
+        
+        if(overPortal != null && overPortal instanceof DraggableCameraPortal){
+            System.out.println("zoom portal");
+            app.portalMngr.changeZoom(wheelDirection);
+        } else {
+            Camera c = app.mCamera;
+            double mvx = v.getVCursor().getVSXCoordinate();
+            double mvy = v.getVCursor().getVSYCoordinate();
+            zoom(c, mvx, mvy, wheelDirection);
+        }
+        
+        
     }
 
     public void Ktype(ViewPanel v, char c, int code, int mod, KeyEvent e){}
@@ -231,47 +293,42 @@ class JSkyFitsViewerEventHandler implements ViewListener {
         else if (code==KeyEvent.VK_G){
             app.rescaleGlobal(true);
         }
-        else if(code==KeyEvent.VK_1){
-            app.showTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_KS], 1.f);
-            app.hideTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_H]);
-            app.hideTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_J]);
-            System.out.println("setActiveLayer: " + JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_KS]);
-            if(app.getTagScene() != JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_KS]) app.setTagScene(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_KS]);
+        else if(code>=KeyEvent.VK_0 && code<=KeyEvent.VK_9){
+            app.changeActiveTag(code-KeyEvent.VK_0);
         }
-        else if(code==KeyEvent.VK_2){
-            app.showTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_KS], 1.f);
-            app.showTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_H], 0.5f);
-            app.hideTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_J]);
-            System.out.println("setActiveLayer: " + JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_KS]);
-            if(app.getTagScene() != JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_KS]) app.setTagScene(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_KS]);
-        }
-        else if(code==KeyEvent.VK_3){
-            app.hideTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_KS]);
-            app.showTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_H], 1.f);
-            app.hideTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_J]);
-            System.out.println("setActiveLayer: " + JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_H]);
-            if(app.getTagScene() != JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_H]) app.setTagScene(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_H]);
-        }
-        else if(code==KeyEvent.VK_4){
-            app.hideTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_KS]);
-            app.showTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_H], 1.f);
-            app.showTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_J], 0.5f);
-            System.out.println("setActiveLayer: " + JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_H]);
-            if(app.getTagScene() != JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_H]) app.setTagScene(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_H]);
-        }
-        else if(code==KeyEvent.VK_5){
-            app.hideTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_KS]);
-            app.hideTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_H]);
-            app.showTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_J], 1.f);
-            System.out.println("setActiveLayer: " + JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_J]);
-            if(app.getTagScene() != JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_J]) app.setTagScene(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_J]);
-        }
-        else if(code==KeyEvent.VK_6){
-            app.showTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_KS], 1.f);
-            app.showTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_H], 0.66f);
-            app.showTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_J], 0.33f);
-            //System.out.println("setActiveLayer: " + JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE]);
-            //if(app.getLayerScene() != JSkyFitsViewer.LAYER_SCENE) app.setLayerScene(JSkyFitsViewer.LAYER_SCENE);
+        else if(code==KeyEvent.VK_P){
+            if(app.portalMngr == null){
+                int x = v.getVCursor().getPanelXCoordinate();
+                int y = v.getVCursor().getPanelYCoordinate();
+                double dx = v.getVCursor().getVSXCoordinate();
+                double dy = v.getVCursor().getVSYCoordinate();
+                Location ml = app.getMainCamera().getLocation();
+                Point2D.Double position = v.getVCursor().getLocation();
+                System.out.println(x + " = " + position.getX() + " - " + ml.getX() + " = " + (ml.getX()-position.getX()) );
+                System.out.println(y + " = " + position.getY() + " - " + ml.getY() + " = " + (ml.getY()-position.getY()));
+                double alt = app.getMainCamera().getAltitude();
+                Location l = new Location(position.getX(), position.getY(), alt);
+                app.portalMngr = new PortalManager(app, app.mView, app.clView);
+                app.portalMngr.createDM(x, y, l);
+
+                /*
+                Point2D.Double point = v.getVCursor().getVSCoordinates(app.portalMngr.getCamera());
+                double[] dist = app.coordinateTransform(app.getMainCamera(), app.portalMngr.getCamera(), v.getVCursor().getVSXCoordinate(), v.getVCursor().getVSYCoordinate());
+                System.out.println("x: " + x + ", y: " + y);
+                System.out.println("dxy: " + dx + ", " + dy + " point.getX(): " + point.getX() + " point.getY(): " + point.getY() );
+                System.out.println(" diff: " + (dx - point.getX()) + ", " + (dy - point.getY()) );
+                System.out.println("dist: " + dist[0] + ", " + dist[1]);
+                */
+                
+            } else {                
+                app.portalMngr.killDM();
+                app.portalMngr = null;
+                overPortal = null;
+                
+            }
+            
+        } else if(code == KeyEvent.VK_C){
+            app.clear();
         }
         // else if (code == KeyEvent.VK_MINUS){
         //     //app.scaleBounds[1] -= 100;
@@ -296,6 +353,12 @@ class JSkyFitsViewerEventHandler implements ViewListener {
     public void viewClosing(View v){System.exit(0);}
 
 
+    protected void resetDragMagInteraction(){
+        inMagWindow = false;
+        inZoomWindow = false;
+        draggingZoomWindow = false;
+        draggingZoomWindowContent = false;
+    }
 
     void pan(Camera c, int dx, int dy){
         synchronized(c){
@@ -324,6 +387,7 @@ class JSkyFitsViewerEventHandler implements ViewListener {
     }
 
 
+    /*
     void fadeOutRightClickSelection(){
         Animation a = am.getAnimationFactory().createTranslucencyAnim(300,
                             rightClickSelectionG, 0f, false, IdentityInterpolator.getInstance(),
@@ -334,6 +398,17 @@ class JSkyFitsViewerEventHandler implements ViewListener {
                                 }
                             });
         am.startAnimation(a, true);
+    }
+    */
+
+    public void enterPortal(Portal p){
+        if(overPortal == null)
+            overPortal = p;
+    }
+
+    public void exitPortal(Portal p){
+        if(overPortal != null)
+            overPortal = null;
     }
 
 }

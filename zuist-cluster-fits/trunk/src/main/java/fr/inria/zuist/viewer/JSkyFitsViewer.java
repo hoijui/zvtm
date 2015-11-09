@@ -101,6 +101,10 @@ import fr.inria.zuist.od.JSkyFitsImageDescription;
 import fr.inria.zuist.engine.JSkyFitsResourceHandler;
 import fr.inria.zuist.engine.TaggedViewSceneObserver;
 
+import fr.inria.zvtm.glyphs.JSkyFitsHistogram;
+
+import fr.inria.zvtm.event.PortalListener;
+
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.FactoryConfigurationError;
@@ -116,6 +120,7 @@ import java.awt.image.ImageFilter;
 
 import cl.inria.massda.SmartiesManager;
 import cl.inria.massda.TuioEventHandler;
+import cl.inria.massda.PortalManager;
 
 import edu.jhu.pha.sdss.fits.FITSImage; 
 import jsky.coords.WCSTransform;
@@ -151,8 +156,8 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
     /* screen dimensions, actual dimensions of windows */
     static int SCREEN_WIDTH =  Toolkit.getDefaultToolkit().getScreenSize().width;
     static int SCREEN_HEIGHT =  Toolkit.getDefaultToolkit().getScreenSize().height;
-    static int VIEW_MAX_W = 1024;  // 1400
-    static int VIEW_MAX_H = 768;   // 1050
+    static int VIEW_MAX_W = 1600; //1024;  // 1400
+    static int VIEW_MAX_H = 900; //768;   // 1050
     int VIEW_W, VIEW_H;
     int VIEW_X, VIEW_Y;
     /* dimensions of zoomable panel */
@@ -176,6 +181,7 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
     static final String mSpaceJName = "SceneJSpace";
     static final String mSpaceName = "SceneSpace";
     static final String catalogSpaceName = "CatalogSpace";
+    /*static final String portalSpaceName = "portalSpace";*/
     static final String pMnSpaceName = "PieMenuSpace";
     static final String mnSpaceName = "MenuSpace";
     static final String cursorSpaceName = "CursorSpace";
@@ -187,15 +193,18 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
     static final int LAYER_SCENE_J = 2;
     static final int LAYER_SCENE = 3;
     static final int LAYER_CATALOG = 4;
+    //static final int LAYER_PORTAL = 5;
     static final int LAYER_PIEMENU = 5;
     static final int LAYER_MENU = 6;
     static final int LAYER_CURSOR = 7;
     static final int LAYER_OVERLAY = 8;
 
 
-    String tag;
+    //String tag;
 
-    public static final String[] TAGS = {"mSpaceKs", "mSpaceH", "mSpaceJ"};
+    public static final String[] TAGS = {"J", "H", "Ks", "G", "I", "U"};
+    private boolean[] isTagsShowed = {true, true, true, true, true, true};
+    private float[] alphaTags = {1f, 1f, 1f, 1f, 1f, 1f};
 
     public static final Font FONT_LAYER_SCENE = new Font("Bold", Font.PLAIN, 46);
 
@@ -205,6 +214,7 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
     VirtualSpace mSpaceKs, mSpaceH, mSpaceJ;
     public VirtualSpace mSpace;
     VirtualSpace catalogSpace;
+    /*public VirtualSpace portalSpace;*/
     VirtualSpace pMnSpace; //menuSpace;
     public VirtualSpace mnSpace;
     public VirtualSpace cursorSpace;
@@ -214,6 +224,8 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
     Camera mCameraKs, mCameraH, mCameraJ;
     public Camera mCamera;
     Camera catalogCamera;
+    /*public Camera portalCamera;
+    public Camera portalCamera2;*/
     Camera mnCamera; // menuCamera;
     public Camera cursorCamera;
 
@@ -227,7 +239,7 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
     
     JSkyFitsViewerEventHandler eh;
 
-    SceneManager sm;
+    public SceneManager sm;
 
     FitsOverlayManager ovm;
     //VWGlassPane gp;
@@ -269,8 +281,12 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
 
     private DrawSymbol draw;
     private Query query;
+    VCircle rightClickSelectionG;
+    static final BasicStroke SEL_STROKE = new BasicStroke(2f);
+    static final float SEL_ALPHA = .5f;
 
-    
+    PortalManager portalMngr;
+
 
     static HashMap<String,String> parseSceneOptions(Options options){
         HashMap<String,String> res = new HashMap(2,1);
@@ -304,11 +320,13 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
             cursorCamera.getOwningView(), cursorCamera, cursorSpace)*/ // };
         
 
-        HashMap<String, VirtualSpace> t2s = new HashMap<String, VirtualSpace>(3,1);
-        t2s.put("mSpaceKs", mSpaceKs);
-        t2s.put("mSpaceH", mSpaceH);
-        t2s.put("mSpaceJ", mSpaceJ);
-        //t2s.put("mSpace", mSpace);
+        HashMap<String, VirtualSpace> t2s = new HashMap<String, VirtualSpace>(6,1);
+        t2s.put("J", mSpaceKs);
+        t2s.put("H", mSpaceH);
+        t2s.put("Ks", mSpaceJ);
+        t2s.put("G", mSpaceKs);
+        t2s.put("I", mSpaceH);
+        t2s.put("U", mSpaceJ);
         
         SceneObserver[] so = {new TaggedViewSceneObserver(mCamera.getOwningView(), mCamera, t2s)};
 
@@ -361,6 +379,11 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
         draw = new DrawSymbol();
         query = new Query();
 
+        rightClickSelectionG = new VCircle(0, 0, 1000, 1, Color.BLACK, Color.RED, SEL_ALPHA);
+        rightClickSelectionG.setFilled(false);
+        rightClickSelectionG.setStroke(SEL_STROKE);
+        
+
     }
 
     void initGUI(Options options){
@@ -373,6 +396,7 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
         mSpaceJ = vsm.addVirtualSpace(mSpaceJName);
         mSpace = vsm.addVirtualSpace(mSpaceName);
         catalogSpace = vsm.addVirtualSpace(catalogSpaceName);
+        /*portalSpace = vsm.addVirtualSpace(portalSpaceName);*/
         pMnSpace = vsm.addVirtualSpace(pMnSpaceName);
         mnSpace = vsm.addVirtualSpace(mnSpaceName);
         cursorSpace = vsm.addVirtualSpace(cursorSpaceName);
@@ -383,6 +407,10 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
         mCameraJ = mSpaceJ.addCamera();
         mCamera = mSpace.addCamera();
         catalogCamera = catalogSpace.addCamera();
+        /*
+        portalCamera = portalSpace.addCamera();
+        portalCamera2 = portalSpace.addCamera();
+        */
         
         mCamera.stick(mCameraKs);
         mCamera.stick(mCameraH);
@@ -401,6 +429,7 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
         cameras.add(mCameraJ);
         cameras.add(mCamera);
         cameras.add(catalogCamera);
+        //cameras.add(portalCamera);
         cameras.add(vsm.getVirtualSpace(pMnSpaceName).getCamera(0));
         cameras.add(mnCamera);
         cameras.add(cursorCamera);
@@ -437,6 +466,7 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
         mView.setListener(eh, LAYER_SCENE_J);
         mView.setListener(eh, LAYER_SCENE);
         mView.setListener(eh, LAYER_CATALOG);
+        //mView.setListener(eh, LAYER_PORTAL);
         mView.setListener(eh, LAYER_PIEMENU);
         mView.setListener(menu, LAYER_MENU);
         mView.setListener(eh, LAYER_CURSOR);
@@ -467,21 +497,60 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
         sceneCam.add(mCameraJ);
         sceneCam.add(mCamera);
         sceneCam.add(catalogCamera);
+        //sceneCam.add(portalCamera);
+        //sceneCam.add(mnCamera);
         sceneCam.add(cursorCamera);
 
         clView = new ClusteredView(clGeom, options.numRows-1, options.numCols, options.numRows, sceneCam);
         clView.setBackgroundColor(Color.GRAY);
         vsm.addClusteredView(clView);
 
-
 		//mView.setActiveLayer(LAYER_SCENE);
         mView.getFrame().addComponentListener(ca0);
-		
+
+
     }
 
+    public Camera getMainCamera(){
+        return mCamera;
+    }
+
+    public Camera getCursorCamera(){
+        return cursorCamera;
+    }
+
+    public View getMainView(){
+        return mView;
+    }
+
+    public ClusteredView getClusterView(){
+        return clView;
+    }
+
+    public void clear(){
+
+        catalogSpace.removeAllGlyphs();
+    }
+
+    /*
+    public VirtualSpace getPortalSpace(){
+        return portalSpace;
+    }
+    */
+
+    public VirtualSpace[] getVirtualSpaces(){
+        return new VirtualSpace[]{ mSpaceKs, mSpaceH, mSpaceJ, mSpace, catalogSpace, cursorSpace };
+    }
+
+    public PortalListener getPortalListener(){
+        return (PortalListener)eh;
+    }
+
+    /*
     public void setColorFilter(ImageFilter filter){
         //hi.setColorFilter(filter);
     }
+    */
 
     public int getDisplayWidth(){
         return SCREEN_WIDTH;
@@ -489,6 +558,14 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
 
     public int getDisplayHeight(){
         return SCREEN_HEIGHT;
+    }
+
+    public int getPanelWidth(){
+        return panelWidth;
+    }
+
+    public int getPanelHeight(){
+        return panelHeight;
     }
 
     JMenuItem infoMI, consoleMI;
@@ -547,12 +624,14 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
         return jmb;
     }
 
+    /*
     public String getTagScene(){
         return tag;
     }
+    */
 
     public void setTagScene(String tag){
-        this.tag = tag;
+        //this.tag = tag;
         layerSceneLabel.setText(tag);
         //cursorSpace.addGlyph(layerSceneLabel);
         
@@ -573,35 +652,180 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
 
 
     public void hideTag(String tag){
-        for(ObjectDescription desc: sm.getObjectDescriptions()){
-            if(desc instanceof JSkyFitsImageDescription){
-                //System.out.println("getLayerIndex: " + ((JSkyFitsImageDescription)desc).getLayerIndex() + " layerIndex: " + layerIndex);
-                if( ((JSkyFitsImageDescription)desc).hasTag(tag)){
-                    ((JSkyFitsImageDescription)desc).setVisible(false);
-                }
+        for(int i = 0; i < TAGS.length; i++){
+            if( TAGS[i].equals(tag) ){
+                isTagsShowed[i] = false;
             }
         }
-        /*for(Glyph g:vs.getAllGlyphs()){
-            vs.hide(g);
-        }*/
     }
 
     public void showTag(String tag, float alpha){
-        for(ObjectDescription desc: sm.getObjectDescriptions()){
-            if(desc instanceof JSkyFitsImageDescription){
-                //System.out.println("getLayerIndex: " + ((JSkyFitsImageDescription)desc).getLayerIndex() + " layerIndex: " + layerIndex);
-                if( ((JSkyFitsImageDescription)desc).hasTag(tag)){
-                    ((JSkyFitsImageDescription)desc).setVisible(true);
-                    ((JSkyFitsImageDescription)desc).setTranslucencyValue(alpha);
-                }
+        for(int i = 0; i < TAGS.length; i++){
+            if( TAGS[i].equals(tag) ){
+                isTagsShowed[i] = true;
+                alphaTags[i] = alpha;
             }
         }
-        /*for(Glyph g:vs.getAllGlyphs()){
-            vs.show(g);
-            g.setTranslucencyValue(alpha);
+    }
+
+    public void updateTags(){
+        for(ObjectDescription desc: sm.getObjectDescriptions()){
+            if(desc instanceof JSkyFitsImageDescription){
+                for(int i = 0; i < TAGS.length; i++){
+                    if( ((JSkyFitsImageDescription)desc).hasTag(TAGS[i])){
+                        if( isTagsShowed[i] ){
+                            ((JSkyFitsImageDescription)desc).setVisible(true);
+                            ((JSkyFitsImageDescription)desc).setTranslucencyValue(alphaTags[i]);
+                            if( ((JSkyFitsImageDescription)desc).isReference() ){
+                                setTagScene(TAGS[i]);
+                            }
+                        } else {
+                            ((JSkyFitsImageDescription)desc).setVisible(false);
+                        }
+                    }
+                }
+                
+            }
+        }
+    }
+
+    public boolean[] getTagsShowed(){
+        return isTagsShowed;
+    }
+
+    public void changeActiveTag(int number){
+        System.out.println("changeActiveTag("+number+")");
+        /*
+        int first = number/3;
+        int mod = number % 3;
+        if( mod == 0){
+            showTag(JSkyFitsViewer.TAGS[first-1], 1.f);
+            showTag(JSkyFitsViewer.TAGS[first+2], 1.f);
+            for(int i = 1; i <= JSkyFitsViewer.TAGS.size(); i++){
+                if( i != first && i != (first+3) ){
+                    hideTag(JSkyFitsViewer.TAGS[i-1]);
+                }
+            }
+        } else if( mod == 2 ){
+            showTag(JSkyFitsViewer.TAGS[first-1], 0.6f);
+            showTag(JSkyFitsViewer.TAGS[first+2], 0.6f);
+            showTag(JSkyFitsViewer.TAGS[(first+2)%3-1], 0.3f);
+            showTag(JSkyFitsViewer.TAGS[(first+2)%3+2], 0.3f);
+            for(int i = 1; i <= JSkyFitsViewer.TAGS.size(); i++){
+                if( i != first && i != (first+3) &&  ){
+                    hideTag(JSkyFitsViewer.TAGS[i-1]);
+                }
+            }
+        } else if ( mod == 1 ){
+            showTag(JSkyFitsViewer.TAGS[first-1], 0.3f);
+            showTag(JSkyFitsViewer.TAGS[first+2], 0.3f);
         }
         */
+
+        switch(number){
+            case 1:
+                showTag(TAGS[LAYER_SCENE_KS], 1.f);
+                showTag(TAGS[LAYER_SCENE_KS+3], 1.f);
+                hideTag(TAGS[LAYER_SCENE_H]);
+                hideTag(TAGS[LAYER_SCENE_H+3]);
+                hideTag(TAGS[LAYER_SCENE_J]);
+                hideTag(TAGS[LAYER_SCENE_J+3]);
+                break;
+            case 2:
+                showTag(TAGS[LAYER_SCENE_KS], 1.f);
+                showTag(TAGS[LAYER_SCENE_KS+3], 1.f);
+                showTag(TAGS[LAYER_SCENE_H], 0.5f);
+                showTag(TAGS[LAYER_SCENE_H+3], 0.5f);
+                hideTag(TAGS[LAYER_SCENE_J]);
+                hideTag(TAGS[LAYER_SCENE_J+3]);
+                break;
+            case 3:
+                hideTag(TAGS[LAYER_SCENE_KS]);
+                hideTag(TAGS[LAYER_SCENE_KS+3]);
+                showTag(TAGS[LAYER_SCENE_H], 1.f);
+                showTag(TAGS[LAYER_SCENE_H+3], 1.f);
+                hideTag(TAGS[LAYER_SCENE_J]);
+                hideTag(TAGS[LAYER_SCENE_J+3]);
+                break;
+            case 4:
+                hideTag(TAGS[LAYER_SCENE_KS]);
+                hideTag(TAGS[LAYER_SCENE_KS+3]);
+                showTag(TAGS[LAYER_SCENE_H], 1.f);
+                showTag(TAGS[LAYER_SCENE_H+3], 1.f);
+                showTag(TAGS[LAYER_SCENE_J], 0.5f);   
+                showTag(TAGS[LAYER_SCENE_J+3], 0.5f);                
+                break;
+            case 5:
+                hideTag(TAGS[LAYER_SCENE_KS]);
+                hideTag(TAGS[LAYER_SCENE_KS+3]);
+                hideTag(TAGS[LAYER_SCENE_H]);
+                hideTag(TAGS[LAYER_SCENE_H+3]);
+                showTag(TAGS[LAYER_SCENE_J], 1.f);
+                showTag(TAGS[LAYER_SCENE_J+3], 1.f);            
+                break;
+            default:
+                showTag(TAGS[LAYER_SCENE_KS], 1.f);
+                showTag(TAGS[LAYER_SCENE_H], 0.66f);
+                showTag(TAGS[LAYER_SCENE_J], 0.33f);
+                showTag(TAGS[LAYER_SCENE_KS+3], 1.f);
+                showTag(TAGS[LAYER_SCENE_H+3], 0.66f);
+                showTag(TAGS[LAYER_SCENE_J+3], 0.33f);
+                break;
+
+        }
+
+
+        /*
+        else if(code==KeyEvent.VK_1){
+            app.showTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_KS], 1.f);
+            app.hideTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_H]);
+            app.hideTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_J]);
+            System.out.println("setActiveLayer: " + JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_KS]);
+            if(app.getTagScene() != JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_KS]) app.setTagScene(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_KS]);
+        }
+        else if(code==KeyEvent.VK_2){
+            System.out.println(code);
+            app.showTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_KS], 1.f);
+            app.showTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_H], 0.5f);
+            app.hideTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_J]);
+            System.out.println("setActiveLayer: " + JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_KS]);
+            if(app.getTagScene() != JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_KS]) app.setTagScene(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_KS]);
+        }
+        else if(code==KeyEvent.VK_3){
+            app.hideTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_KS]);
+            app.showTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_H], 1.f);
+            app.hideTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_J]);
+            System.out.println("setActiveLayer: " + JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_H]);
+            if(app.getTagScene() != JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_H]) app.setTagScene(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_H]);
+        }
+        else if(code==KeyEvent.VK_4){
+            app.hideTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_KS]);
+            app.showTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_H], 1.f);
+            app.showTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_J], 0.5f);
+            System.out.println("setActiveLayer: " + JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_H]);
+            if(app.getTagScene() != JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_H]) app.setTagScene(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_H]);
+        }
+        else if(code==KeyEvent.VK_5){
+            app.hideTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_KS]);
+            app.hideTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_H]);
+            app.showTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_J], 1.f);
+            System.out.println("setActiveLayer: " + JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_J]);
+            if(app.getTagScene() != JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_J]) app.setTagScene(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_J]);
+        }
+        else if(code==KeyEvent.VK_6){
+            app.showTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_KS], 1.f);
+            app.showTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_H], 0.66f);
+            app.showTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_J], 0.33f);
+            //System.out.println("setActiveLayer: " + JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE]);
+            //if(app.getLayerScene() != JSkyFitsViewer.LAYER_SCENE) app.setLayerScene(JSkyFitsViewer.LAYER_SCENE);
+        }
+        */
+
+        updateTags();
+
     }
+
+    
 
     void displayMainPieMenu(boolean b){
         if (b){
@@ -878,6 +1102,8 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
         System.out.println("levelCount: " + sm.getLevelCount());
         rPicker = sm.createRegionPicker(0, sm.getLevelCount());
         rPicker.setListener(new RegionPickerListener(this));
+
+        
     }
 
     public Point2D.Double viewToSpace(Camera cam, int jpx, int jpy){
@@ -905,18 +1131,26 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
         System.out.println("app.setColorLookupTable(" + filter + ")");
         for(ObjectDescription desc: sm.getObjectDescriptions()){
            // System.out.println(getLayerScene() + " == " + ((JSkyFitsImageDescription)desc).getLayerIndex());
-            if(desc instanceof JSkyFitsImageDescription && ((JSkyFitsImageDescription)desc).hasTag(getTagScene()) ){
-                ((JSkyFitsImageDescription)desc).setColorLookupTable(filter, true);
+            for(int i = 0; i < TAGS.length; i++){
+                if(isTagsShowed[i]){
+                    if(desc instanceof JSkyFitsImageDescription && ((JSkyFitsImageDescription)desc).hasTag(TAGS[i]) ){
+                        ((JSkyFitsImageDescription)desc).setColorLookupTable(filter, true);
+                    }
+                }
             }
+            
         } 
     }
 
     //@Override
     public void setScaleAlgorithm(JSkyFitsImage.ScaleAlgorithm method){
     	for(ObjectDescription desc: sm.getObjectDescriptions()){
-            //System.out.println(getLayerScene() + " == " + ((JSkyFitsImageDescription)desc).getLayerIndex());
-            if(desc instanceof JSkyFitsImageDescription && ((JSkyFitsImageDescription)desc).hasTag(getTagScene()) ){
-                ((JSkyFitsImageDescription)desc).setScaleAlgorithm(method, true);
+            for(int i = 0; i < TAGS.length; i++){
+                if(isTagsShowed[i]){
+                    if(desc instanceof JSkyFitsImageDescription && ((JSkyFitsImageDescription)desc).hasTag(TAGS[i]) ){
+                        ((JSkyFitsImageDescription)desc).setScaleAlgorithm(method, true);
+                    }
+                }
             }
         } 
     }
@@ -925,9 +1159,12 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
     public void rescale(double min, double max){
     	//System.out.println("rescale");
     	for(ObjectDescription desc: sm.getObjectDescriptions()){
-            //System.out.println(getLayerScene() + " == " + ((JSkyFitsImageDescription)desc).getLayerIndex());
-            if(desc instanceof JSkyFitsImageDescription && ((JSkyFitsImageDescription)desc).hasTag(getTagScene()) ){
-                ((JSkyFitsImageDescription)desc).rescale(min, max, true);
+            for(int i = 0; i < TAGS.length; i++){
+                if(isTagsShowed[i]){
+                    if(desc instanceof JSkyFitsImageDescription && ((JSkyFitsImageDescription)desc).hasTag(TAGS[i]) ){
+                        ((JSkyFitsImageDescription)desc).rescale(min, max, true);
+                    }
+                }
             }
         }
     }
@@ -938,25 +1175,31 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
         boolean globalData = false;
         if(!globalData)
     	for(ObjectDescription desc: sm.getObjectDescriptions()){
-            //System.out.println(getLayerScene() + " == " + ((JSkyFitsImageDescription)desc).getLayerIndex());
-            if(desc instanceof JSkyFitsImageDescription && ((JSkyFitsImageDescription)desc).hasTag(getTagScene()) ){
-                if(((JSkyFitsImageDescription)desc).isCreatedWithGlobalData()){
-                    globalData = true;
-                    //break;
+            for(int i = 0; i < TAGS.length; i++){
+                if(isTagsShowed[i]){
+                    if(desc instanceof JSkyFitsImageDescription && ((JSkyFitsImageDescription)desc).hasTag(TAGS[i]) ){
+                        if(((JSkyFitsImageDescription)desc).isCreatedWithGlobalData()){
+                            globalData = true;
+                            //break;
+                        }
+                        double[] localScaleParams = ((JSkyFitsImageDescription)desc).getLocalScaleParams();
+                        if(localScaleParams[0] < globalScaleParams[0]) globalScaleParams[0] = localScaleParams[0];
+                        if(localScaleParams[1] > globalScaleParams[1]) globalScaleParams[1] = localScaleParams[1];
+                    }
                 }
-                double[] localScaleParams = ((JSkyFitsImageDescription)desc).getLocalScaleParams();
-                if(localScaleParams[0] < globalScaleParams[0]) globalScaleParams[0] = localScaleParams[0];
-                if(localScaleParams[1] > globalScaleParams[1]) globalScaleParams[1] = localScaleParams[1];
             }
         }
         if(globalData)
         for(ObjectDescription desc: sm.getObjectDescriptions()){
-            //System.out.println(getLayerScene() + " == " + ((JSkyFitsImageDescription)desc).getLayerIndex());
-            if(desc instanceof JSkyFitsImageDescription && ((JSkyFitsImageDescription)desc).hasTag(getTagScene()) ){ 
-                ((JSkyFitsImageDescription)desc).setRescaleGlobal(globalScaleParams[0], globalScaleParams[1]);
-                ((JSkyFitsImageDescription)desc).changeMode(JSkyFitsImageDescription.GLOBAL);
-                if(global) ((JSkyFitsImageDescription)desc).rescaleGlobal();
-                else ((JSkyFitsImageDescription)desc).rescaleLocal();
+            for(int i = 0; i < TAGS.length; i++){
+                if(isTagsShowed[i]){
+                    if(desc instanceof JSkyFitsImageDescription && ((JSkyFitsImageDescription)desc).hasTag(TAGS[i]) ){ 
+                        ((JSkyFitsImageDescription)desc).setRescaleGlobal(globalScaleParams[0], globalScaleParams[1]);
+                        ((JSkyFitsImageDescription)desc).changeMode(JSkyFitsImageDescription.GLOBAL);
+                        if(global) ((JSkyFitsImageDescription)desc).rescaleGlobal();
+                        else ((JSkyFitsImageDescription)desc).rescaleLocal();
+                    }
+                }
             }
         }
         //System.out.println(" min: " + globalScaleParams[0] + " max: " + globalScaleParams[1] );
@@ -1121,6 +1364,8 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
         Dimension d = mView.getPanel().getComponent().getSize();
         panelWidth = d.width;
         panelHeight = d.height;
+
+        System.out.println("updatePanelSize: width: " + panelWidth + " height: " + panelHeight);
         if (ovm.console != null){
             ovm.updateConsoleBounds();
         }
@@ -1450,42 +1695,46 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
         if(reference == null){
             for(ObjectDescription desc: sm.getObjectDescriptions()){
                 if(desc instanceof JSkyFitsImageDescription){
-                    if( ((JSkyFitsImageDescription)desc).isReference() && ((JSkyFitsImageDescription)desc).hasTag(getTagScene()) ){
-                        System.out.println("Reference");
-                        System.out.println(desc);
+                    for(int i = 0; i < TAGS.length; i++){
+                        if(isTagsShowed[i]){
+                            if( ((JSkyFitsImageDescription)desc).isReference() && ((JSkyFitsImageDescription)desc).hasTag(TAGS[i]) ){
+                                System.out.println("Reference");
+                                System.out.println(desc);
 
-                        fitsImageDescRef = (JSkyFitsImageDescription)desc;
+                                fitsImageDescRef = (JSkyFitsImageDescription)desc;
 
-                        loadHistogram();
+                                loadHistogram();
 
-                        if(pythonWCS != null){
-                            System.out.println("pythonWCS.setReference("+fitsImageDescRef.getSrc().getPath()+")");
-                            pythonWCS.setReference(fitsImageDescRef.getSrc().getPath());
+                                if(pythonWCS != null){
+                                    System.out.println("pythonWCS.setReference("+fitsImageDescRef.getSrc().getPath()+")");
+                                    pythonWCS.setReference(fitsImageDescRef.getSrc().getPath());
 
 
-                        } else {
-                            System.out.println("pythonWCS == null. setReference() failed");
+                                } else {
+                                    System.out.println("pythonWCS == null. setReference() failed");
+                                }
+
+                                /*
+                                try{
+                                    fitsImageDescRef = (FitsImageDescription)desc;
+                                    //FITSImage fitsImage = new FITSImage( fitsImageDescRef.getSrc() );
+                                    //wcsKeyProviderRef = new NomWcsKeywordProvider( fitsImage.getFits().getHDU(0).getHeader());
+                                    //wcsTransformRef = new WCSTransform(wcsKeyProviderRef);
+
+                                } catch(IOException ioe){
+                                    wcsTransformRef = null;
+                                } catch (FitsException fe){
+                                    wcsTransformRef = null;
+                                } catch(FITSImage.NoImageDataFoundException nidfe){
+                                    wcsTransformRef = null;
+                                } catch(FITSImage.DataTypeNotSupportedException dtnse) {
+                                    wcsTransformRef = null;
+                                }
+                                */
+
+                                break;
+                            }
                         }
-
-                        /*
-                        try{
-                            fitsImageDescRef = (FitsImageDescription)desc;
-                            //FITSImage fitsImage = new FITSImage( fitsImageDescRef.getSrc() );
-                            //wcsKeyProviderRef = new NomWcsKeywordProvider( fitsImage.getFits().getHDU(0).getHeader());
-                            //wcsTransformRef = new WCSTransform(wcsKeyProviderRef);
-
-                        } catch(IOException ioe){
-                            wcsTransformRef = null;
-                        } catch (FitsException fe){
-                            wcsTransformRef = null;
-                        } catch(FITSImage.NoImageDataFoundException nidfe){
-                            wcsTransformRef = null;
-                        } catch(FITSImage.DataTypeNotSupportedException dtnse) {
-                            wcsTransformRef = null;
-                        }
-                        */
-
-                        break;
                     }
                 }
             }
@@ -1590,7 +1839,8 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
                                     List<AstroObject> objs = (List<AstroObject>)get();
                                     System.out.println("drawSymbols("+objs+")");
                                     drawSymbols(objs);
-                                    eh.fadeOutRightClickSelection();
+                                    fadeOutRightClickSelection();
+                                    smartiesMngr.queryOff();
 
                                 }
                             }.start();
@@ -1614,10 +1864,30 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
         }
     }
 
+    public void initClickSelection(Point2D.Double rightClickPress){
+        rightClickSelectionG.moveTo(rightClickPress.x, rightClickPress.y);
+        rightClickSelectionG.sizeTo(1);
+        cursorSpace.addGlyph(rightClickSelectionG);
+    }
+
+    public void updateClickSelection(Point2D.Double rightClickPress, Point2D.Double dragClickPress){
+        rightClickSelectionG.sizeTo(2*Math.sqrt((dragClickPress.x-rightClickPress.x)*(dragClickPress.x-rightClickPress.x)+(dragClickPress.y-rightClickPress.y)*(dragClickPress.y-rightClickPress.y)));
+    }
+
+    void fadeOutRightClickSelection(){
+        Animation a = am.getAnimationFactory().createTranslucencyAnim(300,
+                            rightClickSelectionG, 0f, false, IdentityInterpolator.getInstance(),
+                            new EndAction(){
+                                public void execute(Object subject, Animation.Dimension dimension){
+                                    cursorSpace.removeGlyph(rightClickSelectionG);
+                                    rightClickSelectionG.setTranslucencyValue(SEL_ALPHA);
+                                }
+                            });
+        am.startAnimation(a, true);
+    }
 
 
-
-    void querySimbad(Point2D.Double center, Point2D.Double onCircle){
+    public void querySimbad(Point2D.Double center, Point2D.Double onCircle){
 
         System.out.println("center");
         System.out.println(center);
@@ -1667,11 +1937,7 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
         mSpace.addGlyph(cr);
         */
 
-        center.x = center.x - fitsImageDescRef.getX() + fitsImageDescRef.getWidth()/2;
-        center.y = center.y - fitsImageDescRef.getY() + fitsImageDescRef.getHeight()/2;
-
-        onCircle.x = onCircle.x - fitsImageDescRef.getX() + fitsImageDescRef.getWidth()/2;
-        onCircle.y = onCircle.y - fitsImageDescRef.getY() + fitsImageDescRef.getHeight()/2;
+        
 
 
         /*
@@ -1691,8 +1957,17 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
         double a = (mCamera.focal + mCamera.getAltitude()) / mCamera.focal;
 
         */
-        
-        query.callQuery(center, onCircle);
+
+        if(fitsImageDescRef != null){
+            center.x = center.x - fitsImageDescRef.getX() + fitsImageDescRef.getWidth()/2;
+            center.y = center.y - fitsImageDescRef.getY() + fitsImageDescRef.getHeight()/2;
+
+            onCircle.x = onCircle.x - fitsImageDescRef.getX() + fitsImageDescRef.getWidth()/2;
+            onCircle.y = onCircle.y - fitsImageDescRef.getY() + fitsImageDescRef.getHeight()/2;
+            
+            query.callQuery(center, onCircle);
+        }
+
 
         // XXX
         //Point2D.Double centerWCS = coordinateWCS(xy); //new Point2D.Double();//img.vs2wcs(center.x, center.y);
@@ -1963,23 +2238,31 @@ class RegionPickerListener implements RegionListener{
     @Override
     public void enteredRegion(Region r){
         //System.out.println("enteredRegion");
+
+        boolean[] isTagsShowed = app.getTagsShowed();
+
         ObjectDescription[] objects = r.getObjectsInRegion();
         for( ObjectDescription desc : objects){
             if(desc instanceof JSkyFitsImageDescription){
-                JSkyFitsImageDescription obj = (JSkyFitsImageDescription)desc;
-                if( obj.isReference() && obj.hasTag(app.getTagScene())){
-                    if( !obj.equals(app.fitsImageDescRef) ){
-                        app.fitsImageDescRef = obj;
-                        app.loadHistogram();
-                        if(app.pythonWCS != null){
-                            System.out.println("enteredRegion: " + r.getID());
-                            System.out.println("pythonWCS.setReference("+app.fitsImageDescRef.getSrc().getPath()+")");
-                            app.pythonWCS.setReference(app.fitsImageDescRef.getSrc().getPath());
-                        } else {
-                            System.out.println("pythonWCS == null. setReference() failed");
+                for(int i = 0; i < JSkyFitsViewer.TAGS.length; i++){
+                    if( isTagsShowed[i] ){
+                        JSkyFitsImageDescription obj = (JSkyFitsImageDescription)desc;
+                        if( obj.isReference() && obj.hasTag(JSkyFitsViewer.TAGS[i])){
+                            if( !obj.equals(app.fitsImageDescRef) ){
+                                app.fitsImageDescRef = obj;
+                                app.loadHistogram();
+                                if(app.pythonWCS != null){
+                                    System.out.println("enteredRegion: " + r.getID());
+                                    System.out.println("pythonWCS.setReference("+app.fitsImageDescRef.getSrc().getPath()+")");
+                                    app.pythonWCS.setReference(app.fitsImageDescRef.getSrc().getPath());
+                                } else {
+                                    System.out.println("pythonWCS == null. setReference() failed");
+                                }
+                            }
                         }
                     }
                 }
+                
             }
         }
     }

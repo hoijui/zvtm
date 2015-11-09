@@ -717,7 +717,7 @@ aspect SceneManagerReplication {
             SceneBuilder sm = su.getSlaveObject(smId);
             Region region = su.getSlaveObject(regionId);
             ResourceDescription desc = sm.createResourceDescription(x,y,id,z,region,
-                    location,JSkyFitsResourceHandler.RESOURCE_TYPE_FITS,true,Color.BLACK,params);
+                    location,JSkyFitsResourceHandler.RESOURCE_TYPE_FITS,true,Color.RED,params);
             su.putSlaveObject(descId, desc);
         }
     }

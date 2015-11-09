@@ -54,6 +54,7 @@ import jsky.image.ImageLookup;
 import jsky.image.ImageProcessor;
 
 import fr.inria.zvtm.glyphs.JSkyFitsImage;
+import fr.inria.zvtm.glyphs.JSkyFitsHistogram;
 import jsky.image.fits.codec.FITSImage;
 
 import javax.media.jai.Histogram;
@@ -101,6 +102,9 @@ public class JSkyFitsMenu implements ViewListener, PickerListener {
         COLOR_MAPPINGS.put("Standard", new StandardFilter());
         COLOR_MAPPINGS.put("Idl4", new Idl4Filter());
         COLOR_MAPPINGS.put("Stairs8", new Stairs8Filter());
+        COLOR_MAPPINGS.put("Red", new RedFilter());
+        COLOR_MAPPINGS.put("Green", new GreenFilter());
+        COLOR_MAPPINGS.put("Blue", new BlueFilter());
         /*
         COLOR_MAPPINGS.put("Aips0", new Aips0Filter());
         COLOR_MAPPINGS.put("Background", new BackgrFilter());

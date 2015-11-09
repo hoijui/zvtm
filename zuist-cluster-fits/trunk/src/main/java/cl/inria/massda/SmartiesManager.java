@@ -33,9 +33,14 @@ import java.util.Observable;
 import org.json.JSONObject;
 import org.json.JSONException;
 
-//import fr.inria.zvtm.engine.Location;
+import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.glyphs.VSegment;
 import fr.inria.zvtm.glyphs.VText;
+import fr.inria.zvtm.glyphs.VCircle;
+import fr.inria.zvtm.glyphs.Glyph;
+
+import fr.inria.zvtm.event.PickerListener;
+
 import java.awt.Font;
 
 import fr.inria.zuist.viewer.JSkyFitsViewer;
@@ -67,9 +72,15 @@ public class SmartiesManager implements Observer {
     int ui_swdist;
     int ui_swsystem;
     int ui_swrescale;
+    int ui_swquery;
 
     Map<String, VSegment> linesDist;
     Map<String, VText> labelsDist;
+
+    boolean query = false;
+    Point2D.Double rightClickPress;
+    //VCircle rightClickSelectionG = new VCircle(0, 0, 1000, 1, Color.BLACK, Color.RED, 0.1f);
+    Point2D.Double coordClickPress;
 
 
     public SmartiesManager(JSkyFitsViewer app){
@@ -77,8 +88,8 @@ public class SmartiesManager implements Observer {
 
         this.app = app;
         smarties = new Smarties((int)app.SCENE_W , (int)app.SCENE_H,
-                                8, 4);
-        smarties.initWidgets(6,2);
+                                6, 4);
+        smarties.initWidgets(7,2);
 
         countWidget = 0;
 
@@ -164,6 +175,17 @@ public class SmartiesManager implements Observer {
         sw.handler = new EventLowerView();
         countWidget++;
 
+        sw = smarties.addWidget(
+                                SmartiesWidget.SMARTIES_WIDGET_TYPE_BUTTON, "Portal", 7, 2, 1, 1);
+        sw.handler = new EventPortal();
+        countWidget++;
+
+        sw = smarties.addWidget(
+                                SmartiesWidget.SMARTIES_WIDGET_TYPE_TOGGLE_BUTTON, "Query", 7, 1, 1, 1);
+        sw.handler = new EventQuery();
+        ui_swquery = countWidget;
+        countWidget++;
+
         smarties.addObserver(this);
 
         linesDist = new HashMap<String, VSegment>();
@@ -216,8 +238,9 @@ public class SmartiesManager implements Observer {
                 case SmartiesEvent.SMARTIE_EVENTS_TYPE_DELETE:{
                     MyCursor c = (MyCursor)se.p.app_data;
                     c.dispose();
-                    smarties.deletePuck(se.p.id);
+                    
                     updateDistance();
+                    smarties.deletePuck(se.p.id);
                     break;
                 }
 
@@ -236,9 +259,15 @@ public class SmartiesManager implements Observer {
                         if (se.d > 0){
                             double x = (se.p != null) ? se.p.x : se.x;
                             double y = (se.p != null) ? se.p.y : se.y;
-                            app.centeredZoom(prevMFPinchD/se.d,
+                            MyCursor c = (se.p != null) ? (MyCursor)se.p.app_data : null;
+                            if(c!= null && c.isPortal()){
+                                c.setZoom(prevMFPinchD/se.d);
+                            } else {
+                                app.centeredZoom(prevMFPinchD/se.d,
                                                         x*(float)app.SCENE_W,
                                                         y*(float)app.SCENE_H);
+                            }
+                            
                         }
                         prevMFPinchD = se.d;
                     }
@@ -269,7 +298,14 @@ public class SmartiesManager implements Observer {
                         // this is the device that lock the drag, e.p should be == dragPuck
                         float dx = (se.x - prevMFMoveX)*(float)app.getDisplayWidth();
                         float dy = (se.y - prevMFMoveY)*(float)app.getDisplayHeight();
-                        app.directTranslate(-dx, dy);
+                        MyCursor c = (se.p != null) ? (MyCursor)se.p.app_data : null;
+                        if(c!= null && c.isPortal()){
+                            dx = (prevMFMoveX - se.x)*(float)app.getDisplayWidth();
+                            dy = (prevMFMoveY - se.y)*(float)app.getDisplayHeight();
+                            c.setLocation(-dx, dy);
+                        } else {
+                            app.directTranslate(-dx, dy);
+                        }
                         prevMFMoveX = se.x;
                         prevMFMoveY = se.y;
                     }
@@ -292,6 +328,14 @@ public class SmartiesManager implements Observer {
                             dragPuck = se.p;
                             prevMFMoveX = se.x;
                             prevMFMoveY = se.y;
+                        } else if(query){
+                            MyCursor c = (se.p != null) ? (MyCursor)se.p.app_data : null;
+                            rightClickPress = c.getLocation();
+                            double[] coordPress = app.coordinateTransform(app.getCursorCamera(), app.getMainCamera(), rightClickPress.getX(), rightClickPress.getY());
+                            coordClickPress = new Point2D.Double(coordPress[0], coordPress[1]);
+
+                            app.initClickSelection(rightClickPress);
+                            
                         }
 
                     }
@@ -313,6 +357,10 @@ public class SmartiesManager implements Observer {
                             prevMFMoveX = se.x;
                             prevMFMoveY = se.y;
                         }
+                        if(query && c != null){
+                            Point2D.Double point = c.getLocation();
+                            app.updateClickSelection(rightClickPress, point);
+                        }
 
                     }
 
@@ -333,6 +381,13 @@ public class SmartiesManager implements Observer {
                         updateDistance();
                         if(swWCS.on) c.labelSetVisible(true);
                         se.p.app_data = c; // CHECK
+                        if(query){
+                            query = false;
+                            rightClickPress = c.getLocation();
+                            double[] coordRelease = app.coordinateTransform(app.getCursorCamera(), app.getMainCamera(), rightClickPress.getX(), rightClickPress.getY());
+                            Point2D.Double coordClickRelease = new Point2D.Double(coordRelease[0], coordRelease[1]);
+                            app.querySimbad(coordClickPress, coordClickRelease);
+                        }
                     }
                
                     break;
@@ -455,8 +510,22 @@ public class SmartiesManager implements Observer {
         }
     }
 
+    public void queryOn(){
+        Map<String,SmartiesDevice> devices = smarties.getDevicesMapping();
+        for(Map.Entry<String,SmartiesDevice> device : devices.entrySet()){
+            smarties.sendWidgetOnState(ui_swquery, true, device.getValue());
+        }
+    }
 
-    public class MyCursor implements Observer {
+    public void queryOff(){
+        Map<String,SmartiesDevice> devices = smarties.getDevicesMapping();
+        for(Map.Entry<String,SmartiesDevice> device : devices.entrySet()){
+            smarties.sendWidgetOnState(ui_swquery, false, device.getValue());
+        }
+    }
+
+
+    public class MyCursor implements Observer, PickerListener {
 
         public static final String T_SMARTIES = "Smarties";
 
@@ -482,6 +551,7 @@ public class SmartiesManager implements Observer {
         double l;
         double b;
         
+        PortalManager prtMng;
         
         public MyCursor(int id, double x, double y){
             this.id = id;
@@ -513,10 +583,20 @@ public class SmartiesManager implements Observer {
 
         }
 
+        public void enterGlyph(Glyph g){
+            System.out.println("enterGlyph");
+        }
+        public void exitGlyph(Glyph g){
+            System.out.println("exitGlyph");
+        }
+
         public void dispose(){
             wc.dispose();
+            if(labelfst != null) app.cursorSpace.removeGlyph(labelfst);
+            if(labelsnd != null) app.cursorSpace.removeGlyph(labelsnd);
             app.pythonWCS.deleteObserver(this);
             removeDistance();
+            if(prtMng != null) prtMng.killDM();
         }
 
         public void setVisible(boolean b){
@@ -544,7 +624,39 @@ public class SmartiesManager implements Observer {
             }
         }
 
-        
+        public void setLocation(double x, double y){
+            if(isPortal())
+                prtMng.setLocation(x, y);
+        }
+
+        public void setZoom(double f){
+            if(isPortal())
+                prtMng.setZoom(f);
+        }
+
+        public boolean isPortal(){
+            return prtMng != null;
+        }
+
+        public void togglePortal(){
+            if(prtMng == null){
+
+                Point2D.Double point = getLocation();
+                double alt = app.getMainCamera().getAltitude();
+                double[] loc = app.coordinateTransform(app.getCursorCamera(), app.getMainCamera(), point.getX(), point.getY());
+                Location l = new Location(loc[0], loc[1], alt);
+                prtMng = new PortalManager(app, color);
+                double[] lPortal = app.coordinateTransform(app.getCursorCamera(), prtMng.getCamera(), point.getX(), point.getY());
+                prtMng.createDM((int)(x*app.SCENE_W), (int)(y*app.SCENE_H), l);
+                prtMng.resize(500, 500);
+                /*double[] coord = app.coordinateTransform(app.cursorCamera, prtMng.getCamera(), point.getX(), point.getY());
+                prtMng.moveTo(coord[0], coord[1]);*/
+            } else {
+                prtMng.killDM();
+                prtMng = null;
+            }
+            
+        }
 
         public void labelSetVisible(boolean b){
             /*
@@ -894,6 +1006,26 @@ public class SmartiesManager implements Observer {
         public boolean callback(SmartiesWidget sw, SmartiesEvent se, Object user_data){
             System.out.println("EventNextScale");
             app.menu.selectNextScale();
+            return true;
+        }
+    }
+
+    class EventPortal implements SmartiesWidgetHandler{
+        public boolean callback(SmartiesWidget sw, SmartiesEvent se, Object user_data){
+            System.out .println("EventPortal");
+            if(se.p != null){
+                MyCursor c = (MyCursor)se.p.app_data;
+                c.togglePortal();
+            }
+            return true;
+        }
+    }
+
+    class EventQuery implements SmartiesWidgetHandler{
+        public boolean callback(SmartiesWidget sw, SmartiesEvent se, Object user_data){
+            System.out .println("EventQuery");
+            query = true;
+            queryOn();
             return true;
         }
     }
