@@ -17,6 +17,9 @@ import fr.inria.zuist.engine.Region;
 import fr.inria.zuist.engine.SceneManager;
 import fr.inria.zvtm.glyphs.JSkyFitsImage;
 import fr.inria.zuist.od.JSkyFitsImageDescription;
+import fr.inria.zvtm.glyphs.JSkyFitsHistogram;
+import java.awt.Color;
+import fr.inria.zvtm.glyphs.VRectangle;
 
 
 import java.net.URL;
@@ -57,6 +60,11 @@ aspect AutoReplay extends AbstractAutoReplay {
          execution(public URL JSkyFitsImageDescription.getSrc()) ||
          execution(public void JSkyFitsImageDescription.moveTo(double, double)) ||
          execution(public void JSkyFitsImageDescription.orientTo(double)) ||
-         execution(public void JSkyFitsImageDescription.setVisible(boolean))
+         execution(public void JSkyFitsImageDescription.setVisible(boolean)) ||
+         execution(private void JSkyFitsHistogram.initBars(int[], int, int, Color)) ||
+         execution(public JSkyFitsHistogram JSkyFitsHistogram.fromFitsImage(JSkyFitsImage)) ||
+         execution(public JSkyFitsHistogram JSkyFitsHistogram.fromFitsImage(JSkyFitsImage, Color)) ||
+         execution(public void JSkyFitsHistogram.moveTo(double, double)) ||
+         execution(public VRectangle[] JSkyFitsHistogram.getBars())
         );
 }

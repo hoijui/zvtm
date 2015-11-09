@@ -154,7 +154,7 @@ class FitsOverlayManager implements ViewListener {
         if (!showingShortcut){
             fadeAbout = new VRectangle(0, 0, 0, 600, 400,
                 FADE_REGION_FILL, FADE_REGION_STROKE, 0.85f);
-            aboutLines = new VText[27];
+            aboutLines = new VText[31];
 			aboutLines[0] = new VText(-290, 175, 0, Color.WHITE, "ZUIST FITS Image Viewer", VText.TEXT_ANCHOR_START, 2.0f);
             aboutLines[1] = new VText(-285+50, 140, 0, Color.WHITE, "Key", VText.TEXT_ANCHOR_START, 1.5f);
             aboutLines[2] = new VText(-185+50, 140, 0, Color.WHITE, "Description", VText.TEXT_ANCHOR_START, 1.5f);
@@ -170,18 +170,22 @@ class FitsOverlayManager implements ViewListener {
             aboutLines[12] = new VText(-175+50, 40, 0, Color.WHITE, "Set scale method with local values", VText.TEXT_ANCHOR_START, 1.3f);
             aboutLines[13] = new VText(-275+50, 20, 0, Color.WHITE, "G", VText.TEXT_ANCHOR_START, 1.3f);
             aboutLines[14] = new VText(-175+50, 20, 0, Color.WHITE, "Set scale method with global values", VText.TEXT_ANCHOR_START, 1.3f);
-             aboutLines[15] = new VText(-275+50, 0, 0, Color.WHITE, "1", VText.TEXT_ANCHOR_START, 1.3f);
-            aboutLines[16] = new VText(-175+50, 0, 0, Color.WHITE, "Set Ks layer", VText.TEXT_ANCHOR_START, 1.3f);
-             aboutLines[17] = new VText(-275+50, -20, 0, Color.WHITE, "2", VText.TEXT_ANCHOR_START, 1.3f);
-            aboutLines[18] = new VText(-175+50, -20, 0, Color.WHITE, "Set Ks/H layer", VText.TEXT_ANCHOR_START, 1.3f);
-             aboutLines[19] = new VText(-275+50, -40, 0, Color.WHITE, "3", VText.TEXT_ANCHOR_START, 1.3f);
-            aboutLines[20] = new VText(-175+50, -40, 0, Color.WHITE, "Set H layer", VText.TEXT_ANCHOR_START, 1.3f);
-             aboutLines[21] = new VText(-275+50, -60, 0, Color.WHITE, "4", VText.TEXT_ANCHOR_START, 1.3f);
-            aboutLines[22] = new VText(-175+50, -60, 0, Color.WHITE, "Set H/J layer", VText.TEXT_ANCHOR_START, 1.3f);
-             aboutLines[23] = new VText(-275+50, -80, 0, Color.WHITE, "5", VText.TEXT_ANCHOR_START, 1.3f);
-            aboutLines[24] = new VText(-175+50, -80, 0, Color.WHITE, "Set J layer", VText.TEXT_ANCHOR_START, 1.3f);
-             aboutLines[25] = new VText(-275+50, -100, 0, Color.WHITE, "6", VText.TEXT_ANCHOR_START, 1.3f);
-            aboutLines[26] = new VText(-175+50, -100, 0, Color.WHITE, "Set Ks/H/J layer", VText.TEXT_ANCHOR_START, 1.3f);
+            aboutLines[15] = new VText(-275+50, 0, 0, Color.WHITE, "P", VText.TEXT_ANCHOR_START, 1.3f);
+            aboutLines[16] = new VText(-175+50, 0, 0, Color.WHITE, "Toggle portal view on cursor position", VText.TEXT_ANCHOR_START, 1.3f);
+            aboutLines[17] = new VText(-275+50, -20, 0, Color.WHITE, "C", VText.TEXT_ANCHOR_START, 1.3f);
+            aboutLines[18] = new VText(-175+50, -20, 0, Color.WHITE, "Remove the icons about the answer of query catalog", VText.TEXT_ANCHOR_START, 1.3f);
+             aboutLines[19] = new VText(-275+50, -40, 0, Color.WHITE, "1", VText.TEXT_ANCHOR_START, 1.3f);
+            aboutLines[20] = new VText(-175+50, -40, 0, Color.WHITE, "Set Ks layer", VText.TEXT_ANCHOR_START, 1.3f);
+             aboutLines[21] = new VText(-275+50, -60, 0, Color.WHITE, "2", VText.TEXT_ANCHOR_START, 1.3f);
+            aboutLines[22] = new VText(-175+50, -60, 0, Color.WHITE, "Set Ks/H layer", VText.TEXT_ANCHOR_START, 1.3f);
+             aboutLines[23] = new VText(-275+50, -80, 0, Color.WHITE, "3", VText.TEXT_ANCHOR_START, 1.3f);
+            aboutLines[24] = new VText(-175+50, -80, 0, Color.WHITE, "Set H layer", VText.TEXT_ANCHOR_START, 1.3f);
+             aboutLines[25] = new VText(-275+50, -100, 0, Color.WHITE, "4", VText.TEXT_ANCHOR_START, 1.3f);
+            aboutLines[26] = new VText(-175+50, -100, 0, Color.WHITE, "Set H/J layer", VText.TEXT_ANCHOR_START, 1.3f);
+             aboutLines[27] = new VText(-275+50, -120, 0, Color.WHITE, "5", VText.TEXT_ANCHOR_START, 1.3f);
+            aboutLines[28] = new VText(-175+50, -120, 0, Color.WHITE, "Set J layer", VText.TEXT_ANCHOR_START, 1.3f);
+             aboutLines[29] = new VText(-275+50, -140, 0, Color.WHITE, "6", VText.TEXT_ANCHOR_START, 1.3f);
+            aboutLines[30] = new VText(-175+50, -140, 0, Color.WHITE, "Set Ks/H/J layer", VText.TEXT_ANCHOR_START, 1.3f);
             application.ovSpace.addGlyph(fadeAbout);
 			for (int i=0;i<aboutLines.length;i++){
 	            application.ovSpace.addGlyph(aboutLines[i]);

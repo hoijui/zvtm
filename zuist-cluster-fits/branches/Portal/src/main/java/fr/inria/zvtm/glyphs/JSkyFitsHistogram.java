@@ -1,8 +1,9 @@
 
-package fr.inria.zuist.viewer;
+package fr.inria.zvtm.glyphs;
 
 import java.awt.Color;
 
+import fr.inria.zvtm.glyphs.VTextOr;
 import fr.inria.zvtm.glyphs.VRectangle;
 import javax.media.jai.Histogram;
 
@@ -10,6 +11,8 @@ import fr.inria.zvtm.glyphs.Composite;
 import fr.inria.zvtm.glyphs.JSkyFitsImage;
 
 import java.awt.image.DataBuffer;
+
+import fr.inria.zuist.viewer.JSkyFitsMenu;
 
 
 public class JSkyFitsHistogram extends Composite {
@@ -32,6 +35,11 @@ public class JSkyFitsHistogram extends Composite {
         VRectangle backgrown = new VRectangle(width/2, height/2, JSkyFitsMenu.Z_BTN, width, height, Color.GRAY, Color.BLACK, 0.2f);
         addChild(backgrown);
 
+        initBars(data, min, max, fillColor);
+
+    }
+
+    private void initBars(int[] data, int min, int max, Color fillColor){
         int i = 0;
         //int val;
         for(int j = 0; j< data.length; j++){
@@ -43,9 +51,10 @@ public class JSkyFitsHistogram extends Composite {
             bar.setBorderColor(DEFAULT_BORDER_COLOR);
             addChild(bar);
             bars[j] = bar;
+            //VTextOr label = new VTextOr(i+DEFAULT_BIN_WIDTH/2, height + DEFAULT_BIN_WIDTH, JSkyFitsMenu.Z_BTN, fillColor, ""+, Math.PI/2, VText.TEXT_ANCHOR_START);
+            //addChild(label);
             i += DEFAULT_BIN_WIDTH;
         }
-
     }
 
     public VRectangle[] getBars(){

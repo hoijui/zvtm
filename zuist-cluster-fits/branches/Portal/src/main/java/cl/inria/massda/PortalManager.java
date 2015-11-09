@@ -52,21 +52,9 @@ public class PortalManager{
     String portalSpaceName;
 
 	public VirtualSpaceManager vsm;
-
-	CameraPortal ovPortal;
 	
 	//virtual space containing rectangle representing region seen through main camera (used in overview)
 	VirtualSpace portalSpace;
-
-	//name of the VTM virtual space holding the rectangle delimiting the region seen by main view in radar view
-    //static final String rdRegionVirtualSpaceName = "radarSpace";
-
-    //View rView;
-    //static final String RADAR_VIEW_NAME = "Overview";
-    
-
-    //represents the region seen by main view in the radar view
-    VRectangle observedRegion;
 
     AnimationManager animator;
 
@@ -92,9 +80,6 @@ public class PortalManager{
 
     double[] dmwnes = new double[4];
 
-
-    //Camera ovCamera;
-    Camera[] cameras;
     Camera mCamera;
 	
 	View mView;
@@ -260,13 +245,10 @@ public class PortalManager{
     //public void changeZoom(double vx, double vy, short direction){
     public void changeZoom(short direction){
     	double a = (portalCamera.focal+Math.abs(portalCamera.altitude)) / portalCamera.focal;
-    	System.out.println("a: " + a);
-    	System.out.println("wheel: " + direction);
 
     	switch(direction)
     	{
     		case ViewListener.WHEEL_UP:
-				System.out.println("zoom in");
 	            portalCamera.altitudeOffset(a*WHEEL_ZOOMIN_FACTOR);
 	    		break;
 	    	case ViewListener.WHEEL_DOWN:
@@ -298,27 +280,6 @@ public class PortalManager{
         portalCamera.setLocation(new Location(newx, newy, l.getAltitude()));
         updateMagWindow();
     }
-
-
-    /*
-    public void cameraMoved(Camera cam, Point2D.Double coord, double alt){
-        System.out.println("cameraMoved");
-        if (rView!=null){
-            Camera c0=mSpace.getCamera(1);
-            Camera c1=rSpace.getCamera(0);
-            c1.vx=c0.vx;
-            c1.vy=c0.vy;
-            c1.focal=c0.focal;
-            c1.altitude=c0.altitude;
-            double[] wnes = mainView.getVisibleRegion(mSpace.getCamera(0));
-            observedRegion.moveTo((wnes[0]+wnes[2])/2,(wnes[3]+wnes[1])/2);
-            observedRegion.setWidth((wnes[2]-wnes[0]));
-            observedRegion.setHeight((wnes[1]-wnes[3]));
-        }
-        vsm.repaint();
-    }
-    */
-
 
 
 }

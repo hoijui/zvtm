@@ -74,8 +74,7 @@ import cl.inria.massda.PortalManager;
 //class FitsViewerEventHandler implements ViewEventHandler, ComponentListener, CameraListener {
 class JSkyFitsViewerEventHandler implements ViewListener, PortalListener {
 
-    static final BasicStroke SEL_STROKE = new BasicStroke(2f);
-    static final float SEL_ALPHA = .5f;
+    
 
     static float ZOOM_SPEED_COEF = 1.0f/50.0f;
     static double PAN_SPEED_COEF = 50.0;
@@ -93,7 +92,7 @@ class JSkyFitsViewerEventHandler implements ViewListener, PortalListener {
     private int lastJPY;
 
     Point2D.Double rightClickPress;
-    VCircle rightClickSelectionG = new VCircle(0, 0, 1000, 1, Color.BLACK, Color.RED, SEL_ALPHA);
+    //VCircle rightClickSelectionG = new VCircle(0, 0, 1000, 1, Color.BLACK, Color.RED, SEL_ALPHA);
     Point2D.Double coordClickPress;
 
     boolean panning = false;
@@ -113,8 +112,7 @@ class JSkyFitsViewerEventHandler implements ViewListener, PortalListener {
 
     JSkyFitsViewerEventHandler(JSkyFitsViewer app){
         this.app = app;
-        rightClickSelectionG.setFilled(false);
-        rightClickSelectionG.setStroke(SEL_STROKE);
+        
     }
 
     public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
@@ -182,9 +180,7 @@ class JSkyFitsViewerEventHandler implements ViewListener, PortalListener {
 
             // first point (start dragging) defines the center of the query zone
             rightClickPress = v.getVCursor().getVSCoordinates(app.cursorCamera);
-            rightClickSelectionG.moveTo(rightClickPress.x, rightClickPress.y);
-            rightClickSelectionG.sizeTo(1);
-            app.cursorSpace.addGlyph(rightClickSelectionG);
+            app.initClickSelection(rightClickPress);
         }
 
         //VCircle test = new VCircle(v.getVCursor().getVSCoordinates(app.mnCamera).x, v.getVCursor().getVSCoordinates(app.mnCamera).y, 1000, 100, Color.BLACK, Color.RED);
@@ -229,7 +225,7 @@ class JSkyFitsViewerEventHandler implements ViewListener, PortalListener {
         }
         else if (selectingForQuery && overPortal == null){
             Point2D.Double p = v.getVCursor().getVSCoordinates(app.mnCamera);
-            rightClickSelectionG.sizeTo(2*Math.sqrt((p.x-rightClickPress.x)*(p.x-rightClickPress.x)+(p.y-rightClickPress.y)*(p.y-rightClickPress.y)));
+            app.updateClickSelection(rightClickPress, p);
         }
         else if(overPortal != null && panning){
             if(overPortal instanceof DraggableCameraPortal ){
@@ -297,47 +293,8 @@ class JSkyFitsViewerEventHandler implements ViewListener, PortalListener {
         else if (code==KeyEvent.VK_G){
             app.rescaleGlobal(true);
         }
-        else if(code==KeyEvent.VK_1){
-            app.showTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_KS], 1.f);
-            app.hideTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_H]);
-            app.hideTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_J]);
-            System.out.println("setActiveLayer: " + JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_KS]);
-            if(app.getTagScene() != JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_KS]) app.setTagScene(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_KS]);
-        }
-        else if(code==KeyEvent.VK_2){
-            app.showTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_KS], 1.f);
-            app.showTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_H], 0.5f);
-            app.hideTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_J]);
-            System.out.println("setActiveLayer: " + JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_KS]);
-            if(app.getTagScene() != JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_KS]) app.setTagScene(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_KS]);
-        }
-        else if(code==KeyEvent.VK_3){
-            app.hideTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_KS]);
-            app.showTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_H], 1.f);
-            app.hideTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_J]);
-            System.out.println("setActiveLayer: " + JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_H]);
-            if(app.getTagScene() != JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_H]) app.setTagScene(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_H]);
-        }
-        else if(code==KeyEvent.VK_4){
-            app.hideTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_KS]);
-            app.showTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_H], 1.f);
-            app.showTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_J], 0.5f);
-            System.out.println("setActiveLayer: " + JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_H]);
-            if(app.getTagScene() != JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_H]) app.setTagScene(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_H]);
-        }
-        else if(code==KeyEvent.VK_5){
-            app.hideTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_KS]);
-            app.hideTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_H]);
-            app.showTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_J], 1.f);
-            System.out.println("setActiveLayer: " + JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_J]);
-            if(app.getTagScene() != JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_J]) app.setTagScene(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_J]);
-        }
-        else if(code==KeyEvent.VK_6){
-            app.showTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_KS], 1.f);
-            app.showTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_H], 0.66f);
-            app.showTag(JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE_J], 0.33f);
-            //System.out.println("setActiveLayer: " + JSkyFitsViewer.TAGS[JSkyFitsViewer.LAYER_SCENE]);
-            //if(app.getLayerScene() != JSkyFitsViewer.LAYER_SCENE) app.setLayerScene(JSkyFitsViewer.LAYER_SCENE);
+        else if(code>=KeyEvent.VK_0 && code<=KeyEvent.VK_9){
+            app.changeActiveTag(code-KeyEvent.VK_0);
         }
         else if(code==KeyEvent.VK_P){
             if(app.portalMngr == null){
@@ -370,6 +327,8 @@ class JSkyFitsViewerEventHandler implements ViewListener, PortalListener {
                 
             }
             
+        } else if(code == KeyEvent.VK_C){
+            app.clear();
         }
         // else if (code == KeyEvent.VK_MINUS){
         //     //app.scaleBounds[1] -= 100;
@@ -428,6 +387,7 @@ class JSkyFitsViewerEventHandler implements ViewListener, PortalListener {
     }
 
 
+    /*
     void fadeOutRightClickSelection(){
         Animation a = am.getAnimationFactory().createTranslucencyAnim(300,
                             rightClickSelectionG, 0f, false, IdentityInterpolator.getInstance(),
@@ -439,6 +399,7 @@ class JSkyFitsViewerEventHandler implements ViewListener, PortalListener {
                             });
         am.startAnimation(a, true);
     }
+    */
 
     public void enterPortal(Portal p){
         if(overPortal == null)

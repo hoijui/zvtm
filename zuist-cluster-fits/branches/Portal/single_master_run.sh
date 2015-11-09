@@ -20,7 +20,7 @@ IP=`ifconfig eth0 2>/dev/null|awk '/inet addr:/ {print $2}'|sed 's/addr://'`
 
 #python src/main/resources/scripts/wcs/daemon_wcsCoordinates.py &
 
-java -Djava.net.preferIPv4Stack=true -Djgroups.bind_addr="$IP" -Xmx4096M -Xms2048M -Dcom.sun.media.jai.disableMediaLib=true -cp $LIB:$JAR fr.inria.zuist.viewer.JSkyFitsViewer -r 1 -c 1 -bw 800 -bh 600 "$@"
+java -Djava.net.preferIPv4Stack=true -Djgroups.bind_addr="$IP" -Xmx4096M -Xms2048M -Dcom.sun.media.jai.disableMediaLib=true -cp $LIB:$JAR fr.inria.zuist.viewer.JSkyFitsViewer -r 1 -c 1 -bw 1600 -bh 900 "$@"
 
 #echo "killall -9 python"
 #killall -9 python

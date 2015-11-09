@@ -36,6 +36,11 @@ import org.json.JSONException;
 import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.glyphs.VSegment;
 import fr.inria.zvtm.glyphs.VText;
+import fr.inria.zvtm.glyphs.VCircle;
+import fr.inria.zvtm.glyphs.Glyph;
+
+import fr.inria.zvtm.event.PickerListener;
+
 import java.awt.Font;
 
 import fr.inria.zuist.viewer.JSkyFitsViewer;
@@ -67,9 +72,15 @@ public class SmartiesManager implements Observer {
     int ui_swdist;
     int ui_swsystem;
     int ui_swrescale;
+    int ui_swquery;
 
     Map<String, VSegment> linesDist;
     Map<String, VText> labelsDist;
+
+    boolean query = false;
+    Point2D.Double rightClickPress;
+    //VCircle rightClickSelectionG = new VCircle(0, 0, 1000, 1, Color.BLACK, Color.RED, 0.1f);
+    Point2D.Double coordClickPress;
 
 
     public SmartiesManager(JSkyFitsViewer app){
@@ -77,7 +88,7 @@ public class SmartiesManager implements Observer {
 
         this.app = app;
         smarties = new Smarties((int)app.SCENE_W , (int)app.SCENE_H,
-                                8, 4);
+                                6, 4);
         smarties.initWidgets(7,2);
 
         countWidget = 0;
@@ -169,6 +180,12 @@ public class SmartiesManager implements Observer {
         sw.handler = new EventPortal();
         countWidget++;
 
+        sw = smarties.addWidget(
+                                SmartiesWidget.SMARTIES_WIDGET_TYPE_TOGGLE_BUTTON, "Query", 7, 1, 1, 1);
+        sw.handler = new EventQuery();
+        ui_swquery = countWidget;
+        countWidget++;
+
         smarties.addObserver(this);
 
         linesDist = new HashMap<String, VSegment>();
@@ -221,8 +238,9 @@ public class SmartiesManager implements Observer {
                 case SmartiesEvent.SMARTIE_EVENTS_TYPE_DELETE:{
                     MyCursor c = (MyCursor)se.p.app_data;
                     c.dispose();
-                    smarties.deletePuck(se.p.id);
+                    
                     updateDistance();
+                    smarties.deletePuck(se.p.id);
                     break;
                 }
 
@@ -310,6 +328,14 @@ public class SmartiesManager implements Observer {
                             dragPuck = se.p;
                             prevMFMoveX = se.x;
                             prevMFMoveY = se.y;
+                        } else if(query){
+                            MyCursor c = (se.p != null) ? (MyCursor)se.p.app_data : null;
+                            rightClickPress = c.getLocation();
+                            double[] coordPress = app.coordinateTransform(app.getCursorCamera(), app.getMainCamera(), rightClickPress.getX(), rightClickPress.getY());
+                            coordClickPress = new Point2D.Double(coordPress[0], coordPress[1]);
+
+                            app.initClickSelection(rightClickPress);
+                            
                         }
 
                     }
@@ -331,6 +357,10 @@ public class SmartiesManager implements Observer {
                             prevMFMoveX = se.x;
                             prevMFMoveY = se.y;
                         }
+                        if(query && c != null){
+                            Point2D.Double point = c.getLocation();
+                            app.updateClickSelection(rightClickPress, point);
+                        }
 
                     }
 
@@ -351,6 +381,13 @@ public class SmartiesManager implements Observer {
                         updateDistance();
                         if(swWCS.on) c.labelSetVisible(true);
                         se.p.app_data = c; // CHECK
+                        if(query){
+                            query = false;
+                            rightClickPress = c.getLocation();
+                            double[] coordRelease = app.coordinateTransform(app.getCursorCamera(), app.getMainCamera(), rightClickPress.getX(), rightClickPress.getY());
+                            Point2D.Double coordClickRelease = new Point2D.Double(coordRelease[0], coordRelease[1]);
+                            app.querySimbad(coordClickPress, coordClickRelease);
+                        }
                     }
                
                     break;
@@ -473,8 +510,22 @@ public class SmartiesManager implements Observer {
         }
     }
 
+    public void queryOn(){
+        Map<String,SmartiesDevice> devices = smarties.getDevicesMapping();
+        for(Map.Entry<String,SmartiesDevice> device : devices.entrySet()){
+            smarties.sendWidgetOnState(ui_swquery, true, device.getValue());
+        }
+    }
 
-    public class MyCursor implements Observer {
+    public void queryOff(){
+        Map<String,SmartiesDevice> devices = smarties.getDevicesMapping();
+        for(Map.Entry<String,SmartiesDevice> device : devices.entrySet()){
+            smarties.sendWidgetOnState(ui_swquery, false, device.getValue());
+        }
+    }
+
+
+    public class MyCursor implements Observer, PickerListener {
 
         public static final String T_SMARTIES = "Smarties";
 
@@ -532,8 +583,17 @@ public class SmartiesManager implements Observer {
 
         }
 
+        public void enterGlyph(Glyph g){
+            System.out.println("enterGlyph");
+        }
+        public void exitGlyph(Glyph g){
+            System.out.println("exitGlyph");
+        }
+
         public void dispose(){
             wc.dispose();
+            if(labelfst != null) app.cursorSpace.removeGlyph(labelfst);
+            if(labelsnd != null) app.cursorSpace.removeGlyph(labelsnd);
             app.pythonWCS.deleteObserver(this);
             removeDistance();
             if(prtMng != null) prtMng.killDM();
@@ -957,6 +1017,15 @@ public class SmartiesManager implements Observer {
                 MyCursor c = (MyCursor)se.p.app_data;
                 c.togglePortal();
             }
+            return true;
+        }
+    }
+
+    class EventQuery implements SmartiesWidgetHandler{
+        public boolean callback(SmartiesWidget sw, SmartiesEvent se, Object user_data){
+            System.out .println("EventQuery");
+            query = true;
+            queryOn();
             return true;
         }
     }

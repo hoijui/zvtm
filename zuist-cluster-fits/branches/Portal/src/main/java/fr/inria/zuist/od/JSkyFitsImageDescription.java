@@ -332,7 +332,7 @@ public class JSkyFitsImageDescription extends ResourceDescription {
         //glyph.setSensitivity(isSensitive);
         //System.out.println("glyph.setSensitivity("+isSensitive+")");
         glyph.setVisible(isVisible);
-        //glyph.setDrawBorder(false);
+        glyph.setDrawBorder(false);
         glyph.setTranslucencyValue(alpha);
 
         glyph.setScaleAlgorithm(scaleMethod, false);
