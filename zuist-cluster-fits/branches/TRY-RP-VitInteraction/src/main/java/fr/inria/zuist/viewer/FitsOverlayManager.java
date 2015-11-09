@@ -44,7 +44,7 @@ class FitsOverlayManager implements ViewEventHandler {
     static final String INSITU_LOGO_PATH = "/images/insitu.png";
     static final String INRIA_LOGO_PATH = "/images/inria.png";
 
-    FitsViewer application;
+    JSkyFitsViewer application;
 
 	TranslucentTextArea console;
 
@@ -53,7 +53,7 @@ class FitsOverlayManager implements ViewEventHandler {
 	
 	int[] consolePaddingWNES = {5, 5, 5, 5};
 
-    FitsOverlayManager(FitsViewer app){
+    FitsOverlayManager(JSkyFitsViewer app){
         this.application = app;
     }
 
