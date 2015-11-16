@@ -50,6 +50,13 @@ import fr.inria.zuist.engine.SceneObserver;
 import fr.inria.zuist.engine.ViewSceneObserver;
 import fr.inria.zuist.event.ProgressListener;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.FactoryConfigurationError;
+import javax.xml.parsers.ParserConfigurationException;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
+
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
@@ -111,14 +118,7 @@ public class SlippyMapViewer implements Java2DPainter {
         initGUI(options);
         mso = new ViewSceneObserver(mView, mCamera, mSpace);
         sm = new SceneManager(new SceneObserver[]{mso}, parseSceneOptions(options));
-        initScene();
-        // if (xmlSceneFile != null){
-        //     System.out.println("Loading ZUIST map "+xmlSceneFile.getName());
-        //     gp.setLabel("Loading ZUIST map "+xmlSceneFile.getName());
-        //     sm.loadScene(parseXML(xmlSceneFile), xmlSceneFile.getParentFile(), true, gp);
-        // }
-        // gp.setVisible(false);
-        // gp.setLabel(WEGlassPane.EMPTY_STRING);
+        initScene(options.path_to_zuist_map);
         EndAction ea  = new EndAction(){
                 public void execute(Object subject, Animation.Dimension dimension){
                    sm.setUpdateLevel(true);
@@ -200,8 +200,11 @@ public class SlippyMapViewer implements Java2DPainter {
 
     /*-------------     Navigation       -------------*/
 
-    void initScene(){
-        //XXX:TBW
+    void initScene(String zuistMapPath){
+        if (zuistMapPath != null){
+            File f = new File(zuistMapPath);
+            sm.loadScene(parseXML(f), f.getParentFile(), true, null);
+        }
     }
 
     /*-------------     Navigation       -------------*/
@@ -239,6 +242,22 @@ public class SlippyMapViewer implements Java2DPainter {
 
     void exit(){
         System.exit(0);
+    }
+
+    static Document parseXML(File f){
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setValidating(false);
+            factory.setAttribute("http://apache.org/xml/features/nonvalidating/load-external-dtd", new Boolean(false));
+            factory.setNamespaceAware(true);
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            Document res = builder.parse(f);
+            return res;
+        }
+        catch (FactoryConfigurationError e){e.printStackTrace();return null;}
+        catch (ParserConfigurationException e){e.printStackTrace();return null;}
+        catch (SAXException e){e.printStackTrace();return null;}
+        catch (IOException e){e.printStackTrace();return null;}
     }
 
     public static void main(String[] args){
