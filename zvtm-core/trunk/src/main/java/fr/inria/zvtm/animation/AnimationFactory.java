@@ -1,6 +1,6 @@
 /*   AUTHOR : Romain Primet (romain.primet@inria.fr)
  *
- *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009-2011.
+ *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009-2015.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -50,6 +50,7 @@ public class AnimationFactory {
      * for each animation event. The handler is responsible for
      * implementing the animation code itself (e.g. move a Camera or
      * change the color of a Glyph).
+     *@return the animation instance.
      */
     public Animation createAnimation(int duration,
                      Object subject,
@@ -75,6 +76,7 @@ public class AnimationFactory {
      * for each animation event. The handler is responsible for
      * implementing the animation code itself (e.g. move a Camera or
      * change the color of a Glyph).
+     *@return the animation instance.
      */
     public Animation createAnimation(int duration,
                      double repeatCount,
@@ -109,6 +111,7 @@ public class AnimationFactory {
      * used, but spline interpolators may be used to provide different animation
      * behaviors: slow in/slow out, fast in/slow out et caetera. You may also
      * provide your own interpolator.
+     *@return the animation instance.
      */
     public Animation createAnimation(int duration,
                      double repeatCount,
@@ -136,6 +139,7 @@ public class AnimationFactory {
      * animation (constant speed, constant acceleration, slow in/slow out...)
      * @param endAction a functor that will be executed when the animation
      * ends. May be set to null, in which case it is ignored.
+     *@return the animation instance.
      * @see EndAction
      */
     public Animation createCameraTranslation(final int duration, final Camera camera,
@@ -190,6 +194,7 @@ public class AnimationFactory {
      * animation (constant speed, constant acceleration, slow in/slow out...)
      * @param endAction a functor that will be executed when the animation
      * ends. May be set to null, in which case it is ignored.
+     *@return the animation instance.
      */
     public Animation createCameraAltAnim(final int duration, final Camera camera,
                      final double data, final boolean relative,
@@ -239,6 +244,7 @@ public class AnimationFactory {
      * animation (constant speed, constant acceleration, slow in/slow out...)
      * @param endAction a functor that will be executed when the animation
      * ends. May be set to null, in which case it is ignored.
+     *@return the animation instance.
      */
     public Animation createGlyphTranslation(final int duration, final Glyph glyph,
                         final Point2D.Double data, final boolean relative,
@@ -293,6 +299,7 @@ public class AnimationFactory {
      * animation (constant speed, constant acceleration, slow in/slow out...)
      * @param endAction a functor that will be executed when the animation
      * ends. May be set to null, in which case it is ignored.
+     *@return the animation instance.
      */
     public Animation createGlyphSizeAnim(final int duration, final Glyph glyph,
                      final double data, final boolean relative,
@@ -348,6 +355,7 @@ public class AnimationFactory {
      * animation (constant speed, constant acceleration, slow in/slow out...)
      * @param endAction a functor that will be executed when the animation
      * ends. May be set to null, in which case it is ignored.
+     *@return the animation instance.
      */
     public Animation createGlyphOrientationAnim(final int duration, final Glyph glyph,
                         final double data, final boolean relative,
@@ -401,6 +409,7 @@ public class AnimationFactory {
      * animation (constant speed, constant acceleration, slow in/slow out...)
      * @param endAction a functor that will be executed when the animation
      * ends. May be set to null, in which case it is ignored.
+     *@return the animation instance.
      */
     public Animation createGlyphFillColorAnim(final int duration, final Glyph glyph,
                           final float[] data, final boolean relative,
@@ -464,6 +473,7 @@ public class AnimationFactory {
      * animation (constant speed, constant acceleration, slow in/slow out...)
      * @param endAction a functor that will be executed when the animation
      * ends. May be set to null, in which case it is ignored.
+     *@return the animation instance.
      */
     public Animation createGlyphBorderColorAnim(final int duration, final Glyph glyph,
                         final float[] data, final boolean relative,
@@ -525,6 +535,7 @@ public class AnimationFactory {
      * animation (constant speed, constant acceleration, slow in/slow out...)
      * @param endAction a functor that will be executed when the animation
      * ends. May be set to null, in which case it is ignored.
+     *@return the animation instance.
      */
     public Animation createTranslucencyAnim(final int duration, final Translucent translucent,
                         final float data, final boolean relative,
@@ -573,6 +584,7 @@ public class AnimationFactory {
      * animation (constant speed, constant acceleration, slow in/slow out...)
      * @param endAction a functor that will be executed when the animation
      * ends. May be set to null, in which case it is ignored.
+     *@return the animation instance.
      */
     public Animation createPortalTranslation(final int duration, final Portal portal,
                          final Point data, final boolean relative,
@@ -631,6 +643,7 @@ public class AnimationFactory {
      * animation (constant speed, constant acceleration, slow in/slow out...)
      * @param endAction a functor that will be executed when the animation
      * ends. May be set to null, in which case it is ignored.
+     *@return the animation instance.
      */
     public Animation createPortalSizeAnim(final int duration, final Portal portal,
                       final int wdata, final int hdata,
@@ -686,6 +699,7 @@ public class AnimationFactory {
      * animation (constant speed, constant acceleration, slow in/slow out...)
      * @param endAction a functor that will be executed when the animation
      * ends. May be set to null, in which case it is ignored.
+     *@return the animation instance.
      */
     public Animation createLensMagAnim(final int duration, final FixedSizeLens lens,
                        final float data, final boolean relative,
@@ -753,6 +767,7 @@ public class AnimationFactory {
      * animation (constant speed, constant acceleration, slow in/slow out...)
      * @param endAction a functor that will be executed when the animation
      * ends. May be set to null, in which case it is ignored.
+     *@return the animation instance.
      */
     public Animation createLensMagRadiusAnim(final int duration, final FixedSizeLens lens,
                          final float magData, final int orData,
@@ -832,6 +847,7 @@ public class AnimationFactory {
      * animation (constant speed, constant acceleration, slow in/slow out...)
      * @param endAction a functor that will be executed when the animation
      * ends. May be set to null, in which case it is ignored.
+     *@return the animation instance.
      */
     public Animation createLensRadiusAnim(final int duration, final FixedSizeLens lens,
                       final int orData, final int irData,
@@ -902,6 +918,7 @@ public class AnimationFactory {
      * animation (constant speed, constant acceleration, slow in/slow out...)
      * @param endAction a functor that will be executed when the animation
      * ends. May be set to null, in which case it is ignored.
+     *@return the animation instance.
      */
     public Animation createPathAnim(final int duration, final DPath path,
                     final Point2D.Double[] data, final boolean relative,

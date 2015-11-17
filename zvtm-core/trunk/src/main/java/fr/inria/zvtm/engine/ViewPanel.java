@@ -4,7 +4,7 @@
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2000-2002. All Rights Reserved
  *   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2014. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2015. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -189,6 +189,7 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
 	}
 
 	/**Get the underlying Swing component.
+    *@return the Swing component instance.
      */
 	public abstract Component getComponent();
 
@@ -311,15 +312,9 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
                          (int)Math.round((d.height/2)-(vy-c.vy)*coef));
     }
 
-    /**true will draw a segment between origin of drag and current cursor pos until drag is finished (still visible for backward compatibility reasons - should use setDrawSegment instead)*/
-    public void setDrawDrag(boolean b){
-	curDragx=origDragx;
-	curDragy=origDragy;
-	drawDrag=b;
-	parent.repaint();
-    }
-
-    /**true will draw a segment between origin of drag and current cursor pos until drag is finished*/
+    /** Draw a segment between the point where a press event was heard and the current position of the cursor (drag).
+     *@param b true to draw the segment.
+     */
     public void setDrawSegment(boolean b){
 	curDragx=origDragx;
 	curDragy=origDragy;
@@ -327,7 +322,9 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
 	parent.repaint();
     }
 
-    /**true will draw a rectangle between origin of drag and current cursor pos until drag is finished*/
+    /** Draw a rectangle between the point where a press event was heard and the current position of the cursor (drag).
+     *@param b true to draw the rectangle.
+     */
     public void setDrawRect(boolean b){
 	curDragx=origDragx;
 	curDragy=origDragy;
@@ -335,7 +332,10 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
 	parent.repaint();
     }
 
-    /**draw a circle between origin of drag and current cursor pos until drag is finished (drag segment represents the radius of the circle, not its diameter) - use OVAL for any oval, CIRCLE for circle, NONE to stop drawing it*/
+    /** Draw a circle/oval between the point where a press event was heard and the current position of the cursor (drag).
+     * The line between the two points represents the circle's radius, not its diameter.
+     *@param s use OVAL for any oval, CIRCLE for circle, NONE to stop drawing.
+     */
     public void setDrawOval(short s){
 	curDragx=origDragx;
 	curDragy=origDragy;
@@ -370,6 +370,7 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
     }
 
     /** Set the icon used to represent first-order-of-control panning.
+     *@param icon the image used as an icon.
      *@see #showFirstOrderPanWidget(int jpx, int jpy)
      *@see #hideFirstOrderPanWidget()
      *@see #isShowingFirstOrderPanWidget()
@@ -382,6 +383,7 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
      *@see #showFirstOrderPanWidget(int jpx, int jpy)
      *@see #hideFirstOrderPanWidget()
      *@see #setFirstOrderPanWidget(Image icon)
+     *@return whether the view is currently showing the widget or not.
      */
     public boolean isShowingFirstOrderPanWidget(){
         return sfopw;
@@ -597,6 +599,7 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
     void eraseCursor(){}
 
     /** Should the viewpanel automatically request focus when cursor enters it or not.
+     *@param b pass true to automatically request focus, false not to request it.
      *  Default is false for external views (EView).
      *  Default is true for panel views (PView) as keyboard events don't get sent otherwise.
      */
@@ -607,6 +610,7 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
     /** Tells whether the viewpanel is automatically requesting focus when cursor enters it or not.
      *  Default is false for external views (EView).
      *  Default is true for panel views (PView) as keyboard events don't get sent otherwise.
+     *@return true if automatically requesting focus, false otherwise.
      */
     public boolean getAutoRequestFocusOnMouseEnter(){
         return autoRequestFocusOnMouseEnter;
@@ -721,19 +725,24 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
 	}
     }
 
-    /** Get VCursor instance associated with the parent view.*/
+    /** Get VCursor instance associated with the parent view.
+     *@return the ZVTM VCursor instance.
+     */
     public VCursor getVCursor(){
         return parent.getCursor();
     }
 
-    /**last glyph the mouse entered in  (for this view and current active layer)*/
+    /** Get the last glyph the mouse entered in  (for this view and current active layer).
+     *@return that Glyph instance.
+     */
     public Glyph lastGlyphEntered(){
 	return parent.mouse.getPicker().lastGlyphEntered();
     }
 
-    /** Get the list of glyphs currently under mouse (last entry is last glyph entered)
-     * This returns a <em>copy</em> of the actual array managed by VCursor at the time the method is called
-     * (in other words, the array returned by this method is not synchronized with the actual list over time)
+    /** Get the list of glyphs currently under the cursor. The last entry is the last glyph entered.
+     * This returns a <em>copy</em> of the actual array managed by VCursor at the time the method is called.
+     * In other words, the array returned by this method is not synchronized with the actual list over time.
+     *@return the list of glyphs.
      */
     public Glyph[] getGlyphsUnderCursorList(){
 	    return parent.mouse.getPicker().getPickedGlyphList();
@@ -759,13 +768,17 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
     long lastButOneRepaint = 0;
 
     /**
-     * Get the actual instantaneous refresh rate. As the delay (in milliseconds) between the last two full view repaint calls performed.
+     * Get the actual instantaneous refresh rate.
+     *@return the delay, in milliseconds, between the last two full view repaint calls performed.
      */
     public long getDelay(){
         return delay;
     }
 
-	/**set a lens for this view ; set to null to remove an existing lens*/
+	/** Set a lens for this view.
+     *@param l pass null to remove an existing lens.
+     *@return that same lens.
+     */
 	protected Lens setLens(Lens l){
 		if (l != null){
 			this.lens = l;
@@ -783,9 +796,11 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
 		}
 	}
 
-    /**return Lens cyrrently used by this view (null if none)*/
+    /** Get the Lens currently used by this view.
+     *@return null if none.
+     */
     protected Lens getLens(){
-	return this.lens;
+	    return this.lens;
     }
 
     protected void setLayerVisibility(boolean[] context, boolean[] lens){
@@ -803,6 +818,7 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
 
     /** Get the padding values customizing the region inside the view in which objects are actually visible.
      *@param wnesPadding padding values in pixels for the west, north, east and south borders
+     *@param layer the layer in the view to which this padding should be applied.
      */
     protected void setVisibilityPadding(int[] wnesPadding, int layer){
         if (layer < visibilityPadding.length){
@@ -811,6 +827,7 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
     }
 
     /** Get the padding values customizing the region inside the view in which objects are actually visible.
+     *@param layer specify the layer for which this information is requested (different layers canhave different padding settings).
      *@return padding values in pixels for the west, north, east and south borders, null if layer is invalid
      */
     protected int[] getVisibilityPadding(int layer){

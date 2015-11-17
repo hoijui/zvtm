@@ -3,7 +3,7 @@
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2002. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2011. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2015. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -131,9 +131,10 @@ public class Camera {
     }
 
     /**
-     * get the zoom-in limit/maximum magnification  (like a floor the camera cannot go through)<br>
-     * default value 0 means that, at maximum magnification, the size of observed glyphs corresponds to their <i>real</i> size (e.g. if a circle has a declared radius of 50 in the virtual space, then its radius at max magnification is 50)<br>
-     * if the floor is set to a negative value, you will be able to zoom in further (meaning that you will be able to magnify objects beyond their declared size)<br>
+     * Get the zoom-in limit/maximum magnification. This is like a floor the camera cannot go through.<br>
+     * Default value 0 means that, at maximum magnification, the size of observed glyphs corresponds to their <i>real</i> size (e.g. if a circle has a declared radius of 50 in the virtual space, then its radius at max magnification is 50)<br>
+     * if the floor is set to a negative value, you will be able to zoom in further (meaning that you will be able to magnify objects beyond their declared size)
+     *@return the lowest altitude/zoom-in limit/maximum magnification.
      */
     public double getZoomFloor(){
         return zoomFloor;
@@ -150,8 +151,9 @@ public class Camera {
     }
 
     /**
-     * Get the zoom-out limit/minimum magnification (like a ceiling the camera cannot go through).
+     * Get the zoom-out limit/minimum magnification. This is like a ceiling the camera cannot go through.
      * The default value is Double.MAX_VALUE.
+     *@return the highest altitude/zoom-out limit/minimum magnification.
      */
     public double getZoomCeiling(){
         return zoomCeiling;
@@ -159,8 +161,8 @@ public class Camera {
 
     /**
      * Sets the horizontal bounds for this Camera.
-     * Note: This does not move the Camera if it currently
-     * lies outside the bounds.
+     * Note: This does not move the Camera if it currently lies outside the bounds.
+     *@param wnes the bounds (west, north, east , south)
      */
     public void setBounds(double[] wnes){
         if(wnes[0] > wnes[2] || wnes[1] < wnes[3]){
@@ -175,18 +177,24 @@ public class Camera {
     /**
      * Gets the horizontal bounds for this Camera.
      * @return a double array of size 4, containing the
-     * {west, north, east, south} borders.
+     * {west, north, east, south} bounds.
      */
     public double[] getBounds(){
         return new double[]{wb, nb, eb, sb};
     }
 
-    /**relative translation (offset) - will trigger a repaint, whereas directly assigning values to vx, vy will not*/
+    /** Camera relative translation. This will trigger a repaint.
+     *@param x relative x-displacement.
+     *@param y relative y-displacement.
+     */
     public void move(double x, double y){
         moveTo(vx+x, vy+y);
     }
 
-    /**absolute translation - will trigger a repaint, whereas directly assigning values to vx, vy will not*/
+    /** Camera absolute translation. This will trigger a repaint.
+     *@param x new x-coordinate.
+     *@param y new y-coordinate.
+     */
     public void moveTo(double x, double y){
         if(x < wb){ x = wb; }
         if(x > eb){ x = eb; }
@@ -247,7 +255,8 @@ public class Camera {
     }
 
     /**
-     * get camera altitude
+     * Get camera's altitude.
+     *@return the camera's current altitude.
      */
     public double getAltitude(){
 	    return altitude;
@@ -255,7 +264,8 @@ public class Camera {
 
 
     /**
-     * Set camera location
+     * Set camera location.
+     *@param l the location at which to position this camera.
      */
     public void setLocation(Location l){
         double clippedx = l.vx;
@@ -288,7 +298,8 @@ public class Camera {
     }
 
     /**
-     * get camera location
+     * Get camera location.
+     *@return the location of this camera.
      */
     public Location getLocation(){
 	return new Location(vx,vy,altitude);
@@ -340,6 +351,8 @@ public class Camera {
     }
 
     /** Set zoom-invariant point's coordinates in virtual space.
+     *@param x x-coordinate of zoom-invariant point in VirtualSpace.
+     *@param y y-coordinate of zoom-invariant point in VirtualSpace.
      *@see #enableCustomZoomInvariantLocation(boolean b)
      *@see #isCustomZoomInvariantLocationEnabled()
      *@see #getZilX()
@@ -351,6 +364,7 @@ public class Camera {
     }
 
     /** Use a specific zoom-invariant point or use the camera's (x,y) coords are used (default).
+     *@param b true to enable it, false to diable it.
      *@see #setZoomInvariantLocation(double x, double y)
      *@see #isCustomZoomInvariantLocationEnabled()
      *@see #getZilX()
@@ -365,6 +379,7 @@ public class Camera {
      *@see #enableCustomZoomInvariantLocation(boolean b)
      *@see #isCustomZoomInvariantLocationEnabled()
      *@see #getZilY()
+     *@return the x-coordinate of the zoom-invariant location in VirtualSpace.
      */
     public double getZilX(){
         return zilX;
@@ -375,6 +390,7 @@ public class Camera {
      *@see #enableCustomZoomInvariantLocation(boolean b)
      *@see #isCustomZoomInvariantLocationEnabled()
      *@see #getZilX()
+     *@return the y-coordinate of the zoom-invariant location in VirtualSpace.
      */
     public double getZilY(){
         return zilY;
@@ -385,18 +401,20 @@ public class Camera {
      *@see #enableCustomZoomInvariantLocation(boolean b)
      *@see #getZilX()
      *@see #getZilY()
+     *@return true if a specific zoom-invariant location is used.
      */
     public boolean isCustomZoomInvariantLocationEnabled(){
         return zile;
     }
 
     /**
-     * Get the camera's horizontal speed
+     * Get the camera's horizontal speed.
      *@see #setXspeed(double dx)
      *@see #setYspeed(double dy)
      *@see #setZspeed(double dz)
      *@see #getYspeed()
      *@see #getZspeed()
+     *@return camera speed along x-axis, first order of control.
      */
     public double getXspeed(){
 	    return dx;
@@ -409,6 +427,7 @@ public class Camera {
      *@see #setZspeed(double dz)
      *@see #getXspeed()
      *@see #getZspeed()
+     *@return camera speed along y-axis, first order of control.
      */
 	public double getYspeed(){
 	    return dy;
@@ -421,6 +440,7 @@ public class Camera {
      *@see #setZspeed(double dz)
      *@see #getXspeed()
      *@see #getYspeed()
+     *@return camera zoom speed, first order of control.
      */
 	public double getZspeed(){
 	    return dz;
@@ -430,6 +450,7 @@ public class Camera {
 
     /**
      * Registers a CameraListener for this Camera
+     *@param listener instance implementing the callback.
      */
     public void addListener(CameraListener listener){
 	listeners.add(listener);
@@ -437,6 +458,7 @@ public class Camera {
 
     /**
      * Un-registers a CameraListener for this Camera
+     *@param listener instance implementing the callback.
      */
     public void removeListener(CameraListener listener){
 	listeners.remove(listener);
@@ -453,7 +475,8 @@ public class Camera {
     }
 
     /**
-     * set camera focal distance (absolute value)
+     * Set camera focal distance (absolute value).
+     *@param f the focal distance.
      */
     public void setFocal(double f){
 	if (f<0) {f=0;}
@@ -461,13 +484,17 @@ public class Camera {
     }
 
     /**
-     * get camera focal distance
+     * Get camera focal distance.
+     *@return the focal distance.
      */
     public double getFocal(){
 	return focal;
     }
 
-    /** Propagate this camera's movement to all glyphs and cameras attached to it. */
+    /** Propagate this camera's movement to all glyphs and cameras attached to it.
+     *@param x relative horizontal displacement.
+     *@param y relative vettical displacement.
+     */
     public void propagateMove(double x, double y){
         double lx = x;
         double ly = y;
@@ -483,7 +510,9 @@ public class Camera {
         }
     }
 
-    /**Propagate this camera's altitude change to all cameras attached to it.*/
+    /** Propagate this camera's altitude change to all cameras attached to it.
+     *@param alt new altitude.
+     */
     public void propagateAltitudeChange(double alt){
         if (stickedCameras != null && alt != 0){
             for (int i=0;i<stickedCameras.length;i++){
@@ -495,21 +524,24 @@ public class Camera {
     }
 
     /**
-     * get camera index (w.r.t owning virtual space)
+     * Get camera index.
+     *@return index in owning virtual space.
      */
     public int getIndex(){
 	return index;
     }
 
     /**
-     * set virtual space owning this camera
+     * Set virtual space owning this camera.
+     *@param vs the owning VirtualSpace.
      */
     protected void setOwningSpace(VirtualSpace vs){
 	parentSpace=vs;
     }
 
     /**
-     * get virtual space owning this camera
+     * Get virtual space owning this camera.
+     *@return the owning VirtualSpace.
      */
     public VirtualSpace getOwningSpace(){
 	return parentSpace;
@@ -517,14 +549,16 @@ public class Camera {
 
     /**
      * set view owning this camera.
-     * CALLED INTERNALLY - NOT FOR PUBLIC USE
+     * CALLED INTERNALLY - NOT FOR PUBLIC USE.
+     *@param vi the owning View.
      */
     public void setOwningView(View vi){
 	view=vi;
     }
 
     /**
-     * get view owning this camera
+     * Get view owning this camera.
+     *@return the owning View.
      */
     public View getOwningView(){
 	return view;
@@ -600,7 +634,9 @@ public class Camera {
 	}
     }
 
-    /**return the list of glyphs sticked to this camera (null if none)*/
+    /** Get the list of glyphs sticked to this camera.
+     *@return null if none.
+     */
     public Glyph[] getStickedGlyphArray(){
 	return stickedGlyphs;
     }
@@ -697,13 +733,16 @@ public class Camera {
 	}
     }
 
-    /**return the list of cameras sticked to this camera (null if none)*/
+    /** Get the list of cameras sticked to this camera.
+     *@return null if none.
+     */
     public Camera[] getStickedCameraArray(){
 	return stickedCameras;
     }
 
     /**
      * Enable or disable camera. What is seen through the camera will (or will not) be painted in the View.
+     *@param b pass true to enable, false to disable.
      *@see #isEnabled()
      */
     public void setEnabled(boolean b){
@@ -715,6 +754,7 @@ public class Camera {
 
     /**
      * Tells whether the camera is enabled or disabled.
+     *@return true if enabled, false if disabled.
      *@see #setEnabled(boolean b)
      */
     public boolean isEnabled(){
@@ -757,12 +797,17 @@ public class Camera {
 
 	/*--------------------Sticking--------------------*/
 
-    /** Stick glyph g to camera c. Behaves like a one-way constraint. */
+    /** Stick glyph g to camera c. Behaves like a one-way constraint.
+     *@param g glyph to be sticked.
+     *@param c camera to which the glyph will be sticked.
+     */
     public static void stickToCamera(Glyph g, Camera c){
 		c.stick(g);
     }
 
-    /** Unstick all glyphs sticked to Camera c. */
+    /** Unstick all glyphs sticked from Camera c.
+     *@param c the Camera from which to unstick glyphs.
+     */
     public static void unstickAllGlyphs(Camera c){
 		c.unstickAllGlyphs();
     }

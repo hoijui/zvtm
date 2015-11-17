@@ -1,10 +1,10 @@
 /*   AUTHOR : Romain Primet (romain.primet@inria.fr)
  *
- *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009.
+ *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009-2015.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id$ 
- */ 
+ * $Id$
+ */
 package fr.inria.zvtm.animation;
 
 import net.jcip.annotations.*;
@@ -29,7 +29,7 @@ import org.jdesktop.animation.timing.TimingTarget;
 @ThreadSafe
 public class Animation {
 
-    public static enum Dimension {POSITION, ALTITUDE, SIZE, ORIENTATION,                
+    public static enum Dimension {POSITION, ALTITUDE, SIZE, ORIENTATION,
 	    BORDERCOLOR, FILLCOLOR, TRANSLUCENCY, PATH, LENS_MAG,
 	    LENS_RADIUS, LENS_MAG_RADIUS};
 
@@ -43,10 +43,10 @@ public class Animation {
 	 */
 	public static enum RepeatBehavior {
 		/**
-		 * Each repeated cycle proceeds in the same direction 
+		 * Each repeated cycle proceeds in the same direction
 		 * as the previous one.
 		 */
-		LOOP { 
+		LOOP {
 			Animator.RepeatBehavior getAnimatorValue(){
 				return Animator.RepeatBehavior.LOOP;
 			}
@@ -64,13 +64,13 @@ public class Animation {
 		//translate into Animator.RepeatBehavior enum values
 		abstract Animator.RepeatBehavior getAnimatorValue();
 	}
-    
+
     //package-level ctor, to be used from AnimationManager
     //(not publicly visible)
     Animation(AnimationManager parent,
-	      int duration, 
-	      double repeatCount, 
-	      RepeatBehavior repeatBehavior, 
+	      int duration,
+	      double repeatCount,
+	      RepeatBehavior repeatBehavior,
 	      Object subject,
 	      Dimension dimension,
 	      TimingHandler handler){
@@ -85,6 +85,7 @@ public class Animation {
 
     /**
      * Sets the interpolator for this Animation.
+     *@param interpolator the interpolator to use. One of fr.inria.zvtm.animation.interpolation.*
      */
     public void setInterpolator(Interpolator interpolator){
 	animator.setInterpolator(interpolator);
@@ -93,14 +94,14 @@ public class Animation {
     /**
      * Sets the initial fraction at which the first animation cycle will begin. The default value is 0.
      * @param startFraction initial fraction.
-     * @throws IllegalArgumentException if startFraction is less than 0 or greater than 1 
-     * @throws IllegalStateException if animation is already running; this parameter may only 
+     * @throws IllegalArgumentException if startFraction is less than 0 or greater than 1
+     * @throws IllegalStateException if animation is already running; this parameter may only
      * be changed prior to starting the animation or after the animation has ended
      */
     public void setStartFraction(float startFraction){
 	animator.setStartFraction(startFraction);
     }
-    
+
     /**
      * Two or more Animations can be run concurrently if and only if they
      * are orthogonal. Two Animations are said to be orthogonal if they either
@@ -109,10 +110,10 @@ public class Animation {
      * Non-orthogonal animations get queued and run in the order in which
      * they were started.
      */
-    boolean orthogonalWith(Animation other){                      
-     return ( !((subject == other.subject) &&                            
-                (dimension == other.dimension)) );                       
-    }   
+    boolean orthogonalWith(Animation other){
+     return ( !((subject == other.subject) &&
+                (dimension == other.dimension)) );
+    }
 
     //called by parent AnimationManager (owns the tick source)
     void setTimer(TimingSource timingSource){
@@ -157,7 +158,7 @@ public class Animation {
     //intercepts TimingTarget events and propagates them to
     //TimingHandlers and to the parent class for queuing and
     //housekeeping tasks
-    private final TimingTarget timingInterceptor; 
+    private final TimingTarget timingInterceptor;
 
     //real, destination handler that is provided by client code
     final TimingHandler handler;

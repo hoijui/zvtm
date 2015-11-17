@@ -1,10 +1,10 @@
 /*   AUTHOR : Romain Primet (romain.primet@inria.fr)
  *
- *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009-2011.
+ *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009-2015.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id$ 
- */ 
+ * $Id$
+ */
 package fr.inria.zvtm.animation;
 
 import java.util.List;
@@ -41,6 +41,7 @@ public class AnimationManager {
      * Creates a new AnimationManager. Clients are expected to retrieve an existing AnimationManager
      * by calling the appropriate operation on their application's VirtualSpaceManager, and
      * not to create an AnimationManager themselves.
+     *@param vsm the VirtualSpaceManager in charge of this UI (a singleton: VirtualSpaceManager.INSTANCE).
      */
     public AnimationManager(VirtualSpaceManager vsm){
 	pendingAnims = new LinkedList<Animation>();
@@ -60,8 +61,8 @@ public class AnimationManager {
 	startAnimation(anim, true);
     }
 
-    Animation createAnimation(int duration, 
-			      double repeatCount, 
+    Animation createAnimation(int duration,
+			      double repeatCount,
 			      Animation.RepeatBehavior repeatBehavior,
 			      Object subject,
 			      Animation.Dimension dimension,
@@ -75,8 +76,8 @@ public class AnimationManager {
 	return retval;
     }
 
-    Animation createAnimation(int duration, 
-			      double repeatCount, 
+    Animation createAnimation(int duration,
+			      double repeatCount,
 			      Animation.RepeatBehavior repeatBehavior,
 			      Object subject,
 			      Animation.Dimension dimension,
@@ -92,7 +93,7 @@ public class AnimationManager {
      * Starts this AnimationManager.
      * This method must be called for animations to start.
      * This method may be called multiple times from multiple threads;
-     * only the first one will be taken in consideration, and subsequent 
+     * only the first one will be taken in consideration, and subsequent
      * calls will have no effect.
      */
     public void start(){
@@ -114,8 +115,8 @@ public class AnimationManager {
 	tickThread.requestStop();
     }
 
-    /**
-     * Returns the AnimationFactory associated with this AnimationManager
+    /** Get the AnimationFactory associated with this AnimationManager.
+     * @return the AnimationFactory object.
      */
     public AnimationFactory getAnimationFactory(){
 	return animationFactory;
@@ -123,10 +124,10 @@ public class AnimationManager {
 
     /**
      * Starts an animation.
-     * @param anim animation to start (must have been created by 
+     * @param anim animation to start (must have been created by
      * calling createAnimation on the same AnimationManager).
-     * @param force if true, any previously started and conflicting 
-     * animations will be cancelled. Queued conflicting animations 
+     * @param force if true, any previously started and conflicting
+     * animations will be cancelled. Queued conflicting animations
      * that did not yet start are cancelled. Two animations conflict if
      * they target the same subject and animate the same dimension.
      * Note that the end() action of a cancelled animation will <b>not</b>
@@ -140,7 +141,7 @@ public class AnimationManager {
 	    }
 
 	    pendingAnims.add(anim);
-	    
+
 	    //*moves and starts* eligible animations
 	    startEligibleAnimations();
 	} finally {
@@ -152,7 +153,7 @@ public class AnimationManager {
      * Stops an animation.
      * The end() action of an animation will be executed if the animation has
      * been started beforehand.
-     * @param anim animation to stop (must have been created by 
+     * @param anim animation to stop (must have been created by
      * calling createAnimation on the same AnimationManager).
      */
     public void stopAnimation(Animation anim){
@@ -176,7 +177,7 @@ public class AnimationManager {
 
     /**
      * Cancels an animation.
-     * @param anim animation to cancel (must have been created by 
+     * @param anim animation to cancel (must have been created by
      * calling createAnimation on the same AnimationManager).
      * Note that the end() action of a cancelled animation will not
      * be executed.
@@ -234,7 +235,7 @@ public class AnimationManager {
     }
 
     /**
-     * Sets the timing events period, in milliseconds. 
+     * Sets the timing events period, in milliseconds.
      * This is not a guaranteed resolution but rather a minimal value.
      * @param resolution minimal tick interval, in milliseconds.
      * All animations handled by this AnimationManager share the same
@@ -291,7 +292,7 @@ public class AnimationManager {
 
     private void startEligibleAnimations(){
 	listsLock.lock();
-	try{  
+	try{
 	    //XXX lists may not be the best data structure for
 	    //queued animations, perhaps a hash table is better
 	    List<Animation> transfer = new LinkedList<Animation>();
@@ -343,12 +344,12 @@ public class AnimationManager {
 		    cancel = running;
 		}
 	    }
-	    
+
 	    if(null != cancel){
 		cancel.cancel();
 		runningAnims.remove(cancel);
 	    }
-	    
+
 	} finally {
 	    listsLock.unlock();
 	}
@@ -358,7 +359,7 @@ public class AnimationManager {
     @GuardedBy("listsLock") private final List<Animation> pendingAnims;
 
     //animations are moved here when they are running. Paused animations
-    //also stay here (ie a paused animation still prevents conflicting 
+    //also stay here (ie a paused animation still prevents conflicting
     //candidates from running)
     @GuardedBy("listsLock") private final List<Animation> runningAnims;
 
@@ -370,28 +371,28 @@ public class AnimationManager {
 
     //infinite animation that handles cameras x-y-speed and altitude
     //typically used to implement user-directed camera movement (mouse handlers...)
-    private final InteractiveCameraAnimation currentCamAnim; 
+    private final InteractiveCameraAnimation currentCamAnim;
 
     private final AtomicBoolean started;
 
     /**
      * A class that represents an indefinite, interactive
-     * camera animation. The user interacts with this 
+     * camera animation. The user interacts with this
      * animation by providing instantaneous camera speeds.
      */
     private static class InteractiveCameraAnimation extends DefaultTimingHandler {
 	InteractiveCameraAnimation(VirtualSpaceManager vsm){
 	    this.vsm = vsm;
 	}
-	
+
 	@Override public void timingEvent(float fraction, Object subject, Animation.Dimension dim){
 	    for (VirtualSpace vs:vsm.getVirtualSpaces()){
 	        for (Camera cam:vs.getCameraListAsArray()){
-    	        animateInteractiveCamera(cam);	            
+    	        animateInteractiveCamera(cam);
 	        }
 	    }
 	}
-	
+
     private void animateInteractiveCamera(Camera cam){
         if (null != cam){
             if ((cam.getXspeed() != 0) || (cam.getYspeed() != 0)){
@@ -404,7 +405,7 @@ public class AnimationManager {
                         cam.getAltitude()+cam.getZspeed()));
                 }
                 else {
-                    // was: cam.altitudeOffset(dz);  
+                    // was: cam.altitudeOffset(dz);
                     double a = cam.getAltitude();
                     double b = 0;
                     // FIXME !?!
@@ -428,7 +429,7 @@ public class AnimationManager {
     }
 
 	private final VirtualSpaceManager vsm;
-	
+
     }
 
 }
@@ -441,11 +442,11 @@ public class AnimationManager {
 //@ThreadSafe
 class TickSource extends TimingSource {
     private TickThread tickThread;
-    
+
     public TickSource(TickThread tickThread){
 	this.tickThread = tickThread;
     }
-    
+
     public void setResolution(int resolution){
 	//This has purposely no effect. Animation resolution is set globally,
 	//see AnimationManager#setResolution.
@@ -502,9 +503,8 @@ class TickThread {
     public void removeSubscriber(TickSource ts){
 	receivers.remove(ts);
     }
-	
+
     public void requestStop(){
 		edtTimer.stop();
     }
 }
-
