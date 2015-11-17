@@ -132,8 +132,7 @@ public class SlippyMapViewer implements Java2DPainter {
         nm.createOverview();
         nm.updateOverview();
 
-        //XXX: get bounds from ZUIST scene
-        double[] wnes = {-8192,8192,8192,-8192};
+        double[] wnes = sm.findFarmostRegionCoords();
         sfl = new ShapefileLayer(options.minLon, options.maxLon,
                                  options.minLat, options.maxLat,
                                  wnes);
