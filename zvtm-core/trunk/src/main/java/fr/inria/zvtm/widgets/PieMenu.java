@@ -2,7 +2,7 @@
  *   DATE OF CREATION:  Thu Aug 25 14:14:50 2005
  *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2004-2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2015. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -112,7 +112,7 @@ public abstract class PieMenu {
 	/** Get the menu item at a given index.
 	 * Menu items are ordered counter clockwise, starting with the element placed at the start angle.
 	 *@param i item index
-	 *@return null if i > item count
+	 *@return null if i &gt; item count
 	 */
 	public Glyph getItem(int i){
 		if (i < items.length){

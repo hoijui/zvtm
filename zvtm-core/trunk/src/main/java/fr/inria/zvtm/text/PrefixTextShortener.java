@@ -1,4 +1,4 @@
-/*   Copyright (c) INRIA, 2011. All Rights Reserved
+/*   Copyright (c) INRIA, 2011-2015. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -11,13 +11,13 @@ public class PrefixTextShortener implements TextShortener {
      * Singleton PrefixTextShortener.
      * This class is thread-safe.
      */
-    public static final PrefixTextShortener INSTANCE = 
+    public static final PrefixTextShortener INSTANCE =
         new PrefixTextShortener();
 
     private PrefixTextShortener(){}
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     public String shorten(String source, int len){
         if(len < 0){
@@ -30,5 +30,4 @@ public class PrefixTextShortener implements TextShortener {
 
         return source.substring(0, len);
     }
-} 
-
+}
