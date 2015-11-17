@@ -255,6 +255,16 @@ def fetchTile(tileURL, z, x, y, tgtDir):
     return relPath
 
 ################################################################################
+# Tile numbers to lon/lat
+################################################################################
+def num2deg(xtile, ytile, zoom):
+  n = 2.0 ** zoom
+  lon_deg = xtile / n * 360.0 - 180.0
+  lat_rad = math.atan(math.sinh(math.pi * (1 - 2 * ytile / n)))
+  lat_deg = math.degrees(lat_rad)
+  return (lon_deg, lat_deg)
+
+################################################################################
 # Trace exec on std output
 ################################################################################
 def log(msg, level=0):
@@ -295,6 +305,7 @@ else:
     log(CMD_LINE_HELP)
     sys.exit(0)
 
+
 log("Tile Size: %dx%d" % (TILE_SIZE, TILE_SIZE), 1)
 log("Maximum levels in scene fragments: %d" % MAX_FRAG_DEPTH, 1)
 log("TMS URL prefix: %s" % getTMSURL(), 1)
@@ -303,3 +314,6 @@ createTargetDir(TGT_DIR)
 sox = -int(math.pow(2,ZOOM_DEPTH-1)) * TILE_SIZE / 2
 soy = int(math.pow(2,ZOOM_DEPTH-1)) * TILE_SIZE / 2
 generateTree(ROOT_TILE, ZOOM_DEPTH, 0, sox, soy, TGT_DIR)
+NWlonglat = num2deg(ROOT_TILE[1], ROOT_TILE[2], ROOT_TILE[0])
+SElonglat = num2deg(ROOT_TILE[1]+1, ROOT_TILE[2]+1, ROOT_TILE[0])
+log("NW lon/lat [%s %s]\nSE lon/lat [%s %s]" % (NWlonglat[0], NWlonglat[1], SElonglat[0], SElonglat[1]), 1)
