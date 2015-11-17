@@ -118,7 +118,7 @@ public class SlippyMapViewer implements Java2DPainter {
         initGUI(options);
         mso = new ViewSceneObserver(mView, mCamera, mSpace);
         sm = new SceneManager(new SceneObserver[]{mso}, parseSceneOptions(options));
-        initScene(options.path_to_zuist_map);
+        loadMap(options.path_to_zuist_map);
         EndAction ea  = new EndAction(){
                 public void execute(Object subject, Animation.Dimension dimension){
                    sm.setUpdateLevel(true);
@@ -198,9 +198,9 @@ public class SlippyMapViewer implements Java2DPainter {
         return antialiasing;
     }
 
-    /*-------------     Navigation       -------------*/
+    /*-------------     Data      -------------*/
 
-    void initScene(String zuistMapPath){
+    void loadMap(String zuistMapPath){
         if (zuistMapPath != null){
             File f = new File(zuistMapPath);
             sm.loadScene(parseXML(f), f.getParentFile(), true, null);
