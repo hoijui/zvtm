@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+$Id: pom.xml 5739 2015-11-16 13:51:05Z epietrig $
+-->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>fr.inria.zvtm</groupId>
+  <artifactId>zuist-slippymap</artifactId>
+  <packaging>jar</packaging>
+  <name>ZUIST SlippyMap</name>
+  <version>0.1</version>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <geotools.version>12.1</geotools.version>
+  </properties>
+
+  <!-- Repositories -->
+  <repositories>
+    <repository>
+      <id>zvtm repository</id>
+      <url>http://zvtm.sourceforge.net/maven</url>
+    </repository>
+    <repository>
+      <id>central</id>
+      <name>Maven Repository</name>
+      <url>http://repo1.maven.org/maven2</url>
+    </repository>
+    <!-- for GeoTools -->
+    <repository>
+      <id>maven2-repository.dev.java.net</id>
+      <name>Java.net repository</name>
+      <url>http://download.java.net/maven/2</url>
+    </repository>
+    <repository>
+      <id>osgeo</id>
+      <name>Open Source Geospatial Foundation Repository</name>
+      <url>http://download.osgeo.org/webdav/geotools/</url>
+    </repository>
+  </repositories>
+
+  <!-- Dependencies -->
+  <dependencies>
+    <dependency>
+      <groupId>args4j</groupId>
+      <artifactId>args4j</artifactId>
+      <version>2.0.29</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+         <groupId>fr.inria.zvtm</groupId>
+         <artifactId>zuist-core</artifactId>
+         <version>0.5.0-SNAPSHOT</version>
+     </dependency>
+     <dependency>
+       <groupId>org.geotools</groupId>
+       <artifactId>gt-shapefile</artifactId>
+       <version>${geotools.version}</version>
+     </dependency>
+  </dependencies>
+
+  <!-- Build -->
+
+  <profiles>
+    <profile>
+        <!-- mvn -P main ... -->
+        <id>main</id>
+        <activation>
+          <activeByDefault>true</activeByDefault>
+        </activation>
+        <build>
+            <plugins>
+                <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-compiler-plugin</artifactId>
+                  <version>3.3</version>
+                  <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                    <excludes>
+                      <exclude>**/*Wall*.java</exclude>
+                    </excludes>
+                  </configuration>
+                </plugin>
+             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.6</version>
+                <configuration>
+                  <archive>
+                    <manifest>
+                      <useUniqueVersions>false</useUniqueVersions>
+                      <mainClass>fr.inria.zuist.viewer.SlippyMapViewer</mainClass>
+                      <packageName>fr.inria.zuist.viewer</packageName>
+                      <addClasspath>true</addClasspath>
+                    </manifest>
+                    <manifestEntries>
+                      <mode>development</mode>
+                      <url>${project.url}</url>
+                    </manifestEntries>
+                  </archive>
+                </configuration>
+              </plugin>
+            </plugins>
+        </build>
+    </profile>
+    <profile>
+        <!-- mvn -P wall ... -->
+        <id>wall</id>
+        <dependencies>
+          <dependency>
+            <groupId>fr.inria.zvtm</groupId>
+            <artifactId>zvtm-cluster</artifactId>
+            <version>0.2.9-SNAPSHOT</version>
+          </dependency>
+        </dependencies>
+        <build>
+            <plugins>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>aspectj-maven-plugin</artifactId>
+                    <version>1.7</version>
+                    <configuration>
+                      <weaveDependencies>
+                        <weaveDependency>
+                          <groupId>fr.inria.zvtm</groupId>
+                          <artifactId>zuist-core</artifactId>
+                        </weaveDependency>
+                        <weaveDependency>
+                          <groupId>fr.inria.zvtm</groupId>
+                          <artifactId>zvtm-cluster</artifactId>
+                      </weaveDependency>
+                      </weaveDependencies>
+                      <source>1.7</source>
+                      <target>1.7</target>
+                      <complianceLevel>1.7</complianceLevel>
+                      <!--<showWeaveInfo>true</showWeaveInfo>-->
+                      <aspectLibraries>
+                        <aspectLibrary>
+                          <groupId>fr.inria.zvtm</groupId>
+                          <artifactId>zvtm-cluster</artifactId>
+                        </aspectLibrary>
+                      </aspectLibraries>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <phase>process-sources</phase>
+                            <goals>
+                                <goal>compile</goal>
+                                <goal>test-compile</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.aspectj</groupId>
+                            <artifactId>aspectjtools</artifactId>
+                            <version>1.8.6</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+                <plugin>
+                  <groupId>org.apache.maven.plugins</groupId>
+                  <artifactId>maven-compiler-plugin</artifactId>
+                  <!-- WARNING: when moving to a more recent version such as 3.3, custom glyphs
+                       such as TrainDetailG are no longer displayed in SlaveApp -->
+                  <version>2.3.2</version>
+                  <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                  </configuration>
+                </plugin>
+                <plugin>
+                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.6</version>
+                <configuration>
+                  <archive>
+                    <manifest>
+                        <useUniqueVersions>false</useUniqueVersions>
+                      <mainClass>fr.inria.zuist.viewer.WallSlippyMapViewer</mainClass>
+                      <packageName>fr.inria.zuist.viewer</packageName>
+                      <addClasspath>true</addClasspath>
+                    </manifest>
+                    <manifestEntries>
+                      <mode>development</mode>
+                      <url>${project.url}</url>
+                    </manifestEntries>
+                  </archive>
+                </configuration>
+              </plugin>
+            </plugins>
+        </build>
+    </profile>
+  </profiles>
+
+  <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+          <excludes>
+		    <exclude>python/**</exclude>
+          </excludes>
+      </resource>
+    </resources>
+    <plugins>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>dependency-maven-plugin</artifactId>
+          <version>1.0</version>
+          <executions>
+            <execution>
+              <id>copy-dependencies</id>
+              <phase>package</phase>
+              <goals>
+                <goal>copy-dependencies</goal>
+              </goals>
+              <configuration>
+                <outputDirectory>${project.build.directory}</outputDirectory>
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+    </plugins>
+  </build>
+
+</project>
