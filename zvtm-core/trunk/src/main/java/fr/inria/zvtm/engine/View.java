@@ -123,8 +123,9 @@ public abstract class View {
 
     String vt;
 
-    /**
-     *
+    /** Get view type.
+     *@return one of View.STD_VIEW, View.OPENGL_VIEW or any other view type registered with #registerViewPanelFactory(String ptID, PanelFactory pf)
+     *@see #registerViewPanelFactory(String ptID, PanelFactory pf)
      */
     public String getViewType(){
         return vt;
@@ -181,7 +182,7 @@ public abstract class View {
      * Sets the active repaint interval for this View.
      * By default, active repaint is disabled.
      * @param timeMillis active repaint interval, in milliseconds.
-     *                   if <= 0, active repaint will be disabled.
+     *                   if &lt;= 0, active repaint will be disabled.
      */
     public void setActiveRepaintInterval(int timeMillis){
         activeRepaintTimer.stop();
@@ -191,7 +192,9 @@ public abstract class View {
         }
     }
 
-    /** Get this View's cursor object. */
+    /** Get this View's cursor object.
+     *@return the cursor instance associated with this view.
+     */
     public VCursor getCursor(){
         return mouse;
     }
@@ -215,6 +218,7 @@ public abstract class View {
 
     /**
      * Get the ViewPanel associated with this View.
+     *@return the ViewPanel encapsulated in this View.
      */
     public ViewPanel getPanel(){
         return panel;
@@ -228,7 +232,9 @@ public abstract class View {
         }
     }
 
-    /** Get the java.awt.Component for this View. */
+    /** Get the java.awt.Component for this View.
+     *@return the AWT enclosing component.
+     */
     public abstract Component getFrame();
 
     /**Set the cursor for this View.
@@ -284,26 +290,35 @@ public abstract class View {
     /** Sets whether the mouseMoved callback in ViewListener is triggered when the cursor moves.
      * Set to true by default. Applications that do not care about this callback can disable notification
      * about these events to avoid unnecessary callbacks (an event each sent each time the cursor moves).
+     *@param b true to be notified about cursor move events, false otherwise.
      */
     public void setNotifyCursorMoved(boolean b){
         notifyCursorMoved=b;
     }
 
     /** Tells whether the mouseMoved callback in ViewListener is triggered when the mouse is moved.
-     * Set to true by default.*/
+     * Set to true by default.
+     *@return true if notifying about cursor move events, false if not.
+     */
     public boolean getNotifyCursorMoved(){return notifyCursorMoved;}
 
-    /** Set status bar text. */
+    /** Set status bar text.
+     *@param s text to be displayed.
+     */
     public void setStatusBarText(String s){
         if (statusBar!=null){if (s.equals("")){statusBar.setText(" ");}else{{statusBar.setText(s);}}}
     }
 
-    /** Set font used in status bar text. */
+    /** Set font used in status bar text.
+     *@param f font to be used.
+     */
     public void setStatusBarFont(Font f){
         if (statusBar!=null){statusBar.setFont(f);}
     }
 
-    /** Set color used for status bar text. */
+    /** Set color used for status bar text.
+     *@param c Color used to paint the status bar message.
+     */
     public void setStatusBarForeground(Color c){
         if (statusBar!=null){statusBar.setForeground(c);}
     }
@@ -312,6 +327,7 @@ public abstract class View {
      * Off by default.
      * If enabled, all glyphs below the higest glyph in the drawing stack that fills the viewport will not be painted, as they will be invisible anyway.
      * This computation has a cost. Assess its usefulness and evaluate performance (there is tradeoff).
+     *@param b true to enable, false to disable.
      *@see #getDetectMultiFills()
      */
     public void setDetectMultiFills(boolean b){
@@ -320,6 +336,7 @@ public abstract class View {
 
     /** Tells whether detection of multiple full fills in one view repaint is enabled or not for this View.
      * Off by default.
+     *@return true if enabled, false if disabled.
      *@see #setDetectMultiFills(boolean b)
      */
     public boolean getDetectMultiFills(){
@@ -400,7 +417,9 @@ public abstract class View {
         return panel.activeLayer;
     }
 
-    /** Get the number of layers (cameras) in this View. */
+    /** Get the number of layers (cameras) in this View.
+     *@return the number of layers.
+     */
     public int getLayerCount(){
         return cameras.size();
     }
@@ -408,7 +427,9 @@ public abstract class View {
     /** Update default font used in this View. */
     public void updateFont(){panel.updateFont=true;}
 
-    /** Set antialias rendering hint for this View. */
+    /** Set antialias rendering hint for this View.
+     *@param b true to enable, false to disable.
+     */
     public void setAntialiasing(boolean b){
         if (b!=panel.antialias){
             panel.antialias=b;
@@ -417,20 +438,24 @@ public abstract class View {
         }
     }
 
-    /** Get the value of the antialias rendering hint for this View. */
+    /** Get the value of the antialias rendering hint for this View.
+     *@return true if enabled, false if disabled.
+     */
     public boolean getAntialiasing(){
         return panel.antialias;
     }
 
-    /** Get camera for layer i.
-     *@param i layer index. 0 is the deepest layer (first camera given in the Vector at construction time).
+    /** Get Camera for layer i.
+     *@param i layer index. 0 is the deepest layer (first Camera given in the Vector at construction time).
+     *@return the corresponding Camera.
      */
     public Camera getCameraNumber(int i){
         if (cameras.size()>i){return (Camera)cameras.elementAt(i);}
         else return null;
     }
 
-    /** Get camera corresponding to layer currently active (getting events).
+    /** Get Camera corresponding to layer currently active (getting events).
+     *@return the corresponding Camera.
      */
     public Camera getActiveCamera(){
     return panel.cams[panel.activeLayer];
@@ -455,12 +480,16 @@ public abstract class View {
         cameras.remove(c);
     }
 
-    /** Set background color for this View. */
+    /** Set background color for this View.
+     *@param c background color.
+     */
     public void setBackgroundColor(Color c){
         panel.backColor = c;
     }
 
-    /** Get background color of this view. */
+    /** Get background color of this view.
+     *@return background color.
+     */
     public Color getBackgroundColor(){
         return panel.backColor;
     }
@@ -485,7 +514,9 @@ public abstract class View {
      */
     public abstract void setSize(int width, int height);
 
-    /** Get the dimensions of the ZVTM panel embedded in this View. */
+    /** Get the dimensions of the ZVTM panel embedded in this View.
+     *@return width and height of the panel.
+     */
     public Dimension getPanelSize(){
         return panel.size;
     }
@@ -495,17 +526,21 @@ public abstract class View {
      */
     public abstract void setResizable(boolean resizable);
 
-    /** Shows or hides this View depending on the value of parameter b. */
+    /** Shows or hides this View depending on the value of parameter b.
+     *@param b true to show, false to hide.
+     */
     public abstract void setVisible(boolean b);
 
-    /** Set this View's refresh rate - default is 25.
-     *@param rr positive integer (refresh rate in milliseconds)
+    /** Set this View's refresh rate. Default value: 25.
+     *@param rr refresh rate in milleseconds (positive integer).
      */
     public void setRefreshRate(int rr){
         panel.setRefreshRate(rr);
     }
 
-    /** Get this View's refresh rate - default is 25.*/
+    /** Get this View's refresh rate. Default value: 25.
+     *@return the refresh rate in milliseconds.
+     */
     public int getRefreshRate(){
         return panel.getRefreshRate();
     }
@@ -611,6 +646,7 @@ public abstract class View {
      * This can be useful in some cases, for instance to compute the bounds of a text string
        that has not yet been added to any virtual space.
        This instance of Graphics should not be tampered with (this will be at your own risks).
+       *@return the panel's AWT Graphics context instance.
      */
     public Graphics2D getGraphicsContext(){
         return panel.stableRefToBackBufferGraphics;
@@ -694,7 +730,9 @@ public abstract class View {
         return painters[g];
     }
 
-    /** Get the View's name. */
+    /** Get the View's name.
+     *@return its name.
+     */
     public String getName(){
         return name;
     }
@@ -727,19 +765,21 @@ public abstract class View {
 
     /** Set the padding values customizing the region inside the view in which objects are actually visible.
      *@param wnesPadding padding values in pixels for the west, north, east and south borders
+     *@param layer the layer to which these padding settings should be applied.
      */
     public void setVisibilityPadding(int[] wnesPadding, int layer){
         panel.setVisibilityPadding(wnesPadding, layer);
     }
 
     /** Get the padding values customizing the region inside the view in which objects are actually visible.
+     *@param layer the layer for which padding settings are requested.
      *@return padding values in pixels for the west, north, east and south borders, null if layer is invalid
      */
     public int[] getVisibilityPadding(int layer){
         return panel.getVisibilityPadding(layer);
     }
 
-    /* for gridbagconstraint layout */
+    /* For gridbagconstraint layout */
     static void buildConstraints(GridBagConstraints gbc, int gx,int gy,int gw,int gh,int wx,int wy){
         gbc.gridx=gx;
         gbc.gridy=gy;
@@ -753,10 +793,10 @@ public abstract class View {
 
     /** Activate a lens in this view. This only works with regular views (not OpengGL views - GLEView).
      *@param l the lens instance. Pass null to remove an existing lens.
+     *@return the lens given as argument (null if removing a lens).
      */
     public Lens setLens(Lens l){
-        Lens res = panel.setLens(l);
-        return res;
+        return panel.setLens(l);
     }
 
     /** Get Lens currently active in this view
@@ -866,7 +906,7 @@ public abstract class View {
         *@param c Camera to be moved
         *@param d duration of the animation in ms
         *@param z if false, do not (un)zoom, just translate (default is true)
-        *@param mFactor magnification factor: 1.0 (default) means that the glyph will occupy the whole screen. mFactor > 1 will make the glyph smaller (zoom out). mFactor < 1 will make the glyph appear bigger (zoom in).
+        *@param mFactor magnification factor: 1.0 (default) means that the glyph will occupy the whole screen. mFactor &gt; 1 will make the glyph smaller (zoom out). mFactor &lt; 1 will make the glyph appear bigger (zoom in).
         *@param endAction end action to execute after camera reaches its final position
         *@return the final camera location, null if the camera is not associated with this view.
         */
@@ -975,7 +1015,7 @@ public abstract class View {
      *@param c Camera to be moved
      *@param d duration of the animation in ms
      *@param z if false, do not (un)zoom, just translate (default is true)
-     *@param mFactor magnification factor: 1.0 (default) means that the glyph will occupy the whole screen. mFactor > 1 will make the glyph smaller (zoom out). mFactor < 1 will make the glyph appear bigger (zoom in).
+     *@param mFactor magnification factor: 1.0 (default) means that the glyph will occupy the whole screen. mFactor &gt; 1 will make the glyph smaller (zoom out). mFactor &lt; 1 will make the glyph appear bigger (zoom in).
      *@return the final camera location, null if the camera is not associated with this view.
      */
     public Location centerOnGlyph(Glyph g, Camera c, int d, boolean z, float mFactor){

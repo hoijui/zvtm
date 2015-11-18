@@ -3,7 +3,7 @@
  *   AUTHOR :            Emmanuel Pietriga (emmanuel@w3.org)
  *   MODIF:              Mon Feb 03 10:50:18 2003 by Emmanuel Pietriga
  *   Copyright (c) Emmanuel Pietriga, 2002. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2015. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id $
@@ -19,11 +19,12 @@ import java.util.Vector;
 
 public class Location {
 
-    /**
-     * returns the difference betzeen two locations (l2-l1, how much to go from l1 to l2).
-     * Returned as a vector whose first element is the altitude difference (as a Double) and second element is a Point2D.Double for X,Y difference
+    /** Get the difference between two locations  in position and altitude.
+     *@param l1 first location
+     *@param l2 second location
+     *@return a vector whose first element is the altitude difference (as a Double) and second element is a Point2D.Double for X,Y difference.
      */
-    public static Vector getDifference(Location l1,Location l2){
+    public static Vector getDifference(Location l1, Location l2){
         Vector res=new Vector();
         Double f=new Double(l2.getAltitude()-l1.getAltitude());
         res.add(f);
@@ -52,25 +53,38 @@ public class Location {
     /**a zvtm altitude*/
     public double alt;
 
+    /** Set (x,y) position.
+     *@param p (x,y) coordinates
+     */
     public void setPosition(Point2D.Double p){
         vx=p.x;
         vy=p.y;
     }
 
-    /** Set x-coordinate only. */
+    /** Set x-coordinate only.
+     *@param x coordinate on x-axis.
+     */
     public void setPositionX(double x){
         vx=x;
     }
 
-    /** Set y-coordinate only. */
+    /** Set y-coordinate only.
+     *@param y coordinate on y-axis.
+     */
     public void setPositionY(double y){
         vy=y;
     }
 
+    /** Set altitude.
+     *@param a altitude.
+     */
     public void setAltitude(double a){
         alt=a;
     }
 
+    /** Get (x,y) position.
+     *@return (x,y) coordinates
+     */
     public Point2D.Double getPosition(){
         return new Point2D.Double(vx,vy);
     }
