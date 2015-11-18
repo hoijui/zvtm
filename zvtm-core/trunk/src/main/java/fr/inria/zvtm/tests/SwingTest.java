@@ -42,7 +42,7 @@ public class SwingTest {
     View view;
     VirtualSpace testSpace;
     int foo = 0;
-    
+
     public SwingTest() throws Exception {
         TableModel dataModel = new AbstractTableModel() {
             public int getColumnCount() { return 10; }
@@ -87,28 +87,28 @@ public class SwingTest {
     }
 
     public static void main(String[] args) throws Exception {
-        new SwingTest();    
+        new SwingTest();
     }
 }
 
 class MyEventListener extends SwingListener {
-	
+
 	SwingTest application;
-	
+
 	static float ZOOM_SPEED_COEF = 1.0f/50.0f;
     static double PAN_SPEED_COEF = 50.0;
-   
-	
+
+
 	int lastJPX, lastJPY;
-	
+
 	MyEventListener(SwingTest app){
 		this.application = app;
 	}
-	
+
 	@Override public void press1(ViewPanel v, int mod, int jpx, int jpy, MouseEvent e){
         lastJPX=jpx;
         lastJPY=jpy;
-        v.setDrawDrag(true);
+        v.setDrawSegment(true);
 		pickAndForward(v, e);
     }
 
@@ -116,7 +116,7 @@ class MyEventListener extends SwingListener {
         application.cam.setXspeed(0);
         application.cam.setYspeed(0);
         application.cam.setZspeed(0);
-        v.setDrawDrag(false);
+        v.setDrawSegment(false);
 		pickAndForward(v, e);
     }
 
@@ -137,5 +137,5 @@ class MyEventListener extends SwingListener {
             }
         }
     }
-	
+
 }

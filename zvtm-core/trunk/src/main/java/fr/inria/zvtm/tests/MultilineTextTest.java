@@ -4,7 +4,7 @@
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
- */ 
+ */
 package fr.inria.zvtm.tests;
 
 import fr.inria.zvtm.engine.Camera;
@@ -33,7 +33,7 @@ import java.util.Vector;
  */
 public class MultilineTextTest {
     //shortcut
-    private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE; 
+    private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE;
     private Camera cam;
 
     MultilineTextTest(){
@@ -41,10 +41,10 @@ public class MultilineTextTest {
         cam = vs.addCamera();
         cam.setZoomFloor(-90);
         Vector<Camera> cameras = new Vector<Camera>();
-        cameras.add(cam);	
+        cameras.add(cam);
 
         final View view = vsm.addFrameView(cameras, "MultilineText test",
-                View.STD_VIEW, 800, 600, false, true, true, null);	
+                View.STD_VIEW, 800, 600, false, true, true, null);
         MultilineTestEventHandler eh = new MultilineTestEventHandler();
         view.setListener(eh);
         view.getCursor().getPicker().setListener(eh);
@@ -54,7 +54,7 @@ public class MultilineTextTest {
         adt.setColor(Color.RED);
         adt.setWidthConstraint(42);
         vs.addGlyph(adt);
-    
+
         final MultilineText adt2 = new MultilineText("We apologize for the inconvenience");
         adt2.setColor(Color.BLUE);
         adt2.setFont(new Font("Monospaced", Font.PLAIN, 6));
@@ -77,7 +77,7 @@ public class MultilineTextTest {
                     adt2B.getX(), adt2B.getY(),
                     new Color(0,0,0,0));
                 adt2Bounds.setBorderColor(Color.BLUE);
-                adt2Bounds.move(adt2Bounds.getWidth()/2, 
+                adt2Bounds.move(adt2Bounds.getWidth()/2,
                     -adt2Bounds.getHeight()/2);
                 vs.addGlyph(adt2Bounds);
 
@@ -103,14 +103,14 @@ public class MultilineTextTest {
         public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
             lastJPX = jpx;
             lastJPY = jpy;
-            v.setDrawDrag(true);
+            v.setDrawSegment(true);
             System.out.println(v.getVCursor().getPicker().lastGlyphEntered());
         }
 
         public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
             v.cams[0].setXspeed(0);
             v.cams[0].setYspeed(0);
-            v.setDrawDrag(false);
+            v.setDrawSegment(false);
         }
 
         public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
@@ -153,4 +153,3 @@ public class MultilineTextTest {
 
     }
 }
-

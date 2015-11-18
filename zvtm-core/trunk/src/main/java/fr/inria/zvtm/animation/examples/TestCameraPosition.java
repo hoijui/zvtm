@@ -3,7 +3,7 @@
  *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009-2011.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id$ 
+ * $Id$
  */
 
 package fr.inria.zvtm.animation.examples;
@@ -64,7 +64,7 @@ public class TestCameraPosition {
 	    circles.add(circle);
 	    vs.addGlyph(circle);
 
-	    Animation anim = am.getAnimationFactory().createAnimation(3000, 
+	    Animation anim = am.getAnimationFactory().createAnimation(3000,
 						Animation.INFINITE,
 						Animation.RepeatBehavior.REVERSE,
 						circle,
@@ -73,10 +73,10 @@ public class TestCameraPosition {
 						    final double initX = circle.vx;
 						    final double initY = circle.vy;
 
-						    public void timingEvent(float fraction, 
+						    public void timingEvent(float fraction,
 									    Object subject, Animation.Dimension dim){
 							Glyph g = (Glyph)subject;
-							
+
 							g.moveTo(initX,
 								 Double.valueOf((1-fraction)*initY).doubleValue());
 						    }
@@ -88,7 +88,7 @@ public class TestCameraPosition {
 
 	cam.setLocation(testView.getGlobalView(cam));
     }
-    
+
     public static void main(String[] args){
         System.out.println("-----------------");
         System.out.println("General information");
@@ -96,7 +96,7 @@ public class TestCameraPosition {
         System.out.println("OS type: "+System.getProperty("os.name")+" "+System.getProperty("os.version")+"/"+System.getProperty("os.arch")+" "+System.getProperty("sun.cpu.isalist"));
         System.out.println("-----------------");
         System.out.println("Directory information");
-        System.out.println("Java Classpath: "+System.getProperty("java.class.path"));	
+        System.out.println("Java Classpath: "+System.getProperty("java.class.path"));
         System.out.println("Java directory: "+System.getProperty("java.home"));
         System.out.println("Launching from: "+System.getProperty("user.dir"));
         System.out.println("-----------------");
@@ -124,7 +124,7 @@ public class TestCameraPosition {
 	}
 
 	public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-	    //Animate from the current position to the target position 
+	    //Animate from the current position to the target position
 	    //over the course of a second
 	    final double sx = cam.vx;
 	    final double sy = cam.vy;
@@ -140,10 +140,10 @@ public class TestCameraPosition {
 						      final double endX = ex;
 						      final double endY = ey;
 
-						      public void timingEvent(float fraction, 
+						      public void timingEvent(float fraction,
 									      Object subject, Animation.Dimension dim){
 							  Camera c = (Camera)subject;
-							  
+
 							  c.moveTo((fraction*(endX-startX))+startX,
 								   (fraction*(endY-startY))+startY);
 						      }},
@@ -154,14 +154,14 @@ public class TestCameraPosition {
 						    Animation.Dimension.ALTITUDE,
 						    new DefaultTimingHandler(){
 							final double initZ = cam.getAltitude();
-							public void timingEvent(float fraction, 
+							public void timingEvent(float fraction,
 										Object subject, Animation.Dimension dim){
 							    Camera c = (Camera)subject;
-							    
+
 							    c.setAltitude((initZ + 0.25*initZ*Math.sin(Math.PI * fraction)));
 							}
 
-							@Override public void end(Object subject, 
+							@Override public void end(Object subject,
                                 Animation.Dimension dim){
 							    Camera c = (Camera)subject;
 							    c.setAltitude(initZ);
@@ -169,8 +169,8 @@ public class TestCameraPosition {
 						    }
 						    );
 	    am.startAnimation(trans, true); //force anim start
-	    //XXX I think this makes a case that we should be able to request 
-	    //bypassed animations to execute their end action when forcing 
+	    //XXX I think this makes a case that we should be able to request
+	    //bypassed animations to execute their end action when forcing
 	    //a new animation to start
 	    am.startAnimation(altitude, true);
 	}
@@ -186,13 +186,13 @@ public class TestCameraPosition {
 	}
 
 	public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	    v.setDrawDrag(true);
+	    v.setDrawSegment(true);
 	    application.vsm.getActiveView().mouse.setSensitivity(false);
 	    //because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
 	}
 
 	public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-	    v.setDrawDrag(false);
+	    v.setDrawSegment(false);
 	    application.vsm.getActiveView().mouse.setSensitivity(true);
 	}
 
@@ -203,7 +203,7 @@ public class TestCameraPosition {
 	}
 
 	public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
-	    
+
 	}
 
 	public void mouseWheelMoved(ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e){
@@ -228,9 +228,9 @@ public class TestCameraPosition {
 	}
 
 	public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
-    
+
 	public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){}
-    
+
 	public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 
 	public void viewActivated(View v){}

@@ -3,7 +3,7 @@
  *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009-2011.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id$ 
+ * $Id$
  */
 
 package fr.inria.zvtm.animation.examples;
@@ -54,13 +54,13 @@ public class TestDefaultHandler {
 	AnimationManager am = vsm.getAnimationManager();
 
 	for(int i=0; i<4; ++i){
-	    Animation anim = am.getAnimationFactory().createAnimation(3000, 
+	    Animation anim = am.getAnimationFactory().createAnimation(3000,
 								      1.0,
 								      Animation.RepeatBehavior.LOOP,
 								      circle,
 								      Animation.Dimension.POSITION,
 								      new DefaultTimingHandler(){
-									  public void timingEvent(float fraction, 
+									  public void timingEvent(float fraction,
 												  Object subject, Animation.Dimension dim){
 									      Glyph g = (Glyph)subject;
 									      g.moveTo(100 - Double.valueOf(600*fraction).doubleValue(), 0);
@@ -70,13 +70,13 @@ public class TestDefaultHandler {
 	    am.startAnimation(anim, false);
 	}
 
-	Animation anim = am.getAnimationFactory().createAnimation(8000, 
+	Animation anim = am.getAnimationFactory().createAnimation(8000,
 								  1.0,
 								  Animation.RepeatBehavior.LOOP,
 								  circle,
 								  Animation.Dimension.FILLCOLOR,
 								  new DefaultTimingHandler(){
-								      public void timingEvent(float fraction, 
+								      public void timingEvent(float fraction,
 											      Object subject, Animation.Dimension dim){
 									  Glyph g = (Glyph)subject;
 									  g.setColor(new Color(0,
@@ -85,14 +85,14 @@ public class TestDefaultHandler {
 								      }
 								  });
 	am.startAnimation(anim, false);
-	 
-	Animation animSize = am.getAnimationFactory().createAnimation(4000, 
+
+	Animation animSize = am.getAnimationFactory().createAnimation(4000,
 								      1.0,
 								      Animation.RepeatBehavior.LOOP,
 								      circle,
 								      Animation.Dimension.SIZE,
 								      new DefaultTimingHandler(){
-									  public void timingEvent(float fraction, 
+									  public void timingEvent(float fraction,
 												  Object subject, Animation.Dimension dim){
 									      Glyph g = (Glyph)subject;
 									      g.sizeTo(40+60*fraction);
@@ -101,7 +101,7 @@ public class TestDefaultHandler {
 	am.startAnimation(animSize, false);
 
     }
-    
+
     public static void main(String[] args){
         System.out.println("-----------------");
         System.out.println("General information");
@@ -109,7 +109,7 @@ public class TestDefaultHandler {
         System.out.println("OS type: "+System.getProperty("os.name")+" "+System.getProperty("os.version")+"/"+System.getProperty("os.arch")+" "+System.getProperty("sun.cpu.isalist"));
         System.out.println("-----------------");
         System.out.println("Directory information");
-        System.out.println("Java Classpath: "+System.getProperty("java.class.path"));	
+        System.out.println("Java Classpath: "+System.getProperty("java.class.path"));
         System.out.println("Java directory: "+System.getProperty("java.home"));
         System.out.println("Launching from: "+System.getProperty("user.dir"));
         System.out.println("-----------------");
@@ -119,7 +119,7 @@ public class TestDefaultHandler {
         System.out.println("-----------------");
         new TestDefaultHandler((args.length > 0) ? args[0] : View.STD_VIEW);
     }
-    
+
     class EventHandlerTestDTH implements ViewListener{
 
 	TestDefaultHandler application;
@@ -157,7 +157,7 @@ public class TestDefaultHandler {
 	    lastJPX=jpx;
 	    lastJPY=jpy;
 	    //application.vsm.animator.setActiveCam(v.cams[0]);
-	    v.setDrawDrag(true);
+	    v.setDrawSegment(true);
 	    application.vsm.getActiveView().mouse.setSensitivity(false);
 	    //because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
 	}
@@ -166,7 +166,7 @@ public class TestDefaultHandler {
 	    application.cam.setXspeed(0);
 	    application.cam.setYspeed(0);
 	    application.cam.setZspeed(0);
-	    v.setDrawDrag(false);
+	    v.setDrawSegment(false);
 	    application.vsm.getActiveView().mouse.setSensitivity(true);
 	    /*Camera c=v.cams[0];
 	      application.cam.createCameraAnimation(500,2,new LongPoint(lastX-application.vsm.mouse.vx,lastY-application.vsm.mouse.vy),c.getID());*/
@@ -219,9 +219,9 @@ public class TestDefaultHandler {
 	}
 
 	public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
-    
+
 	public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){}
-    
+
 	public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 
 	public void viewActivated(View v){}
