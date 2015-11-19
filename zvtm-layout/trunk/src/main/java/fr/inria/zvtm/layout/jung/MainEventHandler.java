@@ -30,27 +30,27 @@ class MainEventHandler implements ViewListener, ComponentListener, PortalListene
     static final float WHEEL_ZOOMIN_COEF = 21.0f;
     static final float WHEEL_ZOOMOUT_COEF = 22.0f;
     static float WHEEL_MM_STEP = 1.0f;
-    
+
     //remember last mouse coords
     int lastJPX,lastJPY;
     double lastVX, lastVY;
-    
+
     Viewer application;
-    
+
     boolean pcameraStickedToMouse = false;
     boolean regionStickedToMouse = false;
     boolean inPortal = false;
-    
+
     boolean panning = false;
-    
+
     // region selection
 	boolean selectingRegion = false;
 	double x1, y1, x2, y2;
-	
+
 	boolean cursorNearBorder = false;
-    
+
     Glyph sticked = null;
-    
+
     MainEventHandler(Viewer app){
         this.application = app;
     }
@@ -74,7 +74,7 @@ class MainEventHandler implements ViewListener, ComponentListener, PortalListene
         }
         else {
             panning = true;
-            v.setDrawDrag(true);            
+            v.setDrawSegment(true);
         }
     }
 
@@ -95,14 +95,14 @@ class MainEventHandler implements ViewListener, ComponentListener, PortalListene
 		    application.nm.mCamera.setXspeed(0);
             application.nm.mCamera.setYspeed(0);
             application.nm.mCamera.setZspeed(0);
-            v.setDrawDrag(false);
+            v.setDrawSegment(false);
             panning = false;
 		}
     }
 
     public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
         if (v.lastGlyphEntered() != null){
-    		application.mView.centerOnGlyph(v.lastGlyphEntered(), v.cams[0], ConfigManager.ANIM_MOVE_LENGTH, true, 1.0f);				
+    		application.mView.centerOnGlyph(v.lastGlyphEntered(), v.cams[0], ConfigManager.ANIM_MOVE_LENGTH, true, 1.0f);
 		}
     }
 
@@ -120,7 +120,7 @@ class MainEventHandler implements ViewListener, ComponentListener, PortalListene
 	public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
     public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
-        
+
     public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){}
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
@@ -149,7 +149,7 @@ class MainEventHandler implements ViewListener, ComponentListener, PortalListene
                 application.nm.mCamera.setXspeed((jpx-lastJPX)*(a/PAN_SPEED_COEF));
                 application.nm.mCamera.setYspeed((lastJPY-jpy)*(a/PAN_SPEED_COEF));
                 application.nm.mCamera.setZspeed(0);
-            }		    
+            }
 		}
     }
 
@@ -164,7 +164,7 @@ class MainEventHandler implements ViewListener, ComponentListener, PortalListene
             //wheelDirection == WHEEL_DOWN, zooming out
             application.nm.mCamera.altitudeOffset(-a*WHEEL_ZOOMIN_COEF);
             VirtualSpaceManager.INSTANCE.repaint();
-        }            
+        }
     }
 
 	public void enterGlyph(Glyph g){
@@ -191,7 +191,7 @@ class MainEventHandler implements ViewListener, ComponentListener, PortalListene
     public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 
     public void viewActivated(View v){}
-    
+
     public void viewDeactivated(View v){}
 
     public void viewIconified(View v){}
@@ -208,7 +208,7 @@ class MainEventHandler implements ViewListener, ComponentListener, PortalListene
     public void componentResized(ComponentEvent e){
         application.updatePanelSize();
     }
-    public void componentShown(ComponentEvent e){}    
+    public void componentShown(ComponentEvent e){}
 
 	/* Overview Portal */
 	public void enterPortal(Portal p){
@@ -222,5 +222,5 @@ class MainEventHandler implements ViewListener, ComponentListener, PortalListene
 		((OverviewPortal)p).setBorder(ConfigManager.OV_BORDER_COLOR);
 		VirtualSpaceManager.INSTANCE.repaint();
 	}
-	
+
 }
