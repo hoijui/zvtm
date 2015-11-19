@@ -3,7 +3,7 @@
  *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009-2015.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- */ 
+ */
 package fr.inria.zvtm.cluster.examples;
 
 import org.kohsuke.args4j.Argument;
@@ -40,20 +40,20 @@ import org.jdesktop.animation.timing.interpolation.*;
  */
 public class AnimRings {
     //shortcut
-    private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE; 
+    private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE;
 
     AnimRings(AROptions options){
         vsm.setMaster("AnimRings");
         VirtualSpace vs = vsm.addVirtualSpace("testSpace");
         Camera cam = vs.addCamera();
         Vector<Camera> cameras = new Vector<Camera>();
-        cameras.add(cam);	
+        cameras.add(cam);
         ClusterGeometry clGeom = new ClusterGeometry(
                 options.blockWidth,
                 options.blockHeight,
                 options.numCols,
                 options.numRows);
-        ClusteredView cv = 
+        ClusteredView cv =
             new ClusteredView(
                     clGeom,
                     options.numRows-1, //origin (block number)
@@ -66,7 +66,7 @@ public class AnimRings {
         //the view below is just a standard, non-clustered view
         //that lets an user navigate the scene
         View view = vsm.addFrameView(cameras, "Master View",
-                View.STD_VIEW, 800, 600, false, true, true, null);	
+                View.STD_VIEW, 800, 600, false, true, true, null);
         view.setListener(new PanZoomEventHandler());
 
         Random rnd = new Random();
@@ -86,7 +86,7 @@ public class AnimRings {
                     radius,
                     Math.PI/8,
                     (i % 2 == 0)? 0.5f : 0f,
-                    0, 
+                    0,
                     nextColor,
                     Color.RED);
             vs.addGlyph(glyph);
@@ -101,7 +101,7 @@ public class AnimRings {
                         final double initX = glyph.vx;
                         final double initY = glyph.vy;
 
-                        public void timingEvent(float fraction, 
+                        public void timingEvent(float fraction,
                             Object subject, Animation.Dimension dim){
                             Glyph g = (Glyph)subject;
                             g.moveTo(initX, (1-fraction)*initY);
@@ -152,7 +152,7 @@ public class AnimRings {
         public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
             lastJPX=jpx;
             lastJPY=jpy;
-            v.setDrawDrag(true);
+            v.setDrawSegment(true);
             vsm.getActiveView().mouse.setSensitivity(false);
             //because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
         }
@@ -162,7 +162,7 @@ public class AnimRings {
             c.setXspeed(0);
             c.setYspeed(0);
             c.setZspeed(0);
-            v.setDrawDrag(false);
+            v.setDrawSegment(false);
             vsm.getActiveView().mouse.setSensitivity(true);
         }
 
@@ -234,4 +234,3 @@ class AROptions {
     @Option(name = "-h", aliases = {"--help"}, usage = "print this help message and exit")
         boolean help = false;
 }
-
