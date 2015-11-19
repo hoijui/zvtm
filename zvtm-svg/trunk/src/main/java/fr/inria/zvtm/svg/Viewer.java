@@ -627,7 +627,7 @@ class MainEventHandler implements ViewListener, ComponentListener, PortalListene
             lastJPX = jpx;
             lastJPY = jpy;
             panning = true;
-            v.setDrawDrag(true);
+            v.setDrawSegment(true);
         }
     }
 
@@ -648,7 +648,7 @@ class MainEventHandler implements ViewListener, ComponentListener, PortalListene
             application.nm.mCamera.setXspeed(0);
             application.nm.mCamera.setYspeed(0);
             application.nm.mCamera.setZspeed(0);
-            v.setDrawDrag(false);
+            v.setDrawSegment(false);
             panning = false;
         }
     }
