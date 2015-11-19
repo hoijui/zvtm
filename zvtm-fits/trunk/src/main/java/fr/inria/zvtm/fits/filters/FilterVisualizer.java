@@ -61,7 +61,7 @@ public class FilterVisualizer {
         loadFilters();
         vsm.repaint();
     }
-    
+
     void loadFilters(){
         try {
             Iterator<String> filterClasses = getFilterClasses().iterator();
@@ -82,7 +82,7 @@ public class FilterVisualizer {
 
     static String JAR_NAME = "target/zvtm-fits-"+Utils.VERSION+".jar";
     static String FILTER_PACKAGE_NAME = "fr.inria.zvtm.fits.filters";
-    
+
     public static List getFilterClasses(){
         ArrayList classes = new ArrayList();
         String packageName = FILTER_PACKAGE_NAME.replaceAll("\\." , "/");
@@ -111,7 +111,7 @@ public class FilterVisualizer {
     public static void main(String[] args){
         new FilterVisualizer();
     }
-    
+
 }
 
 class FVListener implements ViewListener {
@@ -124,11 +124,11 @@ class FVListener implements ViewListener {
     FVListener(FilterVisualizer app){
         application = app;
     }
-    
+
     public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
         lastJPX=jpx;
         lastJPY=jpy;
-        v.setDrawDrag(true);
+        v.setDrawSegment(true);
         application.vsm.getActiveView().mouse.setSensitivity(false);
     }
 
@@ -136,7 +136,7 @@ class FVListener implements ViewListener {
         v.cams[0].setXspeed(0);
         v.cams[0].setYspeed(0);
         v.cams[0].setZspeed(0);
-        v.setDrawDrag(false);
+        v.setDrawSegment(false);
         application.vsm.getActiveView().mouse.setSensitivity(true);
     }
 
@@ -200,11 +200,11 @@ class FVListener implements ViewListener {
     }
 
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
-    
+
     public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
-        
+
     }
-    
+
     public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 
     public void viewActivated(View v){}

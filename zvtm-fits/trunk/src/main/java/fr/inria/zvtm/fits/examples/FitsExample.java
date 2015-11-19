@@ -346,7 +346,7 @@ class IFEEventHandler implements ViewListener {
         lastJPY = jpy;
         if (navMode == FIRST_ORDER){
             first_order_dragging = true;
-            v.setDrawDrag(true);
+            v.setDrawSegment(true);
         }
         else {
             // ZERO_ORDER
@@ -372,7 +372,7 @@ class IFEEventHandler implements ViewListener {
             c.setXspeed(0);
             c.setYspeed(0);
             c.setZspeed(0);
-            v.setDrawDrag(false);
+            v.setDrawSegment(false);
             first_order_dragging = false;
         }
 
@@ -405,7 +405,7 @@ class IFEEventHandler implements ViewListener {
         /*
         lastJPX=jpx;
         lastJPY=jpy;
-        v.setDrawDrag(true);
+        v.setDrawSegment(true);
         app.vsm.getActiveView().mouse.setSensitivity(false);
         */
         //because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
@@ -416,7 +416,7 @@ class IFEEventHandler implements ViewListener {
         v.cams[0].setXspeed(0);
         v.cams[0].setYspeed(0);
         v.cams[0].setZspeed(0);
-        v.setDrawDrag(false);
+        v.setDrawSegment(false);
         app.vsm.getActiveView().mouse.setSensitivity(true);
         */
         //v.parent.setActiveLayer(0);
@@ -1111,4 +1111,3 @@ class FitsHistogram extends Composite {
 
 
 }
-
