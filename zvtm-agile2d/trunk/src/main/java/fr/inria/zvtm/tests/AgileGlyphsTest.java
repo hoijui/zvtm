@@ -32,7 +32,7 @@ public class AgileGlyphsTest {
     Camera mCam;
 
     View testView;
-    
+
     AgileGlyphsTest(String vt){
         vsm = VirtualSpaceManager.INSTANCE;
         vsm.setDebug(true);
@@ -59,16 +59,16 @@ public class AgileGlyphsTest {
         else {
             System.out.println("Instantiating a GLCanvas-backed view");
             View.registerViewPanelFactory(AgileGLCanvasFactory.AGILE_GLC_VIEW, new AgileGLCanvasFactory());
-            testView = vsm.addFrameView(cameras, View.ANONYMOUS, AgileGLCanvasFactory.AGILE_GLC_VIEW, 800, 600, true);            
+            testView = vsm.addFrameView(cameras, View.ANONYMOUS, AgileGLCanvasFactory.AGILE_GLC_VIEW, 800, 600, true);
         }
         testView.setBackgroundColor(Color.LIGHT_GRAY);
         testView.setListener(eh);
         vs.getCamera(0).setAltitude(0);
         populate();
         testView.getGlobalView(mCam, 500, 1.5f);
-        testView.setNotifyCursorMoved(true);        
+        testView.setNotifyCursorMoved(true);
     }
-    
+
     void toggleDynaSpot(){
         testView.getCursor().getDynaPicker().activateDynaSpot(!testView.getCursor().getDynaPicker().isDynaSpotActivated());
     }
@@ -249,7 +249,7 @@ public class AgileGlyphsTest {
         im.moveTo(200, 360);
         vs.addGlyph(im);
     }
-    
+
     void translate(){
         Point2D.Double translation = new Point2D.Double(400, -200);
         AnimationFactory af = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory();
@@ -258,7 +258,7 @@ public class AgileGlyphsTest {
             VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, true);
         }
     }
-    
+
     void rotate(){
         AnimationFactory af = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory();
         for (Glyph g:vs.getAllGlyphs()){
@@ -274,7 +274,7 @@ public class AgileGlyphsTest {
         System.out.println("OS type: "+System.getProperty("os.name")+" "+System.getProperty("os.version")+"/"+System.getProperty("os.arch")+" "+System.getProperty("sun.cpu.isalist"));
         System.out.println("-----------------");
         System.out.println("Directory information");
-        System.out.println("Java Classpath: "+System.getProperty("java.class.path"));	
+        System.out.println("Java Classpath: "+System.getProperty("java.class.path"));
         System.out.println("Java directory: "+System.getProperty("java.home"));
         System.out.println("Launching from: "+System.getProperty("user.dir"));
         System.out.println("-----------------");
@@ -284,40 +284,40 @@ public class AgileGlyphsTest {
         System.out.println("-----------------");
         new AgileGlyphsTest((args.length > 0) ? args[0] : AgileGLCanvasFactory.AGILE_GLC_VIEW);
     }
-    
+
 }
 
 class TestEventHandler extends ViewAdapter {
-    
+
     static float ZOOM_SPEED_COEF = 1.0f/50.0f;
     static double PAN_SPEED_COEF = 50.0;
-    
+
     AgileGlyphsTest application;
-    
+
     int lastJPX,lastJPY;
-    
+
     TestEventHandler(AgileGlyphsTest t){
         this.application = t;
     }
-    
+
     public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
         lastJPX = jpx;
         lastJPY = jpy;
-        v.setDrawDrag(true);
+        v.setDrawSegment(true);
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
         application.mCam.setXspeed(0);
         application.mCam.setYspeed(0);
-        v.setDrawDrag(false);
+        v.setDrawSegment(false);
     }
-    
+
     public void mouseMoved(ViewPanel v, int jpx, int jpy, MouseEvent e){
         if (application.testView.getCursor().getDynaPicker().isDynaSpotActivated()){
-            v.getVCursor().getDynaPicker().dynaPick(application.mCam);            
+            v.getVCursor().getDynaPicker().dynaPick(application.mCam);
         }
     }
-    
+
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
         if (buttonNumber == 1){
             Camera c = application.mCam;
@@ -326,7 +326,7 @@ class TestEventHandler extends ViewAdapter {
             application.mCam.setYspeed((c.altitude>0) ? (long)((lastJPY-jpy)*(a/PAN_SPEED_COEF)) : (long)((lastJPY-jpy)/(a*PAN_SPEED_COEF)));
         }
     }
-    
+
     public void mouseWheelMoved(ViewPanel v, short wheelDirection, int jpx, int jpy, MouseWheelEvent e){
         Camera c = application.mCam;
         double a = (c.focal+Math.abs(c.altitude)) / c.focal;
@@ -340,7 +340,7 @@ class TestEventHandler extends ViewAdapter {
             VirtualSpaceManager.INSTANCE.repaint();
         }
     }
-    
+
     public void enterGlyph(Glyph g){
         g.highlight(true, null);
         System.out.println(g);
@@ -349,7 +349,7 @@ class TestEventHandler extends ViewAdapter {
     public void exitGlyph(Glyph g){
         g.highlight(false, null);
     }
-    
+
     public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
         if (c == 't'){application.translate();}
         else if (c == 'r'){application.rotate();}
@@ -357,9 +357,9 @@ class TestEventHandler extends ViewAdapter {
         else if (code == KeyEvent.VK_1){((AgileViewPanel)v).setFontRenderingStrategy(agile2d.AgileGraphics2D.BEST_TEXT_RENDERING_STRATEGY);}
         else if (code == KeyEvent.VK_2){((AgileViewPanel)v).setFontRenderingStrategy(agile2d.AgileGraphics2D.ROUGH_TEXT_RENDERING_STRATEGY);}
     }
-    
+
     public void viewClosing(View v){
         System.exit(0);
     }
-    
+
 }
