@@ -137,7 +137,7 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
         else {
             if (navMode == FIRST_ORDER){
                 first_order_dragging = true;
-                v.setDrawDrag(true);
+                v.setDrawSegment(true);
             }
             else {
                 // ZERO_ORDER
@@ -164,7 +164,7 @@ class TIVEventHandler implements ViewListener, ComponentListener, PortalListener
             c.setXspeed(0);
             c.setYspeed(0);
             c.setZspeed(0);
-            v.setDrawDrag(false);
+            v.setDrawSegment(false);
             first_order_dragging = false;
         }
         if (draggingMagWindow){
