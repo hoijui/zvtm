@@ -36,27 +36,52 @@ import com.vividsolutions.jts.geom.Point;
 import fr.inria.zvtm.glyphs.SICircle;
 import fr.inria.zvtm.glyphs.BoatInfoG;
 import fr.inria.zvtm.engine.VirtualSpace;
-
+import fr.inria.zuist.engine.SceneManager;
+import fr.inria.zuist.engine.Level;
+import fr.inria.zuist.engine.Region;
 
 public class ShapefileLayer {
 
     static final double MIN_DISTANCE_BETWEEN_BOATS = 50;
 
-    Point2D.Double NWcorner, SEcorner;
-
-    double AX, BX, AY, BY;
+    // projection from lat/lon to virtual space
+    GoogleProjection GP;
+    // slippy map transform
+    Point2D.Double SMT = new Point2D.Double(0,0);
 
     Vector<Boat> allBoats = new Vector();
 
     // sceneBounds as wnes
-    public ShapefileLayer(double minLon, double maxLon, double minLat, double maxLat,
-                          double[] sceneBounds){
-        NWcorner = new Point2D.Double(minLon, maxLat);
-        SEcorner = new Point2D.Double(maxLon, minLat);
-        AX = (sceneBounds[2]-sceneBounds[0]) / ((double)(SEcorner.getX()-NWcorner.getX()));
-        BX = (SEcorner.getX()*sceneBounds[0]-NWcorner.getX()*sceneBounds[2]) / ((double)(SEcorner.getX()-NWcorner.getX()));
-        AY = (sceneBounds[3]-sceneBounds[1]) / ((double)(SEcorner.getY()-NWcorner.getY()));
-        BY = (SEcorner.getY()*sceneBounds[1]-NWcorner.getY()*sceneBounds[3]) / ((double)(SEcorner.getY()-NWcorner.getY()));
+    public ShapefileLayer(){}
+
+    void computeSlippyMapTransform(SceneManager sm, int tileSize){
+        Level l = sm.getLevel(sm.getLevelCount()-1);
+        double[] wnes = sm.findFarmostRegionCoords();
+        Region topLeftR = l.getClosestRegion(new Point2D.Double(wnes[0], wnes[1]));
+        // assumes IDs of the form Rz-x-y, like R11-544-736
+        String[] zxy = topLeftR.getID().substring(1).split("-");
+        GP = new GoogleProjection(tileSize, Integer.parseInt(zxy[0]));
+        SMT.setLocation(tileSize*Integer.parseInt(zxy[1])-wnes[0],
+                        -tileSize*Integer.parseInt(zxy[2])-wnes[1]);
+    }
+
+    Point2D.Double fromLLToPixel(double lon, double lat, Point2D.Double res){
+        GP.fromLLToPixel(lon, lat, res);
+        res.setLocation(res.x-SMT.x, res.y-SMT.y);
+        return res;
+    }
+
+    Point2D.Double fromLLToPixel(double lon, double lat){
+        return fromLLToPixel(lon, lat, new Point2D.Double());
+    }
+
+    Point2D.Double fromPixelToLL(double x, double y, Point2D.Double res){
+        GP.fromPixelToLL(x+SMT.x, y+SMT.y, res);
+        return res;
+    }
+
+    Point2D.Double fromPixelToLL(double x, double y){
+        return fromPixelToLL(x, y, new Point2D.Double());
     }
 
     void loadShapes(File shapeFile, VirtualSpace vs){
@@ -72,17 +97,16 @@ public class ShapefileLayer {
                 while(fi.hasNext()){
                     SimpleFeature f = fi.next();
                     Point p = (Point)f.getAttribute(0);
-                    double vx = AX * p.getX() + BX;
-                    double vy = AY * p.getY() + BY;
+                    Point2D.Double vp = fromLLToPixel(p.getY(), p.getX());
                     boolean tooClose = false;
                     for (Boat boat:allBoats){
-                        if (boat.distanceTo(vx,vy) < MIN_DISTANCE_BETWEEN_BOATS){
+                        if (boat.distanceTo(vp.getX(),vp.getY()) < MIN_DISTANCE_BETWEEN_BOATS){
                             tooClose = true;
                             break;
                         }
                     }
                     if (!tooClose){
-                        Boat boat = new Boat(vx, vy, f.getAttributes());
+                        Boat boat = new Boat(vp.getX(), vp.getY(), f.getAttributes());
                         vs.addGlyph(boat.glyph);
                         allBoats.add(boat);
                     }

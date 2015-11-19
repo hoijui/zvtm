@@ -160,9 +160,7 @@ class ExplorerEventHandler implements ViewListener, CameraListener, ComponentLis
         }
     }
 
-    public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
-        // System.out.println(v.getVCursor().getVSXCoordinate()+" "+v.getVCursor().getVSYCoordinate());
-    }
+    public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){}
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
         if (panning){

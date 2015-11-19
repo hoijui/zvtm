@@ -120,6 +120,7 @@ public class SlippyMapViewer implements Java2DPainter {
         initGUI(options);
         mso = new ViewSceneObserver(mView, mCamera, mSpace);
         sm = new SceneManager(new SceneObserver[]{mso}, parseSceneOptions(options));
+        sfl = new ShapefileLayer();
         loadMap(options.path_to_zuist_map);
         EndAction ea  = new EndAction(){
                 public void execute(Object subject, Animation.Dimension dimension){
@@ -131,11 +132,7 @@ public class SlippyMapViewer implements Java2DPainter {
         eh.cameraMoved(mCamera, null, 0);
         nm.createOverview();
         nm.updateOverview();
-
-        double[] wnes = sm.findFarmostRegionCoords();
-        sfl = new ShapefileLayer(options.minLon, options.maxLon,
-                                 options.minLat, options.maxLat,
-                                 wnes);
+        sfl.computeSlippyMapTransform(sm, options.tileSize);
         if (options.path_to_shapefile != null){
             File f = new File(options.path_to_shapefile);
             sfl.loadShapes(f, bSpace);

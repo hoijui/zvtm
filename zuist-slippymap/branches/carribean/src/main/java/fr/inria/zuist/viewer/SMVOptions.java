@@ -52,18 +52,8 @@ public class SMVOptions {
     @Option(name = "-password", usage = "HTTPS password")
     public String httpPassword = null;
 
-    @Option(name = "-minLon", aliases = {"--minimum-longitude"}, usage = "western bound")
-    public double minLon = 0;
-
-    @Option(name = "-maxLon", aliases = {"--maximum-longitude"}, usage = "eastern bound")
-    public double maxLon = 0;
-
-    @Option(name = "-minLat", aliases = {"--minimum-latitude"}, usage = "southern bound")
-    public double minLat = 0;
-
-    @Option(name = "-maxLat", aliases = {"--maximum-latitude"}, usage = "northern bound")
-    public double maxLat = 0;
-
+    @Option(name = "-ts", aliases = {"--tile-size"}, usage = "slippy map tile size")
+    public int tileSize = 256;
 
     @Argument
     List<String> arguments = new ArrayList<String>();
