@@ -148,7 +148,7 @@ class NamesDemo {
             @Override public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
                 lastJPX=jpx;
                 lastJPY=jpy;
-                v.setDrawDrag(true);
+                v.setDrawSegment(true);
                 VirtualSpaceManager.INSTANCE.getActiveView().mouse.setSensitivity(false);
             }
 
@@ -157,7 +157,7 @@ class NamesDemo {
                 c.setXspeed(0);
                 c.setYspeed(0);
                 c.setZspeed(0);
-                v.setDrawDrag(false);
+                v.setDrawSegment(false);
                 VirtualSpaceManager.INSTANCE.getActiveView().mouse.setSensitivity(true);
             }
         });
