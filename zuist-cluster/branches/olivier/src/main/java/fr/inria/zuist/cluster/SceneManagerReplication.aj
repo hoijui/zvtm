@@ -97,6 +97,51 @@ aspect SceneManagerReplication {
         }
     }
 
+    //----------------------------
+    //
+    
+    pointcut sceneManagerPCreation(SceneManager sceneManager,
+            PseudoView pv, HashMap<String,String> properties) :
+        execution(public SceneManager.new(PseudoView, HashMap<String,String>)) &&
+        if(VirtualSpaceManager.INSTANCE.isMaster()) &&
+        this(sceneManager) &&
+        args(pv, properties);
+
+    after(SceneManager sceneManager,
+            PseudoView pv,
+            HashMap<String,String> properties)
+        returning() :
+        sceneManagerPCreation(sceneManager, pv, properties) &&
+        !cflowbelow(sceneManagerPCreation(SceneManager, PseudoView, HashMap<String,String>)){
+            
+            pv.vs.setZuistOwned(true);
+
+            sceneManager.setReplicated(true);
+
+            SceneManagerPCreateDelta delta =
+                new SceneManagerPCreateDelta(sceneManager.getObjId(),
+                        pv.getObjId(), properties);
+            VirtualSpaceManager.INSTANCE.sendDelta(delta);
+        }
+
+    private static class SceneManagerPCreateDelta implements Delta {
+        private final ObjId<SceneManager> smId;
+        private final ObjId<PseudoView> pvId;
+        private final HashMap<String,String> properties;
+
+        SceneManagerPCreateDelta(ObjId<SceneManager> smId, ObjId<PseudoView> pvId,
+                                HashMap<String,String> props){
+            this.smId = smId;
+            this.pvId = pvId;
+            this.properties = props;
+        }
+
+        public void apply(SlaveUpdater su){
+            SceneManager sm =
+                new SceneManager(su.getSlaveObject(pvId), properties);
+            su.putSlaveObject(smId, sm);
+        }
+    }
     // -----------------------
     // addPseudoView
     pointcut addPseudoView(SceneManager sceneManager, int idx, PseudoView pv) :
@@ -106,44 +151,40 @@ aspect SceneManagerReplication {
         args(idx, pv);
 
     after(SceneManager sceneManager, int idx, PseudoView pv)  
-        : //returning(boolean b) :
+        returning(boolean b) :
         addPseudoView(sceneManager, idx, pv)  &&
-        if(VirtualSpaceManager.INSTANCE.isMaster()) //&&
-        //!cflowbelow(addPseudoView(SceneManager, int, PseudoView))
+        if(VirtualSpaceManager.INSTANCE.isMaster()) &&
+        !cflowbelow(addPseudoView(SceneManager, int, PseudoView))
         {
             //b.setReplicated(true);
-            VirtualSpace vs = pv.vs;
-            Camera c = pv.c;
+            pv.vs.setZuistOwned(true);
+            // pv.setReplicated(true);
             AddPseudoViewCreateDelta delta =
-                new AddPseudoViewCreateDelta(sceneManager.getObjId(), idx, vs.getObjId(), c.getObjId()); //pv.getObjId());
+                new AddPseudoViewCreateDelta(sceneManager.getObjId(), idx, pv.getObjId());
             VirtualSpaceManager.INSTANCE.sendDelta(delta);
         }
 
     private static class AddPseudoViewCreateDelta implements Delta {
         private final ObjId<SceneManager> smId;
         private final int idx;
-        //private final ObjId<PseudoView> pvId;
-        private final ObjId<VirtualSpace> vsId;
-        private final ObjId<Camera> cId;
+        private final ObjId<PseudoView> pvId;
 
-        AddPseudoViewCreateDelta(ObjId<SceneManager> smId, int idx,  ObjId<VirtualSpace> vsId, ObjId<Camera> cId) {//ObjId<PseudoView> pvId){
+         AddPseudoViewCreateDelta(ObjId<SceneManager> smId, int idx, ObjId<PseudoView> pvId){
             this.smId = smId;
             this.idx = idx;
-            //this.pvId = pvId;
-            this.vsId = vsId;
-            this.cId = cId;
+            this.pvId = pvId;
         }
 
         public void apply(SlaveUpdater su){
             SceneManager sm = su.getSlaveObject(smId);
-            //PseudoView pv = su.getSlaveObject(pvId);
-            VirtualSpace vs = su.getSlaveObject(vsId);
-            Camera c = su.getSlaveObject(cId);
-            boolean b = sm.addPseudoView(idx, new PseudoView(vs, c, 0));
+            PseudoView pv = su.getSlaveObject(pvId);
+            boolean b = sm.addPseudoView(idx, pv);
+            System.out.println("slave Add Pweudo View "+ idx + " "+ pv.getWidth() +" "+ pv.getHeight());
         }
     }
+
     // -----------------------
-    // removePseudoView ... does not work well !!! 
+    // removePseudoView ... does not work well !!!  FIXED ?
     pointcut removePseudoView(SceneManager sceneManager, PseudoView pv) :
         execution(public boolean SceneManager.removePseudoView(PseudoView)) &&
         if(VirtualSpaceManager.INSTANCE.isMaster()) &&
@@ -151,13 +192,16 @@ aspect SceneManagerReplication {
         args(pv);
 
     after(SceneManager sceneManager, PseudoView pv)  
-        : //returning(boolean b) :
+        returning(boolean b) :
         removePseudoView(sceneManager, pv)  &&
-        if(VirtualSpaceManager.INSTANCE.isMaster()) //&&
-        //!cflowbelow(removePseudoView(SceneManager, PseudoView))
+        if(VirtualSpaceManager.INSTANCE.isMaster()) &&
+        !cflowbelow(removePseudoView(SceneManager, PseudoView))
         {
             //b.setReplicated(true);
 
+            // FIXME should we do that
+            // pv.vs.setZuistOwned(false);
+            // pv.setReplicated(true);
             RemovePseudoViewCreateDelta delta =
                 new RemovePseudoViewCreateDelta(sceneManager.getObjId(), pv.getObjId());
             VirtualSpaceManager.INSTANCE.sendDelta(delta);
@@ -176,6 +220,7 @@ aspect SceneManagerReplication {
             SceneManager sm = su.getSlaveObject(smId);
             PseudoView pv = su.getSlaveObject(pvId);
             boolean b = sm.removePseudoView(pv);
+            System.out.println("slave removePseudoView "+ pv.getWidth() +" "+ pv.getHeight());
         }
     }
 
@@ -443,6 +488,7 @@ aspect SceneManagerReplication {
                    id, zindex, region,
                    imageURL, sensitivity,
                    stroke, alpha, params);
+           // System.out.println("slave createImageDescription " + params.substring(3));
            su.putSlaveObject(descId, desc);
        }
     }
@@ -692,4 +738,77 @@ aspect SceneManagerReplication {
        }
     }
 
+    // -----------------------
+    // 
+    pointcut enableRegionUpdater(SceneManager sceneManager, PseudoView pv, boolean b) :
+        execution(public void SceneManager.enableRegionUpdater(PseudoView, boolean)) &&
+        if(VirtualSpaceManager.INSTANCE.isMaster()) &&
+        this(sceneManager) &&
+        args(pv, b);
+
+    after(SceneManager sceneManager, PseudoView pv, boolean b)  
+        : //returning(boolean b) :
+        enableRegionUpdater(sceneManager, pv, b)  &&
+        if(VirtualSpaceManager.INSTANCE.isMaster()) &&
+        !cflowbelow(enableRegionUpdater(SceneManager, PseudoView, boolean))
+        {
+            EnableRegionUpdaterCreateDelta delta =
+                new EnableRegionUpdaterCreateDelta(sceneManager.getObjId(), pv.getObjId(), b);
+            VirtualSpaceManager.INSTANCE.sendDelta(delta);
+        }
+
+    private static class EnableRegionUpdaterCreateDelta implements Delta {
+        private final ObjId<SceneManager> smId;
+        private final ObjId<PseudoView> pvId;
+          private final boolean b;
+       
+        EnableRegionUpdaterCreateDelta(ObjId<SceneManager> smId, ObjId<PseudoView> pvId, boolean b){
+            this.smId = smId;
+            this.pvId = pvId;
+            this.b = b;
+        }
+
+        public void apply(SlaveUpdater su){
+            SceneManager sm = su.getSlaveObject(smId);
+            PseudoView pv = su.getSlaveObject(pvId);
+            sm.enableRegionUpdater(pv, b);
+        }
+    }
+
+    // -----------------------
+    // 
+    pointcut setUpdateLevel(SceneManager sceneManager, PseudoView pv, boolean b) :
+        execution(public void SceneManager.setUpdateLevel(PseudoView, boolean)) &&
+        if(VirtualSpaceManager.INSTANCE.isMaster()) &&
+        this(sceneManager) &&
+        args(pv, b);
+
+    after(SceneManager sceneManager, PseudoView pv, boolean b)  
+        : //returning(boolean b) :
+        setUpdateLevel(sceneManager, pv, b)  &&
+        if(VirtualSpaceManager.INSTANCE.isMaster()) &&
+        !cflowbelow(setUpdateLevel(SceneManager, PseudoView, boolean))
+        {
+            SetUpdateLevelCreateDelta delta =
+                new SetUpdateLevelCreateDelta(sceneManager.getObjId(), pv.getObjId(), b);
+            VirtualSpaceManager.INSTANCE.sendDelta(delta);
+        }
+
+    private static class SetUpdateLevelCreateDelta implements Delta {
+        private final ObjId<SceneManager> smId;
+        private final ObjId<PseudoView> pvId;
+          private final boolean b;
+       
+        SetUpdateLevelCreateDelta(ObjId<SceneManager> smId, ObjId<PseudoView> pvId, boolean b){
+            this.smId = smId;
+            this.pvId = pvId;
+            this.b = b;
+        }
+
+        public void apply(SlaveUpdater su){
+            SceneManager sm = su.getSlaveObject(smId);
+            PseudoView pv = su.getSlaveObject(pvId);
+            sm.setUpdateLevel(pv, b);
+        }
+    }
 }
