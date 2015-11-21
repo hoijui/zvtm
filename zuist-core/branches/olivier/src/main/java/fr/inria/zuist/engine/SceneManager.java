@@ -243,20 +243,30 @@ public class SceneManager implements CameraListener, PseudoViewListener {
         RESOURCE_HANDLERS = new HashMap<String, ResourceHandler>(5);
     }
 
+    public SceneManager(PseudoView pv, HashMap<String,String> properties){
+        addPseudoView(pv);
+        this.setProperties(properties);
+        regUpdater = new RegionUpdater();
+        glyphLoader = new GlyphLoader(this);
+        id2region = new Hashtable<String,Region>();
+        id2object = new Hashtable<String,ObjectDescription>();
+        sceneAttrs = new HashMap(5,1);
+        RESOURCE_HANDLERS = new HashMap<String, ResourceHandler>(5);
+    }
 
     /* --------- the "views" on the scene -------------------- */
 
     Vector<PseudoView> pseudoViews = new Vector<PseudoView>();
 
     public boolean addPseudoView(PseudoView pv){
-        pseudoViews.add(pv);
-        pv.c.addListener(this);
-        pv.addListener(this);
-        // 
-        return true;
+        //pseudoViews.add(pv);
+        //pv.c.addListener(this);
+        //pv.addListener(this);
+        return addPseudoView(-1,pv);
     }
 
     public boolean addPseudoView(int idx, PseudoView pv){
+        // FIXME add some safty check
         if (idx == -1){
             pseudoViews.add(pv);
         }
@@ -270,6 +280,7 @@ public class SceneManager implements CameraListener, PseudoViewListener {
     }
 
     public boolean removePseudoView(PseudoView pv){
+         // FIXME add some safty check
         // unload stuff...
         if (pv.currentLevel >= 0 && pv.currentLevel < levels.length)
         {
@@ -288,6 +299,7 @@ public class SceneManager implements CameraListener, PseudoViewListener {
     }
 
     public boolean removePseudoView(int idx){
+         // FIXME add some safty check
         PseudoView pv = pseudoViews.elementAt(idx);
         if (pv != null) return removePseudoView(pv);
         return false;
@@ -917,6 +929,7 @@ public class SceneManager implements CameraListener, PseudoViewListener {
     public ImageDescription createImageDescription(double x, double y, double w, double h, String id, int zindex, Region region,
                                                    URL imageURL, boolean sensitivity, Color stroke, float alpha, String params){
         Object interpolation = (params != null && params.startsWith(_im)) ? parseInterpolation(params.substring(3)) : RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
+        interpolation = RenderingHints.VALUE_INTERPOLATION_BILINEAR;
         ImageDescription imd = new ImageDescription(id, x, y, zindex, w, h, imageURL, stroke, alpha, interpolation, region);
         imd.setSensitive(sensitivity);
         region.addObject(imd);
@@ -1084,10 +1097,12 @@ public class SceneManager implements CameraListener, PseudoViewListener {
     /* ----------- level / region visibility update ----------- */
 
     public void enableRegionUpdater(boolean b){
+        if (DEBUG_MODE){System.err.println("enableRegionUpdater: "+b);}
         regUpdater.setEnabled(b);
     }
 
     public void enableRegionUpdater(PseudoView pv, boolean b){
+        if (DEBUG_MODE){System.err.println("enableRegionUpdater for PseudoView: "+b);}
         pv.regUpdaterEnabled = b;
     }
 
@@ -1098,6 +1113,7 @@ public class SceneManager implements CameraListener, PseudoViewListener {
      *@see #updateLevel(int layerIndex, double[] cameraBounds, double altitude)
      */
     public void setUpdateLevel(boolean b){
+        if (DEBUG_MODE){System.err.println("update level: "+b);}
         updateLevel = b;
         //update level for every camera
         if(updateLevel){
@@ -1114,6 +1130,7 @@ public class SceneManager implements CameraListener, PseudoViewListener {
      *@see #updateLevel(int layerIndex, double[] cameraBounds, double altitude)
      */
     public void setUpdateLevel(PseudoView pv, boolean b){
+        if (DEBUG_MODE){System.err.println("update level for pseudo view: "+b); }
         pv.updateLevel = b;
         //update level for the pv camera
         if(pv.updateLevel){
@@ -1369,6 +1386,7 @@ public class SceneManager implements CameraListener, PseudoViewListener {
         //double[] cameraBounds = pv.getVisibleRegion();
         //updateVisibleRegions(pv, cameraBounds);
         // use regUpdater
+        //if (DEBUG_MODE){System.err.println("Size of the pseudo view changed");}
         regUpdater.addEntry(pv.c, pv.c.getLocation());
     }
 

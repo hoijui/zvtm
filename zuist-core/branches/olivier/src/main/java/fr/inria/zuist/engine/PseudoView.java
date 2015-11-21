@@ -57,7 +57,7 @@ public class PseudoView
 	}
 
 	public int getWidth() { return width; }
-	public int getHigth() { return height; }
+	public int getHeight() { return height; }
 
 	
 	public double[] getVisibleRegion(){

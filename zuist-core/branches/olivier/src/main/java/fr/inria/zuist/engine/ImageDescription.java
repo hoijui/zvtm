@@ -25,6 +25,10 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.lang.reflect.InvocationTargetException;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.glyphs.Glyph;
@@ -47,6 +51,9 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.util.EntityUtils;
 
+import java.security.ProtectionDomain;
+import java.net.URLDecoder;
+
 /** Description of bitmap image objects to be loaded/unloaded in the scene.
  *@author Emmanuel Pietriga
  */
@@ -61,7 +68,9 @@ public class ImageDescription extends ResourceDescription {
     float alpha;
     Object interpolationMethod = RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
 
-    private volatile VImage glyph;
+    private HashMap<VirtualSpace,VImage> glyphsMap;
+    private Image img = null; 
+
     private static final ThreadPoolExecutor imageLoader, imageUnloader;
     private Future loadTask;
     private volatile boolean display = true;
@@ -91,19 +100,11 @@ public class ImageDescription extends ResourceDescription {
         }
 
         public void run(){
+            //System.out.println("ImageLoadTask " + glyphsMap.size() + " " + interpolationMethod
+            //    + " "+ id);
+            Glyph glyph = glyphsMap.get(vs);
             if (glyph != null) {
-                assert(!SwingUtilities.isEventDispatchThread());
-                try{
-                    SwingUtilities.invokeAndWait(new Runnable(){
-                        public void run(){
-                            loadCount++;
-                            vs.addGlyph(glyph);
-                            glyph.setOwner(ImageDescription.this);
-                            sm.objectCreated(ImageDescription.this);
-                        }
-                    });
-                } catch(InterruptedException ie){ /*ie.printStackTrace();*/}
-                catch(InvocationTargetException ite){ /*ite.printStackTrace();*/}
+                System.out.println("GLYPH ALREADY LOADED FOR THIS VS!!!");
             }
             else {
                 String protocol = src.getProtocol();
@@ -131,8 +132,11 @@ public class ImageDescription extends ResourceDescription {
                             response = httpclient.execute(httpget);
                             HttpEntity entity = response.getEntity();
                             if (entity != null) {
-                                byte[] imgData = EntityUtils.toByteArray(entity);
-                                finishCreatingObject(sm, vs, (new ImageIcon(imgData)).getImage(), vrp, fadeIn);
+                                if (img == null){
+                                    byte[] imgData = EntityUtils.toByteArray(entity);
+                                    img = (new ImageIcon(imgData)).getImage();
+                                }
+                                finishCreatingObject(sm, vs, img, vrp, fadeIn);
                             }
                         }
                         catch(URISyntaxException usex){
@@ -154,10 +158,16 @@ public class ImageDescription extends ResourceDescription {
                     }
                 }
                 else if (src.toString().startsWith(JAR_HEADER)){
-                    finishCreatingObject(sm, vs, (new ImageIcon(this.getClass().getResource(src.toString().substring(JAR_HEADER.length())))).getImage(), null, fadeIn);
+                    if (img == null){
+                        img = (new ImageIcon(this.getClass().getResource(src.toString().substring(JAR_HEADER.length())))).getImage();
+                    }
+                    finishCreatingObject(sm, vs, img, null, fadeIn);
                 }
                 else {
-                    finishCreatingObject(sm, vs, (new ImageIcon(src)).getImage(), null, fadeIn);
+                    if (img == null){
+                        img =  (new ImageIcon(src)).getImage();
+                    }
+                    finishCreatingObject(sm, vs, img, null, fadeIn);
                 }
             }
         }
@@ -181,26 +191,30 @@ public class ImageDescription extends ResourceDescription {
             }
             catch(InterruptedException ie){ /*ie.printStackTrace();*/ }
             catch(ExecutionException ee){ /*ee.printStackTrace();*/ }
+            //System.out.println("ImageUnloadTask " + glyphsMap.size() +" "+ id);
+            VImage glyph = glyphsMap.get(vs);
             if (glyph != null){
-                if (fadeOut && loadCount == 1){  // FIXME loadCount !
-                    loadCount--;
-                    Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, glyph,
-                        0.0f, false, IdentityInterpolator.getInstance(), new ImageHideAction(sm, vs, loadCount));
-                    VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
-                    if (loadCount < 1) { // true
-                        glyph = null;
+                if (fadeOut){
+                    glyphsMap.remove(vs);
+                    if ( glyphsMap.size() == 0) {
+                        img = null; // flushed in ImageHideAction
                     }
+                    Animation a = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, glyph,
+                        0.0f, false, IdentityInterpolator.getInstance(),
+                        new ImageHideAction(sm, vs, glyphsMap.size()));
+                    VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(a, false);
                 }
                 else {
                     assert(!SwingUtilities.isEventDispatchThread());
                     try {
                         SwingUtilities.invokeAndWait(new Runnable(){
                         public void run(){
-                            vs.removeGlyph(glyph);
-                            loadCount--;
-                            if (loadCount < 1) {
-                                glyph.getImage().flush();
-                                glyph = null;
+                            VImage g = glyphsMap.get(vs);
+                            vs.removeGlyph(g);
+                            glyphsMap.remove(vs);
+                            if (glyphsMap.size() == 0) {
+                                img.flush();
+                                img = null;
                             }
                             sm.objectDestroyed(ImageDescription.this);
                         }
@@ -252,6 +266,8 @@ public class ImageDescription extends ResourceDescription {
         this.alpha = alpha;
         this.interpolationMethod = (im != null) ? im : RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR;
         this.parentRegion = pr;
+        // System.out.println("ImageDescription " + interpolationMethod);
+        glyphsMap = new HashMap<VirtualSpace,VImage>();
     }
 
     @Override
@@ -270,7 +286,8 @@ public class ImageDescription extends ResourceDescription {
         // fit image in declared "bounding box"
         double sf = Math.min(vw / ((double)i.getWidth(null)), vh / ((double)i.getHeight(null)));
         if (fadeIn){
-            glyph = new VImage(vx, vy, zindex, i, sf, 0.0f);
+            VImage glyph = new VImage(vx, vy, zindex, i, sf, 0.0f);
+            //System.out.println("new VImage "+glyph);
             if(!display){
                 glyph.setVisible(false);
             }
@@ -282,6 +299,7 @@ public class ImageDescription extends ResourceDescription {
             }
             if (!sensitive){glyph.setSensitivity(false);}
             glyph.setInterpolationMethod(interpolationMethod);
+            glyphsMap.put(vs,glyph);
             if (showFeedbackWhenFetching){
                 // remove visual feedback about loading (smoothly)
                 Animation a2 = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, vrp,
@@ -297,7 +315,8 @@ public class ImageDescription extends ResourceDescription {
             if (showFeedbackWhenFetching){
                 vs.removeGlyph(vrp);
             }
-            glyph = new VImage(vx, vy, zindex, i, sf, alpha);
+            VImage glyph = new VImage(vx, vy, zindex, i, sf, alpha);
+            //System.out.println("new VImage "+glyph);
             if(!display){
                 glyph.setVisible(false);
             }
@@ -309,13 +328,16 @@ public class ImageDescription extends ResourceDescription {
             }
             if (!sensitive){glyph.setSensitivity(false);}
             glyph.setInterpolationMethod(interpolationMethod);
+            glyphsMap.put(vs,glyph);
         }
         assert(!SwingUtilities.isEventDispatchThread());
         try{
             SwingUtilities.invokeAndWait(new Runnable(){
                 public void run(){
-                    vs.addGlyph(glyph);
-                    glyph.setOwner(ImageDescription.this);
+                    VImage g = glyphsMap.get(vs);
+                    vs.addGlyph(g);
+                    //g.setInterpolationMethod(interpolationMethod);
+                    g.setOwner(ImageDescription.this);
                     sm.objectCreated(ImageDescription.this);
                 }
                 });
@@ -330,14 +352,23 @@ public class ImageDescription extends ResourceDescription {
 
     @Override
     public Glyph getGlyph(){
-        return glyph;
+        //return glyph;
+        for(Map.Entry<VirtualSpace,VImage> entry: glyphsMap.entrySet()){
+            VirtualSpace vs = entry.getKey();
+            return glyphsMap.get(vs);
+        }
+        return null;
     }
 
     @Override
     public void moveTo(double x, double y){
         super.moveTo(x, y);
-        if (glyph != null){
-            glyph.moveTo(vx, vy);
+        for(Map.Entry<VirtualSpace,VImage> entry: glyphsMap.entrySet()){
+            VirtualSpace vs = entry.getKey();
+            VImage glyph = glyphsMap.get(vs);
+            if (glyph != null){
+                glyph.moveTo(vx, vy);
+            }
         }
     }
 
@@ -367,7 +398,7 @@ class ImageHideAction implements EndAction {
     public void execute(Object subject, Animation.Dimension dimension){
         try {
             vs.removeGlyph((Glyph)subject);
-            if (loadCount < 1){
+            if (loadCount == 0) {
                 ((VImage)subject).getImage().flush();
             }
             sm.objectDestroyed((ImageDescription)((Glyph)subject).getOwner());
@@ -381,8 +412,8 @@ class ImageHideAction implements EndAction {
     public void recoverFailingAnimationEnded(Object subject, Animation.Dimension dimension){
         try {
             vs.removeGlyph((Glyph)subject);
-            if (loadCount < 1){
-                ((VImage)subject).getImage().flush();
+            if (loadCount == 0) {
+               ((VImage)subject).getImage().flush();
             }
             sm.objectDestroyed((ImageDescription)((Glyph)subject).getOwner());
         }
