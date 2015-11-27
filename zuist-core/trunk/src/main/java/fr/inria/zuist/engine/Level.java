@@ -101,7 +101,7 @@ public class Level {
     }
 
     /** Get the bounding box enclosing all regions at this level.
-     *@return the west, north, east and south bounds of the box. {0,0,0,0} if no region.
+     *@return the west, north, east and south bounds of the box. null if no region.
      */
     public double[] getBounds(){
         if (regions.length > 0){
@@ -115,8 +115,7 @@ public class Level {
             return res;
         }
         else {
-            double[] res = {0,0,0,0};
-            return res;
+            return null;
         }
     }
 
