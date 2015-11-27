@@ -625,21 +625,22 @@ public class SceneManager {
     /* -------- Navigation ----------------- */
 
     /** Get the bounding box of all regions in this scene.
-     *@return bounds in virtual space
+     *@return bounds in virtual space, null if none
      */
     public double[] findFarmostRegionCoords(){
-        int l = 0;
-        while (getRegionsAtLevel(l) == null){
-            l++;
-            if (l > getLevelCount()){
-                l = -1;
-                break;
+        double[] wnes = {Double.MAX_VALUE, Double.MIN_VALUE, Double.MIN_VALUE, Double.MAX_VALUE};
+        boolean foundAtLeastOneRegion = false;
+        for (int i=0;i<levels.length;i++){
+            double[] wnesAtL = levels[i].getBounds();
+            if (wnesAtL != null){
+                foundAtLeastOneRegion = true;
+                if (wnes[0] > wnesAtL[0]){wnes[0] = wnesAtL[0];}
+                if (wnes[1] < wnesAtL[1]){wnes[1] = wnesAtL[1];}
+                if (wnes[2] < wnesAtL[2]){wnes[2] = wnesAtL[2];}
+                if (wnes[3] > wnesAtL[3]){wnes[3] = wnesAtL[3];}
             }
         }
-        if (l > -1){
-            return getLevel(l).getBounds();
-        }
-        else return new double[]{0,0,0,0};
+        return (foundAtLeastOneRegion) ? wnes : null;
     }
 
     /* ------------------ DEBUGGING --------------------- */
