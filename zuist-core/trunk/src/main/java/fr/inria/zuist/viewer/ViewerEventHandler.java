@@ -89,34 +89,7 @@ class ViewerEventHandler implements ViewListener, ComponentListener, CameraListe
         }
     }
 
-    public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
-        Vector gum = v.getVCursor().getPicker().getIntersectingGlyphs(v.cams[0]);
-        if (gum == null){
-            return;
-        }
-        Glyph g = (Glyph)gum.lastElement();
-        if (objectJustSelected != null && g == objectJustSelected){
-            // last click was on this object, already centered on it,
-            // check if it takes somewhere and go there if it does
-            Object owner = g.getOwner();
-            if (owner != null && owner instanceof ObjectDescription){
-                ObjectDescription od = (ObjectDescription)owner;
-                String takesToID = od.takesTo();
-                if (takesToID != null){
-                    switch(od.takesToType()){
-                        case SceneManager.TAKES_TO_OBJECT:{application.centerOnObject(takesToID);break;}
-                        case SceneManager.TAKES_TO_REGION:{application.centerOnRegion(takesToID);break;}
-                    }
-                }
-            }
-        }
-        else {
-            // last click was not on this object, center on it
-            application.rememberLocation(application.mCamera.getLocation());
-            v.cams[0].getOwningView().centerOnGlyph(g, v.cams[0], Viewer.ANIM_MOVE_LENGTH, true, 1.2f);
-            objectJustSelected = g;
-        }
-    }
+    public void click1(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){}
 
     public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){}
 
@@ -225,6 +198,10 @@ class ViewerEventHandler implements ViewListener, ComponentListener, CameraListe
         else if (code == KeyEvent.VK_F2){application.ovm.toggleConsole();}
         else if (code == KeyEvent.VK_Q && Toolkit.getDefaultToolkit().getMenuShortcutKeyMask() == e.getModifiers()){application.exit();}
         else if (code == KeyEvent.VK_A){application.toggleBenchAnim();}
+        else if (code == KeyEvent.VK_SPACE){
+            double[] wnes = application.sm.findFarmostRegionCoords();
+            System.out.println(wnes[0]+" "+wnes[1]+" "+wnes[2]+" "+wnes[3]);
+        }
     }
 
     public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
