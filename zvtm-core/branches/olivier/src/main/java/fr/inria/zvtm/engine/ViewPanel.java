@@ -75,6 +75,7 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
     GraphicsConfiguration gconf;
 
     protected Graphics2D stableRefToBackBufferGraphics = null;
+    protected Graphics2D stableRefToOverlayBufferGraphics = null;
 
     /**list of cameras used in this view*/
     public Camera[] cams;
@@ -98,12 +99,26 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
     volatile boolean repaintASAP=true;
     RepaintListener repaintListener;
 
+    /**only repaint the back buffer */
+    volatile boolean repaintBack=true;
+
     /**only repaint mouse cursor (using XOR mode)*/
     boolean updateCursorOnly=false;
+
+    /**"only" repaint overlay cam */
+    volatile boolean repaintOverlay=true;
+
+    /**repaint portal */
+    volatile boolean repaintPortals=true;
 
     /**for blank mode (methods to enter/exit blank mode are in View)*/
     boolean notBlank=true;
     Color blankColor=null;
+
+    // ---- sync stuff for zvtm-cluster
+    boolean paintLocked = false;
+    long repaintCount = 0;
+    SyncPaintImmediately syncPaintImmediately = null;
 
     /**view's backgorund color (default is black)*/
     Color backColor = Color.BLACK;
@@ -135,6 +150,9 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
 
     /**should the view be antialiased*/
     boolean antialias=false;
+
+    /**should we draw the portals with offscreen buffers */
+    boolean drawPortalsOffScreen = false;
 
     /**Previous coordinates of the mouse.
      * Used to erase old cursor before repainting in XOR mode.
@@ -311,12 +329,14 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
                          (int)Math.round((d.height/2)-(vy-c.vy)*coef));
     }
 
+
+    // FIXME multi buffering rendering
     /**true will draw a segment between origin of drag and current cursor pos until drag is finished (still visible for backward compatibility reasons - should use setDrawSegment instead)*/
     public void setDrawDrag(boolean b){
 	curDragx=origDragx;
 	curDragy=origDragy;
 	drawDrag=b;
-	parent.repaint();
+	parent.repaintBack();
     }
 
     /**true will draw a segment between origin of drag and current cursor pos until drag is finished*/
@@ -324,7 +344,7 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
 	curDragx=origDragx;
 	curDragy=origDragy;
 	drawDrag=b;
-	parent.repaint();
+	parent.repaintBack();
     }
 
     /**true will draw a rectangle between origin of drag and current cursor pos until drag is finished*/
@@ -332,7 +352,7 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
 	curDragx=origDragx;
 	curDragy=origDragy;
 	drawRect=b;
-	parent.repaint();
+	parent.repaintBack();
     }
 
     /**draw a circle between origin of drag and current cursor pos until drag is finished (drag segment represents the radius of the circle, not its diameter) - use OVAL for any oval, CIRCLE for circle, NONE to stop drawing it*/
@@ -342,7 +362,7 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
 	if (s==OVAL){drawOval=true;circleOnly=false;}
 	else if (s==CIRCLE){drawOval=true;circleOnly=true;}
 	else if (s==NONE){drawOval=false;}
-	parent.repaint();
+	parent.repaintBack();
     }
 
     /** Show the icon representing first-order-of-control panning.
@@ -356,7 +376,7 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
         fopw_x = jpx - FIRST_ORDER_PAN_WIDGET.getWidth(null)/2;
         fopw_y = jpy - FIRST_ORDER_PAN_WIDGET.getHeight(null)/2;
         sfopw = true;
-    	parent.repaint();
+    	parent.repaintBack();
     }
 
     /** Hide the icon representing first-order-of-control panning.
@@ -366,7 +386,7 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
      */
     public void hideFirstOrderPanWidget(){
         sfopw = false;
-    	parent.repaint();
+    	parent.repaintBack();
     }
 
     /** Set the icon used to represent first-order-of-control panning.
@@ -585,7 +605,7 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
                 }
             }
         }
-        repaintASAP = true;
+        parent.repaint();
     }
 
     /** Mouse cursor exited this view. */
@@ -641,7 +661,6 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
                     parent.mouse.setJPanelCoordinates(e.getX(),e.getY());
                     //we project the mouse cursor wrt the appropriate coord sys
                     //parent.mouse.unProject(cams[activeLayer],this);
-                    updateCursorOnly=true;
                 //translate glyphs sticked to mouse
                 parent.mouse.propagateMove();
                 // find out is the cursor is inside one (or more) portals
@@ -651,7 +670,9 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
                     if (parent.notifyCursorMoved){
                         evHs[activeLayer].mouseMoved(this, e.getX(), e.getY(), e);
                     }
-                    parent.repaint();
+                    // FIXME multi buffering rendering
+                    //OC parent.repaint();
+                    parent.repaintCursor();
                     // if (parent.mouse.isSensitive()){
                     //     if (parent.mouse.getPicker().computePickedGlyphList(evHs[activeLayer], cams[activeLayer], this)){
                     //         parent.repaint();
@@ -702,7 +723,9 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
                 }
                 //assign anyway, even if the current drag command does not want to display a segment
                 curDragx=e.getX();curDragy=e.getY();
-                parent.repaint();
+                // FIXME multi buffering rendering
+                //OC parent.repaint();
+                 parent.repaintCursor();
                 // if (parent.mouse.isSensitive()){
                 //     parent.mouse.getPicker().computePickedGlyphList(evHs[activeLayer],cams[activeLayer],this);
                 // }
@@ -770,14 +793,14 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
 		if (l != null){
 			this.lens = l;
 			this.lens.setLensBuffer(this);
-			parent.repaint();
+			parent.repaintBack();
 			return this.lens;
 		}
 		else {
 			//removing the lens set for this view
 			if (this.lens != null){
 				this.lens = null;
-				parent.repaint();
+				parent.repaintBack();
 			}
 			return null;
 		}

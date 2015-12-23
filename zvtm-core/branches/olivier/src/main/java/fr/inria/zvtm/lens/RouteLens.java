@@ -329,7 +329,7 @@ public class RouteLens {
         else {
             lens.setAbsolutePosition(x, y);
         }
-        view.repaint();
+        view.repaintBack();
     }
 
     protected void updateGeneralPath() {

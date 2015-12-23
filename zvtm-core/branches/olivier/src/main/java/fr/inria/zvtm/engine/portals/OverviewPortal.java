@@ -22,6 +22,7 @@ import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.glyphs.Translucent;
 import fr.inria.zvtm.event.ObservedRegionListener;
+import fr.inria.zvtm.engine.VirtualSpace;
 
 /**A portal showing what is seen through a camera that serves as an overview. Shape: rectangular.
    The Camera should not be used in any other View or Portal.*/
@@ -60,13 +61,26 @@ public class OverviewPortal extends CameraPortal {
         super(x, y, w, h, pc);
         this.observedRegionCamera = orc;
         this.observedRegionView = orc.getOwningView();
+        usedCameras.add(orc);
+        if (orc.getOwningSpace() != null){
+            usedSpaces.add(orc.getOwningSpace());
+        }
         observedRegion = new double[4];
         borderTimer = new Timer();
         borderTimer.scheduleAtFixedRate(new BorderTimer(this), 40, 40);
     }
 
     public OverviewPortal(int x, int y, int w, int h, Vector<Camera> cvect, Camera orc){
-        this(x, y, w, h, cvect.elementAt(0), orc);
+        super(x, y, w, h, cvect);
+        this.observedRegionCamera = orc;
+        this.observedRegionView = orc.getOwningView();
+        usedCameras.add(orc);
+        if (orc.getOwningSpace() != null){
+            usedSpaces.add(orc.getOwningSpace());
+        }
+        observedRegion = new double[4];
+        borderTimer = new Timer();
+        borderTimer.scheduleAtFixedRate(new BorderTimer(this), 40, 40);
     }
 
     private class BorderTimer extends TimerTask {
@@ -93,6 +107,7 @@ public class OverviewPortal extends CameraPortal {
 
     public void drawObservedRegionLocator(boolean b){
         drawObservedRegionLocator = b;
+        repaint(true);
     }
 
     public boolean isDrawObservedRegionLocator(){
@@ -127,6 +142,7 @@ public class OverviewPortal extends CameraPortal {
         else {
             acST = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, a);
         }
+        repaint(true);
     }
 
     /** Set the border width of the rectangle depicting what is seen through the main camera. **/
@@ -140,10 +156,11 @@ public class OverviewPortal extends CameraPortal {
             orBorderWidth = bw;
             orHalfBorderWidth = bw/2;
         }
+        repaint(true);
     }
 
     /** Get the border width of the rectangle depicting what is seen through the main camera. **/
-    public float setObservedRegionBorderWidth(){
+    public float getObservedRegionBorderWidth(){
         return orBorderWidth;
     }
 
@@ -181,61 +198,145 @@ public class OverviewPortal extends CameraPortal {
         return observedRegionCamera;
     }
 
+    // for zvtm-cluster (observedRegionView is not correct)
+    protected int obsViewWidth = 0;
+    protected int obsViewHeight = 0;
+    protected double obsViewX = 0;
+    protected double obsViewY = 0;
+    /**CALLED INTERNALLY (zvtm-cluster) - NOT FOR PUBLIC USE*/
+    public void setObservedViewLocationAndSize(double ox, double oy, int evw, int evh){
+        obsViewWidth = evw;
+        obsViewHeight = evh;
+        obsViewX = ox;
+        obsViewY = oy;
+    }
+
+    protected double[] getViewVisibleRegion(){
+        if (obsViewWidth == 0 || obsViewHeight == 0){
+            return observedRegionView.getVisibleRegion(observedRegionCamera, observedRegion);
+        }
+        Camera c = observedRegionCamera;
+        double uncoef = (c.focal+c.altitude) / c.focal;
+        observedRegion[0] = (c.vx - obsViewX*uncoef) - (obsViewWidth/2)*uncoef;
+        observedRegion[1] = (c.vy - obsViewY*uncoef) + (obsViewHeight/2)*uncoef;
+        observedRegion[2] = (c.vx - obsViewX*uncoef) + (obsViewWidth/2)*uncoef;
+        observedRegion[3] = (c.vy - obsViewY*uncoef) - (obsViewHeight/2)*uncoef;
+        return observedRegion;
+    }
+
+    // FIXME: introduce an additional buffer for the obs region !
     @Override
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
+        bufferDraw = owningView.getDrawPortalsOffScreen();
+        if (bufferDraw){
+            //System.out.println("draw portal.... ? "+ repaintASAP);
+            updateOffscreenBuffer(viewWidth, viewHeight);
+            if (wasOutOfView &&
+                !(x+w < 0 || y+h < 0 || x >= viewWidth || y >= viewHeight)){
+                repaintASAP=true;
+                wasOutOfView=false;
+            }
+            if (repaintASAP){
+                repaintASAP=false;
+                // System.out.println("draw portal.... "+x+" "+y+" "+w+" "+h+" "+buffx+" "+backBufferW);
+                try {
+                    paintOnBack(stableRefToBackBufferGraphics, viewWidth, viewHeight, x, y);
+                }
+                catch (NullPointerException ex0){
+                    //ex0.printStackTrace(); 
+                }
+            }
+        }
+        else{
+            paintOnBack(g2d, viewWidth, viewHeight, 0, 0);
+        }
+    }
+
+    @Override
+    protected void paintOnBack(Graphics2D g2d, int viewWidth, int viewHeight, int tx, int ty){
         if (!visible){return;}
         //Check if the portal is out of the view
-        if (x+w+halfBorderWidth < 0 || y+h+halfBorderWidth < 0 ||
-            x-halfBorderWidth >= viewWidth || y-halfBorderWidth >= viewHeight){
+        if (x+w < 0 || y+h < 0 || x >= viewWidth || y >= viewHeight){
+            // clear the buffer ???
+            wasOutOfView = true;
             return;
+        }
+        wasOutOfView=false;
+        int bw = w;
+        int bh = h;
+        if (bufferDraw){
+            bw = backBufferW;
+            bh = backBufferH;
         }
         if (alphaC != null){
             if (alphaC.getAlpha() == 0){
+                if (bufferDraw){
+                    g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.CLEAR));
+                    g2d.fillRect(0, 0, w, h);
+                    g2d.setComposite(Translucent.acO);
+                }
                 return;
             }
-            g2d.setComposite(alphaC);
+            if (!bufferDraw){
+                g2d.setComposite(alphaC);
+            }
         }
-        g2d.setClip(x, y, w, h);
+
+        g2d.setClip(x-tx, y-ty, w, h);
+        if (bufferDraw){
+            if (bkgColor == null){
+                g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.CLEAR));
+                g2d.fillRect(0, 0, bw, bh);
+                g2d.setComposite(Translucent.acO);
+            }
+        }
         if (bkgColor != null){
             g2d.setColor(bkgColor);
-            g2d.fillRect(x, y, w, h);
+            g2d.fillRect(x-tx, y-ty, w, h);
         }
         standardStroke = g2d.getStroke();
         // be sure to call the translate instruction before getting the standard transform
         // as the latter's matrix is preconcatenated to the translation matrix of glyphs
         // that use AffineTransforms for translation
         standardTransform = g2d.getTransform();
-        drawnGlyphs = cameraSpace.getDrawnGlyphs(camIndex);
-        synchronized(drawnGlyphs){
-            drawnGlyphs.removeAllElements();
-            duncoef = (camera.focal+camera.altitude) / camera.focal;
-            //compute region seen from this view through camera
-            viewWC = camera.vx - (w/2d)*duncoef;
-            viewNC = camera.vy + (h/2d)*duncoef;
-            viewEC = camera.vx + (w/2d)*duncoef;
-            viewSC = camera.vy - (h/2d)*duncoef;
-            gll = cameraSpace.getDrawingList();
-            for (int i=0;i<gll.length;i++){
-                if (gll[i] != null){
-                    synchronized(gll[i]){
-                        if (gll[i].visibleInViewport(viewWC, viewNC, viewEC, viewSC, camera)){
-                            //if glyph is at least partially visible in the reg. seen from this view, display
-                            gll[i].project(camera, size); // an invisible glyph should still be projected
-                            if (gll[i].isVisible()){      // as it can be sensitive
-                                gll[i].draw(g2d, w, h, camIndex, standardStroke, standardTransform, x, y);
+        for (int u=0; u < cameras.size(); u++){
+            Camera cam = cameras.elementAt(u);
+            VirtualSpace spa = cameraSpaces.elementAt(u);
+            int idx = camIndexs.elementAt(u);
+            drawnGlyphs = spa.getDrawnGlyphs(idx);
+            synchronized(drawnGlyphs){
+                drawnGlyphs.removeAllElements();
+                duncoef = (cam.focal+cam.altitude) / cam.focal;
+                //compute region seen from this view through camera
+                viewWC = cam.vx - (w/2d) * duncoef - (double)(backBufferTX)* duncoef ;
+                viewNC = cam.vy + (h/2d) * duncoef + (double)(backBufferTY)* duncoef;
+                viewEC =  viewWC + (bw/1d)  * duncoef;
+                viewSC = viewNC - (bh/1d) * duncoef;
+                gll = spa.getDrawingList();
+                for (int i=0;i<gll.length;i++){
+                    if (gll[i] != null){
+                        synchronized(gll[i]){
+                            if (gll[i].visibleInViewport(viewWC, viewNC, viewEC, viewSC, cam)){
+                                //if glyph is at least partially visible in the reg. seen from this view, display
+                                gll[i].project(cam, size); // an invisible glyph should still be projected
+                                if (gll[i].isVisible()){      // as it can be sensitive
+                                    gll[i].draw(g2d, bw, bh, idx, standardStroke, standardTransform,
+                                        x-tx+backBufferTX, y-ty+backBufferTY);
+                                }
+                                spa.drewGlyph(gll[i], idx);
                             }
-                            cameraSpace.drewGlyph(gll[i], camIndex);
                         }
                     }
                 }
             }
         }
         // paint region observed through observedRegionCamera
-        observedRegion = observedRegionView.getVisibleRegion(observedRegionCamera, observedRegion);
+        observedRegion = getViewVisibleRegion();
+        //observedRegion = observedRegionView.getVisibleRegion(observedRegionCamera, observedRegion);
         g2d.setColor(observedRegionColor);
         orcoef = (float)(camera.focal/(camera.focal+camera.altitude));
-        int nwx = (int)(x+w/2d + Math.round((observedRegion[0]-camera.vx)*orcoef));
-        int nwy = (int)(y+h/2d - Math.round((observedRegion[1]-camera.vy)*orcoef));
+        int nwx = (int)(x-tx+backBufferTX+w/2d + Math.round((observedRegion[0]-camera.vx)*orcoef));
+        int nwy = (int)(y-ty+backBufferTY+h/2d - Math.round((observedRegion[1]-camera.vy)*orcoef));
         int orw = (int)Math.round((observedRegion[2]-observedRegion[0])*orcoef);
         int orh = (int)Math.round((observedRegion[1]-observedRegion[3])*orcoef);
         if (acST != null){
@@ -257,9 +358,9 @@ public class OverviewPortal extends CameraPortal {
         g2d.drawRect(nwx, nwy, orw, orh);
         if (drawObservedRegionLocator){
             // west
-            g2d.drawRect(x, nwy+orh/2, nwx-x, 1);
-            // // north
-            g2d.drawRect(nwx+orw/2, y, 1, nwy-y);
+            g2d.drawRect(x-tx+backBufferTX, nwy+orh/2, nwx-x+tx-backBufferTX, 1);
+            // north
+            g2d.drawRect(nwx+orw/2, y-ty+backBufferTY, 1, nwy-y+ty-backBufferTY);
             // east
             g2d.drawRect(nwx+orw, nwy+orh/2, x+w-(nwx+orw), 1);
             // south
@@ -267,15 +368,15 @@ public class OverviewPortal extends CameraPortal {
         }
         // reset Graphics2D
         g2d.setStroke(standardStroke);
-        g2d.setClip(0, 0, viewWidth, viewHeight);
         if (borderColor != null){
             g2d.setColor(borderColor);
             if (stroke != null){
                 g2d.setStroke(stroke);
             }
-            g2d.drawRect(x, y, w, h);
+            g2d.drawRect(x-tx+backBufferTX+borderWidthXYOff, y-ty+backBufferTY+borderWidthXYOff, w-borderWidthWHOff, h-borderWidthWHOff);
             g2d.setStroke(standardStroke);
         }
+         g2d.setClip(0, 0, viewWidth, viewHeight);
         if (alphaC != null){
             g2d.setComposite(Translucent.acO);
         }

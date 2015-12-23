@@ -12,17 +12,20 @@ package fr.inria.zvtm.engine.portals;
 
 import java.awt.Graphics2D;
 import java.awt.geom.Ellipse2D;
+import java.awt.AlphaComposite;
+
 import java.util.Vector;
 
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.glyphs.Translucent;
+import fr.inria.zvtm.engine.VirtualSpace;
 
 /**A portal showing what is seen through a camera. Shape: circular.
    The Camera should not be used in any other View or Portal.*/
 
 public class RoundCameraPortal extends CameraPortal {
 
-    Ellipse2D clippingShape, borderShape;
+    Ellipse2D clippingShape, borderShape, borderPickingShape;
 
     /** Builds a new portal displaying what is seen through a camera
      *@param x top-left horizontal coordinate of portal, in parent's JPanel coordinates
@@ -53,13 +56,25 @@ public class RoundCameraPortal extends CameraPortal {
     }
 
     private void createShape() {
-        clippingShape = new Ellipse2D.Float(x+halfBorderWidth, y+halfBorderWidth, w-borderWidth, h-borderWidth);
-        borderShape = new Ellipse2D.Float(x-halfBorderWidth, y-halfBorderWidth, w+borderWidth, h+borderWidth);
+        int xx = x;
+        int yy = y;
+        if (bufferDraw){
+            xx = 0; yy = 0;
+        }
+        clippingShape = new Ellipse2D.Float(xx, yy, w, h);
+        borderShape = new Ellipse2D.Float(xx+borderWidthXYOff, yy+borderWidthXYOff, w-borderWidthWHOff, h-borderWidthWHOff);
+        borderPickingShape = new Ellipse2D.Float(xx+2*borderWidthXYOff, yy+2*borderWidthXYOff, w-2*borderWidthWHOff, h-2*borderWidthWHOff);
     }
 
     private void doSetFrame() {
-        clippingShape.setFrame(x+halfBorderWidth, y+halfBorderWidth, w-borderWidth, h-borderWidth);
-        borderShape.setFrame(x-halfBorderWidth, y-halfBorderWidth, w+borderWidth, h+borderWidth);
+        int xx = x;
+        int yy = y;
+        if (bufferDraw){
+            xx = 0; yy = 0;
+        }
+        clippingShape.setFrame(xx, yy, w, h);
+        borderShape.setFrame(xx+borderWidthXYOff, yy+borderWidthXYOff, w-borderWidthWHOff, h-borderWidthWHOff);
+        borderPickingShape.setFrame(xx+2*borderWidthXYOff, yy+2*borderWidthXYOff, w-2*borderWidthWHOff, h-2*borderWidthWHOff);
     }
 
     /** Get bounds of rectangular region of the VirtualSpace seen through this camera portal.
@@ -73,12 +88,20 @@ public class RoundCameraPortal extends CameraPortal {
 
     @Override
     public boolean coordInside(int cx, int cy){
+        if (bufferDraw){
+            cx = cx-x;
+            cy = cy-y;
+        }
 	    return borderShape.contains(cx, cy);
     }
 
     @Override
     public boolean coordInsideBorder(int cx, int cy){
-        return (borderShape.contains(cx, cy) && !clippingShape.contains(cx, cy));
+        if (bufferDraw){
+            cx = cx-x;
+            cy = cy-y;
+        }
+        return (clippingShape.contains(cx, cy) && !borderPickingShape.contains(cx, cy));
     }
 
     /** Move the portal inside the view (relative).
@@ -106,6 +129,7 @@ public class RoundCameraPortal extends CameraPortal {
         size.setSize(w, h);
         if (clippingShape != null){ doSetFrame(); }
         else { createShape();}
+        repaint(true);
     }
 
     @Override
@@ -114,58 +138,115 @@ public class RoundCameraPortal extends CameraPortal {
         doSetFrame();
     }
 
+    // FIXME: cluster && big portal in bufferDraw !!! (clipping !!!)
     @Override
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
-		if (!visible){return;}
+        bufferDraw = owningView.getDrawPortalsOffScreen();
+        if (bufferDraw){
+            //System.out.println("draw portal.... ? "+ repaintASAP);
+            updateOffscreenBuffer(viewWidth, viewHeight);
+            if (wasOutOfView &&
+                !(x+w < 0 || y+h < 0 || x >= viewWidth || y >= viewHeight)){
+                repaintASAP=true;
+                wasOutOfView=false;
+            }
+            if (repaintASAP){
+                repaintASAP=false;
+                // System.out.println("draw portal.... "+x+" "+y+" "+w+" "+h+" "+buffx+" "+backBufferW);
+                try {
+                    paintOnBack(stableRefToBackBufferGraphics, viewWidth, viewHeight, x, y);
+                }
+                catch (NullPointerException ex0){
+                    //ex0.printStackTrace(); 
+                }
+            }
+        }
+        else{
+            paintOnBack(g2d, viewWidth, viewHeight, 0, 0);
+        }
+    }
+
+    @Override
+    protected void paintOnBack(Graphics2D g2d, int viewWidth, int viewHeight, int tx, int ty){
+        if (!visible){return;}
         //Check if the portal is out of the view
-        if (x+w+borderWidth < 0 || y+h+borderWidth < 0 ||
-            x-borderWidth >= viewWidth || y-borderWidth >= viewHeight){
+        if (x+w < 0 || y+h < 0 || x >= viewWidth || y >= viewHeight){
+            // clear the buffer ???
+            wasOutOfView = true;
             return;
         }
-		if (alphaC != null){
-            // portal is not is not opaque
+        wasOutOfView=false;
+        int bw = w;
+        int bh = h;
+        if (bufferDraw){
+            bw = backBufferW;
+            bh = backBufferH;
+        }
+        if (alphaC != null){
+            // portal is not opaque
             if (alphaC.getAlpha() == 0){
                 // portal is totally transparent
+                if (bufferDraw){
+                    g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.CLEAR));
+                    g2d.fillRect(0, 0, w, h);
+                    g2d.setComposite(Translucent.acO);
+                }
                 return;
             }
-            g2d.setComposite(alphaC);
+            if (!bufferDraw){
+                g2d.setComposite(alphaC);
+            }
         }
+
         g2d.setClip(clippingShape);
+        if (bufferDraw){
+            if (bkgColor == null){
+                g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.CLEAR));
+                g2d.fillRect(0, 0, bw, bh);
+                g2d.setComposite(Translucent.acO);
+            }
+        }
         if (bkgColor != null){
             g2d.setColor(bkgColor);
-            g2d.fill(clippingShape);
+            g2d.fillRect(x-tx, y-ty, bw, bh);
         }
         standardStroke = g2d.getStroke();
         // be sure to call the translate instruction before getting the standard transform
         // as the latter's matrix is preconcatenated to the translation matrix of glyphs
         // that use AffineTransforms for translation
         standardTransform = g2d.getTransform();
-        drawnGlyphs = cameraSpace.getDrawnGlyphs(camIndex);
-        synchronized(drawnGlyphs){
-            drawnGlyphs.removeAllElements();
-            duncoef = (camera.focal+camera.altitude) / camera.focal;
-            //compute region seen from this view through camera
-            viewWC = camera.vx - (w/2d)*duncoef;
-            viewNC = camera.vy + (h/2d)*duncoef;
-            viewEC = camera.vx + (w/2d)*duncoef;
-            viewSC = camera.vy - (h/2d)*duncoef;
-            gll = cameraSpace.getDrawingList();
-            for (int i=0;i<gll.length;i++){
-                if (gll[i] != null){
-                    synchronized(gll[i]){
-                        if (gll[i].visibleInViewport(viewWC, viewNC, viewEC, viewSC, camera)){
-                            //if glyph is at least partially visible in the reg. seen from this view, display
-                            gll[i].project(camera, size); // an invisible glyph should still be projected
-                            if (gll[i].isVisible()){      // as it can be sensitive
-                                gll[i].draw(g2d, w, h, camIndex, standardStroke, standardTransform, x, y);
+        for (int u=0; u < cameras.size(); u++){
+            Camera cam = cameras.elementAt(u);
+            VirtualSpace spa = cameraSpaces.elementAt(u);
+            int idx = camIndexs.elementAt(u);
+            drawnGlyphs = spa.getDrawnGlyphs(idx);
+            synchronized(drawnGlyphs){
+                drawnGlyphs.removeAllElements();
+                duncoef = (cam.focal+cam.altitude) / cam.focal;
+                //compute region seen from this view through camera
+                viewWC = cam.vx - (w/2d) * duncoef - (double)(backBufferTX)* duncoef ;
+                viewNC = cam.vy + (h/2d) * duncoef + (double)(backBufferTY)* duncoef;
+                viewEC =  viewWC + (bw/1d)  * duncoef;
+                viewSC = viewNC - (bh/1d) * duncoef;
+                gll = spa.getDrawingList();
+                for (int i=0;i<gll.length;i++){
+                    if (gll[i] != null){
+                        synchronized(gll[i]){
+                            if (gll[i].visibleInViewport(viewWC, viewNC, viewEC, viewSC, cam)){
+                                //if glyph is at least partially visible in the reg. seen from this view, display
+                                gll[i].project(cam, size); // an invisible glyph should still be projected
+                                if (gll[i].isVisible()){      // as it can be sensitive
+                                    gll[i].draw(g2d, bw, bh, idx, standardStroke, standardTransform,
+                                        x-tx+backBufferTX, y-ty+backBufferTY);
+                                }
+                                spa.drewGlyph(gll[i], idx);
                             }
-                            cameraSpace.drewGlyph(gll[i], camIndex);
                         }
                     }
                 }
             }
         }
-        g2d.setClip(0, 0, viewWidth, viewHeight);
+        
         if (borderColor != null){
             g2d.setColor(borderColor);
             if (stroke != null){
@@ -174,6 +255,7 @@ public class RoundCameraPortal extends CameraPortal {
             g2d.draw(clippingShape);
             g2d.setStroke(standardStroke);
         }
+        g2d.setClip(0, 0, viewWidth, viewHeight);
         if (alphaC != null){
             g2d.setComposite(Translucent.acO);
         }

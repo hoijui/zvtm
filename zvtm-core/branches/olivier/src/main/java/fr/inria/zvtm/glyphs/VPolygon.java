@@ -191,7 +191,7 @@ public class VPolygon<T> extends ClosedShape {
         }
         size *= 2;
         updateVSPolygon();
-        VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint(vsOwner);
     }
 
     @Override

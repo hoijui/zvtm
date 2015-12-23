@@ -196,7 +196,7 @@ public class Camera {
         vy = y;
         propagateMove(x-vx, y-vy);  //take care of sticked glyphs
         if (view != null){
-            VirtualSpaceManager.INSTANCE.repaint(view);
+            VirtualSpaceManager.INSTANCE.repaint(view, this);
         }
         notifyMoved();
     }
@@ -232,7 +232,7 @@ public class Camera {
         else {altitude=a;}
         propagateAltitudeChange(altitude - oldAlt);
         if (repaint && view != null){
-            VirtualSpaceManager.INSTANCE.repaint(view);
+            VirtualSpaceManager.INSTANCE.repaint(view, this);
         }
         notifyMoved();
     }
@@ -282,7 +282,7 @@ public class Camera {
         propagateAltitudeChange(clippedAlt);
         altitude = clippedAlt;
         if (view != null){
-            VirtualSpaceManager.INSTANCE.repaint(view);
+            VirtualSpaceManager.INSTANCE.repaint(view, this);
         }
         notifyMoved();
     }
@@ -709,7 +709,7 @@ public class Camera {
     public void setEnabled(boolean b){
         if (b != enabled){
             enabled = b;
-	    VirtualSpaceManager.INSTANCE.repaint(view);
+	    VirtualSpaceManager.INSTANCE.repaint(view, this);
         }
     }
 

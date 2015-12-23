@@ -10,14 +10,19 @@
 
 package fr.inria.zvtm.engine.portals;
 
+import java.util.Vector;
+
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.RenderingHints;
 import java.awt.Stroke;
 import java.awt.BasicStroke;
 import java.awt.AlphaComposite;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
-import java.util.Vector;
+import java.awt.Dimension;
+import java.awt.image.BufferedImage;
 
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.View;
@@ -28,6 +33,7 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.Translucent;
+import fr.inria.zvtm.glyphs.VText;
 
 import fr.inria.zvtm.animation.Animation;
 import fr.inria.zvtm.animation.interpolation.IdentityInterpolator;
@@ -37,6 +43,17 @@ import fr.inria.zvtm.animation.interpolation.SlowInSlowOutInterpolator;
    The Camera should not be used in any other View or Portal.*/
 
 public class CameraPortal extends Portal {
+
+    /** Double Buffering uses a BufferedImage as the back buffer. */
+    BufferedImage backBuffer = null;
+    int backBufferW = 0;
+    int backBufferH = 0;
+    int backBufferTX = 0;
+    int backBufferTY = 0;
+    Graphics2D backBufferGraphics = null;
+    Graphics2D stableRefToBackBufferGraphics;
+    GraphicsConfiguration gconf;
+    Dimension oldSize = new Dimension(0,0);
 
     /**Draw a border delimiting the portal (null if no border).*/
     Color borderColor;
@@ -48,6 +65,8 @@ public class CameraPortal extends Portal {
     Camera camera;
     // space owning camera (optimization)
     VirtualSpace cameraSpace;
+    // camera's index in parent virtual space
+    int camIndex;
 
     //list of Camera objects used in this portal
     Vector<Camera> cameras;
@@ -62,8 +81,6 @@ public class CameraPortal extends Portal {
 
     Vector drawnGlyphs;
     Glyph[] gll;
-    // camera's index in parent virtual space
-    int camIndex;
 
     // picking in camera portal
     Picker picker = new Picker();
@@ -109,7 +126,14 @@ public class CameraPortal extends Portal {
         this.cameraSpaces.add(this.cameraSpace);
         this.camIndexs = new Vector<Integer>();
         this.camIndexs.add(this.camIndex);
+        // need to duplicate
+        this.usedCameras = new Vector<Camera>();
+        for(Camera tc : cameras) { this.usedCameras.add(tc); }
+        this.usedSpaces = new Vector<VirtualSpace>();
+        for(VirtualSpace vs : cameraSpaces) { this.usedSpaces.add(vs); }
 
+        setTranslucencyValue(a);
+        setBorderWidth(1);
     }
 
    /** Builds a new portal displaying what is seen through a camera
@@ -146,7 +170,14 @@ public class CameraPortal extends Portal {
             cameraSpaces.add(cam.getOwningSpace());
             camIndexs.add(cam.getIndex());
         }
+        // need to duplicate
+        this.usedCameras = new Vector<Camera>();
+        for(Camera tc : cameras) { this.usedCameras.add(tc); }
+        this.usedSpaces = new Vector<VirtualSpace>();
+        for(VirtualSpace vs : cameraSpaces) { this.usedSpaces.add(vs); }
+
         setTranslucencyValue(a);
+        setBorderWidth(1);
     }
 
     /** AlphaComposite used to paint glyph if not opaque. Set to null if glyph is opaque. */
@@ -163,7 +194,7 @@ public class CameraPortal extends Portal {
         else {
             alphaC = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha);
         }
-        VirtualSpaceManager.INSTANCE.repaint();
+        repaint(true);
     }
 
     /** Get alpha channel value (translucency).
@@ -190,13 +221,18 @@ public class CameraPortal extends Portal {
     public void setOwningView(View v){
         super.setOwningView(v);
         camera.setOwningView(v);
-        // vect FIXME !
+        for (Camera cam : cameras) {
+            cam.setOwningView(v);
+        }
+        if (v!=null) antialias = v.getAntialiasing();
+
     }
 
     /**Draw a border delimiting the portal.
      *@param bc color of the portal's border (pass null if none)*/
     public void setBorder(Color bc){
         this.borderColor = bc;
+        repaint(true);
     }
 
     /**Get the color used to draw the border delimiting this portal.
@@ -207,8 +243,8 @@ public class CameraPortal extends Portal {
 
      /** For internal use. Dot not tamper with. */
     protected BasicStroke stroke = null;
-    /** For internal use. Dot not tamper with. */
-    protected float halfBorderWidth = 0;
+    protected int borderWidthXYOff = 0;
+    protected int borderWidthWHOff = 0;
     /** For internal use. Dot not tamper with. */
     protected float borderWidth = 0;
 
@@ -217,14 +253,18 @@ public class CameraPortal extends Portal {
      */
     public void setBorderWidth(float bw){
         if (bw <= 0.0f){
-            stroke=null;
-            halfBorderWidth = 0.5f; borderWidth = 1.0f;
+            stroke=new BasicStroke(1.0f);
+            borderWidth = 1.0f;
+            borderWidthXYOff = 0;
+            borderWidthWHOff = 1; 
         }
         else{
             stroke = new BasicStroke(bw);
             borderWidth = bw;
-            halfBorderWidth = bw/2;
+            borderWidthXYOff = (int)Math.floor(bw/2f);
+            borderWidthWHOff =  2*borderWidthXYOff + (int)Math.ceil((bw/2f)-borderWidthXYOff);
         }
+        repaint(true);
     }
 
     /** get the border width of the portal
@@ -238,6 +278,7 @@ public class CameraPortal extends Portal {
      *@param bc color of the border (pass null if none)*/
     public void setBackgroundColor(Color bc){
 	    this.bkgColor = bc;
+        repaint(true);
     }
 
     /**Get the color used to fill the background.
@@ -398,43 +439,200 @@ public class CameraPortal extends Portal {
 
     @Override
     public boolean coordInside(int cx, int cy){
-	   //return ((cx >= x) && (cx <= x+w) && (cy >= y) && (cy <= y+h));
-        return ((cx >= x-halfBorderWidth) && (cx <= x+w+halfBorderWidth) &&
-            (cy >= y-halfBorderWidth) && (cy <= y+h+halfBorderWidth));
+	   return ((cx >= x) && (cx <= x+w) && (cy >= y) && (cy <= y+h));
     }
 
     public boolean coordInsideBorder(int cx, int cy){
-    return (((cx >= x-halfBorderWidth) && (cx <= x+halfBorderWidth) &&
-             (cy >= y-halfBorderWidth) && (cy <= y+h+halfBorderWidth)) ||
-            ((cx >= x-halfBorderWidth) && (cx <= x+w+halfBorderWidth) &&
-             (cy >= y-halfBorderWidth) && (cy <= y+halfBorderWidth)) ||
-            ((cx >= x+w-halfBorderWidth) && (cx <= x+w+halfBorderWidth) &&
-             (cy >= y-halfBorderWidth) && (cy <= y+h+halfBorderWidth)) ||
-            ((cx >= x-halfBorderWidth) && (cx <= x+w+halfBorderWidth) &&
-             (cy >= y+h-halfBorderWidth) && (cy <= y+h+halfBorderWidth)));
+        return ((cx >= x && cx <= x+borderWidth && cy >= y && cy <= y+h) ||
+            (cx >= x && cx <= x+w && cy >= y && cy <= y+borderWidth) ||
+            (cx >= x+w-borderWidth && cx <= x+w && cy >= y && cy <= y+h) ||
+            (cx >= x && cx <= x+w && cy >= y+h-borderWidth && cy <= y+h));
+    }
+
+    public boolean coordInsideBorder(int cx, int cy, int tolerance){
+        int t = tolerance;
+        return ((cx >= x-t && cx <= x+borderWidth+t && cy >= y-t && cy <= y+h+t) ||
+            (cx >= x-t && cx <= x+w+t && cy >= y-t && cy <= y+borderWidth+t) ||
+            (cx >= x+w-borderWidth-t && cx <= x+w+t && cy >= y-t && cy <= y+h+t) ||
+            (cx >= x-t && cx <= x+w+t && cy >= y+h-borderWidth-t && cy <= y+h+t));
+    }
+
+    // -----------------------------------------------------------------
+    // painting
+
+    protected double maxBufferWidthRatio = 1;
+    protected double maxBufferHeightRatio = 1;
+    public void setMaxBufferSizeRatios(double wr, double hr){
+        if (wr < 1) { wr = 1; }
+        if (hr < 1) { hr = 1; }
+        maxBufferWidthRatio = wr;
+        maxBufferHeightRatio = hr;
+    }
+
+    protected void updateOffscreenBuffer(int viewWidth, int viewHeight){
+        // limit the buffer size to the size of the view... we never need more
+        // do not do an intersection because we do not want to update the size to ofthen !!!
+        buffx = x;
+        buffy = y;
+        int bw = w;
+        int bh = h;
+        if (w > viewWidth*maxBufferWidthRatio){
+            bw = (int)Math.ceil(viewWidth*maxBufferWidthRatio);
+            if (x < 0){
+                buffx = w + x - bw;
+                if (buffx > 0){
+                    buffx = 0;
+                }
+            }
+        }
+        if (h > viewHeight*maxBufferHeightRatio){
+            bh = (int)Math.ceil(viewHeight*maxBufferHeightRatio);
+            if (y < 0){
+                buffy = h + y - bh;
+                if (buffy > 0){
+                    buffy = 0;
+                }
+            }
+        }
+        int btx = (x - buffx);
+        int bty = (y - buffy);
+        if(btx !=  backBufferTX || bty != backBufferTY){
+            backBufferTX = btx;
+            backBufferTY = bty;
+            repaintASAP=true;
+        }
+        boolean updateAntialias = false;
+        if (bw != oldSize.width || bh != oldSize.height || backBufferW != bw || backBufferH != bh) {
+            //System.out.println("UPDATE PORTAL BACK BUFFER");
+            backBuffer = null;
+            if (backBufferGraphics != null) {
+                backBufferGraphics.dispose();
+                backBufferGraphics = null;
+            }
+            oldSize.width = bw;
+            oldSize.height = bh;
+            updateAntialias=true;
+            updateFont=true;
+            repaintASAP=true;
+        }
+        if (backBuffer == null){
+            gconf = owningView.getPanel().getComponent().getGraphicsConfiguration();
+            // assign minimal size of 1
+            backBuffer = gconf.createCompatibleImage((bw > 0) ? bw: 1, (bh > 0) ? bh : 1, BufferedImage.TYPE_INT_ARGB);
+            backBufferW = backBuffer.getWidth();
+            backBufferH = backBuffer.getHeight();
+            if (backBufferGraphics != null){
+                backBufferGraphics.dispose();
+                backBufferGraphics = null;
+            }
+            repaintASAP=true;
+            //System.out.println(
+            //    "UPDATE PORTAL BACK BUFFER "+ w+" "+h+" "+ backBufferW+" "+backBufferH);
+        }
+        if (backBufferGraphics == null) {
+            backBufferGraphics = backBuffer.createGraphics();
+            updateAntialias=true;
+            updateFont=true;
+            repaintASAP=true;
+        }
+        if (updateFont){
+            backBufferGraphics.setFont(VText.getMainFont());
+            updateFont = false;
+            repaintASAP=true;
+        }
+        if (owningView!=null && antialias != owningView.getAntialiasing()) { updateAntialias=true; }
+        if (updateAntialias){
+            //System.out.println(
+            //    "UPDATE PORTAL  ANTIALIAS "+ antialias+" "+owningView.getAntialiasing());
+            if (antialias){
+                backBufferGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            }
+            else {
+                backBufferGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+            }
+            antialias = owningView.getAntialiasing();
+            repaintASAP=true;
+        }
+        stableRefToBackBufferGraphics = backBufferGraphics;
+    }
+
+    protected boolean bufferDraw = false;
+    protected boolean wasOutOfView = true;
+
+    @Override
+    public BufferedImage getBufferImage(){
+        return backBuffer;
     }
 
     @Override
     public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
+        bufferDraw = owningView.getDrawPortalsOffScreen();
+        if (bufferDraw){
+            //System.out.println("draw portal.... ? "+ repaintASAP);
+            updateOffscreenBuffer(viewWidth, viewHeight);
+            if (wasOutOfView &&
+                !(x+w < 0 || y+h < 0 || x >= viewWidth || y >= viewHeight)){
+                repaintASAP=true;
+                wasOutOfView=false;
+            }
+            if (repaintASAP){
+                repaintASAP=false;
+                // System.out.println("draw portal.... "+x+" "+y+" "+w+" "+h+" "+buffx+" "+backBufferW);
+                try {
+                    paintOnBack(stableRefToBackBufferGraphics, viewWidth, viewHeight, x, y);
+                }
+                catch (NullPointerException ex0){
+                    //ex0.printStackTrace(); 
+                }
+            }
+        }
+        else{
+            paintOnBack(g2d, viewWidth, viewHeight, 0, 0);
+        }
+    }
+
+    protected void paintOnBack(Graphics2D g2d, int viewWidth, int viewHeight, int tx, int ty){
         if (!visible){return;}
         //Check if the portal is out of the view
-        if (x+w+halfBorderWidth < 0 || y+h+halfBorderWidth < 0 ||
-            x-halfBorderWidth >= viewWidth || y-halfBorderWidth >= viewHeight){
+        if (x+w < 0 || y+h < 0 || x >= viewWidth || y >= viewHeight){
+            // clear the buffer ???
+            wasOutOfView = true;
             return;
+        }
+        wasOutOfView=false;
+        int bw = w;
+        int bh = h;
+        if (bufferDraw){
+            bw = backBufferW;
+            bh = backBufferH;
         }
         if (alphaC != null){
             // portal is not opaque
             if (alphaC.getAlpha() == 0){
                 // portal is totally transparent
+                if (bufferDraw){
+                    g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.CLEAR));
+                    g2d.fillRect(0, 0, w, h);
+                    g2d.setComposite(Translucent.acO);
+                }
                 return;
             }
-            g2d.setComposite(alphaC);
+            if (!bufferDraw){
+                g2d.setComposite(alphaC);
+            }
         }
-                
-        g2d.setClip(x, y, w, h);
+         
+        g2d.setClip(x-tx, y-ty, bw, bh);       
+        if (bufferDraw){
+            if (bkgColor == null){
+                g2d.setComposite(AlphaComposite.getInstance(AlphaComposite.CLEAR));
+                g2d.fillRect(0, 0, bw, bh);
+                g2d.setComposite(Translucent.acO);
+            }
+        }
         if (bkgColor != null){
             g2d.setColor(bkgColor);
-            g2d.fillRect(x, y, w, h);
+            g2d.fillRect(x-tx, y-ty, bw, bh);
         }
         standardStroke = g2d.getStroke();
         // be sure to call the translate instruction before getting the standard transform
@@ -450,11 +648,10 @@ public class CameraPortal extends Portal {
                 drawnGlyphs.removeAllElements();
                 duncoef = (cam.focal+cam.altitude) / cam.focal;
                 //compute region seen from this view through camera
-                viewWC = cam.vx - (w/2d) * duncoef;
-                viewNC = cam.vy + (h/2d) * duncoef;
-                viewEC = cam.vx + (w/2d) * duncoef;
-                viewSC = cam.vy - (h/2d) * duncoef;
-                //gll = cameraSpace.getDrawingList();
+                viewWC = cam.vx - (w/2d) * duncoef - (double)(backBufferTX)* duncoef ;
+                viewNC = cam.vy + (h/2d) * duncoef + (double)(backBufferTY)* duncoef;
+                viewEC =  viewWC + (bw/1d)  * duncoef;
+                viewSC = viewNC - (bh/1d) * duncoef;
                 gll = spa.getDrawingList();
                 for (int i=0;i<gll.length;i++){
                     if (gll[i] != null){
@@ -463,7 +660,8 @@ public class CameraPortal extends Portal {
                                 //if glyph is at least partially visible in the reg. seen from this view, display
                                 gll[i].project(cam, size); // an invisible glyph should still be projected
                                 if (gll[i].isVisible()){      // as it can be sensitive
-                                    gll[i].draw(g2d, w, h, idx, standardStroke, standardTransform, x, y);
+                                    gll[i].draw(g2d, bw, bh, idx, standardStroke, standardTransform,
+                                        x-tx+backBufferTX, y-ty+backBufferTY);
                                 }
                                 spa.drewGlyph(gll[i], idx);
                             }
@@ -472,20 +670,22 @@ public class CameraPortal extends Portal {
                 }
             }
         }
-        g2d.setClip(0, 0, viewWidth, viewHeight);
         if (borderColor != null){
             g2d.setColor(borderColor);
             if (stroke != null){
                 g2d.setStroke(stroke);
             }
-            g2d.drawRect(x, y, w, h);
+            g2d.drawRect(x-tx+backBufferTX+borderWidthXYOff, y-ty+backBufferTY+borderWidthXYOff,
+                w-borderWidthWHOff, h-borderWidthWHOff);
             g2d.setStroke(standardStroke);
         }
+        g2d.setClip(0, 0, viewWidth, viewHeight);
         if (alphaC != null){
             g2d.setComposite(Translucent.acO);
         }
     }
 
+    // FIXME: several cam and buffer rendering !!!
     public void pick(int cx, int cy){
         picker.setJPanelCoordinates(cx-x, cy-y);
         double uncoef = (camera.focal+camera.altitude) / camera.focal;

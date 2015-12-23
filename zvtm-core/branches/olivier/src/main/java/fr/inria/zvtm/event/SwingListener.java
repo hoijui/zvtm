@@ -18,6 +18,8 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VSwingComponent;
 
+// FIXME multi buffering rendering ... repaintBack() -> repaintBack() ???
+
 public class SwingListener extends ViewAdapter {
     private Component focusedComponent = null;
 

@@ -144,13 +144,13 @@ public class VCircle<T> extends ClosedShape {
     @Override
     public void sizeTo(double s){
         size = s;
-        VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint(vsOwner);
     }
 
     @Override
     public void reSize(double factor){
         size *= factor;
-        VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint(vsOwner);
     }
 
     @Override

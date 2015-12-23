@@ -62,7 +62,7 @@ public class VEclipse<T> extends VCircle {
      */
     public void setFraction(float f){
         this.fraction = f;
-        VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint(vsOwner);
     }
 
     /** Get fraction of eclipse.
@@ -108,7 +108,7 @@ public class VEclipse<T> extends VCircle {
     @Override
     public void orientTo(double angle){
         orient = angle;
-        VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint(vsOwner);
     }
 
     @Override

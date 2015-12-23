@@ -254,7 +254,7 @@ public class VPoint<T> extends Glyph {
             }
         }
         if (update){
-        VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint(vsOwner);
         }
     }
 

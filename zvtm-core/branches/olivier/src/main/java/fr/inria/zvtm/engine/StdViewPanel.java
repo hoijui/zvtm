@@ -34,6 +34,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.awt.image.BufferedImage;
+import java.awt.Color;
+import java.awt.AlphaComposite;
+
 import javax.swing.Timer;
 import javax.swing.JPanel;
 
@@ -42,7 +45,10 @@ import java.util.Vector;
 
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.event.ViewListener;
+import fr.inria.zvtm.glyphs.Translucent;
 
+import fr.inria.zvtm.engine.portals.Portal;
+import fr.inria.zvtm.engine.portals.CameraPortal;
 
 /**
  * JPanel used to paint the content of a view (all camera layers).
@@ -70,6 +76,10 @@ public class StdViewPanel extends ViewPanel {
     Dimension oldSize;
     Graphics2D lensG2D = null;
 
+    /** Double Buffering uses a BufferedImage as the overlay buffer. */
+    BufferedImage overlayBuffer;
+    private Graphics2D overlayBufferGraphics = null;
+
     private Timer edtTimer;
 
     StdViewPanel(Vector<Camera> cameras,View v, boolean arfome) {
@@ -78,6 +88,23 @@ public class StdViewPanel extends ViewPanel {
             public void paint(Graphics g) {
                 if (backBuffer != null){
                     g.drawImage(backBuffer, 0, 0, panel);
+                }
+                for (int i=0;i<parent.portals.length;i++){
+                    Portal p = parent.portals[i];
+                    BufferedImage bi = p.getBufferImage();
+                    if (bi != null){
+                        AlphaComposite ac = p.getAlphaComposite();
+                        if (ac != null){
+                            ((Graphics2D)g).setComposite(ac);
+                        }
+                        g.drawImage(bi, p.getBufferX(), p.getBufferY(), panel);
+                        if (ac != null){
+                            ((Graphics2D)g).setComposite(Translucent.acO);
+                        }
+                    }     
+                }
+                if (overlayBuffer != null){
+                     g.drawImage(overlayBuffer, 0, 0, panel);
                 }
             }
         };
@@ -130,6 +157,7 @@ public class StdViewPanel extends ViewPanel {
 
     private void start(){
         backBufferGraphics = null;
+        overlayBufferGraphics = null;
         edtTimer.start();
     }
 
@@ -137,6 +165,9 @@ public class StdViewPanel extends ViewPanel {
         edtTimer.stop();
         if (stableRefToBackBufferGraphics != null) {
             stableRefToBackBufferGraphics.dispose();
+        }
+        if (stableRefToOverlayBufferGraphics != null) {
+            stableRefToOverlayBufferGraphics.dispose();
         }
     }
 
@@ -156,6 +187,11 @@ public class StdViewPanel extends ViewPanel {
                     lensG2D = null;
                 }
             }
+            overlayBuffer = null;
+            if (overlayBufferGraphics != null) {
+                overlayBufferGraphics.dispose();
+                overlayBufferGraphics = null;
+            }
             if (VirtualSpaceManager.debugModeON()){
                 System.out.println("Resizing JPanel: ("+oldSize.width+"x"+oldSize.height+") -> ("+size.width+"x"+size.height+")");
             }
@@ -174,8 +210,22 @@ public class StdViewPanel extends ViewPanel {
                 backBufferGraphics = null;
             }
         }
+        if (parent.overlayCamera != null && overlayBuffer == null){
+            gconf = panel.getGraphicsConfiguration();
+            // assign minimal size of 1
+            overlayBuffer = gconf.createCompatibleImage((size.width > 0) ? size.width : 1, (size.height > 0) ? size.height : 1, BufferedImage.TYPE_INT_ARGB);
+            if (overlayBufferGraphics != null){
+                overlayBufferGraphics.dispose();
+                overlayBufferGraphics = null;
+            }
+        }
         if (backBufferGraphics == null) {
             backBufferGraphics = backBuffer.createGraphics();
+            updateAntialias=true;
+            updateFont=true;
+        }
+        if (parent.overlayCamera != null && overlayBufferGraphics == null) {
+            overlayBufferGraphics = overlayBuffer.createGraphics();
             updateAntialias=true;
             updateFont=true;
         }
@@ -191,6 +241,9 @@ public class StdViewPanel extends ViewPanel {
         }
         if (updateFont){
             backBufferGraphics.setFont(VText.getMainFont());
+            if (overlayBufferGraphics != null){
+                overlayBufferGraphics.setFont(VText.getMainFont());
+            }
             if (lensG2D != null){
                 lensG2D.setFont(VText.getMainFont());
             }
@@ -199,12 +252,18 @@ public class StdViewPanel extends ViewPanel {
         if (updateAntialias){
             if (antialias){
                 backBufferGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                if (overlayBufferGraphics != null){
+                    overlayBufferGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                }
                 if (lensG2D != null){
                     lensG2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 }
             }
             else {
                 backBufferGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+                if (overlayBufferGraphics != null){
+                    overlayBufferGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+                }
                 if (lensG2D != null){
                     lensG2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
                 }
@@ -212,6 +271,7 @@ public class StdViewPanel extends ViewPanel {
             updateAntialias = false;
         }
         stableRefToBackBufferGraphics = backBufferGraphics;
+        stableRefToOverlayBufferGraphics = overlayBufferGraphics;
         standardStroke=stableRefToBackBufferGraphics.getStroke();
         standardTransform=stableRefToBackBufferGraphics.getTransform();
     }
@@ -304,6 +364,10 @@ public class StdViewPanel extends ViewPanel {
     private void drawOverlayCam(){
         Camera overlayCamera = parent.overlayCamera;
         if ((overlayCamera!=null) && (overlayCamera.enabled) && ((overlayCamera.eager) || (overlayCamera.shouldRepaint()))){
+            stableRefToOverlayBufferGraphics.setComposite(
+                AlphaComposite.getInstance(AlphaComposite.CLEAR));
+            stableRefToOverlayBufferGraphics.fillRect(0, 0, size.width,size.height);
+            stableRefToOverlayBufferGraphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
             camIndex=overlayCamera.getIndex();
             drawnGlyphs=overlayCamera.parentSpace.getDrawnGlyphs(camIndex);
             drawnGlyphs.removeAllElements();
@@ -324,7 +388,7 @@ public class StdViewPanel extends ViewPanel {
                         /* always draw in the main buffer */
                             gll[i].project(overlayCamera, size);
                             if (gll[i].isVisible()){
-                                gll[i].draw(stableRefToBackBufferGraphics, size.width, size.height, overlayCamera.getIndex(),
+                                gll[i].draw(stableRefToOverlayBufferGraphics, size.width, size.height, overlayCamera.getIndex(),
                                         standardStroke, standardTransform, 0, 0);
                             }
                         /* notifying outside of above test because glyph sensitivity is not
@@ -336,38 +400,61 @@ public class StdViewPanel extends ViewPanel {
         }
     }
 
-    private void drawCursor(){
-        stableRefToBackBufferGraphics.setColor(parent.mouse.hcolor);
-        if (drawDrag){stableRefToBackBufferGraphics.drawLine(origDragx,origDragy,parent.mouse.jpx,parent.mouse.jpy);}
+    private void drawCursor(boolean erase){
+        Graphics2D stableRef = stableRefToBackBufferGraphics;
+        
+        stableRef.setColor(parent.mouse.hcolor);
+        if (drawDrag){stableRef.drawLine(origDragx,origDragy,parent.mouse.jpx,parent.mouse.jpy);}
         if (drawRect){
-            stableRefToBackBufferGraphics.drawRect(Math.min(origDragx,parent.mouse.jpx),
+            stableRef.drawRect(Math.min(origDragx,parent.mouse.jpx),
                     Math.min(origDragy,parent.mouse.jpy),
                     Math.max(origDragx,parent.mouse.jpx)-Math.min(origDragx,parent.mouse.jpx),
                     Math.max(origDragy,parent.mouse.jpy)-Math.min(origDragy,parent.mouse.jpy));}
         if (drawOval){
             if (circleOnly){
-                stableRefToBackBufferGraphics.drawOval(origDragx-Math.abs(origDragx-parent.mouse.jpx),
+                stableRef.drawOval(origDragx-Math.abs(origDragx-parent.mouse.jpx),
                         origDragy-Math.abs(origDragx-parent.mouse.jpx),
                         2*Math.abs(origDragx-parent.mouse.jpx),
                         2*Math.abs(origDragx-parent.mouse.jpx));
             }
             else {
-                stableRefToBackBufferGraphics.drawOval(origDragx-Math.abs(origDragx-parent.mouse.jpx),
+                stableRef.drawOval(origDragx-Math.abs(origDragx-parent.mouse.jpx),
                         origDragy-Math.abs(origDragy-parent.mouse.jpy),
                         2*Math.abs(origDragx-parent.mouse.jpx),
                         2*Math.abs(origDragy-parent.mouse.jpy));
             }
         }
         if (sfopw){
-            stableRefToBackBufferGraphics.drawImage(FIRST_ORDER_PAN_WIDGET, fopw_x, fopw_y, null);
+            stableRef.drawImage(FIRST_ORDER_PAN_WIDGET, fopw_x, fopw_y, null);
         }
         if (drawVTMcursor){
-            stableRefToBackBufferGraphics.setXORMode(backColor);
-            parent.mouse.draw(stableRefToBackBufferGraphics);
+            stableRef.setXORMode(backColor);
+            stableRef.setColor(parent.mouse.color);
+            if (erase){
+                stableRef.drawLine(oldX-parent.mouse.size,oldY,oldX+parent.mouse.size,oldY);
+                stableRef.drawLine(oldX,oldY-parent.mouse.size,oldX,oldY+parent.mouse.size);
+            }
+            stableRef.drawLine(parent.mouse.jpx-parent.mouse.size,parent.mouse.jpy,parent.mouse.jpx+parent.mouse.size,parent.mouse.jpy);
+            stableRef.drawLine(parent.mouse.jpx,parent.mouse.jpy-parent.mouse.size,parent.mouse.jpx,parent.mouse.jpy+parent.mouse.size);
             oldX = parent.mouse.jpx;
             oldY = parent.mouse.jpy;
         }
 
+    }
+    
+    void eraseCursor(){
+        Graphics2D stableRef =  stableRefToBackBufferGraphics;
+        
+        try {
+            if (drawVTMcursor){
+                stableRef.setXORMode(backColor);
+                stableRef.setColor(parent.mouse.color);
+                stableRef.drawLine(parent.mouse.jpx-parent.mouse.size,parent.mouse.jpy,parent.mouse.jpx+parent.mouse.size,parent.mouse.jpy);
+                stableRef.drawLine(parent.mouse.jpx,parent.mouse.jpy-parent.mouse.size,parent.mouse.jpx,parent.mouse.jpy+parent.mouse.size);
+                panel.paintImmediately(0,0,size.width,size.height);
+            }
+        }
+        catch (NullPointerException ex47){if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.runview.drawVTMcursor "+ex47);}}
     }
 
     private void doCursorPicking(){
@@ -385,35 +472,85 @@ public class StdViewPanel extends ViewPanel {
     public void drawOffscreen() {
         oldSize = panel.getSize();
         if (notBlank){
-            if (repaintable){
+            if (repaintable && !paintLocked){
                 if (repaintASAP){
                     try {
+                        //long ct = System.currentTimeMillis();
                         repaintASAP=false; //do this first as the thread can be interrupted inside
                         //this branch and we want to catch new requests for repaint
+                        boolean rb = repaintBack;
+                        repaintBack = false;
+                        boolean rps = repaintPortals;
+                        repaintPortals = false;
+                        boolean ro = repaintOverlay;
+                        repaintOverlay = false;
+                        boolean uco = updateCursorOnly;
                         updateCursorOnly=false;
-                        updateOffscreenBuffer();
-                        stableRefToBackBufferGraphics.setPaintMode();
-                        stableRefToBackBufferGraphics.setBackground(backColor);
-                        stableRefToBackBufferGraphics.clearRect(0, 0, size.width, size.height);
-                        backgroundHook();
-                        //begin actual drawing here
-                        if(lens != null) {
-                            drawScene(true);
-                        } else {
-                            drawScene(false);
+                        boolean printTime= false;
+                        long ct=0,ctt=0,ctt2=0;
+                        if (printTime){
+                            ct = System.nanoTime();
+                            ctt=ct; ctt2=ct;
                         }
-                        afterLensHook();
-                        drawPortals();
-                        portalsHook();
-                        drawOverlayCam();
-                        if (cursor_inside){
+                        if(rb){
+                            updateOffscreenBuffer();
+                            stableRefToBackBufferGraphics.setPaintMode();
+                            stableRefToBackBufferGraphics.setBackground(backColor);
+                            stableRefToBackBufferGraphics.clearRect(0, 0, size.width, size.height);
+                            if (printTime){
+                                ctt2 = System.nanoTime();
+                                System.out.println("Drawin Delay CLR "+ (ctt2-ctt)/1000000);
+                                ctt = ctt2;
+                            }
+                            backgroundHook();
+                            //begin actual drawing here
+                            if(lens != null) {
+                                drawScene(true);
+                            } else {
+                                drawScene(false);
+                            }
+                            if (printTime){
+                                ctt2 = System.nanoTime();
+                                System.out.println("Drawin Delay DSC "+ (ctt2-ctt)/1000000);
+                                ctt = ctt2;
+                            }
+                            afterLensHook();
+                        }
+                        if (rps){
+                            drawPortals();
+                            portalsHook();
+                            if (printTime){
+                                ctt2 = System.nanoTime();
+                                System.out.println("Drawin Delay DPT "+ (ctt2-ctt)/1000000);
+                                ctt = ctt2;
+                            }
+                        }
+                        if (ro){
+                            drawOverlayCam();
+                            if (printTime){
+                                ctt2 = System.nanoTime();
+                                System.out.println("Drawin Delay DOV "+ (ctt2-ctt)/1000000);
+                                ctt = ctt2;
+                            }
+                        }
+                        if (cursor_inside && (rb || uco)){
                             //deal with mouse glyph only if mouse cursor is inside this window
-                            doCursorPicking();
-                            drawCursor();
+                            if (uco) doCursorPicking();
+                            //System.out.println("Drawing Cursor "+uco);
+                            drawCursor(!rb);
+                        }
+                        if (printTime){
+                            ctt2 = System.nanoTime();
+                            System.out.println("Drawin Delay "+ (ctt2-ct)/1000000);
                         }
                         //end drawing here
                         if (stableRefToBackBufferGraphics == backBufferGraphics) {
-                            panel.paintImmediately(0,0,size.width,size.height);
+                            if (syncPaintImmediately != null){
+                               syncPaintImmediately.paint();
+                            }
+                            else{
+                                panel.paintImmediately(0,0,size.width,size.height);
+                            }
                             if (repaintListener != null){repaintListener.viewRepainted(StdViewPanel.this.parent);}
                             synchronized(this){
                                 lastButOneRepaint = lastRepaint;
@@ -429,51 +566,23 @@ public class StdViewPanel extends ViewPanel {
                         }
                     }
                 }
-                else if (updateCursorOnly){
-                    updateCursorOnly=false; // do this first as the thread can be interrupted inside this
-                    doCursorPicking();
-                    if (drawVTMcursor){
-                        try {
-                            stableRefToBackBufferGraphics.setXORMode(backColor);
-                            stableRefToBackBufferGraphics.setColor(parent.mouse.color);
-                            stableRefToBackBufferGraphics.drawLine(oldX-parent.mouse.size,oldY,oldX+parent.mouse.size,oldY);
-                            stableRefToBackBufferGraphics.drawLine(oldX,oldY-parent.mouse.size,oldX,oldY+parent.mouse.size);
-                            stableRefToBackBufferGraphics.drawLine(parent.mouse.jpx-parent.mouse.size,parent.mouse.jpy,parent.mouse.jpx+parent.mouse.size,parent.mouse.jpy);
-                            stableRefToBackBufferGraphics.drawLine(parent.mouse.jpx,parent.mouse.jpy-parent.mouse.size,parent.mouse.jpx,parent.mouse.jpy+parent.mouse.size);
-                            oldX = parent.mouse.jpx;
-                            oldY = parent.mouse.jpy;
-                        }
-                        //XXX: a nullpointerex on stableRefToBackBufferGraphics seems to occur from time to time when going in or exiting from blank mode
-                        //just catch it and wait for next loop until we find out what's causing this
-                        catch (NullPointerException ex47){if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.runview.drawVTMcursor "+ex47);}}
-                    }
-                    panel.paintImmediately(0,0,size.width,size.height);
-                }
             }
         }
         else {
-            // blank screen
+            // blank screen 
             updateOffscreenBuffer();
             stableRefToBackBufferGraphics.setPaintMode();
             stableRefToBackBufferGraphics.setColor(blankColor);
             stableRefToBackBufferGraphics.fillRect(0, 0, panel.getWidth(), panel.getHeight());
-            portalsHook();
+            // portalsHook();
+            // FIXME multi buffer rendering should blanks portals in buffer mode...
+            if (stableRefToOverlayBufferGraphics != null){
+                stableRefToOverlayBufferGraphics.setComposite(AlphaComposite.getInstance(AlphaComposite.CLEAR));
+                stableRefToOverlayBufferGraphics.fillRect(0, 0, size.width,size.height);
+            }
             panel.paintImmediately(0,0,size.width,size.height);
             if (repaintListener != null){repaintListener.viewRepainted(StdViewPanel.this.parent);}
         }
-    }
-
-    void eraseCursor(){
-        try {
-            if (drawVTMcursor){
-                stableRefToBackBufferGraphics.setXORMode(backColor);
-                stableRefToBackBufferGraphics.setColor(parent.mouse.color);
-                stableRefToBackBufferGraphics.drawLine(parent.mouse.jpx-parent.mouse.size,parent.mouse.jpy,parent.mouse.jpx+parent.mouse.size,parent.mouse.jpy);
-                stableRefToBackBufferGraphics.drawLine(parent.mouse.jpx,parent.mouse.jpy-parent.mouse.size,parent.mouse.jpx,parent.mouse.jpy+parent.mouse.size);
-                panel.paintImmediately(0,0,size.width,size.height);
-            }
-        }
-        catch (NullPointerException ex47){if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.runview.drawVTMcursor "+ex47);}}
     }
 
     @Override

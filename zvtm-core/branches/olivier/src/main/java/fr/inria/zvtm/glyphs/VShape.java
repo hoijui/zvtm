@@ -172,7 +172,7 @@ public class VShape<T> extends ClosedShape {
     public void orientTo(double angle){
         orient=angle;
         updateVSPolygon();
-        VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint(vsOwner);
     }
 
     @Override
@@ -182,14 +182,14 @@ public class VShape<T> extends ClosedShape {
     public void sizeTo(double s){
         size = s;
         updateVSPolygon();
-        VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint(vsOwner);
     }
 
     @Override
     public void reSize(double factor){
         size *= factor;
         updateVSPolygon();
-        VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint(vsOwner);
     }
 
     void updateVSPolygon(){

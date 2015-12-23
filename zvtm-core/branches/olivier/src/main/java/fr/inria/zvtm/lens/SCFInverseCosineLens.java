@@ -162,7 +162,7 @@ public class SCFInverseCosineLens extends FSInverseCosineLens implements Tempora
                 // make the lens almost flat when making big moves
                 dMM = nMM;
                 this.setDynamicMagnification();
-                owningView.parent.repaint();
+                owningView.parent.repaintBack();
                 if (tpl != null){tpl.parameterUpdated();}
             }
         }
@@ -170,7 +170,7 @@ public class SCFInverseCosineLens extends FSInverseCosineLens implements Tempora
 
     void setDynamicMagnification(){
 	c = (2/(float)Math.PI)*(dMM-1);
-	owningView.parent.repaint();
+	owningView.parent.repaintBack();
     }
 
     public void setCutoffFrequencyParameters(double a, double b){

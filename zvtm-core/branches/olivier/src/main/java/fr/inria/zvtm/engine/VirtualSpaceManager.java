@@ -372,6 +372,19 @@ public class VirtualSpaceManager implements AWTEventListener {
         }
     }
 
+    //**used internally */ 
+    public void repaint(VirtualSpace vs){
+        for (int i=0;i<allViews.length;i++){
+            allViews[i].repaint(vs);
+        }
+    }
+
+    //**used internally */ 
+    public void repaint(Camera c){
+        for (int i=0;i<allViews.length;i++){
+            allViews[i].repaint(c);
+        }
+    }
     /** Ask for View v to be repainted. This is an asynchronous call.
      * In some cases it is not possible to detect graphical changes so repaint
      * calls have to be issued manually (unless you are willing to wait for
@@ -381,6 +394,21 @@ public class VirtualSpaceManager implements AWTEventListener {
      */
     public void repaint(View v){
 	    v.repaint();
+    }
+
+    //**used internally */ 
+    public void repaint(View v, VirtualSpace vs){
+        v.repaint(vs);
+    }
+
+    //**used internally */ 
+    public void repaint(View v, Camera c){
+        v.repaint(c);
+    }
+
+    //**used internally */ 
+    public void repaintPortals(View v){
+        v.repaintPortals();
     }
 
     /** Ask for View v to be repainted. This is an asynchronous call.

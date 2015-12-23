@@ -107,7 +107,7 @@ public class VImageOr<T> extends VImage {
     public void orientTo(double angle){
         orient=angle;
         updateVSPolygon();
-        VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint(vsOwner);
     }
 
     public void setScale(double s){
