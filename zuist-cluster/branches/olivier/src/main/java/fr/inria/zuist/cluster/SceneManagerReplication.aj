@@ -139,6 +139,7 @@ aspect SceneManagerReplication {
         public void apply(SlaveUpdater su){
             SceneManager sm =
                 new SceneManager(su.getSlaveObject(pvId), properties);
+            System.out.println("sm replicated");
             su.putSlaveObject(smId, sm);
         }
     }
@@ -156,9 +157,7 @@ aspect SceneManagerReplication {
         if(VirtualSpaceManager.INSTANCE.isMaster()) &&
         !cflowbelow(addPseudoView(SceneManager, int, PseudoView))
         {
-            //b.setReplicated(true);
             pv.vs.setZuistOwned(true);
-            // pv.setReplicated(true);
             AddPseudoViewCreateDelta delta =
                 new AddPseudoViewCreateDelta(sceneManager.getObjId(), idx, pv.getObjId());
             VirtualSpaceManager.INSTANCE.sendDelta(delta);
@@ -179,7 +178,7 @@ aspect SceneManagerReplication {
             SceneManager sm = su.getSlaveObject(smId);
             PseudoView pv = su.getSlaveObject(pvId);
             boolean b = sm.addPseudoView(idx, pv);
-            System.out.println("slave Add Pweudo View "+ idx + " "+ pv.getWidth() +" "+ pv.getHeight());
+            //System.out.println("slave Add Pweudo View "+ sm +" "+ idx + " "+ pv.getWidth() +" "+ pv.getHeight());
         }
     }
 
