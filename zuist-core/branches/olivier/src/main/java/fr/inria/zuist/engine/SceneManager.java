@@ -158,7 +158,7 @@ public class SceneManager implements CameraListener, PseudoViewListener {
     private class RegionUpdater {
         private final HashMap<Camera, Location> toUpdate;
         private boolean active;
-        private static final int DEFAULT_PERIOD =  200; //200; //milliseconds
+        private static final int DEFAULT_PERIOD =  100; //200; //milliseconds
         private int period;
 
         private boolean enabled = true;
@@ -244,7 +244,11 @@ public class SceneManager implements CameraListener, PseudoViewListener {
     }
 
     public SceneManager(PseudoView pv, HashMap<String,String> properties){
-        addPseudoView(pv);
+        //addPseudoView(pv); NO!!!
+        pseudoViews.add(pv);
+        pv.c.addListener(this);
+        pv.addListener(this);
+        //
         this.setProperties(properties);
         regUpdater = new RegionUpdater();
         glyphLoader = new GlyphLoader(this);

@@ -100,13 +100,15 @@ public class ImageDescription extends ResourceDescription {
         }
 
         public void run(){
-            //System.out.println("ImageLoadTask " + glyphsMap.size() + " " + interpolationMethod
-            //    + " "+ id);
-            Glyph glyph = glyphsMap.get(vs);
+            // System.out.println("ImageLoadTask " + glyphsMap.size() + " "  + " "+ id);
+            Glyph glyph = (glyphsMap.size() > 0)? glyphsMap.get(vs):null;
             if (glyph != null) {
-                System.out.println("GLYPH ALREADY LOADED FOR THIS VS!!!");
+                if (SceneManager.getDebugMode()){
+                    System.out.println("GLYPH ALREADY LOADED FOR THIS VS!!! "+ glyphsMap.size() + " "  + " "+ id);
+                }
             }
-            else {
+            //else 
+            {
                 String protocol = src.getProtocol();
                 if (protocol.startsWith(ImageDescription.HTTP_PROTOCOL) || protocol.startsWith(ImageDescription.HTTPS_PROTOCOL)){
                     Glyph vrp = null;
