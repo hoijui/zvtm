@@ -14,17 +14,21 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.engine.portals.Portal;
 import fr.inria.zvtm.engine.portals.CameraPortal;
+import fr.inria.zvtm.engine.portals.OverviewPortal;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 
 import org.kohsuke.args4j.Argument;
 import org.kohsuke.args4j.CmdLineException;
@@ -44,6 +48,9 @@ public class SlaveApp {
     VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE; //shortcut
     private View view = null; //local view
     private ClusteredView clusteredView = null;
+    private JPanel panel = null;
+
+    static SlaveUpdater updater;
 
     SlaveApp(SlaveOptions options){
         this.options = options;
@@ -68,7 +75,7 @@ public class SlaveApp {
         }
 
         SlaveApp app = new SlaveApp(options);
-        SlaveUpdater updater = new SlaveUpdater(options.appName,
+        updater = new SlaveUpdater(options.appName,
                 options.blockNumber);
         updater.setAppDelegate(app);
         updater.startOperation();
@@ -92,6 +99,9 @@ public class SlaveApp {
         }
     }
 
+    boolean ownsBlock(ClusteredView cv){
+        return cv.ownsBlock(options.blockNumber);
+    }
     void createLocalView(ClusteredView cv){
         if (!cv.ownsBlock(options.blockNumber)){
             return;
@@ -107,7 +117,9 @@ public class SlaveApp {
                 cv.getClusterGeometry().getBlockHeight()*options.height,
                 false, false, !options.undecorated, null);
         view.setBackgroundColor(cv.getBackgroundColor());
+        view.setDrawPortalsOffScreen(cv.getDrawPortalsOffScreen());
         view.setListener(new SlaveEventHandler());
+        panel = (JPanel)view.getPanel().getComponent();
         view.getPanel().setRefreshRate(options.refreshPeriod);
         if (options.antialiasing){
             view.setAntialiasing(true);
@@ -154,12 +166,25 @@ public class SlaveApp {
             ((JFrame)view.getFrame()).setLocation(options.xOffset, options.yOffset);
             view.setVisible(true);
         }
+        //
+        updater.setSyncPaintImmediately();
     }
 
-    void setOverlayCamera(Camera c){
-        if (clusteredView == null) { return; }
+    void paintImmediately(){
+        Dimension size = panel.getSize();
+        panel.paintImmediately(0, 0, size.width, size.height);
+    }
+
+    void setOverlayCamera(Camera c, ClusteredView cv){
+        if (clusteredView == null || !cv.ownsBlock(options.blockNumber)) { return; }
         clusteredView.setOverlayCamera(c);
         VirtualSpaceManager.INSTANCE.setOverlayCamera(c, view);
+    }
+
+    void destroyOverlayCamera(ClusteredView cv){
+        if (clusteredView == null || !cv.ownsBlock(options.blockNumber)) { return; }
+        clusteredView.destroyOverlayCamera();
+        VirtualSpaceManager.INSTANCE.destroyOverlayCamera(view);
     }
 
     void setCameraLocation(Location masterLoc,
@@ -168,7 +193,6 @@ public class SlaveApp {
             slaveCamera.setLocation(masterLoc);
             return;
         }
-
         double focal = slaveCamera.getFocal();
         double altCoef = (focal + masterLoc.alt) / focal;
         //block (screen) width in virtualspace coords
@@ -191,7 +215,21 @@ public class SlaveApp {
         slaveCamera.setLocation(new Location(newX, newY, masterLoc.alt));
     }
 
-    void setPortalLocation(Portal p, int x, int y, int w, int h) {
+    void setOverviewPortalObservedViewLocationAndSize(OverviewPortal op){
+        if(clusteredView == null) return; // FIXME own portal ???
+        int virtBlockWidth = clusteredView.getClusterGeometry().getBlockWidth();
+        int virtBlockHeight = clusteredView.getClusterGeometry().getBlockHeight();
+        int row = clusteredView.rowNum(options.blockNumber) ;
+        int col = clusteredView.colNum(options.blockNumber) ;
+        
+        double dx = (col == 0)? 0: (col-1)*virtBlockWidth + virtBlockWidth/2;
+        double dy = (row == 0)? 0: (row-1)*virtBlockHeight + virtBlockHeight/2;
+        op.setObservedViewLocationAndSize(dx, dy, 
+                clusteredView.getClusterGeometry().getWidth(),
+                clusteredView.getClusterGeometry().getHeight());
+    }
+
+    void setPortalLocationAndSize(Portal p, int x, int y, int w, int h) {
         int virtBlockWidth = clusteredView.getClusterGeometry().getBlockWidth();
         int virtBlockHeight = clusteredView.getClusterGeometry().getBlockHeight();
 
@@ -199,6 +237,20 @@ public class SlaveApp {
         int col = clusteredView.colNum(options.blockNumber) ;
 
         p.moveTo(x-col*virtBlockWidth,y-row*virtBlockHeight);
+        p.sizeTo(w,h);
+    }
+
+    void setPortalLocation(Portal p, int x, int y) {
+        int virtBlockWidth = clusteredView.getClusterGeometry().getBlockWidth();
+        int virtBlockHeight = clusteredView.getClusterGeometry().getBlockHeight();
+
+        int row = clusteredView.rowNum(options.blockNumber) ;
+        int col = clusteredView.colNum(options.blockNumber) ;
+
+        p.moveTo(x-col*virtBlockWidth,y-row*virtBlockHeight);
+    }
+
+    void setPortalSize(Portal p, int w, int h) {
         p.sizeTo(w,h);
     }
 

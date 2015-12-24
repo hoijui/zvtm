@@ -14,6 +14,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
+import java.util.HashMap;
+
+import javax.swing.SwingUtilities;
+import javax.swing.Timer;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+
+import org.jgroups.Message;
+import org.jgroups.Address;
 
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.Location;
@@ -27,7 +36,8 @@ public class ClusteredView extends DefaultIdentifiable {
     private ClusterGeometry clGeom;
     private final ArrayList<Camera> cameras;
     private Color bgColor;
-    private Camera overlayCamera;
+    private Camera overlayCamera = null;
+    private boolean drawPortalsOffScreen = false;
 
     /**
      * Constructs a new ClusteredView.
@@ -160,6 +170,168 @@ public class ClusteredView extends DefaultIdentifiable {
 
     void setOverlayCamera(Camera c){
         overlayCamera = c;
+    }
+    void destroyOverlayCamera(){
+        overlayCamera = null;
+    }
+
+    // -----------------------------------------
+    // Sync stuff (master!)
+
+    private boolean isSyncronous = false;
+    private boolean needLateSyncPaint = false;
+    private int num_slaves = 0;
+    private long lastPaintTime = 0;
+    private long lastMsgTime = 0;
+    private HashMap<String,SlaveInfo> slaves = new HashMap<String,SlaveInfo>();
+    private Timer stimer;
+    private int stimerDelay;
+    private ActionListener taskPerformer;
+
+    /**Set slaves synchronous rendering */
+    public void setSynchronous(boolean b){
+        if(VirtualSpaceManager.INSTANCE.isMaster()){
+            System.out.println("master ClusteredView set Synchronous "+b);
+            isSyncronous = b;
+            VirtualSpaceManager.INSTANCE.sendDelta(new SyncDelta(this, b));
+        }
+        else {
+            // should not happen
+            System.out.println("one try to use setSynchronous  with a slave ClusteredView ???? "+b);
+        }
+    }
+
+    /**Is slaves rendering set synchronous */
+    public boolean isSynchronous(){
+        return isSyncronous;
+    }
+
+    // needed for zuist at least for now...
+    public void setLatePaintSync(int delay)
+    {   
+        if(!VirtualSpaceManager.INSTANCE.isMaster()){
+            // should not happen
+            System.out.println("one try to use setLatePaintSync with a slave ClusteredView ???? "+delay);
+            return;
+        }
+        taskPerformer = new ActionListener(){
+            public void actionPerformed(ActionEvent evt){
+                //System.out.println("lateSyncPaint actionPerformed");
+                lateSyncPaint();
+            }
+        };
+        stimer = new Timer(delay, taskPerformer);
+    }
+
+    public void lateSyncPaint()
+    {
+        for(SlaveInfo i : slaves.values()){
+            //System.err.println("VirtualSpaceManager.lateSyncPaint "+i.paintAsked);
+            if (i.paintAsked){
+                VirtualSpaceManager.INSTANCE.sendDeltaPI(i.address, new PaintImmediatelyDelta(0));
+            }
+        }
+    }
+
+    void  handleSyncPaint(Message msg)
+    {    
+        if(!VirtualSpaceManager.INSTANCE.isMaster()){
+            // should not happen
+            System.out.println("handleSyncPaint with a slave ClusteredView ???? "+msg);
+            return;
+        }
+        long ct = System.currentTimeMillis();
+        //System.err.println(msg.getSrc()+ ": "+ msg.getObject() + " "+ (ct - lastMsgTime));
+        lastMsgTime = ct;
+        String m = (msg.getObject()).toString();
+        String s = (msg.getSrc()).toString();
+        if (m.equals("Hello")){
+            num_slaves++;
+            Address add = msg.getSrc(); 
+            slaves.put(s,new SlaveInfo(add));
+        }
+        else if (m.equals("Bye")){
+            num_slaves--;
+            slaves.remove(s);
+        }
+        else {
+            Long L = (Long)msg.getObject();
+            long l = L.longValue();
+            SlaveInfo si = slaves.get(s);
+            long pmt = 0;
+            if (si != null){
+                pmt = si.atTime;
+                si.repaintCount = l;
+                si.atTime = ct;
+                si.paintAsked = true;
+            }
+            else{
+                System.err.println("ERROR in handleSyncPaint");
+                return;
+            }
+            long maxtest = 0;
+            long mintest = -1;
+            long count = 0;
+            for(SlaveInfo i : slaves.values())
+            {
+                    if (i.paintAsked) count++;
+                    if (maxtest < i.repaintCount){
+                        maxtest = i.repaintCount;
+                    }
+                    if (mintest == -1 || mintest > i.repaintCount){
+                        mintest = i.repaintCount;
+                    }
+            }
+            
+            if (mintest == maxtest || count == num_slaves)
+            {
+                if (stimer != null && stimer.isRunning()) { 
+                    stimer.stop();
+                }
+                if (count < num_slaves){
+                    //System.out.println("MASTER: LESS PAINT "+this);
+                    for(SlaveInfo i : slaves.values()){
+                        if (i.paintAsked){
+                            VirtualSpaceManager.INSTANCE.sendDeltaPI(i.address, new PaintImmediatelyDelta(maxtest));
+                        }
+                    }
+                }
+                else {
+                    //System.out.println("MASTER: ALL PAINT "+this);
+                    VirtualSpaceManager.INSTANCE.sendDeltaPI(new PaintImmediatelyDelta(maxtest));
+                }
+                long pp = lastPaintTime;
+                lastPaintTime = ct;
+                // System.out.println("master paint delay "+ (lastPaintTime - pp) +" "+(ct - pmt)+" with lock: "+ numLock);
+                for(SlaveInfo i : slaves.values()){
+                    // System.out.print(i.paintCount+" "+(lastPaintTime-i.atTime)+" "+ i.skipped+ " / ");
+                    i.skipped = 0;
+                    i.paintAsked = false;
+                }
+                // System.out.println("");
+                return;
+            }
+            if (stimer != null){
+                if (stimer.isRunning()){
+                    stimer.restart();
+                }
+                else{
+                    stimer.start();
+                }
+            }
+            si.skipped++;
+        }
+    }
+
+    // --------------------------------------------------------------
+
+    /**tell to renderer (or not) the portals with offscreen buffers */
+    public void setDrawPortalsOffScreen(boolean v){
+        drawPortalsOffScreen = v;
+    }
+    /**do the portals are renderered with offscreen buffers? */
+    public boolean getDrawPortalsOffScreen(){
+        return drawPortalsOffScreen;
     }
 
     /**

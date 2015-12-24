@@ -15,6 +15,7 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.DPath;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.PRectangle;
+import fr.inria.zvtm.glyphs.VSegment;
 
 /**
  * Most of these Deltas are (faster) replacements for common operations that
@@ -69,6 +70,20 @@ aspect GlyphReplication {
        if(dPath.isReplicated()){
            Delta delta = new DPathEditDelta(dPath.getObjId(),
                    coords, absolute);
+           VirtualSpaceManager.INSTANCE.sendDelta(delta);
+       }
+
+    pointcut vSegmentSetEndPoints(VSegment vSegment, double sx, double sy, double ex, double ey):
+        execution(public void VSegment.setEndPoints(double, double, double, double))
+        && this(vSegment)
+        && args(sx, sy, ex, ey)
+        && if(VirtualSpaceManager.INSTANCE.isMaster());
+
+    after(VSegment vSegment, double sx, double sy, double ex, double ey) returning:
+       vSegmentSetEndPoints(vSegment, sx, sy, ex, ey) &&
+       !cflowbelow(vSegmentSetEndPoints(VSegment, double, double, double, double)) &&
+       if(vSegment.isReplicated()){
+           Delta delta = new VSegmentSetEndPointsDelta(vSegment.getObjId(), sx, sy, ex, ey);
            VirtualSpaceManager.INSTANCE.sendDelta(delta);
        }
 
@@ -166,6 +181,21 @@ aspect GlyphReplication {
         }
     }
 
+    private static class VSegmentSetEndPointsDelta implements Delta {
+        private final ObjId<VSegment> targetId;
+        private final double sx, sy, ex, ey;
+
+        VSegmentSetEndPointsDelta(ObjId<VSegment> targetId, double sx, double sy, double ex, double ey){
+            this.targetId = targetId;
+            this.sx= sx; this.sy= sy;
+            this.ex= ex; this.ey= ey;
+        }
+
+        public void apply(SlaveUpdater updater){
+            VSegment target = updater.getSlaveObject(targetId);
+            target.setEndPoints(sx, sy, ex, ey);
+        }
+    }
     private static class GlyphMoveDelta implements Delta {
         private final ObjId<Glyph> targetId;
         private final double x;

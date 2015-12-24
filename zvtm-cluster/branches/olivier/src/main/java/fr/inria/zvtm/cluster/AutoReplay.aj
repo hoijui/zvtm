@@ -69,7 +69,8 @@ public aspect AutoReplay extends AbstractAutoReplay {
          execution(public void Glyph.setSensitivity(boolean)) ||
          //Glyph.setStroke moved to a static Delta that performs wrapping if possible
          //execution(public void Glyph.setStroke(Stroke)) ||
-         execution(public void VSegment.setEndPoints(double, double, double, double)) ||
+         //VSegment.setEnd Pointsmoved to a static delat for performence...
+         //execution(public void VSegment.setEndPoints(double, double, double, double)) ||
          execution(public void VText.setFont(Font)) ||
          execution(public void VText.setText(String)) ||
          execution(public void VText.setScale(float)) ||
@@ -100,6 +101,7 @@ public aspect AutoReplay extends AbstractAutoReplay {
          execution(public void CameraPortal.setBorder(Color)) ||
          execution(public void CameraPortal.setBackgroundColor(Color)) ||
          execution(public void CameraPortal.setBorderWidth(float)) ||
+         execution(public void CameraPortal.setMaxBufferSizeRatios(double, double)) ||
          execution(public void DraggableCameraPortal.setDragBarHeight(int)) ||
          execution(public void DraggableCameraPortal.setDragBarColor(Color)) ||
          execution(public void OverviewPortal.drawObservedRegionLocator(boolean)) ||
@@ -107,9 +109,6 @@ public aspect AutoReplay extends AbstractAutoReplay {
          execution(public void OverviewPortal.setObservedRegionTranslucency(float)) ||
          execution(public void OverviewPortal.setObservedRegionBorderWidth(float))
 
-         // 
-         //execution(public void VirtualSpaceManager.stackPortalFront(Portal)) ||
-         //execution(public void VirtualSpaceManager.stackPortalBack(Portal))
         );
     }
 

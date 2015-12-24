@@ -48,6 +48,7 @@ public class GenericDelta implements Delta {
     public void apply(SlaveUpdater updater){
         try{
             Object target = updater.getSlaveObject(objId);
+            if (target == null) return;
             Method method = target.getClass().getMethod(methodName,
                     parameterTypes);
             for(int i=0; i<arguments.length; ++i){
