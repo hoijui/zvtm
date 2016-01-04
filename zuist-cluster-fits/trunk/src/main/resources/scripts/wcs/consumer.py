@@ -57,10 +57,12 @@ class Consumer(object):
 		"""
 		self.queue_name = queue_name
 		self.routing_key = routing_key
+		self.channel.queue_delete(queue=self.queue_name)
 		self.channel.queue_declare(queue=self.queue_name, durable=durable,
 		                           exclusive=exclusive, auto_delete=auto_delete)
 		self.channel.queue_bind(queue=self.queue_name,
 		    exchange=self.exchange_name, routing_key=self.routing_key)
+
 
 	def start_consuming(self, callback, queue_name=None, consumer_tag='consumer'):
 		"""

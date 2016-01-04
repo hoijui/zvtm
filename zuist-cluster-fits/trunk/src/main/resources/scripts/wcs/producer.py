@@ -63,5 +63,6 @@ class Producer(object):
 		"""
 		Close channel and connection
 		"""
+		#self.channel.queue_delete(queue='')
 		self.channel.close()
 		self.connection.close()

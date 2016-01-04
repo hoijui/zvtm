@@ -138,7 +138,9 @@ import org.json.JSONObject;
 import org.json.JSONArray;
 
 import fr.inria.zvtm.fits.simbad.SimbadCatQuery;
+import fr.inria.zvtm.fits.simbad.LocalCatQuery2;
 import fr.inria.zvtm.fits.simbad.AstroObject;
+import fr.inria.zvtm.fits.simbad.AstroObjectPUC;
 
 import jsky.coords.WorldCoords;
 
@@ -378,6 +380,7 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
 
         draw = new DrawSymbol();
         query = new Query();
+        query.setLocalQuery(options.localquery);
 
         rightClickSelectionG = new VCircle(0, 0, 1000, 1, Color.BLACK, Color.RED, SEL_ALPHA);
         rightClickSelectionG.setFilled(false);
@@ -1775,8 +1778,13 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
         public static final String T_QUERY = "Query";
         Point2D.Double center;
         Point2D.Double onCircle;
+        boolean localquery;
         public Query(){
             pythonWCS.addObserver(this);
+        }
+
+        public void setLocalQuery(boolean localquery){
+            this.localquery = localquery;
         }
 
         public void callQuery(Point2D.Double center, Point2D.Double onCircle){
@@ -1820,15 +1828,21 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
 
                             final double distArcMin = wc.dist(wcDummy);
                             //perform catalog query
-                            System.err.println("Querying Simbad at " + wc + " with a radius of " + distArcMin + " arcminutes");
+                            System.err.println("Querying at " + wc + " with a radius of " + distArcMin + " arcminutes");
                             // symbolSpace.removeAllGlyphs();
                             new SwingWorker(){
                                 @Override public List<AstroObject> construct(){
                                     List<AstroObject> objs = null;
                                     try{
-                                        //objs = SimbadCatQuery.makeSimbadCoordQuery(wc.getRaDeg(), wc.getDecDeg(), distArcMin);
-                                        System.out.println("SimbadCatQuery.makeSimbadCoordQuery("+wc.getRaDeg()+", "+wc.getDecDeg()+", "+distArcMin+")");
-                                        objs = SimbadCatQuery.makeSimbadCoordQuery(wc.getRaDeg(), wc.getDecDeg(), distArcMin);
+                                        if(localquery){
+                                            System.out.println("LocalCatQuery.makeCoordQuery("+wc.getRaDeg()+", "+wc.getDecDeg()+", "+distArcMin+")");
+                                            objs = LocalCatQuery2.makeCoordQuery(wc.getRaDeg(), wc.getDecDeg(), distArcMin);
+                                        }else{
+                                            //objs = SimbadCatQuery.makeSimbadCoordQuery(wc.getRaDeg(), wc.getDecDeg(), distArcMin);
+                                            System.out.println("SimbadCatQuery.makeSimbadCoordQuery("+wc.getRaDeg()+", "+wc.getDecDeg()+", "+distArcMin+")");
+                                            objs = SimbadCatQuery.makeSimbadCoordQuery(wc.getRaDeg(), wc.getDecDeg(), distArcMin);
+                                        }
+                                        
                                     } catch(IOException ioe){
                                         ioe.printStackTrace();
                                     } finally {
@@ -1981,14 +1995,28 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
 
         //String id;
         //AstroObject obj;
+        HashMap<String, Boolean> nucleated;
 
         public static final String T_DRAW = "Draw";
+        Color NUCLEATED_COLOR = Color.decode("#e5f5e0");
+        Color NON_NUCLEATED_COLOR = Color.decode("#a1d99b");
 
         public DrawSymbol(){
             pythonWCS.addObserver(this);
+            nucleated = new HashMap();
         }
 
         public void drawSymbol(double ra, double dec, String id){
+            pythonWCS.sendWorld2Pix(ra, dec, id);
+        }
+
+        public void drawSymbol(double ra, double dec, String id, boolean isNucleated){
+            if(!nucleated.containsKey(id)){
+                nucleated.put(id, isNucleated);
+            } else {
+                nucleated.remove(id);
+                nucleated.put(id, isNucleated);
+            }
             pythonWCS.sendWorld2Pix(ra, dec, id);
         }
 
@@ -2020,9 +2048,21 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
                         //double y = (json.getDouble("y") + fitsImageDescRef.getY()) - fitsImageDescRef.getHeight()/2 ;
                         double[] l = windowToViewCoordinateFromCoordinateWCS(json.getDouble("x"), json.getDouble("y"));
                         System.out.println("location: " + l[0] + ", " + l[1]);
-                        VCross cr = new VCross(l[0], l[1], 100, 20, 20, Color.YELLOW, Color.WHITE, .8f);
+                        VCross cr;
+                        VText lb;
+                        if(nucleated.containsKey(id)){
+                            if(nucleated.get(id)){
+                                cr = new VCross(l[0], l[1], 100, 20, 20, NUCLEATED_COLOR, Color.WHITE, .8f);
+                                lb = new VText(l[0]+10, l[1]+10, 101, NUCLEATED_COLOR, id, VText.TEXT_ANCHOR_START);
+                            } else {
+                                cr = new VCross(l[0], l[1], 100, 20, 20, NON_NUCLEATED_COLOR, Color.WHITE, .8f);
+                                lb = new VText(l[0]+10, l[1]+10, 101, NON_NUCLEATED_COLOR, id, VText.TEXT_ANCHOR_START);
+                            }
+                        } else {
+                            cr = new VCross(l[0], l[1], 100, 20, 20, Color.YELLOW, Color.WHITE, .8f);
+                            lb = new VText(l[0]+10, l[1]+10, 101, Color.YELLOW, id, VText.TEXT_ANCHOR_START);
+                        }
                         cr.setStroke(AstroObject.AO_STROKE);
-                        VText lb = new VText(l[0]+10, l[1]+10, 101, Color.YELLOW, id, VText.TEXT_ANCHOR_START);
                         lb.setBorderColor(Color.BLACK);
                         lb.setTranslucencyValue(.6f);
                         catalogSpace.addGlyph(cr);
@@ -2071,51 +2111,56 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
     }
 
     void drawSymbols(List<AstroObject> objs){
+        if(objs != null){
+            System.out.println("drawSymbols: size:" + objs.size());
 
-        System.out.println("drawSymbols: size:" + objs.size());
-
-        /*
-
-        double[] ras = new double[objs.size()];
-        double[] decs = new double[objs.size()];
-        String[] ids = new String[objs.size()];
-
-        AstroObject ao;
-        for(int i = 0; i <  objs.size(); i++){
-            ao = objs.get(i);
-            ras[i] = ao.getRa();
-            decs[i] = ao.getDec();
-            ids[i] = ao.getIdentifier();
-        }
-
-        new DrawSymbol(ras, decs, ids);
-
-        */
-        
-        for(AstroObject obj: objs){
-
-            System.out.print("AstroObject: ");
-            System.out.println(obj);
-            
-            draw.drawSymbol(obj.getRa(), obj.getDec(), obj.getIdentifier());
-
-            // XXX
             /*
-            Point2D.Double p = new Point2D.Double();//img.wcs2vs(obj.getRa(), obj.getDec());
-            VCross cr = new VCross(p.x, p.y, 100, 10, 10, Color.RED, Color.WHITE, .8f);
-            cr.setStroke(AstroObject.AO_STROKE);
-            VText lb = new VText(p.x+10, p.y+10, 101, Color.RED, obj.getIdentifier(), VText.TEXT_ANCHOR_START);
-            lb.setBorderColor(Color.BLACK);
-            lb.setTranslucencyValue(.6f);
-            mSpace.addGlyph(cr);
-            mSpace.addGlyph(lb);
-            cr.setOwner(obj);
-            lb.setOwner(obj);
-            cr.setType(JSkyFitsMenu.T_ASTRO_OBJ);
-            lb.setType(JSkyFitsMenu.T_ASTRO_OBJ);
+            double[] ras = new double[objs.size()];
+            double[] decs = new double[objs.size()];
+            String[] ids = new String[objs.size()];
+
+            AstroObject ao;
+            for(int i = 0; i <  objs.size(); i++){
+                ao = objs.get(i);
+                ras[i] = ao.getRa();
+                decs[i] = ao.getDec();
+                ids[i] = ao.getIdentifier();
+            }
+
+            new DrawSymbol(ras, decs, ids);
+
             */
+            
+            for(AstroObject obj: objs){
+
+                System.out.print("AstroObject: ");
+                System.out.println(obj);
+                
+                if(obj instanceof AstroObjectPUC){
+
+                    draw.drawSymbol(obj.getRa(), obj.getDec(), obj.getIdentifier(), ((AstroObjectPUC)obj).isNucleated());
+                } else {
+                    draw.drawSymbol(obj.getRa(), obj.getDec(), obj.getIdentifier());
+                }
+                
+
+                // XXX
+                /*
+                Point2D.Double p = new Point2D.Double();//img.wcs2vs(obj.getRa(), obj.getDec());
+                VCross cr = new VCross(p.x, p.y, 100, 10, 10, Color.RED, Color.WHITE, .8f);
+                cr.setStroke(AstroObject.AO_STROKE);
+                VText lb = new VText(p.x+10, p.y+10, 101, Color.RED, obj.getIdentifier(), VText.TEXT_ANCHOR_START);
+                lb.setBorderColor(Color.BLACK);
+                lb.setTranslucencyValue(.6f);
+                mSpace.addGlyph(cr);
+                mSpace.addGlyph(lb);
+                cr.setOwner(obj);
+                lb.setOwner(obj);
+                cr.setType(JSkyFitsMenu.T_ASTRO_OBJ);
+                lb.setType(JSkyFitsMenu.T_ASTRO_OBJ);
+                */
+            }
         }
-        
     }
 
 

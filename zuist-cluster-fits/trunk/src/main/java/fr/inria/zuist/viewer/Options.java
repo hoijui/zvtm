@@ -59,6 +59,9 @@ public class Options {
     @Option(name = "-hostmq", usage = "Host of the RabbitMQ")
     public static String HOST_NAME_MQ = "127.0.0.1";
 
+    @Option(name = "-localquery", usage = "For call query in local servel")
+    public boolean localquery = false;
+
     public static String PRODUCER_ROUTINGKEY_MQ = "java";
     public static String CONSUMER_ROUTINGKEY_MQ = "python";
 

@@ -52,6 +52,7 @@ def consumer():
 		c.declare_exchange(exchange_name=CONSUMER_ROUTINGKEY)
 		#c.declare_queue(queue_name=('%ss')%('java'), routing_key='java')
 		c.declare_queue(queue_name=('%ss')%(CONSUMER_ROUTINGKEY), routing_key=CONSUMER_ROUTINGKEY)
+		
 
 		kill = False
 
