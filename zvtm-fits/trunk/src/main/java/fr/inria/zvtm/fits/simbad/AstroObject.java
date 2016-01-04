@@ -10,6 +10,9 @@ import java.awt.BasicStroke;
 
 import jsky.science.Coordinates;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 public class AstroObject {
 
     public static final BasicStroke AO_STROKE = new BasicStroke(2f);
@@ -31,10 +34,30 @@ public class AstroObject {
             //this does not look like a valid row
             return null;
         }
-        retval.identifier = elems[0];
-        retval.coords = new Coordinates(Double.parseDouble(elems[1]),
-                Double.parseDouble(elems[2]));
+        retval.setIdentifier(elems[0]);
+        retval.setCoords(new Coordinates(Double.parseDouble(elems[1]),
+                Double.parseDouble(elems[2])) );
         return retval;
+    }
+    
+    /**
+     * @param obj - JSONObject with atributes ra, dec and identifier
+     */
+    static AstroObject fromJSON(JSONObject obj) throws JSONException{
+        AstroObject retval = new AstroObject();
+        double ra = obj.getDouble("ra");
+        double dec = obj.getDouble("dec");
+        retval.setIdentifier(obj.getString("identifier") );
+        retval.setCoords(new Coordinates(ra, dec) );
+        return retval;
+    }
+
+    public void setIdentifier(String identifier){
+        this.identifier = identifier;
+    }
+
+    public void setCoords(Coordinates coords){
+        this.coords = coords;
     }
 
     public Coordinates getCoords(){
