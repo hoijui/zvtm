@@ -329,6 +329,8 @@ class JSkyFitsViewerEventHandler implements ViewListener, PortalListener {
             
         } else if(code == KeyEvent.VK_C){
             app.clear();
+        } else if(code == KeyEvent.VK_Q){
+            app.query.changeQuery();
         }
         // else if (code == KeyEvent.VK_MINUS){
         //     //app.scaleBounds[1] -= 100;

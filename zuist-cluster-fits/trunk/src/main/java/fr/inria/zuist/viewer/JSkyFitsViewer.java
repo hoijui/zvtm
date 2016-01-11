@@ -282,7 +282,7 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
     public JSkyFitsImageDescription fitsImageDescRef;
 
     private DrawSymbol draw;
-    private Query query;
+    public Query query;
     VCircle rightClickSelectionG;
     static final BasicStroke SEL_STROKE = new BasicStroke(2f);
     static final float SEL_ALPHA = .5f;
@@ -1783,6 +1783,14 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
             pythonWCS.addObserver(this);
         }
 
+        public void changeQuery(){
+            if(localquery){
+                localquery = false;
+            } else {
+                localquery = true;
+            }
+        }
+
         public void setLocalQuery(boolean localquery){
             this.localquery = localquery;
         }
@@ -1998,8 +2006,8 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
         HashMap<String, Boolean> nucleated;
 
         public static final String T_DRAW = "Draw";
-        Color NUCLEATED_COLOR = Color.decode("#e5f5e0");
-        Color NON_NUCLEATED_COLOR = Color.decode("#a1d99b");
+        Color NUCLEATED_COLOR = Color.decode("#d5efcd");
+        Color NON_NUCLEATED_COLOR = Color.decode("#90d289");
 
         public DrawSymbol(){
             pythonWCS.addObserver(this);

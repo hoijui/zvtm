@@ -23,8 +23,7 @@ import fr.inria.zvtm.fits.simbad.LocalCatQuery;
 
 public class LocalCatQuery2 extends LocalCatQuery {
 
-	//static String prefix = "http://fits-catalog.inria.cl:9000/catalog/query";
-    static String prefix = "http://localhost:9000/catalog/query";
+	static String prefix = "http://fits-catalog.inria.cl/catalog/query";
 
 	public static List<AstroObject> makeCoordQuery(double ra, double dec, double arcmin) throws IOException, JSONException{
 		List<AstroObject> retval = new ArrayList<AstroObject>();
