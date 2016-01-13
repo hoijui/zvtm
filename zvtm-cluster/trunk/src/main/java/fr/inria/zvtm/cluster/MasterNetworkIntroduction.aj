@@ -9,6 +9,7 @@ package fr.inria.zvtm.cluster;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 
 import org.jgroups.Channel;
+import org.jgroups.ChannelException;
 import org.jgroups.JChannel;
 import org.jgroups.Message;
 
@@ -40,7 +41,7 @@ aspect MasterNetworkIntroduction {
 
         try{
             networkDelegate.sendDelta(delta);
-        } catch (Exception ce){
+        } catch (ChannelException ce){
             logger.error("Could not send Delta message: " + ce);
         }
     }
@@ -55,7 +56,7 @@ aspect MasterNetworkIntroduction {
     private void VirtualSpaceManager.startOperation(){
         try{
             networkDelegate.startOperation(appName);
-        } catch (Exception ce){
+        } catch (ChannelException ce){
             logger.error("Could not join network channel: " + ce);
         }
     }
@@ -63,23 +64,17 @@ aspect MasterNetworkIntroduction {
     private static class MasterNetworkDelegate {
         private JChannel channel;
 
-
-        void startOperation(String appName) throws Exception {
+        void startOperation(String appName) throws ChannelException {
             channel = ChannelFactory.makeChannel();
             //disable local echo
-            channel.setDiscardOwnMessages(true);
+            channel.setOpt(Channel.LOCAL, Boolean.FALSE);
             channel.connect(appName);
         }
 
         void stop(){
             //Flush the channel and do not restart it
             if(channel.flushSupported()){
-    			try {
-            		channel.startFlush(false);
-            	} catch (Exception ce){
-            		System.err.println("Flush error: " + ce);
-        		}
-            	
+                channel.startFlush(false);
             } else {
                 //we cannot flush, so try to allow the close message
                 //to reach its recipients
@@ -92,7 +87,7 @@ aspect MasterNetworkIntroduction {
             channel.close();
         }
 
-        void sendDelta(Delta delta) throws Exception {
+        void sendDelta(Delta delta) throws ChannelException {
             Message msg = new Message(null, null, delta);
             channel.send(msg);
         }

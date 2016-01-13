@@ -8,6 +8,7 @@ package fr.inria.zvtm.cluster;
 
 import java.io.File;
 
+import org.jgroups.ChannelException;
 import org.jgroups.JChannel;
 
 import org.slf4j.Logger;
@@ -25,7 +26,7 @@ class ChannelFactory {
     /*
      * Creates a new channel.
      */
-    static final JChannel makeChannel() throws Exception{
+    static final JChannel makeChannel() throws ChannelException{
         final String propFile = System.getProperty("zvtm.cluster.channel_conf");
         if(propFile == null){
             //create channel from the embedded configuration,
