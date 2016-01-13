@@ -4,13 +4,13 @@
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2000-2002. All Rights Reserved
  *   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2011. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2016. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
  * version 2.1 of the License, or (at your option) any later version.
- * 
+ *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
@@ -87,8 +87,8 @@ public class SVGReader {
     public static final String _g="g";
     public static final String _a="a";
     public static final String _title="title";
-    
-    
+
+
     public static final String _fill = "fill";
     public static final String _stroke = "stroke";
     public static final String _strokewidth = "stroke-width";
@@ -108,8 +108,8 @@ public class SVGReader {
     public static final String _fontsizeCSS = _fontsize + ":";
     public static final String _fontweightCSS = _fontweight + ":";
     public static final String _fontstyleCSS = _fontstyle + ":";
-    
-    
+
+
     public static final String _style="style";
     public static final String _class = "class";
     public static final String _cx="cx";
@@ -500,7 +500,7 @@ public class SVGReader {
         }
         catch (Exception ex){System.err.println("Error: SVGReader.getColor(): "+ex);return Color.WHITE;}
     }
-    
+
     static final short fill_INDEX = 0;
     static final short stroke_INDEX = 1;
     static final short strokewidth_INDEX = 2;
@@ -598,7 +598,7 @@ public class SVGReader {
             }
             if (!attributesSet[fontstyle_INDEX] && e.hasAttribute(_fontstyle)){
                 ss.setFontStyle(e.getAttribute(_fontstyle));
-            }            
+            }
         }
         return (ss.hasStylingInformation()) ? ss : null;
     }
@@ -885,16 +885,16 @@ public class SVGReader {
 		*@param ctx used to propagate contextual style information (put null if none)
 		*@param meta store metadata associated with this node (URL, title) in glyph's associated object
 		*/
-		
+
 	public static VText createText(Element e,Context ctx,boolean meta){
         String tx=(e.getFirstChild()==null) ? "" : e.getFirstChild().getNodeValue();
-		
+
 		NodeList nodes = e.getChildNodes();
 		for(int k = 0; k< nodes.getLength(); k++){
 			Node e2 = nodes.item(k);
 			tx += (e2.getFirstChild()==null) ? "" : e2.getFirstChild().getNodeValue();;
 		}
-		
+
         double x = Double.parseDouble(e.getAttribute(_x));
         double y = Double.parseDouble(e.getAttribute(_y));
         if (scale != 1.0) {
@@ -926,7 +926,7 @@ public class SVGReader {
                 res = new VText(x, -y, 0, tc, tx, ta, 1f, ss.getAlphaTransparencyValue());
             }
             else {
-                res = new VText(x, -y, 0, tc, tx, ta, 1f, 1f);				
+                res = new VText(x, -y, 0, tc, tx, ta, 1f, 1f);
             }
             Font f;
             if (specialFont(f=ss.getDefinedFont(ctx), VText.getMainFont())){
@@ -938,7 +938,7 @@ public class SVGReader {
                 res = new VText(x, -y, 0, tc, tx, ta, 1f, ctx.getAlphaTransparencyValue());
             }
             else {
-                res = new VText(x, -y, 0, tc, tx, ta, 1f, 1f);				
+                res = new VText(x, -y, 0, tc, tx, ta, 1f, 1f);
             }
             Font f;
             if (specialFont(f=ctx.getDefinedFont(), VText.getMainFont())){
@@ -957,7 +957,7 @@ public class SVGReader {
         }
         return res;
     }
- 
+
     /** Create a VRectangle from an SVG polygon element.
      * After checking this is actually a rectangle - returns null if not.
      *@param e an SVG polygon as a DOM element (org.w3c.dom.Element)
@@ -1197,7 +1197,7 @@ public class SVGReader {
         double y = Double.parseDouble(e.getAttribute(_y));
         double w = Double.parseDouble(e.getAttribute(_width));
         double h = Double.parseDouble(e.getAttribute(_height));
-		
+
         if (scale != 1.0) {
             x *= scale;
             y *= scale;
@@ -1208,12 +1208,12 @@ public class SVGReader {
         y += yoffset;
         VRectangleOr res;
         SVGStyle ss = ss = getStyle(e.getAttribute(_style), e);
-		
+
 		double xx = x+w/2;
 		double yy = -y-h/2;
-			
+
         if (ss != null){
-			
+
             if (ss.hasTransparencyInformation()){
                 if (ss.getFillColor()==null){res=new VRectangleOr(xx,yy,0,w,h,Color.WHITE, Color.BLACK, 0, ss.getAlphaTransparencyValue());res.setFilled(false);}
                 else {res=new VRectangleOr(xx,yy,0,w,h,ss.getFillColor(), Color.BLACK, 0, ss.getAlphaTransparencyValue());}
@@ -1286,7 +1286,7 @@ public class SVGReader {
      * This may however cause problems when retrieving bitmap images associated with this SVG document, unless there URL
      * is expressed relative to the document's location.
      *@param fallbackParentURL used to indicate a possible fallback directory from which to interpret relative paths in case documentParentURL
-     * is not the right place where to look for those images (this can happen e.g. if a file was generated somewhere and then moved alone, 
+     * is not the right place where to look for those images (this can happen e.g. if a file was generated somewhere and then moved alone,
      * associated images staying in the original directory) ; set to null if no fallback directory is known.
      *@see #createImage(Element e, Context ctx, boolean meta, Hashtable imageStore, String documentParentURL)
      */
@@ -1438,7 +1438,7 @@ public class SVGReader {
     public static VSegment[] createPolyline(Element e,Context ctx,boolean meta){
         Vector<Point2D.Double> coords = new Vector<Point2D.Double>();
         translateSVGPolygon(e.getAttribute(_points),coords);
-        VSegment[] res=new VSegment[coords.size()-1];        
+        VSegment[] res=new VSegment[coords.size()-1];
         Color border=Color.black;
         SVGStyle ss = ss = getStyle(e.getAttribute(_style), e);
         if (ss != null){
@@ -1486,7 +1486,7 @@ public class SVGReader {
 		*@param meta store metadata associated with this node (URL, title) in glyph's associated object
 		*/
 	public static VSegment createLine(Element e, Context ctx, boolean meta){
-		VSegment res;		
+		VSegment res;
 		double x1 = Double.parseDouble(e.getAttribute(_x1));
 		double y1 = Double.parseDouble(e.getAttribute(_y1));
 		double x2 = Double.parseDouble(e.getAttribute(_x2));
@@ -1524,7 +1524,7 @@ public class SVGReader {
 			}
 		}
 		else {
-			res = new VSegment(x1, -y1, x2, -y2, 0, border, 1f);			
+			res = new VSegment(x1, -y1, x2, -y2, 0, border, 1f);
 		}
 		if (ss != null && ss.requiresSpecialStroke()){
 			assignStroke(res, ss);
@@ -1748,7 +1748,7 @@ public class SVGReader {
                 xoffset = xos;
                 yoffset = yos;
             }
-            else { 
+            else {
                 Glyph g = createImage(e, ctx, meta, imageStore, documentParentURL, fallbackParentURL);
                 if (g != null){
                     vs.addGlyph(g);
@@ -1777,7 +1777,7 @@ public class SVGReader {
                         ty = split[1].trim();
                     }
                     xoffset += Double.valueOf(tx) * scale;
-                    yoffset += Double.valueOf(ty) * scale;                    
+                    yoffset += Double.valueOf(ty) * scale;
                 }
             }
             NodeList objects=e.getChildNodes();
