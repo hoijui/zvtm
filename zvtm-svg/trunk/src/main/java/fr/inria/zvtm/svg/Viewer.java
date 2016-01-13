@@ -886,7 +886,8 @@ class Messages {
 	static final String EMPTY_STRING = "";
 
 	static final String V = "v";
-	static String VERSION;
+	static String VERSION = "0.2.2-SNAPSHOT";
+
     static final String AUTHORS = "Author: Emmanuel Pietriga";
     static final String APP_NAME = "ZVTM SVG Viewer";
     static final String CREDITS_NAMES = "Based on: ZVTM";
