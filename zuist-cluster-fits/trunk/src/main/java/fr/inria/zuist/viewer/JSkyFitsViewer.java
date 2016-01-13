@@ -71,6 +71,7 @@ import fr.inria.zvtm.engine.SwingWorker;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.glyphs.VCircle;
+import fr.inria.zvtm.glyphs.VRectangle;
 import fr.inria.zvtm.glyphs.VCross;
 import fr.inria.zvtm.glyphs.Translucent;
 import fr.inria.zvtm.glyphs.JSkyFitsImage;
@@ -2006,8 +2007,8 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
         HashMap<String, Boolean> nucleated;
 
         public static final String T_DRAW = "Draw";
-        Color NUCLEATED_COLOR = Color.decode("#d5efcd");
-        Color NON_NUCLEATED_COLOR = Color.decode("#90d289");
+        Color NUCLEATED_COLOR = Color.decode("#b0f3a9"); //("#d5efcd"); //light
+        Color NON_NUCLEATED_COLOR = Color.decode("#56CF49"); //("#90d289"); //dark
 
         public DrawSymbol(){
             pythonWCS.addObserver(this);
@@ -2058,25 +2059,40 @@ public class JSkyFitsViewer implements Java2DPainter, LevelListener { // RegionL
                         System.out.println("location: " + l[0] + ", " + l[1]);
                         VCross cr;
                         VText lb;
+                        Glyph icon;
                         if(nucleated.containsKey(id)){
                             if(nucleated.get(id)){
                                 cr = new VCross(l[0], l[1], 100, 20, 20, NUCLEATED_COLOR, Color.WHITE, .8f);
-                                lb = new VText(l[0]+10, l[1]+10, 101, NUCLEATED_COLOR, id, VText.TEXT_ANCHOR_START);
+                                lb = new VText(l[0]+20, l[1]+20, 101, NUCLEATED_COLOR, id, VText.TEXT_ANCHOR_START);
+                                icon = new VRectangle(l[0], l[1], 100, 30, 30, NUCLEATED_COLOR, NUCLEATED_COLOR, .8f);
+                                icon.setStroke(new BasicStroke(2f));
+                                //setBorderColor()
+                                ((VRectangle)icon).setDrawBorder(true);
+                                ((VRectangle)icon).setFilled(false);
+                                catalogSpace.addGlyph(cr);
+                                catalogSpace.addGlyph(lb);
+                                catalogSpace.addGlyph(icon);
                             } else {
                                 cr = new VCross(l[0], l[1], 100, 20, 20, NON_NUCLEATED_COLOR, Color.WHITE, .8f);
-                                lb = new VText(l[0]+10, l[1]+10, 101, NON_NUCLEATED_COLOR, id, VText.TEXT_ANCHOR_START);
+                                lb = new VText(l[0]+20, l[1]+20, 101, NON_NUCLEATED_COLOR, id, VText.TEXT_ANCHOR_START);
+                                icon = new VCircle(l[0], l[1], 100, 30, NON_NUCLEATED_COLOR, NON_NUCLEATED_COLOR, .8f);
+                                icon.setStroke(new BasicStroke(2f));
+                                ((VCircle)icon).setDrawBorder(true);
+                                ((VCircle)icon).setFilled(false);
+                                catalogSpace.addGlyph(cr);
+                                catalogSpace.addGlyph(lb);
+                                catalogSpace.addGlyph(icon);
                             }
                         } else {
                             cr = new VCross(l[0], l[1], 100, 20, 20, Color.YELLOW, Color.WHITE, .8f);
                             lb = new VText(l[0]+10, l[1]+10, 101, Color.YELLOW, id, VText.TEXT_ANCHOR_START);
+                            catalogSpace.addGlyph(cr);
+                            catalogSpace.addGlyph(lb);
+                        
                         }
                         cr.setStroke(AstroObject.AO_STROKE);
                         lb.setBorderColor(Color.BLACK);
                         lb.setTranslucencyValue(.6f);
-                        catalogSpace.addGlyph(cr);
-                        catalogSpace.addGlyph(lb);
-                        
-
 
                         //cr.setOwner(this.obj);
                         //lb.setOwner(this.obj);
