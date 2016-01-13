@@ -207,14 +207,6 @@ public class Viewer {
 	}
 
 	void openFile(){
-		if(SCENE_FILE_DIR == null){
-			try{
-				FileInputStream file = new FileInputStream("config.txt");
-				ObjectInputStream reader = new ObjectInputStream(file);
-				SCENE_FILE_DIR = (File)reader.readObject();
-			}catch(Exception ex){ex.printStackTrace();}
-		}
-
 		final JFileChooser fc = new JFileChooser(SCENE_FILE_DIR);
 		fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
 		fc.setDialogTitle("Find SVG File");
@@ -271,16 +263,6 @@ public class Viewer {
 	    SCENE_FILE_DIR = SCENE_FILE.getParentFile();
 	    mView.setTitle(Messages.mViewName + " - " + SCENE_FILE.getName());
         gp.setVisible(false);
-
-        try{
-        	FileOutputStream file = new FileOutputStream("config.txt");
-			ObjectOutputStream writter = new ObjectOutputStream(file);
-			writter.writeObject(SCENE_FILE_DIR);
-			file.close();
-			writter.close();
-		}catch(Exception e){
-			e.printStackTrace();
-		}
     }
 
     /* --------------- SVG exporting ------------------*/
