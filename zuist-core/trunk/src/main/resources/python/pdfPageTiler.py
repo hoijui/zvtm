@@ -12,7 +12,7 @@ from copy import copy
 # http://developer.apple.com/documentation/GraphicsImaging/Conceptual/drawingwithquartz2d/dq_python/dq_python.html
 from CoreGraphics import *
 # http://effbot.org/zone/element-index.htm
-import elementtree.ElementTree as ET
+import xml.etree.ElementTree as ET
 
 CMD_LINE_HELP = "ZUIST PDF Page Tiler Script\n\nUsage:\n\n" + \
     " \tpdfPageTiler <src_image_path> <target_dir> [options]\n\n" + \
@@ -62,12 +62,12 @@ def processSrcPDF():
         x = 0
         while x < page_width:
             generateTile(pdf_document, page, x, y, "%s/tile-%d-%d.%s" % (TGT_DIR, x/TILE_SIZE, y/TILE_SIZE, OUTPUT_FILE_EXT))
-            
+
             include = ET.SubElement(outputroot, "include")
             include.set("src", "tile-%d-%d/scene.xml" % (x/TILE_SIZE, y/TILE_SIZE))
             include.set("x", "%d" % x)
             include.set("y", "%d" % y)
-            
+
             x += TILE_SIZE
         y += TILE_SIZE
     log("Writing scene file %s" % outputSceneFile, 1)
@@ -81,7 +81,7 @@ def generateTile(pdf_document, page, x, y, tgtPath):
         return
     log("Generating tile (%d,%d) (%d,%d)" % (x,y,x+TILE_SIZE,y+TILE_SIZE), 2)
     bitmap = CGBitmapContextCreateWithColor(TILE_SIZE, TILE_SIZE,\
-                                            COLOR_SPACE, CGFloatArray(4))    
+                                            COLOR_SPACE, CGFloatArray(4))
     rect = page.getBoxRect(kCGPDFMediaBox)
     rect = rect.offset(-x,-y)
     rect.size.width = int(rect.size.width * PDF_SCALE_FACTOR)
@@ -89,7 +89,7 @@ def generateTile(pdf_document, page, x, y, tgtPath):
     bitmap.drawPDFDocument(rect, pdf_document, kCGPDFCropBox)
     log("\tWriting bitmap to %s" % tgtPath, 2)
     bitmap.writeToFile(tgtPath, kCGImageFormatPNG)
-    
+
 
 ################################################################################
 # Trace exec on std output
