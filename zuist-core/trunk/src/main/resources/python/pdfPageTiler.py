@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 # AUTHOR : Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
-# Copyright (c) INRIA, 2009. All Rights Reserved
+# Copyright (c) INRIA, 2009-2016. All Rights Reserved
 # Licensed under the GNU LGPL. For full terms see the file COPYING.
 
 # $Id$
@@ -29,7 +29,16 @@ FORCE_GENERATE_TILES = False
 TILE_SIZE = 500
 PDF_SCALE_FACTOR = 1
 
-OUTPUT_FILE_EXT = "png"
+OUTPUT_TYPE_PNG = "png"
+OUTPUT_TYPE_JPEG = "jpg"
+OUTPUT_TYPE_TIFF = "tiff"
+OUTPUT_TYPE = OUTPUT_TYPE_PNG
+
+OUTPUT_TYPE2CG = {
+    OUTPUT_TYPE_PNG: kCGImageFormatPNG,
+    OUTPUT_TYPE_JPEG: kCGImageFormatJPEG,
+    OUTPUT_TYPE_TIFF: kCGImageFormatTIFF
+}
 
 COLOR_SPACE = CGColorSpaceCreateWithName(kCGColorSpaceGenericRGB)
 
@@ -61,7 +70,7 @@ def processSrcPDF():
     while y < page_height:
         x = 0
         while x < page_width:
-            generateTile(pdf_document, page, x, y, "%s/tile-%d-%d.%s" % (TGT_DIR, x/TILE_SIZE, y/TILE_SIZE, OUTPUT_FILE_EXT))
+            generateTile(pdf_document, page, x, y, "%s/tile-%d-%d.%s" % (TGT_DIR, x/TILE_SIZE, y/TILE_SIZE, OUTPUT_TYPE))
 
             include = ET.SubElement(outputroot, "include")
             include.set("src", "tile-%d-%d/scene.xml" % (x/TILE_SIZE, y/TILE_SIZE))
@@ -88,7 +97,7 @@ def generateTile(pdf_document, page, x, y, tgtPath):
     rect.size.height = int(rect.size.height * PDF_SCALE_FACTOR)
     bitmap.drawPDFDocument(rect, pdf_document, kCGPDFCropBox)
     log("\tWriting bitmap to %s" % tgtPath, 2)
-    bitmap.writeToFile(tgtPath, kCGImageFormatPNG)
+    bitmap.writeToFile(tgtPath, OUTPUT_TYPE2CG[OUTPUT_TYPE])
 
 
 ################################################################################
@@ -115,6 +124,8 @@ if len(sys.argv) > 2:
                 TRACE_LEVEL = int(arg[len("-tl="):])
             elif arg.startswith("-scale="):
                 PDF_SCALE_FACTOR = float(arg[len("-scale="):])
+            elif arg.startswith("-format"):
+                OUTPUT_TYPE = arg[len("-format="):]
 else:
     log(CMD_LINE_HELP)
     sys.exit(0)
