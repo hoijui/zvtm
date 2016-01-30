@@ -29,6 +29,8 @@ FORCE_GENERATE_TILES = False
 TILE_SIZE = 500
 PDF_SCALE_FACTOR = 1
 
+PAGE_NUMBER = 1
+
 OUTPUT_TYPE_PNG = "png"
 OUTPUT_TYPE_JPEG = "jpg"
 OUTPUT_TYPE_TIFF = "tiff"
@@ -57,7 +59,7 @@ def processSrcPDF():
     # source image
     log("Loading source image from %s" % SRC_PATH, 2)
     pdf_document = CGPDFDocumentCreateWithProvider(CGDataProviderCreateWithFilename(SRC_PATH))
-    page = pdf_document.getPage(1)
+    page = pdf_document.getPage(PAGE_NUMBER)
     page_rect = page.getBoxRect(kCGPDFCropBox)
     log("Default PDF page size: %d x %d" % (page_rect.getWidth(), page_rect.getHeight()), 1)
     page_width = int(page_rect.getWidth() * PDF_SCALE_FACTOR)
@@ -70,7 +72,7 @@ def processSrcPDF():
     while y < page_height:
         x = 0
         while x < page_width:
-            generateTile(pdf_document, page, x, y, "%s/tile-%d-%d.%s" % (TGT_DIR, x/TILE_SIZE, y/TILE_SIZE, OUTPUT_TYPE))
+            generateTile(pdf_document, page, PAGE_NUMBER, x, y, "%s/tile-%d-%d.%s" % (TGT_DIR, x/TILE_SIZE, y/TILE_SIZE, OUTPUT_TYPE))
 
             include = ET.SubElement(outputroot, "include")
             include.set("src", "tile-%d-%d/scene.xml" % (x/TILE_SIZE, y/TILE_SIZE))
@@ -84,7 +86,7 @@ def processSrcPDF():
     tree.write(outputSceneFile, encoding='utf-8')
 
 
-def generateTile(pdf_document, page, x, y, tgtPath):
+def generateTile(pdf_document, page, page_number, x, y, tgtPath):
     if os.path.exists(tgtPath) and not FORCE_GENERATE_TILES:
         log("Tile %s already exists" % (tgtPath), 2)
         return
@@ -95,8 +97,8 @@ def generateTile(pdf_document, page, x, y, tgtPath):
     rect = rect.offset(-x,-y)
     rect.size.width = int(rect.size.width * PDF_SCALE_FACTOR)
     rect.size.height = int(rect.size.height * PDF_SCALE_FACTOR)
-    bitmap.drawPDFDocument(rect, pdf_document, kCGPDFCropBox)
-    log("\tWriting bitmap to %s" % tgtPath, 2)
+    bitmap.drawPDFDocument(rect, pdf_document, page_number)
+    log("\tWriting bitmap to %s (page %s)" % (tgtPath, page_number), 2)
     bitmap.writeToFile(tgtPath, OUTPUT_TYPE2CG[OUTPUT_TYPE])
 
 
@@ -126,6 +128,8 @@ if len(sys.argv) > 2:
                 PDF_SCALE_FACTOR = float(arg[len("-scale="):])
             elif arg.startswith("-format"):
                 OUTPUT_TYPE = arg[len("-format="):]
+            elif arg.startswith("-page"):
+                PAGE_NUMBER = int(arg[len("-page="):])
 else:
     log(CMD_LINE_HELP)
     sys.exit(0)
