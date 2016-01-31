@@ -274,15 +274,15 @@ def processSrcImg():
             page_height = int(page_rect.getHeight() * PDF_SCALE_FACTOR)
             log("Target bitmap size: %d x %d" % (page_width, page_height), 1)
             bitmap = CGBitmapContextCreateWithColor(page_width, page_height,\
-                                                    COLOR_SPACE, (1,1,1,1))
+                                                    COLOR_SPACE, CGFloatArray(4))
             log("\tRescaling bitmap", 3)
-            bitmap.scaleCTM(PDF_SCALE_FACTOR, PDF_SCALE_FACTOR)
+            page_rect.size.width = page_width
+            page_rect.size.height = page_height
             log("\tDrawing PDF to bitmap", 3)
             bitmap.drawPDFDocument(page_rect, pdf_document, 1)
             log("\tWriting bitmap to temp file", 3)
             bitmap.writeToFile(IMG_SRC_PATH, OUTPUT_TYPE2CG[OUTPUT_TYPE])
             deleteTmpFile = True
-            return
         else:
             IMG_SRC_PATH = SRC_PATH
         im = CGImageImport(CGDataProviderCreateWithFilename(IMG_SRC_PATH))
@@ -298,11 +298,11 @@ def processSrcImg():
     buildTiles([0 for i in range(int(levelCount))], TL, 0, levelCount, 0, 0, src_sz, outputroot, im, None)
     # serialize the XML tree
     tree = ET.ElementTree(outputroot)
-    log("Writing %s" % outputSceneFile)
+    log("Writing %s" % outputSceneFile, 1)
     tree.write(outputSceneFile, encoding='utf-8')
-    #if deleteTmpFile:
-    #    log("Deleting temp file %s" % IMG_SRC_PATH)
-    #    os.remove(IMG_SRC_PATH)
+    if deleteTmpFile:
+        log("Deleting temp file %s" % IMG_SRC_PATH, 3)
+        os.remove(IMG_SRC_PATH)
 
 ################################################################################
 # Trace exec on std output
