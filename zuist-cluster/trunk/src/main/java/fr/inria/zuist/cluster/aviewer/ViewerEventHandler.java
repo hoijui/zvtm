@@ -71,7 +71,7 @@ class ViewerEventHandler implements ViewListener, ComponentListener, CameraListe
         lastJPY = jpy;
         if (navMode == FIRST_ORDER){
             first_order_dragging = true;
-            v.setDrawDrag(true);
+            v.setDrawSegment(true);
         }
         else {
             // ZERO_ORDER
@@ -86,7 +86,7 @@ class ViewerEventHandler implements ViewListener, ComponentListener, CameraListe
             c.setXspeed(0);
             c.setYspeed(0);
             c.setZspeed(0);
-            v.setDrawDrag(false);
+            v.setDrawSegment(false);
             first_order_dragging = false;
         }
     }
