@@ -53,6 +53,7 @@ CMD_LINE_HELP = "ZUIST Image Tiling Script\n\nUsage:\n\n" + \
     "\t-dy=x\t\ty offset for all regions and objects\n"+\
     "\t-dl=l\t\tlevel offset for all regions and objects\n"+\
     "\t-scale=s\ts scale factor w.r.t default size for PDF input\n"+\
+    "\t-im=<i>\t\t<i> one of {bilinear,bicubic,nearestNeighbor}\n"+\
     "\t-format=t\tt output tiles in PNG (png), JPEG (jpg) or TIFF (tiff)\n"
 
 TRACE_LEVEL = 1
@@ -88,6 +89,8 @@ DX = 0
 DY = 0
 # level offset
 DL = 0
+
+INTERPOLATION = "nearestNeighbor"
 
 ID_PREFIX = ""
 
@@ -241,6 +244,7 @@ def buildTiles(parentTileID, pos, level, levelCount, x, y, src_sz, rootEL, im, p
     objectEL.set("w", str(int(aw)))
     objectEL.set("h", str(int(ah)))
     objectEL.set("src", relTilePath)
+    objectEL.set("params", "im=%s" % INTERPOLATION)
     objectEL.set("sensitive", "false")
     log("Image in scene: scale=%.4f, w=%d, h=%d" % (scale, aw, ah), 2)
     # call to lower level, top left
@@ -352,6 +356,8 @@ if len(sys.argv) > 2:
                 OUTPUT_TYPE = arg[len("-format="):]
             elif arg.startswith("-scale="):
                 PDF_SCALE_FACTOR = float(arg[len("-scale="):])
+            elif arg.startswith("-im="):
+                INTERPOLATION = arg[len("-im="):]
 else:
     log(CMD_LINE_HELP)
     sys.exit(0)
