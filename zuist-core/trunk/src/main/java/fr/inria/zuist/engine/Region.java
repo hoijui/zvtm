@@ -276,6 +276,12 @@ public class Region {
         return h;
     }
 
+    public double[] getBounds(){
+        double[] res = new double[4];
+        System.arraycopy(wnes, 0, res, 0, wnes.length);
+        return res;
+    }
+
     /** Set this region's center (x,y)-coordinates.
      */
     public void moveTo(double x, double y){
