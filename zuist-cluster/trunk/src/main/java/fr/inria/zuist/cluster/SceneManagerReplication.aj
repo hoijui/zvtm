@@ -1,5 +1,5 @@
 /*
- *   Copyright (c) INRIA, 2010-2015. All Rights Reserved
+ *   Copyright (c) INRIA, 2010-2016. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id:  $
@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
+import java.util.Vector;
 
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VirtualSpace;
@@ -130,24 +131,28 @@ aspect SceneManagerReplication {
         }
 
         public void apply(SlaveUpdater su){
-            HashMap<String,Object>[] soDescriptions = new HashMap[soDescriptionRefs.length];
+            Vector<HashMap<String,Object>> soDescriptions = new Vector<HashMap<String,Object>>(soDescriptionRefs.length);
             int i = 0;
             for (HashMap<String,Object> sod:soDescriptionRefs){
-                soDescriptions[i] = new HashMap(4,1);
+                Camera c = (Camera)su.getSlaveObject((ObjId<Camera>)sod.get(SceneManager.SO_CAMERA));
+                if (c.getOwningView() == null){continue;}
+                HashMap desc = new HashMap(4,1);
                 Short type = (Short)sod.get(SceneManager.SO_TYPE);
-                soDescriptions[i].put(SceneManager.SO_TYPE, type);
-                soDescriptions[i].put(SceneManager.SO_CAMERA,
-                                      ((Camera)su.getSlaveObject((ObjId<Camera>)sod.get(SceneManager.SO_CAMERA))));
+                desc.put(SceneManager.SO_TYPE, type);
+                desc.put(SceneManager.SO_CAMERA,
+                         ((Camera)su.getSlaveObject((ObjId<Camera>)sod.get(SceneManager.SO_CAMERA))));
                 VirtualSpace[] vss =
                     su.getSlaveObjectArrayList((ArrayList<ObjId<VirtualSpace>>)sod.get(SceneManager.SO_VIRTUAL_SPACES)).toArray(new VirtualSpace[0]);
-                soDescriptions[i].put(SceneManager.SO_VIRTUAL_SPACES, vss);
+                desc.put(SceneManager.SO_VIRTUAL_SPACES, vss);
                 if (type.shortValue() == SceneManager.SO_TYPE_TVSO){
-                    soDescriptions[i].put(SceneManager.SO_PARAMS, sod.get(SceneManager.SO_PARAMS));
+                    desc.put(SceneManager.SO_PARAMS, sod.get(SceneManager.SO_PARAMS));
                 }
-                i++;
+                soDescriptions.add(desc);
             }
+            HashMap<String,Object>[] test = new HashMap[soDescriptions.size()];
             SceneManager sm =
-                new SceneManager(soDescriptions, properties);
+                new SceneManager(soDescriptions.toArray(test),
+                                 properties);
                 // new SceneManager(su.getSlaveObjectArrayList(spaceRefs).toArray(new VirtualSpace[0]),
                         // su.getSlaveObjectArrayList(cameraRefs).toArray(new Camera[0]), properties);
             su.putSlaveObject(smId, sm);
