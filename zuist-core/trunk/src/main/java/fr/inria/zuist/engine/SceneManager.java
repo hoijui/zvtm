@@ -459,16 +459,16 @@ public class SceneManager {
     }
 
     /** For internal use. */
-    public void objectCreated(ObjectDescription od){
+    public void objectCreated(ObjectDescription od, VirtualSpace vs){
         if (objectListener != null){
-            objectListener.objectCreated(od);
+            objectListener.objectCreated(od, vs);
         }
     }
 
     /** For internal use. Made public for outside package subclassing  */
-    public void objectDestroyed(ObjectDescription od){
+    public void objectDestroyed(ObjectDescription od, VirtualSpace vs){
         if (objectListener != null){
-            objectListener.objectDestroyed(od);
+            objectListener.objectDestroyed(od, vs);
         }
     }
 

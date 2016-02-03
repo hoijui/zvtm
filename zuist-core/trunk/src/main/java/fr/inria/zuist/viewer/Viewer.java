@@ -558,11 +558,11 @@ public class Viewer implements Java2DPainter, RegionListener, LevelListener, Obj
         ovm.sayInConsole("Exited level "+depth+"\n");
     }
 
-    public void objectCreated(ObjectDescription od){
+    public void objectCreated(ObjectDescription od, VirtualSpace vs){
         ovm.sayInConsole("Created object "+od.getID()+"\n");
     }
 
-    public void objectDestroyed(ObjectDescription od){
+    public void objectDestroyed(ObjectDescription od, VirtualSpace vs){
         ovm.sayInConsole("Destroyed object "+od.getID()+"\n");
     }
 

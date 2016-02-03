@@ -38,10 +38,12 @@ public class GlyphDescription extends ObjectDescription {
 
   @Override public void createObject(SceneManager sm, VirtualSpace vs, boolean fadeIn){
     vs.addGlyph(glyph);
+    sm.objectCreated(this, vs);
   }
 
   @Override public void destroyObject(SceneManager sm, VirtualSpace vs, boolean fadeOut){
     vs.removeGlyph(glyph);
+    sm.objectDestroyed(this, vs);
   }
 
   @Override public Glyph getGlyph(){

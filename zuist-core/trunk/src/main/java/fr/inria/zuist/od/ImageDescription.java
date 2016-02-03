@@ -186,7 +186,7 @@ public class ImageDescription extends ResourceDescription {
                             vs.removeGlyph(glyph);
                             glyph.getImage().flush();
                             glyph = null;
-                            sm.objectDestroyed(ImageDescription.this);
+                            sm.objectDestroyed(ImageDescription.this, vs);
                         }
                         });
                     } catch(InterruptedException ie){ /*ie.printStackTrace();*/ }
@@ -299,7 +299,7 @@ public class ImageDescription extends ResourceDescription {
                 public void run(){
                     vs.addGlyph(glyph);
                     glyph.setOwner(ImageDescription.this);
-                    sm.objectCreated(ImageDescription.this);
+                    sm.objectCreated(ImageDescription.this, vs);
                 }
                 });
         } catch(InterruptedException ie){ /*ie.printStackTrace();*/}
@@ -349,7 +349,7 @@ class ImageHideAction implements EndAction {
         try {
             vs.removeGlyph((Glyph)subject);
             ((VImage)subject).getImage().flush();
-            sm.objectDestroyed((ImageDescription)((Glyph)subject).getOwner());
+            sm.objectDestroyed((ImageDescription)((Glyph)subject).getOwner(), vs);
         }
         catch(ArrayIndexOutOfBoundsException ex){
             if (SceneManager.getDebugMode()){System.err.println("Warning: attempt at destroying image " + ((Glyph)subject).hashCode() + " failed. Trying one more time.");}
@@ -361,7 +361,7 @@ class ImageHideAction implements EndAction {
         try {
             vs.removeGlyph((Glyph)subject);
             ((VImage)subject).getImage().flush();
-            sm.objectDestroyed((ImageDescription)((Glyph)subject).getOwner());
+            sm.objectDestroyed((ImageDescription)((Glyph)subject).getOwner(), vs);
         }
         catch(ArrayIndexOutOfBoundsException ex){
             if (SceneManager.getDebugMode()){System.err.println("Warning: attempt at destroying image " + ((Glyph)subject).hashCode() + " failed. Giving up.");}

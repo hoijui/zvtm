@@ -117,7 +117,7 @@ public class TextDescription extends ObjectDescription {
                     public void run(){
                         vs.addGlyph(glyph);
                         glyph.setOwner(TextDescription.this);
-                        sm.objectCreated(TextDescription.this);
+                        sm.objectCreated(TextDescription.this, vs);
                     }
                 });
             } catch(InterruptedException ie) {
@@ -144,7 +144,7 @@ public class TextDescription extends ObjectDescription {
                         public void run(){
                             vs.removeGlyph(glyph);
                             glyph = null;
-                            sm.objectDestroyed(TextDescription.this);
+                            sm.objectDestroyed(TextDescription.this, vs);
                         }
                     });
                 } catch(InterruptedException ie) {
@@ -234,7 +234,7 @@ class TextHideAction implements EndAction {
     public void execute(Object subject, Animation.Dimension dimension) {
         try {
             vs.removeGlyph((Glyph)subject);
-            sm.objectDestroyed((TextDescription)((Glyph)subject).getOwner());
+            sm.objectDestroyed((TextDescription)((Glyph)subject).getOwner(), vs);
         }
         catch(ArrayIndexOutOfBoundsException ex){
             if (SceneManager.getDebugMode()){System.err.println("Warning: attempt at destroying rectangle " + ((Glyph)subject).hashCode() + " failed. Trying one more time.");}
@@ -245,7 +245,7 @@ class TextHideAction implements EndAction {
     public void recoverFailingAnimationEnded(Object subject, Animation.Dimension dimension){
         try {
             vs.removeGlyph((Glyph)subject);
-            sm.objectDestroyed((TextDescription)((Glyph)subject).getOwner());
+            sm.objectDestroyed((TextDescription)((Glyph)subject).getOwner(), vs);
         }
         catch(ArrayIndexOutOfBoundsException ex){
             if (SceneManager.getDebugMode()){System.err.println("Warning: attempt at destroying rectangle " + ((Glyph)subject).hashCode() + " failed. Giving up.");}

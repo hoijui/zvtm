@@ -79,7 +79,7 @@ public class ClosedShapeDescription extends ObjectDescription {
                     public void run(){
                         vs.addGlyph(glyph);
                         glyph.setOwner(ClosedShapeDescription.this);
-                        sm.objectCreated(ClosedShapeDescription.this);
+                        sm.objectCreated(ClosedShapeDescription.this, vs);
                     }
                 });
             } catch(InterruptedException ie) {
@@ -103,7 +103,7 @@ public class ClosedShapeDescription extends ObjectDescription {
                     SwingUtilities.invokeAndWait(new Runnable(){
                         public void run(){
                             vs.removeGlyph(glyph);
-                            sm.objectDestroyed(ClosedShapeDescription.this);
+                            sm.objectDestroyed(ClosedShapeDescription.this, vs);
                         }
                     });
                 } catch(InterruptedException ie) {
@@ -161,7 +161,7 @@ class ClosedShapeHideAction implements EndAction {
     public void execute(Object subject, Animation.Dimension dimension) {
         try {
             vs.removeGlyph((Glyph)subject);
-            sm.objectDestroyed((ClosedShapeDescription)((Glyph)subject).getOwner());
+            sm.objectDestroyed((ClosedShapeDescription)((Glyph)subject).getOwner(), vs);
         }
         catch(ArrayIndexOutOfBoundsException ex){
             if (SceneManager.getDebugMode()){System.err.println("Warning: attempt at destroying rectangle " + ((Glyph)subject).hashCode() + " failed. Trying one more time.");}
@@ -172,7 +172,7 @@ class ClosedShapeHideAction implements EndAction {
     public void recoverFailingAnimationEnded(Object subject, Animation.Dimension dimension){
         try {
             vs.removeGlyph((Glyph)subject);
-            sm.objectDestroyed((ClosedShapeDescription)((Glyph)subject).getOwner());
+            sm.objectDestroyed((ClosedShapeDescription)((Glyph)subject).getOwner(), vs);
         }
         catch(ArrayIndexOutOfBoundsException ex){
             if (SceneManager.getDebugMode()){System.err.println("Warning: attempt at destroying rectangle " + ((Glyph)subject).hashCode() + " failed. Giving up.");}
