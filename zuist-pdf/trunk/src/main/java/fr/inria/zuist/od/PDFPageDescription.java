@@ -132,7 +132,7 @@ public class PDFPageDescription extends ResourceDescription {
                                 vs.removeGlyph(glyph);
                                 glyph.flush();
                                 glyph = null;
-                                sm.objectDestroyed(PDFPageDescription.this);
+                                sm.objectDestroyed(PDFPageDescription.this, vs);
                             }
                             });
                         } catch(InterruptedException ie){ /* swallow */ }
@@ -213,7 +213,7 @@ public class PDFPageDescription extends ResourceDescription {
                 SwingUtilities.invokeAndWait(new Runnable(){
                     public void run(){
                         vs.addGlyph(glyph);
-                        sm.objectCreated(PDFPageDescription.this);
+                        sm.objectCreated(PDFPageDescription.this, vs);
                     }
                 });
             }  catch(InterruptedException ie){/* swallow */ }
@@ -240,7 +240,7 @@ public class PDFPageDescription extends ResourceDescription {
                 SwingUtilities.invokeAndWait(new Runnable(){
                     public void run(){
                         vs.addGlyph(glyph);
-                        sm.objectCreated(PDFPageDescription.this);
+                        sm.objectCreated(PDFPageDescription.this, vs);
                     }
                 });
             } catch(InterruptedException ie){ /* swallow */ }
@@ -290,7 +290,7 @@ class PDFPageHideAction implements EndAction {
         try {
             vs.removeGlyph((Glyph)subject);
             ((ZPDFPage)subject).flush();
-            sm.objectDestroyed((PDFPageDescription)((Glyph)subject).getOwner());
+            sm.objectDestroyed((PDFPageDescription)((Glyph)subject).getOwner(), vs);
         }
         catch(ArrayIndexOutOfBoundsException ex){
             if (SceneManager.getDebugMode()){System.err.println("Warning: attempt at destroying PDF page " + ((Glyph)subject).hashCode() + " failed. Trying one more time.");}
@@ -302,7 +302,7 @@ class PDFPageHideAction implements EndAction {
         try {
             vs.removeGlyph((Glyph)subject);
             ((ZPDFPage)subject).flush();
-            sm.objectDestroyed((PDFPageDescription)((Glyph)subject).getOwner());
+            sm.objectDestroyed((PDFPageDescription)((Glyph)subject).getOwner(), vs);
         }
         catch(ArrayIndexOutOfBoundsException ex){
             if (SceneManager.getDebugMode()){System.err.println("Warning: attempt at destroying image " + ((Glyph)subject).hashCode() + " failed. Giving up.");}
