@@ -171,13 +171,19 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
       </distributionManagement>
     </profile>
     <profile>
-      <!-- mvn -P gforge ... -->
-      <id>gforge</id>
+      <!-- mvn -P artifactory ... -->
+      <id>artifactory</id>
       <distributionManagement>
         <repository>
-          <id>gforge</id>
-          <url>scpexe://scm.gforge.inria.fr/home/groups/isteam/htdocs/maven</url>
+          <id>central</id>
+          <name>libs-release</name>
+          <url>http://maven.inria.fr/artifactory/ilda-public-release</url>
         </repository>
+        <snapshotRepository>
+          <id>snapshots</id>
+          <name>libs-snapshot</name>
+          <url>http://maven.inria.fr/artifactory/ilda-private-snapshot</url>
+        </snapshotRepository>
       </distributionManagement>
     </profile>
   </profiles>
