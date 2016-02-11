@@ -3,7 +3,7 @@
  *   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@xrce.xerox.com)
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2002. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2015. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2016. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -75,12 +75,8 @@ public class VSegment<T> extends Glyph implements RectangularShape {
       *@param alpha in [0;1.0]. 0 is fully transparent, 1 is opaque
      */
     public VSegment(double x1, double y1, double x2, double y2, int z, Color c, float alpha){
-        vx = (x1 + x2) / 2;
-        vy = (y1 + y2) / 2;
+        doSetEndPoints(x1, y1, x2, y2);
         vz = z;
-        vw = (x2 - x1);
-        vh = (y2 - y1);
-        computeSize();
         setColor(c);
         setTranslucencyValue(alpha);
     }
@@ -176,13 +172,17 @@ public class VSegment<T> extends Glyph implements RectangularShape {
         return res;
     }
 
-    /** Change the segment's location, size and orientation by giving its two endpoints (absolute coordinates). */
-    public void setEndPoints(double x1, double y1, double x2, double y2){
+    protected void doSetEndPoints(double x1, double y1, double x2, double y2){
         vx = (x1 + x2) / 2;
         vy = (y1 + y2) / 2;
         vw = (x2 - x1);
         vh = (y2 - y1);
         computeSize();
+    }
+
+    /** Change the segment's location, size and orientation by giving its two endpoints (absolute coordinates). */
+    public void setEndPoints(double x1, double y1, double x2, double y2){
+        doSetEndPoints(x1, y1, x2, y2);
         VirtualSpaceManager.INSTANCE.repaint();
     }
 
