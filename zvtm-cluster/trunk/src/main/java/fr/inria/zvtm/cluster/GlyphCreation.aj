@@ -1,6 +1,6 @@
 /*   AUTHOR : Romain Primet (romain.primet@inria.fr)
  *
- *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009-2015.
+ *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009-2016.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -448,17 +448,17 @@ public aspect GlyphCreation {
     }
 
     private static class VSegmentReplicator extends AbstractGlyphReplicator {
-        private final double width;
-        private final double height;
+        private final Point2D.Double[] endPoints;
 
         VSegmentReplicator(VSegment source){
             super(source);
-            this.width = source.getWidth();
-            this.height = source.getHeight();
+            this.endPoints = source.getEndPoints();
         }
 
         public Glyph doCreateGlyph(){
-            return new VSegment(0d,0d,width,height,0,Color.BLACK);
+            return new VSegment(endPoints[0].getX(), endPoints[0].getY(),
+                                endPoints[1].getX(), endPoints[1].getY(),
+                                0, Color.BLACK);
         }
     }
 
