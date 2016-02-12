@@ -30,15 +30,41 @@ public class LensSceneObserver extends SceneObserver implements CameraListener {
      */
     public LensSceneObserver(View observingView, Camera observingCamera,
                              Lens observingLens, VirtualSpace targetVirtualSpace){
+        this(observingView, observingCamera, observingLens, targetVirtualSpace, 1, 1);
+    }
+
+    /**
+     *@param observingView view that observes the scene
+     *@param observingCamera camera in view that observes the scene
+     *@param targetVirtualSpace virtual space in which the scene objects should be put
+     *@param hpf horizontal preload factor. Multiply the SceneObserver's observed region width by hpf for the only purpose of computing what is visible through it. Default is 1.
+     *@param vpf vertical preload factor. Multiply the SceneObserver's observed region height by vpf for the only purpose of computing what is visible through it. Default is 1.
+     */
+    public LensSceneObserver(View observingView, Camera observingCamera,
+                             Lens observingLens, VirtualSpace targetVirtualSpace, double hpf, double vpf){
         this.v = observingView;
         this.c = observingCamera;
         this.l = observingLens;
         this.c.addListener(this);
         this.vs = targetVirtualSpace;
+        this.hpf = hpf;
+        this.vpf = vpf;
     }
 
     public double[] getVisibleRegion(){
-        return l.getVisibleRegion(c, new double[4]);
+        if (hpf != 1 || vpf != 1){
+            double[] res = l.getVisibleRegion(c, new double[4]);
+            double cvx = getX();
+            double cvy = getY();
+            res[0] = cvx - (cvx-res[0]) * hpf;
+            res[1] = cvy + (res[1]-cvy) * vpf;
+            res[2] = cvx + (res[2]-cvx) * hpf;
+            res[3] = cvy - (cvy-res[3]) * vpf;
+            return res;
+        }
+        else {
+            return l.getVisibleRegion(c, new double[4]);
+        }
     }
 
     // x-coord of the conceptual camera that would be observing the region

@@ -27,14 +27,37 @@ public class ViewSceneObserver extends SceneObserver implements CameraListener {
      *@param targetVirtualSpace virtual space in which the scene objects should be put
      */
     public ViewSceneObserver(View observingView, Camera observingCamera, VirtualSpace targetVirtualSpace){
+        this(observingView, observingCamera, targetVirtualSpace, 1, 1);
+    }
+
+    /**
+     *@param observingView view that observes the scene
+     *@param observingCamera camera in view that observes the scene
+     *@param targetVirtualSpace virtual space in which the scene objects should be put
+     *@param hpf horizontal preload factor. Multiply the SceneObserver's observed region width by hpf for the only purpose of computing what is visible through it. Default is 1.
+     *@param vpf vertical preload factor. Multiply the SceneObserver's observed region height by vpf for the only purpose of computing what is visible through it. Default is 1.
+     */
+    public ViewSceneObserver(View observingView, Camera observingCamera, VirtualSpace targetVirtualSpace, double hpf, double vpf){
         this.v = observingView;
         this.c = observingCamera;
         this.c.addListener(this);
         this.vs = targetVirtualSpace;
+        this.hpf = hpf;
+        this.vpf = vpf;
     }
 
     public double[] getVisibleRegion(){
-        return v.getVisibleRegion(c);
+        if (hpf != 1 || vpf != 1){
+            double[] res = v.getVisibleRegion(c);
+            res[0] = c.vx - (c.vx-res[0]) * hpf;
+            res[1] = c.vy + (res[1]-c.vy) * vpf;
+            res[2] = c.vx + (res[2]-c.vx) * hpf;
+            res[3] = c.vy - (c.vy-res[3]) * vpf;
+            return res;
+        }
+        else {
+            return v.getVisibleRegion(c);
+        }
     }
 
     public double getX(){

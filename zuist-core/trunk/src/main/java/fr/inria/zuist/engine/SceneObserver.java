@@ -32,6 +32,9 @@ public abstract class SceneObserver {
     LevelListener levelListener;
     RegionListener regionListener;
 
+    double hpf = 1d;
+    double vpf = 1d;
+
     public abstract double[] getVisibleRegion();
 
     public abstract double getAltitude();
@@ -98,6 +101,21 @@ public abstract class SceneObserver {
 
     public RegionListener getRegionListener(){
         return regionListener;
+    }
+
+
+    /** Multiply the SceneObserver's observed region width by hpf for the only purpose of computing what is visible through it.
+     *@param hpf horizontal preload factor. Default is 1.
+     */
+    public void setHorizontalPreloadFactor(double hpf){
+        this.hpf = hpf;
+    }
+
+    /** Multiply the SceneObserver's observed region height by vpf for the only purpose of computing what is visible through it.
+     *@param vpf vertical preload factor. Default is 1.
+     */
+    public void setVerticalPreloadFactor(double vpf){
+        this.vpf = vpf;
     }
 
 }

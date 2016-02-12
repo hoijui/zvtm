@@ -27,14 +27,36 @@ public class PortalSceneObserver extends SceneObserver implements CameraListener
      *@param targetVirtualSpace virtual space in which the scene objects should be put
      */
     public PortalSceneObserver(CameraPortal observingPortal, Camera observingCamera, VirtualSpace targetVirtualSpace){
+        this(observingPortal, observingCamera, targetVirtualSpace, 1, 1);
+    }
+
+    /**
+     *@param observingPortal portal that observes the scene
+     *@param observingCamera camera in portal that observes the scene
+     *@param targetVirtualSpace virtual space in which the scene objects should be put
+     */
+    public PortalSceneObserver(CameraPortal observingPortal, Camera observingCamera,
+                               VirtualSpace targetVirtualSpace, double hpf, double vpf){
         this.cp = observingPortal;
         this.c = observingCamera;
         this.c.addListener(this);
         this.vs = targetVirtualSpace;
+        this.hpf = hpf;
+        this.vpf = vpf;
     }
 
     public double[] getVisibleRegion(){
-        return cp.getVisibleRegion();
+        if (hpf != 1 || vpf != 1){
+            double[] res = cp.getVisibleRegion();
+            res[0] = c.vx - (c.vx-res[0]) * hpf;
+            res[1] = c.vy + (res[1]-c.vy) * vpf;
+            res[2] = c.vx + (res[2]-c.vx) * hpf;
+            res[3] = c.vy - (c.vy-res[3]) * vpf;
+            return res;
+        }
+        else {
+            return cp.getVisibleRegion();
+        }
     }
 
     public double getX(){
