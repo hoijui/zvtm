@@ -1934,7 +1934,6 @@ public class SVGReader {
             (ctx.getURL()!=null || ctx.getURLTitle()!=null || ctx.getTitle()!=null ||
              ctx.getClosestAncestorGroupID() != null || ctx.getClosestAncestorGroupClass() != null)){
             g.setOwner(new Metadata(ctx.getURL(), ctx.getTitle(), ctx.getURLTitle(), ctx.getClosestAncestorGroupID(), ctx.getClosestAncestorGroupClass()));
-            System.out.println(g+" XXX "+ctx.getTitle());
         }
     }
 
