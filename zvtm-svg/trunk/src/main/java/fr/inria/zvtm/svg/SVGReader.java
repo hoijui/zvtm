@@ -855,7 +855,15 @@ public class SVGReader {
             }
         }
         else {res=new VCircle(x,-y,0,d,Color.WHITE, Color.BLACK, 1.0f);}
-        if (meta){setMetadata(res,ctx);}
+        if (meta){
+            if (ctx == null){
+                ctx = new Context();
+            }
+            if (e.hasAttribute(SVGReader._title)){
+                ctx.setTitle(e.getAttribute(SVGReader._title));
+            }
+            setMetadata(res, ctx);
+        }
         if (e.hasAttribute(_class)){
             res.setType(e.getAttribute(_class));
         }
@@ -1529,7 +1537,15 @@ public class SVGReader {
 		if (ss != null && ss.requiresSpecialStroke()){
 			assignStroke(res, ss);
 		}
-		if (meta){setMetadata(res,ctx);}
+        if (meta){
+            if (ctx == null){
+                ctx = new Context();
+            }
+            if (e.hasAttribute(SVGReader._title)){
+                ctx.setTitle(e.getAttribute(SVGReader._title));
+            }
+            setMetadata(res, ctx);
+        }
 		if (e.hasAttribute(_class)){
 			res.setType(e.getAttribute(_class));
 		}
@@ -1583,7 +1599,15 @@ public class SVGReader {
                     ph.setHSVColor(hsv[0],hsv[1],hsv[2]);
                 }
             }
-            if (meta){setMetadata(ph,ctx);}
+            if (meta){
+                if (ctx == null){
+                    ctx = new Context();
+                }
+                if (e.hasAttribute(SVGReader._title)){
+                    ctx.setTitle(e.getAttribute(SVGReader._title));
+                }
+                setMetadata(ph, ctx);
+            }
             if (e.hasAttribute(_class)){
                 ph.setType(e.getAttribute(_class));
             }
@@ -1910,6 +1934,7 @@ public class SVGReader {
             (ctx.getURL()!=null || ctx.getURLTitle()!=null || ctx.getTitle()!=null ||
              ctx.getClosestAncestorGroupID() != null || ctx.getClosestAncestorGroupClass() != null)){
             g.setOwner(new Metadata(ctx.getURL(), ctx.getTitle(), ctx.getURLTitle(), ctx.getClosestAncestorGroupID(), ctx.getClosestAncestorGroupClass()));
+            System.out.println(g+" XXX "+ctx.getTitle());
         }
     }
 
