@@ -90,27 +90,15 @@ $Id: pom.xml 2427 2009-09-29 07:29:08Z epietrig $
 
   <!-- Build -->
   <build>
-    <extensions>
-        <extension>
-          <groupId>org.apache.maven.wagon</groupId>
-           <artifactId>wagon-ssh</artifactId>
-           <version>2.8</version>
-        </extension>
-      <extension>
-        <groupId>org.apache.maven.wagon</groupId>
-        <artifactId>wagon-ssh-external</artifactId>
-        <version>2.8</version>
-      </extension>
-    </extensions>
-  <resources>
-    <resource>
+    <resources>
+      <resource>
         <directory>src/main/resources</directory>
-          <excludes>
-        <exclude>images/*.ai</exclude>
-        <exclude>images/cprogress/**</exclude>
-    </excludes>
+        <excludes>
+          <exclude>images/*.ai</exclude>
+          <exclude>images/cprogress/**</exclude>
+        </excludes>
       </resource>
-  </resources>
+    </resources>
     <plugins>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
