@@ -5,7 +5,7 @@ $Id$
 
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>fr.inria.zvtm</groupId>
   <artifactId>zvtm-core</artifactId>
@@ -31,9 +31,9 @@ $Id$
 
   <!-- Repositories -->
   <repositories>
-	<repository>
+  <repository>
       <id>zvtm repository</id>
-      <url>http://zvtm.sourceforge.net/maven</url>
+      <url>http://maven.inria.fr/artifactory/ilda-public-release</url>
     </repository>
     <repository>
       <id>central</id>
@@ -51,15 +51,15 @@ $Id$
       <scope>test</scope>
     </dependency>
     <dependency>
-		<groupId>net.java.dev.timingframework</groupId>
-		<artifactId>timingframework</artifactId>
-		<version>1.0</version>
-	</dependency>
-	<dependency>
-		<groupId>net.jcip</groupId>
-		<artifactId>jcip-annotations</artifactId>
-		<version>1.0</version>
-	</dependency>
+    <groupId>net.java.dev.timingframework</groupId>
+    <artifactId>timingframework</artifactId>
+    <version>1.0</version>
+  </dependency>
+  <dependency>
+    <groupId>net.jcip</groupId>
+    <artifactId>jcip-annotations</artifactId>
+    <version>1.0</version>
+  </dependency>
 </dependencies>
 
   <!-- Build -->
@@ -76,15 +76,15 @@ $Id$
           <version>2.8</version>
         </extension>
       </extensions>
-	<resources>
-	  <resource>
+  <resources>
+    <resource>
         <directory>src/main/resources</directory>
           <excludes>
-		    <exclude>images/test.jpg</exclude>
-		    <exclude>images/1st-order.ai</exclude>
-		</excludes>
+        <exclude>images/test.jpg</exclude>
+        <exclude>images/1st-order.ai</exclude>
+    </excludes>
       </resource>
-	</resources>
+  </resources>
     <plugins>
     <plugin>
         <groupId>org.codehaus.mojo</groupId>
@@ -111,7 +111,7 @@ $Id$
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-    	<version>3.3</version>
+      <version>3.3</version>
         <configuration>
           <source>1.7</source>
           <target>1.7</target>
@@ -121,7 +121,7 @@ $Id$
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-    	<version>2.6</version>
+      <version>2.6</version>
         <configuration>
               <excludes>
                 <exclude>**/tests</exclude>
@@ -132,7 +132,7 @@ $Id$
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-   	    <version>2.10.3</version>
+        <version>2.10.3</version>
         <configuration>
           <code>javadoc:aggregate</code>
           <overview>${basedir}/overview.html</overview>
@@ -160,21 +160,14 @@ $Id$
         </repository>
       </distributionManagement>
     </profile>
-
     <profile>
-      <!-- mvn -P artifactory ... -->
+      <!-- mvn -P atifactory ... -->
       <id>artifactory</id>
       <distributionManagement>
         <repository>
-          <id>central</id>
-          <name>libs-release</name>
+          <id>inriacentral</id>
           <url>http://maven.inria.fr/artifactory/ilda-public-release</url>
         </repository>
-        <snapshotRepository>
-          <id>snapshots</id>
-          <name>libs-snapshot</name>
-          <url>http://maven.inria.fr/artifactory/ilda-private-snapshot</url>
-        </snapshotRepository>
       </distributionManagement>
     </profile>
   </profiles>

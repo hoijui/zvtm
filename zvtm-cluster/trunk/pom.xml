@@ -25,7 +25,7 @@
   <repositories>
     <repository>
       <id>zvtm repository</id>
-      <url>http://zvtm.sourceforge.net/maven</url>
+      <url>http://maven.inria.fr/artifactory/ilda-public-release</url>
     </repository>
     <repository>
       <id>central</id>
@@ -64,16 +64,16 @@
       <artifactId>aspectjrt</artifactId>
       <version>1.8.6</version>
     </dependency>
-	<dependency>
-		<groupId>org.jgroups</groupId>
-		<artifactId>jgroups</artifactId>
-		<version>3.6.6.Final</version>
-	</dependency>
+  <dependency>
+    <groupId>org.jgroups</groupId>
+    <artifactId>jgroups</artifactId>
+    <version>3.6.6.Final</version>
+  </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-log4j12</artifactId>
       <version>1.7.10</version>
-      <!--	<scope>test</scope> -->
+      <!--  <scope>test</scope> -->
     </dependency>
     <dependency>
       <groupId>commons-logging</groupId>
@@ -225,15 +225,9 @@
       <id>artifactory</id>
       <distributionManagement>
         <repository>
-          <id>central</id>
-          <name>libs-release</name>
+          <id>inriacentral</id>
           <url>http://maven.inria.fr/artifactory/ilda-public-release</url>
         </repository>
-        <snapshotRepository>
-          <id>snapshots</id>
-          <name>libs-snapshot</name>
-          <url>http://maven.inria.fr/artifactory/ilda-private-snapshot</url>
-        </snapshotRepository>
       </distributionManagement>
     </profile>
   </profiles>
