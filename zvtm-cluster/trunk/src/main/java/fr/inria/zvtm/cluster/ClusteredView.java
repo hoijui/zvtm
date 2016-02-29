@@ -189,7 +189,7 @@ public class ClusteredView extends DefaultIdentifiable {
         return blockNum % clGeom.getRows();
     }
 
-    /**
+    /** Get a camera's coordinates so that it is centered on a given region. Does not actually move the camera. Returns the camera's location.
      * @param x1 first point x-coordinate, in VirtualSpace coords
      * @param y1 first point y-coordinate, in VirtualSpace coords
      * @param x2 second point x-coordinate, in VirtualSpace coords
@@ -229,4 +229,3 @@ public class ClusteredView extends DefaultIdentifiable {
         return Collections.unmodifiableList(cameras);
     }
 }
-
