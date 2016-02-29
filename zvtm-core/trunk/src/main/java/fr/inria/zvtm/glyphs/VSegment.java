@@ -110,7 +110,7 @@ public class VSegment<T> extends Glyph implements RectangularShape {
         vz = z;
         orient = angle;
         size = lgth;
-        computeEdges();
+        computeDimensions();
         setColor(c);
         setTranslucencyValue(alpha);
     }
@@ -156,7 +156,7 @@ public class VSegment<T> extends Glyph implements RectangularShape {
     @Override
     public void orientTo(double angle){
         orient = angle;
-        computeEdges();
+        computeDimensions();
         VirtualSpaceManager.INSTANCE.repaint();
     }
 
@@ -220,14 +220,14 @@ public class VSegment<T> extends Glyph implements RectangularShape {
     @Override
     public void sizeTo(double s){
         size = s;
-        computeEdges();
+        computeDimensions();
         VirtualSpaceManager.INSTANCE.repaint();
     }
 
     @Override
     public void reSize(double factor){
         size *= factor;
-        computeEdges();
+        computeDimensions();
         VirtualSpaceManager.INSTANCE.repaint();
     }
 
@@ -255,7 +255,7 @@ public class VSegment<T> extends Glyph implements RectangularShape {
         return false;
     }
 
-    void computeEdges(){
+    void computeDimensions(){
         vw = size * Math.cos(orient);
         vh = size * Math.sin(orient);
     }
