@@ -110,7 +110,7 @@ public class VSegment<T> extends Glyph implements RectangularShape {
         vz = z;
         orient = angle;
         size = lgth;
-        computeDimensions();
+        updateWidthAndHeight();
         setColor(c);
         setTranslucencyValue(alpha);
     }
@@ -156,7 +156,7 @@ public class VSegment<T> extends Glyph implements RectangularShape {
     @Override
     public void orientTo(double angle){
         orient = angle;
-        computeDimensions();
+        updateWidthAndHeight();
         VirtualSpaceManager.INSTANCE.repaint();
     }
 
@@ -177,7 +177,7 @@ public class VSegment<T> extends Glyph implements RectangularShape {
         vy = (y1 + y2) / 2;
         vw = (x2 - x1);
         vh = (y2 - y1);
-        computeSize();
+        updateSizeAndOrient();
     }
 
     /** Change the segment's location, size and orientation by giving its two endpoints (absolute coordinates). */
@@ -190,27 +190,15 @@ public class VSegment<T> extends Glyph implements RectangularShape {
      *@return absolute coordinates.
      */
     public Point2D.Double[] getEndPoints(){
-        Point2D.Double[] res = new Point2D.Double[2];
-        res[0] = new Point2D.Double(vx+vw/2d, vy+vh/2d);
-        res[1] = new Point2D.Double(vx-vw/2d, vy-vh/2d);
-        return res;
+        return new Point2D.Double[]{
+           new Point2D.Double(vx+vw/2d, vy+vh/2d),
+           new Point2D.Double(vx-vw/2d, vy-vh/2d)
+        };
     }
 
-    void computeSize(){
+    void updateSizeAndOrient(){
         size = Math.sqrt(vw*vw + vh*vh);
-        if (vw!=0){orient=Math.atan((vh/vw));}
-        else {
-            orient=(vh>0) ? Math.PI/2.0f : -Math.PI/2.0f ;
-        }
-        if (orient<0){
-            if (vh>0){orient=Math.PI-orient;}
-            else {orient=-orient;}
-        }
-        else if(orient>0){
-            if (vh>0){orient=2*Math.PI-orient;}
-            else {orient=Math.PI-orient;}
-        }
-        else if(orient==0 && vw<0){orient=Math.PI;}
+        orient = Math.atan2(vh, vw);
     }
 
     public double getWidth(){return vw;}
@@ -220,33 +208,33 @@ public class VSegment<T> extends Glyph implements RectangularShape {
     @Override
     public void sizeTo(double s){
         size = s;
-        computeDimensions();
+        updateWidthAndHeight();
         VirtualSpaceManager.INSTANCE.repaint();
     }
 
     @Override
     public void reSize(double factor){
         size *= factor;
-        computeDimensions();
+        updateWidthAndHeight();
         VirtualSpaceManager.INSTANCE.repaint();
     }
 
     public void setWidth(double w){
         vw = w;
-        computeSize();
+        updateSizeAndOrient();
         VirtualSpaceManager.INSTANCE.repaint();
     }
 
     public void setHeight(double h){
         vh = h;
-        computeSize();
+        updateSizeAndOrient();
         VirtualSpaceManager.INSTANCE.repaint();
     }
 
     public void setWidthHeight(double w,double h){
         vw = w;
         vh = h;
-        computeSize();
+        updateSizeAndOrient();
         VirtualSpaceManager.INSTANCE.repaint();
     }
 
@@ -255,7 +243,7 @@ public class VSegment<T> extends Glyph implements RectangularShape {
         return false;
     }
 
-    void computeDimensions(){
+    public void updateWidthAndHeight(){
         vw = size * Math.cos(orient);
         vh = size * Math.sin(orient);
     }
