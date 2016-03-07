@@ -3,7 +3,7 @@
  *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009-2011.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id$ 
+ * $Id$
  */
 
 package fr.inria.zvtm.animation.examples;
@@ -65,7 +65,7 @@ public class TestStopCancel {
 	vs.addGlyph(circle4);
 
 	class ColorEndAction implements EndAction {
-		public void execute(Object subject, 
+		public void execute(Object subject,
 				Animation.Dimension dimension){
 			((Glyph)subject).setColor(Color.GREEN);
 		}
@@ -143,7 +143,7 @@ public class TestStopCancel {
 	am.stopAnimation(anim5); //stop unstarted animation
 	am.cancelAnimation(anim6); //cancel unstarted animation
     }
-    
+
     public static void main(String[] args){
         System.out.println("-----------------");
         System.out.println("General information");
@@ -151,7 +151,7 @@ public class TestStopCancel {
         System.out.println("OS type: "+System.getProperty("os.name")+" "+System.getProperty("os.version")+"/"+System.getProperty("os.arch")+" "+System.getProperty("sun.cpu.isalist"));
         System.out.println("-----------------");
         System.out.println("Directory information");
-        System.out.println("Java Classpath: "+System.getProperty("java.class.path"));	
+        System.out.println("Java Classpath: "+System.getProperty("java.class.path"));
         System.out.println("Java directory: "+System.getProperty("java.home"));
         System.out.println("Launching from: "+System.getProperty("user.dir"));
         System.out.println("-----------------");
@@ -198,7 +198,7 @@ public class TestStopCancel {
 	    lastJPX=jpx;
 	    lastJPY=jpy;
 
-	    v.setDrawDrag(true);
+	    v.setDrawSegment(true);
 	    application.vsm.getActiveView().mouse.setSensitivity(false);
 	    //because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
 	}
@@ -207,7 +207,7 @@ public class TestStopCancel {
 	    application.cam.setXspeed(0);
 	    application.cam.setYspeed(0);
 	    application.cam.setZspeed(0);
-	    v.setDrawDrag(false);
+	    v.setDrawSegment(false);
 	    application.vsm.getActiveView().mouse.setSensitivity(true);
 	}
 
@@ -257,9 +257,9 @@ public class TestStopCancel {
 	}
 
 	public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){}
-    
+
 	public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){}
-    
+
 	public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 
 	public void viewActivated(View v){}

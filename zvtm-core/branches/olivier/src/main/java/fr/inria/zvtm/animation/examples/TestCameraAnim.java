@@ -3,7 +3,7 @@
  *  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2009-2011.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id$ 
+ * $Id$
  */
 
 package fr.inria.zvtm.animation.examples;
@@ -60,8 +60,8 @@ public class TestCameraAnim {
 
 	final Glyph circle2 = new VCircle(60,200,0,30,Color.GREEN);
 	vs.addGlyph(circle2);
-	
-	Animation anim = am.getAnimationFactory().createAnimation(3000, 
+
+	Animation anim = am.getAnimationFactory().createAnimation(3000,
 					    Animation.INFINITE,
 					    Animation.RepeatBehavior.REVERSE,
 					    circle,
@@ -69,8 +69,8 @@ public class TestCameraAnim {
 					    new DefaultTimingHandler(){
 						final double initX = circle.vx;
 						final double initY = circle.vy;
-						
-						public void timingEvent(float fraction, 
+
+						public void timingEvent(float fraction,
 									Object subject, Animation.Dimension dim){
 						    Glyph g = (Glyph)subject;
 						    g.moveTo(initX,
@@ -78,8 +78,8 @@ public class TestCameraAnim {
 						}
 					    },
 					    new SplineInterpolator(0.1f,0.95f,0.2f,0.95f));
-	
-	anim2 = am.getAnimationFactory().createAnimation(3000, 
+
+	anim2 = am.getAnimationFactory().createAnimation(3000,
 					     Animation.INFINITE,
 					     Animation.RepeatBehavior.REVERSE,
 					     circle2,
@@ -87,8 +87,8 @@ public class TestCameraAnim {
 					     new DefaultTimingHandler(){
 						 final double initX = circle2.vx;
 						 final double initY = circle2.vy;
-						 
-						 public void timingEvent(float fraction, 
+
+						 public void timingEvent(float fraction,
 									 Object subject, Animation.Dimension dim){
 						     Glyph g = (Glyph)subject;
 						     g.moveTo(initX,
@@ -97,17 +97,17 @@ public class TestCameraAnim {
 					     },
 					     new SplineInterpolator(0.1f,0.95f,0.2f,0.95f));
 
-	Animation cameraPos = am.getAnimationFactory().createAnimation(4000, 
+	Animation cameraPos = am.getAnimationFactory().createAnimation(4000,
 						 2f,
 						 Animation.RepeatBehavior.LOOP,
 						 cam,
 						 Animation.Dimension.POSITION,
 						 new DefaultTimingHandler(){
-						     						     
-						     public void timingEvent(float fraction, 
+
+						     public void timingEvent(float fraction,
 									     Object subject, Animation.Dimension dim){
 							   Camera c = (Camera)subject;
-							   
+
 							   c.moveTo(Double.valueOf(180*Math.cos(2*Math.PI*fraction)).doubleValue(),
 								    Double.valueOf(120*Math.sin(2*Math.PI*fraction)).doubleValue());
 						     }
@@ -117,15 +117,15 @@ public class TestCameraAnim {
 						     }
 						 },
 						 SlowInSlowOutInterpolator.getInstance());
-	
-	Animation cameraAlt = am.getAnimationFactory().createAnimation(4000, 
+
+	Animation cameraAlt = am.getAnimationFactory().createAnimation(4000,
 						 2f,
 						 Animation.RepeatBehavior.REVERSE,
 						 cam,
 						 Animation.Dimension.ALTITUDE,
 						 new DefaultTimingHandler(){
-					
-						     public void timingEvent(float fraction, 
+
+						     public void timingEvent(float fraction,
 									     Object subject, Animation.Dimension dim){
 							 Camera c = (Camera)subject;
 							 c.setAltitude(25+Double.valueOf(fraction*50).doubleValue());
@@ -142,7 +142,7 @@ public class TestCameraAnim {
 	am.startAnimation(anim, false);
 	am.startAnimation(anim2, false);
 	am.startAnimation(cameraAlt, false);
-	
+
 	try{
 	    Thread.sleep(1000);
 	} catch(InterruptedException ie){
@@ -153,7 +153,7 @@ public class TestCameraAnim {
 
     }
 
-    
+
     public static void main(String[] args){
         System.out.println("-----------------");
         System.out.println("General information");
@@ -161,7 +161,7 @@ public class TestCameraAnim {
         System.out.println("OS type: "+System.getProperty("os.name")+" "+System.getProperty("os.version")+"/"+System.getProperty("os.arch")+" "+System.getProperty("sun.cpu.isalist"));
         System.out.println("-----------------");
         System.out.println("Directory information");
-        System.out.println("Java Classpath: "+System.getProperty("java.class.path"));	
+        System.out.println("Java Classpath: "+System.getProperty("java.class.path"));
         System.out.println("Java directory: "+System.getProperty("java.home"));
         System.out.println("Launching from: "+System.getProperty("user.dir"));
         System.out.println("-----------------");
@@ -208,7 +208,7 @@ public class TestCameraAnim {
 	    lastJPX=jpx;
 	    lastJPY=jpy;
 
-	    v.setDrawDrag(true);
+	    v.setDrawSegment(true);
 	    application.vsm.getActiveView().mouse.setSensitivity(false);
 	    //because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
 	}
@@ -217,7 +217,7 @@ public class TestCameraAnim {
 	    application.cam.setXspeed(0);
 	    application.cam.setYspeed(0);
 	    application.cam.setZspeed(0);
-	    v.setDrawDrag(false);
+	    v.setDrawSegment(false);
 	    application.vsm.getActiveView().mouse.setSensitivity(true);
 	}
 
@@ -267,9 +267,9 @@ public class TestCameraAnim {
 	}
 
 	public void Ktype(ViewPanel v,char c,int code,int mod, KeyEvent e){
-	    
+
 	}
-    
+
 	public void Kpress(ViewPanel v,char c,int code,int mod, KeyEvent e){
 	    if(KeyEvent.VK_SPACE == code){
 		if(!paused){
@@ -280,7 +280,7 @@ public class TestCameraAnim {
 		paused = !paused;
 	    }
 	}
-    
+
 	public void Krelease(ViewPanel v,char c,int code,int mod, KeyEvent e){}
 
 	public void viewActivated(View v){}
