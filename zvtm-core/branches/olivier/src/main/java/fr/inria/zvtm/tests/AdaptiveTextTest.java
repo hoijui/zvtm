@@ -4,7 +4,7 @@
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
- */ 
+ */
 package fr.inria.zvtm.tests;
 
 import fr.inria.zvtm.engine.Camera;
@@ -30,7 +30,7 @@ import java.util.Vector;
  */
 public class AdaptiveTextTest {
     //shortcut
-    private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE; 
+    private VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE;
     private Camera cam;
 
     AdaptiveTextTest(){
@@ -38,14 +38,14 @@ public class AdaptiveTextTest {
         cam = vs.addCamera();
         cam.setZoomFloor(-90);
         Vector<Camera> cameras = new Vector<Camera>();
-        cameras.add(cam);	
+        cameras.add(cam);
 
         View view = vsm.addFrameView(cameras, "AdaptiveText test",
-                View.STD_VIEW, 800, 600, false, true, true, null);	
+                View.STD_VIEW, 800, 600, false, true, true, null);
         AdaptiveTestEventHandler eh = new AdaptiveTestEventHandler();
         view.setListener(eh);
         view.getCursor().getPicker().setListener(eh);
-        AdaptiveText adt = new AdaptiveText(0,0,0,Color.BLUE, 
+        AdaptiveText adt = new AdaptiveText(0,0,0,Color.BLUE,
                 "Forty-two is six multiplied by nine.", 100, 27);
         vs.addGlyph(adt);
         VRectangle rect = new VRectangle(0,0,0,100,27,new Color(100, 100, 100, 0));
@@ -71,13 +71,13 @@ public class AdaptiveTextTest {
         public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
             lastJPX = jpx;
             lastJPY = jpy;
-            v.setDrawDrag(true);
+            v.setDrawSegment(true);
         }
 
         public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
             v.cams[0].setXspeed(0);
             v.cams[0].setYspeed(0);
-            v.setDrawDrag(false);
+            v.setDrawSegment(false);
         }
 
         public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
@@ -120,4 +120,3 @@ public class AdaptiveTextTest {
 
     }
 }
-

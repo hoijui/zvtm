@@ -2,11 +2,11 @@
  *   DATE OF CREATION:  Thu Aug 25 14:14:50 2005
  *   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   MODIF:             Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2004-2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2015. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
- */ 
+ */
 
 package fr.inria.zvtm.widgets;
 
@@ -48,15 +48,15 @@ public abstract class PieMenu {
 		for (int i=0;i<labels.length;i++){
 			if (labels[i] != null){
 				vs.removeGlyph(labels[i]);
-			}   
+			}
 		}
 		if (animLength > 0){
 			for (int i=0;i<items.length;i++){
 				if (items[i] != null){
 				    Animation sizeAnim = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory()
-					.createGlyphSizeAnim(animLength, 
-							     items[i], 
-							     0.1f, 
+					.createGlyphSizeAnim(animLength,
+							     items[i],
+							     0.1f,
 							     false,
 							     IdentityInterpolator.getInstance(),
 							     new EndAction(){
@@ -66,14 +66,14 @@ public abstract class PieMenu {
 								 }
 							     });
 				    VirtualSpaceManager.INSTANCE.getAnimationManager().startAnimation(sizeAnim, false);
-				}   
+				}
 			}
 		}
 		else {
 			for (int i=0;i<items.length;i++){
 				if (items[i] != null){
 					vs.removeGlyph(items[i]);
-				}   
+				}
 			}
 		}
 	}
@@ -91,12 +91,12 @@ public abstract class PieMenu {
     public VText[] getLabels(){
         return labels;
     }
-    
+
     /** Get the menu's invisible (but sensitive) boundary glyph. */
     public Glyph getBoundary(){
         return boundary;
     }
-    
+
     /** Get index of the provided glyph in the list of menu items.<br>
     * Menu items are sorted counter clockwise, starting with the element
     * placed at the start angle.
@@ -109,10 +109,10 @@ public abstract class PieMenu {
         return -1;
     }
 
-	/** Get the menu item at a given index. 
+	/** Get the menu item at a given index.
 	 * Menu items are ordered counter clockwise, starting with the element placed at the start angle.
 	 *@param i item index
-	 *@return null if i > item count 
+	 *@return null if i &gt; item count
 	 */
 	public Glyph getItem(int i){
 		if (i < items.length){
@@ -122,7 +122,7 @@ public abstract class PieMenu {
 			return null;
 		}
 	}
-	
+
 	/** Get the menu item that has a given label.
 	 *@param label item label.
 	 *@return null if no item has this label.
@@ -135,14 +135,14 @@ public abstract class PieMenu {
 		}
 		return null;
 	}
-    
+
     public void setSensitivity(boolean b){
         for (int i=0;i<items.length;i++){
             items[i].setSensitivity(b);
         }
         boundary.setSensitivity(b);
     }
-    
+
     public boolean getSensitivity(){
         return boundary.isSensitive();
     }

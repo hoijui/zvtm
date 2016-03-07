@@ -434,10 +434,18 @@ public class PickerVS {
     }
 
     /**
-     * The list of glyphs under the picker, ordered according to the drawing stack
+     * The list of glyphs under the picker, ordered according to the drawing stack.
      */
     public Glyph[] getDrawOrderedPickedGlyphList(VirtualSpace v){
-    	Glyph[] tt = getPickedGlyphList();
+        return getDrawOrderedPickedGlyphList(v, null);
+    }
+
+    /**
+     * The list of glyphs under the picker, ordered according to the drawing stack.
+     *@param type the type of glyph to look for. Pass null to look for any type of glyph. Type of glyph as specified with Glyph.setType(String).
+     */
+    public Glyph[] getDrawOrderedPickedGlyphList(VirtualSpace v, String type){
+    	Glyph[] tt = (type != null) ? getPickedGlyphList(type) : getPickedGlyphList();
     	Glyph[] t = new Glyph[tt.length];
 		int k = 0;
 		Glyph[] list = v.getDrawingList();

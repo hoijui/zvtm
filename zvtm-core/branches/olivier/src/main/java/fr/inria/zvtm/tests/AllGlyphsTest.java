@@ -304,13 +304,13 @@ class TestEventHandler extends ViewAdapter implements PickerListener {
     public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
         lastJPX = jpx;
         lastJPY = jpy;
-        v.setDrawDrag(true);
+        v.setDrawSegment(true);
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
         application.mCam.setXspeed(0);
         application.mCam.setYspeed(0);
-        v.setDrawDrag(false);
+        v.setDrawSegment(false);
     }
 
     public void mouseMoved(ViewPanel v, int jpx, int jpy, MouseEvent e){

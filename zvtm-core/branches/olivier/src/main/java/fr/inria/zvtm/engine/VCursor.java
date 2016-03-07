@@ -4,7 +4,7 @@
  *   MODIF:              Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
  *   Copyright (c) Xerox Corporation, XRCE/Contextual Computing, 2000-2002. All Rights Reserved
  *   Copyright (c) 2003 World Wide Web Consortium. All Rights Reserved
- *   Copyright (c) INRIA, 2004-2014. All Rights Reserved
+ *   Copyright (c) INRIA, 2004-2015. All Rights Reserved
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -44,7 +44,7 @@ import fr.inria.zvtm.glyphs.Translucency;
  * Glyph representing pointing device cursor. One instance per view.
  * @author Emmanuel Pietriga
  *
- * <h4>Using DynaSpot</h4>
+ * <h1>Using DynaSpot</h1>
  * <p>The DynaSpot behavior must be activated in VCursor, calling</p>
  * <ul><li>VCursor.getDynaPicker().activateDynaSpot(boolean b)</li></ul>
  *
@@ -146,11 +146,6 @@ public class VCursor {
         this.hcolor = c;
     }
 
-    /** Propagate picker movements to sticked glyphs. */
-    public void propagateMove(){
-        picker.propagateMove(vx-pvx, vy-pvy);
-    }
-
     /** Move mouse cursor (JPanel coordinates).
      *@param x x-coordinate, in JPanel coordinates system
      *@param y y-coordinate, in JPanel coordinates system
@@ -199,7 +194,11 @@ public class VCursor {
             pvy = vy;
             vx = (cx*ucoef) + c.vx;
             vy = (cy*ucoef) + c.vy;
-            picker.setVSCoordinates(vx, vy);
+            if (pvx != vx || pvy != vy){
+                // set coordinates only if they have changed
+                // (as this will trigger a repaint)
+                picker.setVSCoordinates(vx, vy);
+            }
         }
     }
 

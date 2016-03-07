@@ -185,11 +185,11 @@ class FSListener extends ViewAdapter implements PickerListener {
     public void press1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
         lastJPX = jpx;
         lastJPY = jpy;
-        v.setDrawDrag(true);
+        v.setDrawSegment(true);
     }
 
     public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
-        v.setDrawDrag(false);
+        v.setDrawSegment(false);
     }
 
     static float ZOOM_SPEED_COEF = 1.0f/50.0f;

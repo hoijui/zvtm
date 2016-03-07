@@ -58,7 +58,7 @@ public class AdaptiveText<T> extends VText {
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     @Override public void setText(String text){
         super.setText(text);
@@ -146,4 +146,3 @@ public class AdaptiveText<T> extends VText {
         draw(g, vW, vH, i, stdS, stdT, dx, dy);
     }
 }
-

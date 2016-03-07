@@ -356,12 +356,12 @@ public abstract class Lens {
     /**returns bounds of rectangle representing virtual space's region seen through camera c [west,north,east,south]
      *@param c camera
      *@param res array which will contain the result */
-    public long[] getVisibleRegion(Camera c, long[] res){
+    public double[] getVisibleRegion(Camera c, double[] res){
         float uncoef = (float)((c.focal+c.altitude)/c.focal);
-        res[0] = (long)(c.vx + (lx-lensWidth/2)*uncoef);
-        res[1] = (long)(c.vy + (-ly+lensHeight/2)*uncoef);
-        res[2] = (long)(c.vx + (lx+lensWidth/2)*uncoef);
-        res[3] = (long)(c.vy + (-ly-lensHeight/2)*uncoef);
+        res[0] = c.vx + (lx-lensWidth/2)*uncoef;
+        res[1] = c.vy + (-ly+lensHeight/2)*uncoef;
+        res[2] = c.vx + (lx+lensWidth/2)*uncoef;
+        res[3] = c.vy + (-ly-lensHeight/2)*uncoef;
         return res;
     }
 

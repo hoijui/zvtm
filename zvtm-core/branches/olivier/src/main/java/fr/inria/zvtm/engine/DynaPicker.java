@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2011-2013. All Rights Reserved
+ *   Copyright (c) INRIA, 2011-2015. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -33,7 +33,7 @@ import fr.inria.zvtm.glyphs.Glyph;
  * DynaSpot picker.
  * @author Emmanuel Pietriga
  *
- * <h4>Using DynaSpot</h4>
+ * <h1>Using DynaSpot</h1>
  * <p>The DynaSpot behavior must be activated in VCursor, calling</p>
  * <ul><li>VCursor.getDynaPicker().activateDynaSpot(boolean b)</li></ul>
  *
@@ -106,6 +106,7 @@ public class DynaPicker {
     }
 
     /** Get the color of the dynaspot area.
+    *@return The color used to paint the dynaspot area.
     */
     public Color getDynaSpotColor(){
         return DYNASPOT_COLOR;
@@ -126,23 +127,35 @@ public class DynaPicker {
         return DYNASPOT_MAX_TRANSLUCENCY;
     }
 
-    /** Set DynaSpot lag parameter. See <a href="http://zvtm.sourceforge.net/doc/dynaspot.html">http://zvtm.sourceforge.net/doc/dynaspot.html</a> for more detail. */
+    /** Set DynaSpot lag parameter.
+     *@param t lag in milliseconds
+      *See <a href="http://zvtm.sourceforge.net/doc/dynaspot.html">http://zvtm.sourceforge.net/doc/dynaspot.html</a> for more detail.
+      */
     public void setDynaSpotLagTime(int t){
         LAG_TIME = t;
     }
 
-    /** Get DynaSpot lag parameter. See <a href="http://zvtm.sourceforge.net/doc/dynaspot.html">http://zvtm.sourceforge.net/doc/dynaspot.html</a> for more detail. */
+    /** Get DynaSpot lag parameter.
+     *@return lag in milliseconds
+     * See <a href="http://zvtm.sourceforge.net/doc/dynaspot.html">http://zvtm.sourceforge.net/doc/dynaspot.html</a> for more detail.
+     */
     public int getDynaSpotLagTime(){
         return LAG_TIME;
     }
 
-    /** Set DynaSpot reduction time parameter. See <a href="http://zvtm.sourceforge.net/doc/dynaspot.html">http://zvtm.sourceforge.net/doc/dynaspot.html</a> for more detail. */
+    /** Set DynaSpot reduction time parameter.
+     *@param t reduction time in milliseconds
+     *See <a href="http://zvtm.sourceforge.net/doc/dynaspot.html">http://zvtm.sourceforge.net/doc/dynaspot.html</a> for more detail.
+      */
     public void setDynaSpotReducTime(int t){
         REDUC_TIME = t;
         computeParams();
     }
 
-    /** Get DynaSpot reduction time parameter. See <a href="http://zvtm.sourceforge.net/doc/dynaspot.html">http://zvtm.sourceforge.net/doc/dynaspot.html</a> for more detail. */
+    /** Get DynaSpot reduction time parameter.
+     *@return reduction time in milliseconds
+     *See <a href="http://zvtm.sourceforge.net/doc/dynaspot.html">http://zvtm.sourceforge.net/doc/dynaspot.html</a> for more detail.
+      */
     public int getDynaSpotReducTime(){
         return REDUC_TIME;
     }
@@ -273,24 +286,33 @@ public class DynaPicker {
     	}
     }
 
-    /** Get DynaSpot's current radius. See <a href="http://zvtm.sourceforge.net/doc/dynaspot.html">http://zvtm.sourceforge.net/doc/dynaspot.html</a> for more detail. */
+    /** Get DynaSpot's current radius.
+     *@return radius in pixels
+     * See <a href="http://zvtm.sourceforge.net/doc/dynaspot.html">http://zvtm.sourceforge.net/doc/dynaspot.html</a> for more detail.
+     */
     public int getDynaSpotRadius(){
         return dynaSpotRadius;
     }
 
     DynaSpotListener dsl;
 
-    /** Listen for DynaSpot events. */
+    /** Listen for DynaSpot events.
+     *@param dsl callback implementation.
+     */
     public void setDynaSpotListener(DynaSpotListener dsl){
     	this.dsl = dsl;
     }
 
-    /** Find out who is listening for DynaSpot events. */
+    /** Find out who is listening for DynaSpot events.
+     *@return the callback implementation.
+     */
     public DynaSpotListener getDynaSpotListener(){
     	return dsl;
     }
 
-    /** Enable/disable DynaSpot cursor behavior. */
+    /** Enable/disable DynaSpot cursor behavior.
+     *@param b true to enable, false to disable.
+     */
     public void activateDynaSpot(boolean b){
     	dynaSpotActivated = b;
     	if (dynaSpotActivated){
@@ -308,18 +330,26 @@ public class DynaPicker {
     	}
     }
 
-    /** Tells whether DynaSpot cursor behavior is enabled or not. */
+    /** Tells whether DynaSpot cursor behavior is enabled or not.
+     *@return true if enabled, false if disabled.
+     */
     public boolean isDynaSpotActivated(){
         return dynaSpotActivated;
     }
 
-    /** Set maximum size of DynaSpot selection region. See <a href="http://zvtm.sourceforge.net/doc/dynaspot.html">http://zvtm.sourceforge.net/doc/dynaspot.html</a> for more detail. */
+    /** Set maximum size of DynaSpot selection region.
+     *@param r radius in pixels.
+     * See <a href="http://zvtm.sourceforge.net/doc/dynaspot.html">http://zvtm.sourceforge.net/doc/dynaspot.html</a> for more detail.
+     */
     public void setDynaSpotMaxRadius(int r){
     	DYNASPOT_MAX_RADIUS = (r < 0) ? 0 : r;
     	computeParams();
     }
 
-    /** Get maximum size of DynaSpot selection region. See <a href="http://zvtm.sourceforge.net/doc/dynaspot.html">http://zvtm.sourceforge.net/doc/dynaspot.html</a> for more detail. */
+    /** Get maximum size of DynaSpot selection region.
+     *@return radius in pixels.
+     * See <a href="http://zvtm.sourceforge.net/doc/dynaspot.html">http://zvtm.sourceforge.net/doc/dynaspot.html</a> for more detail.
+     */
     public int getDynaSpotMaxRadius(){
     	return DYNASPOT_MAX_RADIUS;
     }
@@ -353,6 +383,7 @@ public class DynaPicker {
     }
 
     /** Compute the list of glyphs picked by the DynaSpot cursor.
+     *@param c the camera/layer considered for picking.
      * The best picked glyph is returned.
      * See <a href="http://zvtm.sourceforge.net/doc/dynaspot.html">http://zvtm.sourceforge.net/doc/dynaspot.html</a> for more detail.
      *@return null if the dynaspot cursor does not pick anything.
@@ -430,6 +461,7 @@ public class DynaPicker {
     }
 
     /** Get the set of glyphs intersected by the cursor's dynaspot region.
+     *@param c the camera/layer considered for picking.
      * See <a href="http://zvtm.sourceforge.net/doc/dynaspot.html">http://zvtm.sourceforge.net/doc/dynaspot.html</a> for more detail.
      *@return a set of Glyph IDs
      *@see #dynaPick(Camera c)
