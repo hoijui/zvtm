@@ -119,7 +119,7 @@ public class TwoCameras {
 		public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
 			lastJPX=jpx;
 			lastJPY=jpy;
-			v.setDrawDrag(true);
+			v.setDrawSegment(true);
 			vsm.getActiveView().mouse.setSensitivity(false);
 			//because we would not be consistent  (when dragging the mouse, we computeMouseOverList, but if there is an anim triggered by {X,Y,A}speed, and if the mouse is not moving, this list is not computed - so here we choose to disable this computation when dragging the mouse with button 3 pressed)
 		}
@@ -129,7 +129,7 @@ public class TwoCameras {
 			c.setXspeed(0);
 			c.setYspeed(0);
 			c.setZspeed(0);
-			v.setDrawDrag(false);
+			v.setDrawSegment(false);
 			vsm.getActiveView().mouse.setSensitivity(true);
 		}
 
@@ -204,4 +204,3 @@ class TCOptions {
 	@Option(name = "-h", aliases = {"--height"}, usage = "color rect height")
 	int height = 600;
 }
-
