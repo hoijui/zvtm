@@ -595,7 +595,7 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
             parent.mouse.setJPanelCoordinates(e.getX(),e.getY());
             updateCursorOnly = true;
             //translate glyphs sticked to mouse
-            parent.mouse.propagateMove();
+            // parent.mouse.propagateMove();
             // find out is the cursor is inside one (or more) portals
             updateCursorInsidePortals(e.getX(), e.getY());
             // forward mouseMoved event to View event handler
@@ -662,7 +662,7 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
                     //we project the mouse cursor wrt the appropriate coord sys
                     //parent.mouse.unProject(cams[activeLayer],this);
                 //translate glyphs sticked to mouse
-                parent.mouse.propagateMove();
+                // parent.mouse.propagateMove();
                 // find out is the cursor is inside one (or more) portals
                 updateCursorInsidePortals(e.getX(), e.getY());
                 // forward mouseMoved event to View event handler
@@ -694,7 +694,7 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
                     //we project the mouse cursor wrt the appropriate coord sys
                     parent.mouse.unProject(cams[activeLayer], this);
                 //translate glyphs sticked to mouse
-                parent.mouse.propagateMove();
+                // parent.mouse.propagateMove();
                 // find out is the cursor is inside one (or more) portals
                 updateCursorInsidePortals(e.getX(), e.getY());
                 if (evHs[activeLayer] != null){
