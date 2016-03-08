@@ -207,7 +207,7 @@ aspect VsmReplication {
 
         public Portal createPortal(SlaveUpdater updater) {
             //Camera cam = updater.getSlaveObject(this.camId);
-            System.out.println("Create Portal !!!");
+            //System.out.println("Create Portal !!!");
             Portal p = new CameraPortal(x, y, w, h, refsToCameras(updater, camIds), a);
             updater.setPortalLocationAndSize(p, x, y, w, h);
             return p;

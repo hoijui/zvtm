@@ -24,7 +24,6 @@ import java.util.HashMap;
 import javax.swing.SwingUtilities;
 
 //Network-related imports
-//CE import org.jgroups.ChannelException;
 import org.jgroups.Channel;
 import org.jgroups.JChannel;
 import org.jgroups.Message;
@@ -131,7 +130,7 @@ public class SlaveUpdater {
     void startOperation(){
         try{
             networkDelegate.startOperation();
-        } catch( Exception ce) { //CE ChannelException ce ){
+        } catch( Exception ce) {
             logger.error("Could not join network channel: " + ce);
         }
     }
@@ -355,9 +354,8 @@ public class SlaveUpdater {
         //start listening on the appropriate channel,
         //handle incoming messages (optionnally post reply
         //or error messages)
-        void startOperation() throws Exception { //CE throws ChannelException {
+        void startOperation() throws Exception {
             channel = ChannelFactory.makeChannel();
-            //CE channel.setOpt(Channel.LOCAL, Boolean.FALSE);
             channel.setDiscardOwnMessages(true);
             channel.connect(appName);
             

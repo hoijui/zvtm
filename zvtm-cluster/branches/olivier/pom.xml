@@ -4,7 +4,7 @@
   <groupId>fr.inria.zvtm</groupId>
   <artifactId>zvtm-cluster</artifactId>
   <packaging>jar</packaging>
-  <version>0.2.10-SNAPSHOT</version>
+  <version>0.2.11.oc-SNAPSHOT</version>
   <name>zvtm-cluster</name>
   <description>Clustering extension to ZVTM</description>
   <url>http://zvtm.sourceforge.net</url>
@@ -55,7 +55,7 @@
     <dependency>
       <groupId>fr.inria.zvtm</groupId>
       <artifactId>zvtm-core</artifactId>
-      <version>[0.12.1-SNAPSHOT,)</version>
+      <version>[0.12.1.oc-SNAPSHOT,)</version>
       <scope>provided</scope>
     </dependency>
     <!-- dependency of zvtm-core, XXX FIX -->
@@ -113,18 +113,6 @@
   </dependencies>
 
   <build>
-      <extensions>
-            <extension>
-              <groupId>org.apache.maven.wagon</groupId>
-               <artifactId>wagon-ssh</artifactId>
-               <version>1.0</version>
-            </extension>
-            <extension>
-              <groupId>org.apache.maven.wagon</groupId>
-              <artifactId>wagon-ssh-external</artifactId>
-              <version>1.0</version>
-            </extension>            
-          </extensions>
     <plugins>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
