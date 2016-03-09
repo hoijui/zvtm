@@ -95,6 +95,18 @@ $Id: pom.xml 856 2007-11-14 14:08:45Z epietrig $
 
   <!-- Build -->
   <build>
+      <extensions>
+        <extension>
+          <groupId>org.apache.maven.wagon</groupId>
+          <artifactId>wagon-ssh</artifactId>
+          <version>2.10</version>
+        </extension>
+        <extension>
+          <groupId>org.apache.maven.wagon</groupId>
+          <artifactId>wagon-ssh-external</artifactId>
+          <version>2.10</version>
+        </extension>
+      </extensions>
     <resources>
       <resource>
         <directory>src/main/resources</directory>
