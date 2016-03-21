@@ -4,7 +4,7 @@
 #IP="192.168.1.14"
 IP="129.175.5.15"
 
-JARS="target/aspectjrt-1.8.6.jar"
+JARS="target/aspectjrt-1.8.9.jar"
 JARS=$JARS":target/jgroups-3.6.6.Final.jar"
 JARS=$JARS":target/log4j-1.2.17.jar"
 JARS=$JARS":target/slf4j-api-1.7.10.jar"
