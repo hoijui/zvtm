@@ -20,6 +20,8 @@ CMD_LINE_HELP = "ZUIST PDF Page Tiler Script\n\nUsage:\n\n" + \
     "\t-ts=N\t\ttile size (N in pixels)\n"+\
     "\t-tl=N\t\ttrace level (N in [0:3])\n"+\
     "\t-f\t\tforce tile generation\n"+\
+    "\t-page=p\t\tpage number\n"+\
+    "\t-format=t\tt output tiles in PNG (png), JPEG (jpg) or TIFF (tiff)\n"+\
     "\t-scale=s\ts scale factor w.r.t default size\n"
 
 TRACE_LEVEL = 1
