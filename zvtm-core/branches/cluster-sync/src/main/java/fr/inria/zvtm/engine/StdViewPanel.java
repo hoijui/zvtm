@@ -62,7 +62,7 @@ public class StdViewPanel extends ViewPanel {
     }
 
     /** Double Buffering uses a BufferedImage as the back buffer. */
-    BufferedImage backBuffer;
+    protected BufferedImage backBuffer;
     int backBufferW = 0;
     int backBufferH = 0;
 
@@ -70,24 +70,13 @@ public class StdViewPanel extends ViewPanel {
     Dimension oldSize;
     Graphics2D lensG2D = null;
 
-    private Timer edtTimer;
+    protected Timer edtTimer;
 
-    StdViewPanel(Vector<Camera> cameras,View v, boolean arfome) {
-        panel = new JPanel(){
-            @Override
-            public void paint(Graphics g) {
-                if (backBuffer != null){
-                    g.drawImage(backBuffer, 0, 0, panel);
-                }
-            }
-        };
+    protected StdViewPanel(Vector<Camera> cameras,View v, boolean arfome) {
 
-        ActionListener taskPerformer = new ActionListener(){
-            public void actionPerformed(ActionEvent evt){
-                drawOffscreen();
-            }
-        };
-        edtTimer = new Timer(DEFAULT_DELAY, taskPerformer);
+        initPanel();
+
+        
 
         panel.addHierarchyListener(
                 new HierarchyListener() {
@@ -127,6 +116,27 @@ public class StdViewPanel extends ViewPanel {
         this.size = panel.getSize();
         if (VirtualSpaceManager.debugModeON()){System.out.println("View refresh time set to "+getRefreshRate()+"ms");}
     }
+
+
+    protected void initPanel () {
+        panel = new JPanel(){
+            @Override
+            public void paint(Graphics g) {
+                if (backBuffer != null){
+                    g.drawImage(backBuffer, 0, 0, panel);
+
+                }
+            }
+        };
+
+        ActionListener taskPerformer = new ActionListener(){
+            public void actionPerformed(ActionEvent evt){
+                drawOffscreen();
+            }
+        };
+        edtTimer = new Timer(DEFAULT_DELAY, taskPerformer);
+    }
+
 
     private void start(){
         backBufferGraphics = null;
