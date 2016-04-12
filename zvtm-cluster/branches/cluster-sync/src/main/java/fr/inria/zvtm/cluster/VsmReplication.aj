@@ -17,6 +17,9 @@ import fr.inria.zvtm.engine.portals.RoundCameraPortal;
 import fr.inria.zvtm.engine.portals.OverviewPortal;
 import fr.inria.zvtm.engine.Location;
 import java.util.ArrayList;
+import javax.swing.Timer;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 import java.awt.Color;
 
@@ -98,7 +101,111 @@ aspect VsmReplication {
     public void VirtualSpaceManager.destroyClusteredView(ClusteredView cv){
         sendDelta(new ClusteredViewDestroyDelta(cv));
     }
-    
+
+
+    //Sync cluster
+
+    public interface AckReceiver {
+        public void ackReceive (long id);
+    }
+
+    declare parents : VirtualSpaceManager implements AckReceiver;  
+
+    private long VirtualSpaceManager.minDrawTime = 20000000L;
+    private Timer VirtualSpaceManager.drawTimer;
+    private long VirtualSpaceManager.lastDrawTime = 0;
+    private long VirtualSpaceManager.lastDrawId = 0;
+    private boolean VirtualSpaceManager.drawAck = true;
+
+    public void VirtualSpaceManager.ackReceive(long id) {
+        drawTimer.stop();
+        long remainingTime = 0;
+
+        if (drawAck) {
+
+            long currentTime = System.nanoTime();
+
+            long ellapsedTime = currentTime - lastDrawTime; 
+
+
+            if (ellapsedTime < minDrawTime)
+                remainingTime = (minDrawTime-ellapsedTime) / 1000000; //in ms
+        }
+        
+        //System.out.println("remainingTime: " + remainingTime + "ms / ellapsed:" + ellapsedTime);
+
+        drawTimer = new Timer(5000, taskPerformer);
+        drawTimer.setInitialDelay((int)remainingTime);
+        drawTimer.setRepeats(false);
+        drawTimer.start();       
+
+    }
+
+    private ActionListener VirtualSpaceManager.taskPerformer = new ActionListener(){
+        public void actionPerformed(ActionEvent evt){
+            drawTimer.stop();
+            if (drawAck) {
+                drawAck = false;
+                //Send Paint Delta
+                //System.out.println("Send Paint Delta");
+                Delta paintDelta = new PaintCreateDelta(lastDrawId);
+                sendDeltaImmediatly(paintDelta); 
+            }
+            else {
+                drawAck = true;
+                //Send Draw Delta
+                //System.out.println("Send Draw Delta");
+                lastDrawTime = System.nanoTime();
+                Delta drawDelta = new DrawCreateDelta(lastDrawId);
+                sendDeltaImmediatly(drawDelta); 
+            }
+        }
+    };
+
+    public void VirtualSpaceManager.startPaintDeltaTimer()
+    {
+        System.out.println("startPaintDeltaTimer");
+
+        drawTimer = new Timer(5000, taskPerformer);
+        drawTimer.setRepeats(false);
+        drawTimer.start();
+    }
+
+
+    public static class PaintCreateDelta implements Delta{
+        public long id;
+        public PaintCreateDelta(long id){
+            this.id = id;
+        }
+
+        public void apply(SlaveUpdater updater){
+            //Send draw call
+            updater.paintAndAck(id);
+        }
+
+        @Override public String toString(){
+            return "PaintCreateDelta";
+        }
+    }
+
+
+    public static class DrawCreateDelta implements Delta{
+        public long id;
+        public DrawCreateDelta(long id){
+            this.id = id;
+        }
+
+        public void apply(SlaveUpdater updater){
+            //Send draw call
+            updater.drawAndAck(id);
+        }
+
+        @Override public String toString(){
+            return "DrawCreateDelta";
+        }
+    }    
+
+   
 
    /** Add a portal to a clustered view. Only subclasses of CameraPortal (e.g.,
     * DraggableCameraPortal, RoundCameraPortal, OverviewPortal) are supported.

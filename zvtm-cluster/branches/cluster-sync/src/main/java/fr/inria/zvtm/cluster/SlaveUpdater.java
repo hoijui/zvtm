@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import javax.swing.SwingUtilities;
+import java.lang.Long;
 
 //Network-related imports
 import org.jgroups.JChannel;
@@ -42,7 +43,7 @@ public class SlaveUpdater {
     //examples of slave objects are glyphs and cameras
     private final Map<ObjId, Object> slaveObjects =
         new HashMap<ObjId, Object>();
-    private final NetworkDelegate networkDelegate;
+    public final NetworkDelegate networkDelegate;
     //'SlaveApp' may be replaced by an interface containing
     //the essential operations. For now it's overkill.
     private SlaveApp appDelegate = null;
@@ -64,6 +65,7 @@ public class SlaveUpdater {
 
     void setAppDelegate(SlaveApp appDelegate){
         this.appDelegate = appDelegate;
+        appDelegate.setSlaveUpdater(this); //TODO 
     }
 
     /**
@@ -109,6 +111,7 @@ public class SlaveUpdater {
         return slaveObjects.remove(id);
     }
 
+
     void startOperation(){
         try{
             networkDelegate.startOperation();
@@ -153,6 +156,20 @@ public class SlaveUpdater {
         appDelegate.setBackgroundColor(cv, bgColor);
     }
 
+    void drawAndAck(long id) {
+        appDelegate.drawAndAck(id);
+    }
+    void paintAndAck(long id) {
+        appDelegate.paintAndAck(id);
+    }
+    //Send the delta immediatly and wait for the answer
+    void sendAckSync(long id) throws Exception {
+        Message msg = new Message(null, null, new Long(id));
+        msg.setFlag(Message.RSVP);
+        msg.setFlag(Message.DONT_BUNDLE);
+        networkDelegate.channel.send(msg);
+    }    
+
     class NetworkDelegate {
         private JChannel channel;
         private final String appName;
@@ -173,7 +190,7 @@ public class SlaveUpdater {
 
                 @Override public void receive(Message msg){
                     if(!(msg.getObject() instanceof Delta)){
-                        logger.warn("wrong message type (Delta expected)");
+                        //logger.warn("wrong message type (Delta expected)");
                         return;
                     }
                     final Delta delta = (Delta)msg.getObject();
@@ -191,6 +208,9 @@ public class SlaveUpdater {
                 }
             });
         }
+
+
+
 
         void stop(){
             channel.close();
