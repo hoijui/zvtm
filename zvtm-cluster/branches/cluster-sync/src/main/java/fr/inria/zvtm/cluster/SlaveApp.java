@@ -47,16 +47,10 @@ public class SlaveApp {
     VirtualSpaceManager vsm = VirtualSpaceManager.INSTANCE; //shortcut
     private View view = null; //local view
     private ClusteredView clusteredView = null;
-    private SlaveUpdater slaveUpdater;
-
 
     SlaveApp(SlaveOptions options){
         this.options = options;
         vsm.setDebug(options.debug);
-    }
-
-    public void setSlaveUpdater(SlaveUpdater slaveUpdater) {
-        this.slaveUpdater = slaveUpdater;
     }
 
 
@@ -82,6 +76,7 @@ public class SlaveApp {
         SlaveUpdater updater = new SlaveUpdater(options.appName,
                 options.blockNumber);
         updater.setAppDelegate(app);
+
         updater.startOperation();
     }
 
@@ -89,7 +84,7 @@ public class SlaveApp {
         return view;
     }
 
-    protected String getViewType(){
+    public String getViewType(){
         if (options.synchronize)
             return ClusteredViewPanelFactory.CLUSTER_VIEW;
             else return options.openGl ? View.OPENGL_VIEW : View.STD_VIEW;
@@ -125,12 +120,9 @@ public class SlaveApp {
         if (options.antialiasing){
             view.setAntialiasing(true);
         }
-        if (view.getViewType()==ClusteredViewPanelFactory.CLUSTER_VIEW) {
-            ClusteredViewPanel clusterViewPanel = (ClusteredViewPanel)view.getPanel();
-            clusterViewPanel.setSlaveUpdater(slaveUpdater);
-            if (options.fps)
-                clusterViewPanel.setDisplayFPS(true);
-        }
+
+        if (options.fps)
+            view.getPanel().setDisplayFPS(true);
 
         System.out.println("Antialiasing " + ((options.antialiasing) ? "enabled" : "disabled"));
         // inputs: block width, block height, fullscreen
@@ -219,18 +211,7 @@ public class SlaveApp {
     void stop(){
         System.exit(0);
     }
-
-    public void drawAndAck(long id) {
-        if (view.getViewType()==ClusteredViewPanelFactory.CLUSTER_VIEW) {
-            ((ClusteredViewPanel)view.getPanel()).drawAndAck(id);
-        }        
-    }
-
-    public void paintAndAck(long id) {
-        if (view.getViewType()==ClusteredViewPanelFactory.CLUSTER_VIEW) {
-            ((ClusteredViewPanel)view.getPanel()).paintAndAck(id);
-        }        
-    }    
+ 
     void setBackgroundColor(ClusteredView cv, Color bgColor){
         //find if cv owns the local view.
         if(!cv.ownsBlock(options.blockNumber)){

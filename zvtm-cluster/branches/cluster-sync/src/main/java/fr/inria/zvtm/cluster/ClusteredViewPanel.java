@@ -3,6 +3,7 @@ package fr.inria.zvtm.cluster;
 import java.util.Vector;
 import javax.swing.JPanel;
 import java.awt.Graphics;
+import java.awt.Color;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.Timer;
@@ -24,13 +25,11 @@ import org.jgroups.Address;
 import org.jgroups.util.MessageBatch;
 
 
-public class ClusteredViewPanel extends StdViewPanel {
+public class ClusteredViewPanel extends StdViewPanel implements SyncView {
 
     private boolean lockPaint = true; //Prevent asynchroned call to paint
     private long lastOffScreenPaintTime = 0;
-    private boolean displayFPS = false;
     private SlaveUpdater slaveUpdater;
-    private long lastOffscreenPaintId;
 
     ClusteredViewPanel(Vector<Camera> cameras,View v, boolean arfome) {
         super(cameras, v, arfome);
@@ -42,8 +41,6 @@ public class ClusteredViewPanel extends StdViewPanel {
 
     @Override
     protected void initPanel () {
-        edtTimer=new Timer(10000,null);
-        edtTimer.setRepeats(false);
         panel = new JPanel(){
             @Override
             public void paint(Graphics g) {
@@ -56,16 +53,18 @@ public class ClusteredViewPanel extends StdViewPanel {
                             fps /= 1000000000.0d;
                             fps = 1.0d/fps;
                             g.drawImage(backBuffer, 0, 0, panel);
-                            g.drawString(String.format("FPS=%.2f",fps), 50, 50 );                        
+                            Color currentColor = g.getColor();
+                            g.setColor(Color.RED);
+                            g.drawString(String.format("FPS=%.2f",fps), 50, 50 );
+                            g.setColor(currentColor);
                         }
                         else 
                             g.drawImage(backBuffer, 0, 0, panel);
                         lockPaint=true;
                     }
                 }
-                else System.out.println("Backbuffer NULL");
                 try{
-                       slaveUpdater.sendAckSync(lastOffscreenPaintId);
+                       slaveUpdater.sendAckSync();
                 } catch (Exception ce){
                     System.out.println("Could not send sync Ack message: " + ce);
                     ce.printStackTrace(System.out);
@@ -74,28 +73,35 @@ public class ClusteredViewPanel extends StdViewPanel {
         };
     }
 
-    public void setDisplayFPS(boolean displayFPS) {
-        this.displayFPS = displayFPS;
-    }
-
-    public void drawAndAck(long id) {
-        lastOffscreenPaintId = id;
+    public void drawAndAck() {
         super.drawOffscreen();
         try{
-            slaveUpdater.sendAckSync(lastOffscreenPaintId);
+            slaveUpdater.sendAckSync();
         } catch (Exception ce){
             System.out.println("Could not send sync Ack message: " + ce);
             ce.printStackTrace(System.out);
         }  
     }
 
-    public void paintAndAck(long id) {
-        lastOffscreenPaintId = id;
+    public void paintAndAck() {
         lockPaint=false;
         panel.paintImmediately(0,0,panel.getWidth(),panel.getHeight());
     }
 
    
+
+    @Override
+    public void setRefreshRate(int rr){
+        System.out.println("setRefreshRate disabled using -s option");
+    }
+
+    @Override
+    public int getRefreshRate(){
+        System.out.println("getRefreshRate disabled using -s option");
+        return 0;
+    }
+
+
 }
 
 

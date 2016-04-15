@@ -106,33 +106,39 @@ aspect VsmReplication {
     //Sync cluster
 
     public interface AckReceiver {
-        public void ackReceive (long id);
+        public void ackReceive ();
     }
 
     declare parents : VirtualSpaceManager implements AckReceiver;  
 
-    private long VirtualSpaceManager.minDrawTime = 20000000L;
+    private long VirtualSpaceManager.minDrawTime = 20000000L; //50fps
     private Timer VirtualSpaceManager.drawTimer;
     private long VirtualSpaceManager.lastDrawTime = 0;
-    private long VirtualSpaceManager.lastDrawId = 0;
     private boolean VirtualSpaceManager.drawAck = true;
 
-    public void VirtualSpaceManager.ackReceive(long id) {
-        drawTimer.stop();
+
+    public void VirtualSpaceManager.setRefreshRate(int rr){
+        minDrawTime = rr * 1000000L; // milli -> nano
+    }
+
+    public int VirtualSpaceManager.getRefreshRate(){
+        return (int)(minDrawTime / 1000000L);
+    }
+
+
+    public void VirtualSpaceManager.ackReceive() {
+        if (drawTimer!=null) drawTimer.stop();
         long remainingTime = 0;
 
         if (drawAck) {
-
             long currentTime = System.nanoTime();
-
             long ellapsedTime = currentTime - lastDrawTime; 
-
 
             if (ellapsedTime < minDrawTime)
                 remainingTime = (minDrawTime-ellapsedTime) / 1000000; //in ms
         }
         
-        //System.out.println("remainingTime: " + remainingTime + "ms / ellapsed:" + ellapsedTime);
+        System.out.println("remainingTime: " + remainingTime + "ms");
 
         drawTimer = new Timer(5000, taskPerformer);
         drawTimer.setInitialDelay((int)remainingTime);
@@ -147,16 +153,16 @@ aspect VsmReplication {
             if (drawAck) {
                 drawAck = false;
                 //Send Paint Delta
-                //System.out.println("Send Paint Delta");
-                Delta paintDelta = new PaintCreateDelta(lastDrawId);
+                System.out.println("Send Paint Delta");
+                Delta paintDelta = new PaintCreateDelta();
                 sendDeltaImmediatly(paintDelta); 
             }
             else {
                 drawAck = true;
                 //Send Draw Delta
-                //System.out.println("Send Draw Delta");
+                System.out.println("Send Draw Delta");
                 lastDrawTime = System.nanoTime();
-                Delta drawDelta = new DrawCreateDelta(lastDrawId);
+                Delta drawDelta = new DrawCreateDelta();
                 sendDeltaImmediatly(drawDelta); 
             }
         }
@@ -173,14 +179,11 @@ aspect VsmReplication {
 
 
     public static class PaintCreateDelta implements Delta{
-        public long id;
-        public PaintCreateDelta(long id){
-            this.id = id;
-        }
+        public PaintCreateDelta(){}
 
         public void apply(SlaveUpdater updater){
             //Send draw call
-            updater.paintAndAck(id);
+            updater.paintAndAck();
         }
 
         @Override public String toString(){
@@ -190,14 +193,11 @@ aspect VsmReplication {
 
 
     public static class DrawCreateDelta implements Delta{
-        public long id;
-        public DrawCreateDelta(long id){
-            this.id = id;
-        }
+        public DrawCreateDelta(){}
 
         public void apply(SlaveUpdater updater){
             //Send draw call
-            updater.drawAndAck(id);
+            updater.drawAndAck();
         }
 
         @Override public String toString(){

@@ -78,6 +78,7 @@ aspect MasterNetworkIntroduction {
     private void VirtualSpaceManager.startOperation(){
         try{
             networkDelegate.startOperation(appName);
+            startPaintDeltaTimer();
         } catch (Exception ce){
             logger.error("Could not join network channel: " + ce);
         }
@@ -135,14 +136,7 @@ aspect MasterNetworkIntroduction {
 
         @Override
         public void receive(Message msg) {
-            //System.out.println("received msg from " + msg.getSrc() + ": " + msg.getObject()+" in thread"+Thread.currentThread().getId());
-
-            if(!(msg.getObject() instanceof Long)) {
-                //
-                return;
-            }
-
-            Long receivedId = (Long)msg.getObject();
+            System.out.println("received msg from " + msg.getSrc() + ": " + msg.getObject()+" in thread"+Thread.currentThread().getId());
 
             if (computeJgroupsView)
             {
@@ -163,7 +157,7 @@ aspect MasterNetworkIntroduction {
             while(iterator.hasNext()) {
                 Map.Entry mentry = (Map.Entry)iterator.next();
                 Address addr = (Address)mentry.getKey();
-                //System.out.println("Address "+addr+ " mentry.getValue() "+mentry.getValue() + " receivedId "+receivedId);
+                //System.out.println("Address "+addr+ " mentry.getValue() ");
 
                 if (addr.compareTo(msg.getSrc())==0) {
                     mentry.setValue(Boolean.TRUE);
@@ -182,9 +176,9 @@ aspect MasterNetworkIntroduction {
                 }
 
 
-
-                VirtualSpaceManager.INSTANCE.ackReceive(receivedId);
-                //System.out.println("receivedAllMsg TRUE");
+                System.out.println("receivedAllMsg TRUE");
+                VirtualSpaceManager.INSTANCE.ackReceive();
+                
 
             }
 //            else 

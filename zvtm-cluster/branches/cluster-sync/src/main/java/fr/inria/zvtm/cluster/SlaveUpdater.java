@@ -48,6 +48,8 @@ public class SlaveUpdater {
     //the essential operations. For now it's overkill.
     private SlaveApp appDelegate = null;
 
+    private SyncView syncView = null;
+
     /**
      * Creates a new Slave updater.
      * SlaveUpdater maintains the state of a whole application,
@@ -65,7 +67,10 @@ public class SlaveUpdater {
 
     void setAppDelegate(SlaveApp appDelegate){
         this.appDelegate = appDelegate;
-        appDelegate.setSlaveUpdater(this); //TODO 
+    }
+
+    void setSyncView(SyncView syncView){
+        this.syncView = syncView;
     }
 
     /**
@@ -131,6 +136,12 @@ public class SlaveUpdater {
 
     void createLocalView(ClusteredView cv){
         appDelegate.createLocalView(cv);
+
+        if (appDelegate.getViewType()==ClusteredViewPanelFactory.CLUSTER_VIEW) {
+            ClusteredViewPanel clusterViewPanel = (ClusteredViewPanel)appDelegate.getView().getPanel();
+            setSyncView(clusterViewPanel);
+            clusterViewPanel.setSlaveUpdater(this);
+        }        
     }
 
     public fr.inria.zvtm.engine.View getLocalView() {
@@ -156,15 +167,19 @@ public class SlaveUpdater {
         appDelegate.setBackgroundColor(cv, bgColor);
     }
 
-    void drawAndAck(long id) {
-        appDelegate.drawAndAck(id);
+
+
+    public void drawAndAck() {
+        syncView.drawAndAck();
     }
-    void paintAndAck(long id) {
-        appDelegate.paintAndAck(id);
-    }
+
+    public void paintAndAck() {
+        syncView.paintAndAck();
+    }   
+
     //Send the delta immediatly and wait for the answer
-    void sendAckSync(long id) throws Exception {
-        Message msg = new Message(null, null, new Long(id));
+    void sendAckSync() throws Exception {
+        Message msg = new Message(null, null, null);
         msg.setFlag(Message.RSVP);
         msg.setFlag(Message.DONT_BUNDLE);
         networkDelegate.channel.send(msg);
