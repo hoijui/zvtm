@@ -28,6 +28,7 @@ import java.awt.Dimension;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Color;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -70,13 +71,13 @@ public class StdViewPanel extends ViewPanel {
     Dimension oldSize;
     Graphics2D lensG2D = null;
 
-    protected Timer edtTimer;
+    protected Timer edtTimer = null;
+
+    private long lastOffScreenPaintTime = 0;
 
     protected StdViewPanel(Vector<Camera> cameras,View v, boolean arfome) {
 
         initPanel();
-
-        
 
         panel.addHierarchyListener(
                 new HierarchyListener() {
@@ -123,7 +124,21 @@ public class StdViewPanel extends ViewPanel {
             @Override
             public void paint(Graphics g) {
                 if (backBuffer != null){
-                    g.drawImage(backBuffer, 0, 0, panel);
+
+                    if (displayFPS) {
+                        long currentTime = System.nanoTime(); 
+                        double fps = (double)(currentTime - lastOffScreenPaintTime);
+                        lastOffScreenPaintTime = currentTime;
+                        fps /= 1000000000.0d;
+                        fps = 1.0d/fps;
+                        g.drawImage(backBuffer, 0, 0, panel);
+                        Color currentColor = g.getColor();
+                        g.setColor(Color.RED);
+                        g.drawString(String.format("FPS=%.2f",fps), 50, 50 );
+                        g.setColor(currentColor);
+                    }
+                    else                   
+                        g.drawImage(backBuffer, 0, 0, panel);
 
                 }
             }
@@ -140,11 +155,11 @@ public class StdViewPanel extends ViewPanel {
 
     private void start(){
         backBufferGraphics = null;
-        edtTimer.start();
+        if (edtTimer!=null) edtTimer.start();
     }
 
     void stop(){
-        edtTimer.stop();
+        if (edtTimer!=null) edtTimer.stop();
         if (stableRefToBackBufferGraphics != null) {
             stableRefToBackBufferGraphics.dispose();
         }
@@ -457,7 +472,7 @@ public class StdViewPanel extends ViewPanel {
 
     @Override
     public void setRefreshRate(int rr){
-        edtTimer.setDelay(rr);
+        if (edtTimer!=null) edtTimer.setDelay(rr);
     }
 
     @Override

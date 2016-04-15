@@ -906,4 +906,13 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
 		}
 	}
 
+
+    //---------------- display framerate -----------------
+
+    protected boolean displayFPS = false;
+
+    public void setDisplayFPS (boolean displayFPS) {
+        this.displayFPS = displayFPS;
+    }
+
 }
