@@ -139,7 +139,7 @@ aspect SceneManagerReplication {
         public void apply(SlaveUpdater su){
             SceneManager sm =
                 new SceneManager(su.getSlaveObject(pvId), properties);
-            System.out.println("sm replicated");
+            //System.out.println("sm replicated");
             su.putSlaveObject(smId, sm);
         }
     }
@@ -219,7 +219,7 @@ aspect SceneManagerReplication {
             SceneManager sm = su.getSlaveObject(smId);
             PseudoView pv = su.getSlaveObject(pvId);
             boolean b = sm.removePseudoView(pv);
-            System.out.println("slave removePseudoView "+ pv.getWidth() +" "+ pv.getHeight());
+            //System.out.println("slave removePseudoView "+ pv.getWidth() +" "+ pv.getHeight());
         }
     }
 

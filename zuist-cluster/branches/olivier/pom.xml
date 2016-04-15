@@ -4,7 +4,7 @@
     <groupId>fr.inria.zvtm</groupId>
     <artifactId>zuist-cluster</artifactId>
     <packaging>jar</packaging>
-    <version>0.3.1-SNAPSHOT</version>
+    <version>0.3.1.oc-SNAPSHOT</version>
     <name>zuist-cluster</name>
     <description>Clustering extension to ZUIST</description>
     <url>http://zvtm.sourceforge.net</url>
@@ -55,12 +55,12 @@
         <dependency>
              <groupId>fr.inria.zvtm</groupId>
              <artifactId>zuist-core</artifactId>
-             <version>0.5.1-SNAPSHOT</version>
+             <version>0.5.0.oc-SNAPSHOT</version>
          </dependency>
         <dependency>
           <groupId>fr.inria.zvtm</groupId>
           <artifactId>zvtm-cluster</artifactId>
-          <version>0.2.10-SNAPSHOT</version>
+          <version>0.2.10.oc-SNAPSHOT</version>
         </dependency>
         <dependency>
           <groupId>fr.lri.smarties</groupId>
