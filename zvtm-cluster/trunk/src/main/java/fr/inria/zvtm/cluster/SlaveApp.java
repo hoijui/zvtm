@@ -14,6 +14,9 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.engine.portals.Portal;
 import fr.inria.zvtm.engine.portals.CameraPortal;
+import fr.inria.zvtm.engine.StdViewPanel;
+import fr.inria.zvtm.engine.PanelFactory;
+
 
 import java.awt.Color;
 import java.awt.GraphicsDevice;
@@ -50,6 +53,8 @@ public class SlaveApp {
         vsm.setDebug(options.debug);
     }
 
+
+
     public static void main(String[] args){
         SlaveOptions options = new SlaveOptions();
         CmdLineParser parser = new CmdLineParser(options);
@@ -71,6 +76,7 @@ public class SlaveApp {
         SlaveUpdater updater = new SlaveUpdater(options.appName,
                 options.blockNumber);
         updater.setAppDelegate(app);
+
         updater.startOperation();
     }
 
@@ -78,8 +84,10 @@ public class SlaveApp {
         return view;
     }
 
-    protected String getViewType(){
-        return options.openGl ? View.OPENGL_VIEW : View.STD_VIEW;
+    public String getViewType(){
+        if (options.synchronize)
+            return ClusteredViewPanelFactory.CLUSTER_VIEW;
+            else return options.openGl ? View.OPENGL_VIEW : View.STD_VIEW;
     }
 
     void destroyLocalView(ClusteredView cv){
@@ -112,6 +120,10 @@ public class SlaveApp {
         if (options.antialiasing){
             view.setAntialiasing(true);
         }
+
+        if (options.fps)
+            view.getPanel().setDisplayFPS(true);
+
         System.out.println("Antialiasing " + ((options.antialiasing) ? "enabled" : "disabled"));
         // inputs: block width, block height, fullscreen
         if (options.fullscreen){
@@ -199,7 +211,7 @@ public class SlaveApp {
     void stop(){
         System.exit(0);
     }
-
+ 
     void setBackgroundColor(ClusteredView cv, Color bgColor){
         //find if cv owns the local view.
         if(!cv.ownsBlock(options.blockNumber)){
@@ -211,12 +223,29 @@ public class SlaveApp {
         view.setBackgroundColor(bgColor);
     }
 
+    static {
+        View.registerViewPanelFactory(ClusteredViewPanelFactory.CLUSTER_VIEW, new ClusteredViewPanelFactory());
+    }
+
     //Simple event handler. All callbacks are no-ops except viewClosing
     //which should ensure graceful application closure.
     protected static class SlaveEventHandler extends ViewAdapter {
         @Override
         public void viewClosing(View v){System.exit(0);}
     }
+}
+
+
+/** Instantiator for ClusteredViewPanel */
+class ClusteredViewPanelFactory implements PanelFactory {
+
+    public ViewPanel getNewInstance(Vector<Camera> cameras, View v, boolean arfome){
+        return new ClusteredViewPanel(cameras, v, arfome);
+    }
+
+    public static final String CLUSTER_VIEW = "cluster";
+
+
 }
 
 class SlaveOptions {
@@ -261,5 +290,11 @@ class SlaveOptions {
 
     @Option(name = "-hb", aliases = {"--h-block"}, usage = "height in block (default 1)")
 		int height = 1;
+
+    @Option(name = "-s", aliases = {"--synchronize"}, usage = "Synchronize with other slaves")
+        boolean synchronize = false;
+
+    @Option(name = "-fps", aliases = {"--fps"}, usage = "Display frame per second")
+        boolean fps = false;        
 }
 

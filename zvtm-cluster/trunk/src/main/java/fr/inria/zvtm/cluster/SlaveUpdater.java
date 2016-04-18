@@ -47,6 +47,8 @@ public class SlaveUpdater {
     //the essential operations. For now it's overkill.
     private SlaveApp appDelegate = null;
 
+    private SyncView syncView = null;
+
     /**
      * Creates a new Slave updater.
      * SlaveUpdater maintains the state of a whole application,
@@ -64,6 +66,10 @@ public class SlaveUpdater {
 
     void setAppDelegate(SlaveApp appDelegate){
         this.appDelegate = appDelegate;
+    }
+
+    void setSyncView(SyncView syncView){
+        this.syncView = syncView;
     }
 
     /**
@@ -109,6 +115,7 @@ public class SlaveUpdater {
         return slaveObjects.remove(id);
     }
 
+
     void startOperation(){
         try{
             networkDelegate.startOperation();
@@ -128,6 +135,12 @@ public class SlaveUpdater {
 
     void createLocalView(ClusteredView cv){
         appDelegate.createLocalView(cv);
+
+        if (appDelegate.getViewType()==ClusteredViewPanelFactory.CLUSTER_VIEW) {
+            ClusteredViewPanel clusterViewPanel = (ClusteredViewPanel)appDelegate.getView().getPanel();
+            setSyncView(clusterViewPanel);
+            clusterViewPanel.setSlaveUpdater(this);
+        }        
     }
 
     public fr.inria.zvtm.engine.View getLocalView() {
@@ -152,6 +165,24 @@ public class SlaveUpdater {
     void setBackgroundColor(ClusteredView cv, Color bgColor){
         appDelegate.setBackgroundColor(cv, bgColor);
     }
+
+
+
+    public void drawAndAck() {
+        if (syncView!=null) syncView.drawAndAck();
+    }
+
+    public void paintAndAck() {
+        if (syncView!=null) syncView.paintAndAck();
+    }   
+
+    //Send the delta immediatly and wait for the answer
+    void sendAckSync() throws Exception {
+        Message msg = new Message(null, null, null);
+        msg.setFlag(Message.RSVP);
+        msg.setFlag(Message.DONT_BUNDLE);
+        networkDelegate.channel.send(msg);
+    }    
 
     class NetworkDelegate {
         private JChannel channel;
@@ -191,6 +222,9 @@ public class SlaveUpdater {
                 }
             });
         }
+
+
+
 
         void stop(){
             channel.close();
