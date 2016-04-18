@@ -28,6 +28,7 @@ import java.awt.Dimension;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Color;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -62,7 +63,7 @@ public class StdViewPanel extends ViewPanel {
     }
 
     /** Double Buffering uses a BufferedImage as the back buffer. */
-    BufferedImage backBuffer;
+    protected BufferedImage backBuffer;
     int backBufferW = 0;
     int backBufferH = 0;
 
@@ -70,24 +71,13 @@ public class StdViewPanel extends ViewPanel {
     Dimension oldSize;
     Graphics2D lensG2D = null;
 
-    private Timer edtTimer;
+    protected Timer edtTimer = null;
 
-    StdViewPanel(Vector<Camera> cameras,View v, boolean arfome) {
-        panel = new JPanel(){
-            @Override
-            public void paint(Graphics g) {
-                if (backBuffer != null){
-                    g.drawImage(backBuffer, 0, 0, panel);
-                }
-            }
-        };
+    private long lastOffScreenPaintTime = 0;
 
-        ActionListener taskPerformer = new ActionListener(){
-            public void actionPerformed(ActionEvent evt){
-                drawOffscreen();
-            }
-        };
-        edtTimer = new Timer(DEFAULT_DELAY, taskPerformer);
+    protected StdViewPanel(Vector<Camera> cameras,View v, boolean arfome) {
+
+        initPanel();
 
         panel.addHierarchyListener(
                 new HierarchyListener() {
@@ -128,13 +118,48 @@ public class StdViewPanel extends ViewPanel {
         if (VirtualSpaceManager.debugModeON()){System.out.println("View refresh time set to "+getRefreshRate()+"ms");}
     }
 
+
+    protected void initPanel () {
+        panel = new JPanel(){
+            @Override
+            public void paint(Graphics g) {
+                if (backBuffer != null){
+
+                    if (displayFPS) {
+                        long currentTime = System.nanoTime(); 
+                        double fps = (double)(currentTime - lastOffScreenPaintTime);
+                        lastOffScreenPaintTime = currentTime;
+                        fps /= 1000000000.0d;
+                        fps = 1.0d/fps;
+                        g.drawImage(backBuffer, 0, 0, panel);
+                        Color currentColor = g.getColor();
+                        g.setColor(Color.RED);
+                        g.drawString(String.format("FPS=%.2f",fps), 50, 50 );
+                        g.setColor(currentColor);
+                    }
+                    else                   
+                        g.drawImage(backBuffer, 0, 0, panel);
+
+                }
+            }
+        };
+
+        ActionListener taskPerformer = new ActionListener(){
+            public void actionPerformed(ActionEvent evt){
+                drawOffscreen();
+            }
+        };
+        edtTimer = new Timer(DEFAULT_DELAY, taskPerformer);
+    }
+
+
     private void start(){
         backBufferGraphics = null;
-        edtTimer.start();
+        if (edtTimer!=null) edtTimer.start();
     }
 
     void stop(){
-        edtTimer.stop();
+        if (edtTimer!=null) edtTimer.stop();
         if (stableRefToBackBufferGraphics != null) {
             stableRefToBackBufferGraphics.dispose();
         }
@@ -447,7 +472,7 @@ public class StdViewPanel extends ViewPanel {
 
     @Override
     public void setRefreshRate(int rr){
-        edtTimer.setDelay(rr);
+        if (edtTimer!=null) edtTimer.setDelay(rr);
     }
 
     @Override
