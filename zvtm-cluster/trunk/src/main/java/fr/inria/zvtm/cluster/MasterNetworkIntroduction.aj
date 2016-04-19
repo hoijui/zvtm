@@ -89,6 +89,7 @@ aspect MasterNetworkIntroduction {
         private org.jgroups.View jgroupsView; //Last received jgroup view
         private boolean computeJgroupsView = false; //Has the jgroups view changed
         private HashMap<Address, Boolean> hmap; 
+        private Object syncLock = new Object();
 
         void startOperation(String appName) throws Exception {
             hmap = new HashMap<Address, Boolean>();
@@ -136,43 +137,43 @@ aspect MasterNetworkIntroduction {
         @Override
         public void receive(Message msg) {
             //System.out.println("received msg from " + msg.getSrc() + ": " + msg.getObject()+" in thread"+Thread.currentThread().getId());
-            if (computeJgroupsView)
-            {
-                hmap.clear();
-                //System.out.println("resetSlavesMap size:"+jgroupsView.getMembers().size() + " MASTER " +channel.getAddress());
-                for (Address addr : jgroupsView.getMembers()) {
-                    if (addr.compareTo(channel.getAddress())!=0) //Do not include the master
-                        hmap.put(addr,Boolean.FALSE);
-                }
-                computeJgroupsView=false;
-            } 
+            synchronized(syncLock) {
+                if (computeJgroupsView)
+                {
+                    hmap.clear();
+                    for (Address addr : jgroupsView.getMembers()) {
+                        if (addr.compareTo(channel.getAddress())!=0) //Do not include the master
+                            hmap.put(addr,Boolean.FALSE);
+                    }
+                    computeJgroupsView=false;
+                } 
 
-            boolean receivedAllMsg = true;
+                boolean receivedAllMsg = true;
 
-            Set set = hmap.entrySet();
-            Iterator iterator = set.iterator();
-            while(iterator.hasNext()) {
-                Map.Entry mentry = (Map.Entry)iterator.next();
-                Address addr = (Address)mentry.getKey();
-                //System.out.println("Address "+addr+ " mentry.getValue() ");
-
-                if (addr.compareTo(msg.getSrc())==0) {
-                    mentry.setValue(Boolean.TRUE);
-                } else {
-                    if (mentry.getValue()!=Boolean.TRUE) receivedAllMsg = false;
-                }
-            }
-
-
-            if (receivedAllMsg) {  
-                iterator = set.iterator();
-
+                Set set = hmap.entrySet();
+                Iterator iterator = set.iterator();
                 while(iterator.hasNext()) {
                     Map.Entry mentry = (Map.Entry)iterator.next();
-                    mentry.setValue(Boolean.FALSE);
+                    Address addr = (Address)mentry.getKey();
+
+                    if (addr.compareTo(msg.getSrc())==0) {
+                        mentry.setValue(Boolean.TRUE);
+                    } else {
+                        if (mentry.getValue()!=Boolean.TRUE) receivedAllMsg = false;
+                    }
                 }
 
-                VirtualSpaceManager.INSTANCE.ackReceive();
+
+                if (receivedAllMsg) {  
+                    iterator = set.iterator();
+
+                    while(iterator.hasNext()) {
+                        Map.Entry mentry = (Map.Entry)iterator.next();
+                        mentry.setValue(Boolean.FALSE);
+                    }
+
+                    VirtualSpaceManager.INSTANCE.ackReceive();
+                }
             }
         }
 
