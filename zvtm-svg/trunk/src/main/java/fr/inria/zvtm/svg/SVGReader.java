@@ -793,7 +793,15 @@ public class SVGReader {
             }
         }
         else {res=new VEllipse(x,-y,0,w,h,Color.WHITE, Color.BLACK, 1.0f);}
-        if (meta){setMetadata(res,ctx);}
+        if (meta){
+            if (ctx == null){
+                ctx = new Context();
+            }
+            if (e.hasAttribute(SVGReader._title)){
+                ctx.setTitle(e.getAttribute(SVGReader._title));
+            }
+            setMetadata(res,ctx);
+        }
         if (e.hasAttribute(_class)){
             res.setType(e.getAttribute(_class));
         }
@@ -956,8 +964,13 @@ public class SVGReader {
         else {
             res = new VText(x, -y, 0, tc, tx, ta, 1f, 1f);
         }
-
         if (meta){
+            if (ctx == null){
+                ctx = new Context();
+            }
+            if (e.hasAttribute(SVGReader._title)){
+                ctx.setTitle(e.getAttribute(SVGReader._title));
+            }
             setMetadata(res,ctx);
         }
         if (e.hasAttribute(_class)){
@@ -1053,7 +1066,15 @@ public class SVGReader {
                 }
             }
             else {res=new VRectangleOr(x,-y,0,w,h,Color.WHITE, Color.BLACK, 0, 1.0f);}
-            if (meta){setMetadata(res,ctx);}
+            if (meta){
+                if (ctx == null){
+                    ctx = new Context();
+                }
+                if (e.hasAttribute(SVGReader._title)){
+                    ctx.setTitle(e.getAttribute(SVGReader._title));
+                }
+                setMetadata(res,ctx);
+            }
             if (e.hasAttribute(_class)){
                 res.setType(e.getAttribute(_class));
             }
@@ -1171,7 +1192,9 @@ public class SVGReader {
             else {
                 res = new VRoundRect(x,-y,0,w,h,Color.WHITE, Color.BLACK, 1.0f, Math.round(RRARCR*Math.min(w,h)),Math.round(RRARCR*Math.min(w,h)));
             }
-            if (meta){setMetadata(res,ctx);}
+            if (meta){
+                setMetadata(res,ctx);
+            }
             if (e.hasAttribute(_class)){
                 res.setType(e.getAttribute(_class));
             }
@@ -1261,7 +1284,15 @@ public class SVGReader {
             }
         }
         else {res=new VRectangleOr(xx,yy,0,w,h,Color.WHITE, Color.BLACK, 0, 1.0f);}
-        if (meta){setMetadata(res,ctx);}
+        if (meta){
+            if (ctx == null){
+                ctx = new Context();
+            }
+            if (e.hasAttribute(SVGReader._title)){
+                ctx.setTitle(e.getAttribute(SVGReader._title));
+            }
+            setMetadata(res,ctx);
+        }
         if (e.hasAttribute(_class)){
             res.setType(e.getAttribute(_class));
         }
@@ -1339,6 +1370,12 @@ public class SVGReader {
                 res.setType(e.getAttribute(_class));
             }
             if (meta) {
+                if (ctx == null){
+                    ctx = new Context();
+                }
+                if (e.hasAttribute(SVGReader._title)){
+                    ctx.setTitle(e.getAttribute(SVGReader._title));
+                }
                 setMetadata(res, ctx);
             }
         }
@@ -1416,7 +1453,15 @@ public class SVGReader {
             }
         }
         else {res=new VPolygon(coords2, 0, Color.WHITE, Color.BLACK, 1.0f);}
-        if (meta){setMetadata(res,ctx);}
+        if (meta){
+            if (ctx == null){
+                ctx = new Context();
+            }
+            if (e.hasAttribute(SVGReader._title)){
+                ctx.setTitle(e.getAttribute(SVGReader._title));
+            }
+            setMetadata(res,ctx);
+        }
         if (e.hasAttribute(_class)){
             res.setType(e.getAttribute(_class));
         }
@@ -1465,7 +1510,15 @@ public class SVGReader {
             if (ss != null && ss.requiresSpecialStroke()){
                 assignStroke(res[i], ss);
             }
-            if (meta){setMetadata(res[i],ctx);}
+            if (meta){
+                if (ctx == null){
+                    ctx = new Context();
+                }
+                if (e.hasAttribute(SVGReader._title)){
+                    ctx.setTitle(e.getAttribute(SVGReader._title));
+                }
+                setMetadata(res[i],ctx);
+            }
             if (e.hasAttribute(_class)){
                 res[i].setType(e.getAttribute(_class));
             }
@@ -1647,7 +1700,9 @@ public class SVGReader {
                 Utils.delLeadingSpaces(svg);
                 processNextSVGPathCommand(svg,ph,lastCommand);
             }
-            if (meta){setMetadata(ph,ctx);}
+            if (meta){
+                setMetadata(ph,ctx);
+            }
             return ph;
         }
         else return null;
