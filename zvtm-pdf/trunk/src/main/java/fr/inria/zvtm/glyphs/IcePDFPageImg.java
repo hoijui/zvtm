@@ -75,7 +75,7 @@ public class IcePDFPageImg extends ZPDFPage {
      *@param pdfDoc the PDF document from ICEpdf
      *@param pageNumber page number starting from 0 (for page 1)
      *@param detailFactor Multiplication factor applied to compute the actual width and height of the bitmap image in which to render the page, taking the default rendering scale as a basis (1.0f).
-                          This has a direct impact of the PDF page rendering quality. &gt; 1.0 will create higher quality renderings, &lt; will create lower quality renderings.
+                          This has a direct impact on the PDF page rendering quality. &gt; 1.0 will create higher quality renderings, &lt; will create lower quality renderings.
      *@param scaleFactor glyph size multiplication factor in virtual space w.r.t specified image size (default is 1.0). This has not impact on the PDF page rendering quality (a posteriori rescaling in ZVTM).
      */
     public IcePDFPageImg(double x, double y, int z, Document pdfDoc, int pageNumber, float detailFactor, double scaleFactor){
