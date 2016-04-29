@@ -1,5 +1,5 @@
 /*   AUTHOR :            Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2010. All Rights Reserved
+ *   Copyright (c) INRIA, 2010-2016. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -10,6 +10,9 @@ package fr.inria.zvtm.glyphs;
 import java.awt.image.BufferedImage;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+
+import java.io.IOException;
+import java.net.URL;
 
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.engine.Camera;
@@ -86,6 +89,20 @@ public class IcePDFPageImg extends ZPDFPage {
         synchronized(pdfDoc){
             setPageImage((BufferedImage)pdfDoc.getPageImage(pageNumber, GraphicsRenderingHints.SCREEN, Page.BOUNDARY_CROPBOX, 0f, detailFactor));
         }
+    }
+
+    /** Instantiate a PDF page as a ZVTM glyph, rendered at a resolution that matches the default scale for that page multiplied by detailFactor.
+     *@param x coordinate in virtual space
+     *@param y coordinate in virtual space
+     *@param z z-index (pass 0 if you do not use z-ordering)
+     *@param pdfURL URL of the PDF document
+     *@param pageNumber page number starting from 0 (for page 1)
+     *@param detailFactor Multiplication factor applied to compute the actual width and height of the bitmap image in which to render the page, taking the default rendering scale as a basis (1.0f).
+                          This has a direct impact on the PDF page rendering quality. &gt; 1.0 will create higher quality renderings, &lt; will create lower quality renderings.
+     *@param scaleFactor glyph size multiplication factor in virtual space w.r.t specified image size (default is 1.0). This has not impact on the PDF page rendering quality (a posteriori rescaling in ZVTM).
+     */
+    public IcePDFPageImg(double x, double y, int z, URL pdfURL, int pageNumber, float detailFactor, double scaleFactor){
+        this(x, y, z, getICEPDF(pdfURL), pageNumber, detailFactor, scaleFactor);
     }
 
     IcePDFPageImg(double x, double y, int z, double scaleFactor){
@@ -379,6 +396,20 @@ public class IcePDFPageImg extends ZPDFPage {
      */
     public BufferedImage getPageImage() {
         return pageImage;
+    }
+
+    public static Document getICEPDF(URL url){
+        Document document = new Document();
+        try {
+            document.setUrl(url);
+        } catch (PDFException ex) {
+            System.out.println("zvtm-pdf: Error parsing PDF document " + ex);
+        } catch (PDFSecurityException ex) {
+            System.out.println("zvtm-pdf: Error encryption not supported " + ex);
+        } catch (IOException ex) {
+            System.out.println("zvtm-pdf: Error handling PDF document " + ex);
+        }
+        return document;
     }
 
 }
