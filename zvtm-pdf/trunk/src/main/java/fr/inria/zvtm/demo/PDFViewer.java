@@ -317,7 +317,7 @@ public class PDFViewer {
     }
 
     static String getVersion(){
-        Scanner sc = new Scanner(PDFViewer.class.getResourceAsStream("/properties")).useDelimiter("\\s*=\\s*");
+        Scanner sc = new Scanner(PDFViewer.class.getResourceAsStream("/zvtm-pdf-properties")).useDelimiter("\\s*=\\s*");
         while (sc.hasNext()){
             String token = sc.next();
             if (token.equals("version")){
