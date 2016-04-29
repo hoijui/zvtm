@@ -23,7 +23,7 @@ public class Utils {
     public static String VERSION;
 
     static {
-        Scanner sc = new Scanner(Utils.class.getResourceAsStream("/properties")).useDelimiter("\\s*=\\s*");
+        Scanner sc = new Scanner(Utils.class.getResourceAsStream("/zvtm-fits-properties")).useDelimiter("\\s*=\\s*");
         while (sc.hasNext()){
             String token = sc.next();
             if (token.equals("version")){
@@ -51,4 +51,3 @@ public class Utils {
         return new LinearGradientPaint(start, end, fractions, colors, MultipleGradientPaint.CycleMethod.NO_CYCLE);
     }
 }
-
