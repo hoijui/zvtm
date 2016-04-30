@@ -134,9 +134,10 @@ public class JSkyFitsImage extends VImage {
             catch(java.lang.IllegalArgumentException ie){
                 throw new Error("Could not create ImageProcesor: " + ie);
             }
-            NomWcsKeywordProvider wcsKeyProvider;
+            jsky.image.fits.FITSKeywordProvider wcsKeyProvider;
             try{
-                wcsKeyProvider = new NomWcsKeywordProvider(fitsImage.getFits().getHDU(0).getHeader());
+                wcsKeyProvider = new jsky.image.fits.FITSKeywordProvider(fitsImage);
+                // wcsKeyProvider = new NomWcsKeywordProvider(fitsImage.getFits().getHDU(0).getHeader());
                 wcsTransform = new WCSTransform(wcsKeyProvider);
             } catch(java.lang.IllegalArgumentException ie){
                 wcsKeyProvider = null;
@@ -330,7 +331,9 @@ public class JSkyFitsImage extends VImage {
             pvy < vy-vh/2d || pvy > vy+vh/2d){
             return null;
         }
-        return wcsTransform.pix2wcs((pvx-vx+vw/2d)/scaleFactor, (pvy-vy+vh/2d)/scaleFactor);
+        double x = (pvx-vx+vw/2d)/scaleFactor;
+        double y = (pvy-vy+vh/2d)/scaleFactor;
+        return wcsTransform.pix2wcs(x, y);
     }
 
     /** Converts from World Coordinates to FITS image coordinates.
@@ -351,6 +354,7 @@ public class JSkyFitsImage extends VImage {
     public Point2D.Double wcs2vs(double ra, double dec){
         if (wcsTransform == null){return null;}
         Point2D.Double res = wcsTransform.wcs2pix(ra,dec);
+        System.out.println("PIX  "+res.x+" "+res.y);
         // got FITS image coords, convert to virtual space coords
         res.setLocation(res.x*scaleFactor+vx-vw/2d, res.y*scaleFactor+vy-vh/2d);
         return res;
