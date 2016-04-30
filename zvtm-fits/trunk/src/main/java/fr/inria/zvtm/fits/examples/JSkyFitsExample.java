@@ -1,4 +1,4 @@
-/*  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2010-2015.
+/*  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2010-2016.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -275,11 +275,15 @@ public class JSkyFitsExample{
         }.start();
     }
 
+    //1116-1117 / 850-851
+
     void drawSymbols(List<AstroObject> objs){
         for(AstroObject obj: objs){
             Point2D.Double p = img.wcs2vs(obj.getRa(), obj.getDec());
-            VCross cr = new VCross(p.x, p.y, 100, 10, 10, Color.RED, Color.WHITE, .8f);
+            // VCross cr = new VCross(p.x, p.y, 100, 10, 10, Color.RED, Color.WHITE, .8f);
+            VCircle cr = new VCircle(p.x, p.y, 100, 10, Color.RED, Color.RED, .8f);
             cr.setStroke(AstroObject.AO_STROKE);
+            cr.setFilled(false);
             VText lb = new VText(p.x+10, p.y+10, 101, Color.RED, obj.getIdentifier(), VText.TEXT_ANCHOR_START);
             lb.setBorderColor(Color.BLACK);
             lb.setTranslucencyValue(.6f);
@@ -402,6 +406,10 @@ class JSFEEventHandler implements ViewListener {
             v.parent.setActiveLayer(app.LAYER_MENU);
             v.parent.setCursorIcon(Cursor.DEFAULT_CURSOR);
         }
+
+        // Point2D.Double p = v.getVCursor().getVSCoordinates(app.mCamera);
+        // app.img.vs2wcs(p.x, p.y);
+
     }
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
