@@ -1,48 +1,38 @@
 /*  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2016.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: WCSExample.java 5441 2015-03-31 10:37:57Z epietrig $
+ * $Id$
  */
 
 package fr.inria.zvtm.fits.examples;
 
-// import edu.jhu.pha.sdss.fits.FITSImage;
+import java.io.File;
 
-import java.awt.geom.Point2D;
-import java.net.URL;
-import jsky.coords.WCSTransform;
-import jsky.coords.WorldCoords;
-
-import fr.inria.zvtm.glyphs.JSkyFitsImage;
-import jsky.image.fits.codec.FITSImage;
-import jsky.image.fits.FITSKeywordProvider;
+import jep.Jep;
+import jep.NDArray;
 
 /**
- * Computes pixel location within a FITS image from WCS coordinates
+ * Computes pixel location in a FITS image from WCS coordinates
  */
 class WCS2PIX {
+
     public static void main(String[] args) throws Exception{
-        if(args.length != 3){
-            System.out.println("usage: WCS2PIX URL ra dec");
-            System.out.println("(where ra and dec are... radec)");
-            return;
-        }
-        JSkyFitsImage jfi = new JSkyFitsImage(new URL(args[0]));
-        WCSTransform transform = new WCSTransform(new FITSKeywordProvider(jfi.getRawFITSImage()));
-        Point2D.Double p = transform.wcs2pix(Double.parseDouble(args[1]), Double.parseDouble(args[2]));
-        System.out.println((int)p.x+" "+(int)p.y);
+        File fitsFile = new File(args[0]);
+        Jep jep = new Jep(false);
+        jep.eval("from __future__ import division # confidence high");
+        jep.eval("import numpy");
+        jep.eval("from astropy import wcs");
+        jep.eval("from astropy.io import fits");
+        jep.set("fitsFilePath", fitsFile.getAbsolutePath());
+        jep.eval("hdulist = fits.open(fitsFilePath)");
+        jep.eval("w = wcs.WCS(hdulist[0].header)");
+        jep.set("ra", Double.parseDouble(args[1]));
+        jep.set("dec", Double.parseDouble(args[2]));
+        jep.eval("pixcoords = w.wcs_world2pix(numpy.array([[ra, dec]]), 1)");
+        double[] pixCoords = ((NDArray<double[]>)jep.getValue("pixcoords")).getData();
+        int x = (int)Math.round(pixCoords[0]);
+        int y = (int)Math.round(pixCoords[1]);
+        System.out.println(x+" "+y);
+        jep.close();
     }
 }
-
-
-// SIMBAD 274.71592, -13.83936
-// DS9 WCS-SEX: 18:18:51.821, -13:50:21.70
-// DS9 PIX: 1116, 851
-// astropy: 274.71592, -13.83936 -> 1116.52507597   850.56945216
-
-// JSKY-CAT:
-// 1116, 851 -> 18:18:51.784, -13:50:21.69
-// 18:18:51.821, -13:50:21.70 -> 1120, 846
-
-// WCS2PIX:
-// 274.71592, -13.83936 -> 1120, 847

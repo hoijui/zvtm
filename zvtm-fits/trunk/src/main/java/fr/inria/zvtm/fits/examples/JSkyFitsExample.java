@@ -66,6 +66,7 @@ import fr.inria.zvtm.animation.EndAction;
 
 import fr.inria.zvtm.fits.RangeSelection;
 import fr.inria.zvtm.fits.Utils;
+import fr.inria.zvtm.fits.CoordConv;
 import fr.inria.zvtm.fits.filters.Aips0Filter;
 import fr.inria.zvtm.fits.filters.BackgrFilter;
 import fr.inria.zvtm.fits.filters.BlueFilter;
@@ -152,6 +153,7 @@ public class JSkyFitsExample{
     JSkyFitsImage img;
     // double[] scaleBounds;
     //private boolean dragLeft = false, dragRight = false;
+    CoordConv cc;
 
     View mView;
     JSFEEventHandler eh;
@@ -167,6 +169,7 @@ public class JSkyFitsExample{
     static final int LAYER_MENU = 2;
 
     JSkyFitsExample(FitsOptions options){
+        cc = new CoordConv();
         initGUI(options);
         try {
             loadFITSImage(options);
@@ -229,7 +232,7 @@ public class JSkyFitsExample{
             }
             String retVal =  "file:" + path;
             img = new JSkyFitsImage(0, 0, 0, new URL(retVal), 1, 1);
-
+            cc.setFITSFile(path);
         }
         if (img != null){
             img.setColorLookupTable("Standard", false);
@@ -275,8 +278,6 @@ public class JSkyFitsExample{
         }.start();
     }
 
-    //1116-1117 / 850-851
-
     void drawSymbols(List<AstroObject> objs){
         for(AstroObject obj: objs){
             Point2D.Double p = img.wcs2vs(obj.getRa(), obj.getDec());
@@ -294,6 +295,11 @@ public class JSkyFitsExample{
             cr.setType(JSkyFitsMenu.T_ASTRO_OBJ);
             lb.setType(JSkyFitsMenu.T_ASTRO_OBJ);
         }
+    }
+
+    public void exit(){
+        cc.close();
+        System.exit(0);
     }
 
     public static void main(String[] args) throws IOException{
@@ -482,7 +488,7 @@ class JSFEEventHandler implements ViewListener {
 
     public void viewDeiconified(View v){}
 
-    public void viewClosing(View v){System.exit(0);}
+    public void viewClosing(View v){app.exit();}
 
     void pan(Camera c, int dx, int dy){
         synchronized(c){
@@ -961,7 +967,7 @@ class JSkyFitsMenu implements ViewListener, PickerListener {
 
     public void viewDeiconified(View v){}
 
-    public void viewClosing(View v){System.exit(0);}
+    public void viewClosing(View v){app.exit();}
 
     void selectColorMapping(PRectangle cm){
         app.img.setColorLookupTable((String)cm.getOwner(), true);

@@ -10,5 +10,6 @@ JARS=$JARS":target/args4j-2.0.29.jar"
 JARS=$JARS":target/hcompress-0.52.jar"
 JARS=$JARS":target/zvtm-core-0.12.0-SNAPSHOT.jar"
 JARS=$JARS":target/zvtm-fits-0.2.0-SNAPSHOT.jar"
+JARS=$JARS":target/jep-3.5.2.jar"
 
-java -Xmx4096M -Xms1024M -Dcom.sun.media.jai.disableMediaLib=true -cp $JARS fr.inria.zvtm.fits.examples.JSkyFitsExample "$@"
+java -Xmx4096M -Xms1024M -Dcom.sun.media.jai.disableMediaLib=true -Djava.library.path=/Library/Python/2.7/site-packages/jep  -cp $JARS fr.inria.zvtm.fits.examples.JSkyFitsExample "$@"

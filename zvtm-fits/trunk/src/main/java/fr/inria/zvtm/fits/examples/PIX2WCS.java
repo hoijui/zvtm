@@ -1,36 +1,36 @@
 /*  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2016.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
- * $Id: WCSExample.java 5441 2015-03-31 10:37:57Z epietrig $
+ * $Id$
  */
 
 package fr.inria.zvtm.fits.examples;
 
-import java.awt.geom.Point2D;
+import java.io.File;
 
-import java.net.URL;
-
-import jsky.coords.WCSTransform;
-import jsky.coords.WorldCoords;
-
-import fr.inria.zvtm.glyphs.JSkyFitsImage;
-import jsky.image.fits.codec.FITSImage;
-import jsky.image.fits.FITSKeywordProvider;
+import jep.Jep;
+import jep.NDArray;
 
 /**
- * Computes WCS coordinates from a pixel location within a FITS image
+ * Computes WCS coordinates from pixel location in a FITS image
  */
 class PIX2WCS {
+
     public static void main(String[] args) throws Exception{
-        if(args.length != 3){
-            System.out.println("usage: PIX2WCS URL x y");
-            System.out.println("(where x and y are pixel coordinates)");
-            return;
-        }
-        JSkyFitsImage jfi = new JSkyFitsImage(new URL(args[0]));
-        WCSTransform transform = new WCSTransform(new FITSKeywordProvider(jfi.getRawFITSImage()));
-        Point2D.Double p = transform.pix2wcs(Double.parseDouble(args[1]), Double.parseDouble(args[2]));
-        System.out.println(p.x+" "+p.y);
-        System.out.println(new WorldCoords(p));
+        File fitsFile = new File(args[0]);
+        Jep jep = new Jep(false);
+        jep.eval("from __future__ import division # confidence high");
+        jep.eval("import numpy");
+        jep.eval("from astropy import wcs");
+        jep.eval("from astropy.io import fits");
+        jep.set("fitsFilePath", fitsFile.getAbsolutePath());
+        jep.eval("hdulist = fits.open(fitsFilePath)");
+        jep.eval("w = wcs.WCS(hdulist[0].header)");
+        jep.set("x", Double.parseDouble(args[1]));
+        jep.set("y", Double.parseDouble(args[2]));
+        jep.eval("wcscoords = w.wcs_pix2world(numpy.array([[x,y]], numpy.float_), 1)");
+        double[] wcsCoords = ((NDArray<double[]>)jep.getValue("wcscoords")).getData();
+        System.out.println(wcsCoords[0]+" "+wcsCoords[1]);
+        jep.close();
     }
 }

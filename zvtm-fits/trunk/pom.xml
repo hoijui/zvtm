@@ -45,19 +45,6 @@ $Id$
         <url>http://repository.springsource.com/maven/bundles/external</url>
     </repository>
 
-<!--
-    <repository>
-        <releases />
-        <snapshots>
-            <enabled>false</enabled>
-        </snapshots>
-        <id>mygrid-repository</id>
-        <name>myGrid Repository</name>
-        <url>http://www.mygrid.org.uk/maven/repository</url>
-    </repository>
--->
-
-
   </repositories>
 
   <!-- Distribution - Deploy to FTP -->
@@ -86,12 +73,29 @@ $Id$
 
     jsky is supplied in the 'libs' directory
 -->
-	  <dependency>
+	<dependency>
       <groupId>ivoa.fits</groupId>
       <artifactId>fits</artifactId>
       <version>0.3.0</version>
     </dependency>
 
+    <!-- https://github.com/mrj0/jep/wiki/Getting-Started -->
+    <!--
+    	JEP is not available in any Maven repository for obvious reasons.
+    	Get it from https://github.com/mrj0/jep
+        * python setup.py install it
+
+        * link to it (LD_LIBRARY_PATH, or symbolic link like (on Mac OS X):
+          ln -sf libjep.so /Library/JavaExtensions/libjep.jnilib)
+
+    	* install the JAR files in your local repository using the following command line:
+            mvn install:install-file -Dfile=jep-3.5.2.jar -DgroupId=jep -DartifactId=jep -Dversion=3.5.2 -Dpackaging=jar
+    -->
+    <dependency>
+        <groupId>jep</groupId>
+        <artifactId>jep</artifactId>
+        <version>3.5.2</version>
+    </dependency>
 
     <dependency>
       <groupId>jsky</groupId>
@@ -135,27 +139,7 @@ $Id$
       <artifactId>commons-lang3</artifactId>
       <version>3.0</version>
     </dependency>
-
-
-<!--
-    <dependency>
-        <groupId>net.java.dev.jai-imageio</groupId>
-        <artifactId>jai-imageio-core-standalone</artifactId>
-        <version>1.2-pre-dr-b04-2011-07-04</version>
-    </dependency>
-
-
-    <dependency>
-      <groupId>com.sun.media</groupId>
-      <artifactId>jai_imageio</artifactId>
-      <version>1.1</version>
-      <type>pom</type>
-    </dependency>
--->
-
-
   </dependencies>
-
 
   <!-- Build -->
   <build>
@@ -189,8 +173,8 @@ $Id$
     	<version>3.3</version>
     	<!--<version>2.3.2</version>-->
         <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
+          <source>1.7</source>
+          <target>1.7</target>
         </configuration>
       </plugin>
 	  <plugin>
