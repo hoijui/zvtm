@@ -9,6 +9,7 @@ package fr.inria.zvtm.fits.examples;
 import java.awt.Toolkit;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics2D;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.GradientPaint;
@@ -21,14 +22,13 @@ import java.awt.BasicStroke;
 import java.awt.Stroke;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
-
 import java.awt.image.ImageFilter;
 import java.awt.image.RGBImageFilter;
 import java.awt.image.DataBuffer;
+import javax.swing.SwingUtilities;
 
 import java.io.IOException;
 import java.io.File;
@@ -43,6 +43,7 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 
 import fr.inria.zvtm.engine.Camera;
+import fr.inria.zvtm.engine.Java2DPainter;
 import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.SwingWorker;
@@ -132,7 +133,7 @@ import org.kohsuke.args4j.CmdLineParser;
  * Example application loading FITS images using JSky.
  */
 
-public class JSkyFitsExample{
+public class JSkyFitsExample implements Java2DPainter {
 
     /* screen dimensions, actual dimensions of windows */
     static int SCREEN_WIDTH =  Toolkit.getDefaultToolkit().getScreenSize().width;
@@ -141,6 +142,8 @@ public class JSkyFitsExample{
     static int VIEW_MAX_H = 800;
     int VIEW_W, VIEW_H;
     int VIEW_X, VIEW_Y;
+
+    public static final Font DEFAULT_FONT = new Font("Dialog", Font.PLAIN, 12);
 
     String APP_TITLE = "JSkyFitsImage viewer";
 
@@ -153,7 +156,8 @@ public class JSkyFitsExample{
     JSkyFitsImage img;
     // double[] scaleBounds;
     //private boolean dragLeft = false, dragRight = false;
-    CoordConv cc;
+    static CoordConv cc;
+    String wcsStr = "";
 
     View mView;
     JSFEEventHandler eh;
@@ -168,16 +172,21 @@ public class JSkyFitsExample{
     static final int LAYER_DATA = 1;
     static final int LAYER_MENU = 2;
 
-    JSkyFitsExample(FitsOptions options){
-        cc = new CoordConv();
-        initGUI(options);
-        try {
-            loadFITSImage(options);
-        }
-        catch (IOException ex){
-            System.err.println("Error while loading FITS image");
-            ex.printStackTrace();
-        }
+    JSkyFitsExample(final FitsOptions options){
+        SwingUtilities.invokeLater(new Runnable(){
+            public void run() {
+                cc = new CoordConv();
+                initGUI(options);
+                try {
+                    String filePath = loadFITSImage(options);
+                    cc.setFITSFile(img, filePath);
+                }
+                catch (IOException ex){
+                    System.err.println("Error while loading FITS image");
+                    ex.printStackTrace();
+                }
+            }
+        });
     }
 
     void initGUI(FitsOptions options){
@@ -209,6 +218,7 @@ public class JSkyFitsExample{
         mView.setListener(eh, LAYER_DATA);
         mView.setListener(menu, LAYER_MENU);
         mView.getCursor().getPicker().setListener(menu);
+        mView.setJava2DPainter(this, Java2DPainter.FOREGROUND);
     }
 
     void windowLayout(){
@@ -216,12 +226,13 @@ public class JSkyFitsExample{
         VIEW_H = (SCREEN_HEIGHT <= VIEW_MAX_H) ? SCREEN_HEIGHT : VIEW_MAX_H;
     }
 
-    void loadFITSImage(FitsOptions options) throws IOException {
+    String loadFITSImage(FitsOptions options) throws IOException {
+        String path = null;
         if(options.url != null){
             img = new JSkyFitsImage(new URL(options.url) );
         }
         else if(options.file != null){
-            String path = new File ( options.file ).getAbsolutePath ();
+            path = new File ( options.file ).getAbsolutePath ();
             if ( File.separatorChar != '/' )
             {
                 path = path.replace ( File.separatorChar, '/' );
@@ -232,7 +243,6 @@ public class JSkyFitsExample{
             }
             String retVal =  "file:" + path;
             img = new JSkyFitsImage(0, 0, 0, new URL(retVal), 1, 1);
-            cc.setFITSFile(path);
         }
         if (img != null){
             img.setColorLookupTable("Standard", false);
@@ -241,6 +251,7 @@ public class JSkyFitsExample{
             mSpace.addGlyph(img);
             menu.buildHistogram();
         }
+        return path;
     }
 
     void toggleMenu(){
@@ -249,8 +260,8 @@ public class JSkyFitsExample{
 
     void querySimbad(Point2D.Double center, Point2D.Double onCircle){
 
-        Point2D.Double centerWCS = img.vs2wcs(center.x, center.y);
-        Point2D.Double onCircleWCS = img.vs2wcs(onCircle.x, onCircle.y);
+        Point2D.Double centerWCS = cc.vs2wcs(center.x, center.y);
+        Point2D.Double onCircleWCS = cc.vs2wcs(onCircle.x, onCircle.y);
 
         //compute radius in arcmin
         final WorldCoords wc = new WorldCoords(centerWCS.getX(), centerWCS.getY());
@@ -280,7 +291,7 @@ public class JSkyFitsExample{
 
     void drawSymbols(List<AstroObject> objs){
         for(AstroObject obj: objs){
-            Point2D.Double p = img.wcs2vs(obj.getRa(), obj.getDec());
+            Point2D.Double p = cc.wcs2vs(obj.getRa(), obj.getDec());
             // VCross cr = new VCross(p.x, p.y, 100, 10, 10, Color.RED, Color.WHITE, .8f);
             VCircle cr = new VCircle(p.x, p.y, 100, 10, Color.RED, Color.RED, .8f);
             cr.setStroke(AstroObject.AO_STROKE);
@@ -297,8 +308,30 @@ public class JSkyFitsExample{
         }
     }
 
+    void updateWCS(Point2D.Double wcs){
+        if (wcs != null){
+            wcsStr = Double.valueOf(wcs.x) + ", " + Double.valueOf(wcs.y);
+        }
+        else {
+            wcsStr = "";
+        }
+        mView.repaint();
+    }
+
+    public void	paint(Graphics2D g2d, int viewWidth, int viewHeight){
+        g2d.setColor(Color.BLACK);
+        g2d.fillRect(0, 0, viewWidth, 16);
+        g2d.setColor(Color.LIGHT_GRAY);
+        g2d.setFont(DEFAULT_FONT);
+        g2d.drawString(wcsStr, 4, 10);
+    }
+
     public void exit(){
-        cc.close();
+        SwingUtilities.invokeLater(new Runnable(){
+            public void run() {
+                cc.close();
+            }
+        });
         System.exit(0);
     }
 
@@ -412,10 +445,8 @@ class JSFEEventHandler implements ViewListener {
             v.parent.setActiveLayer(app.LAYER_MENU);
             v.parent.setCursorIcon(Cursor.DEFAULT_CURSOR);
         }
-
-        // Point2D.Double p = v.getVCursor().getVSCoordinates(app.mCamera);
-        // app.img.vs2wcs(p.x, p.y);
-
+        Point2D.Double p = v.getVCursor().getVSCoordinates(app.mCamera);
+        app.updateWCS(app.cc.vs2wcs(p.x, p.y));
     }
 
     public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
@@ -467,6 +498,10 @@ class JSFEEventHandler implements ViewListener {
         }
         else if (code == KeyEvent.VK_F4){
             app.menu.selectNextScale();
+        }
+        else {
+            // int[] res = JSkyFitsExample.cc.wcs2pix(274,-13.85,new int[2]);
+            // System.out.println(res[0]+" "+res[1]);
         }
         // else if (code == KeyEvent.VK_MINUS){
         //     //app.scaleBounds[1] -= 100;

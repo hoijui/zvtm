@@ -6,6 +6,8 @@
 
 package fr.inria.zvtm.fits;
 
+import java.awt.geom.Point2D;
+
 import javax.swing.SwingUtilities;
 import java.io.File;
 
@@ -13,36 +15,29 @@ import jep.Jep;
 import jep.JepException;
 import jep.NDArray;
 
+import fr.inria.zvtm.glyphs.JSkyFitsImage;
+
 public class CoordConv {
 
     Jep astropyConverter;
 
+    JSkyFitsImage img;
+
     public CoordConv(){
-        SwingUtilities.invokeLater(new Runnable(){
-            public void run() {
-                try {
-                    astropyConverter = new Jep(false);
-                    astropyConverter.eval("from __future__ import division # confidence high");
-                    astropyConverter.eval("import numpy");
-                    astropyConverter.eval("from astropy import wcs");
-                    astropyConverter.eval("from astropy.io import fits");
-                }
-                catch (JepException ex){
-                    ex.printStackTrace();
-                }
-            }
-        });
+        try {
+            astropyConverter = new Jep(false);
+            astropyConverter.eval("from __future__ import division # confidence high");
+            astropyConverter.eval("import numpy");
+            astropyConverter.eval("from astropy import wcs");
+            astropyConverter.eval("from astropy.io import fits");
+        }
+        catch (JepException ex){
+            ex.printStackTrace();
+        }
     }
 
-    public void setFITSFile(final String fitsFilePath){
-        SwingUtilities.invokeLater(new Runnable(){
-            public void run() {
-                _setFITSFile(fitsFilePath);
-            }
-        });
-    }
-
-    public void _setFITSFile(String fitsFilePath){
+    public void setFITSFile(JSkyFitsImage img, String fitsFilePath){
+        this.img = img;
         // should be an absolute file path
         try {
             astropyConverter.set("fitsFilePath", fitsFilePath);
@@ -55,41 +50,26 @@ public class CoordConv {
         }
     }
 
-    public void wcs2pix(final double ra, final double dec, final int[] res){
-        SwingUtilities.invokeLater(new Runnable(){
-            public void run() {
-                _wcs2pix(ra, dec, res);
-            }
-        });
-    }
-
     // expects to be called from EDT
-    public int[] _wcs2pix(double ra, double dec, int[] res){
+    public double[] wcs2pix(double ra, double dec, double[] res){
         try {
             astropyConverter.set("ra", ra);
             astropyConverter.set("dec", dec);
             astropyConverter.eval("p_res = w.wcs_world2pix(numpy.array([[ra, dec]]), 1)");
-            double[] p_res = ((NDArray<double[]>)astropyConverter.getValue("p_res")).getData();
-            res[0] = (int)Math.round(p_res[0]);
-            res[1] = (int)Math.round(p_res[1]);
+            return ((NDArray<double[]>)astropyConverter.getValue("p_res")).getData();
         }
         catch (JepException ex){
             ex.printStackTrace();
             return null;
         }
-        return res;
-    }
-
-    public void pix2wcs(final double x, final double y){
-        SwingUtilities.invokeLater(new Runnable(){
-            public void run() {
-                _pix2wcs(x, y);
-            }
-        });
     }
 
     // expects to be called from EDT
-    public double[] _pix2wcs(double x, double y){
+    public double[] pix2wcs(double x, double y){
+        if (x < 0 || y < 0 ||
+            x > img.getRawFITSImage().getWidth() || y > img.getRawFITSImage().getHeight()){
+            return null;
+        }
         double[] res;
         try {
             astropyConverter.set("x", x);
@@ -104,13 +84,35 @@ public class CoordConv {
         return res;
     }
 
+    /** Converts from World Coordinates to VirtualSpace coordinates.
+     *@param ra right ascension (in degrees).
+     *@param dec declination (in degrees).
+     *@return null if coords are outside the image
+     */
+    public Point2D.Double wcs2vs(double ra, double dec){
+        double[] pix = wcs2pix(ra, dec, new double[2]);
+        // got FITS image coords, now convert them to virtual space coords
+        return new Point2D.Double(
+            pix[0]*img.getScale()+img.vx-img.getWidth()/2d,
+            pix[1]*img.getScale()+img.vy-img.getHeight()/2d);
+    }
+
+
+    public Point2D.Double vs2wcs(double pvx, double pvy){
+        // convert to FITS image coords
+        if (pvx < img.vx-img.getWidth()/2d || pvx > img.vx+img.getWidth()/2d ||
+            pvy < img.vy-img.getHeight()/2d || pvy > img.vy+img.getHeight()/2d){
+            return null;
+        }
+        double x = (pvx-img.vx+img.getWidth()/2d)/img.getScale();
+        double y = (pvy-img.vy+img.getHeight()/2d)/img.getScale();
+        double[] tres = pix2wcs(x, y);
+        return new Point2D.Double(tres[0], tres[1]);
+    }
+
     public void close(){
         System.out.print("Shutting down astropy...");
-        SwingUtilities.invokeLater(new Runnable(){
-            public void run() {
-                astropyConverter.close();
-            }
-        });
+        astropyConverter.close();
         System.out.println("OK");
     }
 

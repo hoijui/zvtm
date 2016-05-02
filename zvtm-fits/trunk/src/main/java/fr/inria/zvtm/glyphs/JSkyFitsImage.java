@@ -1,4 +1,4 @@
-/*  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2010-2015.
+/*  (c) COPYRIGHT INRIA (Institut National de Recherche en Informatique et en Automatique), 2010-2016.
  *  Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -22,22 +22,9 @@ import java.awt.GraphicsEnvironment;
 import java.awt.Transparency;
 
 import java.net.URL;
+import java.net.MalformedURLException;
 
 import java.util.Vector;
-
-import fr.inria.zvtm.glyphs.projection.RProjectedCoordsP;
-
-import fr.inria.zvtm.engine.Camera;
-import fr.inria.zvtm.engine.VirtualSpaceManager;
-import fr.inria.zvtm.glyphs.VImageOr;
-
-import jsky.coords.WCSTransform;
-import jsky.image.fits.FITSKeywordProvider;
-import jsky.image.fits.codec.FITSImage;
-import jsky.image.ImageProcessor;
-import jsky.image.ImageLookup;
-
-//import jsky.image.ImageHistogram;
 
 import javax.media.jai.RenderedImageAdapter;
 import javax.media.jai.Histogram;
@@ -45,13 +32,14 @@ import javax.media.jai.PlanarImage;
 import javax.media.jai.ROI;
 import javax.media.jai.ROIShape;
 
-import fr.inria.zvtm.fits.NomWcsKeywordProvider;
+import fr.inria.zvtm.glyphs.projection.RProjectedCoordsP;
+import fr.inria.zvtm.engine.Camera;
+import fr.inria.zvtm.engine.VirtualSpaceManager;
+import fr.inria.zvtm.glyphs.VImageOr;
 
-import nom.tam.fits.Fits;
-import jsky.image.fits.codec.FITSDecodeParam;
-
-import java.net.MalformedURLException;
-
+import jsky.image.fits.codec.FITSImage;
+import jsky.image.ImageProcessor;
+import jsky.image.ImageLookup;
 
 //Fits support provided by JSky instead of IVOA FITS
 //Note: JSkyFitsImage requires JAI (Java Advanced Imaging)
@@ -61,7 +49,6 @@ public class JSkyFitsImage extends VImage {
     FITSImage fitsImage;
 
     URL furl;
-    WCSTransform wcsTransform;
     final ImageProcessor proc;
 
     double originLowCut;
@@ -133,18 +120,6 @@ public class JSkyFitsImage extends VImage {
             }
             catch(java.lang.IllegalArgumentException ie){
                 throw new Error("Could not create ImageProcesor: " + ie);
-            }
-            jsky.image.fits.FITSKeywordProvider wcsKeyProvider;
-            try{
-                wcsKeyProvider = new jsky.image.fits.FITSKeywordProvider(fitsImage);
-                // wcsKeyProvider = new NomWcsKeywordProvider(fitsImage.getFits().getHDU(0).getHeader());
-                wcsTransform = new WCSTransform(wcsKeyProvider);
-            } catch(java.lang.IllegalArgumentException ie){
-                wcsKeyProvider = null;
-                wcsTransform = null;
-                ie.printStackTrace(System.out);
-            } catch(Exception e){
-                throw new Error("Could not create wcsTransform: " + e);
             }
         }
         catch (Exception e){
@@ -302,62 +277,6 @@ public class JSkyFitsImage extends VImage {
         Rectangle2D.Double region = new Rectangle2D.Double(0,0, fitsImage.getWidth(), fitsImage.getHeight());
         ROI roi = new ROIShape(region);
         return proc.getHistogram(numValues, roi);
-    }
-
-
-    /** Converts from FITS image coordinates to World Coordinates.
-     *@param x x-coordinate, in the FITS system: (0,0) lower left, x-axis oriented to the right.
-     *@param y y-coordinate, in the FITS system: (0,0) lower left, y-axis oriented upward.
-     *@return null if coords are outside the image, ra/dec otherwise (in degrees).
-     */
-    public Point2D.Double pix2wcs(double x, double y){
-        if (wcsTransform == null ||
-            x < 0 || y < 0 ||
-            x > fitsImage.getWidth() || y > fitsImage.getHeight()){
-            return null;
-        }
-        return wcsTransform.pix2wcs(x, y);
-    }
-
-    /** Converts from VirtualSpace coordinates to World Coordinates.
-     *@param pvx x-coord in virtual space.
-     *@param pvy y-coord in virtual space.
-     *@return null if coords are outside the image, ra/dec otherwise (in degrees).
-     */
-    public Point2D.Double vs2wcs(double pvx, double pvy){
-        // convert to FITS image coords
-        if (wcsTransform == null ||
-            pvx < vx-vw/2d || pvx > vx+vw/2d ||
-            pvy < vy-vh/2d || pvy > vy+vh/2d){
-            return null;
-        }
-        double x = (pvx-vx+vw/2d)/scaleFactor;
-        double y = (pvy-vy+vh/2d)/scaleFactor;
-        return wcsTransform.pix2wcs(x, y);
-    }
-
-    /** Converts from World Coordinates to FITS image coordinates.
-     *@param ra right ascension (in degrees).
-     *@param dec declination (in degrees).
-     *@return null if the WCSTransform is invalid, or if the WCS position does not fall within the image.
-     */
-    public Point2D.Double wcs2pix(double ra, double dec){
-        if (wcsTransform == null){return null;}
-        return wcsTransform.wcs2pix(ra, dec);
-    }
-
-    /** Converts from World Coordinates to VirtualSpace coordinates.
-     *@param ra right ascension (in degrees).
-     *@param dec declination (in degrees).
-     *@return null if coords are outside the image
-     */
-    public Point2D.Double wcs2vs(double ra, double dec){
-        if (wcsTransform == null){return null;}
-        Point2D.Double res = wcsTransform.wcs2pix(ra,dec);
-        System.out.println("PIX  "+res.x+" "+res.y);
-        // got FITS image coords, convert to virtual space coords
-        res.setLocation(res.x*scaleFactor+vx-vw/2d, res.y*scaleFactor+vy-vh/2d);
-        return res;
     }
 
     public enum ScaleAlgorithm {
