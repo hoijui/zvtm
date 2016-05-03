@@ -43,11 +43,14 @@ public class CoordConv {
             astropyConverter.set("fitsFilePath", fitsFilePath);
             astropyConverter.eval("hdulist = fits.open(fitsFilePath)");
             astropyConverter.eval("w = wcs.WCS(hdulist[0].header)");
-            System.out.println("Set FITS file to " + fitsFilePath);
         }
         catch (JepException ex){
             ex.printStackTrace();
         }
+    }
+
+    public JSkyFitsImage getFITSImage(){
+        return img;
     }
 
     // expects to be called from EDT
