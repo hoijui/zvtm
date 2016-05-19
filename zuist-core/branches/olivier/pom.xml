@@ -51,12 +51,18 @@ $Id: pom.xml 5570 2015-05-12 14:13:40Z ogladin $
 	<dependency>
       <groupId>fr.inria.zvtm</groupId>
       <artifactId>zvtm-core</artifactId>
-      <version>[0.12.0.oc-SNAPSHOT,)</version>
+      <version>0.12.0.oc-SNAPSHOT</version>
     </dependency>
 	<dependency>
       <groupId>fr.inria.zvtm</groupId>
       <artifactId>zvtm-svg</artifactId>
       <version>[0.2.1,)</version>
+      <exclusions>
+        <exclusion>
+          <groupId>fr.inria.zvtm</groupId>
+          <artifactId>zvtm-core</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
@@ -122,8 +128,8 @@ $Id: pom.xml 5570 2015-05-12 14:13:40Z ogladin $
         <artifactId>maven-compiler-plugin</artifactId>
     	<version>2.3.2</version>
         <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
+          <source>1.7</source>
+          <target>1.7</target>
 		  <showDeprecation>true</showDeprecation>
         </configuration>
       </plugin>
