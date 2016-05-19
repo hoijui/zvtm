@@ -50,8 +50,8 @@
     <dependency>
       <groupId>fr.inria.zvtm</groupId>
       <artifactId>zvtm-core</artifactId>
-      <version>[0.12.0.oc-SNAPSHOT,)</version>
-      <scope>provided</scope>
+      <version>0.12.0.oc-SNAPSHOT</version>
+      <!-- <scope>provided</scope> -->
     </dependency>
     <!-- dependency of zvtm-core, XXX FIX -->
     <dependency>
@@ -63,7 +63,6 @@
       <groupId>org.aspectj</groupId>
       <artifactId>aspectjrt</artifactId>
       <version>1.8.6</version>
-      <!-- <version>1.6.5</version> -->
     </dependency>
     <dependency>
       <groupId>org.jgroups</groupId>
@@ -125,7 +124,7 @@
           <source>1.7</source>
           <target>1.7</target>
           <complianceLevel>1.7</complianceLevel>
-          <!--<showWeaveInfo>true</showWeaveInfo>-->
+          <!-- <showWeaveInfo>true</showWeaveInfo> -->
         </configuration>
         <executions>
           <execution>
@@ -181,7 +180,7 @@
           <showDeprecation>true</showDeprecation>
         </configuration>
       </plugin>
-          <plugin>
+          <!-- <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-source-plugin</artifactId>
             <version>2.4</version>
@@ -193,7 +192,7 @@
                 </goals>
               </execution>
             </executions>
-          </plugin>
+          </plugin> -->
         </plugins>
       </build>
   <profiles>

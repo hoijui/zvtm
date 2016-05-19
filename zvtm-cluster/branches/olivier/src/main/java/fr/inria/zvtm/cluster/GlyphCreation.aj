@@ -448,17 +448,22 @@ public aspect GlyphCreation {
     }
 
     private static class VSegmentReplicator extends AbstractGlyphReplicator {
-        private final double width;
-        private final double height;
+        private final Point2D.Double[] endPoints;
+        //private final double width;
+        //private final double height;
 
         VSegmentReplicator(VSegment source){
             super(source);
-            this.width = source.getWidth();
-            this.height = source.getHeight();
+            this.endPoints = source.getEndPoints();
+            // this.width = source.getWidth();
+            // this.height = source.getHeight();
         }
 
         public Glyph doCreateGlyph(){
-            return new VSegment(0d,0d,width,height,0,Color.BLACK);
+            return new VSegment(endPoints[0].getX(), endPoints[0].getY(),
+                                endPoints[1].getX(), endPoints[1].getY(),
+                                0, Color.BLACK);
+            // return new VSegment(0d,0d,width,height,0,Color.BLACK);
         }
     }
 
