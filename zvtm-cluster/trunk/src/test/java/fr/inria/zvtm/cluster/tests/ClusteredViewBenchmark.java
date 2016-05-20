@@ -63,6 +63,7 @@ public class ClusteredViewBenchmark implements Runnable, ViewListener {
 	private boolean rotating=false;
 	private final double cameraOffset = 10;
 	private fr.inria.zvtm.engine.Camera camCluster;
+	private fr.inria.zvtm.engine.Camera camCluster2;
 	private fr.inria.zvtm.engine.Camera masterCam;
 
 
@@ -98,20 +99,60 @@ public class ClusteredViewBenchmark implements Runnable, ViewListener {
 		camCluster = vs.addCamera();
 		clusterCameras.add(camCluster);
 		
+		Vector<fr.inria.zvtm.engine.Camera> clusterCameras2 = new Vector<fr.inria.zvtm.engine.Camera>();
+		camCluster2 = vs.addCamera();
+		clusterCameras2.add(camCluster2);
+		
 		ClusterGeometry clGeom = new ClusterGeometry(
                 options.blockWidth,
                 options.blockHeight,
                 options.numCols,
                 options.numRows);
-		ClusteredView cv = 
-			new ClusteredView(
+		ClusteredView cv;
+		if (!options.doubleView) {
+			cv = new ClusteredView(
+	                    clGeom,
+	                    options.numRows-1, //origin (block number)
+	                    options.numCols, //use complete
+	                    options.numRows, //cluster surface
+	                    clusterCameras);
+			cv.setBackgroundColor(Color.white);
+			vsm.addClusteredView(cv);
+		}
+		else {
+			ClusteredView cv2;
+			System.out.println("1st ClusteredView");
+			cv = new ClusteredView(
                     clGeom,
                     options.numRows-1, //origin (block number)
-                    options.numCols, //use complete
-                    options.numRows, //cluster surface
+                    (options.numCols/2)+(options.numCols%2), //use 1st half of the surface splitted vertically including the middle column
+                    options.numRows, 
                     clusterCameras);
-		cv.setBackgroundColor(Color.white);
-		vsm.addClusteredView(cv);	
+			cv.setBackgroundColor(Color.white);
+			vsm.addClusteredView(cv);
+
+			System.out.println("2nd ClusteredView");
+			int SecondHalfOrigin = (((options.numCols/2)+(options.numCols%2)+1)*options.numRows)-1;
+			System.out.println("SecondHalfOrigin :" + SecondHalfOrigin );
+			System.out.println("options.numCols :" + options.numCols );
+			
+			cv2 = new ClusteredView(
+                    clGeom,
+                    SecondHalfOrigin, //origin (block number)
+                    options.numCols/2, //use 2nd half without the middle column 
+                    options.numRows, 
+                    clusterCameras2);
+			cv2.setBackgroundColor(Color.black);
+			vsm.addClusteredView(cv2);
+			
+			//Set cameras					
+	        Location loc = cv.centerOnRegion(camCluster, -vsWidth/2, -vsHeight/2, (options.numCols%2)*(options.blockWidth/2), vsHeight/2);
+	        camCluster.setLocation(loc);
+	        
+	        Location loc2 = cv2.centerOnRegion(camCluster2, (options.numCols%2)*(options.blockWidth/2), -vsHeight/2, vsWidth/2, vsHeight/2);
+	        camCluster2.setLocation(loc2);
+						
+		}
 		
 
 		//Zoom out the master view					

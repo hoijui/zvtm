@@ -24,4 +24,7 @@ public class ClusteredViewBenchmarkOptions {
 
 	@Option(name = "-gn", aliases = {"--glyph-number"}, usage = "Number of glyph to display")
 	public int glyphNumber = 50;
+	
+	@Option(name = "-d", aliases = {"--double-view"}, usage = "Create two clustered view")
+	public boolean doubleView = false;
 }
