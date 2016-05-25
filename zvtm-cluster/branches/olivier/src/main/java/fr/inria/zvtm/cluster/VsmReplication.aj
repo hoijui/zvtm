@@ -261,17 +261,19 @@ aspect VsmReplication {
     }
 
     private static class OverviewPortalReplicator extends CameraPortalReplicator {
-        protected final ObjId<Camera> obscamId;
+        //protected final ObjId<Camera> obscamId;
+        protected final ArrayList<ObjId<Camera>> obsCamIds;
 
         OverviewPortalReplicator(OverviewPortal source){
            super(source);
-           obscamId = source.getObservedRegionCamera().getObjId();
+           //obscamId = source.getObservedRegionCamera().getObjId();
+           obsCamIds = makeCamRefs(source.getObservedRegionCameras());
         }
 
         public Portal createPortal(SlaveUpdater updater) {
             //Camera cam = updater.getSlaveObject(this.camId);
-            Camera obsCam = updater.getSlaveObject(this.obscamId);
-            OverviewPortal p = new OverviewPortal(x, y, w, h, refsToCameras(updater, camIds), obsCam);
+            //OverviewPortal p = new OverviewPortal(x, y, w, h, refsToCameras(updater, camIds), obsCam);
+            OverviewPortal p = new OverviewPortal(x, y, w, h, refsToCameras(updater, camIds), refsToCameras(updater, obsCamIds));
             updater.setOverviewPortalObservedViewLocationAndSize(p);
             updater.setPortalLocationAndSize(p,x, y, w, h);
             return (Portal)p;

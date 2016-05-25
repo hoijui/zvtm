@@ -33,6 +33,7 @@ public class ClusteredView extends DefaultIdentifiable {
     private final int origin; //bottom-left block number
     private final int viewCols;
     private final int viewRows;
+    private final int id;
     private ClusterGeometry clGeom;
     private final ArrayList<Camera> cameras;
     private Color bgColor;
@@ -50,12 +51,20 @@ public class ClusteredView extends DefaultIdentifiable {
     public ClusteredView(ClusterGeometry clGeom,
             int origin,
             int viewCols, int viewRows,
-            List<Camera> cameras){
+            List<Camera> cameras)
+    {
+        this(clGeom, origin, viewCols, viewRows, cameras, 0);
+    }
+    public ClusteredView(ClusterGeometry clGeom,
+            int origin,
+            int viewCols, int viewRows,
+            List<Camera> cameras, int id){
         this.clGeom = clGeom;
         this.origin = origin;
         this.viewCols = viewCols;
         this.viewRows = viewRows;
         this.cameras = new ArrayList<Camera>(cameras);
+        this.id = id;
         this.bgColor = Color.DARK_GRAY;
 
         if(origin < 0){
@@ -74,6 +83,8 @@ public class ClusteredView extends DefaultIdentifiable {
 
     public ObjId getObjId(){ return objId; }
 
+    public int getId(){ return id; }
+    
     /**
      * Sets the background color for this ClusteredView.
      * @param color new background color

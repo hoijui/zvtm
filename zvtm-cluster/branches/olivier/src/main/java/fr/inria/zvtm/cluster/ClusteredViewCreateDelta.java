@@ -18,6 +18,7 @@ class ClusteredViewCreateDelta implements Delta {
     private final int origin;
     private final int viewCols;
     private final int viewRows;
+    private final int id;
     private final ArrayList<ObjId<Camera>> camRefs;
     private final Color bgColor;
     private final boolean drawPortalsOffScreen;
@@ -28,6 +29,7 @@ class ClusteredViewCreateDelta implements Delta {
         this.origin = cv.getOrigin();
         this.viewCols = cv.getViewCols();
         this.viewRows = cv.getViewRows();
+        this.id = cv.getId();
         this.camRefs = makeCamRefs(cv.getCameras());
         this.bgColor = cv.getBackgroundColor();
         this.drawPortalsOffScreen = cv.getDrawPortalsOffScreen();
@@ -57,7 +59,7 @@ class ClusteredViewCreateDelta implements Delta {
                 clGeom,
                 origin,
                 viewCols, viewRows,
-                refsToCameras(updater));
+                refsToCameras(updater), id);
         cv.setBackgroundColor(bgColor);
         cv.setDrawPortalsOffScreen(drawPortalsOffScreen);
         updater.putSlaveObject(objId, cv);
