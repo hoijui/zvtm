@@ -30,11 +30,16 @@ import fr.inria.zvtm.engine.VirtualSpace;
 public class OverviewPortal extends CameraPortal {
 
     Camera observedRegionCamera;
+    Vector<Camera> observedRegionCameras;
     View observedRegionView;
+    Vector<View> observedRegionViews;
     double[] observedRegion;
+    Vector<double[]> observedRegions;
     double orcoef;
+    Vector<Double> orcoefs;
 
     Color observedRegionColor = Color.GREEN;
+    Vector<Color> observedRegionColors;
 
     /** For translucency of the rectangle representing the region observed through the main viewport (default is 0.5)*/
     AlphaComposite acST;
@@ -45,7 +50,7 @@ public class OverviewPortal extends CameraPortal {
     /** Alpha channel value. */
     float alpha = 0.5f;
 
-    Timer borderTimer;
+    //Timer borderTimer;
 
     boolean drawObservedRegionLocator = false;
 
@@ -59,30 +64,54 @@ public class OverviewPortal extends CameraPortal {
      */
     public OverviewPortal(int x, int y, int w, int h, Camera pc, Camera orc){
         super(x, y, w, h, pc);
-        this.observedRegionCamera = orc;
-        this.observedRegionView = orc.getOwningView();
-        usedCameras.add(orc);
-        if (orc.getOwningSpace() != null){
-            usedSpaces.add(orc.getOwningSpace());
-        }
-        observedRegion = new double[4];
-        borderTimer = new Timer();
-        borderTimer.scheduleAtFixedRate(new BorderTimer(this), 40, 40);
+        Vector<Camera> vc = new Vector<Camera>();
+        vc.add(orc);
+        setup(vc);
     }
+
 
     public OverviewPortal(int x, int y, int w, int h, Vector<Camera> cvect, Camera orc){
         super(x, y, w, h, cvect);
-        this.observedRegionCamera = orc;
-        this.observedRegionView = orc.getOwningView();
-        usedCameras.add(orc);
-        if (orc.getOwningSpace() != null){
-            usedSpaces.add(orc.getOwningSpace());
-        }
-        observedRegion = new double[4];
-        borderTimer = new Timer();
-        borderTimer.scheduleAtFixedRate(new BorderTimer(this), 40, 40);
+        
+        Vector<Camera> vc = new Vector<Camera>();
+        vc.add(orc);
+        setup(vc);
     }
 
+    public OverviewPortal(int x, int y, int w, int h, Camera pc,  Vector<Camera> orcvect){
+        super(x, y, w, h, pc);
+        setup(orcvect);
+    }
+
+    public OverviewPortal(int x, int y, int w, int h, Vector<Camera> cvect,  Vector<Camera> orcvect){
+        super(x, y, w, h, cvect);
+        setup(orcvect);
+    }
+
+    protected void setup(Vector<Camera> orcvect){
+        observedRegionCameras = orcvect;
+        observedRegionCamera = orcvect.get(0);
+        observedRegionViews = new Vector<View>();
+        observedRegions = new Vector<double[]>();
+        observedRegionColors = new Vector<Color>();
+        for(Camera orc : orcvect){
+            observedRegionViews.add(orc.getOwningView());
+            usedCameras.add(orc);
+            if (orc.getOwningSpace() != null){
+                usedSpaces.add(orc.getOwningSpace());
+            }
+            observedRegions.add(new double[4]);
+            observedRegionColors.add(observedRegionColor);
+        }
+        observedRegionView = observedRegionViews.get(0);
+        observedRegion = observedRegions.get(0);
+    
+        //borderTimer = new Timer();
+        //borderTimer.scheduleAtFixedRate(new BorderTimer(this), 40, 40);
+    }
+
+    // for an ObservedRegionListener ... supoprt only main region
+    // disabled !!
     private class BorderTimer extends TimerTask {
 
         OverviewPortal portal;
@@ -95,7 +124,7 @@ public class OverviewPortal extends CameraPortal {
         }
 
         public void run(){
-            portal.getVisibleRegion(portalRegion);
+            portal.getVisibleRegion(portalRegion); // visible region in the main cam
             intersection[0] = portal.observedRegion[0] - portalRegion[0]; // west
             intersection[1] = portal.observedRegion[1] - portalRegion[1]; // north
             intersection[2] = portal.observedRegion[2] - portalRegion[2]; // east
@@ -119,20 +148,44 @@ public class OverviewPortal extends CameraPortal {
      *@param cy cursor y-coordinate (JPanel coordinates system)
      */
     public boolean coordInsideObservedRegion(int cx, int cy){
-	return (cx >= x-orHalfBorderWidth+w/2 + Math.round((observedRegion[0]-camera.vx)*orcoef) &&
-		cy >= y-orHalfBorderWidth+h/2 + Math.round((camera.vy-observedRegion[1])*orcoef) &&
-		cx <= x+orHalfBorderWidth+w/2 + Math.round((observedRegion[2]-camera.vx)*orcoef) &&
-		cy <= y+orHalfBorderWidth+h/2 + Math.round((camera.vy-observedRegion[3])*orcoef));
+	   return (cx >= x-orHalfBorderWidth+w/2 + Math.round((observedRegion[0]-camera.vx)*orcoef) &&
+		  cy >= y-orHalfBorderWidth+h/2 + Math.round((camera.vy-observedRegion[1])*orcoef) &&
+		  cx <= x+orHalfBorderWidth+w/2 + Math.round((observedRegion[2]-camera.vx)*orcoef) &&
+		  cy <= y+orHalfBorderWidth+h/2 + Math.round((camera.vy-observedRegion[3])*orcoef));
     }
 
+    public boolean coordInsideObservedRegion(int cx, int cy, int i){
+        if (i < 0 || i >= observedRegions.size()) { return false; }
+        double[] or = observedRegions.get(i);
+        return (cx >= x-orHalfBorderWidth+w/2 + Math.round((or[0]-camera.vx)*orcoef) &&
+            cy >= y-orHalfBorderWidth+h/2 + Math.round((camera.vy-or[1])*orcoef) &&
+            cx <= x+orHalfBorderWidth+w/2 + Math.round((or[2]-camera.vx)*orcoef) &&
+            cy <= y+orHalfBorderWidth+h/2 + Math.round((camera.vy-or[3])*orcoef));
+    }
     /** Set color of rectangle depicting what is seen through the main camera. */
     public void setObservedRegionColor(Color c){
 	    observedRegionColor = c;
+        observedRegionColors.set(0,c);
     }
-
+    public void setObservedRegionColor(int i, Color c){
+        if (i < 0 || i >= observedRegionColors.size()) { return; }
+        observedRegionColors.set(i,c);
+    }
+    public void setObservedRegionColors(Vector<Color> colvect){
+        for (int i = 0; i < observedRegionColors.size() &&  i < colvect.size(); i++){
+            observedRegionColors.set(i,colvect.get(i));
+        }
+    }
     /** Get color of rectangle depicting what is seen through the main camera. */
     public Color getObservedRegionColor(){
 	    return observedRegionColor;
+    }
+    public Color getObservedRegionColor(int i){
+        if (i < 0 || i >= observedRegionColors.size()) { return null; }
+        return observedRegionColors.get(i);
+    }
+    public Vector<Color> getObservedRegionColors(){
+        return observedRegionColors;
     }
 
     public void setObservedRegionTranslucency(float a){
@@ -187,6 +240,38 @@ public class OverviewPortal extends CameraPortal {
         return getObservedRegionY() + getObservedRegionH()/2.0;
     }
 
+    public double getObservedRegionX(int i) {
+        if (i < 0 || i >= observedRegions.size()) { return 0; }
+        double[] or = observedRegions.get(i);
+        orcoef = camera.focal/(camera.focal+camera.altitude);
+        return x+ (double)w/2.0 + (or[0]-camera.vx)*orcoef;
+    }
+    public double getObservedRegionY(int i) {
+        if (i < 0 || i >= observedRegions.size()) { return 0; }
+        double[] or = observedRegions.get(i);
+        orcoef = camera.focal/(camera.focal+camera.altitude);
+        return y+ h/2.0 - (or[1]-camera.vy)*orcoef;
+    }
+    public double getObservedRegionW(int i) {
+        if (i < 0 || i >= observedRegions.size()) { return 0; }
+        double[] or = observedRegions.get(i);
+        orcoef = camera.focal/(camera.focal+camera.altitude);
+        return (or[2]-or[0])*orcoef;
+    }
+    public double getObservedRegionH(int i) {
+        if (i < 0 || i >= observedRegions.size()) { return 0; }
+        double[] or = observedRegions.get(i);
+        orcoef = camera.focal/(camera.focal+camera.altitude);
+        return (or[1]-or[3])*orcoef;
+    }
+    public double getObservedRegionCX(int i) {
+        if (i < 0 || i >= observedRegions.size()) { return 0; }
+        return getObservedRegionX(i) + getObservedRegionW(i)/2.0;
+    }
+    public double getObservedRegionCY(int i) {
+        if (i < 0 || i >= observedRegions.size()) { return 0; }
+        return getObservedRegionY(i) + getObservedRegionH(i)/2.0;
+    }
     /**
      *@return null if translucency is 1.0f (opaque).
      */
@@ -197,7 +282,13 @@ public class OverviewPortal extends CameraPortal {
     public Camera getObservedRegionCamera(){
         return observedRegionCamera;
     }
-
+    public Camera getObservedRegionCamera(int i){
+        if (i < 0 || i >= observedRegionCameras.size()) { return null; }
+        return observedRegionCameras.get(i);
+    }
+    public Vector<Camera> getObservedRegionCameras(){
+        return observedRegionCameras;
+    }
     // for zvtm-cluster (observedRegionView is not correct)
     protected int obsViewWidth = 0;
     protected int obsViewHeight = 0;
@@ -212,7 +303,7 @@ public class OverviewPortal extends CameraPortal {
     }
 
     protected double[] getViewVisibleRegion(){
-        if (obsViewWidth == 0 || obsViewHeight == 0){
+       if (obsViewWidth == 0 || obsViewHeight == 0){
             return observedRegionView.getVisibleRegion(observedRegionCamera, observedRegion);
         }
         Camera c = observedRegionCamera;
@@ -222,6 +313,21 @@ public class OverviewPortal extends CameraPortal {
         observedRegion[2] = (c.vx - obsViewX*uncoef) + (obsViewWidth/2)*uncoef;
         observedRegion[3] = (c.vy - obsViewY*uncoef) - (obsViewHeight/2)*uncoef;
         return observedRegion;
+    }
+    protected double[] getViewVisibleRegion(int i){
+        if (i < 0 || i >= observedRegionCameras.size()) { return null; }
+        if (obsViewWidth == 0 || obsViewHeight == 0){
+            return observedRegionViews.get(i).getVisibleRegion(
+                observedRegionCameras.get(i), observedRegions.get(i));
+        }
+        Camera c = observedRegionCameras.get(i);
+        double uncoef = (c.focal+c.altitude) / c.focal;
+        double[] or =  observedRegions.get(i);
+        or[0] = (c.vx - obsViewX*uncoef) - (obsViewWidth/2)*uncoef;
+        or[1] = (c.vy - obsViewY*uncoef) + (obsViewHeight/2)*uncoef;
+        or[2] = (c.vx - obsViewX*uncoef) + (obsViewWidth/2)*uncoef;
+        or[3] = (c.vy - obsViewY*uncoef) - (obsViewHeight/2)*uncoef;
+        return or;
     }
 
     // FIXME: introduce an additional buffer for the obs region !
@@ -238,7 +344,7 @@ public class OverviewPortal extends CameraPortal {
             }
             if (repaintASAP){
                 repaintASAP=false;
-                // System.out.println("draw portal.... "+x+" "+y+" "+w+" "+h+" "+buffx+" "+backBufferW);
+                //System.out.println("draw portal.... "+x+" "+y+" "+w+" "+h+" "+buffx+" "+backBufferW);
                 try {
                     paintOnBack(stableRefToBackBufferGraphics, viewWidth, viewHeight, x, y);
                 }
@@ -331,43 +437,52 @@ public class OverviewPortal extends CameraPortal {
             }
         }
         // paint region observed through observedRegionCamera
-        observedRegion = getViewVisibleRegion();
-        //observedRegion = observedRegionView.getVisibleRegion(observedRegionCamera, observedRegion);
-        g2d.setColor(observedRegionColor);
-        orcoef = (float)(camera.focal/(camera.focal+camera.altitude));
-        int nwx = (int)(x-tx+backBufferTX+w/2d + Math.round((observedRegion[0]-camera.vx)*orcoef));
-        int nwy = (int)(y-ty+backBufferTY+h/2d - Math.round((observedRegion[1]-camera.vy)*orcoef));
-        int orw = (int)Math.round((observedRegion[2]-observedRegion[0])*orcoef);
-        int orh = (int)Math.round((observedRegion[1]-observedRegion[3])*orcoef);
-        if (acST != null){
-            g2d.setComposite(acST);
-            g2d.fillRect(nwx, nwy, orw, orh);
-            if (alphaC != null){
-                g2d.setComposite(alphaC);
-            }
-            else{
-                g2d.setComposite(Translucent.acO);
-            }
-        }
         if (orStroke!=null){
             g2d.setStroke(orStroke);
         }
         else{
             g2d.setStroke(standardStroke);
         }
-        g2d.drawRect(nwx, nwy, orw, orh);
-        if (drawObservedRegionLocator){
-            // west
-            g2d.drawRect(x-tx+backBufferTX, nwy+orh/2, nwx-x+tx-backBufferTX, 1);
-            // north
-            g2d.drawRect(nwx+orw/2, y-ty+backBufferTY, 1, nwy-y+ty-backBufferTY);
-            // east
-            g2d.drawRect(nwx+orw, nwy+orh/2, x+w-(nwx+orw), 1);
-            // south
-            g2d.drawRect(nwx+orw/2, nwy+orh, 1, y+h-(nwy+orh));
+        //System.out.println("observedRegions num: " + observedRegionCameras.size());
+        for (int i = 0; i < observedRegionCameras.size(); i++){
+            observedRegions.set(i, getViewVisibleRegion(i));
+            //observedRegion = observedRegionView.getVisibleRegion(observedRegionCamera, observedRegion);
+            g2d.setColor(observedRegionColors.get(i));
+            orcoef = (float)(camera.focal/(camera.focal+camera.altitude));
+            double[] or = observedRegions.get(i);
+            int nwx = (int)(x-tx+backBufferTX+w/2d + Math.round((or[0]-camera.vx)*orcoef));
+            int nwy = (int)(y-ty+backBufferTY+h/2d - Math.round((or[1]-camera.vy)*orcoef));
+            int orw = (int)Math.round((or[2]-or[0])*orcoef);
+            int orh = (int)Math.round((or[1]-or[3])*orcoef);
+            //System.out.println("observedRegions "+i+" "+nwx+" "+nwy+" "+orw+" "+orh);
+            if (acST != null){
+                g2d.setComposite(acST);
+                g2d.fillRect(nwx, nwy, orw, orh);
+                if (alphaC != null){
+                    g2d.setComposite(alphaC);
+                }
+                else{
+                    g2d.setComposite(Translucent.acO);
+                }
+                g2d.drawRect(nwx, nwy, orw, orh);
+            }
+            else{
+                g2d.fillRect(nwx, nwy, orw, orh);
+            }
+            if (drawObservedRegionLocator){
+                // west
+                g2d.drawRect(x-tx+backBufferTX, nwy+orh/2, nwx-x+tx-backBufferTX, 1);
+                // north
+                g2d.drawRect(nwx+orw/2, y-ty+backBufferTY, 1, nwy-y+ty-backBufferTY);
+                // east
+                g2d.drawRect(nwx+orw, nwy+orh/2, x+w-(nwx+orw), 1);
+                // south
+                g2d.drawRect(nwx+orw/2, nwy+orh, 1, y+h-(nwy+orh));
+            }
         }
         // reset Graphics2D
         g2d.setStroke(standardStroke);
+        //g2d.setClip(0, 0, viewWidth, viewHeight);
         if (borderColor != null){
             g2d.setColor(borderColor);
             if (stroke != null){
@@ -376,14 +491,14 @@ public class OverviewPortal extends CameraPortal {
             g2d.drawRect(x-tx+backBufferTX+borderWidthXYOff, y-ty+backBufferTY+borderWidthXYOff, w-borderWidthWHOff, h-borderWidthWHOff);
             g2d.setStroke(standardStroke);
         }
-         g2d.setClip(0, 0, viewWidth, viewHeight);
+        g2d.setClip(0, 0, viewWidth, viewHeight);
         if (alphaC != null){
             g2d.setComposite(Translucent.acO);
         }
     }
 
     public void dispose(){
-	    borderTimer.cancel();
+	    //borderTimer.cancel();
     }
 
     ObservedRegionListener observedRegionListener;
