@@ -87,6 +87,20 @@ aspect GlyphReplication {
            VirtualSpaceManager.INSTANCE.sendDelta(delta);
        }
 
+    pointcut dPathAddSegment(DPath dPath, double x, double y, boolean b):
+        execution(public void DPath.addSegment(double, double, boolean))
+        && this(dPath)
+        && args(x, y, b)
+        && if(VirtualSpaceManager.INSTANCE.isMaster());
+
+    after(DPath dPath, double x, double y, boolean b) returning:
+       dPathAddSegment(dPath, x, y, b) &&
+       !cflowbelow(dPathAddSegment(DPath, double, double, boolean)) &&
+       if(dPath.isReplicated()){
+           Delta delta = new DPathAddSegmentDelta(dPath.getObjId(), x, y, b);
+           VirtualSpaceManager.INSTANCE.sendDelta(delta);
+       }
+
     pointcut glyphMove(Glyph glyph):
         (execution(public void Glyph.moveTo(double, double)) ||
          execution(public void Glyph.move(double, double)))
@@ -196,6 +210,25 @@ aspect GlyphReplication {
             target.setEndPoints(sx, sy, ex, ey);
         }
     }
+
+    private static class DPathAddSegmentDelta implements Delta {
+        private final ObjId<DPath> targetId;
+        private final double x, y;
+        private final boolean b;
+
+        DPathAddSegmentDelta(ObjId<DPath> targetId, double x, double y, boolean b){
+            this.targetId = targetId;
+            this.x= x; this.y= y;
+            this.b = b;;
+        }
+
+        public void apply(SlaveUpdater updater){
+            DPath target = updater.getSlaveObject(targetId);
+            target.addSegment(x, y, b);
+        }
+    }
+
+
     private static class GlyphMoveDelta implements Delta {
         private final ObjId<Glyph> targetId;
         private final double x;

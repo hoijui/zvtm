@@ -78,7 +78,8 @@ public aspect AutoReplay extends AbstractAutoReplay {
          execution(public void VText.setScaleIndependent(boolean)) ||
          execution(public void ClosedShape.setDrawBorder(boolean)) ||
          execution(public void ClosedShape.setFilled(boolean)) ||
-         execution(public void DPath.addSegment(double, double, boolean)) ||
+         //DPath.addSegment moved  to a static Delta (see GlyphReplication)
+         //execution(public void DPath.addSegment(double, double, boolean)) ||
          execution(public void DPath.addCbCurve(double, double, double, double, double, double, boolean)) ||
          execution(public void DPath.addQdCurve(double, double, double, double, boolean)) ||
          execution(public void DPath.setDrawingMethod(short)) ||

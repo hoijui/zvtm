@@ -292,7 +292,7 @@ class SlaveOptions {
         int blockNumber = 0;
     
     @Option(name = "-i", aliases = {"--id"}, usage = "slave id")
-        int id = -1;
+        int id = 0;
     
     @Option(name = "-n", aliases = {"--app-name"}, usage = "application name (should match master program)")
         String appName = "zvtmApplication";
