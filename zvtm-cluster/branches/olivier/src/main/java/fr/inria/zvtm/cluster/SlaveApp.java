@@ -101,11 +101,9 @@ public class SlaveApp {
     }
 
     boolean ownsBlock(ClusteredView cv){
-        //return ((cv.ownsBlock(options.blockNumber) && cv.getId() == -1) || (options.blockNumber == cv.getId()));
         return (cv.ownsBlock(options.blockNumber) && cv.getId() == options.id);
     }
     void createLocalView(ClusteredView cv){
-        //if (!cv.ownsBlock(options.blockNumber)){
         if (!ownsBlock(cv)) {
             return;
         }
@@ -115,7 +113,7 @@ public class SlaveApp {
         }
         clusteredView = cv;
         view = vsm.addFrameView(cv.getCameras(),
-                "slaveView " + options.blockNumber,
+                "slaveView " + options.blockNumber +"-"+cv.getId(),
                 getViewType(),
                 cv.getClusterGeometry().getBlockWidth()*options.width,
                 cv.getClusterGeometry().getBlockHeight()*options.height,
@@ -188,14 +186,21 @@ public class SlaveApp {
 
     void destroyOverlayCamera(ClusteredView cv){
         if (clusteredView == null ||  !ownsBlock(cv)) { return; }
-            // !cv.ownsBlock(options.blockNumber)) { return; }
         clusteredView.destroyOverlayCamera();
         VirtualSpaceManager.INSTANCE.destroyOverlayCamera(view);
     }
 
     void setCameraLocation(Location masterLoc, Camera slaveCamera){
         if(clusteredView == null || (!clusteredView.ownsCamera(slaveCamera))){
-            slaveCamera.setLocation(masterLoc);
+            if (slaveCamera != null) {
+                slaveCamera.setLocation(masterLoc);
+            }
+            else{
+                System.out.println("SlaveApp[setCameraLocation] WARN slaveCamera null");
+            }
+            if (view != null){
+                view.checkRepaintExt(slaveCamera);
+            }
             return;
         }
         double focal = slaveCamera.getFocal();

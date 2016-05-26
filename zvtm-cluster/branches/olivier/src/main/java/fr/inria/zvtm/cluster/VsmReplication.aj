@@ -192,7 +192,6 @@ aspect VsmReplication {
     private static class CameraPortalReplicator implements PortalReplicator {
         protected final int x,y,w,h;
         protected float a;
-        //protected final ObjId<Camera> camId;
         protected final ArrayList<ObjId<Camera>> camIds;
 
         CameraPortalReplicator(CameraPortal source){
@@ -201,13 +200,10 @@ aspect VsmReplication {
             this.w = source.w;
             this.h = source.h;
             this.a = source.getTranslucencyValue();
-            //this.camId = source.getCamera().getObjId();
             this.camIds =  makeCamRefs(source.getCameras());
         }
 
         public Portal createPortal(SlaveUpdater updater) {
-            //Camera cam = updater.getSlaveObject(this.camId);
-            //System.out.println("Create Portal !!!");
             Portal p = new CameraPortal(x, y, w, h, refsToCameras(updater, camIds), a);
             updater.setPortalLocationAndSize(p, x, y, w, h);
             return p;
@@ -239,7 +235,6 @@ aspect VsmReplication {
         }
 
         public Portal createPortal(SlaveUpdater updater) {
-            //Camera cam = updater.getSlaveObject(this.camId);
             Portal p = new DraggableCameraPortal(x, y, w, h, refsToCameras(updater, camIds));
             updater.setPortalLocationAndSize(p,x, y, w, h);
             return p;
@@ -261,18 +256,15 @@ aspect VsmReplication {
     }
 
     private static class OverviewPortalReplicator extends CameraPortalReplicator {
-        //protected final ObjId<Camera> obscamId;
         protected final ArrayList<ObjId<Camera>> obsCamIds;
 
         OverviewPortalReplicator(OverviewPortal source){
            super(source);
-           //obscamId = source.getObservedRegionCamera().getObjId();
            obsCamIds = makeCamRefs(source.getObservedRegionCameras());
         }
 
         public Portal createPortal(SlaveUpdater updater) {
             //Camera cam = updater.getSlaveObject(this.camId);
-            //OverviewPortal p = new OverviewPortal(x, y, w, h, refsToCameras(updater, camIds), obsCam);
             OverviewPortal p = new OverviewPortal(x, y, w, h, refsToCameras(updater, camIds), refsToCameras(updater, obsCamIds));
             updater.setOverviewPortalObservedViewLocationAndSize(p);
             updater.setPortalLocationAndSize(p,x, y, w, h);

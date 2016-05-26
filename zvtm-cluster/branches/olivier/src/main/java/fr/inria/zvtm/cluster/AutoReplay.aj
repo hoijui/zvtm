@@ -107,7 +107,7 @@ public aspect AutoReplay extends AbstractAutoReplay {
          execution(public void DraggableCameraPortal.setDragBarColor(Color)) ||
          execution(public void OverviewPortal.drawObservedRegionLocator(boolean)) ||
          execution(public void OverviewPortal.setObservedRegionColor(Color)) ||
-         execution(public void OverviewPortal.setObservedRegionColors(int, Color)) ||
+         execution(public void OverviewPortal.setObservedRegionColor(int, Color)) ||
          execution(public void OverviewPortal.setObservedRegionTranslucency(float)) ||
          execution(public void OverviewPortal.setObservedRegionBorderWidth(float))
 
