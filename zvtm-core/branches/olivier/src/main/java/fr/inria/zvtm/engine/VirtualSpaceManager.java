@@ -385,6 +385,15 @@ public class VirtualSpaceManager implements AWTEventListener {
             allViews[i].repaint(c);
         }
     }
+
+     //**used internally */ 
+    void checkRepaintExt(View v, Camera c){
+        for (int i=0;i<allViews.length;i++){
+            if (allViews[i] != v){
+                allViews[i].checkRepaintExt(c);
+            }
+        }
+    }
     /** Ask for View v to be repainted. This is an asynchronous call.
      * In some cases it is not possible to detect graphical changes so repaint
      * calls have to be issued manually (unless you are willing to wait for

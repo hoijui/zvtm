@@ -777,6 +777,23 @@ public abstract class View {
             }
         }
         panel.repaintCount++;
+
+        // a cam can be monitored by a OverviewPortal in an other view...
+        // we call checkRepaintExt below for the other View
+        VirtualSpaceManager.INSTANCE.checkRepaintExt(this, cam);
+    }
+
+    public void checkRepaintExt(Camera cam){
+        boolean rps = false;
+        for(int i = 0; i < portals.length; i++){
+            rps = rps || portals[i].checkSetRepaint(cam);
+            // do not break because we have to informs the portal...
+        }
+        panel.repaintPortals = panel.repaintPortals || rps;
+        if (panel.repaintPortals){
+            panel.repaintASAP = true;
+            panel.repaintCount++;
+        }
     }
 
     /** Ask for the view to be repainted. This is an asynchronous call.

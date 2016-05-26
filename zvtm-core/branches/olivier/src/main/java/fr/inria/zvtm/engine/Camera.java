@@ -709,7 +709,7 @@ public class Camera {
     public void setEnabled(boolean b){
         if (b != enabled){
             enabled = b;
-	    VirtualSpaceManager.INSTANCE.repaint(view, this);
+            VirtualSpaceManager.INSTANCE.repaint(view, this);
         }
     }
 
