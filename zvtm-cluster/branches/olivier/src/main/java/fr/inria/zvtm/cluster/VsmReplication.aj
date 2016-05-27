@@ -127,6 +127,14 @@ aspect VsmReplication {
         _destroyClusteredView(cv);
     }
     
+    public ClusteredView VirtualSpaceManager.getClusteredViewById(int id){
+        for (int i=0;i<allClusteredViews.length;i++){
+            if (allClusteredViews[i].getId() == id){
+               return allClusteredViews[i];
+            }
+        }
+        return null;
+    }
     /** */
     public void VirtualSpaceManager.setClusteredOverlayCamera(Camera cov, ClusteredView cv){
         sendDelta(new SetClusteredOverlayDelta(cov.getObjId(), cv.getObjId()));

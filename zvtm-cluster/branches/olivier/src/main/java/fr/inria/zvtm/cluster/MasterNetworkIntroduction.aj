@@ -123,8 +123,13 @@ aspect MasterNetworkIntroduction {
                     final Message mmsg = msg;
                     SwingUtilities.invokeLater(new Runnable(){
                         public void run(){
-                            // for now we receive only sync paint msg from the slaves 
-                            VirtualSpaceManager.INSTANCE.handleSyncPaint(mmsg);
+                            if(mmsg.getObject() instanceof ToMasterMsg){
+                                ((ToMasterMsg)mmsg.getObject()).apply();
+                            }
+                            else {
+                                // for now we receive only sync paint msg from the slaves
+                                VirtualSpaceManager.INSTANCE.handleSyncPaint(mmsg);
+                            }
                         }
                     });
                 }

@@ -312,6 +312,10 @@ public class SlaveUpdater {
          networkDelegate.sendMsg(str);
     }
 
+    public void sendMessage(ToMasterMsg m){
+         networkDelegate.sendMsg(m);
+    }
+
     class NetworkDelegate {
         private JChannel channel;
         private final String appName;
@@ -351,6 +355,21 @@ public class SlaveUpdater {
             }
         }
 
+        public void sendMsg(ToMasterMsg m){
+            if (masterAddress == null){ 
+                // System.err.println("slave updater do not have masterAddress");
+                return;
+            }
+            try {
+                Message msg=new Message(masterAddress, null, m);
+                // do bundle for sync ....
+                //msg.setFlag(Message.DONT_BUNDLE);
+                channel.send(msg);
+            } catch(Exception e) {
+                System.err.println("slave updater fail to send msg");
+                logger.error("Could not send msg: " + e);
+            }
+        }
         //start listening on the appropriate channel,
         //handle incoming messages (optionnally post reply
         //or error messages)

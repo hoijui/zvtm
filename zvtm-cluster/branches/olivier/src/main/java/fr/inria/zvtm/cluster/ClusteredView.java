@@ -244,6 +244,19 @@ public class ClusteredView extends DefaultIdentifiable {
         }
     }
 
+    void handleSyncHello(Message msg){
+        num_slaves++;
+        Address add = msg.getSrc(); 
+        String s = (msg.getSrc()).toString();
+        slaves.put(s,new SlaveInfo(add));
+    }
+
+    void handleSyncBye(Message msg){
+        String s = (msg.getSrc()).toString();
+        num_slaves--;
+        slaves.remove(s);
+    }
+
     void  handleSyncPaint(Message msg)
     {    
         if(!VirtualSpaceManager.INSTANCE.isMaster()){
@@ -334,6 +347,93 @@ public class ClusteredView extends DefaultIdentifiable {
         }
     }
 
+    // --------------------------------------------------------------
+    // the slaves listener
+    ClusteredViewListener cvListener = null;
+
+    public void setListener(ClusteredViewListener cvl){
+        cvListener = cvl;
+    }
+    public void removeListener(){
+        cvListener = null;
+    }
+
+    // FIXME...
+    int blockXToViewX(int b, int x) { return x; }
+    int blockYToViewY(int b, int y) { return y; }
+
+    public void slavePress(int blockNumber, int button, int mod, int jpx, int jpy){
+        if (cvListener == null){ return; }
+        jpx = blockXToViewX(blockNumber, jpx);
+        jpy = blockYToViewY(blockNumber, jpy);
+        if (button == 1){
+            cvListener.press1(blockNumber, mod, jpx, jpy);
+        }
+        else if (button == 2){
+            cvListener.press2(blockNumber, mod, jpx, jpy);
+        }
+        else if (button == 3){
+            cvListener.press3(blockNumber, mod, jpx, jpy);
+        }
+    }
+    public void slaveClick(int blockNumber, int button, int mod, int jpx, int jpy, int clickNumber){
+        if (cvListener == null){ return; }
+        jpx = blockXToViewX(blockNumber, jpx);
+        jpy = blockYToViewY(blockNumber, jpy);
+        if (button == 1){
+            cvListener.click1(blockNumber, mod, jpx, jpy, clickNumber);
+        }
+        else if (button == 2){
+            cvListener.click2(blockNumber, mod, jpx, jpy, clickNumber);
+        }
+        else if (button == 3){
+            cvListener.click3(blockNumber, mod, jpx, jpy, clickNumber);
+        }
+    }
+    public void slaveRelease(int blockNumber, int button, int mod, int jpx, int jpy){
+        if (cvListener == null){ return; }
+        jpx = blockXToViewX(blockNumber, jpx);
+        jpy = blockYToViewY(blockNumber, jpy);
+        if (button == 1){
+            cvListener.release1(blockNumber, mod, jpx, jpy);
+        }
+        else if (button == 2){
+            cvListener.release2(blockNumber, mod, jpx, jpy);
+        }
+        else if (button == 3){
+            cvListener.release3(blockNumber, mod, jpx, jpy);
+        }
+    }
+    public void slaveMouseMoved(int blockNumber, int jpx, int jpy){
+        if (cvListener == null){ return; }
+        jpx = blockXToViewX(blockNumber, jpx);
+        jpy = blockYToViewY(blockNumber, jpy);
+        cvListener.mouseMoved(blockNumber, jpx, jpy);
+    }
+    public void slaveMouseDragged(int blockNumber, int button, int mod, int jpx, int jpy){
+        if (cvListener == null){ return; }
+        jpx = blockXToViewX(blockNumber, jpx);
+        jpy = blockYToViewY(blockNumber, jpy);
+        cvListener.mouseDragged(blockNumber, mod, button, jpx, jpy);
+    }
+    public void slaveMouseWheelMoved(int blockNumber, short wheelDirection, int jpx, int jpy){
+        if (cvListener == null){ return; }
+        jpx = blockXToViewX(blockNumber, jpx);
+        jpy = blockYToViewY(blockNumber, jpy);
+        cvListener.mouseWheelMoved(blockNumber, wheelDirection, jpx, jpy);
+    }
+    public void slaveKtype(int blockNumber, char c, int code, int mod){
+        if (cvListener == null){ return; }
+        cvListener.Ktype(blockNumber, c, code, mod);
+    }
+    public void slaveKpress(int blockNumber, char c, int code, int mod){
+        if (cvListener == null){ return; }
+        cvListener.Kpress(blockNumber, c, code, mod);
+    }
+    public void slaveKrelease(int blockNumber, char c, int code, int mod){
+        if (cvListener == null){ return; }
+        cvListener.Krelease(blockNumber, c, code, mod);
+    }
     // --------------------------------------------------------------
 
     /**tell to renderer (or not) the portals with offscreen buffers */

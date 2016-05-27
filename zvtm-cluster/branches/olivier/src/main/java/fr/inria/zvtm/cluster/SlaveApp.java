@@ -9,6 +9,7 @@ import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.event.ViewAdapter;
+import fr.inria.zvtm.event.ViewListener;
 import fr.inria.zvtm.engine.ViewPanel;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.Glyph;
@@ -23,6 +24,8 @@ import java.awt.GraphicsEnvironment;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.ComponentEvent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -120,7 +123,14 @@ public class SlaveApp {
                 false, false, !options.undecorated, null);
         view.setBackgroundColor(cv.getBackgroundColor());
         view.setDrawPortalsOffScreen(cv.getDrawPortalsOffScreen());
-        view.setListener(new SlaveEventHandler());
+        if (options.eventFWD){
+            SlaveMsgEventHandler smeh = new SlaveMsgEventHandler();
+            view.setListener(smeh);
+            view.getPanel().getComponent().addComponentListener(smeh);
+        }
+        else{
+            view.setListener(new SlaveEventHandler());
+        }
         panel = (JPanel)view.getPanel().getComponent();
         view.getPanel().setRefreshRate(options.refreshPeriod);
         if (options.antialiasing){
@@ -285,7 +295,120 @@ public class SlaveApp {
         @Override
         public void viewClosing(View v){System.exit(0);}
     }
+
+// -------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------
+ 
+    protected class SlaveMsgEventHandler extends ViewAdapter implements ComponentListener
+    {
+       
+        @Override   
+        public void press1(ViewPanel v,int mod, int jpx, int jpy, MouseEvent e){
+            ToMasterPress d = new ToMasterPress(options.id, options.blockNumber, 1, mod, jpx, jpy);
+            updater.sendMessage(d);
+        }
+
+        @Override public void release1(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+            ToMasterRelease d = new ToMasterRelease(options.id, options.blockNumber, 1, mod, jpx, jpy);
+            updater.sendMessage(d);
+        }
+
+        @Override public void click1(ViewPanel v,int mod,int jpx,int jpy, int clickNumber, MouseEvent e){
+            ToMasterClick d = new ToMasterClick(options.id, options.blockNumber, 1, mod, jpx, jpy, clickNumber);
+            updater.sendMessage(d);
+        }
+
+        @Override public void press2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+            ToMasterPress d = new ToMasterPress(options.id, options.blockNumber, 2, mod, jpx, jpy);
+            updater.sendMessage(d);
+        }
+
+        @Override public void release2(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+            ToMasterRelease d = new ToMasterRelease(options.id, options.blockNumber,2, mod, jpx, jpy);
+            updater.sendMessage(d);
+        }
+
+        @Override public void click2(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
+            ToMasterClick d = new ToMasterClick(options.id, options.blockNumber, 2, mod, jpx, jpy, clickNumber);
+            updater.sendMessage(d);
+        }
+
+        @Override public void press3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+            ToMasterPress d = new ToMasterPress(options.id, options.blockNumber, 3, mod, jpx, jpy);
+            updater.sendMessage(d);
+        }
+
+        @Override public void release3(ViewPanel v,int mod,int jpx,int jpy, MouseEvent e){
+            ToMasterRelease d = new ToMasterRelease(options.id, options.blockNumber,3, mod, jpx, jpy);
+            updater.sendMessage(d);
+        }
+
+        @Override public void click3(ViewPanel v,int mod,int jpx,int jpy,int clickNumber, MouseEvent e){
+            ToMasterClick d = new ToMasterClick(options.id, options.blockNumber, 3, mod, jpx, jpy, clickNumber);
+            updater.sendMessage(d);
+        }
+
+        @Override public void mouseMoved(ViewPanel v,int jpx,int jpy, MouseEvent e){
+            ToMasterMouseMoved d = new ToMasterMouseMoved(options.id, options.blockNumber, jpx, jpy);
+            updater.sendMessage(d);
+        }
+
+        @Override public void mouseDragged(ViewPanel v,int mod,int buttonNumber,int jpx,int jpy, MouseEvent e){
+            ToMasterMouseDragged d = new ToMasterMouseDragged(options.id, options.blockNumber, buttonNumber, mod, jpx, jpy);
+            updater.sendMessage(d);
+        }
+
+        @Override public void mouseWheelMoved(
+            ViewPanel v,short wheelDirection,int jpx,int jpy, MouseWheelEvent e) {
+             ToMasterMouseWheelMoved d = new ToMasterMouseWheelMoved(options.id, options.blockNumber, wheelDirection, jpx, jpy);
+            updater.sendMessage(d);
+        }
+
+        //@Override public void enterGlyph(Glyph g){}
+        //@Override public void exitGlyph(Glyph g){}
+
+        @Override
+        public void Ktype(ViewPanel v, char c,int code, int mod, KeyEvent e){
+            ToMasterKtype d = new ToMasterKtype(options.id, options.blockNumber, c, code, mod);
+            updater.sendMessage(d);
+        }
+
+        @Override public void Kpress(ViewPanel v,char c, int code,int mod, KeyEvent e){
+            ToMasterKpress d = new ToMasterKpress(options.id, options.blockNumber, c, code, mod);
+            updater.sendMessage(d);
+        }
+
+        @Override public void Krelease(ViewPanel v,char c, int code, int mod, KeyEvent e){
+            ToMasterKrelease d = new ToMasterKrelease(options.id, options.blockNumber, c, code, mod);
+            updater.sendMessage(d);
+        }
+
+        // NEED THAT ????
+        @Override public void viewActivated(View v){
+        }
+
+        @Override public void viewDeactivated(View v){}
+
+        @Override public void viewIconified(View v){}
+
+        @Override public void viewDeiconified(View v){}
+
+        @Override public void viewClosing(View v){
+            System.exit(0);
+        }
+
+        /*ComponentListener*/
+        @Override     public void componentHidden(ComponentEvent e){}
+        @Override     public void componentMoved(ComponentEvent e){}
+        @Override     public void componentResized(ComponentEvent e){}
+        @Override     public void componentShown(ComponentEvent e){}
+
+    } 
+
 }
+
+// -------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------
 
 class SlaveOptions {
     @Option(name = "-b", aliases = {"--block"}, usage = "clustered view block number (slave index)")
@@ -332,5 +455,8 @@ class SlaveOptions {
 
     @Option(name = "-hb", aliases = {"--h-block"}, usage = "height in block (default 1)")
 		int height = 1;
+
+    @Option(name = "-e", usage = "enable event forward from the slave")
+        boolean eventFWD = false;
 }
 
