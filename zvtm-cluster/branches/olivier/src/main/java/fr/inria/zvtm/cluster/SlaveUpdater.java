@@ -196,6 +196,11 @@ public class SlaveUpdater {
         appDelegate.setBackgroundColor(cv, bgColor);
     }
 
+    void enableEventForwarding(ClusteredView cv, boolean v){
+        if (!ownsBlock(cv)) { return; }
+        appDelegate.enableEventForwarding(v);
+    }
+
     // ----------------------------------------------
     // sync stuff
 
@@ -383,14 +388,14 @@ public class SlaveUpdater {
 
             channel.setReceiver(new ReceiverAdapter(){
                 @Override public void viewAccepted(View newView){
-                     System.err.println("slave new view: {}"+ newView);
-                    logger.info("slave new view: {}", newView);
+                    //System.err.println("slave new view: {}"+ newView);
+                    //logger.info("slave new view: {}", newView);
                 }
 
                 @Override public void receive(Message msg){
                     if(!(msg.getObject() instanceof Delta)){
-                        logger.warn("wrong message type (Delta expected)");
-                        System.err.println("wrong message type (Delta expected)");
+                        //logger.warn("wrong message type (Delta expected)");
+                        //System.err.println("wrong message type (Delta expected)");
                         return;
                     }
 

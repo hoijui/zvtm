@@ -78,8 +78,7 @@ public class SlaveApp {
         }
 
         SlaveApp app = new SlaveApp(options);
-        updater = new SlaveUpdater(options.appName,
-                options.blockNumber);
+        updater = new SlaveUpdater(options.appName, options.blockNumber);
         updater.setAppDelegate(app);
         updater.startOperation();
     }
@@ -180,6 +179,19 @@ public class SlaveApp {
         }
         //
         updater.setSyncPaintImmediately();
+        ToMasterStarted d = new ToMasterStarted(options.id, options.blockNumber);
+        updater.sendMessage(d);
+    }
+
+    void enableEventForwarding(boolean v){
+        if (v){
+            SlaveMsgEventHandler smeh = new SlaveMsgEventHandler();
+            view.setListener(smeh);
+            view.getPanel().getComponent().addComponentListener(smeh);
+        }
+        else{
+            view.setListener(new SlaveEventHandler());
+        }
     }
 
     void paintImmediately(){

@@ -166,13 +166,13 @@ public class ClusteredView extends DefaultIdentifiable {
      * this ClusteredView. Note that blocks are ordered column-wise,
      * and block numbers start at zero.
      */
-    int getOrigin() { return origin; }
+    public int getOrigin() { return origin; }
 
-    ClusterGeometry getClusterGeometry(){ return clGeom; }
+    public ClusterGeometry getClusterGeometry(){ return clGeom; }
 
-    int getViewRows() { return viewRows; }
+    public int getViewRows() { return viewRows; }
 
-    int getViewCols() { return viewCols; }
+    public int getViewCols() { return viewCols; }
 
     //vector for compatibility with zvtm views
     Vector<Camera> getCameras(){
@@ -186,7 +186,26 @@ public class ClusteredView extends DefaultIdentifiable {
         overlayCamera = null;
     }
 
-    // -----------------------------------------
+    // --------------------------------------------------------------
+    // start
+    int slavesCount = 0;
+    int numSlaves = 0;
+    ClusteredViewStartListener cvStartListener = null;
+
+    void slaveStarted(int bn){
+        slavesCount++;
+        //System.out.println("Master ClusterView of id "+id+" slave "+bn+" connected. We have "+slavesCount+" slaves");
+        if (cvStartListener != null && slavesCount==numSlaves){
+            cvStartListener.started(this);
+        } 
+    }
+
+    public void setStartListener(int ns, ClusteredViewStartListener cvsl){
+        numSlaves = ns;
+        cvStartListener = cvsl;
+    }
+
+    // --------------------------------------------------------------
     // Sync stuff (master!)
 
     private boolean isSyncronous = false;
@@ -348,7 +367,7 @@ public class ClusteredView extends DefaultIdentifiable {
     }
 
     // --------------------------------------------------------------
-    // the slaves listener
+    // the slaves event listener
     ClusteredViewListener cvListener = null;
 
     public void setListener(ClusteredViewListener cvl){
@@ -358,9 +377,12 @@ public class ClusteredView extends DefaultIdentifiable {
         cvListener = null;
     }
 
-    // FIXME...
-    int blockXToViewX(int b, int x) { return x; }
-    int blockYToViewY(int b, int y) { return y; }
+    public void enableEventForwarding(boolean v){
+        VirtualSpaceManager.INSTANCE.sendDelta(new EventForwardingDelta(this, v));
+    }
+   
+    int blockXToViewX(int b, int x) { return x + colNum(b)*clGeom.getBlockWidth() ; }
+    int blockYToViewY(int b, int y) { return y + rowNum(b)*clGeom.getBlockHeight(); }
 
     public void slavePress(int blockNumber, int button, int mod, int jpx, int jpy){
         if (cvListener == null){ return; }
