@@ -122,14 +122,7 @@ public class SlaveApp {
                 false, false, !options.undecorated, null);
         view.setBackgroundColor(cv.getBackgroundColor());
         view.setDrawPortalsOffScreen(cv.getDrawPortalsOffScreen());
-        if (options.eventFWD){
-            SlaveMsgEventHandler smeh = new SlaveMsgEventHandler();
-            view.setListener(smeh);
-            view.getPanel().getComponent().addComponentListener(smeh);
-        }
-        else{
-            view.setListener(new SlaveEventHandler());
-        }
+        view.setListener(new SlaveEventHandler());
         panel = (JPanel)view.getPanel().getComponent();
         view.getPanel().setRefreshRate(options.refreshPeriod);
         if (options.antialiasing){
@@ -183,13 +176,18 @@ public class SlaveApp {
         updater.sendMessage(d);
     }
 
+    SlaveMsgEventHandler smeh = null;
     void enableEventForwarding(boolean v){
         if (v){
-            SlaveMsgEventHandler smeh = new SlaveMsgEventHandler();
+            smeh = new SlaveMsgEventHandler();
             view.setListener(smeh);
             view.getPanel().getComponent().addComponentListener(smeh);
         }
         else{
+            if (smeh != null) {
+                view.getPanel().getComponent().removeComponentListener(smeh);
+                smeh = null;
+            }
             view.setListener(new SlaveEventHandler());
         }
     }
@@ -467,8 +465,5 @@ class SlaveOptions {
 
     @Option(name = "-hb", aliases = {"--h-block"}, usage = "height in block (default 1)")
 		int height = 1;
-
-    @Option(name = "-e", usage = "enable event forward from the slave")
-        boolean eventFWD = false;
 }
 
