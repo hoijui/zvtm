@@ -122,7 +122,8 @@ public class SlaveApp {
                 false, false, !options.undecorated, null);
         view.setBackgroundColor(cv.getBackgroundColor());
         view.setDrawPortalsOffScreen(cv.getDrawPortalsOffScreen());
-        view.setListener(new SlaveEventHandler());
+        //view.setListener(new SlaveEventHandler());
+        enableEventForwarding(cv.getEventForwarding());
         panel = (JPanel)view.getPanel().getComponent();
         view.getPanel().setRefreshRate(options.refreshPeriod);
         if (options.antialiasing){
@@ -177,7 +178,11 @@ public class SlaveApp {
     }
 
     SlaveMsgEventHandler smeh = null;
+    boolean eventFWD = false;
+
     void enableEventForwarding(boolean v){
+        if (view == null) { return; }
+        eventFWD = v;
         if (v){
             smeh = new SlaveMsgEventHandler();
             view.setListener(smeh);

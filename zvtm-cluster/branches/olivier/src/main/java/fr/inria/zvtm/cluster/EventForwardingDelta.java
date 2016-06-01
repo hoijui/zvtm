@@ -16,7 +16,9 @@ class EventForwardingDelta implements Delta {
 
     public void apply(SlaveUpdater updater){
     	ClusteredView cv = updater.getSlaveObject(objId);
-        updater.enableEventForwarding(cv, dofwd);
+    	if (cv != null){
+        	updater.enableEventForwarding(cv, dofwd);
+    	}
     }
 }
 

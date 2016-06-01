@@ -39,6 +39,7 @@ public class ClusteredView extends DefaultIdentifiable {
     private Color bgColor;
     private Camera overlayCamera = null;
     private boolean drawPortalsOffScreen = false;
+    private boolean eventForwarding = false;
 
     /**
      * Constructs a new ClusteredView.
@@ -378,9 +379,14 @@ public class ClusteredView extends DefaultIdentifiable {
     }
 
     public void enableEventForwarding(boolean v){
-        VirtualSpaceManager.INSTANCE.sendDelta(new EventForwardingDelta(this, v));
+        eventForwarding = v;
+        if(VirtualSpaceManager.INSTANCE.isMaster()) {
+            VirtualSpaceManager.INSTANCE.sendDelta(new EventForwardingDelta(this, v));
+        }
     }
    
+    public boolean getEventForwarding() { return eventForwarding; }
+
     int blockXToViewX(int b, int x) { return x + colNum(b)*clGeom.getBlockWidth() ; }
     int blockYToViewY(int b, int y) { return y + rowNum(b)*clGeom.getBlockHeight(); }
 
