@@ -87,6 +87,36 @@ aspect GlyphReplication {
             VirtualSpaceManager.INSTANCE.sendDelta(delta);
        }
 
+    pointcut glyphStick(Glyph glyph, Glyph sticked):
+        (execution(public void Glyph.stick(Glyph)))
+        && this(glyph)
+        && args(sticked)
+        && if(VirtualSpaceManager.INSTANCE.isMaster());
+
+    after(Glyph glyph, Glyph sticked) returning:
+        glyphStick(glyph, sticked) &&
+        !cflowbelow(glyphStick(Glyph,Glyph)) &&
+        if(glyph.isReplicated()){
+            Delta delta = new GlyphStickDelta(glyph.getObjId(),
+                                              sticked.getObjId());
+            VirtualSpaceManager.INSTANCE.sendDelta(delta);
+       }
+
+    pointcut glyphUnStick(Glyph glyph, Glyph sticked):
+        (execution(public void Glyph.unstick(Glyph)))
+        && this(glyph)
+        && args(sticked)
+        && if(VirtualSpaceManager.INSTANCE.isMaster());
+
+    after(Glyph glyph, Glyph sticked) returning:
+        glyphUnStick(glyph, sticked) &&
+        !cflowbelow(glyphUnStick(Glyph,Glyph)) &&
+        if(glyph.isReplicated()){
+            Delta delta = new GlyphUnStickDelta(glyph.getObjId(),
+                                                sticked.getObjId());
+            VirtualSpaceManager.INSTANCE.sendDelta(delta);
+       }
+
     private static class PaintDelta implements Delta {
         private final ObjId<PRectangle> targetId;
         private final Paint paint;
@@ -179,8 +209,41 @@ aspect GlyphReplication {
 
         public void apply(SlaveUpdater updater){
             Glyph target = updater.getSlaveObject(targetId);
+            // System.out.println("Moving target "+target);
             target.moveTo(x, y);
         }
     }
-}
 
+    private static class GlyphStickDelta implements Delta {
+        private final ObjId<Glyph> targetId;
+        private final ObjId<Glyph> toStickId;
+
+        GlyphStickDelta(ObjId<Glyph> targetId, ObjId<Glyph> toStickId){
+            this.targetId = targetId;
+            this.toStickId = toStickId;
+        }
+
+        public void apply(SlaveUpdater updater){
+            Glyph target = updater.getSlaveObject(this.targetId);
+            Glyph toStick = updater.getSlaveObject(this.toStickId);
+            target.stick(toStick);
+        }
+    }
+
+    private static class GlyphUnStickDelta implements Delta {
+        private final ObjId<Glyph> targetId;
+        private final ObjId<Glyph> stickedId;
+
+        GlyphUnStickDelta(ObjId<Glyph> targetId, ObjId<Glyph> stickedId){
+            this.targetId = targetId;
+            this.stickedId = stickedId;
+        }
+
+        public void apply(SlaveUpdater updater){
+            Glyph target = updater.getSlaveObject(this.targetId);
+            Glyph sticked = updater.getSlaveObject(this.stickedId);
+            target.unstick(sticked);
+        }
+    }
+
+}
