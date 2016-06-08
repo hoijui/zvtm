@@ -432,6 +432,9 @@ public class SVGWriter {
 		Color c=t.getColor();
 		//only fill, do not add stroke:rgb("+c.getRed()+","+c.getGreen()+","+c.getBlue()+") as it creates a wide stroke
 		String style="fill:rgb("+c.getRed()+","+c.getGreen()+","+c.getBlue()+")";
+        if (t.getTranslucencyValue() != 1){
+            style += ";fill-opacity:" + String.valueOf(t.getTranslucencyValue());
+        }
 		if (t.usesSpecificFont()){style=createFontInformation(t.getFont())+";"+style;}
 		text.setAttribute(SVGReader._style,style);
 		createClassInforation(t, text);
