@@ -25,3 +25,5 @@ ldd libjep.so | grep libpython | awk '{ print "export LD_PRELOAD="$3}'
 
 libjep.so will typically be in:
   /usr/local/lib/python2.7/dist-packages/jep/libjep.so
+
+Note: code tested mainly with Python 2.7, but that should be compatible with Python 3.x
