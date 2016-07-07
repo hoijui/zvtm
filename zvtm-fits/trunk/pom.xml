@@ -89,12 +89,12 @@ $Id$
           ln -sf libjep.so /Library/JavaExtensions/libjep.jnilib)
 
     	* install the JAR files in your local repository using the following command line:
-            mvn install:install-file -Dfile=jep-3.5.2.jar -DgroupId=jep -DartifactId=jep -Dversion=3.5.2 -Dpackaging=jar
+            mvn install:install-file -Dfile=jep-3.5.3.jar -DgroupId=jep -DartifactId=jep -Dversion=3.5.3 -Dpackaging=jar
     -->
     <dependency>
         <groupId>jep</groupId>
         <artifactId>jep</artifactId>
-        <version>3.5.2</version>
+        <version>3.5.3</version>
     </dependency>
 
     <dependency>
