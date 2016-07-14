@@ -1,0 +1,10 @@
+doing-diff.txt
+
+be updated in the svn, then ...
+
+cd zvtm-core
+svn diff --new ^/zvtm-core/branches/olivier  --old ^/zvtm-core/trunk > core-diff-oc-trunk.txt
+
+
+cd zvtm-cluster
+svn diff --new ^/zvtm-cluster/branches/olivier  --old ^/zvtm-cluster/trunk > cluster-diff-oc-trunk.txt
