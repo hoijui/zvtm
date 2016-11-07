@@ -1,5 +1,5 @@
 /*   AUTHOR :           Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
- *   Copyright (c) INRIA, 2007-2015. All Rights Reserved
+ *   Copyright (c) INRIA, 2007-2016. All Rights Reserved
  *   Licensed under the GNU LGPL. For full terms see the file COPYING.
  *
  * $Id$
@@ -271,7 +271,7 @@ public class SceneBuilder {
      *@param lowestLevel index of lowest level in level span for this region (highestLevel <= lowestLevel)
      *@param id region ID
      *@param title region's title (metadata)
-     *@param tags tags associated with region (can be used to filter regions in SceneObservers)
+     *@param tags tags associated with region. null if none. (can be used to filter regions in SceneObservers)
      *@param transitions a 4-element array with values in Region.{FADE_IN, FADE_OUT, APPEAR, DISAPPEAR}, corresponding to
                          transitions from upper level, from lower level, to upper level, to lower level.
      *@param requestOrdering how requests for loading / unloading objects should be ordered when
