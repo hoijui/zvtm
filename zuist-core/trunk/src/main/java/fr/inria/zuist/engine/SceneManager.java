@@ -402,6 +402,16 @@ public class SceneManager {
         return (index < levels.length) ? levels[index] : null;
     }
 
+    /** Get the index of a given level in the scene.
+     *@return -1 if level not in the scene.
+     */
+    public int getLevelIndex(Level l){
+        for (int i=0;i<levels.length;i++){
+            if (levels[i] == l){return i;}
+        }
+        return -1;
+    }
+
     /** Get all regions that belong to a given level.
      *@param level index of level.
      *@return sequence of regions at this level, in no particular order.
