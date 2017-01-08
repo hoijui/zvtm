@@ -2,12 +2,12 @@
 # -*- coding: UTF-8 -*-
 
 # AUTHOR : Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
-# Copyright (c) INRIA, 2015. All Rights Reserved
+# Copyright (c) INRIA, 2015-2016. All Rights Reserved
 # Licensed under the GNU LGPL. For full terms see the file COPYING.
 
 # $Id$
 
-import os, sys, math, random
+import os, sys, math, random, subprocess
 import urllib2
 from copy import copy
 
@@ -42,7 +42,9 @@ CMD_LINE_HELP = "Slippy Map Tiling Script\n\nUsage:\n\n" + \
     "\t-mfd=N\t\tmaximum depth of scene fragments (0 to generate a single scene no matter the total depth) <optional>\n"+\
     "\t-dt=N-N\t\tdownload and save tiles for levels in the specified range (N in [0,19]) <optional>\n"+\
     "\t-yx\t\tinvert x and y in slippy tile URL coordinates system <optional>\n"+\
+    "\t-ny\t\treverse y in slippy tile URL coordinates system <optional>\n"+\
     "\t-im=<i>\t\t<i> one of {bilinear,bicubic,nearestNeighbor} <optional>\n"+\
+    "\t-wget\t\tused wget instead of Python's urllib2 to fetch tiles <optional>\n"+\
     "\t-tl=N\t\ttrace level (N in [0:2]) <optional>\n"
 
 TRACE_LEVEL = 0
@@ -63,6 +65,8 @@ DOWNLOAD_LEVEL_RANGE = (-1,-1)
 
 INVERT_X_Y = False
 
+NEGATIVE_Y = False
+
 TILE_EXT = "png"
 
 INTERPOLATION = "bilinear"
@@ -71,6 +75,8 @@ INTERPOLATION = "bilinear"
 F = 100.0
 # camera max altitude
 MAX_ALT = "100000"
+
+WGET_MODE = False
 
 # prefix for image tile files
 TILE_FILE_PREFIX = "t-"
@@ -84,37 +90,7 @@ ACCESS_TOKEN = ""
 ################################################################################
 
 def getTMSURL():
-    ######################### OSM
-    ## EXT: png
-    return "http://%s.tile.openstreetmap.org/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*3))]
-    ######################### ArcGIS orthoimagery, use with -yx
-    ## EXT: jpg
-    #return "http://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/"
-    ######################### Stamen maps
-    ## EXT: jpg
-    #return "http://%s.tile.stamen.com/watercolor/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*4))]
-    ## EXT: jpg
-    #return "http://%s.tile.stamen.com/terrain/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*4))]
-    ## EXT: jpg
-    #return "http://%s.tile.stamen.com/terrain-background/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*4))]
-    ## EXT: png
-    #return "http://%s.tile.stamen.com/toner/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*4))]
-    ######################### Mapquest
-    ## EXT: jpg
-    #return "http://otile%d.mqcdn.com/tiles/1.0.0/sat/" % math.ceil(random.random()*4)
-    ## EXT: jpg
-    #return "http://otile%d.mqcdn.com/tiles/1.0.0/osm/" % math.ceil(random.random()*4)
-    ######################### Mapbox
-    # Woodcut
-    ## EXT: jpg
-    #return "http://%s.tiles.mapbox.com/v3/examples.xqwfusor/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*4))]
-    #  Mars https://www.mapbox.com/blog/mars-maps/
-    ## EXT: png
-    #return "https://%s.tiles.mapbox.com/v4/matt.72ca085f/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*4))]
-    ## EXT: png
-    #return "https://%s.tiles.mapbox.com/v4/matt.d160fd9d/" % TILE_SERVER_LETTER_PREFIXES[int(math.floor(random.random()*4))]
-
-    ### More examples at http://homepage.ntlworld.com/keir.clarke/leaflet/leafletlayers.htm
+    return "http://xdworld.vworld.kr:8080/2d/Base/201411/"
 
 ################################################################################
 # Create target directory if it does not exist yet
@@ -216,6 +192,9 @@ def buildRegionsAtLevel(rt, level, ftl, totalLevelCount, rootEL, ox, oy, tgtDir)
                 objectEL.set("sensitive", "false")
                 if INVERT_X_Y:
                     tileURL = "%s%d/%d/%d.%s" % (getTMSURL(),level-ftl+rt[0],y+tcal*rt[2],x+tcal*rt[1],TILE_EXT)
+                elif NEGATIVE_Y:
+                    vtc = 2 ** (level-ftl+rt[0])
+                    tileURL = "%s%d/%d/%d.%s" % (getTMSURL(),level-ftl+rt[0],x+tcal*rt[1],vtc-y+tcal*rt[2]-1,TILE_EXT)
                 else:
                     tileURL = "%s%d/%d/%d.%s" % (getTMSURL(),level-ftl+rt[0],x+tcal*rt[1],y+tcal*rt[2],TILE_EXT)
                 if level-ftl+rt[0] in range(DOWNLOAD_LEVEL_RANGE[0],DOWNLOAD_LEVEL_RANGE[1]+1):
@@ -235,6 +214,16 @@ def buildRegionsAtLevel(rt, level, ftl, totalLevelCount, rootEL, ox, oy, tgtDir)
     return
 
 ################################################################################
+# call an external program
+################################################################################
+def exec_cmd(cmd, printProcessOutput):
+    popen = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True, universal_newlines=True)
+    output,error = popen.communicate()
+    if printProcessOutput:
+        print(output)
+        print(error)
+
+################################################################################
 # Trace exec on std output
 ################################################################################
 def fetchTile(tileURL, z, x, y, tgtDir):
@@ -248,10 +237,17 @@ def fetchTile(tileURL, z, x, y, tgtDir):
         log("Tile already fetched: %s" % absPath, 3)
     else:
         log("Saving tile to %s" % absPath, 3)
-        tile = urllib2.urlopen("%s%s" % (tileURL, ACCESS_TOKEN))
-        tilef = open(absPath, 'wb')
-        tilef.write(tile.read())
-        tilef.close()
+        if (ACCESS_TOKEN):
+            tileURL = "%s?access_token=%s" % (tileURL, ACCESS_TOKEN)
+        if WGET_MODE:
+            cmd_line = "wget -O %s %s" % (absPath, tileURL)
+            #print cmd_line
+            exec_cmd(cmd_line, True)
+        else:
+            tile = urllib2.urlopen(tileURL)
+            tilef = open(absPath, 'wb')
+            tilef.write(tile.read())
+            tilef.close()
     return relPath
 
 ################################################################################
@@ -298,6 +294,10 @@ if len(sys.argv) > 1 and not sys.argv[1].startswith("-"):
                 TRACE_LEVEL = int(arg[4:])
             elif arg.startswith("-yx"):
                 INVERT_X_Y = True
+            elif arg.startswith("-ny"):
+                NEGATIVE_Y = True
+            elif arg.startswith("-wget"):
+                WGET_MODE = True
             elif arg.startswith("-h"):
                 log(CMD_LINE_HELP)
                 sys.exit(0)
