@@ -360,7 +360,7 @@ public class TiledImageViewer {
     }
 
     public static void main(String[] args){
-        ViewerOptions options = new ViewerOptions();
+        final ViewerOptions options = new ViewerOptions();
         CmdLineParser parser = new CmdLineParser(options);
         try {
             parser.parseArgument(args);
@@ -375,7 +375,13 @@ public class TiledImageViewer {
         if (options.debug){
             SceneManager.setDebugMode(true);
         }
-        new TiledImageViewer(options);
+        javax.swing.SwingUtilities.invokeLater(
+            new Runnable(){
+                public void run() {
+                    new TiledImageViewer(options);
+                }
+            }
+        );
     }
 
 }
