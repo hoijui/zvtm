@@ -24,8 +24,8 @@ $Id$
   <scm>
     <url>https://svn.code.sf.net/p/zvtm/code/zvtm-core</url>
   </scm>
-<!-- test -->
-  <properties>
+  
+<properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
