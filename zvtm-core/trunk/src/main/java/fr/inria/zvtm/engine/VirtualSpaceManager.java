@@ -194,6 +194,67 @@ public class VirtualSpaceManager implements AWTEventListener {
 		v.removePortal(p);
 	}
 
+    /** Put a portal on the top of the portals list 
+     *@param p Portal to be put on top
+     *@return position of the portal in the portals list (-1 in case of failure)
+    */
+    public int portalOnTop(Portal p){
+        View v = p.getOwningView();
+        return v.portalOnTop(p);
+    }
+
+    /** Put a portal at the bottom of the portals list 
+     *@param p Portal to be put at bottom
+     *@return position of the portal in the portals list (-1 in case of failure)
+    */
+    public int portalAtBottom(Portal p){
+        View v = p.getOwningView();
+        return v.portalAtBottom(p);
+    }
+
+    /** Put Portal p1 just below Portal p2 in the portals list (p1 painted before p2).
+     *@param p1 Portal to be put below
+     *@param p2 above Portal
+     *@return position of the portal p1 in the portals list (-1 in case of failure)
+     */
+    public int portalBelow(Portal p1, Portal p2){
+         View v1 = p1.getOwningView();
+         View v2 = p2.getOwningView();
+         if (v1 != v2) { return -1; }
+         return v1.portalBelow(p1, p2);
+    }
+
+    /** Put Portal p1 just above Portal p2 in the portals list (p2 painted before p1).
+     *@param p1 Portal to be put above
+     *@param p2 below Portal
+     *@return position of the portal p1 in the portals list (-1 in case of failure)
+     */
+    public int portalAbove(Portal p1, Portal p2){
+         View v1 = p1.getOwningView();
+         View v2 = p2.getOwningView();
+         if (v1 != v2) { return -1; }
+         return v1.portalAbove(p1, p2);
+    }
+
+    /** Put a portal at position index in the portals list 
+    *@param p Portal to be moved
+    *@param index position
+    *@return position of the portal p in the portals list (-1 in case of failure)
+    */
+    public int portalAtPosition(Portal p, int index){
+        View v = p.getOwningView();
+        return v.portalAtPosition(p, index);
+    }
+
+    /** get the position of a portal in the portals list
+     *@param p the Portal
+     *@return position of the portal in the portals list (-1 in case of failure)
+    */
+    public int getPortalPosition(Portal p){
+        View v = p.getOwningView();
+        return v.getPortalPosition(p);
+    }
+
     /* ----------------- VIEWS ---------------- */
 
     /** Create a new External View.<br>

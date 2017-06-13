@@ -156,6 +156,84 @@ public abstract class View {
         return p;
     }
 
+    /**position of the portal in the portals stack*/
+    int getPortalPosition(Portal p){
+        if (portals.length == 0) { return -1; }
+        int pindex = -1;
+        for (int i=0; i<portals.length; i++){
+            if (portals[i] == p){
+                pindex = i;
+                break;
+            }
+        }
+        return pindex;
+    }
+
+    /**move the portal fromposition pindex to position index in the portals stack of this view*/
+    int portalAtPosition(int pindex, int index){
+        if (pindex < 0 || pindex > portals.length ||
+            index < 0  || index > portals.length){ 
+            return -1; 
+        }
+        if (index == pindex) return pindex;
+        Portal[] tmpP = new Portal[portals.length];
+        for (int i=0; i<portals.length; i++){
+            if (i == pindex){
+                continue;
+            }
+            if ((i < index && i < pindex) || (i > index && i > pindex)){
+                tmpP[i] = portals[i];
+            }
+            else if (index < pindex){
+                tmpP[i+1] = portals[i];
+            }
+            else if (pindex < index){
+                tmpP[i-1] = portals[i];
+            }
+        }
+        tmpP[index] = portals[pindex];
+        portals = tmpP;
+        return pindex;
+    }
+
+    /**move a portal at position index in the portals stack of this view */
+    int portalAtPosition(Portal p, int index){
+        int pindex = getPortalPosition(p);
+        if (pindex == -1) { return pindex; }
+        return portalAtPosition(pindex, index);
+    }
+
+    /**put a portal on the top of the portals stack of this view*/
+    int portalOnTop(Portal p){
+        return portalAtPosition(p, portals.length-1);
+    }
+
+    /**put a portal at the bottom of the portals stack of this view*/
+    int portalAtBottom(Portal p){
+        return portalAtPosition(p, 0);
+    }
+
+    /** Put p1 just below p2 */
+    int portalBelow(Portal p1, Portal p2){
+        int pos2 = getPortalPosition(p2);
+        if (pos2 < 1) { return -1; }
+        return portalAtPosition(p1, pos2-1);
+    }
+
+    /** Put p1 just above p2 */
+    int portalAbove(Portal p1, Portal p2){
+        int pos2 = getPortalPosition(p2);
+        int np = pos2+1;
+        if (np >= portals.length-1) {
+            return portalOnTop(p1);
+        }
+        else if (np >= 0) {
+            return portalAtPosition(p1, np);
+        }
+        else { return -1;
+        }
+    }
+
     /**remove a portal from this view*/
     void removePortal(Portal p){
         for (int i=0;i<portals.length;i++){
@@ -166,7 +244,7 @@ public abstract class View {
         }
     }
 
-    /**remove portal at index portalIndex in the list of portals*/
+    /**remove portal at position index in the list of portals*/
     void removePortalAtIndex(int portalIndex){
         Portal[] tmpP = new Portal[portals.length-1];
         System.arraycopy(portals, 0, tmpP, 0, portalIndex);
