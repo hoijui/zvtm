@@ -379,8 +379,6 @@ aspect VsmReplication {
         }
     }    
 
-    // see AutoReplay.aj for setVisible, setColor, setBackgroundColor, etc.
-
     /** Remove a portal to a clustered view.
     * @param p Portal to be removed
     */
@@ -407,5 +405,155 @@ aspect VsmReplication {
             return "PortalDestroyDelta";
         }
     }
+
+    /** Put a portal on the top of the portals list 
+    * @param p the portal to be put on top
+    */
+    public void VirtualSpaceManager.clusteredPortalOnTop(Portal p) {
+        Delta topDelta = new  PortalOnTopDelta(p.getObjId());
+        VirtualSpaceManager.INSTANCE.sendDelta(topDelta);
+    }
+
+    private static class PortalOnTopDelta implements Delta{
+        private final ObjId<Portal> portalId;
+
+        PortalOnTopDelta(ObjId<Portal> portalId){
+            this.portalId = portalId;
+        }
+
+        public void apply(SlaveUpdater updater){
+            Portal p = updater.getSlaveObject(portalId);
+            if (p != null){
+                VirtualSpaceManager.INSTANCE.portalOnTop(p);
+            }
+        }
+
+        @Override public String toString(){
+            return "PortalOnTopDelta";
+        }
+    }
+
+    /** Put a portal at the bottom of the portals list 
+    * @param p the portal
+    */
+    public void VirtualSpaceManager.clusteredPortalAtBottom(Portal p) {
+        Delta bottomDelta = new  PortalAtBottomDelta(p.getObjId());
+        VirtualSpaceManager.INSTANCE.sendDelta(bottomDelta);
+    }
+
+    private static class PortalAtBottomDelta implements Delta{
+        private final ObjId<Portal> portalId;
+
+        PortalAtBottomDelta(ObjId<Portal> portalId){
+            this.portalId = portalId;
+        }
+
+        public void apply(SlaveUpdater updater){
+            Portal p = updater.getSlaveObject(portalId);
+            if (p!=null){
+                VirtualSpaceManager.INSTANCE.portalAtBottom(p); 
+            }
+        }
+
+        @Override public String toString(){
+            return "PortalAtBottomDelta";
+        }
+    }
+
+    /** Put Portal p1 just below Portal p2 in the portals list (p1 painted before p2).
+     *@param p1 Portal to be put below
+     *@param p2 above Portal
+     */
+    public void VirtualSpaceManager.clusteredPortalBelow(Portal p1, Portal p2){
+        Delta belowDelta = new  PortalBelowDelta(p1.getObjId(), p2.getObjId());
+        VirtualSpaceManager.INSTANCE.sendDelta(belowDelta);
+    }
+
+    private static class PortalBelowDelta implements Delta{
+        private final ObjId<Portal> portalId1;
+        private final ObjId<Portal> portalId2;
+
+        PortalBelowDelta(ObjId<Portal> portalId1, ObjId<Portal> portalId2){
+            this.portalId1 = portalId1;
+            this.portalId2 = portalId2;
+        }
+
+        public void apply(SlaveUpdater updater){
+            Portal p1 = updater.getSlaveObject(portalId1);
+            Portal p2 = updater.getSlaveObject(portalId2);
+            if (p1!=null && p2!=null){
+                VirtualSpaceManager.INSTANCE.portalBelow(p1, p2); 
+            }
+        }
+
+        @Override public String toString(){
+            return "PortalBelowDelta";
+        }
+    }
+
+    /** Put Portal p1 just above Portal p2 in the portals list (p1 painted before p2).
+     *@param p1 Portal to be put above
+     *@param p2 above Portal
+     */
+    public void VirtualSpaceManager.clusteredPortalAbove(Portal p1, Portal p2){
+        Delta aboveDelta = new  PortalAboveDelta(p1.getObjId(), p2.getObjId());
+        VirtualSpaceManager.INSTANCE.sendDelta(aboveDelta);
+    }
+
+    private static class PortalAboveDelta implements Delta{
+        private final ObjId<Portal> portalId1;
+        private final ObjId<Portal> portalId2;
+
+        PortalAboveDelta(ObjId<Portal> portalId1, ObjId<Portal> portalId2){
+            this.portalId1 = portalId1;
+            this.portalId2 = portalId2;
+        }
+
+        public void apply(SlaveUpdater updater){
+            Portal p1 = updater.getSlaveObject(portalId1);
+            Portal p2 = updater.getSlaveObject(portalId2);
+            if (p1!=null && p2!=null){
+                VirtualSpaceManager.INSTANCE.portalAbove(p1, p2); 
+            }
+        }
+
+        @Override public String toString(){
+            return "PortalAboveDelta";
+        }
+    }
+
+    /** Put a portal at position index in the portals list 
+    *@param p Portal to be moved
+    *@param index position
+    */
+    public void  VirtualSpaceManager.clusteredPortalAtPosition(Portal p, int idx){
+        Delta atPositionDelta = new   PortalAtPositionDelta(p.getObjId(), idx);
+        VirtualSpaceManager.INSTANCE.sendDelta(atPositionDelta);
+    }
+
+    private static class PortalAtPositionDelta implements Delta{
+         private final ObjId<Portal> portalId;
+         private final int index;
+
+         PortalAtPositionDelta(ObjId<Portal> portalId, int idx){
+            this.portalId = portalId;
+            this.index = idx;
+        }
+
+        public void apply(SlaveUpdater updater){
+            Portal p = updater.getSlaveObject(portalId);
+            if (p!=null){
+                VirtualSpaceManager.INSTANCE.portalAtPosition(p, index); 
+            }
+        }
+
+        @Override public String toString(){
+            return "PortalAtPositionDelta";
+        }
+    }
+
+    // see AutoReplay.aj for Portal methods setVisible, setColor, setBackgroundColor, etc.
+
+
 } 
 
