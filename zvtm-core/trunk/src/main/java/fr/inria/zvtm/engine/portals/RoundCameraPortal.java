@@ -32,7 +32,7 @@ import fr.inria.zvtm.glyphs.Glyph;
 
 public class RoundCameraPortal extends CameraPortal {
 
-    Ellipse2D clippingShape, borderShape;
+    Ellipse2D clippingShape, borderShape, borderPickingShape;
 
     /** Builds a new portal displaying what is seen through a camera
      *@param x top-left horizontal coordinate of portal, in parent's JPanel coordinates
@@ -54,18 +54,53 @@ public class RoundCameraPortal extends CameraPortal {
      *@param a alpha channel value (translucency). alpha ranges between 0.0 (fully transparent) and 1.0 (fully opaque)
      */
     public RoundCameraPortal(int x, int y, int w, int h, Camera c, float a){
-        super(x, y, w, h, c);
+        this(x, y, w, h, new Camera[]{c}, a);
+    }
+    
+    /** Builds a portal displaying what is seen through a set of cameras
+     *@param x top-left horizontal coordinate of portal, in parent's JPanel coordinates
+     *@param y top-left vertical coordinate of portal, in parent's JPanel coordinates
+     *@param w portal width
+     *@param h portal height
+     *@param cams cameras vector associated with the portal
+     */
+    public RoundCameraPortal(int x, int y, int w, int h, Vector<Camera> cams){
+        this (x, y, w, h, cams.toArray(new Camera[cams.size()]), 1);
+    }
+
+    /** Builds a new possibly translucent portal displaying what is seen through a set of cameras
+     *@param x top-left horizontal coordinate of portal, in parent's JPanel coordinates
+     *@param y top-left vertical coordinate of portal, in parent's JPanel coordinates
+     *@param w portal width
+     *@param h portal height
+     *@param cams cameras array associated with the portal
+     *@param a alpha channel value (translucency). alpha ranges between 0.0 (fully transparent) and 1.0 (fully opaque)
+     */
+    public RoundCameraPortal(int x, int y, int w, int h, Camera[] cams, float a){
+        super(x, y, w, h, cams, a);
         createShape();
     }
 
     private void createShape() {
-        clippingShape = new Ellipse2D.Float(x+halfBorderWidth, y+halfBorderWidth, w-borderWidth, h-borderWidth);
-        borderShape = new Ellipse2D.Float(x-halfBorderWidth, y-halfBorderWidth, w+borderWidth, h+borderWidth);
+         int xx = x;
+        int yy = y;
+        if (bufferDraw){
+            xx = 0; yy = 0;
+        }
+        clippingShape = new Ellipse2D.Float(xx, yy, w, h);
+        borderShape = new Ellipse2D.Float(xx+borderWidthXYOff, yy+borderWidthXYOff, w-borderWidthWHOff, h-borderWidthWHOff);
+        borderPickingShape = new Ellipse2D.Float(xx+2*borderWidthXYOff, yy+2*borderWidthXYOff, w-2*borderWidthWHOff, h-2*borderWidthWHOff);
     }
 
     private void doSetFrame() {
-        clippingShape.setFrame(x+halfBorderWidth, y+halfBorderWidth, w-borderWidth, h-borderWidth);
-        borderShape.setFrame(x-halfBorderWidth, y-halfBorderWidth, w+borderWidth, h+borderWidth);
+        int xx = x;
+        int yy = y;
+        if (bufferDraw){
+            xx = 0; yy = 0;
+        }
+        clippingShape.setFrame(xx, yy, w, h);
+        borderShape.setFrame(xx+borderWidthXYOff, yy+borderWidthXYOff, w-borderWidthWHOff, h-borderWidthWHOff);
+        borderPickingShape.setFrame(xx+2*borderWidthXYOff, yy+2*borderWidthXYOff, w-2*borderWidthWHOff, h-2*borderWidthWHOff);
     }
 
     /** Get bounds of rectangular region of the VirtualSpace seen through this camera portal.
@@ -79,12 +114,20 @@ public class RoundCameraPortal extends CameraPortal {
 
     @Override
     public boolean coordInside(int cx, int cy){
+        if (bufferDraw){
+            cx = cx-x;
+            cy = cy-y;
+        }
 	    return borderShape.contains(cx, cy);
     }
 
     @Override
     public boolean coordInsideBorder(int cx, int cy){
-        return (borderShape.contains(cx, cy) && !clippingShape.contains(cx, cy));
+        if (bufferDraw){
+            cx = cx-x;
+            cy = cy-y;
+        }
+        return (clippingShape.contains(cx, cy) && !borderPickingShape.contains(cx, cy));
     }
 
     /** Move the portal inside the view (relative).
@@ -112,16 +155,39 @@ public class RoundCameraPortal extends CameraPortal {
         size.setSize(w, h);
         if (clippingShape != null){ doSetFrame(); }
         else { createShape();}
+        repaint(true);
     }
 
     @Override
     public void setBorderWidth(float w){
         super.setBorderWidth(w);
         doSetFrame();
+        repaint(true);
     }
 
     @Override
-    public void paint(Graphics2D g2d, int viewWidth, int viewHeight){
+    void doSetClip(Graphics2D g2d, int bw, int bh, int tx, int ty){
+        g2d.setClip(clippingShape);
+    }
+
+    @Override
+    void paintPortalFrame(Graphics2D g2d, int viewWidth, int viewHeight, int tx, int ty){
+        g2d.setClip(0, 0, viewWidth, viewHeight);
+        if (borderColor != null){
+            g2d.setColor(borderColor);
+            if (stroke != null){
+                g2d.setStroke(stroke);
+            }
+            g2d.draw(clippingShape);
+            g2d.setStroke(standardStroke);
+        }
+        if (alphaC != null){
+            g2d.setComposite(Translucent.acO);
+        }
+    }
+
+    //@Override
+    public void savePaint(Graphics2D g2d, int viewWidth, int viewHeight){
 		if (!visible){return;}
         //Check if the portal is out of the view
         if (x+w+borderWidth < 0 || y+h+borderWidth < 0 ||

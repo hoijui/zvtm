@@ -185,21 +185,21 @@ public class VEllipse<T> extends ClosedShape implements RectangularShape {
             vw = vh * ar;
         }
         updateVSEllipse();
-        VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint(vsOwner);
     }
 
     public void setWidth(double w){
         vw = w;
         computeSize();
         updateVSEllipse();
-        VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint(vsOwner);
     }
 
     public void setHeight(double h){
         vh = h;
         computeSize();
         updateVSEllipse();
-        VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint(vsOwner);
     }
 
     public double getWidth(){return vw;}
@@ -218,7 +218,7 @@ public class VEllipse<T> extends ClosedShape implements RectangularShape {
             vw = vh*ar;
         }
         updateVSEllipse();
-        VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint(vsOwner);
     }
 
     void updateVSEllipse(){

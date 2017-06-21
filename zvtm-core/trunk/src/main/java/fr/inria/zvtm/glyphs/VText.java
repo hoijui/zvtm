@@ -262,7 +262,7 @@ public class VText<T> extends ClosedShape {
      */
     public void setScaleIndependent(boolean b){
         zoomSensitive = !b;
-        VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint(vsOwner);
     }
 
     /** Indicates whether the text is scaled according to camera's altitude.
@@ -605,7 +605,7 @@ public class VText<T> extends ClosedShape {
     /** Set text that should be painted. */
     public void setText(String t){
     text=t;
-    VirtualSpaceManager.INSTANCE.repaint();
+    VirtualSpaceManager.INSTANCE.repaint(vsOwner);
     invalidate();
     }
 
@@ -666,7 +666,7 @@ public class VText<T> extends ClosedShape {
      */
     public void setFont(Font f){
     if (f!=null){font=f;fontSize=font.getSize2D();}else{font=null;fontSize=getMainFont().getSize2D();}
-    VirtualSpaceManager.INSTANCE.repaint();
+    VirtualSpaceManager.INSTANCE.repaint(vsOwner);
     invalidate();
     }
 
@@ -739,7 +739,7 @@ public class VText<T> extends ClosedShape {
             }
         }
         if (update){
-            VirtualSpaceManager.INSTANCE.repaint();
+            VirtualSpaceManager.INSTANCE.repaint(vsOwner);
         }
     }
 

@@ -241,7 +241,7 @@ public class SCBLens extends BlendingLens implements TemporalLens {
             // avoid unnecesarry repaint requests
             // make the lens almost disappear when making big moves
             MMTf = nMMTf;
-            owningView.parent.repaint();
+            owningView.parent.repaintBack();
             if (tpl != null){tpl.parameterUpdated();}
         }
 
@@ -251,7 +251,7 @@ public class SCBLens extends BlendingLens implements TemporalLens {
             float bR = Math.min(LR2, ((float)opacity) * (LR2) + 1.0f);
             if (Math.abs(bR - scRingRadius) > 1.0f){
                 scRingRadius = bR;
-                owningView.parent.repaint();
+                owningView.parent.repaintBack();
             }
         }
     }

@@ -53,7 +53,7 @@ public abstract class FixedSizeLens extends Lens {
         updateMagBufferWorkingDimensions();
         updateLensRegion();
         setMagRasterDimensions(mbw, mbh);
-        owningView.parent.repaint();
+        owningView.parent.repaintBack();
     }
 
     /**
@@ -66,7 +66,7 @@ public abstract class FixedSizeLens extends Lens {
         updateMagBufferWorkingDimensions();
         updateLensRegion();
         setMagRasterDimensions(mbw, mbh);
-        owningView.parent.repaint();
+        owningView.parent.repaintBack();
     }
 
     /**
@@ -94,7 +94,7 @@ public abstract class FixedSizeLens extends Lens {
         if (forceRaster){
             setMagRasterDimensions(mbw, mbh);
         }
-        owningView.parent.repaint();
+        owningView.parent.repaintBack();
     }
 
     /**
@@ -125,7 +125,7 @@ public abstract class FixedSizeLens extends Lens {
         if (forceRaster){
             setMagRasterDimensions(mbw, mbh);
         }
-        owningView.parent.repaint();
+        owningView.parent.repaintBack();
     }
 
     /**
@@ -393,7 +393,7 @@ public abstract class FixedSizeLens extends Lens {
         owningView.setDrawCursor(!isFocusControlled);
         lensX = lx + (int)owningView.getComponent().getSize().getWidth() / 2;
         lensY = ly + (int)owningView.getComponent().getSize().getHeight() / 2;
-        owningView.parent.repaint();
+        owningView.parent.repaintBack();
     }
 
     int lastX = Integer.MAX_VALUE;
@@ -419,7 +419,7 @@ public abstract class FixedSizeLens extends Lens {
     else
         setAbsolutePosition(lensX, lensY);
 
-    owningView.parent.repaint();
+    owningView.parent.repaintBack();
     }
 
     // FIXME: synchronized !
@@ -456,7 +456,7 @@ public abstract class FixedSizeLens extends Lens {
                 ((TemporalLens)this).setAbsolutePosition(lensX, lensY, currentTime);
             else
                 setAbsolutePosition(lensX, lensY);
-            owningView.parent.repaint();
+            owningView.parent.repaintBack();
         }
     }
 

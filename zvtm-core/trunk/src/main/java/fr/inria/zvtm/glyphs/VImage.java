@@ -177,7 +177,7 @@ public class VImage<T> extends ClosedShape implements RectangularShape {
         vw = image.getWidth(null) * scaleFactor;
         vh = image.getHeight(null) * scaleFactor;
         computeSize();
-        VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint(vsOwner);
     }
 
     public double getScale(){
@@ -189,7 +189,7 @@ public class VImage<T> extends ClosedShape implements RectangularShape {
         vh = vw / ar;
         computeSize();
         scaleFactor = size / Math.sqrt(Math.pow(image.getWidth(null),2)+Math.pow(image.getHeight(null),2));
-        VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint(vsOwner);
     }
 
     public void setHeight(double h){
@@ -197,7 +197,7 @@ public class VImage<T> extends ClosedShape implements RectangularShape {
         vw = vh * ar;
         computeSize();
         scaleFactor = size / Math.sqrt(Math.pow(image.getWidth(null),2)+Math.pow(image.getHeight(null),2));
-        VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint(vsOwner);
     }
 
     public double getWidth(){return vw;}
@@ -210,7 +210,7 @@ public class VImage<T> extends ClosedShape implements RectangularShape {
         vw = (size*ar) / (Math.sqrt(ar*ar+1));
         vh = size / (Math.sqrt(ar*ar+1));
         scaleFactor = size / Math.sqrt(Math.pow(image.getWidth(null),2)+Math.pow(image.getHeight(null),2));
-        VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint(vsOwner);
     }
 
     @Override
@@ -219,7 +219,7 @@ public class VImage<T> extends ClosedShape implements RectangularShape {
         vw = (size*ar) / (Math.sqrt(ar*ar+1));
         vh = size / (Math.sqrt(ar*ar+1));
         scaleFactor = size / Math.sqrt(Math.pow(image.getWidth(null),2)+Math.pow(image.getHeight(null),2));
-        VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint(vsOwner);
     }
 
     /** Get the bounding box of this Glyph in virtual space coordinates.
@@ -237,7 +237,7 @@ public class VImage<T> extends ClosedShape implements RectangularShape {
         vh = image.getHeight(null) * scaleFactor;
         ar = vw / vh;
         computeSize();
-        VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint(vsOwner);
     }
 
     /** Get the bitmap image displayed. */
@@ -251,7 +251,7 @@ public class VImage<T> extends ClosedShape implements RectangularShape {
     public void setZoomSensitive(boolean b){
     if (zoomSensitive!=b){
         zoomSensitive=b;
-        VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint(vsOwner);
     }
     }
 

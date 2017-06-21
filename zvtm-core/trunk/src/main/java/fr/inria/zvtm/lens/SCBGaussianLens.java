@@ -191,7 +191,7 @@ public class SCBGaussianLens extends BGaussianLens implements TemporalLens {
             // make the lens almost disappear when making big moves
             MMTf = nMMTf;
             this.setDynamicTranslucency();
-            owningView.parent.repaint();
+            owningView.parent.repaintBack();
             if (tpl != null){tpl.parameterUpdated();}
         }
 
@@ -200,7 +200,7 @@ public class SCBGaussianLens extends BGaussianLens implements TemporalLens {
             float bR = Math.min(LR2, ((float)opacity) * (LR2) + 1.0f);
             if (Math.abs(bR - scRingRadius) > 1.0f){
                 scRingRadius = bR;
-                owningView.parent.repaint();
+                owningView.parent.repaintBack();
             }
         }
 	}
@@ -209,7 +209,7 @@ public class SCBGaussianLens extends BGaussianLens implements TemporalLens {
     void setDynamicTranslucency(){
 	cT = (MMTf-MMTc)/2;
     eT = (MMTf+MMTc)/2;
-	owningView.parent.repaint();
+	owningView.parent.repaintBack();
     }
 
     public void setCutoffFrequencyParameters(double a, double b){

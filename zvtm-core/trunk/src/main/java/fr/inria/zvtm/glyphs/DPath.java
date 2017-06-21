@@ -404,7 +404,7 @@ public class DPath<T> extends Glyph implements RectangularShape {
         Arrays.fill(t, new Point2D.Double(x, y));
         this.edit(t, false);
         propagateMove(x,y);  //take care of sticked glyphs
-        VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint(vsOwner);
     }
 
     /** Translate the glyph to (x,y) - absolute translation.
@@ -416,7 +416,7 @@ public class DPath<T> extends Glyph implements RectangularShape {
         Point2D.Double[] t = new Point2D.Double[getNumberOfPoints()];
         Arrays.fill(t, new Point2D.Double(x-vx, y-vy));
         this.edit(t, false);
-        VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint(vsOwner);
     }
 
     /** No effect. */
@@ -787,7 +787,7 @@ public class DPath<T> extends Glyph implements RectangularShape {
             }
         }
         if (update){
-        VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint(vsOwner);
         }
     }
 
@@ -871,7 +871,7 @@ public class DPath<T> extends Glyph implements RectangularShape {
         }
         computeBounds();
         updateJava2DGeneralPath();
-        VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint(vsOwner);
     }
 
     /**
@@ -959,7 +959,7 @@ public class DPath<T> extends Glyph implements RectangularShape {
         }
         computeBounds();
         updateJava2DGeneralPath();
-        VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint(vsOwner);
     }
 
     /**

@@ -136,7 +136,7 @@ public class VRectangleOr<T> extends VRectangle {
     public void orientTo(double angle){
         orient = angle;
         updateVSPolygon();
-        VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint(vsOwner);
     }
 
     @Override

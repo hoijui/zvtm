@@ -422,6 +422,44 @@ public class VirtualSpaceManager implements AWTEventListener {
     public void repaint(View v, RepaintListener rl){
 	    v.repaint(rl);
     }
+    
+    //**used internally */ 
+    public void repaint(VirtualSpace vs){
+        for (int i=0;i<allViews.length;i++){
+            allViews[i].repaint(vs);
+        }
+    }
+
+    //**used internally */ 
+    public void repaint(Camera c){
+        for (int i=0;i<allViews.length;i++){
+            allViews[i].repaint(c);
+        }
+    }
+
+    //**used internally */ 
+    void checkRepaintExt(View v, Camera c){
+        for (int i=0;i<allViews.length;i++){
+            if (allViews[i] != v){
+                allViews[i].checkRepaintExt(c);
+            }
+        }
+    }
+
+    //**used internally */ 
+    public void repaint(View v, VirtualSpace vs){
+        v.repaint(vs);
+    }
+
+    //**used internally */ 
+    public void repaint(View v, Camera c){
+        v.repaint(c);
+    }
+
+    //**used internally */ 
+    public void repaintPortals(View v){
+        v.repaintPortals();
+    }
 
     /* ----------- VIRTUAL SPACE --------------- */
 

@@ -75,9 +75,11 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
     GraphicsConfiguration gconf;
 
     protected Graphics2D stableRefToBackBufferGraphics = null;
+    protected Graphics2D stableRefToOverlayBufferGraphics = null;
 
     /**list of cameras used in this view*/
     public Camera[] cams;
+    public Camera[] overlayCams = null;
 
     /**active layer in this view (corresponds to the index of a camera in cams[])*/
     public int activeLayer=0;
@@ -98,6 +100,18 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
     volatile boolean repaintASAP=true;
     RepaintListener repaintListener;
 
+    /**only repaint the back buffer */
+    volatile boolean repaintBack=true;
+
+    /**"only" repaint the overlay buffer */
+    volatile boolean repaintOverlay=true;
+
+    /**repaint portal */
+    volatile boolean repaintPortals=true;
+
+    /**should we draw the portals with offscreen buffers */
+    boolean drawPortalsOffScreen = false;
+
     /**only repaint mouse cursor (using XOR mode)*/
     boolean updateCursorOnly=false;
 
@@ -115,6 +129,7 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
     AffineTransform standardTransform;
 
     int[][] visibilityPadding;
+    int[] zeroVisibilityPadding = {0,0,0,0};
 
     Dimension size;
 
@@ -192,6 +207,19 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
     *@return the Swing component instance.
      */
 	public abstract Component getComponent();
+
+    /* -------------------- Cameras ------------------- */
+    void setupOverlayCameras(){
+        overlayCams = null;
+        if (parent.overlayCameras == null || parent.overlayCameras.size() == 0){
+            return;
+        }
+        overlayCams = new Camera[parent.overlayCameras.size()];  //array of Camera
+        for (int nbcam=0;nbcam<parent.overlayCameras.size();nbcam++){
+            overlayCams[nbcam] = parent.overlayCameras.get(nbcam);
+        }
+        repaintOverlay=true;
+    }
 
 	/* -------------------- PORTALS ------------------- */
 
@@ -319,7 +347,7 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
 	curDragx=origDragx;
 	curDragy=origDragy;
 	drawDrag=b;
-	parent.repaint();
+	parent.repaintBack();
     }
 
     /** Draw a rectangle between the point where a press event was heard and the current position of the cursor (drag).
@@ -329,7 +357,7 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
 	curDragx=origDragx;
 	curDragy=origDragy;
 	drawRect=b;
-	parent.repaint();
+	parent.repaintBack();
     }
 
     /** Draw a circle/oval between the point where a press event was heard and the current position of the cursor (drag).
@@ -342,7 +370,7 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
 	if (s==OVAL){drawOval=true;circleOnly=false;}
 	else if (s==CIRCLE){drawOval=true;circleOnly=true;}
 	else if (s==NONE){drawOval=false;}
-	parent.repaint();
+	parent.repaintBack();
     }
 
     /** Show the icon representing first-order-of-control panning.
@@ -356,7 +384,7 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
         fopw_x = jpx - FIRST_ORDER_PAN_WIDGET.getWidth(null)/2;
         fopw_y = jpy - FIRST_ORDER_PAN_WIDGET.getHeight(null)/2;
         sfopw = true;
-    	parent.repaint();
+    	parent.repaintBack();
     }
 
     /** Hide the icon representing first-order-of-control panning.
@@ -366,7 +394,7 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
      */
     public void hideFirstOrderPanWidget(){
         sfopw = false;
-    	parent.repaint();
+    	parent.repaintBack();
     }
 
     /** Set the icon used to represent first-order-of-control panning.
@@ -587,7 +615,7 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
                 }
             }
         }
-        repaintASAP = true;
+        parent.repaint();
     }
 
     /** Mouse cursor exited this view. */
@@ -645,7 +673,7 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
                     parent.mouse.setJPanelCoordinates(e.getX(),e.getY());
                     //we project the mouse cursor wrt the appropriate coord sys
                     //parent.mouse.unProject(cams[activeLayer],this);
-                    updateCursorOnly=true;
+                    parent.repaintCursor(); 
                 //translate glyphs sticked to mouse
                 // parent.mouse.propagateMove();
                 // find out is the cursor is inside one (or more) portals
@@ -655,7 +683,7 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
                     if (parent.notifyCursorMoved){
                         evHs[activeLayer].mouseMoved(this, e.getX(), e.getY(), e);
                     }
-                    parent.repaint();
+                    parent.repaintBack();  // FIXME parent.repaintCursor(); enough ???
                     // if (parent.mouse.isSensitive()){
                     //     if (parent.mouse.getPicker().computePickedGlyphList(evHs[activeLayer], cams[activeLayer], this)){
                     //         parent.repaint();
@@ -706,7 +734,7 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
                 }
                 //assign anyway, even if the current drag command does not want to display a segment
                 curDragx=e.getX();curDragy=e.getY();
-                parent.repaint();
+                parent.repaint();  // FIXME parent.repaintCursor(); enough
                 // if (parent.mouse.isSensitive()){
                 //     parent.mouse.getPicker().computePickedGlyphList(evHs[activeLayer],cams[activeLayer],this);
                 // }

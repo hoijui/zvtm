@@ -143,6 +143,44 @@ public abstract class View {
         }
     }
 
+    /**list of Overlay Camera objects used in this view*/
+    Vector<Camera> overlayCameras = null;
+
+    /** Set the overlay cameras for this view 
+    *@param  cams cameras of the overlay
+    */
+    public void setOverlayCameras(Vector<Camera> cams){
+        overlayCameras = cams;
+        if (cams == null || cams.size() <= 0){
+            overlayCameras = null;
+        }
+        else {
+            for (Camera c : overlayCameras){
+                c.setOwningView(this);
+            }
+        }
+        panel.setupOverlayCameras();
+    }
+
+    /**Remove the overlay cameras */
+    public void removeOverlayCameras(){
+        overlayCameras = null;
+        panel.setupOverlayCameras();
+    }
+
+    /**Specify whether the portals are rendered with offscreen buffers for this view,
+    * by default thi is not the case
+    *@param  v if true render the portals using offscreen buffers
+    */
+    public void setDrawPortalOffScreen(boolean v){
+        panel.drawPortalsOffScreen = v;
+    }
+
+    /**Do the portals are renderered with offscreen buffers? */
+    public boolean getDrawPortalOffScreen(){
+        return panel.drawPortalsOffScreen;
+    }
+
     /**portals embedded in this view*/
     Portal[] portals = new Portal[0];
 
@@ -503,7 +541,13 @@ public abstract class View {
     }
 
     /** Update default font used in this View. */
-    public void updateFont(){panel.updateFont=true;}
+    public void updateFont(){
+        panel.updateFont=true;
+        panel.updateFont=true;
+        for(int i = 0; i < portals.length; i++){
+            portals[i].updateFont();
+        }
+    }
 
     /** Set antialias rendering hint for this View.
      *@param b true to enable, false to disable.
@@ -700,6 +744,9 @@ public abstract class View {
         */
     public void repaint(){
         panel.repaintASAP = true;
+        panel.repaintBack = true;
+        panel.repaintPortals = true;
+        panel.repaintOverlay = true;
     }
 
     /** Ask for the view to be repainted. This is an asynchronous call.
@@ -718,6 +765,122 @@ public abstract class View {
      */
     public void removeRepaintListener(){
         panel.repaintListener = null;
+    }
+
+    void repaintCursor(){
+        panel.repaintASAP = true;
+        panel.updateCursorOnly = true;
+    }
+
+    /** Ask for the view to repaint its back buffer, mainly for internal use */
+    public void repaintBack(){
+        panel.repaintASAP = true;
+        panel.repaintBack = true;
+        if (!panel.drawPortalsOffScreen) {
+            panel.repaintPortals = true;
+        }
+    }
+
+    void repaintPortals(){
+        // portal buffer mode remark:
+        // any way it is the portal that decide if it repaints itself
+     
+        // but a portal call that when it is moved so that it is at least moved
+        panel.repaintASAP = true;
+        panel.repaintPortals = true;
+        if (!panel.drawPortalsOffScreen) { 
+            panel.repaintBack = true;
+        }
+    }
+
+    /** For internal use */
+    void repaint(VirtualSpace vs){
+        panel.repaintASAP = true;
+        boolean foundAnOverlayVS = false;
+        if (overlayCameras != null){
+            for (Camera c : overlayCameras){
+                if (c.getOwningSpace() == vs){
+                    panel.repaintOverlay = true;
+                    foundAnOverlayVS = true;
+                    break;
+                }
+            }
+        }
+        if (!foundAnOverlayVS)
+        {
+            // check if this vs belong to a portal vs
+            boolean rps = false;
+            for(int i = 0; i < portals.length; i++){
+                rps = rps || portals[i].checkSetRepaint(vs);
+                // do not break because we have to informs the portal...
+            }
+            panel.repaintPortals = panel.repaintPortals || rps;
+            // check if this vs belong to the "back" vs's
+            boolean rpb = false;
+            for(Camera c : cameras){
+                if (c.parentSpace == vs){
+                    rpb = true;
+                    break;
+                }
+            }
+            panel.repaintBack = panel.repaintBack || rpb;
+            if (!panel.drawPortalsOffScreen) { 
+                panel.repaintBack = panel.repaintBack || panel.repaintPortals;
+                panel.repaintPortals = panel.repaintBack || panel.repaintPortals;
+            }
+        }
+    }
+
+    void repaint(Camera cam){
+        panel.repaintASAP = true;
+        boolean foundAnOverlayCam = false;
+        if (overlayCameras != null){
+            for (Camera c : overlayCameras){
+                if (c == cam){
+                    panel.repaintOverlay = true;
+                    foundAnOverlayCam = true;
+                    break;
+                }
+            }
+        }
+        if (!foundAnOverlayCam) {
+            // check if this cam belong to the portal vs
+            boolean rps = false;
+            for(int i = 0; i < portals.length; i++){
+                rps = rps || portals[i].checkSetRepaint(cam);
+                // do not break because we have to informs the portal...
+            }
+            panel.repaintPortals = panel.repaintPortals || rps;
+            // check if this cam belong to the "back" cam's
+            boolean rpb = false;
+            for(Camera c : cameras){
+                if (c == cam){
+                    rpb = true;
+                    break;
+                }
+            }
+            panel.repaintBack = panel.repaintBack || rpb;
+            if (!panel.drawPortalsOffScreen) { 
+                panel.repaintBack = panel.repaintBack || panel.repaintPortals;
+                panel.repaintPortals = panel.repaintBack || panel.repaintPortals;
+            }
+        }
+
+        // a cam can be monitored by a OverviewPortal in an other view...
+        // we call checkRepaintExt below for the other View
+        VirtualSpaceManager.INSTANCE.checkRepaintExt(this, cam);
+    }
+
+    void checkRepaintExt(Camera cam){
+       boolean rps = false;
+        for(int i = 0; i < portals.length; i++){
+            rps = rps || portals[i].checkSetRepaint(cam);
+            // do not break because we have to informs the portal...
+        }
+        panel.repaintPortals = panel.repaintPortals || rps;
+        if (panel.repaintPortals){
+            panel.repaintASAP = true;
+        }
     }
 
     /** Get access to the panel's AWT Graphics object.
@@ -797,7 +960,12 @@ public abstract class View {
      */
     public void setJava2DPainter(Java2DPainter p, short g){
         painters[g] = p;
-        repaint();
+        if (g !=Java2DPainter.AFTER_PORTALS){
+            repaintBack();
+        }
+        else{
+            repaint();
+        }
     }
 
     /** Get the implementation of the paint method (containing Java2D paint instructions) that will be called each time the view is repainted.

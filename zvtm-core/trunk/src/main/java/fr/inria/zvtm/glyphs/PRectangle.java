@@ -94,7 +94,7 @@ public class PRectangle<T> extends VRectangle {
      */
     @Override public void highlight(boolean h, Color unused){
         highlighted = h;
-        VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint(vsOwner);
     }
 
     @Override

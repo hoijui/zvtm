@@ -194,7 +194,7 @@ public class VSwingComponent<T> extends ClosedShape implements RectangularShape 
     public void orientTo(double angle){
         orient = angle;
         updateVSPolygon();
-        VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint(vsOwner);
     }
 
     @Override
@@ -211,7 +211,7 @@ public class VSwingComponent<T> extends ClosedShape implements RectangularShape 
         computeSize();
         scaleFactor = size / Math.sqrt(Math.pow(sc.getWidth(),2)+Math.pow(sc.getHeight(),2));
         updateVSPolygon();
-        VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint(vsOwner);
     }
 
     public void setHeight(double h){
@@ -220,7 +220,7 @@ public class VSwingComponent<T> extends ClosedShape implements RectangularShape 
         computeSize();
         scaleFactor = size / Math.sqrt(Math.pow(sc.getWidth(),2)+Math.pow(sc.getHeight(),2));
         updateVSPolygon();
-        VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint(vsOwner);
     }
 
     public double getWidth(){return vw;}
@@ -234,7 +234,7 @@ public class VSwingComponent<T> extends ClosedShape implements RectangularShape 
         vh = size / (Math.sqrt(ar*ar+1));
         scaleFactor = size / Math.sqrt(Math.pow(sc.getWidth(),2)+Math.pow(sc.getHeight(),2));
         updateVSPolygon();
-        VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint(vsOwner);
     }
 
     @Override
@@ -244,7 +244,7 @@ public class VSwingComponent<T> extends ClosedShape implements RectangularShape 
         vh = size / (Math.sqrt(ar*ar+1));
         scaleFactor = size / Math.sqrt(Math.pow(sc.getWidth(),2)+Math.pow(sc.getHeight(),2));
         updateVSPolygon();
-        VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint(vsOwner);
     }
 
     void updateVSPolygon(){
@@ -278,7 +278,7 @@ public class VSwingComponent<T> extends ClosedShape implements RectangularShape 
         ar = vw / vh;
         computeSize();
         updateVSPolygon();
-        VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint(vsOwner);
     }
 
     /** Get the Swing component displayed. */
@@ -293,7 +293,7 @@ public class VSwingComponent<T> extends ClosedShape implements RectangularShape 
     public void setZoomSensitive(boolean b){
         if (zoomSensitive != b){
             zoomSensitive = b;
-            VirtualSpaceManager.INSTANCE.repaint();
+            VirtualSpaceManager.INSTANCE.repaint(vsOwner);
         }
     }
 

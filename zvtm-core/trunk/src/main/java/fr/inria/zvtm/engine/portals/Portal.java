@@ -10,12 +10,18 @@
 
 package fr.inria.zvtm.engine.portals;
 
+import java.util.Vector;
+
 import java.awt.Graphics2D;
 import java.awt.Dimension;
+import java.awt.image.BufferedImage;
+import java.awt.AlphaComposite;
 
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.event.PortalListener;
 import fr.inria.zvtm.engine.VirtualSpaceManager;
+import fr.inria.zvtm.engine.VirtualSpace;
+import fr.inria.zvtm.engine.Camera;
 
 public abstract class Portal {
 
@@ -34,6 +40,19 @@ public abstract class Portal {
     /** View embedding this portal. */
     View owningView;
 
+    boolean repaintASAP=false;
+    Vector<VirtualSpace> usedSpaces = null;
+    Vector<Camera> usedCameras = null;
+
+    /** Double Buffering uses a BufferedImage as the back buffer. */
+    protected BufferedImage backBuffer = null;
+    protected int buffx;
+    protected int buffy;
+    protected AlphaComposite alphaC;
+
+    boolean antialias;
+    boolean updateFont;
+
     /** Handles events occuring inside the portal. */
     PortalListener pevH;
 
@@ -42,6 +61,38 @@ public abstract class Portal {
 
 	boolean visible = true;
 
+    void repaint(boolean redraw){
+        repaintASAP = repaintASAP || redraw;
+        if (owningView != null)
+            VirtualSpaceManager.INSTANCE.repaintPortals(owningView);
+    }
+
+    public boolean checkSetRepaint(VirtualSpace vs){
+        if (usedSpaces == null) return false;
+        for (VirtualSpace uvs : usedSpaces) {
+            if (uvs == vs){
+                repaintASAP=true;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean checkSetRepaint(Camera cam){
+        if (usedCameras == null) return false;
+        for (Camera c : usedCameras) {
+            if (c == cam){
+                repaintASAP=true;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void updateFont(){
+        updateFont=true;
+    } 
+
     /** Move the portal inside the view (relative).
      *@param dx x-offset (JPanel coordinates system)
      *@param dy y-offset (JPanel coordinates system)
@@ -49,8 +100,7 @@ public abstract class Portal {
     public void move(int dx, int dy){
         x += dx;
         y += dy;
-        if (owningView != null)
-        	VirtualSpaceManager.INSTANCE.repaint(owningView);
+        repaint(false);
     }
 
     /** Move the portal inside the view (absolute).
@@ -60,8 +110,7 @@ public abstract class Portal {
     public void moveTo(int x, int y){
         this.x = x;
         this.y = y;
-        if (owningView != null)
-        	VirtualSpaceManager.INSTANCE.repaint(owningView);
+        repaint(false);
     }
 
     /** Set the portal's size (multiplication factor). */
@@ -69,8 +118,7 @@ public abstract class Portal {
         w += dw;
         h += dh;
         updateDimensions();
-        if (owningView != null)
-        	VirtualSpaceManager.INSTANCE.repaint(owningView);
+        repaint(true);
     }
 
     /** Set the portal's size (absolute value). */
@@ -93,6 +141,10 @@ public abstract class Portal {
     /**CALLED INTERNALLY - NOT FOR PUBLIC USE*/
     public void setOwningView(View v){
 	    this.owningView = v;
+        if (v!=null){
+            antialias = v.getAntialiasing();
+            // v.setDrawPortalsOffScreen(true);  FIXME !
+        }
     }
 
     /** Get the view embedding this portal. */
@@ -174,14 +226,28 @@ public abstract class Portal {
     /** Show/hide this portal. */
 	public void setVisible(boolean b){
 		visible = b;
-        if (owningView != null)
-        	VirtualSpaceManager.INSTANCE.repaint(owningView);
+        repaint(true);
 	}
 
 	/** Tells wether this portal is currently visible or not. */
 	public boolean isVisible(){
 		return visible;
 	}
+
+    public BufferedImage getBufferImage(){
+         return backBuffer;
+    }
+
+    public int getBufferX(){
+        return buffx;
+    }
+    public int getBufferY(){
+        return buffy;
+    }
+
+    public AlphaComposite getAlphaComposite(){
+        return alphaC;
+    }
 
     public abstract void paint(Graphics2D g2d, int viewWidth, int viewHeight);
 

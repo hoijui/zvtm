@@ -162,7 +162,7 @@ public class SCFLinearLens extends FSLinearLens implements TemporalLens {
                 // make the lens almost flat when making big moves
                 dMM = nMM;
                 this.setDynamicMagnification();
-                owningView.parent.repaint();
+                owningView.parent.repaintBack();
                 if (tpl != null){tpl.parameterUpdated();}
             }
         }
@@ -171,7 +171,7 @@ public class SCFLinearLens extends FSLinearLens implements TemporalLens {
     void setDynamicMagnification(){
 	a = (1-dMM)/(float)(LR1 - LR2);
 	b = (dMM*LR1-LR2)/(float)(LR1 - LR2);
-	owningView.parent.repaint();
+	owningView.parent.repaintBack();
     }
 
     public void setCutoffFrequencyParameters(double a, double b){

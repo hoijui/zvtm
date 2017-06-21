@@ -169,7 +169,7 @@ public class VTextLayout<T> extends VText {
                 carets = tl.getCaretShapes(insertionIndex);
             }
         }
-        VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint(vsOwner);
     }
 
     /** Get the caret's position within the string.
@@ -236,7 +236,7 @@ public class VTextLayout<T> extends VText {
                 highlighter = tl.getLogicalHighlightShape(firstEndPoint, secondEndPoint);
             }
         }
-        VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint(vsOwner);
     }
 
     /** Force computation of text's bounding box at next call to draw().
@@ -632,7 +632,7 @@ public class VTextLayout<T> extends VText {
      */
     public void setFont(Font f){
         if (f!=null){font=f;fontSize=font.getSize2D();}else{font=null;fontSize=getMainFont().getSize2D();}
-        VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint(vsOwner);
         invalidate();
     }
 

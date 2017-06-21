@@ -85,7 +85,7 @@ public class VPolygonOr<T> extends VPolygon {
         this.orient = angle;
         updateOrient();
         updateVSPolygon();
-    	VirtualSpaceManager.INSTANCE.repaint();
+    	VirtualSpaceManager.INSTANCE.repaint(vsOwner);
     }
 
     void updateOrient(){
@@ -117,7 +117,7 @@ public class VPolygonOr<T> extends VPolygon {
         size *= 2;
         updateOrient();
         updateVSPolygon();
-        VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint(vsOwner);
     }
 
     void updateVSPolygon(){

@@ -10,6 +10,8 @@
 
 package fr.inria.zvtm.engine.portals;
 
+import java.util.Vector;
+
 import java.awt.Color;
 import java.awt.Stroke;
 import java.awt.Graphics2D;
@@ -39,6 +41,17 @@ public class DraggableCameraPortal extends CameraPortal {
 	    super(x, y, w, h, cam);
     }
 
+    /** Builds a new portal displaying what is seen through a camera
+     *@param x top-left horizontal coordinate of portal, in parent's JPanel coordinates
+     *@param y top-left vertical coordinate of portal, in parent's JPanel coordinates
+     *@param w portal width
+     *@param h portal height
+     *@param cams camera associated with the portal
+     */
+    public DraggableCameraPortal(int x, int y, int w, int h, Vector<Camera> cams){
+        super(x, y, w, h, cams, 1f);
+    }
+    
     /** Builds a new portal displaying what is seen through a camera
      *@param x top-left horizontal coordinate of portal, in parent's JPanel coordinates
      *@param y top-left vertical coordinate of portal, in parent's JPanel coordinates
@@ -84,17 +97,20 @@ public class DraggableCameraPortal extends CameraPortal {
     }
 
     @Override
-    void paintPortalFrame(Graphics2D g2d, Stroke standardStroke){
+    void paintPortalFrame(Graphics2D g2d, int viewWidth, int viewHeight, int tx, int ty){
         g2d.setColor(barColor);
-        g2d.fillRect(x, y, w, barHeight+(int)halfBorderWidth);
+        g2d.fillRect(x-tx+backBufferTX+(int)borderWidth, y-ty+backBufferTY+(int)borderWidth, w-2*(int)borderWidth, barHeight);
+        //g2d.fillRect(x, y, w, barHeight+(int)halfBorderWidth);
         if (borderColor != null){
             if (stroke != null){
                 g2d.setStroke(stroke);
             }
             g2d.setColor(borderColor);
             g2d.drawRect(x, y, w, h);
+            g2d.drawRect(x-tx+backBufferTX+borderWidthXYOff, y-ty+backBufferTY+borderWidthXYOff, w-borderWidthWHOff, h-borderWidthWHOff);
             g2d.setStroke(standardStroke);
         }
+        g2d.setClip(0, 0, viewWidth, viewHeight);
         if (alphaC != null){
             g2d.setComposite(Translucent.acO);
         }

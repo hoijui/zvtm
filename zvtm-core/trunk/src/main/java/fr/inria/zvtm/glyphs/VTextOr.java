@@ -110,7 +110,7 @@ public class VTextOr<T> extends VText {
     public void orientTo(double angle){
     orient = angle;
     invalidate();
-    VirtualSpaceManager.INSTANCE.repaint();
+    VirtualSpaceManager.INSTANCE.repaint(vsOwner);
     }
 
     @Override

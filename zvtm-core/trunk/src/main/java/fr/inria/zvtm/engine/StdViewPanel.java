@@ -35,6 +35,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.HierarchyEvent;
 import java.awt.event.HierarchyListener;
 import java.awt.image.BufferedImage;
+import java.awt.AlphaComposite;
 import javax.swing.Timer;
 import javax.swing.JPanel;
 
@@ -43,7 +44,10 @@ import java.util.Vector;
 
 import fr.inria.zvtm.glyphs.VText;
 import fr.inria.zvtm.event.ViewListener;
+import fr.inria.zvtm.glyphs.Translucent;
 
+import fr.inria.zvtm.engine.portals.Portal;
+import fr.inria.zvtm.engine.portals.CameraPortal;
 
 /**
  * JPanel used to paint the content of a view (all camera layers).
@@ -70,6 +74,10 @@ public class StdViewPanel extends ViewPanel {
     private Graphics2D backBufferGraphics = null;
     Dimension oldSize;
     Graphics2D lensG2D = null;
+
+    /** overlay buffer. */
+    protected  BufferedImage overlayBuffer;
+    private Graphics2D overlayBufferGraphics = null;
 
     protected Timer edtTimer = null;
 
@@ -101,6 +109,8 @@ public class StdViewPanel extends ViewPanel {
         for (int i=0;i<visibilityPadding.length;i++){
             Arrays.fill(visibilityPadding[i], 0);
         }
+        zeroVisibilityPadding = new int[4];
+        Arrays.fill(zeroVisibilityPadding, 0);
         drawInLens = new boolean[cams.length];
         drawInContext = new boolean[cams.length];
         Arrays.fill(drawInLens, true);
@@ -137,10 +147,29 @@ public class StdViewPanel extends ViewPanel {
                         g.drawString(String.format("FPS=%.2f",fps), 50, 50 );
                         g.setColor(currentColor);
                     }
-                    else                   
+                    else {              
                         g.drawImage(backBuffer, 0, 0, panel);
-
+                    }
                 }
+                // draw the offscreen portal here !
+                for (int i=0;i<parent.portals.length;i++){
+                    Portal p = parent.portals[i];
+                    BufferedImage bi = p.getBufferImage();
+                    if (bi != null){
+                        AlphaComposite ac = p.getAlphaComposite();
+                        if (ac != null){
+                            ((Graphics2D)g).setComposite(ac);
+                        }
+                        g.drawImage(bi, p.getBufferX(), p.getBufferY(), panel);
+                        if (ac != null){
+                            ((Graphics2D)g).setComposite(Translucent.acO);
+                        }
+                    }     
+                 }
+                if (overlayBuffer != null){
+                    g.drawImage(overlayBuffer, 0, 0, panel);
+                }
+                // FIXME: paint the zvtm cursor here ??
             }
         };
 
@@ -155,6 +184,7 @@ public class StdViewPanel extends ViewPanel {
 
     private void start(){
         backBufferGraphics = null;
+        overlayBufferGraphics = null;
         if (edtTimer!=null) edtTimer.start();
     }
 
@@ -162,6 +192,9 @@ public class StdViewPanel extends ViewPanel {
         if (edtTimer!=null) edtTimer.stop();
         if (stableRefToBackBufferGraphics != null) {
             stableRefToBackBufferGraphics.dispose();
+        }
+        if (stableRefToOverlayBufferGraphics != null) {
+            stableRefToOverlayBufferGraphics.dispose();
         }
     }
 
@@ -181,6 +214,11 @@ public class StdViewPanel extends ViewPanel {
                     lensG2D = null;
                 }
             }
+            overlayBuffer = null;
+            if (overlayBufferGraphics != null) {
+                overlayBufferGraphics.dispose();
+                overlayBufferGraphics = null;
+            }
             if (VirtualSpaceManager.debugModeON()){
                 System.out.println("Resizing JPanel: ("+oldSize.width+"x"+oldSize.height+") -> ("+size.width+"x"+size.height+")");
             }
@@ -199,8 +237,22 @@ public class StdViewPanel extends ViewPanel {
                 backBufferGraphics = null;
             }
         }
+        if (overlayCams != null && overlayBuffer == null){
+            gconf = panel.getGraphicsConfiguration();
+            // assign minimal size of 1
+            overlayBuffer = gconf.createCompatibleImage((size.width > 0) ? size.width : 1, (size.height > 0) ? size.height : 1, BufferedImage.TYPE_INT_ARGB);
+            if (overlayBufferGraphics != null){
+                overlayBufferGraphics.dispose();
+                overlayBufferGraphics = null;
+            }
+        }
         if (backBufferGraphics == null) {
             backBufferGraphics = backBuffer.createGraphics();
+            updateAntialias=true;
+            updateFont=true;
+        }
+        if (overlayCams != null && overlayBufferGraphics == null) {
+            overlayBufferGraphics = overlayBuffer.createGraphics();
             updateAntialias=true;
             updateFont=true;
         }
@@ -216,6 +268,9 @@ public class StdViewPanel extends ViewPanel {
         }
         if (updateFont){
             backBufferGraphics.setFont(VText.getMainFont());
+            if (overlayBufferGraphics != null){
+                overlayBufferGraphics.setFont(VText.getMainFont());
+            }
             if (lensG2D != null){
                 lensG2D.setFont(VText.getMainFont());
             }
@@ -224,12 +279,18 @@ public class StdViewPanel extends ViewPanel {
         if (updateAntialias){
             if (antialias){
                 backBufferGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                if (overlayBufferGraphics != null){
+                    overlayBufferGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                }
                 if (lensG2D != null){
                     lensG2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 }
             }
             else {
                 backBufferGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+                if (overlayBufferGraphics != null){
+                    overlayBufferGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
+                }
                 if (lensG2D != null){
                     lensG2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
                 }
@@ -237,8 +298,83 @@ public class StdViewPanel extends ViewPanel {
             updateAntialias = false;
         }
         stableRefToBackBufferGraphics = backBufferGraphics;
+        stableRefToOverlayBufferGraphics = overlayBufferGraphics;
         standardStroke=stableRefToBackBufferGraphics.getStroke();
         standardTransform=stableRefToBackBufferGraphics.getTransform();
+    }
+
+
+    private void drawCam(Camera cam, Graphics2D stableRef, int[] visPad, boolean drawLens, boolean dInLens, boolean dInContext)
+    {
+        if (!((cam!=null) && (cam.enabled) && ((cam.eager) || (cam.shouldRepaint())))) {
+            return;
+        }
+        camIndex=cam.getIndex();
+        drawnGlyphs=cam.parentSpace.getDrawnGlyphs(camIndex);
+        drawnGlyphs.removeAllElements();
+        double uncoef = (cam.focal+cam.altitude) / cam.focal;
+        //compute region seen from this view through camera
+        double viewW = size.width;
+        double viewH = size.height;
+        double viewWC = cam.vx - (viewW/2-visPad[0]) * uncoef;
+        double viewNC = cam.vy + (viewH/2-visPad[1]) * uncoef;
+        double viewEC = cam.vx + (viewW/2-visPad[2]) * uncoef;
+        double viewSC = cam.vy - (viewH/2-visPad[3]) * uncoef;
+        double lviewWC = 0;
+        double lviewNC = 0;
+        double lviewEC = 0;
+        double lviewSC = 0;
+        double lensVx = 0;
+        double lensVy = 0;
+        if (drawLens && dInLens){
+            lviewWC = cam.vx + (lens.lx-lens.lensWidth/2) * uncoef;
+            lviewNC = cam.vy + (-lens.ly+lens.lensHeight/2) * uncoef;
+            lviewEC = cam.vx + (lens.lx+lens.lensWidth/2) * uncoef;
+            lviewSC = cam.vy + (-lens.ly-lens.lensHeight/2) * uncoef;
+            lensVx = (lviewWC+lviewEC) / 2d;
+            lensVy = (lviewSC+lviewNC) / 2d;
+        }
+        gll = cam.parentSpace.getDrawingList();
+        for (int i=0;i<gll.length;i++){
+            if (gll[i] != null){
+                if (gll[i].visibleInViewport(viewWC, viewNC, viewEC, viewSC, cam)){
+                    /* if glyph is at least partially visible in the reg. seen from this view,
+                       compute in which buffer it should be rendered: */
+                    /* always draw in the main buffer */
+                    if (dInContext){
+                        gll[i].project(cam, size);
+                        if (gll[i].isVisible()){
+                            gll[i].draw(stableRef, size.width, size.height, cam.getIndex(),
+                                    standardStroke, standardTransform, 0, 0);
+                        }
+                    }
+                    if (drawLens && dInLens){
+                        if (gll[i].visibleInViewport(lviewWC, lviewNC, lviewEC, lviewSC, cam)){
+                            /* partially within the region seen through the lens
+                               draw it in both buffers */
+                            gll[i].projectForLens(cam, lens.mbw, lens.mbh, lens.getMaximumMagnification(), lensVx, lensVy);
+                            if (gll[i].isVisibleThroughLens()){
+                                gll[i].drawForLens(lensG2D, lens.mbw, lens.mbh, cam.getIndex(),
+                                        standardStroke, standardTransform, 0, 0);
+                            }
+                        }
+                    }
+                    /* notifying outside of above test because glyph sensitivity is not
+                       affected by glyph visibility when managed through Glyph.setVisible() */
+                    cam.parentSpace.drewGlyph(gll[i], camIndex);
+                }
+            }
+        }
+    }
+
+    private void drawOverlay(){
+        if (stableRefToOverlayBufferGraphics == null) { return; }         
+        stableRefToOverlayBufferGraphics.setComposite(AlphaComposite.getInstance(AlphaComposite.CLEAR));
+        stableRefToOverlayBufferGraphics.fillRect(0, 0, size.width,size.height);
+        stableRefToOverlayBufferGraphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
+        for (int nbcam=0;nbcam<overlayCams.length;nbcam++){
+            drawCam(overlayCams[nbcam], stableRefToOverlayBufferGraphics, zeroVisibilityPadding , false, false, true);
+        }
     }
 
     private void drawScene(boolean drawLens){
@@ -251,64 +387,7 @@ public class StdViewPanel extends ViewPanel {
             lensG2D.clearRect(0, 0, lens.mbw, lens.mbh);
         }
         for (int nbcam=0;nbcam<cams.length;nbcam++){
-            if ((cams[nbcam]!=null) && (cams[nbcam].enabled) && ((cams[nbcam].eager) || (cams[nbcam].shouldRepaint()))){
-                camIndex=cams[nbcam].getIndex();
-                drawnGlyphs=cams[nbcam].parentSpace.getDrawnGlyphs(camIndex);
-                drawnGlyphs.removeAllElements();
-                double uncoef = (cams[nbcam].focal+cams[nbcam].altitude) / cams[nbcam].focal;
-                //compute region seen from this view through camera
-                double viewW = size.width;
-                double viewH = size.height;
-                double viewWC = cams[nbcam].vx - (viewW/2-visibilityPadding[nbcam][0]) * uncoef;
-                double viewNC = cams[nbcam].vy + (viewH/2-visibilityPadding[nbcam][1]) * uncoef;
-                double viewEC = cams[nbcam].vx + (viewW/2-visibilityPadding[nbcam][2]) * uncoef;
-                double viewSC = cams[nbcam].vy - (viewH/2-visibilityPadding[nbcam][3]) * uncoef;
-                double lviewWC = 0;
-                double lviewNC = 0;
-                double lviewEC = 0;
-                double lviewSC = 0;
-                double lensVx = 0;
-                double lensVy = 0;
-                if (drawLens && drawInLens[nbcam]){
-                    lviewWC = cams[nbcam].vx + (lens.lx-lens.lensWidth/2) * uncoef;
-                    lviewNC = cams[nbcam].vy + (-lens.ly+lens.lensHeight/2) * uncoef;
-                    lviewEC = cams[nbcam].vx + (lens.lx+lens.lensWidth/2) * uncoef;
-                    lviewSC = cams[nbcam].vy + (-lens.ly-lens.lensHeight/2) * uncoef;
-                    lensVx = (lviewWC+lviewEC) / 2d;
-                    lensVy = (lviewSC+lviewNC) / 2d;
-                }
-                gll = cams[nbcam].parentSpace.getDrawingList();
-                for (int i=0;i<gll.length;i++){
-                    if (gll[i] != null){
-                        if (gll[i].visibleInViewport(viewWC, viewNC, viewEC, viewSC, cams[nbcam])){
-                            /* if glyph is at least partially visible in the reg. seen from this view,
-                               compute in which buffer it should be rendered: */
-                            /* always draw in the main buffer */
-                            if (drawInContext[nbcam]){
-                                gll[i].project(cams[nbcam], size);
-                                if (gll[i].isVisible()){
-                                    gll[i].draw(stableRefToBackBufferGraphics, size.width, size.height, cams[nbcam].getIndex(),
-                                            standardStroke, standardTransform, 0, 0);
-                                }
-                            }
-                            if (drawLens && drawInLens[nbcam]){
-                                if (gll[i].visibleInViewport(lviewWC, lviewNC, lviewEC, lviewSC, cams[nbcam])){
-                                    /* partially within the region seen through the lens
-                                       draw it in both buffers */
-                                    gll[i].projectForLens(cams[nbcam], lens.mbw, lens.mbh, lens.getMaximumMagnification(), lensVx, lensVy);
-                                    if (gll[i].isVisibleThroughLens()){
-                                        gll[i].drawForLens(lensG2D, lens.mbw, lens.mbh, cams[nbcam].getIndex(),
-                                                standardStroke, standardTransform, 0, 0);
-                                    }
-                                }
-                            }
-                            /* notifying outside of above test because glyph sensitivity is not
-                               affected by glyph visibility when managed through Glyph.setVisible() */
-                            cams[nbcam].parentSpace.drewGlyph(gll[i], camIndex);
-                        }
-                    }
-                }
-            }
+            drawCam(cams[nbcam], stableRefToBackBufferGraphics, visibilityPadding[nbcam], drawLens, drawInLens[nbcam], drawInContext[nbcam]);
         }
         foregroundHook();
         if(drawLens){
@@ -359,6 +438,19 @@ public class StdViewPanel extends ViewPanel {
         }
 
     }
+    
+     void eraseCursor(){
+        try {
+            if (drawVTMcursor){
+                stableRefToBackBufferGraphics.setXORMode(backColor);
+                stableRefToBackBufferGraphics.setColor(parent.mouse.color);
+                stableRefToBackBufferGraphics.drawLine(parent.mouse.jpx-parent.mouse.size,parent.mouse.jpy,parent.mouse.jpx+parent.mouse.size,parent.mouse.jpy);
+                stableRefToBackBufferGraphics.drawLine(parent.mouse.jpx,parent.mouse.jpy-parent.mouse.size,parent.mouse.jpx,parent.mouse.jpy+parent.mouse.size);
+                panel.paintImmediately(0,0,size.width,size.height);
+            }
+        }
+        catch (NullPointerException ex47){if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.runview.drawVTMcursor "+ex47);}}
+    }
 
     private void doCursorPicking(){
         try {
@@ -375,12 +467,19 @@ public class StdViewPanel extends ViewPanel {
     public void drawOffscreen() {
         oldSize = panel.getSize();
         if (notBlank){
-            if (repaintable){
-                if (repaintASAP){
-                    try {
-                        repaintASAP=false; //do this first as the thread can be interrupted inside
-                        //this branch and we want to catch new requests for repaint
-                        updateCursorOnly=false;
+            if (repaintable && repaintASAP){
+                try {
+                    repaintASAP=false; //do this first as the thread can be interrupted inside
+                    //this branch and we want to catch new requests for repaint
+                    boolean rb = repaintBack;
+                    repaintBack = false;
+                    boolean rps = repaintPortals;
+                    repaintPortals = false;
+                    boolean ro = repaintOverlay;
+                    repaintOverlay = false;
+                    boolean uco = updateCursorOnly;
+                    updateCursorOnly=false;
+                    if (rb) {
                         updateOffscreenBuffer();
                         stableRefToBackBufferGraphics.setPaintMode();
                         stableRefToBackBufferGraphics.setBackground(backColor);
@@ -393,36 +492,22 @@ public class StdViewPanel extends ViewPanel {
                             drawScene(false);
                         }
                         afterLensHook();
+                    }
+                    if (rps){
                         drawPortals();
-                        portalsHook();
-                        if (cursor_inside){
-                            //deal with mouse glyph only if mouse cursor is inside this window
-                            doCursorPicking();
+                        portalsHook();   
+                    }
+                    if (ro){
+                        drawOverlay();
+                    }
+                    if (cursor_inside && (rb || uco)){
+                        // FIXME: paint the zvtm cursor in JPanel.paint
+                        //deal with mouse glyph only if mouse cursor is inside this window
+                        if (uco) doCursorPicking();
+                        if (rb){
                             drawCursor();
                         }
-                        //end drawing here
-                        if (stableRefToBackBufferGraphics == backBufferGraphics) {
-                            panel.paintImmediately(0,0,size.width,size.height);
-                            if (repaintListener != null){repaintListener.viewRepainted(StdViewPanel.this.parent);}
-                            synchronized(this){
-                                lastButOneRepaint = lastRepaint;
-                                lastRepaint = System.currentTimeMillis();
-                                delay = lastRepaint - lastButOneRepaint;
-                            }
-                        }
-                    }
-                    catch (NullPointerException ex0){
-                        if (VirtualSpaceManager.debugModeON()){
-                            System.err.println("viewpanel.run (probably due to backBuffer.createGraphics()) "+ex0);
-                            ex0.printStackTrace();
-                        }
-                    }
-                }
-                else if (updateCursorOnly){
-                    updateCursorOnly=false; // do this first as the thread can be interrupted inside this
-                    doCursorPicking();
-                    if (drawVTMcursor){
-                        try {
+                        else{
                             stableRefToBackBufferGraphics.setXORMode(backColor);
                             stableRefToBackBufferGraphics.setColor(parent.mouse.color);
                             stableRefToBackBufferGraphics.drawLine(oldX-parent.mouse.size,oldY,oldX+parent.mouse.size,oldY);
@@ -432,11 +517,23 @@ public class StdViewPanel extends ViewPanel {
                             oldX = parent.mouse.jpx;
                             oldY = parent.mouse.jpy;
                         }
-                        //XXX: a nullpointerex on stableRefToBackBufferGraphics seems to occur from time to time when going in or exiting from blank mode
-                        //just catch it and wait for next loop until we find out what's causing this
-                        catch (NullPointerException ex47){if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.runview.drawVTMcursor "+ex47);}}
                     }
-                    panel.paintImmediately(0,0,size.width,size.height);
+                    //end drawing here
+                    if (stableRefToBackBufferGraphics == backBufferGraphics) {
+                        panel.paintImmediately(0,0,size.width,size.height);
+                        if (repaintListener != null){repaintListener.viewRepainted(StdViewPanel.this.parent);}
+                        synchronized(this){
+                            lastButOneRepaint = lastRepaint;
+                            lastRepaint = System.currentTimeMillis();
+                            delay = lastRepaint - lastButOneRepaint;
+                        }
+                    }
+                }
+                catch (NullPointerException ex0){
+                    if (VirtualSpaceManager.debugModeON()){
+                        System.err.println("viewpanel.run (probably due to backBuffer.createGraphics()) "+ex0);
+                        ex0.printStackTrace();
+                    }
                 }
             }
         }
@@ -446,25 +543,18 @@ public class StdViewPanel extends ViewPanel {
             stableRefToBackBufferGraphics.setPaintMode();
             stableRefToBackBufferGraphics.setColor(blankColor);
             stableRefToBackBufferGraphics.fillRect(0, 0, panel.getWidth(), panel.getHeight());
-            portalsHook();
+            portalsHook(); // ???
+            // FIXME multi buffer rendering should blanks portals in buffer mode...
+            if (stableRefToOverlayBufferGraphics != null){
+                stableRefToOverlayBufferGraphics.setComposite(AlphaComposite.getInstance(AlphaComposite.CLEAR));
+                stableRefToOverlayBufferGraphics.fillRect(0, 0, size.width,size.height);
+            }
             panel.paintImmediately(0,0,size.width,size.height);
             if (repaintListener != null){repaintListener.viewRepainted(StdViewPanel.this.parent);}
         }
     }
 
-    void eraseCursor(){
-        try {
-            if (drawVTMcursor){
-                stableRefToBackBufferGraphics.setXORMode(backColor);
-                stableRefToBackBufferGraphics.setColor(parent.mouse.color);
-                stableRefToBackBufferGraphics.drawLine(parent.mouse.jpx-parent.mouse.size,parent.mouse.jpy,parent.mouse.jpx+parent.mouse.size,parent.mouse.jpy);
-                stableRefToBackBufferGraphics.drawLine(parent.mouse.jpx,parent.mouse.jpy-parent.mouse.size,parent.mouse.jpx,parent.mouse.jpy+parent.mouse.size);
-                panel.paintImmediately(0,0,size.width,size.height);
-            }
-        }
-        catch (NullPointerException ex47){if (VirtualSpaceManager.debugModeON()){System.err.println("viewpanel.run.runview.drawVTMcursor "+ex47);}}
-    }
-
+   
     @Override
     public BufferedImage getImage(){
         return this.backBuffer;

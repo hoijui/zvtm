@@ -173,7 +173,8 @@ public class VirtualSpace {
         g.initCams(cm.cameraList.length);
         visualEnts.add(g);
         addGlyphToDrawingList(g);
-        if (repaint){VirtualSpaceManager.INSTANCE.repaint();}
+        g.setVirtualSpaceOwner(this);
+        if (repaint){VirtualSpaceManager.INSTANCE.repaint(this);}
     }
 
     /** Add glyph g to this virtual space. */
@@ -196,9 +197,10 @@ public class VirtualSpace {
         for(Glyph glyph: glyphs){
             glyph.initCams(cm.cameraList.length);
             visualEnts.add(glyph);
+            glyph.setVirtualSpaceOwner(this);
         }
         addGlyphsToDrawingList(glyphs);
-        if (repaint){VirtualSpaceManager.INSTANCE.repaint();}
+        if (repaint){VirtualSpaceManager.INSTANCE.repaint(this);}
     }
 
     /** Add a list of glyphs to this virtual space.
@@ -309,7 +311,7 @@ public class VirtualSpace {
             removeGlyph((Glyph)entClone.elementAt(i), false);
         }
         if (repaint){
-            VirtualSpaceManager.INSTANCE.repaint();
+            VirtualSpaceManager.INSTANCE.repaint(this);
         }
     }
 
@@ -349,7 +351,7 @@ public class VirtualSpace {
             visualEnts.remove(g);
             removeGlyphFromDrawingList(g);
             if (repaint){
-                VirtualSpaceManager.INSTANCE.repaint();
+                VirtualSpaceManager.INSTANCE.repaint(this);
             }
         }
         catch (NullPointerException ex){
@@ -387,7 +389,7 @@ public class VirtualSpace {
         }
         removeGlyphsFromDrawingList(gs);
         if (repaint){
-            VirtualSpaceManager.INSTANCE.repaint();
+            VirtualSpaceManager.INSTANCE.repaint(this);
         }
     }
 
@@ -409,7 +411,7 @@ public class VirtualSpace {
      *@see #hide(Glyph g)*/
     public void show(Glyph g){
         if (visualEnts.contains(g) && glyphIndexInDrawingList(g) == -1){addGlyphToDrawingList(g);}
-        VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint(this);
     }
 
     /**hide Glyph g
@@ -419,7 +421,7 @@ public class VirtualSpace {
     public void hide(Glyph g){
         removeGlyphFromDrawingList(g);
         notifyPickersAboutGlyphRemoval(g);
-        VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint(this);
     }
 
     void notifyPickersAboutGlyphRemoval(Glyph g){

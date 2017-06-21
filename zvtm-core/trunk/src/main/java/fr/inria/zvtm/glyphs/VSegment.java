@@ -157,7 +157,7 @@ public class VSegment<T> extends Glyph implements RectangularShape {
     public void orientTo(double angle){
         orient = angle;
         updateWidthAndHeight();
-        VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint(vsOwner);
     }
 
     @Override
@@ -183,7 +183,7 @@ public class VSegment<T> extends Glyph implements RectangularShape {
     /** Change the segment's location, size and orientation by giving its two endpoints (absolute coordinates). */
     public void setEndPoints(double x1, double y1, double x2, double y2){
         doSetEndPoints(x1, y1, x2, y2);
-        VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint(vsOwner);
     }
 
     /** Get the segment's two endpoints
@@ -209,33 +209,33 @@ public class VSegment<T> extends Glyph implements RectangularShape {
     public void sizeTo(double s){
         size = s;
         updateWidthAndHeight();
-        VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint(vsOwner);
     }
 
     @Override
     public void reSize(double factor){
         size *= factor;
         updateWidthAndHeight();
-        VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint(vsOwner);
     }
 
     public void setWidth(double w){
         vw = w;
         updateSizeAndOrient();
-        VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint(vsOwner);
     }
 
     public void setHeight(double h){
         vh = h;
         updateSizeAndOrient();
-        VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint(vsOwner);
     }
 
     public void setWidthHeight(double w,double h){
         vw = w;
         vh = h;
         updateSizeAndOrient();
-        VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint(vsOwner);
     }
 
     @Override
@@ -415,7 +415,7 @@ public class VSegment<T> extends Glyph implements RectangularShape {
             }
         }
         if (update){
-        VirtualSpaceManager.INSTANCE.repaint();
+        VirtualSpaceManager.INSTANCE.repaint(vsOwner);
         }
     }
 
