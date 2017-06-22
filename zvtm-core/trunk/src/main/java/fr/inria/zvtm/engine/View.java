@@ -871,7 +871,7 @@ public abstract class View {
         VirtualSpaceManager.INSTANCE.checkRepaintExt(this, cam);
     }
 
-    void checkRepaintExt(Camera cam){
+    public void checkRepaintExt(Camera cam){
        boolean rps = false;
         for(int i = 0; i < portals.length; i++){
             rps = rps || portals[i].checkSetRepaint(cam);
