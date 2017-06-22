@@ -27,6 +27,8 @@ public class ClusteredView extends DefaultIdentifiable {
     private ClusterGeometry clGeom;
     private final ArrayList<Camera> cameras;
     private Color bgColor;
+    private ArrayList<Camera>  overlayCameras = null;
+    private boolean drawPortalsOffScreen = false;
 
     /**
      * Constructs a new ClusteredView.
@@ -157,6 +159,34 @@ public class ClusteredView extends DefaultIdentifiable {
         return new Vector(cameras);
     }
 
+    /** Set the overlay cameras for this clustered view (should be called before the clustered
+    * view is added to the VirtualSpaceManager) 
+    *@param  cams cameras of the overlay
+    */
+    public void setOverlayCameras(Vector<Camera> cameras){
+        this.overlayCameras = new ArrayList<Camera>(cameras);
+    }
+    void removeOverlayCameras(){
+        this.overlayCameras = null;
+    }
+    Vector<Camera> getOverlayCameras(){
+        if (overlayCameras == null) return new Vector<Camera>();
+        return new Vector(overlayCameras);
+    }
+
+    /**Specify whether the portals are rendered with offscreen buffers for this view,
+    * by default thi is not the case (should be called before the clustered
+    * view is added to the VirtualSpaceManager) 
+    *@param  v if true render the portals using offscreen buffers
+    */
+    public void setDrawPortalsOffScreen(boolean v){
+        drawPortalsOffScreen = v;
+    }
+    /**Do the portals are renderered with offscreen buffers? */
+    public boolean getDrawPortalsOffScreen(){
+        return drawPortalsOffScreen;
+    }
+
     /**
      * Tests whether the block 'blockNumber' belongs
      * to this ClusteredView.
@@ -222,7 +252,7 @@ public class ClusteredView extends DefaultIdentifiable {
    // }
 
     boolean ownsCamera(Camera cam){
-        return cameras.contains(cam);
+        return (cameras.contains(cam) || (overlayCameras != null && overlayCameras.contains(cam)));
     }
 
     List<Camera> peekCameras(){

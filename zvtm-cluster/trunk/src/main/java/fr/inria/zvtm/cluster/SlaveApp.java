@@ -5,6 +5,8 @@
  */
 package fr.inria.zvtm.cluster;
 
+import java.util.Vector;
+
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.engine.View;
@@ -16,9 +18,10 @@ import fr.inria.zvtm.engine.portals.Portal;
 import fr.inria.zvtm.engine.portals.CameraPortal;
 import fr.inria.zvtm.engine.StdViewPanel;
 import fr.inria.zvtm.engine.PanelFactory;
-
+import fr.inria.zvtm.engine.portals.OverviewPortal;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.KeyEvent;
@@ -99,7 +102,10 @@ public class SlaveApp {
             view = null;
         }
     }
-
+    boolean ownsBlock(ClusteredView cv){
+        return (cv.ownsBlock(options.blockNumber)); // && cv.getId() == options.id);
+    }
+    
     void createLocalView(ClusteredView cv){
         if (!cv.ownsBlock(options.blockNumber)){
             return;
@@ -116,6 +122,8 @@ public class SlaveApp {
                 false, false, !options.undecorated, null);
         view.setBackgroundColor(cv.getBackgroundColor());
         view.setListener(new SlaveEventHandler());
+        view.setOverlayCameras(cv.getOverlayCameras());
+        view.setDrawPortalOffScreen(cv.getDrawPortalsOffScreen());
         view.getPanel().setRefreshRate(options.refreshPeriod);
         if (options.antialiasing){
             view.setAntialiasing(true);
@@ -168,10 +176,30 @@ public class SlaveApp {
         }
     }
 
-    void setCameraLocation(Location masterLoc,
-            Camera slaveCamera){
+    // not useful for now...
+    // void setOverlayCameras(Vector<Camera> cams, ClusteredView cv){
+    //     if (clusteredView == null || !cv.ownsBlock(options.blockNumber)) { return; }
+    //     clusteredView.setOverlayCameras(cams);
+    //     view.setOverlayCameras(cams);
+    // }
+
+    // void removeOverlayCameras(ClusteredView cv){
+    //     if (clusteredView == null || !cv.ownsBlock(options.blockNumber)) { return; }
+    //     clusteredView.removeOverlayCameras();
+    //     view.removeOverlayCameras();
+    // }
+
+    void setCameraLocation(Location masterLoc, Camera slaveCamera){
         if(clusteredView == null || (!clusteredView.ownsCamera(slaveCamera))){
-            slaveCamera.setLocation(masterLoc);
+            if (slaveCamera != null) {
+                slaveCamera.setLocation(masterLoc);
+            }
+            else{
+                System.out.println("SlaveApp[setCameraLocation] WARN slaveCamera null");
+            }
+            if (view != null){
+                view.checkRepaintExt(slaveCamera);
+            }
             return;
         }
 
@@ -197,6 +225,31 @@ public class SlaveApp {
         slaveCamera.setLocation(new Location(newX, newY, masterLoc.alt));
     }
 
+    void setOverviewPortalObservedViewLocationAndSize(OverviewPortal op){
+        if(clusteredView == null) return; // FIXME own portal ???
+        int virtBlockWidth = clusteredView.getClusterGeometry().getBlockWidth();
+        int virtBlockHeight = clusteredView.getClusterGeometry().getBlockHeight();
+        int row = clusteredView.rowNum(options.blockNumber) ;
+        int col = clusteredView.colNum(options.blockNumber) ;
+        
+        double dx = (col == 0)? 0: (col-1)*virtBlockWidth + virtBlockWidth/2;
+        double dy = (row == 0)? 0: (row-1)*virtBlockHeight + virtBlockHeight/2;
+        op.setObservedViewLocationAndSize(dx, dy, 
+                clusteredView.getClusterGeometry().getWidth(),
+                clusteredView.getClusterGeometry().getHeight());
+    }
+
+    void setPortalLocationAndSize(Portal p, int x, int y, int w, int h) {
+        int virtBlockWidth = clusteredView.getClusterGeometry().getBlockWidth();
+        int virtBlockHeight = clusteredView.getClusterGeometry().getBlockHeight();
+
+        int row = clusteredView.rowNum(options.blockNumber) ;
+        int col = clusteredView.colNum(options.blockNumber) ;
+
+        p.moveTo(x-col*virtBlockWidth,y-row*virtBlockHeight);
+        p.sizeTo(w,h);
+    }
+    
     void setPortalLocation(Portal p, int x, int y, int w, int h) {
         int virtBlockWidth = clusteredView.getClusterGeometry().getBlockWidth();
         int virtBlockHeight = clusteredView.getClusterGeometry().getBlockHeight();
@@ -205,6 +258,20 @@ public class SlaveApp {
         int col = clusteredView.colNum(options.blockNumber) ;
 
         p.moveTo(x-col*virtBlockWidth,y-row*virtBlockHeight);
+        p.sizeTo(w,h);
+    }
+
+    void setPortalLocation(Portal p, int x, int y) {
+        int virtBlockWidth = clusteredView.getClusterGeometry().getBlockWidth();
+        int virtBlockHeight = clusteredView.getClusterGeometry().getBlockHeight();
+
+        int row = clusteredView.rowNum(options.blockNumber) ;
+        int col = clusteredView.colNum(options.blockNumber) ;
+
+        p.moveTo(x-col*virtBlockWidth,y-row*virtBlockHeight);
+    }
+
+    void setPortalSize(Portal p, int w, int h) {
         p.sizeTo(w,h);
     }
 

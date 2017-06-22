@@ -6,6 +6,9 @@
  */
 package fr.inria.zvtm.cluster;
 
+import java.util.ArrayList;
+import java.util.Vector;
+import java.awt.Color;
 
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.VirtualSpace;
@@ -200,6 +203,32 @@ aspect VsmReplication {
     }    
 
    
+    private static final ArrayList<ObjId<Camera>>
+        makeCamRefs(Vector<Camera> cameras){
+            ArrayList<ObjId<Camera>> retval = new ArrayList<ObjId<Camera>>();
+            for(Camera cam: cameras){
+                retval.add(cam.getObjId());
+            }
+            return retval;
+        }
+
+    private static final ArrayList<ObjId<Camera>>
+        makeCamRefs(Camera[] cameras){
+            ArrayList<ObjId<Camera>> retval = new ArrayList<ObjId<Camera>>();
+            for(Camera cam: cameras){
+                retval.add(cam.getObjId());
+            }
+            return retval;
+        }
+
+    private static final Vector<Camera>
+        refsToCameras(SlaveUpdater su, ArrayList<ObjId<Camera>> camRefs){
+            Vector<Camera> retval = new Vector<Camera>();
+            for(ObjId<Camera> camRef: camRefs){
+                retval.add(su.getSlaveObject(camRef));
+            }
+            return retval;
+        }
 
    /** Add a portal to a clustered view. Only subclasses of CameraPortal (e.g.,
     * DraggableCameraPortal, RoundCameraPortal, OverviewPortal) are supported.
@@ -211,7 +240,7 @@ aspect VsmReplication {
             System.out.println("Only subclasses of CameraPortal are supported");
         }
         else {
-            Delta createDelta = new  PortalCreateDelta(p.getReplicator(),  p.getObjId());
+            Delta createDelta = new  PortalCreateDelta(p.getReplicator(),  p.getObjId(), v.getObjId());
             VirtualSpaceManager.INSTANCE.sendDelta(createDelta);
             p.setReplicated(true);  
         }
@@ -228,21 +257,13 @@ aspect VsmReplication {
             this.w = source.w;
             this.h = source.h;
             this.a = source.getTranslucencyValue();
-            camIds = new ArrayList<ObjId<Camera>>(source.getCameras().length);
-            for (Camera camera : source.getCameras()) {
-            	this.camIds.add((ObjId<Camera>)camera.getObjId());
-    		}
+            camIds = makeCamRefs(source.getCameras());
         }
 
         public Portal createPortal(SlaveUpdater updater) {
-            Camera []cams = new Camera[this.camIds.size()];
-            int i=0;
-            for (ObjId<Camera> camId : this.camIds) {
-            	cams[i++] = updater.getSlaveObject(camId);
-            }
-            Portal p = new CameraPortal(x, y, w, h, cams,a);
-            updater.setPortalLocation(p,x, y, w, h);
-            return p;
+            Portal p = new CameraPortal(x, y, w, h, refsToCameras(updater, camIds), a);
+            updater.setPortalLocationAndSize(p, x, y, w, h);
+                        return p;
         }
     }
 
@@ -253,13 +274,8 @@ aspect VsmReplication {
         }
 
         public Portal createPortal(SlaveUpdater updater) {
-            Camera []cams = new Camera[this.camIds.size()];
-            int i=0;
-            for (ObjId<Camera> camId : this.camIds) {
-            	cams[i++] = updater.getSlaveObject(camId);
-            }
-            Portal p = new DraggableCameraPortal(x, y, w, h, cams);
-            updater.setPortalLocation(p,x, y, w, h);
+            Portal p = new DraggableCameraPortal(x, y, w, h, refsToCameras(updater, camIds));
+            updater.setPortalLocationAndSize(p,x, y, w, h);
             return p;
         }
     }
@@ -271,27 +287,25 @@ aspect VsmReplication {
         }
 
         public Portal createPortal(SlaveUpdater updater) {
-            Camera cam = updater.getSlaveObject(this.camIds.get(0));
-            Portal p = new RoundCameraPortal(x, y, w, h, cam);
-            updater.setPortalLocation(p,x, y, w, h);
+            Portal p = new RoundCameraPortal(x, y, w, h, refsToCameras(updater, camIds));
+            updater.setPortalLocationAndSize(p,x, y, w, h);
             return p;
         }
     }
 
     private static class OverviewPortalReplicator extends CameraPortalReplicator {
-        protected final ObjId<Camera> obscamId;
+        protected final ArrayList<ObjId<Camera>> obsCamIds;
 
         OverviewPortalReplicator(OverviewPortal source){
            super(source);
-           obscamId = source.getObservedRegionCamera().getObjId();
+           obsCamIds = makeCamRefs(source.getObservedRegionCameras());
         }
 
         public Portal createPortal(SlaveUpdater updater) {
-            Camera cam = updater.getSlaveObject(this.camIds.get(0));
-            Camera obsCam = updater.getSlaveObject(this.obscamId);
-            Portal p = new OverviewPortal(x, y, w, h, cam, obsCam);
-            updater.setPortalLocation(p,x, y, w, h);
-            return p;
+            OverviewPortal p = new OverviewPortal(x, y, w, h, refsToCameras(updater, camIds), refsToCameras(updater, obsCamIds));
+            updater.setOverviewPortalObservedViewLocationAndSize(p);
+            updater.setPortalLocationAndSize(p,x, y, w, h);
+            return (Portal)p;
         }
     }
 
@@ -318,17 +332,22 @@ aspect VsmReplication {
     private static class PortalCreateDelta implements Delta{
         private final PortalReplicator replicator;
         private final ObjId<Portal> portalId;
+        private final ObjId<ClusteredView> cvId;
 
-        PortalCreateDelta(PortalReplicator replicator, ObjId<Portal> portalId){
+        PortalCreateDelta(PortalReplicator replicator, ObjId<Portal> portalId, ObjId<ClusteredView> cvId){
             this.replicator = replicator;
             this.portalId = portalId;
+            this.cvId = cvId;
         }
 
         public void apply(SlaveUpdater updater){
             //Create Portal Camera
-            Portal p = replicator.createPortal(updater);
-            VirtualSpaceManager.INSTANCE.addPortal(p, updater.getLocalView());
-            updater.putSlaveObject(portalId, p);
+             ClusteredView cv = updater.getSlaveObject(this.cvId);
+            if (updater.ownsBlock(cv)){ 
+                Portal p = replicator.createPortal(updater);
+                VirtualSpaceManager.INSTANCE.addPortal(p, updater.getLocalView());
+                updater.putSlaveObject(portalId, p);
+            }
         }
 
         @Override public String toString(){
@@ -336,6 +355,7 @@ aspect VsmReplication {
         }
     }
 
+    // portal Moved
     pointcut portalMoved(Portal portal) :
     this(portal) &&
     if(VirtualSpaceManager.INSTANCE.isMaster()) &&
@@ -397,8 +417,10 @@ aspect VsmReplication {
 
         public void apply(SlaveUpdater updater){
             Portal p = updater.getSlaveObject(portalId);
-            VirtualSpaceManager.INSTANCE.destroyPortal(p);
-            updater.removeSlaveObject(portalId); 
+            if (p != null){
+                VirtualSpaceManager.INSTANCE.destroyPortal(p);
+                updater.removeSlaveObject(portalId);
+            }
         }
 
         @Override public String toString(){

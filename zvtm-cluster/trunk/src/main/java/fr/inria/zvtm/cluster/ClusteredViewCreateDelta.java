@@ -19,6 +19,8 @@ class ClusteredViewCreateDelta implements Delta {
     private final int viewCols;
     private final int viewRows;
     private final ArrayList<ObjId<Camera>> camRefs;
+    private final boolean drawPortalsOffScreen;
+    private final ArrayList<ObjId<Camera>> overlayCamRefs;
     private final Color bgColor;
 
     ClusteredViewCreateDelta(ClusteredView cv){
@@ -29,6 +31,8 @@ class ClusteredViewCreateDelta implements Delta {
         this.viewRows = cv.getViewRows();
         this.camRefs = makeCamRefs(cv.getCameras());
         this.bgColor = cv.getBackgroundColor();
+        this.overlayCamRefs = makeCamRefs(cv.getOverlayCameras());
+        this.drawPortalsOffScreen = cv.getDrawPortalsOffScreen();
     }
 
     private static final ArrayList<ObjId<Camera>>
@@ -41,9 +45,9 @@ class ClusteredViewCreateDelta implements Delta {
         }
 
     private final Vector<Camera>
-        refsToCameras(SlaveUpdater su){
+        refsToCameras(SlaveUpdater su, ArrayList<ObjId<Camera>> crs){
             Vector<Camera> retval = new Vector<Camera>();
-            for(ObjId<Camera> camRef: camRefs){
+            for(ObjId<Camera> camRef: crs){
                 retval.add(su.getSlaveObject(camRef));
             }
             return retval;
@@ -55,8 +59,10 @@ class ClusteredViewCreateDelta implements Delta {
                 clGeom,
                 origin,
                 viewCols, viewRows,
-                refsToCameras(updater));
+                refsToCameras(updater,camRefs));
         cv.setBackgroundColor(bgColor);
+        cv.setOverlayCameras(refsToCameras(updater, overlayCamRefs));
+        cv.setDrawPortalsOffScreen(drawPortalsOffScreen);
         updater.putSlaveObject(objId, cv);
         //set owning view for cameras
         //ask slaveupdater to create a local view

@@ -6,12 +6,16 @@
  */
 package fr.inria.zvtm.cluster;
 
+import java.util.Vector;
+
 import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.engine.Location;
 import fr.inria.zvtm.engine.VirtualSpace;
 import fr.inria.zvtm.engine.portals.Portal;
 import fr.inria.zvtm.engine.portals.CameraPortal;
+import fr.inria.zvtm.engine.portals.OverviewPortal;
 import fr.inria.zvtm.engine.Location;
+import fr.inria.zvtm.engine.VirtualSpaceManager;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -147,19 +151,48 @@ public class SlaveUpdater {
         return appDelegate.getView();
     }
 
+    public boolean ownsBlock(ClusteredView cv) {
+        return appDelegate.ownsBlock(cv);
+    }
+    
+    // not useful for now
+    // void setOverlayCameras(Vector<Camera> cams, ClusteredView cv){
+    //     appDelegate.setOverlayCameras(cams, cv);
+    //  }
+    // void removeOverlayCameras(ClusteredView cv){
+    //     appDelegate.removeOverlayCameras(cv);
+    // }
+
     void setCameraLocation(Location masterLoc,
             Camera slaveCamera){
         appDelegate.setCameraLocation(masterLoc, slaveCamera);
     }
 
+    void setOverviewPortalObservedViewLocationAndSize(OverviewPortal slavePortal){
+        appDelegate.setOverviewPortalObservedViewLocationAndSize(slavePortal);
+    }
+
+    void setPortalLocationAndSize(Portal slavePortal, int x, int y, int w, int h){
+        appDelegate.setPortalLocationAndSize(slavePortal, x, y, w, h);
+    }
+
+    void setPortalLocation(Portal slavePortal, int x, int y){
+        appDelegate.setPortalLocation(slavePortal, x, y);
+    }
     void setPortalLocation(Portal slavePortal, int x, int y, int w, int h){
         appDelegate.setPortalLocation(slavePortal, x, y, w, h);
+    }
+    void setPortalSize(Portal slavePortal, int w, int h){
+        appDelegate.setPortalSize(slavePortal, w, h);
     }
 
     void portalCameraUpdate(Portal slavePortal, double vx, double vy, double alt)
     {
         CameraPortal cp = (CameraPortal)slavePortal;
-        cp.getCamera().setLocation(new Location(vx, vy, alt));
+        //cp.getCamera().setLocation(new Location(vx, vy, alt));
+        for(Camera cam : cp.getCameras()) {
+            cam.setLocation(new Location(vx, vy, alt));
+        }
     }
 
     void setBackgroundColor(ClusteredView cv, Color bgColor){

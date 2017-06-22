@@ -6,6 +6,9 @@ import java.awt.Graphics;
 import java.awt.Color;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.awt.AlphaComposite;
 import javax.swing.Timer;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,6 +18,8 @@ import java.util.Set;
 import fr.inria.zvtm.engine.View;
 import fr.inria.zvtm.engine.StdViewPanel;
 import fr.inria.zvtm.engine.Camera;
+import fr.inria.zvtm.glyphs.Translucent;
+import fr.inria.zvtm.engine.portals.Portal;
 import fr.inria.zvtm.cluster.SlaveUpdater;
 
 import org.jgroups.Channel;
@@ -58,8 +63,27 @@ public class ClusteredViewPanel extends StdViewPanel implements SyncView {
                             g.drawString(String.format("FPS=%.2f",fps), 50, 50 );
                             g.setColor(currentColor);
                         }
-                        else 
+                        else {              
                             g.drawImage(backBuffer, 0, 0, panel);
+                        }
+                        // draw the offscreen portal here !
+                        for (int i=0;i<parent.portals.length;i++){
+                            Portal p = parent.portals[i];
+                            BufferedImage bi = p.getBufferImage();
+                            if (bi != null){
+                                AlphaComposite ac = p.getAlphaComposite();
+                                if (ac != null){
+                                    ((Graphics2D)g).setComposite(ac);
+                                }
+                                g.drawImage(bi, p.getBufferX(), p.getBufferY(), panel);
+                                if (ac != null){
+                                    ((Graphics2D)g).setComposite(Translucent.acO);
+                                }
+                            }     
+                        }
+                        if (overlayBuffer != null){
+                            g.drawImage(overlayBuffer, 0, 0, panel);
+                        }
                         lockPaint=true;
                     }
                 }
