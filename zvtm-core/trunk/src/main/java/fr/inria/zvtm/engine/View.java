@@ -182,7 +182,7 @@ public abstract class View {
     }
 
     /**portals embedded in this view*/
-    Portal[] portals = new Portal[0];
+    public Portal[] portals = new Portal[0];
 
     /**add a portal to this view*/
     Portal addPortal(Portal p){

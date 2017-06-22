@@ -134,7 +134,7 @@ public class StdViewPanel extends ViewPanel {
             @Override
             public void paint(Graphics g) {
                 if (backBuffer != null){
-
+                    // zvtm-cluster warning: this is override in zvtm-cluster (og sync option)
                     if (displayFPS) {
                         long currentTime = System.nanoTime(); 
                         double fps = (double)(currentTime - lastOffScreenPaintTime);
