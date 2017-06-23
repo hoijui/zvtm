@@ -94,7 +94,7 @@ public class SlaveApp {
     }
 
     void destroyLocalView(ClusteredView cv){
-        if(!cv.ownsBlock(options.blockNumber)){
+        if (!ownsBlock(cv)) {    
             return;
         }
         if(view != null){
@@ -103,11 +103,11 @@ public class SlaveApp {
         }
     }
     boolean ownsBlock(ClusteredView cv){
-        return (cv.ownsBlock(options.blockNumber)); // && cv.getId() == options.id);
+        return (cv.ownsBlock(options.blockNumber) && cv.getId() == options.id);
     }
-    
+
     void createLocalView(ClusteredView cv){
-        if (!cv.ownsBlock(options.blockNumber)){
+        if (!ownsBlock(cv)) {
             return;
         }
         if (view != null){
@@ -115,7 +115,7 @@ public class SlaveApp {
         }
         clusteredView = cv;
         view = vsm.addFrameView(cv.getCameras(),
-                "slaveView " + options.blockNumber,
+                "slaveView " + options.blockNumber +"-"+ cv.getId(),
                 getViewType(),
                 cv.getClusterGeometry().getBlockWidth()*options.width,
                 cv.getClusterGeometry().getBlockHeight()*options.height,
@@ -178,13 +178,13 @@ public class SlaveApp {
 
     // not useful for now...
     // void setOverlayCameras(Vector<Camera> cams, ClusteredView cv){
-    //     if (clusteredView == null || !cv.ownsBlock(options.blockNumber)) { return; }
+    //     if (clusteredView == null || !ownsBlock(cv)) { return; }
     //     clusteredView.setOverlayCameras(cams);
     //     view.setOverlayCameras(cams);
     // }
 
     // void removeOverlayCameras(ClusteredView cv){
-    //     if (clusteredView == null || !cv.ownsBlock(options.blockNumber)) { return; }
+    //     if (clusteredView == null || !ownsBlock(cv)) { return; }
     //     clusteredView.removeOverlayCameras();
     //     view.removeOverlayCameras();
     // }
@@ -281,7 +281,7 @@ public class SlaveApp {
  
     void setBackgroundColor(ClusteredView cv, Color bgColor){
         //find if cv owns the local view.
-        if(!cv.ownsBlock(options.blockNumber)){
+        if(!ownsBlock(cv)) {
             return;
         }
         if(view == null){
@@ -318,6 +318,9 @@ class ClusteredViewPanelFactory implements PanelFactory {
 class SlaveOptions {
     @Option(name = "-b", aliases = {"--block"}, usage = "clustered view block number (slave index)")
         int blockNumber = 0;
+
+     @Option(name = "-i", aliases = {"--id"}, usage = "slave id")
+        int id = 0;   
 
     @Option(name = "-n", aliases = {"--app-name"}, usage = "application name (should match master program)")
         String appName = "zvtmApplication";

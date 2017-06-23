@@ -24,6 +24,7 @@ public class ClusteredView extends DefaultIdentifiable {
     private final int origin; //bottom-left block number
     private final int viewCols;
     private final int viewRows;
+    private final int id;
     private ClusterGeometry clGeom;
     private final ArrayList<Camera> cameras;
     private Color bgColor;
@@ -31,7 +32,7 @@ public class ClusteredView extends DefaultIdentifiable {
     private boolean drawPortalsOffScreen = false;
 
     /**
-     * Constructs a new ClusteredView.
+     * Constructs a new ClusteredView (with identifier 0).
      * @param clGeom cluster geometry
      * @param origin origin (bottom-left) block number
      * @param viewRows number of rows in the view (viewRows <= nbRows)
@@ -41,12 +42,32 @@ public class ClusteredView extends DefaultIdentifiable {
     public ClusteredView(ClusterGeometry clGeom,
             int origin,
             int viewCols, int viewRows,
-            List<Camera> cameras){
+            List<Camera> cameras)
+    {
+        this(clGeom, origin, viewCols, viewRows, cameras, 0);
+    }
+
+    /**
+     * Constructs a new ClusteredView with a given identifier. If you need to use several ClusteredView
+     * use one identifier for each ClusteredView. If different than 0, this identifier should be
+     * specified to the slaves by using the --id option. 
+     * @param clGeom cluster geometry
+     * @param origin origin (bottom-left) block number
+     * @param viewRows number of rows in the view (viewRows <= nbRows)
+     * @param viewCols number of columns in the view (viewCols <= nbCols)
+     * @param cameras a list of cameras observed by this ClusteredView
+     * @param id the identifier of this ClusteredView
+     */
+    public ClusteredView(ClusterGeometry clGeom,
+            int origin,
+            int viewCols, int viewRows,
+            List<Camera> cameras, int id){
         this.clGeom = clGeom;
         this.origin = origin;
         this.viewCols = viewCols;
         this.viewRows = viewRows;
         this.cameras = new ArrayList<Camera>(cameras);
+        this.id = id;
         this.bgColor = Color.DARK_GRAY;
 
         if(origin < 0){
@@ -64,6 +85,9 @@ public class ClusteredView extends DefaultIdentifiable {
     }
 
     public ObjId getObjId(){ return objId; }
+
+    /** return the identifier of this clustered view */ 
+    public int getId(){ return id; }
 
     /**
      * Sets the background color for this ClusteredView.
@@ -146,13 +170,13 @@ public class ClusteredView extends DefaultIdentifiable {
      * this ClusteredView. Note that blocks are ordered column-wise,
      * and block numbers start at zero.
      */
-    int getOrigin() { return origin; }
+    public int getOrigin() { return origin; }
 
-    ClusterGeometry getClusterGeometry(){ return clGeom; }
+    public ClusterGeometry getClusterGeometry(){ return clGeom; }
 
-    int getViewRows() { return viewRows; }
+    public int getViewRows() { return viewRows; }
 
-    int getViewCols() { return viewCols; }
+    public int getViewCols() { return viewCols; }
 
     //vector for compatibility with zvtm views
     Vector<Camera> getCameras(){

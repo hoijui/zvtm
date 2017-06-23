@@ -92,8 +92,36 @@ aspect VsmReplication {
         }
     }
 
+    ClusteredView[] VirtualSpaceManager.allClusteredViews = new ClusteredView[0];
+
+    private void VirtualSpaceManager._addClusteredView(ClusteredView v){
+        ClusteredView[] tmpA = new ClusteredView[allClusteredViews.length+1];
+        System.arraycopy(allClusteredViews, 0, tmpA, 0, allClusteredViews.length);
+        tmpA[allClusteredViews.length] = v;
+        allClusteredViews = tmpA;
+    }
+
+    private void VirtualSpaceManager._destroyClusteredView(int i){
+        ClusteredView[] tmpA = new ClusteredView[allClusteredViews.length-1];
+        if (tmpA.length > 0){
+            System.arraycopy(allClusteredViews, 0, tmpA, 0, i);
+            System.arraycopy(allClusteredViews, i+1, tmpA, i, allClusteredViews.length-i-1);
+        }
+        allClusteredViews = tmpA;
+    }
+    
+    private void VirtualSpaceManager._destroyClusteredView(ClusteredView v){
+        for (int i=0;i<allClusteredViews.length;i++){
+            if (allClusteredViews[i] == v){
+                _destroyClusteredView(i);
+                break;
+            }
+        }
+    }
+
     public void VirtualSpaceManager.addClusteredView(ClusteredView cv){
         sendDelta(new ClusteredViewCreateDelta(cv));
+        _addClusteredView(cv);
 
         //make sure slave receive camera positions once
         for(Camera cam: cv.peekCameras()){
@@ -103,8 +131,17 @@ aspect VsmReplication {
 
     public void VirtualSpaceManager.destroyClusteredView(ClusteredView cv){
         sendDelta(new ClusteredViewDestroyDelta(cv));
+        _destroyClusteredView(cv);
     }
 
+    public ClusteredView VirtualSpaceManager.getClusteredViewById(int id){
+        for (int i=0;i<allClusteredViews.length;i++){
+            if (allClusteredViews[i].getId() == id){
+               return allClusteredViews[i];
+            }
+        }
+        return null;
+     }
 
     //Sync cluster
 
