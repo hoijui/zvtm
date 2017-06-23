@@ -92,7 +92,7 @@ aspect VsmReplication {
         }
     }
 
-    ClusteredView[] VirtualSpaceManager.allClusteredViews = new ClusteredView[0];
+    private ClusteredView[] VirtualSpaceManager.allClusteredViews = new ClusteredView[0];
 
     private void VirtualSpaceManager._addClusteredView(ClusteredView v){
         ClusteredView[] tmpA = new ClusteredView[allClusteredViews.length+1];
@@ -428,7 +428,9 @@ aspect VsmReplication {
 
         public void apply(SlaveUpdater updater){
             Portal p = updater.getSlaveObject(portalId);
-            updater.setPortalLocation(p,x, y, w, h);
+            if (p != null){
+                updater.setPortalLocation(p,x, y, w, h);
+            }
         }
 
         @Override public String toString(){
