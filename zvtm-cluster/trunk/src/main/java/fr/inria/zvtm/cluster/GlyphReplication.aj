@@ -15,6 +15,7 @@ import fr.inria.zvtm.engine.VirtualSpaceManager;
 import fr.inria.zvtm.glyphs.DPath;
 import fr.inria.zvtm.glyphs.Glyph;
 import fr.inria.zvtm.glyphs.PRectangle;
+import fr.inria.zvtm.glyphs.VSegment;
 
 /**
  * Most of these Deltas are (faster) replacements for common operations that
@@ -57,6 +58,20 @@ aspect GlyphReplication {
             }
         }
 
+    pointcut vSegmentSetEndPoints(VSegment vSegment, double sx, double sy, double ex, double ey):
+        execution(public void VSegment.setEndPoints(double, double, double, double))
+        && this(vSegment)
+        && args(sx, sy, ex, ey)
+        && if(VirtualSpaceManager.INSTANCE.isMaster());
+
+    after(VSegment vSegment, double sx, double sy, double ex, double ey) returning:
+       vSegmentSetEndPoints(vSegment, sx, sy, ex, ey) &&
+       !cflowbelow(vSegmentSetEndPoints(VSegment, double, double, double, double)) &&
+       if(vSegment.isReplicated()){
+           Delta delta = new VSegmentSetEndPointsDelta(vSegment.getObjId(), sx, sy, ex, ey);
+           VirtualSpaceManager.INSTANCE.sendDelta(delta);
+       }
+
     pointcut dPathEdit(DPath dPath, Point2D.Double[] coords, boolean absolute):
         execution(public void DPath.edit(Point2D.Double[], boolean))
         && this(dPath)
@@ -72,6 +87,20 @@ aspect GlyphReplication {
            VirtualSpaceManager.INSTANCE.sendDelta(delta);
        }
 
+    pointcut dPathAddSegment(DPath dPath, double x, double y, boolean b):
+        execution(public void DPath.addSegment(double, double, boolean))
+        && this(dPath)
+        && args(x, y, b)
+        && if(VirtualSpaceManager.INSTANCE.isMaster());
+
+    after(DPath dPath, double x, double y, boolean b) returning:
+       dPathAddSegment(dPath, x, y, b) &&
+       !cflowbelow(dPathAddSegment(DPath, double, double, boolean)) &&
+       if(dPath.isReplicated()){
+           Delta delta = new DPathAddSegmentDelta(dPath.getObjId(), x, y, b);
+           VirtualSpaceManager.INSTANCE.sendDelta(delta);
+       }
+    
     pointcut glyphMove(Glyph glyph):
         (execution(public void Glyph.moveTo(double, double)) ||
          execution(public void Glyph.move(double, double)))
@@ -179,6 +208,22 @@ aspect GlyphReplication {
         return new StrokeDelta(targetId, wrapped);
     }
 
+    private static class VSegmentSetEndPointsDelta implements Delta {
+        private final ObjId<VSegment> targetId;
+        private final double sx, sy, ex, ey;
+
+        VSegmentSetEndPointsDelta(ObjId<VSegment> targetId, double sx, double sy, double ex, double ey){
+            this.targetId = targetId;
+            this.sx= sx; this.sy= sy;
+            this.ex= ex; this.ey= ey;
+        }
+
+        public void apply(SlaveUpdater updater){
+            VSegment target = updater.getSlaveObject(targetId);
+            target.setEndPoints(sx, sy, ex, ey);
+        }
+    }
+
     private static class DPathEditDelta implements Delta {
         private final ObjId<DPath> targetId;
         private final Point2D.Double[] coords;
@@ -193,6 +238,23 @@ aspect GlyphReplication {
         public void apply(SlaveUpdater updater){
             DPath target = updater.getSlaveObject(targetId);
             target.edit(coords, absolute);
+        }
+    }
+    
+    private static class DPathAddSegmentDelta implements Delta {
+        private final ObjId<DPath> targetId;
+        private final double x, y;
+        private final boolean b;
+
+        DPathAddSegmentDelta(ObjId<DPath> targetId, double x, double y, boolean b){
+            this.targetId = targetId;
+            this.x= x; this.y= y;
+            this.b = b;;
+        }
+
+        public void apply(SlaveUpdater updater){
+            DPath target = updater.getSlaveObject(targetId);
+            target.addSegment(x, y, b);
         }
     }
 
