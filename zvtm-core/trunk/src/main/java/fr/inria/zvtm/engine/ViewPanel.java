@@ -673,7 +673,7 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
                     parent.mouse.setJPanelCoordinates(e.getX(),e.getY());
                     //we project the mouse cursor wrt the appropriate coord sys
                     //parent.mouse.unProject(cams[activeLayer],this);
-                    parent.repaintCursor(); 
+                    parent.repaintCursor();
                 //translate glyphs sticked to mouse
                 // parent.mouse.propagateMove();
                 // find out is the cursor is inside one (or more) portals
@@ -683,7 +683,8 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
                     if (parent.notifyCursorMoved){
                         evHs[activeLayer].mouseMoved(this, e.getX(), e.getY(), e);
                     }
-                    parent.repaintBack();  // FIXME parent.repaintCursor(); enough ???
+                    // parent.repaintBack();  // FIXME parent.repaintCursor(); enough ???
+                    parent.repaintCursor(); // repaint cursor seems to be enough at this point
                     // if (parent.mouse.isSensitive()){
                     //     if (parent.mouse.getPicker().computePickedGlyphList(evHs[activeLayer], cams[activeLayer], this)){
                     //         parent.repaint();
@@ -734,7 +735,8 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
                 }
                 //assign anyway, even if the current drag command does not want to display a segment
                 curDragx=e.getX();curDragy=e.getY();
-                parent.repaint();  // FIXME parent.repaintCursor(); enough
+                //parent.repaint();  // FIXME:
+                parent.repaintCursor(); // repaint cursor seems to be enough at this point
                 // if (parent.mouse.isSensitive()){
                 //     parent.mouse.getPicker().computePickedGlyphList(evHs[activeLayer],cams[activeLayer],this);
                 // }
