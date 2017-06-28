@@ -71,6 +71,10 @@ public class PortalSceneObserver extends SceneObserver implements CameraListener
         return c.getAltitude();
     }
 
+    public CameraPortal getPortal(){
+        return cp;
+    }
+    
     public void cameraMoved(){
         sm.regUpdater.addEntry(this, new Location(c.vx, c.vy, c.altitude));
     }

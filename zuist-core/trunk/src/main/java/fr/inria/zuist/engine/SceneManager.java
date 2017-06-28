@@ -292,6 +292,10 @@ public class SceneManager {
         }
     }
 
+    public SceneObserver getSceneObserver(int i){
+        if (i <0 || i >= sceneObservers.length) return null;
+        return sceneObservers[i];
+    }
     /* -------------- Scene Management -------------------- */
 
     /**

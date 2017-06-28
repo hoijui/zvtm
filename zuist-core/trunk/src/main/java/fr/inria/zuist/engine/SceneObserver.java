@@ -72,6 +72,10 @@ public abstract class SceneObserver {
         return c;
     }
 
+    public VirtualSpace getVirtualSpace(){
+        return vs;
+    }
+
     public void setPreviousAltitude(double a){
         this.prevAlt = a;
     }
