@@ -231,6 +231,7 @@ public abstract class View {
         }
         tmpP[index] = portals[pindex];
         portals = tmpP;
+        repaintPortals();
         return pindex;
     }
 
