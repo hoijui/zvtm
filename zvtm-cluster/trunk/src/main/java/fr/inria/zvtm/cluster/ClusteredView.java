@@ -29,7 +29,7 @@ public class ClusteredView extends DefaultIdentifiable {
     private final ArrayList<Camera> cameras;
     private Color bgColor;
     private ArrayList<Camera>  overlayCameras = null;
-    private boolean drawPortalsOffScreen = false;
+    private boolean drawPortalOffScreen = false;
 
     /**
      * Constructs a new ClusteredView (with identifier 0).
@@ -203,12 +203,12 @@ public class ClusteredView extends DefaultIdentifiable {
     * view is added to the VirtualSpaceManager) 
     *@param  v if true render the portals using offscreen buffers
     */
-    public void setDrawPortalsOffScreen(boolean v){
-        drawPortalsOffScreen = v;
+    public void setDrawPortalOffScreen(boolean v){
+        drawPortalOffScreen = v;
     }
     /**Do the portals are renderered with offscreen buffers? */
-    public boolean getDrawPortalsOffScreen(){
-        return drawPortalsOffScreen;
+    public boolean getDrawPortalOffScreen(){
+        return drawPortalOffScreen;
     }
 
     /**

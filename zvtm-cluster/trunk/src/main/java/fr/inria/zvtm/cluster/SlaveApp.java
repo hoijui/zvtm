@@ -123,7 +123,7 @@ public class SlaveApp {
         view.setBackgroundColor(cv.getBackgroundColor());
         view.setListener(new SlaveEventHandler());
         view.setOverlayCameras(cv.getOverlayCameras());
-        view.setDrawPortalOffScreen(cv.getDrawPortalsOffScreen());
+        view.setDrawPortalOffScreen(cv.getDrawPortalOffScreen());
         view.getPanel().setRefreshRate(options.refreshPeriod);
         if (options.antialiasing){
             view.setAntialiasing(true);
