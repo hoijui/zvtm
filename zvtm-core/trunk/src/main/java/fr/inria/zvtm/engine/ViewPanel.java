@@ -685,6 +685,9 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
                     }
                     // parent.repaintBack();  // FIXME parent.repaintCursor(); enough ???
                     parent.repaintCursor(); // repaint cursor seems to be enough at this point
+                    if (drawRect || drawDrag || drawOval){
+                        parent.repaintBack();
+                    }
                     // if (parent.mouse.isSensitive()){
                     //     if (parent.mouse.getPicker().computePickedGlyphList(evHs[activeLayer], cams[activeLayer], this)){
                     //         parent.repaint();
@@ -737,6 +740,9 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
                 curDragx=e.getX();curDragy=e.getY();
                 //parent.repaint();  // FIXME:
                 parent.repaintCursor(); // repaint cursor seems to be enough at this point
+                if (drawRect || drawDrag || drawOval){
+                    parent.repaintBack();
+                }
                 // if (parent.mouse.isSensitive()){
                 //     parent.mouse.getPicker().computePickedGlyphList(evHs[activeLayer],cams[activeLayer],this);
                 // }
