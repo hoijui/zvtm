@@ -143,7 +143,7 @@ public abstract class Portal {
 	    this.owningView = v;
         if (v!=null){
             antialias = v.getAntialiasing();
-            // v.setDrawPortalsOffScreen(true);  FIXME !
+            // v.setDrawPortalOffScreen(true);  FIXME !
         }
     }
 

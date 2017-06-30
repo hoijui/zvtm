@@ -110,7 +110,7 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
     volatile boolean repaintPortals=true;
 
     /**should we draw the portals with offscreen buffers */
-    boolean drawPortalsOffScreen = false;
+    boolean drawPortalOffScreen = false;
 
     /**only repaint mouse cursor (using XOR mode)*/
     boolean updateCursorOnly=false;

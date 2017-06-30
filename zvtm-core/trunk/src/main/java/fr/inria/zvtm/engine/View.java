@@ -173,12 +173,12 @@ public abstract class View {
     *@param  v if true render the portals using offscreen buffers
     */
     public void setDrawPortalOffScreen(boolean v){
-        panel.drawPortalsOffScreen = v;
+        panel.drawPortalOffScreen = v;
     }
 
     /**Do the portals are renderered with offscreen buffers? */
     public boolean getDrawPortalOffScreen(){
-        return panel.drawPortalsOffScreen;
+        return panel.drawPortalOffScreen;
     }
 
     /**portals embedded in this view*/
@@ -777,7 +777,7 @@ public abstract class View {
     public void repaintBack(){
         panel.repaintASAP = true;
         panel.repaintBack = true;
-        if (!panel.drawPortalsOffScreen) {
+        if (!panel.drawPortalOffScreen) {
             panel.repaintPortals = true;
         }
     }
@@ -789,7 +789,7 @@ public abstract class View {
         // but a portal call that when it is moved so that it is at least moved
         panel.repaintASAP = true;
         panel.repaintPortals = true;
-        if (!panel.drawPortalsOffScreen) { 
+        if (!panel.drawPortalOffScreen) { 
             panel.repaintBack = true;
         }
     }
@@ -825,7 +825,7 @@ public abstract class View {
                 }
             }
             panel.repaintBack = panel.repaintBack || rpb;
-            if (!panel.drawPortalsOffScreen) { 
+            if (!panel.drawPortalOffScreen) { 
                 panel.repaintBack = panel.repaintBack || panel.repaintPortals;
                 panel.repaintPortals = panel.repaintBack || panel.repaintPortals;
             }
@@ -861,7 +861,7 @@ public abstract class View {
                 }
             }
             panel.repaintBack = panel.repaintBack || rpb;
-            if (!panel.drawPortalsOffScreen) { 
+            if (!panel.drawPortalOffScreen) { 
                 panel.repaintBack = panel.repaintBack || panel.repaintPortals;
                 panel.repaintPortals = panel.repaintBack || panel.repaintPortals;
             }
