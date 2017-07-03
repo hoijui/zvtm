@@ -189,7 +189,6 @@ public class ImageDescription extends ResourceDescription {
             if (glyph != null){
                 if (fadeOut){
                     glyphsMap.remove(vs);
-                    loadCount--;
                     if ( glyphsMap.size() == 0) {
                         img = null; // flushed in ImageHideAction
                     }
@@ -205,7 +204,6 @@ public class ImageDescription extends ResourceDescription {
                             VImage g = glyphsMap.get(vs);
                             vs.removeGlyph(g);
                             glyphsMap.remove(vs);
-                            loadCount--;
                             if (glyphsMap.size() == 0) {
                                 img.flush();
                                 img = null;
@@ -275,7 +273,6 @@ public class ImageDescription extends ResourceDescription {
     }
 
     private void finishCreatingObject(final SceneManager sm, final VirtualSpace vs, Image i, Glyph vrp, boolean fadeIn){
-        loadCount++;  // = 1
         // fit image in declared "bounding box"
         double sf = Math.min(vw / ((double)i.getWidth(null)), vh / ((double)i.getHeight(null)));
         if (fadeIn){
@@ -292,7 +289,6 @@ public class ImageDescription extends ResourceDescription {
             if (!sensitive){glyph.setSensitivity(false);}
             glyph.setInterpolationMethod(interpolationMethod);
             glyphsMap.put(vs,glyph);
-            loadCount++;
             if (showFeedbackWhenFetching){
                 // remove visual feedback about loading (smoothly)
                 Animation a2 = VirtualSpaceManager.INSTANCE.getAnimationManager().getAnimationFactory().createTranslucencyAnim(GlyphLoader.FADE_OUT_DURATION, vrp,
@@ -321,7 +317,6 @@ public class ImageDescription extends ResourceDescription {
             if (!sensitive){glyph.setSensitivity(false);}
             glyph.setInterpolationMethod(interpolationMethod);
             glyphsMap.put(vs,glyph);
-            loadCount++;
         }
         assert(!SwingUtilities.isEventDispatchThread());
         try{
