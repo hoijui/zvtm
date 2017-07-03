@@ -279,7 +279,13 @@ public class ClusteredView extends DefaultIdentifiable {
         return (cameras.contains(cam) || (overlayCameras != null && overlayCameras.contains(cam)));
     }
 
-    List<Camera> peekCameras(){
-        return Collections.unmodifiableList(cameras);
+    Vector<Camera> peekCameras(){
+        Vector<Camera> col = new Vector<Camera>();
+        col.addAll(cameras);
+        Vector<Camera> ovcs = getOverlayCameras();
+        if (ovcs != null)   {
+            col.addAll(ovcs);
+        }
+        return col;
     }
 }
