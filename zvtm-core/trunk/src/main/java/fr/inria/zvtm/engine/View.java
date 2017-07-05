@@ -748,6 +748,9 @@ public abstract class View {
         panel.repaintBack = true;
         panel.repaintPortals = true;
         panel.repaintOverlay = true;
+        for(int i = 0; i < portals.length; i++){
+            portals[i].repaint(true);
+        }
     }
 
     /** Ask for the view to be repainted. This is an asynchronous call.

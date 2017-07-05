@@ -201,6 +201,14 @@ public class CameraPortal extends Portal {
         return cameras;
     }
 
+    /** Get the main camera at a given index
+    *@param idx the index in the array of cameras*.
+    */
+    public Camera getCamera(int idx){
+        if (idx < 0 || idx >= cameras.length) { return null; }
+        return cameras[idx];
+    }
+    
     /** Get picker associated with this camera portal.*/
     public Picker getPicker(){
         return picker;

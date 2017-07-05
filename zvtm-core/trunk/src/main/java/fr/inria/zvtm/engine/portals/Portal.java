@@ -61,7 +61,7 @@ public abstract class Portal {
 
 	boolean visible = true;
 
-    void repaint(boolean redraw){
+    public void repaint(boolean redraw){
         repaintASAP = repaintASAP || redraw;
         if (owningView != null)
             VirtualSpaceManager.INSTANCE.repaintPortals(owningView);
