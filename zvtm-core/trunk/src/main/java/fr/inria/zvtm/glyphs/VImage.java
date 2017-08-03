@@ -275,8 +275,17 @@ public class VImage<T> extends ClosedShape implements RectangularShape {
 
     @Override
     public boolean coordInsideV(double cvx, double cvy, Camera c){
-        return (cvx>=(vx-vw/2d)) && (cvx<=(vx+vw/2d)) &&
-               (cvy>=(vy-vh/2d)) && (cvy<=(vy+vh/2d));
+        if (!zoomSensitive){
+            double ucoef = (c.focal+c.altitude) / c.focal;
+            double h_uvw = vw * ucoef / 2d;
+            double h_uvh = vh * ucoef / 2d;
+            return (cvx>=(vx-h_uvw)) && (cvx<=(vx+h_uvw)) &&
+                   (cvy>=(vy-h_uvh)) && (cvy<=(vy+h_uvh));
+        }
+        else {
+            return (cvx>=(vx-vw/2d)) && (cvx<=(vx+vw/2d)) &&
+                   (cvy>=(vy-vh/2d)) && (cvy<=(vy+vh/2d));
+        }
     }
 
     @Override
