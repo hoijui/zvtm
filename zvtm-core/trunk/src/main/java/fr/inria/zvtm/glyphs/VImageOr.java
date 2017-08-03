@@ -144,6 +144,7 @@ public class VImageOr<T> extends VImage {
     }
 
     void updateVSPolygon(){
+        //XXX:FIXME this likely won't work for zoom-insensitive VImageOr
         double x1 = -vw/2d;
         double y1 = -vh/2d;
         double x2 = vw/2d;
