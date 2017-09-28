@@ -59,12 +59,12 @@ public class Region {
     static short DEFAULT_F_TRANSITION = APPEAR;
 
     /* Set default transition when none specified.
-     *@param from one of {APPEAR, FADE_IN}
-     *@param to one of {DISAPPEAR, FADE_OUT}
+     *@param comingFrom one of {APPEAR, FADE_IN}
+     *@param goingTo one of {DISAPPEAR, FADE_OUT}
      */
-    public static void setDefaultTransitions(short from, short to){
-        DEFAULT_F_TRANSITION = from;
-        DEFAULT_T_TRANSITION = to;
+    public static void setDefaultTransitions(short comingFrom, short goingTo){
+        DEFAULT_F_TRANSITION = comingFrom;
+        DEFAULT_T_TRANSITION = goingTo;
     }
 
     public static final short ORDERING_ARRAY = 0;
