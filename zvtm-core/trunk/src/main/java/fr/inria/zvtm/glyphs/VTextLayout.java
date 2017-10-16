@@ -277,7 +277,8 @@ public class VTextLayout<T> extends VText {
     }
 
     @Override
-    public boolean visibleInRegion(double wb, double nb, double eb, double sb, int i){
+    public boolean visibleInRegion(double wb, double nb, double eb, double sb, Camera c){
+        int i = c.getIndex();
         if (!validBounds(i)){return true;}
         if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
             //if glyph hotspot is in the region, it is obviously visible
@@ -317,11 +318,12 @@ public class VTextLayout<T> extends VText {
     }
 
     @Override
-    public boolean containedInRegion(double wb, double nb, double eb, double sb, int i){
+    public boolean containedInRegion(double wb, double nb, double eb, double sb, Camera c){
         if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
             /* Glyph hotspot is in the region.
             There is a good chance the glyph is contained in the region, but this is not sufficient. */
             // cw and ch actually hold width and height of text *in virtual space*
+            int i = c.getIndex();
             if (text_anchor==TEXT_ANCHOR_START){
                 if ((vx<=eb) && ((vx+pc[i].cw)>=wb) && (vy<=nb) && ((vy-pc[i].ch)>=sb)){
                     //if glyph is at least partially in region  (we approximate using the glyph bounding circle, meaning that some

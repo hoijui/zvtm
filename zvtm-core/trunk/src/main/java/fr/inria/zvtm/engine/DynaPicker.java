@@ -429,7 +429,7 @@ public class DynaPicker {
     			}
     			// if cursor hotspot is not inside the glyph, check bounding boxes (Glyph's and DynaSpot's),
     			// if they do intersect, peform a finer-grain chec with Areas
-    			else if (g.visibleInRegion(dynawnes[0], dynawnes[1], dynawnes[2], dynawnes[3], c.getIndex()) &&
+    			else if (g.visibleInRegion(dynawnes[0], dynawnes[1], dynawnes[2], dynawnes[3], c) &&
     			 	g.visibleInDisc(cursor.vx, cursor.vy, unprojectedDSRadius, dynaspotVSshape, c.getIndex(), cursor.jpx, cursor.jpy, dynaSpotRadius)){
                     // glyph intersects dynaspot area
                     gida.put(g, null);

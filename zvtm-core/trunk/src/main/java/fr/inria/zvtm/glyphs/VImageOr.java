@@ -173,7 +173,7 @@ public class VImageOr<T> extends VImage {
     }
 
     @Override
-    public boolean visibleInRegion(double wb, double nb, double eb, double sb, int i){
+    public boolean visibleInRegion(double wb, double nb, double eb, double sb, Camera c){
         if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
             /* Glyph hotspot is in the region. The glyph is obviously visible */
             return true;

@@ -191,7 +191,7 @@ public abstract class Glyph<T> implements Cloneable, Translucent {
 
     /*---for repainting------------------------------*/
     protected VirtualSpace vsOwner = null;
-    /** FOR INTERNAL USE ONLY. **/ 
+    /** FOR INTERNAL USE ONLY. **/
     public void setVirtualSpaceOwner(VirtualSpace vs){
         vsOwner = vs;
     }
@@ -657,9 +657,9 @@ public abstract class Glyph<T> implements Cloneable, Translucent {
      *@param nb north region boundary (virtual space coordinates)
      *@param eb east region boundary (virtual space coordinates)
      *@param sb south region boundary (virtual space coordinates)
-     *@param i camera index (useuful only for some glyph classes redefining this method)
+     *@param c camera (useuful only for some glyph classes redefining this method)
      */
-    public boolean visibleInRegion(double wb, double nb, double eb, double sb, int i){
+    public boolean visibleInRegion(double wb, double nb, double eb, double sb, Camera c){
         if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
             /* Glyph hotspot is in the region. The glyph is obviously visible */
             return true;
@@ -674,7 +674,7 @@ public abstract class Glyph<T> implements Cloneable, Translucent {
     }
 
     public boolean visibleInViewport(double wb, double nb, double eb, double sb, Camera c){
-        return visibleInRegion(wb, nb, eb, sb, c.getIndex());
+        return visibleInRegion(wb, nb, eb, sb, c);
     }
 
     /** Method used internally to find out if it is necessary to project and draw the glyph through a lens for a given camera.
@@ -682,10 +682,10 @@ public abstract class Glyph<T> implements Cloneable, Translucent {
      *@param nb north region boundary (virtual space coordinates)
      *@param eb east region boundary (virtual space coordinates)
      *@param sb south region boundary (virtual space coordinates)
-     *@param i camera index (useuful only for some glyph classes redefining this method)
+     *@param c camera  (useuful only for some glyph classes redefining this method)
      *@return true if the glyph intersects the region delimited by wb, nb, eb, sb
      */
-    public boolean containedInRegion(double wb, double nb, double eb, double sb, int i){
+    public boolean containedInRegion(double wb, double nb, double eb, double sb, Camera c){
     if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
         /* Glyph hotspot is in the region.
            There is a good chance the glyph is

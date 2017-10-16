@@ -189,12 +189,13 @@ public class SIRectangle<T> extends ClosedShape implements RectangularShape {
     }
 
     @Override
-    public boolean visibleInRegion(double wb, double nb, double eb, double sb, int i){
+    public boolean visibleInRegion(double wb, double nb, double eb, double sb, Camera c){
     if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
         /* Glyph hotspot is in the region. The glyph is obviously visible */
         return true;
     }
     else {
+        int i = c.getIndex();
         if (((vx-pc[i].cw)<=eb) && ((vx+pc[i].cw)>=wb) && ((vy-pc[i].ch)<=nb) && ((vy+pc[i].ch)>=sb)){
         /* Glyph is at least partially in region.
            We approximate using the glyph bounding box, meaning that some glyphs not
@@ -206,10 +207,11 @@ public class SIRectangle<T> extends ClosedShape implements RectangularShape {
     }
 
     @Override
-    public boolean containedInRegion(double wb, double nb, double eb, double sb, int i){
+    public boolean containedInRegion(double wb, double nb, double eb, double sb, Camera c){
     if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
         /* Glyph hotspot is in the region.
            There is a good chance the glyph is contained in the region, but this is not sufficient. */
+        int i = c.getIndex();
         if (((vx+pc[i].cw)<=eb) && ((vx-pc[i].cw)>=wb) && ((vy+pc[i].ch)<=nb) && ((vy-pc[i].ch)>=sb)){
         return true;
         }

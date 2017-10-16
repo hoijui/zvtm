@@ -728,7 +728,7 @@ public class DPath<T> extends Glyph implements RectangularShape {
     }
 
     @Override
-    public boolean visibleInRegion(double wb, double nb, double eb, double sb, int i){
+    public boolean visibleInRegion(double wb, double nb, double eb, double sb, Camera c){
         if ((vx >= wb) && (vx <= eb) && (vy >= sb) && (vy <= nb)){
             // if glyph hotspot is in the region, we consider it is visible
             return true;
@@ -743,7 +743,7 @@ public class DPath<T> extends Glyph implements RectangularShape {
     }
 
     @Override
-    public boolean containedInRegion(double wb, double nb, double eb, double sb, int i){
+    public boolean containedInRegion(double wb, double nb, double eb, double sb, Camera c){
         if ((vx >= wb) && (vx <= eb) && (vy >= sb) && (vy <= nb)){
             // if glyph hotspot is in the region, we consider it is visible
             return true;

@@ -14,6 +14,7 @@ import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 
+import fr.inria.zvtm.engine.Camera;
 import fr.inria.zvtm.text.PrefixTextShortener;
 import fr.inria.zvtm.text.TextShortener;
 
@@ -85,14 +86,14 @@ public class AdaptiveText<T> extends VText {
      * Since we specify a width and height, visibility rules
      * are easier than the VText ones.
      */
-    @Override public boolean visibleInRegion(double wb, double nb, double eb, double sb, int i){
+    @Override public boolean visibleInRegion(double wb, double nb, double eb, double sb, Camera c){
         return (vx + (vsWidth/2) >= wb &&
                 vx - (vsWidth/2) <= eb &&
                 vy + (vsHeight/2) >= sb &&
                 vy - (vsHeight/2) <= nb);
     }
 
-    @Override public boolean containedInRegion(double wb, double nb, double eb, double sb, int i){
+    @Override public boolean containedInRegion(double wb, double nb, double eb, double sb, Camera c){
         return (vx - (vsWidth/2) >= wb &&
                 vx + (vsWidth/2) <= eb &&
                 vy - (vsHeight/2) >= sb &&

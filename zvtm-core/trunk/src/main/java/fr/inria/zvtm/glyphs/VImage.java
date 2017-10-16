@@ -296,18 +296,32 @@ public class VImage<T> extends ClosedShape implements RectangularShape {
     }
 
     @Override
-    public boolean visibleInRegion(double wb, double nb, double eb, double sb, int i){
+    public boolean visibleInRegion(double wb, double nb, double eb, double sb, Camera c){
         if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
             /* Glyph hotspot is in the region. The glyph is obviously visible */
             return true;
         }
-        else if (((vx-vw)<=eb) && ((vx+vw)>=wb) && ((vy-vh)<=nb) && ((vy+vh)>=sb)){
-            /* Glyph is at least partially in region.
-            We approximate using the glyph bounding box, meaning that some glyphs not
-            actually visible can be projected and drawn (but they won't be displayed)) */
-            return true;
+        else {
+            if (zoomSensitive){
+                if (((vx-vw)<=eb) && ((vx+vw)>=wb) && ((vy-vh)<=nb) && ((vy+vh)>=sb)){
+                    /* Glyph is at least partially in region.
+                    We approximate using the glyph bounding box, meaning that some glyphs not
+                    actually visible can be projected and drawn (but they won't be displayed)) */
+                    return true;
+                }
+                return false;
+            }
+            else {
+                double ucoef = (c.focal+c.altitude) / c.focal;
+                if (((vx-ucoef*vw)<=eb) && ((vx+ucoef*vw)>=wb) && ((vy-ucoef*vh)<=nb) && ((vy+ucoef*vh)>=sb)){
+                    /* Glyph is at least partially in region.
+                    We approximate using the glyph bounding box, meaning that some glyphs not
+                    actually visible can be projected and drawn (but they won't be displayed)) */
+                    return true;
+                }
+                return false;
+            }
         }
-        return false;
     }
 
     @Override

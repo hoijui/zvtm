@@ -241,7 +241,7 @@ public class Composite<T> extends Glyph {
         }
 
     @Override
-        public boolean visibleInRegion(double wb, double nb, double eb, double sb, int i){
+        public boolean visibleInRegion(double wb, double nb, double eb, double sb, Camera c){
             double vw = (bbox[2] - bbox[0])/2d;
             double vh = (bbox[1] - bbox[3])/2d;
             double cx = bbox[0] + vw;
@@ -303,4 +303,3 @@ public class Composite<T> extends Glyph {
     }
 
 }
-

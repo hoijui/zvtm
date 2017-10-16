@@ -123,7 +123,8 @@ public class MultilineText<T> extends VText {
     }
 
     @Override
-    public boolean visibleInRegion(double wb, double nb, double eb, double sb, int i){
+    public boolean visibleInRegion(double wb, double nb, double eb, double sb, Camera c){
+        int i = c.getIndex();
         if (!validBounds(i)){return true;}
         if ((vx>=wb) && (vx<=eb) && (vy>=sb) && (vy<=nb)){
             //if glyph hotspot is in the region, it is obviously visible
@@ -151,7 +152,8 @@ public class MultilineText<T> extends VText {
     }
 
     @Override
-    public boolean containedInRegion(double wb, double nb, double eb, double sb, int i){
+    public boolean containedInRegion(double wb, double nb, double eb, double sb, Camera c){
+        int i = c.getIndex();
         if ((vx>=wb) && (vx<=eb) && (vy <= nb) && (vy >= sb)){
             /* Glyph hotspot is in the region.
                There is a good chance the glyph is contained in the region, but this is not sufficient. */
