@@ -303,7 +303,7 @@ public class VImage<T> extends ClosedShape implements RectangularShape {
         }
         else {
             if (zoomSensitive){
-                if (((vx-vw)<=eb) && ((vx+vw)>=wb) && ((vy-vh)<=nb) && ((vy+vh)>=sb)){
+                if (((vx-vw/2d)<=eb) && ((vx+vw/2d)>=wb) && ((vy-vh/2d)<=nb) && ((vy+vh/2d)>=sb)){
                     /* Glyph is at least partially in region.
                     We approximate using the glyph bounding box, meaning that some glyphs not
                     actually visible can be projected and drawn (but they won't be displayed)) */
@@ -313,7 +313,8 @@ public class VImage<T> extends ClosedShape implements RectangularShape {
             }
             else {
                 double ucoef = (c.focal+c.altitude) / c.focal;
-                if (((vx-ucoef*vw)<=eb) && ((vx+ucoef*vw)>=wb) && ((vy-ucoef*vh)<=nb) && ((vy+ucoef*vh)>=sb)){
+                if (((vx-ucoef*vw/2d)<=eb) && ((vx+ucoef*vw/2d)>=wb) &&
+                    ((vy-ucoef*vh/2d)<=nb) && ((vy+ucoef*vh/2d)>=sb)){
                     /* Glyph is at least partially in region.
                     We approximate using the glyph bounding box, meaning that some glyphs not
                     actually visible can be projected and drawn (but they won't be displayed)) */
