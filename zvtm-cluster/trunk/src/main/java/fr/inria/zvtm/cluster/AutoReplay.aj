@@ -79,6 +79,7 @@ public aspect AutoReplay extends AbstractAutoReplay {
          //execution(public void DPath.addSegment(double, double, boolean)) ||
          execution(public void DPath.addCbCurve(double, double, double, double, double, double, boolean)) ||
          execution(public void DPath.addQdCurve(double, double, double, double, boolean)) ||
+         execution(public void DPath.setOutline(Color,int)) ||
          execution(public void DPath.setDrawingMethod(short)) ||
          //DPath.edit moved to a static Delta (see GlyphReplication)
          //execution(public void DPath.edit(Point2D.Double[], boolean)) ||
