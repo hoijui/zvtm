@@ -563,17 +563,17 @@ public class DPath<T> extends Glyph implements RectangularShape {
     Color borderColor = null;
     BasicStroke outlineStroke = null;
 
-    public void setOutlineColor(Color c){
+    public void setOutline(Color c, int lineWidth){
         if (c != null){
             this.borderColor = c;
             if (stroke != null && stroke instanceof BasicStroke){
                 BasicStroke bs = (BasicStroke)stroke;
-                this.outlineStroke = new BasicStroke(bs.getLineWidth()+2, bs.getEndCap(),
+                this.outlineStroke = new BasicStroke(lineWidth, bs.getEndCap(),
                                 bs.getLineJoin(), bs.getMiterLimit(),
                                 bs.getDashArray(), bs.getDashPhase());
             }
             else {
-                this.outlineStroke = new BasicStroke(3f);
+                this.outlineStroke = new BasicStroke(lineWidth);
             }
         }
         else {
