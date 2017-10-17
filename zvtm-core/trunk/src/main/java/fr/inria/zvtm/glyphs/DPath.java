@@ -20,6 +20,7 @@ import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Shape;
 import java.awt.Stroke;
+import java.awt.BasicStroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.CubicCurve2D;
 import java.awt.geom.Line2D;
@@ -559,25 +560,59 @@ public class DPath<T> extends Glyph implements RectangularShape {
         return drawingMethod;
     }
 
+    Color borderColor = null;
+    BasicStroke outlineStroke = null;
+
+    public void setOutlineColor(Color c){
+        if (c != null){
+            this.borderColor = c;
+            if (stroke != null && stroke instanceof BasicStroke){
+                BasicStroke bs = (BasicStroke)stroke;
+                this.outlineStroke = new BasicStroke(bs.getLineWidth()+2, bs.getEndCap(),
+                                bs.getLineJoin(), bs.getMiterLimit(),
+                                bs.getDashArray(), bs.getDashPhase());
+            }
+            else {
+                this.outlineStroke = new BasicStroke(3f);
+            }
+        }
+        else {
+            this.borderColor = null;
+            this.outlineStroke = null;
+        }
+    }
+
     @Override
     public void draw(Graphics2D g,int vW,int vH,int i,Stroke stdS,AffineTransform stdT, int dx, int dy){
         if (alphaC != null && alphaC.getAlpha() == 0){return;}
-        g.setColor(this.color);
         if (coef*vw >= 1 || coef*vh>=1){
             if (drawingMethod == DPath.DRAW_GENERAL_PATH){
                 AffineTransform atgp = AffineTransform.getTranslateInstance(dx+pc[i].cx,dy+pc[i].cy);
                 atgp.concatenate(AffineTransform.getScaleInstance(coef,coef));
                 g.setTransform(atgp);
                 if (stroke!=null) {
-                    g.setStroke(stroke);
                     if (alphaC != null){
                         // translucent
                         g.setComposite(alphaC);
+                        if (outlineStroke != null){
+                            g.setColor(borderColor);
+                            g.setStroke(outlineStroke);
+                            g.draw(dgp);
+                        }
+                        g.setStroke(stroke);
+                        g.setColor(this.color);
                         g.draw(dgp);
                         g.setComposite(acO);
                     }
                     else {
                         // opaque
+                        if (outlineStroke != null){
+                            g.setColor(borderColor);
+                            g.setStroke(outlineStroke);
+                            g.draw(dgp);
+                        }
+                        g.setStroke(stroke);
+                        g.setColor(this.color);
                         g.draw(dgp);
                     }
                     g.setStroke(stdS);
@@ -586,17 +621,30 @@ public class DPath<T> extends Glyph implements RectangularShape {
                     if (alphaC != null){
                         // translucent
                         g.setComposite(alphaC);
+                        if (outlineStroke != null){
+                            g.setColor(borderColor);
+                            g.setStroke(outlineStroke);
+                            g.draw(dgp);
+                        }
+                        g.setColor(this.color);
                         g.draw(dgp);
                         g.setComposite(acO);
                     }
                     else {
                         // opaque
+                        if (outlineStroke != null){
+                            g.setColor(borderColor);
+                            g.setStroke(outlineStroke);
+                            g.draw(dgp);
+                        }
+                        g.setColor(this.color);
                         g.draw(dgp);
                     }
                 }
                 g.setTransform(stdT);
             }
             else {
+                g.setColor(this.color);
                 if (stroke!=null) {
                     g.translate(dx,dy);
                     g.setStroke(stroke);
