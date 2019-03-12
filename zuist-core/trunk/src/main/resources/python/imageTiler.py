@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 # AUTHOR : Emmanuel Pietriga (emmanuel.pietriga@inria.fr)
-# Copyright (c) INRIA, 2009-2015. All Rights Reserved
+# Copyright (c) INRIA, 2009-2019. All Rights Reserved
 # Licensed under the GNU LGPL. For full terms see the file COPYING.
 
 # $Id$
@@ -15,6 +15,7 @@ import xml.etree.ElementTree as ET
 
 SUCCEEDED_IMPORTING_PIL = True
 SUCCEEDED_IMPORTING_CG = True
+GRAYSCALE = False
 
 # http://developer.apple.com/documentation/GraphicsImaging/Conceptual/drawingwithquartz2d/dq_python/dq_python.html
 try:
@@ -334,9 +335,7 @@ if len(sys.argv) > 2:
                 TRACE_LEVEL = int(arg[4:])
             elif arg == "-cg":
                 USE_CG = True
-                if SUCCEEDED_IMPORTING_CG:
-                    COLOR_SPACE = CGColorSpaceCreateWithName(kCGColorSpaceGenericRGB)
-                else:
+                if not SUCCEEDED_IMPORTING_CG:
                     log("CoreGraphics not available")
                     sys.exit(0)
             elif arg == "-im":
@@ -344,6 +343,8 @@ if len(sys.argv) > 2:
                 if not SUCCEEDED_IMPORTING_PIL:
                     log("PIL not available")
                     sys.exit(0)
+            elif arg == "-gs":
+                GRAYSCALE = True
             elif arg.startswith("-idprefix"):
                 ID_PREFIX = arg[len("-idprefix="):]
             elif arg.startswith("-dx"):
@@ -364,6 +365,12 @@ else:
 
 if USE_CG:
     log("--------------------\nUsing Core Graphics")
+    if GRAYSCALE:
+        COLOR_SPACE = CGColorSpaceCreateWithName(kCGColorSpaceGenericGray)
+        log("Grayscale mode")
+    else:
+        COLOR_SPACE = CGColorSpaceCreateWithName(kCGColorSpaceGenericRGB)
+        log("RGB mode")
 elif USE_GRAPHICSMAGICK:
     log("--------------------\nUsing GraphicsMagick")
 else:
