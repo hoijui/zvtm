@@ -41,7 +41,7 @@
       <repository>
         <id>central</id>
         <name>Maven Repository</name>
-        <url>http://repo1.maven.org/maven2</url>
+        <url>https://repo1.maven.org/maven2</url>
       </repository>
     </repositories>
 
@@ -83,7 +83,7 @@
         <dependency>
           <groupId>org.aspectj</groupId>
           <artifactId>aspectjrt</artifactId>
-          <version>1.8.6</version>
+          <version>1.9.2</version>
           <!-- <version>1.6.5</version> -->
         </dependency>
     </dependencies>
