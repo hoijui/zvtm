@@ -8,3 +8,6 @@ svn diff --new ^/zvtm-core/branches/olivier  --old ^/zvtm-core/trunk > core-diff
 
 cd zvtm-cluster
 svn diff --new ^/zvtm-cluster/branches/olivier  --old ^/zvtm-cluster/trunk > cluster-diff-oc-trunk.txt
+
+cd zuist-core
+svn diff --new ^/zuist-core/branches/olivier  --old ^/zuist-core/trunk > zuist-diff-oc-trunk.txt
