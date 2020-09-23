@@ -371,4 +371,12 @@ public abstract class PieMenuFactory {
         return FONT;
     }
 
+    public static  float getInnerRatio(){
+        return RING_INNER_RATIO;
+    }
+
+    public static void setInnerRatio(float ir){
+        RING_INNER_RATIO = ir;
+    }
+
 }
