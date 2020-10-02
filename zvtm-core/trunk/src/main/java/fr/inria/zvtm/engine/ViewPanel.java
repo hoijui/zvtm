@@ -63,6 +63,8 @@ import java.util.Vector;
  **/
 public abstract class ViewPanel implements MouseListener, MouseMotionListener, MouseWheelListener, ComponentListener {
 
+    static float WHEEL_THRESHOLD = 1;
+
     static final int DEFAULT_DELAY = 20;
 
     /**draw no oval between point where we started dragging the mouse and current point*/
@@ -751,14 +753,35 @@ public abstract class ViewPanel implements MouseListener, MouseMotionListener, M
         catch (NullPointerException ex) {if (VirtualSpaceManager.INSTANCE.debugModeON()){System.err.println("viewpanel.mousedragged "+ex);ex.printStackTrace();}}
     }
 
+    // XXX: HACK to get reasonable number of macOS wheel events when using two fingers on trackpad
+    double wheelAcc = 0;
+
+    public static void setWheelThreshold(float t){
+        WHEEL_THRESHOLD = t;
+    }
+
+    public static float getWheelThreshold(){
+        return WHEEL_THRESHOLD;
+    }
+
     /**send event to application event handler*/
     public void mouseWheelMoved(MouseWheelEvent e){
-	if (evHs[activeLayer] != null){
-	    try {
-		evHs[activeLayer].mouseWheelMoved(this, (e.getWheelRotation() < 0) ? ViewListener.WHEEL_DOWN : ViewListener.WHEEL_UP, e.getX(), e.getY(), e);
+	    if (evHs[activeLayer] != null){
+	        try {
+                wheelAcc += e.getPreciseWheelRotation();
+                if (Math.abs(wheelAcc) >= WHEEL_THRESHOLD){
+                    evHs[activeLayer].mouseWheelMoved(this,
+                        (wheelAcc < 0) ? ViewListener.WHEEL_DOWN : ViewListener.WHEEL_UP,
+                        e.getX(), e.getY(), e);
+                    wheelAcc = 0;
+                }
+	        }
+	        catch (NullPointerException ex) {
+                if (VirtualSpaceManager.INSTANCE.debugModeON()){
+                    System.err.println("viewpanel.mousewheelmoved "+ex);
+                }
+            }
 	    }
-	    catch (NullPointerException ex) {if (VirtualSpaceManager.INSTANCE.debugModeON()){System.err.println("viewpanel.mousewheelmoved "+ex);}}
-	}
     }
 
     /** Get VCursor instance associated with the parent view.
