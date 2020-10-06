@@ -50,8 +50,8 @@ class TIVNavigationManager implements Java2DPainter {
     /* misc. lens settings */
     Lens lens;
     TemporalLens tLens;
-    static int LENS_R1 = 100;
-    static int LENS_R2 = 50;
+    static int LENS_R1 = 150;
+    static int LENS_R2 = 80;
     static final int WHEEL_ANIM_TIME = 50;
     static final int LENS_ANIM_TIME = 300;
     static double DEFAULT_MAG_FACTOR = 4.0;
@@ -90,8 +90,8 @@ class TIVNavigationManager implements Java2DPainter {
 
     /* ---------------- dragmag -----------------------*/
 
-    public static final int DM_PORTAL_WIDTH = 300;
-    public static final int DM_PORTAL_HEIGHT = 300;
+    public static final int DM_PORTAL_WIDTH = 500;
+    public static final int DM_PORTAL_HEIGHT = 500;
     public static final int DM_PORTAL_INITIAL_X_OFFSET = 200;
     public static final int DM_PORTAL_INITIAL_Y_OFFSET = 200;
     public static final int DM_PORTAL_ANIM_TIME = 150;

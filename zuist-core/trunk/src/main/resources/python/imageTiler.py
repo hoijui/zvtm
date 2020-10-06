@@ -68,11 +68,11 @@ OUTPUT_TYPE_JPEG = "jpg"
 OUTPUT_TYPE_TIFF = "tiff"
 OUTPUT_TYPE = OUTPUT_TYPE_PNG
 
-OUTPUT_TYPE2CG = {
-    OUTPUT_TYPE_PNG: kCGImageFormatPNG,
-    OUTPUT_TYPE_JPEG: kCGImageFormatJPEG,
-    OUTPUT_TYPE_TIFF: kCGImageFormatTIFF
-}
+# OUTPUT_TYPE2CG = {
+#     OUTPUT_TYPE_PNG: kCGImageFormatPNG,
+#     OUTPUT_TYPE_JPEG: kCGImageFormatJPEG,
+#     OUTPUT_TYPE_TIFF: kCGImageFormatTIFF
+# }
 
 # camera focal distance
 F = 100.0
@@ -314,7 +314,7 @@ def processSrcImg():
 ################################################################################
 def log(msg, level=0):
     if level <= TRACE_LEVEL:
-        print msg
+        print(msg)
 
 ################################################################################
 # main
